@@ -2,11 +2,11 @@
 #define ZNC_VERSION_H
 
 // The following defines are for #if comparison (preprocessor only likes ints)
-#define VERSION_MAJOR 1
-#define VERSION_MINOR 7
-#define VERSION_PATCH -1
+#define VERSION_MAJOR @ZNC_VERSION_MAJOR@
+#define VERSION_MINOR @ZNC_VERSION_MINOR@
+#define VERSION_PATCH @ZNC_VERSION_PATCH@
 // This one is for display purpose
-#define VERSION_STR "1.7.x"
+#define VERSION_STR "@ZNC_VERSION_STR@"
 // This one is for ZNCModInfo
 #define VERSION (VERSION_MAJOR + VERSION_MINOR / 10.0)
 

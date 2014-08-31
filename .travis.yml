@@ -16,15 +16,12 @@ install:
     - if [[ "$CXX" == "g++" ]]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
     - "echo pkg-config path: [$PKG_CONFIG_PATH]"
 script:
-    - ./bootstrap.sh
     - mkdir build
     - cd build
-    - ../configure --enable-perl --enable-python --enable-tcl --enable-cyrus --enable-charset --with-gtest=/usr/src/gtest
-    - cat config.log
-    - make V=1
-    - make V=1 test
+    - ../configure --enable-perl --enable-python --enable-tcl --enable-cyrus --enable-charset -DGTEST_DIR=/usr/src/gtest
+    - make VERBOSE=1
+    - make VERBOSE=1 test
     - sudo make install
-    - cd ..
 notifications:
     irc:
         channels:

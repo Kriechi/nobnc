@@ -20,11 +20,10 @@
 #include <stdio.h>
 
 bool CDebug::stdoutIsTTY = true;
-bool CDebug::debug =
-#ifdef _DEBUG
-true;
+#ifndef NDEBUG
+bool CDebug::debug = true;
 #else
-false;
+bool CDebug::debug = false;
 #endif
 
 CDebugStream::~CDebugStream()
