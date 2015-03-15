@@ -19,41 +19,6 @@
 #include "nouser.h"
 #include "noznc.h"
 
-CBufLine::CBufLine(const CString& format, const CString& text, const timeval* ts)
-    : m_format(format), m_text(text), m_time()
-{
-    if (!ts)
-        UpdateTime();
-    else
-        m_time = *ts;
-}
-
-CBufLine::~CBufLine()
-{
-}
-
-void CBufLine::UpdateTime()
-{
-    if (!gettimeofday(&m_time, nullptr)) {
-        m_time.tv_sec = time(nullptr);
-        m_time.tv_usec = 0;
-    }
-}
-
-CString CBufLine::GetLine(const CClient& client, const MCString& params) const
-{
-    MCString copy = params;
-
-    if (client.HasServerTime()) {
-        copy["text"] = m_text;
-        CString str = CString::NamedFormat(m_format, copy);
-        return "@time=" + CUtils::FormatServerTime(m_time) + " " + str;
-    } else {
-        copy["text"] = client.GetUser()->AddTimestamp(m_time.tv_sec, m_text);
-        return CString::NamedFormat(m_format, copy);
-    }
-}
-
 CBuffer::CBuffer(unsigned int limit) : m_limit(limit)
 {
 }
@@ -72,13 +37,13 @@ unsigned int CBuffer::AddLine(const CString& format, const CString& text, const 
         m_lines.erase(m_lines.begin());
     }
 
-    m_lines.push_back(CBufLine(format, text, ts));
+    m_lines.push_back(CMessage(format, text, ts));
     return m_lines.size();
 }
 
 unsigned int CBuffer::UpdateLine(const CString& match, const CString& format, const CString& text)
 {
-    for (CBufLine& line : m_lines) {
+    for (CMessage& line : m_lines) {
         if (line.GetFormat().compare(0, match.length(), match) == 0) {
             line.SetFormat(format);
             line.SetText(text);
@@ -92,7 +57,7 @@ unsigned int CBuffer::UpdateLine(const CString& match, const CString& format, co
 
 unsigned int CBuffer::UpdateExactLine(const CString& format, const CString& text)
 {
-    for (const CBufLine& line : m_lines) {
+    for (const CMessage& line : m_lines) {
         if (line.GetFormat() == format && line.GetText() == text) {
             return m_lines.size();
         }
@@ -101,7 +66,7 @@ unsigned int CBuffer::UpdateExactLine(const CString& format, const CString& text
     return AddLine(format, text);
 }
 
-const CBufLine& CBuffer::GetBufLine(unsigned int idx) const
+const CMessage& CBuffer::GetMessage(unsigned int idx) const
 {
     return m_lines[idx];
 }

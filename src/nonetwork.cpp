@@ -623,7 +623,7 @@ void CNetwork::ClientConnected(CClient* pClient)
 
     uSize = m_NoticeBuffer.Size();
     for (uIdx = 0; uIdx < uSize; uIdx++) {
-        const CBufLine& BufLine = m_NoticeBuffer.GetBufLine(uIdx);
+        const CMessage& BufLine = m_NoticeBuffer.GetMessage(uIdx);
         CString sLine = BufLine.GetLine(*pClient, msParams);
         bool bContinue = false;
         NETWORKMODULECALL(OnPrivBufferPlayLine2(*pClient, sLine, BufLine.GetTime()), m_pUser, this, nullptr, &bContinue);

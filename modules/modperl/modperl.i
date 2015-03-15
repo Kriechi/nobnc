@@ -47,6 +47,7 @@
 #include "../include/znc/nodebug.h"
 #include "../include/znc/noexecsock.h"
 #include "../include/znc/nobuffer.h"
+#include "../include/znc/nomessage.h"
 #include "module.h"
 #define stat struct stat
 %}
@@ -102,7 +103,7 @@ typedef std::set<CString> SCString;*/
 class MCString : public std::map<CString, CString> {};
 /*%template(PerlModulesVector) std::vector<CModule*>;*/
 %template(VListeners) std::vector<CListener*>;
-%template(BufLines) std::deque<CBufLine>;
+%template(BufLines) std::deque<CMessage>;
 %template(VVString) std::vector<VCString>;
 
 %typemap(out) std::map<CString, CNick> {
@@ -145,6 +146,7 @@ class MCString : public std::map<CString, CString> {};
 %include "../include/znc/nodebug.h"
 %include "../include/znc/noexecsock.h"
 %include "../include/znc/nobuffer.h"
+%include "../include/znc/nomessage.h"
 
 %include "module.h"
 

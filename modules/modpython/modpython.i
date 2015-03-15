@@ -40,6 +40,7 @@
 #include "../include/znc/nodebug.h"
 #include "../include/znc/noexecsock.h"
 #include "../include/znc/nobuffer.h"
+#include "../include/znc/nomessage.h"
 #include "module.h"
 
 #include "ret.h"
@@ -102,7 +103,7 @@ typedef std::vector<CString> VCString;
 class MCString : public std::map<CString, CString> {};
 %template(PyModulesVector) std::vector<CModule*>;
 %template(VListeners) std::vector<CListener*>;
-%template(BufLines) std::deque<CBufLine>;
+%template(BufLines) std::deque<CMessage>;
 %template(VVString) std::vector<VCString>;
 
 %typemap(in) CString& {
@@ -168,6 +169,7 @@ class MCString : public std::map<CString, CString> {};
 %include "../include/znc/nodebug.h"
 %include "../include/znc/noexecsock.h"
 %include "../include/znc/nobuffer.h"
+%include "../include/znc/nomessage.h"
 
 %include "module.h"
 

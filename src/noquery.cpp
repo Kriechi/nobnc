@@ -53,7 +53,7 @@ void CQuery::SendBuffer(CClient* pClient, const CBuffer& Buffer)
 
                 size_t uSize = Buffer.Size();
                 for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
-                    const CBufLine& BufLine = Buffer.GetBufLine(uIdx);
+                    const CMessage& BufLine = Buffer.GetMessage(uIdx);
 
                     if (!pUseClient->HasSelfMessage()) {
                         CNick Sender(BufLine.GetFormat().Token(0));

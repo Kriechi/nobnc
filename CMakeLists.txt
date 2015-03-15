@@ -25,6 +25,7 @@ list(APPEND ZNC_SOURCES src/nobuffer.cpp
                         src/noircsock.cpp
                         src/nolistener.cpp
                         src/nomd5.cpp
+                        src/nomessage.cpp
                         src/nomodules.cpp
                         src/nonetwork.cpp
                         src/nonick.cpp

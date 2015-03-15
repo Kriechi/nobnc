@@ -175,7 +175,7 @@ public:
 
         size_t uSize = Buffer.Size();
         for (unsigned int uIdx = 0; uIdx < uSize; uIdx++) {
-            const CBufLine& Line = Buffer.GetBufLine(uIdx);
+            const CMessage& Line = Buffer.GetMessage(uIdx);
             timeval ts = Line.GetTime();
             sContent +=
             "@" + CString(ts.tv_sec) + "," + CString(ts.tv_usec) + " " + Line.GetFormat() + "\n" + Line.GetText() + "\n";
