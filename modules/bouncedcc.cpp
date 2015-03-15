@@ -15,7 +15,7 @@
  */
 
 #include <znc/User.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 
 using std::set;
 

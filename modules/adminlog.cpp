@@ -16,7 +16,7 @@
 
 #include <znc/FileUtils.h>
 #include <znc/Server.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 #include <znc/User.h>
 
 #include <syslog.h>

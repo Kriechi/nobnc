@@ -15,7 +15,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 #include <znc/User.h>
 #include <znc/znc.h>
 

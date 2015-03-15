@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "IRCNetwork.h"
+#include "Network.h"
 #include "User.h"
 #include "FileUtils.h"
 #include "Config.h"

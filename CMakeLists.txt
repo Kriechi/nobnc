@@ -22,11 +22,11 @@ list(APPEND ZNC_SOURCES src/Buffer.cpp
                         src/Config.cpp
                         src/FileUtils.cpp
                         src/HTTPSock.cpp
-                        src/IRCNetwork.cpp
                         src/IRCSock.cpp
                         src/Listener.cpp
                         src/MD5.cpp
                         src/Modules.cpp
+                        src/Network.cpp
                         src/Nick.cpp
                         src/Query.cpp
                         src/SHA256.cpp

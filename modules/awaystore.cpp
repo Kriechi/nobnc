@@ -30,7 +30,7 @@
 #define REQUIRESSL
 
 #include <znc/User.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 #include <znc/FileUtils.h>
 
 using std::vector;

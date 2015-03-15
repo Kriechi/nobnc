@@ -18,7 +18,7 @@
  */
 
 #include <znc/User.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 #include <znc/Channel.h>
 #include <znc/IRCSock.h>
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 #include <znc/IRCSock.h>
 
 class CAutoReplyMod : public CModule

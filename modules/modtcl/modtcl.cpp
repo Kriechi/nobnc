@@ -18,7 +18,7 @@
 #include <znc/IRCSock.h>
 #include <znc/Server.h>
 #include <znc/User.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 
 #include <tcl.h>
 

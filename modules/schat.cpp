@@ -23,7 +23,7 @@
 
 #include <znc/FileUtils.h>
 #include <znc/User.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 
 using std::pair;
 using std::stringstream;

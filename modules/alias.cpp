@@ -17,7 +17,7 @@
 #include <znc/Client.h>
 #include <znc/Channel.h>
 #include <znc/Modules.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 
 #include <sstream>
 #include <stdexcept>

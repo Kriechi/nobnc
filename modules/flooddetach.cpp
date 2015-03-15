@@ -15,7 +15,7 @@
  */
 
 #include <znc/Channel.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 
 using std::map;
 

@@ -17,7 +17,7 @@
 #include "Nick.h"
 #include "Channel.h"
 #include "IRCSock.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 
 using std::vector;
 using std::map;

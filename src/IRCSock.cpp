@@ -17,7 +17,7 @@
 #include "IRCSock.h"
 #include "Channel.h"
 #include "User.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 #include "Server.h"
 #include "Query.h"
 

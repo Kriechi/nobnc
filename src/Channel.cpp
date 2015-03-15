@@ -17,7 +17,7 @@
 #include "Channel.h"
 #include "IRCSock.h"
 #include "User.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 #include "Config.h"
 #include "znc.h"
 

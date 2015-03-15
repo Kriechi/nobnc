@@ -17,7 +17,7 @@
 #include "WebModules.h"
 #include "FileUtils.h"
 #include "User.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 #include "znc.h"
 #include <algorithm>
 #include <sstream>

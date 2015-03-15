@@ -19,7 +19,7 @@
 #include "IRCSock.h"
 #include "Server.h"
 #include "User.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 #include "Config.h"
 #include <tuple>
 #include <algorithm>

@@ -18,7 +18,7 @@
 #include "FileUtils.h"
 #include "Template.h"
 #include "User.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 #include "WebModules.h"
 #include "znc.h"
 #include <dlfcn.h>

@@ -17,7 +17,7 @@
 #include "Client.h"
 #include "Channel.h"
 #include "FileUtils.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 #include "IRCSock.h"
 #include "Server.h"
 #include "User.h"

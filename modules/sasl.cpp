@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 #include <znc/IRCSock.h>
 
 static const struct

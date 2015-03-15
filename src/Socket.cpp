@@ -16,7 +16,7 @@
 
 #include "Socket.h"
 #include "User.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 #include "SSLVerifyHost.h"
 #include "znc.h"
 #include <signal.h>

@@ -16,7 +16,7 @@
 
 #include "Query.h"
 #include "User.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 
 using std::vector;
 

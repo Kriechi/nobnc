@@ -26,7 +26,7 @@
 
 #include <znc/Channel.h>
 #include <znc/User.h>
-#include <znc/IRCNetwork.h>
+#include <znc/Network.h>
 #include <znc/FileUtils.h>
 #include <znc/Query.h>
 

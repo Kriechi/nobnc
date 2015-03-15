@@ -18,7 +18,7 @@
 #include "Channel.h"
 #include "IRCSock.h"
 #include "User.h"
-#include "IRCNetwork.h"
+#include "Network.h"
 #include "Query.h"
 
 using std::set;
