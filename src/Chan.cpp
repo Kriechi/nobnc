@@ -37,7 +37,7 @@ CChan::CChan(const CString& sName, CIRCNetwork* pNetwork, bool bInConfig, CConfi
     }
 
     m_Nick.SetNetwork(m_pNetwork);
-    m_Buffer.SetLineCount(m_pNetwork->GetUser()->GetBufferCount(), true);
+    m_Buffer.SetLimit(m_pNetwork->GetUser()->GetBufferCount(), true);
 
     if (pConfig) {
         CString sValue;

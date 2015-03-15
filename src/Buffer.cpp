@@ -52,7 +52,7 @@ CString CBufLine::GetLine(const CClient& client, const MCString& params) const
     }
 }
 
-CBuffer::CBuffer(unsigned int lineCount) : m_lineCount(lineCount)
+CBuffer::CBuffer(unsigned int limit) : m_limit(limit)
 {
 }
 
@@ -62,11 +62,11 @@ CBuffer::~CBuffer()
 
 unsigned int CBuffer::AddLine(const CString& format, const CString& text, const timeval* ts)
 {
-    if (!m_lineCount) {
+    if (!m_limit) {
         return 0;
     }
 
-    while (m_lines.size() >= m_lineCount) {
+    while (m_lines.size() >= m_limit) {
         m_lines.erase(m_lines.begin());
     }
 
@@ -109,16 +109,16 @@ CString CBuffer::GetLine(unsigned int idx, const CClient& client, const MCString
     return m_lines[idx].GetLine(client, params);
 }
 
-bool CBuffer::SetLineCount(unsigned int lineCount, bool force)
+bool CBuffer::SetLimit(unsigned int limit, bool force)
 {
-    if (!force && lineCount > CZNC::Get().GetMaxBufferSize()) {
+    if (!force && limit > CZNC::Get().GetMaxBufferSize()) {
         return false;
     }
 
-    m_lineCount = lineCount;
+    m_limit = limit;
 
     // We may need to shrink the buffer if the allowed size got smaller
-    while (m_lines.size() > m_lineCount) {
+    while (m_lines.size() > m_limit) {
         m_lines.erase(m_lines.begin());
     }
 

@@ -52,7 +52,7 @@ private:
 class CBuffer
 {
 public:
-    CBuffer(unsigned int lineCount = 100);
+    CBuffer(unsigned int limit = 100);
     ~CBuffer();
 
     unsigned int AddLine(const CString& format, const CString& text = "", const timeval* ts = nullptr);
@@ -67,11 +67,11 @@ public:
     bool IsEmpty() const { return m_lines.empty(); }
     void Clear() { m_lines.clear(); }
 
-    unsigned int GetLineCount() const { return m_lineCount; }
-    bool SetLineCount(unsigned int lineCount, bool force = false);
+    unsigned int GetLimit() const { return m_limit; }
+    bool SetLimit(unsigned int limit, bool force = false);
 
 private:
-    unsigned int m_lineCount;
+    unsigned int m_limit;
     std::deque<CBufLine> m_lines;
 };
 

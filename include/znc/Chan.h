@@ -89,15 +89,15 @@ public:
 
     // Buffer
     const CBuffer& GetBuffer() const { return m_Buffer; }
-    unsigned int GetBufferCount() const { return m_Buffer.GetLineCount(); }
+    unsigned int GetBufferCount() const { return m_Buffer.GetLimit(); }
     bool SetBufferCount(unsigned int u, bool bForce = false)
     {
         m_bHasBufferCountSet = true;
-        return m_Buffer.SetLineCount(u, bForce);
+        return m_Buffer.SetLimit(u, bForce);
     }
     void InheritBufferCount(unsigned int u, bool bForce = false)
     {
-        if (!m_bHasBufferCountSet) m_Buffer.SetLineCount(u, bForce);
+        if (!m_bHasBufferCountSet) m_Buffer.SetLimit(u, bForce);
     }
     size_t AddBuffer(const CString& sFormat, const CString& sText = "", const timeval* ts = nullptr)
     {

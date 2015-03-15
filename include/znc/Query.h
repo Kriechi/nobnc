@@ -37,8 +37,8 @@ public:
 
     // Buffer
     const CBuffer& GetBuffer() const { return m_Buffer; }
-    unsigned int GetBufferCount() const { return m_Buffer.GetLineCount(); }
-    bool SetBufferCount(unsigned int u, bool bForce = false) { return m_Buffer.SetLineCount(u, bForce); }
+    unsigned int GetBufferCount() const { return m_Buffer.GetLimit(); }
+    bool SetBufferCount(unsigned int u, bool bForce = false) { return m_Buffer.SetLimit(u, bForce); }
     size_t AddBuffer(const CString& sFormat, const CString& sText = "", const timeval* ts = nullptr)
     {
         return m_Buffer.AddLine(sFormat, sText, ts);

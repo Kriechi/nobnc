@@ -177,7 +177,7 @@ class CWatcherMod : public CModule
 public:
     MODCONSTRUCTOR(CWatcherMod)
     {
-        m_Buffer.SetLineCount(500);
+        m_Buffer.SetLimit(500);
         Load();
     }
 
@@ -337,10 +337,10 @@ public:
             CString sCount = sCommand.Token(1);
 
             if (sCount.size()) {
-                m_Buffer.SetLineCount(sCount.ToUInt());
+                m_Buffer.SetLimit(sCount.ToUInt());
             }
 
-            PutModule("Buffer count is set to [" + CString(m_Buffer.GetLineCount()) + "]");
+            PutModule("Buffer count is set to [" + CString(m_Buffer.GetLimit()) + "]");
         } else if (sCmdName.Equals("DEL")) {
             Remove(sCommand.Token(1).ToUInt());
         } else {
