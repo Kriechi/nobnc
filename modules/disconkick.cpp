@@ -19,26 +19,25 @@
 
 using std::vector;
 
-class CKickClientOnIRCDisconnect: public CModule {
+class CKickClientOnIRCDisconnect : public CModule
+{
 public:
-	MODCONSTRUCTOR(CKickClientOnIRCDisconnect) {}
+    MODCONSTRUCTOR(CKickClientOnIRCDisconnect) {}
 
-	void OnIRCDisconnected() override
-	{
-		const vector<CChan*>& vChans = GetNetwork()->GetChans();
+    void OnIRCDisconnected() override
+    {
+        const vector<CChan*>& vChans = GetNetwork()->GetChans();
 
-		for(vector<CChan*>::const_iterator it = vChans.begin(); it != vChans.end(); ++it)
-		{
-			if((*it)->IsOn()) {
-				PutUser(":ZNC!znc@znc.in KICK " + (*it)->GetName() + " " + GetNetwork()->GetIRCNick().GetNick()
-					+ " :You have been disconnected from the IRC server");
-			}
-		}
-	}
+        for (vector<CChan*>::const_iterator it = vChans.begin(); it != vChans.end(); ++it) {
+            if ((*it)->IsOn()) {
+                PutUser(":ZNC!znc@znc.in KICK " + (*it)->GetName() + " " + GetNetwork()->GetIRCNick().GetNick() +
+                        " :You have been disconnected from the IRC server");
+            }
+        }
+    }
 };
 
-template<> void TModInfo<CKickClientOnIRCDisconnect>(CModInfo& Info) {
-	Info.SetWikiPage("disconkick");
-}
+template <> void TModInfo<CKickClientOnIRCDisconnect>(CModInfo& Info) { Info.SetWikiPage("disconkick"); }
 
-USERMODULEDEFS(CKickClientOnIRCDisconnect, "Kicks the client from all channels when the connection to the IRC server is lost")
+USERMODULEDEFS(CKickClientOnIRCDisconnect,
+               "Kicks the client from all channels when the connection to the IRC server is lost")

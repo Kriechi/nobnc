@@ -20,70 +20,72 @@
 
 using std::vector;
 
-CQuery::CQuery(const CString& sName, CIRCNetwork* pNetwork) : m_sName(sName), m_pNetwork(pNetwork), m_Buffer() {
-	SetBufferCount(m_pNetwork->GetUser()->GetBufferCount(), true);
+CQuery::CQuery(const CString& sName, CIRCNetwork* pNetwork) : m_sName(sName), m_pNetwork(pNetwork), m_Buffer()
+{
+    SetBufferCount(m_pNetwork->GetUser()->GetBufferCount(), true);
 }
 
-CQuery::~CQuery() {
-}
+CQuery::~CQuery() {}
 
-void CQuery::SendBuffer(CClient* pClient) {
-	SendBuffer(pClient, m_Buffer);
-}
+void CQuery::SendBuffer(CClient* pClient) { SendBuffer(pClient, m_Buffer); }
 
-void CQuery::SendBuffer(CClient* pClient, const CBuffer& Buffer) {
-	if (m_pNetwork && m_pNetwork->IsUserAttached()) {
-		// Based on CChan::SendBuffer()
-		if (!Buffer.IsEmpty()) {
-			const vector<CClient*> & vClients = m_pNetwork->GetClients();
-			for (CClient* pEachClient : vClients) {
-				CClient * pUseClient = (pClient ? pClient : pEachClient);
+void CQuery::SendBuffer(CClient* pClient, const CBuffer& Buffer)
+{
+    if (m_pNetwork && m_pNetwork->IsUserAttached()) {
+        // Based on CChan::SendBuffer()
+        if (!Buffer.IsEmpty()) {
+            const vector<CClient*>& vClients = m_pNetwork->GetClients();
+            for (CClient* pEachClient : vClients) {
+                CClient* pUseClient = (pClient ? pClient : pEachClient);
 
-				MCString msParams;
-				msParams["target"] = pUseClient->GetNick();
+                MCString msParams;
+                msParams["target"] = pUseClient->GetNick();
 
-				bool bWasPlaybackActive = pUseClient->IsPlaybackActive();
-				pUseClient->SetPlaybackActive(true);
+                bool bWasPlaybackActive = pUseClient->IsPlaybackActive();
+                pUseClient->SetPlaybackActive(true);
 
-				bool bBatch = pUseClient->HasBatch();
-				CString sBatchName = m_sName.MD5();
+                bool bBatch = pUseClient->HasBatch();
+                CString sBatchName = m_sName.MD5();
 
-				if (bBatch) {
-					m_pNetwork->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + m_sName, pUseClient);
-				}
+                if (bBatch) {
+                    m_pNetwork->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + m_sName, pUseClient);
+                }
 
-				size_t uSize = Buffer.Size();
-				for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
-					const CBufLine& BufLine = Buffer.GetBufLine(uIdx);
+                size_t uSize = Buffer.Size();
+                for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
+                    const CBufLine& BufLine = Buffer.GetBufLine(uIdx);
 
-					if (!pUseClient->HasSelfMessage()) {
-						CNick Sender(BufLine.GetFormat().Token(0));
-						if (Sender.NickEquals(pUseClient->GetNick())) {
-							continue;
-						}
-					}
+                    if (!pUseClient->HasSelfMessage()) {
+                        CNick Sender(BufLine.GetFormat().Token(0));
+                        if (Sender.NickEquals(pUseClient->GetNick())) {
+                            continue;
+                        }
+                    }
 
-					CString sLine = BufLine.GetLine(*pUseClient, msParams);
-					if (bBatch) {
-						MCString msBatchTags = CUtils::GetMessageTags(sLine);
-						msBatchTags["batch"] = sBatchName;
-						CUtils::SetMessageTags(sLine, msBatchTags);
-					}
-					bool bContinue = false;
-					NETWORKMODULECALL(OnPrivBufferPlayLine2(*pUseClient, sLine, BufLine.GetTime()), m_pNetwork->GetUser(), m_pNetwork, nullptr, &bContinue);
-					if (bContinue) continue;
-					m_pNetwork->PutUser(sLine, pUseClient);
-				}
+                    CString sLine = BufLine.GetLine(*pUseClient, msParams);
+                    if (bBatch) {
+                        MCString msBatchTags = CUtils::GetMessageTags(sLine);
+                        msBatchTags["batch"] = sBatchName;
+                        CUtils::SetMessageTags(sLine, msBatchTags);
+                    }
+                    bool bContinue = false;
+                    NETWORKMODULECALL(OnPrivBufferPlayLine2(*pUseClient, sLine, BufLine.GetTime()),
+                                      m_pNetwork->GetUser(),
+                                      m_pNetwork,
+                                      nullptr,
+                                      &bContinue);
+                    if (bContinue) continue;
+                    m_pNetwork->PutUser(sLine, pUseClient);
+                }
 
-				if (bBatch) {
-					m_pNetwork->PutUser(":znc.in BATCH -" + sBatchName, pUseClient);
-				}
+                if (bBatch) {
+                    m_pNetwork->PutUser(":znc.in BATCH -" + sBatchName, pUseClient);
+                }
 
-				pUseClient->SetPlaybackActive(bWasPlaybackActive);
+                pUseClient->SetPlaybackActive(bWasPlaybackActive);
 
-				if (pClient)
-					break;
-			}
-		}
-	}
+                if (pClient) break;
+            }
+        }
+    }
 }

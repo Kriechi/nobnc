@@ -16,32 +16,33 @@
 
 #include <znc/Modules.h>
 
-class CBlockMotd : public CModule {
+class CBlockMotd : public CModule
+{
 public:
-	MODCONSTRUCTOR(CBlockMotd) {
-	}
+    MODCONSTRUCTOR(CBlockMotd) {}
 
-	virtual ~CBlockMotd() {
-	}
+    virtual ~CBlockMotd() {}
 
-	EModRet OnRaw(CString &sLine) override {
-		const CString sCmd = sLine.Token(1);
+    EModRet OnRaw(CString& sLine) override
+    {
+        const CString sCmd = sLine.Token(1);
 
-		if (sCmd == "375" /* begin of MOTD */
-				|| sCmd == "372" /* MOTD */)
-			return HALT;
-		if (sCmd == "376" /* End of MOTD */) {
-			sLine = sLine.Token(0) + " 422 " +
-				sLine.Token(2) + " :MOTD blocked by ZNC";
-		}
-		return CONTINUE;
-	}
+        if (sCmd == "375" /* begin of MOTD */
+            ||
+            sCmd == "372" /* MOTD */)
+            return HALT;
+        if (sCmd == "376" /* End of MOTD */) {
+            sLine = sLine.Token(0) + " 422 " + sLine.Token(2) + " :MOTD blocked by ZNC";
+        }
+        return CONTINUE;
+    }
 };
 
-template<> void TModInfo<CBlockMotd>(CModInfo& Info) {
-	Info.AddType(CModInfo::NetworkModule);
-	Info.AddType(CModInfo::GlobalModule);
-	Info.SetWikiPage("block_motd");
+template <> void TModInfo<CBlockMotd>(CModInfo& Info)
+{
+    Info.AddType(CModInfo::NetworkModule);
+    Info.AddType(CModInfo::GlobalModule);
+    Info.SetWikiPage("block_motd");
 }
 
 USERMODULEDEFS(CBlockMotd, "Block the MOTD from IRC so it's not sent to your client(s).")

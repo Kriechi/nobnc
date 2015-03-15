@@ -16,18 +16,18 @@
 
 #include <znc/Modules.h>
 
-class CAwayNickMod : public CModule {
+class CAwayNickMod : public CModule
+{
 public:
-	MODCONSTRUCTOR(CAwayNickMod) {}
+    MODCONSTRUCTOR(CAwayNickMod) {}
 
-	bool OnLoad(const CString&, CString& sMessage) override {
-		sMessage = "retired module - see http://wiki.znc.in/awaynick";
-		return false;
-	}
+    bool OnLoad(const CString&, CString& sMessage) override
+    {
+        sMessage = "retired module - see http://wiki.znc.in/awaynick";
+        return false;
+    }
 };
 
-template<> void TModInfo<CAwayNickMod>(CModInfo& Info) {
-	Info.SetWikiPage("awaynick");
-}
+template <> void TModInfo<CAwayNickMod>(CModInfo& Info) { Info.SetWikiPage("awaynick"); }
 
 NETWORKMODULEDEFS(CAwayNickMod, "retired module - see http://wiki.znc.in/awaynick")

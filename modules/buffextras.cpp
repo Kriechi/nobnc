@@ -19,64 +19,70 @@
 
 using std::vector;
 
-class CBuffExtras : public CModule {
+class CBuffExtras : public CModule
+{
 public:
-	MODCONSTRUCTOR(CBuffExtras) {}
+    MODCONSTRUCTOR(CBuffExtras) {}
 
-	virtual ~CBuffExtras() {}
+    virtual ~CBuffExtras() {}
 
-	void AddBuffer(CChan& Channel, const CString& sMessage) {
-		// If they have AutoClearChanBuffer enabled, only add messages if no client is connected
-		if (Channel.AutoClearChanBuffer() && GetNetwork()->IsUserOnline())
-			return;
+    void AddBuffer(CChan& Channel, const CString& sMessage)
+    {
+        // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
+        if (Channel.AutoClearChanBuffer() && GetNetwork()->IsUserOnline()) return;
 
-		Channel.AddBuffer(":" + GetModNick() + "!" + GetModName() + "@znc.in PRIVMSG " + _NAMEDFMT(Channel.GetName()) + " :{text}", sMessage);
-	}
+        Channel.AddBuffer(":" + GetModNick() + "!" + GetModName() + "@znc.in PRIVMSG " + _NAMEDFMT(Channel.GetName()) + " :{text}",
+                          sMessage);
+    }
 
-	void OnRawMode2(const CNick* pOpNick, CChan& Channel, const CString& sModes, const CString& sArgs) override {
-		const CString sNickMask = pOpNick ? pOpNick->GetNickMask() : "Server";
-		AddBuffer(Channel, sNickMask + " set mode: " + sModes + " " + sArgs);
-	}
+    void OnRawMode2(const CNick* pOpNick, CChan& Channel, const CString& sModes, const CString& sArgs) override
+    {
+        const CString sNickMask = pOpNick ? pOpNick->GetNickMask() : "Server";
+        AddBuffer(Channel, sNickMask + " set mode: " + sModes + " " + sArgs);
+    }
 
-	void OnKick(const CNick& OpNick, const CString& sKickedNick, CChan& Channel, const CString& sMessage) override {
-		AddBuffer(Channel, OpNick.GetNickMask() + " kicked " + sKickedNick + " Reason: [" + sMessage + "]");
-	}
+    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChan& Channel, const CString& sMessage) override
+    {
+        AddBuffer(Channel, OpNick.GetNickMask() + " kicked " + sKickedNick + " Reason: [" + sMessage + "]");
+    }
 
-	void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChan*>& vChans) override {
-		vector<CChan*>::const_iterator it;
-		CString sMsg = Nick.GetNickMask() + " quit with message: [" + sMessage + "]";
-		for (it = vChans.begin(); it != vChans.end(); ++it) {
-			AddBuffer(**it, sMsg);
-		}
-	}
+    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChan*>& vChans) override
+    {
+        vector<CChan*>::const_iterator it;
+        CString sMsg = Nick.GetNickMask() + " quit with message: [" + sMessage + "]";
+        for (it = vChans.begin(); it != vChans.end(); ++it) {
+            AddBuffer(**it, sMsg);
+        }
+    }
 
-	void OnJoin(const CNick& Nick, CChan& Channel) override {
-		AddBuffer(Channel, Nick.GetNickMask() + " joined");
-	}
+    void OnJoin(const CNick& Nick, CChan& Channel) override { AddBuffer(Channel, Nick.GetNickMask() + " joined"); }
 
-	void OnPart(const CNick& Nick, CChan& Channel, const CString& sMessage) override {
-		AddBuffer(Channel, Nick.GetNickMask() + " parted with message: [" + sMessage + "]");
-	}
+    void OnPart(const CNick& Nick, CChan& Channel, const CString& sMessage) override
+    {
+        AddBuffer(Channel, Nick.GetNickMask() + " parted with message: [" + sMessage + "]");
+    }
 
-	void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChan*>& vChans) override {
-		vector<CChan*>::const_iterator it;
-		CString sMsg = OldNick.GetNickMask() + " is now known as " + sNewNick;
-		for (it = vChans.begin(); it != vChans.end(); ++it) {
-			AddBuffer(**it, sMsg);
-		}
-	}
+    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChan*>& vChans) override
+    {
+        vector<CChan*>::const_iterator it;
+        CString sMsg = OldNick.GetNickMask() + " is now known as " + sNewNick;
+        for (it = vChans.begin(); it != vChans.end(); ++it) {
+            AddBuffer(**it, sMsg);
+        }
+    }
 
-	EModRet OnTopic(CNick& Nick, CChan& Channel, CString& sTopic) override {
-		AddBuffer(Channel, Nick.GetNickMask() + " changed the topic to: " + sTopic);
+    EModRet OnTopic(CNick& Nick, CChan& Channel, CString& sTopic) override
+    {
+        AddBuffer(Channel, Nick.GetNickMask() + " changed the topic to: " + sTopic);
 
-		return CONTINUE;
-	}
+        return CONTINUE;
+    }
 };
 
-template<> void TModInfo<CBuffExtras>(CModInfo& Info) {
-	Info.SetWikiPage("buffextras");
-	Info.AddType(CModInfo::NetworkModule);
+template <> void TModInfo<CBuffExtras>(CModInfo& Info)
+{
+    Info.SetWikiPage("buffextras");
+    Info.AddType(CModInfo::NetworkModule);
 }
 
 USERMODULEDEFS(CBuffExtras, "Add joins, parts etc. to the playback buffer")
-

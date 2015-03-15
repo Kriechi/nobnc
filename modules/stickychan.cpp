@@ -22,202 +22,201 @@ using std::vector;
 class CStickyChan : public CModule
 {
 public:
-	MODCONSTRUCTOR(CStickyChan) {
-		AddHelpCommand();
-		AddCommand("Stick", static_cast<CModCommand::ModCmdFunc>(&CStickyChan::OnStickCommand), "<#channel> [key]", "Sticks a channel");
-		AddCommand("Unstick", static_cast<CModCommand::ModCmdFunc>(&CStickyChan::OnUnstickCommand), "<#channel>", "Unsticks a channel");
-		AddCommand("List", static_cast<CModCommand::ModCmdFunc>(&CStickyChan::OnListCommand), "", "Lists sticky channels");
-	}
-	virtual ~CStickyChan()
-	{
-	}
+    MODCONSTRUCTOR(CStickyChan)
+    {
+        AddHelpCommand();
+        AddCommand("Stick",
+                   static_cast<CModCommand::ModCmdFunc>(&CStickyChan::OnStickCommand),
+                   "<#channel> [key]",
+                   "Sticks a channel");
+        AddCommand("Unstick",
+                   static_cast<CModCommand::ModCmdFunc>(&CStickyChan::OnUnstickCommand),
+                   "<#channel>",
+                   "Unsticks a channel");
+        AddCommand("List",
+                   static_cast<CModCommand::ModCmdFunc>(&CStickyChan::OnListCommand),
+                   "",
+                   "Lists sticky channels");
+    }
+    virtual ~CStickyChan() {}
 
-	bool OnLoad(const CString& sArgs, CString& sMessage) override;
+    bool OnLoad(const CString& sArgs, CString& sMessage) override;
 
-	EModRet OnUserPart(CString& sChannel, CString& sMessage) override
-	{
-		for (MCString::iterator it = BeginNV(); it != EndNV(); ++it)
-		{
-			if (sChannel.Equals(it->first))
-			{
-				CChan* pChan = GetNetwork()->FindChan(sChannel);
+    EModRet OnUserPart(CString& sChannel, CString& sMessage) override
+    {
+        for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {
+            if (sChannel.Equals(it->first)) {
+                CChan* pChan = GetNetwork()->FindChan(sChannel);
 
-				if (pChan)
-				{
-					pChan->JoinUser();
-					return HALT;
-				}
-			}
-		}
+                if (pChan) {
+                    pChan->JoinUser();
+                    return HALT;
+                }
+            }
+        }
 
-		return CONTINUE;
-	}
+        return CONTINUE;
+    }
 
-	virtual void OnMode(const CNick& pOpNick, CChan& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange) override {
-		if (uMode == CChan::M_Key) {
-			if (bAdded) {
-				// We ignore channel key "*" because of some broken nets.
-				if (sArg != "*")
-				{
-					SetNV(Channel.GetName(), sArg, true);
-				}
-			} else {
-				SetNV(Channel.GetName(), "", true);
-			}
-		}
-	}
+    virtual void OnMode(const CNick& pOpNick, CChan& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange) override
+    {
+        if (uMode == CChan::M_Key) {
+            if (bAdded) {
+                // We ignore channel key "*" because of some broken nets.
+                if (sArg != "*") {
+                    SetNV(Channel.GetName(), sArg, true);
+                }
+            } else {
+                SetNV(Channel.GetName(), "", true);
+            }
+        }
+    }
 
-	void OnStickCommand(const CString& sCommand)
-	{
-		CString sChannel = sCommand.Token(1).AsLower();
-		if (sChannel.empty()) {
-			PutModule("Usage: Stick <#channel> [key]");
-			return;
-		}
-		SetNV(sChannel, sCommand.Token(2), true);
-		PutModule("Stuck " + sChannel);
-	}
+    void OnStickCommand(const CString& sCommand)
+    {
+        CString sChannel = sCommand.Token(1).AsLower();
+        if (sChannel.empty()) {
+            PutModule("Usage: Stick <#channel> [key]");
+            return;
+        }
+        SetNV(sChannel, sCommand.Token(2), true);
+        PutModule("Stuck " + sChannel);
+    }
 
-	void OnUnstickCommand(const CString& sCommand) {
-		CString sChannel = sCommand.Token(1);
-		if (sChannel.empty()) {
-			PutModule("Usage: Unstick <#channel>");
-			return;
-		}
-		DelNV(sChannel, true);
-		PutModule("Unstuck " + sChannel);
-	}
+    void OnUnstickCommand(const CString& sCommand)
+    {
+        CString sChannel = sCommand.Token(1);
+        if (sChannel.empty()) {
+            PutModule("Usage: Unstick <#channel>");
+            return;
+        }
+        DelNV(sChannel, true);
+        PutModule("Unstuck " + sChannel);
+    }
 
-	void OnListCommand(const CString& sCommand) {
-		int i = 1;
-		for (MCString::iterator it = BeginNV(); it != EndNV(); ++it, i++)
-		{
-			if (it->second.empty())
-				PutModule(CString(i) + ": " + it->first);
-			else
-				PutModule(CString(i) + ": " + it->first + " (" + it->second + ")");
-		}
-		PutModule(" -- End of List");
-	}
+    void OnListCommand(const CString& sCommand)
+    {
+        int i = 1;
+        for (MCString::iterator it = BeginNV(); it != EndNV(); ++it, i++) {
+            if (it->second.empty())
+                PutModule(CString(i) + ": " + it->first);
+            else
+                PutModule(CString(i) + ": " + it->first + " (" + it->second + ")");
+        }
+        PutModule(" -- End of List");
+    }
 
-	void RunJob()
-	{
-		CIRCNetwork* pNetwork = GetNetwork();
-		if (!pNetwork->GetIRCSock())
-			return;
+    void RunJob()
+    {
+        CIRCNetwork* pNetwork = GetNetwork();
+        if (!pNetwork->GetIRCSock()) return;
 
-		for (MCString::iterator it = BeginNV(); it != EndNV(); ++it)
-		{
-			CChan *pChan = pNetwork->FindChan(it->first);
-			if (!pChan) {
-				pChan = new CChan(it->first, pNetwork, true);
-				if (!it->second.empty())
-					pChan->SetKey(it->second);
-				if (!pNetwork->AddChan(pChan)) {
-					/* AddChan() deleted that channel */
-					PutModule("Could not join [" + it->first
-							+ "] (# prefix missing?)");
-					continue;
-				}
-			}
-			if (!pChan->IsOn() && pNetwork->IsIRCConnected()) {
-				PutModule("Joining [" + pChan->GetName() + "]");
-				PutIRC("JOIN " + pChan->GetName() + (pChan->GetKey().empty()
-							? "" : " " + pChan->GetKey()));
-			}
-		}
-	}
+        for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {
+            CChan* pChan = pNetwork->FindChan(it->first);
+            if (!pChan) {
+                pChan = new CChan(it->first, pNetwork, true);
+                if (!it->second.empty()) pChan->SetKey(it->second);
+                if (!pNetwork->AddChan(pChan)) {
+                    /* AddChan() deleted that channel */
+                    PutModule("Could not join [" + it->first + "] (# prefix missing?)");
+                    continue;
+                }
+            }
+            if (!pChan->IsOn() && pNetwork->IsIRCConnected()) {
+                PutModule("Joining [" + pChan->GetName() + "]");
+                PutIRC("JOIN " + pChan->GetName() + (pChan->GetKey().empty() ? "" : " " + pChan->GetKey()));
+            }
+        }
+    }
 
-	CString GetWebMenuTitle() override { return "Sticky Chans"; }
+    CString GetWebMenuTitle() override { return "Sticky Chans"; }
 
-	bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override {
-		if (sPageName == "index") {
-			bool bSubmitted = (WebSock.GetParam("submitted").ToInt() != 0);
+    bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    {
+        if (sPageName == "index") {
+            bool bSubmitted = (WebSock.GetParam("submitted").ToInt() != 0);
 
-			const vector<CChan*>& Channels = GetNetwork()->GetChans();
-			for (unsigned int c = 0; c < Channels.size(); c++) {
-				const CString sChan = Channels[c]->GetName();
-				bool bStick = FindNV(sChan) != EndNV();
+            const vector<CChan*>& Channels = GetNetwork()->GetChans();
+            for (unsigned int c = 0; c < Channels.size(); c++) {
+                const CString sChan = Channels[c]->GetName();
+                bool bStick = FindNV(sChan) != EndNV();
 
-				if(bSubmitted) {
-					bool bNewStick = WebSock.GetParam("stick_" + sChan).ToBool();
-					if(bNewStick && !bStick)
-						SetNV(sChan, ""); // no password support for now unless chansaver is active too
-					else if(!bNewStick && bStick) {
-						MCString::iterator it = FindNV(sChan);
-						if(it != EndNV())
-							DelNV(it);
-					}
-					bStick = bNewStick;
-				}
+                if (bSubmitted) {
+                    bool bNewStick = WebSock.GetParam("stick_" + sChan).ToBool();
+                    if (bNewStick && !bStick)
+                        SetNV(sChan, ""); // no password support for now unless chansaver is active too
+                    else if (!bNewStick && bStick) {
+                        MCString::iterator it = FindNV(sChan);
+                        if (it != EndNV()) DelNV(it);
+                    }
+                    bStick = bNewStick;
+                }
 
-				CTemplate& Row = Tmpl.AddRow("ChannelLoop");
-				Row["Name"] = sChan;
-				Row["Sticky"] = CString(bStick);
-			}
+                CTemplate& Row = Tmpl.AddRow("ChannelLoop");
+                Row["Name"] = sChan;
+                Row["Sticky"] = CString(bStick);
+            }
 
-			if(bSubmitted) {
-				WebSock.GetSession()->AddSuccess("Changes have been saved!");
-			}
+            if (bSubmitted) {
+                WebSock.GetSession()->AddSuccess("Changes have been saved!");
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	bool OnEmbeddedWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override {
-		if (sPageName == "webadmin/channel") {
-			CString sChan = Tmpl["ChanName"];
-			bool bStick = FindNV(sChan) != EndNV();
-			if (Tmpl["WebadminAction"].Equals("display")) {
-				Tmpl["Sticky"] = CString(bStick);
-			} else if (WebSock.GetParam("embed_stickychan_presented").ToBool()) {
-				bool bNewStick = WebSock.GetParam("embed_stickychan_sticky").ToBool();
-				if(bNewStick && !bStick) {
-					SetNV(sChan, ""); // no password support for now unless chansaver is active too
-					WebSock.GetSession()->AddSuccess("Channel become sticky!");
-				} else if(!bNewStick && bStick) {
-					DelNV(sChan);
-					WebSock.GetSession()->AddSuccess("Channel stopped being sticky!");
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-
+    bool OnEmbeddedWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    {
+        if (sPageName == "webadmin/channel") {
+            CString sChan = Tmpl["ChanName"];
+            bool bStick = FindNV(sChan) != EndNV();
+            if (Tmpl["WebadminAction"].Equals("display")) {
+                Tmpl["Sticky"] = CString(bStick);
+            } else if (WebSock.GetParam("embed_stickychan_presented").ToBool()) {
+                bool bNewStick = WebSock.GetParam("embed_stickychan_sticky").ToBool();
+                if (bNewStick && !bStick) {
+                    SetNV(sChan, ""); // no password support for now unless chansaver is active too
+                    WebSock.GetSession()->AddSuccess("Channel become sticky!");
+                } else if (!bNewStick && bStick) {
+                    DelNV(sChan);
+                    WebSock.GetSession()->AddSuccess("Channel stopped being sticky!");
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 };
 
 
-static void RunTimer(CModule * pModule, CFPTimer *pTimer)
-{
-	((CStickyChan *)pModule)->RunJob();
-}
+static void RunTimer(CModule* pModule, CFPTimer* pTimer) { ((CStickyChan*)pModule)->RunJob(); }
 
 bool CStickyChan::OnLoad(const CString& sArgs, CString& sMessage)
 {
-	VCString vsChans;
-	VCString::iterator it;
-	sArgs.Split(",", vsChans, false);
+    VCString vsChans;
+    VCString::iterator it;
+    sArgs.Split(",", vsChans, false);
 
-	for (it = vsChans.begin(); it != vsChans.end(); ++it) {
-		CString sChan = it->Token(0);
-		CString sKey = it->Token(1, true);
-		SetNV(sChan, sKey);
-	}
+    for (it = vsChans.begin(); it != vsChans.end(); ++it) {
+        CString sChan = it->Token(0);
+        CString sKey = it->Token(1, true);
+        SetNV(sChan, sKey);
+    }
 
-	// Since we now have these channels added, clear the argument list
-	SetArgs("");
+    // Since we now have these channels added, clear the argument list
+    SetArgs("");
 
-	AddTimer(RunTimer, "StickyChanTimer", 15);
-	return(true);
+    AddTimer(RunTimer, "StickyChanTimer", 15);
+    return (true);
 }
 
-template<> void TModInfo<CStickyChan>(CModInfo& Info) {
-	Info.SetWikiPage("stickychan");
-	Info.SetHasArgs(true);
-	Info.SetArgsHelpText("List of channels, separated by comma.");
+template <> void TModInfo<CStickyChan>(CModInfo& Info)
+{
+    Info.SetWikiPage("stickychan");
+    Info.SetHasArgs(true);
+    Info.SetArgsHelpText("List of channels, separated by comma.");
 }
 
 NETWORKMODULEDEFS(CStickyChan, "configless sticky chans, keeps you there very stickily even")
