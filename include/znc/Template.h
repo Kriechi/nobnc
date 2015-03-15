@@ -61,10 +61,9 @@ public:
 
     void Parse(const CString& sLine);
 
-    // Getters
     CString::EEscape GetEscapeFrom() const { return m_eEscapeFrom; }
     CString::EEscape GetEscapeTo() const { return m_eEscapeTo; }
-    // !Getters
+
 private:
     CString::EEscape m_eEscapeFrom;
     CString::EEscape m_eEscapeTo;
@@ -85,7 +84,6 @@ public:
     CTemplateLoopContext(const CTemplateLoopContext&) = default;
     CTemplateLoopContext& operator=(const CTemplateLoopContext&) = default;
 
-    // Setters
     void SetHasData(bool b = true) { m_bHasData = b; }
     void SetName(const CString& s) { m_sName = s; }
     void SetRowIndex(unsigned int u) { m_uRowIndex = u; }
@@ -98,9 +96,7 @@ public:
         return --m_uRowIndex;
     }
     void SetFilePosition(unsigned int u) { m_uFilePosition = u; }
-    // !Setters
 
-    // Getters
     bool HasData() const { return m_bHasData; }
     const CString& GetName() const { return m_sName; }
     unsigned long GetFilePosition() const { return m_uFilePosition; }
@@ -112,7 +108,7 @@ public:
 
     CTemplate* GetRow(unsigned int uIndex);
     CString GetValue(const CString& sName, bool bFromIf = false);
-    // !Getters
+
 private:
     bool m_bReverse; //!< Iterate through this loop in reverse order
     bool m_bHasData; //!< Tells whether this loop has real data or not
@@ -187,9 +183,8 @@ public:
     CTemplateLoopContext* GetCurLoopContext();
     CTemplate* GetCurTemplate();
 
-    // Getters
     const CString& GetFileName() const { return m_sFileName; }
-    // !Getters
+
 private:
     CTemplate* m_pParent;
     CString m_sFileName;

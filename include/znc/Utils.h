@@ -349,12 +349,9 @@ public:
      */
     void Clear() { m_mItems.clear(); }
 
-    // Setters
-    void SetTTL(unsigned int u) { m_uTTL = u; }
-    // !Setters
-    // Getters
     unsigned int GetTTL() const { return m_uTTL; }
-    // !Getters
+    void SetTTL(unsigned int u) { m_uTTL = u; }
+
 protected:
     typedef std::pair<unsigned long long, V> value;
     typedef typename std::map<K, value>::iterator iterator;

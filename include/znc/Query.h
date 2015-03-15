@@ -21,10 +21,8 @@
 #include <znc/ZNCString.h>
 #include <znc/Buffer.h>
 
-// Forward Declarations
 class CClient;
 class CIRCNetwork;
-// !Forward Declarations
 
 class CQuery
 {
@@ -35,7 +33,6 @@ public:
     CQuery(const CQuery&) = delete;
     CQuery& operator=(const CQuery&) = delete;
 
-    // Buffer
     const CBuffer& GetBuffer() const { return m_Buffer; }
     unsigned int GetBufferCount() const { return m_Buffer.GetLimit(); }
     bool SetBufferCount(unsigned int u, bool bForce = false) { return m_Buffer.SetLimit(u, bForce); }
@@ -46,11 +43,8 @@ public:
     void ClearBuffer() { m_Buffer.Clear(); }
     void SendBuffer(CClient* pClient);
     void SendBuffer(CClient* pClient, const CBuffer& Buffer);
-    // !Buffer
 
-    // Getters
     const CString& GetName() const { return m_sName; }
-    // !Getters
 
 private:
     CString m_sName;

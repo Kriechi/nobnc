@@ -23,12 +23,10 @@
 
 #include <deque>
 
-// Forward Declarations
 class CChan;
 class CUser;
 class CIRCNetwork;
 class CClient;
-// !Forward Declarations
 
 // TODO: This class needs new name
 class CIRCSock : public CIRCSocket
@@ -48,7 +46,6 @@ public:
         NoArg = 3
     } EChanModeArgs;
 
-    // Message Handlers
     bool OnCTCPReply(CNick& Nick, CString& sMessage);
     bool OnPrivCTCP(CNick& Nick, CString& sMessage);
     bool OnChanCTCP(CNick& Nick, const CString& sChan, CString& sMessage);
@@ -58,7 +55,6 @@ public:
     bool OnPrivNotice(CNick& Nick, CString& sMessage);
     bool OnChanNotice(CNick& Nick, const CString& sChan, CString& sMessage);
     bool OnServerCapAvailable(const CString& sCap);
-    // !Message Handlers
 
     void ReadLine(const CString& sData) override;
     void Connected() override;
@@ -83,11 +79,8 @@ public:
      */
     void ResumeCap();
 
-    // Setters
     void SetPass(const CString& s) { m_sPass = s; }
-    // !Setters
 
-    // Getters
     unsigned int GetMaxNickLen() const { return m_uMaxNickLen; }
     EChanModeArgs GetModeType(unsigned char uMode) const;
     unsigned char GetPermFromMode(unsigned char uMode) const;
@@ -108,7 +101,6 @@ public:
     bool IsCapAccepted(const CString& sCap) { return 1 == m_ssAcceptedCaps.count(sCap); }
     const MCString& GetISupport() const { return m_mISupport; }
     CString GetISupport(const CString& sKey, const CString& sDefault = "") const;
-    // !Getters
 
     // This handles NAMESX and UHNAMES in a raw 353 reply
     void ForwardRaw353(const CString& sLine) const;

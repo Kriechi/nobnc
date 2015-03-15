@@ -75,7 +75,6 @@ public:
     unsigned long long BytesRead() const { return m_uBytesRead; }
     unsigned long long BytesWritten() const { return m_uBytesWritten; }
 
-    // Traffic fun
     typedef std::pair<unsigned long long, unsigned long long> TrafficStatsPair;
     typedef std::map<CString, TrafficStatsPair> TrafficStatsMap;
     // Returns a map which maps user names to <traffic in, traffic out>
@@ -84,11 +83,9 @@ public:
     // generated through ZNC.
     TrafficStatsMap GetTrafficStats(TrafficStatsPair& Users, TrafficStatsPair& ZNC, TrafficStatsPair& Total);
 
-    // Authenticate a user.
     // The result is passed back via callbacks to CAuthBase.
     void AuthUser(std::shared_ptr<CAuthBase> AuthClass);
 
-    // Setters
     void SetConfigState(enum ConfigState e) { m_eConfigState = e; }
     void SetSkinName(const CString& s) { m_sSkinName = s; }
     void SetStatusPrefix(const CString& s) { m_sStatusPrefix = (s.empty()) ? "*" : s; }
@@ -98,9 +95,7 @@ public:
     void SetProtectWebSessions(bool b) { m_bProtectWebSessions = b; }
     void SetHideVersion(bool b) { m_bHideVersion = b; }
     void SetConnectDelay(unsigned int i);
-    // !Setters
 
-    // Getters
     enum ConfigState GetConfigState() const { return m_eConfigState; }
     CSockManager& GetManager() { return m_Manager; }
     const CSockManager& GetManager() const { return m_Manager; }
@@ -131,9 +126,7 @@ public:
     {
         return static_cast<Csock::EDisableProtocol>(m_uDisabledSSLProtocols);
     }
-    // !Getters
 
-    // Static allocator
     static void CreateInstance();
     static CZNC& Get();
     static void DestroyInstance();
@@ -154,7 +147,6 @@ public:
     bool AddUser(CUser* pUser, CString& sErrorRet);
     const std::map<CString, CUser*>& GetUserMap() const { return (m_msUsers); }
 
-    // Listener yummy
     CListener* FindListener(u_short uPort, const CString& BindHost, EAddrType eAddr);
     bool AddListener(CListener*);
     bool AddListener(unsigned short uPort,
@@ -166,7 +158,6 @@ public:
                      CString& sError);
     bool DelListener(CListener*);
 
-    // Message of the Day
     void SetMotd(const CString& sMessage)
     {
         ClearMotd();
@@ -180,7 +171,6 @@ public:
     }
     void ClearMotd() { m_vsMotd.clear(); }
     const VCString& GetMotd() const { return m_vsMotd; }
-    // !MOTD
 
     void AddServerThrottle(CString sName) { m_sConnectThrottle.AddItem(sName, true); }
     bool GetServerThrottle(CString sName)
@@ -192,7 +182,6 @@ public:
     void AddNetworkToQueue(CIRCNetwork* pNetwork);
     std::list<CIRCNetwork*>& GetConnectionQueue() { return m_lpConnectQueue; }
 
-    // This creates a CConnectQueueTimer if we haven't got one yet
     void EnableConnectQueue();
     void DisableConnectQueue();
 

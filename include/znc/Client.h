@@ -23,13 +23,11 @@
 #include <znc/main.h>
 #include <memory>
 
-// Forward Declarations
 class CZNC;
 class CUser;
 class CIRCNetwork;
 class CIRCSock;
 class CClient;
-// !Forward Declarations
 
 class CAuthBase
 {

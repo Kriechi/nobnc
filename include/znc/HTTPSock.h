@@ -30,19 +30,15 @@ public:
     CHTTPSock(CModule* pMod, const CString& sURIPrefix, const CString& sHostname, unsigned short uPort, int iTimeout = 60);
     virtual ~CHTTPSock();
 
-    // Csocket derived members
     void ReadData(const char* data, size_t len) override;
     void ReadLine(const CString& sData) override;
     void Connected() override;
     Csock* GetSockObj(const CString& sHost, unsigned short uPort) override = 0;
-    // !Csocket derived members
 
-    // Hooks
     virtual bool ForceLogin();
     virtual bool OnLogin(const CString& sUser, const CString& sPass, bool bBasic);
     virtual void OnPageRequest(const CString& sURI) = 0;
     virtual bool PrintFile(const CString& sFileName, CString sContentType = "");
-    // !Hooks
 
     void CheckPost();
     bool SentHeader() const;
@@ -59,17 +55,12 @@ public:
     static CString GetDate(time_t tm = 0);
     CString GetRemoteIP() const override;
 
-    // Cookies
     CString GetRequestCookie(const CString& sKey) const;
     bool SendCookie(const CString& sKey, const CString& sValue);
-    // Cookies
 
-    // Setters
     void SetDocRoot(const CString& s);
     void SetLoggedIn(bool b) { m_bLoggedIn = b; }
-    // !Setters
 
-    // Getters
     CString GetPath() const;
     bool IsLoggedIn() const { return m_bLoggedIn; }
     const CString& GetDocRoot() const;
@@ -79,16 +70,14 @@ public:
     const CString& GetContentType() const;
     const CString& GetURIPrefix() const;
     bool IsPost() const;
-    // !Getters
 
-    // Parameter access
     CString GetParam(const CString& sName, bool bPost = true, const CString& sFilter = "\r\n") const;
     CString GetRawParam(const CString& sName, bool bPost = true) const;
     bool HasParam(const CString& sName, bool bPost = true) const;
     const std::map<CString, VCString>& GetParams(bool bPost = true) const;
     size_t GetParamValues(const CString& sName, VCString& vsRet, bool bPost = true, const CString& sFilter = "\r\n") const;
     size_t GetParamValues(const CString& sName, std::set<CString>& ssRet, bool bPost = true, const CString& sFilter = "\r\n") const;
-    // !Parameter access
+
 private:
     static CString GetRawParam(const CString& sName, const std::map<CString, VCString>& msvsParams);
     static CString GetParam(const CString& sName, const std::map<CString, VCString>& msvsParams, const CString& sFilter);

@@ -267,9 +267,8 @@ public:
     //! Ease of use Listen, assigned to the manager and is subsequently tracked
     bool Listen(unsigned short uPort, bool bSSL, unsigned int uTimeout = 0);
 
-    // Getters
     CModule* GetModule() const;
-    // !Getters
+
 private:
 protected:
     CModule* m_pModule; //!< pointer to the module that this sock instance belongs to

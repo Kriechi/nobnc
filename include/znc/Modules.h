@@ -27,7 +27,6 @@
 #include <queue>
 #include <sys/time.h>
 
-// Forward Declarations
 class CAuthBase;
 class CChan;
 class CIRCNetwork;
@@ -37,7 +36,6 @@ class CTemplate;
 class CIRCSock;
 class CModule;
 class CModInfo;
-// !Forward Declarations
 
 #ifdef REQUIRESSL
 #ifndef HAVE_LIBSSL
@@ -89,20 +87,14 @@ class CModInfo;
     CLASS(ModHandle pDLL, CUser* pUser, CIRCNetwork* pNetwork, const CString& sModName, const CString& sModPath, CModInfo::EModuleType eType) \
         : CModule(pDLL, pUser, pNetwork, sModName, sModPath, eType)
 
-// User Module Macros
 /** This works exactly like MODULEDEFS, but for user modules. */
 #define USERMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, CModInfo::UserModule)
-// !User Module Macros
 
-// Global Module Macros
 /** This works exactly like MODULEDEFS, but for global modules. */
 #define GLOBALMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, CModInfo::GlobalModule)
-// !Global Module Macros
 
-// Network Module Macros
 /** This works exactly like MODULEDEFS, but for network modules. */
 #define NETWORKMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, CModInfo::NetworkModule)
-// !Network Module Macros
 
 /** At the end of your source file, you must call this macro in global context.
  *  It defines some static functions which ZNC needs to load this module.
@@ -112,7 +104,6 @@ class CModInfo;
  */
 #define MODULEDEFS(CLASS, DESCRIPTION) NETWORKMODULEDEFS(CLASS, DESCRIPTION)
 
-// Forward Declarations
 class CZNC;
 class CUser;
 class CNick;
@@ -120,7 +111,6 @@ class CChan;
 class CModule;
 class CFPTimer;
 class CSockManager;
-// !Forward Declarations
 
 class CTimer : public CCron
 {
@@ -132,15 +122,12 @@ public:
     CTimer(const CTimer&) = delete;
     CTimer& operator=(const CTimer&) = delete;
 
-    // Setters
     void SetModule(CModule* p);
     void SetDescription(const CString& s);
-    // !Setters
 
-    // Getters
     CModule* GetModule() const;
     const CString& GetDescription() const;
-    // !Getters
+
 private:
     CModule* m_pModule;
     CString m_sDescription;
@@ -187,11 +174,9 @@ public:
     CModuleJob(const CModuleJob&) = delete;
     CModuleJob& operator=(const CModuleJob&) = delete;
 
-    // Getters
     CModule* GetModule() const { return m_pModule; }
     const CString& GetName() const { return m_sName; }
     const CString& GetDescription() const { return m_sDescription; }
-    // !Getters
 
 private:
     CModule* m_pModule;
@@ -237,7 +222,6 @@ public:
         }
     }
 
-    // Getters
     const CString& GetName() const { return m_sName; }
     const CString& GetPath() const { return m_sPath; }
     const CString& GetDescription() const { return m_sDescription; }
@@ -246,9 +230,7 @@ public:
     bool GetHasArgs() const { return m_bHasArgs; }
     ModLoader GetLoader() const { return m_fLoader; }
     EModuleType GetDefaultType() const { return m_eDefaultType; }
-    // !Getters
 
-    // Setters
     void SetName(const CString& s) { m_sName = s; }
     void SetPath(const CString& s) { m_sPath = s; }
     void SetDescription(const CString& s) { m_sDescription = s; }
@@ -257,7 +239,7 @@ public:
     void SetHasArgs(bool b = false) { m_bHasArgs = b; }
     void SetLoader(ModLoader fLoader) { m_fLoader = fLoader; }
     void SetDefaultType(EModuleType eType) { m_eDefaultType = eType; }
-    // !Setters
+
 private:
     std::set<EModuleType> m_seType;
     EModuleType m_eDefaultType;
@@ -908,7 +890,6 @@ public:
      */
     const CString& GetModDataDir() const { return m_sDataDir; }
 
-    // Timer stuff
     bool AddTimer(CTimer* pTimer);
     bool AddTimer(FPTimer_t pFBCallback, const CString& sLabel, u_int uInterval, u_int uCycles = 0, const CString& sDescription = "");
     bool RemTimer(CTimer* pTimer);
@@ -918,9 +899,7 @@ public:
     std::set<CTimer*>::const_iterator BeginTimers() const { return m_sTimers.begin(); }
     std::set<CTimer*>::const_iterator EndTimers() const { return m_sTimers.end(); }
     virtual void ListTimers();
-    // !Timer stuff
 
-    // Socket stuff
     bool AddSocket(CSocket* pSocket);
     bool RemSocket(CSocket* pSocket);
     bool RemSocket(const CString& sSockName);
@@ -929,19 +908,15 @@ public:
     std::set<CSocket*>::const_iterator BeginSockets() const { return m_sSockets.begin(); }
     std::set<CSocket*>::const_iterator EndSockets() const { return m_sSockets.end(); }
     virtual void ListSockets();
-// !Socket stuff
 
 #ifdef HAVE_PTHREAD
-    // Job stuff
     void AddJob(CModuleJob* pJob);
     void CancelJob(CModuleJob* pJob);
     bool CancelJob(const CString& sJobName);
     void CancelJobs(const std::set<CModuleJob*>& sJobs);
     bool UnlinkJob(CModuleJob* pJob);
-// !Job stuff
 #endif
 
-    // Command stuff
     /// Register the "Help" command.
     void AddHelpCommand();
     /// @return True if the command was successfully added.
@@ -966,7 +941,6 @@ public:
      * @param sLine The help command that is being asked for.
      */
     void HandleHelpCommand(const CString& sLine = "");
-    // !Command stuff
 
     bool LoadRegistry();
     bool SaveRegistry() const;
@@ -984,14 +958,11 @@ public:
     CString ExpandString(const CString& sStr) const;
     CString& ExpandString(const CString& sStr, CString& sRet) const;
 
-    // Setters
     void SetType(CModInfo::EModuleType eType) { m_eType = eType; }
     void SetDescription(const CString& s) { m_sDescription = s; }
     void SetModPath(const CString& s) { m_sModPath = s; }
     void SetArgs(const CString& s) { m_sArgs = s; }
-    // !Setters
 
-    // Getters
     CModInfo::EModuleType GetType() const { return m_eType; }
     const CString& GetDescription() const { return m_sDescription; }
     const CString& GetArgs() const { return m_sArgs; }
@@ -1009,9 +980,7 @@ public:
     CIRCNetwork* GetNetwork() const { return m_pNetwork; }
     CClient* GetClient() const { return m_pClient; }
     CSockManager* GetManager() const { return m_pManager; }
-    // !Getters
 
-    // Global Modules
     /** This module hook is called when a user is being added.
      * @param User The user which will be added.
      * @param sErrorRet A message that may be displayed to the user if
@@ -1103,7 +1072,6 @@ public:
      *  @param bGlobal true if global modules are needed.
      */
     virtual void OnGetAvailableMods(std::set<CModInfo>& ssMods, CModInfo::EModuleType eType);
-    // !Global Modules
 
 private:
     CModInfo::EModuleType m_eType;
@@ -1249,7 +1217,6 @@ public:
     typedef std::queue<std::pair<CString, CString>> ModDirList;
     static ModDirList GetModDirs();
 
-    // Global Modules
     bool OnAddUser(CUser& User, CString& sErrorRet);
     bool OnDeleteUser(CUser& User);
     bool OnClientConnect(CZNCSock* pSock, const CString& sHost, unsigned short uPort);
@@ -1263,7 +1230,6 @@ public:
     bool OnModuleUnloading(CModule* pModule, bool& bSuccess, CString& sRetMsg);
     bool OnGetModInfo(CModInfo& ModInfo, const CString& sModule, bool& bSuccess, CString& sRetMsg);
     bool OnGetAvailableMods(std::set<CModInfo>& ssMods, CModInfo::EModuleType eType);
-    // !Global Modules
 
 private:
     static ModHandle

@@ -23,13 +23,11 @@
 #include <znc/Buffer.h>
 #include <map>
 
-// Forward Declarations
 class CUser;
 class CIRCNetwork;
 class CClient;
 class CConfig;
 class CFile;
-// !Forward Declarations
 
 class CChan
 {
@@ -67,7 +65,6 @@ public:
 
     void OnWho(const CString& sNick, const CString& sIdent, const CString& sHost);
 
-    // Modes
     void SetModes(const CString& s);
     void ModeChange(const CString& sModes, const CNick* OpNick = nullptr);
     bool AddMode(unsigned char uMode, const CString& sArg);
@@ -75,9 +72,7 @@ public:
     CString GetModeString() const;
     CString GetModeArg(CString& sArgs) const;
     CString GetModeForNames() const;
-    // !Modes
 
-    // Nicks
     void ClearNicks();
     const CNick* FindNick(const CString& sNick) const;
     CNick* FindNick(const CString& sNick);
@@ -85,9 +80,7 @@ public:
     bool AddNick(const CString& sNick);
     bool RemNick(const CString& sNick);
     bool ChangeNick(const CString& sOldNick, const CString& sNewNick);
-    // !Nicks
 
-    // Buffer
     const CBuffer& GetBuffer() const { return m_Buffer; }
     unsigned int GetBufferCount() const { return m_Buffer.GetLimit(); }
     bool SetBufferCount(unsigned int u, bool bForce = false)
@@ -106,16 +99,12 @@ public:
     void ClearBuffer() { m_Buffer.Clear(); }
     void SendBuffer(CClient* pClient);
     void SendBuffer(CClient* pClient, const CBuffer& Buffer);
-    // !Buffer
 
-    // m_Nick wrappers
     CString GetPermStr() const { return m_Nick.GetPermStr(); }
     bool HasPerm(unsigned char uPerm) const { return m_Nick.HasPerm(uPerm); }
     bool AddPerm(unsigned char uPerm) { return m_Nick.AddPerm(uPerm); }
     bool RemPerm(unsigned char uPerm) { return m_Nick.RemPerm(uPerm); }
-    // !wrappers
 
-    // Setters
     void SetModeKnown(bool b) { m_bModeKnown = b; }
     void SetIsOn(bool b)
     {
@@ -138,9 +127,7 @@ public:
     void Enable();
     void IncJoinTries() { m_uJoinTries++; }
     void ResetJoinTries() { m_uJoinTries = 0; }
-    // !Setters
 
-    // Getters
     bool IsModeKnown() const { return m_bModeKnown; }
     bool HasMode(unsigned char uMode) const;
     CString GetOptions() const;
@@ -164,7 +151,7 @@ public:
     unsigned int GetJoinTries() const { return m_uJoinTries; }
     bool HasBufferCountSet() const { return m_bHasBufferCountSet; }
     bool HasAutoClearChanBufferSet() const { return m_bHasAutoClearChanBufferSet; }
-    // !Getters
+
 private:
     bool m_bDetached;
     bool m_bIsOn;

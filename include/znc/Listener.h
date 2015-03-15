@@ -20,9 +20,7 @@
 #include <znc/zncconfig.h>
 #include <znc/Socket.h>
 
-// Forward Declarations
 class CRealListener;
-// !Forward Declarations
 
 class CListener
 {
@@ -40,7 +38,6 @@ public:
     CListener(const CListener&) = delete;
     CListener& operator=(const CListener&) = delete;
 
-    // Getters
     bool IsSSL() const { return m_bSSL; }
     EAddrType GetAddrType() const { return m_eAddr; }
     unsigned short GetPort() const { return m_uPort; }
@@ -48,7 +45,6 @@ public:
     CRealListener* GetRealListener() const { return m_pListener; }
     const CString& GetURIPrefix() const { return m_sURIPrefix; }
     EAcceptType GetAcceptType() const { return m_eAcceptType; }
-    // !Getters
 
     // It doesn't make sense to change any of the settings after Listen()
     // except this one, so don't add other setters!

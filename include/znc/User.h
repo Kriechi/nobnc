@@ -70,12 +70,9 @@ public:
     static bool IsValidUserName(const CString& sUserName);
     static CString MakeCleanUserName(const CString& sUserName);
 
-    // Modules
     CModules& GetModules() { return *m_pModules; }
     const CModules& GetModules() const { return *m_pModules; }
-    // !Modules
 
-    // Networks
     CIRCNetwork* AddNetwork(const CString& sNetwork, CString& sErrorRet);
     bool DeleteNetwork(const CString& sNetwork);
     bool AddNetwork(CIRCNetwork* pNetwork);
@@ -83,7 +80,6 @@ public:
     CIRCNetwork* FindNetwork(const CString& sNetwork) const;
     const std::vector<CIRCNetwork*>& GetNetworks() const;
     bool HasSpaceForNewNetwork() const;
-    // !Networks
 
     bool PutUser(const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
     bool PutAllUser(const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
@@ -111,7 +107,6 @@ public:
     void AddBytesRead(unsigned long long u) { m_uBytesRead += u; }
     void AddBytesWritten(unsigned long long u) { m_uBytesWritten += u; }
 
-    // Setters
     void SetNick(const CString& s);
     void SetAltNick(const CString& s);
     void SetIdent(const CString& s);
@@ -143,9 +138,7 @@ public:
     void SetSkinName(const CString& s) { m_sSkinName = s; }
     void SetMaxNetworks(unsigned int i) { m_uMaxNetworks = i; }
     void SetMaxQueryBuffers(unsigned int i) { m_uMaxQueryBuffers = i; }
-    // !Setters
 
-    // Getters
     const std::vector<CClient*>& GetUserClients() const { return m_vClients; }
     std::vector<CClient*> GetAllClients() const;
     const CString& GetUserName() const;
@@ -188,7 +181,6 @@ public:
     CString GetSkinName() const;
     unsigned int MaxNetworks() const { return m_uMaxNetworks; }
     unsigned int MaxQueryBuffers() const { return m_uMaxQueryBuffers; }
-    // !Getters
 
 private:
     const CString m_sUserName;
@@ -211,9 +203,7 @@ private:
     CString m_sTimezone;
     eHashType m_eHashType;
 
-    // Paths
     CString m_sUserPath;
-    // !Paths
 
     bool m_bMultiClients;
     bool m_bDenyLoadMod;

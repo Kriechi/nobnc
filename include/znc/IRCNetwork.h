@@ -85,10 +85,8 @@ public:
     void SetUser(CUser* pUser);
     bool SetName(const CString& sName);
 
-    // Modules
     CModules& GetModules() { return *m_pModules; }
     const CModules& GetModules() const { return *m_pModules; }
-    // !Modules
 
     bool PutUser(const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
     bool PutStatus(const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
@@ -145,8 +143,6 @@ public:
     void SetIRCAway(bool b) { m_bIRCAway = b; }
 
     bool Connect();
-    /** This method will return whether the user is connected and authenticated to an IRC server.
-     */
     bool IsIRCConnected() const;
     void SetIRCSocket(CIRCSock* pIRCSock);
     void IRCConnected();
@@ -155,7 +151,6 @@ public:
 
     bool PutIRC(const CString& sLine);
 
-    // Buffers
     void AddRawBuffer(const CString& sFormat, const CString& sText = "") { m_RawBuffer.AddLine(sFormat, sText); }
     void UpdateRawBuffer(const CString& sMatch, const CString& sFormat, const CString& sText = "")
     {
@@ -182,9 +177,7 @@ public:
     void ClearNoticeBuffer() { m_NoticeBuffer.Clear(); }
 
     void ClearQueryBuffer();
-    // !Buffers
 
-    // la
     const CString& GetNick(const bool bAllowDefault = true) const;
     const CString& GetAltNick(const bool bAllowDefault = true) const;
     const CString& GetIdent(const bool bAllowDefault = true) const;

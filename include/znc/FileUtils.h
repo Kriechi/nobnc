@@ -58,9 +58,6 @@ public:
 
     enum EFileAttr { FA_Name, FA_Size, FA_ATime, FA_MTime, FA_CTime, FA_UID };
 
-    //
-    // Functions to retrieve file information
-    //
     bool Exists() const;
     off_t GetSize() const;
     time_t GetATime() const;
@@ -78,9 +75,6 @@ public:
     static gid_t GetGID(const CString& sFile);
     static int GetInfo(const CString& sFile, struct stat& st);
 
-    //
-    // Functions to manipulate the file on the filesystem
-    //
     bool Delete();
     bool Move(const CString& sNewFileName, bool bOverwrite = false);
     bool Copy(const CString& sNewFileName, bool bOverwrite = false);
