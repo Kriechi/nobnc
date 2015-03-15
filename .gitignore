@@ -48,6 +48,8 @@ __pycache__
 /test/EscapeTest
 
 # CMake
+build
+*.user
 CMakeCache.txt
 CMakeFiles
 Makefile
