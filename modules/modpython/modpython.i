@@ -20,7 +20,7 @@
 #include <utility>
 #include "../include/znc/Utils.h"
 #include "../include/znc/Threads.h"
-#include "../include/znc/Config.h"
+#include "../include/znc/Settings.h"
 #include "../include/znc/Socket.h"
 #include "../include/znc/Modules.h"
 #include "../include/znc/Nick.h"
@@ -147,7 +147,7 @@ class MCString : public std::map<CString, CString> {};
 %include "../include/znc/defines.h"
 %include "../include/znc/Utils.h"
 %include "../include/znc/Threads.h"
-%include "../include/znc/Config.h"
+%include "../include/znc/Settings.h"
 %include "../include/znc/Csocket.h"
 %template(ZNCSocketManager) TSocketManager<CZNCSock>;
 %include "../include/znc/Socket.h"

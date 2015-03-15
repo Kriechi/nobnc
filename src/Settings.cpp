@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "Config.h"
+#include "Settings.h"
 #include "FileUtils.h"
 #include <stack>
 #include <sstream>

@@ -15,7 +15,7 @@
  */
 
 #include "User.h"
-#include "Config.h"
+#include "Settings.h"
 #include "FileUtils.h"
 #include "Network.h"
 #include "IRCSock.h"

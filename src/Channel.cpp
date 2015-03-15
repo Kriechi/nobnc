@@ -18,7 +18,7 @@
 #include "IRCSock.h"
 #include "User.h"
 #include "Network.h"
-#include "Config.h"
+#include "Settings.h"
 #include "znc.h"
 
 using std::set;

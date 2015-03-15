@@ -20,7 +20,7 @@
 #include "Server.h"
 #include "User.h"
 #include "Network.h"
-#include "Config.h"
+#include "Settings.h"
 #include <tuple>
 #include <algorithm>
 

@@ -19,7 +19,6 @@ list(APPEND ZNC_SOURCES src/Buffer.cpp
                         src/Channel.cpp
                         src/Client.cpp
                         src/ClientCommand.cpp
-                        src/Config.cpp
                         src/FileUtils.cpp
                         src/HTTPSock.cpp
                         src/IRCSock.cpp
@@ -31,6 +30,7 @@ list(APPEND ZNC_SOURCES src/Buffer.cpp
                         src/Query.cpp
                         src/SHA256.cpp
                         src/Server.cpp
+                        src/Settings.cpp
                         src/Socket.cpp
                         src/SSLVerifyHost.cpp
                         src/Template.cpp
