@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <znc/FileUtils.h>
-#include <znc/ExecSock.h>
-#include <znc/Utils.h>
+#include "FileUtils.h"
+#include "ExecSock.h"
+#include "Utils.h"
 #include <fcntl.h>
 #include <pwd.h>
 #include <sys/stat.h>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/ZNCDebug.h>
+#include "ZNCDebug.h"
 #include <iostream>
 #include <sys/time.h>
 #include <stdio.h>

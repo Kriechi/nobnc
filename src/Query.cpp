@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <znc/Query.h>
-#include <znc/User.h>
-#include <znc/IRCNetwork.h>
+#include "Query.h"
+#include "User.h"
+#include "IRCNetwork.h"
 
 using std::vector;
 

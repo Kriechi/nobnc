@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-#include <znc/FileUtils.h>
-#include <znc/znc.h>
+#include "HTTPSock.h"
+#include "FileUtils.h"
+#include "znc.h"
 #include <iomanip>
 
 

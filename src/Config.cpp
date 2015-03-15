@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/Config.h>
-#include <znc/FileUtils.h>
+#include "Config.h"
+#include "FileUtils.h"
 #include <stack>
 #include <sstream>
 

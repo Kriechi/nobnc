@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#include <znc/User.h>
-#include <znc/Config.h>
-#include <znc/FileUtils.h>
-#include <znc/IRCNetwork.h>
-#include <znc/IRCSock.h>
-#include <znc/Chan.h>
+#include "User.h"
+#include "Config.h"
+#include "FileUtils.h"
+#include "IRCNetwork.h"
+#include "IRCSock.h"
+#include "Chan.h"
 #include <math.h>
 #include <algorithm>
 

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <znc/Utils.h>
-#include <znc/ZNCDebug.h>
-#include <znc/FileUtils.h>
+#include "Utils.h"
+#include "ZNCDebug.h"
+#include "FileUtils.h"
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>
 #endif /* HAVE_LIBSSL */

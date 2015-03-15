@@ -31,7 +31,7 @@
  * SUCH DAMAGE.
  */
 
-#include <znc/SHA256.h>
+#include "SHA256.h"
 
 #include <string.h>
 

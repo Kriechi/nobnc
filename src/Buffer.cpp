@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/znc.h>
-#include <znc/User.h>
+#include "Buffer.h"
+#include "Client.h"
+#include "User.h"
+#include "znc.h"
 
 CBufLine::CBufLine(const CString& format, const CString& text, const timeval* ts)
     : m_format(format), m_text(text), m_time()

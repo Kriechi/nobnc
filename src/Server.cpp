@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/Server.h>
+#include "Server.h"
 
 CServer::CServer(const CString& sName, unsigned short uPort, const CString& sPass, bool bSSL)
     : m_sName(sName), m_uPort((uPort) ? uPort : (unsigned short)6667), m_sPass(sPass), m_bSSL(bSSL)

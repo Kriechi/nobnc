@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include <znc/Threads.h>
+#include "Threads.h"
 
 #ifdef HAVE_PTHREAD
 
-#include <znc/ZNCDebug.h>
+#include "ZNCDebug.h"
 #include <algorithm>
 
 /* Just an arbitrary limit for the number of idle threads */

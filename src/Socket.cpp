@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#include <random>
-
-#include <znc/User.h>
-#include <znc/IRCNetwork.h>
-#include <znc/SSLVerifyHost.h>
-#include <znc/znc.h>
+#include "Socket.h"
+#include "User.h"
+#include "IRCNetwork.h"
+#include "SSLVerifyHost.h"
+#include "znc.h"
 #include <signal.h>
+#include <random>
 
 #ifdef HAVE_ICU
 #include <unicode/ucnv_cb.h>

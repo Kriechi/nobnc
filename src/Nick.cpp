@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/Chan.h>
-#include <znc/IRCSock.h>
-#include <znc/IRCNetwork.h>
+#include "Nick.h"
+#include "Chan.h"
+#include "IRCSock.h"
+#include "IRCNetwork.h"
 
 using std::vector;
 using std::map;

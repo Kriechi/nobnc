@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#include <znc/Chan.h>
-#include <znc/IRCSock.h>
-#include <znc/User.h>
-#include <znc/IRCNetwork.h>
-#include <znc/Config.h>
-#include <znc/znc.h>
+#include "Chan.h"
+#include "IRCSock.h"
+#include "User.h"
+#include "IRCNetwork.h"
+#include "Config.h"
+#include "znc.h"
 
 using std::set;
 using std::vector;

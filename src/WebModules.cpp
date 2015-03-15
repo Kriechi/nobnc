@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include <znc/WebModules.h>
-#include <znc/FileUtils.h>
-#include <znc/User.h>
-#include <znc/IRCNetwork.h>
-#include <znc/znc.h>
+#include "WebModules.h"
+#include "FileUtils.h"
+#include "User.h"
+#include "IRCNetwork.h"
+#include "znc.h"
 #include <algorithm>
 #include <sstream>
 

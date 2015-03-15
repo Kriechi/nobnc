@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <znc/Template.h>
-#include <znc/FileUtils.h>
-#include <znc/ZNCDebug.h>
+#include "Template.h"
+#include "FileUtils.h"
+#include "ZNCDebug.h"
 #include <algorithm>
 
 using std::stringstream;

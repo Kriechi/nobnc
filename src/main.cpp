@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-#include <znc/znc.h>
+#include "main.h"
+#include "znc.h"
 #include <signal.h>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)
-#include <znc/Threads.h>
+#include "Threads.h"
 #include <openssl/crypto.h>
 #include <memory>
 

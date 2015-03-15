@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/SSLVerifyHost.h>
+#include "SSLVerifyHost.h"
 
 #ifdef HAVE_LIBSSL
 
