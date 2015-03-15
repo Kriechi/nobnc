@@ -17,7 +17,7 @@
 #ifndef ZNC_NICK_H
 #define ZNC_NICK_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/ZNCString.h>
 #include <vector>
 

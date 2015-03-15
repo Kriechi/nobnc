@@ -42,7 +42,7 @@ list(APPEND ZNC_SOURCES src/Buffer.cpp
                         src/ZNCString.cpp
                         src/znc.cpp
                         ${PROJECT_BINARY_DIR}/src/Csocket.cpp
-                        ${PROJECT_BINARY_DIR}/src/version.cpp
+                        ${PROJECT_BINARY_DIR}/src/noversion.cpp
 )
 
 ### TARGETS
@@ -76,21 +76,21 @@ endif()
 
 ### GENERATED FILES
 
-configure_file("${PROJECT_SOURCE_DIR}/include/znc/zncconfig.h.in"
-               "${PROJECT_BINARY_DIR}/include/znc/zncconfig.h")
-configure_file("${PROJECT_SOURCE_DIR}/include/znc/version.h.in"
-               "${PROJECT_BINARY_DIR}/include/znc/version.h")
-configure_file("${PROJECT_SOURCE_DIR}/src/version.cpp.in"
-               "${PROJECT_BINARY_DIR}/src/version.cpp")
+configure_file("${PROJECT_SOURCE_DIR}/include/znc/noconfig.h.in"
+               "${PROJECT_BINARY_DIR}/include/znc/noconfig.h")
+configure_file("${PROJECT_SOURCE_DIR}/include/znc/noversion.h.in"
+               "${PROJECT_BINARY_DIR}/include/znc/noversion.h")
+configure_file("${PROJECT_SOURCE_DIR}/src/noversion.cpp.in"
+               "${PROJECT_BINARY_DIR}/src/noversion.cpp")
 configure_file("${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.cc"
                "${PROJECT_BINARY_DIR}/src/Csocket.cpp" COPYONLY)
 configure_file("${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.h"
                "${PROJECT_BINARY_DIR}/include/znc/Csocket.h" COPYONLY)
 
 if(NOT DEVELOPER_BUILD)
-    install(FILES "${PROJECT_BINARY_DIR}/include/znc/zncconfig.h"
+    install(FILES "${PROJECT_BINARY_DIR}/include/znc/noconfig.h"
             DESTINATION ${INSTALL_INCLUDEDIR}/znc)
-    install(FILES "${PROJECT_BINARY_DIR}/include/znc/version.h"
+    install(FILES "${PROJECT_BINARY_DIR}/include/znc/noversion.h"
             DESTINATION ${INSTALL_INCLUDEDIR}/znc)
 endif()
 

@@ -8,9 +8,9 @@
 *.a
 
 # Generated sources
-/src/version.cpp
-/include/znc/version.h
-/include/znc/zncconfig.h
+/src/noversion.cpp
+/include/znc/noversion.h
+/include/znc/noconfig.h
 
 # Genrated docs
 /share/man/*.gz

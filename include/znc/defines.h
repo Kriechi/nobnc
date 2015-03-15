@@ -17,7 +17,7 @@
 #ifndef ZNC_DEFINES_H
 #define ZNC_DEFINES_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 
 // This header file is just for Csocket
 

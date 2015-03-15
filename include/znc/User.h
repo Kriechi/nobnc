@@ -17,7 +17,7 @@
 #ifndef ZNC_USER_H
 #define ZNC_USER_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/Utils.h>
 #include <znc/Buffer.h>
 #include <znc/Nick.h>

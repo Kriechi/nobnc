@@ -17,7 +17,7 @@
 #ifndef ZNCSTRING_H
 #define ZNCSTRING_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <map>
 #include <set>
 #include <string>

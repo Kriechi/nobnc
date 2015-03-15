@@ -17,7 +17,7 @@
 #ifndef ZNC_CHANNEL_H
 #define ZNC_CHANNEL_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/Nick.h>
 #include <znc/ZNCString.h>
 #include <znc/Buffer.h>

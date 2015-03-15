@@ -17,7 +17,7 @@
 #ifndef ZNC_LISTENER_H
 #define ZNC_LISTENER_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/Socket.h>
 
 class CRealListener;

@@ -17,7 +17,7 @@
 #ifndef ZNC_SSLVERIFYHOST_H
 #define ZNC_SSLVERIFYHOST_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/Csocket.h>
 #include <znc/ZNCString.h>
 

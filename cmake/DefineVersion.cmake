@@ -34,7 +34,7 @@ else()
                   -D ZNC_VERSION_MINOR=${ZNC_VERSION_MINOR}
                   -D ZNC_VERSION_PATCH=${ZNC_VERSION_PATCH}
                   -D ZNC_VERSION_STR=${ZNC_VERSION_STR}
-                  -D ZNC_VERSION_INPUT=${PROJECT_SOURCE_DIR}/src/version.cpp.in
-                  -D ZNC_VERSION_OUTPUT=${PROJECT_BINARY_DIR}/src/version.cpp
+                  -D ZNC_VERSION_INPUT=${PROJECT_SOURCE_DIR}/src/noversion.cpp.in
+                  -D ZNC_VERSION_OUTPUT=${PROJECT_BINARY_DIR}/src/noversion.cpp
                   -P ${PROJECT_SOURCE_DIR}/cmake/DefineVersion.cmake)
 endif()

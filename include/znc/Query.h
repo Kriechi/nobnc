@@ -17,7 +17,7 @@
 #ifndef ZNC_QUERY_H
 #define ZNC_QUERY_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/ZNCString.h>
 #include <znc/Buffer.h>
 

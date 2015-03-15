@@ -17,7 +17,7 @@
 #ifndef ZNC_SOCKET_H
 #define ZNC_SOCKET_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/Csocket.h>
 #include <znc/Threads.h>
 

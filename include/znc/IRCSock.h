@@ -17,7 +17,7 @@
 #ifndef ZNC_IRCSOCK_H
 #define ZNC_IRCSOCK_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/Socket.h>
 #include <znc/Nick.h>
 

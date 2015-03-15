@@ -62,7 +62,7 @@ using std::allocator;
 %feature("python:defaultargs", "0") CModules::GetDefaultMods; // NameError: name 'UserModule' is not defined
 
 %begin %{
-#include "znc/zncconfig.h"
+#include "znc/noconfig.h"
 %}
 
 %include <pyabc.i>
@@ -142,7 +142,7 @@ class MCString : public std::map<CString, CString> {};
 
 #define u_short unsigned short
 #define u_int unsigned int
-#include "../include/znc/zncconfig.h"
+#include "../include/znc/noconfig.h"
 #include "../include/znc/ZNCString.h"
 %include "../include/znc/defines.h"
 %include "../include/znc/Utils.h"

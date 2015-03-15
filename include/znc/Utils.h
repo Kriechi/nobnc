@@ -17,7 +17,7 @@
 #ifndef ZNC_UTILS_H
 #define ZNC_UTILS_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/ZNCString.h>
 #include <assert.h>
 #include <cstdio>

@@ -17,7 +17,7 @@
 #ifndef ZNCDEBUG_H
 #define ZNCDEBUG_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/ZNCString.h>
 #include <sstream>
 

@@ -17,7 +17,7 @@
 #ifndef ZNC_NETWORK_H
 #define ZNC_NETWORK_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/ZNCString.h>
 #include <znc/Buffer.h>
 #include <znc/Nick.h>

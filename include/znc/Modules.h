@@ -17,7 +17,7 @@
 #ifndef ZNC_MODULES_H
 #define ZNC_MODULES_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/WebModules.h>
 #include <znc/Utils.h>
 #include <znc/Threads.h>

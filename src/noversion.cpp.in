@@ -1,2 +1,2 @@
-#include "version.h"
+#include "noversion.h"
 const char* ZNC_VERSION_EXTRA = "@ZNC_VERSION_EXTRA@";

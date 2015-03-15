@@ -17,7 +17,7 @@
 #ifndef ZNC_CONFIG_H
 #define ZNC_CONFIG_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/ZNCString.h>
 
 class CFile;

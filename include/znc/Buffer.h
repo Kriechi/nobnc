@@ -17,7 +17,7 @@
 #ifndef ZNC_BUFFER_H
 #define ZNC_BUFFER_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/ZNCString.h>
 #include <sys/time.h>
 #include <deque>

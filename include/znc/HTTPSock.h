@@ -17,7 +17,7 @@
 #ifndef ZNC_HTTPSOCK_H
 #define ZNC_HTTPSOCK_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/Socket.h>
 #include <znc/FileUtils.h>
 

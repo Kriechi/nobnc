@@ -17,7 +17,7 @@
 #ifndef ZNC_H
 #define ZNC_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/Client.h>
 #include <znc/Modules.h>
 #include <znc/Socket.h>

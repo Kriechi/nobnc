@@ -17,7 +17,7 @@
 #ifndef ZNC_THREADS_H
 #define ZNC_THREADS_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 
 #ifdef HAVE_PTHREAD
 

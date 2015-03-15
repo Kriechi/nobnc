@@ -57,7 +57,7 @@
 %apply long { uint64_t };
 
 %begin %{
-#include "znc/zncconfig.h"
+#include "znc/noconfig.h"
 %}
 
 %include <typemaps.i>
@@ -119,7 +119,7 @@ class MCString : public std::map<CString, CString> {};
 
 #define u_short unsigned short
 #define u_int unsigned int
-#include "../include/znc/zncconfig.h"
+#include "../include/znc/noconfig.h"
 #include "../include/znc/ZNCString.h"
 %include "../include/znc/defines.h"
 %include "../include/znc/Utils.h"

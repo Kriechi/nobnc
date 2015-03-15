@@ -17,7 +17,7 @@
 #ifndef ZNC_WEBMODULES_H
 #define ZNC_WEBMODULES_H
 
-#include <znc/zncconfig.h>
+#include <znc/noconfig.h>
 #include <znc/Template.h>
 #include <znc/HTTPSock.h>
 #include <znc/Utils.h>
