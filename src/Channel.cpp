@@ -25,7 +25,7 @@ using std::set;
 using std::vector;
 using std::map;
 
-CChannel::CChannel(const CString& sName, CNetwork* pNetwork, bool bInConfig, CConfig* pConfig)
+CChannel::CChannel(const CString& sName, CNetwork* pNetwork, bool bInConfig, CSettings* pConfig)
     : m_bDetached(false), m_bIsOn(false), m_bAutoClearChanBuffer(pNetwork->GetUser()->AutoClearChanBuffer()),
       m_bInConfig(bInConfig), m_bDisabled(false), m_bHasBufferCountSet(false), m_bHasAutoClearChanBufferSet(false),
       m_sName(sName.Token(0)), m_sKey(sName.Token(1)), m_sTopic(""), m_sTopicOwner(""), m_ulTopicDate(0),
@@ -72,9 +72,9 @@ void CChannel::Reset()
     ResetJoinTries();
 }
 
-CConfig CChannel::ToConfig() const
+CSettings CChannel::ToConfig() const
 {
-    CConfig config;
+    CSettings config;
 
     if (m_bHasBufferCountSet) config.AddKeyValuePair("Buffer", CString(GetBufferCount()));
     if (m_bHasAutoClearChanBufferSet) config.AddKeyValuePair("AutoClearChanBuffer", CString(AutoClearChanBuffer()));

@@ -26,9 +26,9 @@
 class CModules;
 class CUser;
 class CFile;
-class CConfig;
+class CSettings;
 class CClient;
-class CConfig;
+class CSettings;
 class CChannel;
 class CQuery;
 class CServer;
@@ -66,8 +66,8 @@ public:
 
     void DelServers();
 
-    bool ParseConfig(CConfig* pConfig, CString& sError, bool bUpgrade = false);
-    CConfig ToConfig() const;
+    bool ParseConfig(CSettings* pConfig, CString& sError, bool bUpgrade = false);
+    CSettings ToConfig() const;
 
     void BounceAllClients();
 

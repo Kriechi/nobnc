@@ -23,37 +23,37 @@ struct ConfigStackEntry
 {
     CString sTag;
     CString sName;
-    CConfig Config;
+    CSettings Config;
 
     ConfigStackEntry(const CString& Tag, const CString Name) : sTag(Tag), sName(Name), Config() {}
 };
 
-CConfigEntry::CConfigEntry() : m_pSubConfig(nullptr) {}
+CSettingsEntry::CSettingsEntry() : m_pSubConfig(nullptr) {}
 
-CConfigEntry::CConfigEntry(const CConfig& Config) : m_pSubConfig(new CConfig(Config)) {}
+CSettingsEntry::CSettingsEntry(const CSettings& Config) : m_pSubConfig(new CSettings(Config)) {}
 
-CConfigEntry::CConfigEntry(const CConfigEntry& other) : m_pSubConfig(nullptr)
+CSettingsEntry::CSettingsEntry(const CSettingsEntry& other) : m_pSubConfig(nullptr)
 {
-    if (other.m_pSubConfig) m_pSubConfig = new CConfig(*other.m_pSubConfig);
+    if (other.m_pSubConfig) m_pSubConfig = new CSettings(*other.m_pSubConfig);
 }
 
-CConfigEntry::~CConfigEntry() { delete m_pSubConfig; }
+CSettingsEntry::~CSettingsEntry() { delete m_pSubConfig; }
 
-CConfigEntry& CConfigEntry::operator=(const CConfigEntry& other)
+CSettingsEntry& CSettingsEntry::operator=(const CSettingsEntry& other)
 {
     delete m_pSubConfig;
     if (other.m_pSubConfig)
-        m_pSubConfig = new CConfig(*other.m_pSubConfig);
+        m_pSubConfig = new CSettings(*other.m_pSubConfig);
     else
         m_pSubConfig = nullptr;
     return *this;
 }
 
-bool CConfig::Parse(CFile& file, CString& sErrorMsg)
+bool CSettings::Parse(CFile& file, CString& sErrorMsg)
 {
     CString sLine;
     unsigned int uLineNum = 0;
-    CConfig* pActiveConfig = this;
+    CSettings* pActiveConfig = this;
     std::stack<ConfigStackEntry> ConfigStack;
     bool bCommented = false; // support for /**/ style comments
 
@@ -108,7 +108,7 @@ bool CConfig::Parse(CFile& file, CString& sErrorMsg)
                 if (ConfigStack.empty()) ERROR("Closing tag \"" << sTag << "\" which is not open.");
 
                 const struct ConfigStackEntry& entry = ConfigStack.top();
-                CConfig myConfig(entry.Config);
+                CSettings myConfig(entry.Config);
                 CString sName(entry.sName);
 
                 if (!sTag.Equals(entry.sTag)) ERROR("Closing tag \"" << sTag << "\" which is not open.");
@@ -126,7 +126,7 @@ bool CConfig::Parse(CFile& file, CString& sErrorMsg)
 
                 if (it != conf.end()) ERROR("Duplicate entry for tag \"" << sTag << "\" name \"" << sName << "\".");
 
-                conf[sName] = CConfigEntry(myConfig);
+                conf[sName] = CSettingsEntry(myConfig);
             } else {
                 if (sValue.empty()) ERROR("Empty block name at begin of block.");
                 ConfigStack.push(ConfigStackEntry(sTag.AsLower(), sValue));
@@ -164,7 +164,7 @@ bool CConfig::Parse(CFile& file, CString& sErrorMsg)
     return true;
 }
 
-void CConfig::Write(CFile& File, unsigned int iIndentation)
+void CSettings::Write(CFile& File, unsigned int iIndentation)
 {
     CString sIndentation = CString(iIndentation, '\t');
 

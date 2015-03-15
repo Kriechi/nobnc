@@ -47,7 +47,7 @@ public:
     {
         CFile& File = WriteFile(sConfig);
 
-        CConfig conf;
+        CSettings conf;
         CString sError;
         EXPECT_FALSE(conf.Parse(File, sError));
 
@@ -64,7 +64,7 @@ public:
         // Verify that Parse() rewinds the file
         File.Seek(12);
 
-        CConfig conf;
+        CSettings conf;
         CString sError;
         EXPECT_TRUE(conf.Parse(File, sError)) << sError;
         EXPECT_TRUE(sError.empty()) << "Non-empty error string!";
@@ -75,9 +75,9 @@ public:
         EXPECT_EQ(sExpectedOutput, sOutput);
     }
 
-    void ToString(CString& sRes, CConfig& conf)
+    void ToString(CString& sRes, CSettings& conf)
     {
-        CConfig::EntryMapIterator it = conf.BeginEntries();
+        CSettings::EntryMapIterator it = conf.BeginEntries();
         while (it != conf.EndEntries()) {
             const CString& sKey = it->first;
             const VCString& vsEntries = it->second;
@@ -92,9 +92,9 @@ public:
             ++it;
         }
 
-        CConfig::SubConfigMapIterator it2 = conf.BeginSubConfigs();
+        CSettings::SubConfigMapIterator it2 = conf.BeginSubConfigs();
         while (it2 != conf.EndSubConfigs()) {
-            std::map<CString, CConfigEntry>::const_iterator it3 = it2->second.begin();
+            std::map<CString, CSettingsEntry>::const_iterator it3 = it2->second.begin();
 
             while (it3 != it2->second.end()) {
                 sRes += "->" + it2->first + "/" + it3->first + "\n";

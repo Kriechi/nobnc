@@ -99,7 +99,7 @@ template <class T> struct TOption
     void (CUser::*pSetter)(T);
 };
 
-bool CUser::ParseConfig(CConfig* pConfig, CString& sError)
+bool CUser::ParseConfig(CSettings* pConfig, CString& sError)
 {
     TOption<const CString&> StringOptions[] = {
         { "nick", &CUser::SetNick },
@@ -251,8 +251,8 @@ bool CUser::ParseConfig(CConfig* pConfig, CString& sError)
             SetPass(sValue, CUser::HASH_NONE);
         }
     }
-    CConfig::SubConfig subConf;
-    CConfig::SubConfig::const_iterator subIt;
+    CSettings::SubConfig subConf;
+    CSettings::SubConfig::const_iterator subIt;
     pConfig->FindSubConfig("pass", subConf);
     if (!sValue.empty() && !subConf.empty()) {
         sError = "Password defined more than once";
@@ -261,7 +261,7 @@ bool CUser::ParseConfig(CConfig* pConfig, CString& sError)
     }
     subIt = subConf.begin();
     if (subIt != subConf.end()) {
-        CConfig* pSubConf = subIt->second.m_pSubConfig;
+        CSettings* pSubConf = subIt->second.m_pSubConfig;
         CString sHash;
         CString sMethod;
         CString sSalt;
@@ -825,10 +825,10 @@ bool CUser::IsValid(CString& sErrMsg, bool bSkipPass) const
     return true;
 }
 
-CConfig CUser::ToConfig() const
+CSettings CUser::ToConfig() const
 {
-    CConfig config;
-    CConfig passConfig;
+    CSettings config;
+    CSettings passConfig;
 
     CString sHash;
     switch (m_eHashType) {

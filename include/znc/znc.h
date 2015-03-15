@@ -29,7 +29,7 @@ class CListener;
 class CUser;
 class CNetwork;
 class CConnectQueueTimer;
-class CConfig;
+class CSettings;
 class CFile;
 
 class CZNC
@@ -191,7 +191,7 @@ public:
     // Never call this unless you are CConnectQueueTimer::~CConnectQueueTimer()
     void LeakConnectQueueTimer(CConnectQueueTimer* pTimer);
 
-    static void DumpConfig(const CConfig* Config);
+    static void DumpConfig(const CSettings* Config);
 
 private:
     CFile* InitPidFile();
@@ -200,7 +200,7 @@ private:
     bool HandleUserDeletion();
     CString MakeConfigHeader();
     bool AddListener(const CString& sLine, CString& sError);
-    bool AddListener(CConfig* pConfig, CString& sError);
+    bool AddListener(CSettings* pConfig, CString& sError);
 
     time_t m_TimeStarted;
 

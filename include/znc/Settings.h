@@ -21,26 +21,26 @@
 #include <znc/ZNCString.h>
 
 class CFile;
-class CConfig;
+class CSettings;
 
-struct CConfigEntry
+struct CSettingsEntry
 {
-    CConfigEntry();
-    CConfigEntry(const CConfig& Config);
-    CConfigEntry(const CConfigEntry& other);
-    ~CConfigEntry();
-    CConfigEntry& operator=(const CConfigEntry& other);
+    CSettingsEntry();
+    CSettingsEntry(const CSettings& Config);
+    CSettingsEntry(const CSettingsEntry& other);
+    ~CSettingsEntry();
+    CSettingsEntry& operator=(const CSettingsEntry& other);
 
-    CConfig* m_pSubConfig;
+    CSettings* m_pSubConfig;
 };
 
-class CConfig
+class CSettings
 {
 public:
-    CConfig() : m_ConfigEntries(), m_SubConfigs() {}
+    CSettings() : m_ConfigEntries(), m_SubConfigs() {}
 
     typedef std::map<CString, VCString> EntryMap;
-    typedef std::map<CString, CConfigEntry> SubConfig;
+    typedef std::map<CString, CSettingsEntry> SubConfig;
     typedef std::map<CString, SubConfig> SubConfigMap;
 
     typedef EntryMap::const_iterator EntryMapIterator;
@@ -61,7 +61,7 @@ public:
         m_ConfigEntries[sName].push_back(sValue);
     }
 
-    bool AddSubConfig(const CString& sTag, const CString& sName, CConfig Config)
+    bool AddSubConfig(const CString& sTag, const CString& sName, CSettings Config)
     {
         SubConfig& conf = m_SubConfigs[sTag];
         SubConfig::const_iterator it = conf.find(sName);

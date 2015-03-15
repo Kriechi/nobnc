@@ -441,7 +441,7 @@ bool CZNC::WriteConfig()
 
     pFile->Write(MakeConfigHeader() + "\n");
 
-    CConfig config;
+    CSettings config;
     config.AddKeyValuePair("AnonIPLimit", CString(m_uiAnonIPLimit));
     config.AddKeyValuePair("MaxBufferSize", CString(m_uiMaxBufferSize));
     config.AddKeyValuePair("SSLCertFile", CString(m_sSSLCertFile));
@@ -451,7 +451,7 @@ bool CZNC::WriteConfig()
 
     unsigned int l = 0;
     for (CListener* pListener : m_vpListeners) {
-        CConfig listenerConfig;
+        CSettings listenerConfig;
 
         listenerConfig.AddKeyValuePair("Host", pListener->GetBindHost());
         listenerConfig.AddKeyValuePair("URIPrefix", pListener->GetURIPrefix() + "/");
@@ -964,7 +964,7 @@ bool CZNC::DoRehash(CString& sError)
     m_pLockFile = pFile;
     CFile& File = *pFile;
 
-    CConfig config;
+    CSettings config;
     if (!config.Parse(File, sError)) {
         CUtils::PrintStatus(false, sError);
         return false;
@@ -1152,12 +1152,12 @@ bool CZNC::DoRehash(CString& sError)
         }
     }
 
-    CConfig::SubConfig subConf;
-    CConfig::SubConfig::const_iterator subIt;
+    CSettings::SubConfig subConf;
+    CSettings::SubConfig::const_iterator subIt;
 
     config.FindSubConfig("listener", subConf);
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
-        CConfig* pSubConf = subIt->second.m_pSubConfig;
+        CSettings* pSubConf = subIt->second.m_pSubConfig;
         if (!AddListener(pSubConf, sError)) return false;
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in Listener config!";
@@ -1171,7 +1171,7 @@ bool CZNC::DoRehash(CString& sError)
     config.FindSubConfig("user", subConf);
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
         const CString& sUserName = subIt->first;
-        CConfig* pSubConf = subIt->second.m_pSubConfig;
+        CSettings* pSubConf = subIt->second.m_pSubConfig;
         CUser* pRealUser = nullptr;
 
         CUtils::PrintMessage("Loading user [" + sUserName + "]");
@@ -1273,9 +1273,9 @@ bool CZNC::DoRehash(CString& sError)
     return true;
 }
 
-void CZNC::DumpConfig(const CConfig* pConfig)
+void CZNC::DumpConfig(const CSettings* pConfig)
 {
-    CConfig::EntryMapIterator eit = pConfig->BeginEntries();
+    CSettings::EntryMapIterator eit = pConfig->BeginEntries();
     for (; eit != pConfig->EndEntries(); ++eit) {
         const CString& sKey = eit->first;
         const VCString& vsList = eit->second;
@@ -1285,11 +1285,11 @@ void CZNC::DumpConfig(const CConfig* pConfig)
         }
     }
 
-    CConfig::SubConfigMapIterator sit = pConfig->BeginSubConfigs();
+    CSettings::SubConfigMapIterator sit = pConfig->BeginSubConfigs();
     for (; sit != pConfig->EndSubConfigs(); ++sit) {
         const CString& sKey = sit->first;
-        const CConfig::SubConfig& sSub = sit->second;
-        CConfig::SubConfig::const_iterator it = sSub.begin();
+        const CSettings::SubConfig& sSub = sit->second;
+        CSettings::SubConfig::const_iterator it = sSub.begin();
 
         for (; it != sSub.end(); ++it) {
             CUtils::PrintError("SubConfig [" + sKey + " " + it->first + "]:");
@@ -1668,7 +1668,7 @@ bool CZNC::AddListener(unsigned short uPort,
     return true;
 }
 
-bool CZNC::AddListener(CConfig* pConfig, CString& sError)
+bool CZNC::AddListener(CSettings* pConfig, CString& sError)
 {
     CString sBindHost;
     CString sURIPrefix;

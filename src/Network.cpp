@@ -318,7 +318,7 @@ template <class T> struct TOption
     void (CNetwork::*pSetter)(T);
 };
 
-bool CNetwork::ParseConfig(CConfig* pConfig, CString& sError, bool bUpgrade)
+bool CNetwork::ParseConfig(CSettings* pConfig, CString& sError, bool bUpgrade)
 {
     VCString vsList;
 
@@ -425,13 +425,13 @@ bool CNetwork::ParseConfig(CConfig* pConfig, CString& sError, bool bUpgrade)
         AddChan(sChan, true);
     }
 
-    CConfig::SubConfig subConf;
-    CConfig::SubConfig::const_iterator subIt;
+    CSettings::SubConfig subConf;
+    CSettings::SubConfig::const_iterator subIt;
 
     pConfig->FindSubConfig("chan", subConf);
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
         const CString& sChanName = subIt->first;
-        CConfig* pSubConf = subIt->second.m_pSubConfig;
+        CSettings* pSubConf = subIt->second.m_pSubConfig;
         CChannel* pChan = new CChannel(sChanName, this, true, pSubConf);
 
         if (!pSubConf->empty()) {
@@ -457,9 +457,9 @@ bool CNetwork::ParseConfig(CConfig* pConfig, CString& sError, bool bUpgrade)
     return true;
 }
 
-CConfig CNetwork::ToConfig() const
+CSettings CNetwork::ToConfig() const
 {
-    CConfig config;
+    CSettings config;
 
     if (!m_sNick.empty()) {
         config.AddKeyValuePair("Nick", m_sNick);

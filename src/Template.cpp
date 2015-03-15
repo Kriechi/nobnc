@@ -99,9 +99,9 @@ CTemplate::~CTemplate()
 
 void CTemplate::Init()
 {
-    /* We have no CConfig in ZNC land
+    /* We have no CSettings in ZNC land
      * Hmm... Actually, we do have it now.
-    CString sPath(CConfig::GetValue("WebFilesPath"));
+    CString sPath(CSettings::GetValue("WebFilesPath"));
 
     if (!sPath.empty()) {
         SetPath(sPath);
@@ -823,10 +823,10 @@ CString CTemplate::GetValue(const CString& sArgs, bool bFromIf)
         msArgs[sArg.Token(0, false, "=").AsUpper()] = sArg.Token(1, true, "=");
     }
 
-    /* We have no CConfig in ZNC land
+    /* We have no CSettings in ZNC land
 	 * Hmm... Actually, we do have it now.
 	if (msArgs.find("CONFIG") != msArgs.end()) {
-		sRet = CConfig::GetValue(sName);
+		sRet = CSettings::GetValue(sName);
 	} else*/ if (msArgs.find("ROWS") != msArgs.end()) {
         vector<CTemplate*>* pLoop = GetLoop(sName);
         sRet = CString((pLoop) ? pLoop->size() : 0);

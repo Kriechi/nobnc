@@ -26,7 +26,7 @@
 class CUser;
 class CNetwork;
 class CClient;
-class CConfig;
+class CSettings;
 class CFile;
 
 class CChannel
@@ -49,14 +49,14 @@ public:
         M_Except = 'e'
     } EModes;
 
-    CChannel(const CString& sName, CNetwork* pNetwork, bool bInConfig, CConfig* pConfig = nullptr);
+    CChannel(const CString& sName, CNetwork* pNetwork, bool bInConfig, CSettings* pConfig = nullptr);
     ~CChannel();
 
     CChannel(const CChannel&) = delete;
     CChannel& operator=(const CChannel&) = delete;
 
     void Reset();
-    CConfig ToConfig() const;
+    CSettings ToConfig() const;
     void Clone(CChannel& chan);
     void Cycle() const;
     void JoinUser(const CString& sKey = "");

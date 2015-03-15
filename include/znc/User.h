@@ -27,7 +27,7 @@
 class CModules;
 class CChannel;
 class CClient;
-class CConfig;
+class CSettings;
 class CFile;
 class CNetwork;
 class CIRCSock;
@@ -43,7 +43,7 @@ public:
     CUser(const CUser&) = delete;
     CUser& operator=(const CUser&) = delete;
 
-    bool ParseConfig(CConfig* Config, CString& sError);
+    bool ParseConfig(CSettings* Config, CString& sError);
 
     // TODO refactor this
     enum eHashType {
@@ -62,7 +62,7 @@ public:
         return CUtils::SaltedSHA256Hash(sPass, sSalt);
     }
 
-    CConfig ToConfig() const;
+    CSettings ToConfig() const;
     bool CheckPass(const CString& sPass) const;
     bool AddAllowedHost(const CString& sHostMask);
     bool IsHostAllowed(const CString& sHostMask) const;
