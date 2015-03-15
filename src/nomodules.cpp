@@ -98,28 +98,6 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
     }                                                   \
     return bHaltCore;
 
-/////////////////// Timer ///////////////////
-CTimer::CTimer(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription)
-    : CCron(), m_pModule(pModule), m_sDescription(sDescription)
-{
-    SetName(sLabel);
-
-    if (uCycles) {
-        StartMaxCycles(uInterval, uCycles);
-    } else {
-        Start(uInterval);
-    }
-}
-
-CTimer::~CTimer() { m_pModule->UnlinkTimer(this); }
-
-void CTimer::SetModule(CModule* p) { m_pModule = p; }
-void CTimer::SetDescription(const CString& s) { m_sDescription = s; }
-CModule* CTimer::GetModule() const { return m_pModule; }
-const CString& CTimer::GetDescription() const { return m_sDescription; }
-/////////////////// !Timer ///////////////////
-
-
 CModule::CModule(ModHandle pDLL, CUser* pUser, CNetwork* pNetwork, const CString& sModName, const CString& sDataDir, CModInfo::EModuleType eType)
     : m_eType(eType), m_sDescription(""), m_sTimers(), m_sSockets(),
 #ifdef HAVE_PTHREAD

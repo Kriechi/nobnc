@@ -21,6 +21,7 @@
 #include <znc/nowebmodules.h>
 #include <znc/noutils.h>
 #include <znc/nothreads.h>
+#include <znc/notimer.h>
 #include <znc/main.h>
 #include <functional>
 #include <set>
@@ -109,55 +110,7 @@ class CUser;
 class CNick;
 class CChannel;
 class CModule;
-class CFPTimer;
 class CSockManager;
-
-class CTimer : public CCron
-{
-public:
-    CTimer(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription);
-
-    virtual ~CTimer();
-
-    CTimer(const CTimer&) = delete;
-    CTimer& operator=(const CTimer&) = delete;
-
-    void SetModule(CModule* p);
-    void SetDescription(const CString& s);
-
-    CModule* GetModule() const;
-    const CString& GetDescription() const;
-
-private:
-    CModule* m_pModule;
-    CString m_sDescription;
-};
-
-typedef void (*FPTimer_t)(CModule*, CFPTimer*);
-
-class CFPTimer : public CTimer
-{
-public:
-    CFPTimer(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription)
-        : CTimer(pModule, uInterval, uCycles, sLabel, sDescription), m_pFBCallback(nullptr)
-    {
-    }
-
-    virtual ~CFPTimer() {}
-
-    void SetFPCallback(FPTimer_t p) { m_pFBCallback = p; }
-
-protected:
-    void RunJob() override
-    {
-        if (m_pFBCallback) {
-            m_pFBCallback(GetModule(), this);
-        }
-    }
-
-private:
-    FPTimer_t m_pFBCallback;
-};
 
 #ifdef HAVE_PTHREAD
 /// A CJob version which can be safely used in modules. The job will be

@@ -39,6 +39,7 @@ list(APPEND ZNC_SOURCES src/nobuffer.cpp
                         src/nostring.cpp
                         src/notemplate.cpp
                         src/nothreads.cpp
+                        src/notimer.cpp
                         src/nouser.cpp
                         src/noutils.cpp
                         src/nowebmodules.cpp
