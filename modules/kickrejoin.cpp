@@ -22,8 +22,8 @@
  *
  */
 
-#include <znc/Channel.h>
-#include <znc/Network.h>
+#include <znc/nochannel.h>
+#include <znc/nonetwork.h>
 
 class CRejoinJob : public CTimer
 {

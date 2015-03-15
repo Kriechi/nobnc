@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <znc/User.h>
-#include <znc/Network.h>
-#include <znc/znc.h>
+#include <znc/nouser.h>
+#include <znc/nonetwork.h>
+#include <znc/noznc.h>
 
 class CFOModule : public CModule
 {

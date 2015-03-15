@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include <znc/Channel.h>
-#include <znc/Server.h>
-#include <znc/User.h>
-#include <znc/Network.h>
-#include <znc/IRCSock.h>
+#include <znc/nochannel.h>
+#include <znc/noserver.h>
+#include <znc/nouser.h>
+#include <znc/nonetwork.h>
+#include <znc/noircsock.h>
 
 using std::stringstream;
 using std::make_pair;

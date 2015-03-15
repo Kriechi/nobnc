@@ -24,11 +24,11 @@
 
 #define REQUIRESSL
 
-#include <znc/Channel.h>
-#include <znc/User.h>
-#include <znc/Network.h>
-#include <znc/FileUtils.h>
-#include <znc/Query.h>
+#include <znc/nochannel.h>
+#include <znc/nouser.h>
+#include <znc/nonetwork.h>
+#include <znc/nofileutils.h>
+#include <znc/noquery.h>
 
 using std::set;
 using std::vector;

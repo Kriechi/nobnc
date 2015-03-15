@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/FileUtils.h>
-#include <znc/IRCSock.h>
-#include <znc/User.h>
-#include <znc/Network.h>
+#include <znc/nofileutils.h>
+#include <znc/noircsock.h>
+#include <znc/nouser.h>
+#include <znc/nonetwork.h>
 
 class CIdentFileModule : public CModule
 {

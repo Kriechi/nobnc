@@ -16,13 +16,13 @@
 
 #include <Python.h>
 
-#include <znc/Channel.h>
-#include <znc/FileUtils.h>
-#include <znc/IRCSock.h>
-#include <znc/Modules.h>
-#include <znc/Nick.h>
-#include <znc/User.h>
-#include <znc/znc.h>
+#include <znc/nochannel.h>
+#include <znc/nofileutils.h>
+#include <znc/noircsock.h>
+#include <znc/nomodules.h>
+#include <znc/nonick.h>
+#include <znc/nouser.h>
+#include <znc/noznc.h>
 
 #include "swigpyrun.h"
 #include "module.h"

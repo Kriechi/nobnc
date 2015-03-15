@@ -20,7 +20,7 @@
 #include <perl.h>
 #include <XSUB.h>
 
-#include <znc/Modules.h>
+#include <znc/nomodules.h>
 
 #if HAVE_VISIBILITY
 #pragma GCC visibility push(default)

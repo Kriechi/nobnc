@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/User.h>
-#include <znc/Network.h>
-#include <znc/IRCSock.h>
-#include <znc/Channel.h>
+#include <znc/nouser.h>
+#include <znc/nonetwork.h>
+#include <znc/noircsock.h>
+#include <znc/nochannel.h>
 
 using std::set;
 

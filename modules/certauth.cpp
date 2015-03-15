@@ -16,8 +16,8 @@
 
 #define REQUIRESSL
 
-#include <znc/User.h>
-#include <znc/znc.h>
+#include <znc/nouser.h>
+#include <znc/noznc.h>
 
 using std::map;
 using std::vector;

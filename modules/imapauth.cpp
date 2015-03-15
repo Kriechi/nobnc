@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/znc.h>
+#include <znc/noznc.h>
 
 using std::map;
 

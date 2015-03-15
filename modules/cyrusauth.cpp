@@ -23,8 +23,8 @@
 
 #define REQUIRECYRUS
 
-#include <znc/znc.h>
-#include <znc/User.h>
+#include <znc/noznc.h>
+#include <znc/nouser.h>
 
 #include <sasl/sasl.h>
 

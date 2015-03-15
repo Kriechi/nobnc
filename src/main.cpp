@@ -15,11 +15,11 @@
  */
 
 #include "main.h"
-#include "znc.h"
+#include "noznc.h"
 #include <signal.h>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)
-#include "Threads.h"
+#include "nothreads.h"
 #include <openssl/crypto.h>
 #include <memory>
 

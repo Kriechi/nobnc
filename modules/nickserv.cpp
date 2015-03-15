@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/Modules.h>
-#include <znc/User.h>
+#include <znc/nomodules.h>
+#include <znc/nouser.h>
 
 class CNickServ : public CModule
 {

@@ -15,9 +15,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <znc/Network.h>
-#include <znc/User.h>
-#include <znc/znc.h>
+#include <znc/nonetwork.h>
+#include <znc/nouser.h>
+#include <znc/noznc.h>
 
 class NetworkTest : public ::testing::Test
 {

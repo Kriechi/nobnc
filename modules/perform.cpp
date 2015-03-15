@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/Network.h>
+#include <znc/nonetwork.h>
 
 class CPerform : public CModule
 {

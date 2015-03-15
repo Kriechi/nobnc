@@ -29,9 +29,9 @@
 
 #define REQUIRESSL
 
-#include <znc/User.h>
-#include <znc/Network.h>
-#include <znc/FileUtils.h>
+#include <znc/nouser.h>
+#include <znc/nonetwork.h>
+#include <znc/nofileutils.h>
 
 using std::vector;
 using std::map;

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/FileUtils.h>
-#include <znc/Server.h>
-#include <znc/Network.h>
-#include <znc/User.h>
+#include <znc/nofileutils.h>
+#include <znc/noserver.h>
+#include <znc/nonetwork.h>
+#include <znc/nouser.h>
 
 #include <syslog.h>
 

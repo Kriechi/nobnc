@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/User.h>
-#include <znc/Network.h>
+#include <znc/nouser.h>
+#include <znc/nonetwork.h>
 
 using std::vector;
 

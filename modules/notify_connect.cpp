@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/znc.h>
-#include <znc/User.h>
+#include <znc/noznc.h>
+#include <znc/nouser.h>
 
 class CNotifyConnectMod : public CModule
 {

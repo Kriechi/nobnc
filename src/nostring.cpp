@@ -15,10 +15,10 @@
  */
 
 #include "nostring.h"
-#include "FileUtils.h"
-#include "Utils.h"
-#include "MD5.h"
-#include "SHA256.h"
+#include "nofileutils.h"
+#include "noutils.h"
+#include "nomd5.h"
+#include "nosha256.h"
 #include <sstream>
 
 using std::stringstream;

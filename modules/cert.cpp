@@ -16,10 +16,10 @@
 
 #define REQUIRESSL
 
-#include <znc/FileUtils.h>
-#include <znc/User.h>
-#include <znc/Modules.h>
-#include <znc/IRCSock.h>
+#include <znc/nofileutils.h>
+#include <znc/nouser.h>
+#include <znc/nomodules.h>
+#include <znc/noircsock.h>
 
 class CCertMod : public CModule
 {

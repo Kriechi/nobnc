@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <znc/Channel.h>
-#include <znc/User.h>
-#include <znc/Network.h>
+#include <znc/nochannel.h>
+#include <znc/nouser.h>
+#include <znc/nonetwork.h>
 
 class CChannelSaverMod : public CModule
 {

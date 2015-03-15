@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/Modules.h>
-#include <znc/Channel.h>
+#include <znc/nomodules.h>
+#include <znc/nochannel.h>
 
 class CCtcpFloodMod : public CModule
 {

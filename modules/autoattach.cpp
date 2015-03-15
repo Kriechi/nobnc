@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/Channel.h>
-#include <znc/Modules.h>
+#include <znc/nochannel.h>
+#include <znc/nomodules.h>
 
 using std::vector;
 

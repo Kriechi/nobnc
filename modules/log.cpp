@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <znc/FileUtils.h>
-#include <znc/User.h>
-#include <znc/Network.h>
-#include <znc/Channel.h>
-#include <znc/Server.h>
+#include <znc/nofileutils.h>
+#include <znc/nouser.h>
+#include <znc/nonetwork.h>
+#include <znc/nochannel.h>
+#include <znc/noserver.h>
 #include <algorithm>
 
 using std::vector;

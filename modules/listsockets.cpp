@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/User.h>
-#include <znc/znc.h>
+#include <znc/nouser.h>
+#include <znc/noznc.h>
 
 class CSocketSorter
 {

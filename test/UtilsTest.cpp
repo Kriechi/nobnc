@@ -15,8 +15,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <znc/FileUtils.h>
-#include <znc/Utils.h>
+#include <znc/nofileutils.h>
+#include <znc/noutils.h>
 
 TEST(IRC32, GetMessageTags)
 {

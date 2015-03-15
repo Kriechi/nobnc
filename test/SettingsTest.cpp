@@ -15,8 +15,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <znc/FileUtils.h>
-#include <znc/Settings.h>
+#include <znc/nofileutils.h>
+#include <znc/nosettings.h>
 
 class CSettingsTest : public ::testing::Test
 {

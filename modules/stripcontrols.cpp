@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/Modules.h>
+#include <znc/nomodules.h>
 
 class CStripControlsMod : public CModule
 {

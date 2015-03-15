@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include <znc/Channel.h>
-#include <znc/FileUtils.h>
+#include <znc/nochannel.h>
+#include <znc/nofileutils.h>
 #include <znc/nostring.h>
-#include <znc/IRCSock.h>
-#include <znc/Modules.h>
-#include <znc/Nick.h>
-#include <znc/User.h>
-#include <znc/znc.h>
+#include <znc/noircsock.h>
+#include <znc/nomodules.h>
+#include <znc/nonick.h>
+#include <znc/nouser.h>
+#include <znc/noznc.h>
 
 #include "module.h"
 #include "swigperlrun.h"

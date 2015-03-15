@@ -15,8 +15,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <znc/Client.h>
-#include <znc/znc.h>
+#include <znc/noclient.h>
+#include <znc/noznc.h>
 
 class ClientTest : public ::testing::Test
 {

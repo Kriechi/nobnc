@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/FileUtils.h>
-#include <znc/User.h>
-#include <znc/znc.h>
-#include <znc/ExecSock.h>
+#include <znc/nofileutils.h>
+#include <znc/nouser.h>
+#include <znc/noznc.h>
+#include <znc/noexecsock.h>
 
 using std::vector;
 

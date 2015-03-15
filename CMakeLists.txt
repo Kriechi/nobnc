@@ -15,32 +15,32 @@ include(DefineVersion)
 
 ### SOURCES
 
-list(APPEND ZNC_SOURCES src/Buffer.cpp
-                        src/Channel.cpp
-                        src/Client.cpp
-                        src/ClientCommand.cpp
-                        src/FileUtils.cpp
-                        src/HTTPSock.cpp
-                        src/IRCSock.cpp
-                        src/Listener.cpp
-                        src/MD5.cpp
-                        src/Modules.cpp
-                        src/Network.cpp
-                        src/Nick.cpp
-                        src/Query.cpp
-                        src/SHA256.cpp
-                        src/Server.cpp
-                        src/Settings.cpp
-                        src/Socket.cpp
-                        src/SSLVerifyHost.cpp
-                        src/Template.cpp
-                        src/Threads.cpp
-                        src/User.cpp
-                        src/Utils.cpp
-                        src/WebModules.cpp
+list(APPEND ZNC_SOURCES src/nobuffer.cpp
+                        src/nochannel.cpp
+                        src/noclient.cpp
+                        src/noclientcommand.cpp
                         src/nodebug.cpp
+                        src/nofileutils.cpp
+                        src/nohttpsock.cpp
+                        src/noircsock.cpp
+                        src/nolistener.cpp
+                        src/nomd5.cpp
+                        src/nomodules.cpp
+                        src/nonetwork.cpp
+                        src/nonick.cpp
+                        src/noquery.cpp
+                        src/nosha256.cpp
+                        src/noserver.cpp
+                        src/nosettings.cpp
+                        src/nosocket.cpp
+                        src/nosslverifyhost.cpp
                         src/nostring.cpp
-                        src/znc.cpp
+                        src/notemplate.cpp
+                        src/nothreads.cpp
+                        src/nouser.cpp
+                        src/noutils.cpp
+                        src/nowebmodules.cpp
+                        src/noznc.cpp
                         ${PROJECT_BINARY_DIR}/src/Csocket.cpp
                         ${PROJECT_BINARY_DIR}/src/noversion.cpp
 )
