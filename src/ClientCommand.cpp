@@ -233,9 +233,9 @@ void CClient::UserCommand(CString& sLine)
             Table.SetCell("Network", "N/A");
             Table.SetCell("Clients", CString(it.second->GetUserClients().size()));
 
-            const vector<CIRCNetwork*>& vNetworks = it.second->GetNetworks();
+            const vector<CNetwork*>& vNetworks = it.second->GetNetworks();
 
-            for (const CIRCNetwork* pNetwork : vNetworks) {
+            for (const CNetwork* pNetwork : vNetworks) {
                 Table.AddRow();
                 if (pNetwork == vNetworks.back()) {
                     Table.SetCell("Username", "`-");
@@ -494,7 +494,7 @@ void CClient::UserCommand(CString& sLine)
             return;
         }
 
-        CIRCNetwork* pNetwork = m_pNetwork;
+        CNetwork* pNetwork = m_pNetwork;
 
         const CString sNick = sLine.Token(1);
         const CString sNetwork = sLine.Token(2);
@@ -560,7 +560,7 @@ void CClient::UserCommand(CString& sLine)
             PutStatus("Usage: AddNetwork <name>");
             return;
         }
-        if (!CIRCNetwork::IsValidNetwork(sNetwork)) {
+        if (!CNetwork::IsValidNetwork(sNetwork)) {
             PutStatus("Network name should be alphanumeric");
             return;
         }
@@ -604,7 +604,7 @@ void CClient::UserCommand(CString& sLine)
             }
         }
 
-        const vector<CIRCNetwork*>& vNetworks = pUser->GetNetworks();
+        const vector<CNetwork*>& vNetworks = pUser->GetNetworks();
 
         CTable Table;
         Table.AddColumn("Network");
@@ -613,7 +613,7 @@ void CClient::UserCommand(CString& sLine)
         Table.AddColumn("IRC User");
         Table.AddColumn("Channels");
 
-        for (const CIRCNetwork* pNetwork : vNetworks) {
+        for (const CNetwork* pNetwork : vNetworks) {
             Table.AddRow();
             Table.SetCell("Network", pNetwork->GetName());
             if (pNetwork->IsIRCConnected()) {
@@ -654,7 +654,7 @@ void CClient::UserCommand(CString& sLine)
             return;
         }
 
-        CIRCNetwork* pOldNetwork = pOldUser->FindNetwork(sOldNetwork);
+        CNetwork* pOldNetwork = pOldUser->FindNetwork(sOldNetwork);
         if (!pOldNetwork) {
             PutStatus("Old network [" + sOldNetwork + "] not found.");
             return;
@@ -671,7 +671,7 @@ void CClient::UserCommand(CString& sLine)
             return;
         }
 
-        if (!CIRCNetwork::IsValidNetwork(sNewNetwork)) {
+        if (!CNetwork::IsValidNetwork(sNewNetwork)) {
             PutStatus("Invalid network name [" + sNewNetwork + "]");
             return;
         }
@@ -693,7 +693,7 @@ void CClient::UserCommand(CString& sLine)
         }
 
         CString sNetworkAddError;
-        CIRCNetwork* pNewNetwork = pNewUser->AddNetwork(sNewNetwork, sNetworkAddError);
+        CNetwork* pNewNetwork = pNewUser->AddNetwork(sNewNetwork, sNetworkAddError);
 
         if (!pNewNetwork) {
             PutStatus("Error adding network:" + sNetworkAddError);
@@ -724,7 +724,7 @@ void CClient::UserCommand(CString& sLine)
             return;
         }
 
-        CIRCNetwork* pNetwork = m_pUser->FindNetwork(sNetwork);
+        CNetwork* pNetwork = m_pUser->FindNetwork(sNetwork);
         if (pNetwork) {
             PutStatus("Switched to " + sNetwork);
             SetNetwork(pNetwork);

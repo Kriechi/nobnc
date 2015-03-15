@@ -108,7 +108,7 @@ public:
 
     void RunJob()
     {
-        CIRCNetwork* pNetwork = GetNetwork();
+        CNetwork* pNetwork = GetNetwork();
         if (!pNetwork->GetIRCSock()) return;
 
         for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {

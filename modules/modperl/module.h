@@ -29,7 +29,7 @@ class CPerlModule : public CModule {
 	SV* m_perlObj;
 	VWebSubPages* _GetSubPages();
 public:
-	CPerlModule(CUser* pUser, CIRCNetwork* pNetwork, const CString& sModName, const CString& sDataPath,
+	CPerlModule(CUser* pUser, CNetwork* pNetwork, const CString& sModName, const CString& sDataPath,
 			CModInfo::EModuleType eType, SV* perlObj)
 			: CModule(nullptr, pUser, pNetwork, sModName, sDataPath, eType) {
 		m_perlObj = newSVsv(perlObj);
@@ -102,8 +102,8 @@ public:
 	void OnServerCapResult(const CString& sCap, bool bSuccess) override;
 	EModRet OnTimerAutoJoin(CChan& Channel) override;
 	bool OnEmbeddedWebRequest(CWebSock&, const CString&, CTemplate&) override;
-	EModRet OnAddNetwork(CIRCNetwork& Network, CString& sErrorRet) override;
-	EModRet OnDeleteNetwork(CIRCNetwork& Network) override;
+	EModRet OnAddNetwork(CNetwork& Network, CString& sErrorRet) override;
+	EModRet OnDeleteNetwork(CNetwork& Network) override;
 	EModRet OnSendToClient(CString& sLine, CClient& Client) override;
 	EModRet OnSendToIRC(CString& sLine) override;
 };

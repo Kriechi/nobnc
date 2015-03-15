@@ -29,7 +29,7 @@
 
 class CAuthBase;
 class CChan;
-class CIRCNetwork;
+class CNetwork;
 class CClient;
 class CWebSock;
 class CTemplate;
@@ -84,7 +84,7 @@ class CModInfo;
  *  @param CLASS The name of your module's class.
  */
 #define MODCONSTRUCTOR(CLASS)                                                                                                                 \
-    CLASS(ModHandle pDLL, CUser* pUser, CIRCNetwork* pNetwork, const CString& sModName, const CString& sModPath, CModInfo::EModuleType eType) \
+    CLASS(ModHandle pDLL, CUser* pUser, CNetwork* pNetwork, const CString& sModName, const CString& sModPath, CModInfo::EModuleType eType) \
         : CModule(pDLL, pUser, pNetwork, sModName, sModPath, eType)
 
 /** This works exactly like MODULEDEFS, but for user modules. */
@@ -192,7 +192,7 @@ class CModInfo
 public:
     typedef enum { GlobalModule, UserModule, NetworkModule } EModuleType;
 
-    typedef CModule* (*ModLoader)(ModHandle p, CUser* pUser, CIRCNetwork* pNetwork, const CString& sModName, const CString& sModPath, EModuleType eType);
+    typedef CModule* (*ModLoader)(ModHandle p, CUser* pUser, CNetwork* pNetwork, const CString& sModName, const CString& sModPath, EModuleType eType);
 
     CModInfo() : CModInfo("", "", NetworkModule) {}
     CModInfo(const CString& sName, const CString& sPath, EModuleType eType)
@@ -256,7 +256,7 @@ template <class M> void TModInfo(CModInfo& Info) {}
 
 template <class M>
 CModule*
-TModLoad(ModHandle p, CUser* pUser, CIRCNetwork* pNetwork, const CString& sModName, const CString& sModPath, CModInfo::EModuleType eType)
+TModLoad(ModHandle p, CUser* pUser, CNetwork* pNetwork, const CString& sModName, const CString& sModPath, CModInfo::EModuleType eType)
 {
     return new M(p, pUser, pNetwork, sModName, sModPath, eType);
 }
@@ -334,7 +334,7 @@ class CModule
 public:
     CModule(ModHandle pDLL,
             CUser* pUser,
-            CIRCNetwork* pNetwork,
+            CNetwork* pNetwork,
             const CString& sModName,
             const CString& sDataDir,
             CModInfo::EModuleType eType = CModInfo::NetworkModule); // TODO: remove default value in ZNC 2.x
@@ -375,7 +375,7 @@ public:
     } EModException;
 
     void SetUser(CUser* pUser);
-    void SetNetwork(CIRCNetwork* pNetwork);
+    void SetNetwork(CNetwork* pNetwork);
     void SetClient(CClient* pClient);
 
     /** This function throws CModule::UNLOAD which causes this module to be unloaded.
@@ -810,12 +810,12 @@ public:
      *                  the module stops adding the network.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnAddNetwork(CIRCNetwork& Network, CString& sErrorRet);
+    virtual EModRet OnAddNetwork(CNetwork& Network, CString& sErrorRet);
     /** This module hook is called when a network is deleted.
      *  @param Network The IRC network which is going to be deleted.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnDeleteNetwork(CIRCNetwork& Network);
+    virtual EModRet OnDeleteNetwork(CNetwork& Network);
 
     /** Called when ZNC sends a raw traffic line to a client.
      *  @param sLine The raw traffic line sent.
@@ -977,7 +977,7 @@ public:
     /** @returns nullptr except when we are in a client-specific module hook in
      *           which case this is the client for which the hook is called.
      */
-    CIRCNetwork* GetNetwork() const { return m_pNetwork; }
+    CNetwork* GetNetwork() const { return m_pNetwork; }
     CClient* GetClient() const { return m_pClient; }
     CSockManager* GetManager() const { return m_pManager; }
 
@@ -1084,7 +1084,7 @@ private:
     ModHandle m_pDLL;
     CSockManager* m_pManager;
     CUser* m_pUser;
-    CIRCNetwork* m_pNetwork;
+    CNetwork* m_pNetwork;
     CClient* m_pClient;
     CString m_sModName;
     CString m_sDataDir;
@@ -1108,10 +1108,10 @@ public:
     CModules& operator=(const CModules&) = default;
 
     void SetUser(CUser* pUser) { m_pUser = pUser; }
-    void SetNetwork(CIRCNetwork* pNetwork) { m_pNetwork = pNetwork; }
+    void SetNetwork(CNetwork* pNetwork) { m_pNetwork = pNetwork; }
     void SetClient(CClient* pClient) { m_pClient = pClient; }
     CUser* GetUser() const { return m_pUser; }
-    CIRCNetwork* GetNetwork() const { return m_pNetwork; }
+    CNetwork* GetNetwork() const { return m_pNetwork; }
     CClient* GetClient() const { return m_pClient; }
 
     void UnloadAll();
@@ -1189,8 +1189,8 @@ public:
     bool OnTopic(CNick& Nick, CChan& Channel, CString& sTopic);
     bool OnTimerAutoJoin(CChan& Channel);
 
-    bool OnAddNetwork(CIRCNetwork& Network, CString& sErrorRet);
-    bool OnDeleteNetwork(CIRCNetwork& Network);
+    bool OnAddNetwork(CNetwork& Network, CString& sErrorRet);
+    bool OnDeleteNetwork(CNetwork& Network);
 
     bool OnSendToClient(CString& sLine, CClient& Client);
     bool OnSendToIRC(CString& sLine);
@@ -1199,10 +1199,10 @@ public:
     bool OnServerCapResult(const CString& sCap, bool bSuccess);
 
     CModule* FindModule(const CString& sModule) const;
-    bool LoadModule(const CString& sModule, const CString& sArgs, CModInfo::EModuleType eType, CUser* pUser, CIRCNetwork* pNetwork, CString& sRetMsg);
+    bool LoadModule(const CString& sModule, const CString& sArgs, CModInfo::EModuleType eType, CUser* pUser, CNetwork* pNetwork, CString& sRetMsg);
     bool UnloadModule(const CString& sModule);
     bool UnloadModule(const CString& sModule, CString& sRetMsg);
-    bool ReloadModule(const CString& sModule, const CString& sArgs, CUser* pUser, CIRCNetwork* pNetwork, CString& sRetMsg);
+    bool ReloadModule(const CString& sModule, const CString& sArgs, CUser* pUser, CNetwork* pNetwork, CString& sRetMsg);
 
     static bool GetModInfo(CModInfo& ModInfo, const CString& sModule, CString& sRetMsg);
     static bool GetModPathInfo(CModInfo& ModInfo, const CString& sModule, const CString& sModPath, CString& sRetMsg);
@@ -1236,7 +1236,7 @@ private:
     OpenModule(const CString& sModule, const CString& sModPath, bool& bVersionMismatch, CModInfo& Info, CString& sRetMsg);
 
     CUser* m_pUser;
-    CIRCNetwork* m_pNetwork;
+    CNetwork* m_pNetwork;
     CClient* m_pClient;
 };
 

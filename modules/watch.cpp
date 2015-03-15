@@ -72,7 +72,7 @@ public:
     }
     virtual ~CWatchEntry() {}
 
-    bool IsMatch(const CNick& Nick, const CString& sText, const CString& sSource, const CIRCNetwork* pNetwork)
+    bool IsMatch(const CNick& Nick, const CString& sText, const CString& sSource, const CNetwork* pNetwork)
     {
         if (IsDisabled()) {
             return false;
@@ -352,7 +352,7 @@ private:
     void Process(const CNick& Nick, const CString& sMessage, const CString& sSource)
     {
         set<CString> sHandledTargets;
-        CIRCNetwork* pNetwork = GetNetwork();
+        CNetwork* pNetwork = GetNetwork();
         CChan* pChannel = pNetwork->FindChan(sSource);
 
         for (list<CWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {

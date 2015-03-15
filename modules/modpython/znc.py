@@ -707,7 +707,7 @@ def CreateWebSubPage(name, title='', params=dict(), admin=False):
     return CreateWebSubPage_(name, title, vpair, flags)
 
 CUser.GetNetworks = CUser.GetNetworks_
-CIRCNetwork.GetChans = CIRCNetwork.GetChans_
+CNetwork.GetChans = CNetwork.GetChans_
 CChan.GetNicks = CChan.GetNicks_
 CZNC.GetUserMap = CZNC.GetUserMap_
 
@@ -736,7 +736,7 @@ CZNC.AddListener = FreeOwnership(func=CZNC.AddListener)
 CZNC.AddUser = FreeOwnership(func=CZNC.AddUser)
 CZNC.AddNetworkToQueue = FreeOwnership(func=CZNC.AddNetworkToQueue)
 CUser.AddNetwork = FreeOwnership(func=CUser.AddNetwork)
-CIRCNetwork.AddChan = FreeOwnership(func=CIRCNetwork.AddChan)
+CNetwork.AddChan = FreeOwnership(func=CNetwork.AddChan)
 CModule.AddSocket = FreeOwnership(func=CModule.AddSocket)
 CModule.AddSubPage = FreeOwnership(func=CModule.AddSubPage)
 
@@ -764,5 +764,5 @@ def str_eq(self, other):
 CChan.__eq__ = str_eq
 CNick.__eq__ = str_eq
 CUser.__eq__ = str_eq
-CIRCNetwork.__eq__ = str_eq
+CNetwork.__eq__ = str_eq
 CPyRetString.__eq__ = str_eq

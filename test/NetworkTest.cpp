@@ -29,7 +29,7 @@ protected:
 TEST_F(NetworkTest, FindChan)
 {
     CUser user("user");
-    CIRCNetwork network(&user, "network");
+    CNetwork network(&user, "network");
 
     EXPECT_TRUE(network.AddChan("#foo", false));
     EXPECT_TRUE(network.AddChan("#Bar", false));
@@ -51,7 +51,7 @@ TEST_F(NetworkTest, FindChan)
 TEST_F(NetworkTest, FindChans)
 {
     CUser user("user");
-    CIRCNetwork network(&user, "network");
+    CNetwork network(&user, "network");
 
     EXPECT_TRUE(network.AddChan("#foo", false));
     EXPECT_TRUE(network.AddChan("#Bar", false));
@@ -66,7 +66,7 @@ TEST_F(NetworkTest, FindChans)
 TEST_F(NetworkTest, FindQuery)
 {
     CUser user("user");
-    CIRCNetwork network(&user, "network");
+    CNetwork network(&user, "network");
 
     EXPECT_TRUE(network.AddQuery("foo"));
     EXPECT_TRUE(network.AddQuery("Bar"));
@@ -88,7 +88,7 @@ TEST_F(NetworkTest, FindQuery)
 TEST_F(NetworkTest, FindQueries)
 {
     CUser user("user");
-    CIRCNetwork network(&user, "network");
+    CNetwork network(&user, "network");
 
     EXPECT_TRUE(network.AddQuery("foo"));
     EXPECT_TRUE(network.AddQuery("Bar"));

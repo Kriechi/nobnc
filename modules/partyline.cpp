@@ -124,8 +124,8 @@ public:
 
         for (map<CString, CUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             CUser* pUser = it->second;
-            for (vector<CIRCNetwork*>::const_iterator i = pUser->GetNetworks().begin(); i != pUser->GetNetworks().end(); ++i) {
-                CIRCNetwork* pNetwork = *i;
+            for (vector<CNetwork*>::const_iterator i = pUser->GetNetworks().begin(); i != pUser->GetNetworks().end(); ++i) {
+                CNetwork* pNetwork = *i;
                 if (pNetwork->GetIRCSock()) {
                     if (pNetwork->GetChanPrefixes().find(CHAN_PREFIX_1) == CString::npos) {
                         pNetwork->PutUser(":" + GetIRCServer(pNetwork) + " 005 " + pNetwork->GetIRCNick().GetNick() +
@@ -227,7 +227,7 @@ public:
     {
         CUser* pUser = GetUser();
         CClient* pClient = GetClient();
-        CIRCNetwork* pNetwork = GetNetwork();
+        CNetwork* pNetwork = GetNetwork();
         if (m_spInjectedPrefixes.find(pNetwork) == m_spInjectedPrefixes.end() && pNetwork && !pNetwork->GetChanPrefixes().empty()) {
             pClient->PutClient(":" + GetIRCServer(pNetwork) + " 005 " + pClient->GetNick() + " CHANTYPES=" +
                                pNetwork->GetChanPrefixes() + CHAN_PREFIX_1 " :are supported by this server.");
@@ -506,7 +506,7 @@ public:
 
         CUser* pUser = GetUser();
         CClient* pClient = GetClient();
-        CIRCNetwork* pNetwork = GetNetwork();
+        CNetwork* pNetwork = GetNetwork();
         CString sHost = pUser->GetBindHost();
 
         if (sHost.empty()) {
@@ -578,7 +578,7 @@ public:
         return HandleMessage("NOTICE", sTarget, "\001" + sMessage + "\001");
     }
 
-    const CString GetIRCServer(CIRCNetwork* pNetwork)
+    const CString GetIRCServer(CNetwork* pNetwork)
     {
         if (!pNetwork) {
             return "irc.znc.in";
@@ -640,7 +640,7 @@ public:
         }
     }
 
-    void SendNickList(CUser* pUser, CIRCNetwork* pNetwork, const set<CString>& ssNicks, const CString& sChan)
+    void SendNickList(CUser* pUser, CNetwork* pNetwork, const set<CString>& ssNicks, const CString& sChan)
     {
         CString sNickList;
 
@@ -702,7 +702,7 @@ public:
 
 private:
     set<CPartylineChannel*> m_ssChannels;
-    set<CIRCNetwork*> m_spInjectedPrefixes;
+    set<CNetwork*> m_spInjectedPrefixes;
     set<CString> m_ssDefaultChans;
 };
 

@@ -38,8 +38,8 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
                     bAllExit = true;                                           \
                     break;                                                     \
                 }                                                              \
-                const vector<CIRCNetwork*>& mNets = it->second->GetNetworks(); \
-                vector<CIRCNetwork*>::const_iterator it2;                      \
+                const vector<CNetwork*>& mNets = it->second->GetNetworks(); \
+                vector<CNetwork*>::const_iterator it2;                      \
                 for (it2 = mNets.begin(); it2 != mNets.end(); ++it2) {         \
                     CModules& NMods = (*it2)->GetModules();                    \
                     if (NMods.macFUNC) {                                       \
@@ -57,7 +57,7 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
     do {                                                                      \
         CModules& GMods = CZNC::Get().GetModules();                           \
         CUser* pOldGUser = GMods.GetUser();                                   \
-        CIRCNetwork* pOldGNetwork = GMods.GetNetwork();                       \
+        CNetwork* pOldGNetwork = GMods.GetNetwork();                       \
         CClient* pOldGClient = GMods.GetClient();                             \
         GMods.SetUser(macUSER);                                               \
         GMods.SetNetwork(macNETWORK);                                         \
@@ -83,7 +83,7 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
         }                                                                           \
         if (macUSER != nullptr) {                                                   \
             CModules& UMods = macUSER->GetModules();                                \
-            CIRCNetwork* pOldUNetwork = UMods.GetNetwork();                         \
+            CNetwork* pOldUNetwork = UMods.GetNetwork();                         \
             CClient* pOldUClient = UMods.GetClient();                               \
             UMods.SetNetwork(macNETWORK);                                           \
             UMods.SetClient(macCLIENT);                                             \

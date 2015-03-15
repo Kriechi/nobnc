@@ -27,7 +27,7 @@
 
 class CListener;
 class CUser;
-class CIRCNetwork;
+class CNetwork;
 class CConnectQueueTimer;
 class CConfig;
 class CFile;
@@ -179,8 +179,8 @@ public:
         return (b && *b);
     }
 
-    void AddNetworkToQueue(CIRCNetwork* pNetwork);
-    std::list<CIRCNetwork*>& GetConnectionQueue() { return m_lpConnectQueue; }
+    void AddNetworkToQueue(CNetwork* pNetwork);
+    std::list<CNetwork*>& GetConnectionQueue() { return m_lpConnectQueue; }
 
     void EnableConnectQueue();
     void DisableConnectQueue();
@@ -231,7 +231,7 @@ private:
     CModules* m_pModules;
     unsigned long long m_uBytesRead;
     unsigned long long m_uBytesWritten;
-    std::list<CIRCNetwork*> m_lpConnectQueue;
+    std::list<CNetwork*> m_lpConnectQueue;
     CConnectQueueTimer* m_pConnectQueueTimer;
     unsigned int m_uiConnectPaused;
     TCacheMap<CString> m_sConnectThrottle;

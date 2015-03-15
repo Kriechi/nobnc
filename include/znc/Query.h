@@ -22,12 +22,12 @@
 #include <znc/Buffer.h>
 
 class CClient;
-class CIRCNetwork;
+class CNetwork;
 
 class CQuery
 {
 public:
-    CQuery(const CString& sName, CIRCNetwork* pNetwork);
+    CQuery(const CString& sName, CNetwork* pNetwork);
     ~CQuery();
 
     CQuery(const CQuery&) = delete;
@@ -48,7 +48,7 @@ public:
 
 private:
     CString m_sName;
-    CIRCNetwork* m_pNetwork;
+    CNetwork* m_pNetwork;
     CBuffer m_Buffer;
 };
 

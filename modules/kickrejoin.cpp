@@ -38,7 +38,7 @@ public:
 protected:
     void RunJob() override
     {
-        CIRCNetwork* pNetwork = GetModule()->GetNetwork();
+        CNetwork* pNetwork = GetModule()->GetNetwork();
         CChan* pChan = pNetwork->FindChan(GetName().Token(1, true));
 
         if (pChan) {

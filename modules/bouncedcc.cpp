@@ -238,7 +238,7 @@ public:
 
     EModRet OnPrivCTCP(CNick& Nick, CString& sMessage) override
     {
-        CIRCNetwork* pNetwork = GetNetwork();
+        CNetwork* pNetwork = GetNetwork();
         if (sMessage.StartsWith("DCC ") && pNetwork->IsUserAttached()) {
             // DCC CHAT chat 2453612361 44592
             CString sType = sMessage.Token(1, false, " ", false, "\"", "\"", true);

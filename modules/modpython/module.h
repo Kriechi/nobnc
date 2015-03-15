@@ -31,7 +31,7 @@ class CPyModule : public CModule {
 	CModPython* m_pModPython;
 	VWebSubPages* _GetSubPages();
 public:
-	CPyModule(CUser* pUser, CIRCNetwork* pNetwork, const CString& sModName, const CString& sDataPath,
+	CPyModule(CUser* pUser, CNetwork* pNetwork, const CString& sModName, const CString& sDataPath,
 			CModInfo::EModuleType eType, PyObject* pyObj, CModPython* pModPython)
 			: CModule(nullptr, pUser, pNetwork, sModName, sDataPath, eType) {
 		m_pyObj = pyObj;
@@ -118,8 +118,8 @@ public:
 	void OnServerCapResult(const CString& sCap, bool bSuccess) override;
 	EModRet OnTimerAutoJoin(CChan& Channel) override;
 	bool OnEmbeddedWebRequest(CWebSock&, const CString&, CTemplate&) override;
-	EModRet OnAddNetwork(CIRCNetwork& Network, CString& sErrorRet) override;
-	EModRet OnDeleteNetwork(CIRCNetwork& Network) override;
+	EModRet OnAddNetwork(CNetwork& Network, CString& sErrorRet) override;
+	EModRet OnDeleteNetwork(CNetwork& Network) override;
 	EModRet OnSendToClient(CString& sLine, CClient& Client) override;
 	EModRet OnSendToIRC(CString& sLine) override;
 
@@ -145,7 +145,7 @@ static inline CPyModule* AsPyModule(CModule* p) {
 	return dynamic_cast<CPyModule*>(p);
 }
 
-inline CPyModule* CreatePyModule(CUser* pUser, CIRCNetwork* pNetwork, const CString& sModName, const CString& sDataPath, CModInfo::EModuleType eType, PyObject* pyObj, CModPython* pModPython) {
+inline CPyModule* CreatePyModule(CUser* pUser, CNetwork* pNetwork, const CString& sModName, const CString& sDataPath, CModInfo::EModuleType eType, PyObject* pyObj, CModPython* pModPython) {
 	return new CPyModule(pUser, pNetwork, sModName, sDataPath, eType, pyObj, pModPython);
 }
 

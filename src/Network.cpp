@@ -28,54 +28,54 @@
 using std::vector;
 using std::set;
 
-class CIRCNetworkPingTimer : public CCron
+class CNetworkPingTimer : public CCron
 {
 public:
-    CIRCNetworkPingTimer(CIRCNetwork* pNetwork) : CCron(), m_pNetwork(pNetwork)
+    CNetworkPingTimer(CNetwork* pNetwork) : CCron(), m_pNetwork(pNetwork)
     {
-        SetName("CIRCNetworkPingTimer::" + m_pNetwork->GetUser()->GetUserName() + "::" + m_pNetwork->GetName());
-        Start(CIRCNetwork::PING_SLACK);
+        SetName("CNetworkPingTimer::" + m_pNetwork->GetUser()->GetUserName() + "::" + m_pNetwork->GetName());
+        Start(CNetwork::PING_SLACK);
     }
 
-    virtual ~CIRCNetworkPingTimer() {}
+    virtual ~CNetworkPingTimer() {}
 
-    CIRCNetworkPingTimer(const CIRCNetworkPingTimer&) = delete;
-    CIRCNetworkPingTimer& operator=(const CIRCNetworkPingTimer&) = delete;
+    CNetworkPingTimer(const CNetworkPingTimer&) = delete;
+    CNetworkPingTimer& operator=(const CNetworkPingTimer&) = delete;
 
 protected:
     void RunJob() override
     {
         CIRCSock* pIRCSock = m_pNetwork->GetIRCSock();
 
-        if (pIRCSock && pIRCSock->GetTimeSinceLastDataTransaction() >= CIRCNetwork::PING_FREQUENCY) {
+        if (pIRCSock && pIRCSock->GetTimeSinceLastDataTransaction() >= CNetwork::PING_FREQUENCY) {
             pIRCSock->PutIRC("PING :ZNC");
         }
 
         const vector<CClient*>& vClients = m_pNetwork->GetClients();
         for (CClient* pClient : vClients) {
-            if (pClient->GetTimeSinceLastDataTransaction() >= CIRCNetwork::PING_FREQUENCY) {
+            if (pClient->GetTimeSinceLastDataTransaction() >= CNetwork::PING_FREQUENCY) {
                 pClient->PutClient("PING :ZNC");
             }
         }
     }
 
 private:
-    CIRCNetwork* m_pNetwork;
+    CNetwork* m_pNetwork;
 };
 
-class CIRCNetworkJoinTimer : public CCron
+class CNetworkJoinTimer : public CCron
 {
 public:
-    CIRCNetworkJoinTimer(CIRCNetwork* pNetwork) : CCron(), m_bDelayed(false), m_pNetwork(pNetwork)
+    CNetworkJoinTimer(CNetwork* pNetwork) : CCron(), m_bDelayed(false), m_pNetwork(pNetwork)
     {
-        SetName("CIRCNetworkJoinTimer::" + m_pNetwork->GetUser()->GetUserName() + "::" + m_pNetwork->GetName());
-        Start(CIRCNetwork::JOIN_FREQUENCY);
+        SetName("CNetworkJoinTimer::" + m_pNetwork->GetUser()->GetUserName() + "::" + m_pNetwork->GetName());
+        Start(CNetwork::JOIN_FREQUENCY);
     }
 
-    virtual ~CIRCNetworkJoinTimer() {}
+    virtual ~CNetworkJoinTimer() {}
 
-    CIRCNetworkJoinTimer(const CIRCNetworkJoinTimer&) = delete;
-    CIRCNetworkJoinTimer& operator=(const CIRCNetworkJoinTimer&) = delete;
+    CNetworkJoinTimer(const CNetworkJoinTimer&) = delete;
+    CNetworkJoinTimer& operator=(const CNetworkJoinTimer&) = delete;
 
     void Delay(unsigned short int uDelay)
     {
@@ -88,7 +88,7 @@ protected:
     {
         if (m_bDelayed) {
             m_bDelayed = false;
-            Start(CIRCNetwork::JOIN_FREQUENCY);
+            Start(CNetwork::JOIN_FREQUENCY);
         }
         if (m_pNetwork->IsIRCConnected()) {
             m_pNetwork->JoinChans();
@@ -97,10 +97,10 @@ protected:
 
 private:
     bool m_bDelayed;
-    CIRCNetwork* m_pNetwork;
+    CNetwork* m_pNetwork;
 };
 
-bool CIRCNetwork::IsValidNetwork(const CString& sNetwork)
+bool CNetwork::IsValidNetwork(const CString& sNetwork)
 {
     // ^[-\w]+$
 
@@ -120,7 +120,7 @@ bool CIRCNetwork::IsValidNetwork(const CString& sNetwork)
     return true;
 }
 
-CIRCNetwork::CIRCNetwork(CUser* pUser, const CString& sName)
+CNetwork::CNetwork(CUser* pUser, const CString& sName)
     : m_sName(sName), m_pUser(nullptr), m_sNick(""), m_sAltNick(""), m_sIdent(""), m_sRealName(""), m_sBindHost(""),
       m_sEncoding(""), m_sQuitMsg(""), m_ssTrustedFingerprints(), m_pModules(new CModules), m_vClients(),
       m_pIRCSock(nullptr), m_vChans(), m_vQueries(), m_sChanPrefixes(""), m_bIRCConnectEnabled(true), m_sIRCServer(""),
@@ -134,18 +134,18 @@ CIRCNetwork::CIRCNetwork(CUser* pUser, const CString& sName)
     m_MotdBuffer.SetLimit(200, true); // This should be more than enough motd lines
     m_NoticeBuffer.SetLimit(250, true);
 
-    m_pPingTimer = new CIRCNetworkPingTimer(this);
+    m_pPingTimer = new CNetworkPingTimer(this);
     CZNC::Get().GetManager().AddCron(m_pPingTimer);
 
-    m_pJoinTimer = new CIRCNetworkJoinTimer(this);
+    m_pJoinTimer = new CNetworkJoinTimer(this);
     CZNC::Get().GetManager().AddCron(m_pJoinTimer);
 
     SetIRCConnectEnabled(true);
 }
 
-CIRCNetwork::CIRCNetwork(CUser* pUser, const CIRCNetwork& Network) : CIRCNetwork(pUser, "") { Clone(Network); }
+CNetwork::CNetwork(CUser* pUser, const CNetwork& Network) : CNetwork(pUser, "") { Clone(Network); }
 
-void CIRCNetwork::Clone(const CIRCNetwork& Network, bool bCloneName)
+void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
 {
     if (bCloneName) {
         m_sName = Network.GetName();
@@ -252,7 +252,7 @@ void CIRCNetwork::Clone(const CIRCNetwork& Network, bool bCloneName)
     SetIRCConnectEnabled(Network.GetIRCConnectEnabled());
 }
 
-CIRCNetwork::~CIRCNetwork()
+CNetwork::~CNetwork()
 {
     if (m_pIRCSock) {
         CZNC::Get().GetManager().DelSockByAddr(m_pIRCSock);
@@ -293,7 +293,7 @@ CIRCNetwork::~CIRCNetwork()
     CZNC::Get().GetManager().DelCronByAddr(m_pJoinTimer);
 }
 
-void CIRCNetwork::DelServers()
+void CNetwork::DelServers()
 {
     for (CServer* pServer : m_vServers) {
         delete pServer;
@@ -301,7 +301,7 @@ void CIRCNetwork::DelServers()
     m_vServers.clear();
 }
 
-CString CIRCNetwork::GetNetworkPath() const
+CString CNetwork::GetNetworkPath() const
 {
     CString sNetworkPath = m_pUser->GetUserPath() + "/networks/" + m_sName;
 
@@ -315,31 +315,31 @@ CString CIRCNetwork::GetNetworkPath() const
 template <class T> struct TOption
 {
     const char* name;
-    void (CIRCNetwork::*pSetter)(T);
+    void (CNetwork::*pSetter)(T);
 };
 
-bool CIRCNetwork::ParseConfig(CConfig* pConfig, CString& sError, bool bUpgrade)
+bool CNetwork::ParseConfig(CConfig* pConfig, CString& sError, bool bUpgrade)
 {
     VCString vsList;
 
     if (!bUpgrade) {
         TOption<const CString&> StringOptions[] = {
-            { "nick", &CIRCNetwork::SetNick },
-            { "altnick", &CIRCNetwork::SetAltNick },
-            { "ident", &CIRCNetwork::SetIdent },
-            { "realname", &CIRCNetwork::SetRealName },
-            { "bindhost", &CIRCNetwork::SetBindHost },
-            { "encoding", &CIRCNetwork::SetEncoding },
-            { "quitmsg", &CIRCNetwork::SetQuitMsg },
+            { "nick", &CNetwork::SetNick },
+            { "altnick", &CNetwork::SetAltNick },
+            { "ident", &CNetwork::SetIdent },
+            { "realname", &CNetwork::SetRealName },
+            { "bindhost", &CNetwork::SetBindHost },
+            { "encoding", &CNetwork::SetEncoding },
+            { "quitmsg", &CNetwork::SetQuitMsg },
         };
         TOption<bool> BoolOptions[] = {
-            { "ircconnectenabled", &CIRCNetwork::SetIRCConnectEnabled },
+            { "ircconnectenabled", &CNetwork::SetIRCConnectEnabled },
         };
         TOption<double> DoubleOptions[] = {
-            { "floodrate", &CIRCNetwork::SetFloodRate },
+            { "floodrate", &CNetwork::SetFloodRate },
         };
         TOption<short unsigned int> SUIntOptions[] = {
-            { "floodburst", &CIRCNetwork::SetFloodBurst }, { "joindelay", &CIRCNetwork::SetJoinDelay },
+            { "floodburst", &CNetwork::SetFloodBurst }, { "joindelay", &CNetwork::SetJoinDelay },
         };
 
         for (const auto& Option : StringOptions) {
@@ -457,7 +457,7 @@ bool CIRCNetwork::ParseConfig(CConfig* pConfig, CString& sError, bool bUpgrade)
     return true;
 }
 
-CConfig CIRCNetwork::ToConfig() const
+CConfig CNetwork::ToConfig() const
 {
     CConfig config;
 
@@ -524,7 +524,7 @@ CConfig CIRCNetwork::ToConfig() const
     return config;
 }
 
-void CIRCNetwork::BounceAllClients()
+void CNetwork::BounceAllClients()
 {
     for (CClient* pClient : m_vClients) {
         pClient->BouncedOff();
@@ -533,7 +533,7 @@ void CIRCNetwork::BounceAllClients()
     m_vClients.clear();
 }
 
-bool CIRCNetwork::IsUserOnline() const
+bool CNetwork::IsUserOnline() const
 {
     for (CClient* pClient : m_vClients) {
         if (!pClient->IsAway()) {
@@ -544,7 +544,7 @@ bool CIRCNetwork::IsUserOnline() const
     return false;
 }
 
-void CIRCNetwork::ClientConnected(CClient* pClient)
+void CNetwork::ClientConnected(CClient* pClient)
 {
     if (!m_pUser->MultiClients()) {
         BounceAllClients();
@@ -640,7 +640,7 @@ void CIRCNetwork::ClientConnected(CClient* pClient)
                            "Use 'connect' to reconnect.");
 }
 
-void CIRCNetwork::ClientDisconnected(CClient* pClient)
+void CNetwork::ClientDisconnected(CClient* pClient)
 {
     auto it = std::find(m_vClients.begin(), m_vClients.end(), pClient);
     if (it != m_vClients.end()) {
@@ -648,11 +648,11 @@ void CIRCNetwork::ClientDisconnected(CClient* pClient)
     }
 }
 
-CUser* CIRCNetwork::GetUser() const { return m_pUser; }
+CUser* CNetwork::GetUser() const { return m_pUser; }
 
-const CString& CIRCNetwork::GetName() const { return m_sName; }
+const CString& CNetwork::GetName() const { return m_sName; }
 
-std::vector<CClient*> CIRCNetwork::FindClients(const CString& sIdentifier) const
+std::vector<CClient*> CNetwork::FindClients(const CString& sIdentifier) const
 {
     std::vector<CClient*> vClients;
     for (CClient* pClient : m_vClients) {
@@ -664,7 +664,7 @@ std::vector<CClient*> CIRCNetwork::FindClients(const CString& sIdentifier) const
     return vClients;
 }
 
-void CIRCNetwork::SetUser(CUser* pUser)
+void CNetwork::SetUser(CUser* pUser)
 {
     for (CClient* pClient : m_vClients) {
         pClient->PutStatus("This network is being deleted or moved to another user.");
@@ -683,7 +683,7 @@ void CIRCNetwork::SetUser(CUser* pUser)
     }
 }
 
-bool CIRCNetwork::SetName(const CString& sName)
+bool CNetwork::SetName(const CString& sName)
 {
     if (IsValidNetwork(sName)) {
         m_sName = sName;
@@ -693,7 +693,7 @@ bool CIRCNetwork::SetName(const CString& sName)
     return false;
 }
 
-bool CIRCNetwork::PutUser(const CString& sLine, CClient* pClient, CClient* pSkipClient)
+bool CNetwork::PutUser(const CString& sLine, CClient* pClient, CClient* pSkipClient)
 {
     for (CClient* pEachClient : m_vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
@@ -708,7 +708,7 @@ bool CIRCNetwork::PutUser(const CString& sLine, CClient* pClient, CClient* pSkip
     return (pClient == nullptr);
 }
 
-bool CIRCNetwork::PutStatus(const CString& sLine, CClient* pClient, CClient* pSkipClient)
+bool CNetwork::PutStatus(const CString& sLine, CClient* pClient, CClient* pSkipClient)
 {
     for (CClient* pEachClient : m_vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
@@ -723,7 +723,7 @@ bool CIRCNetwork::PutStatus(const CString& sLine, CClient* pClient, CClient* pSk
     return (pClient == nullptr);
 }
 
-bool CIRCNetwork::PutModule(const CString& sModule, const CString& sLine, CClient* pClient, CClient* pSkipClient)
+bool CNetwork::PutModule(const CString& sModule, const CString& sLine, CClient* pClient, CClient* pSkipClient)
 {
     for (CClient* pEachClient : m_vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
@@ -740,9 +740,9 @@ bool CIRCNetwork::PutModule(const CString& sModule, const CString& sLine, CClien
 
 // Channels
 
-const vector<CChan*>& CIRCNetwork::GetChans() const { return m_vChans; }
+const vector<CChan*>& CNetwork::GetChans() const { return m_vChans; }
 
-CChan* CIRCNetwork::FindChan(CString sName) const
+CChan* CNetwork::FindChan(CString sName) const
 {
     if (GetIRCSock()) {
         // See https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.16
@@ -758,7 +758,7 @@ CChan* CIRCNetwork::FindChan(CString sName) const
     return nullptr;
 }
 
-std::vector<CChan*> CIRCNetwork::FindChans(const CString& sWild) const
+std::vector<CChan*> CNetwork::FindChans(const CString& sWild) const
 {
     std::vector<CChan*> vChans;
     vChans.reserve(m_vChans.size());
@@ -769,7 +769,7 @@ std::vector<CChan*> CIRCNetwork::FindChans(const CString& sWild) const
     return vChans;
 }
 
-bool CIRCNetwork::AddChan(CChan* pChan)
+bool CNetwork::AddChan(CChan* pChan)
 {
     if (!pChan) {
         return false;
@@ -786,7 +786,7 @@ bool CIRCNetwork::AddChan(CChan* pChan)
     return true;
 }
 
-bool CIRCNetwork::AddChan(const CString& sName, bool bInConfig)
+bool CNetwork::AddChan(const CString& sName, bool bInConfig)
 {
     if (sName.empty() || FindChan(sName)) {
         return false;
@@ -797,7 +797,7 @@ bool CIRCNetwork::AddChan(const CString& sName, bool bInConfig)
     return true;
 }
 
-bool CIRCNetwork::DelChan(const CString& sName)
+bool CNetwork::DelChan(const CString& sName)
 {
     for (vector<CChan*>::iterator a = m_vChans.begin(); a != m_vChans.end(); ++a) {
         if (sName.Equals((*a)->GetName())) {
@@ -810,7 +810,7 @@ bool CIRCNetwork::DelChan(const CString& sName)
     return false;
 }
 
-void CIRCNetwork::JoinChans()
+void CNetwork::JoinChans()
 {
     // Avoid divsion by zero, it's bad!
     if (m_vChans.empty()) return;
@@ -841,7 +841,7 @@ void CIRCNetwork::JoinChans()
     while (!sChans.empty()) JoinChans(sChans);
 }
 
-void CIRCNetwork::JoinChans(set<CChan*>& sChans)
+void CNetwork::JoinChans(set<CChan*>& sChans)
 {
     CString sKeys, sJoin;
     bool bHaveKey = false;
@@ -875,7 +875,7 @@ void CIRCNetwork::JoinChans(set<CChan*>& sChans)
         PutIRC("JOIN " + sJoin);
 }
 
-bool CIRCNetwork::JoinChan(CChan* pChan)
+bool CNetwork::JoinChan(CChan* pChan)
 {
     bool bReturn = false;
     NETWORKMODULECALL(OnJoining(*pChan), m_pUser, this, nullptr, &bReturn);
@@ -895,7 +895,7 @@ bool CIRCNetwork::JoinChan(CChan* pChan)
     return false;
 }
 
-bool CIRCNetwork::IsChan(const CString& sChan) const
+bool CNetwork::IsChan(const CString& sChan) const
 {
     if (sChan.empty()) return false; // There is no way this is a chan
     if (GetChanPrefixes().empty()) return true; // We can't know, so we allow everything
@@ -905,9 +905,9 @@ bool CIRCNetwork::IsChan(const CString& sChan) const
 
 // Queries
 
-const vector<CQuery*>& CIRCNetwork::GetQueries() const { return m_vQueries; }
+const vector<CQuery*>& CNetwork::GetQueries() const { return m_vQueries; }
 
-CQuery* CIRCNetwork::FindQuery(const CString& sName) const
+CQuery* CNetwork::FindQuery(const CString& sName) const
 {
     for (CQuery* pQuery : m_vQueries) {
         if (sName.Equals(pQuery->GetName())) {
@@ -918,7 +918,7 @@ CQuery* CIRCNetwork::FindQuery(const CString& sName) const
     return nullptr;
 }
 
-std::vector<CQuery*> CIRCNetwork::FindQueries(const CString& sWild) const
+std::vector<CQuery*> CNetwork::FindQueries(const CString& sWild) const
 {
     std::vector<CQuery*> vQueries;
     vQueries.reserve(m_vQueries.size());
@@ -929,7 +929,7 @@ std::vector<CQuery*> CIRCNetwork::FindQueries(const CString& sWild) const
     return vQueries;
 }
 
-CQuery* CIRCNetwork::AddQuery(const CString& sName)
+CQuery* CNetwork::AddQuery(const CString& sName)
 {
     if (sName.empty()) {
         return nullptr;
@@ -951,7 +951,7 @@ CQuery* CIRCNetwork::AddQuery(const CString& sName)
     return pQuery;
 }
 
-bool CIRCNetwork::DelQuery(const CString& sName)
+bool CNetwork::DelQuery(const CString& sName)
 {
     for (vector<CQuery*>::iterator a = m_vQueries.begin(); a != m_vQueries.end(); ++a) {
         if (sName.Equals((*a)->GetName())) {
@@ -966,9 +966,9 @@ bool CIRCNetwork::DelQuery(const CString& sName)
 
 // Server list
 
-const vector<CServer*>& CIRCNetwork::GetServers() const { return m_vServers; }
+const vector<CServer*>& CNetwork::GetServers() const { return m_vServers; }
 
-CServer* CIRCNetwork::FindServer(const CString& sName) const
+CServer* CNetwork::FindServer(const CString& sName) const
 {
     for (CServer* pServer : m_vServers) {
         if (sName.Equals(pServer->GetName())) {
@@ -979,7 +979,7 @@ CServer* CIRCNetwork::FindServer(const CString& sName) const
     return nullptr;
 }
 
-bool CIRCNetwork::DelServer(const CString& sName, unsigned short uPort, const CString& sPass)
+bool CNetwork::DelServer(const CString& sName, unsigned short uPort, const CString& sPass)
 {
     if (sName.empty()) {
         return false;
@@ -1029,7 +1029,7 @@ bool CIRCNetwork::DelServer(const CString& sName, unsigned short uPort, const CS
     return false;
 }
 
-bool CIRCNetwork::AddServer(const CString& sName)
+bool CNetwork::AddServer(const CString& sName)
 {
     if (sName.empty()) {
         return false;
@@ -1053,7 +1053,7 @@ bool CIRCNetwork::AddServer(const CString& sName)
     return AddServer(sHost, uPort, sPass, bSSL);
 }
 
-bool CIRCNetwork::AddServer(const CString& sName, unsigned short uPort, const CString& sPass, bool bSSL)
+bool CNetwork::AddServer(const CString& sName, unsigned short uPort, const CString& sPass, bool bSSL)
 {
 #ifndef HAVE_LIBSSL
     if (bSSL) {
@@ -1091,7 +1091,7 @@ bool CIRCNetwork::AddServer(const CString& sName, unsigned short uPort, const CS
     return true;
 }
 
-CServer* CIRCNetwork::GetNextServer()
+CServer* CNetwork::GetNextServer()
 {
     if (m_vServers.empty()) {
         return nullptr;
@@ -1104,7 +1104,7 @@ CServer* CIRCNetwork::GetNextServer()
     return m_vServers[m_uServerIdx++];
 }
 
-CServer* CIRCNetwork::GetCurrentServer() const
+CServer* CNetwork::GetCurrentServer() const
 {
     size_t uIdx = (m_uServerIdx) ? m_uServerIdx - 1 : 0;
 
@@ -1115,9 +1115,9 @@ CServer* CIRCNetwork::GetCurrentServer() const
     return m_vServers[uIdx];
 }
 
-void CIRCNetwork::SetIRCServer(const CString& s) { m_sIRCServer = s; }
+void CNetwork::SetIRCServer(const CString& s) { m_sIRCServer = s; }
 
-bool CIRCNetwork::SetNextServer(const CServer* pServer)
+bool CNetwork::SetNextServer(const CServer* pServer)
 {
     for (unsigned int a = 0; a < m_vServers.size(); a++) {
         if (m_vServers[a] == pServer) {
@@ -1129,12 +1129,12 @@ bool CIRCNetwork::SetNextServer(const CServer* pServer)
     return false;
 }
 
-bool CIRCNetwork::IsLastServer() const { return (m_uServerIdx >= m_vServers.size()); }
+bool CNetwork::IsLastServer() const { return (m_uServerIdx >= m_vServers.size()); }
 
-const CString& CIRCNetwork::GetIRCServer() const { return m_sIRCServer; }
-const CNick& CIRCNetwork::GetIRCNick() const { return m_IRCNick; }
+const CString& CNetwork::GetIRCServer() const { return m_sIRCServer; }
+const CNick& CNetwork::GetIRCNick() const { return m_IRCNick; }
 
-void CIRCNetwork::SetIRCNick(const CNick& n)
+void CNetwork::SetIRCNick(const CNick& n)
 {
     m_IRCNick = n;
 
@@ -1143,7 +1143,7 @@ void CIRCNetwork::SetIRCNick(const CNick& n)
     }
 }
 
-CString CIRCNetwork::GetCurNick() const
+CString CNetwork::GetCurNick() const
 {
     const CIRCSock* pIRCSock = GetIRCSock();
 
@@ -1158,7 +1158,7 @@ CString CIRCNetwork::GetCurNick() const
     return "";
 }
 
-bool CIRCNetwork::Connect()
+bool CNetwork::Connect()
 {
     if (!GetIRCConnectEnabled() || m_pIRCSock || !HasServers()) return false;
 
@@ -1204,15 +1204,15 @@ bool CIRCNetwork::Connect()
     return true;
 }
 
-bool CIRCNetwork::IsIRCConnected() const
+bool CNetwork::IsIRCConnected() const
 {
     const CIRCSock* pSock = GetIRCSock();
     return (pSock && pSock->IsAuthed());
 }
 
-void CIRCNetwork::SetIRCSocket(CIRCSock* pIRCSock) { m_pIRCSock = pIRCSock; }
+void CNetwork::SetIRCSocket(CIRCSock* pIRCSock) { m_pIRCSock = pIRCSock; }
 
-void CIRCNetwork::IRCConnected()
+void CNetwork::IRCConnected()
 {
     if (m_uJoinDelay > 0) {
         m_pJoinTimer->Delay(m_uJoinDelay);
@@ -1221,7 +1221,7 @@ void CIRCNetwork::IRCConnected()
     }
 }
 
-void CIRCNetwork::IRCDisconnected()
+void CNetwork::IRCDisconnected()
 {
     m_pIRCSock = nullptr;
 
@@ -1232,7 +1232,7 @@ void CIRCNetwork::IRCDisconnected()
     CheckIRCConnect();
 }
 
-void CIRCNetwork::SetIRCConnectEnabled(bool b)
+void CNetwork::SetIRCConnectEnabled(bool b)
 {
     m_bIRCConnectEnabled = b;
 
@@ -1247,13 +1247,13 @@ void CIRCNetwork::SetIRCConnectEnabled(bool b)
     }
 }
 
-void CIRCNetwork::CheckIRCConnect()
+void CNetwork::CheckIRCConnect()
 {
     // Do we want to connect?
     if (GetIRCConnectEnabled() && GetIRCSock() == nullptr) CZNC::Get().AddNetworkToQueue(this);
 }
 
-bool CIRCNetwork::PutIRC(const CString& sLine)
+bool CNetwork::PutIRC(const CString& sLine)
 {
     CIRCSock* pIRCSock = GetIRCSock();
 
@@ -1265,13 +1265,13 @@ bool CIRCNetwork::PutIRC(const CString& sLine)
     return true;
 }
 
-void CIRCNetwork::ClearQueryBuffer()
+void CNetwork::ClearQueryBuffer()
 {
     std::for_each(m_vQueries.begin(), m_vQueries.end(), std::default_delete<CQuery>());
     m_vQueries.clear();
 }
 
-const CString& CIRCNetwork::GetNick(const bool bAllowDefault) const
+const CString& CNetwork::GetNick(const bool bAllowDefault) const
 {
     if (m_sNick.empty()) {
         return m_pUser->GetNick(bAllowDefault);
@@ -1280,7 +1280,7 @@ const CString& CIRCNetwork::GetNick(const bool bAllowDefault) const
     return m_sNick;
 }
 
-const CString& CIRCNetwork::GetAltNick(const bool bAllowDefault) const
+const CString& CNetwork::GetAltNick(const bool bAllowDefault) const
 {
     if (m_sAltNick.empty()) {
         return m_pUser->GetAltNick(bAllowDefault);
@@ -1289,7 +1289,7 @@ const CString& CIRCNetwork::GetAltNick(const bool bAllowDefault) const
     return m_sAltNick;
 }
 
-const CString& CIRCNetwork::GetIdent(const bool bAllowDefault) const
+const CString& CNetwork::GetIdent(const bool bAllowDefault) const
 {
     if (m_sIdent.empty()) {
         return m_pUser->GetIdent(bAllowDefault);
@@ -1298,7 +1298,7 @@ const CString& CIRCNetwork::GetIdent(const bool bAllowDefault) const
     return m_sIdent;
 }
 
-const CString& CIRCNetwork::GetRealName() const
+const CString& CNetwork::GetRealName() const
 {
     if (m_sRealName.empty()) {
         return m_pUser->GetRealName();
@@ -1307,7 +1307,7 @@ const CString& CIRCNetwork::GetRealName() const
     return m_sRealName;
 }
 
-const CString& CIRCNetwork::GetBindHost() const
+const CString& CNetwork::GetBindHost() const
 {
     if (m_sBindHost.empty()) {
         return m_pUser->GetBindHost();
@@ -1316,9 +1316,9 @@ const CString& CIRCNetwork::GetBindHost() const
     return m_sBindHost;
 }
 
-const CString& CIRCNetwork::GetEncoding() const { return m_sEncoding; }
+const CString& CNetwork::GetEncoding() const { return m_sEncoding; }
 
-CString CIRCNetwork::GetQuitMsg() const
+CString CNetwork::GetQuitMsg() const
 {
     if (m_sQuitMsg.empty()) {
         return m_pUser->GetQuitMsg();
@@ -1327,7 +1327,7 @@ CString CIRCNetwork::GetQuitMsg() const
     return m_sQuitMsg;
 }
 
-void CIRCNetwork::SetNick(const CString& s)
+void CNetwork::SetNick(const CString& s)
 {
     if (m_pUser->GetNick().Equals(s)) {
         m_sNick = "";
@@ -1336,7 +1336,7 @@ void CIRCNetwork::SetNick(const CString& s)
     }
 }
 
-void CIRCNetwork::SetAltNick(const CString& s)
+void CNetwork::SetAltNick(const CString& s)
 {
     if (m_pUser->GetAltNick().Equals(s)) {
         m_sAltNick = "";
@@ -1345,7 +1345,7 @@ void CIRCNetwork::SetAltNick(const CString& s)
     }
 }
 
-void CIRCNetwork::SetIdent(const CString& s)
+void CNetwork::SetIdent(const CString& s)
 {
     if (m_pUser->GetIdent().Equals(s)) {
         m_sIdent = "";
@@ -1354,7 +1354,7 @@ void CIRCNetwork::SetIdent(const CString& s)
     }
 }
 
-void CIRCNetwork::SetRealName(const CString& s)
+void CNetwork::SetRealName(const CString& s)
 {
     if (m_pUser->GetRealName().Equals(s)) {
         m_sRealName = "";
@@ -1363,7 +1363,7 @@ void CIRCNetwork::SetRealName(const CString& s)
     }
 }
 
-void CIRCNetwork::SetBindHost(const CString& s)
+void CNetwork::SetBindHost(const CString& s)
 {
     if (m_pUser->GetBindHost().Equals(s)) {
         m_sBindHost = "";
@@ -1372,9 +1372,9 @@ void CIRCNetwork::SetBindHost(const CString& s)
     }
 }
 
-void CIRCNetwork::SetEncoding(const CString& s) { m_sEncoding = s; }
+void CNetwork::SetEncoding(const CString& s) { m_sEncoding = s; }
 
-void CIRCNetwork::SetQuitMsg(const CString& s)
+void CNetwork::SetQuitMsg(const CString& s)
 {
     if (m_pUser->GetQuitMsg().Equals(s)) {
         m_sQuitMsg = "";
@@ -1383,13 +1383,13 @@ void CIRCNetwork::SetQuitMsg(const CString& s)
     }
 }
 
-CString CIRCNetwork::ExpandString(const CString& sStr) const
+CString CNetwork::ExpandString(const CString& sStr) const
 {
     CString sRet;
     return ExpandString(sStr, sRet);
 }
 
-CString& CIRCNetwork::ExpandString(const CString& sStr, CString& sRet) const
+CString& CNetwork::ExpandString(const CString& sStr, CString& sRet) const
 {
     sRet = sStr;
     sRet.Replace("%defnick%", GetNick());
@@ -1402,7 +1402,7 @@ CString& CIRCNetwork::ExpandString(const CString& sStr, CString& sRet) const
     return m_pUser->ExpandString(sRet, sRet);
 }
 
-bool CIRCNetwork::LoadModule(const CString& sModName, const CString& sArgs, const CString& sNotice, CString& sError)
+bool CNetwork::LoadModule(const CString& sModName, const CString& sArgs, const CString& sNotice, CString& sError)
 {
     CUtils::PrintAction(sNotice);
     CString sModRet;

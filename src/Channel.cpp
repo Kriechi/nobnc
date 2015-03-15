@@ -25,7 +25,7 @@ using std::set;
 using std::vector;
 using std::map;
 
-CChan::CChan(const CString& sName, CIRCNetwork* pNetwork, bool bInConfig, CConfig* pConfig)
+CChan::CChan(const CString& sName, CNetwork* pNetwork, bool bInConfig, CConfig* pConfig)
     : m_bDetached(false), m_bIsOn(false), m_bAutoClearChanBuffer(pNetwork->GetUser()->AutoClearChanBuffer()),
       m_bInConfig(bInConfig), m_bDisabled(false), m_bHasBufferCountSet(false), m_bHasAutoClearChanBufferSet(false),
       m_sName(sName.Token(0)), m_sKey(sName.Token(1)), m_sTopic(""), m_sTopicOwner(""), m_ulTopicDate(0),

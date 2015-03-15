@@ -27,7 +27,7 @@ class CSendRaw_Mod : public CModule
         CUser* pUser = CZNC::Get().FindUser(sLine.Token(1));
 
         if (pUser) {
-            CIRCNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
+            CNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
 
             if (pNetwork) {
                 pNetwork->PutUser(sLine.Token(3, true));
@@ -45,7 +45,7 @@ class CSendRaw_Mod : public CModule
         CUser* pUser = CZNC::Get().FindUser(sLine.Token(1));
 
         if (pUser) {
-            CIRCNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
+            CNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
 
             if (pNetwork) {
                 pNetwork->PutIRC(sLine.Token(3, true));
@@ -90,7 +90,7 @@ public:
                     return true;
                 }
 
-                CIRCNetwork* pNetwork = pUser->FindNetwork(WebSock.GetParam("network").Token(1, false, "/"));
+                CNetwork* pNetwork = pUser->FindNetwork(WebSock.GetParam("network").Token(1, false, "/"));
                 if (!pNetwork) {
                     WebSock.GetSession()->AddError("Network not found");
                     return true;
@@ -117,8 +117,8 @@ public:
                 CTemplate& l = Tmpl.AddRow("UserLoop");
                 l["Username"] = (*it->second).GetUserName();
 
-                vector<CIRCNetwork*> vNetworks = (*it->second).GetNetworks();
-                for (vector<CIRCNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
+                vector<CNetwork*> vNetworks = (*it->second).GetNetworks();
+                for (vector<CNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
                     CTemplate& NetworkLoop = l.AddRow("NetworkLoop");
                     NetworkLoop["Username"] = (*it->second).GetUserName();
                     NetworkLoop["Network"] = (*it2)->GetName();

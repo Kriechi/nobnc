@@ -56,7 +56,7 @@ void CNick::Parse(const CString& sNickMask)
     }
 }
 
-size_t CNick::GetCommonChans(vector<CChan*>& vRetChans, CIRCNetwork* pNetwork) const
+size_t CNick::GetCommonChans(vector<CChan*>& vRetChans, CNetwork* pNetwork) const
 {
     vRetChans.clear();
 
@@ -83,7 +83,7 @@ bool CNick::NickEquals(const CString& nickname) const
     return m_sNick.Equals(nickname);
 }
 
-void CNick::SetNetwork(CIRCNetwork* pNetwork) { m_pNetwork = pNetwork; }
+void CNick::SetNetwork(CNetwork* pNetwork) { m_pNetwork = pNetwork; }
 void CNick::SetNick(const CString& s) { m_sNick = s; }
 void CNick::SetIdent(const CString& s) { m_sIdent = s; }
 void CNick::SetHost(const CString& s) { m_sHost = s; }

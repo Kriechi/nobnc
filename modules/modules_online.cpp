@@ -71,7 +71,7 @@ public:
             CString sNick = sLine.Token(1);
 
             if (IsOnlineModNick(sNick)) {
-                CIRCNetwork* pNetwork = GetNetwork();
+                CNetwork* pNetwork = GetNetwork();
                 PutUser(":znc.in 311 " + pNetwork->GetCurNick() + " " + sNick + " " + sNick + " znc.in * :" + sNick);
                 PutUser(":znc.in 312 " + pNetwork->GetCurNick() + " " + sNick + " *.znc.in :Bouncer");
                 PutUser(":znc.in 318 " + pNetwork->GetCurNick() + " " + sNick + " :End of /WHOIS list.");

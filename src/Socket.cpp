@@ -490,7 +490,7 @@ bool CSocket::Connect(const CString& sHostname, unsigned short uPort, bool bSSL,
     if (pUser) {
         sSockName += "::" + pUser->GetUserName();
         sBindHost = pUser->GetBindHost();
-        CIRCNetwork* pNetwork = m_pModule->GetNetwork();
+        CNetwork* pNetwork = m_pModule->GetNetwork();
         if (pNetwork) {
             sSockName += "::" + pNetwork->GetName();
             sBindHost = pNetwork->GetBindHost();

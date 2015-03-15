@@ -21,7 +21,7 @@
 #include <znc/ZNCString.h>
 #include <vector>
 
-class CIRCNetwork;
+class CNetwork;
 class CChan;
 
 class CNick
@@ -37,10 +37,10 @@ public:
     void Reset();
     void Parse(const CString& sNickMask);
     CString GetHostMask() const;
-    size_t GetCommonChans(std::vector<CChan*>& vChans, CIRCNetwork* pNetwork) const;
+    size_t GetCommonChans(std::vector<CChan*>& vChans, CNetwork* pNetwork) const;
     bool NickEquals(const CString& nickname) const;
 
-    void SetNetwork(CIRCNetwork* pNetwork);
+    void SetNetwork(CNetwork* pNetwork);
     void SetNick(const CString& s);
     void SetIdent(const CString& s);
     void SetHost(const CString& s);
@@ -59,7 +59,7 @@ public:
 
 private:
     CString m_sChanPerms;
-    CIRCNetwork* m_pNetwork;
+    CNetwork* m_pNetwork;
     CString m_sNick;
     CString m_sIdent;
     CString m_sHost;

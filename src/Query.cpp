@@ -20,7 +20,7 @@
 
 using std::vector;
 
-CQuery::CQuery(const CString& sName, CIRCNetwork* pNetwork) : m_sName(sName), m_pNetwork(pNetwork), m_Buffer()
+CQuery::CQuery(const CString& sName, CNetwork* pNetwork) : m_sName(sName), m_pNetwork(pNetwork), m_Buffer()
 {
     SetBufferCount(m_pNetwork->GetUser()->GetBufferCount(), true);
 }

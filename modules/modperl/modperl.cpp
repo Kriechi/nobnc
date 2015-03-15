@@ -121,7 +121,7 @@ public:
         PUSH_STR(sArgs);
         mXPUSHi(eType);
         PUSH_PTR(CUser*, GetUser());
-        PUSH_PTR(CIRCNetwork*, GetNetwork());
+        PUSH_PTR(CNetwork*, GetNetwork());
         PCALL("ZNC::Core::LoadModule");
 
         if (SvTRUE(ERRSV)) {

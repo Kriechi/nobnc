@@ -24,7 +24,7 @@
 #include <map>
 
 class CUser;
-class CIRCNetwork;
+class CNetwork;
 class CClient;
 class CConfig;
 class CFile;
@@ -49,7 +49,7 @@ public:
         M_Except = 'e'
     } EModes;
 
-    CChan(const CString& sName, CIRCNetwork* pNetwork, bool bInConfig, CConfig* pConfig = nullptr);
+    CChan(const CString& sName, CNetwork* pNetwork, bool bInConfig, CConfig* pConfig = nullptr);
     ~CChan();
 
     CChan(const CChan&) = delete;
@@ -166,7 +166,7 @@ private:
     CString m_sTopicOwner;
     unsigned long m_ulTopicDate;
     unsigned long m_ulCreationDate;
-    CIRCNetwork* m_pNetwork;
+    CNetwork* m_pNetwork;
     CNick m_Nick;
     unsigned int m_uJoinTries;
     CString m_sDefaultModes;

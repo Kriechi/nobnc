@@ -33,20 +33,20 @@ class CChan;
 class CQuery;
 class CServer;
 class CIRCSock;
-class CIRCNetworkPingTimer;
-class CIRCNetworkJoinTimer;
+class CNetworkPingTimer;
+class CNetworkJoinTimer;
 
-class CIRCNetwork
+class CNetwork
 {
 public:
     static bool IsValidNetwork(const CString& sNetwork);
 
-    CIRCNetwork(CUser* pUser, const CString& sName);
-    CIRCNetwork(CUser* pUser, const CIRCNetwork& Network);
-    ~CIRCNetwork();
+    CNetwork(CUser* pUser, const CString& sName);
+    CNetwork(CUser* pUser, const CNetwork& Network);
+    ~CNetwork();
 
-    CIRCNetwork(const CIRCNetwork&) = delete;
-    CIRCNetwork& operator=(const CIRCNetwork&) = delete;
+    CNetwork(const CNetwork&) = delete;
+    CNetwork& operator=(const CNetwork&) = delete;
 
     enum {
         JOIN_FREQUENCY = 30,
@@ -60,7 +60,7 @@ public:
         NO_TRAFFIC_TIMEOUT = 540
     };
 
-    void Clone(const CIRCNetwork& Network, bool bCloneName = true);
+    void Clone(const CNetwork& Network, bool bCloneName = true);
 
     CString GetNetworkPath() const;
 
@@ -247,8 +247,8 @@ private:
     CBuffer m_MotdBuffer;
     CBuffer m_NoticeBuffer;
 
-    CIRCNetworkPingTimer* m_pPingTimer;
-    CIRCNetworkJoinTimer* m_pJoinTimer;
+    CNetworkPingTimer* m_pPingTimer;
+    CNetworkJoinTimer* m_pJoinTimer;
 
     unsigned short int m_uJoinDelay;
 };

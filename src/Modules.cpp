@@ -44,7 +44,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
                 pOldUser = pMod->GetUser();             \
                 pMod->SetUser(m_pUser);                 \
             }                                           \
-            CIRCNetwork* pNetwork = nullptr;            \
+            CNetwork* pNetwork = nullptr;            \
             if (m_pNetwork) {                           \
                 pNetwork = pMod->GetNetwork();          \
                 pMod->SetNetwork(m_pNetwork);           \
@@ -73,7 +73,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
                 pOldUser = pMod->GetUser();             \
                 pMod->SetUser(m_pUser);                 \
             }                                           \
-            CIRCNetwork* pNetwork = nullptr;            \
+            CNetwork* pNetwork = nullptr;            \
             if (m_pNetwork) {                           \
                 pNetwork = pMod->GetNetwork();          \
                 pMod->SetNetwork(m_pNetwork);           \
@@ -120,7 +120,7 @@ const CString& CTimer::GetDescription() const { return m_sDescription; }
 /////////////////// !Timer ///////////////////
 
 
-CModule::CModule(ModHandle pDLL, CUser* pUser, CIRCNetwork* pNetwork, const CString& sModName, const CString& sDataDir, CModInfo::EModuleType eType)
+CModule::CModule(ModHandle pDLL, CUser* pUser, CNetwork* pNetwork, const CString& sModName, const CString& sDataDir, CModInfo::EModuleType eType)
     : m_eType(eType), m_sDescription(""), m_sTimers(), m_sSockets(),
 #ifdef HAVE_PTHREAD
       m_sJobs(),
@@ -157,7 +157,7 @@ CModule::~CModule()
 }
 
 void CModule::SetUser(CUser* pUser) { m_pUser = pUser; }
-void CModule::SetNetwork(CIRCNetwork* pNetwork) { m_pNetwork = pNetwork; }
+void CModule::SetNetwork(CNetwork* pNetwork) { m_pNetwork = pNetwork; }
 void CModule::SetClient(CClient* pClient) { m_pClient = pClient; }
 
 CString CModule::ExpandString(const CString& sStr) const
@@ -696,8 +696,8 @@ CModule::EModRet CModule::OnPrivNotice(CNick& Nick, CString& sMessage) { return 
 CModule::EModRet CModule::OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage) { return CONTINUE; }
 CModule::EModRet CModule::OnTopic(CNick& Nick, CChan& Channel, CString& sTopic) { return CONTINUE; }
 CModule::EModRet CModule::OnTimerAutoJoin(CChan& Channel) { return CONTINUE; }
-CModule::EModRet CModule::OnAddNetwork(CIRCNetwork& Network, CString& sErrorRet) { return CONTINUE; }
-CModule::EModRet CModule::OnDeleteNetwork(CIRCNetwork& Network) { return CONTINUE; }
+CModule::EModRet CModule::OnAddNetwork(CNetwork& Network, CString& sErrorRet) { return CONTINUE; }
+CModule::EModRet CModule::OnDeleteNetwork(CNetwork& Network) { return CONTINUE; }
 
 CModule::EModRet CModule::OnSendToClient(CString& sLine, CClient& Client) { return CONTINUE; }
 CModule::EModRet CModule::OnSendToIRC(CString& sLine) { return CONTINUE; }
@@ -995,8 +995,8 @@ bool CModules::OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage)
 }
 bool CModules::OnTopic(CNick& Nick, CChan& Channel, CString& sTopic) { MODHALTCHK(OnTopic(Nick, Channel, sTopic)); }
 bool CModules::OnTimerAutoJoin(CChan& Channel) { MODHALTCHK(OnTimerAutoJoin(Channel)); }
-bool CModules::OnAddNetwork(CIRCNetwork& Network, CString& sErrorRet) { MODHALTCHK(OnAddNetwork(Network, sErrorRet)); }
-bool CModules::OnDeleteNetwork(CIRCNetwork& Network) { MODHALTCHK(OnDeleteNetwork(Network)); }
+bool CModules::OnAddNetwork(CNetwork& Network, CString& sErrorRet) { MODHALTCHK(OnAddNetwork(Network, sErrorRet)); }
+bool CModules::OnDeleteNetwork(CNetwork& Network) { MODHALTCHK(OnDeleteNetwork(Network)); }
 bool CModules::OnSendToClient(CString& sLine, CClient& Client) { MODHALTCHK(OnSendToClient(sLine, Client)); }
 bool CModules::OnSendToIRC(CString& sLine) { MODHALTCHK(OnSendToIRC(sLine)); }
 bool CModules::OnStatusCommand(CString& sCommand) { MODHALTCHK(OnStatusCommand(sCommand)); }
@@ -1144,7 +1144,7 @@ CModule* CModules::FindModule(const CString& sModule) const
     return nullptr;
 }
 
-bool CModules::LoadModule(const CString& sModule, const CString& sArgs, CModInfo::EModuleType eType, CUser* pUser, CIRCNetwork* pNetwork, CString& sRetMsg)
+bool CModules::LoadModule(const CString& sModule, const CString& sArgs, CModInfo::EModuleType eType, CUser* pUser, CNetwork* pNetwork, CString& sRetMsg)
 {
     sRetMsg = "";
 
@@ -1270,7 +1270,7 @@ bool CModules::UnloadModule(const CString& sModule, CString& sRetMsg)
     return false;
 }
 
-bool CModules::ReloadModule(const CString& sModule, const CString& sArgs, CUser* pUser, CIRCNetwork* pNetwork, CString& sRetMsg)
+bool CModules::ReloadModule(const CString& sModule, const CString& sArgs, CUser* pUser, CNetwork* pNetwork, CString& sRetMsg)
 {
     CString sMod = sModule; // Make a copy incase the reference passed in is from CModule::GetModName()
     CModule* pModule = FindModule(sMod);

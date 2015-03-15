@@ -195,8 +195,8 @@ private:
         }
 
         // Disconnect all networks from irc
-        vector<CIRCNetwork*> vNetworks = pUser->GetNetworks();
-        for (vector<CIRCNetwork*>::iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
+        vector<CNetwork*> vNetworks = pUser->GetNetworks();
+        for (vector<CNetwork*>::iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
             (*it2)->SetIRCConnectEnabled(false);
         }
 

@@ -362,7 +362,7 @@ CModule::EModRet CLogMod::OnTopic(CNick& Nick, CChan& Channel, CString& sTopic)
 /* notices */
 CModule::EModRet CLogMod::OnUserNotice(CString& sTarget, CString& sMessage)
 {
-    CIRCNetwork* pNetwork = GetNetwork();
+    CNetwork* pNetwork = GetNetwork();
     if (pNetwork) {
         PutLog("-" + pNetwork->GetCurNick() + "- " + sMessage, sTarget);
     }
@@ -385,7 +385,7 @@ CModule::EModRet CLogMod::OnChanNotice(CNick& Nick, CChan& Channel, CString& sMe
 /* actions */
 CModule::EModRet CLogMod::OnUserAction(CString& sTarget, CString& sMessage)
 {
-    CIRCNetwork* pNetwork = GetNetwork();
+    CNetwork* pNetwork = GetNetwork();
     if (pNetwork) {
         PutLog("* " + pNetwork->GetCurNick() + " " + sMessage, sTarget);
     }
@@ -408,7 +408,7 @@ CModule::EModRet CLogMod::OnChanAction(CNick& Nick, CChan& Channel, CString& sMe
 /* msgs */
 CModule::EModRet CLogMod::OnUserMsg(CString& sTarget, CString& sMessage)
 {
-    CIRCNetwork* pNetwork = GetNetwork();
+    CNetwork* pNetwork = GetNetwork();
     if (pNetwork) {
         PutLog("<" + pNetwork->GetCurNick() + "> " + sMessage, sTarget);
     }

@@ -29,7 +29,7 @@ class CChan;
 class CClient;
 class CConfig;
 class CFile;
-class CIRCNetwork;
+class CNetwork;
 class CIRCSock;
 class CUserTimer;
 class CServer;
@@ -73,12 +73,12 @@ public:
     CModules& GetModules() { return *m_pModules; }
     const CModules& GetModules() const { return *m_pModules; }
 
-    CIRCNetwork* AddNetwork(const CString& sNetwork, CString& sErrorRet);
+    CNetwork* AddNetwork(const CString& sNetwork, CString& sErrorRet);
     bool DeleteNetwork(const CString& sNetwork);
-    bool AddNetwork(CIRCNetwork* pNetwork);
-    void RemoveNetwork(CIRCNetwork* pNetwork);
-    CIRCNetwork* FindNetwork(const CString& sNetwork) const;
-    const std::vector<CIRCNetwork*>& GetNetworks() const;
+    bool AddNetwork(CNetwork* pNetwork);
+    void RemoveNetwork(CNetwork* pNetwork);
+    CNetwork* FindNetwork(const CString& sNetwork) const;
+    const std::vector<CNetwork*>& GetNetworks() const;
     bool HasSpaceForNewNetwork() const;
 
     bool PutUser(const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
@@ -217,7 +217,7 @@ private:
 
     CUserTimer* m_pUserTimer;
 
-    std::vector<CIRCNetwork*> m_vIRCNetworks;
+    std::vector<CNetwork*> m_vIRCNetworks;
     std::vector<CClient*> m_vClients;
     std::set<CString> m_ssAllowedHosts;
     unsigned int m_uBufferCount;

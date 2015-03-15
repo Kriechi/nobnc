@@ -90,7 +90,7 @@ namespace std {
 	argvi++;
 }
 
-%template(VIRCNetworks) std::vector<CIRCNetwork*>;
+%template(VIRCNetworks) std::vector<CNetwork*>;
 %template(VChannels) std::vector<CChan*>;
 %template(VCString) std::vector<CString>;
 typedef std::vector<CString> VCString;
@@ -207,12 +207,12 @@ class MCString : public std::map<CString, CString> {};
 }
 
 %extend CUser {
-	std::vector<CIRCNetwork*> GetNetworks_() {
+	std::vector<CNetwork*> GetNetworks_() {
 		return $self->GetNetworks();
 	}
 }
 
-%extend CIRCNetwork {
+%extend CNetwork {
 	std::vector<CChan*> GetChans_() {
 		return $self->GetChans();
 	}
@@ -278,7 +278,7 @@ typedef std::vector<std::pair<CString, CString> > VPair;
 	*HALTCORE = *ZNC::CModule::HALTCORE;
 	*UNLOAD = *ZNC::CModule::UNLOAD;
 
-	package ZNC::CIRCNetwork;
+	package ZNC::CNetwork;
 	*GetChans = *GetChans_;
 
 	package ZNC::CUser;

@@ -51,13 +51,13 @@ public:
 
     void LoadUser(CUser* pUser)
     {
-        const std::vector<CIRCNetwork*>& vNetworks = pUser->GetNetworks();
-        for (const CIRCNetwork* pNetwork : vNetworks) {
+        const std::vector<CNetwork*>& vNetworks = pUser->GetNetworks();
+        for (const CNetwork* pNetwork : vNetworks) {
             LoadNetwork(pNetwork);
         }
     }
 
-    void LoadNetwork(const CIRCNetwork* pNetwork)
+    void LoadNetwork(const CNetwork* pNetwork)
     {
         const std::vector<CChan*>& vChans = pNetwork->GetChans();
         for (CChan* pChan : vChans) {

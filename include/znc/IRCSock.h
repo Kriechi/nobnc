@@ -25,14 +25,14 @@
 
 class CChan;
 class CUser;
-class CIRCNetwork;
+class CNetwork;
 class CClient;
 
 // TODO: This class needs new name
 class CIRCSock : public CIRCSocket
 {
 public:
-    CIRCSock(CIRCNetwork* pNetwork);
+    CIRCSock(CNetwork* pNetwork);
     virtual ~CIRCSock();
 
     CIRCSock(const CIRCSock&) = delete;
@@ -92,7 +92,7 @@ public:
     CString GetNickMask() const { return m_Nick.GetNickMask(); }
     const CString& GetNick() const { return m_Nick.GetNick(); }
     const CString& GetPass() const { return m_sPass; }
-    CIRCNetwork* GetNetwork() const { return m_pNetwork; }
+    CNetwork* GetNetwork() const { return m_pNetwork; }
     bool HasNamesx() const { return m_bNamesx; }
     bool HasUHNames() const { return m_bUHNames; }
     const std::set<unsigned char>& GetUserModes() const { return m_scUserModes; }
@@ -106,7 +106,7 @@ public:
     void ForwardRaw353(const CString& sLine) const;
     void ForwardRaw353(const CString& sLine, CClient* pClient) const;
 
-    // TODO move this function to CIRCNetwork and make it non-static?
+    // TODO move this function to CNetwork and make it non-static?
     static bool IsFloodProtected(double fRate);
 
 private:
@@ -124,7 +124,7 @@ private:
     CString m_sPermModes;
     std::set<unsigned char> m_scUserModes;
     std::map<unsigned char, EChanModeArgs> m_mueChanModes;
-    CIRCNetwork* m_pNetwork;
+    CNetwork* m_pNetwork;
     CNick m_Nick;
     CString m_sPass;
     std::map<CString, CChan*> m_msChans;

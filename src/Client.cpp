@@ -543,7 +543,7 @@ void CClient::ReadLine(const CString& sData)
 
 void CClient::SetNick(const CString& s) { m_sNick = s; }
 
-void CClient::SetNetwork(CIRCNetwork* pNetwork, bool bDisconnect, bool bReconnect)
+void CClient::SetNetwork(CNetwork* pNetwork, bool bDisconnect, bool bReconnect)
 {
     if (bDisconnect) {
         if (m_pNetwork) {
@@ -707,7 +707,7 @@ void CClient::AcceptLogin(CUser& User)
 
     // Set our proper timeout and set back our proper timeout mode
     // (constructor set a different timeout and mode)
-    SetTimeout(CIRCNetwork::NO_TRAFFIC_TIMEOUT, TMO_READ);
+    SetTimeout(CNetwork::NO_TRAFFIC_TIMEOUT, TMO_READ);
 
     SetSockName("USR::" + m_pUser->GetUserName());
     SetEncoding(m_pUser->GetClientEncoding());
@@ -754,7 +754,7 @@ void CClient::ConnectionRefused() { DEBUG(GetSockName() << " == ConnectionRefuse
 void CClient::Disconnected()
 {
     DEBUG(GetSockName() << " == Disconnected()");
-    CIRCNetwork* pNetwork = m_pNetwork;
+    CNetwork* pNetwork = m_pNetwork;
     SetNetwork(nullptr, true, false);
 
     if (m_pUser) {

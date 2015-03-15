@@ -164,7 +164,7 @@ class CAdminMod : public CModule
         return pUser;
     }
 
-    CIRCNetwork* FindNetwork(CUser* pUser, const CString& sNetwork)
+    CNetwork* FindNetwork(CUser* pUser, const CString& sNetwork)
     {
         if (sNetwork.Equals("$net") || sNetwork.Equals("$network")) {
             if (pUser != GetUser()) {
@@ -173,7 +173,7 @@ class CAdminMod : public CModule
             }
             return CModule::GetNetwork();
         }
-        CIRCNetwork* pNetwork = pUser->FindNetwork(sNetwork);
+        CNetwork* pNetwork = pUser->FindNetwork(sNetwork);
         if (!pNetwork) {
             PutModule("Error: [" + pUser->GetUserName() + "] does not have a network named [" + sNetwork + "].");
         }
@@ -439,7 +439,7 @@ class CAdminMod : public CModule
         const CString sUsername = sLine.Token(2);
         const CString sNetwork = sLine.Token(3);
 
-        CIRCNetwork* pNetwork = nullptr;
+        CNetwork* pNetwork = nullptr;
 
         if (sUsername.empty()) {
             pNetwork = CModule::GetNetwork();
@@ -495,7 +495,7 @@ class CAdminMod : public CModule
         const CString sValue = sLine.Token(4, true);
 
         CUser* pUser = nullptr;
-        CIRCNetwork* pNetwork = nullptr;
+        CNetwork* pNetwork = nullptr;
 
         if (sUsername.empty()) {
             pUser = GetUser();
@@ -596,7 +596,7 @@ class CAdminMod : public CModule
         CUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -627,7 +627,7 @@ class CAdminMod : public CModule
         CUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -665,7 +665,7 @@ class CAdminMod : public CModule
         CUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -723,7 +723,7 @@ class CAdminMod : public CModule
         CUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -976,7 +976,7 @@ class CAdminMod : public CModule
             return;
         }
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -1005,7 +1005,7 @@ class CAdminMod : public CModule
             }
         }
 
-        const vector<CIRCNetwork*>& vNetworks = pUser->GetNetworks();
+        const vector<CNetwork*>& vNetworks = pUser->GetNetworks();
 
         CTable Table;
         Table.AddColumn("Network");
@@ -1015,7 +1015,7 @@ class CAdminMod : public CModule
         Table.AddColumn("Channels");
 
         for (unsigned int a = 0; a < vNetworks.size(); a++) {
-            CIRCNetwork* pNetwork = vNetworks[a];
+            CNetwork* pNetwork = vNetworks[a];
             Table.AddRow();
             Table.SetCell("Network", pNetwork->GetName());
             if (pNetwork->IsIRCConnected()) {
@@ -1047,7 +1047,7 @@ class CAdminMod : public CModule
         CUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -1075,7 +1075,7 @@ class CAdminMod : public CModule
         CUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -1103,7 +1103,7 @@ class CAdminMod : public CModule
             return;
         }
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -1140,7 +1140,7 @@ class CAdminMod : public CModule
             return;
         }
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -1227,7 +1227,7 @@ class CAdminMod : public CModule
             PutModule("Error: [" + sCTCPRequest + "] not found for user [" + pUser->GetUserName() + "]!");
     }
 
-    void LoadModuleFor(CModules& Modules, const CString& sModName, const CString& sArgs, CModInfo::EModuleType eType, CUser* pUser, CIRCNetwork* pNetwork)
+    void LoadModuleFor(CModules& Modules, const CString& sModName, const CString& sArgs, CModInfo::EModuleType eType, CUser* pUser, CNetwork* pNetwork)
     {
         if (pUser->DenyLoadMod() && !GetUser()->IsAdmin()) {
             PutModule("Loading modules has been disabled.");
@@ -1285,7 +1285,7 @@ class CAdminMod : public CModule
         CUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -1343,7 +1343,7 @@ class CAdminMod : public CModule
         CUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }
@@ -1399,7 +1399,7 @@ class CAdminMod : public CModule
         CUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        CIRCNetwork* pNetwork = FindNetwork(pUser, sNetwork);
+        CNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
             return;
         }

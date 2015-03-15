@@ -62,8 +62,8 @@ CZNC::~CZNC()
     for (const auto& it : m_msUsers) {
         it.second->GetModules().UnloadAll();
 
-        const vector<CIRCNetwork*>& networks = it.second->GetNetworks();
-        for (CIRCNetwork* pNetwork : networks) {
+        const vector<CNetwork*>& networks = it.second->GetNetworks();
+        for (CNetwork* pNetwork : networks) {
             pNetwork->GetModules().UnloadAll();
         }
     }
@@ -718,7 +718,7 @@ bool CZNC::WriteNewConfig(const CString& sConfigFile)
 
         do {
             CUtils::GetInput("Name", sNetwork, "freenode");
-        } while (!CIRCNetwork::IsValidNetwork(sNetwork));
+        } while (!CNetwork::IsValidNetwork(sNetwork));
 
         vsLines.push_back("\t<Network " + sNetwork + ">");
 
@@ -1402,7 +1402,7 @@ bool CZNC::UpdateModule(const CString& sModule)
     CModule* pModule;
 
     map<CUser*, CString> musLoaded;
-    map<CIRCNetwork*, CString> mnsLoaded;
+    map<CNetwork*, CString> mnsLoaded;
 
     // Unload the module for every user and network
     for (const auto& it : m_msUsers) {
@@ -1415,8 +1415,8 @@ bool CZNC::UpdateModule(const CString& sModule)
         }
 
         // See if the user has this module loaded to a network
-        vector<CIRCNetwork*> vNetworks = pUser->GetNetworks();
-        for (CIRCNetwork* pNetwork : vNetworks) {
+        vector<CNetwork*> vNetworks = pUser->GetNetworks();
+        for (CNetwork* pNetwork : vNetworks) {
             pModule = pNetwork->GetModules().FindModule(sModule);
             if (pModule) {
                 mnsLoaded[pNetwork] = pModule->GetArgs();
@@ -1461,7 +1461,7 @@ bool CZNC::UpdateModule(const CString& sModule)
 
     // Reload the module for all networks
     for (const auto& it : mnsLoaded) {
-        CIRCNetwork* pNetwork = it.first;
+        CNetwork* pNetwork = it.first;
         const CString& sArgs = it.second;
 
         if (!pNetwork->GetModules().LoadModule(sModule, sArgs, CModInfo::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
@@ -1861,8 +1861,8 @@ public:
 protected:
     void RunJob() override
     {
-        list<CIRCNetwork*> ConnectionQueue;
-        list<CIRCNetwork*>& RealConnectionQueue = CZNC::Get().GetConnectionQueue();
+        list<CNetwork*> ConnectionQueue;
+        list<CNetwork*>& RealConnectionQueue = CZNC::Get().GetConnectionQueue();
 
         // Problem: If a network can't connect right now because e.g. it
         // is throttled, it will re-insert itself into the connection
@@ -1874,7 +1874,7 @@ protected:
         ConnectionQueue.swap(RealConnectionQueue);
 
         while (!ConnectionQueue.empty()) {
-            CIRCNetwork* pNetwork = ConnectionQueue.front();
+            CNetwork* pNetwork = ConnectionQueue.front();
             ConnectionQueue.pop_front();
 
             if (pNetwork->Connect()) {
@@ -1944,7 +1944,7 @@ void CZNC::ResumeConnectQueue()
     }
 }
 
-void CZNC::AddNetworkToQueue(CIRCNetwork* pNetwork)
+void CZNC::AddNetworkToQueue(CNetwork* pNetwork)
 {
     // Make sure we are not already in the queue
     if (std::find(m_lpConnectQueue.begin(), m_lpConnectQueue.end(), pNetwork) != m_lpConnectQueue.end()) {

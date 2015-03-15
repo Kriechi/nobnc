@@ -366,8 +366,8 @@ void CWebSock::SetVars()
             AddModLoop("UserModLoop", *pMod);
         }
 
-        vector<CIRCNetwork*> vNetworks = GetSession()->GetUser()->GetNetworks();
-        for (CIRCNetwork* pNetwork : vNetworks) {
+        vector<CNetwork*> vNetworks = GetSession()->GetUser()->GetNetworks();
+        for (CNetwork* pNetwork : vNetworks) {
             CModules& vnMods = pNetwork->GetModules();
 
             CTemplate& Row = m_Template.AddRow("NetworkModLoop");
@@ -408,7 +408,7 @@ bool CWebSock::AddModLoop(const CString& sLoopName, CModule& Module, CTemplate* 
             } else if (sModuleType == "user" && Module.GetType() == CModInfo::UserModule) {
                 bActiveModule = true;
             } else if (sModuleType == "network" && Module.GetType() == CModInfo::NetworkModule) {
-                CIRCNetwork* Network = Module.GetNetwork();
+                CNetwork* Network = Module.GetNetwork();
                 if (Network) {
                     CString sNetworkName = GetPath().Token(2, false, "/");
                     if (sNetworkName == Network->GetName()) {
@@ -716,7 +716,7 @@ CWebSock::EPageReqResult CWebSock::OnPageRequestInternal(const CString& sURI, CS
             return PAGE_DONE;
         }
 
-        CIRCNetwork* pNetwork = nullptr;
+        CNetwork* pNetwork = nullptr;
         if (eModType == CModInfo::NetworkModule) {
             CString sNetwork = m_sPath.Token(0, false, "/");
             m_sPath = m_sPath.Token(1, true, "/");

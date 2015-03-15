@@ -33,7 +33,7 @@ const unsigned int CIRCSock::m_uCTCPFloodCount = 5;
 
 // It will be bad if user sets it to 0.00000000000001
 // If you want no flood protection, set network's flood rate to -1
-// TODO move this constant to CIRCNetwork?
+// TODO move this constant to CNetwork?
 static const double FLOOD_MINIMAL_RATE = 0.3;
 
 class CIRCFloodTimer : public CCron
@@ -55,7 +55,7 @@ public:
 
 bool CIRCSock::IsFloodProtected(double fRate) { return fRate > FLOOD_MINIMAL_RATE; }
 
-CIRCSock::CIRCSock(CIRCNetwork* pNetwork)
+CIRCSock::CIRCSock(CNetwork* pNetwork)
     : CIRCSocket(), m_bAuthed(false), m_bNamesx(false), m_bUHNames(false), m_sPerms("*!@%+"), m_sPermModes("qaohv"),
       m_scUserModes(), m_mueChanModes(), m_pNetwork(pNetwork), m_Nick(), m_sPass(""), m_msChans(), m_uMaxNickLen(9),
       m_uCapPaused(0), m_ssAcceptedCaps(), m_ssPendingCaps(), m_lastCTCP(0), m_uNumCTCP(0), m_mISupport(),
@@ -171,7 +171,7 @@ void CIRCSock::ReadLine(const CString& sData)
             }
 
             m_pNetwork->SetIRCServer(sServer);
-            SetTimeout(CIRCNetwork::NO_TRAFFIC_TIMEOUT,
+            SetTimeout(CNetwork::NO_TRAFFIC_TIMEOUT,
                        TMO_READ); // Now that we are connected, let nature take its course
             PutIRC("WHO " + sNick);
 

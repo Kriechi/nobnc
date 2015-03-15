@@ -44,7 +44,7 @@ public:
 
     void ClearAllBuffers()
     {
-        CIRCNetwork* pNetwork = GetNetwork();
+        CNetwork* pNetwork = GetNetwork();
 
         if (pNetwork) {
             const vector<CChan*>& vChans = pNetwork->GetChans();

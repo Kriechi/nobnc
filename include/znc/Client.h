@@ -25,7 +25,7 @@
 
 class CZNC;
 class CUser;
-class CIRCNetwork;
+class CNetwork;
 class CIRCSock;
 class CClient;
 
@@ -161,8 +161,8 @@ public:
     void SetNick(const CString& s);
     void SetAway(bool bAway) { m_bAway = bAway; }
     CUser* GetUser() const { return m_pUser; }
-    void SetNetwork(CIRCNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
-    CIRCNetwork* GetNetwork() const { return m_pNetwork; }
+    void SetNetwork(CNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
+    CNetwork* GetNetwork() const { return m_pNetwork; }
     const std::vector<CClient*>& GetClients() const;
     const CIRCSock* GetIRCSock() const;
     CIRCSock* GetIRCSock();
@@ -188,7 +188,7 @@ private:
     bool m_bSelfMessage;
     bool m_bPlaybackActive;
     CUser* m_pUser;
-    CIRCNetwork* m_pNetwork;
+    CNetwork* m_pNetwork;
     CString m_sNick;
     CString m_sPass;
     CString m_sUser;

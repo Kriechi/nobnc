@@ -48,12 +48,12 @@ struct FOR_EACH_MODULE_Type
     {
         where = AtGlobal;
     }
-    FOR_EACH_MODULE_Type(CIRCNetwork* pNetwork)
+    FOR_EACH_MODULE_Type(CNetwork* pNetwork)
         : CMuser(pNetwork ? pNetwork->GetUser()->GetModules() : CMtemp), CMnet(pNetwork ? pNetwork->GetModules() : CMtemp)
     {
         where = AtGlobal;
     }
-    FOR_EACH_MODULE_Type(std::pair<CUser*, CIRCNetwork*> arg)
+    FOR_EACH_MODULE_Type(std::pair<CUser*, CNetwork*> arg)
         : CMuser(arg.first ? arg.first->GetModules() : CMtemp), CMnet(arg.second ? arg.second->GetModules() : CMtemp)
     {
         where = AtGlobal;
@@ -441,10 +441,10 @@ public:
 
     CUser* SafeGetUserFromParam(CWebSock& WebSock) { return CZNC::Get().FindUser(SafeGetUserNameParam(WebSock)); }
 
-    CIRCNetwork* SafeGetNetworkFromParam(CWebSock& WebSock)
+    CNetwork* SafeGetNetworkFromParam(CWebSock& WebSock)
     {
         CUser* pUser = CZNC::Get().FindUser(SafeGetUserNameParam(WebSock));
-        CIRCNetwork* pNetwork = nullptr;
+        CNetwork* pNetwork = nullptr;
 
         if (pUser) {
             pNetwork = pUser->FindNetwork(SafeGetNetworkParam(WebSock));
@@ -487,7 +487,7 @@ public:
             WebSock.PrintErrorPage("No such username");
             return true;
         } else if (sPageName == "editnetwork") {
-            CIRCNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            CNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
@@ -516,7 +516,7 @@ public:
 
             return DelNetwork(WebSock, pUser, Tmpl);
         } else if (sPageName == "editchan") {
-            CIRCNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            CNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
@@ -540,7 +540,7 @@ public:
 
             return ChanPage(WebSock, Tmpl, pNetwork, pChan);
         } else if (sPageName == "addchan") {
-            CIRCNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            CNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
@@ -554,7 +554,7 @@ public:
             WebSock.PrintErrorPage("No such username or network");
             return true;
         } else if (sPageName == "delchan") {
-            CIRCNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            CNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
@@ -650,7 +650,7 @@ public:
         return false;
     }
 
-    bool ChanPage(CWebSock& WebSock, CTemplate& Tmpl, CIRCNetwork* pNetwork, CChan* pChan = nullptr)
+    bool ChanPage(CWebSock& WebSock, CTemplate& Tmpl, CNetwork* pNetwork, CChan* pChan = nullptr)
     {
         std::shared_ptr<CWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_chan.tmpl");
@@ -796,7 +796,7 @@ public:
         return true;
     }
 
-    bool NetworkPage(CWebSock& WebSock, CTemplate& Tmpl, CUser* pUser, CIRCNetwork* pNetwork = nullptr)
+    bool NetworkPage(CWebSock& WebSock, CTemplate& Tmpl, CUser* pUser, CNetwork* pNetwork = nullptr)
     {
         std::shared_ptr<CWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_network.tmpl");
@@ -988,7 +988,7 @@ public:
         }
         if (!pNetwork || pNetwork->GetName() != sName) {
             CString sNetworkAddError;
-            CIRCNetwork* pOldNetwork = pNetwork;
+            CNetwork* pOldNetwork = pNetwork;
             pNetwork = pUser->AddNetwork(sName, sNetworkAddError);
             if (!pNetwork) {
                 WebSock.PrintErrorPage(sNetworkAddError);
@@ -1196,7 +1196,7 @@ public:
         return false;
     }
 
-    bool DelChan(CWebSock& WebSock, CIRCNetwork* pNetwork)
+    bool DelChan(CWebSock& WebSock, CNetwork* pNetwork)
     {
         CString sChan = WebSock.GetParam("name", false);
 
@@ -1264,7 +1264,7 @@ public:
                     l["Host"] = *it;
                 }
 
-                const vector<CIRCNetwork*>& vNetworks = pUser->GetNetworks();
+                const vector<CNetwork*>& vNetworks = pUser->GetNetworks();
                 for (unsigned int a = 0; a < vNetworks.size(); a++) {
                     CTemplate& l = Tmpl.AddRow("NetworkLoop");
                     l["Name"] = vNetworks[a]->GetName();
@@ -1394,10 +1394,10 @@ public:
                 if (pUser) {
                     pModule = pUser->GetModules().FindModule(Info.GetName());
                     // Check if module is loaded by all or some networks
-                    const vector<CIRCNetwork*>& userNetworks = pUser->GetNetworks();
+                    const vector<CNetwork*>& userNetworks = pUser->GetNetworks();
                     unsigned int networksWithRenderedModuleCount = 0;
                     for (unsigned int networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
-                        const CIRCNetwork* pCurrentNetwork = userNetworks[networkIndex];
+                        const CNetwork* pCurrentNetwork = userNetworks[networkIndex];
                         const CModules& networkModules = pCurrentNetwork->GetModules();
                         if (networkModules.FindModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
@@ -1603,10 +1603,10 @@ public:
 
         for (map<CString, CUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             CUser& User = *it->second;
-            vector<CIRCNetwork*> vNetworks = User.GetNetworks();
+            vector<CNetwork*> vNetworks = User.GetNetworks();
 
-            for (vector<CIRCNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
-                CIRCNetwork* pNetwork = *it2;
+            for (vector<CNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
+                CNetwork* pNetwork = *it2;
                 uiNetworks++;
 
                 if (pNetwork->IsIRCConnected()) {
@@ -1868,10 +1868,10 @@ public:
                         usersWithRenderedModuleCount++;
                     }
                     // Count networks which has loaded a render module
-                    const vector<CIRCNetwork*>& userNetworks = User.GetNetworks();
+                    const vector<CNetwork*>& userNetworks = User.GetNetworks();
                     networksCount += userNetworks.size();
                     for (unsigned int networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
-                        const CIRCNetwork* pCurrentNetwork = userNetworks[networkIndex];
+                        const CNetwork* pCurrentNetwork = userNetworks[networkIndex];
                         if (pCurrentNetwork->GetModules().FindModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
