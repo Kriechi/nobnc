@@ -27,7 +27,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanCTCP(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         sMessage.StripControls();
         return CONTINUE;
@@ -39,7 +39,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         sMessage.StripControls();
         return CONTINUE;
@@ -51,7 +51,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         sMessage.StripControls();
         return CONTINUE;

@@ -39,7 +39,7 @@ protected:
     void RunJob() override
     {
         CNetwork* pNetwork = GetModule()->GetNetwork();
-        CChan* pChan = pNetwork->FindChan(GetName().Token(1, true));
+        CChannel* pChan = pNetwork->FindChan(GetName().Token(1, true));
 
         if (pChan) {
             pChan->Enable();
@@ -118,7 +118,7 @@ public:
             PutModule("Rejoin delay disabled");
     }
 
-    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChan& pChan, const CString& sMessage) override
+    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChannel& pChan, const CString& sMessage) override
     {
         if (GetNetwork()->GetCurNick().Equals(sKickedNick)) {
             if (!delay) {

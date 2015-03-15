@@ -212,15 +212,15 @@ public:
         m_msUsers.clear();
     }
 
-    void OnJoin(const CNick& Nick, CChan& Channel) override
+    void OnJoin(const CNick& Nick, CChannel& Channel) override
     {
         // If we have ops in this chan
-        if (Channel.HasPerm(CChan::Op)) {
+        if (Channel.HasPerm(CChannel::Op)) {
             CheckAutoOp(Nick, Channel);
         }
     }
 
-    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChan*>& vChans) override
+    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChannel*>& vChans) override
     {
         MCString::iterator it = m_msQueue.find(Nick.GetNick().AsLower());
 
@@ -229,7 +229,7 @@ public:
         }
     }
 
-    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChan*>& vChans) override
+    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChannel*>& vChans) override
     {
         // Update the queue with nick changes
         MCString::iterator it = m_msQueue.find(OldNick.GetNick().AsLower());
@@ -257,13 +257,13 @@ public:
         return HALTCORE;
     }
 
-    void OnOp2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange) override
+    void OnOp2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override
     {
         if (Nick.GetNick() == GetNetwork()->GetIRCNick().GetNick()) {
             const map<CString, CNick>& msNicks = Channel.GetNicks();
 
             for (map<CString, CNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
-                if (!it->second.HasPerm(CChan::Op)) {
+                if (!it->second.HasPerm(CChannel::Op)) {
                     CheckAutoOp(it->second, Channel);
                 }
             }
@@ -459,7 +459,7 @@ public:
         return nullptr;
     }
 
-    bool CheckAutoOp(const CNick& Nick, CChan& Channel)
+    bool CheckAutoOp(const CNick& Nick, CChannel& Channel)
     {
         CAutoOpUser* pUser = FindUserByHost(Nick.GetHostMask(), Channel.GetName());
 
@@ -519,17 +519,17 @@ public:
 
             // First verify that the person who challenged us matches a user's host
             if (pUser->HostMatches(Nick.GetHostMask())) {
-                const vector<CChan*>& Chans = GetNetwork()->GetChans();
+                const vector<CChannel*>& Chans = GetNetwork()->GetChans();
                 bMatchedHost = true;
 
                 // Also verify that they are opped in at least one of the user's chans
                 for (size_t a = 0; a < Chans.size(); a++) {
-                    const CChan& Chan = *Chans[a];
+                    const CChannel& Chan = *Chans[a];
 
                     const CNick* pNick = Chan.FindNick(Nick.GetNick());
 
                     if (pNick) {
-                        if (pNick->HasPerm(CChan::Op) && pUser->ChannelMatches(Chan.GetName())) {
+                        if (pNick->HasPerm(CChannel::Op) && pUser->ChannelMatches(Chan.GetName())) {
                             bValid = true;
                             break;
                         }
@@ -619,15 +619,15 @@ public:
 
     void OpUser(const CNick& Nick, const CAutoOpUser& User)
     {
-        const vector<CChan*>& Chans = GetNetwork()->GetChans();
+        const vector<CChannel*>& Chans = GetNetwork()->GetChans();
 
         for (size_t a = 0; a < Chans.size(); a++) {
-            const CChan& Chan = *Chans[a];
+            const CChannel& Chan = *Chans[a];
 
-            if (Chan.HasPerm(CChan::Op) && User.ChannelMatches(Chan.GetName())) {
+            if (Chan.HasPerm(CChannel::Op) && User.ChannelMatches(Chan.GetName())) {
                 const CNick* pNick = Chan.FindNick(Nick.GetNick());
 
-                if (pNick && !pNick->HasPerm(CChan::Op)) {
+                if (pNick && !pNick->HasPerm(CChannel::Op)) {
                     PutIRC("MODE " + Chan.GetName() + " +o " + Nick.GetNick());
                 }
             }

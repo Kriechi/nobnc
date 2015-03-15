@@ -75,7 +75,7 @@ public:
         MCString::iterator it = FindNV(sTarget.AsLower());
 
         if (it != EndNV()) {
-            CChan* pChan = GetNetwork()->FindChan(sTarget);
+            CChannel* pChan = GetNetwork()->FindChan(sTarget);
             CString sNickMask = GetNetwork()->GetIRCNick().GetNickMask();
             if (pChan) {
                 if (!pChan->AutoClearChanBuffer())
@@ -103,7 +103,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         FilterIncoming(Channel.GetName(), Nick, sMessage);
         return CONTINUE;

@@ -108,37 +108,37 @@ public:
         return CONTINUE;
     }
 
-    void OnChanPermission(const CNick& OpNick, const CNick& Nick, CChan& Channel, unsigned char uMode, bool bAdded, bool bNoChange) override
+    void OnChanPermission(const CNick& OpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] set mode [" + Channel.GetName() +
                   ((bAdded) ? "] +" : "] -") + CString(uMode) + " " + Nick.GetNick());
     }
 
-    void OnOp(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange) override
+    void OnOp(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] opped [" + Nick.GetNick() + "] on [" +
                   Channel.GetName() + "]");
     }
 
-    void OnDeop(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange) override
+    void OnDeop(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] deopped [" + Nick.GetNick() + "] on [" +
                   Channel.GetName() + "]");
     }
 
-    void OnVoice(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange) override
+    void OnVoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] voiced [" + Nick.GetNick() + "] on [" +
                   Channel.GetName() + "]");
     }
 
-    void OnDevoice(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange) override
+    void OnDevoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] devoiced [" + Nick.GetNick() + "] on [" +
                   Channel.GetName() + "]");
     }
 
-    void OnRawMode(const CNick& OpNick, CChan& Channel, const CString& sModes, const CString& sArgs) override
+    void OnRawMode(const CNick& OpNick, CChannel& Channel, const CString& sModes, const CString& sArgs) override
     {
         PutModule("* " + OpNick.GetNick() + " sets mode: " + sModes + " " + sArgs + " (" + Channel.GetName() + ")");
     }
@@ -155,29 +155,29 @@ public:
         return CONTINUE;
     }
 
-    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChan& Channel, const CString& sMessage) override
+    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChannel& Channel, const CString& sMessage) override
     {
         PutModule("[" + OpNick.GetNick() + "] kicked [" + sKickedNick + "] from [" + Channel.GetName() +
                   "] with the msg [" + sMessage + "]");
     }
 
-    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChan*>& vChans) override
+    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChannel*>& vChans) override
     {
         PutModule("* Quits: " + Nick.GetNick() + " (" + Nick.GetIdent() + "!" + Nick.GetHost() + ") (" + sMessage + ")");
     }
 
-    EModRet OnTimerAutoJoin(CChan& Channel) override
+    EModRet OnTimerAutoJoin(CChannel& Channel) override
     {
         PutModule("Attempting to join " + Channel.GetName());
         return CONTINUE;
     }
 
-    void OnJoin(const CNick& Nick, CChan& Channel) override
+    void OnJoin(const CNick& Nick, CChannel& Channel) override
     {
         PutModule("* Joins: " + Nick.GetNick() + " (" + Nick.GetIdent() + "!" + Nick.GetHost() + ")");
     }
 
-    void OnPart(const CNick& Nick, CChan& Channel, const CString& sMessage) override
+    void OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage) override
     {
         PutModule("* Parts: " + Nick.GetNick() + " (" + Nick.GetIdent() + "!" + Nick.GetHost() + ")");
     }
@@ -193,7 +193,7 @@ public:
         return CONTINUE;
     }
 
-    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChan*>& vChans) override
+    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChannel*>& vChans) override
     {
         PutModule("* " + OldNick.GetNick() + " is now known as " + sNewNick);
     }
@@ -228,7 +228,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanCTCP(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         PutModule("[" + Nick.GetNick() + "] chanctcp [" + sMessage + "] to [" + Channel.GetName() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
@@ -252,7 +252,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         PutModule("[" + Nick.GetNick() + "] channotice [" + sMessage + "] to [" + Channel.GetName() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
@@ -260,7 +260,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnTopic(CNick& Nick, CChan& Channel, CString& sTopic) override
+    EModRet OnTopic(CNick& Nick, CChannel& Channel, CString& sTopic) override
     {
         PutModule("* " + Nick.GetNick() + " changes topic on " + Channel.GetName() + " to '" + sTopic + "'");
 
@@ -290,7 +290,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         if (sMessage == "!ping") {
             PutIRC("PRIVMSG " + Channel.GetName() + " :PONG?");

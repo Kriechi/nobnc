@@ -18,12 +18,12 @@
 #include <znc/User.h>
 #include <znc/Network.h>
 
-class CChanSaverMod : public CModule
+class CChannelSaverMod : public CModule
 {
 public:
-    MODCONSTRUCTOR(CChanSaverMod) {}
+    MODCONSTRUCTOR(CChannelSaverMod) {}
 
-    virtual ~CChanSaverMod() {}
+    virtual ~CChannelSaverMod() {}
 
     bool OnLoad(const CString& sArgsi, CString& sMessage) override
     {
@@ -59,8 +59,8 @@ public:
 
     void LoadNetwork(const CNetwork* pNetwork)
     {
-        const std::vector<CChan*>& vChans = pNetwork->GetChans();
-        for (CChan* pChan : vChans) {
+        const std::vector<CChannel*>& vChans = pNetwork->GetChans();
+        for (CChannel* pChan : vChans) {
             // If that channel isn't yet in the config,
             // we'll have to add it...
             if (!pChan->InConfig()) {
@@ -69,14 +69,14 @@ public:
         }
     }
 
-    void OnJoin(const CNick& Nick, CChan& Channel) override
+    void OnJoin(const CNick& Nick, CChannel& Channel) override
     {
         if (!Channel.InConfig() && GetNetwork()->GetIRCNick().NickEquals(Nick.GetNick())) {
             Channel.SetInConfig(true);
         }
     }
 
-    void OnPart(const CNick& Nick, CChan& Channel, const CString& sMessage) override
+    void OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage) override
     {
         if (Channel.InConfig() && GetNetwork()->GetIRCNick().NickEquals(Nick.GetNick())) {
             Channel.SetInConfig(false);
@@ -84,11 +84,11 @@ public:
     }
 };
 
-template <> void TModInfo<CChanSaverMod>(CModInfo& Info)
+template <> void TModInfo<CChannelSaverMod>(CModInfo& Info)
 {
     Info.SetWikiPage("chansaver");
     Info.AddType(CModInfo::NetworkModule);
     Info.AddType(CModInfo::GlobalModule);
 }
 
-USERMODULEDEFS(CChanSaverMod, "Keep config up-to-date when user joins/parts.")
+USERMODULEDEFS(CChannelSaverMod, "Keep config up-to-date when user joins/parts.")

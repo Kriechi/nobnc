@@ -22,7 +22,7 @@
 #include <vector>
 
 class CNetwork;
-class CChan;
+class CChannel;
 
 class CNick
 {
@@ -37,7 +37,7 @@ public:
     void Reset();
     void Parse(const CString& sNickMask);
     CString GetHostMask() const;
-    size_t GetCommonChans(std::vector<CChan*>& vChans, CNetwork* pNetwork) const;
+    size_t GetCommonChans(std::vector<CChannel*>& vChans, CNetwork* pNetwork) const;
     bool NickEquals(const CString& nickname) const;
 
     void SetNetwork(CNetwork* pNetwork);

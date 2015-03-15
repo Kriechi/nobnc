@@ -91,7 +91,7 @@ public:
         return sConfNick;
     }
 
-    void OnNick(const CNick& Nick, const CString& sNewNick, const vector<CChan*>& vChans) override
+    void OnNick(const CNick& Nick, const CString& sNewNick, const vector<CChannel*>& vChans) override
     {
         if (sNewNick == GetNetwork()->GetIRCSock()->GetNick()) {
             // We are changing our own nick
@@ -114,7 +114,7 @@ public:
         }
     }
 
-    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChan*>& vChans) override
+    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChannel*>& vChans) override
     {
         // If someone with the nick we want quits, be fast and get the nick
         if (Nick.NickEquals(GetNick())) {

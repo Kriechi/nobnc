@@ -58,7 +58,7 @@ void CClient::UserCommand(CString& sLine)
             return;
         }
 
-        CChan* pChan = m_pNetwork->FindChan(sChan);
+        CChannel* pChan = m_pNetwork->FindChan(sChan);
 
         if (!pChan) {
             PutStatus("You are not on [" + sChan + "]");
@@ -125,14 +125,14 @@ void CClient::UserCommand(CString& sLine)
         sPatterns.Replace(",", " ");
         sPatterns.Split(" ", vsChans, false, "", "", true, true);
 
-        set<CChan*> sChans;
+        set<CChannel*> sChans;
         for (const CString& sChan : vsChans) {
-            vector<CChan*> vChans = m_pNetwork->FindChans(sChan);
+            vector<CChannel*> vChans = m_pNetwork->FindChans(sChan);
             sChans.insert(vChans.begin(), vChans.end());
         }
 
         unsigned int uDetached = 0;
-        for (CChan* pChan : sChans) {
+        for (CChannel* pChan : sChans) {
             if (pChan->IsDetached()) continue;
             uDetached++;
             pChan->DetachUser();
@@ -375,14 +375,14 @@ void CClient::UserCommand(CString& sLine)
             sPatterns.Replace(",", " ");
             sPatterns.Split(" ", vsChans, false, "", "", true, true);
 
-            set<CChan*> sChans;
+            set<CChannel*> sChans;
             for (const CString& sChan : vsChans) {
-                vector<CChan*> vChans = m_pNetwork->FindChans(sChan);
+                vector<CChannel*> vChans = m_pNetwork->FindChans(sChan);
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
             unsigned int uEnabled = 0;
-            for (CChan* pChan : sChans) {
+            for (CChannel* pChan : sChans) {
                 if (!pChan->IsDisabled()) continue;
                 uEnabled++;
                 pChan->Enable();
@@ -406,14 +406,14 @@ void CClient::UserCommand(CString& sLine)
             sPatterns.Replace(",", " ");
             sPatterns.Split(" ", vsChans, false, "", "", true, true);
 
-            set<CChan*> sChans;
+            set<CChannel*> sChans;
             for (const CString& sChan : vsChans) {
-                vector<CChan*> vChans = m_pNetwork->FindChans(sChan);
+                vector<CChannel*> vChans = m_pNetwork->FindChans(sChan);
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
             unsigned int uDisabled = 0;
-            for (CChan* pChan : sChans) {
+            for (CChannel* pChan : sChans) {
                 if (pChan->IsDisabled()) continue;
                 uDisabled++;
                 pChan->Disable();
@@ -434,7 +434,7 @@ void CClient::UserCommand(CString& sLine)
             return;
         }
 
-        CChan* pChan = m_pNetwork->FindChan(sChan);
+        CChannel* pChan = m_pNetwork->FindChan(sChan);
         if (!pChan) {
             PutStatus("No such channel [" + sChan + "]");
             return;
@@ -519,7 +519,7 @@ void CClient::UserCommand(CString& sLine)
             }
         }
 
-        const vector<CChan*>& vChans = pNetwork->GetChans();
+        const vector<CChannel*>& vChans = pNetwork->GetChans();
 
         if (vChans.empty()) {
             PutStatus("There are no channels defined.");
@@ -532,7 +532,7 @@ void CClient::UserCommand(CString& sLine)
 
         unsigned int uNumDetached = 0, uNumDisabled = 0, uNumJoined = 0;
 
-        for (const CChan* pChan : vChans) {
+        for (const CChannel* pChan : vChans) {
             Table.AddRow();
             Table.SetCell("Name", pChan->GetPermStr() + pChan->GetName());
             Table.SetCell("Status",
@@ -846,13 +846,13 @@ void CClient::UserCommand(CString& sLine)
             return;
         }
 
-        const vector<CChan*>& vChans = m_pNetwork->GetChans();
+        const vector<CChannel*>& vChans = m_pNetwork->GetChans();
         CTable Table;
         Table.AddColumn("Name");
         Table.AddColumn("Set By");
         Table.AddColumn("Topic");
 
-        for (const CChan* pChan : vChans) {
+        for (const CChannel* pChan : vChans) {
             Table.AddRow();
             Table.SetCell("Name", pChan->GetName());
             Table.SetCell("Set By", pChan->GetTopicOwner());
@@ -1359,7 +1359,7 @@ void CClient::UserCommand(CString& sLine)
         }
 
         if (m_pNetwork->IsChan(sBuffer)) {
-            CChan* pChan = m_pNetwork->FindChan(sBuffer);
+            CChannel* pChan = m_pNetwork->FindChan(sBuffer);
 
             if (!pChan) {
                 PutStatus("You are not on [" + sBuffer + "]");
@@ -1406,8 +1406,8 @@ void CClient::UserCommand(CString& sLine)
         }
 
         unsigned int uMatches = 0;
-        vector<CChan*> vChans = m_pNetwork->FindChans(sBuffer);
-        for (CChan* pChan : vChans) {
+        vector<CChannel*> vChans = m_pNetwork->FindChans(sBuffer);
+        for (CChannel* pChan : vChans) {
             uMatches++;
 
             pChan->ClearBuffer();
@@ -1427,7 +1427,7 @@ void CClient::UserCommand(CString& sLine)
             return;
         }
 
-        for (CChan* pChan : m_pNetwork->GetChans()) {
+        for (CChannel* pChan : m_pNetwork->GetChans()) {
             pChan->ClearBuffer();
         }
         PutStatus("All channel buffers have been cleared");
@@ -1445,7 +1445,7 @@ void CClient::UserCommand(CString& sLine)
             return;
         }
 
-        for (CChan* pChan : m_pNetwork->GetChans()) {
+        for (CChannel* pChan : m_pNetwork->GetChans()) {
             pChan->ClearBuffer();
         }
         m_pNetwork->ClearQueryBuffer();
@@ -1465,8 +1465,8 @@ void CClient::UserCommand(CString& sLine)
 
         unsigned int uLineCount = sLine.Token(2).ToUInt();
         unsigned int uMatches = 0, uFail = 0;
-        vector<CChan*> vChans = m_pNetwork->FindChans(sBuffer);
-        for (CChan* pChan : vChans) {
+        vector<CChannel*> vChans = m_pNetwork->FindChans(sBuffer);
+        for (CChannel* pChan : vChans) {
             uMatches++;
 
             if (!pChan->SetBufferCount(uLineCount)) uFail++;

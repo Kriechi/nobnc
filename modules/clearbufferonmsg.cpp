@@ -47,9 +47,9 @@ public:
         CNetwork* pNetwork = GetNetwork();
 
         if (pNetwork) {
-            const vector<CChan*>& vChans = pNetwork->GetChans();
+            const vector<CChannel*>& vChans = pNetwork->GetChans();
 
-            for (CChan* pChan : vChans) {
+            for (CChannel* pChan : vChans) {
                 // Skip detached channels, they weren't read yet
                 if (pChan->IsDetached()) continue;
 

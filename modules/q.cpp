@@ -276,7 +276,7 @@ public:
 
     EModRet OnPrivNotice(CNick& Nick, CString& sMessage) override { return HandleMessage(Nick, sMessage); }
 
-    EModRet OnJoining(CChan& Channel) override
+    EModRet OnJoining(CChannel& Channel) override
     {
         // Halt if are not already cloaked, but the user requres that we delay
         // channel join till after we are cloaked.
@@ -285,17 +285,17 @@ public:
         return CONTINUE;
     }
 
-    void OnJoin(const CNick& Nick, CChan& Channel) override
+    void OnJoin(const CNick& Nick, CChannel& Channel) override
     {
         if (m_bRequestPerms && IsSelf(Nick)) HandleNeed(Channel, "ov");
     }
 
-    void OnDeop2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange) override
+    void OnDeop2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override
     {
         if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick))) HandleNeed(Channel, "o");
     }
 
-    void OnDevoice2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange) override
+    void OnDevoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override
     {
         if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick))) HandleNeed(Channel, "v");
     }
@@ -496,7 +496,7 @@ private:
         return !m_bCatchResponse && GetUser()->IsUserAttached() ? CONTINUE : HALT;
     }
 
-    void HandleNeed(const CChan& Channel, const CString& sPerms)
+    void HandleNeed(const CChannel& Channel, const CString& sPerms)
     {
         MCString::iterator it = m_msChanModes.find(Channel.GetName());
         if (it == m_msChanModes.end()) return;

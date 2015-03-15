@@ -29,7 +29,7 @@ class CClient;
 class CConfig;
 class CFile;
 
-class CChan
+class CChannel
 {
 public:
     typedef enum { Voice = '+', HalfOp = '%', Op = '@', Admin = '!', Owner = '*' } EUserPerms;
@@ -49,15 +49,15 @@ public:
         M_Except = 'e'
     } EModes;
 
-    CChan(const CString& sName, CNetwork* pNetwork, bool bInConfig, CConfig* pConfig = nullptr);
-    ~CChan();
+    CChannel(const CString& sName, CNetwork* pNetwork, bool bInConfig, CConfig* pConfig = nullptr);
+    ~CChannel();
 
-    CChan(const CChan&) = delete;
-    CChan& operator=(const CChan&) = delete;
+    CChannel(const CChannel&) = delete;
+    CChannel& operator=(const CChannel&) = delete;
 
     void Reset();
     CConfig ToConfig() const;
-    void Clone(CChan& chan);
+    void Clone(CChannel& chan);
     void Cycle() const;
     void JoinUser(const CString& sKey = "");
     void AttachUser(CClient* pClient = nullptr);

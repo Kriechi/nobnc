@@ -91,7 +91,7 @@ namespace std {
 }
 
 %template(VIRCNetworks) std::vector<CNetwork*>;
-%template(VChannels) std::vector<CChan*>;
+%template(VChannels) std::vector<CChannel*>;
 %template(VCString) std::vector<CString>;
 typedef std::vector<CString> VCString;
 /*%template(MNicks) std::map<CString, CNick>;*/
@@ -213,12 +213,12 @@ class MCString : public std::map<CString, CString> {};
 }
 
 %extend CNetwork {
-	std::vector<CChan*> GetChans_() {
+	std::vector<CChannel*> GetChans_() {
 		return $self->GetChans();
 	}
 }
 
-%extend CChan {
+%extend CChannel {
 	std::map<CString, CNick> GetNicks_() {
 		return $self->GetNicks();
 	}
@@ -284,7 +284,7 @@ typedef std::vector<std::pair<CString, CString> > VPair;
 	package ZNC::CUser;
 	*GetNetworks = *GetNetworks_;
 
-	package ZNC::CChan;
+	package ZNC::CChannel;
 	sub _GetNicks_ {
 		my $result = GetNicks_(@_);
 		return %$result;

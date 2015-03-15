@@ -120,7 +120,7 @@ public:
                 }
                 break;
             case ChanBuffer:
-                if (CChan* pChan = GetNetwork()->FindChan(sName)) {
+                if (CChannel* pChan = GetNetwork()->FindChan(sName)) {
                     BootStrap(pChan, sBuffer);
                 }
                 break;
@@ -196,8 +196,8 @@ public:
         if (!m_sPassword.empty()) {
             set<CString> ssPaths;
 
-            const vector<CChan*>& vChans = GetNetwork()->GetChans();
-            for (CChan* pChan : vChans) {
+            const vector<CChannel*>& vChans = GetNetwork()->GetChans();
+            for (CChannel* pChan : vChans) {
                 CString sPath = GetPath(pChan->GetName());
                 SaveBufferToDisk(pChan->GetBuffer(), sPath, CHAN_VERIFICATION_TOKEN + pChan->GetName());
                 ssPaths.insert(sPath);
@@ -304,8 +304,8 @@ public:
 
     CString FindLegacyBufferName(const CString& sPath) const
     {
-        const vector<CChan*>& vChans = GetNetwork()->GetChans();
-        for (CChan* pChan : vChans) {
+        const vector<CChannel*>& vChans = GetNetwork()->GetChans();
+        for (CChannel* pChan : vChans) {
             const CString& sName = pChan->GetName();
             if (GetPath(sName).Equals(sPath)) {
                 return sName;
@@ -321,18 +321,18 @@ public:
         return (sReturn);
     }
 
-    void AddBuffer(CChan& chan, const CString& sLine)
+    void AddBuffer(CChannel& chan, const CString& sLine)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
         if (chan.AutoClearChanBuffer() && GetNetwork()->IsUserAttached()) return;
         chan.AddBuffer(sLine);
     }
 
-    void OnRawMode(const CNick& cOpNick, CChan& cChannel, const CString& sModes, const CString& sArgs) override
+    void OnRawMode(const CNick& cOpNick, CChannel& cChannel, const CString& sModes, const CString& sArgs) override
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cOpNick.GetNickMask() + " MODE " + sModes + " " + sArgs));
     }
-    void OnQuit(const CNick& cNick, const CString& sMessage, const vector<CChan*>& vChans) override
+    void OnQuit(const CNick& cNick, const CString& sMessage, const vector<CChannel*>& vChans) override
     {
         for (size_t a = 0; a < vChans.size(); a++) {
             AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " QUIT " + sMessage));
@@ -340,25 +340,25 @@ public:
         if (cNick.NickEquals(GetUser()->GetNick())) SaveBuffersToDisk(); // need to force a save here to see this!
     }
 
-    void OnNick(const CNick& cNick, const CString& sNewNick, const vector<CChan*>& vChans) override
+    void OnNick(const CNick& cNick, const CString& sNewNick, const vector<CChannel*>& vChans) override
     {
         for (size_t a = 0; a < vChans.size(); a++) {
             AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " NICK " + sNewNick));
         }
     }
-    void OnKick(const CNick& cNick, const CString& sOpNick, CChan& cChannel, const CString& sMessage) override
+    void OnKick(const CNick& cNick, const CString& sOpNick, CChannel& cChannel, const CString& sMessage) override
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), sOpNick + " KICK " + cNick.GetNickMask() + " " + sMessage));
     }
-    void OnJoin(const CNick& cNick, CChan& cChannel) override
+    void OnJoin(const CNick& cNick, CChannel& cChannel) override
     {
         if (cNick.NickEquals(GetUser()->GetNick()) && cChannel.GetBuffer().empty()) {
-            BootStrap((CChan*)&cChannel);
+            BootStrap((CChannel*)&cChannel);
             if (!cChannel.GetBuffer().empty()) Replay(cChannel.GetName());
         }
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cNick.GetNickMask() + " JOIN"));
     }
-    void OnPart(const CNick& cNick, CChan& cChannel) override
+    void OnPart(const CNick& cNick, CChannel& cChannel) override
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cNick.GetNickMask() + " PART"));
         if (cNick.NickEquals(GetUser()->GetNick())) SaveBuffersToDisk(); // need to force a save here to see this!

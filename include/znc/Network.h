@@ -29,7 +29,7 @@ class CFile;
 class CConfig;
 class CClient;
 class CConfig;
-class CChan;
+class CChannel;
 class CQuery;
 class CServer;
 class CIRCSock;
@@ -92,14 +92,14 @@ public:
     bool PutStatus(const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
     bool PutModule(const CString& sModule, const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
 
-    const std::vector<CChan*>& GetChans() const;
-    CChan* FindChan(CString sName) const;
-    std::vector<CChan*> FindChans(const CString& sWild) const;
-    bool AddChan(CChan* pChan);
+    const std::vector<CChannel*>& GetChans() const;
+    CChannel* FindChan(CString sName) const;
+    std::vector<CChannel*> FindChans(const CString& sWild) const;
+    bool AddChan(CChannel* pChan);
     bool AddChan(const CString& sName, bool bInConfig);
     bool DelChan(const CString& sName);
     void JoinChans();
-    void JoinChans(std::set<CChan*>& sChans);
+    void JoinChans(std::set<CChannel*>& sChans);
 
     const std::vector<CQuery*>& GetQueries() const;
     CQuery* FindQuery(const CString& sName) const;
@@ -206,7 +206,7 @@ public:
     CString& ExpandString(const CString& sStr, CString& sRet) const;
 
 private:
-    bool JoinChan(CChan* pChan);
+    bool JoinChan(CChannel* pChan);
     bool LoadModule(const CString& sModName, const CString& sArgs, const CString& sNotice, CString& sError);
 
     CString m_sName;
@@ -227,7 +227,7 @@ private:
 
     CIRCSock* m_pIRCSock;
 
-    std::vector<CChan*> m_vChans;
+    std::vector<CChannel*> m_vChans;
     std::vector<CQuery*> m_vQueries;
 
     CString m_sChanPrefixes;

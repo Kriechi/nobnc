@@ -76,7 +76,7 @@ public:
             // The timeout for this channel did not expire yet?
             if (it->second.first + (time_t)m_iThresholdSecs >= now) continue;
 
-            CChan* pChan = GetNetwork()->FindChan(it->first);
+            CChannel* pChan = GetNetwork()->FindChan(it->first);
             if (it->second.second >= m_iThresholdMsgs && pChan && pChan->IsDetached()) {
                 // The channel is detached and it is over the
                 // messages limit. Since we only track those
@@ -101,7 +101,7 @@ public:
         }
     }
 
-    void Message(CChan& Channel)
+    void Message(CChannel& Channel)
     {
         Limits::iterator it;
         time_t now = time(nullptr);
@@ -148,26 +148,26 @@ public:
         }
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
     // This also catches OnChanAction()
-    EModRet OnChanCTCP(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    EModRet OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    EModRet OnTopic(CNick& Nick, CChan& Channel, CString& sTopic) override
+    EModRet OnTopic(CNick& Nick, CChannel& Channel, CString& sTopic) override
     {
         Message(Channel);
         return CONTINUE;

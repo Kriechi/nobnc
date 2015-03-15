@@ -263,7 +263,7 @@ void CClient::ReadLine(const CString& sData)
             }
 
             if (m_pNetwork) {
-                CChan* pChan = m_pNetwork->FindChan(sTarget);
+                CChannel* pChan = m_pNetwork->FindChan(sTarget);
 
                 if ((pChan) && (!pChan->AutoClearChanBuffer())) {
                     pChan->AddBuffer(":" + _NAMEDFMT(GetNickMask()) + " NOTICE " + _NAMEDFMT(sTarget) + " :{text}", sMsg);
@@ -314,7 +314,7 @@ void CClient::ReadLine(const CString& sData)
                         sCTCP = "ACTION " + sMessage;
 
                         if (m_pNetwork->IsChan(sTarget)) {
-                            CChan* pChan = m_pNetwork->FindChan(sTarget);
+                            CChannel* pChan = m_pNetwork->FindChan(sTarget);
 
                             if (pChan && (!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline())) {
                                 pChan->AddBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) +
@@ -372,7 +372,7 @@ void CClient::ReadLine(const CString& sData)
 
             if (m_pNetwork) {
                 if (m_pNetwork->IsChan(sTarget)) {
-                    CChan* pChan = m_pNetwork->FindChan(sTarget);
+                    CChannel* pChan = m_pNetwork->FindChan(sTarget);
 
                     if ((pChan) && (!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline())) {
                         pChan->AddBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) + " :{text}", sMsg);
@@ -420,14 +420,14 @@ void CClient::ReadLine(const CString& sData)
         sPatterns.Replace(",", " ");
         sPatterns.Split(" ", vsChans, false, "", "", true, true);
 
-        set<CChan*> sChans;
+        set<CChannel*> sChans;
         for (const CString& sChan : vsChans) {
-            vector<CChan*> vChans = m_pNetwork->FindChans(sChan);
+            vector<CChannel*> vChans = m_pNetwork->FindChans(sChan);
             sChans.insert(vChans.begin(), vChans.end());
         }
 
         unsigned int uDetached = 0;
-        for (CChan* pChan : sChans) {
+        for (CChannel* pChan : sChans) {
             if (pChan->IsDetached()) continue;
             uDetached++;
             pChan->DetachUser();
@@ -450,7 +450,7 @@ void CClient::ReadLine(const CString& sData)
             NETWORKMODULECALL(OnUserJoin(sChannel, sKey), m_pUser, m_pNetwork, this, &bContinue);
             if (bContinue) continue;
 
-            CChan* pChan = m_pNetwork->FindChan(sChannel);
+            CChannel* pChan = m_pNetwork->FindChan(sChannel);
             if (pChan) {
                 if (pChan->IsDetached())
                     pChan->AttachUser(this);
@@ -486,7 +486,7 @@ void CClient::ReadLine(const CString& sData)
             NETWORKMODULECALL(OnUserPart(sChan, sMessage), m_pUser, m_pNetwork, this, &bContinue);
             if (bContinue) continue;
 
-            CChan* pChan = m_pNetwork->FindChan(sChan);
+            CChannel* pChan = m_pNetwork->FindChan(sChan);
 
             if (pChan && !pChan->IsOn()) {
                 PutStatusNotice("Removing channel [" + sChan + "]");
@@ -526,7 +526,7 @@ void CClient::ReadLine(const CString& sData)
             // /mode reply from the server, we can answer this
             // request ourself.
 
-            CChan* pChan = m_pNetwork->FindChan(sTarget);
+            CChannel* pChan = m_pNetwork->FindChan(sTarget);
             if (pChan && pChan->IsOn() && !pChan->GetModeString().empty()) {
                 PutClient(":" + m_pNetwork->GetIRCServer() + " 324 " + GetNick() + " " + sTarget + " " + pChan->GetModeString());
                 if (pChan->GetCreationDate() > 0) {
@@ -550,8 +550,8 @@ void CClient::SetNetwork(CNetwork* pNetwork, bool bDisconnect, bool bReconnect)
             m_pNetwork->ClientDisconnected(this);
 
             // Tell the client they are no longer in these channels.
-            const vector<CChan*>& vChans = m_pNetwork->GetChans();
-            for (const CChan* pChan : vChans) {
+            const vector<CChannel*>& vChans = m_pNetwork->GetChans();
+            for (const CChannel* pChan : vChans) {
                 if (!(pChan->IsDetached())) {
                     PutClient(":" + m_pNetwork->GetIRCNick().GetNickMask() + " PART " + pChan->GetName());
                 }

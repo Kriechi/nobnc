@@ -200,7 +200,7 @@ public:
         if (interp) Tcl_Eval(interp, "Binds::ProcessEvnt disconnect-server");
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         CString sMes = TclEscape(sMessage);
         CString sNick = TclEscape(CString(Nick.GetNick()));
@@ -229,7 +229,7 @@ public:
         return CONTINUE;
     }
 
-    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChan*>& vChans) override
+    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChannel*>& vChans) override
     {
         CString sOldNick = TclEscape(CString(OldNick.GetNick()));
         CString sNewNickTmp = TclEscape(sNewNick);
@@ -248,7 +248,7 @@ public:
         }
     }
 
-    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChan& Channel, const CString& sMessage) override
+    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChannel& Channel, const CString& sMessage) override
     {
         CString sOpNick = TclEscape(CString(OpNick.GetNick()));
         CString sNick = TclEscape(sKickedNick);
@@ -319,9 +319,9 @@ private:
 
         BADARGS(1, 1, "");
 
-        const vector<CChan*>& Channels = mod->GetNetwork()->GetChans();
+        const vector<CChannel*>& Channels = mod->GetNetwork()->GetChans();
         for (unsigned int c = 0; c < Channels.size(); c++) {
-            CChan* pChan = Channels[c];
+            CChannel* pChan = Channels[c];
             l[0] = pChan->GetName().c_str();
             p = Tcl_Merge(1, l);
             Tcl_AppendElement(irp, p);
@@ -340,7 +340,7 @@ private:
         BADARGS(2, 999, " channel");
 
         CString sChannel = argvit(argv, argc, 1, " ");
-        CChan* pChannel = mod->GetNetwork()->FindChan(sChannel);
+        CChannel* pChannel = mod->GetNetwork()->FindChan(sChannel);
 
         if (!pChannel) {
             CString sMsg = "invalid channel: " + sChannel;
@@ -370,7 +370,7 @@ private:
         BADARGS(2, 999, " channel");
 
         CString sChannel = argvit(argv, argc, 1, " ");
-        CChan* pChannel = mod->GetNetwork()->FindChan(sChannel);
+        CChannel* pChannel = mod->GetNetwork()->FindChan(sChannel);
         CString sMsg;
 
         if (!pChannel) {

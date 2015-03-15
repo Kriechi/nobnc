@@ -25,7 +25,7 @@
 #include <vector>
 
 class CModules;
-class CChan;
+class CChannel;
 class CClient;
 class CConfig;
 class CFile;

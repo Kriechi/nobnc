@@ -32,7 +32,7 @@ void CQuery::SendBuffer(CClient* pClient) { SendBuffer(pClient, m_Buffer); }
 void CQuery::SendBuffer(CClient* pClient, const CBuffer& Buffer)
 {
     if (m_pNetwork && m_pNetwork->IsUserAttached()) {
-        // Based on CChan::SendBuffer()
+        // Based on CChannel::SendBuffer()
         if (!Buffer.IsEmpty()) {
             const vector<CClient*>& vClients = m_pNetwork->GetClients();
             for (CClient* pEachClient : vClients) {

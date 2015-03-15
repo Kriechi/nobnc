@@ -182,10 +182,10 @@ public:
         m_msUsers.clear();
     }
 
-    void OnJoin(const CNick& Nick, CChan& Channel) override
+    void OnJoin(const CNick& Nick, CChannel& Channel) override
     {
         // If we have ops in this chan
-        if (Channel.HasPerm(CChan::Op) || Channel.HasPerm(CChan::HalfOp)) {
+        if (Channel.HasPerm(CChannel::Op) || Channel.HasPerm(CChannel::HalfOp)) {
             for (map<CString, CAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
                 // and the nick who joined is a valid user
                 if (it->second->HostMatches(Nick.GetHostMask()) && it->second->ChannelMatches(Channel.GetName())) {

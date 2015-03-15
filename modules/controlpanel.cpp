@@ -606,7 +606,7 @@ class CAdminMod : public CModule
             return;
         }
 
-        CChan* pChan = new CChan(sChan, pNetwork, true);
+        CChannel* pChan = new CChannel(sChan, pNetwork, true);
         if (pNetwork->AddChan(pChan))
             PutModule("Channel [" + pChan->GetName() + "] for user [" + sUsername + "] added.");
         else
@@ -632,14 +632,14 @@ class CAdminMod : public CModule
             return;
         }
 
-        std::vector<CChan*> vChans = pNetwork->FindChans(sChan);
+        std::vector<CChannel*> vChans = pNetwork->FindChans(sChan);
         if (vChans.empty()) {
             PutModule("Error: User [" + sUsername + "] does not have any channel matching [" + sChan + "].");
             return;
         }
 
         VCString vsNames;
-        for (const CChan* pChan : vChans) {
+        for (const CChannel* pChan : vChans) {
             const CString& sName = pChan->GetName();
             vsNames.push_back(sName);
             pNetwork->PutIRC("PART " + sName);
@@ -670,13 +670,13 @@ class CAdminMod : public CModule
             return;
         }
 
-        std::vector<CChan*> vChans = pNetwork->FindChans(sChan);
+        std::vector<CChannel*> vChans = pNetwork->FindChans(sChan);
         if (vChans.empty()) {
             PutModule("Error: No channel(s) matching [" + sChan + "] found.");
             return;
         }
 
-        for (CChan* pChan : vChans) {
+        for (CChannel* pChan : vChans) {
             if (sVar == "defmodes") {
                 PutModule(pChan->GetName() + ": DefModes = " + pChan->GetDefaultModes());
             } else if (sVar == "buffer") {
@@ -728,13 +728,13 @@ class CAdminMod : public CModule
             return;
         }
 
-        std::vector<CChan*> vChans = pNetwork->FindChans(sChan);
+        std::vector<CChannel*> vChans = pNetwork->FindChans(sChan);
         if (vChans.empty()) {
             PutModule("Error: No channel(s) matching [" + sChan + "] found.");
             return;
         }
 
-        for (CChan* pChan : vChans) {
+        for (CChannel* pChan : vChans) {
             if (sVar == "defmodes") {
                 pChan->SetDefaultModes(sValue);
                 PutModule(pChan->GetName() + ": DefModes = " + sValue);

@@ -107,20 +107,20 @@ public:
         }
     }
 
-    void OnPart(const CNick& Nick, CChan& Channel, const CString& sMessage) override { AutoCycle(Channel); }
+    void OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage) override { AutoCycle(Channel); }
 
-    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChan*>& vChans) override
+    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChannel*>& vChans) override
     {
         for (unsigned int i = 0; i < vChans.size(); i++) AutoCycle(*vChans[i]);
     }
 
-    void OnKick(const CNick& Nick, const CString& sOpNick, CChan& Channel, const CString& sMessage) override
+    void OnKick(const CNick& Nick, const CString& sOpNick, CChannel& Channel, const CString& sMessage) override
     {
         AutoCycle(Channel);
     }
 
 protected:
-    void AutoCycle(CChan& Channel)
+    void AutoCycle(CChannel& Channel)
     {
         if (!IsAutoCycle(Channel.GetName())) return;
 
@@ -132,7 +132,7 @@ protected:
 
         // Is that person us and we don't have op?
         const CNick& pNick = Channel.GetNicks().begin()->second;
-        if (!pNick.HasPerm(CChan::Op) && pNick.NickEquals(GetNetwork()->GetCurNick())) {
+        if (!pNick.HasPerm(CChannel::Op) && pNick.NickEquals(GetNetwork()->GetCurNick())) {
             Channel.Cycle();
             m_recentlyCycled.AddItem(Channel.GetName());
         }

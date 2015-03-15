@@ -1134,7 +1134,7 @@ void CUser::SetQuitMsg(const CString& s) { m_sQuitMsg = s; }
 void CUser::SetAutoClearChanBuffer(bool b)
 {
     for (CNetwork* pNetwork : m_vIRCNetworks) {
-        for (CChan* pChan : pNetwork->GetChans()) {
+        for (CChannel* pChan : pNetwork->GetChans()) {
             pChan->InheritAutoClearChanBuffer(b);
         }
     }
@@ -1146,7 +1146,7 @@ bool CUser::SetBufferCount(unsigned int u, bool bForce)
 {
     if (!bForce && u > CZNC::Get().GetMaxBufferSize()) return false;
     for (CNetwork* pNetwork : m_vIRCNetworks) {
-        for (CChan* pChan : pNetwork->GetChans()) {
+        for (CChannel* pChan : pNetwork->GetChans()) {
             pChan->InheritBufferCount(u, bForce);
         }
     }

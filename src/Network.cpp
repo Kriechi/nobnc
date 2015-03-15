@@ -198,9 +198,9 @@ void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
     // !Servers
 
     // Chans
-    const vector<CChan*>& vChans = Network.GetChans();
-    for (CChan* pNewChan : vChans) {
-        CChan* pChan = FindChan(pNewChan->GetName());
+    const vector<CChannel*>& vChans = Network.GetChans();
+    for (CChannel* pNewChan : vChans) {
+        CChannel* pChan = FindChan(pNewChan->GetName());
 
         if (pChan) {
             pChan->SetInConfig(pNewChan->InConfig());
@@ -209,8 +209,8 @@ void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
         }
     }
 
-    for (CChan* pChan : m_vChans) {
-        CChan* pNewChan = Network.FindChan(pChan->GetName());
+    for (CChannel* pChan : m_vChans) {
+        CChannel* pNewChan = Network.FindChan(pChan->GetName());
 
         if (!pNewChan) {
             pChan->SetInConfig(false);
@@ -273,7 +273,7 @@ CNetwork::~CNetwork()
     m_pModules = nullptr;
 
     // Delete Channels
-    for (CChan* pChan : m_vChans) {
+    for (CChannel* pChan : m_vChans) {
         delete pChan;
     }
     m_vChans.clear();
@@ -432,7 +432,7 @@ bool CNetwork::ParseConfig(CConfig* pConfig, CString& sError, bool bUpgrade)
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
         const CString& sChanName = subIt->first;
         CConfig* pSubConf = subIt->second.m_pSubConfig;
-        CChan* pChan = new CChan(sChanName, this, true, pSubConf);
+        CChannel* pChan = new CChannel(sChanName, this, true, pSubConf);
 
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in config for User [" + m_pUser->GetUserName() + "], Network [" + GetName() +
@@ -444,7 +444,7 @@ bool CNetwork::ParseConfig(CConfig* pConfig, CString& sError, bool bUpgrade)
         }
 
         // Save the channel name, because AddChan
-        // deletes the CChannel*, if adding fails
+        // deletes the CChannelnel*, if adding fails
         sError = pChan->GetName();
         if (!AddChan(pChan)) {
             sError = "Channel [" + sError + "] defined more than once";
@@ -515,7 +515,7 @@ CConfig CNetwork::ToConfig() const
     }
 
     // Chans
-    for (CChan* pChan : m_vChans) {
+    for (CChannel* pChan : m_vChans) {
         if (pChan->InConfig()) {
             config.AddSubConfig("Chan", pChan->GetName(), pChan->ToConfig());
         }
@@ -603,8 +603,8 @@ void CNetwork::ClientConnected(CClient* pClient)
         pClient->PutClient(":irc.znc.in 306 " + GetIRCNick().GetNick() + " :You have been marked as being away");
     }
 
-    const vector<CChan*>& vChans = GetChans();
-    for (CChan* pChan : vChans) {
+    const vector<CChannel*>& vChans = GetChans();
+    for (CChannel* pChan : vChans) {
         if ((pChan->IsOn()) && (!pChan->IsDetached())) {
             pChan->AttachUser(pClient);
         }
@@ -740,16 +740,16 @@ bool CNetwork::PutModule(const CString& sModule, const CString& sLine, CClient* 
 
 // Channels
 
-const vector<CChan*>& CNetwork::GetChans() const { return m_vChans; }
+const vector<CChannel*>& CNetwork::GetChans() const { return m_vChans; }
 
-CChan* CNetwork::FindChan(CString sName) const
+CChannel* CNetwork::FindChan(CString sName) const
 {
     if (GetIRCSock()) {
         // See https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.16
         sName.TrimLeft(GetIRCSock()->GetISupport("STATUSMSG", ""));
     }
 
-    for (CChan* pChan : m_vChans) {
+    for (CChannel* pChan : m_vChans) {
         if (sName.Equals(pChan->GetName())) {
             return pChan;
         }
@@ -758,24 +758,24 @@ CChan* CNetwork::FindChan(CString sName) const
     return nullptr;
 }
 
-std::vector<CChan*> CNetwork::FindChans(const CString& sWild) const
+std::vector<CChannel*> CNetwork::FindChans(const CString& sWild) const
 {
-    std::vector<CChan*> vChans;
+    std::vector<CChannel*> vChans;
     vChans.reserve(m_vChans.size());
     const CString sLower = sWild.AsLower();
-    for (CChan* pChan : m_vChans) {
+    for (CChannel* pChan : m_vChans) {
         if (pChan->GetName().AsLower().WildCmp(sLower)) vChans.push_back(pChan);
     }
     return vChans;
 }
 
-bool CNetwork::AddChan(CChan* pChan)
+bool CNetwork::AddChan(CChannel* pChan)
 {
     if (!pChan) {
         return false;
     }
 
-    for (CChan* pEachChan : m_vChans) {
+    for (CChannel* pEachChan : m_vChans) {
         if (pEachChan->GetName().Equals(pChan->GetName())) {
             delete pChan;
             return false;
@@ -792,14 +792,14 @@ bool CNetwork::AddChan(const CString& sName, bool bInConfig)
         return false;
     }
 
-    CChan* pChan = new CChan(sName, this, bInConfig);
+    CChannel* pChan = new CChannel(sName, this, bInConfig);
     m_vChans.push_back(pChan);
     return true;
 }
 
 bool CNetwork::DelChan(const CString& sName)
 {
-    for (vector<CChan*>::iterator a = m_vChans.begin(); a != m_vChans.end(); ++a) {
+    for (vector<CChannel*>::iterator a = m_vChans.begin(); a != m_vChans.end(); ++a) {
         if (sName.Equals((*a)->GetName())) {
             delete *a;
             m_vChans.erase(a);
@@ -820,10 +820,10 @@ void CNetwork::JoinChans()
     // still be able to join the rest of your channels.
     unsigned int start = rand() % m_vChans.size();
     unsigned int uJoins = m_pUser->MaxJoins();
-    set<CChan*> sChans;
+    set<CChannel*> sChans;
     for (unsigned int a = 0; a < m_vChans.size(); a++) {
         unsigned int idx = (start + a) % m_vChans.size();
-        CChan* pChan = m_vChans[idx];
+        CChannel* pChan = m_vChans[idx];
         if (!pChan->IsOn() && !pChan->IsDisabled()) {
             if (!JoinChan(pChan)) continue;
 
@@ -841,14 +841,14 @@ void CNetwork::JoinChans()
     while (!sChans.empty()) JoinChans(sChans);
 }
 
-void CNetwork::JoinChans(set<CChan*>& sChans)
+void CNetwork::JoinChans(set<CChannel*>& sChans)
 {
     CString sKeys, sJoin;
     bool bHaveKey = false;
     size_t uiJoinLength = strlen("JOIN ");
 
     while (!sChans.empty()) {
-        set<CChan*>::iterator it = sChans.begin();
+        set<CChannel*>::iterator it = sChans.begin();
         const CString& sName = (*it)->GetName();
         const CString& sKey = (*it)->GetKey();
         size_t len = sName.length() + sKey.length();
@@ -875,7 +875,7 @@ void CNetwork::JoinChans(set<CChan*>& sChans)
         PutIRC("JOIN " + sJoin);
 }
 
-bool CNetwork::JoinChan(CChan* pChan)
+bool CNetwork::JoinChan(CChannel* pChan)
 {
     bool bReturn = false;
     NETWORKMODULECALL(OnJoining(*pChan), m_pUser, this, nullptr, &bReturn);

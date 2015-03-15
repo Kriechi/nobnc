@@ -96,7 +96,7 @@ public:
 
     EModRet OnPrivCTCP(CNick& Nick, CString& sMessage) override { return Message(Nick, sMessage); }
 
-    EModRet OnChanCTCP(CNick& Nick, CChan& Channel, CString& sMessage) override { return Message(Nick, sMessage); }
+    EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage) override { return Message(Nick, sMessage); }
 
     void OnSecsCommand(const CString& sCommand)
     {

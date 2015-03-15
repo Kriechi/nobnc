@@ -23,7 +23,7 @@
 
 #include <deque>
 
-class CChan;
+class CChannel;
 class CUser;
 class CNetwork;
 class CClient;
@@ -127,7 +127,7 @@ private:
     CNetwork* m_pNetwork;
     CNick m_Nick;
     CString m_sPass;
-    std::map<CString, CChan*> m_msChans;
+    std::map<CString, CChannel*> m_msChans;
     unsigned int m_uMaxNickLen;
     unsigned int m_uCapPaused;
     SCString m_ssAcceptedCaps;

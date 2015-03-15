@@ -71,7 +71,7 @@ private:
     CString m_sHostmaskWildcard;
 };
 
-class CChanAttach : public CModule
+class CChannelAttach : public CModule
 {
 public:
     typedef vector<CAttachMatch> VAttachMatch;
@@ -141,18 +141,18 @@ private:
     }
 
 public:
-    MODCONSTRUCTOR(CChanAttach)
+    MODCONSTRUCTOR(CChannelAttach)
     {
         AddHelpCommand();
         AddCommand("Add",
-                   static_cast<CModCommand::ModCmdFunc>(&CChanAttach::HandleAdd),
+                   static_cast<CModCommand::ModCmdFunc>(&CChannelAttach::HandleAdd),
                    "[!]<#chan> <search> <host>",
                    "Add an entry, use !#chan to negate and * for wildcards");
-        AddCommand("Del", static_cast<CModCommand::ModCmdFunc>(&CChanAttach::HandleDel), "[!]<#chan> <search> <host>", "Remove an entry, needs to be an exact match");
-        AddCommand("List", static_cast<CModCommand::ModCmdFunc>(&CChanAttach::HandleList), "", "List all entries");
+        AddCommand("Del", static_cast<CModCommand::ModCmdFunc>(&CChannelAttach::HandleDel), "[!]<#chan> <search> <host>", "Remove an entry, needs to be an exact match");
+        AddCommand("List", static_cast<CModCommand::ModCmdFunc>(&CChannelAttach::HandleList), "", "List all entries");
     }
 
-    virtual ~CChanAttach() {}
+    virtual ~CChannelAttach() {}
 
     bool OnLoad(const CString& sArgs, CString& sMessage) override
     {
@@ -186,7 +186,7 @@ public:
         return true;
     }
 
-    void TryAttach(const CNick& Nick, CChan& Channel, CString& Message)
+    void TryAttach(const CNick& Nick, CChannel& Channel, CString& Message)
     {
         const CString& sChan = Channel.GetName();
         const CString& sHost = Nick.GetHostMask();
@@ -209,19 +209,19 @@ public:
         }
     }
 
-    EModRet OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         TryAttach(Nick, Channel, sMessage);
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         TryAttach(Nick, Channel, sMessage);
         return CONTINUE;
     }
 
-    EModRet OnChanAction(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanAction(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         TryAttach(Nick, Channel, sMessage);
         return CONTINUE;
@@ -274,7 +274,7 @@ private:
     VAttachMatch m_vMatches;
 };
 
-template <> void TModInfo<CChanAttach>(CModInfo& Info)
+template <> void TModInfo<CChannelAttach>(CModInfo& Info)
 {
     Info.AddType(CModInfo::UserModule);
     Info.SetWikiPage("autoattach");
@@ -282,4 +282,4 @@ template <> void TModInfo<CChanAttach>(CModInfo& Info)
     Info.SetArgsHelpText("List of channel masks and channel masks with ! before them.");
 }
 
-NETWORKMODULEDEFS(CChanAttach, "Reattaches you to channels on activity.")
+NETWORKMODULEDEFS(CChannelAttach, "Reattaches you to channels on activity.")

@@ -28,7 +28,7 @@
 #include <sys/time.h>
 
 class CAuthBase;
-class CChan;
+class CChannel;
 class CNetwork;
 class CClient;
 class CWebSock;
@@ -107,7 +107,7 @@ class CModInfo;
 class CZNC;
 class CUser;
 class CNick;
-class CChan;
+class CChannel;
 class CModule;
 class CFPTimer;
 class CSockManager;
@@ -500,20 +500,20 @@ public:
      *       'o' for op).
      */
     virtual void
-    OnChanPermission2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
-    virtual void OnChanPermission(const CNick& OpNick, const CNick& Nick, CChan& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
+    OnChanPermission2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
+    virtual void OnChanPermission(const CNick& OpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
     /** Called when a nick is opped on a channel */
-    virtual void OnOp2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    virtual void OnOp(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
+    virtual void OnOp2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    virtual void OnOp(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
     /** Called when a nick is deopped on a channel */
-    virtual void OnDeop2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    virtual void OnDeop(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
+    virtual void OnDeop2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    virtual void OnDeop(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
     /** Called when a nick is voiced on a channel */
-    virtual void OnVoice2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    virtual void OnVoice(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
+    virtual void OnVoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    virtual void OnVoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
     /** Called when a nick is devoiced on a channel */
-    virtual void OnDevoice2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    virtual void OnDevoice(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
+    virtual void OnDevoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    virtual void OnDevoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
     /** Called on an individual channel mode change.
      *  @param pOpNick The nick who changes the channel mode, or nullptr if set by server.
      *  @param Channel The channel whose mode is changed.
@@ -522,8 +522,8 @@ public:
      *  @param bAdded True if this mode is added ("+"), else false.
      *  @param bNoChange True if this mode was already effective before.
      */
-    virtual void OnMode2(const CNick* pOpNick, CChan& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
-    virtual void OnMode(const CNick& OpNick, CChan& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
+    virtual void OnMode2(const CNick* pOpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
+    virtual void OnMode(const CNick& OpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
     /** Called on any channel mode change. This is called before the more
      *  detailed mode hooks like e.g. OnOp() and OnMode().
      *  @param pOpNick The nick who changes the channel mode, or nullptr if set by server.
@@ -531,8 +531,8 @@ public:
      *  @param sModes The raw mode change, e.g. "+s-io".
      *  @param sArgs All arguments to the mode change from sModes.
      */
-    virtual void OnRawMode2(const CNick* pOpNick, CChan& Channel, const CString& sModes, const CString& sArgs);
-    virtual void OnRawMode(const CNick& OpNick, CChan& Channel, const CString& sModes, const CString& sArgs);
+    virtual void OnRawMode2(const CNick* pOpNick, CChannel& Channel, const CString& sModes, const CString& sArgs);
+    virtual void OnRawMode(const CNick& OpNick, CChannel& Channel, const CString& sModes, const CString& sArgs);
 
     /** Called on any raw IRC line received from the <em>IRC server</em>.
      *  @param sLine The line read from the server.
@@ -571,37 +571,37 @@ public:
      *  @param sMessage The quit message.
      *  @param vChans List of channels which you and nick share.
      */
-    virtual void OnQuit(const CNick& Nick, const CString& sMessage, const std::vector<CChan*>& vChans);
+    virtual void OnQuit(const CNick& Nick, const CString& sMessage, const std::vector<CChannel*>& vChans);
     /** Called when a nickname change occurs. If we are changing our nick,
      *  sNewNick will equal m_pIRCSock->GetNick().
      *  @param Nick The nick which changed its nickname
      *  @param sNewNick The new nickname.
      *  @param vChans Channels which we and nick share.
      */
-    virtual void OnNick(const CNick& Nick, const CString& sNewNick, const std::vector<CChan*>& vChans);
+    virtual void OnNick(const CNick& Nick, const CString& sNewNick, const std::vector<CChannel*>& vChans);
     /** Called when a nick is kicked from a channel.
      *  @param OpNick The nick which generated the kick.
      *  @param sKickedNick The nick which was kicked.
      *  @param Channel The channel on which this kick occurs.
      *  @param sMessage The kick message.
      */
-    virtual void OnKick(const CNick& OpNick, const CString& sKickedNick, CChan& Channel, const CString& sMessage);
+    virtual void OnKick(const CNick& OpNick, const CString& sKickedNick, CChannel& Channel, const CString& sMessage);
     /** This module hook is called just before ZNC tries to join an IRC channel.
      *  @param Chan The channel which is about to get joined.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnJoining(CChan& Channel);
+    virtual EModRet OnJoining(CChannel& Channel);
     /** Called when a nick joins a channel.
      *  @param Nick The nick who joined.
      *  @param Channel The channel which was joined.
      */
-    virtual void OnJoin(const CNick& Nick, CChan& Channel);
+    virtual void OnJoin(const CNick& Nick, CChannel& Channel);
     /** Called when a nick parts a channel.
      *  @param Nick The nick who parted.
      *  @param Channel The channel which was parted.
      *  @param sMessage The part message.
      */
-    virtual void OnPart(const CNick& Nick, CChan& Channel, const CString& sMessage);
+    virtual void OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage);
     /** Called when user is invited into a channel
      *  @param Nick The nick who invited you.
      *  @param sChan The channel the user got invited into
@@ -614,13 +614,13 @@ public:
      *  @param Client The client the buffer will be played back to.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnChanBufferStarting(CChan& Chan, CClient& Client);
+    virtual EModRet OnChanBufferStarting(CChannel& Chan, CClient& Client);
     /** Called after a channel buffer was played back to a client.
      *  @param Chan The channel which was played back.
      *  @param Client The client the buffer was played back to.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnChanBufferEnding(CChan& Chan, CClient& Client);
+    virtual EModRet OnChanBufferEnding(CChannel& Chan, CClient& Client);
     /** Called when for each line during a channel's buffer play back.
      *  @param Chan The channel this playback is from.
      *  @param Client The client the buffer is played back to.
@@ -629,8 +629,8 @@ public:
      *  @param tv The timestamp of the message.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnChanBufferPlayLine2(CChan& Chan, CClient& Client, CString& sLine, const timeval& tv);
-    virtual EModRet OnChanBufferPlayLine(CChan& Chan, CClient& Client, CString& sLine);
+    virtual EModRet OnChanBufferPlayLine2(CChannel& Chan, CClient& Client, CString& sLine, const timeval& tv);
+    virtual EModRet OnChanBufferPlayLine(CChannel& Chan, CClient& Client, CString& sLine);
     /** Called when a line from the query buffer is played back.
      *  @param Client The client this line will go to.
      *  @param sLine The raw IRC traffic line from the buffer.
@@ -734,7 +734,7 @@ public:
      *  @param sMessage The CTCP request message.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnChanCTCP(CNick& Nick, CChan& Channel, CString& sMessage);
+    virtual EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage);
     /** Called when we receive a private CTCP ACTION ("/me" in query) <em>from IRC</em>.
      *  This is called after CModule::OnPrivCTCP().
      *  @param Nick The nick the action came from.
@@ -749,7 +749,7 @@ public:
      *  @param sMessage The action message
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnChanAction(CNick& Nick, CChan& Channel, CString& sMessage);
+    virtual EModRet OnChanAction(CNick& Nick, CChannel& Channel, CString& sMessage);
     /** Called when we receive a private message <em>from IRC</em>.
      *  @param Nick The nick which sent the message.
      *  @param sMessage The message.
@@ -762,7 +762,7 @@ public:
      *  @param sMessage The message.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnChanMsg(CNick& Nick, CChan& Channel, CString& sMessage);
+    virtual EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage);
     /** Called when we receive a private notice.
      *  @param Nick The nick which sent the notice.
      *  @param sMessage The notice message.
@@ -775,14 +775,14 @@ public:
      *  @param sMessage The notice message.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage);
+    virtual EModRet OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage);
     /** Called when we receive a channel topic change <em>from IRC</em>.
      *  @param Nick The nick which changed the topic.
      *  @param Channel The channel whose topic was changed.
      *  @param sTopic The new topic.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnTopic(CNick& Nick, CChan& Channel, CString& sTopic);
+    virtual EModRet OnTopic(CNick& Nick, CChannel& Channel, CString& sTopic);
 
     /** Called for every CAP received via CAP LS from server.
      *  @param sCap capability supported by server.
@@ -802,7 +802,7 @@ public:
      *  @param Channel The channel which will be joined.
      *  @return See CModule::EModRet.
      */
-    virtual EModRet OnTimerAutoJoin(CChan& Channel);
+    virtual EModRet OnTimerAutoJoin(CChannel& Channel);
 
     /** This module hook is called when a network is being added.
      *  @param Network The new IRC network.
@@ -1126,20 +1126,20 @@ public:
     bool OnIRCRegistration(CString& sPass, CString& sNick, CString& sIdent, CString& sRealName);
     bool OnBroadcast(CString& sMessage);
 
-    bool OnChanPermission2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
-    bool OnChanPermission(const CNick& OpNick, const CNick& Nick, CChan& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
-    bool OnOp2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    bool OnOp(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    bool OnDeop2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    bool OnDeop(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    bool OnVoice2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    bool OnVoice(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    bool OnDevoice2(const CNick* pOpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    bool OnDevoice(const CNick& OpNick, const CNick& Nick, CChan& Channel, bool bNoChange);
-    bool OnRawMode2(const CNick* pOpNick, CChan& Channel, const CString& sModes, const CString& sArgs);
-    bool OnRawMode(const CNick& OpNick, CChan& Channel, const CString& sModes, const CString& sArgs);
-    bool OnMode2(const CNick* pOpNick, CChan& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
-    bool OnMode(const CNick& OpNick, CChan& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
+    bool OnChanPermission2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
+    bool OnChanPermission(const CNick& OpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
+    bool OnOp2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    bool OnOp(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    bool OnDeop2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    bool OnDeop(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    bool OnVoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    bool OnVoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    bool OnDevoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    bool OnDevoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
+    bool OnRawMode2(const CNick* pOpNick, CChannel& Channel, const CString& sModes, const CString& sArgs);
+    bool OnRawMode(const CNick& OpNick, CChannel& Channel, const CString& sModes, const CString& sArgs);
+    bool OnMode2(const CNick* pOpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
+    bool OnMode(const CNick& OpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
 
     bool OnRaw(CString& sLine);
 
@@ -1148,18 +1148,18 @@ public:
     bool OnModNotice(const CString& sMessage);
     bool OnModCTCP(const CString& sMessage);
 
-    bool OnQuit(const CNick& Nick, const CString& sMessage, const std::vector<CChan*>& vChans);
-    bool OnNick(const CNick& Nick, const CString& sNewNick, const std::vector<CChan*>& vChans);
-    bool OnKick(const CNick& Nick, const CString& sOpNick, CChan& Channel, const CString& sMessage);
-    bool OnJoining(CChan& Channel);
-    bool OnJoin(const CNick& Nick, CChan& Channel);
-    bool OnPart(const CNick& Nick, CChan& Channel, const CString& sMessage);
+    bool OnQuit(const CNick& Nick, const CString& sMessage, const std::vector<CChannel*>& vChans);
+    bool OnNick(const CNick& Nick, const CString& sNewNick, const std::vector<CChannel*>& vChans);
+    bool OnKick(const CNick& Nick, const CString& sOpNick, CChannel& Channel, const CString& sMessage);
+    bool OnJoining(CChannel& Channel);
+    bool OnJoin(const CNick& Nick, CChannel& Channel);
+    bool OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage);
     bool OnInvite(const CNick& Nick, const CString& sChan);
 
-    bool OnChanBufferStarting(CChan& Chan, CClient& Client);
-    bool OnChanBufferEnding(CChan& Chan, CClient& Client);
-    bool OnChanBufferPlayLine2(CChan& Chan, CClient& Client, CString& sLine, const timeval& tv);
-    bool OnChanBufferPlayLine(CChan& Chan, CClient& Client, CString& sLine);
+    bool OnChanBufferStarting(CChannel& Chan, CClient& Client);
+    bool OnChanBufferEnding(CChannel& Chan, CClient& Client);
+    bool OnChanBufferPlayLine2(CChannel& Chan, CClient& Client, CString& sLine, const timeval& tv);
+    bool OnChanBufferPlayLine(CChannel& Chan, CClient& Client, CString& sLine);
     bool OnPrivBufferPlayLine2(CClient& Client, CString& sLine, const timeval& tv);
     bool OnPrivBufferPlayLine(CClient& Client, CString& sLine);
 
@@ -1179,15 +1179,15 @@ public:
 
     bool OnCTCPReply(CNick& Nick, CString& sMessage);
     bool OnPrivCTCP(CNick& Nick, CString& sMessage);
-    bool OnChanCTCP(CNick& Nick, CChan& Channel, CString& sMessage);
+    bool OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage);
     bool OnPrivAction(CNick& Nick, CString& sMessage);
-    bool OnChanAction(CNick& Nick, CChan& Channel, CString& sMessage);
+    bool OnChanAction(CNick& Nick, CChannel& Channel, CString& sMessage);
     bool OnPrivMsg(CNick& Nick, CString& sMessage);
-    bool OnChanMsg(CNick& Nick, CChan& Channel, CString& sMessage);
+    bool OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage);
     bool OnPrivNotice(CNick& Nick, CString& sMessage);
-    bool OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage);
-    bool OnTopic(CNick& Nick, CChan& Channel, CString& sTopic);
-    bool OnTimerAutoJoin(CChan& Channel);
+    bool OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage);
+    bool OnTopic(CNick& Nick, CChannel& Channel, CString& sTopic);
+    bool OnTimerAutoJoin(CChannel& Channel);
 
     bool OnAddNetwork(CNetwork& Network, CString& sErrorRet);
     bool OnDeleteNetwork(CNetwork& Network);

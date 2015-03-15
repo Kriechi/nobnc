@@ -532,7 +532,7 @@ public:
             if (sChan.empty() && !WebSock.IsPost()) {
                 sChan = WebSock.GetParam("name", false);
             }
-            CChan* pChan = pNetwork->FindChan(sChan);
+            CChannel* pChan = pNetwork->FindChan(sChan);
             if (!pChan) {
                 WebSock.PrintErrorPage("No such channel");
                 return true;
@@ -650,7 +650,7 @@ public:
         return false;
     }
 
-    bool ChanPage(CWebSock& WebSock, CTemplate& Tmpl, CNetwork* pNetwork, CChan* pChan = nullptr)
+    bool ChanPage(CWebSock& WebSock, CTemplate& Tmpl, CNetwork* pNetwork, CChannel* pChan = nullptr)
     {
         std::shared_ptr<CWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_chan.tmpl");
@@ -733,7 +733,7 @@ public:
             }
 
             // This could change the channel name and e.g. add a "#" prefix
-            pChan = new CChan(sChanName, pNetwork, true);
+            pChan = new CChannel(sChanName, pNetwork, true);
 
             if (pNetwork->FindChan(pChan->GetName())) {
                 WebSock.PrintErrorPage("Channel [" + pChan->GetName() + "] already exists");
@@ -897,9 +897,9 @@ public:
                     l["Server"] = vServers[a]->GetString();
                 }
 
-                const vector<CChan*>& Channels = pNetwork->GetChans();
+                const vector<CChannel*>& Channels = pNetwork->GetChans();
                 for (unsigned int c = 0; c < Channels.size(); c++) {
-                    CChan* pChan = Channels[c];
+                    CChannel* pChan = Channels[c];
                     CTemplate& l = Tmpl.AddRow("ChannelLoop");
 
                     l["Network"] = pNetwork->GetName();
@@ -1084,7 +1084,7 @@ public:
         WebSock.GetParamValues("channel", vsArgs);
         for (unsigned int a = 0; a < vsArgs.size(); a++) {
             const CString& sChan = vsArgs[a];
-            CChan* pChan = pNetwork->FindChan(sChan.TrimRight_n("\r"));
+            CChannel* pChan = pNetwork->FindChan(sChan.TrimRight_n("\r"));
             if (pChan) {
                 pChan->SetInConfig(WebSock.GetParam("save_" + sChan).ToBool());
             }

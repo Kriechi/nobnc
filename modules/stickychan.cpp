@@ -46,7 +46,7 @@ public:
     {
         for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {
             if (sChannel.Equals(it->first)) {
-                CChan* pChan = GetNetwork()->FindChan(sChannel);
+                CChannel* pChan = GetNetwork()->FindChan(sChannel);
 
                 if (pChan) {
                     pChan->JoinUser();
@@ -58,9 +58,9 @@ public:
         return CONTINUE;
     }
 
-    virtual void OnMode(const CNick& pOpNick, CChan& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange) override
+    virtual void OnMode(const CNick& pOpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange) override
     {
-        if (uMode == CChan::M_Key) {
+        if (uMode == CChannel::M_Key) {
             if (bAdded) {
                 // We ignore channel key "*" because of some broken nets.
                 if (sArg != "*") {
@@ -112,9 +112,9 @@ public:
         if (!pNetwork->GetIRCSock()) return;
 
         for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {
-            CChan* pChan = pNetwork->FindChan(it->first);
+            CChannel* pChan = pNetwork->FindChan(it->first);
             if (!pChan) {
-                pChan = new CChan(it->first, pNetwork, true);
+                pChan = new CChannel(it->first, pNetwork, true);
                 if (!it->second.empty()) pChan->SetKey(it->second);
                 if (!pNetwork->AddChan(pChan)) {
                     /* AddChan() deleted that channel */
@@ -136,7 +136,7 @@ public:
         if (sPageName == "index") {
             bool bSubmitted = (WebSock.GetParam("submitted").ToInt() != 0);
 
-            const vector<CChan*>& Channels = GetNetwork()->GetChans();
+            const vector<CChannel*>& Channels = GetNetwork()->GetChans();
             for (unsigned int c = 0; c < Channels.size(); c++) {
                 const CString sChan = Channels[c]->GetName();
                 bool bStick = FindNV(sChan) != EndNV();

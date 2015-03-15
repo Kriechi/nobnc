@@ -90,7 +90,7 @@ using std::allocator;
 %}
 
 %template(VIRCNetworks) std::vector<CNetwork*>;
-%template(VChannels) std::vector<CChan*>;
+%template(VChannels) std::vector<CChannel*>;
 %template(MNicks) std::map<CString, CNick>;
 %template(SModInfo) std::set<CModInfo>;
 %template(SCString) std::set<CString>;
@@ -264,17 +264,17 @@ class CPyRetBool {
 	CString __repr__() {
 		return "<CNetwork " + $self->GetName() + ">";
 	}
-	std::vector<CChan*> GetChans_() {
+	std::vector<CChannel*> GetChans_() {
 		return $self->GetChans();
 	}
 }
 
-%extend CChan {
+%extend CChannel {
 	CString __str__() {
 		return $self->GetName();
 	}
 	CString __repr__() {
-		return "<CChan " + $self->GetName() + ">";
+		return "<CChannel " + $self->GetName() + ">";
 	}
 	std::map<CString, CNick> GetNicks_() {
 		return $self->GetNicks();

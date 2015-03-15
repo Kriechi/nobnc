@@ -93,8 +93,8 @@ CIRCSock::~CIRCSock()
         IRCSOCKMODULECALL(OnIRCConnectionError(this), NOTHING);
     }
 
-    const vector<CChan*>& vChans = m_pNetwork->GetChans();
-    for (CChan* pChan : vChans) {
+    const vector<CChannel*>& vChans = m_pNetwork->GetChans();
+    for (CChannel* pChan : vChans) {
         pChan->Reset();
     }
 
@@ -237,7 +237,7 @@ void CIRCSock::ReadLine(const CString& sData)
             break;
         case 324: { // MODE
             sRest.Trim();
-            CChan* pChan = m_pNetwork->FindChan(sRest.Token(0));
+            CChannel* pChan = m_pNetwork->FindChan(sRest.Token(0));
 
             if (pChan) {
                 pChan->SetModes(sRest.Token(1, true));
@@ -257,7 +257,7 @@ void CIRCSock::ReadLine(const CString& sData)
         } break;
         case 329: {
             sRest.Trim();
-            CChan* pChan = m_pNetwork->FindChan(sRest.Token(0));
+            CChannel* pChan = m_pNetwork->FindChan(sRest.Token(0));
 
             if (pChan) {
                 unsigned long ulDate = sLine.Token(4).ToULong();
@@ -277,7 +277,7 @@ void CIRCSock::ReadLine(const CString& sData)
         } break;
         case 331: {
             // :irc.server.com 331 yournick #chan :No topic is set.
-            CChan* pChan = m_pNetwork->FindChan(sLine.Token(3));
+            CChannel* pChan = m_pNetwork->FindChan(sLine.Token(3));
 
             if (pChan) {
                 pChan->SetTopic("");
@@ -290,7 +290,7 @@ void CIRCSock::ReadLine(const CString& sData)
         }
         case 332: {
             // :irc.server.com 332 yournick #chan :This is a topic
-            CChan* pChan = m_pNetwork->FindChan(sLine.Token(3));
+            CChannel* pChan = m_pNetwork->FindChan(sLine.Token(3));
 
             if (pChan) {
                 CString sTopic = sLine.Token(4, true);
@@ -305,7 +305,7 @@ void CIRCSock::ReadLine(const CString& sData)
         }
         case 333: {
             // :irc.server.com 333 yournick #chan setternick 1112320796
-            CChan* pChan = m_pNetwork->FindChan(sLine.Token(3));
+            CChannel* pChan = m_pNetwork->FindChan(sLine.Token(3));
 
             if (pChan) {
                 sNick = sLine.Token(4);
@@ -339,9 +339,9 @@ void CIRCSock::ReadLine(const CString& sData)
             m_pNetwork->SetIRCNick(m_Nick);
             m_pNetwork->SetIRCServer(sServer);
 
-            const vector<CChan*>& vChans = m_pNetwork->GetChans();
+            const vector<CChannel*>& vChans = m_pNetwork->GetChans();
 
-            for (CChan* pChan : vChans) {
+            for (CChannel* pChan : vChans) {
                 pChan->OnWho(sNick, sIdent, sHost);
             }
 
@@ -370,7 +370,7 @@ void CIRCSock::ReadLine(const CString& sData)
                 return;
             }
 
-            CChan* pChan = m_pNetwork->FindChan(sChan);
+            CChannel* pChan = m_pNetwork->FindChan(sChan);
             if (pChan && pChan->IsDetached()) {
                 return;
             }
@@ -380,7 +380,7 @@ void CIRCSock::ReadLine(const CString& sData)
         case 353: { // NAMES
             sRest.Trim();
             // Todo: allow for non @+= server msgs
-            CChan* pChan = m_pNetwork->FindChan(sRest.Token(1));
+            CChannel* pChan = m_pNetwork->FindChan(sRest.Token(1));
             // If we don't know that channel, some client might have
             // requested a /names for it and we really should forward this.
             if (pChan) {
@@ -398,7 +398,7 @@ void CIRCSock::ReadLine(const CString& sData)
         }
         case 366: { // end of names list
             // :irc.server.com 366 nick #chan :End of /NAMES list.
-            CChan* pChan = m_pNetwork->FindChan(sRest.Token(0));
+            CChannel* pChan = m_pNetwork->FindChan(sRest.Token(0));
 
             if (pChan) {
                 if (pChan->IsOn()) {
@@ -459,7 +459,7 @@ void CIRCSock::ReadLine(const CString& sData)
             // :mccaffrey.freenode.net 470 mynick #electronics ##electronics :Forwarding to another channel
 
             // freenode style numeric
-            CChan* pChan = m_pNetwork->FindChan(sRest.Token(0));
+            CChannel* pChan = m_pNetwork->FindChan(sRest.Token(0));
             if (!pChan) {
                 // unreal style numeric
                 pChan = m_pNetwork->FindChan(sRest.Token(1));
@@ -491,10 +491,10 @@ void CIRCSock::ReadLine(const CString& sData)
             CString sNewNick = sRest.TrimPrefix_n();
             bool bIsVisible = false;
 
-            vector<CChan*> vFoundChans;
-            const vector<CChan*>& vChans = m_pNetwork->GetChans();
+            vector<CChannel*> vFoundChans;
+            const vector<CChannel*>& vChans = m_pNetwork->GetChans();
 
-            for (CChan* pChan : vChans) {
+            for (CChannel* pChan : vChans) {
                 if (pChan->ChangeNick(Nick.GetNick(), sNewNick)) {
                     vFoundChans.push_back(pChan);
 
@@ -530,10 +530,10 @@ void CIRCSock::ReadLine(const CString& sData)
                 return;
             }
 
-            vector<CChan*> vFoundChans;
-            const vector<CChan*>& vChans = m_pNetwork->GetChans();
+            vector<CChannel*> vFoundChans;
+            const vector<CChannel*>& vChans = m_pNetwork->GetChans();
 
-            for (CChan* pChan : vChans) {
+            for (CChannel* pChan : vChans) {
                 if (pChan->RemNick(Nick.GetNick())) {
                     vFoundChans.push_back(pChan);
 
@@ -550,7 +550,7 @@ void CIRCSock::ReadLine(const CString& sData)
             }
         } else if (sCmd.Equals("JOIN")) {
             CString sChan = sRest.Token(0).TrimPrefix_n();
-            CChan* pChan;
+            CChannel* pChan;
 
             if (Nick.NickEquals(GetNick())) {
                 m_pNetwork->AddChan(sChan, false);
@@ -576,7 +576,7 @@ void CIRCSock::ReadLine(const CString& sData)
             CString sChan = sRest.Token(0).TrimPrefix_n();
             CString sMsg = sRest.Token(1, true).TrimPrefix_n();
 
-            CChan* pChan = m_pNetwork->FindChan(sChan);
+            CChannel* pChan = m_pNetwork->FindChan(sChan);
             bool bDetached = false;
             if (pChan) {
                 pChan->RemNick(Nick.GetNick());
@@ -603,7 +603,7 @@ void CIRCSock::ReadLine(const CString& sData)
             CString sModes = sRest.Token(1, true);
             if (sModes.Left(1) == ":") sModes = sModes.substr(1);
 
-            CChan* pChan = m_pNetwork->FindChan(sTarget);
+            CChannel* pChan = m_pNetwork->FindChan(sTarget);
             if (pChan) {
                 pChan->ModeChange(sModes, &Nick);
 
@@ -640,7 +640,7 @@ void CIRCSock::ReadLine(const CString& sData)
             CString sMsg = sRest.Token(2, true);
             sMsg.LeftChomp();
 
-            CChan* pChan = m_pNetwork->FindChan(sChan);
+            CChannel* pChan = m_pNetwork->FindChan(sChan);
 
             if (pChan) {
                 IRCSOCKMODULECALL(OnKick(Nick, sKickedNick, *pChan, sMsg), NOTHING);
@@ -698,7 +698,7 @@ void CIRCSock::ReadLine(const CString& sData)
             return;
         } else if (sCmd.Equals("TOPIC")) {
             // :nick!ident@host.com TOPIC #chan :This is a topic
-            CChan* pChan = m_pNetwork->FindChan(sLine.Token(2));
+            CChannel* pChan = m_pNetwork->FindChan(sLine.Token(2));
 
             if (pChan) {
                 CString sTopic = sLine.Token(3, true);
@@ -961,7 +961,7 @@ bool CIRCSock::OnPrivMsg(CNick& Nick, CString& sMessage)
 
 bool CIRCSock::OnChanCTCP(CNick& Nick, const CString& sChan, CString& sMessage)
 {
-    CChan* pChan = m_pNetwork->FindChan(sChan);
+    CChannel* pChan = m_pNetwork->FindChan(sChan);
     if (pChan) {
         bool bResult = false;
         IRCSOCKMODULECALL(OnChanCTCP(Nick, *pChan, sMessage), &bResult);
@@ -988,7 +988,7 @@ bool CIRCSock::OnChanCTCP(CNick& Nick, const CString& sChan, CString& sMessage)
 
 bool CIRCSock::OnChanNotice(CNick& Nick, const CString& sChan, CString& sMessage)
 {
-    CChan* pChan = m_pNetwork->FindChan(sChan);
+    CChannel* pChan = m_pNetwork->FindChan(sChan);
     if (pChan) {
         bool bResult = false;
         IRCSOCKMODULECALL(OnChanNotice(Nick, *pChan, sMessage), &bResult);
@@ -1004,7 +1004,7 @@ bool CIRCSock::OnChanNotice(CNick& Nick, const CString& sChan, CString& sMessage
 
 bool CIRCSock::OnChanMsg(CNick& Nick, const CString& sChan, CString& sMessage)
 {
-    CChan* pChan = m_pNetwork->FindChan(sChan);
+    CChannel* pChan = m_pNetwork->FindChan(sChan);
     if (pChan) {
         bool bResult = false;
         IRCSOCKMODULECALL(OnChanMsg(Nick, *pChan, sMessage), &bResult);

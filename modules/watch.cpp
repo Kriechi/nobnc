@@ -183,7 +183,7 @@ public:
 
     virtual ~CWatcherMod() {}
 
-    void OnRawMode(const CNick& OpNick, CChan& Channel, const CString& sModes, const CString& sArgs) override
+    void OnRawMode(const CNick& OpNick, CChannel& Channel, const CString& sModes, const CString& sArgs) override
     {
         Process(OpNick, "* " + OpNick.GetNick() + " sets mode: " + sModes + " " + sArgs + " on " + Channel.GetName(), Channel.GetName());
     }
@@ -200,14 +200,14 @@ public:
         m_Buffer.Clear();
     }
 
-    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChan& Channel, const CString& sMessage) override
+    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChannel& Channel, const CString& sMessage) override
     {
         Process(OpNick,
                 "* " + OpNick.GetNick() + " kicked " + sKickedNick + " from " + Channel.GetName() + " because [" + sMessage + "]",
                 Channel.GetName());
     }
 
-    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChan*>& vChans) override
+    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChannel*>& vChans) override
     {
         Process(Nick,
                 "* Quits: " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") "
@@ -216,14 +216,14 @@ public:
                 "");
     }
 
-    void OnJoin(const CNick& Nick, CChan& Channel) override
+    void OnJoin(const CNick& Nick, CChannel& Channel) override
     {
         Process(Nick,
                 "* " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") joins " + Channel.GetName(),
                 Channel.GetName());
     }
 
-    void OnPart(const CNick& Nick, CChan& Channel, const CString& sMessage) override
+    void OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage) override
     {
         Process(Nick,
                 "* " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") parts " + Channel.GetName() +
@@ -231,7 +231,7 @@ public:
                 Channel.GetName());
     }
 
-    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChan*>& vChans) override
+    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChannel*>& vChans) override
     {
         Process(OldNick, "* " + OldNick.GetNick() + " is now known as " + sNewNick, "");
     }
@@ -248,7 +248,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanCTCP(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         Process(Nick,
                 "* CTCP: " + Nick.GetNick() + " [" + sMessage + "] to "
@@ -264,7 +264,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanNotice(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         Process(Nick, "-" + Nick.GetNick() + ":" + Channel.GetName() + "- " + sMessage, Channel.GetName());
         return CONTINUE;
@@ -276,7 +276,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChan& Channel, CString& sMessage) override
+    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
     {
         Process(Nick, "<" + Nick.GetNick() + ":" + Channel.GetName() + "> " + sMessage, Channel.GetName());
         return CONTINUE;
@@ -353,7 +353,7 @@ private:
     {
         set<CString> sHandledTargets;
         CNetwork* pNetwork = GetNetwork();
-        CChan* pChannel = pNetwork->FindChan(sSource);
+        CChannel* pChannel = pNetwork->FindChan(sSource);
 
         for (list<CWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
             CWatchEntry& WatchEntry = *it;

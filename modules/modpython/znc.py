@@ -708,7 +708,7 @@ def CreateWebSubPage(name, title='', params=dict(), admin=False):
 
 CUser.GetNetworks = CUser.GetNetworks_
 CNetwork.GetChans = CNetwork.GetChans_
-CChan.GetNicks = CChan.GetNicks_
+CChannel.GetNicks = CChannel.GetNicks_
 CZNC.GetUserMap = CZNC.GetUserMap_
 
 
@@ -761,7 +761,7 @@ def str_eq(self, other):
 
     return id(self) == id(other)
 
-CChan.__eq__ = str_eq
+CChannel.__eq__ = str_eq
 CNick.__eq__ = str_eq
 CUser.__eq__ = str_eq
 CNetwork.__eq__ = str_eq
