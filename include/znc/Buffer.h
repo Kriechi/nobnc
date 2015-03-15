@@ -22,34 +22,30 @@
 #include <sys/time.h>
 #include <deque>
 
-// Forward Declarations
 class CClient;
-// !Forward Declarations
 
 class CBufLine
 {
 public:
-    CBufLine() : CBufLine("") { throw 0; } // shouldn't be called, but is needed for compilation
-    CBufLine(const CString& sFormat, const CString& sText = "", const timeval* ts = nullptr);
+    CBufLine(const CString& format = "", const CString& text = "", const timeval* ts = nullptr);
     ~CBufLine();
-    CString GetLine(const CClient& Client, const MCString& msParams) const;
+
+    CString GetLine(const CClient& client, const MCString& params) const;
+
+    CString GetFormat() const { return m_format; }
+    void SetFormat(const CString& format) { m_format = format; }
+
+    CString GetText() const { return m_text; }
+    void SetText(const CString& text) { m_text = text; }
+
+    timeval GetTime() const { return m_time; }
+    void SetTime(const timeval& ts) { m_time = ts; }
+
     void UpdateTime();
 
-    // Setters
-    void SetFormat(const CString& sFormat) { m_sFormat = sFormat; }
-    void SetText(const CString& sText) { m_sText = sText; }
-    void SetTime(const timeval& ts) { m_time = ts; }
-    // !Setters
-
-    // Getters
-    const CString& GetFormat() const { return m_sFormat; }
-    const CString& GetText() const { return m_sText; }
-    timeval GetTime() const { return m_time; }
-    // !Getters
-
 private:
-    CString m_sFormat;
-    CString m_sText;
+    CString m_format;
+    CString m_text;
     timeval m_time;
 };
 

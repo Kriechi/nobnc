@@ -17,37 +17,38 @@
 #include <znc/znc.h>
 #include <znc/User.h>
 
-CBufLine::CBufLine(const CString& sFormat, const CString& sText, const timeval* ts)
-    : m_sFormat(sFormat), m_sText(sText), m_time()
+CBufLine::CBufLine(const CString& format, const CString& text, const timeval* ts)
+    : m_format(format), m_text(text), m_time()
 {
-    if (ts == nullptr)
+    if (!ts)
         UpdateTime();
     else
         m_time = *ts;
 }
 
-CBufLine::~CBufLine() {}
+CBufLine::~CBufLine()
+{
+}
 
 void CBufLine::UpdateTime()
 {
-    if (0 == gettimeofday(&m_time, nullptr)) {
-        return;
+    if (!gettimeofday(&m_time, nullptr)) {
+        m_time.tv_sec = time(nullptr);
+        m_time.tv_usec = 0;
     }
-    m_time.tv_sec = time(nullptr);
-    m_time.tv_usec = 0;
 }
 
-CString CBufLine::GetLine(const CClient& Client, const MCString& msParams) const
+CString CBufLine::GetLine(const CClient& client, const MCString& params) const
 {
-    MCString msThisParams = msParams;
+    MCString copy = params;
 
-    if (Client.HasServerTime()) {
-        msThisParams["text"] = m_sText;
-        CString sStr = CString::NamedFormat(m_sFormat, msThisParams);
-        return "@time=" + CUtils::FormatServerTime(m_time) + " " + sStr;
+    if (client.HasServerTime()) {
+        copy["text"] = m_text;
+        CString str = CString::NamedFormat(m_format, copy);
+        return "@time=" + CUtils::FormatServerTime(m_time) + " " + str;
     } else {
-        msThisParams["text"] = Client.GetUser()->AddTimestamp(m_time.tv_sec, m_sText);
-        return CString::NamedFormat(m_sFormat, msThisParams);
+        copy["text"] = client.GetUser()->AddTimestamp(m_time.tv_sec, m_text);
+        return CString::NamedFormat(m_format, copy);
     }
 }
 
