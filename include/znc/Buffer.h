@@ -49,33 +49,30 @@ private:
     timeval m_time;
 };
 
-class CBuffer : private std::deque<CBufLine>
+class CBuffer
 {
 public:
-    CBuffer(unsigned int uLineCount = 100);
+    CBuffer(unsigned int lineCount = 100);
     ~CBuffer();
 
-    size_type AddLine(const CString& sFormat, const CString& sText = "", const timeval* ts = nullptr);
+    unsigned int AddLine(const CString& format, const CString& text = "", const timeval* ts = nullptr);
     /// Same as AddLine, but replaces a line whose format string starts with sMatch if there is one.
-    size_type UpdateLine(const CString& sMatch, const CString& sFormat, const CString& sText = "");
+    unsigned int UpdateLine(const CString& sMatch, const CString& format, const CString& text = "");
     /// Same as UpdateLine, but does nothing if this exact line already exists.
     /// We need this because "/version" sends us the 005 raws again
-    size_type UpdateExactLine(const CString& sFormat, const CString& sText = "");
-    const CBufLine& GetBufLine(unsigned int uIdx) const;
-    CString GetLine(size_type uIdx, const CClient& Client, const MCString& msParams = MCString::EmptyMap) const;
-    size_type Size() const { return size(); }
-    bool IsEmpty() const { return empty(); }
-    void Clear() { clear(); }
+    unsigned int UpdateExactLine(const CString& format, const CString& text = "");
+    const CBufLine& GetBufLine(unsigned int idx) const;
+    CString GetLine(unsigned int idx, const CClient& client, const MCString& params = MCString::EmptyMap) const;
+    unsigned int Size() const { return m_lines.size(); }
+    bool IsEmpty() const { return m_lines.empty(); }
+    void Clear() { m_lines.clear(); }
 
-    // Setters
-    bool SetLineCount(unsigned int u, bool bForce = false);
-    // !Setters
+    unsigned int GetLineCount() const { return m_lineCount; }
+    bool SetLineCount(unsigned int lineCount, bool force = false);
 
-    // Getters
-    unsigned int GetLineCount() const { return m_uLineCount; }
-    // !Getters
 private:
-    unsigned int m_uLineCount;
+    unsigned int m_lineCount;
+    std::deque<CBufLine> m_lines;
 };
 
 #endif // !ZNC_BUFFER_H

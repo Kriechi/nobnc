@@ -52,67 +52,74 @@ CString CBufLine::GetLine(const CClient& client, const MCString& params) const
     }
 }
 
-CBuffer::CBuffer(unsigned int uLineCount) : m_uLineCount(uLineCount) {}
-
-CBuffer::~CBuffer() {}
-
-CBuffer::size_type CBuffer::AddLine(const CString& sFormat, const CString& sText, const timeval* ts)
+CBuffer::CBuffer(unsigned int lineCount) : m_lineCount(lineCount)
 {
-    if (!m_uLineCount) {
+}
+
+CBuffer::~CBuffer()
+{
+}
+
+unsigned int CBuffer::AddLine(const CString& format, const CString& text, const timeval* ts)
+{
+    if (!m_lineCount) {
         return 0;
     }
 
-    while (size() >= m_uLineCount) {
-        erase(begin());
+    while (m_lines.size() >= m_lineCount) {
+        m_lines.erase(m_lines.begin());
     }
 
-    push_back(CBufLine(sFormat, sText, ts));
-    return size();
+    m_lines.push_back(CBufLine(format, text, ts));
+    return m_lines.size();
 }
 
-CBuffer::size_type CBuffer::UpdateLine(const CString& sMatch, const CString& sFormat, const CString& sText)
+unsigned int CBuffer::UpdateLine(const CString& match, const CString& format, const CString& text)
 {
-    for (CBufLine& Line : *this) {
-        if (Line.GetFormat().compare(0, sMatch.length(), sMatch) == 0) {
-            Line.SetFormat(sFormat);
-            Line.SetText(sText);
-            Line.UpdateTime();
-            return size();
+    for (CBufLine& line : m_lines) {
+        if (line.GetFormat().compare(0, match.length(), match) == 0) {
+            line.SetFormat(format);
+            line.SetText(text);
+            line.UpdateTime();
+            return m_lines.size();
         }
     }
 
-    return AddLine(sFormat, sText);
+    return AddLine(format, text);
 }
 
-CBuffer::size_type CBuffer::UpdateExactLine(const CString& sFormat, const CString& sText)
+unsigned int CBuffer::UpdateExactLine(const CString& format, const CString& text)
 {
-    for (const CBufLine& Line : *this) {
-        if (Line.GetFormat() == sFormat && Line.GetText() == sText) {
-            return size();
+    for (const CBufLine& line : m_lines) {
+        if (line.GetFormat() == format && line.GetText() == text) {
+            return m_lines.size();
         }
     }
 
-    return AddLine(sFormat, sText);
+    return AddLine(format, text);
 }
 
-const CBufLine& CBuffer::GetBufLine(unsigned int uIdx) const { return (*this)[uIdx]; }
-
-CString CBuffer::GetLine(size_type uIdx, const CClient& Client, const MCString& msParams) const
+const CBufLine& CBuffer::GetBufLine(unsigned int idx) const
 {
-    return (*this)[uIdx].GetLine(Client, msParams);
+    return m_lines[idx];
 }
 
-bool CBuffer::SetLineCount(unsigned int u, bool bForce)
+CString CBuffer::GetLine(unsigned int idx, const CClient& client, const MCString& params) const
 {
-    if (!bForce && u > CZNC::Get().GetMaxBufferSize()) {
+    return m_lines[idx].GetLine(client, params);
+}
+
+bool CBuffer::SetLineCount(unsigned int lineCount, bool force)
+{
+    if (!force && lineCount > CZNC::Get().GetMaxBufferSize()) {
         return false;
     }
 
-    m_uLineCount = u;
+    m_lineCount = lineCount;
 
     // We may need to shrink the buffer if the allowed size got smaller
-    while (size() > m_uLineCount) {
-        erase(begin());
+    while (m_lines.size() > m_lineCount) {
+        m_lines.erase(m_lines.begin());
     }
 
     return true;
