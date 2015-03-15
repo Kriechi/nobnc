@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_CHAN_H
-#define ZNC_CHAN_H
+#ifndef ZNC_CHANNEL_H
+#define ZNC_CHANNEL_H
 
 #include <znc/zncconfig.h>
 #include <znc/Nick.h>
@@ -177,4 +177,4 @@ private:
     std::map<unsigned char, CString> m_musModes;
 };
 
-#endif // !ZNC_CHAN_H
+#endif // !ZNC_CHANNEL_H

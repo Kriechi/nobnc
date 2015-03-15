@@ -16,7 +16,7 @@
 
 #include <znc/IRCNetwork.h>
 #include <znc/User.h>
-#include <znc/Chan.h>
+#include <znc/Channel.h>
 #include <znc/Query.h>
 
 using std::vector;

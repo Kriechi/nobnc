@@ -24,7 +24,7 @@
 
 #define REQUIRESSL
 
-#include <znc/Chan.h>
+#include <znc/Channel.h>
 #include <znc/User.h>
 #include <znc/IRCNetwork.h>
 #include <znc/FileUtils.h>

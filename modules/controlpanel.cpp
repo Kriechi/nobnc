@@ -19,7 +19,7 @@
 
 #include <znc/User.h>
 #include <znc/IRCNetwork.h>
-#include <znc/Chan.h>
+#include <znc/Channel.h>
 #include <znc/IRCSock.h>
 
 using std::map;

@@ -31,7 +31,7 @@
 //       and gets sent to your client in plain text.
 //
 
-#include <znc/Chan.h>
+#include <znc/Channel.h>
 #include <znc/User.h>
 #include <znc/IRCNetwork.h>
 

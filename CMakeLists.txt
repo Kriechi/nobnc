@@ -16,7 +16,7 @@ include(DefineVersion)
 ### SOURCES
 
 list(APPEND ZNC_SOURCES src/Buffer.cpp
-                        src/Chan.cpp
+                        src/Channel.cpp
                         src/Client.cpp
                         src/ClientCommand.cpp
                         src/Config.cpp

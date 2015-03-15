@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "Chan.h"
+#include "Channel.h"
 #include "IRCSock.h"
 #include "User.h"
 #include "IRCNetwork.h"

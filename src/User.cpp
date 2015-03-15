@@ -19,7 +19,7 @@
 #include "FileUtils.h"
 #include "IRCNetwork.h"
 #include "IRCSock.h"
-#include "Chan.h"
+#include "Channel.h"
 #include <math.h>
 #include <algorithm>
 

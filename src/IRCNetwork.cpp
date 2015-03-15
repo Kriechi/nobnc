@@ -20,7 +20,7 @@
 #include "Config.h"
 #include "IRCSock.h"
 #include "Server.h"
-#include "Chan.h"
+#include "Channel.h"
 #include "Query.h"
 #include <algorithm>
 #include <memory>

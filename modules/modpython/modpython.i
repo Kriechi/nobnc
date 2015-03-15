@@ -24,7 +24,7 @@
 #include "../include/znc/Socket.h"
 #include "../include/znc/Modules.h"
 #include "../include/znc/Nick.h"
-#include "../include/znc/Chan.h"
+#include "../include/znc/Channel.h"
 #include "../include/znc/User.h"
 #include "../include/znc/IRCNetwork.h"
 #include "../include/znc/Client.h"

@@ -22,7 +22,7 @@
  *
  */
 
-#include <znc/Chan.h>
+#include <znc/Channel.h>
 #include <znc/IRCNetwork.h>
 
 class CRejoinJob : public CTimer

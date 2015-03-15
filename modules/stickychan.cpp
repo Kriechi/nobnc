@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/Chan.h>
+#include <znc/Channel.h>
 #include <znc/IRCNetwork.h>
 
 using std::vector;

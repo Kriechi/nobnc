@@ -16,7 +16,7 @@
 
 #include <Python.h>
 
-#include <znc/Chan.h>
+#include <znc/Channel.h>
 #include <znc/FileUtils.h>
 #include <znc/IRCSock.h>
 #include <znc/Modules.h>

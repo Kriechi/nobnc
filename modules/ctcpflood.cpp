@@ -15,7 +15,7 @@
  */
 
 #include <znc/Modules.h>
-#include <znc/Chan.h>
+#include <znc/Channel.h>
 
 class CCtcpFloodMod : public CModule
 {

@@ -15,7 +15,7 @@
  */
 
 #include "Nick.h"
-#include "Chan.h"
+#include "Channel.h"
 #include "IRCSock.h"
 #include "IRCNetwork.h"
 

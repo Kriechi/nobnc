@@ -15,7 +15,7 @@
  */
 
 #include <znc/Modules.h>
-#include <znc/Chan.h>
+#include <znc/Channel.h>
 
 using std::map;
 using std::set;
