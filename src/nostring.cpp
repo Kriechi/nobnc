@@ -15,7 +15,7 @@
  */
 
 #include "nostring.h"
-#include "nofileutils.h"
+#include "nofile.h"
 #include "noutils.h"
 #include "nomd5.h"
 #include "nosha256.h"

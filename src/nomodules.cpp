@@ -15,7 +15,7 @@
  */
 
 #include "nomodules.h"
-#include "nofileutils.h"
+#include "nodir.h"
 #include "notemplate.h"
 #include "nouser.h"
 #include "nonetwork.h"

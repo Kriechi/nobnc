@@ -27,7 +27,8 @@
 #include <znc/nochannel.h>
 #include <znc/nouser.h>
 #include <znc/nonetwork.h>
-#include <znc/nofileutils.h>
+#include <znc/nofile.h>
+#include <znc/nodir.h>
 #include <znc/noquery.h>
 
 using std::set;

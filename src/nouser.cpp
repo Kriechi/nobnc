@@ -16,7 +16,8 @@
 
 #include "nouser.h"
 #include "nosettings.h"
-#include "nofileutils.h"
+#include "nofile.h"
+#include "nodir.h"
 #include "nonetwork.h"
 #include "noircsock.h"
 #include "nochannel.h"

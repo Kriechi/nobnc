@@ -31,7 +31,7 @@
 
 #include <znc/nouser.h>
 #include <znc/nonetwork.h>
-#include <znc/nofileutils.h>
+#include <znc/nofile.h>
 
 using std::vector;
 using std::map;

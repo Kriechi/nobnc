@@ -15,7 +15,8 @@
  */
 
 #include "notemplate.h"
-#include "nofileutils.h"
+#include "nofile.h"
+#include "nodir.h"
 #include "nodebug.h"
 #include <algorithm>
 

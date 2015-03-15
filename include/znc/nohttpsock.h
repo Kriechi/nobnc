@@ -19,7 +19,7 @@
 
 #include <znc/noconfig.h>
 #include <znc/nosocket.h>
-#include <znc/nofileutils.h>
+#include <znc/nofile.h>
 
 class CModule;
 

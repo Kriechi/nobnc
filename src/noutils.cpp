@@ -16,7 +16,8 @@
 
 #include "noutils.h"
 #include "nodebug.h"
-#include "nofileutils.h"
+#include "nofile.h"
+#include "nodir.h"
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>
 #endif /* HAVE_LIBSSL */

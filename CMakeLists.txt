@@ -20,7 +20,8 @@ list(APPEND ZNC_SOURCES src/nobuffer.cpp
                         src/noclient.cpp
                         src/noclientcommand.cpp
                         src/nodebug.cpp
-                        src/nofileutils.cpp
+                        src/nodir.cpp
+                        src/nofile.cpp
                         src/nohttpsock.cpp
                         src/noircsock.cpp
                         src/nolistener.cpp

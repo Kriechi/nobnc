@@ -15,7 +15,7 @@
  */
 
 #include <znc/nochannel.h>
-#include <znc/nofileutils.h>
+#include <znc/nofile.h>
 #include <znc/nostring.h>
 #include <znc/noircsock.h>
 #include <znc/nomodules.h>

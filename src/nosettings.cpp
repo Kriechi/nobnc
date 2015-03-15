@@ -15,7 +15,7 @@
  */
 
 #include "nosettings.h"
-#include "nofileutils.h"
+#include "nofile.h"
 #include <stack>
 #include <sstream>
 

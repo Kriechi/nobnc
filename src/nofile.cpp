@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "nofileutils.h"
+#include "nofile.h"
 #include "noexecsock.h"
 #include "noutils.h"
 #include <fcntl.h>
@@ -513,100 +513,6 @@ void CFile::InitHomePath(const CString& sFallback)
     if (m_sHomePath.empty()) {
         m_sHomePath = sFallback;
     }
-}
-
-CString CDir::ChangeDir(const CString& sPath, const CString& sAdd, const CString& sHome)
-{
-    CString sHomeDir(sHome);
-
-    if (sHomeDir.empty()) {
-        sHomeDir = CFile::GetHomePath();
-    }
-
-    if (sAdd == "~") {
-        return sHomeDir;
-    }
-
-    CString sAddDir(sAdd);
-
-    if (sAddDir.Left(2) == "~/") {
-        sAddDir.LeftChomp();
-        sAddDir = sHomeDir + sAddDir;
-    }
-
-    CString sRet = ((sAddDir.size()) && (sAddDir[0] == '/')) ? "" : sPath;
-    sAddDir += "/";
-    CString sCurDir;
-
-    if (sRet.Right(1) == "/") {
-        sRet.RightChomp();
-    }
-
-    for (unsigned int a = 0; a < sAddDir.size(); a++) {
-        switch (sAddDir[a]) {
-        case '/':
-            if (sCurDir == "..") {
-                sRet = sRet.substr(0, sRet.rfind('/'));
-            } else if ((sCurDir != "") && (sCurDir != ".")) {
-                sRet += "/" + sCurDir;
-            }
-
-            sCurDir = "";
-            break;
-        default:
-            sCurDir += sAddDir[a];
-            break;
-        }
-    }
-
-    return (sRet.empty()) ? "/" : sRet;
-}
-
-CString CDir::CheckPathPrefix(const CString& sPath, const CString& sAdd, const CString& sHomeDir)
-{
-    CString sPrefix = sPath.Replace_n("//", "/").TrimRight_n("/") + "/";
-    CString sAbsolutePath = ChangeDir(sPrefix, sAdd, sHomeDir);
-
-    if (sAbsolutePath.Left(sPrefix.length()) != sPrefix) return "";
-    return sAbsolutePath;
-}
-
-bool CDir::MakeDir(const CString& sPath, mode_t iMode)
-{
-    CString sDir;
-    VCString dirs;
-    VCString::iterator it;
-
-    // Just in case someone tries this...
-    if (sPath.empty()) {
-        errno = ENOENT;
-        return false;
-    }
-
-    // If this is an absolute path, we need to handle this now!
-    if (sPath.Left(1) == "/") sDir = "/";
-
-    // For every single subpath, do...
-    sPath.Split("/", dirs, false);
-    for (it = dirs.begin(); it != dirs.end(); ++it) {
-        // Add this to the path we already created
-        sDir += *it;
-
-        int i = mkdir(sDir.c_str(), iMode);
-
-        if (i != 0) {
-            // All errors except EEXIST are fatal
-            if (errno != EEXIST) return false;
-
-            // If it's EEXIST we have to make sure it's a dir
-            if (!CFile::IsDir(sDir)) return false;
-        }
-
-        sDir += "/";
-    }
-
-    // All went well
-    return true;
 }
 
 int CExecSock::popen2(int& iReadFD, int& iWriteFD, const CString& sCommand)

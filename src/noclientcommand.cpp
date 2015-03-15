@@ -16,7 +16,7 @@
 
 #include "noclient.h"
 #include "nochannel.h"
-#include "nofileutils.h"
+#include "nodir.h"
 #include "nonetwork.h"
 #include "noircsock.h"
 #include "noserver.h"

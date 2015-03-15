@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/nofileutils.h>
+#include <znc/nofile.h>
 #include <znc/noircsock.h>
 #include <znc/nouser.h>
 #include <znc/nonetwork.h>

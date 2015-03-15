@@ -15,7 +15,8 @@
  */
 
 #include "nohttpsock.h"
-#include "nofileutils.h"
+#include "nofile.h"
+#include "nodir.h"
 #include "noznc.h"
 #include <iomanip>
 

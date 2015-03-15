@@ -15,7 +15,8 @@
  */
 
 #include "nowebmodules.h"
-#include "nofileutils.h"
+#include "nofile.h"
+#include "nodir.h"
 #include "nouser.h"
 #include "nonetwork.h"
 #include "noznc.h"

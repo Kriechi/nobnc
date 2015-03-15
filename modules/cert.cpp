@@ -16,7 +16,7 @@
 
 #define REQUIRESSL
 
-#include <znc/nofileutils.h>
+#include <znc/nofile.h>
 #include <znc/nouser.h>
 #include <znc/nomodules.h>
 #include <znc/noircsock.h>

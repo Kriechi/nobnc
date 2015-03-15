@@ -17,7 +17,7 @@
 #include <Python.h>
 
 #include <znc/nochannel.h>
-#include <znc/nofileutils.h>
+#include <znc/nofile.h>
 #include <znc/noircsock.h>
 #include <znc/nomodules.h>
 #include <znc/nonick.h>

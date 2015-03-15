@@ -15,7 +15,8 @@
  */
 
 #include "noznc.h"
-#include "nofileutils.h"
+#include "nodir.h"
+#include "nofile.h"
 #include "noircsock.h"
 #include "noserver.h"
 #include "nouser.h"

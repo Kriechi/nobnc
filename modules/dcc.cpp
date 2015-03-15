@@ -16,7 +16,8 @@
 
 #include <znc/noznc.h>
 #include <znc/nouser.h>
-#include <znc/nofileutils.h>
+#include <znc/nofile.h>
+#include <znc/nodir.h>
 
 using std::set;
 
