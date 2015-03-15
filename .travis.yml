@@ -28,7 +28,6 @@ matrix:
         - os: osx
           compiler: clang
           env: BUILD_TYPE=normal USE_SYSTEM_OPENSSL=true
-
 before_install:
     - "echo os: [$TRAVIS_OS_NAME] build: [$BUILD_TYPE]"
     - if [[ "$BUILD_TYPE" == "normal" ]]; then export CFGFLAGS= MYCXXFLAGS= MYLDFLAGS=; fi
@@ -68,21 +67,9 @@ script:
     - make V=1 test
     - sudo make install
     - cd ..
-after_success:
-    - test -r .travis_after_all.py && python .travis_after_all.py || echo No .travis_after_all.py found
-    - test -r .to_export_back && echo $(cat .to_export_back) || echo No .to_export_back found
-    - export DUMMY_VAR=dummy-value $(cat .to_export_back)
-    - |
-          if [ "$BUILD_LEADER" == "YES" ] && [ "$BUILD_AGGREGATE_STATUS" == "others_succeeded" ] && [ "$TRAVIS_REPO_SLUG" == "znc/znc" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
-              echo "All builds passed!"
-              ./.travis-generate-docs.sh
-          else
-              echo "Not leader"
-          fi
 notifications:
     irc:
         channels:
-            - "irc.freenode.net#znc"
-            - "irc.arcti.ca#znc"
+            - "irc.freenode.net#nobnc"
         on_success: always
         on_failure: always
