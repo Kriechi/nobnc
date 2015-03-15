@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "ZNCString.h"
+#include "nostring.h"
 #include "FileUtils.h"
 #include "Utils.h"
 #include "MD5.h"

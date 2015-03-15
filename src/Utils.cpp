@@ -15,7 +15,7 @@
  */
 
 #include "Utils.h"
-#include "ZNCDebug.h"
+#include "nodebug.h"
 #include "FileUtils.h"
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>

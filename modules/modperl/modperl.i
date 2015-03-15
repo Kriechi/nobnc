@@ -42,9 +42,9 @@
 #include "../include/znc/WebModules.h"
 #include "../include/znc/znc.h"
 #include "../include/znc/Server.h"
-#include "../include/znc/ZNCString.h"
+#include "../include/znc/nostring.h"
 #include "../include/znc/FileUtils.h"
-#include "../include/znc/ZNCDebug.h"
+#include "../include/znc/nodebug.h"
 #include "../include/znc/ExecSock.h"
 #include "../include/znc/Buffer.h"
 #include "module.h"
@@ -120,7 +120,7 @@ class MCString : public std::map<CString, CString> {};
 #define u_short unsigned short
 #define u_int unsigned int
 #include "../include/znc/noconfig.h"
-#include "../include/znc/ZNCString.h"
+#include "../include/znc/nostring.h"
 %include "../include/znc/defines.h"
 %include "../include/znc/Utils.h"
 %include "../include/znc/Threads.h"
@@ -142,7 +142,7 @@ class MCString : public std::map<CString, CString> {};
 %include "../include/znc/WebModules.h"
 %include "../include/znc/znc.h"
 %include "../include/znc/Server.h"
-%include "../include/znc/ZNCDebug.h"
+%include "../include/znc/nodebug.h"
 %include "../include/znc/ExecSock.h"
 %include "../include/znc/Buffer.h"
 

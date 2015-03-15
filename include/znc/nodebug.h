@@ -18,7 +18,7 @@
 #define ZNCDEBUG_H
 
 #include <znc/noconfig.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 #include <sstream>
 
 /** Output a debug info if debugging is enabled.

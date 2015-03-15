@@ -18,7 +18,7 @@
 #define ZNC_SERVER_H
 
 #include <znc/noconfig.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 
 class CServer
 {

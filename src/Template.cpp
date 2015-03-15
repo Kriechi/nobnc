@@ -16,7 +16,7 @@
 
 #include "Template.h"
 #include "FileUtils.h"
-#include "ZNCDebug.h"
+#include "nodebug.h"
 #include <algorithm>
 
 using std::stringstream;

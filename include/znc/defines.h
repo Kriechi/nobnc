@@ -21,8 +21,8 @@
 
 // This header file is just for Csocket
 
-#include <znc/ZNCDebug.h>
-#include <znc/ZNCString.h>
+#include <znc/nodebug.h>
+#include <znc/nostring.h>
 
 #define CS_STRING CString
 #define _NO_CSOCKET_NS

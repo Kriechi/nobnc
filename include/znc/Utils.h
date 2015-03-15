@@ -18,7 +18,7 @@
 #define ZNC_UTILS_H
 
 #include <znc/noconfig.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 #include <assert.h>
 #include <cstdio>
 #include <fcntl.h>

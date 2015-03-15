@@ -38,8 +38,8 @@ list(APPEND ZNC_SOURCES src/Buffer.cpp
                         src/User.cpp
                         src/Utils.cpp
                         src/WebModules.cpp
-                        src/ZNCDebug.cpp
-                        src/ZNCString.cpp
+                        src/nodebug.cpp
+                        src/nostring.cpp
                         src/znc.cpp
                         ${PROJECT_BINARY_DIR}/src/Csocket.cpp
                         ${PROJECT_BINARY_DIR}/src/noversion.cpp

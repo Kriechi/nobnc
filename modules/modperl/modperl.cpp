@@ -16,7 +16,7 @@
 
 #include <znc/Channel.h>
 #include <znc/FileUtils.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 #include <znc/IRCSock.h>
 #include <znc/Modules.h>
 #include <znc/Nick.h>

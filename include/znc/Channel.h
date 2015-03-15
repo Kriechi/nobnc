@@ -19,7 +19,7 @@
 
 #include <znc/noconfig.h>
 #include <znc/Nick.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 #include <znc/Buffer.h>
 #include <map>
 

@@ -18,7 +18,7 @@
 
 #ifdef HAVE_PTHREAD
 
-#include "ZNCDebug.h"
+#include "nodebug.h"
 #include <algorithm>
 
 /* Just an arbitrary limit for the number of idle threads */

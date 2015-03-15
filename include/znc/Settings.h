@@ -18,7 +18,7 @@
 #define ZNC_CONFIG_H
 
 #include <znc/noconfig.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 
 class CFile;
 class CSettings;

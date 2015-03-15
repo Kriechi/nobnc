@@ -18,7 +18,7 @@
 #define ZNC_NICK_H
 
 #include <znc/noconfig.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 #include <vector>
 
 class CNetwork;

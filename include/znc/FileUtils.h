@@ -18,7 +18,7 @@
 #define ZNC_FILEUTILS_H
 
 #include <znc/noconfig.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>

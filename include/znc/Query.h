@@ -18,7 +18,7 @@
 #define ZNC_QUERY_H
 
 #include <znc/noconfig.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 #include <znc/Buffer.h>
 
 class CClient;

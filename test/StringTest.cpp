@@ -15,7 +15,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 
 // GTest uses this function to output objects
 static void PrintTo(const CString& s, std::ostream* o)

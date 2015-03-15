@@ -19,7 +19,7 @@
 
 #include <znc/noconfig.h>
 #include <znc/Csocket.h>
-#include <znc/ZNCString.h>
+#include <znc/nostring.h>
 
 #ifdef HAVE_LIBSSL
 
