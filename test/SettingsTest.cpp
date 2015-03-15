@@ -18,10 +18,10 @@
 #include <znc/FileUtils.h>
 #include <znc/Settings.h>
 
-class CConfigTest : public ::testing::Test
+class CSettingsTest : public ::testing::Test
 {
 public:
-    virtual ~CConfigTest() { m_File.Delete(); }
+    virtual ~CSettingsTest() { m_File.Delete(); }
 
 protected:
     CFile& WriteFile(const CString& sConfig)
@@ -40,7 +40,7 @@ private:
     CFile m_File;
 };
 
-class CConfigErrorTest : public CConfigTest
+class CSettingsErrorTest : public CSettingsTest
 {
 public:
     void TEST_ERROR(const CString& sConfig, const CString& sExpectError)
@@ -55,7 +55,7 @@ public:
     }
 };
 
-class CConfigSuccessTest : public CConfigTest
+class CSettingsSuccessTest : public CSettingsTest
 {
 public:
     void TEST_SUCCESS(const CString& sConfig, const CString& sExpectedOutput)
@@ -110,48 +110,48 @@ public:
 private:
 };
 
-TEST_F(CConfigSuccessTest, Empty) { TEST_SUCCESS("", ""); }
+TEST_F(CSettingsSuccessTest, Empty) { TEST_SUCCESS("", ""); }
 
 /* duplicate entries */
-TEST_F(CConfigSuccessTest, Duble1) { TEST_SUCCESS("Foo = bar\nFoo = baz\n", "foo=bar\nfoo=baz\n"); }
-TEST_F(CConfigSuccessTest, Duble2) { TEST_SUCCESS("Foo = baz\nFoo = bar\n", "foo=baz\nfoo=bar\n"); }
+TEST_F(CSettingsSuccessTest, Duble1) { TEST_SUCCESS("Foo = bar\nFoo = baz\n", "foo=bar\nfoo=baz\n"); }
+TEST_F(CSettingsSuccessTest, Duble2) { TEST_SUCCESS("Foo = baz\nFoo = bar\n", "foo=baz\nfoo=bar\n"); }
 
 /* sub configs */
-TEST_F(CConfigErrorTest, SubConf1) { TEST_ERROR("</foo>", "Error on line 1: Closing tag \"foo\" which is not open."); }
-TEST_F(CConfigErrorTest, SubConf2)
+TEST_F(CSettingsErrorTest, SubConf1) { TEST_ERROR("</foo>", "Error on line 1: Closing tag \"foo\" which is not open."); }
+TEST_F(CSettingsErrorTest, SubConf2)
 {
     TEST_ERROR("<foo a>\n</bar>\n", "Error on line 2: Closing tag \"bar\" which is not open.");
 }
-TEST_F(CConfigErrorTest, SubConf3)
+TEST_F(CSettingsErrorTest, SubConf3)
 {
     TEST_ERROR("<foo bar>",
                "Error on line 1: Not all tags are closed at the end of the file. Inner-most open tag is \"foo\".");
 }
-TEST_F(CConfigErrorTest, SubConf4)
+TEST_F(CSettingsErrorTest, SubConf4)
 {
     TEST_ERROR("<foo>\n</foo>", "Error on line 1: Empty block name at begin of block.");
 }
-TEST_F(CConfigErrorTest, SubConf5)
+TEST_F(CSettingsErrorTest, SubConf5)
 {
     TEST_ERROR("<foo 1>\n</foo>\n<foo 1>\n</foo>", "Error on line 4: Duplicate entry for tag \"foo\" name \"1\".");
 }
-TEST_F(CConfigSuccessTest, SubConf6) { TEST_SUCCESS("<foo a>\n</foo>", "->foo/a\n<-\n"); }
-TEST_F(CConfigSuccessTest, SubConf7) { TEST_SUCCESS("<a b>\n  <c d>\n </c>\n</a>", "->a/b\n->c/d\n<-\n<-\n"); }
-TEST_F(CConfigSuccessTest, SubConf8)
+TEST_F(CSettingsSuccessTest, SubConf6) { TEST_SUCCESS("<foo a>\n</foo>", "->foo/a\n<-\n"); }
+TEST_F(CSettingsSuccessTest, SubConf7) { TEST_SUCCESS("<a b>\n  <c d>\n </c>\n</a>", "->a/b\n->c/d\n<-\n<-\n"); }
+TEST_F(CSettingsSuccessTest, SubConf8)
 {
     TEST_SUCCESS(" \t <A B>\nfoo = bar\n\tFooO = bar\n</a>", "->a/B\nfoo=bar\nfooo=bar\n<-\n");
 }
 
 /* comments */
-TEST_F(CConfigSuccessTest, Comment1) { TEST_SUCCESS("Foo = bar // baz\n// Bar = baz", "foo=bar // baz\n"); }
-TEST_F(CConfigSuccessTest, Comment2)
+TEST_F(CSettingsSuccessTest, Comment1) { TEST_SUCCESS("Foo = bar // baz\n// Bar = baz", "foo=bar // baz\n"); }
+TEST_F(CSettingsSuccessTest, Comment2)
 {
     TEST_SUCCESS("Foo = bar /* baz */\n/*** Foo = baz ***/\n   /**** asdsdfdf \n Some quite invalid stuff ***/\n",
                  "foo=bar /* baz */\n");
 }
-TEST_F(CConfigErrorTest, Comment3)
+TEST_F(CSettingsErrorTest, Comment3)
 {
     TEST_ERROR("<foo foo>\n/* Just a comment\n</foo>", "Error on line 3: Comment not closed at end of file.");
 }
-TEST_F(CConfigSuccessTest, Comment4) { TEST_SUCCESS("/* Foo\n/* Bar */", ""); }
-TEST_F(CConfigSuccessTest, Comment5) { TEST_SUCCESS("/* Foo\n// */", ""); }
+TEST_F(CSettingsSuccessTest, Comment4) { TEST_SUCCESS("/* Foo\n/* Bar */", ""); }
+TEST_F(CSettingsSuccessTest, Comment5) { TEST_SUCCESS("/* Foo\n// */", ""); }

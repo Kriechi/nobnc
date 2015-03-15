@@ -31,7 +31,7 @@ if(EXISTS ${GTEST_ZIP} OR EXISTS ${GTEST_DIR} OR WGET_FOUND)
 
     include_directories(${GTEST_DIR} ${GTEST_DIR}/include)
     add_executable(unittest EXCLUDE_FROM_ALL
-                            ConfigTest.cpp
+                            SettingsTest.cpp
                             StringTest.cpp
                             ThreadTest.cpp
                             UtilsTest.cpp
