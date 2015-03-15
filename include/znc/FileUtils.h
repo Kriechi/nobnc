@@ -243,7 +243,6 @@ public:
     }
 
 private:
-protected:
     CFile::EFileAttr m_eSortAttr;
     bool m_bDesc;
 };

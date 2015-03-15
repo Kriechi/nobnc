@@ -92,7 +92,6 @@ public:
     void RefusedLogin(const CString& sReason) override;
 
 private:
-protected:
     CClient* m_pClient;
 };
 
@@ -178,7 +177,7 @@ private:
     void ParseUser(const CString& sAuthLine);
     void ParseIdentifier(const CString& sAuthLine);
 
-protected:
+private:
     bool m_bGotPass;
     bool m_bGotNick;
     bool m_bGotUser;

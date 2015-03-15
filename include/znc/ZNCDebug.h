@@ -48,7 +48,7 @@ public:
     static void SetDebug(bool b) { debug = b; }
     static bool Debug() { return debug; }
 
-protected:
+private:
     static bool stdoutIsTTY;
     static bool debug;
 };

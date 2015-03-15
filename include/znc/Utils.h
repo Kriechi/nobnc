@@ -90,9 +90,6 @@ public:
 
     static MCString GetMessageTags(const CString& sLine);
     static void SetMessageTags(CString& sLine, const MCString& mssTags);
-
-private:
-protected:
 };
 
 class CException
@@ -106,7 +103,6 @@ public:
     EType GetType() const { return m_eType; }
 
 private:
-protected:
     EType m_eType;
 };
 
@@ -203,7 +199,7 @@ private:
     VCString Render() const;
     static VCString WrapWords(const CString& s, size_type uWidth);
 
-protected:
+private:
     VCString m_vsHeaders;
     std::vector<CString::size_type> m_vuMaxWidths; // Column don't need to be bigger than this
     std::vector<CString::size_type> m_vuMinWidths; // Column can't be thiner than this
@@ -363,6 +359,7 @@ protected:
     typedef std::pair<unsigned long long, V> value;
     typedef typename std::map<K, value>::iterator iterator;
     std::map<K, value> m_mItems; //!< Map of cached items.  The value portion of the map is for the expire time
+private:
     unsigned int m_uTTL; //!< Default time-to-live duration
 };
 

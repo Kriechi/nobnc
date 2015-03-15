@@ -58,7 +58,6 @@ public:
     void ResetRealListener();
 
 private:
-protected:
     bool m_bSSL;
     EAddrType m_eAddr;
     unsigned short m_uPort;

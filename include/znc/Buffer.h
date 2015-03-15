@@ -48,7 +48,6 @@ public:
     // !Getters
 
 private:
-protected:
     CString m_sFormat;
     CString m_sText;
     timeval m_time;
@@ -80,7 +79,6 @@ public:
     unsigned int GetLineCount() const { return m_uLineCount; }
     // !Getters
 private:
-protected:
     unsigned int m_uLineCount;
 };
 

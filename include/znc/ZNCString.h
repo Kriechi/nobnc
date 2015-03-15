@@ -572,7 +572,6 @@ public:
     CString StripControls_n() const;
 
 private:
-protected:
     unsigned char* strnchr(const unsigned char* src,
                            unsigned char c,
                            unsigned int iMaxBytes,

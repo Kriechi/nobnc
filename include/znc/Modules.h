@@ -142,7 +142,6 @@ public:
     const CString& GetDescription() const;
     // !Getters
 private:
-protected:
     CModule* m_pModule;
     CString m_sDescription;
 };
@@ -165,7 +164,7 @@ protected:
     void RunJob() override
     {
         if (m_pFBCallback) {
-            m_pFBCallback(m_pModule, this);
+            m_pFBCallback(GetModule(), this);
         }
     }
 
@@ -194,7 +193,7 @@ public:
     const CString& GetDescription() const { return m_sDescription; }
     // !Getters
 
-protected:
+private:
     CModule* m_pModule;
     const CString m_sName;
     const CString m_sDescription;
@@ -260,7 +259,6 @@ public:
     void SetDefaultType(EModuleType eType) { m_eDefaultType = eType; }
     // !Setters
 private:
-protected:
     std::set<EModuleType> m_seType;
     EModuleType m_eDefaultType;
     CString m_sName;
@@ -1107,7 +1105,7 @@ public:
     virtual void OnGetAvailableMods(std::set<CModInfo>& ssMods, CModInfo::EModuleType eType);
     // !Global Modules
 
-protected:
+private:
     CModInfo::EModuleType m_eType;
     CString m_sDescription;
     std::set<CTimer*> m_sTimers;
@@ -1271,7 +1269,6 @@ private:
     static ModHandle
     OpenModule(const CString& sModule, const CString& sModPath, bool& bVersionMismatch, CModInfo& Info, CString& sRetMsg);
 
-protected:
     CUser* m_pUser;
     CIRCNetwork* m_pNetwork;
     CClient* m_pClient;

@@ -166,7 +166,6 @@ public:
     bool HasAutoClearChanBufferSet() const { return m_bHasAutoClearChanBufferSet; }
     // !Getters
 private:
-protected:
     bool m_bDetached;
     bool m_bIsOn;
     bool m_bAutoClearChanBuffer;

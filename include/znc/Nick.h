@@ -64,7 +64,6 @@ public:
     void Clone(const CNick& SourceNick);
 
 private:
-protected:
     CString m_sChanPerms;
     CIRCNetwork* m_pNetwork;
     CString m_sNick;

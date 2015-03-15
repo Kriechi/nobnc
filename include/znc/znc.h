@@ -213,7 +213,6 @@ private:
     bool AddListener(const CString& sLine, CString& sError);
     bool AddListener(CConfig* pConfig, CString& sError);
 
-protected:
     time_t m_TimeStarted;
 
     enum ConfigState m_eConfigState;

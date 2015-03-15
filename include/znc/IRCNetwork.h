@@ -216,7 +216,6 @@ private:
     bool JoinChan(CChan* pChan);
     bool LoadModule(const CString& sModName, const CString& sArgs, const CString& sNotice, CString& sError);
 
-protected:
     CString m_sName;
     CUser* m_pUser;
 

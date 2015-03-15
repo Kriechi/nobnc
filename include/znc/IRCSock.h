@@ -125,7 +125,6 @@ private:
     void SendNextCap();
     void TrySend();
 
-protected:
     bool m_bAuthed;
     bool m_bNamesx;
     bool m_bUHNames;

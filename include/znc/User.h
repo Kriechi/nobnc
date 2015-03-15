@@ -190,7 +190,7 @@ public:
     unsigned int MaxQueryBuffers() const { return m_uMaxQueryBuffers; }
     // !Getters
 
-protected:
+private:
     const CString m_sUserName;
     const CString m_sCleanUserName;
     CString m_sNick;
