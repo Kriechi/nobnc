@@ -1,5 +1,5 @@
 # Binaries
-/znc
+/nobnc
 *.dylib
 *.bundle
 *.dll

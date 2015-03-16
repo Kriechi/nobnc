@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.4)
-project(ZNC)
+project(NoBNC)
 
 set(NO_VERSION_MAJOR 1)
 set(NO_VERSION_MINOR 7)
@@ -87,18 +87,18 @@ list(APPEND NO_SOURCES src/noapp.cpp
 
 ### TARGETS
 
-add_library(libznc SHARED ${NO_SOURCES} ${NO_HEADERS})
+add_library(libno SHARED ${NO_SOURCES} ${NO_HEADERS})
 include_directories(${NO_INCLUDEDIRS})
 include_directories(${PROJECT_SOURCE_DIR}/include/znc) ### TODO: cleanup
 include_directories(${PROJECT_BINARY_DIR}/include/znc) ### TODO: cleanup
-target_link_libraries(libznc ${NO_LIBRARIES})
-set_target_properties(libznc PROPERTIES OUTPUT_NAME znc)
-add_dependencies(libznc version)
+target_link_libraries(libno ${NO_LIBRARIES})
+set_target_properties(libno PROPERTIES OUTPUT_NAME no)
+add_dependencies(libno version)
 
-list(APPEND NO_LIBRARIES libznc)
+list(APPEND NO_LIBRARIES libno)
 
-add_executable(znc src/main.cpp)
-target_link_libraries(znc ${NO_LIBRARIES})
+add_executable(nobnc src/main.cpp)
+target_link_libraries(nobnc ${NO_LIBRARIES})
 
 add_subdirectory(modules)
 add_subdirectory(share)
@@ -107,10 +107,10 @@ add_subdirectory(test)
 ### INSTALLS
 
 if(NOT DEVELOPER_BUILD)
-    install(TARGETS znc RUNTIME DESTINATION ${INSTALL_BINDIR})
-    install(TARGETS libznc LIBRARY DESTINATION ${INSTALL_LIBDIR}
-                           RUNTIME DESTINATION ${INSTALL_BINDIR}
-                           ARCHIVE DESTINATION ${INSTALL_LIBDIR})
+    install(TARGETS nobnc RUNTIME DESTINATION ${INSTALL_BINDIR})
+    install(TARGETS libno LIBRARY DESTINATION ${INSTALL_LIBDIR}
+                          RUNTIME DESTINATION ${INSTALL_BINDIR}
+                          ARCHIVE DESTINATION ${INSTALL_LIBDIR})
     install(DIRECTORY include/znc DESTINATION ${INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN *.h)
 endif()
 
@@ -164,14 +164,14 @@ endif()
 
 if(NOT DEVELOPER_BUILD)
     if(NOT CPACK_SOURCE_PACKAGE_FILE_NAME)
-        set(CPACK_SOURCE_PACKAGE_FILE_NAME "znc-${NO_VERSION}")
+        set(CPACK_SOURCE_PACKAGE_FILE_NAME "nobnc-${NO_VERSION}")
     endif()
     if(NOT CPACK_OUTPUT_FILE_PREFIX)
         set(CPACK_OUTPUT_FILE_PREFIX ${PROJECT_BINARY_DIR})
     endif()
-    set(CPACK_PACKAGE_NAME znc)
-    set(CPACK_PACKAGE_VENDOR "http://znc.in/")
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "ZNC - an advanced IRC bouncer")
+    set(CPACK_PACKAGE_NAME nobnc)
+    set(CPACK_PACKAGE_VENDOR "http://nobnc.github.io")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "NoBNC - a Nordic IRC bouncer")
     set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
     set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
     set(CPACK_PACKAGE_VERSION_MAJOR ${NO_VERSION_MAJOR})
@@ -180,8 +180,8 @@ if(NOT DEVELOPER_BUILD)
     set(CPACK_PACKAGE_VERSION ${NO_VERSION})
     set(CPACK_GENERATOR TGZ)
     set(CPACK_SOURCE_GENERATOR TGZ)
-    set(CPACK_STRIP_FILES "znc")
-    set(CPACK_PACKAGE_EXECUTABLES "znc" "ZNC IRC bouncer")
+    set(CPACK_STRIP_FILES "nobnc")
+    set(CPACK_PACKAGE_EXECUTABLES "nobnc" "NoBNC IRC bouncer")
     set(CPACK_SOURCE_IGNORE_FILES "/.git;Makefile;CMakeFiles;CMakeCache.txt;CPackConfig.cmake;CPackSourceConfig.cmake;cmake_install.cmake;/*.log;/.travis*;/*.gz;make-tarball.sh")
     include(CPack)
 
