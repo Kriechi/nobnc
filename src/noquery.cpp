@@ -23,9 +23,44 @@ NoQuery::NoQuery(const NoString& sName, NoNetwork* pNetwork) : m_name(sName), m_
     setBufferCount(m_network->GetUser()->GetBufferCount(), true);
 }
 
-NoQuery::~NoQuery() {}
+NoQuery::~NoQuery()
+{
+}
 
-void NoQuery::sendBuffer(NoClient* pClient) { sendBuffer(pClient, m_buffer); }
+NoString NoQuery::getName() const
+{
+    return m_name;
+}
+
+const NoBuffer& NoQuery::getBuffer() const
+{
+    return m_buffer;
+}
+
+unsigned int NoQuery::getBufferCount() const
+{
+    return m_buffer.getLimit();
+}
+
+bool NoQuery::setBufferCount(unsigned int u, bool bForce)
+{
+    return m_buffer.setLimit(u, bForce);
+}
+
+size_t NoQuery::addBuffer(const NoString& sFormat, const NoString& sText, const timeval* ts)
+{
+    return m_buffer.addMessage(sFormat, sText, ts);
+}
+
+void NoQuery::clearBuffer()
+{
+    m_buffer.clear();
+}
+
+void NoQuery::sendBuffer(NoClient* pClient)
+{
+    sendBuffer(pClient, m_buffer);
+}
 
 void NoQuery::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
 {

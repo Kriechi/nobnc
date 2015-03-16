@@ -33,18 +33,16 @@ public:
     NoQuery(const NoQuery&) = delete;
     NoQuery& operator=(const NoQuery&) = delete;
 
-    const NoBuffer& getBuffer() const { return m_buffer; }
-    unsigned int getBufferCount() const { return m_buffer.getLimit(); }
-    bool setBufferCount(unsigned int u, bool bForce = false) { return m_buffer.setLimit(u, bForce); }
-    size_t addBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr)
-    {
-        return m_buffer.addMessage(sFormat, sText, ts);
-    }
-    void clearBuffer() { m_buffer.clear(); }
+    NoString getName() const;
+
+    const NoBuffer& getBuffer() const;
+    unsigned int getBufferCount() const;
+    bool setBufferCount(unsigned int u, bool bForce = false);
+    size_t addBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr);
+    void clearBuffer();
+
     void sendBuffer(NoClient* pClient);
     void sendBuffer(NoClient* pClient, const NoBuffer& Buffer);
-
-    const NoString& getName() const { return m_name; }
 
 private:
     NoString m_name;
