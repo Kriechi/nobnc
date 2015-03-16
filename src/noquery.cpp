@@ -33,7 +33,7 @@ void NoQuery::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
 {
     if (m_pNetwork && m_pNetwork->IsUserAttached()) {
         // Based on NoChannel::SendBuffer()
-        if (!Buffer.IsEmpty()) {
+        if (!Buffer.isEmpty()) {
             const vector<NoClient*>& vClients = m_pNetwork->GetClients();
             for (NoClient* pEachClient : vClients) {
                 NoClient* pUseClient = (pClient ? pClient : pEachClient);
@@ -51,9 +51,9 @@ void NoQuery::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                     m_pNetwork->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + m_sName, pUseClient);
                 }
 
-                size_t uSize = Buffer.Size();
+                size_t uSize = Buffer.size();
                 for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
-                    const NoMessage& BufLine = Buffer.GetMessage(uIdx);
+                    const NoMessage& BufLine = Buffer.getMessage(uIdx);
 
                     if (!pUseClient->HasSelfMessage()) {
                         NoNick Sender(BufLine.GetFormat().Token(0));

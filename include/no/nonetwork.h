@@ -151,30 +151,30 @@ public:
 
     bool PutIRC(const NoString& sLine);
 
-    void AddRawBuffer(const NoString& sFormat, const NoString& sText = "") { m_RawBuffer.AddLine(sFormat, sText); }
+    void AddRawBuffer(const NoString& sFormat, const NoString& sText = "") { m_RawBuffer.addLine(sFormat, sText); }
     void UpdateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
     {
-        m_RawBuffer.UpdateLine(sMatch, sFormat, sText);
+        m_RawBuffer.updateLine(sMatch, sFormat, sText);
     }
     void UpdateExactRawBuffer(const NoString& sFormat, const NoString& sText = "")
     {
-        m_RawBuffer.UpdateExactLine(sFormat, sText);
+        m_RawBuffer.updateExactLine(sFormat, sText);
     }
-    void ClearRawBuffer() { m_RawBuffer.Clear(); }
+    void ClearRawBuffer() { m_RawBuffer.clear(); }
 
-    void AddMotdBuffer(const NoString& sFormat, const NoString& sText = "") { m_MotdBuffer.AddLine(sFormat, sText); }
+    void AddMotdBuffer(const NoString& sFormat, const NoString& sText = "") { m_MotdBuffer.addLine(sFormat, sText); }
     void UpdateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
     {
-        m_MotdBuffer.UpdateLine(sMatch, sFormat, sText);
+        m_MotdBuffer.updateLine(sMatch, sFormat, sText);
     }
-    void ClearMotdBuffer() { m_MotdBuffer.Clear(); }
+    void ClearMotdBuffer() { m_MotdBuffer.clear(); }
 
-    void AddNoticeBuffer(const NoString& sFormat, const NoString& sText = "") { m_NoticeBuffer.AddLine(sFormat, sText); }
+    void AddNoticeBuffer(const NoString& sFormat, const NoString& sText = "") { m_NoticeBuffer.addLine(sFormat, sText); }
     void UpdateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
     {
-        m_NoticeBuffer.UpdateLine(sMatch, sFormat, sText);
+        m_NoticeBuffer.updateLine(sMatch, sFormat, sText);
     }
-    void ClearNoticeBuffer() { m_NoticeBuffer.Clear(); }
+    void ClearNoticeBuffer() { m_NoticeBuffer.clear(); }
 
     void ClearQueryBuffer();
 

@@ -177,7 +177,7 @@ class NoWatcherMod : public NoModule
 public:
     MODCONSTRUCTOR(NoWatcherMod)
     {
-        m_Buffer.SetLimit(500);
+        m_Buffer.setLimit(500);
         Load();
     }
 
@@ -193,11 +193,11 @@ public:
         NoStringMap msParams;
         msParams["target"] = GetNetwork()->GetCurNick();
 
-        size_t uSize = m_Buffer.Size();
+        size_t uSize = m_Buffer.size();
         for (unsigned int uIdx = 0; uIdx < uSize; uIdx++) {
-            PutUser(m_Buffer.GetLine(uIdx, *GetClient(), msParams));
+            PutUser(m_Buffer.getLine(uIdx, *GetClient(), msParams));
         }
-        m_Buffer.Clear();
+        m_Buffer.clear();
     }
 
     void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
@@ -337,10 +337,10 @@ public:
             NoString sCount = sCommand.Token(1);
 
             if (sCount.size()) {
-                m_Buffer.SetLimit(sCount.ToUInt());
+                m_Buffer.setLimit(sCount.ToUInt());
             }
 
-            PutModule("Buffer count is set to [" + NoString(m_Buffer.GetLimit()) + "]");
+            PutModule("Buffer count is set to [" + NoString(m_Buffer.getLimit()) + "]");
         } else if (sCmdName.Equals("DEL")) {
             Remove(sCommand.Token(1).ToUInt());
         } else {
@@ -370,7 +370,7 @@ private:
                 if (pNetwork->IsUserAttached()) {
                     pNetwork->PutUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " + pNetwork->GetCurNick() + " :" + sMessage);
                 } else {
-                    m_Buffer.AddLine(":" + _NAMEDFMT(WatchEntry.GetTarget()) + "!watch@znc.in PRIVMSG {target} :{text}", sMessage);
+                    m_Buffer.addLine(":" + _NAMEDFMT(WatchEntry.GetTarget()) + "!watch@znc.in PRIVMSG {target} :{text}", sMessage);
                 }
                 sHandledTargets.insert(WatchEntry.GetTarget());
             }

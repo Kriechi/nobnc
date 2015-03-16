@@ -31,20 +31,20 @@ public:
     NoBuffer(unsigned int limit = 100);
     ~NoBuffer();
 
-    unsigned int AddLine(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
-    /// Same as AddLine, but replaces a line whose format string starts with sMatch if there is one.
-    unsigned int UpdateLine(const NoString& sMatch, const NoString& format, const NoString& text = "");
-    /// Same as UpdateLine, but does nothing if this exact line already exists.
+    unsigned int addLine(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
+    /// Same as addLine, but replaces a line whose format string starts with match if there is one.
+    unsigned int updateLine(const NoString& match, const NoString& format, const NoString& text = "");
+    /// Same as updateLine, but does nothing if this exact line already exists.
     /// We need this because "/version" sends us the 005 raws again
-    unsigned int UpdateExactLine(const NoString& format, const NoString& text = "");
-    const NoMessage& GetMessage(unsigned int idx) const;
-    NoString GetLine(unsigned int idx, const NoClient& client, const NoStringMap& params = NoStringMap::EmptyMap) const;
-    unsigned int Size() const { return m_lines.size(); }
-    bool IsEmpty() const { return m_lines.empty(); }
-    void Clear() { m_lines.clear(); }
+    unsigned int updateExactLine(const NoString& format, const NoString& text = "");
+    const NoMessage& getMessage(unsigned int idx) const;
+    NoString getLine(unsigned int idx, const NoClient& client, const NoStringMap& params = NoStringMap::EmptyMap) const;
+    unsigned int size() const { return m_lines.size(); }
+    bool isEmpty() const { return m_lines.empty(); }
+    void clear() { m_lines.clear(); }
 
-    unsigned int GetLimit() const { return m_limit; }
-    bool SetLimit(unsigned int limit, bool force = false);
+    unsigned int getLimit() const { return m_limit; }
+    bool setLimit(unsigned int limit, bool force = false);
 
 private:
     unsigned int m_limit;

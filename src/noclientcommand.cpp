@@ -454,7 +454,7 @@ void NoClient::UserCommand(NoString& sLine)
         Table.AddRow();
         Table.SetCell(sChan, "Buffer");
         Table.SetCell(sStatus,
-                      NoString(pChan->GetBuffer().Size()) + "/" + NoString(pChan->GetBufferCount()) +
+                      NoString(pChan->GetBuffer().size()) + "/" + NoString(pChan->GetBufferCount()) +
                       NoString(pChan->HasBufferCountSet() ? "" : " (default)"));
 
         Table.AddRow();
@@ -1371,7 +1371,7 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            if (pChan->GetBuffer().IsEmpty()) {
+            if (pChan->GetBuffer().isEmpty()) {
                 PutStatus("The buffer for [" + sBuffer + "] is empty");
                 return;
             }
@@ -1385,7 +1385,7 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            if (pQuery->GetBuffer().IsEmpty()) {
+            if (pQuery->GetBuffer().isEmpty()) {
                 PutStatus("The buffer for [" + sBuffer + "] is empty");
                 return;
             }

@@ -129,10 +129,10 @@ NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName)
 {
     SetUser(pUser);
 
-    m_RawBuffer.SetLimit(100, true); // This should be more than enough raws, especially since we are buffering the
+    m_RawBuffer.setLimit(100, true); // This should be more than enough raws, especially since we are buffering the
     // MOTD separately
-    m_MotdBuffer.SetLimit(200, true); // This should be more than enough motd lines
-    m_NoticeBuffer.SetLimit(250, true);
+    m_MotdBuffer.setLimit(200, true); // This should be more than enough motd lines
+    m_NoticeBuffer.setLimit(250, true);
 
     m_pPingTimer = new NoNetworkPingTimer(this);
     NoApp::Get().GetManager().AddCron(m_pPingTimer);
@@ -556,16 +556,16 @@ void NoNetwork::ClientConnected(NoClient* pClient)
 
     pClient->SetPlaybackActive(true);
 
-    if (m_RawBuffer.IsEmpty()) {
+    if (m_RawBuffer.isEmpty()) {
         pClient->PutClient(":irc.znc.in 001 " + pClient->GetNick() + " :- Welcome to ZNC -");
     } else {
         const NoString& sClientNick = pClient->GetNick(false);
         NoStringMap msParams;
         msParams["target"] = sClientNick;
 
-        uSize = m_RawBuffer.Size();
+        uSize = m_RawBuffer.size();
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            pClient->PutClient(m_RawBuffer.GetLine(uIdx, *pClient, msParams));
+            pClient->PutClient(m_RawBuffer.getLine(uIdx, *pClient, msParams));
         }
 
         const NoNick& Nick = GetIRNoNick();
@@ -579,10 +579,10 @@ void NoNetwork::ClientConnected(NoClient* pClient)
     msParams["target"] = GetIRNoNick().GetNick();
 
     // Send the cached MOTD
-    uSize = m_MotdBuffer.Size();
+    uSize = m_MotdBuffer.size();
     if (uSize > 0) {
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            pClient->PutClient(m_MotdBuffer.GetLine(uIdx, *pClient, msParams));
+            pClient->PutClient(m_MotdBuffer.getLine(uIdx, *pClient, msParams));
         }
     }
 
@@ -621,16 +621,16 @@ void NoNetwork::ClientConnected(NoClient* pClient)
         m_vQueries.clear();
     }
 
-    uSize = m_NoticeBuffer.Size();
+    uSize = m_NoticeBuffer.size();
     for (uIdx = 0; uIdx < uSize; uIdx++) {
-        const NoMessage& BufLine = m_NoticeBuffer.GetMessage(uIdx);
+        const NoMessage& BufLine = m_NoticeBuffer.getMessage(uIdx);
         NoString sLine = BufLine.GetLine(*pClient, msParams);
         bool bContinue = false;
         NETWORKMODULECALL(OnPrivBufferPlayLine2(*pClient, sLine, BufLine.GetTime()), m_pUser, this, nullptr, &bContinue);
         if (bContinue) continue;
         pClient->PutClient(sLine);
     }
-    m_NoticeBuffer.Clear();
+    m_NoticeBuffer.clear();
 
     pClient->SetPlaybackActive(false);
 

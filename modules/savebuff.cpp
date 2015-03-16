@@ -139,7 +139,7 @@ public:
 
     template <typename T> void BootStrap(T* pTarget, const NoString& sContent)
     {
-        if (!pTarget->GetBuffer().IsEmpty()) return; // in this case the module was probably reloaded
+        if (!pTarget->GetBuffer().isEmpty()) return; // in this case the module was probably reloaded
 
         NoStringVector vsLines;
         NoStringVector::iterator it;
@@ -174,9 +174,9 @@ public:
         NoFile File(sPath);
         NoString sContent = sHeader + "\n";
 
-        size_t uSize = Buffer.Size();
+        size_t uSize = Buffer.size();
         for (unsigned int uIdx = 0; uIdx < uSize; uIdx++) {
-            const NoMessage& Line = Buffer.GetMessage(uIdx);
+            const NoMessage& Line = Buffer.getMessage(uIdx);
             timeval ts = Line.GetTime();
             sContent +=
             "@" + NoString(ts.tv_sec) + "," + NoString(ts.tv_usec) + " " + Line.GetFormat() + "\n" + Line.GetText() + "\n";

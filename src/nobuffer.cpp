@@ -27,7 +27,7 @@ NoBuffer::~NoBuffer()
 {
 }
 
-unsigned int NoBuffer::AddLine(const NoString& format, const NoString& text, const timeval* ts)
+unsigned int NoBuffer::addLine(const NoString& format, const NoString& text, const timeval* ts)
 {
     if (!m_limit) {
         return 0;
@@ -41,7 +41,7 @@ unsigned int NoBuffer::AddLine(const NoString& format, const NoString& text, con
     return m_lines.size();
 }
 
-unsigned int NoBuffer::UpdateLine(const NoString& match, const NoString& format, const NoString& text)
+unsigned int NoBuffer::updateLine(const NoString& match, const NoString& format, const NoString& text)
 {
     for (NoMessage& line : m_lines) {
         if (line.GetFormat().compare(0, match.length(), match) == 0) {
@@ -52,10 +52,10 @@ unsigned int NoBuffer::UpdateLine(const NoString& match, const NoString& format,
         }
     }
 
-    return AddLine(format, text);
+    return addLine(format, text);
 }
 
-unsigned int NoBuffer::UpdateExactLine(const NoString& format, const NoString& text)
+unsigned int NoBuffer::updateExactLine(const NoString& format, const NoString& text)
 {
     for (const NoMessage& line : m_lines) {
         if (line.GetFormat() == format && line.GetText() == text) {
@@ -63,20 +63,20 @@ unsigned int NoBuffer::UpdateExactLine(const NoString& format, const NoString& t
         }
     }
 
-    return AddLine(format, text);
+    return addLine(format, text);
 }
 
-const NoMessage& NoBuffer::GetMessage(unsigned int idx) const
+const NoMessage& NoBuffer::getMessage(unsigned int idx) const
 {
     return m_lines[idx];
 }
 
-NoString NoBuffer::GetLine(unsigned int idx, const NoClient& client, const NoStringMap& params) const
+NoString NoBuffer::getLine(unsigned int idx, const NoClient& client, const NoStringMap& params) const
 {
     return m_lines[idx].GetLine(client, params);
 }
 
-bool NoBuffer::SetLimit(unsigned int limit, bool force)
+bool NoBuffer::setLimit(unsigned int limit, bool force)
 {
     if (!force && limit > NoApp::Get().GetMaxBufferSize()) {
         return false;

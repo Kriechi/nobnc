@@ -37,7 +37,7 @@ NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig,
     }
 
     m_Nick.SetNetwork(m_pNetwork);
-    m_Buffer.SetLimit(m_pNetwork->GetUser()->GetBufferCount(), true);
+    m_Buffer.setLimit(m_pNetwork->GetUser()->GetBufferCount(), true);
 
     if (pConfig) {
         NoString sValue;
@@ -578,7 +578,7 @@ void NoChannel::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
         // if pClient is not nullptr, the loops break after the first iteration.
         //
         // Rework this if you like ...
-        if (!Buffer.IsEmpty()) {
+        if (!Buffer.isEmpty()) {
             const vector<NoClient*>& vClients = m_pNetwork->GetClients();
             for (NoClient* pEachClient : vClients) {
                 NoClient* pUseClient = (pClient ? pClient : pEachClient);
@@ -600,9 +600,9 @@ void NoChannel::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                     m_pNetwork->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + GetName(), pUseClient);
                 }
 
-                size_t uSize = Buffer.Size();
+                size_t uSize = Buffer.size();
                 for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
-                    const NoMessage& BufLine = Buffer.GetMessage(uIdx);
+                    const NoMessage& BufLine = Buffer.getMessage(uIdx);
                     NoString sLine = BufLine.GetLine(*pUseClient, NoStringMap::EmptyMap);
                     if (bBatch) {
                         NoStringMap msBatchTags = NoUtils::GetMessageTags(sLine);

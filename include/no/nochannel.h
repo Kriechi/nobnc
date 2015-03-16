@@ -82,21 +82,21 @@ public:
     bool ChangeNick(const NoString& sOldNick, const NoString& sNewNick);
 
     const NoBuffer& GetBuffer() const { return m_Buffer; }
-    unsigned int GetBufferCount() const { return m_Buffer.GetLimit(); }
+    unsigned int GetBufferCount() const { return m_Buffer.getLimit(); }
     bool SetBufferCount(unsigned int u, bool bForce = false)
     {
         m_bHasBufferCountSet = true;
-        return m_Buffer.SetLimit(u, bForce);
+        return m_Buffer.setLimit(u, bForce);
     }
     void InheritBufferCount(unsigned int u, bool bForce = false)
     {
-        if (!m_bHasBufferCountSet) m_Buffer.SetLimit(u, bForce);
+        if (!m_bHasBufferCountSet) m_Buffer.setLimit(u, bForce);
     }
     size_t AddBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr)
     {
-        return m_Buffer.AddLine(sFormat, sText, ts);
+        return m_Buffer.addLine(sFormat, sText, ts);
     }
-    void ClearBuffer() { m_Buffer.Clear(); }
+    void ClearBuffer() { m_Buffer.clear(); }
     void SendBuffer(NoClient* pClient);
     void SendBuffer(NoClient* pClient, const NoBuffer& Buffer);
 
