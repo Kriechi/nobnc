@@ -42,10 +42,6 @@ Available features:
  +  Zlib .................. Zlib compression library
     Cyrus ................. Cyrus SASL
  +  Threads ............... Threaded DNS
-    SWIG .................. Automatic code generation
-      Perl ................ Perl modules, requires SWIG
-      Python .............. Python modules, requires SWIG
-    TCL ................... TCL modules
 
 (*) denotes that the option or feature is enabled by default
 (+) denotes that the feature is enabled by default if found

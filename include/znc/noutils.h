@@ -53,10 +53,8 @@ public:
     static void PrintAction(const NoString& sMessage);
     static void PrintStatus(bool bSuccess, const NoString& sMessage = "");
 
-#ifndef SWIGPERL
     // TODO refactor this
     static const NoString sDefaultHash;
-#endif
 
     static NoString GetSaltedHashPass(NoString& sSalt);
     static NoString GetSalt();

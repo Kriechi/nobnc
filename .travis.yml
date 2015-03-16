@@ -7,18 +7,17 @@ compiler:
 install:
     - cat /proc/cpuinfo /proc/meminfo
     - lsb_release -a
-    - sudo add-apt-repository -y ppa:teward/swig3.0
     - sudo add-apt-repository -y ppa:teward/icu-backports
     - if [[ "$CXX" == "g++" ]]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
     - sudo apt-get update
-    - sudo apt-get install libperl-dev python3-dev tcl-dev libsasl2-dev libgtest-dev libicu-dev swig3.0 doxygen graphviz
+    - sudo apt-get install libsasl2-dev libgtest-dev libicu-dev doxygen graphviz
     - if [[ "$CXX" == "g++" ]]; then sudo apt-get install g++-4.8; fi
     - if [[ "$CXX" == "g++" ]]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
     - "echo pkg-config path: [$PKG_CONFIG_PATH]"
 script:
     - mkdir build
     - cd build
-    - ../configure --enable-perl --enable-python --enable-tcl --enable-cyrus --enable-charset -DGTEST_DIR=/usr/src/gtest
+    - ../configure --enable-cyrus --enable-charset -DGTEST_DIR=/usr/src/gtest
     - make VERBOSE=1
     - make VERBOSE=1 test
     - sudo make install

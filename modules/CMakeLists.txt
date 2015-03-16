@@ -1,15 +1,3 @@
-if(HAVE_PERL)
-    add_subdirectory(modperl)
-endif()
-
-if(HAVE_PYTHON)
-    add_subdirectory(modpython)
-endif()
-
-if(HAVE_TCL)
-    add_subdirectory(modtcl)
-endif()
-
 file(GLOB NO_MODULES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
 foreach(NO_MODULE ${NO_MODULES})
     file(STRINGS ${NO_MODULE} REQUIRESSL REGEX "REQUIRESSL")
