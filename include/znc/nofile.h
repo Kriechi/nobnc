@@ -128,4 +128,4 @@ protected:
     NoString m_sShortName; //!< Filename alone, without path
 };
 
-#endif // !NOFILE_H
+#endif // NOFILE_H

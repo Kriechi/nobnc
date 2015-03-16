@@ -35,5 +35,4 @@
 #define CS_DEBUG(f) DEBUG(__FILE__ << ":" << __LINE__ << " " << f)
 #define PERROR(f) DEBUG(__FILE__ << ":" << __LINE__ << " " << f << ": " << strerror(GetSockError()))
 
-
-#endif // !NODEFINES_H
+#endif // NODEFINES_H

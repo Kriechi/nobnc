@@ -253,4 +253,4 @@ private:
     unsigned short int m_uJoinDelay;
 };
 
-#endif // !NONETWORK_H
+#endif // NONETWORK_H

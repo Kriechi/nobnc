@@ -306,4 +306,4 @@ public:
 #endif
 };
 
-#endif /* NOSOCKET_H */
+#endif // NOSOCKET_H

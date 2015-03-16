@@ -40,4 +40,4 @@ private:
     bool m_bSSL;
 };
 
-#endif // !NOSERVER_H
+#endif // NOSERVER_H

@@ -358,4 +358,4 @@ private:
     unsigned int m_uTTL; //!< Default time-to-live duration
 };
 
-#endif // !NOUTILS_H
+#endif // NOUTILS_H

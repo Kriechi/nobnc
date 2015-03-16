@@ -65,4 +65,4 @@ private:
     NoString m_sHost;
 };
 
-#endif // !NONICK_H
+#endif // NONICK_H

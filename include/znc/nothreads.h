@@ -332,4 +332,4 @@ private:
 };
 
 #endif // HAVE_PTHREAD
-#endif // !NOTHREADS_H
+#endif // NOTHREADS_H

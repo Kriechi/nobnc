@@ -141,4 +141,4 @@ private:
     bool m_bDesc;
 };
 
-#endif // !NODIR_H
+#endif // NODIR_H

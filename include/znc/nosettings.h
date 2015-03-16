@@ -169,4 +169,4 @@ private:
     SubConfigMap m_SubConfigs;
 };
 
-#endif // !NOSETTINGS_H
+#endif // NOSETTINGS_H

@@ -52,4 +52,4 @@ private:
     NoBuffer m_Buffer;
 };
 
-#endif // !NOQUERY_H
+#endif // NOQUERY_H

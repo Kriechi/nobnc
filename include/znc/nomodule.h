@@ -1051,4 +1051,4 @@ private:
     std::map<NoString, NoModCommand> m_mCommands;
 };
 
-#endif // !NOMODULE_H
+#endif // NOMODULE_H

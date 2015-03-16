@@ -649,4 +649,4 @@ public:
     virtual NoString& Decode(NoString& sValue) const;
 };
 
-#endif // !NOSTRING_H
+#endif // NOSTRING_H

@@ -117,4 +117,4 @@ protected:
     NoString m_sURIPrefix;
 };
 
-#endif // !NOHTTPSOCK_H
+#endif // NOHTTPSOCK_H

@@ -90,4 +90,4 @@ private:
     const NoString m_sURIPrefix;
 };
 
-#endif // !NOLISTENER_H
+#endif // NOLISTENER_H

@@ -200,4 +200,4 @@ private:
     friend class ClientTest;
 };
 
-#endif // !NOCLIENT_H
+#endif // NOCLIENT_H

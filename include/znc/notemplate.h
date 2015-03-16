@@ -195,4 +195,4 @@ private:
     std::vector<std::shared_ptr<NoTemplateTagHandler>> m_vspTagHandlers;
 };
 
-#endif // !NOTEMPLATE_H
+#endif // NOTEMPLATE_H

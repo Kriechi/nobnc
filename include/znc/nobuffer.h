@@ -51,4 +51,4 @@ private:
     std::deque<NoMessage> m_lines;
 };
 
-#endif // !NOBUFFER_H
+#endif // NOBUFFER_H

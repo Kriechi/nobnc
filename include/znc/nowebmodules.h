@@ -182,4 +182,4 @@ private:
     static const unsigned int m_uiMaxSessions;
 };
 
-#endif // !NOWEBMODULES_H
+#endif // NOWEBMODULES_H

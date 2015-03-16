@@ -48,4 +48,4 @@ private:
     timeval m_time;
 };
 
-#endif // !NOMESSAGE_H
+#endif // NOMESSAGE_H

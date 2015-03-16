@@ -146,4 +146,4 @@ private:
     friend class NoIrcFloodTimer;
 };
 
-#endif // !NOIRCSOCK_H
+#endif // NOIRCSOCK_H

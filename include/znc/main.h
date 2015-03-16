@@ -139,4 +139,4 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
  *  Feel free to also look at existing modules.
  */
 
-#endif // !NOMAIN_H
+#endif // NOMAIN_H

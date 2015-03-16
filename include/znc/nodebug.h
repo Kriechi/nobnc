@@ -59,4 +59,4 @@ public:
     ~NoDebugStream();
 };
 
-#endif // !NODEBUG_H
+#endif // NODEBUG_H

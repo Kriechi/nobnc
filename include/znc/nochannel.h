@@ -177,4 +177,4 @@ private:
     std::map<unsigned char, NoString> m_musModes;
 };
 
-#endif // !NOCHANNEL_H
+#endif // NOCHANNEL_H

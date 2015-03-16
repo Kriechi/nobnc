@@ -239,4 +239,4 @@ private:
     bool m_bHideVersion;
 };
 
-#endif // !NOAPP_H
+#endif // NOAPP_H

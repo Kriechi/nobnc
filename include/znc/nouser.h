@@ -236,4 +236,4 @@ private:
     bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 };
 
-#endif // !NOUSER_H
+#endif // NOUSER_H

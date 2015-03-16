@@ -27,4 +27,4 @@ bool ZNC_SSLVerifyHost(const NoString& sHost, const X509* pCert, NoString& sErro
 
 #endif /* HAVE_LIBSSL */
 
-#endif /* NOSSLVERIFYHOST_H */
+#endif // NOSSLVERIFYHOST_H

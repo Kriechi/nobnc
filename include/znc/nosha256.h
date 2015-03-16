@@ -59,4 +59,4 @@ void sha256_update(sha256_ctx* ctx, const unsigned char* message, size_t len);
 void sha256_final(sha256_ctx* ctx, unsigned char* digest);
 void sha256(const unsigned char* message, size_t len, unsigned char* digest);
 
-#endif /* !NOSHA2_H */
+#endif // NOSHA2_H

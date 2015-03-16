@@ -55,4 +55,4 @@ private:
     int m_iPid;
 };
 
-#endif // !NOEXECSOCK_H
+#endif // NOEXECSOCK_H

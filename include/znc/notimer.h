@@ -72,4 +72,4 @@ private:
     FPTimer_t m_pFBCallback;
 };
 
-#endif // !NOTIMER_H
+#endif // NOTIMER_H

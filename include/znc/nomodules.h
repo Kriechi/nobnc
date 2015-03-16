@@ -171,4 +171,4 @@ private:
     NoClient* m_pClient;
 };
 
-#endif // !NOMODULES_H
+#endif // NOMODULES_H

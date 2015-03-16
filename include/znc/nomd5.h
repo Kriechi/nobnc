@@ -48,4 +48,4 @@ private:
     void md5_process(md5_context* ctx, const uint8 data[64]) const;
 };
 
-#endif /* NOMD5_H */
+#endif // NOMD5_H
