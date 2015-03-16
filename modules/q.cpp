@@ -496,7 +496,7 @@ private:
 
     void HandleNeed(const NoChannel& Channel, const NoString& sPerms)
     {
-        NoStringMap::iterator it = m_msChanModes.find(Channel.GetName());
+        NoStringMap::iterator it = m_msChanModes.find(Channel.getName());
         if (it == m_msChanModes.end()) return;
         NoString sModes = it->second;
 
@@ -507,8 +507,8 @@ private:
             bool bAutoOp = (sModes.find("a") != NoString::npos);
             if (bMaster || bOp) {
                 if (!bAutoOp) {
-                    PutModule("RequestPerms: Requesting op on " + Channel.GetName());
-                    PutQ("OP " + Channel.GetName());
+                    PutModule("RequestPerms: Requesting op on " + Channel.getName());
+                    PutQ("OP " + Channel.getName());
                 }
                 return;
             }
@@ -519,8 +519,8 @@ private:
             bool bAutoVoice = (sModes.find("g") != NoString::npos);
             if (bMaster || bVoice) {
                 if (!bAutoVoice) {
-                    PutModule("RequestPerms: Requesting voice on " + Channel.GetName());
-                    PutQ("VOICE " + Channel.GetName());
+                    PutModule("RequestPerms: Requesting voice on " + Channel.getName());
+                    PutQ("VOICE " + Channel.getName());
                 }
                 return;
             }

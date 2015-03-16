@@ -61,12 +61,12 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (!pChan->IsOn()) {
+        if (!pChan->isOn()) {
             PutStatus("You are not on [" + sChan + "] [trying]");
             return;
         }
 
-        const std::map<NoString, NoNick>& msNicks = pChan->GetNicks();
+        const std::map<NoString, NoNick>& msNicks = pChan->getNicks();
         NoIrcSock* pIRCSock = m_pNetwork->GetIRCSock();
         const NoString& sPerms = (pIRCSock) ? pIRCSock->GetPerms() : "";
 
@@ -129,9 +129,9 @@ void NoClient::UserCommand(NoString& sLine)
 
         unsigned int uDetached = 0;
         for (NoChannel* pChan : sChans) {
-            if (pChan->IsDetached()) continue;
+            if (pChan->isDetached()) continue;
             uDetached++;
-            pChan->DetachUser();
+            pChan->detachUser();
         }
 
         PutStatus("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
@@ -379,9 +379,9 @@ void NoClient::UserCommand(NoString& sLine)
 
             unsigned int uEnabled = 0;
             for (NoChannel* pChan : sChans) {
-                if (!pChan->IsDisabled()) continue;
+                if (!pChan->isDisabled()) continue;
                 uEnabled++;
-                pChan->Enable();
+                pChan->enable();
             }
 
             PutStatus("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
@@ -410,9 +410,9 @@ void NoClient::UserCommand(NoString& sLine)
 
             unsigned int uDisabled = 0;
             for (NoChannel* pChan : sChans) {
-                if (pChan->IsDisabled()) continue;
+                if (pChan->isDisabled()) continue;
                 uDisabled++;
-                pChan->Disable();
+                pChan->disable();
             }
 
             PutStatus("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
@@ -435,9 +435,9 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("No such channel [" + sChan + "]");
             return;
         }
-        sChan = pChan->GetPermStr() + pChan->GetName();
+        sChan = pChan->getPermStr() + pChan->getName();
         NoString sStatus =
-        pChan->IsOn() ? (pChan->IsDetached() ? "Detached" : "Joined") : (pChan->IsDisabled() ? "Disabled" : "Trying");
+        pChan->isOn() ? (pChan->isDetached() ? "Detached" : "Joined") : (pChan->isDisabled() ? "Disabled" : "Trying");
 
         NoTable Table;
         Table.AddColumn(sChan, false);
@@ -445,38 +445,38 @@ void NoClient::UserCommand(NoString& sLine)
 
         Table.AddRow();
         Table.SetCell(sChan, "InConfig");
-        Table.SetCell(sStatus, NoString(pChan->InConfig() ? "yes" : "no"));
+        Table.SetCell(sStatus, NoString(pChan->inConfig() ? "yes" : "no"));
 
         Table.AddRow();
         Table.SetCell(sChan, "Buffer");
         Table.SetCell(sStatus,
-                      NoString(pChan->GetBuffer().size()) + "/" + NoString(pChan->GetBufferCount()) +
-                      NoString(pChan->HasBufferCountSet() ? "" : " (default)"));
+                      NoString(pChan->getBuffer().size()) + "/" + NoString(pChan->getBufferCount()) +
+                      NoString(pChan->hasBufferCountSet() ? "" : " (default)"));
 
         Table.AddRow();
         Table.SetCell(sChan, "AutoClearChanBuffer");
         Table.SetCell(sStatus,
-                      NoString(pChan->AutoClearChanBuffer() ? "yes" : "no") +
-                      NoString(pChan->HasAutoClearChanBufferSet() ? "" : " (default)"));
+                      NoString(pChan->autoClearChanBuffer() ? "yes" : "no") +
+                      NoString(pChan->hasAutoClearChanBufferSet() ? "" : " (default)"));
 
-        if (pChan->IsOn()) {
+        if (pChan->isOn()) {
             Table.AddRow();
             Table.SetCell(sChan, "Topic");
-            Table.SetCell(sStatus, pChan->GetTopic());
+            Table.SetCell(sStatus, pChan->getTopic());
 
             Table.AddRow();
             Table.SetCell(sChan, "Modes");
-            Table.SetCell(sStatus, pChan->GetModeString());
+            Table.SetCell(sStatus, pChan->getModeString());
 
             Table.AddRow();
             Table.SetCell(sChan, "Users");
 
             NoStringVector vsUsers;
-            vsUsers.push_back("All: " + NoString(pChan->GetNickCount()));
+            vsUsers.push_back("All: " + NoString(pChan->getNickCount()));
 
             NoIrcSock* pIRCSock = m_pNetwork->GetIRCSock();
             const NoString& sPerms = pIRCSock ? pIRCSock->GetPerms() : "";
-            std::map<char, unsigned int> mPerms = pChan->GetPermCounts();
+            std::map<char, unsigned int> mPerms = pChan->getPermCounts();
             for (char cPerm : sPerms) {
                 vsUsers.push_back(NoString(cPerm) + ": " + NoString(mPerms[cPerm]));
             }
@@ -530,14 +530,14 @@ void NoClient::UserCommand(NoString& sLine)
 
         for (const NoChannel* pChan : vChans) {
             Table.AddRow();
-            Table.SetCell("Name", pChan->GetPermStr() + pChan->GetName());
+            Table.SetCell("Name", pChan->getPermStr() + pChan->getName());
             Table.SetCell("Status",
-                          ((pChan->IsOn()) ? ((pChan->IsDetached()) ? "Detached" : "Joined") :
-                                             ((pChan->IsDisabled()) ? "Disabled" : "Trying")));
+                          ((pChan->isOn()) ? ((pChan->isDetached()) ? "Detached" : "Joined") :
+                                             ((pChan->isDisabled()) ? "Disabled" : "Trying")));
 
-            if (pChan->IsDetached()) uNumDetached++;
-            if (pChan->IsOn()) uNumJoined++;
-            if (pChan->IsDisabled()) uNumDisabled++;
+            if (pChan->isDetached()) uNumDetached++;
+            if (pChan->isOn()) uNumJoined++;
+            if (pChan->isDisabled()) uNumDisabled++;
         }
 
         PutStatus(Table);
@@ -850,9 +850,9 @@ void NoClient::UserCommand(NoString& sLine)
 
         for (const NoChannel* pChan : vChans) {
             Table.AddRow();
-            Table.SetCell("Name", pChan->GetName());
-            Table.SetCell("Set By", pChan->GetTopicOwner());
-            Table.SetCell("Topic", pChan->GetTopic());
+            Table.SetCell("Name", pChan->getName());
+            Table.SetCell("Set By", pChan->getTopicOwner());
+            Table.SetCell("Topic", pChan->getTopic());
         }
 
         PutStatus(Table);
@@ -1362,17 +1362,17 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            if (!pChan->IsOn()) {
+            if (!pChan->isOn()) {
                 PutStatus("You are not on [" + sBuffer + "] [trying]");
                 return;
             }
 
-            if (pChan->GetBuffer().isEmpty()) {
+            if (pChan->getBuffer().isEmpty()) {
                 PutStatus("The buffer for [" + sBuffer + "] is empty");
                 return;
             }
 
-            pChan->SendBuffer(this);
+            pChan->sendBuffer(this);
         } else {
             NoQuery* pQuery = m_pNetwork->FindQuery(sBuffer);
 
@@ -1381,12 +1381,12 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            if (pQuery->GetBuffer().isEmpty()) {
+            if (pQuery->getBuffer().isEmpty()) {
                 PutStatus("The buffer for [" + sBuffer + "] is empty");
                 return;
             }
 
-            pQuery->SendBuffer(this);
+            pQuery->sendBuffer(this);
         }
     } else if (sCommand.Equals("CLEARBUFFER")) {
         if (!m_pNetwork) {
@@ -1406,14 +1406,14 @@ void NoClient::UserCommand(NoString& sLine)
         for (NoChannel* pChan : vChans) {
             uMatches++;
 
-            pChan->ClearBuffer();
+            pChan->clearBuffer();
         }
 
         std::vector<NoQuery*> vQueries = m_pNetwork->FindQueries(sBuffer);
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
-            m_pNetwork->DelQuery(pQuery->GetName());
+            m_pNetwork->DelQuery(pQuery->getName());
         }
 
         PutStatus("[" + NoString(uMatches) + "] buffers matching [" + sBuffer + "] have been cleared");
@@ -1424,7 +1424,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         for (NoChannel* pChan : m_pNetwork->GetChans()) {
-            pChan->ClearBuffer();
+            pChan->clearBuffer();
         }
         PutStatus("All channel buffers have been cleared");
     } else if (sCommand.Equals("CLEARALLQUERYBUFFERS")) {
@@ -1442,7 +1442,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         for (NoChannel* pChan : m_pNetwork->GetChans()) {
-            pChan->ClearBuffer();
+            pChan->clearBuffer();
         }
         m_pNetwork->ClearQueryBuffer();
         PutStatus("All buffers have been cleared");
@@ -1465,14 +1465,14 @@ void NoClient::UserCommand(NoString& sLine)
         for (NoChannel* pChan : vChans) {
             uMatches++;
 
-            if (!pChan->SetBufferCount(uLineCount)) uFail++;
+            if (!pChan->setBufferCount(uLineCount)) uFail++;
         }
 
         std::vector<NoQuery*> vQueries = m_pNetwork->FindQueries(sBuffer);
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
-            if (!pQuery->SetBufferCount(uLineCount)) uFail++;
+            if (!pQuery->setBufferCount(uLineCount)) uFail++;
         }
 
         PutStatus("BufferCount for [" + NoString(uMatches - uFail) + "] buffer was set to [" + NoString(uLineCount) + "]");

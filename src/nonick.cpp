@@ -60,7 +60,7 @@ size_t NoNick::GetCommonChans(std::vector<NoChannel*>& vRetChans, NoNetwork* pNe
     const std::vector<NoChannel*>& vChans = pNetwork->GetChans();
 
     for (NoChannel* pChan : vChans) {
-        const std::map<NoString, NoNick>& msNicks = pChan->GetNicks();
+        const std::map<NoString, NoNick>& msNicks = pChan->getNicks();
 
         for (const auto& it : msNicks) {
             if (it.first.Equals(m_sNick)) {

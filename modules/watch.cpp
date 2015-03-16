@@ -181,7 +181,7 @@ public:
 
     void OnRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
     {
-        Process(OpNick, "* " + OpNick.GetNick() + " sets mode: " + sModes + " " + sArgs + " on " + Channel.GetName(), Channel.GetName());
+        Process(OpNick, "* " + OpNick.GetNick() + " sets mode: " + sModes + " " + sArgs + " on " + Channel.getName(), Channel.getName());
     }
 
     void OnClientLogin() override
@@ -199,8 +199,8 @@ public:
     void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
         Process(OpNick,
-                "* " + OpNick.GetNick() + " kicked " + sKickedNick + " from " + Channel.GetName() + " because [" + sMessage + "]",
-                Channel.GetName());
+                "* " + OpNick.GetNick() + " kicked " + sKickedNick + " from " + Channel.getName() + " because [" + sMessage + "]",
+                Channel.getName());
     }
 
     void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
@@ -215,16 +215,16 @@ public:
     void OnJoin(const NoNick& Nick, NoChannel& Channel) override
     {
         Process(Nick,
-                "* " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") joins " + Channel.GetName(),
-                Channel.GetName());
+                "* " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") joins " + Channel.getName(),
+                Channel.getName());
     }
 
     void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
         Process(Nick,
-                "* " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") parts " + Channel.GetName() +
+                "* " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") parts " + Channel.getName() +
                 "(" + sMessage + ")",
-                Channel.GetName());
+                Channel.getName());
     }
 
     void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
@@ -249,8 +249,8 @@ public:
         Process(Nick,
                 "* CTCP: " + Nick.GetNick() + " [" + sMessage + "] to "
                                                                 "[" +
-                Channel.GetName() + "]",
-                Channel.GetName());
+                Channel.getName() + "]",
+                Channel.getName());
         return CONTINUE;
     }
 
@@ -262,7 +262,7 @@ public:
 
     EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        Process(Nick, "-" + Nick.GetNick() + ":" + Channel.GetName() + "- " + sMessage, Channel.GetName());
+        Process(Nick, "-" + Nick.GetNick() + ":" + Channel.getName() + "- " + sMessage, Channel.getName());
         return CONTINUE;
     }
 
@@ -274,7 +274,7 @@ public:
 
     EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        Process(Nick, "<" + Nick.GetNick() + ":" + Channel.GetName() + "> " + sMessage, Channel.GetName());
+        Process(Nick, "<" + Nick.GetNick() + ":" + Channel.getName() + "> " + sMessage, Channel.getName());
         return CONTINUE;
     }
 
@@ -358,7 +358,7 @@ private:
                 continue;
             }
 
-            if (pChannel && !pChannel->IsDetached() && WatchEntry.IsDetachedChannelOnly()) {
+            if (pChannel && !pChannel->isDetached() && WatchEntry.IsDetachedChannelOnly()) {
                 continue;
             }
 

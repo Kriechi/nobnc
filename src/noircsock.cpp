@@ -91,7 +91,7 @@ NoIrcSock::~NoIrcSock()
 
     const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
     for (NoChannel* pChan : vChans) {
-        pChan->Reset();
+        pChan->reset();
     }
 
     m_pNetwork->IRCDisconnected();
@@ -236,17 +236,17 @@ void NoIrcSock::ReadLine(const NoString& sData)
             NoChannel* pChan = m_pNetwork->FindChan(sRest.Token(0));
 
             if (pChan) {
-                pChan->SetModes(sRest.Token(1, true));
+                pChan->setModes(sRest.Token(1, true));
 
                 // We don't SetModeKnown(true) here,
                 // because a 329 will follow
-                if (!pChan->IsModeKnown()) {
+                if (!pChan->isModeKnown()) {
                     // When we JOIN, we send a MODE
                     // request. This makes sure the
                     // reply isn't forwarded.
                     return;
                 }
-                if (pChan->IsDetached()) {
+                if (pChan->isDetached()) {
                     return;
                 }
             }
@@ -257,16 +257,16 @@ void NoIrcSock::ReadLine(const NoString& sData)
 
             if (pChan) {
                 unsigned long ulDate = sLine.Token(4).ToULong();
-                pChan->SetCreationDate(ulDate);
+                pChan->setCreationDate(ulDate);
 
-                if (!pChan->IsModeKnown()) {
-                    pChan->SetModeKnown(true);
+                if (!pChan->isModeKnown()) {
+                    pChan->setModeKnown(true);
                     // When we JOIN, we send a MODE
                     // request. This makes sure the
                     // reply isn't forwarded.
                     return;
                 }
-                if (pChan->IsDetached()) {
+                if (pChan->isDetached()) {
                     return;
                 }
             }
@@ -276,8 +276,8 @@ void NoIrcSock::ReadLine(const NoString& sData)
             NoChannel* pChan = m_pNetwork->FindChan(sLine.Token(3));
 
             if (pChan) {
-                pChan->SetTopic("");
-                if (pChan->IsDetached()) {
+                pChan->setTopic("");
+                if (pChan->isDetached()) {
                     return;
                 }
             }
@@ -291,8 +291,8 @@ void NoIrcSock::ReadLine(const NoString& sData)
             if (pChan) {
                 NoString sTopic = sLine.Token(4, true);
                 sTopic.LeftChomp();
-                pChan->SetTopic(sTopic);
-                if (pChan->IsDetached()) {
+                pChan->setTopic(sTopic);
+                if (pChan->isDetached()) {
                     return;
                 }
             }
@@ -307,10 +307,10 @@ void NoIrcSock::ReadLine(const NoString& sData)
                 sNick = sLine.Token(4);
                 unsigned long ulDate = sLine.Token(5).ToULong();
 
-                pChan->SetTopicOwner(sNick);
-                pChan->SetTopicDate(ulDate);
+                pChan->setTopicOwner(sNick);
+                pChan->setTopicDate(ulDate);
 
-                if (pChan->IsDetached()) {
+                if (pChan->isDetached()) {
                     return;
                 }
             }
@@ -338,7 +338,7 @@ void NoIrcSock::ReadLine(const NoString& sData)
             const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
 
             for (NoChannel* pChan : vChans) {
-                pChan->OnWho(sNick, sIdent, sHost);
+                pChan->onWho(sNick, sIdent, sHost);
             }
 
             if (m_bNamesx && (sNick.size() > 1) && IsPermChar(sNick[1])) {
@@ -367,7 +367,7 @@ void NoIrcSock::ReadLine(const NoString& sData)
             }
 
             NoChannel* pChan = m_pNetwork->FindChan(sChan);
-            if (pChan && pChan->IsDetached()) {
+            if (pChan && pChan->isDetached()) {
                 return;
             }
 
@@ -381,8 +381,8 @@ void NoIrcSock::ReadLine(const NoString& sData)
             // requested a /names for it and we really should forward this.
             if (pChan) {
                 NoString sNicks = sRest.Token(2, true).TrimPrefix_n();
-                pChan->AddNicks(sNicks);
-                if (pChan->IsDetached()) {
+                pChan->addNicks(sNicks);
+                if (pChan->isDetached()) {
                     return;
                 }
             }
@@ -397,21 +397,21 @@ void NoIrcSock::ReadLine(const NoString& sData)
             NoChannel* pChan = m_pNetwork->FindChan(sRest.Token(0));
 
             if (pChan) {
-                if (pChan->IsOn()) {
+                if (pChan->isOn()) {
                     // If we are the only one in the chan, set our default modes
-                    if (pChan->GetNickCount() == 1) {
-                        NoString sModes = pChan->GetDefaultModes();
+                    if (pChan->getNickCount() == 1) {
+                        NoString sModes = pChan->getDefaultModes();
 
                         if (sModes.empty()) {
                             sModes = m_pNetwork->GetUser()->GetDefaultChanModes();
                         }
 
                         if (!sModes.empty()) {
-                            PutIRC("MODE " + pChan->GetName() + " " + sModes);
+                            PutIRC("MODE " + pChan->getName() + " " + sModes);
                         }
                     }
                 }
-                if (pChan->IsDetached()) {
+                if (pChan->isDetached()) {
                     // don't put it to clients
                     return;
                 }
@@ -461,8 +461,8 @@ void NoIrcSock::ReadLine(const NoString& sData)
                 pChan = m_pNetwork->FindChan(sRest.Token(1));
             }
             if (pChan) {
-                pChan->Disable();
-                m_pNetwork->PutStatus("Channel [" + pChan->GetName() + "] is linked to "
+                pChan->disable();
+                m_pNetwork->PutStatus("Channel [" + pChan->getName() + "] is linked to "
                                                                        "another channel and was thus disabled.");
             }
             break;
@@ -491,10 +491,10 @@ void NoIrcSock::ReadLine(const NoString& sData)
             const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
 
             for (NoChannel* pChan : vChans) {
-                if (pChan->ChangeNick(Nick.GetNick(), sNewNick)) {
+                if (pChan->changeNick(Nick.GetNick(), sNewNick)) {
                     vFoundChans.push_back(pChan);
 
-                    if (!pChan->IsDetached()) {
+                    if (!pChan->isDetached()) {
                         bIsVisible = true;
                     }
                 }
@@ -530,10 +530,10 @@ void NoIrcSock::ReadLine(const NoString& sData)
             const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
 
             for (NoChannel* pChan : vChans) {
-                if (pChan->RemNick(Nick.GetNick())) {
+                if (pChan->remNick(Nick.GetNick())) {
                     vFoundChans.push_back(pChan);
 
-                    if (!pChan->IsDetached()) {
+                    if (!pChan->isDetached()) {
                         bIsVisible = true;
                     }
                 }
@@ -552,8 +552,8 @@ void NoIrcSock::ReadLine(const NoString& sData)
                 m_pNetwork->AddChan(sChan, false);
                 pChan = m_pNetwork->FindChan(sChan);
                 if (pChan) {
-                    pChan->Enable();
-                    pChan->SetIsOn(true);
+                    pChan->enable();
+                    pChan->setIsOn(true);
                     PutIRC("MODE " + sChan);
                 }
             } else {
@@ -561,10 +561,10 @@ void NoIrcSock::ReadLine(const NoString& sData)
             }
 
             if (pChan) {
-                pChan->AddNick(Nick.GetNickMask());
+                pChan->addNick(Nick.GetNickMask());
                 IRCSOCKMODULECALL(OnJoin(Nick.GetNickMask(), *pChan), NOTHING);
 
-                if (pChan->IsDetached()) {
+                if (pChan->isDetached()) {
                     return;
                 }
             }
@@ -575,10 +575,10 @@ void NoIrcSock::ReadLine(const NoString& sData)
             NoChannel* pChan = m_pNetwork->FindChan(sChan);
             bool bDetached = false;
             if (pChan) {
-                pChan->RemNick(Nick.GetNick());
+                pChan->remNick(Nick.GetNick());
                 IRCSOCKMODULECALL(OnPart(Nick.GetNickMask(), *pChan, sMsg), NOTHING);
 
-                if (pChan->IsDetached()) bDetached = true;
+                if (pChan->isDetached()) bDetached = true;
             }
 
             if (Nick.NickEquals(GetNick())) {
@@ -601,9 +601,9 @@ void NoIrcSock::ReadLine(const NoString& sData)
 
             NoChannel* pChan = m_pNetwork->FindChan(sTarget);
             if (pChan) {
-                pChan->ModeChange(sModes, &Nick);
+                pChan->modeChange(sModes, &Nick);
 
-                if (pChan->IsDetached()) {
+                if (pChan->isDetached()) {
                     return;
                 }
             } else if (sTarget == m_Nick.GetNick()) {
@@ -642,17 +642,17 @@ void NoIrcSock::ReadLine(const NoString& sData)
                 IRCSOCKMODULECALL(OnKick(Nick, sKickedNick, *pChan, sMsg), NOTHING);
                 // do not remove the nick till after the OnKick call, so modules
                 // can do Chan.FindNick or something to get more info.
-                pChan->RemNick(sKickedNick);
+                pChan->remNick(sKickedNick);
             }
 
             if (GetNick().Equals(sKickedNick) && pChan) {
-                pChan->SetIsOn(false);
+                pChan->setIsOn(false);
 
                 // Don't try to rejoin!
-                pChan->Disable();
+                pChan->disable();
             }
 
-            if ((pChan) && (pChan->IsDetached())) {
+            if ((pChan) && (pChan->isDetached())) {
                 return;
             }
         } else if (sCmd.Equals("NOTICE")) {
@@ -703,15 +703,15 @@ void NoIrcSock::ReadLine(const NoString& sData)
                 IRCSOCKMODULECALL(OnTopic(Nick, *pChan, sTopic), &bReturn);
                 if (bReturn) return;
 
-                pChan->SetTopicOwner(Nick.GetNick());
-                pChan->SetTopicDate((unsigned long)time(nullptr));
-                pChan->SetTopic(sTopic);
+                pChan->setTopicOwner(Nick.GetNick());
+                pChan->setTopicDate((unsigned long)time(nullptr));
+                pChan->setTopic(sTopic);
 
-                if (pChan->IsDetached()) {
+                if (pChan->isDetached()) {
                     return; // Don't forward this
                 }
 
-                sLine = ":" + Nick.GetNickMask() + " TOPIC " + pChan->GetName() + " :" + sTopic;
+                sLine = ":" + Nick.GetNickMask() + " TOPIC " + pChan->getName() + " :" + sTopic;
             }
         } else if (sCmd.Equals("PRIVMSG")) {
             // :nick!ident@host.com PRIVMSG #chan :Message
@@ -870,7 +870,7 @@ bool NoIrcSock::OnPrivCTCP(NoNick& Nick, NoString& sMessage)
         if (!m_pNetwork->IsUserOnline() || !m_pNetwork->GetUser()->AutoClearQueryBuffer()) {
             NoQuery* pQuery = m_pNetwork->AddQuery(Nick.GetNick());
             if (pQuery) {
-                pQuery->AddBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " PRIVMSG {target} :\001ACTION {text}\001", sMessage);
+                pQuery->addBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " PRIVMSG {target} :\001ACTION {text}\001", sMessage);
             }
         }
 
@@ -948,7 +948,7 @@ bool NoIrcSock::OnPrivMsg(NoNick& Nick, NoString& sMessage)
     if (!m_pNetwork->IsUserOnline() || !m_pNetwork->GetUser()->AutoClearQueryBuffer()) {
         NoQuery* pQuery = m_pNetwork->AddQuery(Nick.GetNick());
         if (pQuery) {
-            pQuery->AddBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " PRIVMSG {target} :{text}", sMessage);
+            pQuery->addBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " PRIVMSG {target} :{text}", sMessage);
         }
     }
 
@@ -968,8 +968,8 @@ bool NoIrcSock::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMessa
             bResult = false;
             IRCSOCKMODULECALL(OnChanAction(Nick, *pChan, sMessage), &bResult);
             if (bResult) return true;
-            if (!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline() || pChan->IsDetached()) {
-                pChan->AddBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) +
+            if (!pChan->autoClearChanBuffer() || !m_pNetwork->IsUserOnline() || pChan->isDetached()) {
+                pChan->addBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) +
                                  " :\001ACTION {text}\001",
                                  sMessage);
             }
@@ -979,7 +979,7 @@ bool NoIrcSock::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMessa
 
     if (OnGeneralCTCP(Nick, sMessage)) return true;
 
-    return (pChan && pChan->IsDetached());
+    return (pChan && pChan->isDetached());
 }
 
 bool NoIrcSock::OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage)
@@ -990,12 +990,12 @@ bool NoIrcSock::OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMes
         IRCSOCKMODULECALL(OnChanNotice(Nick, *pChan, sMessage), &bResult);
         if (bResult) return true;
 
-        if (!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline() || pChan->IsDetached()) {
-            pChan->AddBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " NOTICE " + _NAMEDFMT(sChan) + " :{text}", sMessage);
+        if (!pChan->autoClearChanBuffer() || !m_pNetwork->IsUserOnline() || pChan->isDetached()) {
+            pChan->addBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " NOTICE " + _NAMEDFMT(sChan) + " :{text}", sMessage);
         }
     }
 
-    return ((pChan) && (pChan->IsDetached()));
+    return ((pChan) && (pChan->isDetached()));
 }
 
 bool NoIrcSock::OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage)
@@ -1006,12 +1006,12 @@ bool NoIrcSock::OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessag
         IRCSOCKMODULECALL(OnChanMsg(Nick, *pChan, sMessage), &bResult);
         if (bResult) return true;
 
-        if (!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline() || pChan->IsDetached()) {
-            pChan->AddBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) + " :{text}", sMessage);
+        if (!pChan->autoClearChanBuffer() || !m_pNetwork->IsUserOnline() || pChan->isDetached()) {
+            pChan->addBuffer(":" + _NAMEDFMT(Nick.GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) + " :{text}", sMessage);
         }
     }
 
-    return ((pChan) && (pChan->IsDetached()));
+    return ((pChan) && (pChan->isDetached()));
 }
 
 void NoIrcSock::PutIRC(const NoString& sLine)
@@ -1385,6 +1385,6 @@ NoIrcSock::EChanModeArgs NoIrcSock::GetModeType(unsigned char uMode) const
 void NoIrcSock::ResetChans()
 {
     for (const auto& it : m_msChans) {
-        it.second->Reset();
+        it.second->reset();
     }
 }

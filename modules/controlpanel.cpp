@@ -605,7 +605,7 @@ class NoAdminMod : public NoModule
 
         NoChannel* pChan = new NoChannel(sChan, pNetwork, true);
         if (pNetwork->AddChan(pChan))
-            PutModule("Channel [" + pChan->GetName() + "] for user [" + sUsername + "] added.");
+            PutModule("Channel [" + pChan->getName() + "] for user [" + sUsername + "] added.");
         else
             PutModule("Could not add channel [" + sChan + "] for user [" + sUsername + "], does it already exist?");
     }
@@ -637,7 +637,7 @@ class NoAdminMod : public NoModule
 
         NoStringVector vsNames;
         for (const NoChannel* pChan : vChans) {
-            const NoString& sName = pChan->GetName();
+            const NoString& sName = pChan->getName();
             vsNames.push_back(sName);
             pNetwork->PutIRC("PART " + sName);
             pNetwork->DelChan(sName);
@@ -675,28 +675,28 @@ class NoAdminMod : public NoModule
 
         for (NoChannel* pChan : vChans) {
             if (sVar == "defmodes") {
-                PutModule(pChan->GetName() + ": DefModes = " + pChan->GetDefaultModes());
+                PutModule(pChan->getName() + ": DefModes = " + pChan->getDefaultModes());
             } else if (sVar == "buffer") {
-                NoString sValue(pChan->GetBufferCount());
-                if (!pChan->HasBufferCountSet()) {
+                NoString sValue(pChan->getBufferCount());
+                if (!pChan->hasBufferCountSet()) {
                     sValue += " (default)";
                 }
-                PutModule(pChan->GetName() + ": Buffer = " + sValue);
+                PutModule(pChan->getName() + ": Buffer = " + sValue);
             } else if (sVar == "inconfig") {
-                PutModule(pChan->GetName() + ": InConfig = " + NoString(pChan->InConfig()));
+                PutModule(pChan->getName() + ": InConfig = " + NoString(pChan->inConfig()));
             } else if (sVar == "keepbuffer") {
-                PutModule(pChan->GetName() + ": KeepBuffer = " +
-                          NoString(!pChan->AutoClearChanBuffer())); // XXX compatibility crap, added in 0.207
+                PutModule(pChan->getName() + ": KeepBuffer = " +
+                          NoString(!pChan->autoClearChanBuffer())); // XXX compatibility crap, added in 0.207
             } else if (sVar == "autoclearchanbuffer") {
-                NoString sValue(pChan->AutoClearChanBuffer());
-                if (!pChan->HasAutoClearChanBufferSet()) {
+                NoString sValue(pChan->autoClearChanBuffer());
+                if (!pChan->hasAutoClearChanBufferSet()) {
                     sValue += " (default)";
                 }
-                PutModule(pChan->GetName() + ": AutoClearChanBuffer = " + sValue);
+                PutModule(pChan->getName() + ": AutoClearChanBuffer = " + sValue);
             } else if (sVar == "detached") {
-                PutModule(pChan->GetName() + ": Detached = " + NoString(pChan->IsDetached()));
+                PutModule(pChan->getName() + ": Detached = " + NoString(pChan->isDetached()));
             } else if (sVar == "key") {
-                PutModule(pChan->GetName() + ": Key = " + pChan->GetKey());
+                PutModule(pChan->getName() + ": Key = " + pChan->getKey());
             } else {
                 PutModule("Error: Unknown variable");
                 return;
@@ -733,41 +733,41 @@ class NoAdminMod : public NoModule
 
         for (NoChannel* pChan : vChans) {
             if (sVar == "defmodes") {
-                pChan->SetDefaultModes(sValue);
-                PutModule(pChan->GetName() + ": DefModes = " + sValue);
+                pChan->setDefaultModes(sValue);
+                PutModule(pChan->getName() + ": DefModes = " + sValue);
             } else if (sVar == "buffer") {
                 unsigned int i = sValue.ToUInt();
                 // Admins don't have to honour the buffer limit
-                if (pChan->SetBufferCount(i, GetUser()->IsAdmin())) {
-                    PutModule(pChan->GetName() + ": Buffer = " + sValue);
+                if (pChan->setBufferCount(i, GetUser()->IsAdmin())) {
+                    PutModule(pChan->getName() + ": Buffer = " + sValue);
                 } else {
                     PutModule("Setting failed, limit is " + NoString(NoApp::Get().GetMaxBufferSize()));
                     return;
                 }
             } else if (sVar == "inconfig") {
                 bool b = sValue.ToBool();
-                pChan->SetInConfig(b);
-                PutModule(pChan->GetName() + ": InConfig = " + NoString(b));
+                pChan->setInConfig(b);
+                PutModule(pChan->getName() + ": InConfig = " + NoString(b));
             } else if (sVar == "keepbuffer") { // XXX compatibility crap, added in 0.207
                 bool b = !sValue.ToBool();
-                pChan->SetAutoClearChanBuffer(b);
-                PutModule(pChan->GetName() + ": AutoClearChanBuffer = " + NoString(b));
+                pChan->setAutoClearChanBuffer(b);
+                PutModule(pChan->getName() + ": AutoClearChanBuffer = " + NoString(b));
             } else if (sVar == "autoclearchanbuffer") {
                 bool b = sValue.ToBool();
-                pChan->SetAutoClearChanBuffer(b);
-                PutModule(pChan->GetName() + ": AutoClearChanBuffer = " + NoString(b));
+                pChan->setAutoClearChanBuffer(b);
+                PutModule(pChan->getName() + ": AutoClearChanBuffer = " + NoString(b));
             } else if (sVar == "detached") {
                 bool b = sValue.ToBool();
-                if (pChan->IsDetached() != b) {
+                if (pChan->isDetached() != b) {
                     if (b)
-                        pChan->DetachUser();
+                        pChan->detachUser();
                     else
-                        pChan->AttachUser();
+                        pChan->attachUser();
                 }
-                PutModule(pChan->GetName() + ": Detached = " + NoString(b));
+                PutModule(pChan->getName() + ": Detached = " + NoString(b));
             } else if (sVar == "key") {
-                pChan->SetKey(sValue);
-                PutModule(pChan->GetName() + ": Key = " + sValue);
+                pChan->setKey(sValue);
+                PutModule(pChan->getName() + ": Key = " + sValue);
             } else {
                 PutModule("Error: Unknown variable");
                 return;

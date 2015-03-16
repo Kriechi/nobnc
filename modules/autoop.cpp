@@ -211,7 +211,7 @@ public:
     void OnJoin(const NoNick& Nick, NoChannel& Channel) override
     {
         // If we have ops in this chan
-        if (Channel.HasPerm(NoChannel::Op)) {
+        if (Channel.hasPerm(NoChannel::Op)) {
             CheckAutoOp(Nick, Channel);
         }
     }
@@ -256,7 +256,7 @@ public:
     void OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         if (Nick.GetNick() == GetNetwork()->GetIRNoNick().GetNick()) {
-            const std::map<NoString, NoNick>& msNicks = Channel.GetNicks();
+            const std::map<NoString, NoNick>& msNicks = Channel.getNicks();
 
             for (std::map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
                 if (!it->second.HasPerm(NoChannel::Op)) {
@@ -457,14 +457,14 @@ public:
 
     bool CheckAutoOp(const NoNick& Nick, NoChannel& Channel)
     {
-        NoAutoOpUser* pUser = FindUserByHost(Nick.GetHostMask(), Channel.GetName());
+        NoAutoOpUser* pUser = FindUserByHost(Nick.GetHostMask(), Channel.getName());
 
         if (!pUser) {
             return false;
         }
 
         if (pUser->GetUserKey().Equals("__NOKEY__")) {
-            PutIRC("MODE " + Channel.GetName() + " +o " + Nick.GetNick());
+            PutIRC("MODE " + Channel.getName() + " +o " + Nick.GetNick());
         } else {
             // then insert this nick into the queue, the timer does the rest
             NoString sNick = Nick.GetNick().AsLower();
@@ -522,10 +522,10 @@ public:
                 for (size_t a = 0; a < Chans.size(); a++) {
                     const NoChannel& Chan = *Chans[a];
 
-                    const NoNick* pNick = Chan.FindNick(Nick.GetNick());
+                    const NoNick* pNick = Chan.findNick(Nick.GetNick());
 
                     if (pNick) {
-                        if (pNick->HasPerm(NoChannel::Op) && pUser->ChannelMatches(Chan.GetName())) {
+                        if (pNick->HasPerm(NoChannel::Op) && pUser->ChannelMatches(Chan.getName())) {
                             bValid = true;
                             break;
                         }
@@ -620,11 +620,11 @@ public:
         for (size_t a = 0; a < Chans.size(); a++) {
             const NoChannel& Chan = *Chans[a];
 
-            if (Chan.HasPerm(NoChannel::Op) && User.ChannelMatches(Chan.GetName())) {
-                const NoNick* pNick = Chan.FindNick(Nick.GetNick());
+            if (Chan.hasPerm(NoChannel::Op) && User.ChannelMatches(Chan.getName())) {
+                const NoNick* pNick = Chan.findNick(Nick.GetNick());
 
                 if (pNick && !pNick->HasPerm(NoChannel::Op)) {
-                    PutIRC("MODE " + Chan.GetName() + " +o " + Nick.GetNick());
+                    PutIRC("MODE " + Chan.getName() + " +o " + Nick.GetNick());
                 }
             }
         }

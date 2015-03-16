@@ -33,23 +33,23 @@ public:
     NoQuery(const NoQuery&) = delete;
     NoQuery& operator=(const NoQuery&) = delete;
 
-    const NoBuffer& GetBuffer() const { return m_Buffer; }
-    unsigned int GetBufferCount() const { return m_Buffer.getLimit(); }
-    bool SetBufferCount(unsigned int u, bool bForce = false) { return m_Buffer.setLimit(u, bForce); }
-    size_t AddBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr)
+    const NoBuffer& getBuffer() const { return m_buffer; }
+    unsigned int getBufferCount() const { return m_buffer.getLimit(); }
+    bool setBufferCount(unsigned int u, bool bForce = false) { return m_buffer.setLimit(u, bForce); }
+    size_t addBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr)
     {
-        return m_Buffer.addLine(sFormat, sText, ts);
+        return m_buffer.addLine(sFormat, sText, ts);
     }
-    void ClearBuffer() { m_Buffer.clear(); }
-    void SendBuffer(NoClient* pClient);
-    void SendBuffer(NoClient* pClient, const NoBuffer& Buffer);
+    void clearBuffer() { m_buffer.clear(); }
+    void sendBuffer(NoClient* pClient);
+    void sendBuffer(NoClient* pClient, const NoBuffer& Buffer);
 
-    const NoString& GetName() const { return m_sName; }
+    const NoString& getName() const { return m_name; }
 
 private:
-    NoString m_sName;
-    NoNetwork* m_pNetwork;
-    NoBuffer m_Buffer;
+    NoString m_name;
+    NoNetwork* m_network;
+    NoBuffer m_buffer;
 };
 
 #endif // NOQUERY_H

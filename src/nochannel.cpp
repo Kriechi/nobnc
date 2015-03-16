@@ -37,24 +37,24 @@ NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig,
 
     if (pConfig) {
         NoString sValue;
-        if (pConfig->FindStringEntry("buffer", sValue)) SetBufferCount(sValue.ToUInt(), true);
-        if (pConfig->FindStringEntry("autoclearchanbuffer", sValue)) SetAutoClearChanBuffer(sValue.ToBool());
+        if (pConfig->FindStringEntry("buffer", sValue)) setBufferCount(sValue.ToUInt(), true);
+        if (pConfig->FindStringEntry("autoclearchanbuffer", sValue)) setAutoClearChanBuffer(sValue.ToBool());
         if (pConfig->FindStringEntry("keepbuffer", sValue))
-            SetAutoClearChanBuffer(!sValue.ToBool()); // XXX Compatibility crap, added in 0.207
-        if (pConfig->FindStringEntry("detached", sValue)) SetDetached(sValue.ToBool());
+            setAutoClearChanBuffer(!sValue.ToBool()); // XXX Compatibility crap, added in 0.207
+        if (pConfig->FindStringEntry("detached", sValue)) setDetached(sValue.ToBool());
         if (pConfig->FindStringEntry("disabled", sValue))
-            if (sValue.ToBool()) Disable();
+            if (sValue.ToBool()) disable();
         if (pConfig->FindStringEntry("autocycle", sValue))
             if (sValue.Equals("true"))
                 NoUtils::PrintError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle " + sName);
-        if (pConfig->FindStringEntry("key", sValue)) SetKey(sValue);
-        if (pConfig->FindStringEntry("modes", sValue)) SetDefaultModes(sValue);
+        if (pConfig->FindStringEntry("key", sValue)) setKey(sValue);
+        if (pConfig->FindStringEntry("modes", sValue)) setDefaultModes(sValue);
     }
 }
 
-NoChannel::~NoChannel() { ClearNicks(); }
+NoChannel::~NoChannel() { clearNicks(); }
 
-void NoChannel::Reset()
+void NoChannel::reset()
 {
     m_isOn = false;
     m_modeKnown = false;
@@ -64,72 +64,72 @@ void NoChannel::Reset()
     m_topicDate = 0;
     m_creationDate = 0;
     m_nick.Reset();
-    ClearNicks();
-    ResetJoinTries();
+    clearNicks();
+    resetJoinTries();
 }
 
-NoSettings NoChannel::ToConfig() const
+NoSettings NoChannel::toConfig() const
 {
     NoSettings config;
 
-    if (m_hasBufferCountSet) config.AddKeyValuePair("Buffer", NoString(GetBufferCount()));
-    if (m_hasAutoClearChanBufferSet) config.AddKeyValuePair("AutoClearChanBuffer", NoString(AutoClearChanBuffer()));
-    if (IsDetached()) config.AddKeyValuePair("Detached", "true");
-    if (IsDisabled()) config.AddKeyValuePair("Disabled", "true");
-    if (!GetKey().empty()) config.AddKeyValuePair("Key", GetKey());
-    if (!GetDefaultModes().empty()) config.AddKeyValuePair("Modes", GetDefaultModes());
+    if (m_hasBufferCountSet) config.AddKeyValuePair("Buffer", NoString(getBufferCount()));
+    if (m_hasAutoClearChanBufferSet) config.AddKeyValuePair("AutoClearChanBuffer", NoString(autoClearChanBuffer()));
+    if (isDetached()) config.AddKeyValuePair("Detached", "true");
+    if (isDisabled()) config.AddKeyValuePair("Disabled", "true");
+    if (!getKey().empty()) config.AddKeyValuePair("Key", getKey());
+    if (!getDefaultModes().empty()) config.AddKeyValuePair("Modes", getDefaultModes());
 
     return config;
 }
 
-void NoChannel::Clone(NoChannel& chan)
+void NoChannel::clone(NoChannel& chan)
 {
     // We assume that m_sName and m_pNetwork are equal
-    SetBufferCount(chan.GetBufferCount(), true);
-    SetAutoClearChanBuffer(chan.AutoClearChanBuffer());
-    SetKey(chan.GetKey());
-    SetDefaultModes(chan.GetDefaultModes());
+    setBufferCount(chan.getBufferCount(), true);
+    setAutoClearChanBuffer(chan.autoClearChanBuffer());
+    setKey(chan.getKey());
+    setDefaultModes(chan.getDefaultModes());
 
-    if (IsDetached() != chan.IsDetached()) {
+    if (isDetached() != chan.isDetached()) {
         // Only send something if it makes sense
         // (= Only detach if client is on the channel
         //    and only attach if we are on the channel)
-        if (IsOn()) {
-            if (IsDetached()) {
-                AttachUser();
+        if (isOn()) {
+            if (isDetached()) {
+                attachUser();
             } else {
-                DetachUser();
+                detachUser();
             }
         }
-        SetDetached(chan.IsDetached());
+        setDetached(chan.isDetached());
     }
 }
 
-void NoChannel::Cycle() const { m_network->PutIRC("PART " + GetName() + "\r\nJOIN " + GetName() + " " + GetKey()); }
+void NoChannel::cycle() const { m_network->PutIRC("PART " + getName() + "\r\nJOIN " + getName() + " " + getKey()); }
 
-void NoChannel::JoinUser(const NoString& sKey)
+void NoChannel::joinUser(const NoString& sKey)
 {
     if (!sKey.empty()) {
-        SetKey(sKey);
+        setKey(sKey);
     }
-    m_network->PutIRC("JOIN " + GetName() + " " + GetKey());
+    m_network->PutIRC("JOIN " + getName() + " " + getKey());
 }
 
-void NoChannel::AttachUser(NoClient* pClient)
+void NoChannel::attachUser(NoClient* pClient)
 {
-    m_network->PutUser(":" + m_network->GetIRNoNick().GetNickMask() + " JOIN :" + GetName(), pClient);
+    m_network->PutUser(":" + m_network->GetIRNoNick().GetNickMask() + " JOIN :" + getName(), pClient);
 
-    if (!GetTopic().empty()) {
+    if (!getTopic().empty()) {
         m_network->PutUser(":" + m_network->GetIRNoServer() + " 332 " + m_network->GetIRNoNick().GetNick() + " " +
-                            GetName() + " :" + GetTopic(),
+                            getName() + " :" + getTopic(),
                             pClient);
         m_network->PutUser(":" + m_network->GetIRNoServer() + " 333 " + m_network->GetIRNoNick().GetNick() + " " +
-                            GetName() + " " + GetTopicOwner() + " " + NoString(GetTopicDate()),
+                            getName() + " " + getTopicOwner() + " " + NoString(getTopicDate()),
                             pClient);
     }
 
     NoString sPre = ":" + m_network->GetIRNoServer() + " 353 " + m_network->GetIRNoNick().GetNick() + " " +
-                   GetModeForNames() + " " + GetName() + " :";
+                   getModeForNames() + " " + getName() + " :";
     NoString sLine = sPre;
     NoString sPerm, sNick;
 
@@ -171,23 +171,23 @@ void NoChannel::AttachUser(NoClient* pClient)
             break;
     }
 
-    m_network->PutUser(":" + m_network->GetIRNoServer() + " 366 " + m_network->GetIRNoNick().GetNick() + " " + GetName() + " :End of /NAMES list.",
+    m_network->PutUser(":" + m_network->GetIRNoServer() + " 366 " + m_network->GetIRNoNick().GetNick() + " " + getName() + " :End of /NAMES list.",
                         pClient);
     m_detached = false;
 
     // Send Buffer
-    SendBuffer(pClient);
+    sendBuffer(pClient);
 }
 
-void NoChannel::DetachUser()
+void NoChannel::detachUser()
 {
     if (!m_detached) {
-        m_network->PutUser(":" + m_network->GetIRNoNick().GetNickMask() + " PART " + GetName());
+        m_network->PutUser(":" + m_network->GetIRNoNick().GetNickMask() + " PART " + getName());
         m_detached = true;
     }
 }
 
-NoString NoChannel::GetModeString() const
+NoString NoChannel::getModeString() const
 {
     NoString sModes, sArgs;
 
@@ -201,7 +201,7 @@ NoString NoChannel::GetModeString() const
     return sModes.empty() ? sModes : NoString("+" + sModes + sArgs);
 }
 
-NoString NoChannel::GetModeForNames() const
+NoString NoChannel::getModeForNames() const
 {
     NoString sMode;
 
@@ -216,36 +216,36 @@ NoString NoChannel::GetModeForNames() const
     return (sMode.empty() ? "=" : sMode);
 }
 
-void NoChannel::SetModes(const NoString& sModes)
+void NoChannel::setModes(const NoString& sModes)
 {
     m_modes.clear();
-    ModeChange(sModes);
+    modeChange(sModes);
 }
 
-void NoChannel::SetAutoClearChanBuffer(bool b)
+void NoChannel::setAutoClearChanBuffer(bool b)
 {
     m_hasAutoClearChanBufferSet = true;
     m_autoClearChanBuffer = b;
 
-    if (m_autoClearChanBuffer && !IsDetached() && m_network->IsUserOnline()) {
-        ClearBuffer();
+    if (m_autoClearChanBuffer && !isDetached() && m_network->IsUserOnline()) {
+        clearBuffer();
     }
 }
 
-void NoChannel::InheritAutoClearChanBuffer(bool b)
+void NoChannel::inheritAutoClearChanBuffer(bool b)
 {
     if (!m_hasAutoClearChanBufferSet) {
         m_autoClearChanBuffer = b;
 
-        if (m_autoClearChanBuffer && !IsDetached() && m_network->IsUserOnline()) {
-            ClearBuffer();
+        if (m_autoClearChanBuffer && !isDetached() && m_network->IsUserOnline()) {
+            clearBuffer();
         }
     }
 }
 
-void NoChannel::OnWho(const NoString& sNick, const NoString& sIdent, const NoString& sHost)
+void NoChannel::onWho(const NoString& sNick, const NoString& sIdent, const NoString& sHost)
 {
-    NoNick* pNick = FindNick(sNick);
+    NoNick* pNick = findNick(sNick);
 
     if (pNick) {
         pNick->SetIdent(sIdent);
@@ -253,7 +253,7 @@ void NoChannel::OnWho(const NoString& sNick, const NoString& sIdent, const NoStr
     }
 }
 
-void NoChannel::ModeChange(const NoString& sModes, const NoNick* pOpNick)
+void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
 {
     NoString sModeArg = sModes.Token(0);
     NoString sArgs = sModes.Token(1, true);
@@ -262,7 +262,7 @@ void NoChannel::ModeChange(const NoString& sModes, const NoNick* pOpNick)
     /* Try to find a NoNick* from this channel so that pOpNick->HasPerm()
      * works as expected. */
     if (pOpNick) {
-        NoNick* OpNick = FindNick(pOpNick->GetNick());
+        NoNick* OpNick = findNick(pOpNick->GetNick());
         /* If nothing was found, use the original pOpNick, else use the
          * NoNick* from FindNick() */
         if (OpNick) pOpNick = OpNick;
@@ -278,8 +278,8 @@ void NoChannel::ModeChange(const NoString& sModes, const NoNick* pOpNick)
         } else if (uMode == '-') {
             bAdd = false;
         } else if (m_network->GetIRCSock()->IsPermMode(uMode)) {
-            NoString sArg = GetModeArg(sArgs);
-            NoNick* pNick = FindNick(sArg);
+            NoString sArg = getModeArg(sArgs);
+            NoNick* pNick = findNick(sArg);
             if (pNick) {
                 unsigned char uPerm = m_network->GetIRCSock()->GetPermFromMode(uMode);
 
@@ -290,13 +290,13 @@ void NoChannel::ModeChange(const NoString& sModes, const NoNick* pOpNick)
                         pNick->AddPerm(uPerm);
 
                         if (pNick->NickEquals(m_network->GetCurNick())) {
-                            AddPerm(uPerm);
+                            addPerm(uPerm);
                         }
                     } else {
                         pNick->RemPerm(uPerm);
 
                         if (pNick->NickEquals(m_network->GetCurNick())) {
-                            RemPerm(uPerm);
+                            remPerm(uPerm);
                         }
                     }
 
@@ -328,16 +328,16 @@ void NoChannel::ModeChange(const NoString& sModes, const NoNick* pOpNick)
             switch (m_network->GetIRCSock()->GetModeType(uMode)) {
             case NoIrcSock::ListArg:
                 bList = true;
-                sArg = GetModeArg(sArgs);
+                sArg = getModeArg(sArgs);
                 break;
             case NoIrcSock::HasArg:
-                sArg = GetModeArg(sArgs);
+                sArg = getModeArg(sArgs);
                 break;
             case NoIrcSock::NoArg:
                 break;
             case NoIrcSock::ArgWhenSet:
                 if (bAdd) {
-                    sArg = GetModeArg(sArgs);
+                    sArg = getModeArg(sArgs);
                 }
 
                 break;
@@ -347,36 +347,36 @@ void NoChannel::ModeChange(const NoString& sModes, const NoNick* pOpNick)
             if (bList) {
                 bNoChange = false;
             } else if (bAdd) {
-                bNoChange = HasMode(uMode) && GetModeArg(uMode) == sArg;
+                bNoChange = hasMode(uMode) && getModeArg(uMode) == sArg;
             } else {
-                bNoChange = !HasMode(uMode);
+                bNoChange = !hasMode(uMode);
             }
             NETWORKMODULECALL(OnMode2(pOpNick, *this, uMode, sArg, bAdd, bNoChange), m_network->GetUser(), m_network, nullptr, NOTHING);
 
             if (!bList) {
-                (bAdd) ? AddMode(uMode, sArg) : RemMode(uMode);
+                (bAdd) ? addMode(uMode, sArg) : remMode(uMode);
             }
 
             // This is called when we join (ZNC requests the channel modes
             // on join) *and* when someone changes the channel keys.
             // We ignore channel key "*" because of some broken nets.
             if (uMode == M_Key && !bNoChange && bAdd && sArg != "*") {
-                SetKey(sArg);
+                setKey(sArg);
             }
         }
     }
 }
 
-NoString NoChannel::GetOptions() const
+NoString NoChannel::getOptions() const
 {
     NoStringVector vsRet;
 
-    if (IsDetached()) {
+    if (isDetached()) {
         vsRet.push_back("Detached");
     }
 
-    if (AutoClearChanBuffer()) {
-        if (HasAutoClearChanBufferSet()) {
+    if (autoClearChanBuffer()) {
+        if (hasAutoClearChanBufferSet()) {
             vsRet.push_back("AutoClearChanBuffer");
         } else {
             vsRet.push_back("AutoClearChanBuffer (default)");
@@ -386,7 +386,7 @@ NoString NoChannel::GetOptions() const
     return NoString(", ").Join(vsRet.begin(), vsRet.end());
 }
 
-NoString NoChannel::GetModeArg(unsigned char uMode) const
+NoString NoChannel::getModeArg(unsigned char uMode) const
 {
     if (uMode) {
         std::map<unsigned char, NoString>::const_iterator it = m_modes.find(uMode);
@@ -399,17 +399,17 @@ NoString NoChannel::GetModeArg(unsigned char uMode) const
     return "";
 }
 
-bool NoChannel::HasMode(unsigned char uMode) const { return (uMode && m_modes.find(uMode) != m_modes.end()); }
+bool NoChannel::hasMode(unsigned char uMode) const { return (uMode && m_modes.find(uMode) != m_modes.end()); }
 
-bool NoChannel::AddMode(unsigned char uMode, const NoString& sArg)
+bool NoChannel::addMode(unsigned char uMode, const NoString& sArg)
 {
     m_modes[uMode] = sArg;
     return true;
 }
 
-bool NoChannel::RemMode(unsigned char uMode)
+bool NoChannel::remMode(unsigned char uMode)
 {
-    if (!HasMode(uMode)) {
+    if (!hasMode(uMode)) {
         return false;
     }
 
@@ -417,16 +417,16 @@ bool NoChannel::RemMode(unsigned char uMode)
     return true;
 }
 
-NoString NoChannel::GetModeArg(NoString& sArgs) const
+NoString NoChannel::getModeArg(NoString& sArgs) const
 {
     NoString sRet = sArgs.substr(0, sArgs.find(' '));
     sArgs = (sRet.size() < sArgs.size()) ? sArgs.substr(sRet.size() + 1) : "";
     return sRet;
 }
 
-void NoChannel::ClearNicks() { m_nicks.clear(); }
+void NoChannel::clearNicks() { m_nicks.clear(); }
 
-int NoChannel::AddNicks(const NoString& sNicks)
+int NoChannel::addNicks(const NoString& sNicks)
 {
     int iRet = 0;
     NoStringVector vsNicks;
@@ -434,7 +434,7 @@ int NoChannel::AddNicks(const NoString& sNicks)
     sNicks.Split(" ", vsNicks, false);
 
     for (const NoString& sNick : vsNicks) {
-        if (AddNick(sNick)) {
+        if (addNick(sNick)) {
             iRet++;
         }
     }
@@ -442,7 +442,7 @@ int NoChannel::AddNicks(const NoString& sNicks)
     return iRet;
 }
 
-bool NoChannel::AddNick(const NoString& sNick)
+bool NoChannel::addNick(const NoString& sNick)
 {
     const char* p = sNick.c_str();
     NoString sPrefix, sTmp, sIdent, sHost;
@@ -465,7 +465,7 @@ bool NoChannel::AddNick(const NoString& sNick)
     sTmp = sTmp.Token(0, false, "!");
 
     NoNick tmpNick(sTmp);
-    NoNick* pNick = FindNick(sTmp);
+    NoNick* pNick = findNick(sTmp);
     if (!pNick) {
         pNick = &tmpNick;
         pNick->SetNetwork(m_network);
@@ -480,7 +480,7 @@ bool NoChannel::AddNick(const NoString& sNick)
 
     if (pNick->NickEquals(m_network->GetCurNick())) {
         for (NoString::size_type i = 0; i < sPrefix.length(); i++) {
-            AddPerm(sPrefix[i]);
+            addPerm(sPrefix[i]);
         }
     }
 
@@ -489,7 +489,7 @@ bool NoChannel::AddNick(const NoString& sNick)
     return true;
 }
 
-std::map<char, unsigned int> NoChannel::GetPermCounts() const
+std::map<char, unsigned int> NoChannel::getPermCounts() const
 {
     std::map<char, unsigned int> mRet;
 
@@ -504,7 +504,7 @@ std::map<char, unsigned int> NoChannel::GetPermCounts() const
     return mRet;
 }
 
-bool NoChannel::RemNick(const NoString& sNick)
+bool NoChannel::remNick(const NoString& sNick)
 {
     std::map<NoString, NoNick>::iterator it;
     std::set<unsigned char>::iterator it2;
@@ -519,7 +519,7 @@ bool NoChannel::RemNick(const NoString& sNick)
     return true;
 }
 
-bool NoChannel::ChangeNick(const NoString& sOldNick, const NoString& sNewNick)
+bool NoChannel::changeNick(const NoString& sOldNick, const NoString& sNewNick)
 {
     std::map<NoString, NoNick>::iterator it = m_nicks.find(sOldNick);
 
@@ -537,27 +537,27 @@ bool NoChannel::ChangeNick(const NoString& sOldNick, const NoString& sNewNick)
     return true;
 }
 
-const NoNick* NoChannel::FindNick(const NoString& sNick) const
+const NoNick* NoChannel::findNick(const NoString& sNick) const
 {
     std::map<NoString, NoNick>::const_iterator it = m_nicks.find(sNick);
     return (it != m_nicks.end()) ? &it->second : nullptr;
 }
 
-NoNick* NoChannel::FindNick(const NoString& sNick)
+NoNick* NoChannel::findNick(const NoString& sNick)
 {
     std::map<NoString, NoNick>::iterator it = m_nicks.find(sNick);
     return (it != m_nicks.end()) ? &it->second : nullptr;
 }
 
-void NoChannel::SendBuffer(NoClient* pClient)
+void NoChannel::sendBuffer(NoClient* pClient)
 {
-    SendBuffer(pClient, m_buffer);
-    if (AutoClearChanBuffer()) {
-        ClearBuffer();
+    sendBuffer(pClient, m_buffer);
+    if (autoClearChanBuffer()) {
+        clearBuffer();
     }
 }
 
-void NoChannel::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
+void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
 {
     if (m_network && m_network->IsUserAttached()) {
         // in the event that pClient is nullptr, need to send this to all clients for the user
@@ -586,14 +586,14 @@ void NoChannel::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                 NETWORKMODULECALL(OnChanBufferStarting(*this, *pUseClient), m_network->GetUser(), m_network, nullptr, &bSkipStatusMsg);
 
                 if (!bSkipStatusMsg) {
-                    m_network->PutUser(":***!znc@znc.in PRIVMSG " + GetName() + " :Buffer Playback...", pUseClient);
+                    m_network->PutUser(":***!znc@znc.in PRIVMSG " + getName() + " :Buffer Playback...", pUseClient);
                 }
 
                 bool bBatch = pUseClient->HasBatch();
-                NoString sBatchName = GetName().MD5();
+                NoString sBatchName = getName().MD5();
 
                 if (bBatch) {
-                    m_network->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + GetName(), pUseClient);
+                    m_network->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + getName(), pUseClient);
                 }
 
                 size_t uSize = Buffer.size();
@@ -618,7 +618,7 @@ void NoChannel::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                 bSkipStatusMsg = pUseClient->HasServerTime();
                 NETWORKMODULECALL(OnChanBufferEnding(*this, *pUseClient), m_network->GetUser(), m_network, nullptr, &bSkipStatusMsg);
                 if (!bSkipStatusMsg) {
-                    m_network->PutUser(":***!znc@znc.in PRIVMSG " + GetName() + " :Playback Complete.", pUseClient);
+                    m_network->PutUser(":***!znc@znc.in PRIVMSG " + getName() + " :Playback Complete.", pUseClient);
                 }
 
                 if (bBatch) {
@@ -633,13 +633,13 @@ void NoChannel::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
     }
 }
 
-void NoChannel::Enable()
+void NoChannel::enable()
 {
-    ResetJoinTries();
+    resetJoinTries();
     m_disabled = false;
 }
 
-void NoChannel::SetKey(const NoString& s)
+void NoChannel::setKey(const NoString& s)
 {
     if (m_key != s) {
         m_key = s;
@@ -649,7 +649,7 @@ void NoChannel::SetKey(const NoString& s)
     }
 }
 
-void NoChannel::SetInConfig(bool b)
+void NoChannel::setInConfig(bool b)
 {
     if (m_inConfig != b) {
         m_inConfig = b;

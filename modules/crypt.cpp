@@ -78,8 +78,8 @@ public:
             NoChannel* pChan = GetNetwork()->FindChan(sTarget);
             NoString sNickMask = GetNetwork()->GetIRNoNick().GetNickMask();
             if (pChan) {
-                if (!pChan->AutoClearChanBuffer())
-                    pChan->AddBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +
+                if (!pChan->autoClearChanBuffer())
+                    pChan->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +
                                      " :{text}",
                                      sMessage);
                 GetUser()->PutUser(":" + NickPrefix() + sNickMask + " PRIVMSG " + sTarget + " :" + sMessage, nullptr, GetClient());
@@ -105,7 +105,7 @@ public:
 
     EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        FilterIncoming(Channel.GetName(), Nick, sMessage);
+        FilterIncoming(Channel.getName(), Nick, sMessage);
         return CONTINUE;
     }
 

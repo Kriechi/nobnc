@@ -18,21 +18,21 @@
 #include "nouser.h"
 #include "nonetwork.h"
 
-NoQuery::NoQuery(const NoString& sName, NoNetwork* pNetwork) : m_sName(sName), m_pNetwork(pNetwork), m_Buffer()
+NoQuery::NoQuery(const NoString& sName, NoNetwork* pNetwork) : m_name(sName), m_network(pNetwork), m_buffer()
 {
-    SetBufferCount(m_pNetwork->GetUser()->GetBufferCount(), true);
+    setBufferCount(m_network->GetUser()->GetBufferCount(), true);
 }
 
 NoQuery::~NoQuery() {}
 
-void NoQuery::SendBuffer(NoClient* pClient) { SendBuffer(pClient, m_Buffer); }
+void NoQuery::sendBuffer(NoClient* pClient) { sendBuffer(pClient, m_buffer); }
 
-void NoQuery::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
+void NoQuery::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
 {
-    if (m_pNetwork && m_pNetwork->IsUserAttached()) {
+    if (m_network && m_network->IsUserAttached()) {
         // Based on NoChannel::SendBuffer()
         if (!Buffer.isEmpty()) {
-            const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
+            const std::vector<NoClient*>& vClients = m_network->GetClients();
             for (NoClient* pEachClient : vClients) {
                 NoClient* pUseClient = (pClient ? pClient : pEachClient);
 
@@ -43,10 +43,10 @@ void NoQuery::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                 pUseClient->SetPlaybackActive(true);
 
                 bool bBatch = pUseClient->HasBatch();
-                NoString sBatchName = m_sName.MD5();
+                NoString sBatchName = m_name.MD5();
 
                 if (bBatch) {
-                    m_pNetwork->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + m_sName, pUseClient);
+                    m_network->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + m_name, pUseClient);
                 }
 
                 size_t uSize = Buffer.size();
@@ -68,16 +68,16 @@ void NoQuery::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                     }
                     bool bContinue = false;
                     NETWORKMODULECALL(OnPrivBufferPlayLine2(*pUseClient, sLine, BufLine.GetTime()),
-                                      m_pNetwork->GetUser(),
-                                      m_pNetwork,
+                                      m_network->GetUser(),
+                                      m_network,
                                       nullptr,
                                       &bContinue);
                     if (bContinue) continue;
-                    m_pNetwork->PutUser(sLine, pUseClient);
+                    m_network->PutUser(sLine, pUseClient);
                 }
 
                 if (bBatch) {
-                    m_pNetwork->PutUser(":znc.in BATCH -" + sBatchName, pUseClient);
+                    m_network->PutUser(":znc.in BATCH -" + sBatchName, pUseClient);
                 }
 
                 pUseClient->SetPlaybackActive(bWasPlaybackActive);

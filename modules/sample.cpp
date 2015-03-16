@@ -108,37 +108,37 @@ public:
 
     void OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange) override
     {
-        PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] set mode [" + Channel.GetName() +
+        PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] set mode [" + Channel.getName() +
                   ((bAdded) ? "] +" : "] -") + NoString(uMode) + " " + Nick.GetNick());
     }
 
     void OnOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] opped [" + Nick.GetNick() + "] on [" +
-                  Channel.GetName() + "]");
+                  Channel.getName() + "]");
     }
 
     void OnDeop(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] deopped [" + Nick.GetNick() + "] on [" +
-                  Channel.GetName() + "]");
+                  Channel.getName() + "]");
     }
 
     void OnVoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] voiced [" + Nick.GetNick() + "] on [" +
-                  Channel.GetName() + "]");
+                  Channel.getName() + "]");
     }
 
     void OnDevoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.GetNick() + "] devoiced [" + Nick.GetNick() + "] on [" +
-                  Channel.GetName() + "]");
+                  Channel.getName() + "]");
     }
 
     void OnRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
     {
-        PutModule("* " + OpNick.GetNick() + " sets mode: " + sModes + " " + sArgs + " (" + Channel.GetName() + ")");
+        PutModule("* " + OpNick.GetNick() + " sets mode: " + sModes + " " + sArgs + " (" + Channel.getName() + ")");
     }
 
     EModRet OnRaw(NoString& sLine) override
@@ -155,7 +155,7 @@ public:
 
     void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
-        PutModule("[" + OpNick.GetNick() + "] kicked [" + sKickedNick + "] from [" + Channel.GetName() +
+        PutModule("[" + OpNick.GetNick() + "] kicked [" + sKickedNick + "] from [" + Channel.getName() +
                   "] with the msg [" + sMessage + "]");
     }
 
@@ -166,7 +166,7 @@ public:
 
     EModRet OnTimerAutoJoin(NoChannel& Channel) override
     {
-        PutModule("Attempting to join " + Channel.GetName());
+        PutModule("Attempting to join " + Channel.getName());
         return CONTINUE;
     }
 
@@ -228,7 +228,7 @@ public:
 
     EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        PutModule("[" + Nick.GetNick() + "] chanctcp [" + sMessage + "] to [" + Channel.GetName() + "]");
+        PutModule("[" + Nick.GetNick() + "] chanctcp [" + sMessage + "] to [" + Channel.getName() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
 
         return CONTINUE;
@@ -252,7 +252,7 @@ public:
 
     EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        PutModule("[" + Nick.GetNick() + "] channotice [" + sMessage + "] to [" + Channel.GetName() + "]");
+        PutModule("[" + Nick.GetNick() + "] channotice [" + sMessage + "] to [" + Channel.getName() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
 
         return CONTINUE;
@@ -260,7 +260,7 @@ public:
 
     EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
-        PutModule("* " + Nick.GetNick() + " changes topic on " + Channel.GetName() + " to '" + sTopic + "'");
+        PutModule("* " + Nick.GetNick() + " changes topic on " + Channel.getName() + " to '" + sTopic + "'");
 
         return CONTINUE;
     }
@@ -291,7 +291,7 @@ public:
     EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         if (sMessage == "!ping") {
-            PutIRC("PRIVMSG " + Channel.GetName() + " :PONG?");
+            PutIRC("PRIVMSG " + Channel.getName() + " :PONG?");
         }
 
         sMessage = "x " + sMessage + " x";

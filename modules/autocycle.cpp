@@ -120,19 +120,19 @@ public:
 protected:
     void AutoCycle(NoChannel& Channel)
     {
-        if (!IsAutoCycle(Channel.GetName())) return;
+        if (!IsAutoCycle(Channel.getName())) return;
 
         // Did we recently annoy opers via cycling of an empty channel?
-        if (m_recentlyCycled.HasItem(Channel.GetName())) return;
+        if (m_recentlyCycled.HasItem(Channel.getName())) return;
 
         // Is there only one person left in the channel?
-        if (Channel.GetNickCount() != 1) return;
+        if (Channel.getNickCount() != 1) return;
 
         // Is that person us and we don't have op?
-        const NoNick& pNick = Channel.GetNicks().begin()->second;
+        const NoNick& pNick = Channel.getNicks().begin()->second;
         if (!pNick.HasPerm(NoChannel::Op) && pNick.NickEquals(GetNetwork()->GetCurNick())) {
-            Channel.Cycle();
-            m_recentlyCycled.AddItem(Channel.GetName());
+            Channel.cycle();
+            m_recentlyCycled.AddItem(Channel.getName());
         }
     }
 

@@ -261,8 +261,8 @@ void NoClient::ReadLine(const NoString& sData)
             if (m_pNetwork) {
                 NoChannel* pChan = m_pNetwork->FindChan(sTarget);
 
-                if ((pChan) && (!pChan->AutoClearChanBuffer())) {
-                    pChan->AddBuffer(":" + _NAMEDFMT(GetNickMask()) + " NOTICE " + _NAMEDFMT(sTarget) + " :{text}", sMsg);
+                if ((pChan) && (!pChan->autoClearChanBuffer())) {
+                    pChan->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " NOTICE " + _NAMEDFMT(sTarget) + " :{text}", sMsg);
                 }
 
                 // Relay to the rest of the clients that may be connected to this user
@@ -312,8 +312,8 @@ void NoClient::ReadLine(const NoString& sData)
                         if (m_pNetwork->IsChan(sTarget)) {
                             NoChannel* pChan = m_pNetwork->FindChan(sTarget);
 
-                            if (pChan && (!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline())) {
-                                pChan->AddBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) +
+                            if (pChan && (!pChan->autoClearChanBuffer() || !m_pNetwork->IsUserOnline())) {
+                                pChan->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) +
                                                  " :\001ACTION {text}\001",
                                                  sMessage);
                             }
@@ -321,7 +321,7 @@ void NoClient::ReadLine(const NoString& sData)
                             if (!m_pUser->AutoClearQueryBuffer() || !m_pNetwork->IsUserOnline()) {
                                 NoQuery* pQuery = m_pNetwork->AddQuery(sTarget);
                                 if (pQuery) {
-                                    pQuery->AddBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) + " :\001ACTION {text}\001",
+                                    pQuery->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) + " :\001ACTION {text}\001",
                                                       sMessage);
                                 }
                             }
@@ -370,14 +370,14 @@ void NoClient::ReadLine(const NoString& sData)
                 if (m_pNetwork->IsChan(sTarget)) {
                     NoChannel* pChan = m_pNetwork->FindChan(sTarget);
 
-                    if ((pChan) && (!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline())) {
-                        pChan->AddBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) + " :{text}", sMsg);
+                    if ((pChan) && (!pChan->autoClearChanBuffer() || !m_pNetwork->IsUserOnline())) {
+                        pChan->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) + " :{text}", sMsg);
                     }
                 } else {
                     if (!m_pUser->AutoClearQueryBuffer() || !m_pNetwork->IsUserOnline()) {
                         NoQuery* pQuery = m_pNetwork->AddQuery(sTarget);
                         if (pQuery) {
-                            pQuery->AddBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) +
+                            pQuery->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) +
                                               " :{text}",
                                               sMsg);
                         }
@@ -424,9 +424,9 @@ void NoClient::ReadLine(const NoString& sData)
 
         unsigned int uDetached = 0;
         for (NoChannel* pChan : sChans) {
-            if (pChan->IsDetached()) continue;
+            if (pChan->isDetached()) continue;
             uDetached++;
-            pChan->DetachUser();
+            pChan->detachUser();
         }
 
         PutStatusNotice("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
@@ -448,10 +448,10 @@ void NoClient::ReadLine(const NoString& sData)
 
             NoChannel* pChan = m_pNetwork->FindChan(sChannel);
             if (pChan) {
-                if (pChan->IsDetached())
-                    pChan->AttachUser(this);
+                if (pChan->isDetached())
+                    pChan->attachUser(this);
                 else
-                    pChan->JoinUser(sKey);
+                    pChan->joinUser(sKey);
                 continue;
             }
 
@@ -484,7 +484,7 @@ void NoClient::ReadLine(const NoString& sData)
 
             NoChannel* pChan = m_pNetwork->FindChan(sChan);
 
-            if (pChan && !pChan->IsOn()) {
+            if (pChan && !pChan->isOn()) {
                 PutStatusNotice("Removing channel [" + sChan + "]");
                 m_pNetwork->DelChan(sChan);
             } else {
@@ -523,11 +523,11 @@ void NoClient::ReadLine(const NoString& sData)
             // request ourself.
 
             NoChannel* pChan = m_pNetwork->FindChan(sTarget);
-            if (pChan && pChan->IsOn() && !pChan->GetModeString().empty()) {
-                PutClient(":" + m_pNetwork->GetIRNoServer() + " 324 " + GetNick() + " " + sTarget + " " + pChan->GetModeString());
-                if (pChan->GetCreationDate() > 0) {
+            if (pChan && pChan->isOn() && !pChan->getModeString().empty()) {
+                PutClient(":" + m_pNetwork->GetIRNoServer() + " 324 " + GetNick() + " " + sTarget + " " + pChan->getModeString());
+                if (pChan->getCreationDate() > 0) {
                     PutClient(":" + m_pNetwork->GetIRNoServer() + " 329 " + GetNick() + " " + sTarget + " " +
-                              NoString(pChan->GetCreationDate()));
+                              NoString(pChan->getCreationDate()));
                 }
                 return;
             }
@@ -548,8 +548,8 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
             // Tell the client they are no longer in these channels.
             const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
             for (const NoChannel* pChan : vChans) {
-                if (!(pChan->IsDetached())) {
-                    PutClient(":" + m_pNetwork->GetIRNoNick().GetNickMask() + " PART " + pChan->GetName());
+                if (!(pChan->isDetached())) {
+                    PutClient(":" + m_pNetwork->GetIRNoNick().GetNickMask() + " PART " + pChan->getName());
                 }
             }
         } else if (m_pUser) {

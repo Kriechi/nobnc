@@ -63,23 +63,23 @@ public:
         for (NoChannel* pChan : vChans) {
             // If that channel isn't yet in the config,
             // we'll have to add it...
-            if (!pChan->InConfig()) {
-                pChan->SetInConfig(true);
+            if (!pChan->inConfig()) {
+                pChan->setInConfig(true);
             }
         }
     }
 
     void OnJoin(const NoNick& Nick, NoChannel& Channel) override
     {
-        if (!Channel.InConfig() && GetNetwork()->GetIRNoNick().NickEquals(Nick.GetNick())) {
-            Channel.SetInConfig(true);
+        if (!Channel.inConfig() && GetNetwork()->GetIRNoNick().NickEquals(Nick.GetNick())) {
+            Channel.setInConfig(true);
         }
     }
 
     void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
-        if (Channel.InConfig() && GetNetwork()->GetIRNoNick().NickEquals(Nick.GetNick())) {
-            Channel.SetInConfig(false);
+        if (Channel.inConfig() && GetNetwork()->GetIRNoNick().NickEquals(Nick.GetNick())) {
+            Channel.setInConfig(false);
         }
     }
 };

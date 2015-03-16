@@ -42,8 +42,8 @@ protected:
         NoChannel* pChan = pNetwork->FindChan(GetName().Token(1, true));
 
         if (pChan) {
-            pChan->Enable();
-            GetModule()->PutIRC("JOIN " + pChan->GetName() + " " + pChan->GetKey());
+            pChan->enable();
+            GetModule()->PutIRC("JOIN " + pChan->getName() + " " + pChan->getKey());
         }
     }
 };
@@ -122,11 +122,11 @@ public:
     {
         if (GetNetwork()->GetCurNick().Equals(sKickedNick)) {
             if (!delay) {
-                PutIRC("JOIN " + pChan.GetName() + " " + pChan.GetKey());
-                pChan.Enable();
+                PutIRC("JOIN " + pChan.getName() + " " + pChan.getKey());
+                pChan.enable();
                 return;
             }
-            AddTimer(new NoRejoinJob(this, delay, 1, "Rejoin " + pChan.GetName(), "Rejoin channel after a delay"));
+            AddTimer(new NoRejoinJob(this, delay, 1, "Rejoin " + pChan.getName(), "Rejoin channel after a delay"));
         }
     }
 };

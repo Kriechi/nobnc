@@ -47,7 +47,7 @@ public:
                 NoChannel* pChan = GetNetwork()->FindChan(sChannel);
 
                 if (pChan) {
-                    pChan->JoinUser();
+                    pChan->joinUser();
                     return HALT;
                 }
             }
@@ -62,10 +62,10 @@ public:
             if (bAdded) {
                 // We ignore channel key "*" because of some broken nets.
                 if (sArg != "*") {
-                    SetNV(Channel.GetName(), sArg, true);
+                    SetNV(Channel.getName(), sArg, true);
                 }
             } else {
-                SetNV(Channel.GetName(), "", true);
+                SetNV(Channel.getName(), "", true);
             }
         }
     }
@@ -113,16 +113,16 @@ public:
             NoChannel* pChan = pNetwork->FindChan(it->first);
             if (!pChan) {
                 pChan = new NoChannel(it->first, pNetwork, true);
-                if (!it->second.empty()) pChan->SetKey(it->second);
+                if (!it->second.empty()) pChan->setKey(it->second);
                 if (!pNetwork->AddChan(pChan)) {
                     /* AddChan() deleted that channel */
                     PutModule("Could not join [" + it->first + "] (# prefix missing?)");
                     continue;
                 }
             }
-            if (!pChan->IsOn() && pNetwork->IsIRCConnected()) {
-                PutModule("Joining [" + pChan->GetName() + "]");
-                PutIRC("JOIN " + pChan->GetName() + (pChan->GetKey().empty() ? "" : " " + pChan->GetKey()));
+            if (!pChan->isOn() && pNetwork->IsIRCConnected()) {
+                PutModule("Joining [" + pChan->getName() + "]");
+                PutIRC("JOIN " + pChan->getName() + (pChan->getKey().empty() ? "" : " " + pChan->getKey()));
             }
         }
     }
@@ -136,7 +136,7 @@ public:
 
             const std::vector<NoChannel*>& Channels = GetNetwork()->GetChans();
             for (unsigned int c = 0; c < Channels.size(); c++) {
-                const NoString sChan = Channels[c]->GetName();
+                const NoString sChan = Channels[c]->getName();
                 bool bStick = FindNV(sChan) != EndNV();
 
                 if (bSubmitted) {

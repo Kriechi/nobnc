@@ -662,14 +662,14 @@ public:
             if (pChan) {
                 Tmpl["Action"] = "editchan";
                 Tmpl["Edit"] = "true";
-                Tmpl["Title"] = "Edit Channel" + NoString(" [" + pChan->GetName() + "]") + " of Network [" +
+                Tmpl["Title"] = "Edit Channel" + NoString(" [" + pChan->getName() + "]") + " of Network [" +
                                 pNetwork->GetName() + "] of User [" + pNetwork->GetUser()->GetUserName() + "]";
-                Tmpl["ChanName"] = pChan->GetName();
-                Tmpl["BufferCount"] = NoString(pChan->GetBufferCount());
-                Tmpl["DefModes"] = pChan->GetDefaultModes();
-                Tmpl["Key"] = pChan->GetKey();
+                Tmpl["ChanName"] = pChan->getName();
+                Tmpl["BufferCount"] = NoString(pChan->getBufferCount());
+                Tmpl["DefModes"] = pChan->getDefaultModes();
+                Tmpl["Key"] = pChan->getKey();
 
-                if (pChan->InConfig()) {
+                if (pChan->inConfig()) {
                     Tmpl["InConfig"] = "true";
                 }
             } else {
@@ -686,21 +686,21 @@ public:
             o2["Name"] = "autoclearchanbuffer";
             o2["DisplayName"] = "Auto Clear Chan Buffer";
             o2["Tooltip"] = "Automatically Clear Channel Buffer After Playback";
-            if ((pChan && pChan->AutoClearChanBuffer()) || (!pChan && pUser->AutoClearChanBuffer())) {
+            if ((pChan && pChan->autoClearChanBuffer()) || (!pChan && pUser->AutoClearChanBuffer())) {
                 o2["Checked"] = "true";
             }
 
             NoTemplate& o3 = Tmpl.AddRow("OptionLoop");
             o3["Name"] = "detached";
             o3["DisplayName"] = "Detached";
-            if (pChan && pChan->IsDetached()) {
+            if (pChan && pChan->isDetached()) {
                 o3["Checked"] = "true";
             }
 
             NoTemplate& o4 = Tmpl.AddRow("OptionLoop");
             o4["Name"] = "disabled";
             o4["DisplayName"] = "Disabled";
-            if (pChan && pChan->IsDisabled()) {
+            if (pChan && pChan->isDisabled()) {
                 o4["Checked"] = "true";
             }
 
@@ -729,48 +729,48 @@ public:
             // This could change the channel name and e.g. add a "#" prefix
             pChan = new NoChannel(sChanName, pNetwork, true);
 
-            if (pNetwork->FindChan(pChan->GetName())) {
-                WebSock.PrintErrorPage("Channel [" + pChan->GetName() + "] already exists");
+            if (pNetwork->FindChan(pChan->getName())) {
+                WebSock.PrintErrorPage("Channel [" + pChan->getName() + "] already exists");
                 delete pChan;
                 return true;
             }
 
             if (!pNetwork->AddChan(pChan)) {
-                WebSock.PrintErrorPage("Could not add channel [" + pChan->GetName() + "]");
+                WebSock.PrintErrorPage("Could not add channel [" + pChan->getName() + "]");
                 return true;
             }
         }
 
         unsigned int uBufferCount = WebSock.GetParam("buffercount").ToUInt();
-        if (pChan->GetBufferCount() != uBufferCount) {
-            pChan->SetBufferCount(uBufferCount, spSession->IsAdmin());
+        if (pChan->getBufferCount() != uBufferCount) {
+            pChan->setBufferCount(uBufferCount, spSession->IsAdmin());
         }
-        pChan->SetDefaultModes(WebSock.GetParam("defmodes"));
-        pChan->SetInConfig(WebSock.GetParam("save").ToBool());
+        pChan->setDefaultModes(WebSock.GetParam("defmodes"));
+        pChan->setInConfig(WebSock.GetParam("save").ToBool());
         bool bAutoClearChanBuffer = WebSock.GetParam("autoclearchanbuffer").ToBool();
-        if (pChan->AutoClearChanBuffer() != bAutoClearChanBuffer) {
-            pChan->SetAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").ToBool());
+        if (pChan->autoClearChanBuffer() != bAutoClearChanBuffer) {
+            pChan->setAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").ToBool());
         }
-        pChan->SetKey(WebSock.GetParam("key"));
+        pChan->setKey(WebSock.GetParam("key"));
 
         bool bDetached = WebSock.GetParam("detached").ToBool();
-        if (pChan->IsDetached() != bDetached) {
+        if (pChan->isDetached() != bDetached) {
             if (bDetached) {
-                pChan->DetachUser();
+                pChan->detachUser();
             } else {
-                pChan->AttachUser();
+                pChan->attachUser();
             }
         }
 
         bool bDisabled = WebSock.GetParam("disabled").ToBool();
         if (bDisabled)
-            pChan->Disable();
+            pChan->disable();
         else
-            pChan->Enable();
+            pChan->enable();
 
         NoTemplate TmplMod;
         TmplMod["User"] = pUser->GetUserName();
-        TmplMod["ChanName"] = pChan->GetName();
+        TmplMod["ChanName"] = pChan->getName();
         TmplMod["WebadminAction"] = "change";
         FOR_EACH_MODULE(it, pNetwork) { (*it)->OnEmbeddedWebRequest(WebSock, "webadmin/channel", TmplMod); }
 
@@ -785,7 +785,7 @@ public:
         } else {
             WebSock.Redirect(GetWebPath() + "editchan?user=" + pUser->GetUserName().Escape_n(NoString::EURL) +
                              "&network=" + pNetwork->GetName().Escape_n(NoString::EURL) + "&name=" +
-                             pChan->GetName().Escape_n(NoString::EURL));
+                             pChan->getName().Escape_n(NoString::EURL));
         }
         return true;
     }
@@ -898,18 +898,18 @@ public:
 
                     l["Network"] = pNetwork->GetName();
                     l["Username"] = pUser->GetUserName();
-                    l["Name"] = pChan->GetName();
-                    l["Perms"] = pChan->GetPermStr();
-                    l["CurModes"] = pChan->GetModeString();
-                    l["DefModes"] = pChan->GetDefaultModes();
-                    if (pChan->HasBufferCountSet()) {
-                        l["BufferCount"] = NoString(pChan->GetBufferCount());
+                    l["Name"] = pChan->getName();
+                    l["Perms"] = pChan->getPermStr();
+                    l["CurModes"] = pChan->getModeString();
+                    l["DefModes"] = pChan->getDefaultModes();
+                    if (pChan->hasBufferCountSet()) {
+                        l["BufferCount"] = NoString(pChan->getBufferCount());
                     } else {
-                        l["BufferCount"] = NoString(pChan->GetBufferCount()) + " (default)";
+                        l["BufferCount"] = NoString(pChan->getBufferCount()) + " (default)";
                     }
-                    l["Options"] = pChan->GetOptions();
+                    l["Options"] = pChan->getOptions();
 
-                    if (pChan->InConfig()) {
+                    if (pChan->inConfig()) {
                         l["InConfig"] = "true";
                     }
                 }
@@ -1080,7 +1080,7 @@ public:
             const NoString& sChan = vsArgs[a];
             NoChannel* pChan = pNetwork->FindChan(sChan.TrimRight_n("\r"));
             if (pChan) {
-                pChan->SetInConfig(WebSock.GetParam("save_" + sChan).ToBool());
+                pChan->setInConfig(WebSock.GetParam("save_" + sChan).ToBool());
             }
         }
 

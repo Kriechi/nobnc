@@ -75,7 +75,7 @@ public:
             if (it->second.first + (time_t)m_iThresholdSecs >= now) continue;
 
             NoChannel* pChan = GetNetwork()->FindChan(it->first);
-            if (it->second.second >= m_iThresholdMsgs && pChan && pChan->IsDetached()) {
+            if (it->second.second >= m_iThresholdMsgs && pChan && pChan->isDetached()) {
                 // The channel is detached and it is over the
                 // messages limit. Since we only track those
                 // limits for non-detached channels or for
@@ -83,12 +83,12 @@ public:
                 // we detached because of a flood.
 
                 if (!GetNV("silent").ToBool()) {
-                    PutModule("Flood in [" + pChan->GetName() + "] is over, "
+                    PutModule("Flood in [" + pChan->getName() + "] is over, "
                                                                 "re-attaching...");
                 }
                 // No buffer playback, makes sense, doesn't it?
-                pChan->ClearBuffer();
-                pChan->AttachUser();
+                pChan->clearBuffer();
+                pChan->attachUser();
             }
 
             Limits::iterator it2 = it++;
@@ -107,16 +107,16 @@ public:
         // First: Clean up old entries and reattach where necessary
         Cleanup();
 
-        it = m_chans.find(Channel.GetName());
+        it = m_chans.find(Channel.getName());
 
         if (it == m_chans.end()) {
             // We don't track detached channels
-            if (Channel.IsDetached()) return;
+            if (Channel.isDetached()) return;
 
             // This is the first message for this channel, start a
             // new timeout.
             std::pair<time_t, unsigned int> tmp(now, 1);
-            m_chans[Channel.GetName()] = tmp;
+            m_chans[Channel.getName()] = tmp;
             return;
         }
 
@@ -139,9 +139,9 @@ public:
         // it detached for longer.
         it->second.first = now;
 
-        Channel.DetachUser();
+        Channel.detachUser();
         if (!GetNV("silent").ToBool()) {
-            PutModule("Channel [" + Channel.GetName() + "] was "
+            PutModule("Channel [" + Channel.getName() + "] was "
                                                         "flooded, you've been detached");
         }
     }

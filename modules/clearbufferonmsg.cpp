@@ -49,18 +49,18 @@ public:
 
             for (NoChannel* pChan : vChans) {
                 // Skip detached channels, they weren't read yet
-                if (pChan->IsDetached()) continue;
+                if (pChan->isDetached()) continue;
 
-                pChan->ClearBuffer();
+                pChan->clearBuffer();
                 // We deny AutoClearChanBuffer on all channels since this module
                 // doesn't make any sense with it
-                pChan->SetAutoClearChanBuffer(false);
+                pChan->setAutoClearChanBuffer(false);
             }
 
             std::vector<NoQuery*> VQueries = pNetwork->GetQueries();
 
             for (NoQuery* pQuery : VQueries) {
-                pNetwork->DelQuery(pQuery->GetName());
+                pNetwork->DelQuery(pQuery->getName());
             }
 
             // We deny AutoClearQueryBuffer since this module

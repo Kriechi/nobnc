@@ -1133,7 +1133,7 @@ void NoUser::SetAutoClearChanBuffer(bool b)
 {
     for (NoNetwork* pNetwork : m_vIRNoNetworks) {
         for (NoChannel* pChan : pNetwork->GetChans()) {
-            pChan->InheritAutoClearChanBuffer(b);
+            pChan->inheritAutoClearChanBuffer(b);
         }
     }
     m_bAutoClearChanBuffer = b;
@@ -1145,7 +1145,7 @@ bool NoUser::SetBufferCount(unsigned int u, bool bForce)
     if (!bForce && u > NoApp::Get().GetMaxBufferSize()) return false;
     for (NoNetwork* pNetwork : m_vIRNoNetworks) {
         for (NoChannel* pChan : pNetwork->GetChans()) {
-            pChan->InheritBufferCount(u, bForce);
+            pChan->inheritBufferCount(u, bForce);
         }
     }
     m_uBufferCount = u;

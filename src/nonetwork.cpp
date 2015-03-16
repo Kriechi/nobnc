@@ -197,22 +197,22 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     // Chans
     const std::vector<NoChannel*>& vChans = Network.GetChans();
     for (NoChannel* pNewChan : vChans) {
-        NoChannel* pChan = FindChan(pNewChan->GetName());
+        NoChannel* pChan = FindChan(pNewChan->getName());
 
         if (pChan) {
-            pChan->SetInConfig(pNewChan->InConfig());
+            pChan->setInConfig(pNewChan->inConfig());
         } else {
-            AddChan(pNewChan->GetName(), pNewChan->InConfig());
+            AddChan(pNewChan->getName(), pNewChan->inConfig());
         }
     }
 
     for (NoChannel* pChan : m_vChans) {
-        NoChannel* pNewChan = Network.FindChan(pChan->GetName());
+        NoChannel* pNewChan = Network.FindChan(pChan->getName());
 
         if (!pNewChan) {
-            pChan->SetInConfig(false);
+            pChan->setInConfig(false);
         } else {
-            pChan->Clone(*pNewChan);
+            pChan->clone(*pNewChan);
         }
     }
     // !Chans
@@ -442,7 +442,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
 
         // Save the channel name, because AddChan
         // deletes the NoChannelnel*, if adding fails
-        sError = pChan->GetName();
+        sError = pChan->getName();
         if (!AddChan(pChan)) {
             sError = "Channel [" + sError + "] defined more than once";
             NoUtils::PrintError(sError);
@@ -513,8 +513,8 @@ NoSettings NoNetwork::ToConfig() const
 
     // Chans
     for (NoChannel* pChan : m_vChans) {
-        if (pChan->InConfig()) {
-            config.AddSubConfig("Chan", pChan->GetName(), pChan->ToConfig());
+        if (pChan->inConfig()) {
+            config.AddSubConfig("Chan", pChan->getName(), pChan->toConfig());
         }
     }
 
@@ -602,14 +602,14 @@ void NoNetwork::ClientConnected(NoClient* pClient)
 
     const std::vector<NoChannel*>& vChans = GetChans();
     for (NoChannel* pChan : vChans) {
-        if ((pChan->IsOn()) && (!pChan->IsDetached())) {
-            pChan->AttachUser(pClient);
+        if ((pChan->isOn()) && (!pChan->isDetached())) {
+            pChan->attachUser(pClient);
         }
     }
 
     bool bClearQuery = m_pUser->AutoClearQueryBuffer();
     for (NoQuery* pQuery : m_vQueries) {
-        pQuery->SendBuffer(pClient);
+        pQuery->sendBuffer(pClient);
         if (bClearQuery) {
             delete pQuery;
         }
@@ -747,7 +747,7 @@ NoChannel* NoNetwork::FindChan(NoString sName) const
     }
 
     for (NoChannel* pChan : m_vChans) {
-        if (sName.Equals(pChan->GetName())) {
+        if (sName.Equals(pChan->getName())) {
             return pChan;
         }
     }
@@ -761,7 +761,7 @@ std::vector<NoChannel*> NoNetwork::FindChans(const NoString& sWild) const
     vChans.reserve(m_vChans.size());
     const NoString sLower = sWild.AsLower();
     for (NoChannel* pChan : m_vChans) {
-        if (pChan->GetName().AsLower().WildCmp(sLower)) vChans.push_back(pChan);
+        if (pChan->getName().AsLower().WildCmp(sLower)) vChans.push_back(pChan);
     }
     return vChans;
 }
@@ -773,7 +773,7 @@ bool NoNetwork::AddChan(NoChannel* pChan)
     }
 
     for (NoChannel* pEachChan : m_vChans) {
-        if (pEachChan->GetName().Equals(pChan->GetName())) {
+        if (pEachChan->getName().Equals(pChan->getName())) {
             delete pChan;
             return false;
         }
@@ -797,7 +797,7 @@ bool NoNetwork::AddChan(const NoString& sName, bool bInConfig)
 bool NoNetwork::DelChan(const NoString& sName)
 {
     for (std::vector<NoChannel*>::iterator a = m_vChans.begin(); a != m_vChans.end(); ++a) {
-        if (sName.Equals((*a)->GetName())) {
+        if (sName.Equals((*a)->getName())) {
             delete *a;
             m_vChans.erase(a);
             return true;
@@ -821,7 +821,7 @@ void NoNetwork::JoinChans()
     for (unsigned int a = 0; a < m_vChans.size(); a++) {
         unsigned int idx = (start + a) % m_vChans.size();
         NoChannel* pChan = m_vChans[idx];
-        if (!pChan->IsOn() && !pChan->IsDisabled()) {
+        if (!pChan->isOn() && !pChan->isDisabled()) {
             if (!JoinChan(pChan)) continue;
 
             sChans.insert(pChan);
@@ -846,8 +846,8 @@ void NoNetwork::JoinChans(std::set<NoChannel*>& sChans)
 
     while (!sChans.empty()) {
         std::set<NoChannel*>::iterator it = sChans.begin();
-        const NoString& sName = (*it)->GetName();
-        const NoString& sKey = (*it)->GetKey();
+        const NoString& sName = (*it)->getName();
+        const NoString& sKey = (*it)->getKey();
         size_t len = sName.length() + sKey.length();
         len += 2; // two comma
 
@@ -879,11 +879,11 @@ bool NoNetwork::JoinChan(NoChannel* pChan)
 
     if (bReturn) return false;
 
-    if (m_pUser->JoinTries() != 0 && pChan->GetJoinTries() >= m_pUser->JoinTries()) {
-        PutStatus("The channel " + pChan->GetName() + " could not be joined, disabling it.");
-        pChan->Disable();
+    if (m_pUser->JoinTries() != 0 && pChan->getJoinTries() >= m_pUser->JoinTries()) {
+        PutStatus("The channel " + pChan->getName() + " could not be joined, disabling it.");
+        pChan->disable();
     } else {
-        pChan->IncJoinTries();
+        pChan->incJoinTries();
         bool bFailed = false;
         NETWORKMODULECALL(OnTimerAutoJoin(*pChan), m_pUser, this, nullptr, &bFailed);
         if (bFailed) return false;
@@ -907,7 +907,7 @@ const std::vector<NoQuery*>& NoNetwork::GetQueries() const { return m_vQueries; 
 NoQuery* NoNetwork::FindQuery(const NoString& sName) const
 {
     for (NoQuery* pQuery : m_vQueries) {
-        if (sName.Equals(pQuery->GetName())) {
+        if (sName.Equals(pQuery->getName())) {
             return pQuery;
         }
     }
@@ -921,7 +921,7 @@ std::vector<NoQuery*> NoNetwork::FindQueries(const NoString& sWild) const
     vQueries.reserve(m_vQueries.size());
     const NoString sLower = sWild.AsLower();
     for (NoQuery* pQuery : m_vQueries) {
-        if (pQuery->GetName().AsLower().WildCmp(sLower)) vQueries.push_back(pQuery);
+        if (pQuery->getName().AsLower().WildCmp(sLower)) vQueries.push_back(pQuery);
     }
     return vQueries;
 }
@@ -951,7 +951,7 @@ NoQuery* NoNetwork::AddQuery(const NoString& sName)
 bool NoNetwork::DelQuery(const NoString& sName)
 {
     for (std::vector<NoQuery*>::iterator a = m_vQueries.begin(); a != m_vQueries.end(); ++a) {
-        if (sName.Equals((*a)->GetName())) {
+        if (sName.Equals((*a)->getName())) {
             delete *a;
             m_vQueries.erase(a);
             return true;

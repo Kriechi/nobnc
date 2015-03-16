@@ -186,12 +186,12 @@ public:
 
     void TryAttach(const NoNick& Nick, NoChannel& Channel, NoString& Message)
     {
-        const NoString& sChan = Channel.GetName();
+        const NoString& sChan = Channel.getName();
         const NoString& sHost = Nick.GetHostMask();
         const NoString& sMessage = Message;
         VAttachIter it;
 
-        if (!Channel.IsDetached()) return;
+        if (!Channel.isDetached()) return;
 
         // Any negated match?
         for (it = m_vMatches.begin(); it != m_vMatches.end(); ++it) {
@@ -201,7 +201,7 @@ public:
         // Now check for a positive match
         for (it = m_vMatches.begin(); it != m_vMatches.end(); ++it) {
             if (!it->IsNegated() && it->IsMatch(sChan, sHost, sMessage)) {
-                Channel.AttachUser();
+                Channel.attachUser();
                 return;
             }
         }

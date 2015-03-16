@@ -136,7 +136,7 @@ public:
 
     template <typename T> void BootStrap(T* pTarget, const NoString& sContent)
     {
-        if (!pTarget->GetBuffer().isEmpty()) return; // in this case the module was probably reloaded
+        if (!pTarget->getBuffer().isEmpty()) return; // in this case the module was probably reloaded
 
         NoStringVector vsLines;
         NoStringVector::iterator it;
@@ -158,10 +158,10 @@ public:
                 NoString sText(*++it);
                 sText.Trim();
 
-                pTarget->AddBuffer(sFormat, sText, &ts);
+                pTarget->addBuffer(sFormat, sText, &ts);
             } else {
                 // Old format, escape the line and use as is.
-                pTarget->AddBuffer(_NAMEDFMT(sLine));
+                pTarget->addBuffer(_NAMEDFMT(sLine));
             }
         }
     }
@@ -196,15 +196,15 @@ public:
 
             const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
             for (NoChannel* pChan : vChans) {
-                NoString sPath = GetPath(pChan->GetName());
-                SaveBufferToDisk(pChan->GetBuffer(), sPath, CHAN_VERIFICATION_TOKEN + pChan->GetName());
+                NoString sPath = GetPath(pChan->getName());
+                SaveBufferToDisk(pChan->getBuffer(), sPath, CHAN_VERIFICATION_TOKEN + pChan->getName());
                 ssPaths.insert(sPath);
             }
 
             const std::vector<NoQuery*>& vQueries = GetNetwork()->GetQueries();
             for (NoQuery* pQuery : vQueries) {
-                NoString sPath = GetPath(pQuery->GetName());
-                SaveBufferToDisk(pQuery->GetBuffer(), sPath, QUERY_VERIFICATION_TOKEN + pQuery->GetName());
+                NoString sPath = GetPath(pQuery->getName());
+                SaveBufferToDisk(pQuery->getBuffer(), sPath, QUERY_VERIFICATION_TOKEN + pQuery->getName());
                 ssPaths.insert(sPath);
             }
 
@@ -304,7 +304,7 @@ public:
     {
         const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
         for (NoChannel* pChan : vChans) {
-            const NoString& sName = pChan->GetName();
+            const NoString& sName = pChan->getName();
             if (GetPath(sName).Equals(sPath)) {
                 return sName;
             }
