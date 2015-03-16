@@ -20,12 +20,6 @@
 #include <no/nonetwork.h>
 #include <no/noircsock.h>
 
-using std::stringstream;
-using std::make_pair;
-using std::set;
-using std::vector;
-using std::map;
-
 /* Stuff to be able to write this:
    // i will be name of local variable, see below
    // pUser can be nullptr if only global modules are needed
@@ -85,7 +79,7 @@ public:
     MODCONSTRUCTOR(NoWebAdminMod)
     {
         NoStringPairVector vParams;
-        vParams.push_back(make_pair("user", ""));
+        vParams.push_back(std::make_pair("user", ""));
         AddSubPage(std::make_shared<NoWebSubPage>("settings", "Global Settings", NoWebSubPage::F_ADMIN));
         AddSubPage(std::make_shared<NoWebSubPage>("edituser", "Your Settings", vParams));
         AddSubPage(std::make_shared<NoWebSubPage>("traffic", "Traffic Info", NoWebSubPage::F_ADMIN));
@@ -150,8 +144,8 @@ public:
 
         if (!bShareIRCPorts) {
             // Make all existing listeners IRC-only
-            const vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
-            vector<NoListener*>::const_iterator it;
+            const std::vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
+            std::vector<NoListener*>::const_iterator it;
             for (it = vListeners.begin(); it != vListeners.end(); ++it) {
                 (*it)->SetAcceptType(NoListener::ACCEPT_IRC);
             }
@@ -804,9 +798,9 @@ public:
         if (!WebSock.GetParam("submitted").ToUInt()) {
             Tmpl["Username"] = pUser->GetUserName();
 
-            set<NoModInfo> ssNetworkMods;
+            std::set<NoModInfo> ssNetworkMods;
             NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, NoModInfo::NetworkModule);
-            for (set<NoModInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
+            for (std::set<NoModInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
                 const NoModInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
@@ -891,13 +885,13 @@ public:
 
                 Tmpl["IRCConnectEnabled"] = NoString(pNetwork->GetIRCConnectEnabled());
 
-                const vector<NoServer*>& vServers = pNetwork->GetServers();
+                const std::vector<NoServer*>& vServers = pNetwork->GetServers();
                 for (unsigned int a = 0; a < vServers.size(); a++) {
                     NoTemplate& l = Tmpl.AddRow("ServerLoop");
                     l["Server"] = vServers[a]->GetString();
                 }
 
-                const vector<NoChannel*>& Channels = pNetwork->GetChans();
+                const std::vector<NoChannel*>& Channels = pNetwork->GetChans();
                 for (unsigned int c = 0; c < Channels.size(); c++) {
                     NoChannel* pChan = Channels[c];
                     NoTemplate& l = Tmpl.AddRow("ChannelLoop");
@@ -939,7 +933,7 @@ public:
                 Tmpl["JoinDelay"] = "0";
             }
 
-            FOR_EACH_MODULE(i, make_pair(pUser, pNetwork))
+            FOR_EACH_MODULE(i, std::make_pair(pUser, pNetwork))
             {
                 NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
@@ -1090,10 +1084,10 @@ public:
             }
         }
 
-        set<NoString> ssArgs;
+        std::set<NoString> ssArgs;
         WebSock.GetParamValues("loadmod", ssArgs);
         if (spSession->IsAdmin() || !pUser->DenyLoadMod()) {
-            for (set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
+            for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
                 NoString sModRet;
                 NoString sModName = (*it).TrimRight_n("\r");
                 NoString sModLoadError;
@@ -1122,7 +1116,7 @@ public:
         }
 
         const NoModules& vCurMods = pNetwork->GetModules();
-        set<NoString> ssUnloadMods;
+        std::set<NoString> ssUnloadMods;
 
         for (unsigned int a = 0; a < vCurMods.size(); a++) {
             NoModule* pCurMod = vCurMods[a];
@@ -1132,7 +1126,7 @@ public:
             }
         }
 
-        for (set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
+        for (std::set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
             pNetwork->GetModules().UnloadModule(*it2);
         }
 
@@ -1140,7 +1134,7 @@ public:
         TmplMod["Username"] = pUser->GetUserName();
         TmplMod["Name"] = pNetwork->GetName();
         TmplMod["WebadminAction"] = "change";
-        FOR_EACH_MODULE(it, make_pair(pUser, pNetwork))
+        FOR_EACH_MODULE(it, std::make_pair(pUser, pNetwork))
         {
             (*it)->OnEmbeddedWebRequest(WebSock, "webadmin/network", TmplMod);
         }
@@ -1258,13 +1252,13 @@ public:
                 Tmpl["MaxJoins"] = NoString(pUser->MaxJoins());
                 Tmpl["MaxQueryBuffers"] = NoString(pUser->MaxQueryBuffers());
 
-                const set<NoString>& ssAllowedHosts = pUser->GetAllowedHosts();
-                for (set<NoString>::const_iterator it = ssAllowedHosts.begin(); it != ssAllowedHosts.end(); ++it) {
+                const std::set<NoString>& ssAllowedHosts = pUser->GetAllowedHosts();
+                for (std::set<NoString>::const_iterator it = ssAllowedHosts.begin(); it != ssAllowedHosts.end(); ++it) {
                     NoTemplate& l = Tmpl.AddRow("AllowedHostLoop");
                     l["Host"] = *it;
                 }
 
-                const vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
+                const std::vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
                 for (unsigned int a = 0; a < vNetworks.size(); a++) {
                     NoTemplate& l = Tmpl.AddRow("NetworkLoop");
                     l["Name"] = vNetworks[a]->GetName();
@@ -1364,7 +1358,7 @@ public:
                 }
             }
 
-            vector<NoString> vDirs;
+            std::vector<NoString> vDirs;
             WebSock.GetAvailSkins(vDirs);
 
             for (unsigned int d = 0; d < vDirs.size(); d++) {
@@ -1377,10 +1371,10 @@ public:
                 }
             }
 
-            set<NoModInfo> ssUserMods;
+            std::set<NoModInfo> ssUserMods;
             NoApp::Get().GetModules().GetAvailableMods(ssUserMods);
 
-            for (set<NoModInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
+            for (std::set<NoModInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
                 const NoModInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
@@ -1394,7 +1388,7 @@ public:
                 if (pUser) {
                     pModule = pUser->GetModules().FindModule(Info.GetName());
                     // Check if module is loaded by all or some networks
-                    const vector<NoNetwork*>& userNetworks = pUser->GetNetworks();
+                    const std::vector<NoNetwork*>& userNetworks = pUser->GetNetworks();
                     unsigned int networksWithRenderedModuleCount = 0;
                     for (unsigned int networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
@@ -1569,13 +1563,13 @@ public:
     bool ListUsersPage(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
-        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         Tmpl["Title"] = "Manage Users";
         Tmpl["Action"] = "listusers";
 
         unsigned int a = 0;
 
-        for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it, a++) {
+        for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it, a++) {
             NoTemplate& l = Tmpl.AddRow("UserLoop");
             NoUser& User = *it->second;
 
@@ -1596,16 +1590,16 @@ public:
         Tmpl["Title"] = "Traffic Info";
         Tmpl["Uptime"] = NoApp::Get().GetUptime();
 
-        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         Tmpl["TotalUsers"] = NoString(msUsers.size());
 
         size_t uiNetworks = 0, uiAttached = 0, uiClients = 0, uiServers = 0;
 
-        for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
+        for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             NoUser& User = *it->second;
-            vector<NoNetwork*> vNetworks = User.GetNetworks();
+            std::vector<NoNetwork*> vNetworks = User.GetNetworks();
 
-            for (vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
+            for (std::vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
                 NoNetwork* pNetwork = *it2;
                 uiNetworks++;
 
@@ -1777,7 +1771,7 @@ public:
                 l["Line"] = vsMotd[b];
             }
 
-            const vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
+            const std::vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
             for (unsigned int c = 0; c < vpListeners.size(); c++) {
                 NoListener* pListener = vpListeners[c];
                 NoTemplate& l = Tmpl.AddRow("ListenLoop");
@@ -1819,7 +1813,7 @@ public:
 #endif
             }
 
-            vector<NoString> vDirs;
+            std::vector<NoString> vDirs;
             WebSock.GetAvailSkins(vDirs);
 
             for (unsigned int d = 0; d < vDirs.size(); d++) {
@@ -1832,10 +1826,10 @@ public:
                 }
             }
 
-            set<NoModInfo> ssGlobalMods;
+            std::set<NoModInfo> ssGlobalMods;
             NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, NoModInfo::GlobalModule);
 
-            for (set<NoModInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
+            for (std::set<NoModInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
                 const NoModInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
@@ -1858,8 +1852,8 @@ public:
                 unsigned int usersWithRenderedModuleCount = 0;
                 unsigned int networksWithRenderedModuleCount = 0;
                 unsigned int networksCount = 0;
-                const map<NoString, NoUser*>& allUsers = NoApp::Get().GetUserMap();
-                for (map<NoString, NoUser*>::const_iterator usersIt = allUsers.begin(); usersIt != allUsers.end(); ++usersIt) {
+                const std::map<NoString, NoUser*>& allUsers = NoApp::Get().GetUserMap();
+                for (std::map<NoString, NoUser*>::const_iterator usersIt = allUsers.begin(); usersIt != allUsers.end(); ++usersIt) {
                     const NoUser& User = *usersIt->second;
 
                     // Count users which has loaded a render module
@@ -1868,7 +1862,7 @@ public:
                         usersWithRenderedModuleCount++;
                     }
                     // Count networks which has loaded a render module
-                    const vector<NoNetwork*>& userNetworks = User.GetNetworks();
+                    const std::vector<NoNetwork*>& userNetworks = User.GetNetworks();
                     networksCount += userNetworks.size();
                     for (unsigned int networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
@@ -1923,10 +1917,10 @@ public:
 
         NoApp::Get().SetSkinName(WebSock.GetParam("skin"));
 
-        set<NoString> ssArgs;
+        std::set<NoString> ssArgs;
         WebSock.GetParamValues("loadmod", ssArgs);
 
-        for (set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
+        for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
             NoString sModRet;
             NoString sModName = (*it).TrimRight_n("\r");
             NoString sModLoadError;
@@ -1953,7 +1947,7 @@ public:
         }
 
         const NoModules& vCurMods = NoApp::Get().GetModules();
-        set<NoString> ssUnloadMods;
+        std::set<NoString> ssUnloadMods;
 
         for (a = 0; a < vCurMods.size(); a++) {
             NoModule* pCurMod = vCurMods[a];
@@ -1964,7 +1958,7 @@ public:
             }
         }
 
-        for (set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
+        for (std::set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
             NoApp::Get().GetModules().UnloadModule(*it2);
         }
 

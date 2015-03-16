@@ -17,8 +17,6 @@
 #include <no/noapp.h>
 #include <no/nouser.h>
 
-using std::set;
-
 class NoClientNotifyMod : public NoModule
 {
 protected:
@@ -26,7 +24,7 @@ protected:
     bool m_bNewOnly;
     bool m_bOnDisconnect;
 
-    set<NoString> m_sClientsSeen;
+    std::set<NoString> m_sClientsSeen;
 
     void SaveSettings()
     {
@@ -90,7 +88,7 @@ public:
                              "Use the 'ListClients' command to see all " +
                              NoString(GetUser()->GetAllClients().size()) + " clients.");
 
-            // the set<> will automatically disregard duplicates:
+            // the std::set<> will automatically disregard duplicates:
             m_sClientsSeen.insert(sRemoteIP);
         }
     }

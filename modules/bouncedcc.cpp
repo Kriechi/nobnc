@@ -17,8 +17,6 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 
-using std::set;
-
 class NoBounceDccMod;
 
 class NoDccBounce : public NoSocket
@@ -115,7 +113,7 @@ public:
         Table.AddColumn("IP");
         Table.AddColumn("File");
 
-        set<NoSocket*>::const_iterator it;
+        std::set<NoSocket*>::const_iterator it;
         for (it = BeginSockets(); it != EndSockets(); ++it) {
             NoDccBounce* pSock = (NoDccBounce*)*it;
             NoString sSockName = pSock->GetSockName();
@@ -208,7 +206,7 @@ public:
                 // PRIVMSG user :DCC RESUME "znc.o" 58810 151552
                 unsigned short uResumePort = sMessage.Token(3).ToUShort();
 
-                set<NoSocket*>::const_iterator it;
+                std::set<NoSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 
@@ -220,7 +218,7 @@ public:
             } else if (sType.Equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
 
-                set<NoSocket*>::const_iterator it;
+                std::set<NoSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
                     if (pSock->GetUserPort() == sMessage.Token(3).ToUShort()) {
@@ -269,7 +267,7 @@ public:
                 // Need to lookup the connection by port, filter the port, and forward to the user
                 unsigned short uResumePort = sMessage.Token(3).ToUShort();
 
-                set<NoSocket*>::const_iterator it;
+                std::set<NoSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 
@@ -280,7 +278,7 @@ public:
                 }
             } else if (sType.Equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
-                set<NoSocket*>::const_iterator it;
+                std::set<NoSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 

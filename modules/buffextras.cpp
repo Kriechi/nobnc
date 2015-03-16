@@ -17,8 +17,6 @@
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
 
-using std::vector;
-
 class NoBuffExtras : public NoModule
 {
 public:
@@ -46,9 +44,9 @@ public:
         AddBuffer(Channel, OpNick.GetNickMask() + " kicked " + sKickedNick + " Reason: [" + sMessage + "]");
     }
 
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) override
+    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
-        vector<NoChannel*>::const_iterator it;
+        std::vector<NoChannel*>::const_iterator it;
         NoString sMsg = Nick.GetNickMask() + " quit with message: [" + sMessage + "]";
         for (it = vChans.begin(); it != vChans.end(); ++it) {
             AddBuffer(**it, sMsg);
@@ -62,9 +60,9 @@ public:
         AddBuffer(Channel, Nick.GetNickMask() + " parted with message: [" + sMessage + "]");
     }
 
-    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override
+    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
-        vector<NoChannel*>::const_iterator it;
+        std::vector<NoChannel*>::const_iterator it;
         NoString sMsg = OldNick.GetNickMask() + " is now known as " + sNewNick;
         for (it = vChans.begin(); it != vChans.end(); ++it) {
             AddBuffer(**it, sMsg);

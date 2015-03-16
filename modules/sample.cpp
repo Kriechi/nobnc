@@ -18,8 +18,6 @@
 #include <no/nochannel.h>
 #include <no/nomodules.h>
 
-using std::vector;
-
 #ifdef HAVE_PTHREAD
 class NoSampleJob : public NoModuleJob
 {
@@ -161,7 +159,7 @@ public:
                   "] with the msg [" + sMessage + "]");
     }
 
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) override
+    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         PutModule("* Quits: " + Nick.GetNick() + " (" + Nick.GetIdent() + "!" + Nick.GetHost() + ") (" + sMessage + ")");
     }
@@ -193,7 +191,7 @@ public:
         return CONTINUE;
     }
 
-    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override
+    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         PutModule("* " + OldNick.GetNick() + " is now known as " + sNewNick);
     }

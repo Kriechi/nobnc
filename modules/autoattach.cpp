@@ -17,8 +17,6 @@
 #include <no/nochannel.h>
 #include <no/nomodules.h>
 
-using std::vector;
-
 class NoAttachMatch
 {
 public:
@@ -74,7 +72,7 @@ private:
 class NoChannelAttach : public NoModule
 {
 public:
-    typedef vector<NoAttachMatch> VAttachMatch;
+    typedef std::vector<NoAttachMatch> VAttachMatch;
     typedef VAttachMatch::iterator VAttachIter;
 
 private:

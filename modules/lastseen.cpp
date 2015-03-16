@@ -17,10 +17,6 @@
 #include <no/nouser.h>
 #include <no/noapp.h>
 
-using std::map;
-using std::pair;
-using std::multimap;
-
 class NoLastSeenMod : public NoModule
 {
 private:
@@ -40,8 +36,8 @@ private:
         }
     }
 
-    typedef multimap<time_t, NoUser*> MTimeMulti;
-    typedef map<NoString, NoUser*> MUsers;
+    typedef std::multimap<time_t, NoUser*> MTimeMulti;
+    typedef std::map<NoString, NoUser*> MUsers;
 
     void ShowCommand(const NoString& sLine)
     {
@@ -102,7 +98,7 @@ public:
             const MUsers& mUsers = NoApp::Get().GetUserMap();
 
             for (MUsers::const_iterator uit = mUsers.begin(); uit != mUsers.end(); ++uit) {
-                mmSorted.insert(pair<time_t, NoUser*>(GetTime(uit->second), uit->second));
+                mmSorted.insert(std::pair<time_t, NoUser*>(GetTime(uit->second), uit->second));
             }
 
             for (MTimeMulti::const_iterator it = mmSorted.begin(); it != mmSorted.end(); ++it) {

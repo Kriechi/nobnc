@@ -17,10 +17,6 @@
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
 
-using std::list;
-using std::vector;
-using std::set;
-
 class NoWatchSource
 {
 public:
@@ -114,7 +110,7 @@ public:
     bool IsDisabled() const { return m_bDisabled; }
     bool IsDetachedClientOnly() const { return m_bDetachedClientOnly; }
     bool IsDetachedChannelOnly() const { return m_bDetachedChannelOnly; }
-    const vector<NoWatchSource>& GetSources() const { return m_vsSources; }
+    const std::vector<NoWatchSource>& GetSources() const { return m_vsSources; }
     NoString GetSourcesStr() const
     {
         NoString sRet;
@@ -169,7 +165,7 @@ protected:
     bool m_bDisabled;
     bool m_bDetachedClientOnly;
     bool m_bDetachedChannelOnly;
-    vector<NoWatchSource> m_vsSources;
+    std::vector<NoWatchSource> m_vsSources;
 };
 
 class NoWatcherMod : public NoModule
@@ -207,7 +203,7 @@ public:
                 Channel.GetName());
     }
 
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) override
+    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         Process(Nick,
                 "* Quits: " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") "
@@ -231,7 +227,7 @@ public:
                 Channel.GetName());
     }
 
-    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override
+    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         Process(OldNick, "* " + OldNick.GetNick() + " is now known as " + sNewNick, "");
     }
@@ -351,11 +347,11 @@ public:
 private:
     void Process(const NoNick& Nick, const NoString& sMessage, const NoString& sSource)
     {
-        set<NoString> sHandledTargets;
+        std::set<NoString> sHandledTargets;
         NoNetwork* pNetwork = GetNetwork();
         NoChannel* pChannel = pNetwork->FindChan(sSource);
 
-        for (list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
+        for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
             NoWatchEntry& WatchEntry = *it;
 
             if (pNetwork->IsUserAttached() && WatchEntry.IsDetachedClientOnly()) {
@@ -380,7 +376,7 @@ private:
     void SetDisabled(unsigned int uIdx, bool bDisabled)
     {
         if (uIdx == (unsigned int)~0) {
-            for (list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
+            for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
                 (*it).SetDisabled(bDisabled);
             }
 
@@ -395,7 +391,7 @@ private:
             return;
         }
 
-        list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
+        std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
         for (unsigned int a = 0; a < uIdx; a++) ++it;
 
         (*it).SetDisabled(bDisabled);
@@ -406,7 +402,7 @@ private:
     void SetDetachedClientOnly(unsigned int uIdx, bool bDetachedClientOnly)
     {
         if (uIdx == (unsigned int)~0) {
-            for (list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
+            for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
                 (*it).SetDetachedClientOnly(bDetachedClientOnly);
             }
 
@@ -421,7 +417,7 @@ private:
             return;
         }
 
-        list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
+        std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
         for (unsigned int a = 0; a < uIdx; a++) ++it;
 
         (*it).SetDetachedClientOnly(bDetachedClientOnly);
@@ -432,7 +428,7 @@ private:
     void SetDetachedChannelOnly(unsigned int uIdx, bool bDetachedChannelOnly)
     {
         if (uIdx == (unsigned int)~0) {
-            for (list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
+            for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
                 (*it).SetDetachedChannelOnly(bDetachedChannelOnly);
             }
 
@@ -448,7 +444,7 @@ private:
             return;
         }
 
-        list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
+        std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
         for (unsigned int a = 0; a < uIdx; a++) ++it;
 
         (*it).SetDetachedChannelOnly(bDetachedChannelOnly);
@@ -470,7 +466,7 @@ private:
 
         unsigned int uIdx = 1;
 
-        for (list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it, uIdx++) {
+        for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it, uIdx++) {
             NoWatchEntry& WatchEntry = *it;
 
             Table.AddRow();
@@ -503,7 +499,7 @@ private:
 
         unsigned int uIdx = 1;
 
-        for (list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it, uIdx++) {
+        for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it, uIdx++) {
             NoWatchEntry& WatchEntry = *it;
 
             PutModule("/msg " + GetModNick() + " ADD " + WatchEntry.GetHostMask() + " " + WatchEntry.GetTarget() + " " +
@@ -537,7 +533,7 @@ private:
             return;
         }
 
-        list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
+        std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
         for (unsigned int a = 0; a < uIdx; a++) ++it;
 
         (*it).SetSources(sSources);
@@ -553,7 +549,7 @@ private:
             return;
         }
 
-        list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
+        std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
         for (unsigned int a = 0; a < uIdx; a++) ++it;
 
         m_lsWatchers.erase(it);
@@ -627,7 +623,7 @@ private:
             NoWatchEntry WatchEntry(sHostMask, sTarget, sPattern);
 
             bool bExists = false;
-            for (list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
+            for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
                 if (*it == WatchEntry) {
                     sMessage = "Entry for [" + WatchEntry.GetHostMask() + "] already exists.";
                     bExists = true;
@@ -656,7 +652,7 @@ private:
     void Save()
     {
         ClearNV(false);
-        for (list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
+        for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
             NoWatchEntry& WatchEntry = *it;
             NoString sSave;
 
@@ -714,7 +710,7 @@ private:
         if (bWarn) PutModule("WARNING: malformed entry found while loading");
     }
 
-    list<NoWatchEntry> m_lsWatchers;
+    std::list<NoWatchEntry> m_lsWatchers;
     NoBuffer m_Buffer;
 };
 

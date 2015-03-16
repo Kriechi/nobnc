@@ -16,8 +16,6 @@
 
 #include <no/noapp.h>
 
-using std::map;
-
 class NoImapAuthMod;
 
 class NoImapSock : public NoSocket

@@ -17,8 +17,6 @@
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
 
-using std::map;
-
 class NoFloodDetachMod : public NoModule
 {
 public:
@@ -226,7 +224,7 @@ public:
     }
 
 private:
-    typedef map<NoString, std::pair<time_t, unsigned int>> Limits;
+    typedef std::map<NoString, std::pair<time_t, unsigned int>> Limits;
     Limits m_chans;
     unsigned int m_iThresholdSecs;
     unsigned int m_iThresholdMsgs;

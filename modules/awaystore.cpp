@@ -33,9 +33,6 @@
 #include <no/nonetwork.h>
 #include <no/nofile.h>
 
-using std::vector;
-using std::map;
-
 #define CRYPT_VERIFICATION_TOKEN "::__:AWAY:__::"
 
 class NoAway;
@@ -140,7 +137,7 @@ class NoAway : public NoModule
 
     void ShowCommand(const NoString& sCommand)
     {
-        map<NoString, vector<NoString>> msvOutput;
+        std::map<NoString, std::vector<NoString>> msvOutput;
         for (u_int a = 0; a < m_vMessages.size(); a++) {
             NoString sTime = m_vMessages[a].Token(0, false);
             NoString sWhom = m_vMessages[a].Token(1, false);
@@ -172,7 +169,7 @@ class NoAway : public NoModule
             msvOutput[sWhom].push_back(sTmp);
         }
 
-        for (map<NoString, vector<NoString>>::iterator it = msvOutput.begin(); it != msvOutput.end(); ++it) {
+        for (std::map<NoString, std::vector<NoString>>::iterator it = msvOutput.begin(); it != msvOutput.end(); ++it) {
             PutModule(it->first);
             for (u_int a = 0; a < it->second.size(); a++) PutModule(it->second[a]);
         }
@@ -467,7 +464,7 @@ private:
     time_t m_iLastSentData;
     bool m_bIsAway;
     time_t m_iAutoAway;
-    vector<NoString> m_vMessages;
+    std::vector<NoString> m_vMessages;
     NoString m_sReason;
     bool m_saveMessages;
 };

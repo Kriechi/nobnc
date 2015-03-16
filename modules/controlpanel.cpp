@@ -22,9 +22,6 @@
 #include <no/nochannel.h>
 #include <no/noircsock.h>
 
-using std::map;
-using std::vector;
-
 template <std::size_t N> struct array_size_helper
 {
     char __place_holder[N];
@@ -782,7 +779,7 @@ class NoAdminMod : public NoModule
     {
         if (!GetUser()->IsAdmin()) return;
 
-        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
         Table.AddColumn("Username");
         Table.AddColumn("Realname");
@@ -792,7 +789,7 @@ class NoAdminMod : public NoModule
         Table.AddColumn("Ident");
         Table.AddColumn("BindHost");
 
-        for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
+        for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             Table.AddRow();
             Table.SetCell("Username", it->first);
             Table.SetCell("Realname", it->second->GetRealName());
@@ -1005,7 +1002,7 @@ class NoAdminMod : public NoModule
             }
         }
 
-        const vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
+        const std::vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
 
         NoTable Table;
         Table.AddColumn("Network");

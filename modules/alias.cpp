@@ -22,9 +22,6 @@
 #include <sstream>
 #include <stdexcept>
 
-using std::vector;
-using std::stringstream;
-
 class NoAlias
 {
 private:

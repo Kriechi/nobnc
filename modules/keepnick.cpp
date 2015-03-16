@@ -17,8 +17,6 @@
 #include <no/nonetwork.h>
 #include <no/noircsock.h>
 
-using std::vector;
-
 class NoKeepNickMod;
 
 class NoKeepNickTimer : public NoTimer
@@ -91,7 +89,7 @@ public:
         return sConfNick;
     }
 
-    void OnNick(const NoNick& Nick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override
+    void OnNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         if (sNewNick == GetNetwork()->GetIRCSock()->GetNick()) {
             // We are changing our own nick
@@ -114,7 +112,7 @@ public:
         }
     }
 
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) override
+    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         // If someone with the nick we want quits, be fast and get the nick
         if (Nick.NickEquals(GetNick())) {

@@ -17,10 +17,6 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 
-using std::set;
-using std::vector;
-using std::map;
-
 // If you change these and it breaks, you get to keep the pieces
 #define CHAN_PREFIX_1 "~"
 #define CHAN_PREFIX_1C '~'
@@ -37,7 +33,7 @@ public:
 
     const NoString& GetTopic() const { return m_sTopic; }
     const NoString& GetName() const { return m_sName; }
-    const set<NoString>& GetNicks() const { return m_ssNicks; }
+    const std::set<NoString>& GetNicks() const { return m_ssNicks; }
 
     void SetTopic(const NoString& s) { m_sTopic = s; }
 
@@ -49,7 +45,7 @@ public:
 protected:
     NoString m_sTopic;
     NoString m_sName;
-    set<NoString> m_ssNicks;
+    std::set<NoString> m_ssNicks;
 };
 
 class NoPartylineMod : public NoModule
@@ -67,7 +63,7 @@ public:
         Table.AddColumn("Channel");
         Table.AddColumn("Users");
 
-        for (set<NoPartylineChannel*>::const_iterator a = m_ssChannels.begin(); a != m_ssChannels.end(); ++a) {
+        for (std::set<NoPartylineChannel*>::const_iterator a = m_ssChannels.begin(); a != m_ssChannels.end(); ++a) {
             Table.AddRow();
 
             Table.SetCell("Channel", (*a)->GetName());
@@ -89,14 +85,14 @@ public:
     virtual ~NoPartylineMod()
     {
         // Kick all clients who are in partyline channels
-        for (set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
-            set<NoString> ssNicks = (*it)->GetNicks();
+        for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
+            std::set<NoString> ssNicks = (*it)->GetNicks();
 
-            for (set<NoString>::const_iterator it2 = ssNicks.begin(); it2 != ssNicks.end(); ++it2) {
+            for (std::set<NoString>::const_iterator it2 = ssNicks.begin(); it2 != ssNicks.end(); ++it2) {
                 NoUser* pUser = NoApp::Get().FindUser(*it2);
-                vector<NoClient*> vClients = pUser->GetAllClients();
+                std::vector<NoClient*> vClients = pUser->GetAllClients();
 
-                for (vector<NoClient*>::const_iterator it3 = vClients.begin(); it3 != vClients.end(); ++it3) {
+                for (std::vector<NoClient*>::const_iterator it3 = vClients.begin(); it3 != vClients.end(); ++it3) {
                     NoClient* pClient = *it3;
                     pClient->PutClient(":*" + GetModName() + "!znc@znc.in KICK " + (*it)->GetName() + " " +
                                        pClient->GetNick() + " :" + GetModName() + " unloaded");
@@ -120,11 +116,11 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
 
-        for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
+        for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             NoUser* pUser = it->second;
-            for (vector<NoNetwork*>::const_iterator i = pUser->GetNetworks().begin(); i != pUser->GetNetworks().end(); ++i) {
+            for (std::vector<NoNetwork*>::const_iterator i = pUser->GetNetworks().begin(); i != pUser->GetNetworks().end(); ++i) {
                 NoNetwork* pNetwork = *i;
                 if (pNetwork->GetIRCSock()) {
                     if (pNetwork->GetChanPrefixes().find(CHAN_PREFIX_1) == NoString::npos) {
@@ -192,7 +188,7 @@ public:
     EModRet OnDeleteUser(NoUser& User) override
     {
         // Loop through each chan
-        for (set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end();) {
+        for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end();) {
             NoPartylineChannel* pChan = *it;
             // RemoveUser() might delete channels, so make sure our
             // iterator doesn't break.
@@ -234,14 +230,14 @@ public:
         }
 
         // Make sure this user is in the default channels
-        for (set<NoString>::iterator a = m_ssDefaultChans.begin(); a != m_ssDefaultChans.end(); ++a) {
+        for (std::set<NoString>::iterator a = m_ssDefaultChans.begin(); a != m_ssDefaultChans.end(); ++a) {
             NoPartylineChannel* pChannel = GetChannel(*a);
             const NoString& sNick = pUser->GetUserName();
 
             if (pChannel->IsInChannel(sNick)) continue;
 
             NoString sHost = pUser->GetBindHost();
-            const set<NoString>& ssNicks = pChannel->GetNicks();
+            const std::set<NoString>& ssNicks = pChannel->GetNicks();
 
             if (sHost.empty()) {
                 sHost = "znc.in";
@@ -252,8 +248,8 @@ public:
 
         NoString sNickMask = pClient->GetNickMask();
 
-        for (set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
-            const set<NoString>& ssNicks = (*it)->GetNicks();
+        for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
+            const std::set<NoString>& ssNicks = (*it)->GetNicks();
 
             if ((*it)->IsInChannel(pUser->GetUserName())) {
 
@@ -277,8 +273,8 @@ public:
     {
         NoUser* pUser = GetUser();
         if (!pUser->IsUserAttached() && !pUser->IsBeingDeleted()) {
-            for (set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
-                const set<NoString>& ssNicks = (*it)->GetNicks();
+            for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
+                const std::set<NoString>& ssNicks = (*it)->GetNicks();
 
                 if (ssNicks.find(pUser->GetUserName()) != ssNicks.end()) {
                     PutChan(ssNicks,
@@ -307,7 +303,7 @@ public:
             NoPartylineChannel* pChannel = FindChannel(sChannel);
 
             if (pChannel && pChannel->IsInChannel(pUser->GetUserName())) {
-                const set<NoString>& ssNicks = pChannel->GetNicks();
+                const std::set<NoString>& ssNicks = pChannel->GetNicks();
                 if (!sTopic.empty()) {
                     if (pUser->IsAdmin()) {
                         PutChan(ssNicks, ":" + pClient->GetNickMask() + " TOPIC " + sChannel + " :" + sTopic);
@@ -365,7 +361,7 @@ public:
             return;
         }
 
-        vector<NoClient*> vClients = pUser->GetAllClients();
+        std::vector<NoClient*> vClients = pUser->GetAllClients();
 
         NoString sCmd = " " + sCommand + " ";
         NoString sMsg = sMessage;
@@ -373,7 +369,7 @@ public:
 
         pChannel->DelNick(pUser->GetUserName());
 
-        const set<NoString>& ssNicks = pChannel->GetNicks();
+        const std::set<NoString>& ssNicks = pChannel->GetNicks();
         NoString sHost = pUser->GetBindHost();
 
         if (sHost.empty()) {
@@ -381,7 +377,7 @@ public:
         }
 
         if (bNickAsTarget) {
-            for (vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
+            for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
                 NoClient* pClient = *it;
 
                 pClient->PutClient(":" + pClient->GetNickMask() + sCmd + pChannel->GetName() + " " + pClient->GetNick() + sMsg);
@@ -394,7 +390,7 @@ public:
                     true,
                     pUser);
         } else {
-            for (vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
+            for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
                 NoClient* pClient = *it;
 
                 pClient->PutClient(":" + pClient->GetNickMask() + sCmd + pChannel->GetName() + sMsg);
@@ -441,9 +437,9 @@ public:
     void JoinUser(NoUser* pUser, NoPartylineChannel* pChannel)
     {
         if (pChannel && !pChannel->IsInChannel(pUser->GetUserName())) {
-            vector<NoClient*> vClients = pUser->GetAllClients();
+            std::vector<NoClient*> vClients = pUser->GetAllClients();
 
-            const set<NoString>& ssNicks = pChannel->GetNicks();
+            const std::set<NoString>& ssNicks = pChannel->GetNicks();
             const NoString& sNick = pUser->GetUserName();
             pChannel->AddNick(sNick);
 
@@ -453,7 +449,7 @@ public:
                 sHost = "znc.in";
             }
 
-            for (vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
+            for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
                 NoClient* pClient = *it;
                 pClient->PutClient(":" + pClient->GetNickMask() + " JOIN " + pChannel->GetName());
             }
@@ -465,7 +461,7 @@ public:
                     pUser);
 
             if (!pChannel->GetTopic().empty()) {
-                for (vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
+                for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
                     NoClient* pClient = *it;
                     pClient->PutClient(":" + GetIRNoServer(pClient->GetNetwork()) + " 332 " + pClient->GetNickMask() +
                                        " " + pChannel->GetName() + " :" + pChannel->GetTopic());
@@ -530,7 +526,7 @@ public:
             NoUser* pTargetUser = NoApp::Get().FindUser(sNick);
 
             if (pTargetUser) {
-                vector<NoClient*> vClients = pTargetUser->GetAllClients();
+                std::vector<NoClient*> vClients = pTargetUser->GetAllClients();
 
                 if (vClients.empty()) {
                     pClient->PutClient(":" + GetIRNoServer(pNetwork) + " 401 " + pClient->GetNick() + " " + sTarget +
@@ -538,7 +534,7 @@ public:
                     return HALT;
                 }
 
-                for (vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
+                for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
                     NoClient* pTarget = *it;
 
                     pTarget->PutClient(":" + NICK_PREFIX + pUser->GetUserName() + "!" + pUser->GetIdent() + "@" +
@@ -606,19 +602,19 @@ public:
         return false;
     }
 
-    void PutChan(const set<NoString>& ssNicks,
+    void PutChan(const std::set<NoString>& ssNicks,
                  const NoString& sLine,
                  bool bIncludeCurUser = true,
                  bool bIncludeClient = true,
                  NoUser* pUser = nullptr,
                  NoClient* pClient = nullptr)
     {
-        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
 
         if (!pUser) pUser = GetUser();
         if (!pClient) pClient = GetClient();
 
-        for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
+        for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             if (ssNicks.find(it->first) != ssNicks.end()) {
                 if (it->second == pUser) {
                     if (bIncludeCurUser) {
@@ -633,18 +629,18 @@ public:
 
     void PutUserIRNoNick(NoUser* pUser, const NoString& sPre, const NoString& sPost)
     {
-        const vector<NoClient*>& vClients = pUser->GetAllClients();
-        vector<NoClient*>::const_iterator it;
+        const std::vector<NoClient*>& vClients = pUser->GetAllClients();
+        std::vector<NoClient*>::const_iterator it;
         for (it = vClients.begin(); it != vClients.end(); ++it) {
             (*it)->PutClient(sPre + (*it)->GetNick() + sPost);
         }
     }
 
-    void SendNickList(NoUser* pUser, NoNetwork* pNetwork, const set<NoString>& ssNicks, const NoString& sChan)
+    void SendNickList(NoUser* pUser, NoNetwork* pNetwork, const std::set<NoString>& ssNicks, const NoString& sChan)
     {
         NoString sNickList;
 
-        for (set<NoString>::const_iterator it = ssNicks.begin(); it != ssNicks.end(); ++it) {
+        for (std::set<NoString>::const_iterator it = ssNicks.begin(); it != ssNicks.end(); ++it) {
             NoUser* pChanUser = NoApp::Get().FindUser(*it);
 
             if (pChanUser == pUser) {
@@ -667,8 +663,8 @@ public:
             PutUserIRNoNick(pUser, ":" + GetIRNoServer(pNetwork) + " 353 ", " @ " + sChan + " :" + sNickList);
         }
 
-        vector<NoClient*> vClients = pUser->GetAllClients();
-        for (vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
+        std::vector<NoClient*> vClients = pUser->GetAllClients();
+        for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
             NoClient* pClient = *it;
             pClient->PutClient(":" + GetIRNoServer(pNetwork) + " 353 " + pClient->GetNick() + " @ " + sChan + " :" +
                                ((pUser->IsAdmin()) ? "@" : "+") + pClient->GetNick());
@@ -681,7 +677,7 @@ public:
     {
         NoString sChannel = sChan.AsLower();
 
-        for (set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
+        for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
             if ((*it)->GetName().AsLower() == sChannel) return *it;
         }
 
@@ -701,9 +697,9 @@ public:
     }
 
 private:
-    set<NoPartylineChannel*> m_ssChannels;
-    set<NoNetwork*> m_spInjectedPrefixes;
-    set<NoString> m_ssDefaultChans;
+    std::set<NoPartylineChannel*> m_ssChannels;
+    std::set<NoNetwork*> m_spInjectedPrefixes;
+    std::set<NoString> m_ssDefaultChans;
 };
 
 template <> void TModInfo<NoPartylineMod>(NoModInfo& Info)

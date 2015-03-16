@@ -17,8 +17,6 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 
-using std::vector;
-
 #define MESSAGE "Your account has been disabled. Contact your administrator."
 
 class NoBlockUser : public NoModule
@@ -187,16 +185,16 @@ private:
         if (!pUser) return false;
 
         // Disconnect all clients
-        vector<NoClient*> vpClients = pUser->GetAllClients();
-        vector<NoClient*>::iterator it;
+        std::vector<NoClient*> vpClients = pUser->GetAllClients();
+        std::vector<NoClient*>::iterator it;
         for (it = vpClients.begin(); it != vpClients.end(); ++it) {
             (*it)->PutStatusNotice(MESSAGE);
             (*it)->Close(Csock::CLT_AFTERWRITE);
         }
 
         // Disconnect all networks from irc
-        vector<NoNetwork*> vNetworks = pUser->GetNetworks();
-        for (vector<NoNetwork*>::iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
+        std::vector<NoNetwork*> vNetworks = pUser->GetNetworks();
+        for (std::vector<NoNetwork*>::iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
             (*it2)->SetIRCConnectEnabled(false);
         }
 

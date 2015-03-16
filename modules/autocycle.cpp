@@ -17,8 +17,6 @@
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
 
-using std::vector;
-
 class NoAutoCycleMod : public NoModule
 {
 public:
@@ -109,7 +107,7 @@ public:
 
     void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override { AutoCycle(Channel); }
 
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) override
+    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         for (unsigned int i = 0; i < vChans.size(); i++) AutoCycle(*vChans[i]);
     }
@@ -140,7 +138,7 @@ protected:
 
     bool AlreadyAdded(const NoString& sInput)
     {
-        vector<NoString>::iterator it;
+        std::vector<NoString>::iterator it;
 
         if (sInput.Left(1) == "!") {
             NoString sChan = sInput.substr(1);
@@ -175,7 +173,7 @@ protected:
 
     bool Del(const NoString& sChan)
     {
-        vector<NoString>::iterator it, end;
+        std::vector<NoString>::iterator it, end;
 
         if (sChan.empty() || sChan == "!") return false;
 
@@ -225,8 +223,8 @@ protected:
     }
 
 private:
-    vector<NoString> m_vsChans;
-    vector<NoString> m_vsNegChans;
+    std::vector<NoString> m_vsChans;
+    std::vector<NoString> m_vsNegChans;
     TCacheMap<NoString> m_recentlyCycled;
 };
 

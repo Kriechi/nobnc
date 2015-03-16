@@ -19,11 +19,6 @@
 #include <no/nouser.h>
 #include <no/noapp.h>
 
-using std::map;
-using std::vector;
-using std::set;
-using std::pair;
-
 class NoSslClientCertMod : public NoModule
 {
 public:
@@ -46,8 +41,8 @@ public:
 
     bool OnBoot() override
     {
-        const vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
-        vector<NoListener*>::const_iterator it;
+        const std::vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
+        std::vector<NoListener*>::const_iterator it;
 
         // We need the SSL_VERIFY_PEER flag on all listeners, or else
         // the client doesn't send a ssl cert
@@ -97,7 +92,7 @@ public:
 
     bool AddKey(NoUser* pUser, const NoString& sKey)
     {
-        const pair<NoStringSet::const_iterator, bool> pair = m_PubKeys[pUser->GetUserName()].insert(sKey.AsLower());
+        const std::pair<NoStringSet::const_iterator, bool> pair = m_PubKeys[pUser->GetUserName()].insert(sKey.AsLower());
 
         if (pair.second) {
             Save();
@@ -286,7 +281,7 @@ public:
 
 private:
     // Maps user names to a list of allowed pubkeys
-    typedef map<NoString, set<NoString>> MNoStringSet;
+    typedef std::map<NoString, std::set<NoString>> MNoStringSet;
     MNoStringSet m_PubKeys;
 };
 

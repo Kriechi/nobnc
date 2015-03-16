@@ -19,8 +19,6 @@
 #include <no/nofile.h>
 #include <no/nodir.h>
 
-using std::set;
-
 class NoDccMod;
 
 class NoDccSock : public NoSocket
@@ -203,7 +201,7 @@ public:
         Table.AddColumn("IP");
         Table.AddColumn("File");
 
-        set<NoSocket*>::const_iterator it;
+        std::set<NoSocket*>::const_iterator it;
         for (it = BeginSockets(); it != EndSockets(); ++it) {
             NoDccSock* pSock = (NoDccSock*)*it;
 
@@ -238,7 +236,7 @@ public:
             unsigned short uResumePort = sMessage.Token(3).ToUShort();
             unsigned long uResumeSize = sMessage.Token(4).ToULong();
 
-            set<NoSocket*>::const_iterator it;
+            std::set<NoSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 NoDccSock* pSock = (NoDccSock*)*it;
 

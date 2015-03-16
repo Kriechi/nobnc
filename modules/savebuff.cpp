@@ -31,9 +31,6 @@
 #include <no/nodir.h>
 #include <no/noquery.h>
 
-using std::set;
-using std::vector;
-
 #define LEGACY_VERIFICATION_TOKEN "::__:SAVEBUFF:__::"
 #define CHAN_VERIFICATION_TOKEN "::__:CHANBUFF:__::"
 #define QUERY_VERIFICATION_TOKEN "::__:QUERYBUFF:__::"
@@ -195,16 +192,16 @@ public:
     void SaveBuffersToDisk()
     {
         if (!m_sPassword.empty()) {
-            set<NoString> ssPaths;
+            std::set<NoString> ssPaths;
 
-            const vector<NoChannel*>& vChans = GetNetwork()->GetChans();
+            const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
             for (NoChannel* pChan : vChans) {
                 NoString sPath = GetPath(pChan->GetName());
                 SaveBufferToDisk(pChan->GetBuffer(), sPath, CHAN_VERIFICATION_TOKEN + pChan->GetName());
                 ssPaths.insert(sPath);
             }
 
-            const vector<NoQuery*>& vQueries = GetNetwork()->GetQueries();
+            const std::vector<NoQuery*>& vQueries = GetNetwork()->GetQueries();
             for (NoQuery* pQuery : vQueries) {
                 NoString sPath = GetPath(pQuery->GetName());
                 SaveBufferToDisk(pQuery->GetBuffer(), sPath, QUERY_VERIFICATION_TOKEN + pQuery->GetName());
@@ -305,7 +302,7 @@ public:
 
     NoString FindLegacyBufferName(const NoString& sPath) const
     {
-        const vector<NoChannel*>& vChans = GetNetwork()->GetChans();
+        const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
         for (NoChannel* pChan : vChans) {
             const NoString& sName = pChan->GetName();
             if (GetPath(sName).Equals(sPath)) {
@@ -333,7 +330,7 @@ public:
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cOpNick.GetNickMask() + " MODE " + sModes + " " + sArgs));
     }
-    void OnQuit(const NoNick& cNick, const NoString& sMessage, const vector<NoChannel*>& vChans) override
+    void OnQuit(const NoNick& cNick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         for (size_t a = 0; a < vChans.size(); a++) {
             AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " QUIT " + sMessage));
@@ -341,7 +338,7 @@ public:
         if (cNick.NickEquals(GetUser()->GetNick())) SaveBuffersToDisk(); // need to force a save here to see this!
     }
 
-    void OnNick(const NoNick& cNick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override
+    void OnNick(const NoNick& cNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         for (size_t a = 0; a < vChans.size(); a++) {
             AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " NICK " + sNewNick));

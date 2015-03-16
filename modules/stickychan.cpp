@@ -17,8 +17,6 @@
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
 
-using std::vector;
-
 class NoStickyChan : public NoModule
 {
 public:
@@ -136,7 +134,7 @@ public:
         if (sPageName == "index") {
             bool bSubmitted = (WebSock.GetParam("submitted").ToInt() != 0);
 
-            const vector<NoChannel*>& Channels = GetNetwork()->GetChans();
+            const std::vector<NoChannel*>& Channels = GetNetwork()->GetChans();
             for (unsigned int c = 0; c < Channels.size(); c++) {
                 const NoString sChan = Channels[c]->GetName();
                 bool bStick = FindNV(sChan) != EndNV();

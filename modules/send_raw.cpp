@@ -17,9 +17,6 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 
-using std::vector;
-using std::map;
-
 class NoSendRawMod : public NoModule
 {
     void SendClient(const NoString& sLine)
@@ -112,13 +109,13 @@ public:
                 WebSock.GetSession()->AddSuccess("Line sent");
             }
 
-            const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
-            for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
+            const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+            for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
                 NoTemplate& l = Tmpl.AddRow("UserLoop");
                 l["Username"] = (*it->second).GetUserName();
 
-                vector<NoNetwork*> vNetworks = (*it->second).GetNetworks();
-                for (vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
+                std::vector<NoNetwork*> vNetworks = (*it->second).GetNetworks();
+                for (std::vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
                     NoTemplate& NetworkLoop = l.AddRow("NetworkLoop");
                     NetworkLoop["Username"] = (*it->second).GetUserName();
                     NetworkLoop["Network"] = (*it2)->GetName();

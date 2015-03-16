@@ -17,10 +17,6 @@
 #include <no/nonetwork.h>
 #include <no/nochannel.h>
 
-using std::map;
-using std::set;
-using std::vector;
-
 class NoAutoOpMod;
 
 #define AUTOOP_CHALLENGE_LENGTH 32
@@ -64,7 +60,7 @@ public:
 
     bool ChannelMatches(const NoString& sChan) const
     {
-        for (set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
+        for (std::set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
             if (sChan.AsLower().WildCmp(*it, NoString::CaseInsensitive)) {
                 return true;
             }
@@ -75,7 +71,7 @@ public:
 
     bool HostMatches(const NoString& sHostmask)
     {
-        for (set<NoString>::const_iterator it = m_ssHostmasks.begin(); it != m_ssHostmasks.end(); ++it) {
+        for (std::set<NoString>::const_iterator it = m_ssHostmasks.begin(); it != m_ssHostmasks.end(); ++it) {
             if (sHostmask.WildCmp(*it, NoString::CaseInsensitive)) {
                 return true;
             }
@@ -145,8 +141,8 @@ private:
 protected:
     NoString m_sUsername;
     NoString m_sUserKey;
-    set<NoString> m_ssHostmasks;
-    set<NoString> m_ssChans;
+    std::set<NoString> m_ssHostmasks;
+    std::set<NoString> m_ssChans;
 };
 
 class NoAutoOpMod : public NoModule
@@ -206,7 +202,7 @@ public:
 
     virtual ~NoAutoOpMod()
     {
-        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             delete it->second;
         }
         m_msUsers.clear();
@@ -220,7 +216,7 @@ public:
         }
     }
 
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) override
+    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         NoStringMap::iterator it = m_msQueue.find(Nick.GetNick().AsLower());
 
@@ -229,7 +225,7 @@ public:
         }
     }
 
-    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override
+    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         // Update the queue with nick changes
         NoStringMap::iterator it = m_msQueue.find(OldNick.GetNick().AsLower());
@@ -260,9 +256,9 @@ public:
     void OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         if (Nick.GetNick() == GetNetwork()->GetIRNoNick().GetNick()) {
-            const map<NoString, NoNick>& msNicks = Channel.GetNicks();
+            const std::map<NoString, NoNick>& msNicks = Channel.GetNicks();
 
-            for (map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
+            for (std::map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
                 if (!it->second.HasPerm(NoChannel::Op)) {
                     CheckAutoOp(it->second, Channel);
                 }
@@ -324,7 +320,7 @@ public:
         Table.AddColumn("Key");
         Table.AddColumn("Channels");
 
-        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             NoStringVector vsHostmasks;
             it->second->GetHostmasks().Split(",", vsHostmasks);
             for (unsigned int a = 0; a < vsHostmasks.size(); a++) {
@@ -441,14 +437,14 @@ public:
 
     NoAutoOpUser* FindUser(const NoString& sUser)
     {
-        map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
 
         return (it != m_msUsers.end()) ? it->second : nullptr;
     }
 
     NoAutoOpUser* FindUserByHost(const NoString& sHostmask, const NoString& sChannel = "")
     {
-        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             NoAutoOpUser* pUser = it->second;
 
             if (pUser->HostMatches(sHostmask) && (sChannel.empty() || pUser->ChannelMatches(sChannel))) {
@@ -482,7 +478,7 @@ public:
 
     void DelUser(const NoString& sUser)
     {
-        map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
 
         if (it == m_msUsers.end()) {
             PutModule("That user does not exist");
@@ -514,12 +510,12 @@ public:
         bool bMatchedHost = false;
         NoAutoOpUser* pUser = nullptr;
 
-        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             pUser = it->second;
 
             // First verify that the person who challenged us matches a user's host
             if (pUser->HostMatches(Nick.GetHostMask())) {
-                const vector<NoChannel*>& Chans = GetNetwork()->GetChans();
+                const std::vector<NoChannel*>& Chans = GetNetwork()->GetChans();
                 bMatchedHost = true;
 
                 // Also verify that they are opped in at least one of the user's chans
@@ -575,7 +571,7 @@ public:
         NoString sChallenge = itQueue->second;
         m_msQueue.erase(itQueue);
 
-        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             if (it->second->HostMatches(Nick.GetHostMask())) {
                 if (sResponse == NoString(it->second->GetUserKey() + "::" + sChallenge).MD5()) {
                     OpUser(Nick, *it->second);
@@ -619,7 +615,7 @@ public:
 
     void OpUser(const NoNick& Nick, const NoAutoOpUser& User)
     {
-        const vector<NoChannel*>& Chans = GetNetwork()->GetChans();
+        const std::vector<NoChannel*>& Chans = GetNetwork()->GetChans();
 
         for (size_t a = 0; a < Chans.size(); a++) {
             const NoChannel& Chan = *Chans[a];
@@ -635,7 +631,7 @@ public:
     }
 
 private:
-    map<NoString, NoAutoOpUser*> m_msUsers;
+    std::map<NoString, NoAutoOpUser*> m_msUsers;
     NoStringMap m_msQueue;
 };
 

@@ -17,8 +17,6 @@
 #include <no/nonetwork.h>
 #include <no/nochannel.h>
 
-using std::vector;
-
 class NoKickClientOnIrcDisconnect : public NoModule
 {
 public:
@@ -26,9 +24,9 @@ public:
 
     void OnIRCDisconnected() override
     {
-        const vector<NoChannel*>& vChans = GetNetwork()->GetChans();
+        const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
 
-        for (vector<NoChannel*>::const_iterator it = vChans.begin(); it != vChans.end(); ++it) {
+        for (std::vector<NoChannel*>::const_iterator it = vChans.begin(); it != vChans.end(); ++it) {
             if ((*it)->IsOn()) {
                 PutUser(":ZNC!znc@znc.in KICK " + (*it)->GetName() + " " + GetNetwork()->GetIRNoNick().GetNick() +
                         " :You have been disconnected from the IRC server");

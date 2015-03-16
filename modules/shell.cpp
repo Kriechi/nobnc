@@ -20,8 +20,6 @@
 #include <no/noapp.h>
 #include <no/noexecsock.h>
 
-using std::vector;
-
 // Forward Declaration
 class NoShellMod;
 
@@ -63,7 +61,7 @@ public:
 
     virtual ~NoShellMod()
     {
-        vector<Csock*> vSocks = GetManager()->FindSocksByName("SHELL");
+        std::vector<Csock*> vSocks = GetManager()->FindSocksByName("SHELL");
 
         for (unsigned int a = 0; a < vSocks.size(); a++) {
             GetManager()->DelSockByAddr(vSocks[a]);

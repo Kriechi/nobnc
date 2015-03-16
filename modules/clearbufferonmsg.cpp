@@ -19,8 +19,6 @@
 #include <no/nochannel.h>
 #include <no/noquery.h>
 
-using std::vector;
-
 enum {
     RULE_MSG,
     RULE_CTCP,
@@ -47,7 +45,7 @@ public:
         NoNetwork* pNetwork = GetNetwork();
 
         if (pNetwork) {
-            const vector<NoChannel*>& vChans = pNetwork->GetChans();
+            const std::vector<NoChannel*>& vChans = pNetwork->GetChans();
 
             for (NoChannel* pChan : vChans) {
                 // Skip detached channels, they weren't read yet
@@ -59,7 +57,7 @@ public:
                 pChan->SetAutoClearChanBuffer(false);
             }
 
-            vector<NoQuery*> VQueries = pNetwork->GetQueries();
+            std::vector<NoQuery*> VQueries = pNetwork->GetQueries();
 
             for (NoQuery* pQuery : VQueries) {
                 pNetwork->DelQuery(pQuery->GetName());

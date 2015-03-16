@@ -19,8 +19,6 @@
 #include <no/noircsock.h>
 #include <no/nochannel.h>
 
-using std::set;
-
 #ifndef Q_DEBUG_COMMUNICATION
 #define Q_DEBUG_COMMUNICATION 0
 #endif
@@ -58,7 +56,7 @@ public:
 
         if (IsIRCConnected()) {
             // check for usermode +x if we are already connected
-            set<unsigned char> scUserModes = GetNetwork()->GetIRCSock()->GetUserModes();
+            std::set<unsigned char> scUserModes = GetNetwork()->GetIRCSock()->GetUserModes();
             if (scUserModes.find('x') != scUserModes.end()) m_bCloaked = true;
 
             // This will only happen once, and only if the user loads the module after connecting to IRC.

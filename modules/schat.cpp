@@ -25,12 +25,6 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 
-using std::pair;
-using std::stringstream;
-using std::map;
-using std::set;
-using std::vector;
-
 class NoSChat;
 
 class NoRemMarkerJob : public NoTimer
@@ -92,7 +86,7 @@ public:
             ReadLine("*** Reattached.");
         } else {
             // Buffer playback
-            vector<CS_STRING>::reverse_iterator it = m_vBuffer.rbegin();
+            std::vector<CS_STRING>::reverse_iterator it = m_vBuffer.rbegin();
             for (; it != m_vBuffer.rend(); ++it) ReadLine(*it);
 
             m_vBuffer.clear();
@@ -129,7 +123,7 @@ public:
 
     void OnClientLogin() override
     {
-        set<NoSocket*>::const_iterator it;
+        std::set<NoSocket*>::const_iterator it;
         for (it = BeginSockets(); it != EndSockets(); ++it) {
             NoSChatSock* p = (NoSChatSock*)*it;
 
@@ -161,7 +155,7 @@ public:
 
         if (sCom.Equals("chat") && !sArgs.empty()) {
             NoString sNick = "(s)" + sArgs;
-            set<NoSocket*>::const_iterator it;
+            std::set<NoSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 NoSChatSock* pSock = (NoSChatSock*)*it;
 
@@ -183,7 +177,7 @@ public:
                 return;
             }
 
-            stringstream s;
+            std::stringstream s;
             s << "PRIVMSG " << sArgs << " :\001";
             s << "DCC SCHAT chat ";
             s << NoUtils::GetLongIP(GetUser()->GetLocalDCCIP());
@@ -200,7 +194,7 @@ public:
             Table.AddColumn("Status");
             Table.AddColumn("Cipher");
 
-            set<NoSocket*>::const_iterator it;
+            std::set<NoSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 Table.AddRow();
 
@@ -236,7 +230,7 @@ public:
         } else if (sCom.Equals("close")) {
             if (!sArgs.StartsWith("(s)")) sArgs = "(s)" + sArgs;
 
-            set<NoSocket*>::const_iterator it;
+            std::set<NoSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 NoSChatSock* pSock = (NoSChatSock*)*it;
 
@@ -255,7 +249,7 @@ public:
             Table.AddColumn("Type");
             Table.AddColumn("Cipher");
 
-            set<NoSocket*>::const_iterator it;
+            std::set<NoSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 Table.AddRow();
                 Csock* pSock = *it;
@@ -317,7 +311,7 @@ public:
             unsigned short iPort = sMessage.Token(4).ToUShort();
 
             if (iIP > 0 && iPort > 0) {
-                pair<u_long, u_short> pTmp;
+                std::pair<u_long, u_short> pTmp;
                 NoString sMask;
 
                 pTmp.first = iIP;
@@ -350,7 +344,7 @@ public:
             NoString sSockName = GetModName().AsUpper() + "::" + sTarget;
             NoSChatSock* p = (NoSChatSock*)FindSocket(sSockName);
             if (!p) {
-                map<NoString, pair<u_long, u_short>>::iterator it;
+                std::map<NoString, std::pair<u_long, u_short>>::iterator it;
                 it = m_siiWaitingChats.find(sTarget);
 
                 if (it != m_siiWaitingChats.end()) {
@@ -374,7 +368,7 @@ public:
 
     void RemoveMarker(const NoString& sNick)
     {
-        map<NoString, pair<u_long, u_short>>::iterator it = m_siiWaitingChats.find(sNick);
+        std::map<NoString, std::pair<u_long, u_short>>::iterator it = m_siiWaitingChats.find(sNick);
         if (it != m_siiWaitingChats.end()) m_siiWaitingChats.erase(it);
     }
 
@@ -388,7 +382,7 @@ public:
     bool IsAttached() { return (GetNetwork()->IsUserAttached()); }
 
 private:
-    map<NoString, pair<u_long, u_short>> m_siiWaitingChats;
+    std::map<NoString, std::pair<u_long, u_short>> m_siiWaitingChats;
     NoString m_sPemFile;
 };
 

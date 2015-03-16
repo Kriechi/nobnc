@@ -16,8 +16,6 @@
 
 #include <no/noapp.h>
 
-using std::stringstream;
-
 class NoNotesMod : public NoModule
 {
     bool bShowNotesOnLogin;

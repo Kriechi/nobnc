@@ -23,8 +23,6 @@
 #include <no/noserver.h>
 #include <algorithm>
 
-using std::vector;
-
 class NoLogRule
 {
 public:
@@ -86,10 +84,10 @@ public:
 
     void OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override;
     void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override;
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) override;
+    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override;
     void OnJoin(const NoNick& Nick, NoChannel& Channel) override;
     void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override;
-    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override;
+    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override;
     EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override;
 
     /* notices */
@@ -110,7 +108,7 @@ public:
 private:
     NoString m_sLogPath;
     bool m_bSanitize;
-    vector<NoLogRule> m_vRules;
+    std::vector<NoLogRule> m_vRules;
 };
 
 void NoLogMod::SetRulesCmd(const NoString& sLine)
@@ -332,7 +330,7 @@ void NoLogMod::OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChann
     PutLog("*** " + sKickedNick + " was kicked by " + OpNick.GetNick() + " (" + sMessage + ")", Channel);
 }
 
-void NoLogMod::OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans)
+void NoLogMod::OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans)
 {
     for (std::vector<NoChannel*>::const_iterator pChan = vChans.begin(); pChan != vChans.end(); ++pChan)
         PutLog("*** Quits: " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") (" + sMessage + ")", **pChan);
@@ -348,7 +346,7 @@ void NoLogMod::OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sM
     PutLog("*** Parts: " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") (" + sMessage + ")", Channel);
 }
 
-void NoLogMod::OnNick(const NoNick& OldNick, const NoString& sNewNick, const vector<NoChannel*>& vChans)
+void NoLogMod::OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans)
 {
     for (std::vector<NoChannel*>::const_iterator pChan = vChans.begin(); pChan != vChans.end(); ++pChan)
         PutLog("*** " + OldNick.GetNick() + " is now known as " + sNewNick, **pChan);

@@ -17,9 +17,6 @@
 #include <no/nomodules.h>
 #include <no/nochannel.h>
 
-using std::map;
-using std::set;
-
 class NoAutoVoiceUser
 {
 public:
@@ -40,7 +37,7 @@ public:
 
     bool ChannelMatches(const NoString& sChan) const
     {
-        for (set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
+        for (std::set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
             if (sChan.AsLower().WildCmp(*it, NoString::CaseInsensitive)) {
                 return true;
             }
@@ -55,7 +52,7 @@ public:
     {
         NoString sRet;
 
-        for (set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
+        for (std::set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
             if (!sRet.empty()) {
                 sRet += " ";
             }
@@ -90,7 +87,7 @@ public:
     {
         NoString sChans;
 
-        for (set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
+        for (std::set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
             if (!sChans.empty()) {
                 sChans += " ";
             }
@@ -114,7 +111,7 @@ private:
 protected:
     NoString m_sUsername;
     NoString m_sHostmask;
-    set<NoString> m_ssChans;
+    std::set<NoString> m_ssChans;
 };
 
 class NoAutoVoiceMod : public NoModule
@@ -175,7 +172,7 @@ public:
 
     virtual ~NoAutoVoiceMod()
     {
-        for (map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             delete it->second;
         }
 
@@ -186,7 +183,7 @@ public:
     {
         // If we have ops in this chan
         if (Channel.HasPerm(NoChannel::Op) || Channel.HasPerm(NoChannel::HalfOp)) {
-            for (map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+            for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
                 // and the nick who joined is a valid user
                 if (it->second->HostMatches(Nick.GetHostMask()) && it->second->ChannelMatches(Channel.GetName())) {
                     PutIRC("MODE " + Channel.GetName() + " +v " + Nick.GetNick());
@@ -237,7 +234,7 @@ public:
         Table.AddColumn("Hostmask");
         Table.AddColumn("Channels");
 
-        for (map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             Table.AddRow();
             Table.SetCell("User", it->second->GetUsername());
             Table.SetCell("Hostmask", it->second->GetHostmask());
@@ -295,14 +292,14 @@ public:
 
     NoAutoVoiceUser* FindUser(const NoString& sUser)
     {
-        map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
 
         return (it != m_msUsers.end()) ? it->second : nullptr;
     }
 
     NoAutoVoiceUser* FindUserByHost(const NoString& sHostmask, const NoString& sChannel = "")
     {
-        for (map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             NoAutoVoiceUser* pUser = it->second;
 
             if (pUser->HostMatches(sHostmask) && (sChannel.empty() || pUser->ChannelMatches(sChannel))) {
@@ -315,7 +312,7 @@ public:
 
     void DelUser(const NoString& sUser)
     {
-        map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
 
         if (it == m_msUsers.end()) {
             PutModule("That user does not exist");
@@ -341,7 +338,7 @@ public:
     }
 
 private:
-    map<NoString, NoAutoVoiceUser*> m_msUsers;
+    std::map<NoString, NoAutoVoiceUser*> m_msUsers;
 };
 
 template <> void TModInfo<NoAutoVoiceMod>(NoModInfo& Info)
