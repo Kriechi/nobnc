@@ -17,7 +17,7 @@
 #include "notimer.h"
 #include "nomodules.h"
 
-NoTimer::NoTimer(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+NoTimer::NoTimer(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
     : CCron(), m_pModule(pModule), m_sDescription(sDescription)
 {
     SetName(sLabel);

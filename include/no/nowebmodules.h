@@ -85,12 +85,12 @@ private:
 class NoWebSubPage
 {
 public:
-    NoWebSubPage(const NoString& sName, const NoString& sTitle = "", unsigned int uFlags = 0)
+    NoWebSubPage(const NoString& sName, const NoString& sTitle = "", uint uFlags = 0)
         : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams()
     {
     }
 
-    NoWebSubPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, unsigned int uFlags = 0)
+    NoWebSubPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags = 0)
         : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams(vParams)
     {
     }
@@ -110,7 +110,7 @@ public:
     const NoStringPairVector& GetParams() const { return m_vParams; }
 
 private:
-    unsigned int m_uFlags;
+    uint m_uFlags;
     NoString m_sName;
     NoString m_sTitle;
     NoStringPairVector m_vParams;
@@ -119,7 +119,7 @@ private:
 class NoWebSessionMap : public TCacheMap<NoString, std::shared_ptr<NoWebSession>>
 {
 public:
-    NoWebSessionMap(unsigned int uTTL = 5000) : TCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
+    NoWebSessionMap(uint uTTL = 5000) : TCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
     void FinishUserSessions(const NoUser& User);
 };
 
@@ -149,7 +149,7 @@ public:
 
     std::shared_ptr<NoWebSession> GetSession();
 
-    Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override;
+    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
     static NoString GetSkinPath(const NoString& sSkinName);
     void GetAvailSkins(NoStringVector& vRet) const;
     NoString GetSkinName();
@@ -179,7 +179,7 @@ private:
     NoString m_sPage;
     std::shared_ptr<NoWebSession> m_spSession;
 
-    static const unsigned int m_uiMaxSessions;
+    static const uint m_uiMaxSessions;
 };
 
 #endif // NOWEBMODULES_H

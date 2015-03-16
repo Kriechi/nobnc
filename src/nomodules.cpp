@@ -152,12 +152,12 @@ bool NoModules::OnIRCDisconnected()
     return false;
 }
 
-bool NoModules::OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange)
+bool NoModules::OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange)
 {
     MODUNLOADCHK(OnChanPermission2(pOpNick, Nick, Channel, uMode, bAdded, bNoChange));
     return false;
 }
-bool NoModules::OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange)
+bool NoModules::OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange)
 {
     MODUNLOADCHK(OnChanPermission(OpNick, Nick, Channel, uMode, bAdded, bNoChange));
     return false;
@@ -375,7 +375,7 @@ bool NoModules::OnAddUser(NoUser& User, NoString& sErrorRet) { MODHALTCHK(OnAddU
 
 bool NoModules::OnDeleteUser(NoUser& User) { MODHALTCHK(OnDeleteUser(User)); }
 
-bool NoModules::OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, unsigned short uPort)
+bool NoModules::OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, ushort uPort)
 {
     MODUNLOADCHK(OnClientConnect(pClient, sHost, uPort));
     return false;
@@ -656,7 +656,7 @@ void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModule
 {
     ssMods.clear();
 
-    unsigned int a = 0;
+    uint a = 0;
     NoDir Dir;
 
     ModDirList dirs = GetModDirs();
@@ -748,7 +748,7 @@ ModHandle NoModules::OpenModule(const NoString& sModule, const NoString& sModPat
     bVersionMismatch = false;
     sRetMsg.clear();
 
-    for (unsigned int a = 0; a < sModule.length(); a++) {
+    for (uint a = 0; a < sModule.length(); a++) {
         if (((sModule[a] < '0') || (sModule[a] > '9')) && ((sModule[a] < 'a') || (sModule[a] > 'z')) &&
             ((sModule[a] < 'A') || (sModule[a] > 'Z')) && (sModule[a] != '_')) {
             sRetMsg = "Module names can only contain letters, numbers and underscores, [" + sModule + "] is invalid.";

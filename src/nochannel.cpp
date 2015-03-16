@@ -270,8 +270,8 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
 
     NETWORKMODULECALL(OnRawMode2(pOpNick, *this, sModeArg, sArgs), m_network->GetUser(), m_network, nullptr, NOTHING);
 
-    for (unsigned int a = 0; a < sModeArg.size(); a++) {
-        const unsigned char& uMode = sModeArg[a];
+    for (uint a = 0; a < sModeArg.size(); a++) {
+        const uchar& uMode = sModeArg[a];
 
         if (uMode == '+') {
             bAdd = true;
@@ -281,7 +281,7 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
             NoString sArg = getModeArg(sArgs);
             NoNick* pNick = findNick(sArg);
             if (pNick) {
-                unsigned char uPerm = m_network->GetIRCSock()->GetPermFromMode(uMode);
+                uchar uPerm = m_network->GetIRCSock()->GetPermFromMode(uMode);
 
                 if (uPerm) {
                     bool bNoChange = (pNick->HasPerm(uPerm) == bAdd);
@@ -386,10 +386,10 @@ NoString NoChannel::getOptions() const
     return NoString(", ").Join(vsRet.begin(), vsRet.end());
 }
 
-NoString NoChannel::getModeArg(unsigned char uMode) const
+NoString NoChannel::getModeArg(uchar uMode) const
 {
     if (uMode) {
-        std::map<unsigned char, NoString>::const_iterator it = m_modes.find(uMode);
+        std::map<uchar, NoString>::const_iterator it = m_modes.find(uMode);
 
         if (it != m_modes.end()) {
             return it->second;
@@ -399,15 +399,15 @@ NoString NoChannel::getModeArg(unsigned char uMode) const
     return "";
 }
 
-bool NoChannel::hasMode(unsigned char uMode) const { return (uMode && m_modes.find(uMode) != m_modes.end()); }
+bool NoChannel::hasMode(uchar uMode) const { return (uMode && m_modes.find(uMode) != m_modes.end()); }
 
-bool NoChannel::addMode(unsigned char uMode, const NoString& sArg)
+bool NoChannel::addMode(uchar uMode, const NoString& sArg)
 {
     m_modes[uMode] = sArg;
     return true;
 }
 
-bool NoChannel::remMode(unsigned char uMode)
+bool NoChannel::remMode(uchar uMode)
 {
     if (!hasMode(uMode)) {
         return false;
@@ -489,14 +489,14 @@ bool NoChannel::addNick(const NoString& sNick)
     return true;
 }
 
-std::map<char, unsigned int> NoChannel::getPermCounts() const
+std::map<char, uint> NoChannel::getPermCounts() const
 {
-    std::map<char, unsigned int> mRet;
+    std::map<char, uint> mRet;
 
     for (const auto& it : m_nicks) {
         NoString sPerms = it.second.GetPermStr();
 
-        for (unsigned int p = 0; p < sPerms.size(); p++) {
+        for (uint p = 0; p < sPerms.size(); p++) {
             mRet[sPerms[p]]++;
         }
     }
@@ -507,7 +507,7 @@ std::map<char, unsigned int> NoChannel::getPermCounts() const
 bool NoChannel::remNick(const NoString& sNick)
 {
     std::map<NoString, NoNick>::iterator it;
-    std::set<unsigned char>::iterator it2;
+    std::set<uchar>::iterator it2;
 
     it = m_nicks.find(sNick);
     if (it == m_nicks.end()) {

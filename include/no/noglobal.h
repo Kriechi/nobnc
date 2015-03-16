@@ -14,30 +14,13 @@
  * limitations under the License.
  */
 
-#ifndef NOSERVER_H
-#define NOSERVER_H
+#ifndef NOGLOBAL_H
+#define NOGLOBAL_H
 
-#include <no/noconfig.h>
-#include <no/nostring.h>
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;
+typedef unsigned long ulong;
+typedef unsigned long long ulonglong;
 
-class NoServer
-{
-public:
-    NoServer(const NoString& sName, ushort uPort = 6667, const NoString& sPass = "", bool bSSL = false);
-    ~NoServer();
-
-    const NoString& GetName() const;
-    ushort GetPort() const;
-    const NoString& GetPass() const;
-    bool IsSSL() const;
-    NoString GetString(bool bIncludePassword = true) const;
-    static bool IsValidHostName(const NoString& sHostName);
-
-private:
-    NoString m_sName;
-    ushort m_uPort;
-    NoString m_sPass;
-    bool m_bSSL;
-};
-
-#endif // NOSERVER_H
+#endif // NOGLOBAL_H

@@ -48,7 +48,7 @@ NoString NoDir::ChangeDir(const NoString& sPath, const NoString& sAdd, const NoS
         sRet.RightChomp();
     }
 
-    for (unsigned int a = 0; a < sAddDir.size(); a++) {
+    for (uint a = 0; a < sAddDir.size(); a++) {
         switch (sAddDir[a]) {
         case '/':
             if (sCurDir == "..") {

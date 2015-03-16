@@ -27,7 +27,7 @@ class NoListener
 public:
     typedef enum { ACCEPT_IRC, ACCEPT_HTTP, ACCEPT_ALL } EAcceptType;
 
-    NoListener(unsigned short uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept)
+    NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept)
         : m_bSSL(bSSL), m_eAddr(eAddr), m_uPort(uPort), m_sBindHost(sBindHost), m_sURIPrefix(sURIPrefix),
           m_pListener(nullptr), m_eAcceptType(eAccept)
     {
@@ -40,7 +40,7 @@ public:
 
     bool IsSSL() const { return m_bSSL; }
     EAddrType GetAddrType() const { return m_eAddr; }
-    unsigned short GetPort() const { return m_uPort; }
+    ushort GetPort() const { return m_uPort; }
     const NoString& GetBindHost() const { return m_sBindHost; }
     NoRealListener* GetRealListener() const { return m_pListener; }
     const NoString& GetURIPrefix() const { return m_sURIPrefix; }
@@ -56,7 +56,7 @@ public:
 private:
     bool m_bSSL;
     EAddrType m_eAddr;
-    unsigned short m_uPort;
+    ushort m_uPort;
     NoString m_sBindHost;
     NoString m_sURIPrefix;
     NoRealListener* m_pListener;
@@ -69,8 +69,8 @@ public:
     NoRealListener(NoListener& listener) : NoBaseSocket(), m_Listener(listener) {}
     virtual ~NoRealListener();
 
-    bool ConnectionFrom(const NoString& sHost, unsigned short uPort) override;
-    Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override;
+    bool ConnectionFrom(const NoString& sHost, ushort uPort) override;
+    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
     void SockError(int iErrno, const NoString& sDescription) override;
 
 private:
@@ -80,7 +80,7 @@ private:
 class NoIncomingConnection : public NoBaseSocket
 {
 public:
-    NoIncomingConnection(const NoString& sHostname, unsigned short uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix);
+    NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix);
     virtual ~NoIncomingConnection() {}
     void ReadLine(const NoString& sData) override;
     void ReachedMaxBuffer() override;

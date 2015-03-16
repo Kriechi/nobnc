@@ -26,7 +26,7 @@
 /// @todo Do we want to make this a configure option?
 #define _SKINDIR_ _DATADIR_ "/webskins"
 
-const unsigned int NoWebSock::m_uiMaxSessions = 5;
+const uint NoWebSock::m_uiMaxSessions = 5;
 
 // We need this class to make sure the contained maps and their content is
 // destroyed in the order that we want.
@@ -816,8 +816,8 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
     } else {
         NoString sPage(sURI.Trim_n("/"));
         if (sPage.length() < 32) {
-            for (unsigned int a = 0; a < sPage.length(); a++) {
-                unsigned char c = sPage[a];
+            for (uint a = 0; a < sPage.length(); a++) {
+                uchar c = sPage[a];
 
                 if ((c < '0' || c > '9') && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && c != '_') {
                     return PAGE_NOTFOUND;
@@ -911,7 +911,7 @@ bool NoWebSock::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasi
     return IsLoggedIn();
 }
 
-Csock* NoWebSock::GetSockObj(const NoString& sHost, unsigned short uPort)
+Csock* NoWebSock::GetSockObj(const NoString& sHost, ushort uPort)
 {
     // All listening is done by NoListener, thus NoWebSock should never have
     // to listen, but since GetSockObj() is pure virtual...

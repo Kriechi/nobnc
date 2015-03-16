@@ -49,7 +49,7 @@ class NoPerform : public NoModule
     void List(const NoString& sCommand)
     {
         NoTable Table;
-        unsigned int index = 1;
+        uint index = 1;
 
         Table.AddColumn("Id");
         Table.AddColumn("Perform");

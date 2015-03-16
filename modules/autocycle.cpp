@@ -88,12 +88,12 @@ public:
         NoTable Table;
         Table.AddColumn("Chan");
 
-        for (unsigned int a = 0; a < m_vsChans.size(); a++) {
+        for (uint a = 0; a < m_vsChans.size(); a++) {
             Table.AddRow();
             Table.SetCell("Chan", m_vsChans[a]);
         }
 
-        for (unsigned int b = 0; b < m_vsNegChans.size(); b++) {
+        for (uint b = 0; b < m_vsNegChans.size(); b++) {
             Table.AddRow();
             Table.SetCell("Chan", "!" + m_vsNegChans[b]);
         }
@@ -109,7 +109,7 @@ public:
 
     void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
-        for (unsigned int i = 0; i < vChans.size(); i++) AutoCycle(*vChans[i]);
+        for (uint i = 0; i < vChans.size(); i++) AutoCycle(*vChans[i]);
     }
 
     void OnKick(const NoNick& Nick, const NoString& sOpNick, NoChannel& Channel, const NoString& sMessage) override
@@ -207,13 +207,13 @@ protected:
 
     bool IsAutoCycle(const NoString& sChan)
     {
-        for (unsigned int a = 0; a < m_vsNegChans.size(); a++) {
+        for (uint a = 0; a < m_vsNegChans.size(); a++) {
             if (sChan.WildCmp(m_vsNegChans[a], NoString::CaseInsensitive)) {
                 return false;
             }
         }
 
-        for (unsigned int b = 0; b < m_vsChans.size(); b++) {
+        for (uint b = 0; b < m_vsChans.size(); b++) {
             if (sChan.WildCmp(m_vsChans[b], NoString::CaseInsensitive)) {
                 return true;
             }

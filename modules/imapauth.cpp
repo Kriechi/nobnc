@@ -77,7 +77,7 @@ public:
             sPort.LeftChomp();
         }
 
-        unsigned short uPort = sPort.ToUShort();
+        ushort uPort = sPort.ToUShort();
 
         if (uPort) {
             m_uPort = uPort;
@@ -117,7 +117,7 @@ public:
 private:
     // Settings
     NoString m_sServer;
-    unsigned short m_uPort;
+    ushort m_uPort;
     bool m_bSSL;
     NoString m_sUserFormat;
     // !Settings

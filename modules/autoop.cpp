@@ -88,7 +88,7 @@ public:
         NoStringVector vsHostmasks;
         sHostmasks.Split(",", vsHostmasks);
 
-        for (unsigned int a = 0; a < vsHostmasks.size(); a++) {
+        for (uint a = 0; a < vsHostmasks.size(); a++) {
             m_ssHostmasks.erase(vsHostmasks[a]);
         }
 
@@ -100,7 +100,7 @@ public:
         NoStringVector vsHostmasks;
         sHostmasks.Split(",", vsHostmasks);
 
-        for (unsigned int a = 0; a < vsHostmasks.size(); a++) {
+        for (uint a = 0; a < vsHostmasks.size(); a++) {
             m_ssHostmasks.insert(vsHostmasks[a]);
         }
     }
@@ -110,7 +110,7 @@ public:
         NoStringVector vsChans;
         sChans.Split(" ", vsChans);
 
-        for (unsigned int a = 0; a < vsChans.size(); a++) {
+        for (uint a = 0; a < vsChans.size(); a++) {
             m_ssChans.erase(vsChans[a].AsLower());
         }
     }
@@ -120,7 +120,7 @@ public:
         NoStringVector vsChans;
         sChans.Split(" ", vsChans);
 
-        for (unsigned int a = 0; a < vsChans.size(); a++) {
+        for (uint a = 0; a < vsChans.size(); a++) {
             m_ssChans.insert(vsChans[a].AsLower());
         }
     }
@@ -323,7 +323,7 @@ public:
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             NoStringVector vsHostmasks;
             it->second->GetHostmasks().Split(",", vsHostmasks);
-            for (unsigned int a = 0; a < vsHostmasks.size(); a++) {
+            for (uint a = 0; a < vsHostmasks.size(); a++) {
                 Table.AddRow();
                 if (a == 0) {
                     Table.SetCell("User", it->second->GetUsername());

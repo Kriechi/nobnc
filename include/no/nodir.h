@@ -39,7 +39,7 @@ public:
 
     void CleanUp()
     {
-        for (unsigned int a = 0; a < size(); a++) {
+        for (uint a = 0; a < size(); a++) {
             delete (*this)[a];
         }
 
@@ -77,17 +77,17 @@ public:
         return size();
     }
 
-    static unsigned int Chmod(mode_t mode, const NoString& sWildcard, const NoString& sDir = ".")
+    static uint Chmod(mode_t mode, const NoString& sWildcard, const NoString& sDir = ".")
     {
         NoDir cDir;
         cDir.FillByWildcard(sDir, sWildcard);
         return cDir.Chmod(mode);
     }
 
-    unsigned int Chmod(mode_t mode)
+    uint Chmod(mode_t mode)
     {
-        unsigned int uRet = 0;
-        for (unsigned int a = 0; a < size(); a++) {
+        uint uRet = 0;
+        for (uint a = 0; a < size(); a++) {
             if ((*this)[a]->Chmod(mode)) {
                 uRet++;
             }
@@ -96,17 +96,17 @@ public:
         return uRet;
     }
 
-    static unsigned int Delete(const NoString& sWildcard, const NoString& sDir = ".")
+    static uint Delete(const NoString& sWildcard, const NoString& sDir = ".")
     {
         NoDir cDir;
         cDir.FillByWildcard(sDir, sWildcard);
         return cDir.Delete();
     }
 
-    unsigned int Delete()
+    uint Delete()
     {
-        unsigned int uRet = 0;
-        for (unsigned int a = 0; a < size(); a++) {
+        uint uRet = 0;
+        for (uint a = 0; a < size(); a++) {
             if ((*this)[a]->Delete()) {
                 uRet++;
             }

@@ -40,7 +40,7 @@ class NoAway;
 class NoAwayJob : public NoTimer
 {
 public:
-    NoAwayJob(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+    NoAwayJob(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
         : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }

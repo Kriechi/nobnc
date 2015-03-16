@@ -55,7 +55,7 @@ void NoUtils::GenerateCert(FILE* pOut, const NoString& sHost)
     const int days = 365;
     const int years = 10;
 
-    unsigned int uSeed = (unsigned int)time(nullptr);
+    uint uSeed = (uint)time(nullptr);
     int serial = (rand_r(&uSeed) % 9999);
 
     RSA* pRSA = RSA_generate_key(2048, 0x10001, nullptr, nullptr);
@@ -103,9 +103,9 @@ void NoUtils::GenerateCert(FILE* pOut, const NoString& sHost)
         sEmailAddr += "@";
         sEmailAddr += pHostName;
 
-        X509_NAME_add_entry_by_txt(pName, "OU", MBSTRING_ASC, (unsigned char*)pLogName, -1, -1, 0);
-        X509_NAME_add_entry_by_txt(pName, "CN", MBSTRING_ASC, (unsigned char*)pHostName, -1, -1, 0);
-        X509_NAME_add_entry_by_txt(pName, "emailAddress", MBSTRING_ASC, (unsigned char*)sEmailAddr.c_str(), -1, -1, 0);
+        X509_NAME_add_entry_by_txt(pName, "OU", MBSTRING_ASC, (uchar*)pLogName, -1, -1, 0);
+        X509_NAME_add_entry_by_txt(pName, "CN", MBSTRING_ASC, (uchar*)pHostName, -1, -1, 0);
+        X509_NAME_add_entry_by_txt(pName, "emailAddress", MBSTRING_ASC, (uchar*)sEmailAddr.c_str(), -1, -1, 0);
 
         X509_set_subject_name(pCert, pName);
         X509_set_issuer_name(pCert, pName);
@@ -125,13 +125,13 @@ void NoUtils::GenerateCert(FILE* pOut, const NoString& sHost)
 }
 #endif /* HAVE_LIBSSL */
 
-NoString NoUtils::GetIP(unsigned long addr)
+NoString NoUtils::GetIP(ulong addr)
 {
     char szBuf[16];
     memset((char*)szBuf, 0, 16);
 
     if (addr >= (1 << 24)) {
-        unsigned long ip[4];
+        ulong ip[4];
         ip[0] = addr >> 24 & 255;
         ip[1] = addr >> 16 & 255;
         ip[2] = addr >> 8 & 255;
@@ -142,11 +142,11 @@ NoString NoUtils::GetIP(unsigned long addr)
     return szBuf;
 }
 
-unsigned long NoUtils::GetLongIP(const NoString& sIP)
+ulong NoUtils::GetLongIP(const NoString& sIP)
 {
-    unsigned long ret;
+    ulong ret;
     char ip[4][4];
-    unsigned int i;
+    uint i;
 
     i = sscanf(sIP.c_str(), "%3[0-9].%3[0-9].%3[0-9].%3[0-9]", ip[0], ip[1], ip[2], ip[3]);
     if (i != 4) return 0;
@@ -222,16 +222,16 @@ bool NoUtils::GetBoolInput(const NoString& sPrompt, bool* pbDefault)
     }
 }
 
-bool NoUtils::GetNumInput(const NoString& sPrompt, unsigned int& uRet, unsigned int uMin, unsigned int uMax, unsigned int uDefault)
+bool NoUtils::GetNumInput(const NoString& sPrompt, uint& uRet, uint uMin, uint uMax, uint uDefault)
 {
     if (uMin > uMax) {
         return false;
     }
 
-    NoString sDefault = (uDefault != (unsigned int)~0) ? NoString(uDefault) : "";
+    NoString sDefault = (uDefault != (uint)~0) ? NoString(uDefault) : "";
     NoString sNum, sHint;
 
-    if (uMax != (unsigned int)~0) {
+    if (uMax != (uint)~0) {
         sHint = NoString(uMin) + " to " + NoString(uMax);
     } else if (uMin > 0) {
         sHint = NoString(uMin) + " and up";
@@ -594,9 +594,9 @@ bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, size_type
         uRowIdx = size() - 1;
     }
 
-    unsigned int uColIdx = GetColumnIndex(sColumn);
+    uint uColIdx = GetColumnIndex(sColumn);
 
-    if (uColIdx == (unsigned int)-1) return false;
+    if (uColIdx == (uint)-1) return false;
 
     (*this)[uRowIdx][uColIdx] = sValue;
 
@@ -624,7 +624,7 @@ bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, size_type
     return true;
 }
 
-bool NoTable::GetLine(unsigned int uIdx, NoString& sLine) const
+bool NoTable::GetLine(uint uIdx, NoString& sLine) const
 {
     if (empty()) {
         return false;
@@ -649,7 +649,7 @@ NoStringVector NoTable::Render() const
     std::vector<size_type> vuWidth = m_vuMaxWidths;
 
     std::map<int, int> miColumnSpace;
-    for (unsigned int i = 0; i < m_vsHeaders.size(); ++i) {
+    for (uint i = 0; i < m_vsHeaders.size(); ++i) {
         int iSpace = m_vuMaxWidths[i] - m_vuMinWidths[i];
         if (iSpace > 0) {
             miColumnSpace[i] = iSpace;
@@ -695,7 +695,7 @@ NoStringVector NoTable::Render() const
     {
         std::ostringstream ssLine;
         ssLine << "|";
-        for (unsigned int iCol = 0; iCol < vuWidth.size(); ++iCol) {
+        for (uint iCol = 0; iCol < vuWidth.size(); ++iCol) {
             ssLine << " ";
             ssLine << std::setw(vuWidth[iCol]) << std::left;
             ssLine << m_vsHeaders[iCol] << " |";
@@ -707,8 +707,8 @@ NoStringVector NoTable::Render() const
         // Wrap words
         std::vector<NoStringVector> vvsColumns;
         vvsColumns.reserve(m_vsHeaders.size());
-        unsigned int uRowNum = 1;
-        for (unsigned int iCol = 0; iCol < vuWidth.size(); ++iCol) {
+        uint uRowNum = 1;
+        for (uint iCol = 0; iCol < vuWidth.size(); ++iCol) {
             if (m_vbWrappable[iCol]) {
                 vvsColumns.emplace_back(WrapWords(vsRow[iCol], vuWidth[iCol]));
             } else {
@@ -722,7 +722,7 @@ NoStringVector NoTable::Render() const
         for (size_type uCurrentLine = 0; uCurrentLine < uRowNum; ++uCurrentLine) {
             std::ostringstream ssLine;
             ssLine << "|";
-            for (unsigned int iCol = 0; iCol < vvsColumns.size(); ++iCol) {
+            for (uint iCol = 0; iCol < vvsColumns.size(); ++iCol) {
                 const NoString& sData = uCurrentLine < vvsColumns[iCol].size() ? vvsColumns[iCol][uCurrentLine] : sEmpty;
                 ssLine << " ";
                 ssLine << std::setw(vuWidth[iCol]) << std::left;
@@ -760,18 +760,18 @@ NoStringVector NoTable::WrapWords(const NoString& s, size_type uWidth)
     return vsResult;
 }
 
-unsigned int NoTable::GetColumnIndex(const NoString& sName) const
+uint NoTable::GetColumnIndex(const NoString& sName) const
 {
-    for (unsigned int i = 0; i < m_vsHeaders.size(); i++) {
+    for (uint i = 0; i < m_vsHeaders.size(); i++) {
         if (m_vsHeaders[i] == sName) return i;
     }
 
     DEBUG("NoTable::GetColumnIndex(" + sName + ") failed");
 
-    return (unsigned int)-1;
+    return (uint)-1;
 }
 
-NoString::size_type NoTable::GetColumnWidth(unsigned int uIdx) const
+NoString::size_type NoTable::GetColumnWidth(uint uIdx) const
 {
     if (uIdx >= m_vsHeaders.size()) {
         return 0;
@@ -791,22 +791,22 @@ void NoTable::Clear()
 
 #ifdef HAVE_LIBSSL
 NoBlowfish::NoBlowfish(const NoString& sPassword, int iEncrypt, const NoString& sIvec)
-    : m_ivec((unsigned char*)calloc(sizeof(unsigned char), 8)), m_bkey(), m_iEncrypt(iEncrypt), m_num(0)
+    : m_ivec((uchar*)calloc(sizeof(uchar), 8)), m_bkey(), m_iEncrypt(iEncrypt), m_num(0)
 {
 
     if (sIvec.length() >= 8) {
         memcpy(m_ivec, sIvec.data(), 8);
     }
 
-    BF_set_key(&m_bkey, (unsigned int)sPassword.length(), (unsigned char*)sPassword.data());
+    BF_set_key(&m_bkey, (uint)sPassword.length(), (uchar*)sPassword.data());
 }
 
 NoBlowfish::~NoBlowfish() { free(m_ivec); }
 
 //! output must be freed
-unsigned char* NoBlowfish::MD5(const unsigned char* input, u_int ilen)
+uchar* NoBlowfish::MD5(const uchar* input, u_int ilen)
 {
-    unsigned char* output = (unsigned char*)malloc(MD5_DIGEST_LENGTH);
+    uchar* output = (uchar*)malloc(MD5_DIGEST_LENGTH);
     ::MD5(input, ilen, output);
     return output;
 }
@@ -815,7 +815,7 @@ unsigned char* NoBlowfish::MD5(const unsigned char* input, u_int ilen)
 NoString NoBlowfish::MD5(const NoString& sInput, bool bHexEncode)
 {
     NoString sRet;
-    unsigned char* data = MD5((const unsigned char*)sInput.data(), (unsigned int)sInput.length());
+    uchar* data = MD5((const uchar*)sInput.data(), (uint)sInput.length());
 
     if (!bHexEncode) {
         sRet.append((const char*)data, MD5_DIGEST_LENGTH);
@@ -831,22 +831,22 @@ NoString NoBlowfish::MD5(const NoString& sInput, bool bHexEncode)
 }
 
 //! output must be the same size as input
-void NoBlowfish::Crypt(unsigned char* input, unsigned char* output, u_int uBytes)
+void NoBlowfish::Crypt(uchar* input, uchar* output, u_int uBytes)
 {
     BF_cfb64_encrypt(input, output, uBytes, &m_bkey, m_ivec, &m_num, m_iEncrypt);
 }
 
 //! must free result
-unsigned char* NoBlowfish::Crypt(unsigned char* input, u_int uBytes)
+uchar* NoBlowfish::Crypt(uchar* input, u_int uBytes)
 {
-    unsigned char* buff = (unsigned char*)malloc(uBytes);
+    uchar* buff = (uchar*)malloc(uBytes);
     Crypt(input, buff, uBytes);
     return buff;
 }
 
 NoString NoBlowfish::Crypt(const NoString& sData)
 {
-    unsigned char* buff = Crypt((unsigned char*)sData.data(), (unsigned int)sData.length());
+    uchar* buff = Crypt((uchar*)sData.data(), (uint)sData.length());
     NoString sOutput;
     sOutput.append((const char*)buff, sData.length());
     free(buff);

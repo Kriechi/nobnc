@@ -36,8 +36,8 @@ public:
     NoString getName() const;
 
     const NoBuffer& getBuffer() const;
-    unsigned int getBufferCount() const;
-    bool setBufferCount(unsigned int count, bool force = false);
+    uint getBufferCount() const;
+    bool setBufferCount(uint count, bool force = false);
     size_t addBuffer(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
     void clearBuffer();
 

@@ -67,8 +67,8 @@ public:
 
     void setModes(const NoString& s);
     void modeChange(const NoString& sModes, const NoNick* OpNick = nullptr);
-    bool addMode(unsigned char uMode, const NoString& sArg);
-    bool remMode(unsigned char uMode);
+    bool addMode(uchar uMode, const NoString& sArg);
+    bool remMode(uchar uMode);
     NoString getModeString() const;
     NoString getModeArg(NoString& sArgs) const;
     NoString getModeForNames() const;
@@ -82,13 +82,13 @@ public:
     bool changeNick(const NoString& sOldNick, const NoString& sNewNick);
 
     const NoBuffer& getBuffer() const { return m_buffer; }
-    unsigned int getBufferCount() const { return m_buffer.getLimit(); }
-    bool setBufferCount(unsigned int u, bool bForce = false)
+    uint getBufferCount() const { return m_buffer.getLimit(); }
+    bool setBufferCount(uint u, bool bForce = false)
     {
         m_hasBufferCountSet = true;
         return m_buffer.setLimit(u, bForce);
     }
-    void inheritBufferCount(unsigned int u, bool bForce = false)
+    void inheritBufferCount(uint u, bool bForce = false)
     {
         if (!m_hasBufferCountSet) m_buffer.setLimit(u, bForce);
     }
@@ -101,9 +101,9 @@ public:
     void sendBuffer(NoClient* pClient, const NoBuffer& Buffer);
 
     NoString getPermStr() const { return m_nick.GetPermStr(); }
-    bool hasPerm(unsigned char uPerm) const { return m_nick.HasPerm(uPerm); }
-    bool addPerm(unsigned char uPerm) { return m_nick.AddPerm(uPerm); }
-    bool remPerm(unsigned char uPerm) { return m_nick.RemPerm(uPerm); }
+    bool hasPerm(uchar uPerm) const { return m_nick.HasPerm(uPerm); }
+    bool addPerm(uchar uPerm) { return m_nick.AddPerm(uPerm); }
+    bool remPerm(uchar uPerm) { return m_nick.RemPerm(uPerm); }
 
     void setModeKnown(bool b) { m_modeKnown = b; }
     void setIsOn(bool b)
@@ -116,39 +116,39 @@ public:
     void setKey(const NoString& s);
     void setTopic(const NoString& s) { m_topic = s; }
     void setTopicOwner(const NoString& s) { m_topicOwner = s; }
-    void setTopicDate(unsigned long u) { m_topicDate = u; }
+    void setTopicDate(ulong u) { m_topicDate = u; }
     void setDefaultModes(const NoString& s) { m_defaultModes = s; }
     void setAutoClearChanBuffer(bool b);
     void inheritAutoClearChanBuffer(bool b);
     void setDetached(bool b = true) { m_detached = b; }
     void setInConfig(bool b);
-    void setCreationDate(unsigned long u) { m_creationDate = u; }
+    void setCreationDate(ulong u) { m_creationDate = u; }
     void disable() { m_disabled = true; }
     void enable();
     void incJoinTries() { m_joinTries++; }
     void resetJoinTries() { m_joinTries = 0; }
 
     bool isModeKnown() const { return m_modeKnown; }
-    bool hasMode(unsigned char uMode) const;
+    bool hasMode(uchar uMode) const;
     NoString getOptions() const;
-    NoString getModeArg(unsigned char uMode) const;
-    std::map<char, unsigned int> getPermCounts() const;
+    NoString getModeArg(uchar uMode) const;
+    std::map<char, uint> getPermCounts() const;
     bool isOn() const { return m_isOn; }
     const NoString& getName() const { return m_name; }
-    const std::map<unsigned char, NoString>& getModes() const { return m_modes; }
+    const std::map<uchar, NoString>& getModes() const { return m_modes; }
     const NoString& getKey() const { return m_key; }
     const NoString& getTopic() const { return m_topic; }
     const NoString& getTopicOwner() const { return m_topicOwner; }
-    unsigned long getTopicDate() const { return m_topicDate; }
+    ulong getTopicDate() const { return m_topicDate; }
     const NoString& getDefaultModes() const { return m_defaultModes; }
     const std::map<NoString, NoNick>& getNicks() const { return m_nicks; }
     size_t getNickCount() const { return m_nicks.size(); }
     bool autoClearChanBuffer() const { return m_autoClearChanBuffer; }
     bool isDetached() const { return m_detached; }
     bool inConfig() const { return m_inConfig; }
-    unsigned long getCreationDate() const { return m_creationDate; }
+    ulong getCreationDate() const { return m_creationDate; }
     bool isDisabled() const { return m_disabled; }
-    unsigned int getJoinTries() const { return m_joinTries; }
+    uint getJoinTries() const { return m_joinTries; }
     bool hasBufferCountSet() const { return m_hasBufferCountSet; }
     bool hasAutoClearChanBufferSet() const { return m_hasAutoClearChanBufferSet; }
 
@@ -164,17 +164,17 @@ private:
     NoString m_key;
     NoString m_topic;
     NoString m_topicOwner;
-    unsigned long m_topicDate;
-    unsigned long m_creationDate;
+    ulong m_topicDate;
+    ulong m_creationDate;
     NoNetwork* m_network;
     NoNick m_nick;
-    unsigned int m_joinTries;
+    uint m_joinTries;
     NoString m_defaultModes;
     std::map<NoString, NoNick> m_nicks; // Todo: make this caseless (irc style)
     NoBuffer m_buffer;
 
     bool m_modeKnown;
-    std::map<unsigned char, NoString> m_modes;
+    std::map<uchar, NoString> m_modes;
 };
 
 #endif // NOCHANNEL_H

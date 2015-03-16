@@ -79,7 +79,7 @@ public:
         if (!sSource.empty() && !m_vsSources.empty()) {
             bGoodSource = false;
 
-            for (unsigned int a = 0; a < m_vsSources.size(); a++) {
+            for (uint a = 0; a < m_vsSources.size(); a++) {
                 const NoWatchSource& WatchSource = m_vsSources[a];
 
                 if (sSource.WildCmp(WatchSource.GetSource(), NoString::CaseInsensitive)) {
@@ -115,7 +115,7 @@ public:
     {
         NoString sRet;
 
-        for (unsigned int a = 0; a < m_vsSources.size(); a++) {
+        for (uint a = 0; a < m_vsSources.size(); a++) {
             const NoWatchSource& WatchSource = m_vsSources[a];
 
             if (a) {
@@ -190,7 +190,7 @@ public:
         msParams["target"] = GetNetwork()->GetCurNick();
 
         size_t uSize = m_Buffer.size();
-        for (unsigned int uIdx = 0; uIdx < uSize; uIdx++) {
+        for (uint uIdx = 0; uIdx < uSize; uIdx++) {
             PutUser(m_Buffer.getMessage(uIdx, *GetClient(), msParams));
         }
         m_Buffer.clear();
@@ -373,9 +373,9 @@ private:
         }
     }
 
-    void SetDisabled(unsigned int uIdx, bool bDisabled)
+    void SetDisabled(uint uIdx, bool bDisabled)
     {
-        if (uIdx == (unsigned int)~0) {
+        if (uIdx == (uint)~0) {
             for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
                 (*it).SetDisabled(bDisabled);
             }
@@ -392,16 +392,16 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (unsigned int a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++) ++it;
 
         (*it).SetDisabled(bDisabled);
         PutModule("Id " + NoString(uIdx + 1) + ((bDisabled) ? " Disabled" : " Enabled"));
         Save();
     }
 
-    void SetDetachedClientOnly(unsigned int uIdx, bool bDetachedClientOnly)
+    void SetDetachedClientOnly(uint uIdx, bool bDetachedClientOnly)
     {
-        if (uIdx == (unsigned int)~0) {
+        if (uIdx == (uint)~0) {
             for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
                 (*it).SetDetachedClientOnly(bDetachedClientOnly);
             }
@@ -418,16 +418,16 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (unsigned int a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++) ++it;
 
         (*it).SetDetachedClientOnly(bDetachedClientOnly);
         PutModule("Id " + NoString(uIdx + 1) + " set to: " + ((bDetachedClientOnly) ? "Yes" : "No"));
         Save();
     }
 
-    void SetDetachedChannelOnly(unsigned int uIdx, bool bDetachedChannelOnly)
+    void SetDetachedChannelOnly(uint uIdx, bool bDetachedChannelOnly)
     {
-        if (uIdx == (unsigned int)~0) {
+        if (uIdx == (uint)~0) {
             for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
                 (*it).SetDetachedChannelOnly(bDetachedChannelOnly);
             }
@@ -445,7 +445,7 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (unsigned int a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++) ++it;
 
         (*it).SetDetachedChannelOnly(bDetachedChannelOnly);
         PutModule("Id " + NoString(uIdx + 1) + " set to: " + ((bDetachedChannelOnly) ? "Yes" : "No"));
@@ -464,7 +464,7 @@ private:
         Table.AddColumn("DetachedClientOnly");
         Table.AddColumn("DetachedChannelOnly");
 
-        unsigned int uIdx = 1;
+        uint uIdx = 1;
 
         for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it, uIdx++) {
             NoWatchEntry& WatchEntry = *it;
@@ -497,7 +497,7 @@ private:
         PutModule("---------------");
         PutModule("/msg " + GetModNick() + " CLEAR");
 
-        unsigned int uIdx = 1;
+        uint uIdx = 1;
 
         for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it, uIdx++) {
             NoWatchEntry& WatchEntry = *it;
@@ -525,7 +525,7 @@ private:
         PutModule("---------------");
     }
 
-    void SetSources(unsigned int uIdx, const NoString& sSources)
+    void SetSources(uint uIdx, const NoString& sSources)
     {
         uIdx--; // "convert" index to zero based
         if (uIdx >= m_lsWatchers.size()) {
@@ -534,14 +534,14 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (unsigned int a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++) ++it;
 
         (*it).SetSources(sSources);
         PutModule("Sources set for Id " + NoString(uIdx + 1) + ".");
         Save();
     }
 
-    void Remove(unsigned int uIdx)
+    void Remove(uint uIdx)
     {
         uIdx--; // "convert" index to zero based
         if (uIdx >= m_lsWatchers.size()) {
@@ -550,7 +550,7 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (unsigned int a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++) ++it;
 
         m_lsWatchers.erase(it);
         PutModule("Id " + NoString(uIdx + 1) + " Removed.");

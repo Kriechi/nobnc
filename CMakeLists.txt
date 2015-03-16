@@ -25,6 +25,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nodir.h
                        include/no/noexecsock.h
                        include/no/nofile.h
+                       include/no/noglobal.h
                        include/no/nohttpsock.h
                        include/no/noircsock.h
                        include/no/nolistener.h

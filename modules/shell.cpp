@@ -63,7 +63,7 @@ public:
     {
         std::vector<Csock*> vSocks = GetManager()->FindSocksByName("SHELL");
 
-        for (unsigned int a = 0; a < vSocks.size(); a++) {
+        for (uint a = 0; a < vSocks.size(); a++) {
             GetManager()->DelSockByAddr(vSocks[a]);
         }
     }

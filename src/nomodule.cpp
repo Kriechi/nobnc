@@ -265,7 +265,7 @@ void NoModule::ListTimers()
     Table.AddColumn("Description");
 
     for (const NoTimer* pTimer : m_sTimers) {
-        unsigned int uCycles = pTimer->GetCyclesLeft();
+        uint uCycles = pTimer->GetCyclesLeft();
         timeval Interval = pTimer->GetInterval();
 
         Table.AddRow();
@@ -493,7 +493,7 @@ NoModule::EModRet NoModule::OnIRCRegistration(NoString& sPass, NoString& sNick, 
 }
 NoModule::EModRet NoModule::OnBroadcast(NoString& sMessage) { return CONTINUE; }
 
-void NoModule::OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange)
+void NoModule::OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange)
 {
     if (pOpNick) OnChanPermission(*pOpNick, Nick, Channel, uMode, bAdded, bNoChange);
 }
@@ -522,7 +522,7 @@ void NoModule::OnMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, co
     if (pOpNick) OnMode(*pOpNick, Channel, uMode, sArg, bAdded, bNoChange);
 }
 
-void NoModule::OnChanPermission(const NoNick& pOpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange)
+void NoModule::OnChanPermission(const NoNick& pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange)
 {
 }
 void NoModule::OnOp(const NoNick& pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) {}
@@ -611,11 +611,11 @@ void NoModule::OnServerCapResult(const NoString& sCap, bool bSuccess) {}
 bool NoModule::PutIRC(const NoString& sLine) { return (m_pNetwork) ? m_pNetwork->PutIRC(sLine) : false; }
 bool NoModule::PutUser(const NoString& sLine) { return (m_pNetwork) ? m_pNetwork->PutUser(sLine, m_pClient) : false; }
 bool NoModule::PutStatus(const NoString& sLine) { return (m_pNetwork) ? m_pNetwork->PutStatus(sLine, m_pClient) : false; }
-unsigned int NoModule::PutModule(const NoTable& table)
+uint NoModule::PutModule(const NoTable& table)
 {
     if (!m_pUser) return 0;
 
-    unsigned int idx = 0;
+    uint idx = 0;
     NoString sLine;
     while (table.GetLine(idx++, sLine)) PutModule(sLine);
     return idx - 1;
@@ -654,7 +654,7 @@ bool NoModule::PutModNotice(const NoString& sLine)
 ///////////////////
 NoModule::EModRet NoModule::OnAddUser(NoUser& User, NoString& sErrorRet) { return CONTINUE; }
 NoModule::EModRet NoModule::OnDeleteUser(NoUser& User) { return CONTINUE; }
-void NoModule::OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, unsigned short uPort) {}
+void NoModule::OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, ushort uPort) {}
 NoModule::EModRet NoModule::OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) { return CONTINUE; }
 void NoModule::OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) {}
 NoModule::EModRet NoModule::OnUnknownUserRaw(NoClient* pClient, NoString& sLine) { return CONTINUE; }

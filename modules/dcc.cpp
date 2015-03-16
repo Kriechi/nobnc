@@ -24,8 +24,8 @@ class NoDccMod;
 class NoDccSock : public NoSocket
 {
 public:
-    NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, unsigned long uFileSize = 0, NoFile* pFile = nullptr);
-    NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sRemoteIP, unsigned short uRemotePort, const NoString& sLocalFile, unsigned long uFileSize);
+    NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize = 0, NoFile* pFile = nullptr);
+    NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sLocalFile, ulong uFileSize);
     virtual ~NoDccSock();
 
     void ReadData(const char* data, size_t len) override;
@@ -35,19 +35,19 @@ public:
     void Connected() override;
     void Disconnected() override;
     void SendPacket();
-    Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override;
+    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
     NoFile* OpenFile(bool bWrite = true);
-    bool Seek(unsigned long int uPos);
+    bool Seek(ulong uPos);
 
     // Setters
     void SetRemoteIP(const NoString& s) { m_sRemoteIP = s; }
     void SetRemoteNick(const NoString& s) { m_sRemoteNick = s; }
     void SetFileName(const NoString& s) { m_sFileName = s; }
-    void SetFileOffset(unsigned long u) { m_uBytesSoFar = u; }
+    void SetFileOffset(ulong u) { m_uBytesSoFar = u; }
     // !Setters
 
     // Getters
-    unsigned short GetUserPort() const { return m_uRemotePort; }
+    ushort GetUserPort() const { return m_uRemotePort; }
     const NoString& GetRemoteNick() const { return m_sRemoteNick; }
     const NoString& GetFileName() const { return m_sFileName; }
     const NoString& GetLocalFile() const { return m_sLocalFile; }
@@ -66,9 +66,9 @@ protected:
     NoString m_sFileName;
     NoString m_sLocalFile;
     NoString m_sSendBuf;
-    unsigned short m_uRemotePort;
-    unsigned long long m_uFileSize;
-    unsigned long long m_uBytesSoFar;
+    ushort m_uRemotePort;
+    ulonglong m_uFileSize;
+    ulonglong m_uBytesSoFar;
     bool m_bSend;
     bool m_bNoDelFile;
     NoFile* m_pFile;
@@ -113,7 +113,7 @@ public:
         }
 
         NoString sLocalDCCIP = GetUser()->GetLocalDCCIP();
-        unsigned short uPort =
+        ushort uPort =
         NoApp::Get().GetManager().ListenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
 
         if (GetUser()->GetNick().Equals(sRemoteNick)) {
@@ -128,7 +128,7 @@ public:
         return true;
     }
 
-    bool GetFile(const NoString& sRemoteNick, const NoString& sRemoteIP, unsigned short uRemotePort, const NoString& sFileName, unsigned long uFileSize)
+    bool GetFile(const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sFileName, ulong uFileSize)
     {
         if (NoFile::Exists(sFileName)) {
             PutModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - File already exists.");
@@ -233,8 +233,8 @@ public:
     {
         if (sMessage.StartsWith("DCC RESUME ")) {
             NoString sFile = sMessage.Token(2);
-            unsigned short uResumePort = sMessage.Token(3).ToUShort();
-            unsigned long uResumeSize = sMessage.Token(4).ToULong();
+            ushort uResumePort = sMessage.Token(3).ToUShort();
+            ulong uResumeSize = sMessage.Token(4).ToULong();
 
             std::set<NoSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
@@ -257,15 +257,15 @@ public:
             if (sLocalFile.empty()) {
                 PutModule("Bad DCC file: " + sMessage.Token(2));
             }
-            unsigned long uLongIP = sMessage.Token(3).ToULong();
-            unsigned short uPort = sMessage.Token(4).ToUShort();
-            unsigned long uFileSize = sMessage.Token(5).ToULong();
+            ulong uLongIP = sMessage.Token(3).ToULong();
+            ushort uPort = sMessage.Token(4).ToUShort();
+            ulong uFileSize = sMessage.Token(5).ToULong();
             GetFile(GetClient()->GetNick(), NoUtils::GetIP(uLongIP), uPort, sLocalFile, uFileSize);
         }
     }
 };
 
-NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, unsigned long uFileSize, NoFile* pFile)
+NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize, NoFile* pFile)
     : NoSocket(pMod)
 {
     m_sRemoteNick = sRemoteNick;
@@ -283,9 +283,9 @@ NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString
 NoDccSock::NoDccSock(NoDccMod* pMod,
                    const NoString& sRemoteNick,
                    const NoString& sRemoteIP,
-                   unsigned short uRemotePort,
+                   ushort uRemotePort,
                    const NoString& sLocalFile,
-                   unsigned long uFileSize)
+                   ulong uFileSize)
     : NoSocket(pMod)
 {
     m_sRemoteNick = sRemoteNick;
@@ -435,7 +435,7 @@ void NoDccSock::SendPacket()
     }
 }
 
-Csock* NoDccSock::GetSockObj(const NoString& sHost, unsigned short uPort)
+Csock* NoDccSock::GetSockObj(const NoString& sHost, ushort uPort)
 {
     Close();
 
@@ -490,8 +490,8 @@ NoFile* NoDccSock::OpenFile(bool bWrite)
 
         // The DCC specs only allow file transfers with files smaller
         // than 4GiB (see ReadData()).
-        unsigned long long uFileSize = m_pFile->GetSize();
-        if (uFileSize > (unsigned long long)0xffffffffULL) {
+        ulonglong uFileSize = m_pFile->GetSize();
+        if (uFileSize > (ulonglong)0xffffffffULL) {
             delete m_pFile;
             m_pFile = nullptr;
             m_pModule->PutModule("DCC -> [" + m_sRemoteNick + "] - File too large (>4 GiB) [" + m_sLocalFile + "]");
@@ -506,7 +506,7 @@ NoFile* NoDccSock::OpenFile(bool bWrite)
     return m_pFile;
 }
 
-bool NoDccSock::Seek(unsigned long int uPos)
+bool NoDccSock::Seek(ulong uPos)
 {
     if (m_pFile) {
         if (m_pFile->Seek(uPos)) {

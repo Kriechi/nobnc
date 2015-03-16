@@ -56,7 +56,7 @@ public:
 
         if (IsIRCConnected()) {
             // check for usermode +x if we are already connected
-            std::set<unsigned char> scUserModes = GetNetwork()->GetIRCSock()->GetUserModes();
+            std::set<uchar> scUserModes = GetNetwork()->GetIRCSock()->GetUserModes();
             if (scUserModes.find('x') != scUserModes.end()) m_bCloaked = true;
 
             // This will only happen once, and only if the user loads the module after connecting to IRC.
@@ -545,10 +545,10 @@ private:
 
         NoString::size_type len = sHex.length() / 2;
         for (NoString::size_type i = 0; i < len; i++) {
-            unsigned int value;
+            uint value;
             int n = sscanf(&sHex[i * 2], "%02x", &value);
             if (n != 1 || value > 0xff) return false;
-            sPackedHex += (unsigned char)value;
+            sPackedHex += (uchar)value;
         }
 
         return true;
@@ -564,7 +564,7 @@ private:
 
         NoString sOuterKey, sInnerKey;
         NoString::size_type iKeyLength = sRealKey.length();
-        for (unsigned int i = 0; i < 64; i++) {
+        for (uint i = 0; i < 64; i++) {
             char r = (i < iKeyLength ? sRealKey[i] : '\0');
             sOuterKey += r ^ 0x5c;
             sInnerKey += r ^ 0x36;

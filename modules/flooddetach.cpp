@@ -115,7 +115,7 @@ public:
 
             // This is the first message for this channel, start a
             // new timeout.
-            std::pair<time_t, unsigned int> tmp(now, 1);
+            std::pair<time_t, uint> tmp(now, 1);
             m_chans[Channel.getName()] = tmp;
             return;
         }
@@ -224,10 +224,10 @@ public:
     }
 
 private:
-    typedef std::map<NoString, std::pair<time_t, unsigned int>> Limits;
+    typedef std::map<NoString, std::pair<time_t, uint>> Limits;
     Limits m_chans;
-    unsigned int m_iThresholdSecs;
-    unsigned int m_iThresholdMsgs;
+    uint m_iThresholdSecs;
+    uint m_iThresholdMsgs;
 };
 
 template <> void TModInfo<NoFloodDetachMod>(NoModInfo& Info)

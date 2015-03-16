@@ -34,7 +34,7 @@ static void locking_callback(int mode, int type, const char* file, int line)
     }
 }
 
-static unsigned long thread_id_callback() { return (unsigned long)pthread_self(); }
+static ulong thread_id_callback() { return (ulong)pthread_self(); }
 
 static CRYPTO_dynlock_value* dyn_create_callback(const char* file, int line)
 {
@@ -163,18 +163,18 @@ static bool isRoot()
 static void seedPRNG()
 {
     struct timeval tv;
-    unsigned int seed;
+    uint seed;
 
     // Try to find a seed which can't be as easily guessed as only time()
 
     if (gettimeofday(&tv, nullptr) == 0) {
-        seed = (unsigned int)tv.tv_sec;
+        seed = (uint)tv.tv_sec;
 
         // This is in [0:1e6], which means that roughly 20 bits are
         // actually used, let's try to shuffle the high bits.
         seed ^= uint32_t((tv.tv_usec << 10) | tv.tv_usec);
     } else
-        seed = (unsigned int)time(nullptr);
+        seed = (uint)time(nullptr);
 
     seed ^= rand();
     seed ^= getpid();

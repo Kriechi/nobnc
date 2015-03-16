@@ -44,8 +44,8 @@ public:
     NoUtils();
     ~NoUtils();
 
-    static NoString GetIP(unsigned long addr);
-    static unsigned long GetLongIP(const NoString& sIP);
+    static NoString GetIP(ulong addr);
+    static ulong GetLongIP(const NoString& sIP);
 
     static void PrintError(const NoString& sMessage);
     static void PrintMessage(const NoString& sMessage, bool bStrong = false);
@@ -65,15 +65,15 @@ public:
     static bool GetBoolInput(const NoString& sPrompt, bool bDefault);
     static bool GetBoolInput(const NoString& sPrompt, bool* pbDefault = nullptr);
     static bool
-    GetNumInput(const NoString& sPrompt, unsigned int& uRet, unsigned int uMin = 0, unsigned int uMax = ~0, unsigned int uDefault = ~0);
+    GetNumInput(const NoString& sPrompt, uint& uRet, uint uMin = 0, uint uMax = ~0, uint uDefault = ~0);
 
-    static unsigned long long GetMillTime()
+    static ulonglong GetMillTime()
     {
         struct timeval tv;
-        unsigned long long iTime = 0;
+        ulonglong iTime = 0;
         gettimeofday(&tv, nullptr);
-        iTime = (unsigned long long)tv.tv_sec * 1000;
-        iTime += ((unsigned long long)tv.tv_usec / 1000);
+        iTime = (ulonglong)tv.tv_sec * 1000;
+        iTime += ((ulonglong)tv.tv_usec / 1000);
         return iTime;
     }
 #ifdef HAVE_LIBSSL
@@ -115,7 +115,7 @@ private:
  *  table.SetCell("a", "hello");
  *  table.SetCell("b", "world");
  *
- *  unsigned int idx = 0;
+ *  uint idx = 0;
  *  NoString tmp;
  *  while (table.GetLine(idx++, tmp)) {
  *      // Output tmp somehow
@@ -173,7 +173,7 @@ public:
      *  @param sLine This string will receive the output.
      *  @return True unless uIdx is past the end of the table.
      */
-    bool GetLine(unsigned int uIdx, NoString& sLine) const;
+    bool GetLine(uint uIdx, NoString& sLine) const;
 
     /** Return the width of the given column.
      *  Please note that adding and filling new rows might change the
@@ -181,7 +181,7 @@ public:
      *  @param uIdx The index of the column you are interested in.
      *  @return The width of the column.
      */
-    NoString::size_type GetColumnWidth(unsigned int uIdx) const;
+    NoString::size_type GetColumnWidth(uint uIdx) const;
 
     /// Completely clear the table.
     void Clear();
@@ -193,7 +193,7 @@ public:
     using std::vector<std::vector<NoString>>::empty;
 
 private:
-    unsigned int GetColumnIndex(const NoString& sName) const;
+    uint GetColumnIndex(const NoString& sName) const;
     NoStringVector Render() const;
     static NoStringVector WrapWords(const NoString& s, size_type uWidth);
 
@@ -227,20 +227,20 @@ public:
     NoBlowfish& operator=(const NoBlowfish&) = default;
 
     //! output must be freed
-    static unsigned char* MD5(const unsigned char* input, u_int ilen);
+    static uchar* MD5(const uchar* input, u_int ilen);
 
     //! returns an md5 of the NoString (not hex encoded)
     static NoString MD5(const NoString& sInput, bool bHexEncode = false);
 
     //! output must be the same size as input
-    void Crypt(unsigned char* input, unsigned char* output, u_int ibytes);
+    void Crypt(uchar* input, uchar* output, u_int ibytes);
 
     //! must free result
-    unsigned char* Crypt(unsigned char* input, u_int ibytes);
+    uchar* Crypt(uchar* input, u_int ibytes);
     NoString Crypt(const NoString& sData);
 
 private:
-    unsigned char* m_ivec;
+    uchar* m_ivec;
     BF_KEY m_bkey;
     int m_iEncrypt, m_num;
 };
@@ -255,7 +255,7 @@ private:
 template <typename K, typename V = bool> class TCacheMap
 {
 public:
-    TCacheMap(unsigned int uTTL = 5000) : m_mItems(), m_uTTL(uTTL) {}
+    TCacheMap(uint uTTL = 5000) : m_mItems(), m_uTTL(uTTL) {}
 
     virtual ~TCacheMap() {}
 
@@ -270,7 +270,7 @@ public:
      * @param Item the item to add to the cache
      * @param uTTL the time-to-live for this specific item
      */
-    void AddItem(const K& Item, unsigned int uTTL) { AddItem(Item, V(), uTTL); }
+    void AddItem(const K& Item, uint uTTL) { AddItem(Item, V(), uTTL); }
 
     /**
      * @brief This function adds an item to the cache using the default time-to-live value
@@ -285,7 +285,7 @@ public:
      * @param Val The value associated with the key Item
      * @param uTTL the time-to-live for this specific item
      */
-    void AddItem(const K& Item, const V& Val, unsigned int uTTL)
+    void AddItem(const K& Item, const V& Val, uint uTTL)
     {
         if (!uTTL) { // If time-to-live is zero we don't want to waste our time adding it
             RemItem(Item); // Remove the item incase it already exists
@@ -347,15 +347,15 @@ public:
      */
     void Clear() { m_mItems.clear(); }
 
-    unsigned int GetTTL() const { return m_uTTL; }
-    void SetTTL(unsigned int u) { m_uTTL = u; }
+    uint GetTTL() const { return m_uTTL; }
+    void SetTTL(uint u) { m_uTTL = u; }
 
 protected:
-    typedef std::pair<unsigned long long, V> value;
+    typedef std::pair<ulonglong, V> value;
     typedef typename std::map<K, value>::iterator iterator;
     std::map<K, value> m_mItems; //!< Map of cached items.  The value portion of the map is for the expire time
 private:
-    unsigned int m_uTTL; //!< Default time-to-live duration
+    uint m_uTTL; //!< Default time-to-live duration
 };
 
 #endif // NOUTILS_H

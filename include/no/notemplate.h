@@ -73,7 +73,7 @@ private:
 class NoTemplateLoopContext
 {
 public:
-    NoTemplateLoopContext(unsigned long uFilePos, const NoString& sLoopName, bool bReverse, std::vector<NoTemplate*>* pRows)
+    NoTemplateLoopContext(ulong uFilePos, const NoString& sLoopName, bool bReverse, std::vector<NoTemplate*>* pRows)
         : m_bReverse(bReverse), m_bHasData(false), m_sName(sLoopName), m_uRowIndex(0), m_uFilePosition(uFilePos),
           m_pvRows(pRows)
     {
@@ -86,35 +86,35 @@ public:
 
     void SetHasData(bool b = true) { m_bHasData = b; }
     void SetName(const NoString& s) { m_sName = s; }
-    void SetRowIndex(unsigned int u) { m_uRowIndex = u; }
-    unsigned int IncRowIndex() { return ++m_uRowIndex; }
-    unsigned int DecRowIndex()
+    void SetRowIndex(uint u) { m_uRowIndex = u; }
+    uint IncRowIndex() { return ++m_uRowIndex; }
+    uint DecRowIndex()
     {
         if (m_uRowIndex == 0) {
             return 0;
         }
         return --m_uRowIndex;
     }
-    void SetFilePosition(unsigned int u) { m_uFilePosition = u; }
+    void SetFilePosition(uint u) { m_uFilePosition = u; }
 
     bool HasData() const { return m_bHasData; }
     const NoString& GetName() const { return m_sName; }
-    unsigned long GetFilePosition() const { return m_uFilePosition; }
-    unsigned int GetRowIndex() const { return m_uRowIndex; }
+    ulong GetFilePosition() const { return m_uFilePosition; }
+    uint GetRowIndex() const { return m_uRowIndex; }
     size_t GetRowCount() { return m_pvRows->size(); }
     std::vector<NoTemplate*>* GetRows() { return m_pvRows; }
     NoTemplate* GetNextRow() { return GetRow(IncRowIndex()); }
     NoTemplate* GetCurRow() { return GetRow(m_uRowIndex); }
 
-    NoTemplate* GetRow(unsigned int uIndex);
+    NoTemplate* GetRow(uint uIndex);
     NoString GetValue(const NoString& sName, bool bFromIf = false);
 
 private:
     bool m_bReverse; //!< Iterate through this loop in reverse order
     bool m_bHasData; //!< Tells whether this loop has real data or not
     NoString m_sName; //!< The name portion of the <?LOOP name?> tag
-    unsigned int m_uRowIndex; //!< The index of the current row we're on
-    unsigned long m_uFilePosition; //!< The file position of the opening <?LOOP?> tag
+    uint m_uRowIndex; //!< The index of the current row we're on
+    ulong m_uFilePosition; //!< The file position of the opening <?LOOP?> tag
     std::vector<NoTemplate*>* m_pvRows; //!< This holds pointers to the templates associated with this loop
 };
 
@@ -177,7 +177,7 @@ public:
     bool HasLoop(const NoString& sName);
     NoString GetValue(const NoString& sName, bool bFromIf = false);
     NoTemplate& AddRow(const NoString& sName);
-    NoTemplate* GetRow(const NoString& sName, unsigned int uIndex);
+    NoTemplate* GetRow(const NoString& sName, uint uIndex);
     std::vector<NoTemplate*>* GetLoop(const NoString& sName);
     void DelCurLoopContext();
     NoTemplateLoopContext* GetCurLoopContext();

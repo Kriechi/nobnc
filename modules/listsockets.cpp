@@ -86,7 +86,7 @@ public:
         NoSocketManager& m = NoApp::Get().GetManager();
         std::priority_queue<NoSocketSorter> ret;
 
-        for (unsigned int a = 0; a < m.size(); a++) {
+        for (uint a = 0; a < m.size(); a++) {
             Csock* pSock = m[a];
             // These sockets went through SwapSockByAddr. That means
             // another socket took over the connection from this
@@ -162,7 +162,7 @@ public:
 
     NoString GetCreatedTime(Csock* pSocket)
     {
-        unsigned long long iStartTime = pSocket->GetStartTime();
+        ulonglong iStartTime = pSocket->GetStartTime();
         time_t iTime = iStartTime / 1000;
         return NoUtils::FormatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->GetTimezone());
     }

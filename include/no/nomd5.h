@@ -7,7 +7,7 @@
 #include <string>
 
 #ifndef uint8
-#define uint8 unsigned char
+#define uint8 uchar
 #endif
 
 #ifndef uint32

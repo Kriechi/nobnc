@@ -35,13 +35,13 @@ class NoAdminMod : public NoModule
 {
     using NoModule::PutModule;
 
-    void PrintVarsHelp(const NoString& sFilter, const char* vars[][2], unsigned int uSize, const NoString& sDescription)
+    void PrintVarsHelp(const NoString& sFilter, const char* vars[][2], uint uSize, const NoString& sDescription)
     {
         NoTable VarTable;
         VarTable.AddColumn("Type");
         VarTable.AddColumn("Variables");
         std::map<const char*, NoStringVector> mvsTypedVariables;
-        for (unsigned int i = 0; i != uSize; ++i) {
+        for (uint i = 0; i != uSize; ++i) {
             NoString sVar = NoString(vars[i][0]).AsLower();
             if (sFilter.empty() || sVar.StartsWith(sFilter) || sVar.WildCmp(sFilter)) {
                 mvsTypedVariables[vars[i][1]].emplace_back(vars[i][0]);
@@ -339,7 +339,7 @@ class NoAdminMod : public NoModule
             pUser->SetQuitMsg(sValue);
             PutModule("QuitMsg = " + sValue);
         } else if (sVar == "buffercount") {
-            unsigned int i = sValue.ToUInt();
+            uint i = sValue.ToUInt();
             // Admins don't have to honour the buffer limit
             if (pUser->SetBufferCount(i, GetUser()->IsAdmin())) {
                 PutModule("BufferCount = " + sValue);
@@ -364,23 +364,23 @@ class NoAdminMod : public NoModule
             pUser->SetPass(sHash, NoUser::HASH_DEFAULT, sSalt);
             PutModule("Password has been changed!");
         } else if (sVar == "maxjoins") {
-            unsigned int i = sValue.ToUInt();
+            uint i = sValue.ToUInt();
             pUser->SetMaxJoins(i);
             PutModule("MaxJoins = " + NoString(pUser->MaxJoins()));
         } else if (sVar == "maxnetworks") {
             if (GetUser()->IsAdmin()) {
-                unsigned int i = sValue.ToUInt();
+                uint i = sValue.ToUInt();
                 pUser->SetMaxNetworks(i);
                 PutModule("MaxNetworks = " + sValue);
             } else {
                 PutModule("Access denied!");
             }
         } else if (sVar == "maxquerybuffers") {
-            unsigned int i = sValue.ToUInt();
+            uint i = sValue.ToUInt();
             pUser->SetMaxQueryBuffers(i);
             PutModule("MaxQueryBuffers = " + sValue);
         } else if (sVar == "jointries") {
-            unsigned int i = sValue.ToUInt();
+            uint i = sValue.ToUInt();
             pUser->SetJoinTries(i);
             PutModule("JoinTries = " + NoString(pUser->JoinTries()));
         } else if (sVar == "timezone") {
@@ -736,7 +736,7 @@ class NoAdminMod : public NoModule
                 pChan->setDefaultModes(sValue);
                 PutModule(pChan->getName() + ": DefModes = " + sValue);
             } else if (sVar == "buffer") {
-                unsigned int i = sValue.ToUInt();
+                uint i = sValue.ToUInt();
                 // Admins don't have to honour the buffer limit
                 if (pChan->setBufferCount(i, GetUser()->IsAdmin())) {
                     PutModule(pChan->getName() + ": Buffer = " + sValue);
@@ -1011,7 +1011,7 @@ class NoAdminMod : public NoModule
         Table.AddColumn("IRC User");
         Table.AddColumn("Channels");
 
-        for (unsigned int a = 0; a < vNetworks.size(); a++) {
+        for (uint a = 0; a < vNetworks.size(); a++) {
             NoNetwork* pNetwork = vNetworks[a];
             Table.AddRow();
             Table.SetCell("Network", pNetwork->GetName());
@@ -1061,7 +1061,7 @@ class NoAdminMod : public NoModule
         NoString sUsername = sLine.Token(1);
         NoString sNetwork = sLine.Token(2);
         NoString sServer = sLine.Token(3, true);
-        unsigned short uPort = sLine.Token(4).ToUShort();
+        ushort uPort = sLine.Token(4).ToUShort();
         NoString sPass = sLine.Token(5);
 
         if (sServer.empty()) {
@@ -1358,7 +1358,7 @@ class NoAdminMod : public NoModule
             Table.AddColumn("Name");
             Table.AddColumn("Arguments");
 
-            for (unsigned int b = 0; b < Modules.size(); b++) {
+            for (uint b = 0; b < Modules.size(); b++) {
                 Table.AddRow();
                 Table.SetCell("Name", Modules[b]->GetModName());
                 Table.SetCell("Arguments", Modules[b]->GetArgs());

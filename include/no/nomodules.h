@@ -57,8 +57,8 @@ public:
     bool OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName);
     bool OnBroadcast(NoString& sMessage);
 
-    bool OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
-    bool OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
+    bool OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
+    bool OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
     bool OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
     bool OnOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
     bool OnDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
@@ -150,7 +150,7 @@ public:
 
     bool OnAddUser(NoUser& User, NoString& sErrorRet);
     bool OnDeleteUser(NoUser& User);
-    bool OnClientConnect(NoBaseSocket* pSock, const NoString& sHost, unsigned short uPort);
+    bool OnClientConnect(NoBaseSocket* pSock, const NoString& sHost, ushort uPort);
     bool OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth);
     bool OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP);
     bool OnUnknownUserRaw(NoClient* pClient, NoString& sLine);

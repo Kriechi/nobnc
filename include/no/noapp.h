@@ -70,12 +70,12 @@ public:
     bool AddTrustedProxy(const NoString& sHost);
     bool RemTrustedProxy(const NoString& sHost);
     void Broadcast(const NoString& sMessage, bool bAdminOnly = false, NoUser* pSkipUser = nullptr, NoClient* pSkipClient = nullptr);
-    void AddBytesRead(unsigned long long u) { m_uBytesRead += u; }
-    void AddBytesWritten(unsigned long long u) { m_uBytesWritten += u; }
-    unsigned long long BytesRead() const { return m_uBytesRead; }
-    unsigned long long BytesWritten() const { return m_uBytesWritten; }
+    void AddBytesRead(ulonglong u) { m_uBytesRead += u; }
+    void AddBytesWritten(ulonglong u) { m_uBytesWritten += u; }
+    ulonglong BytesRead() const { return m_uBytesRead; }
+    ulonglong BytesWritten() const { return m_uBytesWritten; }
 
-    typedef std::pair<unsigned long long, unsigned long long> TrafficStatsPair;
+    typedef std::pair<ulonglong, ulonglong> TrafficStatsPair;
     typedef std::map<NoString, TrafficStatsPair> TrafficStatsMap;
     // Returns a map which maps user names to <traffic in, traffic out>
     // while also providing the traffic of all users together, traffic which
@@ -89,12 +89,12 @@ public:
     void SetConfigState(enum ConfigState e) { m_eConfigState = e; }
     void SetSkinName(const NoString& s) { m_sSkinName = s; }
     void SetStatusPrefix(const NoString& s) { m_sStatusPrefix = (s.empty()) ? "*" : s; }
-    void SetMaxBufferSize(unsigned int i) { m_uiMaxBufferSize = i; }
-    void SetAnonIPLimit(unsigned int i) { m_uiAnonIPLimit = i; }
-    void SetServerThrottle(unsigned int i) { m_sConnectThrottle.SetTTL(i * 1000); }
+    void SetMaxBufferSize(uint i) { m_uiMaxBufferSize = i; }
+    void SetAnonIPLimit(uint i) { m_uiAnonIPLimit = i; }
+    void SetServerThrottle(uint i) { m_sConnectThrottle.SetTTL(i * 1000); }
     void SetProtectWebSessions(bool b) { m_bProtectWebSessions = b; }
     void SetHideVersion(bool b) { m_bHideVersion = b; }
-    void SetConnectDelay(unsigned int i);
+    void SetConnectDelay(uint i);
 
     enum ConfigState GetConfigState() const { return m_eConfigState; }
     NoSocketManager& GetManager() { return m_Manager; }
@@ -115,10 +115,10 @@ public:
     const NoStringVector& GetTrustedProxies() const { return m_vsTrustedProxies; }
     const std::vector<NoListener*>& GetListeners() const { return m_vpListeners; }
     time_t TimeStarted() const { return m_TimeStarted; }
-    unsigned int GetMaxBufferSize() const { return m_uiMaxBufferSize; }
-    unsigned int GetAnonIPLimit() const { return m_uiAnonIPLimit; }
-    unsigned int GetServerThrottle() const { return m_sConnectThrottle.GetTTL() / 1000; }
-    unsigned int GetConnectDelay() const { return m_uiConnectDelay; }
+    uint GetMaxBufferSize() const { return m_uiMaxBufferSize; }
+    uint GetAnonIPLimit() const { return m_uiAnonIPLimit; }
+    uint GetServerThrottle() const { return m_sConnectThrottle.GetTTL() / 1000; }
+    uint GetConnectDelay() const { return m_uiConnectDelay; }
     bool GetProtectWebSessions() const { return m_bProtectWebSessions; }
     bool GetHideVersion() const { return m_bHideVersion; }
     NoString GetSSLCiphers() const { return m_sSSLCiphers; }
@@ -149,7 +149,7 @@ public:
 
     NoListener* FindListener(u_short uPort, const NoString& BindHost, EAddrType eAddr);
     bool AddListener(NoListener*);
-    bool AddListener(unsigned short uPort,
+    bool AddListener(ushort uPort,
                      const NoString& sBindHost,
                      const NoString& sURIPrefix,
                      bool bSSL,
@@ -224,16 +224,16 @@ private:
     NoStringVector m_vsTrustedProxies;
     NoStringVector m_vsMotd;
     NoFile* m_pLockFile;
-    unsigned int m_uiConnectDelay;
-    unsigned int m_uiAnonIPLimit;
-    unsigned int m_uiMaxBufferSize;
-    unsigned int m_uDisabledSSLProtocols;
+    uint m_uiConnectDelay;
+    uint m_uiAnonIPLimit;
+    uint m_uiMaxBufferSize;
+    uint m_uDisabledSSLProtocols;
     NoModules* m_pModules;
-    unsigned long long m_uBytesRead;
-    unsigned long long m_uBytesWritten;
+    ulonglong m_uBytesRead;
+    ulonglong m_uBytesWritten;
     std::list<NoNetwork*> m_lpConnectQueue;
     NoConnectQueueTimer* m_pConnectQueueTimer;
-    unsigned int m_uiConnectPaused;
+    uint m_uiConnectPaused;
     TCacheMap<NoString> m_sConnectThrottle;
     bool m_bProtectWebSessions;
     bool m_bHideVersion;

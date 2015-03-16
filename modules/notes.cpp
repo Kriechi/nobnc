@@ -172,7 +172,7 @@ public:
             }
 
             if (Table.size()) {
-                unsigned int idx = 0;
+                uint idx = 0;
                 NoString sLine;
                 while (Table.GetLine(idx++, sLine)) {
                     if (bNotice) {

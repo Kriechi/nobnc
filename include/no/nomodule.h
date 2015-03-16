@@ -453,8 +453,8 @@ public:
      *       'o' for op).
      */
     virtual void
-    OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
-    virtual void OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
+    OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
+    virtual void OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
     /** Called when a nick is opped on a channel */
     virtual void OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
     virtual void OnOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
@@ -820,7 +820,7 @@ public:
      *  @param table The table which should be send.
      *  @return The number of lines sent.
      */
-    virtual unsigned int PutModule(const NoTable& table);
+    virtual uint PutModule(const NoTable& table);
     /** Send a notice from your module nick. If we are in a module hook for
      *  a specific client, only that client gets this notice, else all
      *  clients will receive it.
@@ -952,7 +952,7 @@ public:
      *  @param sHost The IP the client is connecting from.
      *  @param uPort The port the client is connecting from.
      */
-    virtual void OnClientConnect(NoBaseSocket* pSock, const NoString& sHost, unsigned short uPort);
+    virtual void OnClientConnect(NoBaseSocket* pSock, const NoString& sHost, ushort uPort);
     /** This module hook is called when a client tries to login. If your
      *  module wants to handle the login attempt, it must return
      *  NoModule::EModRet::HALT;

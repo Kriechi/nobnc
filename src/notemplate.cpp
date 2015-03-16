@@ -32,7 +32,7 @@ void NoTemplateOptions::Parse(const NoString& sLine)
     }
 }
 
-NoTemplate* NoTemplateLoopContext::GetRow(unsigned int uIndex)
+NoTemplate* NoTemplateLoopContext::GetRow(uint uIndex)
 {
     size_t uSize = m_pvRows->size();
 
@@ -240,7 +240,7 @@ NoTemplate& NoTemplate::AddRow(const NoString& sName)
     return *pTmpl;
 }
 
-NoTemplate* NoTemplate::GetRow(const NoString& sName, unsigned int uIndex)
+NoTemplate* NoTemplate::GetRow(const NoString& sName, uint uIndex)
 {
     std::vector<NoTemplate*>* pvLoop = GetLoop(sName);
 
@@ -305,11 +305,11 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
     NoString sSetBlockVar;
     bool bValidLastIf = false;
     bool bInSetBlock = false;
-    unsigned long uFilePos = 0;
-    unsigned long uCurPos = 0;
-    unsigned int uLineNum = 0;
-    unsigned int uNestedIfs = 0;
-    unsigned int uSkip = 0;
+    ulong uFilePos = 0;
+    ulong uCurPos = 0;
+    uint uLineNum = 0;
+    uint uNestedIfs = 0;
+    uint uSkip = 0;
     bool bLoopCont = false;
     bool bLoopBreak = false;
     bool bExit = false;
@@ -483,8 +483,8 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
                             if (pvLoop) {
                                 // If we found data for this loop, add it to our context vector
-                                // unsigned long uBeforeLoopTag = uCurPos - iPos2 - 4;
-                                unsigned long uAfterLoopTag = uCurPos;
+                                // ulong uBeforeLoopTag = uCurPos - iPos2 - 4;
+                                ulong uAfterLoopTag = uCurPos;
 
                                 for (NoString::size_type t = 0; t < sLine.size(); t++) {
                                     char c = sLine[t];

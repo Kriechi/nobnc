@@ -99,7 +99,7 @@ public:
         bool bSSL = false;
         bool bIPv6 = false;
         bool bShareIRCPorts = true;
-        unsigned short uPort = 8080;
+        ushort uPort = 8080;
         NoString sArgs(sArgStr);
         NoString sPort;
         NoString sListenHost;
@@ -200,7 +200,7 @@ public:
         }
 
         NoStringVector vsArgs;
-        unsigned int a = 0;
+        uint a = 0;
 
         WebSock.GetRawParam("allowedips").Split("\n", vsArgs);
         if (vsArgs.size()) {
@@ -741,7 +741,7 @@ public:
             }
         }
 
-        unsigned int uBufferCount = WebSock.GetParam("buffercount").ToUInt();
+        uint uBufferCount = WebSock.GetParam("buffercount").ToUInt();
         if (pChan->getBufferCount() != uBufferCount) {
             pChan->setBufferCount(uBufferCount, spSession->IsAdmin());
         }
@@ -841,7 +841,7 @@ public:
                     }
                 } else {
                     bool bFoundBindHost = false;
-                    for (unsigned int b = 0; b < vsBindHosts.size(); b++) {
+                    for (uint b = 0; b < vsBindHosts.size(); b++) {
                         const NoString& sBindHost = vsBindHosts[b];
                         NoTemplate& l = Tmpl.AddRow("BindHostLoop");
 
@@ -886,13 +886,13 @@ public:
                 Tmpl["IRCConnectEnabled"] = NoString(pNetwork->GetIRCConnectEnabled());
 
                 const std::vector<NoServer*>& vServers = pNetwork->GetServers();
-                for (unsigned int a = 0; a < vServers.size(); a++) {
+                for (uint a = 0; a < vServers.size(); a++) {
                     NoTemplate& l = Tmpl.AddRow("ServerLoop");
                     l["Server"] = vServers[a]->GetString();
                 }
 
                 const std::vector<NoChannel*>& Channels = pNetwork->GetChans();
-                for (unsigned int c = 0; c < Channels.size(); c++) {
+                for (uint c = 0; c < Channels.size(); c++) {
                     NoChannel* pChan = Channels[c];
                     NoTemplate& l = Tmpl.AddRow("ChannelLoop");
 
@@ -1063,7 +1063,7 @@ public:
 
         pNetwork->DelServers();
         WebSock.GetRawParam("servers").Split("\n", vsArgs);
-        for (unsigned int a = 0; a < vsArgs.size(); a++) {
+        for (uint a = 0; a < vsArgs.size(); a++) {
             pNetwork->AddServer(vsArgs[a].Trim_n());
         }
 
@@ -1076,7 +1076,7 @@ public:
         }
 
         WebSock.GetParamValues("channel", vsArgs);
-        for (unsigned int a = 0; a < vsArgs.size(); a++) {
+        for (uint a = 0; a < vsArgs.size(); a++) {
             const NoString& sChan = vsArgs[a];
             NoChannel* pChan = pNetwork->FindChan(sChan.TrimRight_n("\r"));
             if (pChan) {
@@ -1118,7 +1118,7 @@ public:
         const NoModules& vCurMods = pNetwork->GetModules();
         std::set<NoString> ssUnloadMods;
 
-        for (unsigned int a = 0; a < vCurMods.size(); a++) {
+        for (uint a = 0; a < vCurMods.size(); a++) {
             NoModule* pCurMod = vCurMods[a];
 
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() && pCurMod->GetModName() != GetModName()) {
@@ -1259,7 +1259,7 @@ public:
                 }
 
                 const std::vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
-                for (unsigned int a = 0; a < vNetworks.size(); a++) {
+                for (uint a = 0; a < vNetworks.size(); a++) {
                     NoTemplate& l = Tmpl.AddRow("NetworkLoop");
                     l["Name"] = vNetworks[a]->GetName();
                     l["Username"] = pUser->GetUserName();
@@ -1323,7 +1323,7 @@ public:
                 } else {
                     bool bFoundBindHost = false;
                     bool bFoundDCCBindHost = false;
-                    for (unsigned int b = 0; b < vsBindHosts.size(); b++) {
+                    for (uint b = 0; b < vsBindHosts.size(); b++) {
                         const NoString& sBindHost = vsBindHosts[b];
                         NoTemplate& l = Tmpl.AddRow("BindHostLoop");
                         NoTemplate& k = Tmpl.AddRow("DCCBindHostLoop");
@@ -1361,7 +1361,7 @@ public:
             std::vector<NoString> vDirs;
             WebSock.GetAvailSkins(vDirs);
 
-            for (unsigned int d = 0; d < vDirs.size(); d++) {
+            for (uint d = 0; d < vDirs.size(); d++) {
                 const NoString& SubDir = vDirs[d];
                 NoTemplate& l = Tmpl.AddRow("SkinLoop");
                 l["Name"] = SubDir;
@@ -1389,8 +1389,8 @@ public:
                     pModule = pUser->GetModules().FindModule(Info.GetName());
                     // Check if module is loaded by all or some networks
                     const std::vector<NoNetwork*>& userNetworks = pUser->GetNetworks();
-                    unsigned int networksWithRenderedModuleCount = 0;
-                    for (unsigned int networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
+                    uint networksWithRenderedModuleCount = 0;
+                    for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
                         const NoModules& networkModules = pCurrentNetwork->GetModules();
                         if (networkModules.FindModule(Info.GetName())) {
@@ -1567,7 +1567,7 @@ public:
         Tmpl["Title"] = "Manage Users";
         Tmpl["Action"] = "listusers";
 
-        unsigned int a = 0;
+        uint a = 0;
 
         for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it, a++) {
             NoTemplate& l = Tmpl.AddRow("UserLoop");
@@ -1652,7 +1652,7 @@ public:
 
     bool AddListener(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
-        unsigned short uPort = WebSock.GetParam("port").ToUShort();
+        ushort uPort = WebSock.GetParam("port").ToUShort();
         NoString sHost = WebSock.GetParam("host");
         NoString sURIPrefix = WebSock.GetParam("uriprefix");
         if (sHost == "*") sHost = "";
@@ -1711,7 +1711,7 @@ public:
 
     bool DelListener(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
-        unsigned short uPort = WebSock.GetParam("port").ToUShort();
+        ushort uPort = WebSock.GetParam("port").ToUShort();
         NoString sHost = WebSock.GetParam("host");
         bool bIPv4 = WebSock.GetParam("ipv4").ToBool();
         bool bIPv6 = WebSock.GetParam("ipv6").ToBool();
@@ -1760,19 +1760,19 @@ public:
             Tmpl["HideVersion"] = NoString(NoApp::Get().GetHideVersion());
 
             const NoStringVector& vsBindHosts = NoApp::Get().GetBindHosts();
-            for (unsigned int a = 0; a < vsBindHosts.size(); a++) {
+            for (uint a = 0; a < vsBindHosts.size(); a++) {
                 NoTemplate& l = Tmpl.AddRow("BindHostLoop");
                 l["BindHost"] = vsBindHosts[a];
             }
 
             const NoStringVector& vsMotd = NoApp::Get().GetMotd();
-            for (unsigned int b = 0; b < vsMotd.size(); b++) {
+            for (uint b = 0; b < vsMotd.size(); b++) {
                 NoTemplate& l = Tmpl.AddRow("MOTDLoop");
                 l["Line"] = vsMotd[b];
             }
 
             const std::vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
-            for (unsigned int c = 0; c < vpListeners.size(); c++) {
+            for (uint c = 0; c < vpListeners.size(); c++) {
                 NoListener* pListener = vpListeners[c];
                 NoTemplate& l = Tmpl.AddRow("ListenLoop");
 
@@ -1816,7 +1816,7 @@ public:
             std::vector<NoString> vDirs;
             WebSock.GetAvailSkins(vDirs);
 
-            for (unsigned int d = 0; d < vDirs.size(); d++) {
+            for (uint d = 0; d < vDirs.size(); d++) {
                 const NoString& SubDir = vDirs[d];
                 NoTemplate& l = Tmpl.AddRow("SkinLoop");
                 l["Name"] = SubDir;
@@ -1849,9 +1849,9 @@ public:
                 l["ArgsHelpText"] = Info.GetArgsHelpText();
 
                 // Check if the module is loaded by all or some users, and/or by all or some networks
-                unsigned int usersWithRenderedModuleCount = 0;
-                unsigned int networksWithRenderedModuleCount = 0;
-                unsigned int networksCount = 0;
+                uint usersWithRenderedModuleCount = 0;
+                uint networksWithRenderedModuleCount = 0;
+                uint networksCount = 0;
                 const std::map<NoString, NoUser*>& allUsers = NoApp::Get().GetUserMap();
                 for (std::map<NoString, NoUser*>::const_iterator usersIt = allUsers.begin(); usersIt != allUsers.end(); ++usersIt) {
                     const NoUser& User = *usersIt->second;
@@ -1864,7 +1864,7 @@ public:
                     // Count networks which has loaded a render module
                     const std::vector<NoNetwork*>& userNetworks = User.GetNetworks();
                     networksCount += userNetworks.size();
-                    for (unsigned int networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
+                    for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
                         if (pCurrentNetwork->GetModules().FindModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
@@ -1903,7 +1903,7 @@ public:
         WebSock.GetRawParam("motd").Split("\n", vsArgs);
         NoApp::Get().ClearMotd();
 
-        unsigned int a = 0;
+        uint a = 0;
         for (a = 0; a < vsArgs.size(); a++) {
             NoApp::Get().AddMotd(vsArgs[a].TrimRight_n());
         }

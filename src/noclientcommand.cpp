@@ -77,7 +77,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         NoTable Table;
 
-        for (unsigned int p = 0; p < sPerms.size(); p++) {
+        for (uint p = 0; p < sPerms.size(); p++) {
             NoString sPerm;
             sPerm += sPerms[p];
             Table.AddColumn(sPerm);
@@ -90,7 +90,7 @@ void NoClient::UserCommand(NoString& sLine)
         for (const auto& it : msNicks) {
             Table.AddRow();
 
-            for (unsigned int b = 0; b < sPerms.size(); b++) {
+            for (uint b = 0; b < sPerms.size(); b++) {
                 if (it.second.HasPerm(sPerms[b])) {
                     NoString sPerm;
                     sPerm += sPerms[b];
@@ -127,7 +127,7 @@ void NoClient::UserCommand(NoString& sLine)
             sChans.insert(vChans.begin(), vChans.end());
         }
 
-        unsigned int uDetached = 0;
+        uint uDetached = 0;
         for (NoChannel* pChan : sChans) {
             if (pChan->isDetached()) continue;
             uDetached++;
@@ -377,7 +377,7 @@ void NoClient::UserCommand(NoString& sLine)
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
-            unsigned int uEnabled = 0;
+            uint uEnabled = 0;
             for (NoChannel* pChan : sChans) {
                 if (!pChan->isDisabled()) continue;
                 uEnabled++;
@@ -408,7 +408,7 @@ void NoClient::UserCommand(NoString& sLine)
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
-            unsigned int uDisabled = 0;
+            uint uDisabled = 0;
             for (NoChannel* pChan : sChans) {
                 if (pChan->isDisabled()) continue;
                 uDisabled++;
@@ -476,7 +476,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             NoIrcSock* pIRCSock = m_pNetwork->GetIRCSock();
             const NoString& sPerms = pIRCSock ? pIRCSock->GetPerms() : "";
-            std::map<char, unsigned int> mPerms = pChan->getPermCounts();
+            std::map<char, uint> mPerms = pChan->getPermCounts();
             for (char cPerm : sPerms) {
                 vsUsers.push_back(NoString(cPerm) + ": " + NoString(mPerms[cPerm]));
             }
@@ -526,7 +526,7 @@ void NoClient::UserCommand(NoString& sLine)
         Table.AddColumn("Name");
         Table.AddColumn("Status");
 
-        unsigned int uNumDetached = 0, uNumDisabled = 0, uNumJoined = 0;
+        uint uNumDetached = 0, uNumDisabled = 0, uNumJoined = 0;
 
         for (const NoChannel* pChan : vChans) {
             Table.AddRow();
@@ -753,7 +753,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         NoString sServer = sLine.Token(1);
-        unsigned short uPort = sLine.Token(2).ToUShort();
+        ushort uPort = sLine.Token(2).ToUShort();
         NoString sPass = sLine.Token(3);
 
         if (sServer.empty()) {
@@ -1401,7 +1401,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        unsigned int uMatches = 0;
+        uint uMatches = 0;
         std::vector<NoChannel*> vChans = m_pNetwork->FindChans(sBuffer);
         for (NoChannel* pChan : vChans) {
             uMatches++;
@@ -1459,8 +1459,8 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        unsigned int uLineCount = sLine.Token(2).ToUInt();
-        unsigned int uMatches = 0, uFail = 0;
+        uint uLineCount = sLine.Token(2).ToUInt();
+        uint uMatches = 0, uFail = 0;
         std::vector<NoChannel*> vChans = m_pNetwork->FindChans(sBuffer);
         for (NoChannel* pChan : vChans) {
             uMatches++;
@@ -1579,7 +1579,7 @@ void NoClient::UserPortCommand(NoString& sLine)
         sAddr.clear();
     }
 
-    unsigned short uPort = sPort.ToUShort();
+    ushort uPort = sPort.ToUShort();
 
     if (sCommand.Equals("ADDPORT")) {
         NoListener::EAcceptType eAccept = NoListener::ACCEPT_ALL;

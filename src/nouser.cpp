@@ -114,7 +114,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         { "skin", &NoUser::SetSkinName },
         { "clientencoding", &NoUser::SetClientEncoding },
     };
-    TOption<unsigned int> UIntOptions[] = {
+    TOption<uint> UIntOptions[] = {
         { "jointries", &NoUser::SetJoinTries },
         { "maxnetworks", &NoUser::SetMaxNetworks },
         { "maxquerybuffers", &NoUser::SetMaxQueryBuffers },
@@ -927,7 +927,7 @@ bool NoUser::CheckPass(const NoString& sPass) const
     NoSocketManager& Manager = NoApp::Get().GetManager();
     NoString sSockName = "USR::" + m_sUserName;
 
-    for (unsigned int a = 0; a < Manager.size(); a++) {
+    for (uint a = 0; a < Manager.size(); a++) {
         Csock* pSock = Manager[a];
         if (pSock->GetSockName().Equals(sSockName)) {
             if (!pSock->IsClosed()) {
@@ -1140,7 +1140,7 @@ void NoUser::SetAutoClearChanBuffer(bool b)
 }
 void NoUser::SetAutoClearQueryBuffer(bool b) { m_bAutoClearQueryBuffer = b; }
 
-bool NoUser::SetBufferCount(unsigned int u, bool bForce)
+bool NoUser::SetBufferCount(uint u, bool bForce)
 {
     if (!bForce && u > NoApp::Get().GetMaxBufferSize()) return false;
     for (NoNetwork* pNetwork : m_vIRNoNetworks) {
@@ -1228,7 +1228,7 @@ bool NoUser::HasSpaceForNewNetwork() const { return GetNetworks().size() < MaxNe
 
 NoString NoUser::GetQuitMsg() const { return (!m_sQuitMsg.Trim_n().empty()) ? m_sQuitMsg : NoApp::GetTag(false); }
 const NoStringMap& NoUser::GetCTCPReplies() const { return m_mssCTCPReplies; }
-unsigned int NoUser::GetBufferCount() const { return m_uBufferCount; }
+uint NoUser::GetBufferCount() const { return m_uBufferCount; }
 bool NoUser::AutoClearChanBuffer() const { return m_bAutoClearChanBuffer; }
 bool NoUser::AutoClearQueryBuffer() const { return m_bAutoClearQueryBuffer; }
 // NoString NoUser::GetSkinName() const { return (!m_sSkinName.empty()) ? m_sSkinName : NoApp::Get().GetSkinName(); }

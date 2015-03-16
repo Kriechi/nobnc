@@ -139,10 +139,10 @@ public:
 
 private:
     time_t m_tLastCTCP;
-    unsigned int m_iNumCTCP;
+    uint m_iNumCTCP;
 
     time_t m_iThresholdSecs;
-    unsigned int m_iThresholdMsgs;
+    uint m_iThresholdMsgs;
 };
 
 template <> void TModInfo<NoCtcpFloodMod>(NoModInfo& Info)

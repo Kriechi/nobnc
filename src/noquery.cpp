@@ -37,12 +37,12 @@ const NoBuffer& NoQuery::getBuffer() const
     return m_buffer;
 }
 
-unsigned int NoQuery::getBufferCount() const
+uint NoQuery::getBufferCount() const
 {
     return m_buffer.getLimit();
 }
 
-bool NoQuery::setBufferCount(unsigned int count, bool force)
+bool NoQuery::setBufferCount(uint count, bool force)
 {
     return m_buffer.setLimit(count, force);
 }

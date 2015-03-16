@@ -441,7 +441,7 @@ bool NoApp::WriteConfig()
     config.AddKeyValuePair("HideVersion", NoString(m_bHideVersion));
     config.AddKeyValuePair("Version", NoString(NO_VERSION_STR));
 
-    unsigned int l = 0;
+    uint l = 0;
     for (NoListener* pListener : m_vpListeners) {
         NoSettings listenerConfig;
 
@@ -589,7 +589,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     NoString sListenHost;
     NoString sURIPrefix;
     bool bListenSSL = false;
-    unsigned int uListenPort = 0;
+    uint uListenPort = 0;
     bool bSuccess;
 
     do {
@@ -621,7 +621,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
         NoUtils::PrintAction("Verifying the listener");
         NoListener* pListener =
-        new NoListener((unsigned short int)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? ADDR_ALL : ADDR_IPV4ONLY, NoListener::ACCEPT_ALL);
+        new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? ADDR_ALL : ADDR_IPV4ONLY, NoListener::ACCEPT_ALL);
         if (!pListener->Listen()) {
             NoUtils::PrintStatus(false, FormatBindError());
             bSuccess = false;
@@ -724,7 +724,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
         NoString sHost, sPass, sHint;
         bool bSSL = false;
-        unsigned int uServerPort = 0;
+        uint uServerPort = 0;
 
         if (sNetwork.Equals("freenode")) {
             sHost = "chat.freenode.net";
@@ -965,9 +965,9 @@ bool NoApp::DoRehash(NoString& sError)
 
     NoString sSavedVersion;
     config.FindStringEntry("version", sSavedVersion);
-    std::tuple<unsigned int, unsigned int> tSavedVersion =
+    std::tuple<uint, uint> tSavedVersion =
     std::make_tuple(sSavedVersion.Token(0, false, ".").ToUInt(), sSavedVersion.Token(1, false, ".").ToUInt());
-    std::tuple<unsigned int, unsigned int> tCurrentVersion = std::make_tuple(NO_VERSION_MAJOR, NO_VERSION_MINOR);
+    std::tuple<uint, uint> tCurrentVersion = std::make_tuple(NO_VERSION_MAJOR, NO_VERSION_MINOR);
     if (tSavedVersion < tCurrentVersion) {
         if (sSavedVersion.empty()) {
             sSavedVersion = "< 0.203";
@@ -1101,7 +1101,7 @@ bool NoApp::DoRehash(NoString& sError)
 
         for (NoString& sProtocol : vsProtocols) {
 
-            unsigned int uFlag = 0;
+            uint uFlag = 0;
             bool bEnable = sProtocol.TrimPrefix("+");
             bool bDisable = sProtocol.TrimPrefix("-");
 
@@ -1562,11 +1562,11 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
 
     // No support for URIPrefix for old-style configs.
     NoString sURIPrefix;
-    unsigned short uPort = sPort.ToUShort();
+    ushort uPort = sPort.ToUShort();
     return AddListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
 }
 
-bool NoApp::AddListener(unsigned short uPort,
+bool NoApp::AddListener(ushort uPort,
                        const NoString& sBindHost,
                        const NoString& sURIPrefixRaw,
                        bool bSSL,
@@ -1673,7 +1673,7 @@ bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
 #endif
     bool bIRC;
     bool bWeb;
-    unsigned short uPort;
+    ushort uPort;
     if (!pConfig->FindUShortEntry("port", uPort)) {
         sError = "No port given";
         NoUtils::PrintError(sError);
@@ -1763,7 +1763,7 @@ void NoApp::DestroyInstance()
 NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficStatsPair& ZNC, TrafficStatsPair& Total)
 {
     TrafficStatsMap ret;
-    unsigned long long uiUsers_in, uiUsers_out, uiZNC_in, uiZNC_out;
+    ulonglong uiUsers_in, uiUsers_out, uiZNC_in, uiZNC_out;
     const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
 
     uiUsers_in = uiUsers_out = 0;
@@ -1886,7 +1886,7 @@ protected:
     }
 };
 
-void NoApp::SetConnectDelay(unsigned int i)
+void NoApp::SetConnectDelay(uint i)
 {
     if (i < 1) {
         // Don't hammer server with our failed connects

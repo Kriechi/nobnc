@@ -23,15 +23,15 @@ class NoDccBounce : public NoSocket
 {
 public:
     NoDccBounce(NoBounceDccMod* pMod,
-               unsigned long uLongIP,
-               unsigned short uPort,
+               ulong uLongIP,
+               ushort uPort,
                const NoString& sFileName,
                const NoString& sRemoteNick,
                const NoString& sRemoteIP,
                bool bIsChat = false);
     NoDccBounce(NoBounceDccMod* pMod,
                const NoString& sHostname,
-               unsigned short uPort,
+               ushort uPort,
                const NoString& sRemoteNick,
                const NoString& sRemoteIP,
                const NoString& sFileName,
@@ -39,9 +39,9 @@ public:
                bool bIsChat = false);
     virtual ~NoDccBounce();
 
-    static unsigned short DCCRequest(const NoString& sNick,
-                                     unsigned long uLongIP,
-                                     unsigned short uPort,
+    static ushort DCCRequest(const NoString& sNick,
+                                     ulong uLongIP,
+                                     ushort uPort,
                                      const NoString& sFileName,
                                      bool bIsChat,
                                      NoBounceDccMod* pMod,
@@ -56,7 +56,7 @@ public:
     void SockError(int iErrno, const NoString& sDescription) override;
     void Connected() override;
     void Disconnected() override;
-    Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override;
+    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
     void Shutdown();
     void PutServ(const NoString& sLine);
     void PutPeer(const NoString& sLine);
@@ -70,7 +70,7 @@ public:
     // !Setters
 
     // Getters
-    unsigned short GetUserPort() const { return m_uRemotePort; }
+    ushort GetUserPort() const { return m_uRemotePort; }
     const NoString& GetRemoteAddr() const { return m_sRemoteIP; }
     const NoString& GetRemoteNick() const { return m_sRemoteNick; }
     const NoString& GetFileName() const { return m_sFileName; }
@@ -87,18 +87,18 @@ protected:
     NoString m_sFileName;
     NoBounceDccMod* m_pModule;
     NoDccBounce* m_pPeer;
-    unsigned short m_uRemotePort;
+    ushort m_uRemotePort;
     bool m_bIsChat;
     bool m_bIsRemote;
 
-    static const unsigned int m_uiMaxDCCBuffer;
-    static const unsigned int m_uiMinDCCBuffer;
+    static const uint m_uiMaxDCCBuffer;
+    static const uint m_uiMinDCCBuffer;
 };
 
 // If we buffer more than this in memory, we will throttle the receiving side
-const unsigned int NoDccBounce::m_uiMaxDCCBuffer = 10 * 1024;
+const uint NoDccBounce::m_uiMaxDCCBuffer = 10 * 1024;
 // If less than this is in the buffer, the receiving side continues
-const unsigned int NoDccBounce::m_uiMinDCCBuffer = 2 * 1024;
+const uint NoDccBounce::m_uiMinDCCBuffer = 2 * 1024;
 
 class NoBounceDccMod : public NoModule
 {
@@ -180,9 +180,9 @@ public:
         if (sMessage.StartsWith("DCC ")) {
             NoString sType = sMessage.Token(1, false, " ", false, "\"", "\"", true);
             NoString sFile = sMessage.Token(2, false, " ", false, "\"", "\"", false);
-            unsigned long uLongIP = sMessage.Token(3, false, " ", false, "\"", "\"", true).ToULong();
-            unsigned short uPort = sMessage.Token(4, false, " ", false, "\"", "\"", true).ToUShort();
-            unsigned long uFileSize = sMessage.Token(5, false, " ", false, "\"", "\"", true).ToULong();
+            ulong uLongIP = sMessage.Token(3, false, " ", false, "\"", "\"", true).ToULong();
+            ushort uPort = sMessage.Token(4, false, " ", false, "\"", "\"", true).ToUShort();
+            ulong uFileSize = sMessage.Token(5, false, " ", false, "\"", "\"", true).ToULong();
             NoString sIP = GetLocalDCCIP();
 
             if (!UseClientIP()) {
@@ -190,21 +190,21 @@ public:
             }
 
             if (sType.Equals("CHAT")) {
-                unsigned short uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, "", true, this, "");
+                ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, "", true, this, "");
                 if (uBNCPort) {
                     PutIRC("PRIVMSG " + sTarget + " :\001DCC CHAT chat " + NoString(NoUtils::GetLongIP(sIP)) + " " +
                            NoString(uBNCPort) + "\001");
                 }
             } else if (sType.Equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
-                unsigned short uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, sFile, false, this, "");
+                ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, sFile, false, this, "");
                 if (uBNCPort) {
                     PutIRC("PRIVMSG " + sTarget + " :\001DCC SEND " + sFile + " " + NoString(NoUtils::GetLongIP(sIP)) +
                            " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.Equals("RESUME")) {
                 // PRIVMSG user :DCC RESUME "znc.o" 58810 151552
-                unsigned short uResumePort = sMessage.Token(3).ToUShort();
+                ushort uResumePort = sMessage.Token(3).ToUShort();
 
                 std::set<NoSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
@@ -241,13 +241,13 @@ public:
             // DCC CHAT chat 2453612361 44592
             NoString sType = sMessage.Token(1, false, " ", false, "\"", "\"", true);
             NoString sFile = sMessage.Token(2, false, " ", false, "\"", "\"", false);
-            unsigned long uLongIP = sMessage.Token(3, false, " ", false, "\"", "\"", true).ToULong();
-            unsigned short uPort = sMessage.Token(4, false, " ", false, "\"", "\"", true).ToUShort();
-            unsigned long uFileSize = sMessage.Token(5, false, " ", false, "\"", "\"", true).ToULong();
+            ulong uLongIP = sMessage.Token(3, false, " ", false, "\"", "\"", true).ToULong();
+            ushort uPort = sMessage.Token(4, false, " ", false, "\"", "\"", true).ToUShort();
+            ulong uFileSize = sMessage.Token(5, false, " ", false, "\"", "\"", true).ToULong();
 
             if (sType.Equals("CHAT")) {
                 NoNick FromNick(Nick.GetNickMask());
-                unsigned short uBNCPort =
+                ushort uBNCPort =
                 NoDccBounce::DCCRequest(FromNick.GetNick(), uLongIP, uPort, "", true, this, NoUtils::GetIP(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
@@ -256,7 +256,7 @@ public:
                 }
             } else if (sType.Equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
-                unsigned short uBNCPort =
+                ushort uBNCPort =
                 NoDccBounce::DCCRequest(Nick.GetNick(), uLongIP, uPort, sFile, false, this, NoUtils::GetIP(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
@@ -265,7 +265,7 @@ public:
                 }
             } else if (sType.Equals("RESUME")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
-                unsigned short uResumePort = sMessage.Token(3).ToUShort();
+                ushort uResumePort = sMessage.Token(3).ToUShort();
 
                 std::set<NoSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
@@ -297,8 +297,8 @@ public:
 };
 
 NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
-                       unsigned long uLongIP,
-                       unsigned short uPort,
+                       ulong uLongIP,
+                       ushort uPort,
                        const NoString& sFileName,
                        const NoString& sRemoteNick,
                        const NoString& sRemoteIP,
@@ -325,7 +325,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
 
 NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
                        const NoString& sHostname,
-                       unsigned short uPort,
+                       ushort uPort,
                        const NoString& sRemoteNick,
                        const NoString& sRemoteIP,
                        const NoString& sFileName,
@@ -466,7 +466,7 @@ void NoDccBounce::Shutdown()
     Close();
 }
 
-Csock* NoDccBounce::GetSockObj(const NoString& sHost, unsigned short uPort)
+Csock* NoDccBounce::GetSockObj(const NoString& sHost, ushort uPort)
 {
     Close();
 
@@ -508,16 +508,16 @@ void NoDccBounce::PutPeer(const NoString& sLine)
     }
 }
 
-unsigned short NoDccBounce::DCCRequest(const NoString& sNick,
-                                      unsigned long uLongIP,
-                                      unsigned short uPort,
+ushort NoDccBounce::DCCRequest(const NoString& sNick,
+                                      ulong uLongIP,
+                                      ushort uPort,
                                       const NoString& sFileName,
                                       bool bIsChat,
                                       NoBounceDccMod* pMod,
                                       const NoString& sRemoteIP)
 {
     NoDccBounce* pDCCBounce = new NoDccBounce(pMod, uLongIP, uPort, sFileName, sNick, sRemoteIP, bIsChat);
-    unsigned short uListenPort = NoApp::Get().GetManager().ListenRand(
+    ushort uListenPort = NoApp::Get().GetManager().ListenRand(
     "DCC::" + NoString((bIsChat) ? "Chat" : "Xfer") + "::Local::" + sNick, pMod->GetLocalDCCIP(), false, SOMAXCONN, pDCCBounce, 120);
 
     return uListenPort;

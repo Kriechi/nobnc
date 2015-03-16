@@ -104,8 +104,8 @@ public:
     bool Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks = true);
     void BounceAllClients();
 
-    void AddBytesRead(unsigned long long u) { m_uBytesRead += u; }
-    void AddBytesWritten(unsigned long long u) { m_uBytesWritten += u; }
+    void AddBytesRead(ulonglong u) { m_uBytesRead += u; }
+    void AddBytesWritten(ulonglong u) { m_uBytesWritten += u; }
 
     void SetNick(const NoString& s);
     void SetAltNick(const NoString& s);
@@ -124,7 +124,7 @@ public:
     void SetQuitMsg(const NoString& s);
     bool AddCTCPReply(const NoString& sCTCP, const NoString& sReply);
     bool DelCTCPReply(const NoString& sCTCP);
-    bool SetBufferCount(unsigned int u, bool bForce = false);
+    bool SetBufferCount(uint u, bool bForce = false);
     void SetAutoClearChanBuffer(bool b);
     void SetAutoClearQueryBuffer(bool b);
 
@@ -133,11 +133,11 @@ public:
     void SetTimestampAppend(bool b) { m_bAppendTimestamp = b; }
     void SetTimestampPrepend(bool b) { m_bPrependTimestamp = b; }
     void SetTimezone(const NoString& s) { m_sTimezone = s; }
-    void SetJoinTries(unsigned int i) { m_uMaxJoinTries = i; }
-    void SetMaxJoins(unsigned int i) { m_uMaxJoins = i; }
+    void SetJoinTries(uint i) { m_uMaxJoinTries = i; }
+    void SetMaxJoins(uint i) { m_uMaxJoins = i; }
     void SetSkinName(const NoString& s) { m_sSkinName = s; }
-    void SetMaxNetworks(unsigned int i) { m_uMaxNetworks = i; }
-    void SetMaxQueryBuffers(unsigned int i) { m_uMaxQueryBuffers = i; }
+    void SetMaxNetworks(uint i) { m_uMaxNetworks = i; }
+    void SetMaxQueryBuffers(uint i) { m_uMaxQueryBuffers = i; }
 
     const std::vector<NoClient*>& GetUserClients() const { return m_vClients; }
     std::vector<NoClient*> GetAllClients() const;
@@ -169,18 +169,18 @@ public:
 
     NoString GetQuitMsg() const;
     const NoStringMap& GetCTCPReplies() const;
-    unsigned int GetBufferCount() const;
+    uint GetBufferCount() const;
     bool AutoClearChanBuffer() const;
     bool AutoClearQueryBuffer() const;
     bool IsBeingDeleted() const { return m_bBeingDeleted; }
     NoString GetTimezone() const { return m_sTimezone; }
-    unsigned long long BytesRead() const { return m_uBytesRead; }
-    unsigned long long BytesWritten() const { return m_uBytesWritten; }
-    unsigned int JoinTries() const { return m_uMaxJoinTries; }
-    unsigned int MaxJoins() const { return m_uMaxJoins; }
+    ulonglong BytesRead() const { return m_uBytesRead; }
+    ulonglong BytesWritten() const { return m_uBytesWritten; }
+    uint JoinTries() const { return m_uMaxJoinTries; }
+    uint MaxJoins() const { return m_uMaxJoins; }
     NoString GetSkinName() const;
-    unsigned int MaxNetworks() const { return m_uMaxNetworks; }
-    unsigned int MaxQueryBuffers() const { return m_uMaxQueryBuffers; }
+    uint MaxNetworks() const { return m_uMaxNetworks; }
+    uint MaxQueryBuffers() const { return m_uMaxQueryBuffers; }
 
 private:
     const NoString m_sUserName;
@@ -220,13 +220,13 @@ private:
     std::vector<NoNetwork*> m_vIRNoNetworks;
     std::vector<NoClient*> m_vClients;
     std::set<NoString> m_ssAllowedHosts;
-    unsigned int m_uBufferCount;
-    unsigned long long m_uBytesRead;
-    unsigned long long m_uBytesWritten;
-    unsigned int m_uMaxJoinTries;
-    unsigned int m_uMaxNetworks;
-    unsigned int m_uMaxQueryBuffers;
-    unsigned int m_uMaxJoins;
+    uint m_uBufferCount;
+    ulonglong m_uBytesRead;
+    ulonglong m_uBytesWritten;
+    uint m_uMaxJoinTries;
+    uint m_uMaxNetworks;
+    uint m_uMaxQueryBuffers;
+    uint m_uMaxJoins;
     NoString m_sSkinName;
 
     NoModules* m_pModules;

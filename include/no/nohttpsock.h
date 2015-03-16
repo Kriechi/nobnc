@@ -27,13 +27,13 @@ class NoHttpSock : public NoSocket
 {
 public:
     NoHttpSock(NoModule* pMod, const NoString& sURIPrefix);
-    NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, unsigned short uPort, int iTimeout = 60);
+    NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort, int iTimeout = 60);
     virtual ~NoHttpSock();
 
     void ReadData(const char* data, size_t len) override;
     void ReadLine(const NoString& sData) override;
     void Connected() override;
-    Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override = 0;
+    Csock* GetSockObj(const NoString& sHost, ushort uPort) override = 0;
 
     virtual bool ForceLogin();
     virtual bool OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic);
@@ -42,13 +42,13 @@ public:
 
     void CheckPost();
     bool SentHeader() const;
-    bool PrintHeader(off_t uContentLength, const NoString& sContentType = "", unsigned int uStatusId = 200, const NoString& sStatusMsg = "OK");
+    bool PrintHeader(off_t uContentLength, const NoString& sContentType = "", uint uStatusId = 200, const NoString& sStatusMsg = "OK");
     void AddHeader(const NoString& sName, const NoString& sValue);
     void SetContentType(const NoString& sContentType);
 
     bool PrintNotFound();
     bool Redirect(const NoString& sURL);
-    bool PrintErrorPage(unsigned int uStatusId, const NoString& sStatusMsg, const NoString& sMessage);
+    bool PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage);
     static void ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams);
     void ParseURI();
     void GetPage();
@@ -98,7 +98,7 @@ protected:
     bool m_bLoggedIn;
     bool m_bPost;
     bool m_bDone;
-    unsigned long m_uPostLen;
+    ulong m_uPostLen;
     NoString m_sPostData;
     NoString m_sURI;
     NoString m_sUser;

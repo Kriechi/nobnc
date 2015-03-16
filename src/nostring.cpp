@@ -27,7 +27,7 @@ NoString::NoString(char c) : std::string()
     s << c;
     *this = s.str();
 }
-NoString::NoString(unsigned char c) : std::string()
+NoString::NoString(uchar c) : std::string()
 {
     std::stringstream s;
     s << c;
@@ -39,7 +39,7 @@ NoString::NoString(short i) : std::string()
     s << i;
     *this = s.str();
 }
-NoString::NoString(unsigned short i) : std::string()
+NoString::NoString(ushort i) : std::string()
 {
     std::stringstream s;
     s << i;
@@ -51,7 +51,7 @@ NoString::NoString(int i) : std::string()
     s << i;
     *this = s.str();
 }
-NoString::NoString(unsigned int i) : std::string()
+NoString::NoString(uint i) : std::string()
 {
     std::stringstream s;
     s << i;
@@ -63,7 +63,7 @@ NoString::NoString(long i) : std::string()
     s << i;
     *this = s.str();
 }
-NoString::NoString(unsigned long i) : std::string()
+NoString::NoString(ulong i) : std::string()
 {
     std::stringstream s;
     s << i;
@@ -75,7 +75,7 @@ NoString::NoString(long long i) : std::string()
     s << i;
     *this = s.str();
 }
-NoString::NoString(unsigned long long i) : std::string()
+NoString::NoString(ulonglong i) : std::string()
 {
     std::stringstream s;
     s << i;
@@ -96,10 +96,10 @@ NoString::NoString(float i, int precision) : std::string()
     *this = s.str();
 }
 
-unsigned char*
-NoString::strnchr(const unsigned char* src, unsigned char c, unsigned int iMaxBytes, unsigned char* pFill, unsigned int* piCount) const
+uchar*
+NoString::strnchr(const uchar* src, uchar c, uint iMaxBytes, uchar* pFill, uint* piCount) const
 {
-    for (unsigned int a = 0; a < iMaxBytes && *src; a++, src++) {
+    for (uint a = 0; a < iMaxBytes && *src; a++, src++) {
         if (pFill) {
             pFill[a] = *src;
         }
@@ -113,7 +113,7 @@ NoString::strnchr(const unsigned char* src, unsigned char c, unsigned int iMaxBy
                 *piCount = a;
             }
 
-            return (unsigned char*)src;
+            return (uchar*)src;
         }
     }
 
@@ -270,19 +270,19 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
 {
     NoString sRet;
     const char szHex[] = "0123456789ABCDEF";
-    const unsigned char* pStart = (const unsigned char*)data();
-    const unsigned char* p = (const unsigned char*)data();
+    const uchar* pStart = (const uchar*)data();
+    const uchar* p = (const uchar*)data();
     size_type iLength = length();
     sRet.reserve(iLength * 3);
-    unsigned char pTmp[21];
-    unsigned int iCounted = 0;
+    uchar pTmp[21];
+    uint iCounted = 0;
 
-    for (unsigned int a = 0; a < iLength; a++, p = pStart + a) {
-        unsigned char ch = 0;
+    for (uint a = 0; a < iLength; a++, p = pStart + a) {
+        uchar ch = 0;
 
         switch (eFrom) {
         case EHTML:
-            if ((*p == '&') && (strnchr((unsigned char*)p, ';', sizeof(pTmp) - 1, pTmp, &iCounted))) {
+            if ((*p == '&') && (strnchr((uchar*)p, ';', sizeof(pTmp) - 1, pTmp, &iCounted))) {
                 // please note that we do not have any Unicode or UTF-8 support here at all.
 
                 if ((iCounted >= 3) && (pTmp[1] == '#')) { // do XML and HTML &#97; &#x3c
@@ -293,10 +293,10 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
                     }
 
                     char* endptr = nullptr;
-                    unsigned long int b = strtol((const char*)(pTmp + 2 + (base == 16)), &endptr, base);
+                    ulong b = strtol((const char*)(pTmp + 2 + (base == 16)), &endptr, base);
 
                     if ((*endptr == ';') && (b <= 255)) { // incase they do something like &#7777777777;
-                        ch = (unsigned char)b;
+                        ch = (uchar)b;
                         a += iCounted;
                         break;
                     }
@@ -329,16 +329,16 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             if (*p == '%' && (a + 2) < iLength && isxdigit(*(p + 1)) && isxdigit(*(p + 2))) {
                 p++;
                 if (isdigit(*p)) {
-                    ch = (unsigned char)((*p - '0') << 4);
+                    ch = (uchar)((*p - '0') << 4);
                 } else {
-                    ch = (unsigned char)((tolower(*p) - 'a' + 10) << 4);
+                    ch = (uchar)((tolower(*p) - 'a' + 10) << 4);
                 }
 
                 p++;
                 if (isdigit(*p)) {
-                    ch |= (unsigned char)(*p - '0');
+                    ch |= (uchar)(*p - '0');
                 } else {
-                    ch |= (unsigned char)(tolower(*p) - 'a' + 10);
+                    ch |= (uchar)(tolower(*p) - 'a' + 10);
                 }
 
                 a += 2;
@@ -386,16 +386,16 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             if (*p == '\\' && (a + 3) < iLength && *(p + 1) == 'x' && isxdigit(*(p + 2)) && isxdigit(*(p + 3))) {
                 p += 2;
                 if (isdigit(*p)) {
-                    ch = (unsigned char)((*p - '0') << 4);
+                    ch = (uchar)((*p - '0') << 4);
                 } else {
-                    ch = (unsigned char)((tolower(*p) - 'a' + 10) << 4);
+                    ch = (uchar)((tolower(*p) - 'a' + 10) << 4);
                 }
 
                 p++;
                 if (isdigit(*p)) {
-                    ch |= (unsigned char)(*p - '0');
+                    ch |= (uchar)(*p - '0');
                 } else {
-                    ch |= (unsigned char)(tolower(*p) - 'a' + 10);
+                    ch |= (uchar)(tolower(*p) - 'a' + 10);
                 }
 
                 a += 3;
@@ -442,9 +442,9 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
                 continue;
             }
             if (isdigit(*p)) {
-                ch = (unsigned char)((*p - '0') << 4);
+                ch = (uchar)((*p - '0') << 4);
             } else {
-                ch = (unsigned char)((tolower(*p) - 'a' + 10) << 4);
+                ch = (uchar)((tolower(*p) - 'a' + 10) << 4);
             }
             a++;
             p++;
@@ -456,9 +456,9 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
                 continue;
             }
             if (isdigit(*p)) {
-                ch |= (unsigned char)(*p - '0');
+                ch |= (uchar)(*p - '0');
             } else {
-                ch |= (unsigned char)(tolower(*p) - 'a' + 10);
+                ch |= (uchar)(tolower(*p) - 'a' + 10);
             }
         } break;
         }
@@ -602,15 +602,15 @@ NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith, co
     return sRet;
 }
 
-unsigned int NoString::Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
+uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
 {
     return NoString::Replace(*this, sReplace, sWith, sLeft, sRight, bRemoveDelims);
 }
 
-unsigned int
+uint
 NoString::Replace(NoString& sStr, const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
 {
-    unsigned int uRet = 0;
+    uint uRet = 0;
     NoString sCopy = sStr;
     sStr.clear();
 
@@ -724,7 +724,7 @@ NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAl
     return substr(start_pos);
 }
 
-NoString NoString::Ellipsize(unsigned int uLen) const
+NoString NoString::Ellipsize(uint uLen) const
 {
     if (uLen >= size()) {
         return *this;
@@ -734,7 +734,7 @@ NoString NoString::Ellipsize(unsigned int uLen) const
 
     // @todo this looks suspect
     if (uLen < 4) {
-        for (unsigned int a = 0; a < uLen; a++) {
+        for (uint a = 0; a < uLen; a++) {
             sRet += ".";
         }
 
@@ -790,7 +790,7 @@ NoString::size_type NoString::OptionSplit(NoStringMap& msRet, bool bUpperKeys) c
         NoStringVector vsNames;
         sName.Split(" ", vsNames, false, "\"", "\"");
 
-        for (unsigned int a = 0; a < vsNames.size(); a++) {
+        for (uint a = 0; a < vsNames.size(); a++) {
             NoString sKeyName = vsNames[a];
 
             if (bUpperKeys) {
@@ -955,7 +955,7 @@ NoString NoString::NamedFormat(const NoString& sFormat, const NoStringMap& msVal
     return sRet;
 }
 
-NoString NoString::RandomString(unsigned int uLength)
+NoString NoString::RandomString(uint uLength)
 {
     const char chars[] = "abcdefghijklmnopqrstuvwxyz"
                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -965,7 +965,7 @@ NoString NoString::RandomString(unsigned int uLength)
     size_t p;
     NoString sRet;
 
-    for (unsigned int a = 0; a < uLength; a++) {
+    for (uint a = 0; a < uLength; a++) {
         p = (size_t)(len * (rand() / (RAND_MAX + 1.0)));
         sRet += chars[p];
     }
@@ -973,19 +973,19 @@ NoString NoString::RandomString(unsigned int uLength)
     return sRet;
 }
 
-bool NoString::Base64Encode(unsigned int uWrap)
+bool NoString::Base64Encode(uint uWrap)
 {
     NoString sCopy(*this);
     return sCopy.Base64Encode(*this, uWrap);
 }
 
-unsigned long NoString::Base64Decode()
+ulong NoString::Base64Decode()
 {
     NoString sCopy(*this);
     return sCopy.Base64Decode(*this);
 }
 
-NoString NoString::Base64Encode_n(unsigned int uWrap) const
+NoString NoString::Base64Encode_n(uint uWrap) const
 {
     NoString sRet;
     Base64Encode(sRet, uWrap);
@@ -999,13 +999,13 @@ NoString NoString::Base64Decode_n() const
     return sRet;
 }
 
-bool NoString::Base64Encode(NoString& sRet, unsigned int uWrap) const
+bool NoString::Base64Encode(NoString& sRet, uint uWrap) const
 {
     const char b64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     sRet.clear();
     size_t len = size();
-    const unsigned char* input = (const unsigned char*)c_str();
-    unsigned char* output, *p;
+    const uchar* input = (const uchar*)c_str();
+    uchar* output, *p;
     size_t i = 0, mod = len % 3, toalloc;
     toalloc = (len / 3) * 4 + (3 - mod) % 3 + 1 + 8;
 
@@ -1020,7 +1020,7 @@ bool NoString::Base64Encode(NoString& sRet, unsigned int uWrap) const
         return 0;
     }
 
-    p = output = new unsigned char[toalloc];
+    p = output = new uchar[toalloc];
 
     while (i < len - mod) {
         *p++ = b64table[input[i++] >> 2];
@@ -1060,7 +1060,7 @@ bool NoString::Base64Encode(NoString& sRet, unsigned int uWrap) const
     return true;
 }
 
-unsigned long NoString::Base64Decode(NoString& sRet) const
+ulong NoString::Base64Decode(NoString& sRet) const
 {
     NoString sTmp(*this);
     // remove new lines
@@ -1069,20 +1069,20 @@ unsigned long NoString::Base64Decode(NoString& sRet) const
 
     const char* in = sTmp.c_str();
     char c, c1, *p;
-    unsigned long i;
-    unsigned long uLen = sTmp.size();
+    ulong i;
+    ulong uLen = sTmp.size();
     char* out = new char[uLen + 1];
 
     for (i = 0, p = out; i < uLen; i++) {
-        c = (char)base64_table[(unsigned char)in[i++]];
-        c1 = (char)base64_table[(unsigned char)in[i++]];
+        c = (char)base64_table[(uchar)in[i++]];
+        c1 = (char)base64_table[(uchar)in[i++]];
         *p++ = char((c << 2) | ((c1 >> 4) & 0x3));
 
         if (i < uLen) {
             if (in[i] == '=') {
                 break;
             }
-            c = (char)base64_table[(unsigned char)in[i]];
+            c = (char)base64_table[(uchar)in[i]];
             *p++ = char(((c1 << 4) & 0xf0) | ((c >> 2) & 0xf));
         }
 
@@ -1090,12 +1090,12 @@ unsigned long NoString::Base64Decode(NoString& sRet) const
             if (in[i] == '=') {
                 break;
             }
-            *p++ = char(((c << 6) & 0xc0) | (char)base64_table[(unsigned char)in[i]]);
+            *p++ = char(((c << 6) & 0xc0) | (char)base64_table[(uchar)in[i]]);
         }
     }
 
     *p = '\0';
-    unsigned long uRet = p - out;
+    ulong uRet = p - out;
     sRet.clear();
     sRet.append(out, uRet);
     delete[] out;
@@ -1107,9 +1107,9 @@ NoString NoString::MD5() const { return (const char*)NoMD5(*this); }
 
 NoString NoString::SHA256() const
 {
-    unsigned char digest[SHA256_DIGEST_SIZE];
+    uchar digest[SHA256_DIGEST_SIZE];
     char digest_hex[SHA256_DIGEST_SIZE * 2 + 1];
-    const unsigned char* message = (const unsigned char*)c_str();
+    const uchar* message = (const uchar*)c_str();
 
     sha256(message, length(), digest);
 
@@ -1176,15 +1176,15 @@ void NoString::Decrypt(const NoString& sPass, const NoString& sIvec) { Crypt(sPa
 
 void NoString::Crypt(const NoString& sPass, bool bEncrypt, const NoString& sIvec)
 {
-    unsigned char szIvec[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    uchar szIvec[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     BF_KEY bKey;
 
     if (sIvec.length() >= 8) {
         memcpy(szIvec, sIvec.data(), 8);
     }
 
-    BF_set_key(&bKey, (unsigned int)sPass.length(), (unsigned char*)sPass.data());
-    unsigned int uPad = (length() % 8);
+    BF_set_key(&bKey, (uint)sPass.length(), (uchar*)sPass.data());
+    uint uPad = (length() % 8);
 
     if (uPad) {
         uPad = 8 - uPad;
@@ -1192,8 +1192,8 @@ void NoString::Crypt(const NoString& sPass, bool bEncrypt, const NoString& sIvec
     }
 
     size_t uLen = length();
-    unsigned char* szBuff = (unsigned char*)malloc(uLen);
-    BF_cbc_encrypt((const unsigned char*)data(), szBuff, uLen, &bKey, szIvec, ((bEncrypt) ? BF_ENCRYPT : BF_DECRYPT));
+    uchar* szBuff = (uchar*)malloc(uLen);
+    BF_cbc_encrypt((const uchar*)data(), szBuff, uLen, &bKey, szIvec, ((bEncrypt) ? BF_ENCRYPT : BF_DECRYPT));
 
     clear();
     append((const char*)szBuff, uLen);
@@ -1208,12 +1208,12 @@ NoString NoString::ToPercent(double d)
     return szRet;
 }
 
-NoString NoString::ToByteStr(unsigned long long d)
+NoString NoString::ToByteStr(ulonglong d)
 {
-    const unsigned long long KiB = 1024;
-    const unsigned long long MiB = KiB * 1024;
-    const unsigned long long GiB = MiB * 1024;
-    const unsigned long long TiB = GiB * 1024;
+    const ulonglong KiB = 1024;
+    const ulonglong MiB = KiB * 1024;
+    const ulonglong GiB = MiB * 1024;
+    const ulonglong TiB = GiB * 1024;
 
     if (d > TiB) {
         return NoString(d / TiB) + " TiB";
@@ -1228,13 +1228,13 @@ NoString NoString::ToByteStr(unsigned long long d)
     return NoString(d) + " B";
 }
 
-NoString NoString::ToTimeStr(unsigned long s)
+NoString NoString::ToTimeStr(ulong s)
 {
-    const unsigned long m = 60;
-    const unsigned long h = m * 60;
-    const unsigned long d = h * 24;
-    const unsigned long w = d * 7;
-    const unsigned long y = d * 365;
+    const ulong m = 60;
+    const ulong h = m * 60;
+    const ulong d = h * 24;
+    const ulong w = d * 7;
+    const ulong y = d * 365;
     NoString sRet;
 
 #define TIMESPAN(time, str)                  \
@@ -1262,12 +1262,12 @@ bool NoString::ToBool() const
 }
 
 short NoString::ToShort() const { return (short int)strtol(this->c_str(), (char**)nullptr, 10); }
-unsigned short NoString::ToUShort() const { return (unsigned short int)strtoul(this->c_str(), (char**)nullptr, 10); }
-unsigned int NoString::ToUInt() const { return (unsigned int)strtoul(this->c_str(), (char**)nullptr, 10); }
+ushort NoString::ToUShort() const { return (ushort)strtoul(this->c_str(), (char**)nullptr, 10); }
+uint NoString::ToUInt() const { return (uint)strtoul(this->c_str(), (char**)nullptr, 10); }
 int NoString::ToInt() const { return (int)strtol(this->c_str(), (char**)nullptr, 10); }
 long NoString::ToLong() const { return strtol(this->c_str(), (char**)nullptr, 10); }
-unsigned long NoString::ToULong() const { return strtoul(c_str(), nullptr, 10); }
-unsigned long long NoString::ToULongLong() const { return strtoull(c_str(), nullptr, 10); }
+ulong NoString::ToULong() const { return strtoul(c_str(), nullptr, 10); }
+ulonglong NoString::ToULongLong() const { return strtoull(c_str(), nullptr, 10); }
 long long NoString::ToLongLong() const { return strtoll(c_str(), nullptr, 10); }
 double NoString::ToDouble() const { return strtod(c_str(), nullptr); }
 
@@ -1424,15 +1424,15 @@ bool NoString::RightChomp(size_type uLen)
 NoString NoString::StripControls_n() const
 {
     NoString sRet;
-    const unsigned char* pStart = (const unsigned char*)data();
-    unsigned char ch = *pStart;
+    const uchar* pStart = (const uchar*)data();
+    uchar ch = *pStart;
     size_type iLength = length();
     sRet.reserve(iLength);
     bool colorCode = false;
-    unsigned int digits = 0;
+    uint digits = 0;
     bool comma = false;
 
-    for (unsigned int a = 0; a < iLength; a++, ch = pStart[a]) {
+    for (uint a = 0; a < iLength; a++, ch = pStart[a]) {
         // Color code. Format: \x03([0-9]{1,2}(,[0-9]{1,2})?)?
         if (ch == 0x03) {
             colorCode = true;
@@ -1540,8 +1540,8 @@ static const char hexdigits[] = "0123456789abcdef";
 NoString& NoStringMap::Encode(NoString& sValue) const
 {
     NoString sTmp;
-    for (unsigned char c : sValue) {
-        // isalnum() needs unsigned char as argument and this code
+    for (uchar c : sValue) {
+        // isalnum() needs uchar as argument and this code
         // assumes unsigned, too.
         if (isalnum(c)) {
             sTmp += c;

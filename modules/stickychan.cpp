@@ -135,7 +135,7 @@ public:
             bool bSubmitted = (WebSock.GetParam("submitted").ToInt() != 0);
 
             const std::vector<NoChannel*>& Channels = GetNetwork()->GetChans();
-            for (unsigned int c = 0; c < Channels.size(); c++) {
+            for (uint c = 0; c < Channels.size(); c++) {
                 const NoString sChan = Channels[c]->getName();
                 bool bStick = FindNV(sChan) != EndNV();
 

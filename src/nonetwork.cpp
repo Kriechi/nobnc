@@ -74,7 +74,7 @@ public:
     NoNetworkJoinTimer(const NoNetworkJoinTimer&) = delete;
     NoNetworkJoinTimer& operator=(const NoNetworkJoinTimer&) = delete;
 
-    void Delay(unsigned short int uDelay)
+    void Delay(ushort uDelay)
     {
         m_bDelayed = true;
         Start(uDelay);
@@ -335,7 +335,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
         TOption<double> DoubleOptions[] = {
             { "floodrate", &NoNetwork::SetFloodRate },
         };
-        TOption<short unsigned int> SUIntOptions[] = {
+        TOption<ushort> SUIntOptions[] = {
             { "floodburst", &NoNetwork::SetFloodBurst }, { "joindelay", &NoNetwork::SetJoinDelay },
         };
 
@@ -355,7 +355,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
         }
 
         for (const auto& Option : SUIntOptions) {
-            unsigned short value;
+            ushort value;
             if (pConfig->FindUShortEntry(Option.name, value)) (this->*Option.pSetter)(value);
         }
 
@@ -585,8 +585,8 @@ void NoNetwork::ClientConnected(NoClient* pClient)
 
     if (GetIRCSock() != nullptr) {
         NoString sUserMode("");
-        const std::set<unsigned char>& scUserModes = GetIRCSock()->GetUserModes();
-        for (unsigned char cMode : scUserModes) {
+        const std::set<uchar>& scUserModes = GetIRCSock()->GetUserModes();
+        for (uchar cMode : scUserModes) {
             sUserMode += cMode;
         }
         if (!sUserMode.empty()) {
@@ -815,11 +815,11 @@ void NoNetwork::JoinChans()
     // We start at a random offset into the channel list so that if your
     // first 3 channels are invite-only and you got MaxJoins == 3, ZNC will
     // still be able to join the rest of your channels.
-    unsigned int start = rand() % m_vChans.size();
-    unsigned int uJoins = m_pUser->MaxJoins();
+    uint start = rand() % m_vChans.size();
+    uint uJoins = m_pUser->MaxJoins();
     std::set<NoChannel*> sChans;
-    for (unsigned int a = 0; a < m_vChans.size(); a++) {
-        unsigned int idx = (start + a) % m_vChans.size();
+    for (uint a = 0; a < m_vChans.size(); a++) {
+        uint idx = (start + a) % m_vChans.size();
         NoChannel* pChan = m_vChans[idx];
         if (!pChan->isOn() && !pChan->isDisabled()) {
             if (!JoinChan(pChan)) continue;
@@ -976,13 +976,13 @@ NoServer* NoNetwork::FindServer(const NoString& sName) const
     return nullptr;
 }
 
-bool NoNetwork::DelServer(const NoString& sName, unsigned short uPort, const NoString& sPass)
+bool NoNetwork::DelServer(const NoString& sName, ushort uPort, const NoString& sPass)
 {
     if (sName.empty()) {
         return false;
     }
 
-    unsigned int a = 0;
+    uint a = 0;
     bool bSawCurrentServer = false;
     NoServer* pCurServer = GetCurrentServer();
 
@@ -1044,13 +1044,13 @@ bool NoNetwork::AddServer(const NoString& sName)
         sPort.LeftChomp();
     }
 
-    unsigned short uPort = sPort.ToUShort();
+    ushort uPort = sPort.ToUShort();
     NoString sPass = sLine.Token(2, true);
 
     return AddServer(sHost, uPort, sPass, bSSL);
 }
 
-bool NoNetwork::AddServer(const NoString& sName, unsigned short uPort, const NoString& sPass, bool bSSL)
+bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& sPass, bool bSSL)
 {
 #ifndef HAVE_LIBSSL
     if (bSSL) {
@@ -1116,7 +1116,7 @@ void NoNetwork::SetIRNoServer(const NoString& s) { m_sIRNoServer = s; }
 
 bool NoNetwork::SetNextServer(const NoServer* pServer)
 {
-    for (unsigned int a = 0; a < m_vServers.size(); a++) {
+    for (uint a = 0; a < m_vServers.size(); a++) {
         if (m_vServers[a] == pServer) {
             m_uServerIdx = a;
             return true;

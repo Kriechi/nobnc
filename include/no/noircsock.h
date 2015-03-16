@@ -81,10 +81,10 @@ public:
 
     void SetPass(const NoString& s) { m_sPass = s; }
 
-    unsigned int GetMaxNickLen() const { return m_uMaxNickLen; }
-    EChanModeArgs GetModeType(unsigned char uMode) const;
-    unsigned char GetPermFromMode(unsigned char uMode) const;
-    const std::map<unsigned char, EChanModeArgs>& GetChanModes() const { return m_mueChanModes; }
+    uint GetMaxNickLen() const { return m_uMaxNickLen; }
+    EChanModeArgs GetModeType(uchar uMode) const;
+    uchar GetPermFromMode(uchar uMode) const;
+    const std::map<uchar, EChanModeArgs>& GetChanModes() const { return m_mueChanModes; }
     bool IsPermChar(const char c) const { return (c != '\0' && GetPerms().find(c) != NoString::npos); }
     bool IsPermMode(const char c) const { return (c != '\0' && GetPermModes().find(c) != NoString::npos); }
     const NoString& GetPerms() const { return m_sPerms; }
@@ -95,7 +95,7 @@ public:
     NoNetwork* GetNetwork() const { return m_pNetwork; }
     bool HasNamesx() const { return m_bNamesx; }
     bool HasUHNames() const { return m_bUHNames; }
-    const std::set<unsigned char>& GetUserModes() const { return m_scUserModes; }
+    const std::set<uchar>& GetUserModes() const { return m_scUserModes; }
     // This is true if we are past raw 001
     bool IsAuthed() const { return m_bAuthed; }
     bool IsCapAccepted(const NoString& sCap) { return 1 == m_ssAcceptedCaps.count(sCap); }
@@ -122,24 +122,24 @@ private:
     bool m_bUHNames;
     NoString m_sPerms;
     NoString m_sPermModes;
-    std::set<unsigned char> m_scUserModes;
-    std::map<unsigned char, EChanModeArgs> m_mueChanModes;
+    std::set<uchar> m_scUserModes;
+    std::map<uchar, EChanModeArgs> m_mueChanModes;
     NoNetwork* m_pNetwork;
     NoNick m_Nick;
     NoString m_sPass;
     std::map<NoString, NoChannel*> m_msChans;
-    unsigned int m_uMaxNickLen;
-    unsigned int m_uCapPaused;
+    uint m_uMaxNickLen;
+    uint m_uCapPaused;
     NoStringSet m_ssAcceptedCaps;
     NoStringSet m_ssPendingCaps;
     time_t m_lastCTCP;
-    unsigned int m_uNumCTCP;
+    uint m_uNumCTCP;
     static const time_t m_uCTCPFloodTime;
-    static const unsigned int m_uCTCPFloodCount;
+    static const uint m_uCTCPFloodCount;
     NoStringMap m_mISupport;
     std::deque<NoString> m_vsSendQueue;
     short int m_iSendsAllowed;
-    unsigned short int m_uFloodBurst;
+    ushort m_uFloodBurst;
     double m_fFloodRate;
     bool m_bFloodProtection;
 

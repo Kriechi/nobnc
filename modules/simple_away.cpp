@@ -26,7 +26,7 @@ class NoSimpleAway;
 class NoSimpleAwayJob : public NoTimer
 {
 public:
-    NoSimpleAwayJob(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+    NoSimpleAwayJob(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
         : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }
@@ -41,7 +41,7 @@ class NoSimpleAway : public NoModule
 {
 private:
     NoString m_sReason;
-    unsigned int m_iAwayWait;
+    uint m_iAwayWait;
     bool m_bClientSetAway;
     bool m_bWeSetAway;
 
@@ -214,7 +214,7 @@ private:
         m_sReason = sReason;
     }
 
-    void SetAwayWait(unsigned int iAwayWait, bool bSave = true)
+    void SetAwayWait(uint iAwayWait, bool bSave = true)
     {
         if (bSave) SetNV("awaywait", NoString(iAwayWait));
         m_iAwayWait = iAwayWait;

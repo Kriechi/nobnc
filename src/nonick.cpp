@@ -85,9 +85,9 @@ void NoNick::SetNick(const NoString& s) { m_sNick = s; }
 void NoNick::SetIdent(const NoString& s) { m_sIdent = s; }
 void NoNick::SetHost(const NoString& s) { m_sHost = s; }
 
-bool NoNick::HasPerm(unsigned char uPerm) const { return (uPerm && m_sChanPerms.find(uPerm) != NoString::npos); }
+bool NoNick::HasPerm(uchar uPerm) const { return (uPerm && m_sChanPerms.find(uPerm) != NoString::npos); }
 
-bool NoNick::AddPerm(unsigned char uPerm)
+bool NoNick::AddPerm(uchar uPerm)
 {
     if (!uPerm || HasPerm(uPerm)) {
         return false;
@@ -98,7 +98,7 @@ bool NoNick::AddPerm(unsigned char uPerm)
     return true;
 }
 
-bool NoNick::RemPerm(unsigned char uPerm)
+bool NoNick::RemPerm(uchar uPerm)
 {
     NoString::size_type uPos = m_sChanPerms.find(uPerm);
     if (uPos == NoString::npos) {
@@ -110,13 +110,13 @@ bool NoNick::RemPerm(unsigned char uPerm)
     return true;
 }
 
-unsigned char NoNick::GetPermChar() const
+uchar NoNick::GetPermChar() const
 {
     NoIrcSock* pIRCSock = (!m_pNetwork) ? nullptr : m_pNetwork->GetIRCSock();
     const NoString& sChanPerms = (!pIRCSock) ? "@+" : pIRCSock->GetPerms();
 
-    for (unsigned int a = 0; a < sChanPerms.size(); a++) {
-        const unsigned char& c = sChanPerms[a];
+    for (uint a = 0; a < sChanPerms.size(); a++) {
+        const uchar& c = sChanPerms[a];
         if (HasPerm(c)) {
             return c;
         }
@@ -131,8 +131,8 @@ NoString NoNick::GetPermStr() const
     const NoString& sChanPerms = (!pIRCSock) ? "@+" : pIRCSock->GetPerms();
     NoString sRet;
 
-    for (unsigned int a = 0; a < sChanPerms.size(); a++) {
-        const unsigned char& c = sChanPerms[a];
+    for (uint a = 0; a < sChanPerms.size(); a++) {
+        const uchar& c = sChanPerms[a];
 
         if (HasPerm(c)) {
             sRet += c;

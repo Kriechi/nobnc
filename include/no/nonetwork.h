@@ -114,9 +114,9 @@ public:
     const std::vector<NoServer*>& GetServers() const;
     bool HasServers() const { return !m_vServers.empty(); }
     NoServer* FindServer(const NoString& sName) const;
-    bool DelServer(const NoString& sName, unsigned short uPort, const NoString& sPass);
+    bool DelServer(const NoString& sName, ushort uPort, const NoString& sPass);
     bool AddServer(const NoString& sName);
-    bool AddServer(const NoString& sName, unsigned short uPort, const NoString& sPass = "", bool bSSL = false);
+    bool AddServer(const NoString& sName, ushort uPort, const NoString& sPass = "", bool bSSL = false);
     NoServer* GetNextServer();
     NoServer* GetCurrentServer() const;
     void SetIRNoServer(const NoString& s);
@@ -195,12 +195,12 @@ public:
     void SetQuitMsg(const NoString& s);
 
     double GetFloodRate() const { return m_fFloodRate; }
-    unsigned short int GetFloodBurst() const { return m_uFloodBurst; }
+    ushort GetFloodBurst() const { return m_uFloodBurst; }
     void SetFloodRate(double fFloodRate) { m_fFloodRate = fFloodRate; }
-    void SetFloodBurst(unsigned short int uFloodBurst) { m_uFloodBurst = uFloodBurst; }
+    void SetFloodBurst(ushort uFloodBurst) { m_uFloodBurst = uFloodBurst; }
 
-    unsigned short int GetJoinDelay() const { return m_uJoinDelay; }
-    void SetJoinDelay(unsigned short int uJoinDelay) { m_uJoinDelay = uJoinDelay; }
+    ushort GetJoinDelay() const { return m_uJoinDelay; }
+    void SetJoinDelay(ushort uJoinDelay) { m_uJoinDelay = uJoinDelay; }
 
     NoString ExpandString(const NoString& sStr) const;
     NoString& ExpandString(const NoString& sStr, NoString& sRet) const;
@@ -241,7 +241,7 @@ private:
     bool m_bIRNoAway;
 
     double m_fFloodRate; ///< Set to -1 to disable protection.
-    unsigned short int m_uFloodBurst;
+    ushort m_uFloodBurst;
 
     NoBuffer m_RawBuffer;
     NoBuffer m_MotdBuffer;
@@ -250,7 +250,7 @@ private:
     NoNetworkPingTimer* m_pPingTimer;
     NoNetworkJoinTimer* m_pJoinTimer;
 
-    unsigned short int m_uJoinDelay;
+    ushort m_uJoinDelay;
 };
 
 #endif // NONETWORK_H

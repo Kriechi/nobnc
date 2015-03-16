@@ -29,7 +29,7 @@
 
 NoHttpSock::NoHttpSock(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSock(pMod, sURIPrefix, "", 0) { Init(); }
 
-NoHttpSock::NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, unsigned short uPort, int iTimeout)
+NoHttpSock::NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort, int iTimeout)
     : NoSocket(pMod, sHostname, uPort, iTimeout), m_bSentHeader(false), m_bGotHeader(false), m_bLoggedIn(false), m_bPost(false),
       m_bDone(false), m_uPostLen(0), m_sPostData(""), m_sURI(""), m_sUser(""), m_sPass(""), m_sContentType(""),
       m_sDocRoot(""), m_sForwardedIP(""), m_msvsPOSTParams(), m_msvsGETParams(), m_msHeaders(), m_bHTTP10Client(false),
@@ -605,7 +605,7 @@ bool NoHttpSock::PrintNotFound()
     return PrintErrorPage(404, "Not Found", "The requested URL was not found on this server.");
 }
 
-bool NoHttpSock::PrintErrorPage(unsigned int uStatusId, const NoString& sStatusMsg, const NoString& sMessage)
+bool NoHttpSock::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage)
 {
     if (SentHeader()) {
         DEBUG("PrintErrorPage(): Header was already sent");
@@ -660,7 +660,7 @@ bool NoHttpSock::OnLogin(const NoString& sUser, const NoString& sPass, bool bBas
 
 bool NoHttpSock::SentHeader() const { return m_bSentHeader; }
 
-bool NoHttpSock::PrintHeader(off_t uContentLength, const NoString& sContentType, unsigned int uStatusId, const NoString& sStatusMsg)
+bool NoHttpSock::PrintHeader(off_t uContentLength, const NoString& sContentType, uint uStatusId, const NoString& sStatusMsg)
 {
     if (SentHeader()) {
         DEBUG("PrintHeader(): Header was already sent!");

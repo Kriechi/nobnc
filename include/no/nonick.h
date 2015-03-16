@@ -44,12 +44,12 @@ public:
     void SetNick(const NoString& s);
     void SetIdent(const NoString& s);
     void SetHost(const NoString& s);
-    bool AddPerm(unsigned char uPerm);
-    bool RemPerm(unsigned char uPerm);
+    bool AddPerm(uchar uPerm);
+    bool RemPerm(uchar uPerm);
 
     NoString GetPermStr() const;
-    unsigned char GetPermChar() const;
-    bool HasPerm(unsigned char uPerm) const;
+    uchar GetPermChar() const;
+    bool HasPerm(uchar uPerm) const;
     const NoString& GetNick() const;
     const NoString& GetIdent() const;
     const NoString& GetHost() const;

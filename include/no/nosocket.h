@@ -117,7 +117,7 @@ public:
                        u_int iTimeout = 0,
                        EAddrType eAddr = ADDR_ALL)
     {
-        unsigned short uPort = 0;
+        ushort uPort = 0;
         CSListener L(0, sBindHost);
 
         L.SetSockName(sSockName);
@@ -162,7 +162,7 @@ public:
                  const NoString& sBindHost = "",
                  NoBaseSocket* pcSock = nullptr);
 
-    unsigned int GetAnonConnectionCount(const NoString& sIP) const;
+    uint GetAnonConnectionCount(const NoString& sIP) const;
 
 private:
     void FinishConnect(const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoBaseSocket* pcSock);
@@ -245,7 +245,7 @@ public:
      * @param uPort the port being connected to
      * @param iTimeout the timeout period for this specific sock
      */
-    NoSocket(NoModule* pModule, const NoString& sHostname, unsigned short uPort, int iTimeout = 60);
+    NoSocket(NoModule* pModule, const NoString& sHostname, ushort uPort, int iTimeout = 60);
     virtual ~NoSocket();
 
     NoSocket(const NoSocket&) = delete;
@@ -260,12 +260,12 @@ public:
 
     //! This limits the global connections from this IP to defeat DoS attacks, feel free to override. The ACL used is
     // provided by the main interface @see NoApp::AllowConnectionFrom
-    bool ConnectionFrom(const NoString& sHost, unsigned short uPort) override;
+    bool ConnectionFrom(const NoString& sHost, ushort uPort) override;
 
     //! Ease of use Connect, assigns to the manager and is subsequently tracked
-    bool Connect(const NoString& sHostname, unsigned short uPort, bool bSSL = false, unsigned int uTimeout = 60);
+    bool Connect(const NoString& sHostname, ushort uPort, bool bSSL = false, uint uTimeout = 60);
     //! Ease of use Listen, assigned to the manager and is subsequently tracked
-    bool Listen(unsigned short uPort, bool bSSL, unsigned int uTimeout = 0);
+    bool Listen(ushort uPort, bool bSSL, uint uTimeout = 0);
 
     NoModule* GetModule() const;
 

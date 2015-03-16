@@ -241,7 +241,7 @@ void NoMD5::md5_finish(md5_context* ctx, uint8 digest[16]) const
 char* NoMD5::MakeHash(const char* szText, uint32 nTextLen)
 {
     md5_context ctx;
-    unsigned char md5sum[16];
+    uchar md5sum[16];
 
     md5_starts(&ctx);
     md5_update(&ctx, (uint8*)szText, nTextLen);

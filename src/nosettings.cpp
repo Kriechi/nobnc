@@ -52,7 +52,7 @@ NoSettingsEntry& NoSettingsEntry::operator=(const NoSettingsEntry& other)
 bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 {
     NoString sLine;
-    unsigned int uLineNum = 0;
+    uint uLineNum = 0;
     NoSettings* pActiveConfig = this;
     std::stack<ConfigStackEntry> ConfigStack;
     bool bCommented = false; // support for /**/ style comments
@@ -164,7 +164,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
     return true;
 }
 
-void NoSettings::Write(NoFile& File, unsigned int iIndentation)
+void NoSettings::Write(NoFile& File, uint iIndentation)
 {
     NoString sIndentation = NoString(iIndentation, '\t');
 

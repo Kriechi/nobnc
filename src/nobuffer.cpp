@@ -19,7 +19,7 @@
 #include "nouser.h"
 #include "noapp.h"
 
-NoBuffer::NoBuffer(unsigned int limit) : m_limit(limit)
+NoBuffer::NoBuffer(uint limit) : m_limit(limit)
 {
 }
 
@@ -27,7 +27,7 @@ NoBuffer::~NoBuffer()
 {
 }
 
-unsigned int NoBuffer::addMessage(const NoString& format, const NoString& text, const timeval* ts)
+uint NoBuffer::addMessage(const NoString& format, const NoString& text, const timeval* ts)
 {
     if (!m_limit) {
         return 0;
@@ -41,7 +41,7 @@ unsigned int NoBuffer::addMessage(const NoString& format, const NoString& text, 
     return m_lines.size();
 }
 
-unsigned int NoBuffer::updateMessage(const NoString& match, const NoString& format, const NoString& text)
+uint NoBuffer::updateMessage(const NoString& match, const NoString& format, const NoString& text)
 {
     for (NoMessage& line : m_lines) {
         if (line.GetFormat().compare(0, match.length(), match) == 0) {
@@ -55,7 +55,7 @@ unsigned int NoBuffer::updateMessage(const NoString& match, const NoString& form
     return addMessage(format, text);
 }
 
-unsigned int NoBuffer::updateExactMessage(const NoString& format, const NoString& text)
+uint NoBuffer::updateExactMessage(const NoString& format, const NoString& text)
 {
     for (const NoMessage& line : m_lines) {
         if (line.GetFormat() == format && line.GetText() == text) {
@@ -66,17 +66,17 @@ unsigned int NoBuffer::updateExactMessage(const NoString& format, const NoString
     return addMessage(format, text);
 }
 
-const NoMessage& NoBuffer::getMessage(unsigned int idx) const
+const NoMessage& NoBuffer::getMessage(uint idx) const
 {
     return m_lines[idx];
 }
 
-NoString NoBuffer::getMessage(unsigned int idx, const NoClient& client, const NoStringMap& params) const
+NoString NoBuffer::getMessage(uint idx, const NoClient& client, const NoStringMap& params) const
 {
     return m_lines[idx].GetLine(client, params);
 }
 
-unsigned int NoBuffer::size() const
+uint NoBuffer::size() const
 {
     return m_lines.size();
 }
@@ -91,12 +91,12 @@ void NoBuffer::clear()
     m_lines.clear();
 }
 
-unsigned int NoBuffer::getLimit() const
+uint NoBuffer::getLimit() const
 {
     return m_limit;
 }
 
-bool NoBuffer::setLimit(unsigned int limit, bool force)
+bool NoBuffer::setLimit(uint limit, bool force)
 {
     if (!force && limit > NoApp::Get().GetMaxBufferSize()) {
         return false;

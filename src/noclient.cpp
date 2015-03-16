@@ -422,7 +422,7 @@ void NoClient::ReadLine(const NoString& sData)
             sChans.insert(vChans.begin(), vChans.end());
         }
 
-        unsigned int uDetached = 0;
+        uint uDetached = 0;
         for (NoChannel* pChan : sChans) {
             if (pChan->isDetached()) continue;
             uDetached++;
@@ -801,9 +801,9 @@ void NoClient::PutClient(const NoString& sLine)
 
 void NoClient::PutStatusNotice(const NoString& sLine) { PutModNotice("status", sLine); }
 
-unsigned int NoClient::PutStatus(const NoTable& table)
+uint NoClient::PutStatus(const NoTable& table)
 {
-    unsigned int idx = 0;
+    uint idx = 0;
     NoString sLine;
     while (table.GetLine(idx++, sLine)) PutStatus(sLine);
     return idx - 1;

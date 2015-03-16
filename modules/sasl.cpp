@@ -32,9 +32,9 @@ static const struct
 class Mechanisms : public NoStringVector
 {
 public:
-    void SetIndex(unsigned int uiIndex) { m_uiIndex = uiIndex; }
+    void SetIndex(uint uiIndex) { m_uiIndex = uiIndex; }
 
-    unsigned int GetIndex() const { return m_uiIndex; }
+    uint GetIndex() const { return m_uiIndex; }
 
     bool HasNext() const { return size() > (m_uiIndex + 1); }
 
@@ -52,7 +52,7 @@ public:
     }
 
 private:
-    unsigned int m_uiIndex;
+    uint m_uiIndex;
 };
 
 class NoSaslMod : public NoModule

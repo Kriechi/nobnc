@@ -179,7 +179,7 @@ public:
             return;
         }
 
-        unsigned int id = 1;
+        uint id = 1;
         for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
             Table.AddRow();
             Table.SetCell("Id", NoString(id++));
@@ -195,7 +195,7 @@ public:
 
     void HandleDelCommand(const NoString& sLine)
     {
-        unsigned int id = sLine.Token(1, true).ToUInt();
+        uint id = sLine.Token(1, true).ToUInt();
         MNoStringSet::iterator it = m_PubKeys.find(GetUser()->GetUserName());
 
         if (it == m_PubKeys.end()) {

@@ -30,7 +30,7 @@ class NoSChat;
 class NoRemMarkerJob : public NoTimer
 {
 public:
-    NoRemMarkerJob(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+    NoRemMarkerJob(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
         : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }
@@ -200,7 +200,7 @@ public:
 
                 NoSChatSock* pSock = (NoSChatSock*)*it;
                 Table.SetCell("Nick", pSock->GetChatNick());
-                unsigned long long iStartTime = pSock->GetStartTime();
+                ulonglong iStartTime = pSock->GetStartTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
@@ -254,7 +254,7 @@ public:
                 Table.AddRow();
                 Csock* pSock = *it;
                 Table.SetCell("SockName", pSock->GetSockName());
-                unsigned long long iStartTime = pSock->GetStartTime();
+                ulonglong iStartTime = pSock->GetStartTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
@@ -307,8 +307,8 @@ public:
     {
         if (sMessage.StartsWith("DCC SCHAT ")) {
             // chat ip port
-            unsigned long iIP = sMessage.Token(3).ToULong();
-            unsigned short iPort = sMessage.Token(4).ToUShort();
+            ulong iIP = sMessage.Token(3).ToULong();
+            ushort iPort = sMessage.Token(4).ToUShort();
 
             if (iIP > 0 && iPort > 0) {
                 std::pair<u_long, u_short> pTmp;

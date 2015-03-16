@@ -26,7 +26,7 @@ public:
     {
         NoString sTimeout = sArgs.Token(0);
         NoString sAttempts = sArgs.Token(1);
-        unsigned int timeout = sTimeout.ToUInt();
+        uint timeout = sTimeout.ToUInt();
 
         if (sAttempts.empty())
             m_uiAllowedFailed = 2;
@@ -51,7 +51,7 @@ public:
 
     void OnPostRehash() override { m_Cache.Clear(); }
 
-    void Add(const NoString& sHost, unsigned int count) { m_Cache.AddItem(sHost, count, m_Cache.GetTTL()); }
+    void Add(const NoString& sHost, uint count) { m_Cache.AddItem(sHost, count, m_Cache.GetTTL()); }
 
     void OnModCommand(const NoString& sCommand) override
     {
@@ -60,9 +60,9 @@ public:
         PutModule("is blocked after a failed login.");
     }
 
-    void OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, unsigned short uPort) override
+    void OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, ushort uPort) override
     {
-        unsigned int* pCount = m_Cache.GetItem(sHost);
+        uint* pCount = m_Cache.GetItem(sHost);
         if (sHost.empty() || pCount == nullptr || *pCount < m_uiAllowedFailed) {
             return;
         }
@@ -76,7 +76,7 @@ public:
 
     void OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
     {
-        unsigned int* pCount = m_Cache.GetItem(sRemoteIP);
+        uint* pCount = m_Cache.GetItem(sRemoteIP);
         if (pCount)
             Add(sRemoteIP, *pCount + 1);
         else
@@ -90,7 +90,7 @@ public:
 
         if (sRemoteIP.empty()) return CONTINUE;
 
-        unsigned int* pCount = m_Cache.GetItem(sRemoteIP);
+        uint* pCount = m_Cache.GetItem(sRemoteIP);
         if (pCount && *pCount >= m_uiAllowedFailed) {
             // OnFailedLogin() will refresh their ban
             Auth->RefuseLogin("Please try again later - reconnecting too fast");
@@ -101,8 +101,8 @@ public:
     }
 
 private:
-    TCacheMap<NoString, unsigned int> m_Cache;
-    unsigned int m_uiAllowedFailed;
+    TCacheMap<NoString, uint> m_Cache;
+    uint m_uiAllowedFailed;
 };
 
 template <> void TModInfo<NoFailToBanMod>(NoModInfo& Info)

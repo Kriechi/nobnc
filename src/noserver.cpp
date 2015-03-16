@@ -16,8 +16,8 @@
 
 #include "noserver.h"
 
-NoServer::NoServer(const NoString& sName, unsigned short uPort, const NoString& sPass, bool bSSL)
-    : m_sName(sName), m_uPort((uPort) ? uPort : (unsigned short)6667), m_sPass(sPass), m_bSSL(bSSL)
+NoServer::NoServer(const NoString& sName, ushort uPort, const NoString& sPass, bool bSSL)
+    : m_sName(sName), m_uPort((uPort) ? uPort : (ushort)6667), m_sPass(sPass), m_bSSL(bSSL)
 {
 }
 
@@ -29,7 +29,7 @@ bool NoServer::IsValidHostName(const NoString& sHostName)
 }
 
 const NoString& NoServer::GetName() const { return m_sName; }
-unsigned short NoServer::GetPort() const { return m_uPort; }
+ushort NoServer::GetPort() const { return m_uPort; }
 const NoString& NoServer::GetPass() const { return m_sPass; }
 bool NoServer::IsSSL() const { return m_bSSL; }
 

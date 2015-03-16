@@ -71,10 +71,10 @@ NoBaseSocket::NoBaseSocket(const NoString& sHost, u_short port, int timeout)
 #endif
 }
 
-unsigned int NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
+uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
 {
     const_iterator it;
-    unsigned int ret = 0;
+    uint ret = 0;
 
     for (it = begin(); it != end(); ++it) {
         Csock* pSock = *it;
@@ -152,8 +152,8 @@ NoString NoBaseSocket::GetSSLPeerFingerprint() const
         DEBUG(GetSockName() + ": GetSSLPeerFingerprint: Anonymous cert");
         return "";
     }
-    unsigned char buf[256 / 8];
-    unsigned int _32 = 256 / 8;
+    uchar buf[256 / 8];
+    uint _32 = 256 / 8;
     int iSuccess = X509_digest(pCert, evp, buf, &_32);
     X509_free(pCert);
     if (!iSuccess) {
@@ -428,7 +428,7 @@ NoSocket::NoSocket(NoModule* pModule) : NoBaseSocket(), m_pModule(pModule)
     SetMaxBufferThreshold(10240);
 }
 
-NoSocket::NoSocket(NoModule* pModule, const NoString& sHostname, unsigned short uPort, int iTimeout)
+NoSocket::NoSocket(NoModule* pModule, const NoString& sHostname, ushort uPort, int iTimeout)
     : NoBaseSocket(sHostname, uPort, iTimeout), m_pModule(pModule)
 {
     if (m_pModule) m_pModule->AddSocket(this);
@@ -471,12 +471,12 @@ void NoSocket::SockError(int iErrno, const NoString& sDescription)
     }
 }
 
-bool NoSocket::ConnectionFrom(const NoString& sHost, unsigned short uPort)
+bool NoSocket::ConnectionFrom(const NoString& sHost, ushort uPort)
 {
     return NoApp::Get().AllowConnectionFrom(sHost);
 }
 
-bool NoSocket::Connect(const NoString& sHostname, unsigned short uPort, bool bSSL, unsigned int uTimeout)
+bool NoSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL, uint uTimeout)
 {
     if (!m_pModule) {
         DEBUG("ERROR: NoSocket::Connect called on instance without m_pModule handle!");
@@ -506,7 +506,7 @@ bool NoSocket::Connect(const NoString& sHostname, unsigned short uPort, bool bSS
     return true;
 }
 
-bool NoSocket::Listen(unsigned short uPort, bool bSSL, unsigned int uTimeout)
+bool NoSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
 {
     if (!m_pModule) {
         DEBUG("ERROR: NoSocket::Listen called on instance without m_pModule handle!");

@@ -139,7 +139,7 @@ public:
 
     void PutIRC(const NoString& sLine);
     void PutClient(const NoString& sLine);
-    unsigned int PutStatus(const NoTable& table);
+    uint PutStatus(const NoTable& table);
     void PutStatus(const NoString& sLine);
     void PutStatusNotice(const NoString& sLine);
     void PutModule(const NoString& sModule, const NoString& sLine);

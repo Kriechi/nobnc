@@ -37,8 +37,8 @@ typedef std::set<NoString> NoStringSet;
 typedef std::vector<NoString> NoStringVector;
 typedef std::vector<std::pair<NoString, NoString>> NoStringPairVector;
 
-static const unsigned char XX = 0xff;
-static const unsigned char base64_table[256] = {
+static const uchar XX = 0xff;
+static const uchar base64_table[256] = {
     XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
     XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, 62, XX, XX, XX, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
     XX, XX, XX, XX, XX, XX, XX, 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
@@ -78,15 +78,15 @@ public:
 
     explicit NoString(bool b) : std::string(b ? "true" : "false") {}
     explicit NoString(char c);
-    explicit NoString(unsigned char c);
+    explicit NoString(uchar c);
     explicit NoString(short i);
-    explicit NoString(unsigned short i);
+    explicit NoString(ushort i);
     explicit NoString(int i);
-    explicit NoString(unsigned int i);
+    explicit NoString(uint i);
     explicit NoString(long i);
-    explicit NoString(unsigned long i);
+    explicit NoString(ulong i);
     explicit NoString(long long i);
-    explicit NoString(unsigned long long i);
+    explicit NoString(ulonglong i);
     explicit NoString(double i, int precision = 2);
     explicit NoString(float i, int precision = 2);
 
@@ -229,7 +229,7 @@ public:
      *                      sRight are removed.
      * @returns The number of replacements done.
      */
-    static unsigned int Replace(NoString& sStr,
+    static uint Replace(NoString& sStr,
                                 const NoString& sReplace,
                                 const NoString& sWith,
                                 const NoString& sLeft = "",
@@ -260,7 +260,7 @@ public:
      * @param bRemoveDelims If true, all matching delimiters are removed.
      * @returns The number of replacements done.
      */
-    unsigned int
+    uint
     Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft = "", const NoString& sRight = "", bool bRemoveDelims = false);
     /** Ellipsize the current string.
      * For example, ellipsizing "Hello, I'm Bob" to the length 9 would
@@ -268,7 +268,7 @@ public:
      * @param uLen The length to ellipsize to.
      * @return The ellipsized string.
      */
-    NoString Ellipsize(unsigned int uLen) const;
+    NoString Ellipsize(uint uLen) const;
     /** Return the left part of the string.
      * @param uCount The number of characters to keep.
      * @return The resulting string.
@@ -362,7 +362,7 @@ public:
      * @param uLength The length of the resulting string.
      * @return A random string.
      */
-    static NoString RandomString(unsigned int uLength);
+    static NoString RandomString(uint uLength);
 
     /** @return The MD5 hash of this string. */
     NoString MD5() const;
@@ -373,12 +373,12 @@ public:
      * @param sRet String to which the result of the decode is safed.
      * @return The length of the resulting string.
      */
-    unsigned long Base64Decode(NoString& sRet) const;
+    ulong Base64Decode(NoString& sRet) const;
     /** Treat this string as base64-encoded data and decode it.
      *  The result is saved in this NoString instance.
      * @return The length of the resulting string.
      */
-    unsigned long Base64Decode();
+    ulong Base64Decode();
     /** Treat this string as base64-encoded data and decode it.
      * @return The decoded string.
      */
@@ -391,17 +391,17 @@ public:
      * @todo WTF @ uWrap.
      * @todo This only returns false if some formula we use was wrong?!
      */
-    bool Base64Encode(NoString& sRet, unsigned int uWrap = 0) const;
+    bool Base64Encode(NoString& sRet, uint uWrap = 0) const;
     /** Base64-encode the current string.
      *  This string is overwritten with the result of the encode.
      *  @todo return value and param are as with Base64Encode() from above.
      */
-    bool Base64Encode(unsigned int uWrap = 0);
+    bool Base64Encode(uint uWrap = 0);
     /** Base64-encode the current string
      * @todo uWrap is as broken as Base64Encode()'s uWrap.
      * @return The encoded string.
      */
-    NoString Base64Encode_n(unsigned int uWrap = 0) const;
+    NoString Base64Encode_n(uint uWrap = 0) const;
 
 #ifdef HAVE_LIBSSL
     NoString Encrypt_n(const NoString& sPass, const NoString& sIvec = "") const;
@@ -420,29 +420,29 @@ public:
      * @param d The number of bytes.
      * @return A string describing the number of bytes.
      */
-    static NoString ToByteStr(unsigned long long d);
+    static NoString ToByteStr(ulonglong d);
     /** Pretty-print a time span.
      * @param s Number of seconds to print.
      * @return A string like "4w 6d 4h 3m 58s".
      */
-    static NoString ToTimeStr(unsigned long s);
+    static NoString ToTimeStr(ulong s);
 
     /** @return True if this string is not "false". */
     bool ToBool() const;
     /** @return The numerical value of this string similar to atoi(). */
     short ToShort() const;
     /** @return The numerical value of this string similar to atoi(). */
-    unsigned short ToUShort() const;
+    ushort ToUShort() const;
     /** @return The numerical value of this string similar to atoi(). */
     int ToInt() const;
     /** @return The numerical value of this string similar to atoi(). */
     long ToLong() const;
     /** @return The numerical value of this string similar to atoi(). */
-    unsigned int ToUInt() const;
+    uint ToUInt() const;
     /** @return The numerical value of this string similar to atoi(). */
-    unsigned long ToULong() const;
+    ulong ToULong() const;
     /** @return The numerical value of this string similar to atoi(). */
-    unsigned long long ToULongLong() const;
+    ulonglong ToULongLong() const;
     /** @return The numerical value of this string similar to atoi(). */
     long long ToLongLong() const;
     /** @return The numerical value of this string similar to atoi(). */
@@ -572,11 +572,11 @@ public:
     NoString StripControls_n() const;
 
 private:
-    unsigned char* strnchr(const unsigned char* src,
-                           unsigned char c,
-                           unsigned int iMaxBytes,
-                           unsigned char* pFill = nullptr,
-                           unsigned int* piCount = nullptr) const;
+    uchar* strnchr(const uchar* src,
+                           uchar c,
+                           uint iMaxBytes,
+                           uchar* pFill = nullptr,
+                           uint* piCount = nullptr) const;
 };
 
 /**

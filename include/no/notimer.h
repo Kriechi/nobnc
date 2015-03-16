@@ -26,7 +26,7 @@ class NoModule;
 class NoTimer : public CCron
 {
 public:
-    NoTimer(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription);
+    NoTimer(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription);
 
     virtual ~NoTimer();
 
@@ -51,7 +51,7 @@ typedef void (*FPTimer_t)(NoModule*, NoFPTimer*);
 class NoFPTimer : public NoTimer
 {
 public:
-    NoFPTimer(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+    NoFPTimer(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
         : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription), m_pFBCallback(nullptr)
     {
     }

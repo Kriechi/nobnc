@@ -44,7 +44,7 @@ class NoSaveBuff;
 class NoSaveBuffJob : public NoTimer
 {
 public:
-    NoSaveBuffJob(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+    NoSaveBuffJob(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
         : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }
@@ -172,7 +172,7 @@ public:
         NoString sContent = sHeader + "\n";
 
         size_t uSize = Buffer.size();
-        for (unsigned int uIdx = 0; uIdx < uSize; uIdx++) {
+        for (uint uIdx = 0; uIdx < uSize; uIdx++) {
             const NoMessage& Line = Buffer.getMessage(uIdx);
             timeval ts = Line.GetTime();
             sContent +=

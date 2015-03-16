@@ -110,7 +110,7 @@ public:
         return false;
     }
 
-    bool FindUIntEntry(const NoString& sName, unsigned int& uRes, unsigned int uDefault = 0)
+    bool FindUIntEntry(const NoString& sName, uint& uRes, uint uDefault = 0)
     {
         NoString s;
         if (FindStringEntry(sName, s)) {
@@ -121,7 +121,7 @@ public:
         return false;
     }
 
-    bool FindUShortEntry(const NoString& sName, unsigned short& uRes, unsigned short uDefault = 0)
+    bool FindUShortEntry(const NoString& sName, ushort& uRes, ushort uDefault = 0)
     {
         NoString s;
         if (FindStringEntry(sName, s)) {
@@ -162,7 +162,7 @@ public:
     bool empty() const { return m_ConfigEntries.empty() && m_SubConfigs.empty(); }
 
     bool Parse(NoFile& file, NoString& sErrorMsg);
-    void Write(NoFile& file, unsigned int iIndentation = 0);
+    void Write(NoFile& file, uint iIndentation = 0);
 
 private:
     EntryMap m_ConfigEntries;

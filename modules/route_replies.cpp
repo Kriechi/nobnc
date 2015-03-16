@@ -184,7 +184,7 @@ static const struct
 class NoRouteTimeout : public NoTimer
 {
 public:
-    NoRouteTimeout(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+    NoRouteTimeout(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
         : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }

@@ -25,7 +25,7 @@
     NETWORKMODULECALL(macFUNC, m_pNetwork->GetUser(), m_pNetwork, nullptr, macEXITER)
 // These are used in OnGeneralCTCP()
 const time_t NoIrcSock::m_uCTCPFloodTime = 5;
-const unsigned int NoIrcSock::m_uCTCPFloodCount = 5;
+const uint NoIrcSock::m_uCTCPFloodCount = 5;
 
 // It will be bad if user sets it to 0.00000000000001
 // If you want no flood protection, set network's flood rate to -1
@@ -152,7 +152,7 @@ void NoIrcSock::ReadLine(const NoString& sData)
 
     if ((sCmd.length() == 3) && (isdigit(sCmd[0])) && (isdigit(sCmd[1])) && (isdigit(sCmd[2]))) {
         NoString sServer = sLine.Token(0).LeftChomp_n();
-        unsigned int uRaw = sCmd.ToUInt();
+        uint uRaw = sCmd.ToUInt();
         NoString sNick = sLine.Token(2);
         NoString sRest = sLine.Token(3, true);
         NoString sTmp;
@@ -256,7 +256,7 @@ void NoIrcSock::ReadLine(const NoString& sData)
             NoChannel* pChan = m_pNetwork->FindChan(sRest.Token(0));
 
             if (pChan) {
-                unsigned long ulDate = sLine.Token(4).ToULong();
+                ulong ulDate = sLine.Token(4).ToULong();
                 pChan->setCreationDate(ulDate);
 
                 if (!pChan->isModeKnown()) {
@@ -305,7 +305,7 @@ void NoIrcSock::ReadLine(const NoString& sData)
 
             if (pChan) {
                 sNick = sLine.Token(4);
-                unsigned long ulDate = sLine.Token(5).ToULong();
+                ulong ulDate = sLine.Token(5).ToULong();
 
                 pChan->setTopicOwner(sNick);
                 pChan->setTopicDate(ulDate);
@@ -613,8 +613,8 @@ void NoIrcSock::ReadLine(const NoString& sData)
                                 MODULECALL(OnRawUserMode(*pOpNick, *this, sModeArg, sArgs), m_pNetwork->GetUser(),
                    nullptr, );
                 */
-                for (unsigned int a = 0; a < sModeArg.size(); a++) {
-                    const unsigned char& uMode = sModeArg[a];
+                for (uint a = 0; a < sModeArg.size(); a++) {
+                    const uchar& uMode = sModeArg[a];
 
                     if (uMode == '+') {
                         bAdd = true;
@@ -704,7 +704,7 @@ void NoIrcSock::ReadLine(const NoString& sData)
                 if (bReturn) return;
 
                 pChan->setTopicOwner(Nick.GetNick());
-                pChan->setTopicDate((unsigned long)time(nullptr));
+                pChan->setTopicDate((ulong)time(nullptr));
                 pChan->setTopic(sTopic);
 
                 if (pChan->isDetached()) {
@@ -1101,7 +1101,7 @@ void NoIrcSock::Disconnected()
     // otherwise, on reconnect, it might think it still
     // had user modes that it actually doesn't have.
     NoString sUserMode;
-    for (unsigned char cMode : m_scUserModes) {
+    for (uchar cMode : m_scUserModes) {
         sUserMode += cMode;
     }
     if (!sUserMode.empty()) {
@@ -1218,7 +1218,7 @@ void NoIrcSock::ParseISupport(const NoString& sLine)
         } else if (sName.Equals("CHANTYPES")) {
             m_pNetwork->SetChanPrefixes(sValue);
         } else if (sName.Equals("NICKLEN")) {
-            unsigned int uMax = sValue.ToUInt();
+            uint uMax = sValue.ToUInt();
 
             if (uMax) {
                 m_uMaxNickLen = uMax;
@@ -1227,10 +1227,10 @@ void NoIrcSock::ParseISupport(const NoString& sLine)
             if (!sValue.empty()) {
                 m_mueChanModes.clear();
 
-                for (unsigned int a = 0; a < 4; a++) {
+                for (uint a = 0; a < 4; a++) {
                     NoString sModes = sValue.Token(a, false, ",");
 
-                    for (unsigned int b = 0; b < sModes.size(); b++) {
+                    for (uint b = 0; b < sModes.size(); b++) {
                         m_mueChanModes[sModes[b]] = (EChanModeArgs)a;
                     }
                 }
@@ -1313,9 +1313,9 @@ void NoIrcSock::SendAltNick(const NoString& sBadNick)
     // We don't know the maximum allowed nick length yet, but we know which
     // nick we sent last. If sBadNick is shorter than that, we assume the
     // server truncated our nick.
-    if (sBadNick.length() < sLastNick.length()) m_uMaxNickLen = (unsigned int)sBadNick.length();
+    if (sBadNick.length() < sLastNick.length()) m_uMaxNickLen = (uint)sBadNick.length();
 
-    unsigned int uMax = m_uMaxNickLen;
+    uint uMax = m_uMaxNickLen;
 
     const NoString& sConfNick = m_pNetwork->GetNick();
     const NoString& sAltNick = m_pNetwork->GetAltNick();
@@ -1358,10 +1358,10 @@ void NoIrcSock::SendAltNick(const NoString& sBadNick)
     m_Nick.SetNick(sNewNick);
 }
 
-unsigned char NoIrcSock::GetPermFromMode(unsigned char uMode) const
+uchar NoIrcSock::GetPermFromMode(uchar uMode) const
 {
     if (m_sPermModes.size() == m_sPerms.size()) {
-        for (unsigned int a = 0; a < m_sPermModes.size(); a++) {
+        for (uint a = 0; a < m_sPermModes.size(); a++) {
             if (m_sPermModes[a] == uMode) {
                 return m_sPerms[a];
             }
@@ -1371,9 +1371,9 @@ unsigned char NoIrcSock::GetPermFromMode(unsigned char uMode) const
     return 0;
 }
 
-NoIrcSock::EChanModeArgs NoIrcSock::GetModeType(unsigned char uMode) const
+NoIrcSock::EChanModeArgs NoIrcSock::GetModeType(uchar uMode) const
 {
-    std::map<unsigned char, EChanModeArgs>::const_iterator it = m_mueChanModes.find(uMode);
+    std::map<uchar, EChanModeArgs>::const_iterator it = m_mueChanModes.find(uMode);
 
     if (it == m_mueChanModes.end()) {
         return NoArg;

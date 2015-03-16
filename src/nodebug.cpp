@@ -30,13 +30,13 @@ NoDebugStream::~NoDebugStream()
 {
     timeval tTime;
     gettimeofday(&tTime, nullptr);
-    time_t tSec = (time_t)tTime.tv_sec; // some systems (e.g. openbsd) define tv_sec as long int instead of time_t
+    time_t tSec = (time_t)tTime.tv_sec; // some systems (e.g. openbsd) define tv_sec as ulong instead of time_t
     tm tM;
     tzset(); // localtime_r requires this
     localtime_r(&tSec, &tM);
     char sTime[20] = {};
     strftime(sTime, sizeof(sTime), "%Y-%m-%d %H:%M:%S", &tM);
     char sUsec[7] = {};
-    snprintf(sUsec, sizeof(sUsec), "%06lu", (unsigned long int)tTime.tv_usec);
+    snprintf(sUsec, sizeof(sUsec), "%06lu", (ulong)tTime.tv_usec);
     std::cout << "[" << sTime << "." << sUsec << "] " << NoString(this->str()).Escape_n(NoString::EDEBUG) << std::endl;
 }

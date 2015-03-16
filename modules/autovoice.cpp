@@ -68,7 +68,7 @@ public:
         NoStringVector vsChans;
         sChans.Split(" ", vsChans);
 
-        for (unsigned int a = 0; a < vsChans.size(); a++) {
+        for (uint a = 0; a < vsChans.size(); a++) {
             m_ssChans.erase(vsChans[a].AsLower());
         }
     }
@@ -78,7 +78,7 @@ public:
         NoStringVector vsChans;
         sChans.Split(" ", vsChans);
 
-        for (unsigned int a = 0; a < vsChans.size(); a++) {
+        for (uint a = 0; a < vsChans.size(); a++) {
             m_ssChans.insert(vsChans[a].AsLower());
         }
     }
@@ -145,7 +145,7 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         // Load the chans from the command line
-        unsigned int a = 0;
+        uint a = 0;
         NoStringVector vsChans;
         sArgs.Split(" ", vsChans, false);
 

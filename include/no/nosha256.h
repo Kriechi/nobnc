@@ -50,13 +50,13 @@ typedef struct
 {
     size_t tot_len;
     size_t len;
-    unsigned char block[2 * SHA256_BLOCK_SIZE];
+    uchar block[2 * SHA256_BLOCK_SIZE];
     uint32_t h[8];
 } sha256_ctx;
 
 void sha256_init(sha256_ctx* ctx);
-void sha256_update(sha256_ctx* ctx, const unsigned char* message, size_t len);
-void sha256_final(sha256_ctx* ctx, unsigned char* digest);
-void sha256(const unsigned char* message, size_t len, unsigned char* digest);
+void sha256_update(sha256_ctx* ctx, const uchar* message, size_t len);
+void sha256_final(sha256_ctx* ctx, uchar* digest);
+void sha256(const uchar* message, size_t len, uchar* digest);
 
 #endif // NOSHA2_H

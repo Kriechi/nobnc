@@ -28,25 +28,25 @@ class NoClient;
 class NoBuffer
 {
 public:
-    NoBuffer(unsigned int limit = 100);
+    NoBuffer(uint limit = 100);
     ~NoBuffer();
 
-    unsigned int addMessage(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
-    unsigned int updateMessage(const NoString& match, const NoString& format, const NoString& text = "");
-    unsigned int updateExactMessage(const NoString& format, const NoString& text = "");
+    uint addMessage(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
+    uint updateMessage(const NoString& match, const NoString& format, const NoString& text = "");
+    uint updateExactMessage(const NoString& format, const NoString& text = "");
 
-    const NoMessage& getMessage(unsigned int idx) const;
-    NoString getMessage(unsigned int idx, const NoClient& client, const NoStringMap& params = NoStringMap::EmptyMap) const;
+    const NoMessage& getMessage(uint idx) const;
+    NoString getMessage(uint idx, const NoClient& client, const NoStringMap& params = NoStringMap::EmptyMap) const;
 
-    unsigned int size() const;
+    uint size() const;
     bool isEmpty() const;
     void clear();
 
-    unsigned int getLimit() const;
-    bool setLimit(unsigned int limit, bool force = false);
+    uint getLimit() const;
+    bool setLimit(uint limit, bool force = false);
 
 private:
-    unsigned int m_limit;
+    uint m_limit;
     std::deque<NoMessage> m_lines;
 };
 

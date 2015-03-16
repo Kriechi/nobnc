@@ -50,7 +50,7 @@ void NoListener::ResetRealListener() { m_pListener = nullptr; }
 
 NoRealListener::~NoRealListener() { m_Listener.ResetRealListener(); }
 
-bool NoRealListener::ConnectionFrom(const NoString& sHost, unsigned short uPort)
+bool NoRealListener::ConnectionFrom(const NoString& sHost, ushort uPort)
 {
     bool bHostAllowed = NoApp::Get().IsHostAllowed(sHost);
     DEBUG(GetSockName() << " == ConnectionFrom(" << sHost << ", " << uPort << ") ["
@@ -58,7 +58,7 @@ bool NoRealListener::ConnectionFrom(const NoString& sHost, unsigned short uPort)
     return bHostAllowed;
 }
 
-Csock* NoRealListener::GetSockObj(const NoString& sHost, unsigned short uPort)
+Csock* NoRealListener::GetSockObj(const NoString& sHost, ushort uPort)
 {
     NoIncomingConnection* pClient = new NoIncomingConnection(sHost, uPort, m_Listener.GetAcceptType(), m_Listener.GetURIPrefix());
     if (NoApp::Get().AllowConnectionFrom(sHost)) {
@@ -84,7 +84,7 @@ void NoRealListener::SockError(int iErrno, const NoString& sDescription)
     }
 }
 
-NoIncomingConnection::NoIncomingConnection(const NoString& sHostname, unsigned short uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix)
+NoIncomingConnection::NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix)
     : NoBaseSocket(sHostname, uPort), m_eAcceptType(eAcceptType), m_sURIPrefix(sURIPrefix)
 {
     // The socket will time out in 120 secs, no matter what.
