@@ -1,17 +1,17 @@
 # You can access these with e.g. pkg-config --variable=moddir znc
-prefix=@ZNC_PREFIX@
-exec_prefix=@ZNC_EXEC_PREFIX@
-includedir=@ZNC_INCLUDEDIR@
-libdir=@ZNC_LIBDIR@
-bindir=@ZNC_BINDIR@
-datarootdir=@ZNC_DATAROOTDIR@
-datadir=@ZNC_DATADIR@
-moddir=@ZNC_MODDIR@
-mandir=@ZNC_MANDIR@
+prefix=@NO_PREFIX@
+exec_prefix=@NO_EXEC_PREFIX@
+includedir=@NO_INCLUDEDIR@
+libdir=@NO_LIBDIR@
+bindir=@NO_BINDIR@
+datarootdir=@NO_DATAROOTDIR@
+datadir=@NO_DATADIR@
+moddir=@NO_MODDIR@
+mandir=@NO_MANDIR@
 
 cxx=@CMAKE_CXX_COMPILER@
-cxxflags=@ZNC_CXXFLAGS@
-ldflags=@ZNC_LDFLAGS@
+cxxflags=@NO_CXXFLAGS@
+ldflags=@NO_LDFLAGS@
 
 version=@NO_VERSION@
 

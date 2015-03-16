@@ -10,10 +10,10 @@ include(DefineVisibility)
 include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_BINARY_DIR}/include")
 
-list(APPEND ZNC_DEFINITIONS "-D_MODDIR_=\"${ZNC_MODDIR}\"")
-list(APPEND ZNC_DEFINITIONS "-D_DATADIR_=\"${ZNC_DATADIR}\"")
+list(APPEND NO_DEFINITIONS "-D_MODDIR_=\"${NO_MODDIR}\"")
+list(APPEND NO_DEFINITIONS "-D_DATADIR_=\"${NO_DATADIR}\"")
 
-add_definitions(${ZNC_DEFINITIONS})
+add_definitions(${NO_DEFINITIONS})
 
 check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)

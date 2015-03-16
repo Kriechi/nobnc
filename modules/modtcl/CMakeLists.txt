@@ -1,6 +1,6 @@
 add_library(modtcl MODULE modtcl.cpp)
 include_directories(${TCL_INCLUDE_PATH})
-target_link_libraries(modtcl ${ZNC_LIBRARIES} ${TCL_LIBRARY})
+target_link_libraries(modtcl ${NO_LIBRARIES} ${TCL_LIBRARY})
 set_target_properties(modtcl PROPERTIES PREFIX "" SUFFIX .so LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/modules)
 
 if(NOT DEVELOPER_BUILD)

@@ -37,7 +37,7 @@ if(EXISTS ${GTEST_ZIP} OR EXISTS ${GTEST_DIR} OR WGET_FOUND)
                             UtilsTest.cpp
                             ${GTEST_DIR}/src/gtest-all.cc
                             ${GTEST_DIR}/src/gtest_main.cc)
-    target_link_libraries(unittest ${ZNC_LIBRARIES})
+    target_link_libraries(unittest ${NO_LIBRARIES})
 
     # target "test" is reserved
     if(POLICY CMP0037)

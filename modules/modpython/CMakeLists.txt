@@ -19,12 +19,12 @@ add_custom_target(swigpyrun
 set(SWIG_MODULE_znc_core_EXTRA_DEPS pyfunctions swigpyrun)
 
 swig_add_module(znc_core python modpython.i modpython.cpp)
-swig_link_libraries(znc_core ${ZNC_LIBRARIES} ${PYTHON_LIBRARIES})
+swig_link_libraries(znc_core ${NO_LIBRARIES} ${PYTHON_LIBRARIES})
 set_target_properties(${SWIG_MODULE_znc_core_REAL_NAME} PROPERTIES PREFIX "" SUFFIX .so)
 
 add_library(modpython MODULE modpython.cpp)
 add_dependencies(modpython pyfunctions swigpyrun)
-target_link_libraries(modpython ${ZNC_LIBRARIES} ${PYTHON_LIBRARIES})
+target_link_libraries(modpython ${NO_LIBRARIES} ${PYTHON_LIBRARIES})
 set_target_properties(modpython PROPERTIES PREFIX "" SUFFIX .so LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/modules)
 
 set(MODPYTHON_FLAGS "-Wno-missing-field-initializers -Wno-unused -Wno-shadow")

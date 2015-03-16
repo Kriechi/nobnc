@@ -16,18 +16,18 @@ add_custom_target(swigperlrun
                   COMMAND ${SWIG_EXECUTABLE} -perl5 -c++ -shadow -external-runtime
                                              ${CMAKE_CURRENT_BINARY_DIR}/swigperlrun.h)
 
-set(SWIG_MODULE_ZNC_EXTRA_DEPS perlfunctions swigperlrun)
+set(SWIG_MODULE_NO_EXTRA_DEPS perlfunctions swigperlrun)
 
 swig_add_module(ZNC perl5 modperl.i modperl.cpp)
-swig_link_libraries(ZNC ${ZNC_LIBRARIES} ${PERL_LIBRARIES})
-set_target_properties(${SWIG_MODULE_ZNC_REAL_NAME} PROPERTIES PREFIX "")
+swig_link_libraries(ZNC ${NO_LIBRARIES} ${PERL_LIBRARIES})
+set_target_properties(${SWIG_MODULE_NO_REAL_NAME} PROPERTIES PREFIX "")
 if (APPLE)
-    set_target_properties(${SWIG_MODULE_ZNC_REAL_NAME} PROPERTIES SUFFIX .bundle)
+    set_target_properties(${SWIG_MODULE_NO_REAL_NAME} PROPERTIES SUFFIX .bundle)
 endif()
 
 add_library(modperl MODULE modperl.cpp)
 add_dependencies(modperl perlfunctions swigperlrun)
-target_link_libraries(modperl ${ZNC_LIBRARIES} ${PERL_LIBRARIES})
+target_link_libraries(modperl ${NO_LIBRARIES} ${PERL_LIBRARIES})
 set_target_properties(modperl PROPERTIES PREFIX "" SUFFIX .so LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/modules)
 
 set(MODPERL_FLAGS "-Wno-write-strings -Wno-redundant-decls -Wno-missing-declarations")
@@ -45,7 +45,7 @@ configure_file(startup.pl startup.pl COPYONLY)
 
 if(NOT DEVELOPER_BUILD)
     install(TARGETS modperl LIBRARY DESTINATION ${INSTALL_MODDIR})
-    install(TARGETS ${SWIG_MODULE_ZNC_REAL_NAME} LIBRARY DESTINATION ${INSTALL_MODDIR}/modperl)
+    install(TARGETS ${SWIG_MODULE_NO_REAL_NAME} LIBRARY DESTINATION ${INSTALL_MODDIR}/modperl)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/startup.pl
                   ${CMAKE_CURRENT_BINARY_DIR}/ZNC.pm DESTINATION ${INSTALL_MODDIR}/modperl)
 endif()

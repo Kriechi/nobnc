@@ -15,54 +15,54 @@ include(DefineVersion)
 
 ### SOURCES
 
-list(APPEND ZNC_SOURCES src/nobuffer.cpp
-                        src/nochannel.cpp
-                        src/noclient.cpp
-                        src/noclientcommand.cpp
-                        src/nodebug.cpp
-                        src/nodir.cpp
-                        src/nofile.cpp
-                        src/nohttpsock.cpp
-                        src/noircsock.cpp
-                        src/nolistener.cpp
-                        src/nomd5.cpp
-                        src/nomessage.cpp
-                        src/nomodule.cpp
-                        src/nomodules.cpp
-                        src/nonetwork.cpp
-                        src/nonick.cpp
-                        src/noquery.cpp
-                        src/nosha256.cpp
-                        src/noserver.cpp
-                        src/nosettings.cpp
-                        src/nosocket.cpp
-                        src/nosslverifyhost.cpp
-                        src/nostring.cpp
-                        src/notemplate.cpp
-                        src/nothreads.cpp
-                        src/notimer.cpp
-                        src/nouser.cpp
-                        src/noutils.cpp
-                        src/nowebmodules.cpp
-                        src/noznc.cpp
-                        ${PROJECT_BINARY_DIR}/src/Csocket.cpp
-                        ${PROJECT_BINARY_DIR}/src/noversion.cpp
+list(APPEND NO_SOURCES src/nobuffer.cpp
+                       src/nochannel.cpp
+                       src/noclient.cpp
+                       src/noclientcommand.cpp
+                       src/nodebug.cpp
+                       src/nodir.cpp
+                       src/nofile.cpp
+                       src/nohttpsock.cpp
+                       src/noircsock.cpp
+                       src/nolistener.cpp
+                       src/nomd5.cpp
+                       src/nomessage.cpp
+                       src/nomodule.cpp
+                       src/nomodules.cpp
+                       src/nonetwork.cpp
+                       src/nonick.cpp
+                       src/noquery.cpp
+                       src/nosha256.cpp
+                       src/noserver.cpp
+                       src/nosettings.cpp
+                       src/nosocket.cpp
+                       src/nosslverifyhost.cpp
+                       src/nostring.cpp
+                       src/notemplate.cpp
+                       src/nothreads.cpp
+                       src/notimer.cpp
+                       src/nouser.cpp
+                       src/noutils.cpp
+                       src/nowebmodules.cpp
+                       src/noznc.cpp
+                       ${PROJECT_BINARY_DIR}/src/Csocket.cpp
+                       ${PROJECT_BINARY_DIR}/src/noversion.cpp
 )
 
 ### TARGETS
 
-add_library(libznc SHARED ${ZNC_SOURCES})
-include_directories(${ZNC_INCLUDEDIRS})
+add_library(libznc SHARED ${NO_SOURCES})
+include_directories(${NO_INCLUDEDIRS})
 include_directories(${PROJECT_SOURCE_DIR}/include/znc) ### TODO: cleanup
 include_directories(${PROJECT_BINARY_DIR}/include/znc) ### TODO: cleanup
-target_link_libraries(libznc ${ZNC_LIBRARIES})
+target_link_libraries(libznc ${NO_LIBRARIES})
 set_target_properties(libznc PROPERTIES OUTPUT_NAME znc)
 add_dependencies(libznc version)
 
-list(APPEND ZNC_LIBRARIES libznc)
+list(APPEND NO_LIBRARIES libznc)
 
 add_executable(znc src/main.cpp)
-target_link_libraries(znc ${ZNC_LIBRARIES})
+target_link_libraries(znc ${NO_LIBRARIES})
 
 add_subdirectory(modules)
 add_subdirectory(share)
@@ -98,20 +98,20 @@ if(NOT DEVELOPER_BUILD)
             DESTINATION ${INSTALL_INCLUDEDIR}/znc)
 endif()
 
-process_definitions("${ZNC_DEFINITIONS}" ZNC_DEFINITION_FLAGS)
-process_includedirs("${ZNC_INCLUDEDIRS}" ZNC_INCLUDE_FLAGS)
-process_link_libraries("${ZNC_LIBRARIES}" ZNC_LIBRARY_FLAGS)
+process_definitions("${NO_DEFINITIONS}" NO_DEFINITION_FLAGS)
+process_includedirs("${NO_INCLUDEDIRS}" NO_INCLUDE_FLAGS)
+process_link_libraries("${NO_LIBRARIES}" NO_LIBRARY_FLAGS)
 
 if(NOT DEVELOPER_BUILD)
-    set(ZNC_INCLUDE_FLAGS "-I${INSTALL_INCLUDEDIR} ${ZNC_INCLUDE_FLAGS}")
-    set(ZNC_LIBRARY_FLAGS "-L${INSTALL_LIBDIR} ${ZNC_LIBRARY_FLAGS}")
+    set(NO_INCLUDE_FLAGS "-I${INSTALL_INCLUDEDIR} ${NO_INCLUDE_FLAGS}")
+    set(NO_LIBRARY_FLAGS "-L${INSTALL_LIBDIR} ${NO_LIBRARY_FLAGS}")
 else()
-    set(ZNC_INCLUDE_FLAGS "-I${PROJECT_SOURCE_DIR}/include -I${PROJECT_BINARY_DIR}/include ${ZNC_INCLUDE_FLAGS}")
-    set(ZNC_LIBRARY_FLAGS "-L${PROJECT_BINARY_DIR} ${ZNC_LIBRARY_FLAGS}")
+    set(NO_INCLUDE_FLAGS "-I${PROJECT_SOURCE_DIR}/include -I${PROJECT_BINARY_DIR}/include ${NO_INCLUDE_FLAGS}")
+    set(NO_LIBRARY_FLAGS "-L${PROJECT_BINARY_DIR} ${NO_LIBRARY_FLAGS}")
 endif()
 
-set(ZNC_CXXFLAGS "${CMAKE_SHARED_MODULE_CXX_FLAGS} ${CMAKE_CXX_FLAGS} ${ZNC_DEFINITION_FLAGS} ${ZNC_INCLUDE_FLAGS}")
-set(ZNC_LDFLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} ${ZNC_LIBRARY_FLAGS}")
+set(NO_CXXFLAGS "${CMAKE_SHARED_MODULE_CXX_FLAGS} ${CMAKE_CXX_FLAGS} ${NO_DEFINITION_FLAGS} ${NO_INCLUDE_FLAGS}")
+set(NO_LDFLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} ${NO_LIBRARY_FLAGS}")
 
 configure_file("${PROJECT_SOURCE_DIR}/znc-buildmod.in"
                "${PROJECT_BINARY_DIR}/znc-buildmod" @ONLY)
@@ -149,8 +149,8 @@ if(NOT DEVELOPER_BUILD)
     set(CPACK_SOURCE_IGNORE_FILES "/.git;Makefile;CMakeFiles;CMakeCache.txt;CPackConfig.cmake;CPackSourceConfig.cmake;cmake_install.cmake;/*.log;/.travis*;/*.gz;make-tarball.sh")
     include(CPack)
 
-    set(ZNC_TARBALL "${CPACK_OUTPUT_FILE_PREFIX}/${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.gz")
-    add_custom_target(package_sign COMMAND gpg --detach-sign ${ZNC_TARBALL} COMMENT "Signing ${ZNC_TARBALL}...")
+    set(NO_TARBALL "${CPACK_OUTPUT_FILE_PREFIX}/${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.gz")
+    add_custom_target(package_sign COMMAND gpg --detach-sign ${NO_TARBALL} COMMENT "Signing ${NO_TARBALL}...")
 endif()
 
 ### SUMMARY
