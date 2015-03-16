@@ -149,15 +149,15 @@ endif()
 set(NO_CXXFLAGS "${CMAKE_SHARED_MODULE_CXX_FLAGS} ${CMAKE_CXX_FLAGS} ${NO_DEFINITION_FLAGS} ${NO_INCLUDE_FLAGS}")
 set(NO_LDFLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} ${NO_LIBRARY_FLAGS}")
 
-configure_file("${PROJECT_SOURCE_DIR}/znc-buildmod.in"
-               "${PROJECT_BINARY_DIR}/znc-buildmod" @ONLY)
+configure_file("${PROJECT_SOURCE_DIR}/nobnc-buildmod.in"
+               "${PROJECT_BINARY_DIR}/nobnc-buildmod" @ONLY)
 
-configure_file("${PROJECT_SOURCE_DIR}/znc.pc.in"
-               "${PROJECT_BINARY_DIR}/znc.pc" @ONLY)
+configure_file("${PROJECT_SOURCE_DIR}/nobnc.pc.in"
+               "${PROJECT_BINARY_DIR}/nobnc.pc" @ONLY)
 
 if(NOT DEVELOPER_BUILD)
-    install(FILES "${PROJECT_BINARY_DIR}/znc.pc" DESTINATION ${INSTALL_LIBDIR}/pkgconfig)
-    install(PROGRAMS "${PROJECT_BINARY_DIR}/znc-buildmod" DESTINATION ${INSTALL_BINDIR})
+    install(FILES "${PROJECT_BINARY_DIR}/nobnc.pc" DESTINATION ${INSTALL_LIBDIR}/pkgconfig)
+    install(PROGRAMS "${PROJECT_BINARY_DIR}/nobnc-buildmod" DESTINATION ${INSTALL_BINDIR})
 endif()
 
 ### PACKAGE

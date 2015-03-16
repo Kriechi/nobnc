@@ -43,9 +43,9 @@ do
 	MOD="${MOD##*/}"
 
 	if test ! -f "${FILE}"; then
-		echo "${ERROR} Building \"${MOD}\" for ZNC $VERSION... File not found"
+		echo "${ERROR} Building \"${MOD}\" for NoBNC $VERSION... File not found"
 	else
-		printf "Building \"${MOD}.so\" for ZNC $VERSION... "
+		printf "Building \"${MOD}.so\" for NoBNC $VERSION... "
 		if ${CXX} ${CXXFLAGS} ${INCLUDES} ${LDFLAGS} -o "${MOD}.so" "${FILE}" ${LIBS} ; then
 			echo "${OK}"
 		else

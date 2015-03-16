@@ -1,4 +1,4 @@
-# You can access these with e.g. pkg-config --variable=moddir znc
+# You can access these with e.g. pkg-config --variable=moddir nobnc
 prefix=@NO_PREFIX@
 exec_prefix=@NO_EXEC_PREFIX@
 includedir=@NO_INCLUDEDIR@
@@ -15,8 +15,8 @@ ldflags=@NO_LDFLAGS@
 
 version=@NO_VERSION@
 
-Name: ZNC
-Description: An advanced IRC proxy
+Name: NoBNC
+Description: A Nordic IRC bouncer
 Version: ${version}
-URL: http://znc.in
+URL: http://nobnc.github.io
 Cflags: ${cxxflags}

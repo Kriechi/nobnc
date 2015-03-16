@@ -1,0 +1,10 @@
+[Unit]
+Description=NoBNC, a Nordic IRC bouncer
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/nobnc -f
+User=nobnc
+
+[Install]
+WantedBy=multi-user.target
