@@ -18,12 +18,12 @@
 
 using std::map;
 
-class CIMAPAuthMod;
+class NoImapAuthMod;
 
-class CIMAPSock : public CSocket
+class NoImapSock : public NoSocket
 {
 public:
-    CIMAPSock(CIMAPAuthMod* pModule, std::shared_ptr<CAuthBase> Auth) : CSocket((CModule*)pModule), m_spAuth(Auth)
+    NoImapSock(NoImapAuthMod* pModule, std::shared_ptr<NoAuthBase> Auth) : NoSocket((NoModule*)pModule), m_spAuth(Auth)
     {
         m_pIMAPMod = pModule;
         m_bSentReply = false;
@@ -31,28 +31,28 @@ public:
         EnableReadLine();
     }
 
-    virtual ~CIMAPSock()
+    virtual ~NoImapSock()
     {
         if (!m_bSentReply) {
             m_spAuth->RefuseLogin("IMAP server is down, please try again later");
         }
     }
 
-    void ReadLine(const CString& sLine) override;
+    void ReadLine(const NoString& sLine) override;
 
 private:
 protected:
-    CIMAPAuthMod* m_pIMAPMod;
+    NoImapAuthMod* m_pIMAPMod;
     bool m_bSentLogin;
     bool m_bSentReply;
-    std::shared_ptr<CAuthBase> m_spAuth;
+    std::shared_ptr<NoAuthBase> m_spAuth;
 };
 
 
-class CIMAPAuthMod : public CModule
+class NoImapAuthMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CIMAPAuthMod)
+    MODCONSTRUCTOR(NoImapAuthMod)
     {
         m_Cache.SetTTL(60000);
         m_sServer = "localhost";
@@ -60,18 +60,18 @@ public:
         m_bSSL = false;
     }
 
-    virtual ~CIMAPAuthMod() {}
+    virtual ~NoImapAuthMod() {}
 
     bool OnBoot() override { return true; }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (sArgs.Trim_n().empty()) {
             return true; // use defaults
         }
 
         m_sServer = sArgs.Token(0);
-        CString sPort = sArgs.Token(1);
+        NoString sPort = sArgs.Token(1);
         m_sUserFormat = sArgs.Token(2);
 
         if (sPort.Left(1) == "+") {
@@ -88,55 +88,55 @@ public:
         return true;
     }
 
-    EModRet OnLoginAttempt(std::shared_ptr<CAuthBase> Auth) override
+    EModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
     {
-        CUser* pUser = CZNC::Get().FindUser(Auth->GetUsername());
+        NoUser* pUser = CZNC::Get().FindUser(Auth->GetUsername());
 
         if (!pUser) { // @todo Will want to do some sort of && !m_bAllowCreate in the future
             Auth->RefuseLogin("Invalid User - Halting IMAP Lookup");
             return HALT;
         }
 
-        if (pUser && m_Cache.HasItem(CString(Auth->GetUsername() + ":" + Auth->GetPassword()).MD5())) {
+        if (pUser && m_Cache.HasItem(NoString(Auth->GetUsername() + ":" + Auth->GetPassword()).MD5())) {
             DEBUG("+++ Found in cache");
             Auth->AcceptLogin(*pUser);
             return HALT;
         }
 
-        CIMAPSock* pSock = new CIMAPSock(this, Auth);
+        NoImapSock* pSock = new NoImapSock(this, Auth);
         pSock->Connect(m_sServer, m_uPort, m_bSSL, 20);
 
         return HALT;
     }
 
-    void OnModCommand(const CString& sLine) override {}
+    void OnModCommand(const NoString& sLine) override {}
 
-    void CacheLogin(const CString& sLogin) { m_Cache.AddItem(sLogin); }
+    void CacheLogin(const NoString& sLogin) { m_Cache.AddItem(sLogin); }
 
     // Getters
-    const CString& GetUserFormat() const { return m_sUserFormat; }
+    const NoString& GetUserFormat() const { return m_sUserFormat; }
     // !Getters
 private:
     // Settings
-    CString m_sServer;
+    NoString m_sServer;
     unsigned short m_uPort;
     bool m_bSSL;
-    CString m_sUserFormat;
+    NoString m_sUserFormat;
     // !Settings
 
-    TCacheMap<CString> m_Cache;
+    TCacheMap<NoString> m_Cache;
 };
 
-void CIMAPSock::ReadLine(const CString& sLine)
+void NoImapSock::ReadLine(const NoString& sLine)
 {
     if (!m_bSentLogin) {
-        CString sUsername = m_spAuth->GetUsername();
+        NoString sUsername = m_spAuth->GetUsername();
         m_bSentLogin = true;
 
-        const CString& sFormat = m_pIMAPMod->GetUserFormat();
+        const NoString& sFormat = m_pIMAPMod->GetUserFormat();
 
         if (!sFormat.empty()) {
-            if (sFormat.find('%') != CString::npos) {
+            if (sFormat.find('%') != NoString::npos) {
                 sUsername = sFormat.Replace_n("%", sUsername);
             } else {
                 sUsername += sFormat;
@@ -145,11 +145,11 @@ void CIMAPSock::ReadLine(const CString& sLine)
 
         Write("AUTH LOGIN " + sUsername + " " + m_spAuth->GetPassword() + "\r\n");
     } else if (sLine.Left(5) == "AUTH ") {
-        CUser* pUser = CZNC::Get().FindUser(m_spAuth->GetUsername());
+        NoUser* pUser = CZNC::Get().FindUser(m_spAuth->GetUsername());
 
         if (pUser && sLine.StartsWith("AUTH OK")) {
             m_spAuth->AcceptLogin(*pUser);
-            m_pIMAPMod->CacheLogin(CString(m_spAuth->GetUsername() + ":" + m_spAuth->GetPassword())
+            m_pIMAPMod->CacheLogin(NoString(m_spAuth->GetUsername() + ":" + m_spAuth->GetPassword())
                                    .MD5()); // Use MD5 so passes don't sit in memory in plain text
             DEBUG("+++ Successful IMAP lookup");
         } else {
@@ -162,11 +162,11 @@ void CIMAPSock::ReadLine(const CString& sLine)
     }
 }
 
-template <> void TModInfo<CIMAPAuthMod>(CModInfo& Info)
+template <> void TModInfo<NoImapAuthMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("imapauth");
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("[ server [+]port [ UserFormatString ] ]");
 }
 
-GLOBALMODULEDEFS(CIMAPAuthMod, "Allow users to authenticate via IMAP.")
+GLOBALMODULEDEFS(NoImapAuthMod, "Allow users to authenticate via IMAP.")

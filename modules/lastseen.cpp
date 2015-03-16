@@ -21,14 +21,14 @@ using std::map;
 using std::pair;
 using std::multimap;
 
-class CLastSeenMod : public CModule
+class NoLastSeenMod : public NoModule
 {
 private:
-    time_t GetTime(const CUser* pUser) { return GetNV(pUser->GetUserName()).ToULong(); }
+    time_t GetTime(const NoUser* pUser) { return GetNV(pUser->GetUserName()).ToULong(); }
 
-    void SetTime(const CUser* pUser) { SetNV(pUser->GetUserName(), CString(time(nullptr))); }
+    void SetTime(const NoUser* pUser) { SetNV(pUser->GetUserName(), NoString(time(nullptr))); }
 
-    const CString FormatLastSeen(const CUser* pUser, const char* sDefault = "")
+    const NoString FormatLastSeen(const NoUser* pUser, const char* sDefault = "")
     {
         time_t last = GetTime(pUser);
         if (last < 1) {
@@ -40,10 +40,10 @@ private:
         }
     }
 
-    typedef multimap<time_t, CUser*> MTimeMulti;
-    typedef map<CString, CUser*> MUsers;
+    typedef multimap<time_t, NoUser*> MTimeMulti;
+    typedef map<NoString, NoUser*> MUsers;
 
-    void ShowCommand(const CString& sLine)
+    void ShowCommand(const NoString& sLine)
     {
         if (!GetUser()->IsAdmin()) {
             PutModule("Access denied");
@@ -52,7 +52,7 @@ private:
 
         const MUsers& mUsers = CZNC::Get().GetUserMap();
         MUsers::const_iterator it;
-        CTable Table;
+        NoTable Table;
 
         Table.AddColumn("User");
         Table.AddColumn("Last Seen");
@@ -67,13 +67,13 @@ private:
     }
 
 public:
-    MODCONSTRUCTOR(CLastSeenMod)
+    MODCONSTRUCTOR(NoLastSeenMod)
     {
         AddHelpCommand();
-        AddCommand("Show", static_cast<CModCommand::ModCmdFunc>(&CLastSeenMod::ShowCommand));
+        AddCommand("Show", static_cast<NoModCommand::ModCmdFunc>(&NoLastSeenMod::ShowCommand));
     }
 
-    virtual ~CLastSeenMod() {}
+    virtual ~NoLastSeenMod() {}
 
     // Event stuff:
 
@@ -81,7 +81,7 @@ public:
 
     void OnClientDisconnect() override { SetTime(GetUser()); }
 
-    EModRet OnDeleteUser(CUser& User) override
+    EModRet OnDeleteUser(NoUser& User) override
     {
         DelNV(User.GetUserName());
         return CONTINUE;
@@ -90,27 +90,27 @@ public:
     // Web stuff:
 
     bool WebRequiresAdmin() override { return true; }
-    CString GetWebMenuTitle() override { return "Last Seen"; }
+    NoString GetWebMenuTitle() override { return "Last Seen"; }
 
-    bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            CModules& GModules = CZNC::Get().GetModules();
-            Tmpl["WebAdminLoaded"] = CString(GModules.FindModule("webadmin") != nullptr);
+            NoModules& GModules = CZNC::Get().GetModules();
+            Tmpl["WebAdminLoaded"] = NoString(GModules.FindModule("webadmin") != nullptr);
 
             MTimeMulti mmSorted;
             const MUsers& mUsers = CZNC::Get().GetUserMap();
 
             for (MUsers::const_iterator uit = mUsers.begin(); uit != mUsers.end(); ++uit) {
-                mmSorted.insert(pair<time_t, CUser*>(GetTime(uit->second), uit->second));
+                mmSorted.insert(pair<time_t, NoUser*>(GetTime(uit->second), uit->second));
             }
 
             for (MTimeMulti::const_iterator it = mmSorted.begin(); it != mmSorted.end(); ++it) {
-                CUser* pUser = it->second;
-                CTemplate& Row = Tmpl.AddRow("UserLoop");
+                NoUser* pUser = it->second;
+                NoTemplate& Row = Tmpl.AddRow("UserLoop");
 
                 Row["Username"] = pUser->GetUserName();
-                Row["IsSelf"] = CString(pUser == WebSock.GetSession()->GetUser());
+                Row["IsSelf"] = NoString(pUser == WebSock.GetSession()->GetUser());
                 Row["LastSeen"] = FormatLastSeen(pUser, "never");
             }
 
@@ -120,10 +120,10 @@ public:
         return false;
     }
 
-    bool OnEmbeddedWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    bool OnEmbeddedWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/user" && WebSock.GetSession()->IsAdmin()) {
-            CUser* pUser = CZNC::Get().FindUser(Tmpl["Username"]);
+            NoUser* pUser = CZNC::Get().FindUser(Tmpl["Username"]);
             if (pUser) {
                 Tmpl["LastSeen"] = FormatLastSeen(pUser);
             }
@@ -134,6 +134,6 @@ public:
     }
 };
 
-template <> void TModInfo<CLastSeenMod>(CModInfo& Info) { Info.SetWikiPage("lastseen"); }
+template <> void TModInfo<NoLastSeenMod>(NoModInfo& Info) { Info.SetWikiPage("lastseen"); }
 
-GLOBALMODULEDEFS(CLastSeenMod, "Collects data about when a user last logged in.")
+GLOBALMODULEDEFS(NoLastSeenMod, "Collects data about when a user last logged in.")

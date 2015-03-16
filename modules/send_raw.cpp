@@ -20,14 +20,14 @@
 using std::vector;
 using std::map;
 
-class CSendRaw_Mod : public CModule
+class NoSendRawMod : public NoModule
 {
-    void SendClient(const CString& sLine)
+    void SendClient(const NoString& sLine)
     {
-        CUser* pUser = CZNC::Get().FindUser(sLine.Token(1));
+        NoUser* pUser = CZNC::Get().FindUser(sLine.Token(1));
 
         if (pUser) {
-            CNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
+            NoNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
 
             if (pNetwork) {
                 pNetwork->PutUser(sLine.Token(3, true));
@@ -40,12 +40,12 @@ class CSendRaw_Mod : public CModule
         }
     }
 
-    void SendServer(const CString& sLine)
+    void SendServer(const NoString& sLine)
     {
-        CUser* pUser = CZNC::Get().FindUser(sLine.Token(1));
+        NoUser* pUser = CZNC::Get().FindUser(sLine.Token(1));
 
         if (pUser) {
-            CNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
+            NoNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
 
             if (pNetwork) {
                 pNetwork->PutIRC(sLine.Token(3, true));
@@ -58,16 +58,16 @@ class CSendRaw_Mod : public CModule
         }
     }
 
-    void CurrentClient(const CString& sLine)
+    void CurrentClient(const NoString& sLine)
     {
-        CString sData = sLine.Token(1, true);
+        NoString sData = sLine.Token(1, true);
         GetClient()->PutClient(sData);
     }
 
 public:
-    virtual ~CSendRaw_Mod() {}
+    virtual ~NoSendRawMod() {}
 
-    bool OnLoad(const CString& sArgs, CString& sErrorMsg) override
+    bool OnLoad(const NoString& sArgs, NoString& sErrorMsg) override
     {
         if (!GetUser()->IsAdmin()) {
             sErrorMsg = "You must have admin privileges to load this module";
@@ -77,27 +77,27 @@ public:
         return true;
     }
 
-    CString GetWebMenuTitle() override { return "Send Raw"; }
+    NoString GetWebMenuTitle() override { return "Send Raw"; }
     bool WebRequiresAdmin() override { return true; }
 
-    bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             if (WebSock.IsPost()) {
-                CUser* pUser = CZNC::Get().FindUser(WebSock.GetParam("network").Token(0, false, "/"));
+                NoUser* pUser = CZNC::Get().FindUser(WebSock.GetParam("network").Token(0, false, "/"));
                 if (!pUser) {
                     WebSock.GetSession()->AddError("User not found");
                     return true;
                 }
 
-                CNetwork* pNetwork = pUser->FindNetwork(WebSock.GetParam("network").Token(1, false, "/"));
+                NoNetwork* pNetwork = pUser->FindNetwork(WebSock.GetParam("network").Token(1, false, "/"));
                 if (!pNetwork) {
                     WebSock.GetSession()->AddError("Network not found");
                     return true;
                 }
 
                 bool bToServer = WebSock.GetParam("send_to") == "server";
-                const CString sLine = WebSock.GetParam("line");
+                const NoString sLine = WebSock.GetParam("line");
 
                 Tmpl["user"] = pUser->GetUserName();
                 Tmpl[bToServer ? "to_server" : "to_client"] = "true";
@@ -112,14 +112,14 @@ public:
                 WebSock.GetSession()->AddSuccess("Line sent");
             }
 
-            const map<CString, CUser*>& msUsers = CZNC::Get().GetUserMap();
-            for (map<CString, CUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
-                CTemplate& l = Tmpl.AddRow("UserLoop");
+            const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
+            for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
+                NoTemplate& l = Tmpl.AddRow("UserLoop");
                 l["Username"] = (*it->second).GetUserName();
 
-                vector<CNetwork*> vNetworks = (*it->second).GetNetworks();
-                for (vector<CNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
-                    CTemplate& NetworkLoop = l.AddRow("NetworkLoop");
+                vector<NoNetwork*> vNetworks = (*it->second).GetNetworks();
+                for (vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
+                    NoTemplate& NetworkLoop = l.AddRow("NetworkLoop");
                     NetworkLoop["Username"] = (*it->second).GetUserName();
                     NetworkLoop["Network"] = (*it2)->GetName();
                 }
@@ -131,24 +131,24 @@ public:
         return false;
     }
 
-    MODCONSTRUCTOR(CSendRaw_Mod)
+    MODCONSTRUCTOR(NoSendRawMod)
     {
         AddHelpCommand();
         AddCommand("Client",
-                   static_cast<CModCommand::ModCmdFunc>(&CSendRaw_Mod::SendClient),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSendRawMod::SendClient),
                    "[user] [network] [data to send]",
                    "The data will be sent to the user's IRC client(s)");
         AddCommand("Server",
-                   static_cast<CModCommand::ModCmdFunc>(&CSendRaw_Mod::SendServer),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSendRawMod::SendServer),
                    "[user] [network] [data to send]",
                    "The data will be sent to the IRC server the user is connected to");
         AddCommand("Current",
-                   static_cast<CModCommand::ModCmdFunc>(&CSendRaw_Mod::CurrentClient),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSendRawMod::CurrentClient),
                    "[data to send]",
                    "The data will be sent to your current client");
     }
 };
 
-template <> void TModInfo<CSendRaw_Mod>(CModInfo& Info) { Info.SetWikiPage("send_raw"); }
+template <> void TModInfo<NoSendRawMod>(NoModInfo& Info) { Info.SetWikiPage("send_raw"); }
 
-USERMODULEDEFS(CSendRaw_Mod, "Lets you send some raw IRC lines as/to someone else")
+USERMODULEDEFS(NoSendRawMod, "Lets you send some raw IRC lines as/to someone else")

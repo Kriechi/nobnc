@@ -25,23 +25,23 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define ALLMODULECALL(macFUNC, macEXITER)                                      \
     do {                                                                       \
-        CModules& GMods = CZNC::Get().GetModules();                            \
+        NoModules& GMods = CZNC::Get().GetModules();                            \
         bool bAllExit = false;                                                 \
         if (GMods.macFUNC) {                                                   \
             bAllExit = true;                                                   \
         } else {                                                               \
-            const map<CString, CUser*>& mUsers = CZNC::Get().GetUserMap();     \
-            map<CString, CUser*>::const_iterator it;                           \
+            const map<NoString, NoUser*>& mUsers = CZNC::Get().GetUserMap();     \
+            map<NoString, NoUser*>::const_iterator it;                           \
             for (it = mUsers.begin(); it != mUsers.end(); ++it) {              \
-                CModules& UMods = it->second->GetModules();                    \
+                NoModules& UMods = it->second->GetModules();                    \
                 if (UMods.macFUNC) {                                           \
                     bAllExit = true;                                           \
                     break;                                                     \
                 }                                                              \
-                const vector<CNetwork*>& mNets = it->second->GetNetworks(); \
-                vector<CNetwork*>::const_iterator it2;                      \
+                const vector<NoNetwork*>& mNets = it->second->GetNetworks(); \
+                vector<NoNetwork*>::const_iterator it2;                      \
                 for (it2 = mNets.begin(); it2 != mNets.end(); ++it2) {         \
-                    CModules& NMods = (*it2)->GetModules();                    \
+                    NoModules& NMods = (*it2)->GetModules();                    \
                     if (NMods.macFUNC) {                                       \
                         bAllExit = true;                                       \
                         break;                                                 \
@@ -55,10 +55,10 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define _GLOBALMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, macEXITER) \
     do {                                                                      \
-        CModules& GMods = CZNC::Get().GetModules();                           \
-        CUser* pOldGUser = GMods.GetUser();                                   \
-        CNetwork* pOldGNetwork = GMods.GetNetwork();                       \
-        CClient* pOldGClient = GMods.GetClient();                             \
+        NoModules& GMods = CZNC::Get().GetModules();                           \
+        NoUser* pOldGUser = GMods.GetUser();                                   \
+        NoNetwork* pOldGNetwork = GMods.GetNetwork();                       \
+        NoClient* pOldGClient = GMods.GetClient();                             \
         GMods.SetUser(macUSER);                                               \
         GMods.SetNetwork(macNETWORK);                                         \
         GMods.SetClient(macCLIENT);                                           \
@@ -82,9 +82,9 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             break;                                                                  \
         }                                                                           \
         if (macUSER != nullptr) {                                                   \
-            CModules& UMods = macUSER->GetModules();                                \
-            CNetwork* pOldUNetwork = UMods.GetNetwork();                         \
-            CClient* pOldUClient = UMods.GetClient();                               \
+            NoModules& UMods = macUSER->GetModules();                                \
+            NoNetwork* pOldUNetwork = UMods.GetNetwork();                         \
+            NoClient* pOldUClient = UMods.GetClient();                               \
             UMods.SetNetwork(macNETWORK);                                           \
             UMods.SetClient(macCLIENT);                                             \
             if (UMods.macFUNC) {                                                    \
@@ -106,8 +106,8 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             break;                                                              \
         }                                                                       \
         if (macNETWORK != nullptr) {                                            \
-            CModules& NMods = macNETWORK->GetModules();                         \
-            CClient* pOldNClient = NMods.GetClient();                           \
+            NoModules& NMods = macNETWORK->GetModules();                         \
+            NoClient* pOldNClient = NMods.GetClient();                           \
             NMods.SetClient(macCLIENT);                                         \
             if (NMods.macFUNC) {                                                \
                 NMods.SetClient(pOldNClient);                                   \
@@ -126,14 +126,14 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
  *  Welcome to the API documentation for ZNC.
  *
  *  To write your own module, you should start with writing a new class which
- *  inherits from CModule. Use #MODCONSTRUCTOR for the module's constructor and
+ *  inherits from NoModule. Use #MODCONSTRUCTOR for the module's constructor and
  *  call #MODULEDEFS at the end of your source file.
  *  Congratulations, you just wrote your first module. <br>
  *  For global modules, the procedure is similar. Instead of #MODULEDEFS call
  *  #GLOBALMODULEDEFS.
  *
  *  If you want your module to actually do something, you should override some
- *  of the hooks from CModule. These are the functions whose names start with
+ *  of the hooks from NoModule. These are the functions whose names start with
  *  "On". They are called when the associated event happens.
  *
  *  Feel free to also look at existing modules.

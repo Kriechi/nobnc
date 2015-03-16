@@ -21,77 +21,77 @@
 
 using std::set;
 
-class CDCCMod;
+class NoDccMod;
 
-class CDCCSock : public CSocket
+class NoDccSock : public NoSocket
 {
 public:
-    CDCCSock(CDCCMod* pMod, const CString& sRemoteNick, const CString& sLocalFile, unsigned long uFileSize = 0, CFile* pFile = nullptr);
-    CDCCSock(CDCCMod* pMod, const CString& sRemoteNick, const CString& sRemoteIP, unsigned short uRemotePort, const CString& sLocalFile, unsigned long uFileSize);
-    virtual ~CDCCSock();
+    NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, unsigned long uFileSize = 0, NoFile* pFile = nullptr);
+    NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sRemoteIP, unsigned short uRemotePort, const NoString& sLocalFile, unsigned long uFileSize);
+    virtual ~NoDccSock();
 
     void ReadData(const char* data, size_t len) override;
     void ConnectionRefused() override;
-    void SockError(int iErrno, const CString& sDescription) override;
+    void SockError(int iErrno, const NoString& sDescription) override;
     void Timeout() override;
     void Connected() override;
     void Disconnected() override;
     void SendPacket();
-    Csock* GetSockObj(const CString& sHost, unsigned short uPort) override;
-    CFile* OpenFile(bool bWrite = true);
+    Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override;
+    NoFile* OpenFile(bool bWrite = true);
     bool Seek(unsigned long int uPos);
 
     // Setters
-    void SetRemoteIP(const CString& s) { m_sRemoteIP = s; }
-    void SetRemoteNick(const CString& s) { m_sRemoteNick = s; }
-    void SetFileName(const CString& s) { m_sFileName = s; }
+    void SetRemoteIP(const NoString& s) { m_sRemoteIP = s; }
+    void SetRemoteNick(const NoString& s) { m_sRemoteNick = s; }
+    void SetFileName(const NoString& s) { m_sFileName = s; }
     void SetFileOffset(unsigned long u) { m_uBytesSoFar = u; }
     // !Setters
 
     // Getters
     unsigned short GetUserPort() const { return m_uRemotePort; }
-    const CString& GetRemoteNick() const { return m_sRemoteNick; }
-    const CString& GetFileName() const { return m_sFileName; }
-    const CString& GetLocalFile() const { return m_sLocalFile; }
-    CFile* GetFile() { return m_pFile; }
+    const NoString& GetRemoteNick() const { return m_sRemoteNick; }
+    const NoString& GetFileName() const { return m_sFileName; }
+    const NoString& GetLocalFile() const { return m_sLocalFile; }
+    NoFile* GetFile() { return m_pFile; }
     double GetProgress() const
     {
         return ((m_uFileSize) && (m_uBytesSoFar)) ? (double)(((double)m_uBytesSoFar / (double)m_uFileSize) * 100.0) : 0;
     }
     bool IsSend() const { return m_bSend; }
-    // const CString& GetRemoteIP() const { return m_sRemoteIP; }
+    // const NoString& GetRemoteIP() const { return m_sRemoteIP; }
     // !Getters
 private:
 protected:
-    CString m_sRemoteNick;
-    CString m_sRemoteIP;
-    CString m_sFileName;
-    CString m_sLocalFile;
-    CString m_sSendBuf;
+    NoString m_sRemoteNick;
+    NoString m_sRemoteIP;
+    NoString m_sFileName;
+    NoString m_sLocalFile;
+    NoString m_sSendBuf;
     unsigned short m_uRemotePort;
     unsigned long long m_uFileSize;
     unsigned long long m_uBytesSoFar;
     bool m_bSend;
     bool m_bNoDelFile;
-    CFile* m_pFile;
-    CDCCMod* m_pModule;
+    NoFile* m_pFile;
+    NoDccMod* m_pModule;
 };
 
-class CDCCMod : public CModule
+class NoDccMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CDCCMod)
+    MODCONSTRUCTOR(NoDccMod)
     {
         AddHelpCommand();
-        AddCommand("Send", static_cast<CModCommand::ModCmdFunc>(&CDCCMod::SendCommand), "<nick> <file>");
-        AddCommand("Get", static_cast<CModCommand::ModCmdFunc>(&CDCCMod::GetCommand), "<file>");
-        AddCommand("ListTransfers", static_cast<CModCommand::ModCmdFunc>(&CDCCMod::ListTransfersCommand));
+        AddCommand("Send", static_cast<NoModCommand::ModCmdFunc>(&NoDccMod::SendCommand), "<nick> <file>");
+        AddCommand("Get", static_cast<NoModCommand::ModCmdFunc>(&NoDccMod::GetCommand), "<file>");
+        AddCommand("ListTransfers", static_cast<NoModCommand::ModCmdFunc>(&NoDccMod::ListTransfersCommand));
     }
 
-    virtual ~CDCCMod() {}
+    virtual ~NoDccMod() {}
 
 #ifndef MOD_DCC_ALLOW_EVERYONE
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (!GetUser()->IsAdmin()) {
             sMessage = "You must be admin to use the DCC module";
@@ -102,42 +102,42 @@ public:
     }
 #endif
 
-    bool SendFile(const CString& sRemoteNick, const CString& sFileName)
+    bool SendFile(const NoString& sRemoteNick, const NoString& sFileName)
     {
-        CString sFullPath = CDir::ChangeDir(GetSavePath(), sFileName, CZNC::Get().GetHomePath());
-        CDCCSock* pSock = new CDCCSock(this, sRemoteNick, sFullPath);
+        NoString sFullPath = NoDir::ChangeDir(GetSavePath(), sFileName, CZNC::Get().GetHomePath());
+        NoDccSock* pSock = new NoDccSock(this, sRemoteNick, sFullPath);
 
-        CFile* pFile = pSock->OpenFile(false);
+        NoFile* pFile = pSock->OpenFile(false);
 
         if (!pFile) {
             delete pSock;
             return false;
         }
 
-        CString sLocalDCCIP = GetUser()->GetLocalDCCIP();
+        NoString sLocalDCCIP = GetUser()->GetLocalDCCIP();
         unsigned short uPort =
         CZNC::Get().GetManager().ListenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
 
         if (GetUser()->GetNick().Equals(sRemoteNick)) {
             PutUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
-                    CString(CUtils::GetLongIP(sLocalDCCIP)) + " " + CString(uPort) + " " + CString(pFile->GetSize()) + "\001");
+                    NoString(NoUtils::GetLongIP(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
         } else {
             PutIRC("PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
-                   CString(CUtils::GetLongIP(sLocalDCCIP)) + " " + CString(uPort) + " " + CString(pFile->GetSize()) + "\001");
+                   NoString(NoUtils::GetLongIP(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
         }
 
         PutModule("DCC -> [" + sRemoteNick + "][" + pFile->GetShortName() + "] - Attempting Send.");
         return true;
     }
 
-    bool GetFile(const CString& sRemoteNick, const CString& sRemoteIP, unsigned short uRemotePort, const CString& sFileName, unsigned long uFileSize)
+    bool GetFile(const NoString& sRemoteNick, const NoString& sRemoteIP, unsigned short uRemotePort, const NoString& sFileName, unsigned long uFileSize)
     {
-        if (CFile::Exists(sFileName)) {
+        if (NoFile::Exists(sFileName)) {
             PutModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - File already exists.");
             return false;
         }
 
-        CDCCSock* pSock = new CDCCSock(this, sRemoteNick, sRemoteIP, uRemotePort, sFileName, uFileSize);
+        NoDccSock* pSock = new NoDccSock(this, sRemoteNick, sRemoteIP, uRemotePort, sFileName, uFileSize);
 
         if (!pSock->OpenFile()) {
             delete pSock;
@@ -150,19 +150,19 @@ public:
         return true;
     }
 
-    void SendCommand(const CString& sLine)
+    void SendCommand(const NoString& sLine)
     {
-        CString sToNick = sLine.Token(1);
-        CString sFile = sLine.Token(2);
-        CString sAllowedPath = GetSavePath();
-        CString sAbsolutePath;
+        NoString sToNick = sLine.Token(1);
+        NoString sFile = sLine.Token(2);
+        NoString sAllowedPath = GetSavePath();
+        NoString sAbsolutePath;
 
         if ((sToNick.empty()) || (sFile.empty())) {
             PutModule("Usage: Send <nick> <file>");
             return;
         }
 
-        sAbsolutePath = CDir::CheckPathPrefix(sAllowedPath, sFile);
+        sAbsolutePath = NoDir::CheckPathPrefix(sAllowedPath, sFile);
 
         if (sAbsolutePath.empty()) {
             PutStatus("Illegal path.");
@@ -172,18 +172,18 @@ public:
         SendFile(sToNick, sFile);
     }
 
-    void GetCommand(const CString& sLine)
+    void GetCommand(const NoString& sLine)
     {
-        CString sFile = sLine.Token(1);
-        CString sAllowedPath = GetSavePath();
-        CString sAbsolutePath;
+        NoString sFile = sLine.Token(1);
+        NoString sAllowedPath = GetSavePath();
+        NoString sAbsolutePath;
 
         if (sFile.empty()) {
             PutModule("Usage: Get <file>");
             return;
         }
 
-        sAbsolutePath = CDir::CheckPathPrefix(sAllowedPath, sFile);
+        sAbsolutePath = NoDir::CheckPathPrefix(sAllowedPath, sFile);
 
         if (sAbsolutePath.empty()) {
             PutModule("Illegal path.");
@@ -193,9 +193,9 @@ public:
         SendFile(GetUser()->GetNick(), sFile);
     }
 
-    void ListTransfersCommand(const CString& sLine)
+    void ListTransfersCommand(const NoString& sLine)
     {
-        CTable Table;
+        NoTable Table;
         Table.AddColumn("Type");
         Table.AddColumn("State");
         Table.AddColumn("Speed");
@@ -203,9 +203,9 @@ public:
         Table.AddColumn("IP");
         Table.AddColumn("File");
 
-        set<CSocket*>::const_iterator it;
+        set<NoSocket*>::const_iterator it;
         for (it = BeginSockets(); it != EndSockets(); ++it) {
-            CDCCSock* pSock = (CDCCSock*)*it;
+            NoDccSock* pSock = (NoDccSock*)*it;
 
             Table.AddRow();
             Table.SetCell("Nick", pSock->GetRemoteNick());
@@ -221,8 +221,8 @@ public:
             if (pSock->GetType() == Csock::LISTENER) {
                 Table.SetCell("State", "Waiting");
             } else {
-                Table.SetCell("State", CString::ToPercent(pSock->GetProgress()));
-                Table.SetCell("Speed", CString((int)(pSock->GetAvgRead() / 1024.0)) + " KiB/s");
+                Table.SetCell("State", NoString::ToPercent(pSock->GetProgress()));
+                Table.SetCell("Speed", NoString((int)(pSock->GetAvgRead() / 1024.0)) + " KiB/s");
             }
         }
 
@@ -231,23 +231,23 @@ public:
         }
     }
 
-    void OnModCTCP(const CString& sMessage) override
+    void OnModCTCP(const NoString& sMessage) override
     {
         if (sMessage.StartsWith("DCC RESUME ")) {
-            CString sFile = sMessage.Token(2);
+            NoString sFile = sMessage.Token(2);
             unsigned short uResumePort = sMessage.Token(3).ToUShort();
             unsigned long uResumeSize = sMessage.Token(4).ToULong();
 
-            set<CSocket*>::const_iterator it;
+            set<NoSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
-                CDCCSock* pSock = (CDCCSock*)*it;
+                NoDccSock* pSock = (NoDccSock*)*it;
 
                 if (pSock->GetLocalPort() == uResumePort) {
                     if (pSock->Seek(uResumeSize)) {
                         PutModule("DCC -> [" + pSock->GetRemoteNick() + "][" + pSock->GetFileName() +
-                                  "] - Attempting to resume from file position [" + CString(uResumeSize) + "]");
+                                  "] - Attempting to resume from file position [" + NoString(uResumeSize) + "]");
                         PutUser(":*dcc!znc@znc.in PRIVMSG " + GetUser()->GetNick() + " :\001DCC ACCEPT " + sFile + " " +
-                                CString(uResumePort) + " " + CString(uResumeSize) + "\001");
+                                NoString(uResumePort) + " " + NoString(uResumeSize) + "\001");
                     } else {
                         PutModule("DCC -> [" + GetUser()->GetNick() + "][" + sFile +
                                   "] Unable to find send to initiate resume.");
@@ -255,20 +255,20 @@ public:
                 }
             }
         } else if (sMessage.StartsWith("DCC SEND ")) {
-            CString sLocalFile = CDir::CheckPathPrefix(GetSavePath(), sMessage.Token(2));
+            NoString sLocalFile = NoDir::CheckPathPrefix(GetSavePath(), sMessage.Token(2));
             if (sLocalFile.empty()) {
                 PutModule("Bad DCC file: " + sMessage.Token(2));
             }
             unsigned long uLongIP = sMessage.Token(3).ToULong();
             unsigned short uPort = sMessage.Token(4).ToUShort();
             unsigned long uFileSize = sMessage.Token(5).ToULong();
-            GetFile(GetClient()->GetNick(), CUtils::GetIP(uLongIP), uPort, sLocalFile, uFileSize);
+            GetFile(GetClient()->GetNick(), NoUtils::GetIP(uLongIP), uPort, sLocalFile, uFileSize);
         }
     }
 };
 
-CDCCSock::CDCCSock(CDCCMod* pMod, const CString& sRemoteNick, const CString& sLocalFile, unsigned long uFileSize, CFile* pFile)
-    : CSocket(pMod)
+NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, unsigned long uFileSize, NoFile* pFile)
+    : NoSocket(pMod)
 {
     m_sRemoteNick = sRemoteNick;
     m_uFileSize = uFileSize;
@@ -282,13 +282,13 @@ CDCCSock::CDCCSock(CDCCMod* pMod, const CString& sRemoteNick, const CString& sLo
     SetMaxBufferThreshold(0);
 }
 
-CDCCSock::CDCCSock(CDCCMod* pMod,
-                   const CString& sRemoteNick,
-                   const CString& sRemoteIP,
+NoDccSock::NoDccSock(NoDccMod* pMod,
+                   const NoString& sRemoteNick,
+                   const NoString& sRemoteIP,
                    unsigned short uRemotePort,
-                   const CString& sLocalFile,
+                   const NoString& sLocalFile,
                    unsigned long uFileSize)
-    : CSocket(pMod)
+    : NoSocket(pMod)
 {
     m_sRemoteNick = sRemoteNick;
     m_sRemoteIP = sRemoteIP;
@@ -303,7 +303,7 @@ CDCCSock::CDCCSock(CDCCMod* pMod,
     SetMaxBufferThreshold(0);
 }
 
-CDCCSock::~CDCCSock()
+NoDccSock::~NoDccSock()
 {
     if ((m_pFile) && (!m_bNoDelFile)) {
         m_pFile->Close();
@@ -311,7 +311,7 @@ CDCCSock::~CDCCSock()
     }
 }
 
-void CDCCSock::ReadData(const char* data, size_t len)
+void NoDccSock::ReadData(const char* data, size_t len)
 {
     if (!m_pFile) {
         DEBUG("File not open! closing get.");
@@ -350,27 +350,27 @@ void CDCCSock::ReadData(const char* data, size_t len)
     }
 }
 
-void CDCCSock::ConnectionRefused()
+void NoDccSock::ConnectionRefused()
 {
     DEBUG(GetSockName() << " == ConnectionRefused()");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Connection Refused.");
 }
 
-void CDCCSock::Timeout()
+void NoDccSock::Timeout()
 {
     DEBUG(GetSockName() << " == Timeout()");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - Timed Out.");
 }
 
-void CDCCSock::SockError(int iErrno, const CString& sDescription)
+void NoDccSock::SockError(int iErrno, const NoString& sDescription)
 {
     DEBUG(GetSockName() << " == SockError(" << iErrno << ", " << sDescription << ")");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Socket Error [" + sDescription + "]");
 }
 
-void CDCCSock::Connected()
+void NoDccSock::Connected()
 {
     DEBUG(GetSockName() << " == Connected(" << GetRemoteIP() << ")");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
@@ -383,9 +383,9 @@ void CDCCSock::Connected()
     SetTimeout(120);
 }
 
-void CDCCSock::Disconnected()
+void NoDccSock::Disconnected()
 {
-    const CString sStart = ((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - ";
+    const NoString sStart = ((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - ";
 
     DEBUG(GetSockName() << " == Disconnected()");
 
@@ -394,17 +394,17 @@ void CDCCSock::Disconnected()
     } else if (m_uBytesSoFar == m_uFileSize) {
         if (m_bSend) {
             m_pModule->PutModule(sStart + "Completed! - Sent [" + m_sLocalFile + "] at [" +
-                                 CString((int)(GetAvgWrite() / 1024.0)) + " KiB/s ]");
+                                 NoString((int)(GetAvgWrite() / 1024.0)) + " KiB/s ]");
         } else {
             m_pModule->PutModule(sStart + "Completed! - Saved to [" + m_sLocalFile + "] at [" +
-                                 CString((int)(GetAvgRead() / 1024.0)) + " KiB/s ]");
+                                 NoString((int)(GetAvgRead() / 1024.0)) + " KiB/s ]");
         }
     } else {
         m_pModule->PutModule(sStart + "Incomplete!");
     }
 }
 
-void CDCCSock::SendPacket()
+void NoDccSock::SendPacket()
 {
     if (!m_pFile) {
         m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
@@ -437,11 +437,11 @@ void CDCCSock::SendPacket()
     }
 }
 
-Csock* CDCCSock::GetSockObj(const CString& sHost, unsigned short uPort)
+Csock* NoDccSock::GetSockObj(const NoString& sHost, unsigned short uPort)
 {
     Close();
 
-    CDCCSock* pSock = new CDCCSock(m_pModule, m_sRemoteNick, m_sLocalFile, m_uFileSize, m_pFile);
+    NoDccSock* pSock = new NoDccSock(m_pModule, m_sRemoteNick, m_sLocalFile, m_uFileSize, m_pFile);
     pSock->SetSockName("DCC::SEND::" + m_sRemoteNick);
     pSock->SetTimeout(120);
     pSock->SetFileName(m_sFileName);
@@ -451,7 +451,7 @@ Csock* CDCCSock::GetSockObj(const CString& sHost, unsigned short uPort)
     return pSock;
 }
 
-CFile* CDCCSock::OpenFile(bool bWrite)
+NoFile* NoDccSock::OpenFile(bool bWrite)
 {
     if ((m_pFile) || (m_sLocalFile.empty())) {
         m_pModule->PutModule(((bWrite) ? "DCC <- [" : "DCC -> [") + m_sRemoteNick + "][" + m_sLocalFile +
@@ -459,7 +459,7 @@ CFile* CDCCSock::OpenFile(bool bWrite)
         return nullptr;
     }
 
-    m_pFile = new CFile(m_sLocalFile);
+    m_pFile = new NoFile(m_sLocalFile);
 
     if (bWrite) {
         if (m_pFile->Exists()) {
@@ -508,7 +508,7 @@ CFile* CDCCSock::OpenFile(bool bWrite)
     return m_pFile;
 }
 
-bool CDCCSock::Seek(unsigned long int uPos)
+bool NoDccSock::Seek(unsigned long int uPos)
 {
     if (m_pFile) {
         if (m_pFile->Seek(uPos)) {
@@ -520,6 +520,6 @@ bool CDCCSock::Seek(unsigned long int uPos)
     return false;
 }
 
-template <> void TModInfo<CDCCMod>(CModInfo& Info) { Info.SetWikiPage("dcc"); }
+template <> void TModInfo<NoDccMod>(NoModInfo& Info) { Info.SetWikiPage("dcc"); }
 
-USERMODULEDEFS(CDCCMod, "This module allows you to transfer files to and from ZNC")
+USERMODULEDEFS(NoDccMod, "This module allows you to transfer files to and from ZNC")

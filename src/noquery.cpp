@@ -20,32 +20,32 @@
 
 using std::vector;
 
-CQuery::CQuery(const CString& sName, CNetwork* pNetwork) : m_sName(sName), m_pNetwork(pNetwork), m_Buffer()
+NoQuery::NoQuery(const NoString& sName, NoNetwork* pNetwork) : m_sName(sName), m_pNetwork(pNetwork), m_Buffer()
 {
     SetBufferCount(m_pNetwork->GetUser()->GetBufferCount(), true);
 }
 
-CQuery::~CQuery() {}
+NoQuery::~NoQuery() {}
 
-void CQuery::SendBuffer(CClient* pClient) { SendBuffer(pClient, m_Buffer); }
+void NoQuery::SendBuffer(NoClient* pClient) { SendBuffer(pClient, m_Buffer); }
 
-void CQuery::SendBuffer(CClient* pClient, const CBuffer& Buffer)
+void NoQuery::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
 {
     if (m_pNetwork && m_pNetwork->IsUserAttached()) {
-        // Based on CChannel::SendBuffer()
+        // Based on NoChannel::SendBuffer()
         if (!Buffer.IsEmpty()) {
-            const vector<CClient*>& vClients = m_pNetwork->GetClients();
-            for (CClient* pEachClient : vClients) {
-                CClient* pUseClient = (pClient ? pClient : pEachClient);
+            const vector<NoClient*>& vClients = m_pNetwork->GetClients();
+            for (NoClient* pEachClient : vClients) {
+                NoClient* pUseClient = (pClient ? pClient : pEachClient);
 
-                MCString msParams;
+                NoStringMap msParams;
                 msParams["target"] = pUseClient->GetNick();
 
                 bool bWasPlaybackActive = pUseClient->IsPlaybackActive();
                 pUseClient->SetPlaybackActive(true);
 
                 bool bBatch = pUseClient->HasBatch();
-                CString sBatchName = m_sName.MD5();
+                NoString sBatchName = m_sName.MD5();
 
                 if (bBatch) {
                     m_pNetwork->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + m_sName, pUseClient);
@@ -53,20 +53,20 @@ void CQuery::SendBuffer(CClient* pClient, const CBuffer& Buffer)
 
                 size_t uSize = Buffer.Size();
                 for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
-                    const CMessage& BufLine = Buffer.GetMessage(uIdx);
+                    const NoMessage& BufLine = Buffer.GetMessage(uIdx);
 
                     if (!pUseClient->HasSelfMessage()) {
-                        CNick Sender(BufLine.GetFormat().Token(0));
+                        NoNick Sender(BufLine.GetFormat().Token(0));
                         if (Sender.NickEquals(pUseClient->GetNick())) {
                             continue;
                         }
                     }
 
-                    CString sLine = BufLine.GetLine(*pUseClient, msParams);
+                    NoString sLine = BufLine.GetLine(*pUseClient, msParams);
                     if (bBatch) {
-                        MCString msBatchTags = CUtils::GetMessageTags(sLine);
+                        NoStringMap msBatchTags = NoUtils::GetMessageTags(sLine);
                         msBatchTags["batch"] = sBatchName;
-                        CUtils::SetMessageTags(sLine, msBatchTags);
+                        NoUtils::SetMessageTags(sLine, msBatchTags);
                     }
                     bool bContinue = false;
                     NETWORKMODULECALL(OnPrivBufferPlayLine2(*pUseClient, sLine, BufLine.GetTime()),

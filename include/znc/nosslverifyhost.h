@@ -23,7 +23,7 @@
 
 #ifdef HAVE_LIBSSL
 
-bool ZNC_SSLVerifyHost(const CString& sHost, const X509* pCert, CString& sError);
+bool ZNC_SSLVerifyHost(const NoString& sHost, const X509* pCert, NoString& sError);
 
 #endif /* HAVE_LIBSSL */
 

@@ -28,14 +28,14 @@
 #include <unistd.h>
 #include <vector>
 
-class CDir : public std::vector<CFile*>
+class NoDir : public std::vector<NoFile*>
 {
 public:
-    CDir(const CString& sDir) : m_eSortAttr(CFile::FA_Name), m_bDesc(false) { Fill(sDir); }
+    NoDir(const NoString& sDir) : m_eSortAttr(NoFile::FA_Name), m_bDesc(false) { Fill(sDir); }
 
-    CDir() : m_eSortAttr(CFile::FA_Name), m_bDesc(false) {}
+    NoDir() : m_eSortAttr(NoFile::FA_Name), m_bDesc(false) {}
 
-    ~CDir() { CleanUp(); }
+    ~NoDir() { CleanUp(); }
 
     void CleanUp()
     {
@@ -46,9 +46,9 @@ public:
         clear();
     }
 
-    size_t Fill(const CString& sDir) { return FillByWildcard(sDir, "*"); }
+    size_t Fill(const NoString& sDir) { return FillByWildcard(sDir, "*"); }
 
-    size_t FillByWildcard(const CString& sDir, const CString& sWildcard)
+    size_t FillByWildcard(const NoString& sDir, const NoString& sWildcard)
     {
         CleanUp();
         DIR* dir = opendir((sDir.empty()) ? "." : sDir.c_str());
@@ -63,12 +63,12 @@ public:
             if ((strcmp(de->d_name, ".") == 0) || (strcmp(de->d_name, "..") == 0)) {
                 continue;
             }
-            if ((!sWildcard.empty()) && (!CString(de->d_name).WildCmp(sWildcard))) {
+            if ((!sWildcard.empty()) && (!NoString(de->d_name).WildCmp(sWildcard))) {
                 continue;
             }
 
-            CFile* file =
-            new CFile(sDir.TrimSuffix_n("/") + "/" +
+            NoFile* file =
+            new NoFile(sDir.TrimSuffix_n("/") + "/" +
                       de->d_name /*, this*/); // @todo need to pass pointer to 'this' if we want to do Sort()
             push_back(file);
         }
@@ -77,9 +77,9 @@ public:
         return size();
     }
 
-    static unsigned int Chmod(mode_t mode, const CString& sWildcard, const CString& sDir = ".")
+    static unsigned int Chmod(mode_t mode, const NoString& sWildcard, const NoString& sDir = ".")
     {
-        CDir cDir;
+        NoDir cDir;
         cDir.FillByWildcard(sDir, sWildcard);
         return cDir.Chmod(mode);
     }
@@ -96,9 +96,9 @@ public:
         return uRet;
     }
 
-    static unsigned int Delete(const CString& sWildcard, const CString& sDir = ".")
+    static unsigned int Delete(const NoString& sWildcard, const NoString& sDir = ".")
     {
-        CDir cDir;
+        NoDir cDir;
         cDir.FillByWildcard(sDir, sWildcard);
         return cDir.Delete();
     }
@@ -115,18 +115,18 @@ public:
         return uRet;
     }
 
-    CFile::EFileAttr GetSortAttr() const { return m_eSortAttr; }
+    NoFile::EFileAttr GetSortAttr() const { return m_eSortAttr; }
     bool IsDescending() const { return m_bDesc; }
 
     // Check if sPath + "/" + sAdd (~/ is handled) is an absolute path which
     // resides under sPath. Returns absolute path on success, else "".
-    static CString CheckPathPrefix(const CString& sPath, const CString& sAdd, const CString& sHomeDir = "");
-    static CString ChangeDir(const CString& sPath, const CString& sAdd, const CString& sHomeDir = "");
-    static bool MakeDir(const CString& sPath, mode_t iMode = 0700);
+    static NoString CheckPathPrefix(const NoString& sPath, const NoString& sAdd, const NoString& sHomeDir = "");
+    static NoString ChangeDir(const NoString& sPath, const NoString& sAdd, const NoString& sHomeDir = "");
+    static bool MakeDir(const NoString& sPath, mode_t iMode = 0700);
 
-    static CString GetCWD()
+    static NoString GetCWD()
     {
-        CString sRet;
+        NoString sRet;
         char* pszCurDir = getcwd(nullptr, 0);
         if (pszCurDir) {
             sRet = pszCurDir;
@@ -137,7 +137,7 @@ public:
     }
 
 private:
-    CFile::EFileAttr m_eSortAttr;
+    NoFile::EFileAttr m_eSortAttr;
     bool m_bDesc;
 };
 

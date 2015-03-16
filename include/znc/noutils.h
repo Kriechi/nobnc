@@ -38,36 +38,36 @@ static inline void SetFdCloseOnExec(int fd)
 
 static const char g_HexDigits[] = "0123456789abcdef";
 
-class CUtils
+class NoUtils
 {
 public:
-    CUtils();
-    ~CUtils();
+    NoUtils();
+    ~NoUtils();
 
-    static CString GetIP(unsigned long addr);
-    static unsigned long GetLongIP(const CString& sIP);
+    static NoString GetIP(unsigned long addr);
+    static unsigned long GetLongIP(const NoString& sIP);
 
-    static void PrintError(const CString& sMessage);
-    static void PrintMessage(const CString& sMessage, bool bStrong = false);
-    static void PrintPrompt(const CString& sMessage);
-    static void PrintAction(const CString& sMessage);
-    static void PrintStatus(bool bSuccess, const CString& sMessage = "");
+    static void PrintError(const NoString& sMessage);
+    static void PrintMessage(const NoString& sMessage, bool bStrong = false);
+    static void PrintPrompt(const NoString& sMessage);
+    static void PrintAction(const NoString& sMessage);
+    static void PrintStatus(bool bSuccess, const NoString& sMessage = "");
 
 #ifndef SWIGPERL
     // TODO refactor this
-    static const CString sDefaultHash;
+    static const NoString sDefaultHash;
 #endif
 
-    static CString GetSaltedHashPass(CString& sSalt);
-    static CString GetSalt();
-    static CString SaltedMD5Hash(const CString& sPass, const CString& sSalt);
-    static CString SaltedSHA256Hash(const CString& sPass, const CString& sSalt);
-    static CString GetPass(const CString& sPrompt);
-    static bool GetInput(const CString& sPrompt, CString& sRet, const CString& sDefault = "", const CString& sHint = "");
-    static bool GetBoolInput(const CString& sPrompt, bool bDefault);
-    static bool GetBoolInput(const CString& sPrompt, bool* pbDefault = nullptr);
+    static NoString GetSaltedHashPass(NoString& sSalt);
+    static NoString GetSalt();
+    static NoString SaltedMD5Hash(const NoString& sPass, const NoString& sSalt);
+    static NoString SaltedSHA256Hash(const NoString& sPass, const NoString& sSalt);
+    static NoString GetPass(const NoString& sPrompt);
+    static bool GetInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefault = "", const NoString& sHint = "");
+    static bool GetBoolInput(const NoString& sPrompt, bool bDefault);
+    static bool GetBoolInput(const NoString& sPrompt, bool* pbDefault = nullptr);
     static bool
-    GetNumInput(const CString& sPrompt, unsigned int& uRet, unsigned int uMin = 0, unsigned int uMax = ~0, unsigned int uDefault = ~0);
+    GetNumInput(const NoString& sPrompt, unsigned int& uRet, unsigned int uMin = 0, unsigned int uMax = ~0, unsigned int uDefault = ~0);
 
     static unsigned long long GetMillTime()
     {
@@ -79,26 +79,26 @@ public:
         return iTime;
     }
 #ifdef HAVE_LIBSSL
-    static void GenerateCert(FILE* pOut, const CString& sHost = "");
+    static void GenerateCert(FILE* pOut, const NoString& sHost = "");
 #endif /* HAVE_LIBSSL */
 
-    static CString CTime(time_t t, const CString& sTZ);
-    static CString FormatTime(time_t t, const CString& sFormat, const CString& sTZ);
-    static CString FormatServerTime(const timeval& tv);
-    static SCString GetTimezones();
-    static SCString GetEncodings();
+    static NoString CTime(time_t t, const NoString& sTZ);
+    static NoString FormatTime(time_t t, const NoString& sFormat, const NoString& sTZ);
+    static NoString FormatServerTime(const timeval& tv);
+    static NoStringSet GetTimezones();
+    static NoStringSet GetEncodings();
 
-    static MCString GetMessageTags(const CString& sLine);
-    static void SetMessageTags(CString& sLine, const MCString& mssTags);
+    static NoStringMap GetMessageTags(const NoString& sLine);
+    static void SetMessageTags(NoString& sLine, const NoStringMap& mssTags);
 };
 
-class CException
+class NoException
 {
 public:
     typedef enum { EX_Shutdown, EX_Restart } EType;
 
-    CException(EType e) : m_eType(e) {}
-    virtual ~CException() {}
+    NoException(EType e) : m_eType(e) {}
+    virtual ~NoException() {}
 
     EType GetType() const { return m_eType; }
 
@@ -110,7 +110,7 @@ private:
 /** Generate a grid-like output from a given input.
  *
  *  @code
- *  CTable table;
+ *  NoTable table;
  *  table.AddColumn("a");
  *  table.AddColumn("b");
  *  table.AddRow();
@@ -118,7 +118,7 @@ private:
  *  table.SetCell("b", "world");
  *
  *  unsigned int idx = 0;
- *  CString tmp;
+ *  NoString tmp;
  *  while (table.GetLine(idx++, tmp)) {
  *      // Output tmp somehow
  *  }
@@ -132,7 +132,7 @@ private:
 | hello | world |
 +-------+-------+@endverbatim
  */
-class CTable : protected std::vector<std::vector<CString>>
+class NoTable : protected std::vector<std::vector<NoString>>
 {
 public:
     /** Constructor
@@ -140,11 +140,11 @@ public:
      *  @param uPreferredWidth If width of table is bigger than this, text in cells will be wrapped to several lines, if
      *possible
      */
-    explicit CTable(size_type uPreferredWidth = 110)
+    explicit NoTable(size_type uPreferredWidth = 110)
         : m_vsHeaders(), m_vuMaxWidths(), m_vuMinWidths(), m_vbWrappable(), m_uPreferredWidth(uPreferredWidth), m_vsOutput()
     {
     }
-    virtual ~CTable() {}
+    virtual ~NoTable() {}
 
     /** Adds a new column to the table.
      *  Please note that you should add all columns before starting to fill
@@ -153,7 +153,7 @@ public:
      *  @param bWrappable True if long lines can be wrapped in the same cell.
      *  @return false if a column by that name already existed.
      */
-    bool AddColumn(const CString& sName, bool bWrappable = true);
+    bool AddColumn(const NoString& sName, bool bWrappable = true);
 
     /** Adds a new row to the table.
      *  After calling this you can fill the row with content.
@@ -168,14 +168,14 @@ public:
      *                 If this is not given, the last row will be used.
      *  @return True if setting the cell was successful.
      */
-    bool SetCell(const CString& sColumn, const CString& sValue, size_type uRowIdx = ~0);
+    bool SetCell(const NoString& sColumn, const NoString& sValue, size_type uRowIdx = ~0);
 
     /** Get a line of the table's output
      *  @param uIdx The index of the line you want.
      *  @param sLine This string will receive the output.
      *  @return True unless uIdx is past the end of the table.
      */
-    bool GetLine(unsigned int uIdx, CString& sLine) const;
+    bool GetLine(unsigned int uIdx, NoString& sLine) const;
 
     /** Return the width of the given column.
      *  Please note that adding and filling new rows might change the
@@ -183,29 +183,29 @@ public:
      *  @param uIdx The index of the column you are interested in.
      *  @return The width of the column.
      */
-    CString::size_type GetColumnWidth(unsigned int uIdx) const;
+    NoString::size_type GetColumnWidth(unsigned int uIdx) const;
 
     /// Completely clear the table.
     void Clear();
 
     /// @return The number of rows in this table, not counting the header.
-    using std::vector<std::vector<CString>>::size;
+    using std::vector<std::vector<NoString>>::size;
 
     /// @return True if this table doesn't contain any rows.
-    using std::vector<std::vector<CString>>::empty;
+    using std::vector<std::vector<NoString>>::empty;
 
 private:
-    unsigned int GetColumnIndex(const CString& sName) const;
-    VCString Render() const;
-    static VCString WrapWords(const CString& s, size_type uWidth);
+    unsigned int GetColumnIndex(const NoString& sName) const;
+    NoStringVector Render() const;
+    static NoStringVector WrapWords(const NoString& s, size_type uWidth);
 
 private:
-    VCString m_vsHeaders;
-    std::vector<CString::size_type> m_vuMaxWidths; // Column don't need to be bigger than this
-    std::vector<CString::size_type> m_vuMinWidths; // Column can't be thiner than this
+    NoStringVector m_vsHeaders;
+    std::vector<NoString::size_type> m_vuMaxWidths; // Column don't need to be bigger than this
+    std::vector<NoString::size_type> m_vuMinWidths; // Column can't be thiner than this
     std::vector<bool> m_vbWrappable;
     size_type m_uPreferredWidth;
-    mutable VCString m_vsOutput; // Rendered table
+    mutable NoStringVector m_vsOutput; // Rendered table
 };
 
 
@@ -214,7 +214,7 @@ private:
 #include <openssl/blowfish.h>
 #include <openssl/md5.h>
 //! does Blowfish w/64 bit feedback, no padding
-class CBlowfish
+class NoBlowfish
 {
 public:
     /**
@@ -222,24 +222,24 @@ public:
      * @param iEncrypt encrypt method (BF_DECRYPT or BF_ENCRYPT)
      * @param sIvec what to set the ivector to start with, default sets it all 0's
      */
-    CBlowfish(const CString& sPassword, int iEncrypt, const CString& sIvec = "");
-    ~CBlowfish();
+    NoBlowfish(const NoString& sPassword, int iEncrypt, const NoString& sIvec = "");
+    ~NoBlowfish();
 
-    CBlowfish(const CBlowfish&) = default;
-    CBlowfish& operator=(const CBlowfish&) = default;
+    NoBlowfish(const NoBlowfish&) = default;
+    NoBlowfish& operator=(const NoBlowfish&) = default;
 
     //! output must be freed
     static unsigned char* MD5(const unsigned char* input, u_int ilen);
 
-    //! returns an md5 of the CString (not hex encoded)
-    static CString MD5(const CString& sInput, bool bHexEncode = false);
+    //! returns an md5 of the NoString (not hex encoded)
+    static NoString MD5(const NoString& sInput, bool bHexEncode = false);
 
     //! output must be the same size as input
     void Crypt(unsigned char* input, unsigned char* output, u_int ibytes);
 
     //! must free result
     unsigned char* Crypt(unsigned char* input, u_int ibytes);
-    CString Crypt(const CString& sData);
+    NoString Crypt(const NoString& sData);
 
 private:
     unsigned char* m_ivec;
@@ -294,7 +294,7 @@ public:
             return;
         }
 
-        m_mItems[Item] = value(CUtils::GetMillTime() + uTTL, Val);
+        m_mItems[Item] = value(NoUtils::GetMillTime() + uTTL, Val);
     }
 
     /**
@@ -336,7 +336,7 @@ public:
         iterator it = m_mItems.begin();
 
         while (it != m_mItems.end()) {
-            if (CUtils::GetMillTime() > (it->second.first)) {
+            if (NoUtils::GetMillTime() > (it->second.first)) {
                 m_mItems.erase(it++);
             } else {
                 ++it;

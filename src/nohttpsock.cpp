@@ -30,10 +30,10 @@ using std::set;
 
 #define MAX_POST_SIZE 1024 * 1024
 
-CHTTPSock::CHTTPSock(CModule* pMod, const CString& sURIPrefix) : CHTTPSock(pMod, sURIPrefix, "", 0) { Init(); }
+NoHttpSock::NoHttpSock(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSock(pMod, sURIPrefix, "", 0) { Init(); }
 
-CHTTPSock::CHTTPSock(CModule* pMod, const CString& sURIPrefix, const CString& sHostname, unsigned short uPort, int iTimeout)
-    : CSocket(pMod, sHostname, uPort, iTimeout), m_bSentHeader(false), m_bGotHeader(false), m_bLoggedIn(false), m_bPost(false),
+NoHttpSock::NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, unsigned short uPort, int iTimeout)
+    : NoSocket(pMod, sHostname, uPort, iTimeout), m_bSentHeader(false), m_bGotHeader(false), m_bLoggedIn(false), m_bPost(false),
       m_bDone(false), m_uPostLen(0), m_sPostData(""), m_sURI(""), m_sUser(""), m_sPass(""), m_sContentType(""),
       m_sDocRoot(""), m_sForwardedIP(""), m_msvsPOSTParams(), m_msvsGETParams(), m_msHeaders(), m_bHTTP10Client(false),
       m_sIfNoneMatch(""), m_bAcceptGzip(false), m_msRequestCookies(), m_msResponseCookies(), m_sURIPrefix(sURIPrefix)
@@ -41,15 +41,15 @@ CHTTPSock::CHTTPSock(CModule* pMod, const CString& sURIPrefix, const CString& sH
     Init();
 }
 
-void CHTTPSock::Init()
+void NoHttpSock::Init()
 {
     EnableReadLine();
     SetMaxBufferThreshold(10240);
 }
 
-CHTTPSock::~CHTTPSock() {}
+NoHttpSock::~NoHttpSock() {}
 
-void CHTTPSock::ReadData(const char* data, size_t len)
+void NoHttpSock::ReadData(const char* data, size_t len)
 {
     if (!m_bDone && m_bGotHeader && m_bPost) {
         m_sPostData.append(data, len);
@@ -57,7 +57,7 @@ void CHTTPSock::ReadData(const char* data, size_t len)
     }
 }
 
-bool CHTTPSock::SendCookie(const CString& sKey, const CString& sValue)
+bool NoHttpSock::SendCookie(const NoString& sKey, const NoString& sValue)
 {
     if (!sKey.empty() && !sValue.empty()) {
         if (m_msRequestCookies.find(sKey) == m_msRequestCookies.end() || m_msRequestCookies[sKey].StrCmp(sValue) != 0) {
@@ -70,14 +70,14 @@ bool CHTTPSock::SendCookie(const CString& sKey, const CString& sValue)
     return false;
 }
 
-CString CHTTPSock::GetRequestCookie(const CString& sKey) const
+NoString NoHttpSock::GetRequestCookie(const NoString& sKey) const
 {
-    MCString::const_iterator it = m_msRequestCookies.find(sKey);
+    NoStringMap::const_iterator it = m_msRequestCookies.find(sKey);
 
     return it != m_msRequestCookies.end() ? it->second : "";
 }
 
-void CHTTPSock::CheckPost()
+void NoHttpSock::CheckPost()
 {
     if (m_sPostData.size() >= m_uPostLen) {
         ParseParams(m_sPostData.Left(m_uPostLen), m_msvsPOSTParams);
@@ -87,16 +87,16 @@ void CHTTPSock::CheckPost()
     }
 }
 
-void CHTTPSock::ReadLine(const CString& sData)
+void NoHttpSock::ReadLine(const NoString& sData)
 {
     if (m_bGotHeader) {
         return;
     }
 
-    CString sLine = sData;
+    NoString sLine = sData;
     sLine.TrimRight("\r\n");
 
-    CString sName = sLine.Token(0);
+    NoString sName = sLine.Token(0);
 
     if (sName.Equals("GET")) {
         m_bPost = false;
@@ -108,16 +108,16 @@ void CHTTPSock::ReadLine(const CString& sData)
         m_sURI = sLine.Token(1);
         ParseURI();
     } else if (sName.Equals("Cookie:")) {
-        VCString vsNV;
+        NoStringVector vsNV;
 
         sLine.Token(1, true).Split(";", vsNV, false, "", "", true, true);
 
-        for (const CString& s : vsNV) {
-            m_msRequestCookies[s.Token(0, false, "=").Escape_n(CString::EURL, CString::EASCII)] =
-            s.Token(1, true, "=").Escape_n(CString::EURL, CString::EASCII);
+        for (const NoString& s : vsNV) {
+            m_msRequestCookies[s.Token(0, false, "=").Escape_n(NoString::EURL, NoString::EASCII)] =
+            s.Token(1, true, "=").Escape_n(NoString::EURL, NoString::EASCII);
         }
     } else if (sName.Equals("Authorization:")) {
-        CString sUnhashed;
+        NoString sUnhashed;
         sLine.Token(2).Base64Decode(sUnhashed);
         m_sUser = sUnhashed.Token(0, false, ":");
         m_sPass = sUnhashed.Token(1, true, ":");
@@ -129,17 +129,17 @@ void CHTTPSock::ReadLine(const CString& sData)
     } else if (sName.Equals("X-Forwarded-For:")) {
         // X-Forwarded-For: client, proxy1, proxy2
         if (m_sForwardedIP.empty()) {
-            const VCString& vsTrustedProxies = CZNC::Get().GetTrustedProxies();
-            CString sIP = GetRemoteIP();
+            const NoStringVector& vsTrustedProxies = CZNC::Get().GetTrustedProxies();
+            NoString sIP = GetRemoteIP();
 
-            VCString vsIPs;
+            NoStringVector vsIPs;
             sLine.Token(1, true).Split(",", vsIPs, false, "", "", false, true);
 
             while (!vsIPs.empty()) {
                 // sIP told us that it got connection from vsIPs.back()
                 // check if sIP is trusted proxy
                 bool bTrusted = false;
-                for (const CString& sTrustedProxy : vsTrustedProxies) {
+                for (const NoString& sTrustedProxy : vsTrustedProxies) {
                     if (sIP.WildCmp(sTrustedProxy)) {
                         bTrusted = true;
                         break;
@@ -162,7 +162,7 @@ void CHTTPSock::ReadLine(const CString& sData)
         // this is for proper client cache support (HTTP 304) on static files:
         m_sIfNoneMatch = sLine.Token(1, true);
     } else if (sName.Equals("Accept-Encoding:") && !m_bHTTP10Client) {
-        SCString ssEncodings;
+        NoStringSet ssEncodings;
         // trimming whitespace from the tokens is important:
         sLine.Token(1, true).Split(",", ssEncodings, false, "", "", false, true);
         m_bAcceptGzip = (ssEncodings.find("gzip") != ssEncodings.end());
@@ -180,16 +180,16 @@ void CHTTPSock::ReadLine(const CString& sData)
     }
 }
 
-CString CHTTPSock::GetRemoteIP() const
+NoString NoHttpSock::GetRemoteIP() const
 {
     if (!m_sForwardedIP.empty()) {
         return m_sForwardedIP;
     }
 
-    return CSocket::GetRemoteIP();
+    return NoSocket::GetRemoteIP();
 }
 
-CString CHTTPSock::GetDate(time_t stamp)
+NoString NoHttpSock::GetDate(time_t stamp)
 {
     struct tm tm;
     std::stringstream stream;
@@ -210,7 +210,7 @@ CString CHTTPSock::GetDate(time_t stamp)
     return stream.str();
 }
 
-void CHTTPSock::GetPage()
+void NoHttpSock::GetPage()
 {
     DEBUG("Page Request [" << m_sURI << "] ");
 
@@ -240,7 +240,7 @@ static bool InitZlibStream(z_stream* zStrm, const char* buf)
 }
 #endif
 
-void CHTTPSock::PrintPage(const CString& sPage)
+void NoHttpSock::PrintPage(const NoString& sPage)
 {
 #ifdef HAVE_ZLIB
     if (m_bAcceptGzip && !SentHeader()) {
@@ -286,14 +286,14 @@ void CHTTPSock::PrintPage(const CString& sPage)
     Close(Csock::CLT_AFTERWRITE);
 }
 
-bool CHTTPSock::PrintFile(const CString& sFileName, CString sContentType)
+bool NoHttpSock::PrintFile(const NoString& sFileName, NoString sContentType)
 {
-    CString sFilePath = sFileName;
+    NoString sFilePath = sFileName;
 
     if (!m_sDocRoot.empty()) {
         sFilePath.TrimLeft("/");
 
-        sFilePath = CDir::CheckPathPrefix(m_sDocRoot, sFilePath, m_sDocRoot);
+        sFilePath = NoDir::CheckPathPrefix(m_sDocRoot, sFilePath, m_sDocRoot);
 
         if (sFilePath.empty()) {
             PrintErrorPage(403, "Forbidden", "You don't have permission to access that file on this server.");
@@ -303,7 +303,7 @@ bool CHTTPSock::PrintFile(const CString& sFileName, CString sContentType)
         }
     }
 
-    CFile File(sFilePath);
+    NoFile File(sFilePath);
 
     if (!File.Open()) {
         PrintNotFound();
@@ -334,10 +334,10 @@ bool CHTTPSock::PrintFile(const CString& sFileName, CString sContentType)
 
     const time_t iMTime = File.GetMTime();
     bool bNotModified = false;
-    CString sETag;
+    NoString sETag;
 
     if (iMTime > 0 && !m_bHTTP10Client) {
-        sETag = "-" + CString(iMTime); // lighttpd style ETag
+        sETag = "-" + NoString(iMTime); // lighttpd style ETag
 
         AddHeader("Last-Modified", GetDate(iMTime));
         AddHeader("ETag", "\"" + sETag + "\"");
@@ -345,7 +345,7 @@ bool CHTTPSock::PrintFile(const CString& sFileName, CString sContentType)
 
         if (!m_sIfNoneMatch.empty()) {
             m_sIfNoneMatch.Trim("\\\"'");
-            bNotModified = (m_sIfNoneMatch.Equals(sETag, CString::CaseSensitive));
+            bNotModified = (m_sIfNoneMatch.Equals(sETag, NoString::CaseSensitive));
         }
     }
 
@@ -385,7 +385,7 @@ bool CHTTPSock::PrintFile(const CString& sFileName, CString sContentType)
     return true;
 }
 
-void CHTTPSock::WriteFileUncompressed(CFile& File)
+void NoHttpSock::WriteFileUncompressed(NoFile& File)
 {
     char szBuf[4096];
     off_t iLen = 0;
@@ -404,7 +404,7 @@ void CHTTPSock::WriteFileUncompressed(CFile& File)
 }
 
 #ifdef HAVE_ZLIB
-void CHTTPSock::WriteFileGzipped(CFile& File)
+void NoHttpSock::WriteFileGzipped(NoFile& File)
 {
     char szBufIn[8192];
     char szBufOut[8192];
@@ -459,64 +459,64 @@ void CHTTPSock::WriteFileGzipped(CFile& File)
 }
 #endif
 
-void CHTTPSock::ParseURI()
+void NoHttpSock::ParseURI()
 {
     ParseParams(m_sURI.Token(1, true, "?"), m_msvsGETParams);
     m_sURI = m_sURI.Token(0, false, "?");
 }
 
-CString CHTTPSock::GetPath() const { return m_sURI.Token(0, false, "?"); }
+NoString NoHttpSock::GetPath() const { return m_sURI.Token(0, false, "?"); }
 
-void CHTTPSock::ParseParams(const CString& sParams, map<CString, VCString>& msvsParams)
+void NoHttpSock::ParseParams(const NoString& sParams, map<NoString, NoStringVector>& msvsParams)
 {
     msvsParams.clear();
 
-    VCString vsPairs;
+    NoStringVector vsPairs;
     sParams.Split("&", vsPairs, true);
 
-    for (const CString& sPair : vsPairs) {
-        CString sName = sPair.Token(0, false, "=").Escape_n(CString::EURL, CString::EASCII);
-        CString sValue = sPair.Token(1, true, "=").Escape_n(CString::EURL, CString::EASCII);
+    for (const NoString& sPair : vsPairs) {
+        NoString sName = sPair.Token(0, false, "=").Escape_n(NoString::EURL, NoString::EASCII);
+        NoString sValue = sPair.Token(1, true, "=").Escape_n(NoString::EURL, NoString::EASCII);
 
         msvsParams[sName].push_back(sValue);
     }
 }
 
-void CHTTPSock::SetDocRoot(const CString& s)
+void NoHttpSock::SetDocRoot(const NoString& s)
 {
     m_sDocRoot = s + "/";
     m_sDocRoot.Replace("//", "/");
 }
 
-const CString& CHTTPSock::GetDocRoot() const { return m_sDocRoot; }
+const NoString& NoHttpSock::GetDocRoot() const { return m_sDocRoot; }
 
-const CString& CHTTPSock::GetUser() const { return m_sUser; }
+const NoString& NoHttpSock::GetUser() const { return m_sUser; }
 
-const CString& CHTTPSock::GetPass() const { return m_sPass; }
+const NoString& NoHttpSock::GetPass() const { return m_sPass; }
 
-const CString& CHTTPSock::GetContentType() const { return m_sContentType; }
+const NoString& NoHttpSock::GetContentType() const { return m_sContentType; }
 
-const CString& CHTTPSock::GetParamString() const { return m_sPostData; }
+const NoString& NoHttpSock::GetParamString() const { return m_sPostData; }
 
-const CString& CHTTPSock::GetURIPrefix() const { return m_sURIPrefix; }
+const NoString& NoHttpSock::GetURIPrefix() const { return m_sURIPrefix; }
 
-bool CHTTPSock::HasParam(const CString& sName, bool bPost) const
+bool NoHttpSock::HasParam(const NoString& sName, bool bPost) const
 {
     if (bPost) return (m_msvsPOSTParams.find(sName) != m_msvsPOSTParams.end());
     return (m_msvsGETParams.find(sName) != m_msvsGETParams.end());
 }
 
-CString CHTTPSock::GetRawParam(const CString& sName, bool bPost) const
+NoString NoHttpSock::GetRawParam(const NoString& sName, bool bPost) const
 {
     if (bPost) return GetRawParam(sName, m_msvsPOSTParams);
     return GetRawParam(sName, m_msvsGETParams);
 }
 
-CString CHTTPSock::GetRawParam(const CString& sName, const map<CString, VCString>& msvsParams)
+NoString NoHttpSock::GetRawParam(const NoString& sName, const map<NoString, NoStringVector>& msvsParams)
 {
-    CString sRet;
+    NoString sRet;
 
-    map<CString, VCString>::const_iterator it = msvsParams.find(sName);
+    map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
 
     if (it != msvsParams.end() && it->second.size() > 0) {
         sRet = it->second[0];
@@ -525,42 +525,42 @@ CString CHTTPSock::GetRawParam(const CString& sName, const map<CString, VCString
     return sRet;
 }
 
-CString CHTTPSock::GetParam(const CString& sName, bool bPost, const CString& sFilter) const
+NoString NoHttpSock::GetParam(const NoString& sName, bool bPost, const NoString& sFilter) const
 {
     if (bPost) return GetParam(sName, m_msvsPOSTParams, sFilter);
     return GetParam(sName, m_msvsGETParams, sFilter);
 }
 
-CString CHTTPSock::GetParam(const CString& sName, const map<CString, VCString>& msvsParams, const CString& sFilter)
+NoString NoHttpSock::GetParam(const NoString& sName, const map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
-    CString sRet = GetRawParam(sName, msvsParams);
+    NoString sRet = GetRawParam(sName, msvsParams);
     sRet.Trim();
 
     for (size_t i = 0; i < sFilter.length(); i++) {
-        sRet.Replace(CString(sFilter.at(i)), "");
+        sRet.Replace(NoString(sFilter.at(i)), "");
     }
 
     return sRet;
 }
 
-size_t CHTTPSock::GetParamValues(const CString& sName, set<CString>& ssRet, bool bPost, const CString& sFilter) const
+size_t NoHttpSock::GetParamValues(const NoString& sName, set<NoString>& ssRet, bool bPost, const NoString& sFilter) const
 {
     if (bPost) return GetParamValues(sName, ssRet, m_msvsPOSTParams, sFilter);
     return GetParamValues(sName, ssRet, m_msvsGETParams, sFilter);
 }
 
-size_t CHTTPSock::GetParamValues(const CString& sName, set<CString>& ssRet, const map<CString, VCString>& msvsParams, const CString& sFilter)
+size_t NoHttpSock::GetParamValues(const NoString& sName, set<NoString>& ssRet, const map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
     ssRet.clear();
 
-    map<CString, VCString>::const_iterator it = msvsParams.find(sName);
+    map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
 
     if (it != msvsParams.end()) {
-        for (CString sParam : it->second) {
+        for (NoString sParam : it->second) {
             sParam.Trim();
 
             for (size_t i = 0; i < sFilter.length(); i++) {
-                sParam.Replace(CString(sFilter.at(i)), "");
+                sParam.Replace(NoString(sFilter.at(i)), "");
             }
             ssRet.insert(sParam);
         }
@@ -569,24 +569,24 @@ size_t CHTTPSock::GetParamValues(const CString& sName, set<CString>& ssRet, cons
     return ssRet.size();
 }
 
-size_t CHTTPSock::GetParamValues(const CString& sName, VCString& vsRet, bool bPost, const CString& sFilter) const
+size_t NoHttpSock::GetParamValues(const NoString& sName, NoStringVector& vsRet, bool bPost, const NoString& sFilter) const
 {
     if (bPost) return GetParamValues(sName, vsRet, m_msvsPOSTParams, sFilter);
     return GetParamValues(sName, vsRet, m_msvsGETParams, sFilter);
 }
 
-size_t CHTTPSock::GetParamValues(const CString& sName, VCString& vsRet, const map<CString, VCString>& msvsParams, const CString& sFilter)
+size_t NoHttpSock::GetParamValues(const NoString& sName, NoStringVector& vsRet, const map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
     vsRet.clear();
 
-    map<CString, VCString>::const_iterator it = msvsParams.find(sName);
+    map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
 
     if (it != msvsParams.end()) {
-        for (CString sParam : it->second) {
+        for (NoString sParam : it->second) {
             sParam.Trim();
 
             for (size_t i = 0; i < sFilter.length(); i++) {
-                sParam.Replace(CString(sFilter.at(i)), "");
+                sParam.Replace(NoString(sFilter.at(i)), "");
             }
             vsRet.push_back(sParam);
         }
@@ -595,43 +595,43 @@ size_t CHTTPSock::GetParamValues(const CString& sName, VCString& vsRet, const ma
     return vsRet.size();
 }
 
-const map<CString, VCString>& CHTTPSock::GetParams(bool bPost) const
+const map<NoString, NoStringVector>& NoHttpSock::GetParams(bool bPost) const
 {
     if (bPost) return m_msvsPOSTParams;
     return m_msvsGETParams;
 }
 
-bool CHTTPSock::IsPost() const { return m_bPost; }
+bool NoHttpSock::IsPost() const { return m_bPost; }
 
-bool CHTTPSock::PrintNotFound()
+bool NoHttpSock::PrintNotFound()
 {
     return PrintErrorPage(404, "Not Found", "The requested URL was not found on this server.");
 }
 
-bool CHTTPSock::PrintErrorPage(unsigned int uStatusId, const CString& sStatusMsg, const CString& sMessage)
+bool NoHttpSock::PrintErrorPage(unsigned int uStatusId, const NoString& sStatusMsg, const NoString& sMessage)
 {
     if (SentHeader()) {
         DEBUG("PrintErrorPage(): Header was already sent");
         return false;
     }
 
-    CString sPage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+    NoString sPage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
                     "<!DOCTYPE html>\r\n"
                     "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\r\n"
                     "<head>\r\n"
                     "<meta charset=\"UTF-8\"/>\r\n"
                     "<title>" +
-                    CString(uStatusId) + " " + sStatusMsg.Escape_n(CString::EHTML) + "</title>\r\n"
+                    NoString(uStatusId) + " " + sStatusMsg.Escape_n(NoString::EHTML) + "</title>\r\n"
                                                                                      "</head>\r\n"
                                                                                      "<body>\r\n"
                                                                                      "<h1>" +
-                    sStatusMsg.Escape_n(CString::EHTML) + "</h1>\r\n"
+                    sStatusMsg.Escape_n(NoString::EHTML) + "</h1>\r\n"
                                                           "<p>" +
-                    sMessage.Escape_n(CString::EHTML) + "</p>\r\n"
+                    sMessage.Escape_n(NoString::EHTML) + "</p>\r\n"
                                                         "<hr/>\r\n"
                                                         "<address>" +
-                    CZNC::GetTag(false, /* bHTML = */ true) + " at " + GetLocalIP().Escape_n(CString::EHTML) +
-                    " Port " + CString(GetLocalPort()) + "</address>\r\n"
+                    CZNC::GetTag(false, /* bHTML = */ true) + " at " + GetLocalIP().Escape_n(NoString::EHTML) +
+                    " Port " + NoString(GetLocalPort()) + "</address>\r\n"
                                                          "</body>\r\n"
                                                          "</html>\r\n";
 
@@ -642,7 +642,7 @@ bool CHTTPSock::PrintErrorPage(unsigned int uStatusId, const CString& sStatusMsg
     return true;
 }
 
-bool CHTTPSock::ForceLogin()
+bool NoHttpSock::ForceLogin()
 {
     if (m_bLoggedIn) {
         return true;
@@ -659,11 +659,11 @@ bool CHTTPSock::ForceLogin()
     return false;
 }
 
-bool CHTTPSock::OnLogin(const CString& sUser, const CString& sPass, bool bBasic) { return false; }
+bool NoHttpSock::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic) { return false; }
 
-bool CHTTPSock::SentHeader() const { return m_bSentHeader; }
+bool NoHttpSock::SentHeader() const { return m_bSentHeader; }
 
-bool CHTTPSock::PrintHeader(off_t uContentLength, const CString& sContentType, unsigned int uStatusId, const CString& sStatusMsg)
+bool NoHttpSock::PrintHeader(off_t uContentLength, const NoString& sContentType, unsigned int uStatusId, const NoString& sStatusMsg)
 {
     if (SentHeader()) {
         DEBUG("PrintHeader(): Header was already sent!");
@@ -680,16 +680,16 @@ bool CHTTPSock::PrintHeader(off_t uContentLength, const CString& sContentType, u
 
     DEBUG("- " << uStatusId << " (" << sStatusMsg << ") [" << m_sContentType << "]");
 
-    Write("HTTP/" + CString(m_bHTTP10Client ? "1.0 " : "1.1 ") + CString(uStatusId) + " " + sStatusMsg + "\r\n");
+    Write("HTTP/" + NoString(m_bHTTP10Client ? "1.0 " : "1.1 ") + NoString(uStatusId) + " " + sStatusMsg + "\r\n");
     Write("Date: " + GetDate() + "\r\n");
     Write("Server: " + CZNC::GetTag(false) + "\r\n");
     if (uContentLength > 0) {
-        Write("Content-Length: " + CString(uContentLength) + "\r\n");
+        Write("Content-Length: " + NoString(uContentLength) + "\r\n");
     }
     Write("Content-Type: " + m_sContentType + "\r\n");
 
     for (const auto& it : m_msResponseCookies) {
-        Write("Set-Cookie: " + it.first.Escape_n(CString::EURL) + "=" + it.second.Escape_n(CString::EURL) +
+        Write("Set-Cookie: " + it.first.Escape_n(NoString::EURL) + "=" + it.second.Escape_n(NoString::EURL) +
               "; path=/;" + (GetSSL() ? "Secure;" : "") + "\r\n");
     }
 
@@ -705,11 +705,11 @@ bool CHTTPSock::PrintHeader(off_t uContentLength, const CString& sContentType, u
     return true;
 }
 
-void CHTTPSock::SetContentType(const CString& sContentType) { m_sContentType = sContentType; }
+void NoHttpSock::SetContentType(const NoString& sContentType) { m_sContentType = sContentType; }
 
-void CHTTPSock::AddHeader(const CString& sName, const CString& sValue) { m_msHeaders[sName] = sValue; }
+void NoHttpSock::AddHeader(const NoString& sName, const NoString& sValue) { m_msHeaders[sName] = sValue; }
 
-bool CHTTPSock::Redirect(const CString& sURL)
+bool NoHttpSock::Redirect(const NoString& sURL)
 {
     if (SentHeader()) {
         DEBUG("Redirect() - Header was already sent");
@@ -719,16 +719,16 @@ bool CHTTPSock::Redirect(const CString& sURL)
         DEBUG("Redirect to relative URI [" + sURL + "] is not allowed.");
         return false;
     } else {
-        CString location = m_sURIPrefix + sURL;
+        NoString location = m_sURIPrefix + sURL;
 
         DEBUG("- Redirect to [" << location << "] with prefix [" + m_sURIPrefix + "]");
         AddHeader("Location", location);
         PrintErrorPage(302,
                        "Found",
-                       "The document has moved <a href=\"" + location.Escape_n(CString::EHTML) + "\">here</a>.");
+                       "The document has moved <a href=\"" + location.Escape_n(NoString::EHTML) + "\">here</a>.");
 
         return true;
     }
 }
 
-void CHTTPSock::Connected() { SetTimeout(120); }
+void NoHttpSock::Connected() { SetTimeout(120); }

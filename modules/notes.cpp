@@ -18,16 +18,16 @@
 
 using std::stringstream;
 
-class CNotesMod : public CModule
+class NoNotesMod : public NoModule
 {
     bool bShowNotesOnLogin;
 
-    void ListCommand(const CString& sLine) { ListNotes(); }
+    void ListCommand(const NoString& sLine) { ListNotes(); }
 
-    void AddNoteCommand(const CString& sLine)
+    void AddNoteCommand(const NoString& sLine)
     {
-        CString sKey(sLine.Token(1));
-        CString sValue(sLine.Token(2, true));
+        NoString sKey(sLine.Token(1));
+        NoString sValue(sLine.Token(2, true));
 
         if (!GetNV(sKey).empty()) {
             PutModule("That note already exists.  Use MOD <key> <note> to overwrite.");
@@ -38,10 +38,10 @@ class CNotesMod : public CModule
         }
     }
 
-    void ModCommand(const CString& sLine)
+    void ModCommand(const NoString& sLine)
     {
-        CString sKey(sLine.Token(1));
-        CString sValue(sLine.Token(2, true));
+        NoString sKey(sLine.Token(1));
+        NoString sValue(sLine.Token(2, true));
 
         if (AddNote(sKey, sValue)) {
             PutModule("Set note for [" + sKey + "]");
@@ -50,9 +50,9 @@ class CNotesMod : public CModule
         }
     }
 
-    void GetCommand(const CString& sLine)
+    void GetCommand(const NoString& sLine)
     {
-        CString sNote = GetNV(sLine.Token(1, true));
+        NoString sNote = GetNV(sLine.Token(1, true));
 
         if (sNote.empty()) {
             PutModule("This note doesn't exist.");
@@ -61,9 +61,9 @@ class CNotesMod : public CModule
         }
     }
 
-    void DelCommand(const CString& sLine)
+    void DelCommand(const NoString& sLine)
     {
-        CString sKey(sLine.Token(1));
+        NoString sKey(sLine.Token(1));
 
         if (DelNote(sKey)) {
             PutModule("Deleted note [" + sKey + "]");
@@ -73,26 +73,26 @@ class CNotesMod : public CModule
     }
 
 public:
-    MODCONSTRUCTOR(CNotesMod)
+    MODCONSTRUCTOR(NoNotesMod)
     {
         using std::placeholders::_1;
         AddHelpCommand();
-        AddCommand("List", static_cast<CModCommand::ModCmdFunc>(&CNotesMod::ListCommand));
-        AddCommand("Add", static_cast<CModCommand::ModCmdFunc>(&CNotesMod::AddNoteCommand), "<key> <note>");
-        AddCommand("Del", static_cast<CModCommand::ModCmdFunc>(&CNotesMod::DelCommand), "<key>", "Delete a note");
-        AddCommand("Mod", "<key> <note>", "Modify a note", std::bind(&CNotesMod::ModCommand, this, _1));
-        AddCommand("Get", "<key>", "", [this](const CString& sLine) { GetCommand(sLine); });
+        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoNotesMod::ListCommand));
+        AddCommand("Add", static_cast<NoModCommand::ModCmdFunc>(&NoNotesMod::AddNoteCommand), "<key> <note>");
+        AddCommand("Del", static_cast<NoModCommand::ModCmdFunc>(&NoNotesMod::DelCommand), "<key>", "Delete a note");
+        AddCommand("Mod", "<key> <note>", "Modify a note", std::bind(&NoNotesMod::ModCommand, this, _1));
+        AddCommand("Get", "<key>", "", [this](const NoString& sLine) { GetCommand(sLine); });
     }
 
-    virtual ~CNotesMod() {}
+    virtual ~NoNotesMod() {}
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         bShowNotesOnLogin = !sArgs.Equals("-disableNotesOnLogin");
         return true;
     }
 
-    CString GetWebMenuTitle() override { return "Notes"; }
+    NoString GetWebMenuTitle() override { return "Notes"; }
 
     void OnClientLogin() override
     {
@@ -101,13 +101,13 @@ public:
         }
     }
 
-    EModRet OnUserRaw(CString& sLine) override
+    EModRet OnUserRaw(NoString& sLine) override
     {
         if (sLine.Left(1) != "#") {
             return CONTINUE;
         }
 
-        CString sKey;
+        NoString sKey;
         bool bOverwrite = false;
 
         if (sLine == "#?") {
@@ -128,7 +128,7 @@ public:
             sKey = sLine.Token(0).LeftChomp_n(1);
         }
 
-        CString sValue(sLine.Token(1, true));
+        NoString sValue(sLine.Token(1, true));
 
         if (!sKey.empty()) {
             if (!bOverwrite && FindNV(sKey) != EndNV()) {
@@ -147,9 +147,9 @@ public:
         return HALT;
     }
 
-    bool DelNote(const CString& sKey) { return DelNV(sKey); }
+    bool DelNote(const NoString& sKey) { return DelNV(sKey); }
 
-    bool AddNote(const CString& sKey, const CString& sNote)
+    bool AddNote(const NoString& sKey, const NoString& sNote)
     {
         if (sKey.empty()) {
             return false;
@@ -160,14 +160,14 @@ public:
 
     void ListNotes(bool bNotice = false)
     {
-        CClient* pClient = GetClient();
+        NoClient* pClient = GetClient();
 
         if (pClient) {
-            CTable Table;
+            NoTable Table;
             Table.AddColumn("Key");
             Table.AddColumn("Note");
 
-            for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {
+            for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
                 Table.AddRow();
                 Table.SetCell("Key", it->first);
                 Table.SetCell("Note", it->second);
@@ -175,7 +175,7 @@ public:
 
             if (Table.size()) {
                 unsigned int idx = 0;
-                CString sLine;
+                NoString sLine;
                 while (Table.GetLine(idx++, sLine)) {
                     if (bNotice) {
                         pClient->PutModNotice(GetModName(), sLine);
@@ -193,11 +193,11 @@ public:
         }
     }
 
-    bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {
-                CTemplate& Row = Tmpl.AddRow("NotesLoop");
+            for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
+                NoTemplate& Row = Tmpl.AddRow("NotesLoop");
 
                 Row["Key"] = it->first;
                 Row["Note"] = it->second;
@@ -218,7 +218,7 @@ public:
     }
 };
 
-template <> void TModInfo<CNotesMod>(CModInfo& Info)
+template <> void TModInfo<NoNotesMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("notes");
     Info.SetHasArgs(true);
@@ -226,4 +226,4 @@ template <> void TModInfo<CNotesMod>(CModInfo& Info)
     "This user module takes up to one arguments. It can be -disableNotesOnLogin not to show notes upon client login");
 }
 
-USERMODULEDEFS(CNotesMod, "Keep and replay notes")
+USERMODULEDEFS(NoNotesMod, "Keep and replay notes")

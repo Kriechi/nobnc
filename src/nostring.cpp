@@ -23,74 +23,74 @@
 
 using std::stringstream;
 
-CString::CString(char c) : string()
+NoString::NoString(char c) : string()
 {
     stringstream s;
     s << c;
     *this = s.str();
 }
-CString::CString(unsigned char c) : string()
+NoString::NoString(unsigned char c) : string()
 {
     stringstream s;
     s << c;
     *this = s.str();
 }
-CString::CString(short i) : string()
+NoString::NoString(short i) : string()
 {
     stringstream s;
     s << i;
     *this = s.str();
 }
-CString::CString(unsigned short i) : string()
+NoString::NoString(unsigned short i) : string()
 {
     stringstream s;
     s << i;
     *this = s.str();
 }
-CString::CString(int i) : string()
+NoString::NoString(int i) : string()
 {
     stringstream s;
     s << i;
     *this = s.str();
 }
-CString::CString(unsigned int i) : string()
+NoString::NoString(unsigned int i) : string()
 {
     stringstream s;
     s << i;
     *this = s.str();
 }
-CString::CString(long i) : string()
+NoString::NoString(long i) : string()
 {
     stringstream s;
     s << i;
     *this = s.str();
 }
-CString::CString(unsigned long i) : string()
+NoString::NoString(unsigned long i) : string()
 {
     stringstream s;
     s << i;
     *this = s.str();
 }
-CString::CString(long long i) : string()
+NoString::NoString(long long i) : string()
 {
     stringstream s;
     s << i;
     *this = s.str();
 }
-CString::CString(unsigned long long i) : string()
+NoString::NoString(unsigned long long i) : string()
 {
     stringstream s;
     s << i;
     *this = s.str();
 }
-CString::CString(double i, int precision) : string()
+NoString::NoString(double i, int precision) : string()
 {
     stringstream s;
     s.precision(precision);
     s << std::fixed << i;
     *this = s.str();
 }
-CString::CString(float i, int precision) : string()
+NoString::NoString(float i, int precision) : string()
 {
     stringstream s;
     s.precision(precision);
@@ -99,7 +99,7 @@ CString::CString(float i, int precision) : string()
 }
 
 unsigned char*
-CString::strnchr(const unsigned char* src, unsigned char c, unsigned int iMaxBytes, unsigned char* pFill, unsigned int* piCount) const
+NoString::strnchr(const unsigned char* src, unsigned char c, unsigned int iMaxBytes, unsigned char* pFill, unsigned int* piCount) const
 {
     for (unsigned int a = 0; a < iMaxBytes && *src; a++, src++) {
         if (pFill) {
@@ -130,23 +130,23 @@ CString::strnchr(const unsigned char* src, unsigned char c, unsigned int iMaxByt
     return nullptr;
 }
 
-int CString::CaseCmp(const CString& s, CString::size_type uLen) const
+int NoString::CaseCmp(const NoString& s, NoString::size_type uLen) const
 {
-    if (uLen != CString::npos) {
+    if (uLen != NoString::npos) {
         return strncasecmp(c_str(), s.c_str(), uLen);
     }
     return strcasecmp(c_str(), s.c_str());
 }
 
-int CString::StrCmp(const CString& s, CString::size_type uLen) const
+int NoString::StrCmp(const NoString& s, NoString::size_type uLen) const
 {
-    if (uLen != CString::npos) {
+    if (uLen != NoString::npos) {
         return strncmp(c_str(), s.c_str(), uLen);
     }
     return strcmp(c_str(), s.c_str());
 }
 
-bool CString::Equals(const CString& s, CaseSensitivity cs) const
+bool NoString::Equals(const NoString& s, CaseSensitivity cs) const
 {
     if (cs == CaseSensitive) {
         return (StrCmp(s) == 0);
@@ -155,7 +155,7 @@ bool CString::Equals(const CString& s, CaseSensitivity cs) const
     }
 }
 
-bool CString::Equals(const CString& s, bool bCaseSensitive, CString::size_type uLen) const
+bool NoString::Equals(const NoString& s, bool bCaseSensitive, NoString::size_type uLen) const
 {
     if (bCaseSensitive) {
         return (StrCmp(s, uLen) == 0);
@@ -164,41 +164,41 @@ bool CString::Equals(const CString& s, bool bCaseSensitive, CString::size_type u
     }
 }
 
-bool CString::WildCmp(const CString& sWild, const CString& sString, CaseSensitivity cs)
+bool NoString::WildCmp(const NoString& sWild, const NoString& sString, CaseSensitivity cs)
 {
     // avoid a copy when cs == CaseSensitive (C++ deliberately specifies that binding
     // a temporary object to a reference to const on the stack lengthens the lifetime
     // of the temporary to the lifetime of the reference itself)
-    const CString& sWld = (cs == CaseSensitive ? sWild : sWild.AsLower());
-    const CString& sStr = (cs == CaseSensitive ? sString : sString.AsLower());
+    const NoString& sWld = (cs == CaseSensitive ? sWild : sWild.AsLower());
+    const NoString& sStr = (cs == CaseSensitive ? sString : sString.AsLower());
 
     // Written by Jack Handy - jakkhandy@hotmail.com
-    const char* wild = sWld.c_str(), *CString = sStr.c_str();
+    const char* wild = sWld.c_str(), *NoString = sStr.c_str();
     const char* cp = nullptr, *mp = nullptr;
 
-    while ((*CString) && (*wild != '*')) {
-        if ((*wild != *CString) && (*wild != '?')) {
+    while ((*NoString) && (*wild != '*')) {
+        if ((*wild != *NoString) && (*wild != '?')) {
             return false;
         }
 
         wild++;
-        CString++;
+        NoString++;
     }
 
-    while (*CString) {
+    while (*NoString) {
         if (*wild == '*') {
             if (!*++wild) {
                 return true;
             }
 
             mp = wild;
-            cp = CString + 1;
-        } else if ((*wild == *CString) || (*wild == '?')) {
+            cp = NoString + 1;
+        } else if ((*wild == *NoString) || (*wild == '?')) {
             wild++;
-            CString++;
+            NoString++;
         } else {
             wild = mp;
-            CString = cp++;
+            NoString = cp++;
         }
     }
 
@@ -209,9 +209,9 @@ bool CString::WildCmp(const CString& sWild, const CString& sString, CaseSensitiv
     return (*wild == 0);
 }
 
-bool CString::WildCmp(const CString& sWild, CaseSensitivity cs) const { return CString::WildCmp(sWild, *this, cs); }
+bool NoString::WildCmp(const NoString& sWild, CaseSensitivity cs) const { return NoString::WildCmp(sWild, *this, cs); }
 
-CString& CString::MakeUpper()
+NoString& NoString::MakeUpper()
 {
     for (char& c : *this) {
         // TODO use unicode
@@ -221,7 +221,7 @@ CString& CString::MakeUpper()
     return *this;
 }
 
-CString& CString::MakeLower()
+NoString& NoString::MakeLower()
 {
     for (char& c : *this) {
         // TODO use unicode
@@ -231,21 +231,21 @@ CString& CString::MakeLower()
     return *this;
 }
 
-CString CString::AsUpper() const
+NoString NoString::AsUpper() const
 {
-    CString sRet = *this;
+    NoString sRet = *this;
     sRet.MakeUpper();
     return sRet;
 }
 
-CString CString::AsLower() const
+NoString NoString::AsLower() const
 {
-    CString sRet = *this;
+    NoString sRet = *this;
     sRet.MakeLower();
     return sRet;
 }
 
-CString::EEscape CString::ToEscape(const CString& sEsc)
+NoString::EEscape NoString::ToEscape(const NoString& sEsc)
 {
     if (sEsc.Equals("ASCII")) {
         return EASCII;
@@ -268,9 +268,9 @@ CString::EEscape CString::ToEscape(const CString& sEsc)
     return EASCII;
 }
 
-CString CString::Escape_n(EEscape eFrom, EEscape eTo) const
+NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
 {
-    CString sRet;
+    NoString sRet;
     const char szHex[] = "0123456789ABCDEF";
     const unsigned char* pStart = (const unsigned char*)data();
     const unsigned char* p = (const unsigned char*)data();
@@ -591,29 +591,29 @@ CString CString::Escape_n(EEscape eFrom, EEscape eTo) const
     return sRet;
 }
 
-CString CString::Escape_n(EEscape eTo) const { return Escape_n(EASCII, eTo); }
+NoString NoString::Escape_n(EEscape eTo) const { return Escape_n(EASCII, eTo); }
 
-CString& CString::Escape(EEscape eFrom, EEscape eTo) { return (*this = Escape_n(eFrom, eTo)); }
+NoString& NoString::Escape(EEscape eFrom, EEscape eTo) { return (*this = Escape_n(eFrom, eTo)); }
 
-CString& CString::Escape(EEscape eTo) { return (*this = Escape_n(eTo)); }
+NoString& NoString::Escape(EEscape eTo) { return (*this = Escape_n(eTo)); }
 
-CString CString::Replace_n(const CString& sReplace, const CString& sWith, const CString& sLeft, const CString& sRight, bool bRemoveDelims) const
+NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims) const
 {
-    CString sRet = *this;
-    CString::Replace(sRet, sReplace, sWith, sLeft, sRight, bRemoveDelims);
+    NoString sRet = *this;
+    NoString::Replace(sRet, sReplace, sWith, sLeft, sRight, bRemoveDelims);
     return sRet;
 }
 
-unsigned int CString::Replace(const CString& sReplace, const CString& sWith, const CString& sLeft, const CString& sRight, bool bRemoveDelims)
+unsigned int NoString::Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
 {
-    return CString::Replace(*this, sReplace, sWith, sLeft, sRight, bRemoveDelims);
+    return NoString::Replace(*this, sReplace, sWith, sLeft, sRight, bRemoveDelims);
 }
 
 unsigned int
-CString::Replace(CString& sStr, const CString& sReplace, const CString& sWith, const CString& sLeft, const CString& sRight, bool bRemoveDelims)
+NoString::Replace(NoString& sStr, const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
 {
     unsigned int uRet = 0;
-    CString sCopy = sStr;
+    NoString sCopy = sStr;
     sStr.clear();
 
     size_type uReplaceWidth = sReplace.length();
@@ -651,11 +651,11 @@ CString::Replace(CString& sStr, const CString& sReplace, const CString& sWith, c
     return uRet;
 }
 
-CString CString::Token(size_t uPos, bool bRest, const CString& sSep, bool bAllowEmpty, const CString& sLeft, const CString& sRight, bool bTrimQuotes) const
+NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
 {
-    VCString vsTokens;
+    NoStringVector vsTokens;
     if (Split(sSep, vsTokens, bAllowEmpty, sLeft, sRight, bTrimQuotes) > uPos) {
-        CString sRet;
+        NoString sRet;
 
         for (size_t a = uPos; a < vsTokens.size(); a++) {
             if (a > uPos) {
@@ -675,7 +675,7 @@ CString CString::Token(size_t uPos, bool bRest, const CString& sSep, bool bAllow
     return Token(uPos, bRest, sSep, bAllowEmpty);
 }
 
-CString CString::Token(size_t uPos, bool bRest, const CString& sSep, bool bAllowEmpty) const
+NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty) const
 {
     const char* sep_str = sSep.c_str();
     size_t sep_len = sSep.length();
@@ -726,7 +726,7 @@ CString CString::Token(size_t uPos, bool bRest, const CString& sSep, bool bAllow
     return substr(start_pos);
 }
 
-CString CString::Ellipsize(unsigned int uLen) const
+NoString NoString::Ellipsize(unsigned int uLen) const
 {
     if (uLen >= size()) {
         return *this;
@@ -748,37 +748,37 @@ CString CString::Ellipsize(unsigned int uLen) const
     return sRet;
 }
 
-CString CString::Left(size_type uCount) const
+NoString NoString::Left(size_type uCount) const
 {
     uCount = (uCount > length()) ? length() : uCount;
     return substr(0, uCount);
 }
 
-CString CString::Right(size_type uCount) const
+NoString NoString::Right(size_type uCount) const
 {
     uCount = (uCount > length()) ? length() : uCount;
     return substr(length() - uCount, uCount);
 }
 
-CString::size_type CString::URLSplit(MCString& msRet) const
+NoString::size_type NoString::URLSplit(NoStringMap& msRet) const
 {
     msRet.clear();
 
-    VCString vsPairs;
+    NoStringVector vsPairs;
     Split("&", vsPairs);
 
-    for (const CString& sPair : vsPairs) {
-        msRet[sPair.Token(0, false, "=").Escape(CString::EURL, CString::EASCII)] =
-        sPair.Token(1, true, "=").Escape(CString::EURL, CString::EASCII);
+    for (const NoString& sPair : vsPairs) {
+        msRet[sPair.Token(0, false, "=").Escape(NoString::EURL, NoString::EASCII)] =
+        sPair.Token(1, true, "=").Escape(NoString::EURL, NoString::EASCII);
     }
 
     return msRet.size();
 }
 
-CString::size_type CString::OptionSplit(MCString& msRet, bool bUpperKeys) const
+NoString::size_type NoString::OptionSplit(NoStringMap& msRet, bool bUpperKeys) const
 {
-    CString sName;
-    CString sCopy(*this);
+    NoString sName;
+    NoString sCopy(*this);
     msRet.clear();
 
     while (!sCopy.empty()) {
@@ -789,11 +789,11 @@ CString::size_type CString::OptionSplit(MCString& msRet, bool bUpperKeys) const
             continue;
         }
 
-        VCString vsNames;
+        NoStringVector vsNames;
         sName.Split(" ", vsNames, false, "\"", "\"");
 
         for (unsigned int a = 0; a < vsNames.size(); a++) {
-            CString sKeyName = vsNames[a];
+            NoString sKeyName = vsNames[a];
 
             if (bUpperKeys) {
                 sKeyName.MakeUpper();
@@ -811,14 +811,14 @@ CString::size_type CString::OptionSplit(MCString& msRet, bool bUpperKeys) const
     return msRet.size();
 }
 
-CString::size_type CString::QuoteSplit(VCString& vsRet) const
+NoString::size_type NoString::QuoteSplit(NoStringVector& vsRet) const
 {
     vsRet.clear();
     return Split(" ", vsRet, false, "\"", "\"", true);
 }
 
-CString::size_type
-CString::Split(const CString& sDelim, VCString& vsRet, bool bAllowEmpty, const CString& sLeft, const CString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
+NoString::size_type
+NoString::Split(const NoString& sDelim, NoStringVector& vsRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
 {
     vsRet.clear();
 
@@ -826,7 +826,7 @@ CString::Split(const CString& sDelim, VCString& vsRet, bool bAllowEmpty, const C
         return 0;
     }
 
-    CString sTmp;
+    NoString sTmp;
     bool bInside = false;
     size_type uDelimLen = sDelim.length();
     size_type uLeftLen = sLeft.length();
@@ -895,27 +895,27 @@ CString::Split(const CString& sDelim, VCString& vsRet, bool bAllowEmpty, const C
     return vsRet.size();
 }
 
-CString::size_type
-CString::Split(const CString& sDelim, SCString& ssRet, bool bAllowEmpty, const CString& sLeft, const CString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
+NoString::size_type
+NoString::Split(const NoString& sDelim, NoStringSet& ssRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
 {
-    VCString vsTokens;
+    NoStringVector vsTokens;
 
     Split(sDelim, vsTokens, bAllowEmpty, sLeft, sRight, bTrimQuotes, bTrimWhiteSpace);
 
     ssRet.clear();
 
-    for (const CString& sToken : vsTokens) {
+    for (const NoString& sToken : vsTokens) {
         ssRet.insert(sToken);
     }
 
     return ssRet.size();
 }
 
-CString CString::NamedFormat(const CString& sFormat, const MCString& msValues)
+NoString NoString::NamedFormat(const NoString& sFormat, const NoStringMap& msValues)
 {
-    CString sRet;
+    NoString sRet;
 
-    CString sKey;
+    NoString sKey;
     bool bEscape = false;
     bool bParam = false;
     const char* p = sFormat.c_str();
@@ -942,7 +942,7 @@ CString CString::NamedFormat(const CString& sFormat, const MCString& msValues)
                 bEscape = true;
             } else if (*p == '}') {
                 bParam = false;
-                MCString::const_iterator it = msValues.find(sKey);
+                NoStringMap::const_iterator it = msValues.find(sKey);
                 if (it != msValues.end()) {
                     sRet += (*it).second;
                 }
@@ -957,7 +957,7 @@ CString CString::NamedFormat(const CString& sFormat, const MCString& msValues)
     return sRet;
 }
 
-CString CString::RandomString(unsigned int uLength)
+NoString NoString::RandomString(unsigned int uLength)
 {
     const char chars[] = "abcdefghijklmnopqrstuvwxyz"
                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -965,7 +965,7 @@ CString CString::RandomString(unsigned int uLength)
     // -1 because sizeof() includes the trailing '\0' byte
     const size_t len = sizeof(chars) / sizeof(chars[0]) - 1;
     size_t p;
-    CString sRet;
+    NoString sRet;
 
     for (unsigned int a = 0; a < uLength; a++) {
         p = (size_t)(len * (rand() / (RAND_MAX + 1.0)));
@@ -975,33 +975,33 @@ CString CString::RandomString(unsigned int uLength)
     return sRet;
 }
 
-bool CString::Base64Encode(unsigned int uWrap)
+bool NoString::Base64Encode(unsigned int uWrap)
 {
-    CString sCopy(*this);
+    NoString sCopy(*this);
     return sCopy.Base64Encode(*this, uWrap);
 }
 
-unsigned long CString::Base64Decode()
+unsigned long NoString::Base64Decode()
 {
-    CString sCopy(*this);
+    NoString sCopy(*this);
     return sCopy.Base64Decode(*this);
 }
 
-CString CString::Base64Encode_n(unsigned int uWrap) const
+NoString NoString::Base64Encode_n(unsigned int uWrap) const
 {
-    CString sRet;
+    NoString sRet;
     Base64Encode(sRet, uWrap);
     return sRet;
 }
 
-CString CString::Base64Decode_n() const
+NoString NoString::Base64Decode_n() const
 {
-    CString sRet;
+    NoString sRet;
     Base64Decode(sRet);
     return sRet;
 }
 
-bool CString::Base64Encode(CString& sRet, unsigned int uWrap) const
+bool NoString::Base64Encode(NoString& sRet, unsigned int uWrap) const
 {
     const char b64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     sRet.clear();
@@ -1062,9 +1062,9 @@ bool CString::Base64Encode(CString& sRet, unsigned int uWrap) const
     return true;
 }
 
-unsigned long CString::Base64Decode(CString& sRet) const
+unsigned long NoString::Base64Decode(NoString& sRet) const
 {
-    CString sTmp(*this);
+    NoString sTmp(*this);
     // remove new lines
     sTmp.Replace("\r", "");
     sTmp.Replace("\n", "");
@@ -1105,9 +1105,9 @@ unsigned long CString::Base64Decode(CString& sRet) const
     return uRet;
 }
 
-CString CString::MD5() const { return (const char*)CMD5(*this); }
+NoString NoString::MD5() const { return (const char*)NoMD5(*this); }
 
-CString CString::SHA256() const
+NoString NoString::SHA256() const
 {
     unsigned char digest[SHA256_DIGEST_SIZE];
     char digest_hex[SHA256_DIGEST_SIZE * 2 + 1];
@@ -1158,25 +1158,25 @@ CString CString::SHA256() const
 }
 
 #ifdef HAVE_LIBSSL
-CString CString::Encrypt_n(const CString& sPass, const CString& sIvec) const
+NoString NoString::Encrypt_n(const NoString& sPass, const NoString& sIvec) const
 {
-    CString sRet;
+    NoString sRet;
     sRet.Encrypt(sPass, sIvec);
     return sRet;
 }
 
-CString CString::Decrypt_n(const CString& sPass, const CString& sIvec) const
+NoString NoString::Decrypt_n(const NoString& sPass, const NoString& sIvec) const
 {
-    CString sRet;
+    NoString sRet;
     sRet.Decrypt(sPass, sIvec);
     return sRet;
 }
 
-void CString::Encrypt(const CString& sPass, const CString& sIvec) { Crypt(sPass, true, sIvec); }
+void NoString::Encrypt(const NoString& sPass, const NoString& sIvec) { Crypt(sPass, true, sIvec); }
 
-void CString::Decrypt(const CString& sPass, const CString& sIvec) { Crypt(sPass, false, sIvec); }
+void NoString::Decrypt(const NoString& sPass, const NoString& sIvec) { Crypt(sPass, false, sIvec); }
 
-void CString::Crypt(const CString& sPass, bool bEncrypt, const CString& sIvec)
+void NoString::Crypt(const NoString& sPass, bool bEncrypt, const NoString& sIvec)
 {
     unsigned char szIvec[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     BF_KEY bKey;
@@ -1203,14 +1203,14 @@ void CString::Crypt(const CString& sPass, bool bEncrypt, const CString& sIvec)
 }
 #endif // HAVE_LIBSSL
 
-CString CString::ToPercent(double d)
+NoString NoString::ToPercent(double d)
 {
     char szRet[32];
     snprintf(szRet, 32, "%.02f%%", d);
     return szRet;
 }
 
-CString CString::ToByteStr(unsigned long long d)
+NoString NoString::ToByteStr(unsigned long long d)
 {
     const unsigned long long KiB = 1024;
     const unsigned long long MiB = KiB * 1024;
@@ -1218,30 +1218,30 @@ CString CString::ToByteStr(unsigned long long d)
     const unsigned long long TiB = GiB * 1024;
 
     if (d > TiB) {
-        return CString(d / TiB) + " TiB";
+        return NoString(d / TiB) + " TiB";
     } else if (d > GiB) {
-        return CString(d / GiB) + " GiB";
+        return NoString(d / GiB) + " GiB";
     } else if (d > MiB) {
-        return CString(d / MiB) + " MiB";
+        return NoString(d / MiB) + " MiB";
     } else if (d > KiB) {
-        return CString(d / KiB) + " KiB";
+        return NoString(d / KiB) + " KiB";
     }
 
-    return CString(d) + " B";
+    return NoString(d) + " B";
 }
 
-CString CString::ToTimeStr(unsigned long s)
+NoString NoString::ToTimeStr(unsigned long s)
 {
     const unsigned long m = 60;
     const unsigned long h = m * 60;
     const unsigned long d = h * 24;
     const unsigned long w = d * 7;
     const unsigned long y = d * 365;
-    CString sRet;
+    NoString sRet;
 
 #define TIMESPAN(time, str)                  \
     if (s >= time) {                         \
-        sRet += CString(s / time) + str " "; \
+        sRet += NoString(s / time) + str " "; \
         s = s % time;                        \
     }
     TIMESPAN(y, "y");
@@ -1256,31 +1256,31 @@ CString CString::ToTimeStr(unsigned long s)
     return sRet.RightChomp_n();
 }
 
-bool CString::ToBool() const
+bool NoString::ToBool() const
 {
-    CString sTrimmed = Trim_n();
+    NoString sTrimmed = Trim_n();
     return (!sTrimmed.Trim_n("0").empty() && !sTrimmed.Equals("false") && !sTrimmed.Equals("off") &&
             !sTrimmed.Equals("no") && !sTrimmed.Equals("n"));
 }
 
-short CString::ToShort() const { return (short int)strtol(this->c_str(), (char**)nullptr, 10); }
-unsigned short CString::ToUShort() const { return (unsigned short int)strtoul(this->c_str(), (char**)nullptr, 10); }
-unsigned int CString::ToUInt() const { return (unsigned int)strtoul(this->c_str(), (char**)nullptr, 10); }
-int CString::ToInt() const { return (int)strtol(this->c_str(), (char**)nullptr, 10); }
-long CString::ToLong() const { return strtol(this->c_str(), (char**)nullptr, 10); }
-unsigned long CString::ToULong() const { return strtoul(c_str(), nullptr, 10); }
-unsigned long long CString::ToULongLong() const { return strtoull(c_str(), nullptr, 10); }
-long long CString::ToLongLong() const { return strtoll(c_str(), nullptr, 10); }
-double CString::ToDouble() const { return strtod(c_str(), nullptr); }
+short NoString::ToShort() const { return (short int)strtol(this->c_str(), (char**)nullptr, 10); }
+unsigned short NoString::ToUShort() const { return (unsigned short int)strtoul(this->c_str(), (char**)nullptr, 10); }
+unsigned int NoString::ToUInt() const { return (unsigned int)strtoul(this->c_str(), (char**)nullptr, 10); }
+int NoString::ToInt() const { return (int)strtol(this->c_str(), (char**)nullptr, 10); }
+long NoString::ToLong() const { return strtol(this->c_str(), (char**)nullptr, 10); }
+unsigned long NoString::ToULong() const { return strtoul(c_str(), nullptr, 10); }
+unsigned long long NoString::ToULongLong() const { return strtoull(c_str(), nullptr, 10); }
+long long NoString::ToLongLong() const { return strtoll(c_str(), nullptr, 10); }
+double NoString::ToDouble() const { return strtod(c_str(), nullptr); }
 
 
-bool CString::Trim(const CString& s)
+bool NoString::Trim(const NoString& s)
 {
     bool bLeft = TrimLeft(s);
     return (TrimRight(s) || bLeft);
 }
 
-bool CString::TrimLeft(const CString& s)
+bool NoString::TrimLeft(const NoString& s)
 {
     size_type i = find_first_not_of(s);
 
@@ -1294,7 +1294,7 @@ bool CString::TrimLeft(const CString& s)
     return true;
 }
 
-bool CString::TrimRight(const CString& s)
+bool NoString::TrimRight(const NoString& s)
 {
     size_type i = find_last_not_of(s);
 
@@ -1308,28 +1308,28 @@ bool CString::TrimRight(const CString& s)
     return true;
 }
 
-CString CString::Trim_n(const CString& s) const
+NoString NoString::Trim_n(const NoString& s) const
 {
-    CString sRet = *this;
+    NoString sRet = *this;
     sRet.Trim(s);
     return sRet;
 }
 
-CString CString::TrimLeft_n(const CString& s) const
+NoString NoString::TrimLeft_n(const NoString& s) const
 {
-    CString sRet = *this;
+    NoString sRet = *this;
     sRet.TrimLeft(s);
     return sRet;
 }
 
-CString CString::TrimRight_n(const CString& s) const
+NoString NoString::TrimRight_n(const NoString& s) const
 {
-    CString sRet = *this;
+    NoString sRet = *this;
     sRet.TrimRight(s);
     return sRet;
 }
 
-bool CString::TrimPrefix(const CString& sPrefix)
+bool NoString::TrimPrefix(const NoString& sPrefix)
 {
     if (StartsWith(sPrefix)) {
         LeftChomp(sPrefix.length());
@@ -1339,7 +1339,7 @@ bool CString::TrimPrefix(const CString& sPrefix)
     }
 }
 
-bool CString::TrimSuffix(const CString& sSuffix)
+bool NoString::TrimSuffix(const NoString& sSuffix)
 {
     if (Right(sSuffix.length()).Equals(sSuffix)) {
         RightChomp(sSuffix.length());
@@ -1349,7 +1349,7 @@ bool CString::TrimSuffix(const CString& sSuffix)
     }
 }
 
-size_t CString::Find(const CString& s, CaseSensitivity cs) const
+size_t NoString::Find(const NoString& s, CaseSensitivity cs) const
 {
     if (cs == CaseSensitive) {
         return find(s);
@@ -1358,48 +1358,48 @@ size_t CString::Find(const CString& s, CaseSensitivity cs) const
     }
 }
 
-bool CString::StartsWith(const CString& sPrefix, CaseSensitivity cs) const
+bool NoString::StartsWith(const NoString& sPrefix, CaseSensitivity cs) const
 {
     return Left(sPrefix.length()).Equals(sPrefix, cs);
 }
 
-bool CString::EndsWith(const CString& sSuffix, CaseSensitivity cs) const
+bool NoString::EndsWith(const NoString& sSuffix, CaseSensitivity cs) const
 {
     return Right(sSuffix.length()).Equals(sSuffix, cs);
 }
 
-bool CString::Contains(const CString& s, CaseSensitivity cs) const { return Find(s, cs) != npos; }
+bool NoString::Contains(const NoString& s, CaseSensitivity cs) const { return Find(s, cs) != npos; }
 
 
-CString CString::TrimPrefix_n(const CString& sPrefix) const
+NoString NoString::TrimPrefix_n(const NoString& sPrefix) const
 {
-    CString sRet = *this;
+    NoString sRet = *this;
     sRet.TrimPrefix(sPrefix);
     return sRet;
 }
 
-CString CString::TrimSuffix_n(const CString& sSuffix) const
+NoString NoString::TrimSuffix_n(const NoString& sSuffix) const
 {
-    CString sRet = *this;
+    NoString sRet = *this;
     sRet.TrimSuffix(sSuffix);
     return sRet;
 }
 
-CString CString::LeftChomp_n(size_type uLen) const
+NoString NoString::LeftChomp_n(size_type uLen) const
 {
-    CString sRet = *this;
+    NoString sRet = *this;
     sRet.LeftChomp(uLen);
     return sRet;
 }
 
-CString CString::RightChomp_n(size_type uLen) const
+NoString NoString::RightChomp_n(size_type uLen) const
 {
-    CString sRet = *this;
+    NoString sRet = *this;
     sRet.RightChomp(uLen);
     return sRet;
 }
 
-bool CString::LeftChomp(size_type uLen)
+bool NoString::LeftChomp(size_type uLen)
 {
     bool bRet = false;
 
@@ -1411,7 +1411,7 @@ bool CString::LeftChomp(size_type uLen)
     return bRet;
 }
 
-bool CString::RightChomp(size_type uLen)
+bool NoString::RightChomp(size_type uLen)
 {
     bool bRet = false;
 
@@ -1423,9 +1423,9 @@ bool CString::RightChomp(size_type uLen)
     return bRet;
 }
 
-CString CString::StripControls_n() const
+NoString NoString::StripControls_n() const
 {
-    CString sRet;
+    NoString sRet;
     const unsigned char* pStart = (const unsigned char*)data();
     unsigned char ch = *pStart;
     size_type iLength = length();
@@ -1471,14 +1471,14 @@ CString CString::StripControls_n() const
     return sRet;
 }
 
-CString& CString::StripControls() { return (*this = StripControls_n()); }
+NoString& NoString::StripControls() { return (*this = StripControls_n()); }
 
-//////////////// MCString ////////////////
-const MCString MCString::EmptyMap;
+//////////////// NoStringMap ////////////////
+const NoStringMap NoStringMap::EmptyMap;
 
-MCString::status_t MCString::WriteToDisk(const CString& sPath, mode_t iMode) const
+NoStringMap::status_t NoStringMap::WriteToDisk(const NoString& sPath, mode_t iMode) const
 {
-    CFile cFile(sPath);
+    NoFile cFile(sPath);
 
     if (this->empty()) {
         if (!cFile.Exists()) return MCS_SUCCESS;
@@ -1490,8 +1490,8 @@ MCString::status_t MCString::WriteToDisk(const CString& sPath, mode_t iMode) con
     }
 
     for (const auto& it : *this) {
-        CString sKey = it.first;
-        CString sValue = it.second;
+        NoString sKey = it.first;
+        NoString sValue = it.second;
         if (!WriteFilter(sKey, sValue)) {
             return MCS_EWRITEFIL;
         }
@@ -1510,20 +1510,20 @@ MCString::status_t MCString::WriteToDisk(const CString& sPath, mode_t iMode) con
     return MCS_SUCCESS;
 }
 
-MCString::status_t MCString::ReadFromDisk(const CString& sPath)
+NoStringMap::status_t NoStringMap::ReadFromDisk(const NoString& sPath)
 {
     clear();
-    CFile cFile(sPath);
+    NoFile cFile(sPath);
     if (!cFile.Open(O_RDONLY)) {
         return MCS_EOPEN;
     }
 
-    CString sBuffer;
+    NoString sBuffer;
 
     while (cFile.ReadLine(sBuffer)) {
         sBuffer.Trim();
-        CString sKey = sBuffer.Token(0);
-        CString sValue = sBuffer.Token(1);
+        NoString sKey = sBuffer.Token(0);
+        NoString sValue = sBuffer.Token(1);
         Decode(sKey);
         Decode(sValue);
 
@@ -1539,9 +1539,9 @@ MCString::status_t MCString::ReadFromDisk(const CString& sPath)
 
 static const char hexdigits[] = "0123456789abcdef";
 
-CString& MCString::Encode(CString& sValue) const
+NoString& NoStringMap::Encode(NoString& sValue) const
 {
-    CString sTmp;
+    NoString sTmp;
     for (unsigned char c : sValue) {
         // isalnum() needs unsigned char as argument and this code
         // assumes unsigned, too.
@@ -1558,11 +1558,11 @@ CString& MCString::Encode(CString& sValue) const
     return sValue;
 }
 
-CString& MCString::Decode(CString& sValue) const
+NoString& NoStringMap::Decode(NoString& sValue) const
 {
     const char* pTmp = sValue.c_str();
     char* endptr;
-    CString sTmp;
+    NoString sTmp;
 
     while (*pTmp) {
         if (*pTmp != '%') {

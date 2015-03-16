@@ -22,27 +22,27 @@
 using std::vector;
 using std::map;
 
-CNick::CNick() : m_sChanPerms(""), m_pNetwork(nullptr), m_sNick(""), m_sIdent(""), m_sHost("") {}
+NoNick::NoNick() : m_sChanPerms(""), m_pNetwork(nullptr), m_sNick(""), m_sIdent(""), m_sHost("") {}
 
-CNick::CNick(const CString& sNick) : CNick() { Parse(sNick); }
+NoNick::NoNick(const NoString& sNick) : NoNick() { Parse(sNick); }
 
-CNick::~CNick() {}
+NoNick::~NoNick() {}
 
-void CNick::Reset()
+void NoNick::Reset()
 {
     m_sChanPerms.clear();
     m_pNetwork = nullptr;
 }
 
-void CNick::Parse(const CString& sNickMask)
+void NoNick::Parse(const NoString& sNickMask)
 {
     if (sNickMask.empty()) {
         return;
     }
 
-    CString::size_type uPos = sNickMask.find('!');
+    NoString::size_type uPos = sNickMask.find('!');
 
-    if (uPos == CString::npos) {
+    if (uPos == NoString::npos) {
         m_sNick = sNickMask.substr((sNickMask[0] == ':'));
         return;
     }
@@ -50,20 +50,20 @@ void CNick::Parse(const CString& sNickMask)
     m_sNick = sNickMask.substr((sNickMask[0] == ':'), uPos - (sNickMask[0] == ':'));
     m_sHost = sNickMask.substr(uPos + 1);
 
-    if ((uPos = m_sHost.find('@')) != CString::npos) {
+    if ((uPos = m_sHost.find('@')) != NoString::npos) {
         m_sIdent = m_sHost.substr(0, uPos);
         m_sHost = m_sHost.substr(uPos + 1);
     }
 }
 
-size_t CNick::GetCommonChans(vector<CChannel*>& vRetChans, CNetwork* pNetwork) const
+size_t NoNick::GetCommonChans(vector<NoChannel*>& vRetChans, NoNetwork* pNetwork) const
 {
     vRetChans.clear();
 
-    const vector<CChannel*>& vChans = pNetwork->GetChans();
+    const vector<NoChannel*>& vChans = pNetwork->GetChans();
 
-    for (CChannel* pChan : vChans) {
-        const map<CString, CNick>& msNicks = pChan->GetNicks();
+    for (NoChannel* pChan : vChans) {
+        const map<NoString, NoNick>& msNicks = pChan->GetNicks();
 
         for (const auto& it : msNicks) {
             if (it.first.Equals(m_sNick)) {
@@ -76,21 +76,21 @@ size_t CNick::GetCommonChans(vector<CChannel*>& vRetChans, CNetwork* pNetwork) c
     return vRetChans.size();
 }
 
-bool CNick::NickEquals(const CString& nickname) const
+bool NoNick::NickEquals(const NoString& nickname) const
 {
     // TODO add proper IRC case mapping here
     // https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.1
     return m_sNick.Equals(nickname);
 }
 
-void CNick::SetNetwork(CNetwork* pNetwork) { m_pNetwork = pNetwork; }
-void CNick::SetNick(const CString& s) { m_sNick = s; }
-void CNick::SetIdent(const CString& s) { m_sIdent = s; }
-void CNick::SetHost(const CString& s) { m_sHost = s; }
+void NoNick::SetNetwork(NoNetwork* pNetwork) { m_pNetwork = pNetwork; }
+void NoNick::SetNick(const NoString& s) { m_sNick = s; }
+void NoNick::SetIdent(const NoString& s) { m_sIdent = s; }
+void NoNick::SetHost(const NoString& s) { m_sHost = s; }
 
-bool CNick::HasPerm(unsigned char uPerm) const { return (uPerm && m_sChanPerms.find(uPerm) != CString::npos); }
+bool NoNick::HasPerm(unsigned char uPerm) const { return (uPerm && m_sChanPerms.find(uPerm) != NoString::npos); }
 
-bool CNick::AddPerm(unsigned char uPerm)
+bool NoNick::AddPerm(unsigned char uPerm)
 {
     if (!uPerm || HasPerm(uPerm)) {
         return false;
@@ -101,10 +101,10 @@ bool CNick::AddPerm(unsigned char uPerm)
     return true;
 }
 
-bool CNick::RemPerm(unsigned char uPerm)
+bool NoNick::RemPerm(unsigned char uPerm)
 {
-    CString::size_type uPos = m_sChanPerms.find(uPerm);
-    if (uPos == CString::npos) {
+    NoString::size_type uPos = m_sChanPerms.find(uPerm);
+    if (uPos == NoString::npos) {
         return false;
     }
 
@@ -113,10 +113,10 @@ bool CNick::RemPerm(unsigned char uPerm)
     return true;
 }
 
-unsigned char CNick::GetPermChar() const
+unsigned char NoNick::GetPermChar() const
 {
-    CIRCSock* pIRCSock = (!m_pNetwork) ? nullptr : m_pNetwork->GetIRCSock();
-    const CString& sChanPerms = (!pIRCSock) ? "@+" : pIRCSock->GetPerms();
+    NoIrcSock* pIRCSock = (!m_pNetwork) ? nullptr : m_pNetwork->GetIRCSock();
+    const NoString& sChanPerms = (!pIRCSock) ? "@+" : pIRCSock->GetPerms();
 
     for (unsigned int a = 0; a < sChanPerms.size(); a++) {
         const unsigned char& c = sChanPerms[a];
@@ -128,11 +128,11 @@ unsigned char CNick::GetPermChar() const
     return '\0';
 }
 
-CString CNick::GetPermStr() const
+NoString NoNick::GetPermStr() const
 {
-    CIRCSock* pIRCSock = (!m_pNetwork) ? nullptr : m_pNetwork->GetIRCSock();
-    const CString& sChanPerms = (!pIRCSock) ? "@+" : pIRCSock->GetPerms();
-    CString sRet;
+    NoIrcSock* pIRCSock = (!m_pNetwork) ? nullptr : m_pNetwork->GetIRCSock();
+    const NoString& sChanPerms = (!pIRCSock) ? "@+" : pIRCSock->GetPerms();
+    NoString sRet;
 
     for (unsigned int a = 0; a < sChanPerms.size(); a++) {
         const unsigned char& c = sChanPerms[a];
@@ -144,12 +144,12 @@ CString CNick::GetPermStr() const
 
     return sRet;
 }
-const CString& CNick::GetNick() const { return m_sNick; }
-const CString& CNick::GetIdent() const { return m_sIdent; }
-const CString& CNick::GetHost() const { return m_sHost; }
-CString CNick::GetNickMask() const
+const NoString& NoNick::GetNick() const { return m_sNick; }
+const NoString& NoNick::GetIdent() const { return m_sIdent; }
+const NoString& NoNick::GetHost() const { return m_sHost; }
+NoString NoNick::GetNickMask() const
 {
-    CString sRet = m_sNick;
+    NoString sRet = m_sNick;
 
     if (!m_sHost.empty()) {
         if (!m_sIdent.empty()) sRet += "!" + m_sIdent;
@@ -159,9 +159,9 @@ CString CNick::GetNickMask() const
     return sRet;
 }
 
-CString CNick::GetHostMask() const
+NoString NoNick::GetHostMask() const
 {
-    CString sRet = m_sNick;
+    NoString sRet = m_sNick;
 
     if (!m_sIdent.empty()) {
         sRet += "!" + m_sIdent;
@@ -174,7 +174,7 @@ CString CNick::GetHostMask() const
     return (sRet);
 }
 
-void CNick::Clone(const CNick& SourceNick)
+void NoNick::Clone(const NoNick& SourceNick)
 {
     SetNick(SourceNick.GetNick());
     SetIdent(SourceNick.GetIdent());

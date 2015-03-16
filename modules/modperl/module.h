@@ -25,13 +25,13 @@
 #if HAVE_VISIBILITY
 #pragma GCC visibility push(default)
 #endif
-class CPerlModule : public CModule {
+class CPerlModule : public NoModule {
 	SV* m_perlObj;
 	VWebSubPages* _GetSubPages();
 public:
-	CPerlModule(CUser* pUser, CNetwork* pNetwork, const CString& sModName, const CString& sDataPath,
-			CModInfo::EModuleType eType, SV* perlObj)
-			: CModule(nullptr, pUser, pNetwork, sModName, sDataPath, eType) {
+	CPerlModule(NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataPath,
+			NoModInfo::EModuleType eType, SV* perlObj)
+			: NoModule(nullptr, pUser, pNetwork, sModName, sDataPath, eType) {
 		m_perlObj = newSVsv(perlObj);
 	}
 	SV* GetPerlObj() {
@@ -41,74 +41,74 @@ public:
 	bool OnBoot() override;
 	bool WebRequiresLogin() override;
 	bool WebRequiresAdmin() override;
-	CString GetWebMenuTitle() override;
-	bool OnWebPreRequest(CWebSock& WebSock, const CString& sPageName) override;
-	bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override;
+	NoString GetWebMenuTitle() override;
+	bool OnWebPreRequest(NoWebSock& WebSock, const NoString& sPageName) override;
+	bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override;
 	VWebSubPages& GetSubPages() override;
 	void OnPreRehash() override;
 	void OnPostRehash() override;
 	void OnIRCDisconnected() override;
 	void OnIRCConnected() override;
-	EModRet OnIRCConnecting(CIRCSock *pIRCSock) override;
-	void OnIRCConnectionError(CIRCSock *pIRCSock) override;
-	EModRet OnIRCRegistration(CString& sPass, CString& sNick, CString& sIdent, CString& sRealName) override;
-	EModRet OnBroadcast(CString& sMessage) override;
-	void OnChanPermission2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange) override;
-	void OnOp2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override;
-	void OnDeop2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override;
-	void OnVoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override;
-	void OnDevoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override;
-	void OnMode2(const CNick* pOpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange) override;
-	void OnRawMode2(const CNick* pOpNick, CChannel& Channel, const CString& sModes, const CString& sArgs) override;
-	EModRet OnRaw(CString& sLine) override;
-	EModRet OnStatusCommand(CString& sCommand) override;
-	void OnModCommand(const CString& sCommand) override;
-	void OnModNotice(const CString& sMessage) override;
-	void OnModCTCP(const CString& sMessage) override;
-	void OnQuit(const CNick& Nick, const CString& sMessage, const std::vector<CChannel*>& vChans) override;
-	void OnNick(const CNick& Nick, const CString& sNewNick, const std::vector<CChannel*>& vChans) override;
-	void OnKick(const CNick& OpNick, const CString& sKickedNick, CChannel& Channel, const CString& sMessage) override;
-	EModRet OnJoining(CChannel& Channel) override;
-	void OnJoin(const CNick& Nick, CChannel& Channel) override;
-	void OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage) override;
-	EModRet OnChanBufferStarting(CChannel& Chan, CClient& Client) override;
-	EModRet OnChanBufferEnding(CChannel& Chan, CClient& Client) override;
-	EModRet OnChanBufferPlayLine(CChannel& Chan, CClient& Client, CString& sLine) override;
-	EModRet OnPrivBufferPlayLine(CClient& Client, CString& sLine) override;
+	EModRet OnIRCConnecting(NoIrcSock *pIRCSock) override;
+	void OnIRCConnectionError(NoIrcSock *pIRCSock) override;
+	EModRet OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName) override;
+	EModRet OnBroadcast(NoString& sMessage) override;
+	void OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange) override;
+	void OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override;
+	void OnDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override;
+	void OnVoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override;
+	void OnDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override;
+	void OnMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange) override;
+	void OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override;
+	EModRet OnRaw(NoString& sLine) override;
+	EModRet OnStatusCommand(NoString& sCommand) override;
+	void OnModCommand(const NoString& sCommand) override;
+	void OnModNotice(const NoString& sMessage) override;
+	void OnModCTCP(const NoString& sMessage) override;
+	void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override;
+	void OnNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override;
+	void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override;
+	EModRet OnJoining(NoChannel& Channel) override;
+	void OnJoin(const NoNick& Nick, NoChannel& Channel) override;
+	void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override;
+	EModRet OnChanBufferStarting(NoChannel& Chan, NoClient& Client) override;
+	EModRet OnChanBufferEnding(NoChannel& Chan, NoClient& Client) override;
+	EModRet OnChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine) override;
+	EModRet OnPrivBufferPlayLine(NoClient& Client, NoString& sLine) override;
 	void OnClientLogin() override;
 	void OnClientDisconnect() override;
-	EModRet OnUserRaw(CString& sLine) override;
-	EModRet OnUserCTCPReply(CString& sTarget, CString& sMessage) override;
-	EModRet OnUserCTCP(CString& sTarget, CString& sMessage) override;
-	EModRet OnUserAction(CString& sTarget, CString& sMessage) override;
-	EModRet OnUserMsg(CString& sTarget, CString& sMessage) override;
-	EModRet OnUserNotice(CString& sTarget, CString& sMessage) override;
-	EModRet OnUserJoin(CString& sChannel, CString& sKey) override;
-	EModRet OnUserPart(CString& sChannel, CString& sMessage) override;
-	EModRet OnUserTopic(CString& sChannel, CString& sTopic) override;
-	EModRet OnUserQuit(CString& sMessage) override;
-	EModRet OnUserTopicRequest(CString& sChannel) override;
-	EModRet OnCTCPReply(CNick& Nick, CString& sMessage) override;
-	EModRet OnPrivCTCP(CNick& Nick, CString& sMessage) override;
-	EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage) override;
-	EModRet OnPrivAction(CNick& Nick, CString& sMessage) override;
-	EModRet OnChanAction(CNick& Nick, CChannel& Channel, CString& sMessage) override;
-	EModRet OnPrivMsg(CNick& Nick, CString& sMessage) override;
-	EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override;
-	EModRet OnPrivNotice(CNick& Nick, CString& sMessage) override;
-	EModRet OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage) override;
-	EModRet OnTopic(CNick& Nick, CChannel& Channel, CString& sTopic) override;
-	bool OnServerCapAvailable(const CString& sCap) override;
-	void OnServerCapResult(const CString& sCap, bool bSuccess) override;
-	EModRet OnTimerAutoJoin(CChannel& Channel) override;
-	bool OnEmbeddedWebRequest(CWebSock&, const CString&, CTemplate&) override;
-	EModRet OnAddNetwork(CNetwork& Network, CString& sErrorRet) override;
-	EModRet OnDeleteNetwork(CNetwork& Network) override;
-	EModRet OnSendToClient(CString& sLine, CClient& Client) override;
-	EModRet OnSendToIRC(CString& sLine) override;
+	EModRet OnUserRaw(NoString& sLine) override;
+	EModRet OnUserCTCPReply(NoString& sTarget, NoString& sMessage) override;
+	EModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override;
+	EModRet OnUserAction(NoString& sTarget, NoString& sMessage) override;
+	EModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override;
+	EModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override;
+	EModRet OnUserJoin(NoString& sChannel, NoString& sKey) override;
+	EModRet OnUserPart(NoString& sChannel, NoString& sMessage) override;
+	EModRet OnUserTopic(NoString& sChannel, NoString& sTopic) override;
+	EModRet OnUserQuit(NoString& sMessage) override;
+	EModRet OnUserTopicRequest(NoString& sChannel) override;
+	EModRet OnCTCPReply(NoNick& Nick, NoString& sMessage) override;
+	EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override;
+	EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
+	EModRet OnPrivAction(NoNick& Nick, NoString& sMessage) override;
+	EModRet OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
+	EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override;
+	EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
+	EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override;
+	EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
+	EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override;
+	bool OnServerCapAvailable(const NoString& sCap) override;
+	void OnServerCapResult(const NoString& sCap, bool bSuccess) override;
+	EModRet OnTimerAutoJoin(NoChannel& Channel) override;
+	bool OnEmbeddedWebRequest(NoWebSock&, const NoString&, NoTemplate&) override;
+	EModRet OnAddNetwork(NoNetwork& Network, NoString& sErrorRet) override;
+	EModRet OnDeleteNetwork(NoNetwork& Network) override;
+	EModRet OnSendToClient(NoString& sLine, NoClient& Client) override;
+	EModRet OnSendToIRC(NoString& sLine) override;
 };
 
-static inline CPerlModule* AsPerlModule(CModule* p) {
+static inline CPerlModule* AsPerlModule(NoModule* p) {
 	return dynamic_cast<CPerlModule*>(p);
 }
 
@@ -118,11 +118,11 @@ enum ELoadPerlMod {
 	Perl_LoadError,
 };
 
-class CPerlTimer : public CTimer {
+class CPerlTimer : public NoTimer {
 	SV* m_perlObj;
 public:
-	CPerlTimer(CPerlModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription, SV* perlObj)
-					: CTimer (pModule, uInterval, uCycles, sLabel, sDescription), m_perlObj(newSVsv(perlObj)) {
+	CPerlTimer(CPerlModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription, SV* perlObj)
+					: NoTimer (pModule, uInterval, uCycles, sLabel, sDescription), m_perlObj(newSVsv(perlObj)) {
 		pModule->AddTimer(this);
 	}
 	void RunJob() override;
@@ -133,14 +133,14 @@ public:
 };
 
 inline CPerlTimer* CreatePerlTimer(CPerlModule* pModule, unsigned int uInterval, unsigned int uCycles,
-		const CString& sLabel, const CString& sDescription, SV* perlObj) {
+		const NoString& sLabel, const NoString& sDescription, SV* perlObj) {
 	return new CPerlTimer(pModule, uInterval, uCycles, sLabel, sDescription, perlObj);
 }
 
-class CPerlSocket : public CSocket {
+class CPerlSocket : public NoSocket {
 	SV* m_perlObj;
 public:
-	CPerlSocket(CPerlModule* pModule, SV* perlObj) : CSocket(pModule), m_perlObj(newSVsv(perlObj)) {}
+	CPerlSocket(CPerlModule* pModule, SV* perlObj) : NoSocket(pModule), m_perlObj(newSVsv(perlObj)) {}
 	SV* GetPerlObj() {
 		return sv_2mortal(newSVsv(m_perlObj));
 	}
@@ -150,8 +150,8 @@ public:
 	void Timeout() override;
 	void ConnectionRefused() override;
 	void ReadData(const char *data, size_t len) override;
-	void ReadLine(const CString& sLine) override;
-	Csock* GetSockObj(const CString& sHost, unsigned short uPort) override;
+	void ReadLine(const NoString& sLine) override;
+	Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override;
 };
 
 inline CPerlSocket* CreatePerlSocket(CPerlModule* pModule, SV* perlObj) {
@@ -195,7 +195,7 @@ inline double GetVersion() {
 	return NO_VERSION;
 }
 
-inline CString GetVersionExtra() {
+inline NoString GetVersionExtra() {
 	return NO_VERSION_EXTRA;
 }
 #if HAVE_VISIBILITY

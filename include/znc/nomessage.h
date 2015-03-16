@@ -21,21 +21,21 @@
 #include <znc/nostring.h>
 #include <sys/time.h>
 
-class CClient;
+class NoClient;
 
-class CMessage
+class NoMessage
 {
 public:
-    CMessage(const CString& format = "", const CString& text = "", const timeval* ts = nullptr);
-    ~CMessage();
+    NoMessage(const NoString& format = "", const NoString& text = "", const timeval* ts = nullptr);
+    ~NoMessage();
 
-    CString GetLine(const CClient& client, const MCString& params) const;
+    NoString GetLine(const NoClient& client, const NoStringMap& params) const;
 
-    CString GetFormat() const { return m_format; }
-    void SetFormat(const CString& format) { m_format = format; }
+    NoString GetFormat() const { return m_format; }
+    void SetFormat(const NoString& format) { m_format = format; }
 
-    CString GetText() const { return m_text; }
-    void SetText(const CString& text) { m_text = text; }
+    NoString GetText() const { return m_text; }
+    void SetText(const NoString& text) { m_text = text; }
 
     timeval GetTime() const { return m_time; }
     void SetTime(const timeval& ts) { m_time = ts; }
@@ -43,8 +43,8 @@ public:
     void UpdateTime();
 
 private:
-    CString m_format;
-    CString m_text;
+    NoString m_format;
+    NoString m_text;
     timeval m_time;
 };
 

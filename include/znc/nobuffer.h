@@ -23,22 +23,22 @@
 #include <sys/time.h>
 #include <deque>
 
-class CClient;
+class NoClient;
 
-class CBuffer
+class NoBuffer
 {
 public:
-    CBuffer(unsigned int limit = 100);
-    ~CBuffer();
+    NoBuffer(unsigned int limit = 100);
+    ~NoBuffer();
 
-    unsigned int AddLine(const CString& format, const CString& text = "", const timeval* ts = nullptr);
+    unsigned int AddLine(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
     /// Same as AddLine, but replaces a line whose format string starts with sMatch if there is one.
-    unsigned int UpdateLine(const CString& sMatch, const CString& format, const CString& text = "");
+    unsigned int UpdateLine(const NoString& sMatch, const NoString& format, const NoString& text = "");
     /// Same as UpdateLine, but does nothing if this exact line already exists.
     /// We need this because "/version" sends us the 005 raws again
-    unsigned int UpdateExactLine(const CString& format, const CString& text = "");
-    const CMessage& GetMessage(unsigned int idx) const;
-    CString GetLine(unsigned int idx, const CClient& client, const MCString& params = MCString::EmptyMap) const;
+    unsigned int UpdateExactLine(const NoString& format, const NoString& text = "");
+    const NoMessage& GetMessage(unsigned int idx) const;
+    NoString GetLine(unsigned int idx, const NoClient& client, const NoStringMap& params = NoStringMap::EmptyMap) const;
     unsigned int Size() const { return m_lines.size(); }
     bool IsEmpty() const { return m_lines.empty(); }
     void Clear() { m_lines.clear(); }
@@ -48,7 +48,7 @@ public:
 
 private:
     unsigned int m_limit;
-    std::deque<CMessage> m_lines;
+    std::deque<NoMessage> m_lines;
 };
 
 #endif // !NOBUFFER_H

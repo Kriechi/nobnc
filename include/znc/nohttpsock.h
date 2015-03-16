@@ -21,76 +21,76 @@
 #include <znc/nosocket.h>
 #include <znc/nofile.h>
 
-class CModule;
+class NoModule;
 
-class CHTTPSock : public CSocket
+class NoHttpSock : public NoSocket
 {
 public:
-    CHTTPSock(CModule* pMod, const CString& sURIPrefix);
-    CHTTPSock(CModule* pMod, const CString& sURIPrefix, const CString& sHostname, unsigned short uPort, int iTimeout = 60);
-    virtual ~CHTTPSock();
+    NoHttpSock(NoModule* pMod, const NoString& sURIPrefix);
+    NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, unsigned short uPort, int iTimeout = 60);
+    virtual ~NoHttpSock();
 
     void ReadData(const char* data, size_t len) override;
-    void ReadLine(const CString& sData) override;
+    void ReadLine(const NoString& sData) override;
     void Connected() override;
-    Csock* GetSockObj(const CString& sHost, unsigned short uPort) override = 0;
+    Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override = 0;
 
     virtual bool ForceLogin();
-    virtual bool OnLogin(const CString& sUser, const CString& sPass, bool bBasic);
-    virtual void OnPageRequest(const CString& sURI) = 0;
-    virtual bool PrintFile(const CString& sFileName, CString sContentType = "");
+    virtual bool OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic);
+    virtual void OnPageRequest(const NoString& sURI) = 0;
+    virtual bool PrintFile(const NoString& sFileName, NoString sContentType = "");
 
     void CheckPost();
     bool SentHeader() const;
-    bool PrintHeader(off_t uContentLength, const CString& sContentType = "", unsigned int uStatusId = 200, const CString& sStatusMsg = "OK");
-    void AddHeader(const CString& sName, const CString& sValue);
-    void SetContentType(const CString& sContentType);
+    bool PrintHeader(off_t uContentLength, const NoString& sContentType = "", unsigned int uStatusId = 200, const NoString& sStatusMsg = "OK");
+    void AddHeader(const NoString& sName, const NoString& sValue);
+    void SetContentType(const NoString& sContentType);
 
     bool PrintNotFound();
-    bool Redirect(const CString& sURL);
-    bool PrintErrorPage(unsigned int uStatusId, const CString& sStatusMsg, const CString& sMessage);
-    static void ParseParams(const CString& sParams, std::map<CString, VCString>& msvsParams);
+    bool Redirect(const NoString& sURL);
+    bool PrintErrorPage(unsigned int uStatusId, const NoString& sStatusMsg, const NoString& sMessage);
+    static void ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams);
     void ParseURI();
     void GetPage();
-    static CString GetDate(time_t tm = 0);
-    CString GetRemoteIP() const override;
+    static NoString GetDate(time_t tm = 0);
+    NoString GetRemoteIP() const override;
 
-    CString GetRequestCookie(const CString& sKey) const;
-    bool SendCookie(const CString& sKey, const CString& sValue);
+    NoString GetRequestCookie(const NoString& sKey) const;
+    bool SendCookie(const NoString& sKey, const NoString& sValue);
 
-    void SetDocRoot(const CString& s);
+    void SetDocRoot(const NoString& s);
     void SetLoggedIn(bool b) { m_bLoggedIn = b; }
 
-    CString GetPath() const;
+    NoString GetPath() const;
     bool IsLoggedIn() const { return m_bLoggedIn; }
-    const CString& GetDocRoot() const;
-    const CString& GetUser() const;
-    const CString& GetPass() const;
-    const CString& GetParamString() const;
-    const CString& GetContentType() const;
-    const CString& GetURIPrefix() const;
+    const NoString& GetDocRoot() const;
+    const NoString& GetUser() const;
+    const NoString& GetPass() const;
+    const NoString& GetParamString() const;
+    const NoString& GetContentType() const;
+    const NoString& GetURIPrefix() const;
     bool IsPost() const;
 
-    CString GetParam(const CString& sName, bool bPost = true, const CString& sFilter = "\r\n") const;
-    CString GetRawParam(const CString& sName, bool bPost = true) const;
-    bool HasParam(const CString& sName, bool bPost = true) const;
-    const std::map<CString, VCString>& GetParams(bool bPost = true) const;
-    size_t GetParamValues(const CString& sName, VCString& vsRet, bool bPost = true, const CString& sFilter = "\r\n") const;
-    size_t GetParamValues(const CString& sName, std::set<CString>& ssRet, bool bPost = true, const CString& sFilter = "\r\n") const;
+    NoString GetParam(const NoString& sName, bool bPost = true, const NoString& sFilter = "\r\n") const;
+    NoString GetRawParam(const NoString& sName, bool bPost = true) const;
+    bool HasParam(const NoString& sName, bool bPost = true) const;
+    const std::map<NoString, NoStringVector>& GetParams(bool bPost = true) const;
+    size_t GetParamValues(const NoString& sName, NoStringVector& vsRet, bool bPost = true, const NoString& sFilter = "\r\n") const;
+    size_t GetParamValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost = true, const NoString& sFilter = "\r\n") const;
 
 private:
-    static CString GetRawParam(const CString& sName, const std::map<CString, VCString>& msvsParams);
-    static CString GetParam(const CString& sName, const std::map<CString, VCString>& msvsParams, const CString& sFilter);
+    static NoString GetRawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams);
+    static NoString GetParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter);
     static size_t
-    GetParamValues(const CString& sName, VCString& vsRet, const std::map<CString, VCString>& msvsParams, const CString& sFilter);
+    GetParamValues(const NoString& sName, NoStringVector& vsRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter);
     static size_t
-    GetParamValues(const CString& sName, std::set<CString>& ssRet, const std::map<CString, VCString>& msvsParams, const CString& sFilter);
+    GetParamValues(const NoString& sName, std::set<NoString>& ssRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter);
 
-    void WriteFileUncompressed(CFile& File);
-    void WriteFileGzipped(CFile& File);
+    void WriteFileUncompressed(NoFile& File);
+    void WriteFileGzipped(NoFile& File);
 
 protected:
-    void PrintPage(const CString& sPage);
+    void PrintPage(const NoString& sPage);
     void Init();
 
     bool m_bSentHeader;
@@ -99,22 +99,22 @@ protected:
     bool m_bPost;
     bool m_bDone;
     unsigned long m_uPostLen;
-    CString m_sPostData;
-    CString m_sURI;
-    CString m_sUser;
-    CString m_sPass;
-    CString m_sContentType;
-    CString m_sDocRoot;
-    CString m_sForwardedIP;
-    std::map<CString, VCString> m_msvsPOSTParams;
-    std::map<CString, VCString> m_msvsGETParams;
-    MCString m_msHeaders;
+    NoString m_sPostData;
+    NoString m_sURI;
+    NoString m_sUser;
+    NoString m_sPass;
+    NoString m_sContentType;
+    NoString m_sDocRoot;
+    NoString m_sForwardedIP;
+    std::map<NoString, NoStringVector> m_msvsPOSTParams;
+    std::map<NoString, NoStringVector> m_msvsGETParams;
+    NoStringMap m_msHeaders;
     bool m_bHTTP10Client;
-    CString m_sIfNoneMatch;
+    NoString m_sIfNoneMatch;
     bool m_bAcceptGzip;
-    MCString m_msRequestCookies;
-    MCString m_msResponseCookies;
-    CString m_sURIPrefix;
+    NoStringMap m_msRequestCookies;
+    NoStringMap m_msResponseCookies;
+    NoString m_sURIPrefix;
 };
 
 #endif // !NOHTTPSOCK_H

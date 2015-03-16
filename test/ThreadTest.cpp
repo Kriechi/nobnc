@@ -17,7 +17,7 @@
 #include <gtest/gtest.h>
 #include <znc/nothreads.h>
 
-class CWaitingJob : public CJob
+class CWaitingJob : public NoJob
 {
 public:
     CWaitingJob(bool& destroyed)
@@ -34,7 +34,7 @@ public:
 
     void signal()
     {
-        CMutexLocker locker(m_Mutex);
+        NoMutexLocker locker(m_Mutex);
         // Wait for the thread to run
         while (!m_bThreadReady) m_CV.wait(m_Mutex);
 
@@ -45,7 +45,7 @@ public:
 
     virtual void runThread()
     {
-        CMutexLocker locker(m_Mutex);
+        NoMutexLocker locker(m_Mutex);
         // We are running
         m_bThreadReady = true;
         m_CV.broadcast();
@@ -58,8 +58,8 @@ public:
 
 private:
     bool& m_bDestroyed;
-    CMutex m_Mutex;
-    CConditionVariable m_CV;
+    NoMutex m_Mutex;
+    NoConditionVariable m_CV;
     bool m_bThreadReady;
     bool m_bThreadDone;
 };
@@ -69,13 +69,13 @@ TEST(Thread, RunJob)
     bool destroyed = false;
     CWaitingJob* pJob = new CWaitingJob(destroyed);
 
-    CThreadPool::Get().addJob(pJob);
+    NoThreadPool::Get().addJob(pJob);
     pJob->signal();
 
-    while (!destroyed) CThreadPool::Get().handlePipeReadable();
+    while (!destroyed) NoThreadPool::Get().handlePipeReadable();
 }
 
-class CCancelJob : public CJob
+class CCancelJob : public NoJob
 {
 public:
     CCancelJob(bool& destroyed) : m_bDestroyed(destroyed), m_Mutex(), m_CVThreadReady(), m_bThreadReady(false) {}
@@ -88,7 +88,7 @@ public:
 
     void wait()
     {
-        CMutexLocker locker(m_Mutex);
+        NoMutexLocker locker(m_Mutex);
         // Wait for the thread to run
         while (!m_bThreadReady) m_CVThreadReady.wait(m_Mutex);
     }
@@ -109,7 +109,7 @@ public:
             // it cannot signal us in any way. And signaling us
             // before calling cancelJob() effictively is the same
             // thing as busy looping anyway. So busy looping it is.
-            // (Yes, CJob shouldn't be used for anything that
+            // (Yes, NoJob shouldn't be used for anything that
             // requires synchronisation between threads!)
         }
     }
@@ -118,8 +118,8 @@ public:
 
 private:
     bool& m_bDestroyed;
-    CMutex m_Mutex;
-    CConditionVariable m_CVThreadReady;
+    NoMutex m_Mutex;
+    NoConditionVariable m_CVThreadReady;
     bool m_bThreadReady;
 };
 
@@ -128,10 +128,10 @@ TEST(Thread, CancelJobEarly)
     bool destroyed = false;
     CCancelJob* pJob = new CCancelJob(destroyed);
 
-    CThreadPool::Get().addJob(pJob);
+    NoThreadPool::Get().addJob(pJob);
     // Don't wait for the job to run. The idea here is that we are calling
     // cancelJob() before pJob->runThread() runs, but this is a race.
-    CThreadPool::Get().cancelJob(pJob);
+    NoThreadPool::Get().cancelJob(pJob);
 
     // cancelJob() should only return after successful cancellation
     EXPECT_TRUE(destroyed);
@@ -142,16 +142,16 @@ TEST(Thread, CancelJobWhileRunning)
     bool destroyed = false;
     CCancelJob* pJob = new CCancelJob(destroyed);
 
-    CThreadPool::Get().addJob(pJob);
+    NoThreadPool::Get().addJob(pJob);
     // Wait for the job to run
     pJob->wait();
-    CThreadPool::Get().cancelJob(pJob);
+    NoThreadPool::Get().cancelJob(pJob);
 
     // cancelJob() should only return after successful cancellation
     EXPECT_TRUE(destroyed);
 }
 
-class CEmptyJob : public CJob
+class CEmptyJob : public NoJob
 {
 public:
     CEmptyJob(bool& destroyed) : m_bDestroyed(destroyed) {}
@@ -174,16 +174,16 @@ TEST(Thread, CancelJobWhenDone)
     bool destroyed = false;
     CEmptyJob* pJob = new CEmptyJob(destroyed);
 
-    CThreadPool::Get().addJob(pJob);
+    NoThreadPool::Get().addJob(pJob);
 
     // Wait for the job to finish
     fd_set fds;
     FD_ZERO(&fds);
-    FD_SET(CThreadPool::Get().getReadFD(), &fds);
-    EXPECT_EQ(1, select(1 + CThreadPool::Get().getReadFD(), &fds, nullptr, nullptr, nullptr));
+    FD_SET(NoThreadPool::Get().getReadFD(), &fds);
+    EXPECT_EQ(1, select(1 + NoThreadPool::Get().getReadFD(), &fds, nullptr, nullptr, nullptr));
 
     // And only cancel it afterwards
-    CThreadPool::Get().cancelJob(pJob);
+    NoThreadPool::Get().cancelJob(pJob);
 
     // cancelJob() should only return after successful cancellation
     EXPECT_TRUE(destroyed);

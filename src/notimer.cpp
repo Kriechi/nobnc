@@ -17,7 +17,7 @@
 #include "notimer.h"
 #include "nomodules.h"
 
-CTimer::CTimer(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription)
+NoTimer::NoTimer(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
     : CCron(), m_pModule(pModule), m_sDescription(sDescription)
 {
     SetName(sLabel);
@@ -29,9 +29,9 @@ CTimer::CTimer(CModule* pModule, unsigned int uInterval, unsigned int uCycles, c
     }
 }
 
-CTimer::~CTimer() { m_pModule->UnlinkTimer(this); }
+NoTimer::~NoTimer() { m_pModule->UnlinkTimer(this); }
 
-void CTimer::SetModule(CModule* p) { m_pModule = p; }
-void CTimer::SetDescription(const CString& s) { m_sDescription = s; }
-CModule* CTimer::GetModule() const { return m_pModule; }
-const CString& CTimer::GetDescription() const { return m_sDescription; }
+void NoTimer::SetModule(NoModule* p) { m_pModule = p; }
+void NoTimer::SetDescription(const NoString& s) { m_sDescription = s; }
+NoModule* NoTimer::GetModule() const { return m_pModule; }
+const NoString& NoTimer::GetDescription() const { return m_sDescription; }

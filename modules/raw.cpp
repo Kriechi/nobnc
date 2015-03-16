@@ -16,31 +16,31 @@
 
 #include <znc/nomodules.h>
 
-class CRawMod : public CModule
+class NoRawMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CRawMod) {}
-    virtual ~CRawMod() {}
+    MODCONSTRUCTOR(NoRawMod) {}
+    virtual ~NoRawMod() {}
 
-    EModRet OnRaw(CString& sLine) override
+    EModRet OnRaw(NoString& sLine) override
     {
         PutModule("IRC -> [" + sLine + "]");
         return CONTINUE;
     }
 
-    void OnModCommand(const CString& sCommand) override { PutIRC(sCommand); }
+    void OnModCommand(const NoString& sCommand) override { PutIRC(sCommand); }
 
-    EModRet OnUserRaw(CString& sLine) override
+    EModRet OnUserRaw(NoString& sLine) override
     {
         PutModule("YOU -> [" + sLine + "]");
         return CONTINUE;
     }
 };
 
-template <> void TModInfo<CRawMod>(CModInfo& Info)
+template <> void TModInfo<NoRawMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("raw");
-    Info.AddType(CModInfo::UserModule);
+    Info.AddType(NoModInfo::UserModule);
 }
 
-NETWORKMODULEDEFS(CRawMod, "View all of the raw traffic")
+NETWORKMODULEDEFS(NoRawMod, "View all of the raw traffic")

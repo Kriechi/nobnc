@@ -19,14 +19,14 @@
 
 using std::set;
 
-class CClientNotifyMod : public CModule
+class NoClientNotifyMod : public NoModule
 {
 protected:
-    CString m_sMethod;
+    NoString m_sMethod;
     bool m_bNewOnly;
     bool m_bOnDisconnect;
 
-    set<CString> m_sClientsSeen;
+    set<NoString> m_sClientsSeen;
 
     void SaveSettings()
     {
@@ -35,7 +35,7 @@ protected:
         SetNV("ondisconnect", m_bOnDisconnect ? "1" : "0");
     }
 
-    void SendNotification(const CString& sMessage)
+    void SendNotification(const NoString& sMessage)
     {
         if (m_sMethod == "message") {
             GetUser()->PutStatus(sMessage, nullptr, GetClient());
@@ -45,28 +45,28 @@ protected:
     }
 
 public:
-    MODCONSTRUCTOR(CClientNotifyMod)
+    MODCONSTRUCTOR(NoClientNotifyMod)
     {
         AddHelpCommand();
         AddCommand("Method",
-                   static_cast<CModCommand::ModCmdFunc>(&CClientNotifyMod::OnMethodCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoClientNotifyMod::OnMethodCommand),
                    "<message|notice|off>",
                    "Sets the notify method");
         AddCommand("NewOnly",
-                   static_cast<CModCommand::ModCmdFunc>(&CClientNotifyMod::OnNewOnlyCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoClientNotifyMod::OnNewOnlyCommand),
                    "<on|off>",
                    "Turns notifies for unseen IP addresses only on or off");
         AddCommand("OnDisconnect",
-                   static_cast<CModCommand::ModCmdFunc>(&CClientNotifyMod::OnDisconnectCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoClientNotifyMod::OnDisconnectCommand),
                    "<on|off>",
                    "Turns notifies on disconnecting clients on or off");
         AddCommand("Show",
-                   static_cast<CModCommand::ModCmdFunc>(&CClientNotifyMod::OnShowCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoClientNotifyMod::OnShowCommand),
                    "",
                    "Show the current settings");
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         m_sMethod = GetNV("method");
 
@@ -84,11 +84,11 @@ public:
 
     void OnClientLogin() override
     {
-        CString sRemoteIP = GetClient()->GetRemoteIP();
+        NoString sRemoteIP = GetClient()->GetRemoteIP();
         if (!m_bNewOnly || m_sClientsSeen.find(sRemoteIP) == m_sClientsSeen.end()) {
             SendNotification("Another client authenticated as your user. "
                              "Use the 'ListClients' command to see all " +
-                             CString(GetUser()->GetAllClients().size()) + " clients.");
+                             NoString(GetUser()->GetAllClients().size()) + " clients.");
 
             // the set<> will automatically disregard duplicates:
             m_sClientsSeen.insert(sRemoteIP);
@@ -100,13 +100,13 @@ public:
         if (m_bOnDisconnect) {
             SendNotification("A client disconnected from your user. "
                              "Use the 'ListClients' command to see the " +
-                             CString(GetUser()->GetAllClients().size()) + " remaining client(s).");
+                             NoString(GetUser()->GetAllClients().size()) + " remaining client(s).");
         }
     }
 
-    void OnMethodCommand(const CString& sCommand)
+    void OnMethodCommand(const NoString& sCommand)
     {
-        const CString& sArg = sCommand.Token(1, true).AsLower();
+        const NoString& sArg = sCommand.Token(1, true).AsLower();
 
         if (sArg != "notice" && sArg != "message" && sArg != "off") {
             PutModule("Usage: Method <message|notice|off>");
@@ -118,9 +118,9 @@ public:
         PutModule("Saved.");
     }
 
-    void OnNewOnlyCommand(const CString& sCommand)
+    void OnNewOnlyCommand(const NoString& sCommand)
     {
-        const CString& sArg = sCommand.Token(1, true).AsLower();
+        const NoString& sArg = sCommand.Token(1, true).AsLower();
 
         if (sArg.empty()) {
             PutModule("Usage: NewOnly <on|off>");
@@ -132,9 +132,9 @@ public:
         PutModule("Saved.");
     }
 
-    void OnDisconnectCommand(const CString& sCommand)
+    void OnDisconnectCommand(const NoString& sCommand)
     {
-        const CString& sArg = sCommand.Token(1, true).AsLower();
+        const NoString& sArg = sCommand.Token(1, true).AsLower();
 
         if (sArg.empty()) {
             PutModule("Usage: OnDisconnect <on|off>");
@@ -146,13 +146,13 @@ public:
         PutModule("Saved.");
     }
 
-    void OnShowCommand(const CString& sLine)
+    void OnShowCommand(const NoString& sLine)
     {
-        PutModule("Current settings: Method: " + m_sMethod + ", for unseen IP addresses only: " + CString(m_bNewOnly) +
-                  ", notify on disconnecting clients: " + CString(m_bOnDisconnect));
+        PutModule("Current settings: Method: " + m_sMethod + ", for unseen IP addresses only: " + NoString(m_bNewOnly) +
+                  ", notify on disconnecting clients: " + NoString(m_bOnDisconnect));
     }
 };
 
-template <> void TModInfo<CClientNotifyMod>(CModInfo& Info) { Info.SetWikiPage("clientnotify"); }
+template <> void TModInfo<NoClientNotifyMod>(NoModInfo& Info) { Info.SetWikiPage("clientnotify"); }
 
-USERMODULEDEFS(CClientNotifyMod, "Notifies you when another IRC client logs into or out of your account. Configurable.")
+USERMODULEDEFS(NoClientNotifyMod, "Notifies you when another IRC client logs into or out of your account. Configurable.")

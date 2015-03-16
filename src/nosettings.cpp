@@ -21,39 +21,39 @@
 
 struct ConfigStackEntry
 {
-    CString sTag;
-    CString sName;
-    CSettings Config;
+    NoString sTag;
+    NoString sName;
+    NoSettings Config;
 
-    ConfigStackEntry(const CString& Tag, const CString Name) : sTag(Tag), sName(Name), Config() {}
+    ConfigStackEntry(const NoString& Tag, const NoString Name) : sTag(Tag), sName(Name), Config() {}
 };
 
-CSettingsEntry::CSettingsEntry() : m_pSubConfig(nullptr) {}
+NoSettingsEntry::NoSettingsEntry() : m_pSubConfig(nullptr) {}
 
-CSettingsEntry::CSettingsEntry(const CSettings& Config) : m_pSubConfig(new CSettings(Config)) {}
+NoSettingsEntry::NoSettingsEntry(const NoSettings& Config) : m_pSubConfig(new NoSettings(Config)) {}
 
-CSettingsEntry::CSettingsEntry(const CSettingsEntry& other) : m_pSubConfig(nullptr)
+NoSettingsEntry::NoSettingsEntry(const NoSettingsEntry& other) : m_pSubConfig(nullptr)
 {
-    if (other.m_pSubConfig) m_pSubConfig = new CSettings(*other.m_pSubConfig);
+    if (other.m_pSubConfig) m_pSubConfig = new NoSettings(*other.m_pSubConfig);
 }
 
-CSettingsEntry::~CSettingsEntry() { delete m_pSubConfig; }
+NoSettingsEntry::~NoSettingsEntry() { delete m_pSubConfig; }
 
-CSettingsEntry& CSettingsEntry::operator=(const CSettingsEntry& other)
+NoSettingsEntry& NoSettingsEntry::operator=(const NoSettingsEntry& other)
 {
     delete m_pSubConfig;
     if (other.m_pSubConfig)
-        m_pSubConfig = new CSettings(*other.m_pSubConfig);
+        m_pSubConfig = new NoSettings(*other.m_pSubConfig);
     else
         m_pSubConfig = nullptr;
     return *this;
 }
 
-bool CSettings::Parse(CFile& file, CString& sErrorMsg)
+bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 {
-    CString sLine;
+    NoString sLine;
     unsigned int uLineNum = 0;
-    CSettings* pActiveConfig = this;
+    NoSettings* pActiveConfig = this;
     std::stack<ConfigStackEntry> ConfigStack;
     bool bCommented = false; // support for /**/ style comments
 
@@ -95,8 +95,8 @@ bool CSettings::Parse(CFile& file, CString& sErrorMsg)
             sLine.RightChomp();
             sLine.Trim();
 
-            CString sTag = sLine.Token(0);
-            CString sValue = sLine.Token(1, true);
+            NoString sTag = sLine.Token(0);
+            NoString sValue = sLine.Token(1, true);
 
             sTag.Trim();
             sValue.Trim();
@@ -108,8 +108,8 @@ bool CSettings::Parse(CFile& file, CString& sErrorMsg)
                 if (ConfigStack.empty()) ERROR("Closing tag \"" << sTag << "\" which is not open.");
 
                 const struct ConfigStackEntry& entry = ConfigStack.top();
-                CSettings myConfig(entry.Config);
-                CString sName(entry.sName);
+                NoSettings myConfig(entry.Config);
+                NoString sName(entry.sName);
 
                 if (!sTag.Equals(entry.sTag)) ERROR("Closing tag \"" << sTag << "\" which is not open.");
 
@@ -126,7 +126,7 @@ bool CSettings::Parse(CFile& file, CString& sErrorMsg)
 
                 if (it != conf.end()) ERROR("Duplicate entry for tag \"" << sTag << "\" name \"" << sName << "\".");
 
-                conf[sName] = CSettingsEntry(myConfig);
+                conf[sName] = NoSettingsEntry(myConfig);
             } else {
                 if (sValue.empty()) ERROR("Empty block name at begin of block.");
                 ConfigStack.push(ConfigStackEntry(sTag.AsLower(), sValue));
@@ -137,8 +137,8 @@ bool CSettings::Parse(CFile& file, CString& sErrorMsg)
         }
 
         // If we have a regular line, figure out where it goes
-        CString sName = sLine.Token(0, false, "=");
-        CString sValue = sLine.Token(1, true, "=");
+        NoString sName = sLine.Token(0, false, "=");
+        NoString sValue = sLine.Token(1, true, "=");
 
         // Only remove the first space, people might want
         // leading spaces (e.g. in the MOTD).
@@ -150,26 +150,26 @@ bool CSettings::Parse(CFile& file, CString& sErrorMsg)
 
         if (sName.empty() || sValue.empty()) ERROR("Malformed line");
 
-        CString sNameLower = sName.AsLower();
+        NoString sNameLower = sName.AsLower();
         pActiveConfig->m_ConfigEntries[sNameLower].push_back(sValue);
     }
 
     if (bCommented) ERROR("Comment not closed at end of file.");
 
     if (!ConfigStack.empty()) {
-        const CString& sTag = ConfigStack.top().sTag;
+        const NoString& sTag = ConfigStack.top().sTag;
         ERROR("Not all tags are closed at the end of the file. Inner-most open tag is \"" << sTag << "\".");
     }
 
     return true;
 }
 
-void CSettings::Write(CFile& File, unsigned int iIndentation)
+void NoSettings::Write(NoFile& File, unsigned int iIndentation)
 {
-    CString sIndentation = CString(iIndentation, '\t');
+    NoString sIndentation = NoString(iIndentation, '\t');
 
     for (const auto& it : m_ConfigEntries) {
-        for (const CString& sValue : it.second) {
+        for (const NoString& sValue : it.second) {
             File.Write(sIndentation + it.first + " = " + sValue + "\n");
         }
     }

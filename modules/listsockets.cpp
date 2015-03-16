@@ -17,11 +17,11 @@
 #include <znc/nouser.h>
 #include <znc/noznc.h>
 
-class CSocketSorter
+class NoSocketSorter
 {
 public:
-    CSocketSorter(Csock* p) { m_pSock = p; }
-    bool operator<(const CSocketSorter& other) const
+    NoSocketSorter(Csock* p) { m_pSock = p; }
+    bool operator<(const NoSocketSorter& other) const
     {
         // The 'biggest' item is displayed first.
         // return false: this is first
@@ -32,11 +32,11 @@ public:
             if (m_pSock->GetType() == Csock::LISTENER) return false;
             if (other.m_pSock->GetType() == Csock::LISTENER) return true;
         }
-        const CString& sMyName = m_pSock->GetSockName();
-        const CString& sMyName2 = sMyName.Token(1, true, "::");
+        const NoString& sMyName = m_pSock->GetSockName();
+        const NoString& sMyName2 = sMyName.Token(1, true, "::");
         bool bMyEmpty = sMyName2.empty();
-        const CString& sHisName = other.GetSock()->GetSockName();
-        const CString& sHisName2 = sHisName.Token(1, true, "::");
+        const NoString& sHisName = other.GetSock()->GetSockName();
+        const NoString& sHisName2 = sHisName.Token(1, true, "::");
         bool bHisEmpty = sHisName2.empty();
 
         // Then sort by first token after "::"
@@ -57,19 +57,19 @@ private:
     Csock* m_pSock;
 };
 
-class CListSockets : public CModule
+class NoListSockets : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CListSockets)
+    MODCONSTRUCTOR(NoListSockets)
     {
         AddHelpCommand();
         AddCommand("List",
-                   static_cast<CModCommand::ModCmdFunc>(&CListSockets::OnListCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoListSockets::OnListCommand),
                    "[-n]",
                    "Show the list of active sockets. Pass -n to show IP addresses");
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
 #ifndef MOD_LISTSOCKETS_ALLOW_EVERYONE
         if (!GetUser()->IsAdmin()) {
@@ -81,10 +81,10 @@ public:
         return true;
     }
 
-    std::priority_queue<CSocketSorter> GetSockets()
+    std::priority_queue<NoSocketSorter> GetSockets()
     {
-        CSockManager& m = CZNC::Get().GetManager();
-        std::priority_queue<CSocketSorter> ret;
+        NoSocketManager& m = CZNC::Get().GetManager();
+        std::priority_queue<NoSocketSorter> ret;
 
         for (unsigned int a = 0; a < m.size(); a++) {
             Csock* pSock = m[a];
@@ -100,30 +100,30 @@ public:
     }
 
     bool WebRequiresAdmin() override { return true; }
-    CString GetWebMenuTitle() override { return "List sockets"; }
+    NoString GetWebMenuTitle() override { return "List sockets"; }
 
-    bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             if (CZNC::Get().GetManager().empty()) {
                 return false;
             }
 
-            std::priority_queue<CSocketSorter> socks = GetSockets();
+            std::priority_queue<NoSocketSorter> socks = GetSockets();
 
             while (!socks.empty()) {
                 Csock* pSocket = socks.top().GetSock();
                 socks.pop();
 
-                CTemplate& Row = Tmpl.AddRow("SocketsLoop");
+                NoTemplate& Row = Tmpl.AddRow("SocketsLoop");
                 Row["Name"] = pSocket->GetSockName();
                 Row["Created"] = GetCreatedTime(pSocket);
                 Row["State"] = GetSocketState(pSocket);
                 Row["SSL"] = pSocket->GetSSL() ? "Yes" : "No";
                 Row["Local"] = GetLocalHost(pSocket, true);
                 Row["Remote"] = GetRemoteHost(pSocket, true);
-                Row["In"] = CString::ToByteStr(pSocket->GetBytesRead());
-                Row["Out"] = CString::ToByteStr(pSocket->GetBytesWritten());
+                Row["In"] = NoString::ToByteStr(pSocket->GetBytesRead());
+                Row["Out"] = NoString::ToByteStr(pSocket->GetBytesWritten());
             }
 
             return true;
@@ -132,9 +132,9 @@ public:
         return false;
     }
 
-    void OnListCommand(const CString& sLine)
+    void OnListCommand(const NoString& sLine)
     {
-        CString sArg = sLine.Token(1, true);
+        NoString sArg = sLine.Token(1, true);
 
         bool bShowHosts = true;
         if (sArg.Equals("-n")) {
@@ -143,7 +143,7 @@ public:
         ShowSocks(bShowHosts);
     }
 
-    CString GetSocketState(Csock* pSocket)
+    NoString GetSocketState(Csock* pSocket)
     {
         switch (pSocket->GetType()) {
         case Csock::LISTENER:
@@ -160,16 +160,16 @@ public:
         return "UNKNOWN";
     }
 
-    CString GetCreatedTime(Csock* pSocket)
+    NoString GetCreatedTime(Csock* pSocket)
     {
         unsigned long long iStartTime = pSocket->GetStartTime();
         time_t iTime = iStartTime / 1000;
-        return CUtils::FormatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->GetTimezone());
+        return NoUtils::FormatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->GetTimezone());
     }
 
-    CString GetLocalHost(Csock* pSocket, bool bShowHosts)
+    NoString GetLocalHost(Csock* pSocket, bool bShowHosts)
     {
-        CString sBindHost;
+        NoString sBindHost;
 
         if (bShowHosts) {
             sBindHost = pSocket->GetBindHost();
@@ -179,12 +179,12 @@ public:
             sBindHost = pSocket->GetLocalIP();
         }
 
-        return sBindHost + " " + CString(pSocket->GetLocalPort());
+        return sBindHost + " " + NoString(pSocket->GetLocalPort());
     }
 
-    CString GetRemoteHost(Csock* pSocket, bool bShowHosts)
+    NoString GetRemoteHost(Csock* pSocket, bool bShowHosts)
     {
-        CString sHost;
+        NoString sHost;
         u_short uPort;
 
         if (!bShowHosts) {
@@ -204,7 +204,7 @@ public:
         }
 
         if (uPort != 0) {
-            return sHost + " " + CString(uPort);
+            return sHost + " " + NoString(uPort);
         }
 
         return sHost;
@@ -217,9 +217,9 @@ public:
             return;
         }
 
-        std::priority_queue<CSocketSorter> socks = GetSockets();
+        std::priority_queue<NoSocketSorter> socks = GetSockets();
 
-        CTable Table;
+        NoTable Table;
         Table.AddColumn("Name");
         Table.AddColumn("Created");
         Table.AddColumn("State");
@@ -246,17 +246,17 @@ public:
 
             Table.SetCell("Local", GetLocalHost(pSocket, bShowHosts));
             Table.SetCell("Remote", GetRemoteHost(pSocket, bShowHosts));
-            Table.SetCell("In", CString::ToByteStr(pSocket->GetBytesRead()));
-            Table.SetCell("Out", CString::ToByteStr(pSocket->GetBytesWritten()));
+            Table.SetCell("In", NoString::ToByteStr(pSocket->GetBytesRead()));
+            Table.SetCell("Out", NoString::ToByteStr(pSocket->GetBytesWritten()));
         }
 
         PutModule(Table);
         return;
     }
 
-    virtual ~CListSockets() {}
+    virtual ~NoListSockets() {}
 };
 
-template <> void TModInfo<CListSockets>(CModInfo& Info) { Info.SetWikiPage("listsockets"); }
+template <> void TModInfo<NoListSockets>(NoModInfo& Info) { Info.SetWikiPage("listsockets"); }
 
-USERMODULEDEFS(CListSockets, "List active sockets")
+USERMODULEDEFS(NoListSockets, "List active sockets")

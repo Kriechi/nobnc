@@ -20,30 +20,30 @@
 #include <znc/noconfig.h>
 #include <znc/nomodule.h>
 
-class CAuthBase;
-class CChannel;
-class CNetwork;
-class CClient;
-class CWebSock;
-class CTemplate;
-class CIRCSock;
-class CNick;
+class NoAuthBase;
+class NoChannel;
+class NoNetwork;
+class NoClient;
+class NoWebSock;
+class NoTemplate;
+class NoIrcSock;
+class NoNick;
 
-class CModules : public std::vector<CModule*>
+class NoModules : public std::vector<NoModule*>
 {
 public:
-    CModules();
-    ~CModules();
+    NoModules();
+    ~NoModules();
 
-    CModules(const CModules&) = default;
-    CModules& operator=(const CModules&) = default;
+    NoModules(const NoModules&) = default;
+    NoModules& operator=(const NoModules&) = default;
 
-    void SetUser(CUser* pUser) { m_pUser = pUser; }
-    void SetNetwork(CNetwork* pNetwork) { m_pNetwork = pNetwork; }
-    void SetClient(CClient* pClient) { m_pClient = pClient; }
-    CUser* GetUser() const { return m_pUser; }
-    CNetwork* GetNetwork() const { return m_pNetwork; }
-    CClient* GetClient() const { return m_pClient; }
+    void SetUser(NoUser* pUser) { m_pUser = pUser; }
+    void SetNetwork(NoNetwork* pNetwork) { m_pNetwork = pNetwork; }
+    void SetClient(NoClient* pClient) { m_pClient = pClient; }
+    NoUser* GetUser() const { return m_pUser; }
+    NoNetwork* GetNetwork() const { return m_pNetwork; }
+    NoClient* GetClient() const { return m_pClient; }
 
     void UnloadAll();
 
@@ -52,123 +52,123 @@ public:
     bool OnPostRehash();
     bool OnIRCDisconnected();
     bool OnIRCConnected();
-    bool OnIRCConnecting(CIRCSock* pIRCSock);
-    bool OnIRCConnectionError(CIRCSock* pIRCSock);
-    bool OnIRCRegistration(CString& sPass, CString& sNick, CString& sIdent, CString& sRealName);
-    bool OnBroadcast(CString& sMessage);
+    bool OnIRCConnecting(NoIrcSock* pIRCSock);
+    bool OnIRCConnectionError(NoIrcSock* pIRCSock);
+    bool OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName);
+    bool OnBroadcast(NoString& sMessage);
 
-    bool OnChanPermission2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
-    bool OnChanPermission(const CNick& OpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
-    bool OnOp2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
-    bool OnOp(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
-    bool OnDeop2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
-    bool OnDeop(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
-    bool OnVoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
-    bool OnVoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
-    bool OnDevoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
-    bool OnDevoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange);
-    bool OnRawMode2(const CNick* pOpNick, CChannel& Channel, const CString& sModes, const CString& sArgs);
-    bool OnRawMode(const CNick& OpNick, CChannel& Channel, const CString& sModes, const CString& sArgs);
-    bool OnMode2(const CNick* pOpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
-    bool OnMode(const CNick& OpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange);
+    bool OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
+    bool OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange);
+    bool OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    bool OnOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    bool OnDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    bool OnDeop(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    bool OnVoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    bool OnVoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    bool OnDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    bool OnDevoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    bool OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs);
+    bool OnRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs);
+    bool OnMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange);
+    bool OnMode(const NoNick& OpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange);
 
-    bool OnRaw(CString& sLine);
+    bool OnRaw(NoString& sLine);
 
-    bool OnStatusCommand(CString& sCommand);
-    bool OnModCommand(const CString& sCommand);
-    bool OnModNotice(const CString& sMessage);
-    bool OnModCTCP(const CString& sMessage);
+    bool OnStatusCommand(NoString& sCommand);
+    bool OnModCommand(const NoString& sCommand);
+    bool OnModNotice(const NoString& sMessage);
+    bool OnModCTCP(const NoString& sMessage);
 
-    bool OnQuit(const CNick& Nick, const CString& sMessage, const std::vector<CChannel*>& vChans);
-    bool OnNick(const CNick& Nick, const CString& sNewNick, const std::vector<CChannel*>& vChans);
-    bool OnKick(const CNick& Nick, const CString& sOpNick, CChannel& Channel, const CString& sMessage);
-    bool OnJoining(CChannel& Channel);
-    bool OnJoin(const CNick& Nick, CChannel& Channel);
-    bool OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage);
-    bool OnInvite(const CNick& Nick, const CString& sChan);
+    bool OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans);
+    bool OnNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans);
+    bool OnKick(const NoNick& Nick, const NoString& sOpNick, NoChannel& Channel, const NoString& sMessage);
+    bool OnJoining(NoChannel& Channel);
+    bool OnJoin(const NoNick& Nick, NoChannel& Channel);
+    bool OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage);
+    bool OnInvite(const NoNick& Nick, const NoString& sChan);
 
-    bool OnChanBufferStarting(CChannel& Chan, CClient& Client);
-    bool OnChanBufferEnding(CChannel& Chan, CClient& Client);
-    bool OnChanBufferPlayLine2(CChannel& Chan, CClient& Client, CString& sLine, const timeval& tv);
-    bool OnChanBufferPlayLine(CChannel& Chan, CClient& Client, CString& sLine);
-    bool OnPrivBufferPlayLine2(CClient& Client, CString& sLine, const timeval& tv);
-    bool OnPrivBufferPlayLine(CClient& Client, CString& sLine);
+    bool OnChanBufferStarting(NoChannel& Chan, NoClient& Client);
+    bool OnChanBufferEnding(NoChannel& Chan, NoClient& Client);
+    bool OnChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv);
+    bool OnChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine);
+    bool OnPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv);
+    bool OnPrivBufferPlayLine(NoClient& Client, NoString& sLine);
 
     bool OnClientLogin();
     bool OnClientDisconnect();
-    bool OnUserRaw(CString& sLine);
-    bool OnUserCTCPReply(CString& sTarget, CString& sMessage);
-    bool OnUserCTCP(CString& sTarget, CString& sMessage);
-    bool OnUserAction(CString& sTarget, CString& sMessage);
-    bool OnUserMsg(CString& sTarget, CString& sMessage);
-    bool OnUserNotice(CString& sTarget, CString& sMessage);
-    bool OnUserJoin(CString& sChannel, CString& sKey);
-    bool OnUserPart(CString& sChannel, CString& sMessage);
-    bool OnUserTopic(CString& sChannel, CString& sTopic);
-    bool OnUserTopicRequest(CString& sChannel);
-    bool OnUserQuit(CString& sMessage);
+    bool OnUserRaw(NoString& sLine);
+    bool OnUserCTCPReply(NoString& sTarget, NoString& sMessage);
+    bool OnUserCTCP(NoString& sTarget, NoString& sMessage);
+    bool OnUserAction(NoString& sTarget, NoString& sMessage);
+    bool OnUserMsg(NoString& sTarget, NoString& sMessage);
+    bool OnUserNotice(NoString& sTarget, NoString& sMessage);
+    bool OnUserJoin(NoString& sChannel, NoString& sKey);
+    bool OnUserPart(NoString& sChannel, NoString& sMessage);
+    bool OnUserTopic(NoString& sChannel, NoString& sTopic);
+    bool OnUserTopicRequest(NoString& sChannel);
+    bool OnUserQuit(NoString& sMessage);
 
-    bool OnCTCPReply(CNick& Nick, CString& sMessage);
-    bool OnPrivCTCP(CNick& Nick, CString& sMessage);
-    bool OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage);
-    bool OnPrivAction(CNick& Nick, CString& sMessage);
-    bool OnChanAction(CNick& Nick, CChannel& Channel, CString& sMessage);
-    bool OnPrivMsg(CNick& Nick, CString& sMessage);
-    bool OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage);
-    bool OnPrivNotice(CNick& Nick, CString& sMessage);
-    bool OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage);
-    bool OnTopic(CNick& Nick, CChannel& Channel, CString& sTopic);
-    bool OnTimerAutoJoin(CChannel& Channel);
+    bool OnCTCPReply(NoNick& Nick, NoString& sMessage);
+    bool OnPrivCTCP(NoNick& Nick, NoString& sMessage);
+    bool OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    bool OnPrivAction(NoNick& Nick, NoString& sMessage);
+    bool OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    bool OnPrivMsg(NoNick& Nick, NoString& sMessage);
+    bool OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    bool OnPrivNotice(NoNick& Nick, NoString& sMessage);
+    bool OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    bool OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic);
+    bool OnTimerAutoJoin(NoChannel& Channel);
 
-    bool OnAddNetwork(CNetwork& Network, CString& sErrorRet);
-    bool OnDeleteNetwork(CNetwork& Network);
+    bool OnAddNetwork(NoNetwork& Network, NoString& sErrorRet);
+    bool OnDeleteNetwork(NoNetwork& Network);
 
-    bool OnSendToClient(CString& sLine, CClient& Client);
-    bool OnSendToIRC(CString& sLine);
+    bool OnSendToClient(NoString& sLine, NoClient& Client);
+    bool OnSendToIRC(NoString& sLine);
 
-    bool OnServerCapAvailable(const CString& sCap);
-    bool OnServerCapResult(const CString& sCap, bool bSuccess);
+    bool OnServerCapAvailable(const NoString& sCap);
+    bool OnServerCapResult(const NoString& sCap, bool bSuccess);
 
-    CModule* FindModule(const CString& sModule) const;
-    bool LoadModule(const CString& sModule, const CString& sArgs, CModInfo::EModuleType eType, CUser* pUser, CNetwork* pNetwork, CString& sRetMsg);
-    bool UnloadModule(const CString& sModule);
-    bool UnloadModule(const CString& sModule, CString& sRetMsg);
-    bool ReloadModule(const CString& sModule, const CString& sArgs, CUser* pUser, CNetwork* pNetwork, CString& sRetMsg);
+    NoModule* FindModule(const NoString& sModule) const;
+    bool LoadModule(const NoString& sModule, const NoString& sArgs, NoModInfo::EModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
+    bool UnloadModule(const NoString& sModule);
+    bool UnloadModule(const NoString& sModule, NoString& sRetMsg);
+    bool ReloadModule(const NoString& sModule, const NoString& sArgs, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
 
-    static bool GetModInfo(CModInfo& ModInfo, const CString& sModule, CString& sRetMsg);
-    static bool GetModPathInfo(CModInfo& ModInfo, const CString& sModule, const CString& sModPath, CString& sRetMsg);
-    static void GetAvailableMods(std::set<CModInfo>& ssMods, CModInfo::EModuleType eType = CModInfo::UserModule);
-    static void GetDefaultMods(std::set<CModInfo>& ssMods, CModInfo::EModuleType eType = CModInfo::UserModule);
+    static bool GetModInfo(NoModInfo& ModInfo, const NoString& sModule, NoString& sRetMsg);
+    static bool GetModPathInfo(NoModInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg);
+    static void GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType = NoModInfo::UserModule);
+    static void GetDefaultMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType = NoModInfo::UserModule);
 
     // This returns the path to the .so and to the data dir
     // which is where static data (webadmin skins) are saved
-    static bool FindModPath(const CString& sModule, CString& sModPath, CString& sDataPath);
+    static bool FindModPath(const NoString& sModule, NoString& sModPath, NoString& sDataPath);
     // Return a list of <module dir, data dir> pairs for directories in
     // which modules can be found.
-    typedef std::queue<std::pair<CString, CString>> ModDirList;
+    typedef std::queue<std::pair<NoString, NoString>> ModDirList;
     static ModDirList GetModDirs();
 
-    bool OnAddUser(CUser& User, CString& sErrorRet);
-    bool OnDeleteUser(CUser& User);
-    bool OnClientConnect(CZNCSock* pSock, const CString& sHost, unsigned short uPort);
-    bool OnLoginAttempt(std::shared_ptr<CAuthBase> Auth);
-    bool OnFailedLogin(const CString& sUsername, const CString& sRemoteIP);
-    bool OnUnknownUserRaw(CClient* pClient, CString& sLine);
-    bool OnClientCapLs(CClient* pClient, SCString& ssCaps);
-    bool IsClientCapSupported(CClient* pClient, const CString& sCap, bool bState);
-    bool OnClientCapRequest(CClient* pClient, const CString& sCap, bool bState);
-    bool OnModuleLoading(const CString& sModName, const CString& sArgs, CModInfo::EModuleType eType, bool& bSuccess, CString& sRetMsg);
-    bool OnModuleUnloading(CModule* pModule, bool& bSuccess, CString& sRetMsg);
-    bool OnGetModInfo(CModInfo& ModInfo, const CString& sModule, bool& bSuccess, CString& sRetMsg);
-    bool OnGetAvailableMods(std::set<CModInfo>& ssMods, CModInfo::EModuleType eType);
+    bool OnAddUser(NoUser& User, NoString& sErrorRet);
+    bool OnDeleteUser(NoUser& User);
+    bool OnClientConnect(NoBaseSocket* pSock, const NoString& sHost, unsigned short uPort);
+    bool OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth);
+    bool OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP);
+    bool OnUnknownUserRaw(NoClient* pClient, NoString& sLine);
+    bool OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps);
+    bool IsClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState);
+    bool OnClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState);
+    bool OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::EModuleType eType, bool& bSuccess, NoString& sRetMsg);
+    bool OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg);
+    bool OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
+    bool OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType);
 
 private:
     static ModHandle
-    OpenModule(const CString& sModule, const CString& sModPath, bool& bVersionMismatch, CModInfo& Info, CString& sRetMsg);
+    OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModInfo& Info, NoString& sRetMsg);
 
-    CUser* m_pUser;
-    CNetwork* m_pNetwork;
-    CClient* m_pClient;
+    NoUser* m_pUser;
+    NoNetwork* m_pNetwork;
+    NoClient* m_pClient;
 };
 
 #endif // !NOMODULES_H

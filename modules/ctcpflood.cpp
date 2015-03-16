@@ -17,43 +17,43 @@
 #include <znc/nomodules.h>
 #include <znc/nochannel.h>
 
-class CCtcpFloodMod : public CModule
+class NoCtcpFloodMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CCtcpFloodMod)
+    MODCONSTRUCTOR(NoCtcpFloodMod)
     {
         m_tLastCTCP = 0;
         m_iNumCTCP = 0;
 
         AddHelpCommand();
         AddCommand("Secs",
-                   static_cast<CModCommand::ModCmdFunc>(&CCtcpFloodMod::OnSecsCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoCtcpFloodMod::OnSecsCommand),
                    "<limit>",
                    "Set seconds limit");
         AddCommand("Lines",
-                   static_cast<CModCommand::ModCmdFunc>(&CCtcpFloodMod::OnLinesCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoCtcpFloodMod::OnLinesCommand),
                    "<limit>",
                    "Set lines limit");
         AddCommand("Show",
-                   static_cast<CModCommand::ModCmdFunc>(&CCtcpFloodMod::OnShowCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoCtcpFloodMod::OnShowCommand),
                    "",
                    "Show the current limits");
     }
 
-    ~CCtcpFloodMod() {}
+    ~NoCtcpFloodMod() {}
 
     void Save()
     {
         // We save the settings twice because the module arguments can
         // be more easily edited via webadmin, while the SetNV() stuff
         // survives e.g. /msg *status reloadmod ctcpflood.
-        SetNV("secs", CString(m_iThresholdSecs));
-        SetNV("msgs", CString(m_iThresholdMsgs));
+        SetNV("secs", NoString(m_iThresholdSecs));
+        SetNV("msgs", NoString(m_iThresholdMsgs));
 
-        SetArgs(CString(m_iThresholdMsgs) + " " + CString(m_iThresholdSecs));
+        SetArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         m_iThresholdMsgs = sArgs.Token(0).ToUInt();
         m_iThresholdSecs = sArgs.Token(1).ToUInt();
@@ -71,7 +71,7 @@ public:
         return true;
     }
 
-    EModRet Message(const CNick& Nick, const CString& sMessage)
+    EModRet Message(const NoNick& Nick, const NoString& sMessage)
     {
         // We never block /me, because it doesn't cause a reply
         if (sMessage.Token(0).Equals("ACTION")) return CONTINUE;
@@ -94,13 +94,13 @@ public:
         return HALT;
     }
 
-    EModRet OnPrivCTCP(CNick& Nick, CString& sMessage) override { return Message(Nick, sMessage); }
+    EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override { return Message(Nick, sMessage); }
 
-    EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage) override { return Message(Nick, sMessage); }
+    EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override { return Message(Nick, sMessage); }
 
-    void OnSecsCommand(const CString& sCommand)
+    void OnSecsCommand(const NoString& sCommand)
     {
-        const CString& sArg = sCommand.Token(1, true);
+        const NoString& sArg = sCommand.Token(1, true);
 
         if (sArg.empty()) {
             PutModule("Usage: Secs <limit>");
@@ -110,13 +110,13 @@ public:
         m_iThresholdSecs = sArg.ToUInt();
         if (m_iThresholdSecs == 0) m_iThresholdSecs = 1;
 
-        PutModule("Set seconds limit to [" + CString(m_iThresholdSecs) + "]");
+        PutModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
         Save();
     }
 
-    void OnLinesCommand(const CString& sCommand)
+    void OnLinesCommand(const NoString& sCommand)
     {
-        const CString& sArg = sCommand.Token(1, true);
+        const NoString& sArg = sCommand.Token(1, true);
 
         if (sArg.empty()) {
             PutModule("Usage: Lines <limit>");
@@ -126,15 +126,15 @@ public:
         m_iThresholdMsgs = sArg.ToUInt();
         if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 2;
 
-        PutModule("Set lines limit to [" + CString(m_iThresholdMsgs) + "]");
+        PutModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");
         Save();
     }
 
-    void OnShowCommand(const CString& sCommand)
+    void OnShowCommand(const NoString& sCommand)
     {
-        PutModule("Current limit is " + CString(m_iThresholdMsgs) + " CTCPs "
+        PutModule("Current limit is " + NoString(m_iThresholdMsgs) + " CTCPs "
                                                                     "in " +
-                  CString(m_iThresholdSecs) + " secs");
+                  NoString(m_iThresholdSecs) + " secs");
     }
 
 private:
@@ -145,7 +145,7 @@ private:
     unsigned int m_iThresholdMsgs;
 };
 
-template <> void TModInfo<CCtcpFloodMod>(CModInfo& Info)
+template <> void TModInfo<NoCtcpFloodMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("ctcpflood");
     Info.SetHasArgs(true);
@@ -154,4 +154,4 @@ template <> void TModInfo<CCtcpFloodMod>(CModInfo& Info)
                          "which the number of lines is reached. The default setting is 4 CTCPs in 2 seconds");
 }
 
-USERMODULEDEFS(CCtcpFloodMod, "Don't forward CTCP floods to clients")
+USERMODULEDEFS(NoCtcpFloodMod, "Don't forward CTCP floods to clients")

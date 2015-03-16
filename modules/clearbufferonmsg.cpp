@@ -32,10 +32,10 @@ enum {
     RULE_MAX,
 };
 
-class CClearBufferOnMsgMod : public CModule
+class NoClearBufferOnMsgMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CClearBufferOnMsgMod)
+    MODCONSTRUCTOR(NoClearBufferOnMsgMod)
     {
         SetAllRules(true);
         // false for backward compatibility
@@ -44,12 +44,12 @@ public:
 
     void ClearAllBuffers()
     {
-        CNetwork* pNetwork = GetNetwork();
+        NoNetwork* pNetwork = GetNetwork();
 
         if (pNetwork) {
-            const vector<CChannel*>& vChans = pNetwork->GetChans();
+            const vector<NoChannel*>& vChans = pNetwork->GetChans();
 
-            for (CChannel* pChan : vChans) {
+            for (NoChannel* pChan : vChans) {
                 // Skip detached channels, they weren't read yet
                 if (pChan->IsDetached()) continue;
 
@@ -59,9 +59,9 @@ public:
                 pChan->SetAutoClearChanBuffer(false);
             }
 
-            vector<CQuery*> VQueries = pNetwork->GetQueries();
+            vector<NoQuery*> VQueries = pNetwork->GetQueries();
 
-            for (CQuery* pQuery : VQueries) {
+            for (NoQuery* pQuery : VQueries) {
                 pNetwork->DelQuery(pQuery->GetName());
             }
 
@@ -71,43 +71,43 @@ public:
         }
     }
 
-    EModRet OnUserMsg(CString& sTarget, CString& sMessage) override
+    EModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         if (m_bRules[RULE_MSG]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    EModRet OnUserCTCP(CString& sTarget, CString& sMessage) override
+    EModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
     {
         if (m_bRules[RULE_CTCP]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    EModRet OnUserAction(CString& sTarget, CString& sMessage) override
+    EModRet OnUserAction(NoString& sTarget, NoString& sMessage) override
     {
         if (m_bRules[RULE_ACTION]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    EModRet OnUserNotice(CString& sTarget, CString& sMessage) override
+    EModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
     {
         if (m_bRules[RULE_NOTICE]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    EModRet OnUserPart(CString& sChannel, CString& sMessage) override
+    EModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
     {
         if (m_bRules[RULE_PART]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    EModRet OnUserTopic(CString& sChannel, CString& sTopic) override
+    EModRet OnUserTopic(NoString& sChannel, NoString& sTopic) override
     {
         if (m_bRules[RULE_TOPIC]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    EModRet OnUserQuit(CString& sMessage) override
+    EModRet OnUserQuit(NoString& sMessage) override
     {
         if (m_bRules[RULE_QUIT]) ClearAllBuffers();
         return CONTINUE;
@@ -118,11 +118,11 @@ public:
         for (int i = 0; i < RULE_MAX; i++) m_bRules[i] = bVal;
     }
 
-    void SetRule(const CString& sOpt, bool bVal)
+    void SetRule(const NoString& sOpt, bool bVal)
     {
         static const struct
         {
-            CString sName;
+            NoString sName;
             int Index;
         } Names[RULE_MAX] = {
               { "msg", RULE_MSG },
@@ -143,13 +143,13 @@ public:
         }
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        VCString vsOpts;
+        NoStringVector vsOpts;
 
         sArgs.Split(" ", vsOpts, false);
 
-        for (CString& sOpt : vsOpts) {
+        for (NoString& sOpt : vsOpts) {
             if (sOpt.StartsWith("!"))
                 SetRule(sOpt.substr(1), false);
             else if (!sOpt.empty())
@@ -163,11 +163,11 @@ private:
     bool m_bRules[RULE_MAX];
 };
 
-template <> void TModInfo<CClearBufferOnMsgMod>(CModInfo& Info)
+template <> void TModInfo<NoClearBufferOnMsgMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("clearbufferonmsg");
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("[ [!]<msg|ctcp|action|notice|part|topic|quit|all> ]");
 }
 
-USERMODULEDEFS(CClearBufferOnMsgMod, "Clear all channel and query buffers whenever the user does something")
+USERMODULEDEFS(NoClearBufferOnMsgMod, "Clear all channel and query buffers whenever the user does something")

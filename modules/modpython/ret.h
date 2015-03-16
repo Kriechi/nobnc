@@ -18,9 +18,9 @@
 
 class CPyRetString {
 public:
-	CString& s;
-	CPyRetString(CString& S) : s(S) {}
-	static PyObject* wrap(CString& S) {
+	NoString& s;
+	CPyRetString(NoString& S) : s(S) {}
+	static PyObject* wrap(NoString& S) {
 		CPyRetString* x = new CPyRetString(S);
 		return SWIG_NewInstanceObj(x, SWIG_TypeQuery("CPyRetString*"), SWIG_POINTER_OWN);
 	}

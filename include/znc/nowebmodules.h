@@ -22,108 +22,108 @@
 #include <znc/nohttpsock.h>
 #include <znc/noutils.h>
 
-class CAuthBase;
-class CUser;
-class CWebSock;
-class CModule;
-class CWebSubPage;
+class NoAuthBase;
+class NoUser;
+class NoWebSock;
+class NoModule;
+class NoWebSubPage;
 
-typedef std::shared_ptr<CWebSubPage> TWebSubPage;
+typedef std::shared_ptr<NoWebSubPage> TWebSubPage;
 typedef std::vector<TWebSubPage> VWebSubPages;
 
-class CZNCTagHandler : public CTemplateTagHandler
+class NoTagHandler : public NoTemplateTagHandler
 {
 public:
-    CZNCTagHandler(CWebSock& pWebSock);
-    virtual ~CZNCTagHandler() {}
+    NoTagHandler(NoWebSock& pWebSock);
+    virtual ~NoTagHandler() {}
 
-    bool HandleTag(CTemplate& Tmpl, const CString& sName, const CString& sArgs, CString& sOutput) override;
+    bool HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override;
 
 private:
-    CWebSock& m_WebSock;
+    NoWebSock& m_WebSock;
 };
 
 
-class CWebSession
+class NoWebSession
 {
 public:
-    CWebSession(const CString& sId, const CString& sIP);
-    ~CWebSession();
+    NoWebSession(const NoString& sId, const NoString& sIP);
+    ~NoWebSession();
 
-    CWebSession(const CWebSession&) = delete;
-    CWebSession& operator=(const CWebSession&) = delete;
+    NoWebSession(const NoWebSession&) = delete;
+    NoWebSession& operator=(const NoWebSession&) = delete;
 
-    const CString& GetId() const { return m_sId; }
-    const CString& GetIP() const { return m_sIP; }
-    CUser* GetUser() const { return m_pUser; }
+    const NoString& GetId() const { return m_sId; }
+    const NoString& GetIP() const { return m_sIP; }
+    NoUser* GetUser() const { return m_pUser; }
     time_t GetLastActive() const { return m_tmLastActive; }
     bool IsLoggedIn() const { return m_pUser != nullptr; }
     bool IsAdmin() const;
     void UpdateLastActive();
 
-    CUser* SetUser(CUser* p)
+    NoUser* SetUser(NoUser* p)
     {
         m_pUser = p;
         return m_pUser;
     }
 
     void ClearMessageLoops();
-    void FillMessageLoops(CTemplate& Tmpl);
-    size_t AddError(const CString& sMessage);
-    size_t AddSuccess(const CString& sMessage);
+    void FillMessageLoops(NoTemplate& Tmpl);
+    size_t AddError(const NoString& sMessage);
+    size_t AddSuccess(const NoString& sMessage);
 
 private:
-    CString m_sId;
-    CString m_sIP;
-    CUser* m_pUser;
-    VCString m_vsErrorMsgs;
-    VCString m_vsSuccessMsgs;
+    NoString m_sId;
+    NoString m_sIP;
+    NoUser* m_pUser;
+    NoStringVector m_vsErrorMsgs;
+    NoStringVector m_vsSuccessMsgs;
     time_t m_tmLastActive;
 };
 
 
-class CWebSubPage
+class NoWebSubPage
 {
 public:
-    CWebSubPage(const CString& sName, const CString& sTitle = "", unsigned int uFlags = 0)
+    NoWebSubPage(const NoString& sName, const NoString& sTitle = "", unsigned int uFlags = 0)
         : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams()
     {
     }
 
-    CWebSubPage(const CString& sName, const CString& sTitle, const VPair& vParams, unsigned int uFlags = 0)
+    NoWebSubPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, unsigned int uFlags = 0)
         : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams(vParams)
     {
     }
 
-    virtual ~CWebSubPage() {}
+    virtual ~NoWebSubPage() {}
 
     enum { F_ADMIN = 1 };
 
-    void SetName(const CString& s) { m_sName = s; }
-    void SetTitle(const CString& s) { m_sTitle = s; }
-    void AddParam(const CString& sName, const CString& sValue) { m_vParams.push_back(make_pair(sName, sValue)); }
+    void SetName(const NoString& s) { m_sName = s; }
+    void SetTitle(const NoString& s) { m_sTitle = s; }
+    void AddParam(const NoString& sName, const NoString& sValue) { m_vParams.push_back(make_pair(sName, sValue)); }
 
     bool RequiresAdmin() const { return m_uFlags & F_ADMIN; }
 
-    const CString& GetName() const { return m_sName; }
-    const CString& GetTitle() const { return m_sTitle; }
-    const VPair& GetParams() const { return m_vParams; }
+    const NoString& GetName() const { return m_sName; }
+    const NoString& GetTitle() const { return m_sTitle; }
+    const NoStringPairVector& GetParams() const { return m_vParams; }
 
 private:
     unsigned int m_uFlags;
-    CString m_sName;
-    CString m_sTitle;
-    VPair m_vParams;
+    NoString m_sName;
+    NoString m_sTitle;
+    NoStringPairVector m_vParams;
 };
 
-class CWebSessionMap : public TCacheMap<CString, std::shared_ptr<CWebSession>>
+class NoWebSessionMap : public TCacheMap<NoString, std::shared_ptr<NoWebSession>>
 {
 public:
-    CWebSessionMap(unsigned int uTTL = 5000) : TCacheMap<CString, std::shared_ptr<CWebSession>>(uTTL) {}
-    void FinishUserSessions(const CUser& User);
+    NoWebSessionMap(unsigned int uTTL = 5000) : TCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
+    void FinishUserSessions(const NoUser& User);
 };
 
-class CWebSock : public CHTTPSock
+class NoWebSock : public NoHttpSock
 {
 public:
     enum EPageReqResult {
@@ -133,51 +133,51 @@ public:
         PAGE_DONE // all stuff has been done
     };
 
-    CWebSock(const CString& sURIPrefix);
-    virtual ~CWebSock();
+    NoWebSock(const NoString& sURIPrefix);
+    virtual ~NoWebSock();
 
     bool ForceLogin() override;
-    bool OnLogin(const CString& sUser, const CString& sPass, bool bBasic) override;
-    void OnPageRequest(const CString& sURI) override;
+    bool OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic) override;
+    void OnPageRequest(const NoString& sURI) override;
 
-    EPageReqResult PrintTemplate(const CString& sPageName, CString& sPageRet, CModule* pModule = nullptr);
-    EPageReqResult PrintStaticFile(const CString& sPath, CString& sPageRet, CModule* pModule = nullptr);
+    EPageReqResult PrintTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule = nullptr);
+    EPageReqResult PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule = nullptr);
 
-    CString FindTmpl(CModule* pModule, const CString& sName);
+    NoString FindTmpl(NoModule* pModule, const NoString& sName);
 
-    void PrintErrorPage(const CString& sMessage);
+    void PrintErrorPage(const NoString& sMessage);
 
-    std::shared_ptr<CWebSession> GetSession();
+    std::shared_ptr<NoWebSession> GetSession();
 
-    Csock* GetSockObj(const CString& sHost, unsigned short uPort) override;
-    static CString GetSkinPath(const CString& sSkinName);
-    void GetAvailSkins(VCString& vRet) const;
-    CString GetSkinName();
+    Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override;
+    static NoString GetSkinPath(const NoString& sSkinName);
+    void GetAvailSkins(NoStringVector& vRet) const;
+    NoString GetSkinName();
 
-    CString GetRequestCookie(const CString& sKey);
-    bool SendCookie(const CString& sKey, const CString& sValue);
+    NoString GetRequestCookie(const NoString& sKey);
+    bool SendCookie(const NoString& sKey, const NoString& sValue);
 
-    static void FinishUserSessions(const CUser& User);
+    static void FinishUserSessions(const NoUser& User);
 
 protected:
-    using CHTTPSock::PrintErrorPage;
+    using NoHttpSock::PrintErrorPage;
 
-    bool AddModLoop(const CString& sLoopName, CModule& Module, CTemplate* pTemplate = nullptr);
-    VCString GetDirs(CModule* pModule, bool bIsTemplate);
-    void SetPaths(CModule* pModule, bool bIsTemplate = false);
+    bool AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemplate* pTemplate = nullptr);
+    NoStringVector GetDirs(NoModule* pModule, bool bIsTemplate);
+    void SetPaths(NoModule* pModule, bool bIsTemplate = false);
     void SetVars();
-    CString GetCSRFCheck();
+    NoString GetCSRFCheck();
 
 private:
-    EPageReqResult OnPageRequestInternal(const CString& sURI, CString& sPageRet);
+    EPageReqResult OnPageRequestInternal(const NoString& sURI, NoString& sPageRet);
 
     bool m_bPathsSet;
-    CTemplate m_Template;
-    std::shared_ptr<CAuthBase> m_spAuth;
-    CString m_sModName;
-    CString m_sPath;
-    CString m_sPage;
-    std::shared_ptr<CWebSession> m_spSession;
+    NoTemplate m_Template;
+    std::shared_ptr<NoAuthBase> m_spAuth;
+    NoString m_sModName;
+    NoString m_sPath;
+    NoString m_sPage;
+    std::shared_ptr<NoWebSession> m_spSession;
 
     static const unsigned int m_uiMaxSessions;
 };

@@ -159,7 +159,7 @@ class ModuleNV(collections.MutableMapping):
 
 class Module:
     description = '< Placeholder for a description >'
-    module_types = [CModInfo.NetworkModule]
+    module_types = [NoModInfo.NetworkModule]
 
     wiki_page = ''
 
@@ -478,7 +478,7 @@ make_inherit(Timer, CPyTimer, '_ctimer')
 
 def find_open(modname):
     '''Returns (pymodule, datapath)'''
-    for d in CModules.GetModDirs():
+    for d in NoModules.GetModDirs():
         # d == (libdir, datadir)
         try:
             x = imp.find_module(modname, [d[0]])
@@ -545,19 +545,19 @@ def load_module(modname, args, module_type, user, network, retmsg, modpython):
     module.SetModPath(pymodule.__file__)
     _py_modules.add(module)
 
-    if module_type == CModInfo.UserModule:
+    if module_type == NoModInfo.UserModule:
         if not user:
             retmsg.s = "Module [{}] is UserModule and needs user.".format(modname)
             unload_module(module)
             return 1
         cont = user
-    elif module_type == CModInfo.NetworkModule:
+    elif module_type == NoModInfo.NetworkModule:
         if not network:
             retmsg.s = "Module [{}] is Network module and needs a network.".format(modname)
             unload_module(module)
             return 1
         cont = network
-    elif module_type == CModInfo.GlobalModule:
+    elif module_type == NoModInfo.GlobalModule:
         cont = CZNC.Get()
     else:
         retmsg.s = "Module [{}] doesn't support that module type.".format(modname)
@@ -608,11 +608,11 @@ def unload_module(module):
     module.OnShutdown()
     _py_modules.discard(module)
     cmod = module._cmod
-    if module.GetType() == CModInfo.UserModule:
+    if module.GetType() == NoModInfo.UserModule:
         cont = cmod.GetUser()
-    elif module.GetType() == CModInfo.NetworkModule:
+    elif module.GetType() == NoModInfo.NetworkModule:
         cont = cmod.GetNetwork()
-    elif module.GetType() == CModInfo.GlobalModule:
+    elif module.GetType() == NoModInfo.GlobalModule:
         cont = CZNC.Get()
     cont.GetModules().removeModule(cmod)
     del module._cmod
@@ -682,11 +682,11 @@ def get_mod_info_path(path, modname, modinfo):
     return 1
 
 
-CONTINUE = CModule.CONTINUE
-HALT = CModule.HALT
-HALTMODS = CModule.HALTMODS
-HALTCORE = CModule.HALTCORE
-UNLOAD = CModule.UNLOAD
+CONTINUE = NoModule.CONTINUE
+HALT = NoModule.HALT
+HALTMODS = NoModule.HALTMODS
+HALTCORE = NoModule.HALTCORE
+UNLOAD = NoModule.UNLOAD
 
 HaveSSL = HaveSSL_()
 HaveIPv6 = HaveIPv6_()
@@ -698,17 +698,17 @@ VersionExtra = GetVersionExtra()
 
 
 def CreateWebSubPage(name, title='', params=dict(), admin=False):
-    vpair = VPair()
+    vpair = NoStringPairVector()
     for k, v in params.items():
-        VPair_Add2Str_(vpair, k, v)
+        NoStringPairVector_Add2Str_(vpair, k, v)
     flags = 0
     if admin:
-        flags |= CWebSubPage.F_ADMIN
+        flags |= NoWebSubPage.F_ADMIN
     return CreateWebSubPage_(name, title, vpair, flags)
 
-CUser.GetNetworks = CUser.GetNetworks_
-CNetwork.GetChans = CNetwork.GetChans_
-CChannel.GetNicks = CChannel.GetNicks_
+NoUser.GetNetworks = NoUser.GetNetworks_
+NoNetwork.GetChans = NoNetwork.GetChans_
+NoChannel.GetNicks = NoChannel.GetNicks_
 CZNC.GetUserMap = CZNC.GetUserMap_
 
 
@@ -735,10 +735,10 @@ def FreeOwnership(func):
 CZNC.AddListener = FreeOwnership(func=CZNC.AddListener)
 CZNC.AddUser = FreeOwnership(func=CZNC.AddUser)
 CZNC.AddNetworkToQueue = FreeOwnership(func=CZNC.AddNetworkToQueue)
-CUser.AddNetwork = FreeOwnership(func=CUser.AddNetwork)
-CNetwork.AddChan = FreeOwnership(func=CNetwork.AddChan)
-CModule.AddSocket = FreeOwnership(func=CModule.AddSocket)
-CModule.AddSubPage = FreeOwnership(func=CModule.AddSubPage)
+NoUser.AddNetwork = FreeOwnership(func=NoUser.AddNetwork)
+NoNetwork.AddChan = FreeOwnership(func=NoNetwork.AddChan)
+NoModule.AddSocket = FreeOwnership(func=NoModule.AddSocket)
+NoModule.AddSubPage = FreeOwnership(func=NoModule.AddSubPage)
 
 
 class ModulesIter(collections.Iterator):
@@ -752,7 +752,7 @@ class ModulesIter(collections.Iterator):
         module = self._cmod.get()
         self._cmod.plusplus()
         return module
-CModules.__iter__ = lambda cmod: ModulesIter(CModulesIter(cmod))
+NoModules.__iter__ = lambda cmod: ModulesIter(NoModulesIter(cmod))
 
 
 def str_eq(self, other):
@@ -761,8 +761,8 @@ def str_eq(self, other):
 
     return id(self) == id(other)
 
-CChannel.__eq__ = str_eq
-CNick.__eq__ = str_eq
-CUser.__eq__ = str_eq
-CNetwork.__eq__ = str_eq
+NoChannel.__eq__ = str_eq
+NoNick.__eq__ = str_eq
+NoUser.__eq__ = str_eq
+NoNetwork.__eq__ = str_eq
 CPyRetString.__eq__ = str_eq

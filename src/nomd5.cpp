@@ -23,13 +23,13 @@
 #include <stdio.h>
 #include <string.h>
 
-CMD5::CMD5() { *m_szMD5 = '\0'; }
+NoMD5::NoMD5() { *m_szMD5 = '\0'; }
 
-CMD5::CMD5(const string& sText) { MakeHash(sText.c_str(), sText.length()); }
+NoMD5::NoMD5(const string& sText) { MakeHash(sText.c_str(), sText.length()); }
 
-CMD5::CMD5(const char* szText, uint32 nTextLen) { MakeHash(szText, nTextLen); }
+NoMD5::NoMD5(const char* szText, uint32 nTextLen) { MakeHash(szText, nTextLen); }
 
-CMD5::~CMD5() {}
+NoMD5::~NoMD5() {}
 
 #define GET_UINT32(n, b, i)                                                                                             \
     {                                                                                                                   \
@@ -44,7 +44,7 @@ CMD5::~CMD5() {}
         (b)[(i)+3] = (uint8)((n) >> 24); \
     }
 
-void CMD5::md5_starts(md5_context* ctx) const
+void NoMD5::md5_starts(md5_context* ctx) const
 {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
@@ -55,7 +55,7 @@ void CMD5::md5_starts(md5_context* ctx) const
     ctx->state[3] = 0x10325476;
 }
 
-void CMD5::md5_process(md5_context* ctx, const uint8 data[64]) const
+void NoMD5::md5_process(md5_context* ctx, const uint8 data[64]) const
 {
     uint32 X[16], A, B, C, D;
 
@@ -177,7 +177,7 @@ void CMD5::md5_process(md5_context* ctx, const uint8 data[64]) const
     ctx->state[3] += D;
 }
 
-void CMD5::md5_update(md5_context* ctx, const uint8* input, uint32 length) const
+void NoMD5::md5_update(md5_context* ctx, const uint8* input, uint32 length) const
 {
     uint32 left, fill;
 
@@ -214,7 +214,7 @@ static const uint8 md5_padding[64] = { 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                        0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                        0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-void CMD5::md5_finish(md5_context* ctx, uint8 digest[16]) const
+void NoMD5::md5_finish(md5_context* ctx, uint8 digest[16]) const
 {
     uint32 last, padn;
     uint32 high, low;
@@ -238,7 +238,7 @@ void CMD5::md5_finish(md5_context* ctx, uint8 digest[16]) const
     PUT_UINT32(ctx->state[3], digest, 12);
 }
 
-char* CMD5::MakeHash(const char* szText, uint32 nTextLen)
+char* NoMD5::MakeHash(const char* szText, uint32 nTextLen)
 {
     md5_context ctx;
     unsigned char md5sum[16];

@@ -21,42 +21,42 @@
 #include <znc/nostring.h>
 #include <znc/Csocket.h>
 
-class CModule;
+class NoModule;
 
-class CTimer : public CCron
+class NoTimer : public CCron
 {
 public:
-    CTimer(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription);
+    NoTimer(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription);
 
-    virtual ~CTimer();
+    virtual ~NoTimer();
 
-    CTimer(const CTimer&) = delete;
-    CTimer& operator=(const CTimer&) = delete;
+    NoTimer(const NoTimer&) = delete;
+    NoTimer& operator=(const NoTimer&) = delete;
 
-    void SetModule(CModule* p);
-    void SetDescription(const CString& s);
+    void SetModule(NoModule* p);
+    void SetDescription(const NoString& s);
 
-    CModule* GetModule() const;
-    const CString& GetDescription() const;
+    NoModule* GetModule() const;
+    const NoString& GetDescription() const;
 
 private:
-    CModule* m_pModule;
-    CString m_sDescription;
+    NoModule* m_pModule;
+    NoString m_sDescription;
 };
 
-class CFPTimer;
+class NoFPTimer;
 
-typedef void (*FPTimer_t)(CModule*, CFPTimer*);
+typedef void (*FPTimer_t)(NoModule*, NoFPTimer*);
 
-class CFPTimer : public CTimer
+class NoFPTimer : public NoTimer
 {
 public:
-    CFPTimer(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription)
-        : CTimer(pModule, uInterval, uCycles, sLabel, sDescription), m_pFBCallback(nullptr)
+    NoFPTimer(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription), m_pFBCallback(nullptr)
     {
     }
 
-    virtual ~CFPTimer() {}
+    virtual ~NoFPTimer() {}
 
     void SetFPCallback(FPTimer_t p) { m_pFBCallback = p; }
 

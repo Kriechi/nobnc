@@ -37,11 +37,11 @@ using std::map;
 
 class CModTcl;
 
-class CModTclTimer : public CTimer
+class CModTclTimer : public NoTimer
 {
 public:
-    CModTclTimer(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription)
-        : CTimer(pModule, uInterval, uCycles, sLabel, sDescription), m_pParent(nullptr)
+    CModTclTimer(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription), m_pParent(nullptr)
     {
     }
     virtual ~CModTclTimer() {}
@@ -51,11 +51,11 @@ protected:
     CModTcl* m_pParent;
 };
 
-class CModTclStartTimer : public CTimer
+class CModTclStartTimer : public NoTimer
 {
 public:
-    CModTclStartTimer(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription)
-        : CTimer(pModule, uInterval, uCycles, sLabel, sDescription), m_pParent(nullptr)
+    CModTclStartTimer(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription), m_pParent(nullptr)
     {
     }
     virtual ~CModTclStartTimer() {}
@@ -66,7 +66,7 @@ protected:
 };
 
 
-class CModTcl : public CModule
+class CModTcl : public NoModule
 {
 public:
     MODCONSTRUCTOR(CModTcl) { interp = nullptr; }
@@ -78,7 +78,7 @@ public:
         }
     }
 
-    bool OnLoad(const CString& sArgs, CString& sErrorMsg) override
+    bool OnLoad(const NoString& sArgs, NoString& sErrorMsg) override
     {
 #ifndef MOD_MODTCL_ALLOW_EVERYONE
         if (!GetUser()->IsAdmin()) {
@@ -93,7 +93,7 @@ public:
 
     void Start()
     {
-        CString sMyArgs = GetArgs();
+        NoString sMyArgs = GetArgs();
 
         interp = Tcl_CreateInterp();
         Tcl_Init(interp);
@@ -139,11 +139,11 @@ public:
                                   "callbacks."));
     }
 
-    void OnModCommand(const CString& sCommand) override
+    void OnModCommand(const NoString& sCommand) override
     {
-        CString sResult;
-        VCString vsResult;
-        CString sCmd = sCommand;
+        NoString sResult;
+        NoStringVector vsResult;
+        NoString sCmd = sCommand;
 
         if (sCmd.Token(0).CaseCmp(".tcl") == 0) sCmd = sCmd.Token(1, true);
 
@@ -151,7 +151,7 @@ public:
 
         Tcl_Eval(interp, sCmd.c_str());
 
-        sResult = CString(Tcl_GetStringResult(interp));
+        sResult = NoString(Tcl_GetStringResult(interp));
         if (!sResult.empty()) {
             sResult.Split("\n", vsResult);
             unsigned int a = 0;
@@ -169,7 +169,7 @@ public:
         }
     }
 
-    CString TclEscape(CString sLine)
+    NoString TclEscape(NoString sLine)
     {
         sLine.Replace("\\", "\\\\");
         sLine.Replace("{", "\\{");
@@ -200,14 +200,14 @@ public:
         if (interp) Tcl_Eval(interp, "Binds::ProcessEvnt disconnect-server");
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
+    EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        CString sMes = TclEscape(sMessage);
-        CString sNick = TclEscape(CString(Nick.GetNick()));
-        CString sHost = TclEscape(CString(Nick.GetIdent() + "@" + Nick.GetHost()));
-        CString sChannel = TclEscape(CString(Channel.GetName()));
+        NoString sMes = TclEscape(sMessage);
+        NoString sNick = TclEscape(NoString(Nick.GetNick()));
+        NoString sHost = TclEscape(NoString(Nick.GetIdent() + "@" + Nick.GetHost()));
+        NoString sChannel = TclEscape(NoString(Channel.GetName()));
 
-        CString sCommand = "Binds::ProcessPubm {" + sNick + "} {" + sHost + "} - {" + sChannel + "} {" + sMes + "}";
+        NoString sCommand = "Binds::ProcessPubm {" + sNick + "} {" + sHost + "} - {" + sChannel + "} {" + sMes + "}";
         i = Tcl_Eval(interp, sCommand.c_str());
         if (i != TCL_OK) {
             PutModule(Tcl_GetStringResult(interp));
@@ -215,13 +215,13 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnPrivMsg(CNick& Nick, CString& sMessage) override
+    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
-        CString sMes = TclEscape(sMessage);
-        CString sNick = TclEscape(CString(Nick.GetNick()));
-        CString sHost = TclEscape(CString(Nick.GetIdent() + "@" + Nick.GetHost()));
+        NoString sMes = TclEscape(sMessage);
+        NoString sNick = TclEscape(NoString(Nick.GetNick()));
+        NoString sHost = TclEscape(NoString(Nick.GetIdent() + "@" + Nick.GetHost()));
 
-        CString sCommand = "Binds::ProcessMsgm {" + sNick + "} {" + sHost + "} - {" + sMes + "}";
+        NoString sCommand = "Binds::ProcessMsgm {" + sNick + "} {" + sHost + "} - {" + sMes + "}";
         i = Tcl_Eval(interp, sCommand.c_str());
         if (i != TCL_OK) {
             PutModule(Tcl_GetStringResult(interp));
@@ -229,13 +229,13 @@ public:
         return CONTINUE;
     }
 
-    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChannel*>& vChans) override
+    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override
     {
-        CString sOldNick = TclEscape(CString(OldNick.GetNick()));
-        CString sNewNickTmp = TclEscape(sNewNick);
-        CString sHost = TclEscape(CString(OldNick.GetIdent() + "@" + OldNick.GetHost()));
+        NoString sOldNick = TclEscape(NoString(OldNick.GetNick()));
+        NoString sNewNickTmp = TclEscape(sNewNick);
+        NoString sHost = TclEscape(NoString(OldNick.GetIdent() + "@" + OldNick.GetHost()));
 
-        CString sCommand;
+        NoString sCommand;
         // Nick change is triggered for each common chan so that binds can be chan specific
         unsigned int nLength = vChans.size();
         for (unsigned int n = 0; n < nLength; n++) {
@@ -248,13 +248,13 @@ public:
         }
     }
 
-    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChannel& Channel, const CString& sMessage) override
+    void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
-        CString sOpNick = TclEscape(CString(OpNick.GetNick()));
-        CString sNick = TclEscape(sKickedNick);
-        CString sOpHost = TclEscape(CString(OpNick.GetIdent() + "@" + OpNick.GetHost()));
+        NoString sOpNick = TclEscape(NoString(OpNick.GetNick()));
+        NoString sNick = TclEscape(sKickedNick);
+        NoString sOpHost = TclEscape(NoString(OpNick.GetIdent() + "@" + OpNick.GetHost()));
 
-        CString sCommand = "Binds::ProcessKick {" + sOpNick + "} {" + sOpHost + "} - {" + Channel.GetName() + "} {" +
+        NoString sCommand = "Binds::ProcessKick {" + sOpNick + "} {" + sOpHost + "} - {" + Channel.GetName() + "} {" +
                            sNick + "} {" + sMessage + "}";
         i = Tcl_Eval(interp, sCommand.c_str());
         if (i != TCL_OK) {
@@ -267,14 +267,14 @@ private:
     Tcl_Interp* interp;
     int i;
 
-    static CString argvit(const char* argv[], unsigned int end, unsigned int begin, CString delim)
+    static NoString argvit(const char* argv[], unsigned int end, unsigned int begin, NoString delim)
     {
-        CString sRet;
+        NoString sRet;
         unsigned int i;
-        if (begin < end) sRet = CString(argv[begin]);
+        if (begin < end) sRet = NoString(argv[begin]);
 
         for (i = begin + 1; i < end; i++) {
-            sRet = sRet + delim + CString(argv[i]);
+            sRet = sRet + delim + NoString(argv[i]);
         }
 
         return sRet;
@@ -319,9 +319,9 @@ private:
 
         BADARGS(1, 1, "");
 
-        const vector<CChannel*>& Channels = mod->GetNetwork()->GetChans();
+        const vector<NoChannel*>& Channels = mod->GetNetwork()->GetChans();
         for (unsigned int c = 0; c < Channels.size(); c++) {
-            CChannel* pChan = Channels[c];
+            NoChannel* pChan = Channels[c];
             l[0] = pChan->GetName().c_str();
             p = Tcl_Merge(1, l);
             Tcl_AppendElement(irp, p);
@@ -339,18 +339,18 @@ private:
 
         BADARGS(2, 999, " channel");
 
-        CString sChannel = argvit(argv, argc, 1, " ");
-        CChannel* pChannel = mod->GetNetwork()->FindChan(sChannel);
+        NoString sChannel = argvit(argv, argc, 1, " ");
+        NoChannel* pChannel = mod->GetNetwork()->FindChan(sChannel);
 
         if (!pChannel) {
-            CString sMsg = "invalid channel: " + sChannel;
+            NoString sMsg = "invalid channel: " + sChannel;
             Tcl_SetResult(irp, (char*)sMsg.c_str(), TCL_VOLATILE);
             return TCL_ERROR;
         }
 
-        const map<CString, CNick>& msNicks = pChannel->GetNicks();
-        for (map<CString, CNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
-            const CNick& Nick = it->second;
+        const map<NoString, NoNick>& msNicks = pChannel->GetNicks();
+        for (map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
+            const NoNick& Nick = it->second;
             l[0] = (Nick.GetNick()).c_str();
             l[1] = (Nick.GetIdent()).c_str();
             l[2] = (Nick.GetHost()).c_str();
@@ -369,9 +369,9 @@ private:
 
         BADARGS(2, 999, " channel");
 
-        CString sChannel = argvit(argv, argc, 1, " ");
-        CChannel* pChannel = mod->GetNetwork()->FindChan(sChannel);
-        CString sMsg;
+        NoString sChannel = argvit(argv, argc, 1, " ");
+        NoChannel* pChannel = mod->GetNetwork()->FindChan(sChannel);
+        NoString sMsg;
 
         if (!pChannel) {
             sMsg = "invalid channel: " + sChannel;
@@ -387,9 +387,9 @@ private:
     static int tcl_GetServer STDVAR
     {
         CModTcl* mod = static_cast<CModTcl*>(cd);
-        CServer* pServer = mod->GetNetwork()->GetCurrentServer();
-        CString sMsg;
-        if (pServer) sMsg = pServer->GetName() + ":" + CString(pServer->GetPort());
+        NoServer* pServer = mod->GetNetwork()->GetCurrentServer();
+        NoString sMsg;
+        if (pServer) sMsg = pServer->GetName() + ":" + NoString(pServer->GetPort());
         Tcl_SetResult(irp, (char*)sMsg.c_str(), TCL_VOLATILE);
         return TCL_OK;
     }
@@ -397,9 +397,9 @@ private:
     static int tcl_GetServerOnline STDVAR
     {
         CModTcl* mod = static_cast<CModTcl*>(cd);
-        CIRCSock* pIRCSock = mod->GetNetwork()->GetIRCSock();
-        CString sMsg = "0";
-        if (pIRCSock) sMsg = CString(pIRCSock->GetStartTime());
+        NoIrcSock* pIRCSock = mod->GetNetwork()->GetIRCSock();
+        NoString sMsg = "0";
+        if (pIRCSock) sMsg = NoString(pIRCSock->GetStartTime());
         Tcl_SetResult(irp, (char*)sMsg.c_str(), TCL_VOLATILE);
         return TCL_OK;
     }
@@ -412,8 +412,8 @@ private:
 
         BADARGS(1, 1, "");
 
-        CModules& GModules = CZNC::Get().GetModules();
-        CModules& Modules = mod->GetUser()->GetModules();
+        NoModules& GModules = CZNC::Get().GetModules();
+        NoModules& Modules = mod->GetUser()->GetModules();
 
         for (unsigned int b = 0; b < GModules.size(); b++) {
             l[0] = GModules[b]->GetModName().c_str();
@@ -438,13 +438,13 @@ private:
     static int tcl_GetClientCount STDVAR
     {
         CModTcl* mod = static_cast<CModTcl*>(cd);
-        Tcl_SetResult(irp, (char*)CString(mod->GetNetwork()->GetClients().size()).c_str(), TCL_VOLATILE);
+        Tcl_SetResult(irp, (char*)NoString(mod->GetNetwork()->GetClients().size()).c_str(), TCL_VOLATILE);
         return TCL_OK;
     }
 
     static int tcl_PutIRC STDVAR
     {
-        CString sMsg;
+        NoString sMsg;
         CModTcl* mod = static_cast<CModTcl*>(cd);
 
         BADARGS(2, 999, " string");
@@ -455,8 +455,8 @@ private:
 
     static int tcl_PutModule STDVAR
     {
-        CString sMsg;
-        VCString vsMsg;
+        NoString sMsg;
+        NoStringVector vsMsg;
         CModTcl* mod = static_cast<CModTcl*>(cd);
 
         BADARGS(2, 999, " string");
@@ -470,7 +470,7 @@ private:
 
     static int tcl_PutStatus STDVAR
     {
-        CString sMsg;
+        NoString sMsg;
         CModTcl* mod = static_cast<CModTcl*>(cd);
 
         BADARGS(2, 999, " string");
@@ -481,7 +481,7 @@ private:
 
     static int tcl_PutStatusNotice STDVAR
     {
-        CString sMsg;
+        NoString sMsg;
         CModTcl* mod = static_cast<CModTcl*>(cd);
 
         BADARGS(2, 999, " string");
@@ -492,7 +492,7 @@ private:
 
     static int tcl_PutUser STDVAR
     {
-        CString sMsg;
+        NoString sMsg;
         CModTcl* mod = static_cast<CModTcl*>(cd);
 
         BADARGS(2, 999, " string");
@@ -503,7 +503,7 @@ private:
 
     static int tcl_exit STDVAR
     {
-        CString sMsg;
+        NoString sMsg;
         CModTcl* mod = static_cast<CModTcl*>(cd);
 
         BADARGS(1, 2, " ?reason?");
@@ -519,7 +519,7 @@ private:
             usleep(100000); // Sleep for 10ms to attempt to allow the previous Broadcast() to go through to all users
         }
 
-        throw CException(CException::EX_Shutdown);
+        throw NoException(NoException::EX_Shutdown);
 
         return TCL_OK;
     }
@@ -537,7 +537,7 @@ void CModTclStartTimer::RunJob()
     if (p) p->Start();
 }
 
-template <> void TModInfo<CModTcl>(CModInfo& Info)
+template <> void TModInfo<CModTcl>(NoModInfo& Info)
 {
     Info.SetWikiPage("modtcl");
     Info.SetHasArgs(true);

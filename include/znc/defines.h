@@ -24,7 +24,7 @@
 #include <znc/nodebug.h>
 #include <znc/nostring.h>
 
-#define CS_STRING CString
+#define CS_STRING NoString
 #define _NO_CSOCKET_NS
 
 #ifndef NDEBUG

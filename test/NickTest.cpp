@@ -19,7 +19,7 @@
 
 TEST(NickTest, Parse)
 {
-    CNick Nick1("nick!~ident@host");
+    NoNick Nick1("nick!~ident@host");
     EXPECT_EQ("nick", Nick1.GetNick());
     EXPECT_EQ("~ident", Nick1.GetIdent());
     EXPECT_EQ("host", Nick1.GetHost());
@@ -27,7 +27,7 @@ TEST(NickTest, Parse)
     EXPECT_EQ("nick!~ident@host", Nick1.GetHostMask());
     EXPECT_TRUE(Nick1.NickEquals("nick"));
 
-    CNick Nick2(":nick!~ident@host");
+    NoNick Nick2(":nick!~ident@host");
     EXPECT_EQ("nick", Nick2.GetNick());
     EXPECT_EQ("~ident", Nick2.GetIdent());
     EXPECT_EQ("host", Nick2.GetHost());

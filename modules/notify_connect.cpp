@@ -17,10 +17,10 @@
 #include <znc/noznc.h>
 #include <znc/nouser.h>
 
-class CNotifyConnectMod : public CModule
+class NoNotifyConnectMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CNotifyConnectMod) {}
+    MODCONSTRUCTOR(NoNotifyConnectMod) {}
 
     void OnClientLogin() override
     {
@@ -33,9 +33,9 @@ public:
     }
 
 private:
-    void SendAdmins(const CString& msg) { CZNC::Get().Broadcast(msg, true, nullptr, GetClient()); }
+    void SendAdmins(const NoString& msg) { CZNC::Get().Broadcast(msg, true, nullptr, GetClient()); }
 };
 
-template <> void TModInfo<CNotifyConnectMod>(CModInfo& Info) { Info.SetWikiPage("notify_connect"); }
+template <> void TModInfo<NoNotifyConnectMod>(NoModInfo& Info) { Info.SetWikiPage("notify_connect"); }
 
-GLOBALMODULEDEFS(CNotifyConnectMod, "Notifies all admin users when a client connects or disconnects.")
+GLOBALMODULEDEFS(NoNotifyConnectMod, "Notifies all admin users when a client connects or disconnects.")

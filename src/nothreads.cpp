@@ -27,15 +27,15 @@ static const size_t MAX_IDLE_THREADS = 3;
 /* Just an arbitrary limit for the number of running threads */
 static const size_t MAX_TOTAL_THREADS = 20;
 
-CThreadPool& CThreadPool::Get()
+NoThreadPool& NoThreadPool::Get()
 {
     // Beware! The following is not thread-safe! This function must
     // be called once any thread is started.
-    static CThreadPool pool;
+    static NoThreadPool pool;
     return pool;
 }
 
-CThreadPool::CThreadPool()
+NoThreadPool::NoThreadPool()
     : m_mutex(), m_cond(), m_cancellationCond(), m_exit_cond(), m_done(false), m_num_threads(0), m_num_idle(0),
       m_iJobPipe{ 0, 0 }, m_jobs()
 {
@@ -45,14 +45,14 @@ CThreadPool::CThreadPool()
     }
 }
 
-void CThreadPool::jobDone(CJob* job)
+void NoThreadPool::jobDone(NoJob* job)
 {
     // This must be called with the mutex locked!
 
-    enum CJob::EJobState oldState = job->m_eState;
-    job->m_eState = CJob::DONE;
+    enum NoJob::EJobState oldState = job->m_eState;
+    job->m_eState = NoJob::DONE;
 
-    if (oldState == CJob::CANCELLED) {
+    if (oldState == NoJob::CANCELLED) {
         // Signal the main thread that cancellation is done
         m_cancellationCond.signal();
         return;
@@ -68,11 +68,11 @@ void CThreadPool::jobDone(CJob* job)
     }
 }
 
-void CThreadPool::handlePipeReadable() const { finishJob(getJobFromPipe()); }
+void NoThreadPool::handlePipeReadable() const { finishJob(getJobFromPipe()); }
 
-CJob* CThreadPool::getJobFromPipe() const
+NoJob* NoThreadPool::getJobFromPipe() const
 {
-    CJob* a = nullptr;
+    NoJob* a = nullptr;
     ssize_t need = sizeof(a);
     ssize_t r = read(m_iJobPipe[0], &a, need);
     if (r != need) {
@@ -82,15 +82,15 @@ CJob* CThreadPool::getJobFromPipe() const
     return a;
 }
 
-void CThreadPool::finishJob(CJob* job) const
+void NoThreadPool::finishJob(NoJob* job) const
 {
     job->runMain();
     delete job;
 }
 
-CThreadPool::~CThreadPool()
+NoThreadPool::~NoThreadPool()
 {
-    CMutexLocker guard(m_mutex);
+    NoMutexLocker guard(m_mutex);
     m_done = true;
 
     while (m_num_threads > 0) {
@@ -99,15 +99,15 @@ CThreadPool::~CThreadPool()
     }
 }
 
-bool CThreadPool::threadNeeded() const
+bool NoThreadPool::threadNeeded() const
 {
     if (m_num_idle > MAX_IDLE_THREADS) return false;
     return !m_done;
 }
 
-void CThreadPool::threadFunc()
+void NoThreadPool::threadFunc()
 {
-    CMutexLocker guard(m_mutex);
+    NoMutexLocker guard(m_mutex);
     // m_num_threads was already increased
     m_num_idle++;
 
@@ -119,12 +119,12 @@ void CThreadPool::threadFunc()
         if (!threadNeeded()) break;
 
         // Figure out a job to do
-        CJob* job = m_jobs.front();
+        NoJob* job = m_jobs.front();
         m_jobs.pop_front();
 
         // Now do the actual job
         m_num_idle--;
-        job->m_eState = CJob::RUNNING;
+        job->m_eState = NoJob::RUNNING;
         guard.unlock();
 
         job->runThread();
@@ -140,9 +140,9 @@ void CThreadPool::threadFunc()
     if (m_num_threads == 0 && m_done) m_exit_cond.signal();
 }
 
-void CThreadPool::addJob(CJob* job)
+void NoThreadPool::addJob(NoJob* job)
 {
-    CMutexLocker guard(m_mutex);
+    NoMutexLocker guard(m_mutex);
     m_jobs.push_back(job);
 
     // Do we already have a thread which can handle this job?
@@ -158,17 +158,17 @@ void CThreadPool::addJob(CJob* job)
 
     // Start a new thread for our pool
     m_num_threads++;
-    CThread::startThread(threadPoolFunc, this);
+    NoThread::startThread(threadPoolFunc, this);
 }
 
-void CThreadPool::cancelJob(CJob* job)
+void NoThreadPool::cancelJob(NoJob* job)
 {
-    std::set<CJob*> jobs;
+    std::set<NoJob*> jobs;
     jobs.insert(job);
     cancelJobs(jobs);
 }
 
-void CThreadPool::cancelJobs(const std::set<CJob*>& jobs)
+void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
 {
     // Thanks to the mutex, jobs cannot change state anymore. There are
     // three different states which can occur:
@@ -187,35 +187,35 @@ void CThreadPool::cancelJobs(const std::set<CJob*>& jobs)
     // status and sees that the job was cancelled. It signals to us that
     // cancellation is done by changing the job's status to DONE.
 
-    CMutexLocker guard(m_mutex);
-    std::set<CJob*> wait, finished, deleteLater;
-    std::set<CJob*>::const_iterator it;
+    NoMutexLocker guard(m_mutex);
+    std::set<NoJob*> wait, finished, deleteLater;
+    std::set<NoJob*>::const_iterator it;
 
     // Start cancelling all jobs
     for (it = jobs.begin(); it != jobs.end(); ++it) {
         switch ((*it)->m_eState) {
-        case CJob::READY: {
-            (*it)->m_eState = CJob::CANCELLED;
+        case NoJob::READY: {
+            (*it)->m_eState = NoJob::CANCELLED;
 
             // Job wasn't started yet, must be in the queue
-            std::list<CJob*>::iterator it2 = std::find(m_jobs.begin(), m_jobs.end(), *it);
+            std::list<NoJob*>::iterator it2 = std::find(m_jobs.begin(), m_jobs.end(), *it);
             assert(it2 != m_jobs.end());
             m_jobs.erase(it2);
             deleteLater.insert(*it);
             continue;
         }
 
-        case CJob::RUNNING:
-            (*it)->m_eState = CJob::CANCELLED;
+        case NoJob::RUNNING:
+            (*it)->m_eState = NoJob::CANCELLED;
             wait.insert(*it);
             continue;
 
-        case CJob::DONE:
-            (*it)->m_eState = CJob::CANCELLED;
+        case NoJob::DONE:
+            (*it)->m_eState = NoJob::CANCELLED;
             finished.insert(*it);
             continue;
 
-        case CJob::CANCELLED:
+        case NoJob::CANCELLED:
         default:
             assert(0);
         }
@@ -228,10 +228,10 @@ void CThreadPool::cancelJobs(const std::set<CJob*>& jobs)
     while (!wait.empty()) {
         it = wait.begin();
         while (it != wait.end()) {
-            if ((*it)->m_eState != CJob::CANCELLED) {
-                assert((*it)->m_eState == CJob::DONE);
+            if ((*it)->m_eState != NoJob::CANCELLED) {
+                assert((*it)->m_eState == NoJob::DONE);
                 // Re-set state for the destructor
-                (*it)->m_eState = CJob::CANCELLED;
+                (*it)->m_eState = NoJob::CANCELLED;
                 ;
                 deleteLater.insert(*it);
                 wait.erase(it++);
@@ -250,9 +250,9 @@ void CThreadPool::cancelJobs(const std::set<CJob*>& jobs)
 
     // Handle finished jobs. They must already be in the pipe.
     while (!finished.empty()) {
-        CJob* job = getJobFromPipe();
+        NoJob* job = getJobFromPipe();
         if (finished.erase(job) > 0) {
-            assert(job->m_eState == CJob::CANCELLED);
+            assert(job->m_eState == NoJob::CANCELLED);
             delete job;
         } else
             finishJob(job);
@@ -265,9 +265,9 @@ void CThreadPool::cancelJobs(const std::set<CJob*>& jobs)
     }
 }
 
-bool CJob::wasCancelled() const
+bool NoJob::wasCancelled() const
 {
-    CMutexLocker guard(CThreadPool::Get().m_mutex);
+    NoMutexLocker guard(NoThreadPool::Get().m_mutex);
     return m_eState == CANCELLED;
 }
 

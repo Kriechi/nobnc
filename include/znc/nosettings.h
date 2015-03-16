@@ -20,28 +20,28 @@
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
 
-class CFile;
-class CSettings;
+class NoFile;
+class NoSettings;
 
-struct CSettingsEntry
+struct NoSettingsEntry
 {
-    CSettingsEntry();
-    CSettingsEntry(const CSettings& Config);
-    CSettingsEntry(const CSettingsEntry& other);
-    ~CSettingsEntry();
-    CSettingsEntry& operator=(const CSettingsEntry& other);
+    NoSettingsEntry();
+    NoSettingsEntry(const NoSettings& Config);
+    NoSettingsEntry(const NoSettingsEntry& other);
+    ~NoSettingsEntry();
+    NoSettingsEntry& operator=(const NoSettingsEntry& other);
 
-    CSettings* m_pSubConfig;
+    NoSettings* m_pSubConfig;
 };
 
-class CSettings
+class NoSettings
 {
 public:
-    CSettings() : m_ConfigEntries(), m_SubConfigs() {}
+    NoSettings() : m_ConfigEntries(), m_SubConfigs() {}
 
-    typedef std::map<CString, VCString> EntryMap;
-    typedef std::map<CString, CSettingsEntry> SubConfig;
-    typedef std::map<CString, SubConfig> SubConfigMap;
+    typedef std::map<NoString, NoStringVector> EntryMap;
+    typedef std::map<NoString, NoSettingsEntry> SubConfig;
+    typedef std::map<NoString, SubConfig> SubConfigMap;
 
     typedef EntryMap::const_iterator EntryMapIterator;
     typedef SubConfigMap::const_iterator SubConfigMapIterator;
@@ -52,7 +52,7 @@ public:
     SubConfigMapIterator BeginSubConfigs() const { return m_SubConfigs.begin(); }
     SubConfigMapIterator EndSubConfigs() const { return m_SubConfigs.end(); }
 
-    void AddKeyValuePair(const CString& sName, const CString& sValue)
+    void AddKeyValuePair(const NoString& sName, const NoString& sValue)
     {
         if (sName.empty() || sValue.empty()) {
             return;
@@ -61,7 +61,7 @@ public:
         m_ConfigEntries[sName].push_back(sValue);
     }
 
-    bool AddSubConfig(const CString& sTag, const CString& sName, CSettings Config)
+    bool AddSubConfig(const NoString& sTag, const NoString& sName, NoSettings Config)
     {
         SubConfig& conf = m_SubConfigs[sTag];
         SubConfig::const_iterator it = conf.find(sName);
@@ -74,7 +74,7 @@ public:
         return true;
     }
 
-    bool FindStringVector(const CString& sName, VCString& vsList, bool bErase = true)
+    bool FindStringVector(const NoString& sName, NoStringVector& vsList, bool bErase = true)
     {
         EntryMap::iterator it = m_ConfigEntries.find(sName);
         vsList.clear();
@@ -88,7 +88,7 @@ public:
         return true;
     }
 
-    bool FindStringEntry(const CString& sName, CString& sRes, const CString& sDefault = "")
+    bool FindStringEntry(const NoString& sName, NoString& sRes, const NoString& sDefault = "")
     {
         EntryMap::iterator it = m_ConfigEntries.find(sName);
         sRes = sDefault;
@@ -99,9 +99,9 @@ public:
         return true;
     }
 
-    bool FindBoolEntry(const CString& sName, bool& bRes, bool bDefault = false)
+    bool FindBoolEntry(const NoString& sName, bool& bRes, bool bDefault = false)
     {
-        CString s;
+        NoString s;
         if (FindStringEntry(sName, s)) {
             bRes = s.ToBool();
             return true;
@@ -110,9 +110,9 @@ public:
         return false;
     }
 
-    bool FindUIntEntry(const CString& sName, unsigned int& uRes, unsigned int uDefault = 0)
+    bool FindUIntEntry(const NoString& sName, unsigned int& uRes, unsigned int uDefault = 0)
     {
-        CString s;
+        NoString s;
         if (FindStringEntry(sName, s)) {
             uRes = s.ToUInt();
             return true;
@@ -121,9 +121,9 @@ public:
         return false;
     }
 
-    bool FindUShortEntry(const CString& sName, unsigned short& uRes, unsigned short uDefault = 0)
+    bool FindUShortEntry(const NoString& sName, unsigned short& uRes, unsigned short uDefault = 0)
     {
-        CString s;
+        NoString s;
         if (FindStringEntry(sName, s)) {
             uRes = s.ToUShort();
             return true;
@@ -132,9 +132,9 @@ public:
         return false;
     }
 
-    bool FindDoubleEntry(const CString& sName, double& fRes, double fDefault = 0)
+    bool FindDoubleEntry(const NoString& sName, double& fRes, double fDefault = 0)
     {
-        CString s;
+        NoString s;
         if (FindStringEntry(sName, s)) {
             fRes = s.ToDouble();
             return true;
@@ -143,7 +143,7 @@ public:
         return false;
     }
 
-    bool FindSubConfig(const CString& sName, SubConfig& Config, bool bErase = true)
+    bool FindSubConfig(const NoString& sName, SubConfig& Config, bool bErase = true)
     {
         SubConfigMap::iterator it = m_SubConfigs.find(sName);
         if (it == m_SubConfigs.end()) {
@@ -161,8 +161,8 @@ public:
 
     bool empty() const { return m_ConfigEntries.empty() && m_SubConfigs.empty(); }
 
-    bool Parse(CFile& file, CString& sErrorMsg);
-    void Write(CFile& file, unsigned int iIndentation = 0);
+    bool Parse(NoFile& file, NoString& sErrorMsg);
+    void Write(NoFile& file, unsigned int iIndentation = 0);
 
 private:
     EntryMap m_ConfigEntries;

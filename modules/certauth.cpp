@@ -24,38 +24,38 @@ using std::vector;
 using std::set;
 using std::pair;
 
-class CSSLClientCertMod : public CModule
+class NoSslClientCertMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CSSLClientCertMod)
+    MODCONSTRUCTOR(NoSslClientCertMod)
     {
         AddHelpCommand();
         AddCommand("Add",
-                   static_cast<CModCommand::ModCmdFunc>(&CSSLClientCertMod::HandleAddCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSslClientCertMod::HandleAddCommand),
                    "[pubkey]",
                    "If pubkey is not provided will use the current key");
-        AddCommand("Del", static_cast<CModCommand::ModCmdFunc>(&CSSLClientCertMod::HandleDelCommand), "id");
-        AddCommand("List", static_cast<CModCommand::ModCmdFunc>(&CSSLClientCertMod::HandleListCommand));
+        AddCommand("Del", static_cast<NoModCommand::ModCmdFunc>(&NoSslClientCertMod::HandleDelCommand), "id");
+        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoSslClientCertMod::HandleListCommand));
         AddCommand("Show",
-                   static_cast<CModCommand::ModCmdFunc>(&CSSLClientCertMod::HandleShowCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSslClientCertMod::HandleShowCommand),
                    "",
                    "Print your current key");
     }
 
-    virtual ~CSSLClientCertMod() {}
+    virtual ~NoSslClientCertMod() {}
 
     bool OnBoot() override
     {
-        const vector<CListener*>& vListeners = CZNC::Get().GetListeners();
-        vector<CListener*>::const_iterator it;
+        const vector<NoListener*>& vListeners = CZNC::Get().GetListeners();
+        vector<NoListener*>::const_iterator it;
 
         // We need the SSL_VERIFY_PEER flag on all listeners, or else
         // the client doesn't send a ssl cert
         for (it = vListeners.begin(); it != vListeners.end(); ++it)
             (*it)->GetRealListener()->SetRequireClientCertFlags(SSL_VERIFY_PEER);
 
-        for (MCString::const_iterator it1 = BeginNV(); it1 != EndNV(); ++it1) {
-            VCString vsKeys;
+        for (NoStringMap::const_iterator it1 = BeginNV(); it1 != EndNV(); ++it1) {
+            NoStringVector vsKeys;
 
             if (CZNC::Get().FindUser(it1->first) == nullptr) {
                 DEBUG("Unknown user in saved data [" + it1->first + "]");
@@ -63,7 +63,7 @@ public:
             }
 
             it1->second.Split(" ", vsKeys, false);
-            for (VCString::const_iterator it2 = vsKeys.begin(); it2 != vsKeys.end(); ++it2) {
+            for (NoStringVector::const_iterator it2 = vsKeys.begin(); it2 != vsKeys.end(); ++it2) {
                 m_PubKeys[it1->first].insert(it2->AsLower());
             }
         }
@@ -73,7 +73,7 @@ public:
 
     void OnPostRehash() override { OnBoot(); }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         OnBoot();
 
@@ -83,9 +83,9 @@ public:
     bool Save()
     {
         ClearNV(false);
-        for (MSCString::const_iterator it = m_PubKeys.begin(); it != m_PubKeys.end(); ++it) {
-            CString sVal;
-            for (SCString::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+        for (MNoStringSet::const_iterator it = m_PubKeys.begin(); it != m_PubKeys.end(); ++it) {
+            NoString sVal;
+            for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
                 sVal += *it2 + " ";
             }
 
@@ -95,9 +95,9 @@ public:
         return SaveRegistry();
     }
 
-    bool AddKey(CUser* pUser, const CString& sKey)
+    bool AddKey(NoUser* pUser, const NoString& sKey)
     {
-        const pair<SCString::const_iterator, bool> pair = m_PubKeys[pUser->GetUserName()].insert(sKey.AsLower());
+        const pair<NoStringSet::const_iterator, bool> pair = m_PubKeys[pUser->GetUserName()].insert(sKey.AsLower());
 
         if (pair.second) {
             Save();
@@ -106,15 +106,15 @@ public:
         return pair.second;
     }
 
-    EModRet OnLoginAttempt(std::shared_ptr<CAuthBase> Auth) override
+    EModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
     {
-        const CString sUser = Auth->GetUsername();
+        const NoString sUser = Auth->GetUsername();
         Csock* pSock = Auth->GetSocket();
-        CUser* pUser = CZNC::Get().FindUser(sUser);
+        NoUser* pUser = CZNC::Get().FindUser(sUser);
 
         if (pSock == nullptr || pUser == nullptr) return CONTINUE;
 
-        const CString sPubKey = GetKey(pSock);
+        const NoString sPubKey = GetKey(pSock);
         DEBUG("User: " << sUser << " Key: " << sPubKey);
 
         if (sPubKey.empty()) {
@@ -122,13 +122,13 @@ public:
             return CONTINUE;
         }
 
-        MSCString::const_iterator it = m_PubKeys.find(sUser);
+        MNoStringSet::const_iterator it = m_PubKeys.find(sUser);
         if (it == m_PubKeys.end()) {
             DEBUG("No saved pubkeys for this client");
             return CONTINUE;
         }
 
-        SCString::const_iterator it2 = it->second.find(sPubKey);
+        NoStringSet::const_iterator it2 = it->second.find(sPubKey);
         if (it2 == it->second.end()) {
             DEBUG("Invalid pubkey");
             return CONTINUE;
@@ -141,9 +141,9 @@ public:
         return HALT;
     }
 
-    void HandleShowCommand(const CString& sLine)
+    void HandleShowCommand(const NoString& sLine)
     {
-        const CString sPubKey = GetKey(GetClient());
+        const NoString sPubKey = GetKey(GetClient());
 
         if (sPubKey.empty()) {
             PutModule("You are not connected with any valid public key");
@@ -152,9 +152,9 @@ public:
         }
     }
 
-    void HandleAddCommand(const CString& sLine)
+    void HandleAddCommand(const NoString& sLine)
     {
-        CString sPubKey = sLine.Token(1);
+        NoString sPubKey = sLine.Token(1);
 
         if (sPubKey.empty()) {
             sPubKey = GetKey(GetClient());
@@ -171,23 +171,23 @@ public:
         }
     }
 
-    void HandleListCommand(const CString& sLine)
+    void HandleListCommand(const NoString& sLine)
     {
-        CTable Table;
+        NoTable Table;
 
         Table.AddColumn("Id");
         Table.AddColumn("Key");
 
-        MSCString::const_iterator it = m_PubKeys.find(GetUser()->GetUserName());
+        MNoStringSet::const_iterator it = m_PubKeys.find(GetUser()->GetUserName());
         if (it == m_PubKeys.end()) {
             PutModule("No keys set for your user");
             return;
         }
 
         unsigned int id = 1;
-        for (SCString::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+        for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
             Table.AddRow();
-            Table.SetCell("Id", CString(id++));
+            Table.SetCell("Id", NoString(id++));
             Table.SetCell("Key", *it2);
         }
 
@@ -198,10 +198,10 @@ public:
         }
     }
 
-    void HandleDelCommand(const CString& sLine)
+    void HandleDelCommand(const NoString& sLine)
     {
         unsigned int id = sLine.Token(1, true).ToUInt();
-        MSCString::iterator it = m_PubKeys.find(GetUser()->GetUserName());
+        MNoStringSet::iterator it = m_PubKeys.find(GetUser()->GetUserName());
 
         if (it == m_PubKeys.end()) {
             PutModule("No keys set for your user");
@@ -213,7 +213,7 @@ public:
             return;
         }
 
-        SCString::const_iterator it2 = it->second.begin();
+        NoStringSet::const_iterator it2 = it->second.begin();
         while (id > 1) {
             ++it2;
             id--;
@@ -226,9 +226,9 @@ public:
         Save();
     }
 
-    CString GetKey(Csock* pSock)
+    NoString GetKey(Csock* pSock)
     {
-        CString sRes;
+        NoString sRes;
         long int res = pSock->GetPeerFingerprint(sRes);
 
         DEBUG("GetKey() returned status " << res << " with key " << sRes);
@@ -245,17 +245,17 @@ public:
         }
     }
 
-    CString GetWebMenuTitle() override { return "certauth"; }
+    NoString GetWebMenuTitle() override { return "certauth"; }
 
-    bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
-        CUser* pUser = WebSock.GetSession()->GetUser();
+        NoUser* pUser = WebSock.GetSession()->GetUser();
 
         if (sPageName == "index") {
-            MSCString::const_iterator it = m_PubKeys.find(pUser->GetUserName());
+            MNoStringSet::const_iterator it = m_PubKeys.find(pUser->GetUserName());
             if (it != m_PubKeys.end()) {
-                for (SCString::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-                    CTemplate& row = Tmpl.AddRow("KeyLoop");
+                for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+                    NoTemplate& row = Tmpl.AddRow("KeyLoop");
                     row["Key"] = *it2;
                 }
             }
@@ -266,7 +266,7 @@ public:
             WebSock.Redirect(GetWebPath());
             return true;
         } else if (sPageName == "delete") {
-            MSCString::iterator it = m_PubKeys.find(pUser->GetUserName());
+            MNoStringSet::iterator it = m_PubKeys.find(pUser->GetUserName());
             if (it != m_PubKeys.end()) {
                 if (it->second.erase(WebSock.GetParam("key", false))) {
                     if (it->second.size() == 0) {
@@ -286,10 +286,10 @@ public:
 
 private:
     // Maps user names to a list of allowed pubkeys
-    typedef map<CString, set<CString>> MSCString;
-    MSCString m_PubKeys;
+    typedef map<NoString, set<NoString>> MNoStringSet;
+    MNoStringSet m_PubKeys;
 };
 
-template <> void TModInfo<CSSLClientCertMod>(CModInfo& Info) { Info.SetWikiPage("certauth"); }
+template <> void TModInfo<NoSslClientCertMod>(NoModInfo& Info) { Info.SetWikiPage("certauth"); }
 
-GLOBALMODULEDEFS(CSSLClientCertMod, "Allow users to authenticate via SSL client certificates.")
+GLOBALMODULEDEFS(NoSslClientCertMod, "Allow users to authenticate via SSL client certificates.")

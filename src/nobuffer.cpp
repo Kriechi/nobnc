@@ -19,15 +19,15 @@
 #include "nouser.h"
 #include "noznc.h"
 
-CBuffer::CBuffer(unsigned int limit) : m_limit(limit)
+NoBuffer::NoBuffer(unsigned int limit) : m_limit(limit)
 {
 }
 
-CBuffer::~CBuffer()
+NoBuffer::~NoBuffer()
 {
 }
 
-unsigned int CBuffer::AddLine(const CString& format, const CString& text, const timeval* ts)
+unsigned int NoBuffer::AddLine(const NoString& format, const NoString& text, const timeval* ts)
 {
     if (!m_limit) {
         return 0;
@@ -37,13 +37,13 @@ unsigned int CBuffer::AddLine(const CString& format, const CString& text, const 
         m_lines.erase(m_lines.begin());
     }
 
-    m_lines.push_back(CMessage(format, text, ts));
+    m_lines.push_back(NoMessage(format, text, ts));
     return m_lines.size();
 }
 
-unsigned int CBuffer::UpdateLine(const CString& match, const CString& format, const CString& text)
+unsigned int NoBuffer::UpdateLine(const NoString& match, const NoString& format, const NoString& text)
 {
-    for (CMessage& line : m_lines) {
+    for (NoMessage& line : m_lines) {
         if (line.GetFormat().compare(0, match.length(), match) == 0) {
             line.SetFormat(format);
             line.SetText(text);
@@ -55,9 +55,9 @@ unsigned int CBuffer::UpdateLine(const CString& match, const CString& format, co
     return AddLine(format, text);
 }
 
-unsigned int CBuffer::UpdateExactLine(const CString& format, const CString& text)
+unsigned int NoBuffer::UpdateExactLine(const NoString& format, const NoString& text)
 {
-    for (const CMessage& line : m_lines) {
+    for (const NoMessage& line : m_lines) {
         if (line.GetFormat() == format && line.GetText() == text) {
             return m_lines.size();
         }
@@ -66,17 +66,17 @@ unsigned int CBuffer::UpdateExactLine(const CString& format, const CString& text
     return AddLine(format, text);
 }
 
-const CMessage& CBuffer::GetMessage(unsigned int idx) const
+const NoMessage& NoBuffer::GetMessage(unsigned int idx) const
 {
     return m_lines[idx];
 }
 
-CString CBuffer::GetLine(unsigned int idx, const CClient& client, const MCString& params) const
+NoString NoBuffer::GetLine(unsigned int idx, const NoClient& client, const NoStringMap& params) const
 {
     return m_lines[idx].GetLine(client, params);
 }
 
-bool CBuffer::SetLimit(unsigned int limit, bool force)
+bool NoBuffer::SetLimit(unsigned int limit, bool force)
 {
     if (!force && limit > CZNC::Get().GetMaxBufferSize()) {
         return false;

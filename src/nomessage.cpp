@@ -19,7 +19,7 @@
 #include "nouser.h"
 #include "noznc.h"
 
-CMessage::CMessage(const CString& format, const CString& text, const timeval* ts)
+NoMessage::NoMessage(const NoString& format, const NoString& text, const timeval* ts)
     : m_format(format), m_text(text), m_time()
 {
     if (!ts)
@@ -28,11 +28,11 @@ CMessage::CMessage(const CString& format, const CString& text, const timeval* ts
         m_time = *ts;
 }
 
-CMessage::~CMessage()
+NoMessage::~NoMessage()
 {
 }
 
-void CMessage::UpdateTime()
+void NoMessage::UpdateTime()
 {
     if (!gettimeofday(&m_time, nullptr)) {
         m_time.tv_sec = time(nullptr);
@@ -40,16 +40,16 @@ void CMessage::UpdateTime()
     }
 }
 
-CString CMessage::GetLine(const CClient& client, const MCString& params) const
+NoString NoMessage::GetLine(const NoClient& client, const NoStringMap& params) const
 {
-    MCString copy = params;
+    NoStringMap copy = params;
 
     if (client.HasServerTime()) {
         copy["text"] = m_text;
-        CString str = CString::NamedFormat(m_format, copy);
-        return "@time=" + CUtils::FormatServerTime(m_time) + " " + str;
+        NoString str = NoString::NamedFormat(m_format, copy);
+        return "@time=" + NoUtils::FormatServerTime(m_time) + " " + str;
     } else {
         copy["text"] = client.GetUser()->AddTimestamp(m_time.tv_sec, m_text);
-        return CString::NamedFormat(m_format, copy);
+        return NoString::NamedFormat(m_format, copy);
     }
 }

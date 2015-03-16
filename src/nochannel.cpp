@@ -25,7 +25,7 @@ using std::set;
 using std::vector;
 using std::map;
 
-CChannel::CChannel(const CString& sName, CNetwork* pNetwork, bool bInConfig, CSettings* pConfig)
+NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig, NoSettings* pConfig)
     : m_bDetached(false), m_bIsOn(false), m_bAutoClearChanBuffer(pNetwork->GetUser()->AutoClearChanBuffer()),
       m_bInConfig(bInConfig), m_bDisabled(false), m_bHasBufferCountSet(false), m_bHasAutoClearChanBufferSet(false),
       m_sName(sName.Token(0)), m_sKey(sName.Token(1)), m_sTopic(""), m_sTopicOwner(""), m_ulTopicDate(0),
@@ -40,7 +40,7 @@ CChannel::CChannel(const CString& sName, CNetwork* pNetwork, bool bInConfig, CSe
     m_Buffer.SetLimit(m_pNetwork->GetUser()->GetBufferCount(), true);
 
     if (pConfig) {
-        CString sValue;
+        NoString sValue;
         if (pConfig->FindStringEntry("buffer", sValue)) SetBufferCount(sValue.ToUInt(), true);
         if (pConfig->FindStringEntry("autoclearchanbuffer", sValue)) SetAutoClearChanBuffer(sValue.ToBool());
         if (pConfig->FindStringEntry("keepbuffer", sValue))
@@ -50,15 +50,15 @@ CChannel::CChannel(const CString& sName, CNetwork* pNetwork, bool bInConfig, CSe
             if (sValue.ToBool()) Disable();
         if (pConfig->FindStringEntry("autocycle", sValue))
             if (sValue.Equals("true"))
-                CUtils::PrintError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle " + sName);
+                NoUtils::PrintError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle " + sName);
         if (pConfig->FindStringEntry("key", sValue)) SetKey(sValue);
         if (pConfig->FindStringEntry("modes", sValue)) SetDefaultModes(sValue);
     }
 }
 
-CChannel::~CChannel() { ClearNicks(); }
+NoChannel::~NoChannel() { ClearNicks(); }
 
-void CChannel::Reset()
+void NoChannel::Reset()
 {
     m_bIsOn = false;
     m_bModeKnown = false;
@@ -72,12 +72,12 @@ void CChannel::Reset()
     ResetJoinTries();
 }
 
-CSettings CChannel::ToConfig() const
+NoSettings NoChannel::ToConfig() const
 {
-    CSettings config;
+    NoSettings config;
 
-    if (m_bHasBufferCountSet) config.AddKeyValuePair("Buffer", CString(GetBufferCount()));
-    if (m_bHasAutoClearChanBufferSet) config.AddKeyValuePair("AutoClearChanBuffer", CString(AutoClearChanBuffer()));
+    if (m_bHasBufferCountSet) config.AddKeyValuePair("Buffer", NoString(GetBufferCount()));
+    if (m_bHasAutoClearChanBufferSet) config.AddKeyValuePair("AutoClearChanBuffer", NoString(AutoClearChanBuffer()));
     if (IsDetached()) config.AddKeyValuePair("Detached", "true");
     if (IsDisabled()) config.AddKeyValuePair("Disabled", "true");
     if (!GetKey().empty()) config.AddKeyValuePair("Key", GetKey());
@@ -86,7 +86,7 @@ CSettings CChannel::ToConfig() const
     return config;
 }
 
-void CChannel::Clone(CChannel& chan)
+void NoChannel::Clone(NoChannel& chan)
 {
     // We assume that m_sName and m_pNetwork are equal
     SetBufferCount(chan.GetBufferCount(), true);
@@ -109,9 +109,9 @@ void CChannel::Clone(CChannel& chan)
     }
 }
 
-void CChannel::Cycle() const { m_pNetwork->PutIRC("PART " + GetName() + "\r\nJOIN " + GetName() + " " + GetKey()); }
+void NoChannel::Cycle() const { m_pNetwork->PutIRC("PART " + GetName() + "\r\nJOIN " + GetName() + " " + GetKey()); }
 
-void CChannel::JoinUser(const CString& sKey)
+void NoChannel::JoinUser(const NoString& sKey)
 {
     if (!sKey.empty()) {
         SetKey(sKey);
@@ -119,33 +119,33 @@ void CChannel::JoinUser(const CString& sKey)
     m_pNetwork->PutIRC("JOIN " + GetName() + " " + GetKey());
 }
 
-void CChannel::AttachUser(CClient* pClient)
+void NoChannel::AttachUser(NoClient* pClient)
 {
-    m_pNetwork->PutUser(":" + m_pNetwork->GetIRCNick().GetNickMask() + " JOIN :" + GetName(), pClient);
+    m_pNetwork->PutUser(":" + m_pNetwork->GetIRNoNick().GetNickMask() + " JOIN :" + GetName(), pClient);
 
     if (!GetTopic().empty()) {
-        m_pNetwork->PutUser(":" + m_pNetwork->GetIRCServer() + " 332 " + m_pNetwork->GetIRCNick().GetNick() + " " +
+        m_pNetwork->PutUser(":" + m_pNetwork->GetIRNoServer() + " 332 " + m_pNetwork->GetIRNoNick().GetNick() + " " +
                             GetName() + " :" + GetTopic(),
                             pClient);
-        m_pNetwork->PutUser(":" + m_pNetwork->GetIRCServer() + " 333 " + m_pNetwork->GetIRCNick().GetNick() + " " +
-                            GetName() + " " + GetTopicOwner() + " " + CString(GetTopicDate()),
+        m_pNetwork->PutUser(":" + m_pNetwork->GetIRNoServer() + " 333 " + m_pNetwork->GetIRNoNick().GetNick() + " " +
+                            GetName() + " " + GetTopicOwner() + " " + NoString(GetTopicDate()),
                             pClient);
     }
 
-    CString sPre = ":" + m_pNetwork->GetIRCServer() + " 353 " + m_pNetwork->GetIRCNick().GetNick() + " " +
+    NoString sPre = ":" + m_pNetwork->GetIRNoServer() + " 353 " + m_pNetwork->GetIRNoNick().GetNick() + " " +
                    GetModeForNames() + " " + GetName() + " :";
-    CString sLine = sPre;
-    CString sPerm, sNick;
+    NoString sLine = sPre;
+    NoString sPerm, sNick;
 
-    const vector<CClient*>& vpClients = m_pNetwork->GetClients();
-    for (CClient* pEachClient : vpClients) {
-        CClient* pThisClient;
+    const vector<NoClient*>& vpClients = m_pNetwork->GetClients();
+    for (NoClient* pEachClient : vpClients) {
+        NoClient* pThisClient;
         if (!pClient)
             pThisClient = pEachClient;
         else
             pThisClient = pClient;
 
-        for (map<CString, CNick>::iterator a = m_msNicks.begin(); a != m_msNicks.end(); ++a) {
+        for (map<NoString, NoNick>::iterator a = m_msNicks.begin(); a != m_msNicks.end(); ++a) {
             if (pThisClient->HasNamesx()) {
                 sPerm = a->second.GetPermStr();
             } else {
@@ -175,7 +175,7 @@ void CChannel::AttachUser(CClient* pClient)
             break;
     }
 
-    m_pNetwork->PutUser(":" + m_pNetwork->GetIRCServer() + " 366 " + m_pNetwork->GetIRCNick().GetNick() + " " + GetName() + " :End of /NAMES list.",
+    m_pNetwork->PutUser(":" + m_pNetwork->GetIRNoServer() + " 366 " + m_pNetwork->GetIRNoNick().GetNick() + " " + GetName() + " :End of /NAMES list.",
                         pClient);
     m_bDetached = false;
 
@@ -183,17 +183,17 @@ void CChannel::AttachUser(CClient* pClient)
     SendBuffer(pClient);
 }
 
-void CChannel::DetachUser()
+void NoChannel::DetachUser()
 {
     if (!m_bDetached) {
-        m_pNetwork->PutUser(":" + m_pNetwork->GetIRCNick().GetNickMask() + " PART " + GetName());
+        m_pNetwork->PutUser(":" + m_pNetwork->GetIRNoNick().GetNickMask() + " PART " + GetName());
         m_bDetached = true;
     }
 }
 
-CString CChannel::GetModeString() const
+NoString NoChannel::GetModeString() const
 {
-    CString sModes, sArgs;
+    NoString sModes, sArgs;
 
     for (const auto& it : m_musModes) {
         sModes += it.first;
@@ -202,12 +202,12 @@ CString CChannel::GetModeString() const
         }
     }
 
-    return sModes.empty() ? sModes : CString("+" + sModes + sArgs);
+    return sModes.empty() ? sModes : NoString("+" + sModes + sArgs);
 }
 
-CString CChannel::GetModeForNames() const
+NoString NoChannel::GetModeForNames() const
 {
-    CString sMode;
+    NoString sMode;
 
     for (const auto& it : m_musModes) {
         if (it.first == 's') {
@@ -220,13 +220,13 @@ CString CChannel::GetModeForNames() const
     return (sMode.empty() ? "=" : sMode);
 }
 
-void CChannel::SetModes(const CString& sModes)
+void NoChannel::SetModes(const NoString& sModes)
 {
     m_musModes.clear();
     ModeChange(sModes);
 }
 
-void CChannel::SetAutoClearChanBuffer(bool b)
+void NoChannel::SetAutoClearChanBuffer(bool b)
 {
     m_bHasAutoClearChanBufferSet = true;
     m_bAutoClearChanBuffer = b;
@@ -236,7 +236,7 @@ void CChannel::SetAutoClearChanBuffer(bool b)
     }
 }
 
-void CChannel::InheritAutoClearChanBuffer(bool b)
+void NoChannel::InheritAutoClearChanBuffer(bool b)
 {
     if (!m_bHasAutoClearChanBufferSet) {
         m_bAutoClearChanBuffer = b;
@@ -247,9 +247,9 @@ void CChannel::InheritAutoClearChanBuffer(bool b)
     }
 }
 
-void CChannel::OnWho(const CString& sNick, const CString& sIdent, const CString& sHost)
+void NoChannel::OnWho(const NoString& sNick, const NoString& sIdent, const NoString& sHost)
 {
-    CNick* pNick = FindNick(sNick);
+    NoNick* pNick = FindNick(sNick);
 
     if (pNick) {
         pNick->SetIdent(sIdent);
@@ -257,18 +257,18 @@ void CChannel::OnWho(const CString& sNick, const CString& sIdent, const CString&
     }
 }
 
-void CChannel::ModeChange(const CString& sModes, const CNick* pOpNick)
+void NoChannel::ModeChange(const NoString& sModes, const NoNick* pOpNick)
 {
-    CString sModeArg = sModes.Token(0);
-    CString sArgs = sModes.Token(1, true);
+    NoString sModeArg = sModes.Token(0);
+    NoString sArgs = sModes.Token(1, true);
     bool bAdd = true;
 
-    /* Try to find a CNick* from this channel so that pOpNick->HasPerm()
+    /* Try to find a NoNick* from this channel so that pOpNick->HasPerm()
      * works as expected. */
     if (pOpNick) {
-        CNick* OpNick = FindNick(pOpNick->GetNick());
+        NoNick* OpNick = FindNick(pOpNick->GetNick());
         /* If nothing was found, use the original pOpNick, else use the
-         * CNick* from FindNick() */
+         * NoNick* from FindNick() */
         if (OpNick) pOpNick = OpNick;
     }
 
@@ -282,8 +282,8 @@ void CChannel::ModeChange(const CString& sModes, const CNick* pOpNick)
         } else if (uMode == '-') {
             bAdd = false;
         } else if (m_pNetwork->GetIRCSock()->IsPermMode(uMode)) {
-            CString sArg = GetModeArg(sArgs);
-            CNick* pNick = FindNick(sArg);
+            NoString sArg = GetModeArg(sArgs);
+            NoNick* pNick = FindNick(sArg);
             if (pNick) {
                 unsigned char uPerm = m_pNetwork->GetIRCSock()->GetPermFromMode(uMode);
 
@@ -310,13 +310,13 @@ void CChannel::ModeChange(const CString& sModes, const CNick* pOpNick)
                                       nullptr,
                                       NOTHING);
 
-                    if (uMode == CChannel::M_Op) {
+                    if (uMode == NoChannel::M_Op) {
                         if (bAdd) {
                             NETWORKMODULECALL(OnOp2(pOpNick, *pNick, *this, bNoChange), m_pNetwork->GetUser(), m_pNetwork, nullptr, NOTHING);
                         } else {
                             NETWORKMODULECALL(OnDeop2(pOpNick, *pNick, *this, bNoChange), m_pNetwork->GetUser(), m_pNetwork, nullptr, NOTHING);
                         }
-                    } else if (uMode == CChannel::M_Voice) {
+                    } else if (uMode == NoChannel::M_Voice) {
                         if (bAdd) {
                             NETWORKMODULECALL(OnVoice2(pOpNick, *pNick, *this, bNoChange), m_pNetwork->GetUser(), m_pNetwork, nullptr, NOTHING);
                         } else {
@@ -327,19 +327,19 @@ void CChannel::ModeChange(const CString& sModes, const CNick* pOpNick)
             }
         } else {
             bool bList = false;
-            CString sArg;
+            NoString sArg;
 
             switch (m_pNetwork->GetIRCSock()->GetModeType(uMode)) {
-            case CIRCSock::ListArg:
+            case NoIrcSock::ListArg:
                 bList = true;
                 sArg = GetModeArg(sArgs);
                 break;
-            case CIRCSock::HasArg:
+            case NoIrcSock::HasArg:
                 sArg = GetModeArg(sArgs);
                 break;
-            case CIRCSock::NoArg:
+            case NoIrcSock::NoArg:
                 break;
-            case CIRCSock::ArgWhenSet:
+            case NoIrcSock::ArgWhenSet:
                 if (bAdd) {
                     sArg = GetModeArg(sArgs);
                 }
@@ -371,9 +371,9 @@ void CChannel::ModeChange(const CString& sModes, const CNick* pOpNick)
     }
 }
 
-CString CChannel::GetOptions() const
+NoString NoChannel::GetOptions() const
 {
-    VCString vsRet;
+    NoStringVector vsRet;
 
     if (IsDetached()) {
         vsRet.push_back("Detached");
@@ -387,13 +387,13 @@ CString CChannel::GetOptions() const
         }
     }
 
-    return CString(", ").Join(vsRet.begin(), vsRet.end());
+    return NoString(", ").Join(vsRet.begin(), vsRet.end());
 }
 
-CString CChannel::GetModeArg(unsigned char uMode) const
+NoString NoChannel::GetModeArg(unsigned char uMode) const
 {
     if (uMode) {
-        map<unsigned char, CString>::const_iterator it = m_musModes.find(uMode);
+        map<unsigned char, NoString>::const_iterator it = m_musModes.find(uMode);
 
         if (it != m_musModes.end()) {
             return it->second;
@@ -403,15 +403,15 @@ CString CChannel::GetModeArg(unsigned char uMode) const
     return "";
 }
 
-bool CChannel::HasMode(unsigned char uMode) const { return (uMode && m_musModes.find(uMode) != m_musModes.end()); }
+bool NoChannel::HasMode(unsigned char uMode) const { return (uMode && m_musModes.find(uMode) != m_musModes.end()); }
 
-bool CChannel::AddMode(unsigned char uMode, const CString& sArg)
+bool NoChannel::AddMode(unsigned char uMode, const NoString& sArg)
 {
     m_musModes[uMode] = sArg;
     return true;
 }
 
-bool CChannel::RemMode(unsigned char uMode)
+bool NoChannel::RemMode(unsigned char uMode)
 {
     if (!HasMode(uMode)) {
         return false;
@@ -421,23 +421,23 @@ bool CChannel::RemMode(unsigned char uMode)
     return true;
 }
 
-CString CChannel::GetModeArg(CString& sArgs) const
+NoString NoChannel::GetModeArg(NoString& sArgs) const
 {
-    CString sRet = sArgs.substr(0, sArgs.find(' '));
+    NoString sRet = sArgs.substr(0, sArgs.find(' '));
     sArgs = (sRet.size() < sArgs.size()) ? sArgs.substr(sRet.size() + 1) : "";
     return sRet;
 }
 
-void CChannel::ClearNicks() { m_msNicks.clear(); }
+void NoChannel::ClearNicks() { m_msNicks.clear(); }
 
-int CChannel::AddNicks(const CString& sNicks)
+int NoChannel::AddNicks(const NoString& sNicks)
 {
     int iRet = 0;
-    VCString vsNicks;
+    NoStringVector vsNicks;
 
     sNicks.Split(" ", vsNicks, false);
 
-    for (const CString& sNick : vsNicks) {
+    for (const NoString& sNick : vsNicks) {
         if (AddNick(sNick)) {
             iRet++;
         }
@@ -446,10 +446,10 @@ int CChannel::AddNicks(const CString& sNicks)
     return iRet;
 }
 
-bool CChannel::AddNick(const CString& sNick)
+bool NoChannel::AddNick(const NoString& sNick)
 {
     const char* p = sNick.c_str();
-    CString sPrefix, sTmp, sIdent, sHost;
+    NoString sPrefix, sTmp, sIdent, sHost;
 
     while (m_pNetwork->GetIRCSock()->IsPermChar(*p)) {
         sPrefix += *p;
@@ -468,8 +468,8 @@ bool CChannel::AddNick(const CString& sNick)
     // Get the nick
     sTmp = sTmp.Token(0, false, "!");
 
-    CNick tmpNick(sTmp);
-    CNick* pNick = FindNick(sTmp);
+    NoNick tmpNick(sTmp);
+    NoNick* pNick = FindNick(sTmp);
     if (!pNick) {
         pNick = &tmpNick;
         pNick->SetNetwork(m_pNetwork);
@@ -478,12 +478,12 @@ bool CChannel::AddNick(const CString& sNick)
     if (!sIdent.empty()) pNick->SetIdent(sIdent);
     if (!sHost.empty()) pNick->SetHost(sHost);
 
-    for (CString::size_type i = 0; i < sPrefix.length(); i++) {
+    for (NoString::size_type i = 0; i < sPrefix.length(); i++) {
         pNick->AddPerm(sPrefix[i]);
     }
 
     if (pNick->NickEquals(m_pNetwork->GetCurNick())) {
-        for (CString::size_type i = 0; i < sPrefix.length(); i++) {
+        for (NoString::size_type i = 0; i < sPrefix.length(); i++) {
             AddPerm(sPrefix[i]);
         }
     }
@@ -493,12 +493,12 @@ bool CChannel::AddNick(const CString& sNick)
     return true;
 }
 
-map<char, unsigned int> CChannel::GetPermCounts() const
+map<char, unsigned int> NoChannel::GetPermCounts() const
 {
     map<char, unsigned int> mRet;
 
     for (const auto& it : m_msNicks) {
-        CString sPerms = it.second.GetPermStr();
+        NoString sPerms = it.second.GetPermStr();
 
         for (unsigned int p = 0; p < sPerms.size(); p++) {
             mRet[sPerms[p]]++;
@@ -508,9 +508,9 @@ map<char, unsigned int> CChannel::GetPermCounts() const
     return mRet;
 }
 
-bool CChannel::RemNick(const CString& sNick)
+bool NoChannel::RemNick(const NoString& sNick)
 {
-    map<CString, CNick>::iterator it;
+    map<NoString, NoNick>::iterator it;
     set<unsigned char>::iterator it2;
 
     it = m_msNicks.find(sNick);
@@ -523,9 +523,9 @@ bool CChannel::RemNick(const CString& sNick)
     return true;
 }
 
-bool CChannel::ChangeNick(const CString& sOldNick, const CString& sNewNick)
+bool NoChannel::ChangeNick(const NoString& sOldNick, const NoString& sNewNick)
 {
-    map<CString, CNick>::iterator it = m_msNicks.find(sOldNick);
+    map<NoString, NoNick>::iterator it = m_msNicks.find(sOldNick);
 
     if (it == m_msNicks.end()) {
         return false;
@@ -541,19 +541,19 @@ bool CChannel::ChangeNick(const CString& sOldNick, const CString& sNewNick)
     return true;
 }
 
-const CNick* CChannel::FindNick(const CString& sNick) const
+const NoNick* NoChannel::FindNick(const NoString& sNick) const
 {
-    map<CString, CNick>::const_iterator it = m_msNicks.find(sNick);
+    map<NoString, NoNick>::const_iterator it = m_msNicks.find(sNick);
     return (it != m_msNicks.end()) ? &it->second : nullptr;
 }
 
-CNick* CChannel::FindNick(const CString& sNick)
+NoNick* NoChannel::FindNick(const NoString& sNick)
 {
-    map<CString, CNick>::iterator it = m_msNicks.find(sNick);
+    map<NoString, NoNick>::iterator it = m_msNicks.find(sNick);
     return (it != m_msNicks.end()) ? &it->second : nullptr;
 }
 
-void CChannel::SendBuffer(CClient* pClient)
+void NoChannel::SendBuffer(NoClient* pClient)
 {
     SendBuffer(pClient, m_Buffer);
     if (AutoClearChanBuffer()) {
@@ -561,7 +561,7 @@ void CChannel::SendBuffer(CClient* pClient)
     }
 }
 
-void CChannel::SendBuffer(CClient* pClient, const CBuffer& Buffer)
+void NoChannel::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
 {
     if (m_pNetwork && m_pNetwork->IsUserAttached()) {
         // in the event that pClient is nullptr, need to send this to all clients for the user
@@ -579,9 +579,9 @@ void CChannel::SendBuffer(CClient* pClient, const CBuffer& Buffer)
         //
         // Rework this if you like ...
         if (!Buffer.IsEmpty()) {
-            const vector<CClient*>& vClients = m_pNetwork->GetClients();
-            for (CClient* pEachClient : vClients) {
-                CClient* pUseClient = (pClient ? pClient : pEachClient);
+            const vector<NoClient*>& vClients = m_pNetwork->GetClients();
+            for (NoClient* pEachClient : vClients) {
+                NoClient* pUseClient = (pClient ? pClient : pEachClient);
 
                 bool bWasPlaybackActive = pUseClient->IsPlaybackActive();
                 pUseClient->SetPlaybackActive(true);
@@ -594,7 +594,7 @@ void CChannel::SendBuffer(CClient* pClient, const CBuffer& Buffer)
                 }
 
                 bool bBatch = pUseClient->HasBatch();
-                CString sBatchName = GetName().MD5();
+                NoString sBatchName = GetName().MD5();
 
                 if (bBatch) {
                     m_pNetwork->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + GetName(), pUseClient);
@@ -602,12 +602,12 @@ void CChannel::SendBuffer(CClient* pClient, const CBuffer& Buffer)
 
                 size_t uSize = Buffer.Size();
                 for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
-                    const CMessage& BufLine = Buffer.GetMessage(uIdx);
-                    CString sLine = BufLine.GetLine(*pUseClient, MCString::EmptyMap);
+                    const NoMessage& BufLine = Buffer.GetMessage(uIdx);
+                    NoString sLine = BufLine.GetLine(*pUseClient, NoStringMap::EmptyMap);
                     if (bBatch) {
-                        MCString msBatchTags = CUtils::GetMessageTags(sLine);
+                        NoStringMap msBatchTags = NoUtils::GetMessageTags(sLine);
                         msBatchTags["batch"] = sBatchName;
-                        CUtils::SetMessageTags(sLine, msBatchTags);
+                        NoUtils::SetMessageTags(sLine, msBatchTags);
                     }
                     bool bNotShowThisLine = false;
                     NETWORKMODULECALL(OnChanBufferPlayLine2(*this, *pUseClient, sLine, BufLine.GetTime()),
@@ -637,13 +637,13 @@ void CChannel::SendBuffer(CClient* pClient, const CBuffer& Buffer)
     }
 }
 
-void CChannel::Enable()
+void NoChannel::Enable()
 {
     ResetJoinTries();
     m_bDisabled = false;
 }
 
-void CChannel::SetKey(const CString& s)
+void NoChannel::SetKey(const NoString& s)
 {
     if (m_sKey != s) {
         m_sKey = s;
@@ -653,7 +653,7 @@ void CChannel::SetKey(const CString& s)
     }
 }
 
-void CChannel::SetInConfig(bool b)
+void NoChannel::SetInConfig(bool b)
 {
     if (m_bInConfig != b) {
         m_bInConfig = b;

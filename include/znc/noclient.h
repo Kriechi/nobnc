@@ -24,80 +24,80 @@
 #include <memory>
 
 class CZNC;
-class CUser;
-class CNetwork;
-class CIRCSock;
-class CClient;
+class NoUser;
+class NoNetwork;
+class NoIrcSock;
+class NoClient;
 
-class CAuthBase
+class NoAuthBase
 {
 public:
-    CAuthBase(const CString& sUsername, const CString& sPassword, CZNCSock* pSock)
+    NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoBaseSocket* pSock)
         : m_sUsername(sUsername), m_sPassword(sPassword), m_pSock(pSock)
     {
     }
 
-    virtual ~CAuthBase() {}
+    virtual ~NoAuthBase() {}
 
-    CAuthBase(const CAuthBase&) = delete;
-    CAuthBase& operator=(const CAuthBase&) = delete;
+    NoAuthBase(const NoAuthBase&) = delete;
+    NoAuthBase& operator=(const NoAuthBase&) = delete;
 
-    virtual void SetLoginInfo(const CString& sUsername, const CString& sPassword, CZNCSock* pSock)
+    virtual void SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoBaseSocket* pSock)
     {
         m_sUsername = sUsername;
         m_sPassword = sPassword;
         m_pSock = pSock;
     }
 
-    void AcceptLogin(CUser& User);
-    void RefuseLogin(const CString& sReason);
+    void AcceptLogin(NoUser& User);
+    void RefuseLogin(const NoString& sReason);
 
-    const CString& GetUsername() const { return m_sUsername; }
-    const CString& GetPassword() const { return m_sPassword; }
+    const NoString& GetUsername() const { return m_sUsername; }
+    const NoString& GetPassword() const { return m_sPassword; }
     Csock* GetSocket() const { return m_pSock; }
-    CString GetRemoteIP() const;
+    NoString GetRemoteIP() const;
 
-    // Invalidate this CAuthBase instance which means it will no longer use
+    // Invalidate this NoAuthBase instance which means it will no longer use
     // m_pSock and AcceptLogin() or RefusedLogin() will have no effect.
     virtual void Invalidate();
 
 protected:
-    virtual void AcceptedLogin(CUser& User) = 0;
-    virtual void RefusedLogin(const CString& sReason) = 0;
+    virtual void AcceptedLogin(NoUser& User) = 0;
+    virtual void RefusedLogin(const NoString& sReason) = 0;
 
 private:
-    CString m_sUsername;
-    CString m_sPassword;
-    CZNCSock* m_pSock;
+    NoString m_sUsername;
+    NoString m_sPassword;
+    NoBaseSocket* m_pSock;
 };
 
 
-class CClientAuth : public CAuthBase
+class NoClientAuth : public NoAuthBase
 {
 public:
-    CClientAuth(CClient* pClient, const CString& sUsername, const CString& sPassword);
-    virtual ~CClientAuth() {}
+    NoClientAuth(NoClient* pClient, const NoString& sUsername, const NoString& sPassword);
+    virtual ~NoClientAuth() {}
 
-    CClientAuth(const CClientAuth&) = delete;
-    CClientAuth& operator=(const CClientAuth&) = delete;
+    NoClientAuth(const NoClientAuth&) = delete;
+    NoClientAuth& operator=(const NoClientAuth&) = delete;
 
     void Invalidate() override
     {
         m_pClient = nullptr;
-        CAuthBase::Invalidate();
+        NoAuthBase::Invalidate();
     }
-    void AcceptedLogin(CUser& User) override;
-    void RefusedLogin(const CString& sReason) override;
+    void AcceptedLogin(NoUser& User) override;
+    void RefusedLogin(const NoString& sReason) override;
 
 private:
-    CClient* m_pClient;
+    NoClient* m_pClient;
 };
 
-class CClient : public CIRCSocket
+class NoClient : public NoIrcSocket
 {
 public:
-    CClient()
-        : CIRCSocket(), m_bGotPass(false), m_bGotNick(false), m_bGotUser(false), m_bInCap(false), m_bNamesx(false),
+    NoClient()
+        : NoIrcSocket(), m_bGotPass(false), m_bGotNick(false), m_bGotUser(false), m_bInCap(false), m_bNamesx(false),
           m_bUHNames(false), m_bAway(false), m_bServerTime(false), m_bBatch(false), m_bSelfMessage(false),
           m_bPlaybackActive(false), m_pUser(nullptr), m_pNetwork(nullptr), m_sNick("unknown-nick"), m_sPass(""),
           m_sUser(""), m_sNetwork(""), m_sIdentifier(""), m_spAuth(), m_ssAcceptedCaps()
@@ -108,18 +108,18 @@ public:
         SetMaxBufferThreshold(1024);
     }
 
-    virtual ~CClient();
+    virtual ~NoClient();
 
-    CClient(const CClient&) = delete;
-    CClient& operator=(const CClient&) = delete;
+    NoClient(const NoClient&) = delete;
+    NoClient& operator=(const NoClient&) = delete;
 
     void SendRequiredPasswordNotice();
-    void AcceptLogin(CUser& User);
-    void RefuseLogin(const CString& sReason);
+    void AcceptLogin(NoUser& User);
+    void RefuseLogin(const NoString& sReason);
 
-    CString GetNick(bool bAllowIRCNick = true) const;
-    CString GetNickMask() const;
-    CString GetIdentifier() const { return m_sIdentifier; }
+    NoString GetNick(bool bAllowIRNoNick = true) const;
+    NoString GetNickMask() const;
+    NoString GetIdentifier() const { return m_sIdentifier; }
     bool HasNamesx() const { return m_bNamesx; }
     bool HasUHNames() const { return m_bUHNames; }
     bool IsAway() const { return m_bAway; }
@@ -127,30 +127,30 @@ public:
     bool HasBatch() const { return m_bBatch; }
     bool HasSelfMessage() const { return m_bSelfMessage; }
 
-    static bool IsValidIdentifier(const CString& sIdentifier);
+    static bool IsValidIdentifier(const NoString& sIdentifier);
 
-    void UserCommand(CString& sLine);
-    void UserPortCommand(CString& sLine);
-    void StatusCTCP(const CString& sCommand);
+    void UserCommand(NoString& sLine);
+    void UserPortCommand(NoString& sLine);
+    void StatusCTCP(const NoString& sCommand);
     void BouncedOff();
     bool IsAttached() const { return m_pUser != nullptr; }
 
     bool IsPlaybackActive() const { return m_bPlaybackActive; }
     void SetPlaybackActive(bool bActive) { m_bPlaybackActive = bActive; }
 
-    void PutIRC(const CString& sLine);
-    void PutClient(const CString& sLine);
-    unsigned int PutStatus(const CTable& table);
-    void PutStatus(const CString& sLine);
-    void PutStatusNotice(const CString& sLine);
-    void PutModule(const CString& sModule, const CString& sLine);
-    void PutModNotice(const CString& sModule, const CString& sLine);
+    void PutIRC(const NoString& sLine);
+    void PutClient(const NoString& sLine);
+    unsigned int PutStatus(const NoTable& table);
+    void PutStatus(const NoString& sLine);
+    void PutStatusNotice(const NoString& sLine);
+    void PutModule(const NoString& sModule, const NoString& sLine);
+    void PutModNotice(const NoString& sModule, const NoString& sLine);
 
-    bool IsCapEnabled(const CString& sCap) const { return 1 == m_ssAcceptedCaps.count(sCap); }
+    bool IsCapEnabled(const NoString& sCap) const { return 1 == m_ssAcceptedCaps.count(sCap); }
 
-    void ReadLine(const CString& sData) override;
+    void ReadLine(const NoString& sData) override;
     bool SendMotd();
-    void HelpUser(const CString& sFilter = "");
+    void HelpUser(const NoString& sFilter = "");
     void AuthUser();
     void Connected() override;
     void Timeout() override;
@@ -158,22 +158,22 @@ public:
     void ConnectionRefused() override;
     void ReachedMaxBuffer() override;
 
-    void SetNick(const CString& s);
+    void SetNick(const NoString& s);
     void SetAway(bool bAway) { m_bAway = bAway; }
-    CUser* GetUser() const { return m_pUser; }
-    void SetNetwork(CNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
-    CNetwork* GetNetwork() const { return m_pNetwork; }
-    const std::vector<CClient*>& GetClients() const;
-    const CIRCSock* GetIRCSock() const;
-    CIRCSock* GetIRCSock();
-    CString GetFullName() const;
+    NoUser* GetUser() const { return m_pUser; }
+    void SetNetwork(NoNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
+    NoNetwork* GetNetwork() const { return m_pNetwork; }
+    const std::vector<NoClient*>& GetClients() const;
+    const NoIrcSock* GetIRCSock() const;
+    NoIrcSock* GetIRCSock();
+    NoString GetFullName() const;
 
 private:
-    void HandleCap(const CString& sLine);
-    void RespondCap(const CString& sResponse);
-    void ParsePass(const CString& sAuthLine);
-    void ParseUser(const CString& sAuthLine);
-    void ParseIdentifier(const CString& sAuthLine);
+    void HandleCap(const NoString& sLine);
+    void RespondCap(const NoString& sResponse);
+    void ParsePass(const NoString& sAuthLine);
+    void ParseUser(const NoString& sAuthLine);
+    void ParseIdentifier(const NoString& sAuthLine);
 
 private:
     bool m_bGotPass;
@@ -187,15 +187,15 @@ private:
     bool m_bBatch;
     bool m_bSelfMessage;
     bool m_bPlaybackActive;
-    CUser* m_pUser;
-    CNetwork* m_pNetwork;
-    CString m_sNick;
-    CString m_sPass;
-    CString m_sUser;
-    CString m_sNetwork;
-    CString m_sIdentifier;
-    std::shared_ptr<CAuthBase> m_spAuth;
-    SCString m_ssAcceptedCaps;
+    NoUser* m_pUser;
+    NoNetwork* m_pNetwork;
+    NoString m_sNick;
+    NoString m_sPass;
+    NoString m_sUser;
+    NoString m_sNetwork;
+    NoString m_sIdentifier;
+    std::shared_ptr<NoAuthBase> m_spAuth;
+    NoStringSet m_ssAcceptedCaps;
 
     friend class ClientTest;
 };

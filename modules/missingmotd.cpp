@@ -16,18 +16,18 @@
 
 #include <znc/nomodules.h>
 
-class CMissingMotd : public CModule
+class NoMissingMotd : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CMissingMotd) {}
+    MODCONSTRUCTOR(NoMissingMotd) {}
 
     void OnClientLogin() override { PutUser(":irc.znc.in 422 :MOTD File is missing"); }
 };
 
-template <> void TModInfo<CMissingMotd>(CModInfo& Info)
+template <> void TModInfo<NoMissingMotd>(NoModInfo& Info)
 {
     Info.SetWikiPage("missingmotd");
     Info.SetHasArgs(false);
 }
 
-USERMODULEDEFS(CMissingMotd, "Sends 422 to clients when they login")
+USERMODULEDEFS(NoMissingMotd, "Sends 422 to clients when they login")

@@ -21,29 +21,29 @@
 
 #include <syslog.h>
 
-class CAdminLogMod : public CModule
+class NoAdminLogMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CAdminLogMod)
+    MODCONSTRUCTOR(NoAdminLogMod)
     {
         AddHelpCommand();
         AddCommand("Show",
-                   static_cast<CModCommand::ModCmdFunc>(&CAdminLogMod::OnShowCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminLogMod::OnShowCommand),
                    "",
                    "Show the logging target");
-        AddCommand("Target", static_cast<CModCommand::ModCmdFunc>(&CAdminLogMod::OnTargetCommand), "<file|syslog|both>", "Set the logging target");
+        AddCommand("Target", static_cast<NoModCommand::ModCmdFunc>(&NoAdminLogMod::OnTargetCommand), "<file|syslog|both>", "Set the logging target");
         openlog("znc", LOG_PID, LOG_DAEMON);
     }
 
-    virtual ~CAdminLogMod()
+    virtual ~NoAdminLogMod()
     {
         Log("Logging ended.");
         closelog();
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        CString sTarget = GetNV("target");
+        NoString sTarget = GetNV("target");
         if (sTarget.Equals("syslog"))
             m_eLogMode = LOG_TO_SYSLOG;
         else if (sTarget.Equals("both"))
@@ -55,7 +55,7 @@ public:
 
         m_sLogFile = GetSavePath() + "/znc.log";
 
-        Log("Logging started. ZNC PID[" + CString(getpid()) + "] UID/GID[" + CString(getuid()) + ":" + CString(getgid()) + "]");
+        Log("Logging started. ZNC PID[" + NoString(getpid()) + "] UID/GID[" + NoString(getuid()) + ":" + NoString(getgid()) + "]");
         return true;
     }
 
@@ -70,12 +70,12 @@ public:
         Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC");
     }
 
-    EModRet OnRaw(CString& sLine) override
+    EModRet OnRaw(NoString& sLine) override
     {
         if (sLine.StartsWith("ERROR ")) {
             // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
             // ERROR :Closing Link: nick[24.24.24.24] Killer (Local kill by Killer (reason))
-            CString sError(sLine.substr(6));
+            NoString sError(sLine.substr(6));
             if (sError.Left(1) == ":") sError.LeftChomp();
             Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC: " +
                 GetNetwork()->GetCurrentServer()->GetName() + " [" + sError + "]",
@@ -94,12 +94,12 @@ public:
         Log("[" + GetUser()->GetUserName() + "] disconnected from ZNC from " + GetClient()->GetRemoteIP());
     }
 
-    void OnFailedLogin(const CString& sUsername, const CString& sRemoteIP) override
+    void OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
     {
         Log("[" + sUsername + "] failed to login from " + sRemoteIP, LOG_WARNING);
     }
 
-    void Log(CString sLine, int iPrio = LOG_INFO)
+    void Log(NoString sLine, int iPrio = LOG_INFO)
     {
         if (m_eLogMode & LOG_TO_SYSLOG) syslog(iPrio, "%s", sLine.c_str());
 
@@ -112,7 +112,7 @@ public:
             timeinfo = localtime(&curtime);
             strftime(buf, sizeof(buf), "[%Y-%m-%d %H:%M:%S] ", timeinfo);
 
-            CFile LogFile(m_sLogFile);
+            NoFile LogFile(m_sLogFile);
 
             if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT))
                 LogFile.Write(buf + sLine + "\n");
@@ -121,7 +121,7 @@ public:
         }
     }
 
-    void OnModCommand(const CString& sCommand) override
+    void OnModCommand(const NoString& sCommand) override
     {
         if (!GetUser()->IsAdmin()) {
             PutModule("Access denied");
@@ -130,11 +130,11 @@ public:
         }
     }
 
-    void OnTargetCommand(const CString& sCommand)
+    void OnTargetCommand(const NoString& sCommand)
     {
-        CString sArg = sCommand.Token(1, true);
-        CString sTarget;
-        CString sMessage;
+        NoString sArg = sCommand.Token(1, true);
+        NoString sTarget;
+        NoString sMessage;
         LogMode mode;
 
         if (sArg.Equals("file")) {
@@ -164,9 +164,9 @@ public:
         PutModule(sMessage);
     }
 
-    void OnShowCommand(const CString& sCommand)
+    void OnShowCommand(const NoString& sCommand)
     {
-        CString sTarget;
+        NoString sTarget;
 
         switch (m_eLogMode) {
         case LOG_TO_FILE:
@@ -187,9 +187,9 @@ public:
 private:
     enum LogMode { LOG_TO_FILE = 1 << 0, LOG_TO_SYSLOG = 1 << 1, LOG_TO_BOTH = LOG_TO_FILE | LOG_TO_SYSLOG };
     LogMode m_eLogMode;
-    CString m_sLogFile;
+    NoString m_sLogFile;
 };
 
-template <> void TModInfo<CAdminLogMod>(CModInfo& Info) { Info.SetWikiPage("adminlog"); }
+template <> void TModInfo<NoAdminLogMod>(NoModInfo& Info) { Info.SetWikiPage("adminlog"); }
 
-GLOBALMODULEDEFS(CAdminLogMod, "Log ZNC events to file and/or syslog.")
+GLOBALMODULEDEFS(NoAdminLogMod, "Log ZNC events to file and/or syslog.")

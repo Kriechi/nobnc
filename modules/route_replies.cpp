@@ -181,14 +181,14 @@ static const struct
                       // END (last item!)
                       { nullptr, { { nullptr, true } } } };
 
-class CRouteTimeout : public CTimer
+class NoRouteTimeout : public NoTimer
 {
 public:
-    CRouteTimeout(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription)
-        : CTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoRouteTimeout(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }
-    virtual ~CRouteTimeout() {}
+    virtual ~NoRouteTimeout() {}
 
 protected:
     void RunJob() override;
@@ -196,25 +196,25 @@ protected:
 
 struct queued_req
 {
-    CString sLine;
+    NoString sLine;
     const struct reply* reply;
 };
 
-typedef std::map<CClient*, std::vector<struct queued_req>> requestQueue;
+typedef std::map<NoClient*, std::vector<struct queued_req>> requestQueue;
 
-class CRouteRepliesMod : public CModule
+class NoRouteRepliesMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CRouteRepliesMod)
+    MODCONSTRUCTOR(NoRouteRepliesMod)
     {
         m_pDoing = nullptr;
         m_pReplies = nullptr;
 
         AddHelpCommand();
-        AddCommand("Silent", static_cast<CModCommand::ModCmdFunc>(&CRouteRepliesMod::SilentCommand), "[yes|no]");
+        AddCommand("Silent", static_cast<NoModCommand::ModCmdFunc>(&NoRouteRepliesMod::SilentCommand), "[yes|no]");
     }
 
-    virtual ~CRouteRepliesMod()
+    virtual ~NoRouteRepliesMod()
     {
         requestQueue::iterator it;
 
@@ -264,9 +264,9 @@ public:
         SendRequest();
     }
 
-    EModRet OnRaw(CString& sLine) override
+    EModRet OnRaw(NoString& sLine) override
     {
-        CString sCmd = sLine.Token(1).AsUpper();
+        NoString sCmd = sLine.Token(1).AsUpper();
         size_t i = 0;
 
         if (!m_pReplies) return CONTINUE;
@@ -274,7 +274,7 @@ public:
         // Is this a "not enough arguments" error?
         if (sCmd == "461") {
             // :server 461 nick WHO :Not enough parameters
-            CString sOrigCmd = sLine.Token(3);
+            NoString sOrigCmd = sLine.Token(3);
 
             if (m_sLastRequest.Token(0).Equals(sOrigCmd)) {
                 // This is the reply to the last request
@@ -297,9 +297,9 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnUserRaw(CString& sLine) override
+    EModRet OnUserRaw(NoString& sLine) override
     {
-        CString sCmd = sLine.Token(0).AsUpper();
+        NoString sCmd = sLine.Token(0).AsUpper();
 
         if (!GetNetwork()->GetIRCSock()) return CONTINUE;
 
@@ -311,7 +311,7 @@ public:
             if (!sLine.Token(3, true).empty()) return CONTINUE;
 
             // Grab the mode change parameter
-            CString sMode = sLine.Token(2);
+            NoString sMode = sLine.Token(2);
 
             // If this is a channel mode request, znc core replies to it
             if (sMode.empty()) return CONTINUE;
@@ -360,7 +360,7 @@ public:
 
             for (size_t i = 0; m_pReplies[i].szReply != nullptr; i++) {
                 if (m_pReplies[i].bLastResponse)
-                    PutModule(m_pReplies[i].szReply + CString(" (last)"));
+                    PutModule(m_pReplies[i].szReply + NoString(" (last)"));
                 else
                     PutModule(m_pReplies[i].szReply);
             }
@@ -372,7 +372,7 @@ public:
     }
 
 private:
-    bool RouteReply(const CString& sLine, bool bFinished = false, bool bIsRaw353 = false)
+    bool RouteReply(const NoString& sLine, bool bFinished = false, bool bIsRaw353 = false)
     {
         if (!m_pDoing) return false;
 
@@ -413,12 +413,12 @@ private:
         // When we are called from the timer, we need to remove it.
         // We can't delete it (segfault on return), thus we
         // just stop it. The main loop will delete it.
-        CTimer* pTimer = FindTimer("RouteTimeout");
+        NoTimer* pTimer = FindTimer("RouteTimeout");
         if (pTimer) {
             pTimer->Stop();
             UnlinkTimer(pTimer);
         }
-        AddTimer(new CRouteTimeout(this, 60, 1, "RouteTimeout", "Recover from missing / wrong server replies"));
+        AddTimer(new NoRouteTimeout(this, 60, 1, "RouteTimeout", "Recover from missing / wrong server replies"));
 
         m_pDoing = it->first;
         m_pReplies = it->second[0].reply;
@@ -427,31 +427,31 @@ private:
         it->second.erase(it->second.begin());
     }
 
-    void SilentCommand(const CString& sLine)
+    void SilentCommand(const NoString& sLine)
     {
-        const CString sValue = sLine.Token(1);
+        const NoString sValue = sLine.Token(1);
 
         if (!sValue.empty()) {
             SetNV("silent_timeouts", sValue);
         }
 
-        CString sPrefix = GetNV("silent_timeouts").ToBool() ? "dis" : "en";
+        NoString sPrefix = GetNV("silent_timeouts").ToBool() ? "dis" : "en";
         PutModule("Timeout messages are " + sPrefix + "abled.");
     }
 
-    CClient* m_pDoing;
+    NoClient* m_pDoing;
     const struct reply* m_pReplies;
     requestQueue m_vsPending;
     // This field is only used for display purpose.
-    CString m_sLastRequest;
+    NoString m_sLastRequest;
 };
 
-void CRouteTimeout::RunJob()
+void NoRouteTimeout::RunJob()
 {
-    CRouteRepliesMod* pMod = (CRouteRepliesMod*)GetModule();
+    NoRouteRepliesMod* pMod = (NoRouteRepliesMod*)GetModule();
     pMod->Timeout();
 }
 
-template <> void TModInfo<CRouteRepliesMod>(CModInfo& Info) { Info.SetWikiPage("route_replies"); }
+template <> void TModInfo<NoRouteRepliesMod>(NoModInfo& Info) { Info.SetWikiPage("route_replies"); }
 
-NETWORKMODULEDEFS(CRouteRepliesMod, "Send replies (e.g. to /who) to the right client only")
+NETWORKMODULEDEFS(NoRouteRepliesMod, "Send replies (e.g. to /who) to the right client only")

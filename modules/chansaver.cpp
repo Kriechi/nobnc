@@ -18,23 +18,23 @@
 #include <znc/nouser.h>
 #include <znc/nonetwork.h>
 
-class CChannelSaverMod : public CModule
+class NoChannelSaverMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CChannelSaverMod) {}
+    MODCONSTRUCTOR(NoChannelSaverMod) {}
 
-    virtual ~CChannelSaverMod() {}
+    virtual ~NoChannelSaverMod() {}
 
-    bool OnLoad(const CString& sArgsi, CString& sMessage) override
+    bool OnLoad(const NoString& sArgsi, NoString& sMessage) override
     {
         switch (GetType()) {
-        case CModInfo::GlobalModule:
+        case NoModInfo::GlobalModule:
             LoadUsers();
             break;
-        case CModInfo::UserModule:
+        case NoModInfo::UserModule:
             LoadUser(GetUser());
             break;
-        case CModInfo::NetworkModule:
+        case NoModInfo::NetworkModule:
             LoadNetwork(GetNetwork());
             break;
         }
@@ -43,24 +43,24 @@ public:
 
     void LoadUsers()
     {
-        const std::map<CString, CUser*>& vUsers = CZNC::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& vUsers = CZNC::Get().GetUserMap();
         for (const auto& user : vUsers) {
             LoadUser(user.second);
         }
     }
 
-    void LoadUser(CUser* pUser)
+    void LoadUser(NoUser* pUser)
     {
-        const std::vector<CNetwork*>& vNetworks = pUser->GetNetworks();
-        for (const CNetwork* pNetwork : vNetworks) {
+        const std::vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
+        for (const NoNetwork* pNetwork : vNetworks) {
             LoadNetwork(pNetwork);
         }
     }
 
-    void LoadNetwork(const CNetwork* pNetwork)
+    void LoadNetwork(const NoNetwork* pNetwork)
     {
-        const std::vector<CChannel*>& vChans = pNetwork->GetChans();
-        for (CChannel* pChan : vChans) {
+        const std::vector<NoChannel*>& vChans = pNetwork->GetChans();
+        for (NoChannel* pChan : vChans) {
             // If that channel isn't yet in the config,
             // we'll have to add it...
             if (!pChan->InConfig()) {
@@ -69,26 +69,26 @@ public:
         }
     }
 
-    void OnJoin(const CNick& Nick, CChannel& Channel) override
+    void OnJoin(const NoNick& Nick, NoChannel& Channel) override
     {
-        if (!Channel.InConfig() && GetNetwork()->GetIRCNick().NickEquals(Nick.GetNick())) {
+        if (!Channel.InConfig() && GetNetwork()->GetIRNoNick().NickEquals(Nick.GetNick())) {
             Channel.SetInConfig(true);
         }
     }
 
-    void OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage) override
+    void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
-        if (Channel.InConfig() && GetNetwork()->GetIRCNick().NickEquals(Nick.GetNick())) {
+        if (Channel.InConfig() && GetNetwork()->GetIRNoNick().NickEquals(Nick.GetNick())) {
             Channel.SetInConfig(false);
         }
     }
 };
 
-template <> void TModInfo<CChannelSaverMod>(CModInfo& Info)
+template <> void TModInfo<NoChannelSaverMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("chansaver");
-    Info.AddType(CModInfo::NetworkModule);
-    Info.AddType(CModInfo::GlobalModule);
+    Info.AddType(NoModInfo::NetworkModule);
+    Info.AddType(NoModInfo::GlobalModule);
 }
 
-USERMODULEDEFS(CChannelSaverMod, "Keep config up-to-date when user joins/parts.")
+USERMODULEDEFS(NoChannelSaverMod, "Keep config up-to-date when user joins/parts.")

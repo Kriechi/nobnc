@@ -18,60 +18,60 @@
 #include <znc/nonetwork.h>
 #include <znc/noznc.h>
 
-class CFOModule : public CModule
+class NoFakeOnlineModule : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CFOModule) {}
-    virtual ~CFOModule() {}
+    MODCONSTRUCTOR(NoFakeOnlineModule) {}
+    virtual ~NoFakeOnlineModule() {}
 
-    bool IsOnlineModNick(const CString& sNick)
+    bool IsOnlineModNick(const NoString& sNick)
     {
-        const CString& sPrefix = GetUser()->GetStatusPrefix();
+        const NoString& sPrefix = GetUser()->GetStatusPrefix();
         if (!sNick.StartsWith(sPrefix)) return false;
 
-        CString sModNick = sNick.substr(sPrefix.length());
+        NoString sModNick = sNick.substr(sPrefix.length());
         if (sModNick.Equals("status") || GetNetwork()->GetModules().FindModule(sModNick) ||
             GetUser()->GetModules().FindModule(sModNick) || CZNC::Get().GetModules().FindModule(sModNick))
             return true;
         return false;
     }
 
-    EModRet OnUserRaw(CString& sLine) override
+    EModRet OnUserRaw(NoString& sLine) override
     {
         // Handle ISON
         if (sLine.Token(0).Equals("ison")) {
-            VCString vsNicks;
-            VCString::const_iterator it;
+            NoStringVector vsNicks;
+            NoStringVector::const_iterator it;
 
             // Get the list of nicks which are being asked for
             sLine.Token(1, true).TrimLeft_n(":").Split(" ", vsNicks, false);
 
-            CString sBNCNicks;
+            NoString sBNNoNicks;
             for (it = vsNicks.begin(); it != vsNicks.end(); ++it) {
                 if (IsOnlineModNick(*it)) {
-                    sBNCNicks += " " + *it;
+                    sBNNoNicks += " " + *it;
                 }
             }
             // Remove the leading space
-            sBNCNicks.LeftChomp();
+            sBNNoNicks.LeftChomp();
 
             if (!GetNetwork()->GetIRCSock()) {
                 // if we are not connected to any IRC server, send
                 // an empty or module-nick filled response.
-                PutUser(":irc.znc.in 303 " + GetClient()->GetNick() + " :" + sBNCNicks);
+                PutUser(":irc.znc.in 303 " + GetClient()->GetNick() + " :" + sBNNoNicks);
             } else {
                 // We let the server handle this request and then act on
                 // the 303 response from the IRC server.
-                m_ISONRequests.push_back(sBNCNicks);
+                m_ISONRequests.push_back(sBNNoNicks);
             }
         }
 
         // Handle WHOIS
         if (sLine.Token(0).Equals("whois")) {
-            CString sNick = sLine.Token(1);
+            NoString sNick = sLine.Token(1);
 
             if (IsOnlineModNick(sNick)) {
-                CNetwork* pNetwork = GetNetwork();
+                NoNetwork* pNetwork = GetNetwork();
                 PutUser(":znc.in 311 " + pNetwork->GetCurNick() + " " + sNick + " " + sNick + " znc.in * :" + sNick);
                 PutUser(":znc.in 312 " + pNetwork->GetCurNick() + " " + sNick + " *.znc.in :Bouncer");
                 PutUser(":znc.in 318 " + pNetwork->GetCurNick() + " " + sNick + " :End of /WHOIS list.");
@@ -83,11 +83,11 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnRaw(CString& sLine) override
+    EModRet OnRaw(NoString& sLine) override
     {
         // Handle 303 reply if m_Requests is not empty
         if (sLine.Token(1) == "303" && !m_ISONRequests.empty()) {
-            VCString::iterator it = m_ISONRequests.begin();
+            NoStringVector::iterator it = m_ISONRequests.begin();
 
             sLine.Trim();
 
@@ -105,9 +105,9 @@ public:
     }
 
 private:
-    VCString m_ISONRequests;
+    NoStringVector m_ISONRequests;
 };
 
-template <> void TModInfo<CFOModule>(CModInfo& Info) { Info.SetWikiPage("modules_online"); }
+template <> void TModInfo<NoFakeOnlineModule>(NoModInfo& Info) { Info.SetWikiPage("modules_online"); }
 
-NETWORKMODULEDEFS(CFOModule, "Make ZNC's *modules to be \"online\".")
+NETWORKMODULEDEFS(NoFakeOnlineModule, "Make ZNC's *modules to be \"online\".")

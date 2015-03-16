@@ -23,69 +23,69 @@
 #include <list>
 #include <memory>
 
-class CTemplate;
+class NoTemplate;
 
-class CTemplateTagHandler
+class NoTemplateTagHandler
 {
 public:
-    CTemplateTagHandler() {}
-    virtual ~CTemplateTagHandler() {}
+    NoTemplateTagHandler() {}
+    virtual ~NoTemplateTagHandler() {}
 
-    virtual bool HandleVar(CTemplate& Tmpl, const CString& sName, const CString& sArgs, CString& sOutput)
+    virtual bool HandleVar(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
     {
         return false;
     }
 
-    virtual bool HandleTag(CTemplate& Tmpl, const CString& sName, const CString& sArgs, CString& sOutput)
+    virtual bool HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
     {
         return false;
     }
 
-    virtual bool HandleIf(CTemplate& Tmpl, const CString& sName, const CString& sArgs, CString& sOutput)
+    virtual bool HandleIf(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
     {
         return HandleVar(Tmpl, sName, sArgs, sOutput);
     }
 
-    virtual bool HandleValue(CTemplate& Tmpl, CString& sValue, const MCString& msOptions) { return false; }
+    virtual bool HandleValue(NoTemplate& Tmpl, NoString& sValue, const NoStringMap& msOptions) { return false; }
 
 private:
 };
-class CTemplate;
+class NoTemplate;
 
-class CTemplateOptions
+class NoTemplateOptions
 {
 public:
-    CTemplateOptions() : m_eEscapeFrom(CString::EASCII), m_eEscapeTo(CString::EASCII) {}
+    NoTemplateOptions() : m_eEscapeFrom(NoString::EASCII), m_eEscapeTo(NoString::EASCII) {}
 
-    virtual ~CTemplateOptions() {}
+    virtual ~NoTemplateOptions() {}
 
-    void Parse(const CString& sLine);
+    void Parse(const NoString& sLine);
 
-    CString::EEscape GetEscapeFrom() const { return m_eEscapeFrom; }
-    CString::EEscape GetEscapeTo() const { return m_eEscapeTo; }
+    NoString::EEscape GetEscapeFrom() const { return m_eEscapeFrom; }
+    NoString::EEscape GetEscapeTo() const { return m_eEscapeTo; }
 
 private:
-    CString::EEscape m_eEscapeFrom;
-    CString::EEscape m_eEscapeTo;
+    NoString::EEscape m_eEscapeFrom;
+    NoString::EEscape m_eEscapeTo;
 };
 
 
-class CTemplateLoopContext
+class NoTemplateLoopContext
 {
 public:
-    CTemplateLoopContext(unsigned long uFilePos, const CString& sLoopName, bool bReverse, std::vector<CTemplate*>* pRows)
+    NoTemplateLoopContext(unsigned long uFilePos, const NoString& sLoopName, bool bReverse, std::vector<NoTemplate*>* pRows)
         : m_bReverse(bReverse), m_bHasData(false), m_sName(sLoopName), m_uRowIndex(0), m_uFilePosition(uFilePos),
           m_pvRows(pRows)
     {
     }
 
-    virtual ~CTemplateLoopContext() {}
+    virtual ~NoTemplateLoopContext() {}
 
-    CTemplateLoopContext(const CTemplateLoopContext&) = default;
-    CTemplateLoopContext& operator=(const CTemplateLoopContext&) = default;
+    NoTemplateLoopContext(const NoTemplateLoopContext&) = default;
+    NoTemplateLoopContext& operator=(const NoTemplateLoopContext&) = default;
 
     void SetHasData(bool b = true) { m_bHasData = b; }
-    void SetName(const CString& s) { m_sName = s; }
+    void SetName(const NoString& s) { m_sName = s; }
     void SetRowIndex(unsigned int u) { m_uRowIndex = u; }
     unsigned int IncRowIndex() { return ++m_uRowIndex; }
     unsigned int DecRowIndex()
@@ -98,53 +98,53 @@ public:
     void SetFilePosition(unsigned int u) { m_uFilePosition = u; }
 
     bool HasData() const { return m_bHasData; }
-    const CString& GetName() const { return m_sName; }
+    const NoString& GetName() const { return m_sName; }
     unsigned long GetFilePosition() const { return m_uFilePosition; }
     unsigned int GetRowIndex() const { return m_uRowIndex; }
     size_t GetRowCount() { return m_pvRows->size(); }
-    std::vector<CTemplate*>* GetRows() { return m_pvRows; }
-    CTemplate* GetNextRow() { return GetRow(IncRowIndex()); }
-    CTemplate* GetCurRow() { return GetRow(m_uRowIndex); }
+    std::vector<NoTemplate*>* GetRows() { return m_pvRows; }
+    NoTemplate* GetNextRow() { return GetRow(IncRowIndex()); }
+    NoTemplate* GetCurRow() { return GetRow(m_uRowIndex); }
 
-    CTemplate* GetRow(unsigned int uIndex);
-    CString GetValue(const CString& sName, bool bFromIf = false);
+    NoTemplate* GetRow(unsigned int uIndex);
+    NoString GetValue(const NoString& sName, bool bFromIf = false);
 
 private:
     bool m_bReverse; //!< Iterate through this loop in reverse order
     bool m_bHasData; //!< Tells whether this loop has real data or not
-    CString m_sName; //!< The name portion of the <?LOOP name?> tag
+    NoString m_sName; //!< The name portion of the <?LOOP name?> tag
     unsigned int m_uRowIndex; //!< The index of the current row we're on
     unsigned long m_uFilePosition; //!< The file position of the opening <?LOOP?> tag
-    std::vector<CTemplate*>* m_pvRows; //!< This holds pointers to the templates associated with this loop
+    std::vector<NoTemplate*>* m_pvRows; //!< This holds pointers to the templates associated with this loop
 };
 
 
-class CTemplate : public MCString
+class NoTemplate : public NoStringMap
 {
 public:
-    CTemplate() : CTemplate("") {}
+    NoTemplate() : NoTemplate("") {}
 
-    CTemplate(const CString& sFileName)
-        : MCString(), m_pParent(nullptr), m_sFileName(sFileName), m_lsbPaths(), m_mvLoops(), m_vLoopContexts(),
-          m_spOptions(new CTemplateOptions), m_vspTagHandlers()
+    NoTemplate(const NoString& sFileName)
+        : NoStringMap(), m_pParent(nullptr), m_sFileName(sFileName), m_lsbPaths(), m_mvLoops(), m_vLoopContexts(),
+          m_spOptions(new NoTemplateOptions), m_vspTagHandlers()
     {
     }
 
-    CTemplate(const std::shared_ptr<CTemplateOptions>& Options, CTemplate* pParent = nullptr)
-        : MCString(), m_pParent(pParent), m_sFileName(""), m_lsbPaths(), m_mvLoops(), m_vLoopContexts(),
+    NoTemplate(const std::shared_ptr<NoTemplateOptions>& Options, NoTemplate* pParent = nullptr)
+        : NoStringMap(), m_pParent(pParent), m_sFileName(""), m_lsbPaths(), m_mvLoops(), m_vLoopContexts(),
           m_spOptions(Options), m_vspTagHandlers()
     {
     }
 
-    virtual ~CTemplate();
+    virtual ~NoTemplate();
 
-    CTemplate(const CTemplate& other) = default;
-    CTemplate& operator=(const CTemplate& other) = default;
+    NoTemplate(const NoTemplate& other) = default;
+    NoTemplate& operator=(const NoTemplate& other) = default;
 
     //! Class for implementing custom tags in subclasses
-    void AddTagHandler(std::shared_ptr<CTemplateTagHandler> spTagHandler) { m_vspTagHandlers.push_back(spTagHandler); }
+    void AddTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler) { m_vspTagHandlers.push_back(spTagHandler); }
 
-    std::vector<std::shared_ptr<CTemplateTagHandler>>& GetTagHandlers()
+    std::vector<std::shared_ptr<NoTemplateTagHandler>>& GetTagHandlers()
     {
         if (m_pParent) {
             return m_pParent->GetTagHandlers();
@@ -153,46 +153,46 @@ public:
         return m_vspTagHandlers;
     }
 
-    CString ResolveLiteral(const CString& sString);
+    NoString ResolveLiteral(const NoString& sString);
 
     void Init();
 
-    CTemplate* GetParent(bool bRoot);
-    CString ExpandFile(const CString& sFilename, bool bFromInc = false);
-    bool SetFile(const CString& sFileName);
+    NoTemplate* GetParent(bool bRoot);
+    NoString ExpandFile(const NoString& sFilename, bool bFromInc = false);
+    bool SetFile(const NoString& sFileName);
 
-    void SetPath(const CString& sPath); // Sets the dir:dir:dir type path to look at for templates, as of right now no
+    void SetPath(const NoString& sPath); // Sets the dir:dir:dir type path to look at for templates, as of right now no
     // ../../.. protection
-    CString MakePath(const CString& sPath) const;
-    void PrependPath(const CString& sPath, bool bIncludesOnly = false);
-    void AppendPath(const CString& sPath, bool bIncludesOnly = false);
-    void RemovePath(const CString& sPath);
+    NoString MakePath(const NoString& sPath) const;
+    void PrependPath(const NoString& sPath, bool bIncludesOnly = false);
+    void AppendPath(const NoString& sPath, bool bIncludesOnly = false);
+    void RemovePath(const NoString& sPath);
     void ClearPaths();
-    bool PrintString(CString& sRet);
+    bool PrintString(NoString& sRet);
     bool Print(std::ostream& oOut);
-    bool Print(const CString& sFileName, std::ostream& oOut);
-    bool ValidIf(const CString& sArgs);
-    bool ValidExpr(const CString& sExpr);
-    bool IsTrue(const CString& sName);
-    bool HasLoop(const CString& sName);
-    CString GetValue(const CString& sName, bool bFromIf = false);
-    CTemplate& AddRow(const CString& sName);
-    CTemplate* GetRow(const CString& sName, unsigned int uIndex);
-    std::vector<CTemplate*>* GetLoop(const CString& sName);
+    bool Print(const NoString& sFileName, std::ostream& oOut);
+    bool ValidIf(const NoString& sArgs);
+    bool ValidExpr(const NoString& sExpr);
+    bool IsTrue(const NoString& sName);
+    bool HasLoop(const NoString& sName);
+    NoString GetValue(const NoString& sName, bool bFromIf = false);
+    NoTemplate& AddRow(const NoString& sName);
+    NoTemplate* GetRow(const NoString& sName, unsigned int uIndex);
+    std::vector<NoTemplate*>* GetLoop(const NoString& sName);
     void DelCurLoopContext();
-    CTemplateLoopContext* GetCurLoopContext();
-    CTemplate* GetCurTemplate();
+    NoTemplateLoopContext* GetCurLoopContext();
+    NoTemplate* GetCurTemplate();
 
-    const CString& GetFileName() const { return m_sFileName; }
+    const NoString& GetFileName() const { return m_sFileName; }
 
 private:
-    CTemplate* m_pParent;
-    CString m_sFileName;
-    std::list<std::pair<CString, bool>> m_lsbPaths;
-    std::map<CString, std::vector<CTemplate*>> m_mvLoops;
-    std::vector<CTemplateLoopContext*> m_vLoopContexts;
-    std::shared_ptr<CTemplateOptions> m_spOptions;
-    std::vector<std::shared_ptr<CTemplateTagHandler>> m_vspTagHandlers;
+    NoTemplate* m_pParent;
+    NoString m_sFileName;
+    std::list<std::pair<NoString, bool>> m_lsbPaths;
+    std::map<NoString, std::vector<NoTemplate*>> m_mvLoops;
+    std::vector<NoTemplateLoopContext*> m_vLoopContexts;
+    std::shared_ptr<NoTemplateOptions> m_spOptions;
+    std::vector<std::shared_ptr<NoTemplateTagHandler>> m_vspTagHandlers;
 };
 
 #endif // !NOTEMPLATE_H

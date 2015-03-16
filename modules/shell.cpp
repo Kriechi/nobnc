@@ -23,19 +23,19 @@
 using std::vector;
 
 // Forward Declaration
-class CShellMod;
+class NoShellMod;
 
-class CShellSock : public CExecSock
+class NoShellSock : public NoExecSock
 {
 public:
-    CShellSock(CShellMod* pShellMod, CClient* pClient, const CString& sExec) : CExecSock()
+    NoShellSock(NoShellMod* pShellMod, NoClient* pClient, const NoString& sExec) : NoExecSock()
     {
         EnableReadLine();
         m_pParent = pShellMod;
         m_pClient = pClient;
 
         if (Execute(sExec) == -1) {
-            CString s = "Failed to execute: ";
+            NoString s = "Failed to execute: ";
             s += strerror(errno);
             ReadLine(s);
             return;
@@ -46,22 +46,22 @@ public:
         close(GetWSock());
         SetWSock(open("/dev/null", O_WRONLY));
     }
-    // These next two function's bodies are at the bottom of the file since they reference CShellMod
-    void ReadLine(const CString& sData) override;
+    // These next two function's bodies are at the bottom of the file since they reference NoShellMod
+    void ReadLine(const NoString& sData) override;
     void Disconnected() override;
 
-    CShellMod* m_pParent;
+    NoShellMod* m_pParent;
 
 private:
-    CClient* m_pClient;
+    NoClient* m_pClient;
 };
 
-class CShellMod : public CModule
+class NoShellMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CShellMod) { m_sPath = CZNC::Get().GetHomePath(); }
+    MODCONSTRUCTOR(NoShellMod) { m_sPath = CZNC::Get().GetHomePath(); }
 
-    virtual ~CShellMod()
+    virtual ~NoShellMod()
     {
         vector<Csock*> vSocks = GetManager()->FindSocksByName("SHELL");
 
@@ -70,7 +70,7 @@ public:
         }
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
 #ifndef MOD_SHELL_ALLOW_EVERYONE
         if (!GetUser()->IsAdmin()) {
@@ -82,14 +82,14 @@ public:
         return true;
     }
 
-    void OnModCommand(const CString& sLine) override
+    void OnModCommand(const NoString& sLine) override
     {
-        CString sCommand = sLine.Token(0);
+        NoString sCommand = sLine.Token(0);
         if (sCommand.Equals("cd")) {
-            CString sArg = sLine.Token(1, true);
-            CString sPath =
-            CDir::ChangeDir(m_sPath, (sArg.empty() ? CString(CZNC::Get().GetHomePath()) : sArg), CZNC::Get().GetHomePath());
-            CFile Dir(sPath);
+            NoString sArg = sLine.Token(1, true);
+            NoString sPath =
+            NoDir::ChangeDir(m_sPath, (sArg.empty() ? NoString(CZNC::Get().GetHomePath()) : sArg), CZNC::Get().GetHomePath());
+            NoFile Dir(sPath);
 
             if (Dir.IsDir()) {
                 m_sPath = sPath;
@@ -105,26 +105,26 @@ public:
         }
     }
 
-    void PutShell(const CString& sMsg)
+    void PutShell(const NoString& sMsg)
     {
-        CString sPath = m_sPath.Replace_n(" ", "_");
-        CString sSource = ":" + GetModNick() + "!shell@" + sPath;
-        CString sLine = sSource + " PRIVMSG " + GetClient()->GetNick() + " :" + sMsg;
+        NoString sPath = m_sPath.Replace_n(" ", "_");
+        NoString sSource = ":" + GetModNick() + "!shell@" + sPath;
+        NoString sLine = sSource + " PRIVMSG " + GetClient()->GetNick() + " :" + sMsg;
         GetClient()->PutClient(sLine);
     }
 
-    void RunCommand(const CString& sCommand)
+    void RunCommand(const NoString& sCommand)
     {
-        GetManager()->AddSock(new CShellSock(this, GetClient(), "cd " + m_sPath + " && " + sCommand), "SHELL");
+        GetManager()->AddSock(new NoShellSock(this, GetClient(), "cd " + m_sPath + " && " + sCommand), "SHELL");
     }
 
 private:
-    CString m_sPath;
+    NoString m_sPath;
 };
 
-void CShellSock::ReadLine(const CString& sData)
+void NoShellSock::ReadLine(const NoString& sData)
 {
-    CString sLine = sData;
+    NoString sLine = sData;
 
     sLine.TrimRight("\r\n");
     sLine.Replace("\t", "    ");
@@ -134,11 +134,11 @@ void CShellSock::ReadLine(const CString& sData)
     m_pParent->SetClient(nullptr);
 }
 
-void CShellSock::Disconnected()
+void NoShellSock::Disconnected()
 {
     // If there is some incomplete line in the buffer, read it
     // (e.g. echo echo -n "hi" triggered this)
-    CString& sBuffer = GetInternalReadBuffer();
+    NoString& sBuffer = GetInternalReadBuffer();
     if (!sBuffer.empty()) ReadLine(sBuffer);
 
     m_pParent->SetClient(m_pClient);
@@ -146,10 +146,10 @@ void CShellSock::Disconnected()
     m_pParent->SetClient(nullptr);
 }
 
-template <> void TModInfo<CShellMod>(CModInfo& Info) { Info.SetWikiPage("shell"); }
+template <> void TModInfo<NoShellMod>(NoModInfo& Info) { Info.SetWikiPage("shell"); }
 
 #ifdef MOD_SHELL_ALLOW_EVERYONE
-USERMODULEDEFS(CShellMod, "Gives shell access")
+USERMODULEDEFS(NoShellMod, "Gives shell access")
 #else
-USERMODULEDEFS(CShellMod, "Gives shell access. Only ZNC admins can use it.")
+USERMODULEDEFS(NoShellMod, "Gives shell access. Only ZNC admins can use it.")
 #endif

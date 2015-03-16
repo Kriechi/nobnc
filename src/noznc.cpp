@@ -34,9 +34,9 @@ using std::list;
 using std::tuple;
 using std::make_tuple;
 
-static inline CString FormatBindError()
+static inline NoString FormatBindError()
 {
-    CString sError = (errno == 0 ? CString("unknown error, check the host name") : CString(strerror(errno)));
+    NoString sError = (errno == 0 ? NoString("unknown error, check the host name") : NoString(strerror(errno)));
     return "Unable to bind [" + sError + "]";
 }
 
@@ -45,12 +45,12 @@ CZNC::CZNC()
       m_Manager(), m_sCurPath(""), m_sZNCPath(""), m_sConfigFile(""), m_sSkinName(""), m_sStatusPrefix(""),
       m_sPidFile(""), m_sSSLCertFile(""), m_sSSLCiphers(""), m_sSSLProtocols(""), m_vsBindHosts(), m_vsTrustedProxies(),
       m_vsMotd(), m_pLockFile(nullptr), m_uiConnectDelay(5), m_uiAnonIPLimit(10), m_uiMaxBufferSize(500),
-      m_uDisabledSSLProtocols(Csock::EDP_SSL), m_pModules(new CModules), m_uBytesRead(0), m_uBytesWritten(0),
+      m_uDisabledSSLProtocols(Csock::EDP_SSL), m_pModules(new NoModules), m_uBytesRead(0), m_uBytesWritten(0),
       m_lpConnectQueue(), m_pConnectQueueTimer(nullptr), m_uiConnectPaused(0), m_sConnectThrottle(),
       m_bProtectWebSessions(true), m_bHideVersion(false)
 {
     if (!InitCsocket()) {
-        CUtils::PrintError("Could not initialize Csocket!");
+        NoUtils::PrintError("Could not initialize Csocket!");
         exit(-1);
     }
     m_sConnectThrottle.SetTTL(30000);
@@ -63,13 +63,13 @@ CZNC::~CZNC()
     for (const auto& it : m_msUsers) {
         it.second->GetModules().UnloadAll();
 
-        const vector<CNetwork*>& networks = it.second->GetNetworks();
-        for (CNetwork* pNetwork : networks) {
+        const vector<NoNetwork*>& networks = it.second->GetNetworks();
+        for (NoNetwork* pNetwork : networks) {
             pNetwork->GetModules().UnloadAll();
         }
     }
 
-    for (CListener* pListener : m_vpListeners) {
+    for (NoListener* pListener : m_vpListeners) {
         delete pListener;
     }
 
@@ -89,25 +89,25 @@ CZNC::~CZNC()
     DeletePidFile();
 }
 
-CString CZNC::GetVersion() { return CString(NO_VERSION_STR) + CString(NO_VERSION_EXTRA); }
+NoString CZNC::GetVersion() { return NoString(NO_VERSION_STR) + NoString(NO_VERSION_EXTRA); }
 
-CString CZNC::GetTag(bool bIncludeVersion, bool bHTML)
+NoString CZNC::GetTag(bool bIncludeVersion, bool bHTML)
 {
     if (!Get().m_bHideVersion) {
         bIncludeVersion = true;
     }
-    CString sAddress = bHTML ? "<a href=\"http://znc.in\">http://znc.in</a>" : "http://znc.in";
+    NoString sAddress = bHTML ? "<a href=\"http://znc.in\">http://znc.in</a>" : "http://znc.in";
 
     if (!bIncludeVersion) {
         return "ZNC - " + sAddress;
     }
 
-    CString sVersion = GetVersion();
+    NoString sVersion = GetVersion();
 
     return "ZNC - " + sVersion + " - " + sAddress;
 }
 
-CString CZNC::GetCompileOptionsString()
+NoString CZNC::GetCompileOptionsString()
 {
     return "IPv6: "
 #ifdef HAVE_IPV6
@@ -136,10 +136,10 @@ CString CZNC::GetCompileOptionsString()
     ;
 }
 
-CString CZNC::GetUptime() const
+NoString CZNC::GetUptime() const
 {
     time_t now = time(nullptr);
-    return CString::ToTimeStr(now - TimeStarted());
+    return NoString::ToTimeStr(now - TimeStarted());
 }
 
 bool CZNC::OnBoot()
@@ -156,7 +156,7 @@ bool CZNC::HandleUserDeletion()
     if (m_msDelUsers.empty()) return false;
 
     for (const auto& it : m_msDelUsers) {
-        CUser* pUser = it.second;
+        NoUser* pUser = it.second;
         pUser->SetBeingDeleted(true);
 
         if (GetModules().OnDeleteUser(*pUser)) {
@@ -164,7 +164,7 @@ bool CZNC::HandleUserDeletion()
             continue;
         }
         m_msUsers.erase(pUser->GetUserName());
-        CWebSock::FinishUserSessions(*pUser);
+        NoWebSock::FinishUserSessions(*pUser);
         delete pUser;
     }
 
@@ -176,7 +176,7 @@ bool CZNC::HandleUserDeletion()
 void CZNC::Loop()
 {
     while (true) {
-        CString sError;
+        NoString sError;
 
         ConfigState eState = GetConfigState();
         switch (eState) {
@@ -216,10 +216,10 @@ void CZNC::Loop()
     }
 }
 
-CFile* CZNC::InitPidFile()
+NoFile* CZNC::InitPidFile()
 {
     if (!m_sPidFile.empty()) {
-        CString sFile;
+        NoString sFile;
 
         // absolute path or relative to the data dir?
         if (m_sPidFile[0] != '/')
@@ -227,7 +227,7 @@ CFile* CZNC::InitPidFile()
         else
             sFile = m_sPidFile;
 
-        return new CFile(sFile);
+        return new NoFile(sFile);
     }
 
     return nullptr;
@@ -235,50 +235,50 @@ CFile* CZNC::InitPidFile()
 
 bool CZNC::WritePidFile(int iPid)
 {
-    CFile* File = InitPidFile();
+    NoFile* File = InitPidFile();
     if (File == nullptr) return false;
 
-    CUtils::PrintAction("Writing pid file [" + File->GetLongName() + "]");
+    NoUtils::PrintAction("Writing pid file [" + File->GetLongName() + "]");
 
     bool bRet = false;
     if (File->Open(O_WRONLY | O_TRUNC | O_CREAT)) {
-        File->Write(CString(iPid) + "\n");
+        File->Write(NoString(iPid) + "\n");
         File->Close();
         bRet = true;
     }
 
     delete File;
-    CUtils::PrintStatus(bRet);
+    NoUtils::PrintStatus(bRet);
     return bRet;
 }
 
 bool CZNC::DeletePidFile()
 {
-    CFile* File = InitPidFile();
+    NoFile* File = InitPidFile();
     if (File == nullptr) return false;
 
-    CUtils::PrintAction("Deleting pid file [" + File->GetLongName() + "]");
+    NoUtils::PrintAction("Deleting pid file [" + File->GetLongName() + "]");
 
     bool bRet = File->Delete();
 
     delete File;
-    CUtils::PrintStatus(bRet);
+    NoUtils::PrintStatus(bRet);
     return bRet;
 }
 
 bool CZNC::WritePemFile()
 {
 #ifndef HAVE_LIBSSL
-    CUtils::PrintError("ZNC was not compiled with ssl support.");
+    NoUtils::PrintError("ZNC was not compiled with ssl support.");
     return false;
 #else
-    CString sPemFile = GetPemLocation();
+    NoString sPemFile = GetPemLocation();
 
-    CUtils::PrintAction("Writing Pem file [" + sPemFile + "]");
+    NoUtils::PrintAction("Writing Pem file [" + sPemFile + "]");
 #ifndef _WIN32
     int fd = creat(sPemFile.c_str(), 0600);
     if (fd == -1) {
-        CUtils::PrintStatus(false, "Unable to open");
+        NoUtils::PrintStatus(false, "Unable to open");
         return false;
     }
     FILE* f = fdopen(fd, "w");
@@ -287,14 +287,14 @@ bool CZNC::WritePemFile()
 #endif
 
     if (!f) {
-        CUtils::PrintStatus(false, "Unable to open");
+        NoUtils::PrintStatus(false, "Unable to open");
         return false;
     }
 
-    CUtils::GenerateCert(f, "");
+    NoUtils::GenerateCert(f, "");
     fclose(f);
 
-    CUtils::PrintStatus(true);
+    NoUtils::PrintStatus(true);
     return true;
 #endif
 }
@@ -310,7 +310,7 @@ void CZNC::DeleteUsers()
     DisableConnectQueue();
 }
 
-bool CZNC::IsHostAllowed(const CString& sHostMask) const
+bool CZNC::IsHostAllowed(const NoString& sHostMask) const
 {
     for (const auto& it : m_msUsers) {
         if (it.second->IsHostAllowed(sHostMask)) {
@@ -321,26 +321,26 @@ bool CZNC::IsHostAllowed(const CString& sHostMask) const
     return false;
 }
 
-bool CZNC::AllowConnectionFrom(const CString& sIP) const
+bool CZNC::AllowConnectionFrom(const NoString& sIP) const
 {
     if (m_uiAnonIPLimit == 0) return true;
     return (GetManager().GetAnonConnectionCount(sIP) < m_uiAnonIPLimit);
 }
 
-void CZNC::InitDirs(const CString& sArgvPath, const CString& sDataDir)
+void CZNC::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
 {
     // If the bin was not ran from the current directory, we need to add that dir onto our cwd
-    CString::size_type uPos = sArgvPath.rfind('/');
-    if (uPos == CString::npos)
+    NoString::size_type uPos = sArgvPath.rfind('/');
+    if (uPos == NoString::npos)
         m_sCurPath = "./";
     else
-        m_sCurPath = CDir::ChangeDir("./", sArgvPath.Left(uPos), "");
+        m_sCurPath = NoDir::ChangeDir("./", sArgvPath.Left(uPos), "");
 
     // Try to set the user's home dir, default to binpath on failure
-    CFile::InitHomePath(m_sCurPath);
+    NoFile::InitHomePath(m_sCurPath);
 
     if (sDataDir.empty()) {
-        m_sZNCPath = CFile::GetHomePath() + "/.znc";
+        m_sZNCPath = NoFile::GetHomePath() + "/.znc";
     } else {
         m_sZNCPath = sDataDir;
     }
@@ -348,56 +348,56 @@ void CZNC::InitDirs(const CString& sArgvPath, const CString& sDataDir)
     m_sSSLCertFile = m_sZNCPath + "/znc.pem";
 }
 
-CString CZNC::GetConfPath(bool bAllowMkDir) const
+NoString CZNC::GetConfPath(bool bAllowMkDir) const
 {
-    CString sConfPath = m_sZNCPath + "/configs";
-    if (bAllowMkDir && !CFile::Exists(sConfPath)) {
-        CDir::MakeDir(sConfPath);
+    NoString sConfPath = m_sZNCPath + "/configs";
+    if (bAllowMkDir && !NoFile::Exists(sConfPath)) {
+        NoDir::MakeDir(sConfPath);
     }
 
     return sConfPath;
 }
 
-CString CZNC::GetUserPath() const
+NoString CZNC::GetUserPath() const
 {
-    CString sUserPath = m_sZNCPath + "/users";
-    if (!CFile::Exists(sUserPath)) {
-        CDir::MakeDir(sUserPath);
+    NoString sUserPath = m_sZNCPath + "/users";
+    if (!NoFile::Exists(sUserPath)) {
+        NoDir::MakeDir(sUserPath);
     }
 
     return sUserPath;
 }
 
-CString CZNC::GetModPath() const
+NoString CZNC::GetModPath() const
 {
-    CString sModPath = m_sZNCPath + "/modules";
+    NoString sModPath = m_sZNCPath + "/modules";
 
     return sModPath;
 }
 
-const CString& CZNC::GetCurPath() const
+const NoString& CZNC::GetCurPath() const
 {
-    if (!CFile::Exists(m_sCurPath)) {
-        CDir::MakeDir(m_sCurPath);
+    if (!NoFile::Exists(m_sCurPath)) {
+        NoDir::MakeDir(m_sCurPath);
     }
     return m_sCurPath;
 }
 
-const CString& CZNC::GetHomePath() const { return CFile::GetHomePath(); }
+const NoString& CZNC::GetHomePath() const { return NoFile::GetHomePath(); }
 
-const CString& CZNC::GetZNCPath() const
+const NoString& CZNC::GetZNCPath() const
 {
-    if (!CFile::Exists(m_sZNCPath)) {
-        CDir::MakeDir(m_sZNCPath);
+    if (!NoFile::Exists(m_sZNCPath)) {
+        NoDir::MakeDir(m_sZNCPath);
     }
     return m_sZNCPath;
 }
 
-CString CZNC::GetPemLocation() const { return CDir::ChangeDir("", m_sSSLCertFile); }
+NoString CZNC::GetPemLocation() const { return NoDir::ChangeDir("", m_sSSLCertFile); }
 
-CString CZNC::ExpandConfigPath(const CString& sConfigFile, bool bAllowMkDir)
+NoString CZNC::ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir)
 {
-    CString sRetPath;
+    NoString sRetPath;
 
     if (sConfigFile.empty()) {
         sRetPath = GetConfPath(bAllowMkDir) + "/znc.conf";
@@ -422,10 +422,10 @@ bool CZNC::WriteConfig()
     }
 
     // We first write to a temporary file and then move it to the right place
-    CFile* pFile = new CFile(GetConfigFile() + "~");
+    NoFile* pFile = new NoFile(GetConfigFile() + "~");
 
     if (!pFile->Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
-        DEBUG("Could not write config to " + GetConfigFile() + "~: " + CString(strerror(errno)));
+        DEBUG("Could not write config to " + GetConfigFile() + "~: " + NoString(strerror(errno)));
         delete pFile;
         return false;
     }
@@ -434,7 +434,7 @@ bool CZNC::WriteConfig()
     // The old file (= inode) is going away and thus a lock on it would be
     // useless. These lock should always succeed (races, anyone?).
     if (!pFile->TryExLock()) {
-        DEBUG("Error while locking the new config file, errno says: " + CString(strerror(errno)));
+        DEBUG("Error while locking the new config file, errno says: " + NoString(strerror(errno)));
         pFile->Delete();
         delete pFile;
         return false;
@@ -442,35 +442,35 @@ bool CZNC::WriteConfig()
 
     pFile->Write(MakeConfigHeader() + "\n");
 
-    CSettings config;
-    config.AddKeyValuePair("AnonIPLimit", CString(m_uiAnonIPLimit));
-    config.AddKeyValuePair("MaxBufferSize", CString(m_uiMaxBufferSize));
-    config.AddKeyValuePair("SSLCertFile", CString(m_sSSLCertFile));
-    config.AddKeyValuePair("ProtectWebSessions", CString(m_bProtectWebSessions));
-    config.AddKeyValuePair("HideVersion", CString(m_bHideVersion));
-    config.AddKeyValuePair("Version", CString(NO_VERSION_STR));
+    NoSettings config;
+    config.AddKeyValuePair("AnonIPLimit", NoString(m_uiAnonIPLimit));
+    config.AddKeyValuePair("MaxBufferSize", NoString(m_uiMaxBufferSize));
+    config.AddKeyValuePair("SSLCertFile", NoString(m_sSSLCertFile));
+    config.AddKeyValuePair("ProtectWebSessions", NoString(m_bProtectWebSessions));
+    config.AddKeyValuePair("HideVersion", NoString(m_bHideVersion));
+    config.AddKeyValuePair("Version", NoString(NO_VERSION_STR));
 
     unsigned int l = 0;
-    for (CListener* pListener : m_vpListeners) {
-        CSettings listenerConfig;
+    for (NoListener* pListener : m_vpListeners) {
+        NoSettings listenerConfig;
 
         listenerConfig.AddKeyValuePair("Host", pListener->GetBindHost());
         listenerConfig.AddKeyValuePair("URIPrefix", pListener->GetURIPrefix() + "/");
-        listenerConfig.AddKeyValuePair("Port", CString(pListener->GetPort()));
+        listenerConfig.AddKeyValuePair("Port", NoString(pListener->GetPort()));
 
-        listenerConfig.AddKeyValuePair("IPv4", CString(pListener->GetAddrType() != ADDR_IPV6ONLY));
-        listenerConfig.AddKeyValuePair("IPv6", CString(pListener->GetAddrType() != ADDR_IPV4ONLY));
+        listenerConfig.AddKeyValuePair("IPv4", NoString(pListener->GetAddrType() != ADDR_IPV6ONLY));
+        listenerConfig.AddKeyValuePair("IPv6", NoString(pListener->GetAddrType() != ADDR_IPV4ONLY));
 
-        listenerConfig.AddKeyValuePair("SSL", CString(pListener->IsSSL()));
+        listenerConfig.AddKeyValuePair("SSL", NoString(pListener->IsSSL()));
 
-        listenerConfig.AddKeyValuePair("AllowIRC", CString(pListener->GetAcceptType() != CListener::ACCEPT_HTTP));
-        listenerConfig.AddKeyValuePair("AllowWeb", CString(pListener->GetAcceptType() != CListener::ACCEPT_IRC));
+        listenerConfig.AddKeyValuePair("AllowIRC", NoString(pListener->GetAcceptType() != NoListener::ACCEPT_HTTP));
+        listenerConfig.AddKeyValuePair("AllowWeb", NoString(pListener->GetAcceptType() != NoListener::ACCEPT_IRC));
 
-        config.AddSubConfig("Listener", "listener" + CString(l++), listenerConfig);
+        config.AddSubConfig("Listener", "listener" + NoString(l++), listenerConfig);
     }
 
-    config.AddKeyValuePair("ConnectDelay", CString(m_uiConnectDelay));
-    config.AddKeyValuePair("ServerThrottle", CString(m_sConnectThrottle.GetTTL() / 1000));
+    config.AddKeyValuePair("ConnectDelay", NoString(m_uiConnectDelay));
+    config.AddKeyValuePair("ServerThrottle", NoString(m_sConnectThrottle.GetTTL() / 1000));
 
     if (!m_sPidFile.empty()) {
         config.AddKeyValuePair("PidFile", m_sPidFile.FirstLine());
@@ -485,30 +485,30 @@ bool CZNC::WriteConfig()
     }
 
     if (!m_sSSLCiphers.empty()) {
-        config.AddKeyValuePair("SSLCiphers", CString(m_sSSLCiphers));
+        config.AddKeyValuePair("SSLCiphers", NoString(m_sSSLCiphers));
     }
 
     if (!m_sSSLProtocols.empty()) {
         config.AddKeyValuePair("SSLProtocols", m_sSSLProtocols);
     }
 
-    for (const CString& sLine : m_vsMotd) {
+    for (const NoString& sLine : m_vsMotd) {
         config.AddKeyValuePair("Motd", sLine.FirstLine());
     }
 
-    for (const CString& sHost : m_vsBindHosts) {
+    for (const NoString& sHost : m_vsBindHosts) {
         config.AddKeyValuePair("BindHost", sHost.FirstLine());
     }
 
-    for (const CString& sProxy : m_vsTrustedProxies) {
+    for (const NoString& sProxy : m_vsTrustedProxies) {
         config.AddKeyValuePair("TrustedProxy", sProxy.FirstLine());
     }
 
-    CModules& Mods = GetModules();
+    NoModules& Mods = GetModules();
 
-    for (const CModule* pMod : Mods) {
-        CString sName = pMod->GetModName();
-        CString sArgs = pMod->GetArgs();
+    for (const NoModule* pMod : Mods) {
+        NoString sName = pMod->GetModName();
+        NoString sArgs = pMod->GetArgs();
 
         if (!sArgs.empty()) {
             sArgs = " " + sArgs.FirstLine();
@@ -518,7 +518,7 @@ bool CZNC::WriteConfig()
     }
 
     for (const auto& it : m_msUsers) {
-        CString sErr;
+        NoString sErr;
 
         if (!it.second->IsValid(sErr)) {
             DEBUG("** Error writing config for user [" << it.first << "] [" << sErr << "]");
@@ -534,7 +534,7 @@ bool CZNC::WriteConfig()
     pFile->Sync();
 
     if (pFile->HadError()) {
-        DEBUG("Error while writing the config, errno says: " + CString(strerror(errno)));
+        DEBUG("Error while writing the config, errno says: " + NoString(strerror(errno)));
         pFile->Delete();
         delete pFile;
         return false;
@@ -558,7 +558,7 @@ bool CZNC::WriteConfig()
     return true;
 }
 
-CString CZNC::MakeConfigHeader()
+NoString CZNC::MakeConfigHeader()
 {
     return "// WARNING\n"
            "//\n"
@@ -571,23 +571,23 @@ CString CZNC::MakeConfigHeader()
            "// Also check http://en.znc.in/wiki/Configuration\n";
 }
 
-bool CZNC::WriteNewConfig(const CString& sConfigFile)
+bool CZNC::WriteNewConfig(const NoString& sConfigFile)
 {
-    CString sAnswer, sUser, sNetwork;
-    VCString vsLines;
+    NoString sAnswer, sUser, sNetwork;
+    NoStringVector vsLines;
 
     vsLines.push_back(MakeConfigHeader());
-    vsLines.push_back("Version = " + CString(NO_VERSION_STR));
+    vsLines.push_back("Version = " + NoString(NO_VERSION_STR));
 
     m_sConfigFile = ExpandConfigPath(sConfigFile);
 
-    if (CFile::Exists(m_sConfigFile)) {
-        CUtils::PrintStatus(false, "WARNING: config [" + m_sConfigFile + "] already exists.");
+    if (NoFile::Exists(m_sConfigFile)) {
+        NoUtils::PrintStatus(false, "WARNING: config [" + m_sConfigFile + "] already exists.");
     }
 
-    CUtils::PrintMessage("");
-    CUtils::PrintMessage("-- Global settings --");
-    CUtils::PrintMessage("");
+    NoUtils::PrintMessage("");
+    NoUtils::PrintMessage("-- Global settings --");
+    NoUtils::PrintMessage("");
 
 // Listen
 #ifdef HAVE_IPV6
@@ -595,8 +595,8 @@ bool CZNC::WriteNewConfig(const CString& sConfigFile)
 #else
     bool b6 = false;
 #endif
-    CString sListenHost;
-    CString sURIPrefix;
+    NoString sListenHost;
+    NoString sURIPrefix;
     bool bListenSSL = false;
     unsigned int uListenPort = 0;
     bool bSuccess;
@@ -604,13 +604,13 @@ bool CZNC::WriteNewConfig(const CString& sConfigFile)
     do {
         bSuccess = true;
         while (true) {
-            if (!CUtils::GetNumInput("Listen on port", uListenPort, 1025, 65534)) {
+            if (!NoUtils::GetNumInput("Listen on port", uListenPort, 1025, 65534)) {
                 continue;
             }
             if (uListenPort == 6667) {
-                CUtils::PrintStatus(false, "WARNING: Some web browsers reject port 6667. If you intend to");
-                CUtils::PrintStatus(false, "use ZNC's web interface, you might want to use another port.");
-                if (!CUtils::GetBoolInput("Proceed with port 6667 anyway?", true)) {
+                NoUtils::PrintStatus(false, "WARNING: Some web browsers reject port 6667. If you intend to");
+                NoUtils::PrintStatus(false, "use ZNC's web interface, you might want to use another port.");
+                if (!NoUtils::GetBoolInput("Proceed with port 6667 anyway?", true)) {
                     continue;
                 }
             }
@@ -619,119 +619,119 @@ bool CZNC::WriteNewConfig(const CString& sConfigFile)
 
 
 #ifdef HAVE_LIBSSL
-        bListenSSL = CUtils::GetBoolInput("Listen using SSL", bListenSSL);
+        bListenSSL = NoUtils::GetBoolInput("Listen using SSL", bListenSSL);
 #endif
 
 #ifdef HAVE_IPV6
-        b6 = CUtils::GetBoolInput("Listen using both IPv4 and IPv6", b6);
+        b6 = NoUtils::GetBoolInput("Listen using both IPv4 and IPv6", b6);
 #endif
 
         // Don't ask for listen host, it may be configured later if needed.
 
-        CUtils::PrintAction("Verifying the listener");
-        CListener* pListener =
-        new CListener((unsigned short int)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? ADDR_ALL : ADDR_IPV4ONLY, CListener::ACCEPT_ALL);
+        NoUtils::PrintAction("Verifying the listener");
+        NoListener* pListener =
+        new NoListener((unsigned short int)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? ADDR_ALL : ADDR_IPV4ONLY, NoListener::ACCEPT_ALL);
         if (!pListener->Listen()) {
-            CUtils::PrintStatus(false, FormatBindError());
+            NoUtils::PrintStatus(false, FormatBindError());
             bSuccess = false;
         } else
-            CUtils::PrintStatus(true);
+            NoUtils::PrintStatus(true);
         delete pListener;
     } while (!bSuccess);
 
 #ifdef HAVE_LIBSSL
-    CString sPemFile = GetPemLocation();
-    if (!CFile::Exists(sPemFile)) {
-        CUtils::PrintMessage("Unable to locate pem file: [" + sPemFile + "], creating it");
+    NoString sPemFile = GetPemLocation();
+    if (!NoFile::Exists(sPemFile)) {
+        NoUtils::PrintMessage("Unable to locate pem file: [" + sPemFile + "], creating it");
         WritePemFile();
     }
 #endif
 
     vsLines.push_back("<Listener l>");
-    vsLines.push_back("\tPort = " + CString(uListenPort));
+    vsLines.push_back("\tPort = " + NoString(uListenPort));
     vsLines.push_back("\tIPv4 = true");
-    vsLines.push_back("\tIPv6 = " + CString(b6));
-    vsLines.push_back("\tSSL = " + CString(bListenSSL));
+    vsLines.push_back("\tIPv6 = " + NoString(b6));
+    vsLines.push_back("\tSSL = " + NoString(bListenSSL));
     if (!sListenHost.empty()) {
         vsLines.push_back("\tHost = " + sListenHost);
     }
     vsLines.push_back("</Listener>");
     // !Listen
 
-    set<CModInfo> ssGlobalMods;
-    GetModules().GetDefaultMods(ssGlobalMods, CModInfo::GlobalModule);
-    vector<CString> vsGlobalModNames;
-    for (const CModInfo& Info : ssGlobalMods) {
+    set<NoModInfo> ssGlobalMods;
+    GetModules().GetDefaultMods(ssGlobalMods, NoModInfo::GlobalModule);
+    vector<NoString> vsGlobalModNames;
+    for (const NoModInfo& Info : ssGlobalMods) {
         vsGlobalModNames.push_back(Info.GetName());
         vsLines.push_back("LoadModule = " + Info.GetName());
     }
-    CUtils::PrintMessage("Enabled global modules [" + CString(", ").Join(vsGlobalModNames.begin(), vsGlobalModNames.end()) + "]");
+    NoUtils::PrintMessage("Enabled global modules [" + NoString(", ").Join(vsGlobalModNames.begin(), vsGlobalModNames.end()) + "]");
 
     // User
-    CUtils::PrintMessage("");
-    CUtils::PrintMessage("-- Admin user settings --");
-    CUtils::PrintMessage("");
+    NoUtils::PrintMessage("");
+    NoUtils::PrintMessage("-- Admin user settings --");
+    NoUtils::PrintMessage("");
 
     vsLines.push_back("");
-    CString sNick;
+    NoString sNick;
     do {
-        CUtils::GetInput("Username", sUser, "", "alphanumeric");
-    } while (!CUser::IsValidUserName(sUser));
+        NoUtils::GetInput("Username", sUser, "", "alphanumeric");
+    } while (!NoUser::IsValidUserName(sUser));
 
     vsLines.push_back("<User " + sUser + ">");
-    CString sSalt;
-    sAnswer = CUtils::GetSaltedHashPass(sSalt);
-    vsLines.push_back("\tPass       = " + CUtils::sDefaultHash + "#" + sAnswer + "#" + sSalt + "#");
+    NoString sSalt;
+    sAnswer = NoUtils::GetSaltedHashPass(sSalt);
+    vsLines.push_back("\tPass       = " + NoUtils::sDefaultHash + "#" + sAnswer + "#" + sSalt + "#");
 
     vsLines.push_back("\tAdmin      = true");
 
-    CUtils::GetInput("Nick", sNick, CUser::MakeCleanUserName(sUser));
+    NoUtils::GetInput("Nick", sNick, NoUser::MakeCleanUserName(sUser));
     vsLines.push_back("\tNick       = " + sNick);
-    CUtils::GetInput("Alternate nick", sAnswer, sNick + "_");
+    NoUtils::GetInput("Alternate nick", sAnswer, sNick + "_");
     if (!sAnswer.empty()) {
         vsLines.push_back("\tAltNick    = " + sAnswer);
     }
-    CUtils::GetInput("Ident", sAnswer, sUser);
+    NoUtils::GetInput("Ident", sAnswer, sUser);
     vsLines.push_back("\tIdent      = " + sAnswer);
-    CUtils::GetInput("Real name", sAnswer, "Got ZNC?");
+    NoUtils::GetInput("Real name", sAnswer, "Got ZNC?");
     vsLines.push_back("\tRealName   = " + sAnswer);
-    CUtils::GetInput("Bind host", sAnswer, "", "optional");
+    NoUtils::GetInput("Bind host", sAnswer, "", "optional");
     if (!sAnswer.empty()) {
         vsLines.push_back("\tBindHost   = " + sAnswer);
     }
 
-    set<CModInfo> ssUserMods;
-    GetModules().GetDefaultMods(ssUserMods, CModInfo::UserModule);
-    vector<CString> vsUserModNames;
-    for (const CModInfo& Info : ssUserMods) {
+    set<NoModInfo> ssUserMods;
+    GetModules().GetDefaultMods(ssUserMods, NoModInfo::UserModule);
+    vector<NoString> vsUserModNames;
+    for (const NoModInfo& Info : ssUserMods) {
         vsUserModNames.push_back(Info.GetName());
         vsLines.push_back("\tLoadModule = " + Info.GetName());
     }
-    CUtils::PrintMessage("Enabled user modules [" + CString(", ").Join(vsUserModNames.begin(), vsUserModNames.end()) + "]");
+    NoUtils::PrintMessage("Enabled user modules [" + NoString(", ").Join(vsUserModNames.begin(), vsUserModNames.end()) + "]");
 
-    CUtils::PrintMessage("");
-    if (CUtils::GetBoolInput("Set up a network?", true)) {
+    NoUtils::PrintMessage("");
+    if (NoUtils::GetBoolInput("Set up a network?", true)) {
         vsLines.push_back("");
 
-        CUtils::PrintMessage("");
-        CUtils::PrintMessage("-- Network settings --");
-        CUtils::PrintMessage("");
+        NoUtils::PrintMessage("");
+        NoUtils::PrintMessage("-- Network settings --");
+        NoUtils::PrintMessage("");
 
         do {
-            CUtils::GetInput("Name", sNetwork, "freenode");
-        } while (!CNetwork::IsValidNetwork(sNetwork));
+            NoUtils::GetInput("Name", sNetwork, "freenode");
+        } while (!NoNetwork::IsValidNetwork(sNetwork));
 
         vsLines.push_back("\t<Network " + sNetwork + ">");
 
-        set<CModInfo> ssNetworkMods;
-        GetModules().GetDefaultMods(ssNetworkMods, CModInfo::NetworkModule);
-        vector<CString> vsNetworkModNames;
-        for (const CModInfo& Info : ssNetworkMods) {
+        set<NoModInfo> ssNetworkMods;
+        GetModules().GetDefaultMods(ssNetworkMods, NoModInfo::NetworkModule);
+        vector<NoString> vsNetworkModNames;
+        for (const NoModInfo& Info : ssNetworkMods) {
             vsNetworkModNames.push_back(Info.GetName());
             vsLines.push_back("\t\tLoadModule = " + Info.GetName());
         }
 
-        CString sHost, sPass, sHint;
+        NoString sHost, sPass, sHint;
         bool bSSL = false;
         unsigned int uServerPort = 0;
 
@@ -744,56 +744,56 @@ bool CZNC::WriteNewConfig(const CString& sConfigFile)
             sHint = "host only";
         }
 
-        while (!CUtils::GetInput("Server host", sHost, sHost, sHint) || !CServer::IsValidHostName(sHost))
+        while (!NoUtils::GetInput("Server host", sHost, sHost, sHint) || !NoServer::IsValidHostName(sHost))
             ;
 #ifdef HAVE_LIBSSL
-        bSSL = CUtils::GetBoolInput("Server uses SSL?", bSSL);
+        bSSL = NoUtils::GetBoolInput("Server uses SSL?", bSSL);
 #endif
-        while (!CUtils::GetNumInput("Server port", uServerPort, 1, 65535, bSSL ? 6697 : 6667))
+        while (!NoUtils::GetNumInput("Server port", uServerPort, 1, 65535, bSSL ? 6697 : 6667))
             ;
-        CUtils::GetInput("Server password (probably empty)", sPass);
+        NoUtils::GetInput("Server password (probably empty)", sPass);
 
-        vsLines.push_back("\t\tServer     = " + sHost + ((bSSL) ? " +" : " ") + CString(uServerPort) + " " + sPass);
+        vsLines.push_back("\t\tServer     = " + sHost + ((bSSL) ? " +" : " ") + NoString(uServerPort) + " " + sPass);
 
-        CString sChans;
-        if (CUtils::GetInput("Initial channels", sChans)) {
+        NoString sChans;
+        if (NoUtils::GetInput("Initial channels", sChans)) {
             vsLines.push_back("");
-            VCString vsChans;
+            NoStringVector vsChans;
             sChans.Replace(",", " ");
             sChans.Replace(";", " ");
             sChans.Split(" ", vsChans, false, "", "", true, true);
-            for (const CString& sChan : vsChans) {
+            for (const NoString& sChan : vsChans) {
                 vsLines.push_back("\t\t<Chan " + sChan + ">");
                 vsLines.push_back("\t\t</Chan>");
             }
         }
 
-        CUtils::PrintMessage("Enabled network modules [" +
-                             CString(", ").Join(vsNetworkModNames.begin(), vsNetworkModNames.end()) + "]");
+        NoUtils::PrintMessage("Enabled network modules [" +
+                             NoString(", ").Join(vsNetworkModNames.begin(), vsNetworkModNames.end()) + "]");
 
         vsLines.push_back("\t</Network>");
     }
 
     vsLines.push_back("</User>");
 
-    CUtils::PrintMessage("");
+    NoUtils::PrintMessage("");
     // !User
 
-    CFile File;
+    NoFile File;
     bool bFileOK, bFileOpen = false;
     do {
-        CUtils::PrintAction("Writing config [" + m_sConfigFile + "]");
+        NoUtils::PrintAction("Writing config [" + m_sConfigFile + "]");
 
         bFileOK = true;
-        if (CFile::Exists(m_sConfigFile)) {
+        if (NoFile::Exists(m_sConfigFile)) {
             if (!File.TryExLock(m_sConfigFile)) {
-                CUtils::PrintStatus(false, "ZNC is currently running on this config.");
+                NoUtils::PrintStatus(false, "ZNC is currently running on this config.");
                 bFileOK = false;
             } else {
                 File.Close();
-                CUtils::PrintStatus(false, "This config already exists.");
-                if (CUtils::GetBoolInput("Are you sure you want to overwrite it?", false))
-                    CUtils::PrintAction("Overwriting config [" + m_sConfigFile + "]");
+                NoUtils::PrintStatus(false, "This config already exists.");
+                if (NoUtils::GetBoolInput("Are you sure you want to overwrite it?", false))
+                    NoUtils::PrintAction("Overwriting config [" + m_sConfigFile + "]");
                 else
                     bFileOK = false;
             }
@@ -804,12 +804,12 @@ bool CZNC::WriteNewConfig(const CString& sConfigFile)
             if (File.Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
                 bFileOpen = true;
             } else {
-                CUtils::PrintStatus(false, "Unable to open file");
+                NoUtils::PrintStatus(false, "Unable to open file");
                 bFileOK = false;
             }
         }
         if (!bFileOK) {
-            while (!CUtils::GetInput("Please specify an alternate location",
+            while (!NoUtils::GetInput("Please specify an alternate location",
                                      m_sConfigFile,
                                      "",
                                      "or \"stdout\" for displaying the config"))
@@ -822,13 +822,13 @@ bool CZNC::WriteNewConfig(const CString& sConfigFile)
     } while (!bFileOK);
 
     if (!bFileOpen) {
-        CUtils::PrintMessage("");
-        CUtils::PrintMessage("Printing the new config to stdout:");
-        CUtils::PrintMessage("");
+        NoUtils::PrintMessage("");
+        NoUtils::PrintMessage("Printing the new config to stdout:");
+        NoUtils::PrintMessage("");
         cout << endl << "----------------------------------------------------------------------------" << endl << endl;
     }
 
-    for (const CString& sLine : vsLines) {
+    for (const NoString& sLine : vsLines) {
         if (bFileOpen) {
             File.Write(sLine + "\n");
         } else {
@@ -839,64 +839,64 @@ bool CZNC::WriteNewConfig(const CString& sConfigFile)
     if (bFileOpen) {
         File.Close();
         if (File.HadError())
-            CUtils::PrintStatus(false, "There was an error while writing the config");
+            NoUtils::PrintStatus(false, "There was an error while writing the config");
         else
-            CUtils::PrintStatus(true);
+            NoUtils::PrintStatus(true);
     } else {
         cout << endl << "----------------------------------------------------------------------------" << endl << endl;
     }
 
     if (File.HadError()) {
         bFileOpen = false;
-        CUtils::PrintMessage("Printing the new config to stdout instead:");
+        NoUtils::PrintMessage("Printing the new config to stdout instead:");
         cout << endl << "----------------------------------------------------------------------------" << endl << endl;
-        for (const CString& sLine : vsLines) {
+        for (const NoString& sLine : vsLines) {
             cout << sLine << endl;
         }
         cout << endl << "----------------------------------------------------------------------------" << endl << endl;
     }
 
-    const CString sProtocol(bListenSSL ? "https" : "http");
-    const CString sSSL(bListenSSL ? "+" : "");
-    CUtils::PrintMessage("");
-    CUtils::PrintMessage("To connect to this ZNC you need to connect to it as your IRC server", true);
-    CUtils::PrintMessage("using the port that you supplied.  You have to supply your login info", true);
-    CUtils::PrintMessage("as the IRC server password like this: user/network:pass.", true);
-    CUtils::PrintMessage("");
-    CUtils::PrintMessage("Try something like this in your IRC client...", true);
-    CUtils::PrintMessage("/server <znc_server_ip> " + sSSL + CString(uListenPort) + " " + sUser + ":<pass>", true);
-    CUtils::PrintMessage("");
-    CUtils::PrintMessage("To manage settings, users and networks, point your web browser to", true);
-    CUtils::PrintMessage(sProtocol + "://<znc_server_ip>:" + CString(uListenPort) + "/", true);
-    CUtils::PrintMessage("");
+    const NoString sProtocol(bListenSSL ? "https" : "http");
+    const NoString sSSL(bListenSSL ? "+" : "");
+    NoUtils::PrintMessage("");
+    NoUtils::PrintMessage("To connect to this ZNC you need to connect to it as your IRC server", true);
+    NoUtils::PrintMessage("using the port that you supplied.  You have to supply your login info", true);
+    NoUtils::PrintMessage("as the IRC server password like this: user/network:pass.", true);
+    NoUtils::PrintMessage("");
+    NoUtils::PrintMessage("Try something like this in your IRC client...", true);
+    NoUtils::PrintMessage("/server <znc_server_ip> " + sSSL + NoString(uListenPort) + " " + sUser + ":<pass>", true);
+    NoUtils::PrintMessage("");
+    NoUtils::PrintMessage("To manage settings, users and networks, point your web browser to", true);
+    NoUtils::PrintMessage(sProtocol + "://<znc_server_ip>:" + NoString(uListenPort) + "/", true);
+    NoUtils::PrintMessage("");
 
     File.UnLock();
-    return bFileOpen && CUtils::GetBoolInput("Launch ZNC now?", true);
+    return bFileOpen && NoUtils::GetBoolInput("Launch ZNC now?", true);
 }
 
-void CZNC::BackupConfigOnce(const CString& sSuffix)
+void CZNC::BackupConfigOnce(const NoString& sSuffix)
 {
     static bool didBackup = false;
     if (didBackup) return;
     didBackup = true;
 
-    CUtils::PrintAction("Creating a config backup");
+    NoUtils::PrintAction("Creating a config backup");
 
-    CString sBackup = CDir::ChangeDir(m_sConfigFile, "../znc.conf." + sSuffix);
-    if (CFile::Copy(m_sConfigFile, sBackup))
-        CUtils::PrintStatus(true, sBackup);
+    NoString sBackup = NoDir::ChangeDir(m_sConfigFile, "../znc.conf." + sSuffix);
+    if (NoFile::Copy(m_sConfigFile, sBackup))
+        NoUtils::PrintStatus(true, sBackup);
     else
-        CUtils::PrintStatus(false, strerror(errno));
+        NoUtils::PrintStatus(false, strerror(errno));
 }
 
-bool CZNC::ParseConfig(const CString& sConfig, CString& sError)
+bool CZNC::ParseConfig(const NoString& sConfig, NoString& sError)
 {
     m_sConfigFile = ExpandConfigPath(sConfig, false);
 
     return DoRehash(sError);
 }
 
-bool CZNC::RehashConfig(CString& sError)
+bool CZNC::RehashConfig(NoString& sError)
 {
     ALLMODULECALL(OnPreRehash(), NOTHING);
 
@@ -914,7 +914,7 @@ bool CZNC::RehashConfig(CString& sError)
     }
 
     // Rehashing failed, try to recover
-    CString s;
+    NoString s;
     while (!m_msDelUsers.empty()) {
         AddUser(m_msDelUsers.begin()->second, s);
         m_msDelUsers.erase(m_msDelUsers.begin());
@@ -923,39 +923,39 @@ bool CZNC::RehashConfig(CString& sError)
     return false;
 }
 
-bool CZNC::DoRehash(CString& sError)
+bool CZNC::DoRehash(NoString& sError)
 {
     sError.clear();
 
-    CUtils::PrintAction("Opening config [" + m_sConfigFile + "]");
+    NoUtils::PrintAction("Opening config [" + m_sConfigFile + "]");
 
-    if (!CFile::Exists(m_sConfigFile)) {
+    if (!NoFile::Exists(m_sConfigFile)) {
         sError = "No such file";
-        CUtils::PrintStatus(false, sError);
-        CUtils::PrintMessage("Restart ZNC with the --makeconf option if you wish to create this config.");
+        NoUtils::PrintStatus(false, sError);
+        NoUtils::PrintMessage("Restart ZNC with the --makeconf option if you wish to create this config.");
         return false;
     }
 
-    if (!CFile::IsReg(m_sConfigFile)) {
+    if (!NoFile::IsReg(m_sConfigFile)) {
         sError = "Not a file";
-        CUtils::PrintStatus(false, sError);
+        NoUtils::PrintStatus(false, sError);
         return false;
     }
 
-    CFile* pFile = new CFile(m_sConfigFile);
+    NoFile* pFile = new NoFile(m_sConfigFile);
 
     // need to open the config file Read/Write for fcntl()
     // exclusive locking to work properly!
     if (!pFile->Open(m_sConfigFile, O_RDWR)) {
         sError = "Can not open config file";
-        CUtils::PrintStatus(false, sError);
+        NoUtils::PrintStatus(false, sError);
         delete pFile;
         return false;
     }
 
     if (!pFile->TryExLock()) {
         sError = "ZNC is already running on this config.";
-        CUtils::PrintStatus(false, sError);
+        NoUtils::PrintStatus(false, sError);
         delete pFile;
         return false;
     }
@@ -963,16 +963,16 @@ bool CZNC::DoRehash(CString& sError)
     // (re)open the config file
     delete m_pLockFile;
     m_pLockFile = pFile;
-    CFile& File = *pFile;
+    NoFile& File = *pFile;
 
-    CSettings config;
+    NoSettings config;
     if (!config.Parse(File, sError)) {
-        CUtils::PrintStatus(false, sError);
+        NoUtils::PrintStatus(false, sError);
         return false;
     }
-    CUtils::PrintStatus(true);
+    NoUtils::PrintStatus(true);
 
-    CString sSavedVersion;
+    NoString sSavedVersion;
     config.FindStringEntry("version", sSavedVersion);
     tuple<unsigned int, unsigned int> tSavedVersion =
     make_tuple(sSavedVersion.Token(0, false, ".").ToUInt(), sSavedVersion.Token(1, false, ".").ToUInt());
@@ -981,10 +981,10 @@ bool CZNC::DoRehash(CString& sError)
         if (sSavedVersion.empty()) {
             sSavedVersion = "< 0.203";
         }
-        CUtils::PrintMessage("Found old config from ZNC " + sSavedVersion + ". Saving a backup of it.");
-        BackupConfigOnce("pre-" + CString(NO_VERSION_STR));
+        NoUtils::PrintMessage("Found old config from ZNC " + sSavedVersion + ". Saving a backup of it.");
+        BackupConfigOnce("pre-" + NoString(NO_VERSION_STR));
     } else if (tSavedVersion > tCurrentVersion) {
-        CUtils::PrintError("Config was saved from ZNC " + sSavedVersion + ". It may or may not work with current ZNC " + GetVersion());
+        NoUtils::PrintError("Config was saved from ZNC " + sSavedVersion + ". It may or may not work with current ZNC " + GetVersion());
     }
 
     m_vsBindHosts.clear();
@@ -997,67 +997,67 @@ bool CZNC::DoRehash(CString& sError)
         m_vpListeners.erase(m_vpListeners.begin());
     }
 
-    MCString msModules; // Modules are queued for later loading
+    NoStringMap msModules; // Modules are queued for later loading
 
-    VCString vsList;
+    NoStringVector vsList;
     config.FindStringVector("loadmodule", vsList);
-    for (const CString& sModLine : vsList) {
-        CString sModName = sModLine.Token(0);
-        CString sArgs = sModLine.Token(1, true);
+    for (const NoString& sModLine : vsList) {
+        NoString sModName = sModLine.Token(0);
+        NoString sArgs = sModLine.Token(1, true);
 
         if (sModName == "saslauth" && tSavedVersion < make_tuple(0, 207)) {
             // XXX compatibility crap, added in 0.207
-            CUtils::PrintMessage("saslauth module was renamed to cyrusauth. Loading cyrusauth instead.");
+            NoUtils::PrintMessage("saslauth module was renamed to cyrusauth. Loading cyrusauth instead.");
             sModName = "cyrusauth";
         }
 
         if (msModules.find(sModName) != msModules.end()) {
             sError = "Module [" + sModName + "] already loaded";
-            CUtils::PrintError(sError);
+            NoUtils::PrintError(sError);
             return false;
         }
-        CString sModRet;
-        CModule* pOldMod;
+        NoString sModRet;
+        NoModule* pOldMod;
 
         pOldMod = GetModules().FindModule(sModName);
         if (!pOldMod) {
-            CUtils::PrintAction("Loading global module [" + sModName + "]");
+            NoUtils::PrintAction("Loading global module [" + sModName + "]");
 
-            bool bModRet = GetModules().LoadModule(sModName, sArgs, CModInfo::GlobalModule, nullptr, nullptr, sModRet);
+            bool bModRet = GetModules().LoadModule(sModName, sArgs, NoModInfo::GlobalModule, nullptr, nullptr, sModRet);
 
-            CUtils::PrintStatus(bModRet, sModRet);
+            NoUtils::PrintStatus(bModRet, sModRet);
             if (!bModRet) {
                 sError = sModRet;
                 return false;
             }
         } else if (pOldMod->GetArgs() != sArgs) {
-            CUtils::PrintAction("Reloading global module [" + sModName + "]");
+            NoUtils::PrintAction("Reloading global module [" + sModName + "]");
 
             bool bModRet = GetModules().ReloadModule(sModName, sArgs, nullptr, nullptr, sModRet);
 
-            CUtils::PrintStatus(bModRet, sModRet);
+            NoUtils::PrintStatus(bModRet, sModRet);
             if (!bModRet) {
                 sError = sModRet;
                 return false;
             }
         } else
-            CUtils::PrintMessage("Module [" + sModName + "] already loaded.");
+            NoUtils::PrintMessage("Module [" + sModName + "] already loaded.");
 
         msModules[sModName] = sArgs;
     }
 
-    CString sISpoofFormat, sISpoofFile;
+    NoString sISpoofFormat, sISpoofFile;
     config.FindStringEntry("ispoofformat", sISpoofFormat);
     config.FindStringEntry("ispooffile", sISpoofFile);
     if (!sISpoofFormat.empty() || !sISpoofFile.empty()) {
-        CModule* pIdentFileMod = GetModules().FindModule("identfile");
+        NoModule* pIdentFileMod = GetModules().FindModule("identfile");
         if (!pIdentFileMod) {
-            CUtils::PrintAction("Loading global Module [identfile]");
+            NoUtils::PrintAction("Loading global Module [identfile]");
 
-            CString sModRet;
-            bool bModRet = GetModules().LoadModule("identfile", "", CModInfo::GlobalModule, nullptr, nullptr, sModRet);
+            NoString sModRet;
+            bool bModRet = GetModules().LoadModule("identfile", "", NoModInfo::GlobalModule, nullptr, nullptr, sModRet);
 
-            CUtils::PrintStatus(bModRet, sModRet);
+            NoUtils::PrintStatus(bModRet, sModRet);
             if (!bModRet) {
                 sError = sModRet;
                 return false;
@@ -1072,26 +1072,26 @@ bool CZNC::DoRehash(CString& sError)
     }
 
     config.FindStringVector("motd", vsList);
-    for (const CString& sMotd : vsList) {
+    for (const NoString& sMotd : vsList) {
         AddMotd(sMotd);
     }
 
     config.FindStringVector("bindhost", vsList);
-    for (const CString& sHost : vsList) {
+    for (const NoString& sHost : vsList) {
         AddBindHost(sHost);
     }
 
     config.FindStringVector("trustedproxy", vsList);
-    for (const CString& sProxy : vsList) {
+    for (const NoString& sProxy : vsList) {
         AddTrustedProxy(sProxy);
     }
 
     config.FindStringVector("vhost", vsList);
-    for (const CString& sHost : vsList) {
+    for (const NoString& sHost : vsList) {
         AddBindHost(sHost);
     }
 
-    CString sVal;
+    NoString sVal;
     if (config.FindStringEntry("pidfile", sVal)) m_sPidFile = sVal;
     if (config.FindStringEntry("statusprefix", sVal)) m_sStatusPrefix = sVal;
     if (config.FindStringEntry("sslcertfile", sVal)) m_sSSLCertFile = sVal;
@@ -1105,10 +1105,10 @@ bool CZNC::DoRehash(CString& sError)
     if (config.FindStringEntry("hideversion", sVal)) m_bHideVersion = sVal.ToBool();
 
     if (config.FindStringEntry("sslprotocols", m_sSSLProtocols)) {
-        VCString vsProtocols;
+        NoStringVector vsProtocols;
         m_sSSLProtocols.Split(" ", vsProtocols, false, "", "", true, true);
 
-        for (CString& sProtocol : vsProtocols) {
+        for (NoString& sProtocol : vsProtocols) {
 
             unsigned int uFlag = 0;
             bool bEnable = sProtocol.TrimPrefix("+");
@@ -1127,9 +1127,9 @@ bool CZNC::DoRehash(CString& sError)
             } else if (sProtocol.Equals("TLSv1.2")) {
                 uFlag = Csock::EDP_TLSv1_2;
             } else {
-                CUtils::PrintError("Invalid SSLProtocols value [" + sProtocol + "]");
-                CUtils::PrintError("The syntax is [SSLProtocols = [+|-]<protocol> ...]");
-                CUtils::PrintError("Available protocols are [SSLv2, SSLv3, TLSv1, TLSv1.1, TLSv1.2]");
+                NoUtils::PrintError("Invalid SSLProtocols value [" + sProtocol + "]");
+                NoUtils::PrintError("The syntax is [SSLProtocols = [+|-]<protocol> ...]");
+                NoUtils::PrintError("Available protocols are [SSLv2, SSLv3, TLSv1, TLSv1.1, TLSv1.2]");
                 return false;
             }
 
@@ -1148,21 +1148,21 @@ bool CZNC::DoRehash(CString& sError)
 
     for (const char* szEntry : szListenerEntries) {
         config.FindStringVector(szEntry, vsList);
-        for (const CString& sListener : vsList) {
-            if (!AddListener(szEntry + CString(" ") + sListener, sError)) return false;
+        for (const NoString& sListener : vsList) {
+            if (!AddListener(szEntry + NoString(" ") + sListener, sError)) return false;
         }
     }
 
-    CSettings::SubConfig subConf;
-    CSettings::SubConfig::const_iterator subIt;
+    NoSettings::SubConfig subConf;
+    NoSettings::SubConfig::const_iterator subIt;
 
     config.FindSubConfig("listener", subConf);
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
-        CSettings* pSubConf = subIt->second.m_pSubConfig;
+        NoSettings* pSubConf = subIt->second.m_pSubConfig;
         if (!AddListener(pSubConf, sError)) return false;
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in Listener config!";
-            CUtils::PrintError(sError);
+            NoUtils::PrintError(sError);
 
             CZNC::DumpConfig(pSubConf);
             return false;
@@ -1171,32 +1171,32 @@ bool CZNC::DoRehash(CString& sError)
 
     config.FindSubConfig("user", subConf);
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
-        const CString& sUserName = subIt->first;
-        CSettings* pSubConf = subIt->second.m_pSubConfig;
-        CUser* pRealUser = nullptr;
+        const NoString& sUserName = subIt->first;
+        NoSettings* pSubConf = subIt->second.m_pSubConfig;
+        NoUser* pRealUser = nullptr;
 
-        CUtils::PrintMessage("Loading user [" + sUserName + "]");
+        NoUtils::PrintMessage("Loading user [" + sUserName + "]");
 
-        // Either create a CUser* or use an existing one
-        map<CString, CUser*>::iterator it = m_msDelUsers.find(sUserName);
+        // Either create a NoUser* or use an existing one
+        map<NoString, NoUser*>::iterator it = m_msDelUsers.find(sUserName);
 
         if (it != m_msDelUsers.end()) {
             pRealUser = it->second;
             m_msDelUsers.erase(it);
         }
 
-        CUser* pUser = new CUser(sUserName);
+        NoUser* pUser = new NoUser(sUserName);
 
         if (!m_sStatusPrefix.empty()) {
             if (!pUser->SetStatusPrefix(m_sStatusPrefix)) {
                 sError = "Invalid StatusPrefix [" + m_sStatusPrefix + "] Must be 1-5 chars, no spaces.";
-                CUtils::PrintError(sError);
+                NoUtils::PrintError(sError);
                 return false;
             }
         }
 
         if (!pUser->ParseConfig(pSubConf, sError)) {
-            CUtils::PrintError(sError);
+            NoUtils::PrintError(sError);
             delete pUser;
             pUser = nullptr;
             return false;
@@ -1204,17 +1204,17 @@ bool CZNC::DoRehash(CString& sError)
 
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in config for User [" + sUserName + "]!";
-            CUtils::PrintError(sError);
+            NoUtils::PrintError(sError);
 
             DumpConfig(pSubConf);
             return false;
         }
 
-        CString sErr;
+        NoString sErr;
         if (pRealUser) {
             if (!pRealUser->Clone(*pUser, sErr) || !AddUser(pRealUser, sErr)) {
                 sError = "Invalid user [" + pUser->GetUserName() + "] " + sErr;
-                DEBUG("CUser::Clone() failed in rehash");
+                DEBUG("NoUser::Clone() failed in rehash");
             }
             pUser->SetBeingDeleted(true);
             delete pUser;
@@ -1224,7 +1224,7 @@ bool CZNC::DoRehash(CString& sError)
         }
 
         if (!sError.empty()) {
-            CUtils::PrintError(sError);
+            NoUtils::PrintError(sError);
             if (pUser) {
                 pUser->SetBeingDeleted(true);
                 delete pUser;
@@ -1239,7 +1239,7 @@ bool CZNC::DoRehash(CString& sError)
 
     if (!config.empty()) {
         sError = "Unhandled lines in config!";
-        CUtils::PrintError(sError);
+        NoUtils::PrintError(sError);
 
         DumpConfig(&config);
         return false;
@@ -1247,53 +1247,53 @@ bool CZNC::DoRehash(CString& sError)
 
 
     // Unload modules which are no longer in the config
-    set<CString> ssUnload;
-    for (CModule* pCurMod : GetModules()) {
+    set<NoString> ssUnload;
+    for (NoModule* pCurMod : GetModules()) {
         if (msModules.find(pCurMod->GetModName()) == msModules.end()) ssUnload.insert(pCurMod->GetModName());
     }
 
-    for (const CString& sMod : ssUnload) {
+    for (const NoString& sMod : ssUnload) {
         if (GetModules().UnloadModule(sMod))
-            CUtils::PrintMessage("Unloaded global module [" + sMod + "]");
+            NoUtils::PrintMessage("Unloaded global module [" + sMod + "]");
         else
-            CUtils::PrintMessage("Could not unload [" + sMod + "]");
+            NoUtils::PrintMessage("Could not unload [" + sMod + "]");
     }
 
     if (m_msUsers.empty()) {
         sError = "You must define at least one user in your config.";
-        CUtils::PrintError(sError);
+        NoUtils::PrintError(sError);
         return false;
     }
 
     if (m_vpListeners.empty()) {
         sError = "You must supply at least one Listen port in your config.";
-        CUtils::PrintError(sError);
+        NoUtils::PrintError(sError);
         return false;
     }
 
     return true;
 }
 
-void CZNC::DumpConfig(const CSettings* pConfig)
+void CZNC::DumpConfig(const NoSettings* pConfig)
 {
-    CSettings::EntryMapIterator eit = pConfig->BeginEntries();
+    NoSettings::EntryMapIterator eit = pConfig->BeginEntries();
     for (; eit != pConfig->EndEntries(); ++eit) {
-        const CString& sKey = eit->first;
-        const VCString& vsList = eit->second;
-        VCString::const_iterator it = vsList.begin();
+        const NoString& sKey = eit->first;
+        const NoStringVector& vsList = eit->second;
+        NoStringVector::const_iterator it = vsList.begin();
         for (; it != vsList.end(); ++it) {
-            CUtils::PrintError(sKey + " = " + *it);
+            NoUtils::PrintError(sKey + " = " + *it);
         }
     }
 
-    CSettings::SubConfigMapIterator sit = pConfig->BeginSubConfigs();
+    NoSettings::SubConfigMapIterator sit = pConfig->BeginSubConfigs();
     for (; sit != pConfig->EndSubConfigs(); ++sit) {
-        const CString& sKey = sit->first;
-        const CSettings::SubConfig& sSub = sit->second;
-        CSettings::SubConfig::const_iterator it = sSub.begin();
+        const NoString& sKey = sit->first;
+        const NoSettings::SubConfig& sSub = sit->second;
+        NoSettings::SubConfig::const_iterator it = sSub.begin();
 
         for (; it != sSub.end(); ++it) {
-            CUtils::PrintError("SubConfig [" + sKey + " " + it->first + "]:");
+            NoUtils::PrintError("SubConfig [" + sKey + " " + it->first + "]:");
             DumpConfig(it->second.m_pSubConfig);
         }
     }
@@ -1301,13 +1301,13 @@ void CZNC::DumpConfig(const CSettings* pConfig)
 
 void CZNC::ClearBindHosts() { m_vsBindHosts.clear(); }
 
-bool CZNC::AddBindHost(const CString& sHost)
+bool CZNC::AddBindHost(const NoString& sHost)
 {
     if (sHost.empty()) {
         return false;
     }
 
-    for (const CString& sBindHost : m_vsBindHosts) {
+    for (const NoString& sBindHost : m_vsBindHosts) {
         if (sBindHost.Equals(sHost)) {
             return false;
         }
@@ -1317,9 +1317,9 @@ bool CZNC::AddBindHost(const CString& sHost)
     return true;
 }
 
-bool CZNC::RemBindHost(const CString& sHost)
+bool CZNC::RemBindHost(const NoString& sHost)
 {
-    VCString::iterator it;
+    NoStringVector::iterator it;
     for (it = m_vsBindHosts.begin(); it != m_vsBindHosts.end(); ++it) {
         if (sHost.Equals(*it)) {
             m_vsBindHosts.erase(it);
@@ -1332,13 +1332,13 @@ bool CZNC::RemBindHost(const CString& sHost)
 
 void CZNC::ClearTrustedProxies() { m_vsTrustedProxies.clear(); }
 
-bool CZNC::AddTrustedProxy(const CString& sHost)
+bool CZNC::AddTrustedProxy(const NoString& sHost)
 {
     if (sHost.empty()) {
         return false;
     }
 
-    for (const CString& sTrustedProxy : m_vsTrustedProxies) {
+    for (const NoString& sTrustedProxy : m_vsTrustedProxies) {
         if (sTrustedProxy.Equals(sHost)) {
             return false;
         }
@@ -1348,9 +1348,9 @@ bool CZNC::AddTrustedProxy(const CString& sHost)
     return true;
 }
 
-bool CZNC::RemTrustedProxy(const CString& sHost)
+bool CZNC::RemTrustedProxy(const NoString& sHost)
 {
-    VCString::iterator it;
+    NoStringVector::iterator it;
     for (it = m_vsTrustedProxies.begin(); it != m_vsTrustedProxies.end(); ++it) {
         if (sHost.Equals(*it)) {
             m_vsTrustedProxies.erase(it);
@@ -1361,13 +1361,13 @@ bool CZNC::RemTrustedProxy(const CString& sHost)
     return false;
 }
 
-void CZNC::Broadcast(const CString& sMessage, bool bAdminOnly, CUser* pSkipUser, CClient* pSkipClient)
+void CZNC::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUser, NoClient* pSkipClient)
 {
     for (const auto& it : m_msUsers) {
         if (bAdminOnly && !it.second->IsAdmin()) continue;
 
         if (it.second != pSkipUser) {
-            CString sMsg = sMessage;
+            NoString sMsg = sMessage;
 
             bool bContinue = false;
             USERMODULECALL(OnBroadcast(sMsg), it.second, nullptr, &bContinue);
@@ -1378,18 +1378,18 @@ void CZNC::Broadcast(const CString& sMessage, bool bAdminOnly, CUser* pSkipUser,
     }
 }
 
-CModule* CZNC::FindModule(const CString& sModName, const CString& sUsername)
+NoModule* CZNC::FindModule(const NoString& sModName, const NoString& sUsername)
 {
     if (sUsername.empty()) {
         return CZNC::Get().GetModules().FindModule(sModName);
     }
 
-    CUser* pUser = FindUser(sUsername);
+    NoUser* pUser = FindUser(sUsername);
 
     return (!pUser) ? nullptr : pUser->GetModules().FindModule(sModName);
 }
 
-CModule* CZNC::FindModule(const CString& sModName, CUser* pUser)
+NoModule* CZNC::FindModule(const NoString& sModName, NoUser* pUser)
 {
     if (pUser) {
         return pUser->GetModules().FindModule(sModName);
@@ -1398,16 +1398,16 @@ CModule* CZNC::FindModule(const CString& sModName, CUser* pUser)
     return CZNC::Get().GetModules().FindModule(sModName);
 }
 
-bool CZNC::UpdateModule(const CString& sModule)
+bool CZNC::UpdateModule(const NoString& sModule)
 {
-    CModule* pModule;
+    NoModule* pModule;
 
-    map<CUser*, CString> musLoaded;
-    map<CNetwork*, CString> mnsLoaded;
+    map<NoUser*, NoString> musLoaded;
+    map<NoNetwork*, NoString> mnsLoaded;
 
     // Unload the module for every user and network
     for (const auto& it : m_msUsers) {
-        CUser* pUser = it.second;
+        NoUser* pUser = it.second;
 
         pModule = pUser->GetModules().FindModule(sModule);
         if (pModule) {
@@ -1416,8 +1416,8 @@ bool CZNC::UpdateModule(const CString& sModule)
         }
 
         // See if the user has this module loaded to a network
-        vector<CNetwork*> vNetworks = pUser->GetNetworks();
-        for (CNetwork* pNetwork : vNetworks) {
+        vector<NoNetwork*> vNetworks = pUser->GetNetworks();
+        for (NoNetwork* pNetwork : vNetworks) {
             pModule = pNetwork->GetModules().FindModule(sModule);
             if (pModule) {
                 mnsLoaded[pNetwork] = pModule->GetArgs();
@@ -1428,7 +1428,7 @@ bool CZNC::UpdateModule(const CString& sModule)
 
     // Unload the global module
     bool bGlobal = false;
-    CString sGlobalArgs;
+    NoString sGlobalArgs;
 
     pModule = GetModules().FindModule(sModule);
     if (pModule) {
@@ -1439,11 +1439,11 @@ bool CZNC::UpdateModule(const CString& sModule)
 
     // Lets reload everything
     bool bError = false;
-    CString sErr;
+    NoString sErr;
 
     // Reload the global module
     if (bGlobal) {
-        if (!GetModules().LoadModule(sModule, sGlobalArgs, CModInfo::GlobalModule, nullptr, nullptr, sErr)) {
+        if (!GetModules().LoadModule(sModule, sGlobalArgs, NoModInfo::GlobalModule, nullptr, nullptr, sErr)) {
             DEBUG("Failed to reload [" << sModule << "] globally [" << sErr << "]");
             bError = true;
         }
@@ -1451,10 +1451,10 @@ bool CZNC::UpdateModule(const CString& sModule)
 
     // Reload the module for all users
     for (const auto& it : musLoaded) {
-        CUser* pUser = it.first;
-        const CString& sArgs = it.second;
+        NoUser* pUser = it.first;
+        const NoString& sArgs = it.second;
 
-        if (!pUser->GetModules().LoadModule(sModule, sArgs, CModInfo::UserModule, pUser, nullptr, sErr)) {
+        if (!pUser->GetModules().LoadModule(sModule, sArgs, NoModInfo::UserModule, pUser, nullptr, sErr)) {
             DEBUG("Failed to reload [" << sModule << "] for [" << pUser->GetUserName() << "] [" << sErr << "]");
             bError = true;
         }
@@ -1462,10 +1462,10 @@ bool CZNC::UpdateModule(const CString& sModule)
 
     // Reload the module for all networks
     for (const auto& it : mnsLoaded) {
-        CNetwork* pNetwork = it.first;
-        const CString& sArgs = it.second;
+        NoNetwork* pNetwork = it.first;
+        const NoString& sArgs = it.second;
 
-        if (!pNetwork->GetModules().LoadModule(sModule, sArgs, CModInfo::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
+        if (!pNetwork->GetModules().LoadModule(sModule, sArgs, NoModInfo::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
             DEBUG("Failed to reload [" << sModule << "] for [" << pNetwork->GetUser()->GetUserName() << "/"
                                        << pNetwork->GetName() << "] [" << sErr << "]");
             bError = true;
@@ -1475,9 +1475,9 @@ bool CZNC::UpdateModule(const CString& sModule)
     return !bError;
 }
 
-CUser* CZNC::FindUser(const CString& sUsername)
+NoUser* CZNC::FindUser(const NoString& sUsername)
 {
-    map<CString, CUser*>::iterator it = m_msUsers.find(sUsername);
+    map<NoString, NoUser*>::iterator it = m_msUsers.find(sUsername);
 
     if (it != m_msUsers.end()) {
         return it->second;
@@ -1486,9 +1486,9 @@ CUser* CZNC::FindUser(const CString& sUsername)
     return nullptr;
 }
 
-bool CZNC::DeleteUser(const CString& sUsername)
+bool CZNC::DeleteUser(const NoString& sUsername)
 {
-    CUser* pUser = FindUser(sUsername);
+    NoUser* pUser = FindUser(sUsername);
 
     if (!pUser) {
         return false;
@@ -1498,7 +1498,7 @@ bool CZNC::DeleteUser(const CString& sUsername)
     return true;
 }
 
-bool CZNC::AddUser(CUser* pUser, CString& sErrorRet)
+bool CZNC::AddUser(NoUser* pUser, NoString& sErrorRet)
 {
     if (FindUser(pUser->GetUserName()) != nullptr) {
         sErrorRet = "User already exists";
@@ -1519,9 +1519,9 @@ bool CZNC::AddUser(CUser* pUser, CString& sErrorRet)
     return true;
 }
 
-CListener* CZNC::FindListener(u_short uPort, const CString& sBindHost, EAddrType eAddr)
+NoListener* CZNC::FindListener(u_short uPort, const NoString& sBindHost, EAddrType eAddr)
 {
-    for (CListener* pListener : m_vpListeners) {
+    for (NoListener* pListener : m_vpListeners) {
         if (pListener->GetPort() != uPort) continue;
         if (pListener->GetBindHost() != sBindHost) continue;
         if (pListener->GetAddrType() != eAddr) continue;
@@ -1530,10 +1530,10 @@ CListener* CZNC::FindListener(u_short uPort, const CString& sBindHost, EAddrType
     return nullptr;
 }
 
-bool CZNC::AddListener(const CString& sLine, CString& sError)
+bool CZNC::AddListener(const NoString& sLine, NoString& sError)
 {
-    CString sName = sLine.Token(0);
-    CString sValue = sLine.Token(1, true);
+    NoString sName = sLine.Token(0);
+    NoString sValue = sLine.Token(1, true);
 
     EAddrType eAddr = ADDR_ALL;
     if (sName.Equals("Listen4") || sName.Equals("Listen") || sName.Equals("Listener4")) {
@@ -1543,21 +1543,21 @@ bool CZNC::AddListener(const CString& sLine, CString& sError)
         eAddr = ADDR_IPV6ONLY;
     }
 
-    CListener::EAcceptType eAccept = CListener::ACCEPT_ALL;
+    NoListener::EAcceptType eAccept = NoListener::ACCEPT_ALL;
     if (sValue.TrimPrefix("irc_only "))
-        eAccept = CListener::ACCEPT_IRC;
+        eAccept = NoListener::ACCEPT_IRC;
     else if (sValue.TrimPrefix("web_only "))
-        eAccept = CListener::ACCEPT_HTTP;
+        eAccept = NoListener::ACCEPT_HTTP;
 
     bool bSSL = false;
-    CString sPort;
-    CString sBindHost;
+    NoString sPort;
+    NoString sBindHost;
 
     if (ADDR_IPV4ONLY == eAddr) {
         sValue.Replace(":", " ");
     }
 
-    if (sValue.find(" ") != CString::npos) {
+    if (sValue.find(" ") != NoString::npos) {
         sBindHost = sValue.Token(0, false, " ");
         sPort = sValue.Token(1, true, " ");
     } else {
@@ -1570,26 +1570,26 @@ bool CZNC::AddListener(const CString& sLine, CString& sError)
     }
 
     // No support for URIPrefix for old-style configs.
-    CString sURIPrefix;
+    NoString sURIPrefix;
     unsigned short uPort = sPort.ToUShort();
     return AddListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
 }
 
 bool CZNC::AddListener(unsigned short uPort,
-                       const CString& sBindHost,
-                       const CString& sURIPrefixRaw,
+                       const NoString& sBindHost,
+                       const NoString& sURIPrefixRaw,
                        bool bSSL,
                        EAddrType eAddr,
-                       CListener::EAcceptType eAccept,
-                       CString& sError)
+                       NoListener::EAcceptType eAccept,
+                       NoString& sError)
 {
-    CString sHostComment;
+    NoString sHostComment;
 
     if (!sBindHost.empty()) {
         sHostComment = " on host [" + sBindHost + "]";
     }
 
-    CString sIPV6Comment;
+    NoString sIPV6Comment;
 
     switch (eAddr) {
     case ADDR_ALL:
@@ -1602,12 +1602,12 @@ bool CZNC::AddListener(unsigned short uPort,
         sIPV6Comment = " using ipv6";
     }
 
-    CUtils::PrintAction("Binding to port [" + CString((bSSL) ? "+" : "") + CString(uPort) + "]" + sHostComment + sIPV6Comment);
+    NoUtils::PrintAction("Binding to port [" + NoString((bSSL) ? "+" : "") + NoString(uPort) + "]" + sHostComment + sIPV6Comment);
 
 #ifndef HAVE_IPV6
     if (ADDR_IPV6ONLY == eAddr) {
         sError = "IPV6 is not enabled";
-        CUtils::PrintStatus(false, sError);
+        NoUtils::PrintStatus(false, sError);
         return false;
     }
 #endif
@@ -1615,36 +1615,36 @@ bool CZNC::AddListener(unsigned short uPort,
 #ifndef HAVE_LIBSSL
     if (bSSL) {
         sError = "SSL is not enabled";
-        CUtils::PrintStatus(false, sError);
+        NoUtils::PrintStatus(false, sError);
         return false;
     }
 #else
-    CString sPemFile = GetPemLocation();
+    NoString sPemFile = GetPemLocation();
 
-    if (bSSL && !CFile::Exists(sPemFile)) {
+    if (bSSL && !NoFile::Exists(sPemFile)) {
         sError = "Unable to locate pem file: [" + sPemFile + "]";
-        CUtils::PrintStatus(false, sError);
+        NoUtils::PrintStatus(false, sError);
 
         // If stdin is e.g. /dev/null and we call GetBoolInput(),
         // we are stuck in an endless loop!
-        if (isatty(0) && CUtils::GetBoolInput("Would you like to create a new pem file?", true)) {
+        if (isatty(0) && NoUtils::GetBoolInput("Would you like to create a new pem file?", true)) {
             sError.clear();
             WritePemFile();
         } else {
             return false;
         }
 
-        CUtils::PrintAction("Binding to port [+" + CString(uPort) + "]" + sHostComment + sIPV6Comment);
+        NoUtils::PrintAction("Binding to port [+" + NoString(uPort) + "]" + sHostComment + sIPV6Comment);
     }
 #endif
     if (!uPort) {
         sError = "Invalid port";
-        CUtils::PrintStatus(false, sError);
+        NoUtils::PrintStatus(false, sError);
         return false;
     }
 
     // URIPrefix must start with a slash and end without one.
-    CString sURIPrefix = CString(sURIPrefixRaw);
+    NoString sURIPrefix = NoString(sURIPrefixRaw);
     if (!sURIPrefix.empty()) {
         if (!sURIPrefix.StartsWith("/")) {
             sURIPrefix = "/" + sURIPrefix;
@@ -1654,25 +1654,25 @@ bool CZNC::AddListener(unsigned short uPort,
         }
     }
 
-    CListener* pListener = new CListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept);
+    NoListener* pListener = new NoListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept);
 
     if (!pListener->Listen()) {
         sError = FormatBindError();
-        CUtils::PrintStatus(false, sError);
+        NoUtils::PrintStatus(false, sError);
         delete pListener;
         return false;
     }
 
     m_vpListeners.push_back(pListener);
-    CUtils::PrintStatus(true);
+    NoUtils::PrintStatus(true);
 
     return true;
 }
 
-bool CZNC::AddListener(CSettings* pConfig, CString& sError)
+bool CZNC::AddListener(NoSettings* pConfig, NoString& sError)
 {
-    CString sBindHost;
-    CString sURIPrefix;
+    NoString sBindHost;
+    NoString sURIPrefix;
     bool bSSL;
     bool b4;
 #ifdef HAVE_IPV6
@@ -1685,7 +1685,7 @@ bool CZNC::AddListener(CSettings* pConfig, CString& sError)
     unsigned short uPort;
     if (!pConfig->FindUShortEntry("port", uPort)) {
         sError = "No port given";
-        CUtils::PrintError(sError);
+        NoUtils::PrintError(sError);
         return false;
     }
     pConfig->FindStringEntry("host", sBindHost);
@@ -1705,27 +1705,27 @@ bool CZNC::AddListener(CSettings* pConfig, CString& sError)
         eAddr = ADDR_IPV6ONLY;
     } else {
         sError = "No address family given";
-        CUtils::PrintError(sError);
+        NoUtils::PrintError(sError);
         return false;
     }
 
-    CListener::EAcceptType eAccept;
+    NoListener::EAcceptType eAccept;
     if (bIRC && bWeb) {
-        eAccept = CListener::ACCEPT_ALL;
+        eAccept = NoListener::ACCEPT_ALL;
     } else if (bIRC && !bWeb) {
-        eAccept = CListener::ACCEPT_IRC;
+        eAccept = NoListener::ACCEPT_IRC;
     } else if (!bIRC && bWeb) {
-        eAccept = CListener::ACCEPT_HTTP;
+        eAccept = NoListener::ACCEPT_HTTP;
     } else {
         sError = "Either Web or IRC or both should be selected";
-        CUtils::PrintError(sError);
+        NoUtils::PrintError(sError);
         return false;
     }
 
     return AddListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
 }
 
-bool CZNC::AddListener(CListener* pListener)
+bool CZNC::AddListener(NoListener* pListener)
 {
     if (!pListener->GetRealListener()) {
         // Listener doesnt actually listen
@@ -1740,7 +1740,7 @@ bool CZNC::AddListener(CListener* pListener)
     return true;
 }
 
-bool CZNC::DelListener(CListener* pListener)
+bool CZNC::DelListener(NoListener* pListener)
 {
     auto it = std::find(m_vpListeners.begin(), m_vpListeners.end(), pListener);
     if (it != m_vpListeners.end()) {
@@ -1773,7 +1773,7 @@ CZNC::TrafficStatsMap CZNC::GetTrafficStats(TrafficStatsPair& Users, TrafficStat
 {
     TrafficStatsMap ret;
     unsigned long long uiUsers_in, uiUsers_out, uiZNC_in, uiZNC_out;
-    const map<CString, CUser*>& msUsers = CZNC::Get().GetUserMap();
+    const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
 
     uiUsers_in = uiUsers_out = 0;
     uiZNC_in = BytesRead();
@@ -1786,11 +1786,11 @@ CZNC::TrafficStatsMap CZNC::GetTrafficStats(TrafficStatsPair& Users, TrafficStat
     }
 
     for (Csock* pSock : m_Manager) {
-        CUser* pUser = nullptr;
+        NoUser* pUser = nullptr;
         if (pSock->GetSockName().Left(5) == "IRC::") {
-            pUser = ((CIRCSock*)pSock)->GetNetwork()->GetUser();
+            pUser = ((NoIrcSock*)pSock)->GetNetwork()->GetUser();
         } else if (pSock->GetSockName().Left(5) == "USR::") {
-            pUser = ((CClient*)pSock)->GetUser();
+            pUser = ((NoClient*)pSock)->GetUser();
         }
 
         if (pUser) {
@@ -1811,21 +1811,21 @@ CZNC::TrafficStatsMap CZNC::GetTrafficStats(TrafficStatsPair& Users, TrafficStat
     return ret;
 }
 
-void CZNC::AuthUser(std::shared_ptr<CAuthBase> AuthClass)
+void CZNC::AuthUser(std::shared_ptr<NoAuthBase> AuthClass)
 {
-    // TODO unless the auth module calls it, CUser::IsHostAllowed() is not honoured
+    // TODO unless the auth module calls it, NoUser::IsHostAllowed() is not honoured
     bool bReturn = false;
     GLOBALMODULECALL(OnLoginAttempt(AuthClass), &bReturn);
     if (bReturn) return;
 
-    CUser* pUser = FindUser(AuthClass->GetUsername());
+    NoUser* pUser = FindUser(AuthClass->GetUsername());
 
     if (!pUser || !pUser->CheckPass(AuthClass->GetPassword())) {
         AuthClass->RefuseLogin("Invalid Password");
         return;
     }
 
-    CString sHost = AuthClass->GetRemoteIP();
+    NoString sHost = AuthClass->GetRemoteIP();
 
     if (!pUser->IsHostAllowed(sHost)) {
         AuthClass->RefuseLogin("Your host [" + sHost + "] is not allowed");
@@ -1835,23 +1835,23 @@ void CZNC::AuthUser(std::shared_ptr<CAuthBase> AuthClass)
     AuthClass->AcceptLogin(*pUser);
 }
 
-class CConnectQueueTimer : public CCron
+class NoConnectQueueTimer : public CCron
 {
 public:
-    CConnectQueueTimer(int iSecs) : CCron()
+    NoConnectQueueTimer(int iSecs) : CCron()
     {
         SetName("Connect users");
         Start(iSecs);
         // Don't wait iSecs seconds for first timer run
         m_bRunOnNextCall = true;
     }
-    virtual ~CConnectQueueTimer()
+    virtual ~NoConnectQueueTimer()
     {
         // This is only needed when ZNC shuts down:
-        // CZNC::~CZNC() sets its CConnectQueueTimer pointer to nullptr and
+        // CZNC::~CZNC() sets its NoConnectQueueTimer pointer to nullptr and
         // calls the manager's Cleanup() which destroys all sockets and
         // timers. If something calls CZNC::EnableConnectQueue() here
-        // (e.g. because a CIRCSock is destroyed), the socket manager
+        // (e.g. because a NoIrcSock is destroyed), the socket manager
         // deletes that timer almost immediately, but CZNC now got a
         // dangling pointer to this timer which can crash later on.
         //
@@ -1862,8 +1862,8 @@ public:
 protected:
     void RunJob() override
     {
-        list<CNetwork*> ConnectionQueue;
-        list<CNetwork*>& RealConnectionQueue = CZNC::Get().GetConnectionQueue();
+        list<NoNetwork*> ConnectionQueue;
+        list<NoNetwork*>& RealConnectionQueue = CZNC::Get().GetConnectionQueue();
 
         // Problem: If a network can't connect right now because e.g. it
         // is throttled, it will re-insert itself into the connection
@@ -1875,7 +1875,7 @@ protected:
         ConnectionQueue.swap(RealConnectionQueue);
 
         while (!ConnectionQueue.empty()) {
-            CNetwork* pNetwork = ConnectionQueue.front();
+            NoNetwork* pNetwork = ConnectionQueue.front();
             ConnectionQueue.pop_front();
 
             if (pNetwork->Connect()) {
@@ -1910,7 +1910,7 @@ void CZNC::SetConnectDelay(unsigned int i)
 void CZNC::EnableConnectQueue()
 {
     if (!m_pConnectQueueTimer && !m_uiConnectPaused && !m_lpConnectQueue.empty()) {
-        m_pConnectQueueTimer = new CConnectQueueTimer(m_uiConnectDelay);
+        m_pConnectQueueTimer = new NoConnectQueueTimer(m_uiConnectDelay);
         GetManager().AddCron(m_pConnectQueueTimer);
     }
 }
@@ -1945,7 +1945,7 @@ void CZNC::ResumeConnectQueue()
     }
 }
 
-void CZNC::AddNetworkToQueue(CNetwork* pNetwork)
+void CZNC::AddNetworkToQueue(NoNetwork* pNetwork)
 {
     // Make sure we are not already in the queue
     if (std::find(m_lpConnectQueue.begin(), m_lpConnectQueue.end(), pNetwork) != m_lpConnectQueue.end()) {
@@ -1956,7 +1956,7 @@ void CZNC::AddNetworkToQueue(CNetwork* pNetwork)
     EnableConnectQueue();
 }
 
-void CZNC::LeakConnectQueueTimer(CConnectQueueTimer* pTimer)
+void CZNC::LeakConnectQueueTimer(NoConnectQueueTimer* pTimer)
 {
     if (m_pConnectQueueTimer == pTimer) m_pConnectQueueTimer = nullptr;
 }

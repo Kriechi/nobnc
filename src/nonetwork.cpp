@@ -28,54 +28,54 @@
 using std::vector;
 using std::set;
 
-class CNetworkPingTimer : public CCron
+class NoNetworkPingTimer : public CCron
 {
 public:
-    CNetworkPingTimer(CNetwork* pNetwork) : CCron(), m_pNetwork(pNetwork)
+    NoNetworkPingTimer(NoNetwork* pNetwork) : CCron(), m_pNetwork(pNetwork)
     {
-        SetName("CNetworkPingTimer::" + m_pNetwork->GetUser()->GetUserName() + "::" + m_pNetwork->GetName());
-        Start(CNetwork::PING_SLACK);
+        SetName("NoNetworkPingTimer::" + m_pNetwork->GetUser()->GetUserName() + "::" + m_pNetwork->GetName());
+        Start(NoNetwork::PING_SLACK);
     }
 
-    virtual ~CNetworkPingTimer() {}
+    virtual ~NoNetworkPingTimer() {}
 
-    CNetworkPingTimer(const CNetworkPingTimer&) = delete;
-    CNetworkPingTimer& operator=(const CNetworkPingTimer&) = delete;
+    NoNetworkPingTimer(const NoNetworkPingTimer&) = delete;
+    NoNetworkPingTimer& operator=(const NoNetworkPingTimer&) = delete;
 
 protected:
     void RunJob() override
     {
-        CIRCSock* pIRCSock = m_pNetwork->GetIRCSock();
+        NoIrcSock* pIRCSock = m_pNetwork->GetIRCSock();
 
-        if (pIRCSock && pIRCSock->GetTimeSinceLastDataTransaction() >= CNetwork::PING_FREQUENCY) {
+        if (pIRCSock && pIRCSock->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
             pIRCSock->PutIRC("PING :ZNC");
         }
 
-        const vector<CClient*>& vClients = m_pNetwork->GetClients();
-        for (CClient* pClient : vClients) {
-            if (pClient->GetTimeSinceLastDataTransaction() >= CNetwork::PING_FREQUENCY) {
+        const vector<NoClient*>& vClients = m_pNetwork->GetClients();
+        for (NoClient* pClient : vClients) {
+            if (pClient->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
                 pClient->PutClient("PING :ZNC");
             }
         }
     }
 
 private:
-    CNetwork* m_pNetwork;
+    NoNetwork* m_pNetwork;
 };
 
-class CNetworkJoinTimer : public CCron
+class NoNetworkJoinTimer : public CCron
 {
 public:
-    CNetworkJoinTimer(CNetwork* pNetwork) : CCron(), m_bDelayed(false), m_pNetwork(pNetwork)
+    NoNetworkJoinTimer(NoNetwork* pNetwork) : CCron(), m_bDelayed(false), m_pNetwork(pNetwork)
     {
-        SetName("CNetworkJoinTimer::" + m_pNetwork->GetUser()->GetUserName() + "::" + m_pNetwork->GetName());
-        Start(CNetwork::JOIN_FREQUENCY);
+        SetName("NoNetworkJoinTimer::" + m_pNetwork->GetUser()->GetUserName() + "::" + m_pNetwork->GetName());
+        Start(NoNetwork::JOIN_FREQUENCY);
     }
 
-    virtual ~CNetworkJoinTimer() {}
+    virtual ~NoNetworkJoinTimer() {}
 
-    CNetworkJoinTimer(const CNetworkJoinTimer&) = delete;
-    CNetworkJoinTimer& operator=(const CNetworkJoinTimer&) = delete;
+    NoNetworkJoinTimer(const NoNetworkJoinTimer&) = delete;
+    NoNetworkJoinTimer& operator=(const NoNetworkJoinTimer&) = delete;
 
     void Delay(unsigned short int uDelay)
     {
@@ -88,7 +88,7 @@ protected:
     {
         if (m_bDelayed) {
             m_bDelayed = false;
-            Start(CNetwork::JOIN_FREQUENCY);
+            Start(NoNetwork::JOIN_FREQUENCY);
         }
         if (m_pNetwork->IsIRCConnected()) {
             m_pNetwork->JoinChans();
@@ -97,10 +97,10 @@ protected:
 
 private:
     bool m_bDelayed;
-    CNetwork* m_pNetwork;
+    NoNetwork* m_pNetwork;
 };
 
-bool CNetwork::IsValidNetwork(const CString& sNetwork)
+bool NoNetwork::IsValidNetwork(const NoString& sNetwork)
 {
     // ^[-\w]+$
 
@@ -120,11 +120,11 @@ bool CNetwork::IsValidNetwork(const CString& sNetwork)
     return true;
 }
 
-CNetwork::CNetwork(CUser* pUser, const CString& sName)
+NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName)
     : m_sName(sName), m_pUser(nullptr), m_sNick(""), m_sAltNick(""), m_sIdent(""), m_sRealName(""), m_sBindHost(""),
-      m_sEncoding(""), m_sQuitMsg(""), m_ssTrustedFingerprints(), m_pModules(new CModules), m_vClients(),
-      m_pIRCSock(nullptr), m_vChans(), m_vQueries(), m_sChanPrefixes(""), m_bIRCConnectEnabled(true), m_sIRCServer(""),
-      m_vServers(), m_uServerIdx(0), m_IRCNick(), m_bIRCAway(false), m_fFloodRate(1), m_uFloodBurst(4), m_RawBuffer(),
+      m_sEncoding(""), m_sQuitMsg(""), m_ssTrustedFingerprints(), m_pModules(new NoModules), m_vClients(),
+      m_pIRCSock(nullptr), m_vChans(), m_vQueries(), m_sChanPrefixes(""), m_bIRCConnectEnabled(true), m_sIRNoServer(""),
+      m_vServers(), m_uServerIdx(0), m_IRNoNick(), m_bIRNoAway(false), m_fFloodRate(1), m_uFloodBurst(4), m_RawBuffer(),
       m_MotdBuffer(), m_NoticeBuffer(), m_pPingTimer(nullptr), m_pJoinTimer(nullptr), m_uJoinDelay(0)
 {
     SetUser(pUser);
@@ -134,18 +134,18 @@ CNetwork::CNetwork(CUser* pUser, const CString& sName)
     m_MotdBuffer.SetLimit(200, true); // This should be more than enough motd lines
     m_NoticeBuffer.SetLimit(250, true);
 
-    m_pPingTimer = new CNetworkPingTimer(this);
+    m_pPingTimer = new NoNetworkPingTimer(this);
     CZNC::Get().GetManager().AddCron(m_pPingTimer);
 
-    m_pJoinTimer = new CNetworkJoinTimer(this);
+    m_pJoinTimer = new NoNetworkJoinTimer(this);
     CZNC::Get().GetManager().AddCron(m_pJoinTimer);
 
     SetIRCConnectEnabled(true);
 }
 
-CNetwork::CNetwork(CUser* pUser, const CNetwork& Network) : CNetwork(pUser, "") { Clone(Network); }
+NoNetwork::NoNetwork(NoUser* pUser, const NoNetwork& Network) : NoNetwork(pUser, "") { Clone(Network); }
 
-void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
+void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
 {
     if (bCloneName) {
         m_sName = Network.GetName();
@@ -165,9 +165,9 @@ void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
     m_ssTrustedFingerprints = Network.m_ssTrustedFingerprints;
 
     // Servers
-    const vector<CServer*>& vServers = Network.GetServers();
-    CString sServer;
-    CServer* pCurServ = GetCurrentServer();
+    const vector<NoServer*>& vServers = Network.GetServers();
+    NoString sServer;
+    NoServer* pCurServ = GetCurrentServer();
 
     if (pCurServ) {
         sServer = pCurServ->GetName();
@@ -175,7 +175,7 @@ void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
 
     DelServers();
 
-    for (CServer* pServer : vServers) {
+    for (NoServer* pServer : vServers) {
         AddServer(pServer->GetName(), pServer->GetPort(), pServer->GetPass(), pServer->IsSSL());
     }
 
@@ -188,7 +188,7 @@ void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
     }
     if (m_uServerIdx == 0) {
         m_uServerIdx = m_vServers.size();
-        CIRCSock* pSock = GetIRCSock();
+        NoIrcSock* pSock = GetIRCSock();
 
         if (pSock) {
             PutStatus("Jumping servers because this server is no longer in the list");
@@ -198,9 +198,9 @@ void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
     // !Servers
 
     // Chans
-    const vector<CChannel*>& vChans = Network.GetChans();
-    for (CChannel* pNewChan : vChans) {
-        CChannel* pChan = FindChan(pNewChan->GetName());
+    const vector<NoChannel*>& vChans = Network.GetChans();
+    for (NoChannel* pNewChan : vChans) {
+        NoChannel* pChan = FindChan(pNewChan->GetName());
 
         if (pChan) {
             pChan->SetInConfig(pNewChan->InConfig());
@@ -209,8 +209,8 @@ void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
         }
     }
 
-    for (CChannel* pChan : m_vChans) {
-        CChannel* pNewChan = Network.FindChan(pChan->GetName());
+    for (NoChannel* pChan : m_vChans) {
+        NoChannel* pNewChan = Network.FindChan(pChan->GetName());
 
         if (!pNewChan) {
             pChan->SetInConfig(false);
@@ -221,30 +221,30 @@ void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
     // !Chans
 
     // Modules
-    set<CString> ssUnloadMods;
-    CModules& vCurMods = GetModules();
-    const CModules& vNewMods = Network.GetModules();
+    set<NoString> ssUnloadMods;
+    NoModules& vCurMods = GetModules();
+    const NoModules& vNewMods = Network.GetModules();
 
-    for (CModule* pNewMod : vNewMods) {
-        CString sModRet;
-        CModule* pCurMod = vCurMods.FindModule(pNewMod->GetModName());
+    for (NoModule* pNewMod : vNewMods) {
+        NoString sModRet;
+        NoModule* pCurMod = vCurMods.FindModule(pNewMod->GetModName());
 
         if (!pCurMod) {
-            vCurMods.LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), CModInfo::NetworkModule, m_pUser, this, sModRet);
+            vCurMods.LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), NoModInfo::NetworkModule, m_pUser, this, sModRet);
         } else if (pNewMod->GetArgs() != pCurMod->GetArgs()) {
             vCurMods.ReloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), m_pUser, this, sModRet);
         }
     }
 
-    for (CModule* pCurMod : vCurMods) {
-        CModule* pNewMod = vNewMods.FindModule(pCurMod->GetModName());
+    for (NoModule* pCurMod : vCurMods) {
+        NoModule* pNewMod = vNewMods.FindModule(pCurMod->GetModName());
 
         if (!pNewMod) {
             ssUnloadMods.insert(pCurMod->GetModName());
         }
     }
 
-    for (const CString& sMod : ssUnloadMods) {
+    for (const NoString& sMod : ssUnloadMods) {
         vCurMods.UnloadModule(sMod);
     }
     // !Modules
@@ -252,7 +252,7 @@ void CNetwork::Clone(const CNetwork& Network, bool bCloneName)
     SetIRCConnectEnabled(Network.GetIRCConnectEnabled());
 }
 
-CNetwork::~CNetwork()
+NoNetwork::~NoNetwork()
 {
     if (m_pIRCSock) {
         CZNC::Get().GetManager().DelSockByAddr(m_pIRCSock);
@@ -273,13 +273,13 @@ CNetwork::~CNetwork()
     m_pModules = nullptr;
 
     // Delete Channels
-    for (CChannel* pChan : m_vChans) {
+    for (NoChannel* pChan : m_vChans) {
         delete pChan;
     }
     m_vChans.clear();
 
     // Delete Queries
-    for (CQuery* pQuery : m_vQueries) {
+    for (NoQuery* pQuery : m_vQueries) {
         delete pQuery;
     }
     m_vQueries.clear();
@@ -293,20 +293,20 @@ CNetwork::~CNetwork()
     CZNC::Get().GetManager().DelCronByAddr(m_pJoinTimer);
 }
 
-void CNetwork::DelServers()
+void NoNetwork::DelServers()
 {
-    for (CServer* pServer : m_vServers) {
+    for (NoServer* pServer : m_vServers) {
         delete pServer;
     }
     m_vServers.clear();
 }
 
-CString CNetwork::GetNetworkPath() const
+NoString NoNetwork::GetNetworkPath() const
 {
-    CString sNetworkPath = m_pUser->GetUserPath() + "/networks/" + m_sName;
+    NoString sNetworkPath = m_pUser->GetUserPath() + "/networks/" + m_sName;
 
-    if (!CFile::Exists(sNetworkPath)) {
-        CDir::MakeDir(sNetworkPath);
+    if (!NoFile::Exists(sNetworkPath)) {
+        NoDir::MakeDir(sNetworkPath);
     }
 
     return sNetworkPath;
@@ -315,40 +315,40 @@ CString CNetwork::GetNetworkPath() const
 template <class T> struct TOption
 {
     const char* name;
-    void (CNetwork::*pSetter)(T);
+    void (NoNetwork::*pSetter)(T);
 };
 
-bool CNetwork::ParseConfig(CSettings* pConfig, CString& sError, bool bUpgrade)
+bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade)
 {
-    VCString vsList;
+    NoStringVector vsList;
 
     if (!bUpgrade) {
-        TOption<const CString&> StringOptions[] = {
-            { "nick", &CNetwork::SetNick },
-            { "altnick", &CNetwork::SetAltNick },
-            { "ident", &CNetwork::SetIdent },
-            { "realname", &CNetwork::SetRealName },
-            { "bindhost", &CNetwork::SetBindHost },
-            { "encoding", &CNetwork::SetEncoding },
-            { "quitmsg", &CNetwork::SetQuitMsg },
+        TOption<const NoString&> StringOptions[] = {
+            { "nick", &NoNetwork::SetNick },
+            { "altnick", &NoNetwork::SetAltNick },
+            { "ident", &NoNetwork::SetIdent },
+            { "realname", &NoNetwork::SetRealName },
+            { "bindhost", &NoNetwork::SetBindHost },
+            { "encoding", &NoNetwork::SetEncoding },
+            { "quitmsg", &NoNetwork::SetQuitMsg },
         };
         TOption<bool> BoolOptions[] = {
-            { "ircconnectenabled", &CNetwork::SetIRCConnectEnabled },
+            { "ircconnectenabled", &NoNetwork::SetIRCConnectEnabled },
         };
         TOption<double> DoubleOptions[] = {
-            { "floodrate", &CNetwork::SetFloodRate },
+            { "floodrate", &NoNetwork::SetFloodRate },
         };
         TOption<short unsigned int> SUIntOptions[] = {
-            { "floodburst", &CNetwork::SetFloodBurst }, { "joindelay", &CNetwork::SetJoinDelay },
+            { "floodburst", &NoNetwork::SetFloodBurst }, { "joindelay", &NoNetwork::SetJoinDelay },
         };
 
         for (const auto& Option : StringOptions) {
-            CString sValue;
+            NoString sValue;
             if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue);
         }
 
         for (const auto& Option : BoolOptions) {
-            CString sValue;
+            NoString sValue;
             if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.ToBool());
         }
 
@@ -363,9 +363,9 @@ bool CNetwork::ParseConfig(CSettings* pConfig, CString& sError, bool bUpgrade)
         }
 
         pConfig->FindStringVector("loadmodule", vsList);
-        for (const CString& sValue : vsList) {
-            CString sModName = sValue.Token(0);
-            CString sNotice = "Loading network module [" + sModName + "]";
+        for (const NoString& sValue : vsList) {
+            NoString sModName = sValue.Token(0);
+            NoString sNotice = "Loading network module [" + sModName + "]";
 
             // XXX Legacy crap, added in ZNC 0.203, modified in 0.207
             // Note that 0.203 == 0.207
@@ -386,8 +386,8 @@ bool CNetwork::ParseConfig(CSettings* pConfig, CString& sError, bool bUpgrade)
                 sModName = "modules_online";
             }
 
-            CString sModRet;
-            CString sArgs = sValue.Token(1, true);
+            NoString sModRet;
+            NoString sArgs = sValue.Token(1, true);
 
             bool bModRet = LoadModule(sModName, sArgs, sNotice, sModRet);
 
@@ -410,45 +410,45 @@ bool CNetwork::ParseConfig(CSettings* pConfig, CString& sError, bool bUpgrade)
     }
 
     pConfig->FindStringVector("server", vsList);
-    for (const CString& sServer : vsList) {
-        CUtils::PrintAction("Adding server [" + sServer + "]");
-        CUtils::PrintStatus(AddServer(sServer));
+    for (const NoString& sServer : vsList) {
+        NoUtils::PrintAction("Adding server [" + sServer + "]");
+        NoUtils::PrintStatus(AddServer(sServer));
     }
 
     pConfig->FindStringVector("trustedserverfingerprint", vsList);
-    for (const CString& sFP : vsList) {
+    for (const NoString& sFP : vsList) {
         AddTrustedFingerprint(sFP);
     }
 
     pConfig->FindStringVector("chan", vsList);
-    for (const CString& sChan : vsList) {
+    for (const NoString& sChan : vsList) {
         AddChan(sChan, true);
     }
 
-    CSettings::SubConfig subConf;
-    CSettings::SubConfig::const_iterator subIt;
+    NoSettings::SubConfig subConf;
+    NoSettings::SubConfig::const_iterator subIt;
 
     pConfig->FindSubConfig("chan", subConf);
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
-        const CString& sChanName = subIt->first;
-        CSettings* pSubConf = subIt->second.m_pSubConfig;
-        CChannel* pChan = new CChannel(sChanName, this, true, pSubConf);
+        const NoString& sChanName = subIt->first;
+        NoSettings* pSubConf = subIt->second.m_pSubConfig;
+        NoChannel* pChan = new NoChannel(sChanName, this, true, pSubConf);
 
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in config for User [" + m_pUser->GetUserName() + "], Network [" + GetName() +
                      "], Channel [" + sChanName + "]!";
-            CUtils::PrintError(sError);
+            NoUtils::PrintError(sError);
 
             CZNC::DumpConfig(pSubConf);
             return false;
         }
 
         // Save the channel name, because AddChan
-        // deletes the CChannelnel*, if adding fails
+        // deletes the NoChannelnel*, if adding fails
         sError = pChan->GetName();
         if (!AddChan(pChan)) {
             sError = "Channel [" + sError + "] defined more than once";
-            CUtils::PrintError(sError);
+            NoUtils::PrintError(sError);
             return false;
         }
         sError.clear();
@@ -457,9 +457,9 @@ bool CNetwork::ParseConfig(CSettings* pConfig, CString& sError, bool bUpgrade)
     return true;
 }
 
-CSettings CNetwork::ToConfig() const
+NoSettings NoNetwork::ToConfig() const
 {
-    CSettings config;
+    NoSettings config;
 
     if (!m_sNick.empty()) {
         config.AddKeyValuePair("Nick", m_sNick);
@@ -480,10 +480,10 @@ CSettings CNetwork::ToConfig() const
         config.AddKeyValuePair("BindHost", m_sBindHost);
     }
 
-    config.AddKeyValuePair("IRCConnectEnabled", CString(GetIRCConnectEnabled()));
-    config.AddKeyValuePair("FloodRate", CString(GetFloodRate()));
-    config.AddKeyValuePair("FloodBurst", CString(GetFloodBurst()));
-    config.AddKeyValuePair("JoinDelay", CString(GetJoinDelay()));
+    config.AddKeyValuePair("IRCConnectEnabled", NoString(GetIRCConnectEnabled()));
+    config.AddKeyValuePair("FloodRate", NoString(GetFloodRate()));
+    config.AddKeyValuePair("FloodBurst", NoString(GetFloodBurst()));
+    config.AddKeyValuePair("JoinDelay", NoString(GetJoinDelay()));
     config.AddKeyValuePair("Encoding", m_sEncoding);
 
     if (!m_sQuitMsg.empty()) {
@@ -491,11 +491,11 @@ CSettings CNetwork::ToConfig() const
     }
 
     // Modules
-    const CModules& Mods = GetModules();
+    const NoModules& Mods = GetModules();
 
     if (!Mods.empty()) {
-        for (CModule* pMod : Mods) {
-            CString sArgs = pMod->GetArgs();
+        for (NoModule* pMod : Mods) {
+            NoString sArgs = pMod->GetArgs();
 
             if (!sArgs.empty()) {
                 sArgs = " " + sArgs;
@@ -506,16 +506,16 @@ CSettings CNetwork::ToConfig() const
     }
 
     // Servers
-    for (CServer* pServer : m_vServers) {
+    for (NoServer* pServer : m_vServers) {
         config.AddKeyValuePair("Server", pServer->GetString());
     }
 
-    for (const CString& sFP : m_ssTrustedFingerprints) {
+    for (const NoString& sFP : m_ssTrustedFingerprints) {
         config.AddKeyValuePair("TrustedServerFingerprint", sFP);
     }
 
     // Chans
-    for (CChannel* pChan : m_vChans) {
+    for (NoChannel* pChan : m_vChans) {
         if (pChan->InConfig()) {
             config.AddSubConfig("Chan", pChan->GetName(), pChan->ToConfig());
         }
@@ -524,18 +524,18 @@ CSettings CNetwork::ToConfig() const
     return config;
 }
 
-void CNetwork::BounceAllClients()
+void NoNetwork::BounceAllClients()
 {
-    for (CClient* pClient : m_vClients) {
+    for (NoClient* pClient : m_vClients) {
         pClient->BouncedOff();
     }
 
     m_vClients.clear();
 }
 
-bool CNetwork::IsUserOnline() const
+bool NoNetwork::IsUserOnline() const
 {
-    for (CClient* pClient : m_vClients) {
+    for (NoClient* pClient : m_vClients) {
         if (!pClient->IsAway()) {
             return true;
         }
@@ -544,7 +544,7 @@ bool CNetwork::IsUserOnline() const
     return false;
 }
 
-void CNetwork::ClientConnected(CClient* pClient)
+void NoNetwork::ClientConnected(NoClient* pClient)
 {
     if (!m_pUser->MultiClients()) {
         BounceAllClients();
@@ -559,8 +559,8 @@ void CNetwork::ClientConnected(CClient* pClient)
     if (m_RawBuffer.IsEmpty()) {
         pClient->PutClient(":irc.znc.in 001 " + pClient->GetNick() + " :- Welcome to ZNC -");
     } else {
-        const CString& sClientNick = pClient->GetNick(false);
-        MCString msParams;
+        const NoString& sClientNick = pClient->GetNick(false);
+        NoStringMap msParams;
         msParams["target"] = sClientNick;
 
         uSize = m_RawBuffer.Size();
@@ -568,15 +568,15 @@ void CNetwork::ClientConnected(CClient* pClient)
             pClient->PutClient(m_RawBuffer.GetLine(uIdx, *pClient, msParams));
         }
 
-        const CNick& Nick = GetIRCNick();
+        const NoNick& Nick = GetIRNoNick();
         if (sClientNick != Nick.GetNick()) { // case-sensitive match
             pClient->PutClient(":" + sClientNick + "!" + Nick.GetIdent() + "@" + Nick.GetHost() + " NICK :" + Nick.GetNick());
             pClient->SetNick(Nick.GetNick());
         }
     }
 
-    MCString msParams;
-    msParams["target"] = GetIRCNick().GetNick();
+    NoStringMap msParams;
+    msParams["target"] = GetIRNoNick().GetNick();
 
     // Send the cached MOTD
     uSize = m_MotdBuffer.Size();
@@ -587,31 +587,31 @@ void CNetwork::ClientConnected(CClient* pClient)
     }
 
     if (GetIRCSock() != nullptr) {
-        CString sUserMode("");
+        NoString sUserMode("");
         const set<unsigned char>& scUserModes = GetIRCSock()->GetUserModes();
         for (unsigned char cMode : scUserModes) {
             sUserMode += cMode;
         }
         if (!sUserMode.empty()) {
-            pClient->PutClient(":" + GetIRCNick().GetNickMask() + " MODE " + GetIRCNick().GetNick() + " :+" + sUserMode);
+            pClient->PutClient(":" + GetIRNoNick().GetNickMask() + " MODE " + GetIRNoNick().GetNick() + " :+" + sUserMode);
         }
     }
 
-    if (m_bIRCAway) {
+    if (m_bIRNoAway) {
         // If they want to know their away reason they'll have to whois
         // themselves. At least we can tell them their away status...
-        pClient->PutClient(":irc.znc.in 306 " + GetIRCNick().GetNick() + " :You have been marked as being away");
+        pClient->PutClient(":irc.znc.in 306 " + GetIRNoNick().GetNick() + " :You have been marked as being away");
     }
 
-    const vector<CChannel*>& vChans = GetChans();
-    for (CChannel* pChan : vChans) {
+    const vector<NoChannel*>& vChans = GetChans();
+    for (NoChannel* pChan : vChans) {
         if ((pChan->IsOn()) && (!pChan->IsDetached())) {
             pChan->AttachUser(pClient);
         }
     }
 
     bool bClearQuery = m_pUser->AutoClearQueryBuffer();
-    for (CQuery* pQuery : m_vQueries) {
+    for (NoQuery* pQuery : m_vQueries) {
         pQuery->SendBuffer(pClient);
         if (bClearQuery) {
             delete pQuery;
@@ -623,8 +623,8 @@ void CNetwork::ClientConnected(CClient* pClient)
 
     uSize = m_NoticeBuffer.Size();
     for (uIdx = 0; uIdx < uSize; uIdx++) {
-        const CMessage& BufLine = m_NoticeBuffer.GetMessage(uIdx);
-        CString sLine = BufLine.GetLine(*pClient, msParams);
+        const NoMessage& BufLine = m_NoticeBuffer.GetMessage(uIdx);
+        NoString sLine = BufLine.GetLine(*pClient, msParams);
         bool bContinue = false;
         NETWORKMODULECALL(OnPrivBufferPlayLine2(*pClient, sLine, BufLine.GetTime()), m_pUser, this, nullptr, &bContinue);
         if (bContinue) continue;
@@ -640,7 +640,7 @@ void CNetwork::ClientConnected(CClient* pClient)
                            "Use 'connect' to reconnect.");
 }
 
-void CNetwork::ClientDisconnected(CClient* pClient)
+void NoNetwork::ClientDisconnected(NoClient* pClient)
 {
     auto it = std::find(m_vClients.begin(), m_vClients.end(), pClient);
     if (it != m_vClients.end()) {
@@ -648,14 +648,14 @@ void CNetwork::ClientDisconnected(CClient* pClient)
     }
 }
 
-CUser* CNetwork::GetUser() const { return m_pUser; }
+NoUser* NoNetwork::GetUser() const { return m_pUser; }
 
-const CString& CNetwork::GetName() const { return m_sName; }
+const NoString& NoNetwork::GetName() const { return m_sName; }
 
-std::vector<CClient*> CNetwork::FindClients(const CString& sIdentifier) const
+std::vector<NoClient*> NoNetwork::FindClients(const NoString& sIdentifier) const
 {
-    std::vector<CClient*> vClients;
-    for (CClient* pClient : m_vClients) {
+    std::vector<NoClient*> vClients;
+    for (NoClient* pClient : m_vClients) {
         if (pClient->GetIdentifier().Equals(sIdentifier)) {
             vClients.push_back(pClient);
         }
@@ -664,9 +664,9 @@ std::vector<CClient*> CNetwork::FindClients(const CString& sIdentifier) const
     return vClients;
 }
 
-void CNetwork::SetUser(CUser* pUser)
+void NoNetwork::SetUser(NoUser* pUser)
 {
-    for (CClient* pClient : m_vClients) {
+    for (NoClient* pClient : m_vClients) {
         pClient->PutStatus("This network is being deleted or moved to another user.");
         pClient->SetNetwork(nullptr);
     }
@@ -683,7 +683,7 @@ void CNetwork::SetUser(CUser* pUser)
     }
 }
 
-bool CNetwork::SetName(const CString& sName)
+bool NoNetwork::SetName(const NoString& sName)
 {
     if (IsValidNetwork(sName)) {
         m_sName = sName;
@@ -693,9 +693,9 @@ bool CNetwork::SetName(const CString& sName)
     return false;
 }
 
-bool CNetwork::PutUser(const CString& sLine, CClient* pClient, CClient* pSkipClient)
+bool NoNetwork::PutUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    for (CClient* pEachClient : m_vClients) {
+    for (NoClient* pEachClient : m_vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutClient(sLine);
 
@@ -708,9 +708,9 @@ bool CNetwork::PutUser(const CString& sLine, CClient* pClient, CClient* pSkipCli
     return (pClient == nullptr);
 }
 
-bool CNetwork::PutStatus(const CString& sLine, CClient* pClient, CClient* pSkipClient)
+bool NoNetwork::PutStatus(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    for (CClient* pEachClient : m_vClients) {
+    for (NoClient* pEachClient : m_vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutStatus(sLine);
 
@@ -723,9 +723,9 @@ bool CNetwork::PutStatus(const CString& sLine, CClient* pClient, CClient* pSkipC
     return (pClient == nullptr);
 }
 
-bool CNetwork::PutModule(const CString& sModule, const CString& sLine, CClient* pClient, CClient* pSkipClient)
+bool NoNetwork::PutModule(const NoString& sModule, const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    for (CClient* pEachClient : m_vClients) {
+    for (NoClient* pEachClient : m_vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutModule(sModule, sLine);
 
@@ -740,16 +740,16 @@ bool CNetwork::PutModule(const CString& sModule, const CString& sLine, CClient* 
 
 // Channels
 
-const vector<CChannel*>& CNetwork::GetChans() const { return m_vChans; }
+const vector<NoChannel*>& NoNetwork::GetChans() const { return m_vChans; }
 
-CChannel* CNetwork::FindChan(CString sName) const
+NoChannel* NoNetwork::FindChan(NoString sName) const
 {
     if (GetIRCSock()) {
         // See https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.16
         sName.TrimLeft(GetIRCSock()->GetISupport("STATUSMSG", ""));
     }
 
-    for (CChannel* pChan : m_vChans) {
+    for (NoChannel* pChan : m_vChans) {
         if (sName.Equals(pChan->GetName())) {
             return pChan;
         }
@@ -758,24 +758,24 @@ CChannel* CNetwork::FindChan(CString sName) const
     return nullptr;
 }
 
-std::vector<CChannel*> CNetwork::FindChans(const CString& sWild) const
+std::vector<NoChannel*> NoNetwork::FindChans(const NoString& sWild) const
 {
-    std::vector<CChannel*> vChans;
+    std::vector<NoChannel*> vChans;
     vChans.reserve(m_vChans.size());
-    const CString sLower = sWild.AsLower();
-    for (CChannel* pChan : m_vChans) {
+    const NoString sLower = sWild.AsLower();
+    for (NoChannel* pChan : m_vChans) {
         if (pChan->GetName().AsLower().WildCmp(sLower)) vChans.push_back(pChan);
     }
     return vChans;
 }
 
-bool CNetwork::AddChan(CChannel* pChan)
+bool NoNetwork::AddChan(NoChannel* pChan)
 {
     if (!pChan) {
         return false;
     }
 
-    for (CChannel* pEachChan : m_vChans) {
+    for (NoChannel* pEachChan : m_vChans) {
         if (pEachChan->GetName().Equals(pChan->GetName())) {
             delete pChan;
             return false;
@@ -786,20 +786,20 @@ bool CNetwork::AddChan(CChannel* pChan)
     return true;
 }
 
-bool CNetwork::AddChan(const CString& sName, bool bInConfig)
+bool NoNetwork::AddChan(const NoString& sName, bool bInConfig)
 {
     if (sName.empty() || FindChan(sName)) {
         return false;
     }
 
-    CChannel* pChan = new CChannel(sName, this, bInConfig);
+    NoChannel* pChan = new NoChannel(sName, this, bInConfig);
     m_vChans.push_back(pChan);
     return true;
 }
 
-bool CNetwork::DelChan(const CString& sName)
+bool NoNetwork::DelChan(const NoString& sName)
 {
-    for (vector<CChannel*>::iterator a = m_vChans.begin(); a != m_vChans.end(); ++a) {
+    for (vector<NoChannel*>::iterator a = m_vChans.begin(); a != m_vChans.end(); ++a) {
         if (sName.Equals((*a)->GetName())) {
             delete *a;
             m_vChans.erase(a);
@@ -810,7 +810,7 @@ bool CNetwork::DelChan(const CString& sName)
     return false;
 }
 
-void CNetwork::JoinChans()
+void NoNetwork::JoinChans()
 {
     // Avoid divsion by zero, it's bad!
     if (m_vChans.empty()) return;
@@ -820,10 +820,10 @@ void CNetwork::JoinChans()
     // still be able to join the rest of your channels.
     unsigned int start = rand() % m_vChans.size();
     unsigned int uJoins = m_pUser->MaxJoins();
-    set<CChannel*> sChans;
+    set<NoChannel*> sChans;
     for (unsigned int a = 0; a < m_vChans.size(); a++) {
         unsigned int idx = (start + a) % m_vChans.size();
-        CChannel* pChan = m_vChans[idx];
+        NoChannel* pChan = m_vChans[idx];
         if (!pChan->IsOn() && !pChan->IsDisabled()) {
             if (!JoinChan(pChan)) continue;
 
@@ -841,16 +841,16 @@ void CNetwork::JoinChans()
     while (!sChans.empty()) JoinChans(sChans);
 }
 
-void CNetwork::JoinChans(set<CChannel*>& sChans)
+void NoNetwork::JoinChans(set<NoChannel*>& sChans)
 {
-    CString sKeys, sJoin;
+    NoString sKeys, sJoin;
     bool bHaveKey = false;
     size_t uiJoinLength = strlen("JOIN ");
 
     while (!sChans.empty()) {
-        set<CChannel*>::iterator it = sChans.begin();
-        const CString& sName = (*it)->GetName();
-        const CString& sKey = (*it)->GetKey();
+        set<NoChannel*>::iterator it = sChans.begin();
+        const NoString& sName = (*it)->GetName();
+        const NoString& sKey = (*it)->GetKey();
         size_t len = sName.length() + sKey.length();
         len += 2; // two comma
 
@@ -875,7 +875,7 @@ void CNetwork::JoinChans(set<CChannel*>& sChans)
         PutIRC("JOIN " + sJoin);
 }
 
-bool CNetwork::JoinChan(CChannel* pChan)
+bool NoNetwork::JoinChan(NoChannel* pChan)
 {
     bool bReturn = false;
     NETWORKMODULECALL(OnJoining(*pChan), m_pUser, this, nullptr, &bReturn);
@@ -895,21 +895,21 @@ bool CNetwork::JoinChan(CChannel* pChan)
     return false;
 }
 
-bool CNetwork::IsChan(const CString& sChan) const
+bool NoNetwork::IsChan(const NoString& sChan) const
 {
     if (sChan.empty()) return false; // There is no way this is a chan
     if (GetChanPrefixes().empty()) return true; // We can't know, so we allow everything
     // Thanks to the above if (empty), we can do sChan[0]
-    return GetChanPrefixes().find(sChan[0]) != CString::npos;
+    return GetChanPrefixes().find(sChan[0]) != NoString::npos;
 }
 
 // Queries
 
-const vector<CQuery*>& CNetwork::GetQueries() const { return m_vQueries; }
+const vector<NoQuery*>& NoNetwork::GetQueries() const { return m_vQueries; }
 
-CQuery* CNetwork::FindQuery(const CString& sName) const
+NoQuery* NoNetwork::FindQuery(const NoString& sName) const
 {
-    for (CQuery* pQuery : m_vQueries) {
+    for (NoQuery* pQuery : m_vQueries) {
         if (sName.Equals(pQuery->GetName())) {
             return pQuery;
         }
@@ -918,26 +918,26 @@ CQuery* CNetwork::FindQuery(const CString& sName) const
     return nullptr;
 }
 
-std::vector<CQuery*> CNetwork::FindQueries(const CString& sWild) const
+std::vector<NoQuery*> NoNetwork::FindQueries(const NoString& sWild) const
 {
-    std::vector<CQuery*> vQueries;
+    std::vector<NoQuery*> vQueries;
     vQueries.reserve(m_vQueries.size());
-    const CString sLower = sWild.AsLower();
-    for (CQuery* pQuery : m_vQueries) {
+    const NoString sLower = sWild.AsLower();
+    for (NoQuery* pQuery : m_vQueries) {
         if (pQuery->GetName().AsLower().WildCmp(sLower)) vQueries.push_back(pQuery);
     }
     return vQueries;
 }
 
-CQuery* CNetwork::AddQuery(const CString& sName)
+NoQuery* NoNetwork::AddQuery(const NoString& sName)
 {
     if (sName.empty()) {
         return nullptr;
     }
 
-    CQuery* pQuery = FindQuery(sName);
+    NoQuery* pQuery = FindQuery(sName);
     if (!pQuery) {
-        pQuery = new CQuery(sName, this);
+        pQuery = new NoQuery(sName, this);
         m_vQueries.push_back(pQuery);
 
         if (m_pUser->MaxQueryBuffers() > 0) {
@@ -951,9 +951,9 @@ CQuery* CNetwork::AddQuery(const CString& sName)
     return pQuery;
 }
 
-bool CNetwork::DelQuery(const CString& sName)
+bool NoNetwork::DelQuery(const NoString& sName)
 {
-    for (vector<CQuery*>::iterator a = m_vQueries.begin(); a != m_vQueries.end(); ++a) {
+    for (vector<NoQuery*>::iterator a = m_vQueries.begin(); a != m_vQueries.end(); ++a) {
         if (sName.Equals((*a)->GetName())) {
             delete *a;
             m_vQueries.erase(a);
@@ -966,11 +966,11 @@ bool CNetwork::DelQuery(const CString& sName)
 
 // Server list
 
-const vector<CServer*>& CNetwork::GetServers() const { return m_vServers; }
+const vector<NoServer*>& NoNetwork::GetServers() const { return m_vServers; }
 
-CServer* CNetwork::FindServer(const CString& sName) const
+NoServer* NoNetwork::FindServer(const NoString& sName) const
 {
-    for (CServer* pServer : m_vServers) {
+    for (NoServer* pServer : m_vServers) {
         if (sName.Equals(pServer->GetName())) {
             return pServer;
         }
@@ -979,7 +979,7 @@ CServer* CNetwork::FindServer(const CString& sName) const
     return nullptr;
 }
 
-bool CNetwork::DelServer(const CString& sName, unsigned short uPort, const CString& sPass)
+bool NoNetwork::DelServer(const NoString& sName, unsigned short uPort, const NoString& sPass)
 {
     if (sName.empty()) {
         return false;
@@ -987,10 +987,10 @@ bool CNetwork::DelServer(const CString& sName, unsigned short uPort, const CStri
 
     unsigned int a = 0;
     bool bSawCurrentServer = false;
-    CServer* pCurServer = GetCurrentServer();
+    NoServer* pCurServer = GetCurrentServer();
 
-    for (vector<CServer*>::iterator it = m_vServers.begin(); it != m_vServers.end(); ++it, a++) {
-        CServer* pServer = *it;
+    for (vector<NoServer*>::iterator it = m_vServers.begin(); it != m_vServers.end(); ++it, a++) {
+        NoServer* pServer = *it;
 
         if (pServer == pCurServer) bSawCurrentServer = true;
 
@@ -1003,7 +1003,7 @@ bool CNetwork::DelServer(const CString& sName, unsigned short uPort, const CStri
         m_vServers.erase(it);
 
         if (pServer == pCurServer) {
-            CIRCSock* pIRCSock = GetIRCSock();
+            NoIrcSock* pIRCSock = GetIRCSock();
 
             // Make sure we don't skip the next server in the list!
             if (m_uServerIdx) {
@@ -1029,18 +1029,18 @@ bool CNetwork::DelServer(const CString& sName, unsigned short uPort, const CStri
     return false;
 }
 
-bool CNetwork::AddServer(const CString& sName)
+bool NoNetwork::AddServer(const NoString& sName)
 {
     if (sName.empty()) {
         return false;
     }
 
     bool bSSL = false;
-    CString sLine = sName;
+    NoString sLine = sName;
     sLine.Trim();
 
-    CString sHost = sLine.Token(0);
-    CString sPort = sLine.Token(1);
+    NoString sHost = sLine.Token(0);
+    NoString sPort = sLine.Token(1);
 
     if (sPort.Left(1) == "+") {
         bSSL = true;
@@ -1048,12 +1048,12 @@ bool CNetwork::AddServer(const CString& sName)
     }
 
     unsigned short uPort = sPort.ToUShort();
-    CString sPass = sLine.Token(2, true);
+    NoString sPass = sLine.Token(2, true);
 
     return AddServer(sHost, uPort, sPass, bSSL);
 }
 
-bool CNetwork::AddServer(const CString& sName, unsigned short uPort, const CString& sPass, bool bSSL)
+bool NoNetwork::AddServer(const NoString& sName, unsigned short uPort, const NoString& sPass, bool bSSL)
 {
 #ifndef HAVE_LIBSSL
     if (bSSL) {
@@ -1070,7 +1070,7 @@ bool CNetwork::AddServer(const CString& sName, unsigned short uPort, const CStri
     }
 
     // Check if server is already added
-    for (CServer* pServer : m_vServers) {
+    for (NoServer* pServer : m_vServers) {
         if (!sName.Equals(pServer->GetName())) continue;
 
         if (uPort != pServer->GetPort()) continue;
@@ -1083,7 +1083,7 @@ bool CNetwork::AddServer(const CString& sName, unsigned short uPort, const CStri
         return false;
     }
 
-    CServer* pServer = new CServer(sName, uPort, sPass, bSSL);
+    NoServer* pServer = new NoServer(sName, uPort, sPass, bSSL);
     m_vServers.push_back(pServer);
 
     CheckIRCConnect();
@@ -1091,7 +1091,7 @@ bool CNetwork::AddServer(const CString& sName, unsigned short uPort, const CStri
     return true;
 }
 
-CServer* CNetwork::GetNextServer()
+NoServer* NoNetwork::GetNextServer()
 {
     if (m_vServers.empty()) {
         return nullptr;
@@ -1104,7 +1104,7 @@ CServer* CNetwork::GetNextServer()
     return m_vServers[m_uServerIdx++];
 }
 
-CServer* CNetwork::GetCurrentServer() const
+NoServer* NoNetwork::GetCurrentServer() const
 {
     size_t uIdx = (m_uServerIdx) ? m_uServerIdx - 1 : 0;
 
@@ -1115,9 +1115,9 @@ CServer* CNetwork::GetCurrentServer() const
     return m_vServers[uIdx];
 }
 
-void CNetwork::SetIRCServer(const CString& s) { m_sIRCServer = s; }
+void NoNetwork::SetIRNoServer(const NoString& s) { m_sIRNoServer = s; }
 
-bool CNetwork::SetNextServer(const CServer* pServer)
+bool NoNetwork::SetNextServer(const NoServer* pServer)
 {
     for (unsigned int a = 0; a < m_vServers.size(); a++) {
         if (m_vServers[a] == pServer) {
@@ -1129,23 +1129,23 @@ bool CNetwork::SetNextServer(const CServer* pServer)
     return false;
 }
 
-bool CNetwork::IsLastServer() const { return (m_uServerIdx >= m_vServers.size()); }
+bool NoNetwork::IsLastServer() const { return (m_uServerIdx >= m_vServers.size()); }
 
-const CString& CNetwork::GetIRCServer() const { return m_sIRCServer; }
-const CNick& CNetwork::GetIRCNick() const { return m_IRCNick; }
+const NoString& NoNetwork::GetIRNoServer() const { return m_sIRNoServer; }
+const NoNick& NoNetwork::GetIRNoNick() const { return m_IRNoNick; }
 
-void CNetwork::SetIRCNick(const CNick& n)
+void NoNetwork::SetIRNoNick(const NoNick& n)
 {
-    m_IRCNick = n;
+    m_IRNoNick = n;
 
-    for (CClient* pClient : m_vClients) {
+    for (NoClient* pClient : m_vClients) {
         pClient->SetNick(n.GetNick());
     }
 }
 
-CString CNetwork::GetCurNick() const
+NoString NoNetwork::GetCurNick() const
 {
-    const CIRCSock* pIRCSock = GetIRCSock();
+    const NoIrcSock* pIRCSock = GetIRCSock();
 
     if (pIRCSock) {
         return pIRCSock->GetNick();
@@ -1158,11 +1158,11 @@ CString CNetwork::GetCurNick() const
     return "";
 }
 
-bool CNetwork::Connect()
+bool NoNetwork::Connect()
 {
     if (!GetIRCConnectEnabled() || m_pIRCSock || !HasServers()) return false;
 
-    CServer* pServer = GetNextServer();
+    NoServer* pServer = GetNextServer();
     if (!pServer) return false;
 
     if (CZNC::Get().GetServerThrottle(pServer->GetName())) {
@@ -1182,7 +1182,7 @@ bool CNetwork::Connect()
     }
 #endif
 
-    CIRCSock* pIRCSock = new CIRCSock(this);
+    NoIrcSock* pIRCSock = new NoIrcSock(this);
     pIRCSock->SetPass(pServer->GetPass());
     pIRCSock->SetSSLTrustedPeerFingerprints(m_ssTrustedFingerprints);
 
@@ -1198,21 +1198,21 @@ bool CNetwork::Connect()
         return false;
     }
 
-    CString sSockName = "IRC::" + m_pUser->GetUserName() + "::" + m_sName;
+    NoString sSockName = "IRC::" + m_pUser->GetUserName() + "::" + m_sName;
     CZNC::Get().GetManager().Connect(pServer->GetName(), pServer->GetPort(), sSockName, 120, bSSL, GetBindHost(), pIRCSock);
 
     return true;
 }
 
-bool CNetwork::IsIRCConnected() const
+bool NoNetwork::IsIRCConnected() const
 {
-    const CIRCSock* pSock = GetIRCSock();
+    const NoIrcSock* pSock = GetIRCSock();
     return (pSock && pSock->IsAuthed());
 }
 
-void CNetwork::SetIRCSocket(CIRCSock* pIRCSock) { m_pIRCSock = pIRCSock; }
+void NoNetwork::SetIRNoSocket(NoIrcSock* pIRCSock) { m_pIRCSock = pIRCSock; }
 
-void CNetwork::IRCConnected()
+void NoNetwork::IRCConnected()
 {
     if (m_uJoinDelay > 0) {
         m_pJoinTimer->Delay(m_uJoinDelay);
@@ -1221,18 +1221,18 @@ void CNetwork::IRCConnected()
     }
 }
 
-void CNetwork::IRCDisconnected()
+void NoNetwork::IRCDisconnected()
 {
     m_pIRCSock = nullptr;
 
-    SetIRCServer("");
-    m_bIRCAway = false;
+    SetIRNoServer("");
+    m_bIRNoAway = false;
 
     // Get the reconnect going
     CheckIRCConnect();
 }
 
-void CNetwork::SetIRCConnectEnabled(bool b)
+void NoNetwork::SetIRCConnectEnabled(bool b)
 {
     m_bIRCConnectEnabled = b;
 
@@ -1247,15 +1247,15 @@ void CNetwork::SetIRCConnectEnabled(bool b)
     }
 }
 
-void CNetwork::CheckIRCConnect()
+void NoNetwork::CheckIRCConnect()
 {
     // Do we want to connect?
     if (GetIRCConnectEnabled() && GetIRCSock() == nullptr) CZNC::Get().AddNetworkToQueue(this);
 }
 
-bool CNetwork::PutIRC(const CString& sLine)
+bool NoNetwork::PutIRC(const NoString& sLine)
 {
-    CIRCSock* pIRCSock = GetIRCSock();
+    NoIrcSock* pIRCSock = GetIRCSock();
 
     if (!pIRCSock) {
         return false;
@@ -1265,13 +1265,13 @@ bool CNetwork::PutIRC(const CString& sLine)
     return true;
 }
 
-void CNetwork::ClearQueryBuffer()
+void NoNetwork::ClearQueryBuffer()
 {
-    std::for_each(m_vQueries.begin(), m_vQueries.end(), std::default_delete<CQuery>());
+    std::for_each(m_vQueries.begin(), m_vQueries.end(), std::default_delete<NoQuery>());
     m_vQueries.clear();
 }
 
-const CString& CNetwork::GetNick(const bool bAllowDefault) const
+const NoString& NoNetwork::GetNick(const bool bAllowDefault) const
 {
     if (m_sNick.empty()) {
         return m_pUser->GetNick(bAllowDefault);
@@ -1280,7 +1280,7 @@ const CString& CNetwork::GetNick(const bool bAllowDefault) const
     return m_sNick;
 }
 
-const CString& CNetwork::GetAltNick(const bool bAllowDefault) const
+const NoString& NoNetwork::GetAltNick(const bool bAllowDefault) const
 {
     if (m_sAltNick.empty()) {
         return m_pUser->GetAltNick(bAllowDefault);
@@ -1289,7 +1289,7 @@ const CString& CNetwork::GetAltNick(const bool bAllowDefault) const
     return m_sAltNick;
 }
 
-const CString& CNetwork::GetIdent(const bool bAllowDefault) const
+const NoString& NoNetwork::GetIdent(const bool bAllowDefault) const
 {
     if (m_sIdent.empty()) {
         return m_pUser->GetIdent(bAllowDefault);
@@ -1298,7 +1298,7 @@ const CString& CNetwork::GetIdent(const bool bAllowDefault) const
     return m_sIdent;
 }
 
-const CString& CNetwork::GetRealName() const
+const NoString& NoNetwork::GetRealName() const
 {
     if (m_sRealName.empty()) {
         return m_pUser->GetRealName();
@@ -1307,7 +1307,7 @@ const CString& CNetwork::GetRealName() const
     return m_sRealName;
 }
 
-const CString& CNetwork::GetBindHost() const
+const NoString& NoNetwork::GetBindHost() const
 {
     if (m_sBindHost.empty()) {
         return m_pUser->GetBindHost();
@@ -1316,9 +1316,9 @@ const CString& CNetwork::GetBindHost() const
     return m_sBindHost;
 }
 
-const CString& CNetwork::GetEncoding() const { return m_sEncoding; }
+const NoString& NoNetwork::GetEncoding() const { return m_sEncoding; }
 
-CString CNetwork::GetQuitMsg() const
+NoString NoNetwork::GetQuitMsg() const
 {
     if (m_sQuitMsg.empty()) {
         return m_pUser->GetQuitMsg();
@@ -1327,7 +1327,7 @@ CString CNetwork::GetQuitMsg() const
     return m_sQuitMsg;
 }
 
-void CNetwork::SetNick(const CString& s)
+void NoNetwork::SetNick(const NoString& s)
 {
     if (m_pUser->GetNick().Equals(s)) {
         m_sNick = "";
@@ -1336,7 +1336,7 @@ void CNetwork::SetNick(const CString& s)
     }
 }
 
-void CNetwork::SetAltNick(const CString& s)
+void NoNetwork::SetAltNick(const NoString& s)
 {
     if (m_pUser->GetAltNick().Equals(s)) {
         m_sAltNick = "";
@@ -1345,7 +1345,7 @@ void CNetwork::SetAltNick(const CString& s)
     }
 }
 
-void CNetwork::SetIdent(const CString& s)
+void NoNetwork::SetIdent(const NoString& s)
 {
     if (m_pUser->GetIdent().Equals(s)) {
         m_sIdent = "";
@@ -1354,7 +1354,7 @@ void CNetwork::SetIdent(const CString& s)
     }
 }
 
-void CNetwork::SetRealName(const CString& s)
+void NoNetwork::SetRealName(const NoString& s)
 {
     if (m_pUser->GetRealName().Equals(s)) {
         m_sRealName = "";
@@ -1363,7 +1363,7 @@ void CNetwork::SetRealName(const CString& s)
     }
 }
 
-void CNetwork::SetBindHost(const CString& s)
+void NoNetwork::SetBindHost(const NoString& s)
 {
     if (m_pUser->GetBindHost().Equals(s)) {
         m_sBindHost = "";
@@ -1372,9 +1372,9 @@ void CNetwork::SetBindHost(const CString& s)
     }
 }
 
-void CNetwork::SetEncoding(const CString& s) { m_sEncoding = s; }
+void NoNetwork::SetEncoding(const NoString& s) { m_sEncoding = s; }
 
-void CNetwork::SetQuitMsg(const CString& s)
+void NoNetwork::SetQuitMsg(const NoString& s)
 {
     if (m_pUser->GetQuitMsg().Equals(s)) {
         m_sQuitMsg = "";
@@ -1383,13 +1383,13 @@ void CNetwork::SetQuitMsg(const CString& s)
     }
 }
 
-CString CNetwork::ExpandString(const CString& sStr) const
+NoString NoNetwork::ExpandString(const NoString& sStr) const
 {
-    CString sRet;
+    NoString sRet;
     return ExpandString(sStr, sRet);
 }
 
-CString& CNetwork::ExpandString(const CString& sStr, CString& sRet) const
+NoString& NoNetwork::ExpandString(const NoString& sStr, NoString& sRet) const
 {
     sRet = sStr;
     sRet.Replace("%defnick%", GetNick());
@@ -1402,14 +1402,14 @@ CString& CNetwork::ExpandString(const CString& sStr, CString& sRet) const
     return m_pUser->ExpandString(sRet, sRet);
 }
 
-bool CNetwork::LoadModule(const CString& sModName, const CString& sArgs, const CString& sNotice, CString& sError)
+bool NoNetwork::LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError)
 {
-    CUtils::PrintAction(sNotice);
-    CString sModRet;
+    NoUtils::PrintAction(sNotice);
+    NoString sModRet;
 
-    bool bModRet = GetModules().LoadModule(sModName, sArgs, CModInfo::NetworkModule, GetUser(), this, sModRet);
+    bool bModRet = GetModules().LoadModule(sModName, sArgs, NoModInfo::NetworkModule, GetUser(), this, sModRet);
 
-    CUtils::PrintStatus(bModRet, sModRet);
+    NoUtils::PrintStatus(bModRet, sModRet);
     if (!bModRet) {
         sError = sModRet;
     }

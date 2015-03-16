@@ -20,28 +20,28 @@
 using std::map;
 using std::set;
 
-class CAutoVoiceUser
+class NoAutoVoiceUser
 {
 public:
-    CAutoVoiceUser() {}
+    NoAutoVoiceUser() {}
 
-    CAutoVoiceUser(const CString& sLine) { FromString(sLine); }
+    NoAutoVoiceUser(const NoString& sLine) { FromString(sLine); }
 
-    CAutoVoiceUser(const CString& sUsername, const CString& sHostmask, const CString& sChannels)
+    NoAutoVoiceUser(const NoString& sUsername, const NoString& sHostmask, const NoString& sChannels)
         : m_sUsername(sUsername), m_sHostmask(sHostmask)
     {
         AddChans(sChannels);
     }
 
-    virtual ~CAutoVoiceUser() {}
+    virtual ~NoAutoVoiceUser() {}
 
-    const CString& GetUsername() const { return m_sUsername; }
-    const CString& GetHostmask() const { return m_sHostmask; }
+    const NoString& GetUsername() const { return m_sUsername; }
+    const NoString& GetHostmask() const { return m_sHostmask; }
 
-    bool ChannelMatches(const CString& sChan) const
+    bool ChannelMatches(const NoString& sChan) const
     {
-        for (set<CString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
-            if (sChan.AsLower().WildCmp(*it, CString::CaseInsensitive)) {
+        for (set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
+            if (sChan.AsLower().WildCmp(*it, NoString::CaseInsensitive)) {
                 return true;
             }
         }
@@ -49,13 +49,13 @@ public:
         return false;
     }
 
-    bool HostMatches(const CString& sHostmask) { return sHostmask.WildCmp(m_sHostmask, CString::CaseInsensitive); }
+    bool HostMatches(const NoString& sHostmask) { return sHostmask.WildCmp(m_sHostmask, NoString::CaseInsensitive); }
 
-    CString GetChannels() const
+    NoString GetChannels() const
     {
-        CString sRet;
+        NoString sRet;
 
-        for (set<CString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
+        for (set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
             if (!sRet.empty()) {
                 sRet += " ";
             }
@@ -66,9 +66,9 @@ public:
         return sRet;
     }
 
-    void DelChans(const CString& sChans)
+    void DelChans(const NoString& sChans)
     {
-        VCString vsChans;
+        NoStringVector vsChans;
         sChans.Split(" ", vsChans);
 
         for (unsigned int a = 0; a < vsChans.size(); a++) {
@@ -76,9 +76,9 @@ public:
         }
     }
 
-    void AddChans(const CString& sChans)
+    void AddChans(const NoString& sChans)
     {
-        VCString vsChans;
+        NoStringVector vsChans;
         sChans.Split(" ", vsChans);
 
         for (unsigned int a = 0; a < vsChans.size(); a++) {
@@ -86,11 +86,11 @@ public:
         }
     }
 
-    CString ToString() const
+    NoString ToString() const
     {
-        CString sChans;
+        NoString sChans;
 
-        for (set<CString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
+        for (set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
             if (!sChans.empty()) {
                 sChans += " ";
             }
@@ -101,7 +101,7 @@ public:
         return m_sUsername + "\t" + m_sHostmask + "\t" + sChans;
     }
 
-    bool FromString(const CString& sLine)
+    bool FromString(const NoString& sLine)
     {
         m_sUsername = sLine.Token(0, false, "\t");
         m_sHostmask = sLine.Token(1, false, "\t");
@@ -112,56 +112,56 @@ public:
 
 private:
 protected:
-    CString m_sUsername;
-    CString m_sHostmask;
-    set<CString> m_ssChans;
+    NoString m_sUsername;
+    NoString m_sHostmask;
+    set<NoString> m_ssChans;
 };
 
-class CAutoVoiceMod : public CModule
+class NoAutoVoiceMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CAutoVoiceMod)
+    MODCONSTRUCTOR(NoAutoVoiceMod)
     {
         AddHelpCommand();
         AddCommand("ListUsers",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoVoiceMod::OnListUsersCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoVoiceMod::OnListUsersCommand),
                    "",
                    "List all users");
         AddCommand("AddChans",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoVoiceMod::OnAddChansCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoVoiceMod::OnAddChansCommand),
                    "<user> <channel> [channel] ...",
                    "Adds channels to a user");
         AddCommand("DelChans",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoVoiceMod::OnDelChansCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoVoiceMod::OnDelChansCommand),
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");
         AddCommand("AddUser",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoVoiceMod::OnAddUserCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoVoiceMod::OnAddUserCommand),
                    "<user> <hostmask> [channels]",
                    "Adds a user");
         AddCommand("DelUser",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoVoiceMod::OnDelUserCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoVoiceMod::OnDelUserCommand),
                    "<user>",
                    "Removes a user");
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         // Load the chans from the command line
         unsigned int a = 0;
-        VCString vsChans;
+        NoStringVector vsChans;
         sArgs.Split(" ", vsChans, false);
 
-        for (VCString::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
-            CString sName = "Args";
-            sName += CString(a);
+        for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
+            NoString sName = "Args";
+            sName += NoString(a);
             AddUser(sName, "*", *it);
         }
 
         // Load the saved users
-        for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {
-            const CString& sLine = it->second;
-            CAutoVoiceUser* pUser = new CAutoVoiceUser;
+        for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
+            const NoString& sLine = it->second;
+            NoAutoVoiceUser* pUser = new NoAutoVoiceUser;
 
             if (!pUser->FromString(sLine) || FindUser(pUser->GetUsername().AsLower())) {
                 delete pUser;
@@ -173,20 +173,20 @@ public:
         return true;
     }
 
-    virtual ~CAutoVoiceMod()
+    virtual ~NoAutoVoiceMod()
     {
-        for (map<CString, CAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             delete it->second;
         }
 
         m_msUsers.clear();
     }
 
-    void OnJoin(const CNick& Nick, CChannel& Channel) override
+    void OnJoin(const NoNick& Nick, NoChannel& Channel) override
     {
         // If we have ops in this chan
-        if (Channel.HasPerm(CChannel::Op) || Channel.HasPerm(CChannel::HalfOp)) {
-            for (map<CString, CAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        if (Channel.HasPerm(NoChannel::Op) || Channel.HasPerm(NoChannel::HalfOp)) {
+            for (map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
                 // and the nick who joined is a valid user
                 if (it->second->HostMatches(Nick.GetHostMask()) && it->second->ChannelMatches(Channel.GetName())) {
                     PutIRC("MODE " + Channel.GetName() + " +v " + Nick.GetNick());
@@ -196,15 +196,15 @@ public:
         }
     }
 
-    void OnAddUserCommand(const CString& sLine)
+    void OnAddUserCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
-        CString sHost = sLine.Token(2);
+        NoString sUser = sLine.Token(1);
+        NoString sHost = sLine.Token(2);
 
         if (sHost.empty()) {
             PutModule("Usage: AddUser <user> <hostmask> [channels]");
         } else {
-            CAutoVoiceUser* pUser = AddUser(sUser, sHost, sLine.Token(3, true));
+            NoAutoVoiceUser* pUser = AddUser(sUser, sHost, sLine.Token(3, true));
 
             if (pUser) {
                 SetNV(sUser, pUser->ToString());
@@ -212,9 +212,9 @@ public:
         }
     }
 
-    void OnDelUserCommand(const CString& sLine)
+    void OnDelUserCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
+        NoString sUser = sLine.Token(1);
 
         if (sUser.empty()) {
             PutModule("Usage: DelUser <user>");
@@ -224,20 +224,20 @@ public:
         }
     }
 
-    void OnListUsersCommand(const CString& sLine)
+    void OnListUsersCommand(const NoString& sLine)
     {
         if (m_msUsers.empty()) {
             PutModule("There are no users defined");
             return;
         }
 
-        CTable Table;
+        NoTable Table;
 
         Table.AddColumn("User");
         Table.AddColumn("Hostmask");
         Table.AddColumn("Channels");
 
-        for (map<CString, CAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             Table.AddRow();
             Table.SetCell("User", it->second->GetUsername());
             Table.SetCell("Hostmask", it->second->GetHostmask());
@@ -247,17 +247,17 @@ public:
         PutModule(Table);
     }
 
-    void OnAddChansCommand(const CString& sLine)
+    void OnAddChansCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
-        CString sChans = sLine.Token(2, true);
+        NoString sUser = sLine.Token(1);
+        NoString sChans = sLine.Token(2, true);
 
         if (sChans.empty()) {
             PutModule("Usage: AddChans <user> <channel> [channel] ...");
             return;
         }
 
-        CAutoVoiceUser* pUser = FindUser(sUser);
+        NoAutoVoiceUser* pUser = FindUser(sUser);
 
         if (!pUser) {
             PutModule("No such user");
@@ -270,17 +270,17 @@ public:
         SetNV(pUser->GetUsername(), pUser->ToString());
     }
 
-    void OnDelChansCommand(const CString& sLine)
+    void OnDelChansCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
-        CString sChans = sLine.Token(2, true);
+        NoString sUser = sLine.Token(1);
+        NoString sChans = sLine.Token(2, true);
 
         if (sChans.empty()) {
             PutModule("Usage: DelChans <user> <channel> [channel] ...");
             return;
         }
 
-        CAutoVoiceUser* pUser = FindUser(sUser);
+        NoAutoVoiceUser* pUser = FindUser(sUser);
 
         if (!pUser) {
             PutModule("No such user");
@@ -293,17 +293,17 @@ public:
         SetNV(pUser->GetUsername(), pUser->ToString());
     }
 
-    CAutoVoiceUser* FindUser(const CString& sUser)
+    NoAutoVoiceUser* FindUser(const NoString& sUser)
     {
-        map<CString, CAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
 
         return (it != m_msUsers.end()) ? it->second : nullptr;
     }
 
-    CAutoVoiceUser* FindUserByHost(const CString& sHostmask, const CString& sChannel = "")
+    NoAutoVoiceUser* FindUserByHost(const NoString& sHostmask, const NoString& sChannel = "")
     {
-        for (map<CString, CAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
-            CAutoVoiceUser* pUser = it->second;
+        for (map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+            NoAutoVoiceUser* pUser = it->second;
 
             if (pUser->HostMatches(sHostmask) && (sChannel.empty() || pUser->ChannelMatches(sChannel))) {
                 return pUser;
@@ -313,9 +313,9 @@ public:
         return nullptr;
     }
 
-    void DelUser(const CString& sUser)
+    void DelUser(const NoString& sUser)
     {
-        map<CString, CAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
 
         if (it == m_msUsers.end()) {
             PutModule("That user does not exist");
@@ -327,24 +327,24 @@ public:
         PutModule("User [" + sUser + "] removed");
     }
 
-    CAutoVoiceUser* AddUser(const CString& sUser, const CString& sHost, const CString& sChans)
+    NoAutoVoiceUser* AddUser(const NoString& sUser, const NoString& sHost, const NoString& sChans)
     {
         if (m_msUsers.find(sUser) != m_msUsers.end()) {
             PutModule("That user already exists");
             return nullptr;
         }
 
-        CAutoVoiceUser* pUser = new CAutoVoiceUser(sUser, sHost, sChans);
+        NoAutoVoiceUser* pUser = new NoAutoVoiceUser(sUser, sHost, sChans);
         m_msUsers[sUser.AsLower()] = pUser;
         PutModule("User [" + sUser + "] added with hostmask [" + sHost + "]");
         return pUser;
     }
 
 private:
-    map<CString, CAutoVoiceUser*> m_msUsers;
+    map<NoString, NoAutoVoiceUser*> m_msUsers;
 };
 
-template <> void TModInfo<CAutoVoiceMod>(CModInfo& Info)
+template <> void TModInfo<NoAutoVoiceMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("autovoice");
     Info.SetHasArgs(true);
@@ -352,4 +352,4 @@ template <> void TModInfo<CAutoVoiceMod>(CModInfo& Info)
                          "if it starts with !, it is an exception for autovoice.");
 }
 
-NETWORKMODULEDEFS(CAutoVoiceMod, "Auto voice the good people")
+NETWORKMODULEDEFS(NoAutoVoiceMod, "Auto voice the good people")

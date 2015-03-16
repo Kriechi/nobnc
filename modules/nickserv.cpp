@@ -17,39 +17,39 @@
 #include <znc/nomodules.h>
 #include <znc/nouser.h>
 
-class CNickServ : public CModule
+class NoNickServ : public NoModule
 {
-    void DoNickCommand(const CString& sCmd, const CString& sNick)
+    void DoNickCommand(const NoString& sCmd, const NoString& sNick)
     {
-        MCString msValues;
+        NoStringMap msValues;
         msValues["nickname"] = sNick;
         msValues["password"] = GetNV("Password");
-        PutIRC(CString::NamedFormat(GetNV(sCmd), msValues));
+        PutIRC(NoString::NamedFormat(GetNV(sCmd), msValues));
     }
 
 public:
-    void SetCommand(const CString& sLine)
+    void SetCommand(const NoString& sLine)
     {
         SetNV("Password", sLine.Token(1, true));
         PutModule("Password set");
     }
 
-    void ClearCommand(const CString& sLine) { DelNV("Password"); }
+    void ClearCommand(const NoString& sLine) { DelNV("Password"); }
 
-    void SetNSNameCommand(const CString& sLine)
+    void SetNSNameCommand(const NoString& sLine)
     {
         SetNV("NickServName", sLine.Token(1, true));
         PutModule("NickServ name set");
     }
 
-    void ClearNSNameCommand(const CString& sLine) { DelNV("NickServName"); }
+    void ClearNSNameCommand(const NoString& sLine) { DelNV("NickServName"); }
 
-    void ViewCommandsCommand(const CString& sLine) { PutModule("IDENTIFY " + GetNV("IdentifyCmd")); }
+    void ViewCommandsCommand(const NoString& sLine) { PutModule("IDENTIFY " + GetNV("IdentifyCmd")); }
 
-    void SetCommandCommand(const CString& sLine)
+    void SetCommandCommand(const NoString& sLine)
     {
-        CString sCmd = sLine.Token(1);
-        CString sNewCmd = sLine.Token(2, true);
+        NoString sCmd = sLine.Token(1);
+        NoString sNewCmd = sLine.Token(2, true);
         if (sCmd.Equals("IDENTIFY")) {
             SetNV("IdentifyCmd", sNewCmd);
         } else {
@@ -59,32 +59,32 @@ public:
         PutModule("Ok");
     }
 
-    MODCONSTRUCTOR(CNickServ)
+    MODCONSTRUCTOR(NoNickServ)
     {
         AddHelpCommand();
-        AddCommand("Set", static_cast<CModCommand::ModCmdFunc>(&CNickServ::SetCommand), "password");
+        AddCommand("Set", static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::SetCommand), "password");
         AddCommand("Clear",
-                   static_cast<CModCommand::ModCmdFunc>(&CNickServ::ClearCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::ClearCommand),
                    "",
                    "Clear your nickserv password");
         AddCommand("SetNSName",
-                   static_cast<CModCommand::ModCmdFunc>(&CNickServ::SetNSNameCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::SetNSNameCommand),
                    "nickname",
                    "Set NickServ name (Useful on networks like EpiKnet, where NickServ is named Themis)");
         AddCommand("ClearNSName",
-                   static_cast<CModCommand::ModCmdFunc>(&CNickServ::ClearNSNameCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::ClearNSNameCommand),
                    "",
                    "Reset NickServ name to default (NickServ)");
         AddCommand("ViewCommands",
-                   static_cast<CModCommand::ModCmdFunc>(&CNickServ::ViewCommandsCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::ViewCommandsCommand),
                    "",
                    "Show patterns for lines, which are being sent to NickServ");
-        AddCommand("SetCommand", static_cast<CModCommand::ModCmdFunc>(&CNickServ::SetCommandCommand), "cmd new-pattern", "Set pattern for commands");
+        AddCommand("SetCommand", static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::SetCommandCommand), "cmd new-pattern", "Set pattern for commands");
     }
 
-    virtual ~CNickServ() {}
+    virtual ~NoNickServ() {}
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (!sArgs.empty() && sArgs != "<hidden>") {
             SetNV("Password", sArgs);
@@ -98,43 +98,43 @@ public:
         return true;
     }
 
-    void HandleMessage(CNick& Nick, const CString& sMessage)
+    void HandleMessage(NoNick& Nick, const NoString& sMessage)
     {
-        CString sNickServName = (!GetNV("NickServName").empty()) ? GetNV("NickServName") : "NickServ";
+        NoString sNickServName = (!GetNV("NickServName").empty()) ? GetNV("NickServName") : "NickServ";
         if (!GetNV("Password").empty() && Nick.NickEquals(sNickServName) &&
-            (sMessage.find("msg") != CString::npos || sMessage.find("authenticate") != CString::npos ||
-             sMessage.find("choose a different nickname") != CString::npos ||
-             sMessage.find("please choose a different nick") != CString::npos ||
-             sMessage.find("If this is your nick, identify yourself with") != CString::npos ||
-             sMessage.find("If this is your nick, type") != CString::npos ||
-             sMessage.find("This is a registered nickname, please identify") != CString::npos ||
-             sMessage.StripControls_n().find("type /NickServ IDENTIFY password") != CString::npos ||
-             sMessage.StripControls_n().find("type /msg NickServ IDENTIFY password") != CString::npos) &&
-            sMessage.AsUpper().find("IDENTIFY") != CString::npos && sMessage.find("help") == CString::npos) {
-            MCString msValues;
+            (sMessage.find("msg") != NoString::npos || sMessage.find("authenticate") != NoString::npos ||
+             sMessage.find("choose a different nickname") != NoString::npos ||
+             sMessage.find("please choose a different nick") != NoString::npos ||
+             sMessage.find("If this is your nick, identify yourself with") != NoString::npos ||
+             sMessage.find("If this is your nick, type") != NoString::npos ||
+             sMessage.find("This is a registered nickname, please identify") != NoString::npos ||
+             sMessage.StripControls_n().find("type /NickServ IDENTIFY password") != NoString::npos ||
+             sMessage.StripControls_n().find("type /msg NickServ IDENTIFY password") != NoString::npos) &&
+            sMessage.AsUpper().find("IDENTIFY") != NoString::npos && sMessage.find("help") == NoString::npos) {
+            NoStringMap msValues;
             msValues["password"] = GetNV("Password");
-            PutIRC(CString::NamedFormat(GetNV("IdentifyCmd"), msValues));
+            PutIRC(NoString::NamedFormat(GetNV("IdentifyCmd"), msValues));
         }
     }
 
-    EModRet OnPrivMsg(CNick& Nick, CString& sMessage) override
+    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         HandleMessage(Nick, sMessage);
         return CONTINUE;
     }
 
-    EModRet OnPrivNotice(CNick& Nick, CString& sMessage) override
+    EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         HandleMessage(Nick, sMessage);
         return CONTINUE;
     }
 };
 
-template <> void TModInfo<CNickServ>(CModInfo& Info)
+template <> void TModInfo<NoNickServ>(NoModInfo& Info)
 {
     Info.SetWikiPage("nickserv");
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("Please enter your nickserv password.");
 }
 
-NETWORKMODULEDEFS(CNickServ, "Auths you with NickServ")
+NETWORKMODULEDEFS(NoNickServ, "Auths you with NickServ")

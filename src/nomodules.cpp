@@ -31,16 +31,16 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 #endif
 
 #define MODUNLOADCHK(func)                              \
-    for (CModule * pMod : *this) {                      \
+    for (NoModule * pMod : *this) {                      \
         try {                                           \
-            CClient* pOldClient = pMod->GetClient();    \
+            NoClient* pOldClient = pMod->GetClient();    \
             pMod->SetClient(m_pClient);                 \
-            CUser* pOldUser = nullptr;                  \
+            NoUser* pOldUser = nullptr;                  \
             if (m_pUser) {                              \
                 pOldUser = pMod->GetUser();             \
                 pMod->SetUser(m_pUser);                 \
             }                                           \
-            CNetwork* pNetwork = nullptr;            \
+            NoNetwork* pNetwork = nullptr;            \
             if (m_pNetwork) {                           \
                 pNetwork = pMod->GetNetwork();          \
                 pMod->SetNetwork(m_pNetwork);           \
@@ -49,8 +49,8 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             if (m_pUser) pMod->SetUser(pOldUser);       \
             if (m_pNetwork) pMod->SetNetwork(pNetwork); \
             pMod->SetClient(pOldClient);                \
-        } catch (const CModule::EModException& e) {     \
-            if (e == CModule::UNLOAD) {                 \
+        } catch (const NoModule::EModException& e) {     \
+            if (e == NoModule::UNLOAD) {                 \
                 UnloadModule(pMod->GetModName());       \
             }                                           \
         }                                               \
@@ -59,17 +59,17 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define MODHALTCHK(func)                                \
     bool bHaltCore = false;                             \
-    for (CModule * pMod : *this) {                      \
+    for (NoModule * pMod : *this) {                      \
         try {                                           \
-            CModule::EModRet e = CModule::CONTINUE;     \
-            CClient* pOldClient = pMod->GetClient();    \
+            NoModule::EModRet e = NoModule::CONTINUE;     \
+            NoClient* pOldClient = pMod->GetClient();    \
             pMod->SetClient(m_pClient);                 \
-            CUser* pOldUser = nullptr;                  \
+            NoUser* pOldUser = nullptr;                  \
             if (m_pUser) {                              \
                 pOldUser = pMod->GetUser();             \
                 pMod->SetUser(m_pUser);                 \
             }                                           \
-            CNetwork* pNetwork = nullptr;            \
+            NoNetwork* pNetwork = nullptr;            \
             if (m_pNetwork) {                           \
                 pNetwork = pMod->GetNetwork();          \
                 pMod->SetNetwork(m_pNetwork);           \
@@ -78,44 +78,44 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             if (m_pUser) pMod->SetUser(pOldUser);       \
             if (m_pNetwork) pMod->SetNetwork(pNetwork); \
             pMod->SetClient(pOldClient);                \
-            if (e == CModule::HALTMODS) {               \
+            if (e == NoModule::HALTMODS) {               \
                 break;                                  \
-            } else if (e == CModule::HALTCORE) {        \
+            } else if (e == NoModule::HALTCORE) {        \
                 bHaltCore = true;                       \
-            } else if (e == CModule::HALT) {            \
+            } else if (e == NoModule::HALT) {            \
                 bHaltCore = true;                       \
                 break;                                  \
             }                                           \
-        } catch (const CModule::EModException& e) {     \
-            if (e == CModule::UNLOAD) {                 \
+        } catch (const NoModule::EModException& e) {     \
+            if (e == NoModule::UNLOAD) {                 \
                 UnloadModule(pMod->GetModName());       \
             }                                           \
         }                                               \
     }                                                   \
     return bHaltCore;
 
-CModules::CModules() : m_pUser(nullptr), m_pNetwork(nullptr), m_pClient(nullptr) {}
+NoModules::NoModules() : m_pUser(nullptr), m_pNetwork(nullptr), m_pClient(nullptr) {}
 
-CModules::~CModules() { UnloadAll(); }
+NoModules::~NoModules() { UnloadAll(); }
 
-void CModules::UnloadAll()
+void NoModules::UnloadAll()
 {
     while (size()) {
-        CString sRetMsg;
-        CString sModName = back()->GetModName();
+        NoString sRetMsg;
+        NoString sModName = back()->GetModName();
         UnloadModule(sModName, sRetMsg);
     }
 }
 
-bool CModules::OnBoot()
+bool NoModules::OnBoot()
 {
-    for (CModule* pMod : *this) {
+    for (NoModule* pMod : *this) {
         try {
             if (!pMod->OnBoot()) {
                 return true;
             }
-        } catch (const CModule::EModException& e) {
-            if (e == CModule::UNLOAD) {
+        } catch (const NoModule::EModException& e) {
+            if (e == NoModule::UNLOAD) {
                 UnloadModule(pMod->GetModName());
             }
         }
@@ -124,231 +124,231 @@ bool CModules::OnBoot()
     return false;
 }
 
-bool CModules::OnPreRehash()
+bool NoModules::OnPreRehash()
 {
     MODUNLOADCHK(OnPreRehash());
     return false;
 }
-bool CModules::OnPostRehash()
+bool NoModules::OnPostRehash()
 {
     MODUNLOADCHK(OnPostRehash());
     return false;
 }
-bool CModules::OnIRCConnected()
+bool NoModules::OnIRCConnected()
 {
     MODUNLOADCHK(OnIRCConnected());
     return false;
 }
-bool CModules::OnIRCConnecting(CIRCSock* pIRCSock) { MODHALTCHK(OnIRCConnecting(pIRCSock)); }
-bool CModules::OnIRCConnectionError(CIRCSock* pIRCSock)
+bool NoModules::OnIRCConnecting(NoIrcSock* pIRCSock) { MODHALTCHK(OnIRCConnecting(pIRCSock)); }
+bool NoModules::OnIRCConnectionError(NoIrcSock* pIRCSock)
 {
     MODUNLOADCHK(OnIRCConnectionError(pIRCSock));
     return false;
 }
-bool CModules::OnIRCRegistration(CString& sPass, CString& sNick, CString& sIdent, CString& sRealName)
+bool NoModules::OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName)
 {
     MODHALTCHK(OnIRCRegistration(sPass, sNick, sIdent, sRealName));
 }
-bool CModules::OnBroadcast(CString& sMessage) { MODHALTCHK(OnBroadcast(sMessage)); }
-bool CModules::OnIRCDisconnected()
+bool NoModules::OnBroadcast(NoString& sMessage) { MODHALTCHK(OnBroadcast(sMessage)); }
+bool NoModules::OnIRCDisconnected()
 {
     MODUNLOADCHK(OnIRCDisconnected());
     return false;
 }
 
-bool CModules::OnChanPermission2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange)
+bool NoModules::OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange)
 {
     MODUNLOADCHK(OnChanPermission2(pOpNick, Nick, Channel, uMode, bAdded, bNoChange));
     return false;
 }
-bool CModules::OnChanPermission(const CNick& OpNick, const CNick& Nick, CChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange)
+bool NoModules::OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, unsigned char uMode, bool bAdded, bool bNoChange)
 {
     MODUNLOADCHK(OnChanPermission(OpNick, Nick, Channel, uMode, bAdded, bNoChange));
     return false;
 }
-bool CModules::OnOp2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange)
+bool NoModules::OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange)
 {
     MODUNLOADCHK(OnOp2(pOpNick, Nick, Channel, bNoChange));
     return false;
 }
-bool CModules::OnOp(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange)
+bool NoModules::OnOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange)
 {
     MODUNLOADCHK(OnOp(OpNick, Nick, Channel, bNoChange));
     return false;
 }
-bool CModules::OnDeop2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange)
+bool NoModules::OnDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange)
 {
     MODUNLOADCHK(OnDeop2(pOpNick, Nick, Channel, bNoChange));
     return false;
 }
-bool CModules::OnDeop(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange)
+bool NoModules::OnDeop(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange)
 {
     MODUNLOADCHK(OnDeop(OpNick, Nick, Channel, bNoChange));
     return false;
 }
-bool CModules::OnVoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange)
+bool NoModules::OnVoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange)
 {
     MODUNLOADCHK(OnVoice2(pOpNick, Nick, Channel, bNoChange));
     return false;
 }
-bool CModules::OnVoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange)
+bool NoModules::OnVoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange)
 {
     MODUNLOADCHK(OnVoice(OpNick, Nick, Channel, bNoChange));
     return false;
 }
-bool CModules::OnDevoice2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange)
+bool NoModules::OnDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange)
 {
     MODUNLOADCHK(OnDevoice2(pOpNick, Nick, Channel, bNoChange));
     return false;
 }
-bool CModules::OnDevoice(const CNick& OpNick, const CNick& Nick, CChannel& Channel, bool bNoChange)
+bool NoModules::OnDevoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange)
 {
     MODUNLOADCHK(OnDevoice(OpNick, Nick, Channel, bNoChange));
     return false;
 }
-bool CModules::OnRawMode2(const CNick* pOpNick, CChannel& Channel, const CString& sModes, const CString& sArgs)
+bool NoModules::OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs)
 {
     MODUNLOADCHK(OnRawMode2(pOpNick, Channel, sModes, sArgs));
     return false;
 }
-bool CModules::OnRawMode(const CNick& OpNick, CChannel& Channel, const CString& sModes, const CString& sArgs)
+bool NoModules::OnRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs)
 {
     MODUNLOADCHK(OnRawMode(OpNick, Channel, sModes, sArgs));
     return false;
 }
-bool CModules::OnMode2(const CNick* pOpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange)
+bool NoModules::OnMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange)
 {
     MODUNLOADCHK(OnMode2(pOpNick, Channel, uMode, sArg, bAdded, bNoChange));
     return false;
 }
-bool CModules::OnMode(const CNick& OpNick, CChannel& Channel, char uMode, const CString& sArg, bool bAdded, bool bNoChange)
+bool NoModules::OnMode(const NoNick& OpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange)
 {
     MODUNLOADCHK(OnMode(OpNick, Channel, uMode, sArg, bAdded, bNoChange));
     return false;
 }
-bool CModules::OnRaw(CString& sLine) { MODHALTCHK(OnRaw(sLine)); }
+bool NoModules::OnRaw(NoString& sLine) { MODHALTCHK(OnRaw(sLine)); }
 
-bool CModules::OnClientLogin()
+bool NoModules::OnClientLogin()
 {
     MODUNLOADCHK(OnClientLogin());
     return false;
 }
-bool CModules::OnClientDisconnect()
+bool NoModules::OnClientDisconnect()
 {
     MODUNLOADCHK(OnClientDisconnect());
     return false;
 }
-bool CModules::OnUserRaw(CString& sLine) { MODHALTCHK(OnUserRaw(sLine)); }
-bool CModules::OnUserCTCPReply(CString& sTarget, CString& sMessage) { MODHALTCHK(OnUserCTCPReply(sTarget, sMessage)); }
-bool CModules::OnUserCTCP(CString& sTarget, CString& sMessage) { MODHALTCHK(OnUserCTCP(sTarget, sMessage)); }
-bool CModules::OnUserAction(CString& sTarget, CString& sMessage) { MODHALTCHK(OnUserAction(sTarget, sMessage)); }
-bool CModules::OnUserMsg(CString& sTarget, CString& sMessage) { MODHALTCHK(OnUserMsg(sTarget, sMessage)); }
-bool CModules::OnUserNotice(CString& sTarget, CString& sMessage) { MODHALTCHK(OnUserNotice(sTarget, sMessage)); }
-bool CModules::OnUserJoin(CString& sChannel, CString& sKey) { MODHALTCHK(OnUserJoin(sChannel, sKey)); }
-bool CModules::OnUserPart(CString& sChannel, CString& sMessage) { MODHALTCHK(OnUserPart(sChannel, sMessage)); }
-bool CModules::OnUserTopic(CString& sChannel, CString& sTopic) { MODHALTCHK(OnUserTopic(sChannel, sTopic)); }
-bool CModules::OnUserTopicRequest(CString& sChannel) { MODHALTCHK(OnUserTopicRequest(sChannel)); }
-bool CModules::OnUserQuit(CString& sMessage) { MODHALTCHK(OnUserQuit(sMessage)); }
+bool NoModules::OnUserRaw(NoString& sLine) { MODHALTCHK(OnUserRaw(sLine)); }
+bool NoModules::OnUserCTCPReply(NoString& sTarget, NoString& sMessage) { MODHALTCHK(OnUserCTCPReply(sTarget, sMessage)); }
+bool NoModules::OnUserCTCP(NoString& sTarget, NoString& sMessage) { MODHALTCHK(OnUserCTCP(sTarget, sMessage)); }
+bool NoModules::OnUserAction(NoString& sTarget, NoString& sMessage) { MODHALTCHK(OnUserAction(sTarget, sMessage)); }
+bool NoModules::OnUserMsg(NoString& sTarget, NoString& sMessage) { MODHALTCHK(OnUserMsg(sTarget, sMessage)); }
+bool NoModules::OnUserNotice(NoString& sTarget, NoString& sMessage) { MODHALTCHK(OnUserNotice(sTarget, sMessage)); }
+bool NoModules::OnUserJoin(NoString& sChannel, NoString& sKey) { MODHALTCHK(OnUserJoin(sChannel, sKey)); }
+bool NoModules::OnUserPart(NoString& sChannel, NoString& sMessage) { MODHALTCHK(OnUserPart(sChannel, sMessage)); }
+bool NoModules::OnUserTopic(NoString& sChannel, NoString& sTopic) { MODHALTCHK(OnUserTopic(sChannel, sTopic)); }
+bool NoModules::OnUserTopicRequest(NoString& sChannel) { MODHALTCHK(OnUserTopicRequest(sChannel)); }
+bool NoModules::OnUserQuit(NoString& sMessage) { MODHALTCHK(OnUserQuit(sMessage)); }
 
-bool CModules::OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChannel*>& vChans)
+bool NoModules::OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans)
 {
     MODUNLOADCHK(OnQuit(Nick, sMessage, vChans));
     return false;
 }
-bool CModules::OnNick(const CNick& Nick, const CString& sNewNick, const vector<CChannel*>& vChans)
+bool NoModules::OnNick(const NoNick& Nick, const NoString& sNewNick, const vector<NoChannel*>& vChans)
 {
     MODUNLOADCHK(OnNick(Nick, sNewNick, vChans));
     return false;
 }
-bool CModules::OnKick(const CNick& Nick, const CString& sKickedNick, CChannel& Channel, const CString& sMessage)
+bool NoModules::OnKick(const NoNick& Nick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage)
 {
     MODUNLOADCHK(OnKick(Nick, sKickedNick, Channel, sMessage));
     return false;
 }
-bool CModules::OnJoining(CChannel& Channel) { MODHALTCHK(OnJoining(Channel)); }
-bool CModules::OnJoin(const CNick& Nick, CChannel& Channel)
+bool NoModules::OnJoining(NoChannel& Channel) { MODHALTCHK(OnJoining(Channel)); }
+bool NoModules::OnJoin(const NoNick& Nick, NoChannel& Channel)
 {
     MODUNLOADCHK(OnJoin(Nick, Channel));
     return false;
 }
-bool CModules::OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage)
+bool NoModules::OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage)
 {
     MODUNLOADCHK(OnPart(Nick, Channel, sMessage));
     return false;
 }
-bool CModules::OnInvite(const CNick& Nick, const CString& sChan) { MODHALTCHK(OnInvite(Nick, sChan)); }
-bool CModules::OnChanBufferStarting(CChannel& Chan, CClient& Client) { MODHALTCHK(OnChanBufferStarting(Chan, Client)); }
-bool CModules::OnChanBufferEnding(CChannel& Chan, CClient& Client) { MODHALTCHK(OnChanBufferEnding(Chan, Client)); }
-bool CModules::OnChanBufferPlayLine2(CChannel& Chan, CClient& Client, CString& sLine, const timeval& tv)
+bool NoModules::OnInvite(const NoNick& Nick, const NoString& sChan) { MODHALTCHK(OnInvite(Nick, sChan)); }
+bool NoModules::OnChanBufferStarting(NoChannel& Chan, NoClient& Client) { MODHALTCHK(OnChanBufferStarting(Chan, Client)); }
+bool NoModules::OnChanBufferEnding(NoChannel& Chan, NoClient& Client) { MODHALTCHK(OnChanBufferEnding(Chan, Client)); }
+bool NoModules::OnChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv)
 {
     MODHALTCHK(OnChanBufferPlayLine2(Chan, Client, sLine, tv));
 }
-bool CModules::OnChanBufferPlayLine(CChannel& Chan, CClient& Client, CString& sLine)
+bool NoModules::OnChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine)
 {
     MODHALTCHK(OnChanBufferPlayLine(Chan, Client, sLine));
 }
-bool CModules::OnPrivBufferPlayLine2(CClient& Client, CString& sLine, const timeval& tv)
+bool NoModules::OnPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv)
 {
     MODHALTCHK(OnPrivBufferPlayLine2(Client, sLine, tv));
 }
-bool CModules::OnPrivBufferPlayLine(CClient& Client, CString& sLine)
+bool NoModules::OnPrivBufferPlayLine(NoClient& Client, NoString& sLine)
 {
     MODHALTCHK(OnPrivBufferPlayLine(Client, sLine));
 }
-bool CModules::OnCTCPReply(CNick& Nick, CString& sMessage) { MODHALTCHK(OnCTCPReply(Nick, sMessage)); }
-bool CModules::OnPrivCTCP(CNick& Nick, CString& sMessage) { MODHALTCHK(OnPrivCTCP(Nick, sMessage)); }
-bool CModules::OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage)
+bool NoModules::OnCTCPReply(NoNick& Nick, NoString& sMessage) { MODHALTCHK(OnCTCPReply(Nick, sMessage)); }
+bool NoModules::OnPrivCTCP(NoNick& Nick, NoString& sMessage) { MODHALTCHK(OnPrivCTCP(Nick, sMessage)); }
+bool NoModules::OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
     MODHALTCHK(OnChanCTCP(Nick, Channel, sMessage));
 }
-bool CModules::OnPrivAction(CNick& Nick, CString& sMessage) { MODHALTCHK(OnPrivAction(Nick, sMessage)); }
-bool CModules::OnChanAction(CNick& Nick, CChannel& Channel, CString& sMessage)
+bool NoModules::OnPrivAction(NoNick& Nick, NoString& sMessage) { MODHALTCHK(OnPrivAction(Nick, sMessage)); }
+bool NoModules::OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
     MODHALTCHK(OnChanAction(Nick, Channel, sMessage));
 }
-bool CModules::OnPrivMsg(CNick& Nick, CString& sMessage) { MODHALTCHK(OnPrivMsg(Nick, sMessage)); }
-bool CModules::OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage)
+bool NoModules::OnPrivMsg(NoNick& Nick, NoString& sMessage) { MODHALTCHK(OnPrivMsg(Nick, sMessage)); }
+bool NoModules::OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
     MODHALTCHK(OnChanMsg(Nick, Channel, sMessage));
 }
-bool CModules::OnPrivNotice(CNick& Nick, CString& sMessage) { MODHALTCHK(OnPrivNotice(Nick, sMessage)); }
-bool CModules::OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage)
+bool NoModules::OnPrivNotice(NoNick& Nick, NoString& sMessage) { MODHALTCHK(OnPrivNotice(Nick, sMessage)); }
+bool NoModules::OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
     MODHALTCHK(OnChanNotice(Nick, Channel, sMessage));
 }
-bool CModules::OnTopic(CNick& Nick, CChannel& Channel, CString& sTopic) { MODHALTCHK(OnTopic(Nick, Channel, sTopic)); }
-bool CModules::OnTimerAutoJoin(CChannel& Channel) { MODHALTCHK(OnTimerAutoJoin(Channel)); }
-bool CModules::OnAddNetwork(CNetwork& Network, CString& sErrorRet) { MODHALTCHK(OnAddNetwork(Network, sErrorRet)); }
-bool CModules::OnDeleteNetwork(CNetwork& Network) { MODHALTCHK(OnDeleteNetwork(Network)); }
-bool CModules::OnSendToClient(CString& sLine, CClient& Client) { MODHALTCHK(OnSendToClient(sLine, Client)); }
-bool CModules::OnSendToIRC(CString& sLine) { MODHALTCHK(OnSendToIRC(sLine)); }
-bool CModules::OnStatusCommand(CString& sCommand) { MODHALTCHK(OnStatusCommand(sCommand)); }
-bool CModules::OnModCommand(const CString& sCommand)
+bool NoModules::OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) { MODHALTCHK(OnTopic(Nick, Channel, sTopic)); }
+bool NoModules::OnTimerAutoJoin(NoChannel& Channel) { MODHALTCHK(OnTimerAutoJoin(Channel)); }
+bool NoModules::OnAddNetwork(NoNetwork& Network, NoString& sErrorRet) { MODHALTCHK(OnAddNetwork(Network, sErrorRet)); }
+bool NoModules::OnDeleteNetwork(NoNetwork& Network) { MODHALTCHK(OnDeleteNetwork(Network)); }
+bool NoModules::OnSendToClient(NoString& sLine, NoClient& Client) { MODHALTCHK(OnSendToClient(sLine, Client)); }
+bool NoModules::OnSendToIRC(NoString& sLine) { MODHALTCHK(OnSendToIRC(sLine)); }
+bool NoModules::OnStatusCommand(NoString& sCommand) { MODHALTCHK(OnStatusCommand(sCommand)); }
+bool NoModules::OnModCommand(const NoString& sCommand)
 {
     MODUNLOADCHK(OnModCommand(sCommand));
     return false;
 }
-bool CModules::OnModNotice(const CString& sMessage)
+bool NoModules::OnModNotice(const NoString& sMessage)
 {
     MODUNLOADCHK(OnModNotice(sMessage));
     return false;
 }
-bool CModules::OnModCTCP(const CString& sMessage)
+bool NoModules::OnModCTCP(const NoString& sMessage)
 {
     MODUNLOADCHK(OnModCTCP(sMessage));
     return false;
 }
 
 // Why MODHALTCHK works only with functions returning EModRet ? :(
-bool CModules::OnServerCapAvailable(const CString& sCap)
+bool NoModules::OnServerCapAvailable(const NoString& sCap)
 {
     bool bResult = false;
-    for (CModule* pMod : *this) {
+    for (NoModule* pMod : *this) {
         try {
-            CClient* pOldClient = pMod->GetClient();
+            NoClient* pOldClient = pMod->GetClient();
             pMod->SetClient(m_pClient);
             if (m_pUser) {
-                CUser* pOldUser = pMod->GetUser();
+                NoUser* pOldUser = pMod->GetUser();
                 pMod->SetUser(m_pUser);
                 bResult |= pMod->OnServerCapAvailable(sCap);
                 pMod->SetUser(pOldUser);
@@ -357,8 +357,8 @@ bool CModules::OnServerCapAvailable(const CString& sCap)
                 bResult |= pMod->OnServerCapAvailable(sCap);
             }
             pMod->SetClient(pOldClient);
-        } catch (const CModule::EModException& e) {
-            if (CModule::UNLOAD == e) {
+        } catch (const NoModule::EModException& e) {
+            if (NoModule::UNLOAD == e) {
                 UnloadModule(pMod->GetModName());
             }
         }
@@ -366,7 +366,7 @@ bool CModules::OnServerCapAvailable(const CString& sCap)
     return bResult;
 }
 
-bool CModules::OnServerCapResult(const CString& sCap, bool bSuccess)
+bool NoModules::OnServerCapResult(const NoString& sCap, bool bSuccess)
 {
     MODUNLOADCHK(OnServerCapResult(sCap, bSuccess));
     return false;
@@ -375,42 +375,42 @@ bool CModules::OnServerCapResult(const CString& sCap, bool bSuccess)
 ////////////////////
 // Global Modules //
 ////////////////////
-bool CModules::OnAddUser(CUser& User, CString& sErrorRet) { MODHALTCHK(OnAddUser(User, sErrorRet)); }
+bool NoModules::OnAddUser(NoUser& User, NoString& sErrorRet) { MODHALTCHK(OnAddUser(User, sErrorRet)); }
 
-bool CModules::OnDeleteUser(CUser& User) { MODHALTCHK(OnDeleteUser(User)); }
+bool NoModules::OnDeleteUser(NoUser& User) { MODHALTCHK(OnDeleteUser(User)); }
 
-bool CModules::OnClientConnect(CZNCSock* pClient, const CString& sHost, unsigned short uPort)
+bool NoModules::OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, unsigned short uPort)
 {
     MODUNLOADCHK(OnClientConnect(pClient, sHost, uPort));
     return false;
 }
 
-bool CModules::OnLoginAttempt(std::shared_ptr<CAuthBase> Auth) { MODHALTCHK(OnLoginAttempt(Auth)); }
+bool NoModules::OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) { MODHALTCHK(OnLoginAttempt(Auth)); }
 
-bool CModules::OnFailedLogin(const CString& sUsername, const CString& sRemoteIP)
+bool NoModules::OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP)
 {
     MODUNLOADCHK(OnFailedLogin(sUsername, sRemoteIP));
     return false;
 }
 
-bool CModules::OnUnknownUserRaw(CClient* pClient, CString& sLine) { MODHALTCHK(OnUnknownUserRaw(pClient, sLine)); }
+bool NoModules::OnUnknownUserRaw(NoClient* pClient, NoString& sLine) { MODHALTCHK(OnUnknownUserRaw(pClient, sLine)); }
 
-bool CModules::OnClientCapLs(CClient* pClient, SCString& ssCaps)
+bool NoModules::OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps)
 {
     MODUNLOADCHK(OnClientCapLs(pClient, ssCaps));
     return false;
 }
 
 // Maybe create new macro for this?
-bool CModules::IsClientCapSupported(CClient* pClient, const CString& sCap, bool bState)
+bool NoModules::IsClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState)
 {
     bool bResult = false;
-    for (CModule* pMod : *this) {
+    for (NoModule* pMod : *this) {
         try {
-            CClient* pOldClient = pMod->GetClient();
+            NoClient* pOldClient = pMod->GetClient();
             pMod->SetClient(m_pClient);
             if (m_pUser) {
-                CUser* pOldUser = pMod->GetUser();
+                NoUser* pOldUser = pMod->GetUser();
                 pMod->SetUser(m_pUser);
                 bResult |= pMod->IsClientCapSupported(pClient, sCap, bState);
                 pMod->SetUser(pOldUser);
@@ -419,8 +419,8 @@ bool CModules::IsClientCapSupported(CClient* pClient, const CString& sCap, bool 
                 bResult |= pMod->IsClientCapSupported(pClient, sCap, bState);
             }
             pMod->SetClient(pOldClient);
-        } catch (const CModule::EModException& e) {
-            if (CModule::UNLOAD == e) {
+        } catch (const NoModule::EModException& e) {
+            if (NoModule::UNLOAD == e) {
                 UnloadModule(pMod->GetModName());
             }
         }
@@ -428,37 +428,37 @@ bool CModules::IsClientCapSupported(CClient* pClient, const CString& sCap, bool 
     return bResult;
 }
 
-bool CModules::OnClientCapRequest(CClient* pClient, const CString& sCap, bool bState)
+bool NoModules::OnClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState)
 {
     MODUNLOADCHK(OnClientCapRequest(pClient, sCap, bState));
     return false;
 }
 
-bool CModules::OnModuleLoading(const CString& sModName, const CString& sArgs, CModInfo::EModuleType eType, bool& bSuccess, CString& sRetMsg)
+bool NoModules::OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::EModuleType eType, bool& bSuccess, NoString& sRetMsg)
 {
     MODHALTCHK(OnModuleLoading(sModName, sArgs, eType, bSuccess, sRetMsg));
 }
 
-bool CModules::OnModuleUnloading(CModule* pModule, bool& bSuccess, CString& sRetMsg)
+bool NoModules::OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg)
 {
     MODHALTCHK(OnModuleUnloading(pModule, bSuccess, sRetMsg));
 }
 
-bool CModules::OnGetModInfo(CModInfo& ModInfo, const CString& sModule, bool& bSuccess, CString& sRetMsg)
+bool NoModules::OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg)
 {
     MODHALTCHK(OnGetModInfo(ModInfo, sModule, bSuccess, sRetMsg));
 }
 
-bool CModules::OnGetAvailableMods(set<CModInfo>& ssMods, CModInfo::EModuleType eType)
+bool NoModules::OnGetAvailableMods(set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
 {
     MODUNLOADCHK(OnGetAvailableMods(ssMods, eType));
     return false;
 }
 
 
-CModule* CModules::FindModule(const CString& sModule) const
+NoModule* NoModules::FindModule(const NoString& sModule) const
 {
-    for (CModule* pMod : *this) {
+    for (NoModule* pMod : *this) {
         if (sModule.Equals(pMod->GetModName())) {
             return pMod;
         }
@@ -467,7 +467,7 @@ CModule* CModules::FindModule(const CString& sModule) const
     return nullptr;
 }
 
-bool CModules::LoadModule(const CString& sModule, const CString& sArgs, CModInfo::EModuleType eType, CUser* pUser, CNetwork* pNetwork, CString& sRetMsg)
+bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, NoModInfo::EModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
 {
     sRetMsg = "";
 
@@ -481,9 +481,9 @@ bool CModules::LoadModule(const CString& sModule, const CString& sArgs, CModInfo
     _GLOBALMODULECALL(OnModuleLoading(sModule, sArgs, eType, bSuccess, sRetMsg), pUser, pNetwork, nullptr, &bHandled);
     if (bHandled) return bSuccess;
 
-    CString sModPath, sDataPath;
+    NoString sModPath, sDataPath;
     bool bVersionMismatch;
-    CModInfo Info;
+    NoModInfo Info;
 
     if (!FindModPath(sModule, sModPath, sDataPath)) {
         sRetMsg = "Unable to find module [" + sModule + "]";
@@ -503,32 +503,32 @@ bool CModules::LoadModule(const CString& sModule, const CString& sArgs, CModInfo
     if (!Info.SupportsType(eType)) {
         dlclose(p);
         sRetMsg =
-        "Module [" + sModule + "] does not support module type [" + CModInfo::ModuleTypeToString(eType) + "].";
+        "Module [" + sModule + "] does not support module type [" + NoModInfo::ModuleTypeToString(eType) + "].";
         return false;
     }
 
-    if (!pUser && eType == CModInfo::UserModule) {
+    if (!pUser && eType == NoModInfo::UserModule) {
         dlclose(p);
         sRetMsg = "Module [" + sModule + "] requires a user.";
         return false;
     }
 
-    if (!pNetwork && eType == CModInfo::NetworkModule) {
+    if (!pNetwork && eType == NoModInfo::NetworkModule) {
         dlclose(p);
         sRetMsg = "Module [" + sModule + "] requires a network.";
         return false;
     }
 
-    CModule* pModule = Info.GetLoader()(p, pUser, pNetwork, sModule, sDataPath, eType);
+    NoModule* pModule = Info.GetLoader()(p, pUser, pNetwork, sModule, sDataPath, eType);
     pModule->SetDescription(Info.GetDescription());
     pModule->SetArgs(sArgs);
-    pModule->SetModPath(CDir::ChangeDir(CZNC::Get().GetCurPath(), sModPath));
+    pModule->SetModPath(NoDir::ChangeDir(CZNC::Get().GetCurPath(), sModPath));
     push_back(pModule);
 
     bool bLoaded;
     try {
         bLoaded = pModule->OnLoad(sArgs, sRetMsg);
-    } catch (const CModule::EModException&) {
+    } catch (const NoModule::EModException&) {
         bLoaded = false;
         sRetMsg = "Caught an exception";
     }
@@ -549,16 +549,16 @@ bool CModules::LoadModule(const CString& sModule, const CString& sArgs, CModInfo
     return true;
 }
 
-bool CModules::UnloadModule(const CString& sModule)
+bool NoModules::UnloadModule(const NoString& sModule)
 {
-    CString s;
+    NoString s;
     return UnloadModule(sModule, s);
 }
 
-bool CModules::UnloadModule(const CString& sModule, CString& sRetMsg)
+bool NoModules::UnloadModule(const NoString& sModule, NoString& sRetMsg)
 {
-    CString sMod = sModule; // Make a copy incase the reference passed in is from CModule::GetModName()
-    CModule* pModule = FindModule(sMod);
+    NoString sMod = sModule; // Make a copy incase the reference passed in is from NoModule::GetModName()
+    NoModule* pModule = FindModule(sMod);
     sRetMsg = "";
 
     if (!pModule) {
@@ -593,17 +593,17 @@ bool CModules::UnloadModule(const CString& sModule, CString& sRetMsg)
     return false;
 }
 
-bool CModules::ReloadModule(const CString& sModule, const CString& sArgs, CUser* pUser, CNetwork* pNetwork, CString& sRetMsg)
+bool NoModules::ReloadModule(const NoString& sModule, const NoString& sArgs, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
 {
-    CString sMod = sModule; // Make a copy incase the reference passed in is from CModule::GetModName()
-    CModule* pModule = FindModule(sMod);
+    NoString sMod = sModule; // Make a copy incase the reference passed in is from NoModule::GetModName()
+    NoModule* pModule = FindModule(sMod);
 
     if (!pModule) {
         sRetMsg = "Module [" + sMod + "] not loaded";
         return false;
     }
 
-    CModInfo::EModuleType eType = pModule->GetType();
+    NoModInfo::EModuleType eType = pModule->GetType();
     pModule = nullptr;
 
     sRetMsg = "";
@@ -619,9 +619,9 @@ bool CModules::ReloadModule(const CString& sModule, const CString& sArgs, CUser*
     return true;
 }
 
-bool CModules::GetModInfo(CModInfo& ModInfo, const CString& sModule, CString& sRetMsg)
+bool NoModules::GetModInfo(NoModInfo& ModInfo, const NoString& sModule, NoString& sRetMsg)
 {
-    CString sModPath, sTmp;
+    NoString sModPath, sTmp;
 
     bool bSuccess;
     bool bHandled = false;
@@ -636,7 +636,7 @@ bool CModules::GetModInfo(CModInfo& ModInfo, const CString& sModule, CString& sR
     return GetModPathInfo(ModInfo, sModule, sModPath, sRetMsg);
 }
 
-bool CModules::GetModPathInfo(CModInfo& ModInfo, const CString& sModule, const CString& sModPath, CString& sRetMsg)
+bool NoModules::GetModPathInfo(NoModInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg)
 {
     bool bVersionMismatch;
 
@@ -656,12 +656,12 @@ bool CModules::GetModPathInfo(CModInfo& ModInfo, const CString& sModule, const C
     return true;
 }
 
-void CModules::GetAvailableMods(set<CModInfo>& ssMods, CModInfo::EModuleType eType)
+void NoModules::GetAvailableMods(set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
 {
     ssMods.clear();
 
     unsigned int a = 0;
-    CDir Dir;
+    NoDir Dir;
 
     ModDirList dirs = GetModDirs();
 
@@ -670,13 +670,13 @@ void CModules::GetAvailableMods(set<CModInfo>& ssMods, CModInfo::EModuleType eTy
         dirs.pop();
 
         for (a = 0; a < Dir.size(); a++) {
-            CFile& File = *Dir[a];
-            CString sName = File.GetShortName();
-            CString sPath = File.GetLongName();
-            CModInfo ModInfo;
+            NoFile& File = *Dir[a];
+            NoString sName = File.GetShortName();
+            NoString sPath = File.GetLongName();
+            NoModInfo ModInfo;
             sName.RightChomp(3);
 
-            CString sIgnoreRetMsg;
+            NoString sIgnoreRetMsg;
             if (GetModPathInfo(ModInfo, sName, sPath, sIgnoreRetMsg)) {
                 if (ModInfo.SupportsType(eType)) {
                     ssMods.insert(ModInfo);
@@ -688,15 +688,15 @@ void CModules::GetAvailableMods(set<CModInfo>& ssMods, CModInfo::EModuleType eTy
     GLOBALMODULECALL(OnGetAvailableMods(ssMods, eType), NOTHING);
 }
 
-void CModules::GetDefaultMods(set<CModInfo>& ssMods, CModInfo::EModuleType eType)
+void NoModules::GetDefaultMods(set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
 {
 
     GetAvailableMods(ssMods, eType);
 
-    const map<CString, CModInfo::EModuleType> ns = { { "chansaver", CModInfo::UserModule },
-                                                     { "controlpanel", CModInfo::UserModule },
-                                                     { "simple_away", CModInfo::NetworkModule },
-                                                     { "webadmin", CModInfo::GlobalModule } };
+    const map<NoString, NoModInfo::EModuleType> ns = { { "chansaver", NoModInfo::UserModule },
+                                                     { "controlpanel", NoModInfo::UserModule },
+                                                     { "simple_away", NoModInfo::NetworkModule },
+                                                     { "webadmin", NoModInfo::GlobalModule } };
 
     auto it = ssMods.begin();
     while (it != ssMods.end()) {
@@ -709,11 +709,11 @@ void CModules::GetDefaultMods(set<CModInfo>& ssMods, CModInfo::EModuleType eType
     }
 }
 
-bool CModules::FindModPath(const CString& sModule, CString& sModPath, CString& sDataPath)
+bool NoModules::FindModPath(const NoString& sModule, NoString& sModPath, NoString& sDataPath)
 {
-    CString sMod = sModule;
-    CString sDir = sMod;
-    if (sModule.find(".") == CString::npos) sMod += ".so";
+    NoString sMod = sModule;
+    NoString sDir = sMod;
+    if (sModule.find(".") == NoString::npos) sMod += ".so";
 
     ModDirList dirs = GetModDirs();
 
@@ -722,7 +722,7 @@ bool CModules::FindModPath(const CString& sModule, CString& sModPath, CString& s
         sDataPath = dirs.front().second;
         dirs.pop();
 
-        if (CFile::Exists(sModPath)) {
+        if (NoFile::Exists(sModPath)) {
             sDataPath += sDir;
             return true;
         }
@@ -731,22 +731,22 @@ bool CModules::FindModPath(const CString& sModule, CString& sModPath, CString& s
     return false;
 }
 
-CModules::ModDirList CModules::GetModDirs()
+NoModules::ModDirList NoModules::GetModDirs()
 {
     ModDirList ret;
-    CString sDir;
+    NoString sDir;
 
     // ~/.znc/modules
     sDir = CZNC::Get().GetModPath() + "/";
     ret.push(std::make_pair(sDir, sDir));
 
     // <moduledir> and <datadir> (<prefix>/lib/znc)
-    ret.push(std::make_pair(_MODDIR_ + CString("/"), _DATADIR_ + CString("/modules/")));
+    ret.push(std::make_pair(_MODDIR_ + NoString("/"), _DATADIR_ + NoString("/modules/")));
 
     return ret;
 }
 
-ModHandle CModules::OpenModule(const CString& sModule, const CString& sModPath, bool& bVersionMismatch, CModInfo& Info, CString& sRetMsg)
+ModHandle NoModules::OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModInfo& Info, NoString& sRetMsg)
 {
     // Some sane defaults in case anything errors out below
     bVersionMismatch = false;
@@ -778,21 +778,21 @@ ModHandle CModules::OpenModule(const CString& sModule, const CString& sModPath, 
         // dlerror() returns pointer to static buffer, which may be overwritten very soon with another dl call
         // also it may just return null.
         const char* cDlError = dlerror();
-        CString sDlError = cDlError ? cDlError : "Unknown error";
+        NoString sDlError = cDlError ? cDlError : "Unknown error";
         sRetMsg = "Unable to open module [" + sModule + "] [" + sDlError + "]";
         return nullptr;
     }
 
-    typedef bool (*InfoFP)(double, CModInfo&);
-    InfoFP ZNCModInfo = (InfoFP)dlsym(p, "ZNCModInfo");
+    typedef bool (*InfoFP)(double, NoModInfo&);
+    InfoFP ZNNoModInfo = (InfoFP)dlsym(p, "ZNNoModInfo");
 
-    if (!ZNCModInfo) {
+    if (!ZNNoModInfo) {
         dlclose(p);
-        sRetMsg = "Could not find ZNCModInfo() in module [" + sModule + "]";
+        sRetMsg = "Could not find ZNNoModInfo() in module [" + sModule + "]";
         return nullptr;
     }
 
-    if (ZNCModInfo(CModule::GetCoreVersion(), Info)) {
+    if (ZNNoModInfo(NoModule::GetCoreVersion(), Info)) {
         sRetMsg = "";
         bVersionMismatch = false;
     } else {

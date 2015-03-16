@@ -19,14 +19,14 @@
 #include <sys/time.h>
 #include <stdio.h>
 
-bool CDebug::stdoutIsTTY = true;
+bool NoDebug::stdoutIsTTY = true;
 #ifndef NDEBUG
-bool CDebug::debug = true;
+bool NoDebug::debug = true;
 #else
-bool CDebug::debug = false;
+bool NoDebug::debug = false;
 #endif
 
-CDebugStream::~CDebugStream()
+NoDebugStream::~NoDebugStream()
 {
     timeval tTime;
     gettimeofday(&tTime, nullptr);
@@ -38,5 +38,5 @@ CDebugStream::~CDebugStream()
     strftime(sTime, sizeof(sTime), "%Y-%m-%d %H:%M:%S", &tM);
     char sUsec[7] = {};
     snprintf(sUsec, sizeof(sUsec), "%06lu", (unsigned long int)tTime.tv_usec);
-    std::cout << "[" << sTime << "." << sUsec << "] " << CString(this->str()).Escape_n(CString::EDEBUG) << std::endl;
+    std::cout << "[" << sTime << "." << sUsec << "] " << NoString(this->str()).Escape_n(NoString::EDEBUG) << std::endl;
 }

@@ -21,29 +21,29 @@
 #include <znc/Csocket.h>
 #include <znc/nothreads.h>
 
-class CModule;
+class NoModule;
 
-class CZNCSock : public Csock
+class NoBaseSocket : public Csock
 {
 public:
-    CZNCSock(int timeout = 60);
-    CZNCSock(const CString& sHost, u_short port, int timeout = 60);
-    ~CZNCSock() {}
+    NoBaseSocket(int timeout = 60);
+    NoBaseSocket(const NoString& sHost, u_short port, int timeout = 60);
+    ~NoBaseSocket() {}
 
     int ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const override;
 #ifdef HAVE_LIBSSL
     int VerifyPeerCertificate(int iPreVerify, X509_STORE_CTX* pStoreCTX) override;
     void SSLHandShakeFinished() override;
 #endif
-    void SetHostToVerifySSL(const CString& sHost) { m_HostToVerifySSL = sHost; }
-    CString GetSSLPeerFingerprint() const;
-    void SetSSLTrustedPeerFingerprints(const SCString& ssFPs) { m_ssTrustedFingerprints = ssFPs; }
+    void SetHostToVerifySSL(const NoString& sHost) { m_HostToVerifySSL = sHost; }
+    NoString GetSSLPeerFingerprint() const;
+    void SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs) { m_ssTrustedFingerprints = ssFPs; }
 
 #ifndef HAVE_ICU
     // Don't fail to compile when ICU is not enabled
-    void SetEncoding(const CString&) {}
+    void SetEncoding(const NoString&) {}
 #endif
-    virtual CString GetRemoteIP() const { return Csock::GetRemoteIP(); }
+    virtual NoString GetRemoteIP() const { return Csock::GetRemoteIP(); }
 
 protected:
     // All existing errno codes seem to be in range 1-300
@@ -52,25 +52,25 @@ protected:
     };
 
 private:
-    CString m_HostToVerifySSL;
-    SCString m_ssTrustedFingerprints;
-    SCString m_ssCertVerificationErrors;
+    NoString m_HostToVerifySSL;
+    NoStringSet m_ssTrustedFingerprints;
+    NoStringSet m_ssCertVerificationErrors;
 };
 
 enum EAddrType { ADDR_IPV4ONLY, ADDR_IPV6ONLY, ADDR_ALL };
 
-class CSockManager : public TSocketManager<CZNCSock>
+class NoSocketManager : public TSocketManager<NoBaseSocket>
 {
 public:
-    CSockManager();
-    virtual ~CSockManager();
+    NoSocketManager();
+    virtual ~NoSocketManager();
 
     bool ListenHost(u_short iPort,
-                    const CString& sSockName,
-                    const CString& sBindHost,
+                    const NoString& sSockName,
+                    const NoString& sBindHost,
                     bool bSSL = false,
                     int iMaxConns = SOMAXCONN,
-                    CZNCSock* pcSock = nullptr,
+                    NoBaseSocket* pcSock = nullptr,
                     u_int iTimeout = 0,
                     EAddrType eAddr = ADDR_ALL)
     {
@@ -99,21 +99,21 @@ public:
     }
 
     bool ListenAll(u_short iPort,
-                   const CString& sSockName,
+                   const NoString& sSockName,
                    bool bSSL = false,
                    int iMaxConns = SOMAXCONN,
-                   CZNCSock* pcSock = nullptr,
+                   NoBaseSocket* pcSock = nullptr,
                    u_int iTimeout = 0,
                    EAddrType eAddr = ADDR_ALL)
     {
         return ListenHost(iPort, sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
     }
 
-    u_short ListenRand(const CString& sSockName,
-                       const CString& sBindHost,
+    u_short ListenRand(const NoString& sSockName,
+                       const NoString& sBindHost,
                        bool bSSL = false,
                        int iMaxConns = SOMAXCONN,
-                       CZNCSock* pcSock = nullptr,
+                       NoBaseSocket* pcSock = nullptr,
                        u_int iTimeout = 0,
                        EAddrType eAddr = ADDR_ALL)
     {
@@ -144,67 +144,67 @@ public:
         return uPort;
     }
 
-    u_short ListenAllRand(const CString& sSockName,
+    u_short ListenAllRand(const NoString& sSockName,
                           bool bSSL = false,
                           int iMaxConns = SOMAXCONN,
-                          CZNCSock* pcSock = nullptr,
+                          NoBaseSocket* pcSock = nullptr,
                           u_int iTimeout = 0,
                           EAddrType eAddr = ADDR_ALL)
     {
         return (ListenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr));
     }
 
-    void Connect(const CString& sHostname,
+    void Connect(const NoString& sHostname,
                  u_short iPort,
-                 const CString& sSockName,
+                 const NoString& sSockName,
                  int iTimeout = 60,
                  bool bSSL = false,
-                 const CString& sBindHost = "",
-                 CZNCSock* pcSock = nullptr);
+                 const NoString& sBindHost = "",
+                 NoBaseSocket* pcSock = nullptr);
 
-    unsigned int GetAnonConnectionCount(const CString& sIP) const;
+    unsigned int GetAnonConnectionCount(const NoString& sIP) const;
 
 private:
-    void FinishConnect(const CString& sHostname, u_short iPort, const CString& sSockName, int iTimeout, bool bSSL, const CString& sBindHost, CZNCSock* pcSock);
+    void FinishConnect(const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoBaseSocket* pcSock);
 
-    class CTDNSMonitorFD;
-    friend class CTDNSMonitorFD;
+    class NoDnsMonitorFD;
+    friend class NoDnsMonitorFD;
 #ifdef HAVE_THREADED_DNS
-    struct TDNSTask
+    struct NoDnsTask
     {
-        TDNSTask()
+        NoDnsTask()
             : sHostname(""), iPort(0), sSockName(""), iTimeout(0), bSSL(false), sBindhost(""), pcSock(nullptr),
               bDoneTarget(false), bDoneBind(false), aiTarget(nullptr), aiBind(nullptr)
         {
         }
 
-        TDNSTask(const TDNSTask&) = delete;
-        TDNSTask& operator=(const TDNSTask&) = delete;
+        NoDnsTask(const NoDnsTask&) = delete;
+        NoDnsTask& operator=(const NoDnsTask&) = delete;
 
-        CString sHostname;
+        NoString sHostname;
         u_short iPort;
-        CString sSockName;
+        NoString sSockName;
         int iTimeout;
         bool bSSL;
-        CString sBindhost;
-        CZNCSock* pcSock;
+        NoString sBindhost;
+        NoBaseSocket* pcSock;
 
         bool bDoneTarget;
         bool bDoneBind;
         addrinfo* aiTarget;
         addrinfo* aiBind;
     };
-    class CDNSJob : public CJob
+    class NoDnsJob : public NoJob
     {
     public:
-        CDNSJob() : sHostname(""), task(nullptr), pManager(nullptr), bBind(false), iRes(0), aiResult(nullptr) {}
+        NoDnsJob() : sHostname(""), task(nullptr), pManager(nullptr), bBind(false), iRes(0), aiResult(nullptr) {}
 
-        CDNSJob(const CDNSJob&) = delete;
-        CDNSJob& operator=(const CDNSJob&) = delete;
+        NoDnsJob(const NoDnsJob&) = delete;
+        NoDnsJob& operator=(const NoDnsJob&) = delete;
 
-        CString sHostname;
-        TDNSTask* task;
-        CSockManager* pManager;
+        NoString sHostname;
+        NoDnsTask* task;
+        NoSocketManager* pManager;
         bool bBind;
 
         int iRes;
@@ -213,15 +213,15 @@ private:
         void runThread() override;
         void runMain() override;
     };
-    void StartTDNSThread(TDNSTask* task, bool bBind);
-    void SetTDNSThreadFinished(TDNSTask* task, bool bBind, addrinfo* aiResult);
+    void StartTDNSThread(NoDnsTask* task, bool bBind);
+    void SetTDNSThreadFinished(NoDnsTask* task, bool bBind, addrinfo* aiResult);
     static void* TDNSThread(void* argument);
 #endif
 protected:
 };
 
 /**
- * @class CSocket
+ * @class NoSocket
  * @brief Base Csock implementation to be used by modules
  *
  * By all means, this class should be used as a base for sockets originating from modules. It handles removing instances
@@ -230,14 +230,14 @@ protected:
  * - EnableReadLine is default to true in this class
  * - MaxBuffer for readline is set to 10240, in the event this is reached the socket is closed (@see ReachedMaxBuffer)
  */
-class CSocket : public CZNCSock
+class NoSocket : public NoBaseSocket
 {
 public:
     /**
      * @brief ctor
      * @param pModule the module this sock instance is associated to
      */
-    CSocket(CModule* pModule);
+    NoSocket(NoModule* pModule);
     /**
      * @brief ctor
      * @param pModule the module this sock instance is associated to
@@ -245,40 +245,40 @@ public:
      * @param uPort the port being connected to
      * @param iTimeout the timeout period for this specific sock
      */
-    CSocket(CModule* pModule, const CString& sHostname, unsigned short uPort, int iTimeout = 60);
-    virtual ~CSocket();
+    NoSocket(NoModule* pModule, const NoString& sHostname, unsigned short uPort, int iTimeout = 60);
+    virtual ~NoSocket();
 
-    CSocket(const CSocket&) = delete;
-    CSocket& operator=(const CSocket&) = delete;
+    NoSocket(const NoSocket&) = delete;
+    NoSocket& operator=(const NoSocket&) = delete;
 
     using Csock::Connect;
     using Csock::Listen;
 
     //! This defaults to closing the socket, feel free to override
     void ReachedMaxBuffer() override;
-    void SockError(int iErrno, const CString& sDescription) override;
+    void SockError(int iErrno, const NoString& sDescription) override;
 
     //! This limits the global connections from this IP to defeat DoS attacks, feel free to override. The ACL used is
     // provided by the main interface @see CZNC::AllowConnectionFrom
-    bool ConnectionFrom(const CString& sHost, unsigned short uPort) override;
+    bool ConnectionFrom(const NoString& sHost, unsigned short uPort) override;
 
     //! Ease of use Connect, assigns to the manager and is subsequently tracked
-    bool Connect(const CString& sHostname, unsigned short uPort, bool bSSL = false, unsigned int uTimeout = 60);
+    bool Connect(const NoString& sHostname, unsigned short uPort, bool bSSL = false, unsigned int uTimeout = 60);
     //! Ease of use Listen, assigned to the manager and is subsequently tracked
     bool Listen(unsigned short uPort, bool bSSL, unsigned int uTimeout = 0);
 
-    CModule* GetModule() const;
+    NoModule* GetModule() const;
 
 private:
 protected:
-    CModule* m_pModule; //!< pointer to the module that this sock instance belongs to
+    NoModule* m_pModule; //!< pointer to the module that this sock instance belongs to
 };
 
 /**
- * @class CIRCSocket
+ * @class NoIrcSocket
  * @brief Base IRC socket for client<->ZNC, and ZNC<->server
  */
-class CIRCSocket : public CZNCSock
+class NoIrcSocket : public NoBaseSocket
 {
 public:
 #ifdef HAVE_ICU

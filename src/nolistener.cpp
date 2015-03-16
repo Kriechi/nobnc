@@ -17,19 +17,19 @@
 #include "nolistener.h"
 #include "noznc.h"
 
-CListener::~CListener()
+NoListener::~NoListener()
 {
     if (m_pListener) CZNC::Get().GetManager().DelSockByAddr(m_pListener);
 }
 
-bool CListener::Listen()
+bool NoListener::Listen()
 {
     if (!m_uPort || m_pListener) {
         errno = EINVAL;
         return false;
     }
 
-    m_pListener = new CRealListener(*this);
+    m_pListener = new NoRealListener(*this);
 
     bool bSSL = false;
 #ifdef HAVE_LIBSSL
@@ -46,11 +46,11 @@ bool CListener::Listen()
     return CZNC::Get().GetManager().ListenHost(m_uPort, "_LISTENER", m_sBindHost, bSSL, SOMAXCONN, m_pListener, 0, m_eAddr);
 }
 
-void CListener::ResetRealListener() { m_pListener = nullptr; }
+void NoListener::ResetRealListener() { m_pListener = nullptr; }
 
-CRealListener::~CRealListener() { m_Listener.ResetRealListener(); }
+NoRealListener::~NoRealListener() { m_Listener.ResetRealListener(); }
 
-bool CRealListener::ConnectionFrom(const CString& sHost, unsigned short uPort)
+bool NoRealListener::ConnectionFrom(const NoString& sHost, unsigned short uPort)
 {
     bool bHostAllowed = CZNC::Get().IsHostAllowed(sHost);
     DEBUG(GetSockName() << " == ConnectionFrom(" << sHost << ", " << uPort << ") ["
@@ -58,9 +58,9 @@ bool CRealListener::ConnectionFrom(const CString& sHost, unsigned short uPort)
     return bHostAllowed;
 }
 
-Csock* CRealListener::GetSockObj(const CString& sHost, unsigned short uPort)
+Csock* NoRealListener::GetSockObj(const NoString& sHost, unsigned short uPort)
 {
-    CIncomingConnection* pClient = new CIncomingConnection(sHost, uPort, m_Listener.GetAcceptType(), m_Listener.GetURIPrefix());
+    NoIncomingConnection* pClient = new NoIncomingConnection(sHost, uPort, m_Listener.GetAcceptType(), m_Listener.GetURIPrefix());
     if (CZNC::Get().AllowConnectionFrom(sHost)) {
         GLOBALMODULECALL(OnClientConnect(pClient, sHost, uPort), NOTHING);
     } else {
@@ -71,21 +71,21 @@ Csock* CRealListener::GetSockObj(const CString& sHost, unsigned short uPort)
     return pClient;
 }
 
-void CRealListener::SockError(int iErrno, const CString& sDescription)
+void NoRealListener::SockError(int iErrno, const NoString& sDescription)
 {
     DEBUG(GetSockName() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
     if (iErrno == EMFILE) {
         // We have too many open fds, let's close this listening port to be able to continue
         // to work, next rehash will (try to) reopen it.
         CZNC::Get().Broadcast("We hit the FD limit, closing listening socket on [" + GetLocalIP() + " : " +
-                              CString(GetLocalPort()) + "]");
+                              NoString(GetLocalPort()) + "]");
         CZNC::Get().Broadcast("An admin has to rehash to reopen the listening port");
         Close();
     }
 }
 
-CIncomingConnection::CIncomingConnection(const CString& sHostname, unsigned short uPort, CListener::EAcceptType eAcceptType, const CString& sURIPrefix)
-    : CZNCSock(sHostname, uPort), m_eAcceptType(eAcceptType), m_sURIPrefix(sURIPrefix)
+NoIncomingConnection::NoIncomingConnection(const NoString& sHostname, unsigned short uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix)
+    : NoBaseSocket(sHostname, uPort), m_eAcceptType(eAcceptType), m_sURIPrefix(sURIPrefix)
 {
     // The socket will time out in 120 secs, no matter what.
     // This has to be fixed up later, if desired.
@@ -95,7 +95,7 @@ CIncomingConnection::CIncomingConnection(const CString& sHostname, unsigned shor
     EnableReadLine();
 }
 
-void CIncomingConnection::ReachedMaxBuffer()
+void NoIncomingConnection::ReachedMaxBuffer()
 {
     if (GetCloseType() != CLT_DONT) return; // Already closing
 
@@ -107,11 +107,11 @@ void CIncomingConnection::ReachedMaxBuffer()
     Close();
 }
 
-void CIncomingConnection::ReadLine(const CString& sLine)
+void NoIncomingConnection::ReadLine(const NoString& sLine)
 {
     bool bIsHTTP = (sLine.WildCmp("GET * HTTP/1.?\r\n") || sLine.WildCmp("POST * HTTP/1.?\r\n"));
-    bool bAcceptHTTP = (m_eAcceptType == CListener::ACCEPT_ALL) || (m_eAcceptType == CListener::ACCEPT_HTTP);
-    bool bAcceptIRC = (m_eAcceptType == CListener::ACCEPT_ALL) || (m_eAcceptType == CListener::ACCEPT_IRC);
+    bool bAcceptHTTP = (m_eAcceptType == NoListener::ACCEPT_ALL) || (m_eAcceptType == NoListener::ACCEPT_HTTP);
+    bool bAcceptIRC = (m_eAcceptType == NoListener::ACCEPT_ALL) || (m_eAcceptType == NoListener::ACCEPT_IRC);
     Csock* pSock = nullptr;
 
     if (!bIsHTTP) {
@@ -125,7 +125,7 @@ void CIncomingConnection::ReadLine(const CString& sLine)
             return;
         }
 
-        pSock = new CClient();
+        pSock = new NoClient();
         CZNC::Get().GetManager().SwapSockByAddr(pSock, this);
 
         // And don't forget to give it some sane name / timeout
@@ -141,7 +141,7 @@ void CIncomingConnection::ReadLine(const CString& sLine)
             return;
         }
 
-        pSock = new CWebSock(m_sURIPrefix);
+        pSock = new NoWebSock(m_sURIPrefix);
         CZNC::Get().GetManager().SwapSockByAddr(pSock, this);
 
         // And don't forget to give it some sane name / timeout

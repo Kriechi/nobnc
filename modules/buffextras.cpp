@@ -19,14 +19,14 @@
 
 using std::vector;
 
-class CBuffExtras : public CModule
+class NoBuffExtras : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CBuffExtras) {}
+    MODCONSTRUCTOR(NoBuffExtras) {}
 
-    virtual ~CBuffExtras() {}
+    virtual ~NoBuffExtras() {}
 
-    void AddBuffer(CChannel& Channel, const CString& sMessage)
+    void AddBuffer(NoChannel& Channel, const NoString& sMessage)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
         if (Channel.AutoClearChanBuffer() && GetNetwork()->IsUserOnline()) return;
@@ -35,43 +35,43 @@ public:
                           sMessage);
     }
 
-    void OnRawMode2(const CNick* pOpNick, CChannel& Channel, const CString& sModes, const CString& sArgs) override
+    void OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
     {
-        const CString sNickMask = pOpNick ? pOpNick->GetNickMask() : "Server";
+        const NoString sNickMask = pOpNick ? pOpNick->GetNickMask() : "Server";
         AddBuffer(Channel, sNickMask + " set mode: " + sModes + " " + sArgs);
     }
 
-    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChannel& Channel, const CString& sMessage) override
+    void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
         AddBuffer(Channel, OpNick.GetNickMask() + " kicked " + sKickedNick + " Reason: [" + sMessage + "]");
     }
 
-    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChannel*>& vChans) override
+    void OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) override
     {
-        vector<CChannel*>::const_iterator it;
-        CString sMsg = Nick.GetNickMask() + " quit with message: [" + sMessage + "]";
+        vector<NoChannel*>::const_iterator it;
+        NoString sMsg = Nick.GetNickMask() + " quit with message: [" + sMessage + "]";
         for (it = vChans.begin(); it != vChans.end(); ++it) {
             AddBuffer(**it, sMsg);
         }
     }
 
-    void OnJoin(const CNick& Nick, CChannel& Channel) override { AddBuffer(Channel, Nick.GetNickMask() + " joined"); }
+    void OnJoin(const NoNick& Nick, NoChannel& Channel) override { AddBuffer(Channel, Nick.GetNickMask() + " joined"); }
 
-    void OnPart(const CNick& Nick, CChannel& Channel, const CString& sMessage) override
+    void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
         AddBuffer(Channel, Nick.GetNickMask() + " parted with message: [" + sMessage + "]");
     }
 
-    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChannel*>& vChans) override
+    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override
     {
-        vector<CChannel*>::const_iterator it;
-        CString sMsg = OldNick.GetNickMask() + " is now known as " + sNewNick;
+        vector<NoChannel*>::const_iterator it;
+        NoString sMsg = OldNick.GetNickMask() + " is now known as " + sNewNick;
         for (it = vChans.begin(); it != vChans.end(); ++it) {
             AddBuffer(**it, sMsg);
         }
     }
 
-    EModRet OnTopic(CNick& Nick, CChannel& Channel, CString& sTopic) override
+    EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
         AddBuffer(Channel, Nick.GetNickMask() + " changed the topic to: " + sTopic);
 
@@ -79,10 +79,10 @@ public:
     }
 };
 
-template <> void TModInfo<CBuffExtras>(CModInfo& Info)
+template <> void TModInfo<NoBuffExtras>(NoModInfo& Info)
 {
     Info.SetWikiPage("buffextras");
-    Info.AddType(CModInfo::NetworkModule);
+    Info.AddType(NoModInfo::NetworkModule);
 }
 
-USERMODULEDEFS(CBuffExtras, "Add joins, parts etc. to the playback buffer")
+USERMODULEDEFS(NoBuffExtras, "Add joins, parts etc. to the playback buffer")

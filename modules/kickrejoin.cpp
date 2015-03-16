@@ -25,21 +25,21 @@
 #include <znc/nochannel.h>
 #include <znc/nonetwork.h>
 
-class CRejoinJob : public CTimer
+class NoRejoinJob : public NoTimer
 {
 public:
-    CRejoinJob(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription)
-        : CTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoRejoinJob(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }
 
-    virtual ~CRejoinJob() {}
+    virtual ~NoRejoinJob() {}
 
 protected:
     void RunJob() override
     {
-        CNetwork* pNetwork = GetModule()->GetNetwork();
-        CChannel* pChan = pNetwork->FindChan(GetName().Token(1, true));
+        NoNetwork* pNetwork = GetModule()->GetNetwork();
+        NoChannel* pChan = pNetwork->FindChan(GetName().Token(1, true));
 
         if (pChan) {
             pChan->Enable();
@@ -48,30 +48,30 @@ protected:
     }
 };
 
-class CRejoinMod : public CModule
+class NoRejoinMod : public NoModule
 {
 private:
     unsigned int delay;
 
 public:
-    MODCONSTRUCTOR(CRejoinMod)
+    MODCONSTRUCTOR(NoRejoinMod)
     {
         AddHelpCommand();
         AddCommand("SetDelay",
-                   static_cast<CModCommand::ModCmdFunc>(&CRejoinMod::OnSetDelayCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoRejoinMod::OnSetDelayCommand),
                    "<secs>",
                    "Set the rejoin delay");
         AddCommand("ShowDelay",
-                   static_cast<CModCommand::ModCmdFunc>(&CRejoinMod::OnShowDelayCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoRejoinMod::OnShowDelayCommand),
                    "",
                    "Show the rejoin delay");
     }
-    virtual ~CRejoinMod() {}
+    virtual ~NoRejoinMod() {}
 
-    bool OnLoad(const CString& sArgs, CString& sErrorMsg) override
+    bool OnLoad(const NoString& sArgs, NoString& sErrorMsg) override
     {
         if (sArgs.empty()) {
-            CString sDelay = GetNV("delay");
+            NoString sDelay = GetNV("delay");
 
             if (sDelay.empty())
                 delay = 10;
@@ -91,7 +91,7 @@ public:
         return true;
     }
 
-    void OnSetDelayCommand(const CString& sCommand)
+    void OnSetDelayCommand(const NoString& sCommand)
     {
         int i;
         i = sCommand.Token(1).ToInt();
@@ -102,23 +102,23 @@ public:
         }
 
         delay = i;
-        SetNV("delay", CString(delay));
+        SetNV("delay", NoString(delay));
 
         if (delay)
-            PutModule("Rejoin delay set to " + CString(delay) + " seconds");
+            PutModule("Rejoin delay set to " + NoString(delay) + " seconds");
         else
             PutModule("Rejoin delay disabled");
     }
 
-    void OnShowDelayCommand(const CString& sCommand)
+    void OnShowDelayCommand(const NoString& sCommand)
     {
         if (delay)
-            PutModule("Rejoin delay enabled, " + CString(delay) + " seconds");
+            PutModule("Rejoin delay enabled, " + NoString(delay) + " seconds");
         else
             PutModule("Rejoin delay disabled");
     }
 
-    void OnKick(const CNick& OpNick, const CString& sKickedNick, CChannel& pChan, const CString& sMessage) override
+    void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& pChan, const NoString& sMessage) override
     {
         if (GetNetwork()->GetCurNick().Equals(sKickedNick)) {
             if (!delay) {
@@ -126,16 +126,16 @@ public:
                 pChan.Enable();
                 return;
             }
-            AddTimer(new CRejoinJob(this, delay, 1, "Rejoin " + pChan.GetName(), "Rejoin channel after a delay"));
+            AddTimer(new NoRejoinJob(this, delay, 1, "Rejoin " + pChan.GetName(), "Rejoin channel after a delay"));
         }
     }
 };
 
-template <> void TModInfo<CRejoinMod>(CModInfo& Info)
+template <> void TModInfo<NoRejoinMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("kickrejoin");
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("You might enter the number of seconds to wait before rejoining.");
 }
 
-NETWORKMODULEDEFS(CRejoinMod, "Autorejoin on kick")
+NETWORKMODULEDEFS(NoRejoinMod, "Autorejoin on kick")

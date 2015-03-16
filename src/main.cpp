@@ -23,7 +23,7 @@
 #include <openssl/crypto.h>
 #include <memory>
 
-static std::vector<std::unique_ptr<CMutex>> lock_cs;
+static std::vector<std::unique_ptr<NoMutex>> lock_cs;
 
 static void locking_callback(int mode, int type, const char* file, int line)
 {
@@ -38,12 +38,12 @@ static unsigned long thread_id_callback() { return (unsigned long)pthread_self()
 
 static CRYPTO_dynlock_value* dyn_create_callback(const char* file, int line)
 {
-    return (CRYPTO_dynlock_value*)new CMutex;
+    return (CRYPTO_dynlock_value*)new NoMutex;
 }
 
 static void dyn_lock_callback(int mode, CRYPTO_dynlock_value* dlock, const char* file, int line)
 {
-    CMutex* mtx = (CMutex*)dlock;
+    NoMutex* mtx = (NoMutex*)dlock;
 
     if (mode & CRYPTO_LOCK) {
         mtx->lock();
@@ -54,7 +54,7 @@ static void dyn_lock_callback(int mode, CRYPTO_dynlock_value* dlock, const char*
 
 static void dyn_destroy_callback(CRYPTO_dynlock_value* dlock, const char* file, int line)
 {
-    CMutex* mtx = (CMutex*)dlock;
+    NoMutex* mtx = (NoMutex*)dlock;
 
     delete mtx;
 }
@@ -63,7 +63,7 @@ static void thread_setup()
 {
     lock_cs.resize(CRYPTO_num_locks());
 
-    for (std::unique_ptr<CMutex>& mtx : lock_cs) mtx = std::unique_ptr<CMutex>(new CMutex());
+    for (std::unique_ptr<NoMutex>& mtx : lock_cs) mtx = std::unique_ptr<NoMutex>(new NoMutex());
 
     CRYPTO_set_id_callback(&thread_id_callback);
     CRYPTO_set_locking_callback(&locking_callback);
@@ -116,27 +116,27 @@ static const struct option g_LongOpts[] = { { "help", no_argument, nullptr, 'h' 
 
 static void GenerateHelp(const char* appname)
 {
-    CUtils::PrintMessage("USAGE: " + CString(appname) + " [options]");
-    CUtils::PrintMessage("Options are:");
-    CUtils::PrintMessage("\t-h, --help         List available command line options (this page)");
-    CUtils::PrintMessage("\t-v, --version      Output version information and exit");
-    CUtils::PrintMessage("\t-f, --foreground   Don't fork into the background");
-    CUtils::PrintMessage("\t-D, --debug        Output debugging information (Implies -f)");
-    CUtils::PrintMessage("\t-n, --no-color     Don't use escape sequences in the output");
-    CUtils::PrintMessage("\t-r, --allow-root   Don't complain if ZNC is run as root");
-    CUtils::PrintMessage("\t-c, --makeconf     Interactively create a new config");
-    CUtils::PrintMessage("\t-s, --makepass     Generates a password for use in config");
+    NoUtils::PrintMessage("USAGE: " + NoString(appname) + " [options]");
+    NoUtils::PrintMessage("Options are:");
+    NoUtils::PrintMessage("\t-h, --help         List available command line options (this page)");
+    NoUtils::PrintMessage("\t-v, --version      Output version information and exit");
+    NoUtils::PrintMessage("\t-f, --foreground   Don't fork into the background");
+    NoUtils::PrintMessage("\t-D, --debug        Output debugging information (Implies -f)");
+    NoUtils::PrintMessage("\t-n, --no-color     Don't use escape sequences in the output");
+    NoUtils::PrintMessage("\t-r, --allow-root   Don't complain if ZNC is run as root");
+    NoUtils::PrintMessage("\t-c, --makeconf     Interactively create a new config");
+    NoUtils::PrintMessage("\t-s, --makepass     Generates a password for use in config");
 #ifdef HAVE_LIBSSL
-    CUtils::PrintMessage("\t-p, --makepem      Generates a pemfile for use with SSL");
+    NoUtils::PrintMessage("\t-p, --makepem      Generates a pemfile for use with SSL");
 #endif /* HAVE_LIBSSL */
-    CUtils::PrintMessage("\t-d, --datadir      Set a different ZNC repository (default is ~/.znc)");
+    NoUtils::PrintMessage("\t-d, --datadir      Set a different ZNC repository (default is ~/.znc)");
 }
 
 static void die(int sig)
 {
     signal(SIGPIPE, SIG_DFL);
 
-    CUtils::PrintMessage("Exiting on SIG [" + CString(sig) + "]");
+    NoUtils::PrintMessage("Exiting on SIG [" + NoString(sig) + "]");
 
     CZNC::DestroyInstance();
     exit(sig);
@@ -146,15 +146,15 @@ static void signalHandler(int sig)
 {
     switch (sig) {
     case SIGHUP:
-        CUtils::PrintMessage("Caught SIGHUP");
+        NoUtils::PrintMessage("Caught SIGHUP");
         CZNC::Get().SetConfigState(CZNC::ECONFIG_NEED_REHASH);
         break;
     case SIGUSR1:
-        CUtils::PrintMessage("Caught SIGUSR1");
+        NoUtils::PrintMessage("Caught SIGUSR1");
         CZNC::Get().SetConfigState(CZNC::ECONFIG_NEED_VERBOSE_WRITE);
         break;
     default:
-        CUtils::PrintMessage("WTF? Signal handler called for a signal it doesn't know?");
+        NoUtils::PrintMessage("WTF? Signal handler called for a signal it doesn't know?");
     }
 }
 
@@ -188,13 +188,13 @@ static void seedPRNG()
 
 int main(int argc, char** argv)
 {
-    CString sConfig;
-    CString sDataDir = "";
+    NoString sConfig;
+    NoString sDataDir = "";
 
     thread_setup();
 
     seedPRNG();
-    CDebug::SetStdoutIsTTY(isatty(1));
+    NoDebug::SetStdoutIsTTY(isatty(1));
 
     int iArg, iOptIndex = -1;
     bool bMakeConf = false;
@@ -219,7 +219,7 @@ int main(int argc, char** argv)
             cout << CZNC::GetCompileOptionsString() << endl;
             return 0;
         case 'n':
-            CDebug::SetStdoutIsTTY(false);
+            NoDebug::SetStdoutIsTTY(false);
             break;
         case 'r':
             bAllowRoot = true;
@@ -235,18 +235,18 @@ int main(int argc, char** argv)
             bMakePem = true;
             break;
 #else
-            CUtils::PrintError("ZNC is compiled without SSL support.");
+            NoUtils::PrintError("ZNC is compiled without SSL support.");
             return 1;
 #endif /* HAVE_LIBSSL */
         case 'd':
-            sDataDir = CString(optarg);
+            sDataDir = NoString(optarg);
             break;
         case 'f':
             bForeground = true;
             break;
         case 'D':
             bForeground = true;
-            CDebug::SetDebug(true);
+            NoDebug::SetDebug(true);
             break;
         case '?':
         default:
@@ -256,8 +256,8 @@ int main(int argc, char** argv)
     }
 
     if (optind < argc) {
-        CUtils::PrintError("Specifying a config file as an argument isn't supported anymore.");
-        CUtils::PrintError("Use --datadir instead.");
+        NoUtils::PrintError("Specifying a config file as an argument isn't supported anymore.");
+        NoUtils::PrintError("Use --datadir instead.");
         return 1;
     }
 
@@ -274,53 +274,53 @@ int main(int argc, char** argv)
 #endif /* HAVE_LIBSSL */
 
     if (bMakePass) {
-        CString sSalt;
-        CUtils::PrintMessage("Type your new password.");
-        CString sHash = CUtils::GetSaltedHashPass(sSalt);
-        CUtils::PrintMessage("Kill ZNC process, if it's running.");
-        CUtils::PrintMessage("Then replace password in the <User> section of your config with this:");
+        NoString sSalt;
+        NoUtils::PrintMessage("Type your new password.");
+        NoString sHash = NoUtils::GetSaltedHashPass(sSalt);
+        NoUtils::PrintMessage("Kill ZNC process, if it's running.");
+        NoUtils::PrintMessage("Then replace password in the <User> section of your config with this:");
         // Not PrintMessage(), to remove [**] from the beginning, to ease copypasting
         std::cout << "<Pass password>" << std::endl;
-        std::cout << "\tMethod = " << CUtils::sDefaultHash << std::endl;
+        std::cout << "\tMethod = " << NoUtils::sDefaultHash << std::endl;
         std::cout << "\tHash = " << sHash << std::endl;
         std::cout << "\tSalt = " << sSalt << std::endl;
         std::cout << "</Pass>" << std::endl;
-        CUtils::PrintMessage("After that start ZNC again, and you should be able to login with the new password.");
+        NoUtils::PrintMessage("After that start ZNC again, and you should be able to login with the new password.");
 
         CZNC::DestroyInstance();
         return 0;
     }
 
     {
-        set<CModInfo> ssGlobalMods;
-        set<CModInfo> ssUserMods;
-        set<CModInfo> ssNetworkMods;
-        CUtils::PrintAction("Checking for list of available modules");
-        pZNC->GetModules().GetAvailableMods(ssGlobalMods, CModInfo::GlobalModule);
-        pZNC->GetModules().GetAvailableMods(ssUserMods, CModInfo::UserModule);
-        pZNC->GetModules().GetAvailableMods(ssNetworkMods, CModInfo::NetworkModule);
+        set<NoModInfo> ssGlobalMods;
+        set<NoModInfo> ssUserMods;
+        set<NoModInfo> ssNetworkMods;
+        NoUtils::PrintAction("Checking for list of available modules");
+        pZNC->GetModules().GetAvailableMods(ssGlobalMods, NoModInfo::GlobalModule);
+        pZNC->GetModules().GetAvailableMods(ssUserMods, NoModInfo::UserModule);
+        pZNC->GetModules().GetAvailableMods(ssNetworkMods, NoModInfo::NetworkModule);
         if (ssGlobalMods.empty() && ssUserMods.empty() && ssNetworkMods.empty()) {
-            CUtils::PrintStatus(false, "");
-            CUtils::PrintError("No modules found. Perhaps you didn't install ZNC properly?");
-            CUtils::PrintError("Read http://wiki.znc.in/Installation for instructions.");
-            if (!CUtils::GetBoolInput("Do you really want to run ZNC without any modules?", false)) {
+            NoUtils::PrintStatus(false, "");
+            NoUtils::PrintError("No modules found. Perhaps you didn't install ZNC properly?");
+            NoUtils::PrintError("Read http://wiki.znc.in/Installation for instructions.");
+            if (!NoUtils::GetBoolInput("Do you really want to run ZNC without any modules?", false)) {
                 CZNC::DestroyInstance();
                 return 1;
             }
         }
-        CUtils::PrintStatus(true, "");
+        NoUtils::PrintStatus(true, "");
     }
 
     if (isRoot()) {
-        CUtils::PrintError("You are running ZNC as root! Don't do that! There are not many valid");
-        CUtils::PrintError("reasons for this and it can, in theory, cause great damage!");
+        NoUtils::PrintError("You are running ZNC as root! Don't do that! There are not many valid");
+        NoUtils::PrintError("reasons for this and it can, in theory, cause great damage!");
         if (!bAllowRoot) {
             CZNC::DestroyInstance();
             return 1;
         }
-        CUtils::PrintError("You have been warned.");
-        CUtils::PrintError("Hit CTRL+C now if you don't want to run ZNC as root.");
-        CUtils::PrintError("ZNC will start in 30 seconds.");
+        NoUtils::PrintError("You have been warned.");
+        NoUtils::PrintError("Hit CTRL+C now if you don't want to run ZNC as root.");
+        NoUtils::PrintError("ZNC will start in 30 seconds.");
         sleep(30);
     }
 
@@ -332,42 +332,42 @@ int main(int argc, char** argv)
         /* Fall through to normal bootup */
     }
 
-    CString sConfigError;
+    NoString sConfigError;
     if (!pZNC->ParseConfig(sConfig, sConfigError)) {
-        CUtils::PrintError("Unrecoverable config error.");
+        NoUtils::PrintError("Unrecoverable config error.");
         CZNC::DestroyInstance();
         return 1;
     }
 
     if (!pZNC->OnBoot()) {
-        CUtils::PrintError("Exiting due to module boot errors.");
+        NoUtils::PrintError("Exiting due to module boot errors.");
         CZNC::DestroyInstance();
         return 1;
     }
 
     if (bForeground) {
         int iPid = getpid();
-        CUtils::PrintMessage("Staying open for debugging [pid: " + CString(iPid) + "]");
+        NoUtils::PrintMessage("Staying open for debugging [pid: " + NoString(iPid) + "]");
 
         pZNC->WritePidFile(iPid);
-        CUtils::PrintMessage(CZNC::GetTag());
+        NoUtils::PrintMessage(CZNC::GetTag());
     } else {
-        CUtils::PrintAction("Forking into the background");
+        NoUtils::PrintAction("Forking into the background");
 
         int iPid = fork();
 
         if (iPid == -1) {
-            CUtils::PrintStatus(false, strerror(errno));
+            NoUtils::PrintStatus(false, strerror(errno));
             CZNC::DestroyInstance();
             return 1;
         }
 
         if (iPid > 0) {
             // We are the parent. We are done and will go to bed.
-            CUtils::PrintStatus(true, "[pid: " + CString(iPid) + "]");
+            NoUtils::PrintStatus(true, "[pid: " + NoString(iPid) + "]");
 
             pZNC->WritePidFile(iPid);
-            CUtils::PrintMessage(CZNC::GetTag());
+            NoUtils::PrintMessage(CZNC::GetTag());
             /* Don't destroy pZNC here or it will delete the pid file. */
             return 0;
         }
@@ -377,7 +377,7 @@ int main(int argc, char** argv)
          *   call to avoid race condition with parent exiting.
          */
         if (!pZNC->WaitForChildLock()) {
-            CUtils::PrintError("Child was unable to obtain lock on config file.");
+            NoUtils::PrintError("Child was unable to obtain lock on config file.");
             CZNC::DestroyInstance();
             return 1;
         }
@@ -390,7 +390,7 @@ int main(int argc, char** argv)
         close(2);
         open("/dev/null", O_WRONLY);
 
-        CDebug::SetStdoutIsTTY(false);
+        NoDebug::SetStdoutIsTTY(false);
 
         // We are the child. There is no way we can be a process group
         // leader, thus setsid() must succeed.
@@ -422,28 +422,28 @@ int main(int argc, char** argv)
 
     try {
         pZNC->Loop();
-    } catch (const CException& e) {
+    } catch (const NoException& e) {
         switch (e.GetType()) {
-        case CException::EX_Shutdown:
+        case NoException::EX_Shutdown:
             iRet = 0;
             break;
-        case CException::EX_Restart: {
+        case NoException::EX_Restart: {
             // strdup() because GCC is stupid
             char* args[] = { strdup(argv[0]), strdup("--datadir"), strdup(pZNC->GetZNCPath().c_str()), nullptr,
                              nullptr,         nullptr,             nullptr };
             int pos = 3;
-            if (CDebug::Debug())
+            if (NoDebug::Debug())
                 args[pos++] = strdup("--debug");
             else if (bForeground)
                 args[pos++] = strdup("--foreground");
-            if (!CDebug::StdoutIsTTY()) args[pos++] = strdup("--no-color");
+            if (!NoDebug::StdoutIsTTY()) args[pos++] = strdup("--no-color");
             if (bAllowRoot) args[pos++] = strdup("--allow-root");
             // The above code adds 3 entries to args tops
             // which means the array should be big enough
 
             CZNC::DestroyInstance();
             execvp(args[0], args);
-            CUtils::PrintError("Unable to restart ZNC [" + CString(strerror(errno)) + "]");
+            NoUtils::PrintError("Unable to restart ZNC [" + NoString(strerror(errno)) + "]");
         } /* Fall through */
         default:
             iRet = 1;

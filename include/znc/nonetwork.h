@@ -23,30 +23,30 @@
 #include <znc/nonick.h>
 #include <znc/noznc.h>
 
-class CModules;
-class CUser;
-class CFile;
-class CSettings;
-class CClient;
-class CSettings;
-class CChannel;
-class CQuery;
-class CServer;
-class CIRCSock;
-class CNetworkPingTimer;
-class CNetworkJoinTimer;
+class NoModules;
+class NoUser;
+class NoFile;
+class NoSettings;
+class NoClient;
+class NoSettings;
+class NoChannel;
+class NoQuery;
+class NoServer;
+class NoIrcSock;
+class NoNetworkPingTimer;
+class NoNetworkJoinTimer;
 
-class CNetwork
+class NoNetwork
 {
 public:
-    static bool IsValidNetwork(const CString& sNetwork);
+    static bool IsValidNetwork(const NoString& sNetwork);
 
-    CNetwork(CUser* pUser, const CString& sName);
-    CNetwork(CUser* pUser, const CNetwork& Network);
-    ~CNetwork();
+    NoNetwork(NoUser* pUser, const NoString& sName);
+    NoNetwork(NoUser* pUser, const NoNetwork& Network);
+    ~NoNetwork();
 
-    CNetwork(const CNetwork&) = delete;
-    CNetwork& operator=(const CNetwork&) = delete;
+    NoNetwork(const NoNetwork&) = delete;
+    NoNetwork& operator=(const NoNetwork&) = delete;
 
     enum {
         JOIN_FREQUENCY = 30,
@@ -60,117 +60,117 @@ public:
         NO_TRAFFIC_TIMEOUT = 540
     };
 
-    void Clone(const CNetwork& Network, bool bCloneName = true);
+    void Clone(const NoNetwork& Network, bool bCloneName = true);
 
-    CString GetNetworkPath() const;
+    NoString GetNetworkPath() const;
 
     void DelServers();
 
-    bool ParseConfig(CSettings* pConfig, CString& sError, bool bUpgrade = false);
-    CSettings ToConfig() const;
+    bool ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade = false);
+    NoSettings ToConfig() const;
 
     void BounceAllClients();
 
     bool IsUserAttached() const { return !m_vClients.empty(); }
     bool IsUserOnline() const;
-    void ClientConnected(CClient* pClient);
-    void ClientDisconnected(CClient* pClient);
+    void ClientConnected(NoClient* pClient);
+    void ClientDisconnected(NoClient* pClient);
 
-    CUser* GetUser() const;
-    const CString& GetName() const;
+    NoUser* GetUser() const;
+    const NoString& GetName() const;
     bool IsNetworkAttached() const { return !m_vClients.empty(); }
-    const std::vector<CClient*>& GetClients() const { return m_vClients; }
-    std::vector<CClient*> FindClients(const CString& sIdentifier) const;
+    const std::vector<NoClient*>& GetClients() const { return m_vClients; }
+    std::vector<NoClient*> FindClients(const NoString& sIdentifier) const;
 
-    void SetUser(CUser* pUser);
-    bool SetName(const CString& sName);
+    void SetUser(NoUser* pUser);
+    bool SetName(const NoString& sName);
 
-    CModules& GetModules() { return *m_pModules; }
-    const CModules& GetModules() const { return *m_pModules; }
+    NoModules& GetModules() { return *m_pModules; }
+    const NoModules& GetModules() const { return *m_pModules; }
 
-    bool PutUser(const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
-    bool PutStatus(const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
-    bool PutModule(const CString& sModule, const CString& sLine, CClient* pClient = nullptr, CClient* pSkipClient = nullptr);
+    bool PutUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool PutStatus(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool PutModule(const NoString& sModule, const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
 
-    const std::vector<CChannel*>& GetChans() const;
-    CChannel* FindChan(CString sName) const;
-    std::vector<CChannel*> FindChans(const CString& sWild) const;
-    bool AddChan(CChannel* pChan);
-    bool AddChan(const CString& sName, bool bInConfig);
-    bool DelChan(const CString& sName);
+    const std::vector<NoChannel*>& GetChans() const;
+    NoChannel* FindChan(NoString sName) const;
+    std::vector<NoChannel*> FindChans(const NoString& sWild) const;
+    bool AddChan(NoChannel* pChan);
+    bool AddChan(const NoString& sName, bool bInConfig);
+    bool DelChan(const NoString& sName);
     void JoinChans();
-    void JoinChans(std::set<CChannel*>& sChans);
+    void JoinChans(std::set<NoChannel*>& sChans);
 
-    const std::vector<CQuery*>& GetQueries() const;
-    CQuery* FindQuery(const CString& sName) const;
-    std::vector<CQuery*> FindQueries(const CString& sWild) const;
-    CQuery* AddQuery(const CString& sName);
-    bool DelQuery(const CString& sName);
+    const std::vector<NoQuery*>& GetQueries() const;
+    NoQuery* FindQuery(const NoString& sName) const;
+    std::vector<NoQuery*> FindQueries(const NoString& sWild) const;
+    NoQuery* AddQuery(const NoString& sName);
+    bool DelQuery(const NoString& sName);
 
-    const CString& GetChanPrefixes() const { return m_sChanPrefixes; }
-    void SetChanPrefixes(const CString& s) { m_sChanPrefixes = s; }
-    bool IsChan(const CString& sChan) const;
+    const NoString& GetChanPrefixes() const { return m_sChanPrefixes; }
+    void SetChanPrefixes(const NoString& s) { m_sChanPrefixes = s; }
+    bool IsChan(const NoString& sChan) const;
 
-    const std::vector<CServer*>& GetServers() const;
+    const std::vector<NoServer*>& GetServers() const;
     bool HasServers() const { return !m_vServers.empty(); }
-    CServer* FindServer(const CString& sName) const;
-    bool DelServer(const CString& sName, unsigned short uPort, const CString& sPass);
-    bool AddServer(const CString& sName);
-    bool AddServer(const CString& sName, unsigned short uPort, const CString& sPass = "", bool bSSL = false);
-    CServer* GetNextServer();
-    CServer* GetCurrentServer() const;
-    void SetIRCServer(const CString& s);
-    bool SetNextServer(const CServer* pServer);
+    NoServer* FindServer(const NoString& sName) const;
+    bool DelServer(const NoString& sName, unsigned short uPort, const NoString& sPass);
+    bool AddServer(const NoString& sName);
+    bool AddServer(const NoString& sName, unsigned short uPort, const NoString& sPass = "", bool bSSL = false);
+    NoServer* GetNextServer();
+    NoServer* GetCurrentServer() const;
+    void SetIRNoServer(const NoString& s);
+    bool SetNextServer(const NoServer* pServer);
     bool IsLastServer() const;
 
-    const SCString& GetTrustedFingerprints() const { return m_ssTrustedFingerprints; }
-    void AddTrustedFingerprint(const CString& sFP)
+    const NoStringSet& GetTrustedFingerprints() const { return m_ssTrustedFingerprints; }
+    void AddTrustedFingerprint(const NoString& sFP)
     {
-        m_ssTrustedFingerprints.insert(sFP.Escape_n(CString::EHEXCOLON, CString::EHEXCOLON));
+        m_ssTrustedFingerprints.insert(sFP.Escape_n(NoString::EHEXCOLON, NoString::EHEXCOLON));
     }
-    void DelTrustedFingerprint(const CString& sFP) { m_ssTrustedFingerprints.erase(sFP); }
+    void DelTrustedFingerprint(const NoString& sFP) { m_ssTrustedFingerprints.erase(sFP); }
 
     void SetIRCConnectEnabled(bool b);
     bool GetIRCConnectEnabled() const { return m_bIRCConnectEnabled; }
 
-    CIRCSock* GetIRCSock() { return m_pIRCSock; }
-    const CIRCSock* GetIRCSock() const { return m_pIRCSock; }
-    const CString& GetIRCServer() const;
-    const CNick& GetIRCNick() const;
-    void SetIRCNick(const CNick& n);
-    CString GetCurNick() const;
-    bool IsIRCAway() const { return m_bIRCAway; }
-    void SetIRCAway(bool b) { m_bIRCAway = b; }
+    NoIrcSock* GetIRCSock() { return m_pIRCSock; }
+    const NoIrcSock* GetIRCSock() const { return m_pIRCSock; }
+    const NoString& GetIRNoServer() const;
+    const NoNick& GetIRNoNick() const;
+    void SetIRNoNick(const NoNick& n);
+    NoString GetCurNick() const;
+    bool IsIRNoAway() const { return m_bIRNoAway; }
+    void SetIRNoAway(bool b) { m_bIRNoAway = b; }
 
     bool Connect();
     bool IsIRCConnected() const;
-    void SetIRCSocket(CIRCSock* pIRCSock);
+    void SetIRNoSocket(NoIrcSock* pIRCSock);
     void IRCConnected();
     void IRCDisconnected();
     void CheckIRCConnect();
 
-    bool PutIRC(const CString& sLine);
+    bool PutIRC(const NoString& sLine);
 
-    void AddRawBuffer(const CString& sFormat, const CString& sText = "") { m_RawBuffer.AddLine(sFormat, sText); }
-    void UpdateRawBuffer(const CString& sMatch, const CString& sFormat, const CString& sText = "")
+    void AddRawBuffer(const NoString& sFormat, const NoString& sText = "") { m_RawBuffer.AddLine(sFormat, sText); }
+    void UpdateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
     {
         m_RawBuffer.UpdateLine(sMatch, sFormat, sText);
     }
-    void UpdateExactRawBuffer(const CString& sFormat, const CString& sText = "")
+    void UpdateExactRawBuffer(const NoString& sFormat, const NoString& sText = "")
     {
         m_RawBuffer.UpdateExactLine(sFormat, sText);
     }
     void ClearRawBuffer() { m_RawBuffer.Clear(); }
 
-    void AddMotdBuffer(const CString& sFormat, const CString& sText = "") { m_MotdBuffer.AddLine(sFormat, sText); }
-    void UpdateMotdBuffer(const CString& sMatch, const CString& sFormat, const CString& sText = "")
+    void AddMotdBuffer(const NoString& sFormat, const NoString& sText = "") { m_MotdBuffer.AddLine(sFormat, sText); }
+    void UpdateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
     {
         m_MotdBuffer.UpdateLine(sMatch, sFormat, sText);
     }
     void ClearMotdBuffer() { m_MotdBuffer.Clear(); }
 
-    void AddNoticeBuffer(const CString& sFormat, const CString& sText = "") { m_NoticeBuffer.AddLine(sFormat, sText); }
-    void UpdateNoticeBuffer(const CString& sMatch, const CString& sFormat, const CString& sText = "")
+    void AddNoticeBuffer(const NoString& sFormat, const NoString& sText = "") { m_NoticeBuffer.AddLine(sFormat, sText); }
+    void UpdateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
     {
         m_NoticeBuffer.UpdateLine(sMatch, sFormat, sText);
     }
@@ -178,21 +178,21 @@ public:
 
     void ClearQueryBuffer();
 
-    const CString& GetNick(const bool bAllowDefault = true) const;
-    const CString& GetAltNick(const bool bAllowDefault = true) const;
-    const CString& GetIdent(const bool bAllowDefault = true) const;
-    const CString& GetRealName() const;
-    const CString& GetBindHost() const;
-    const CString& GetEncoding() const;
-    CString GetQuitMsg() const;
+    const NoString& GetNick(const bool bAllowDefault = true) const;
+    const NoString& GetAltNick(const bool bAllowDefault = true) const;
+    const NoString& GetIdent(const bool bAllowDefault = true) const;
+    const NoString& GetRealName() const;
+    const NoString& GetBindHost() const;
+    const NoString& GetEncoding() const;
+    NoString GetQuitMsg() const;
 
-    void SetNick(const CString& s);
-    void SetAltNick(const CString& s);
-    void SetIdent(const CString& s);
-    void SetRealName(const CString& s);
-    void SetBindHost(const CString& s);
-    void SetEncoding(const CString& s);
-    void SetQuitMsg(const CString& s);
+    void SetNick(const NoString& s);
+    void SetAltNick(const NoString& s);
+    void SetIdent(const NoString& s);
+    void SetRealName(const NoString& s);
+    void SetBindHost(const NoString& s);
+    void SetEncoding(const NoString& s);
+    void SetQuitMsg(const NoString& s);
 
     double GetFloodRate() const { return m_fFloodRate; }
     unsigned short int GetFloodBurst() const { return m_uFloodBurst; }
@@ -202,53 +202,53 @@ public:
     unsigned short int GetJoinDelay() const { return m_uJoinDelay; }
     void SetJoinDelay(unsigned short int uJoinDelay) { m_uJoinDelay = uJoinDelay; }
 
-    CString ExpandString(const CString& sStr) const;
-    CString& ExpandString(const CString& sStr, CString& sRet) const;
+    NoString ExpandString(const NoString& sStr) const;
+    NoString& ExpandString(const NoString& sStr, NoString& sRet) const;
 
 private:
-    bool JoinChan(CChannel* pChan);
-    bool LoadModule(const CString& sModName, const CString& sArgs, const CString& sNotice, CString& sError);
+    bool JoinChan(NoChannel* pChan);
+    bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 
-    CString m_sName;
-    CUser* m_pUser;
+    NoString m_sName;
+    NoUser* m_pUser;
 
-    CString m_sNick;
-    CString m_sAltNick;
-    CString m_sIdent;
-    CString m_sRealName;
-    CString m_sBindHost;
-    CString m_sEncoding;
-    CString m_sQuitMsg;
-    SCString m_ssTrustedFingerprints;
+    NoString m_sNick;
+    NoString m_sAltNick;
+    NoString m_sIdent;
+    NoString m_sRealName;
+    NoString m_sBindHost;
+    NoString m_sEncoding;
+    NoString m_sQuitMsg;
+    NoStringSet m_ssTrustedFingerprints;
 
-    CModules* m_pModules;
+    NoModules* m_pModules;
 
-    std::vector<CClient*> m_vClients;
+    std::vector<NoClient*> m_vClients;
 
-    CIRCSock* m_pIRCSock;
+    NoIrcSock* m_pIRCSock;
 
-    std::vector<CChannel*> m_vChans;
-    std::vector<CQuery*> m_vQueries;
+    std::vector<NoChannel*> m_vChans;
+    std::vector<NoQuery*> m_vQueries;
 
-    CString m_sChanPrefixes;
+    NoString m_sChanPrefixes;
 
     bool m_bIRCConnectEnabled;
-    CString m_sIRCServer;
-    std::vector<CServer*> m_vServers;
+    NoString m_sIRNoServer;
+    std::vector<NoServer*> m_vServers;
     size_t m_uServerIdx; ///< Index in m_vServers of our current server + 1
 
-    CNick m_IRCNick;
-    bool m_bIRCAway;
+    NoNick m_IRNoNick;
+    bool m_bIRNoAway;
 
     double m_fFloodRate; ///< Set to -1 to disable protection.
     unsigned short int m_uFloodBurst;
 
-    CBuffer m_RawBuffer;
-    CBuffer m_MotdBuffer;
-    CBuffer m_NoticeBuffer;
+    NoBuffer m_RawBuffer;
+    NoBuffer m_MotdBuffer;
+    NoBuffer m_NoticeBuffer;
 
-    CNetworkPingTimer* m_pPingTimer;
-    CNetworkJoinTimer* m_pJoinTimer;
+    NoNetworkPingTimer* m_pPingTimer;
+    NoNetworkJoinTimer* m_pJoinTimer;
 
     unsigned short int m_uJoinDelay;
 };

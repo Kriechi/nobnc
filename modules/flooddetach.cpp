@@ -19,35 +19,35 @@
 
 using std::map;
 
-class CFloodDetachMod : public CModule
+class NoFloodDetachMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CFloodDetachMod)
+    MODCONSTRUCTOR(NoFloodDetachMod)
     {
         m_iThresholdSecs = 0;
         m_iThresholdMsgs = 0;
 
         AddHelpCommand();
-        AddCommand("Show", static_cast<CModCommand::ModCmdFunc>(&CFloodDetachMod::ShowCommand), "");
-        AddCommand("Secs", static_cast<CModCommand::ModCmdFunc>(&CFloodDetachMod::SecsCommand), "[<limit>]");
-        AddCommand("Lines", static_cast<CModCommand::ModCmdFunc>(&CFloodDetachMod::LinesCommand), "[<limit>]");
-        AddCommand("Silent", static_cast<CModCommand::ModCmdFunc>(&CFloodDetachMod::SilentCommand), "[yes|no]");
+        AddCommand("Show", static_cast<NoModCommand::ModCmdFunc>(&NoFloodDetachMod::ShowCommand), "");
+        AddCommand("Secs", static_cast<NoModCommand::ModCmdFunc>(&NoFloodDetachMod::SecsCommand), "[<limit>]");
+        AddCommand("Lines", static_cast<NoModCommand::ModCmdFunc>(&NoFloodDetachMod::LinesCommand), "[<limit>]");
+        AddCommand("Silent", static_cast<NoModCommand::ModCmdFunc>(&NoFloodDetachMod::SilentCommand), "[yes|no]");
     }
 
-    ~CFloodDetachMod() {}
+    ~NoFloodDetachMod() {}
 
     void Save()
     {
         // We save the settings twice because the module arguments can
         // be more easily edited via webadmin, while the SetNV() stuff
         // survives e.g. /msg *status reloadmod ctcpflood.
-        SetNV("secs", CString(m_iThresholdSecs));
-        SetNV("msgs", CString(m_iThresholdMsgs));
+        SetNV("secs", NoString(m_iThresholdSecs));
+        SetNV("msgs", NoString(m_iThresholdMsgs));
 
-        SetArgs(CString(m_iThresholdMsgs) + " " + CString(m_iThresholdSecs));
+        SetArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         m_iThresholdMsgs = sArgs.Token(0).ToUInt();
         m_iThresholdSecs = sArgs.Token(1).ToUInt();
@@ -76,7 +76,7 @@ public:
             // The timeout for this channel did not expire yet?
             if (it->second.first + (time_t)m_iThresholdSecs >= now) continue;
 
-            CChannel* pChan = GetNetwork()->FindChan(it->first);
+            NoChannel* pChan = GetNetwork()->FindChan(it->first);
             if (it->second.second >= m_iThresholdMsgs && pChan && pChan->IsDetached()) {
                 // The channel is detached and it is over the
                 // messages limit. Since we only track those
@@ -101,7 +101,7 @@ public:
         }
     }
 
-    void Message(CChannel& Channel)
+    void Message(NoChannel& Channel)
     {
         Limits::iterator it;
         time_t now = time(nullptr);
@@ -148,74 +148,74 @@ public:
         }
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
+    EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
     // This also catches OnChanAction()
-    EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage) override
+    EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    EModRet OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage) override
+    EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    EModRet OnTopic(CNick& Nick, CChannel& Channel, CString& sTopic) override
+    EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    void ShowCommand(const CString& sLine)
+    void ShowCommand(const NoString& sLine)
     {
-        PutModule("Current limit is " + CString(m_iThresholdMsgs) + " lines "
+        PutModule("Current limit is " + NoString(m_iThresholdMsgs) + " lines "
                                                                     "in " +
-                  CString(m_iThresholdSecs) + " secs.");
+                  NoString(m_iThresholdSecs) + " secs.");
     }
 
-    void SecsCommand(const CString& sLine)
+    void SecsCommand(const NoString& sLine)
     {
-        const CString sArg = sLine.Token(1, true);
+        const NoString sArg = sLine.Token(1, true);
 
         if (sArg.empty()) {
-            PutModule("Seconds limit is [" + CString(m_iThresholdSecs) + "]");
+            PutModule("Seconds limit is [" + NoString(m_iThresholdSecs) + "]");
         } else {
             m_iThresholdSecs = sArg.ToUInt();
             if (m_iThresholdSecs == 0) m_iThresholdSecs = 1;
 
-            PutModule("Set seconds limit to [" + CString(m_iThresholdSecs) + "]");
+            PutModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
             Save();
         }
     }
 
-    void LinesCommand(const CString& sLine)
+    void LinesCommand(const NoString& sLine)
     {
-        const CString sArg = sLine.Token(1, true);
+        const NoString sArg = sLine.Token(1, true);
 
         if (sArg.empty()) {
-            PutModule("Lines limit is [" + CString(m_iThresholdMsgs) + "]");
+            PutModule("Lines limit is [" + NoString(m_iThresholdMsgs) + "]");
         } else {
             m_iThresholdMsgs = sArg.ToUInt();
             if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 2;
 
-            PutModule("Set lines limit to [" + CString(m_iThresholdMsgs) + "]");
+            PutModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");
             Save();
         }
     }
 
-    void SilentCommand(const CString& sLine)
+    void SilentCommand(const NoString& sLine)
     {
-        const CString sArg = sLine.Token(1, true);
+        const NoString sArg = sLine.Token(1, true);
 
         if (!sArg.empty()) {
-            SetNV("silent", CString(sArg.ToBool()));
+            SetNV("silent", NoString(sArg.ToBool()));
         }
 
         if (GetNV("silent").ToBool()) {
@@ -226,17 +226,17 @@ public:
     }
 
 private:
-    typedef map<CString, std::pair<time_t, unsigned int>> Limits;
+    typedef map<NoString, std::pair<time_t, unsigned int>> Limits;
     Limits m_chans;
     unsigned int m_iThresholdSecs;
     unsigned int m_iThresholdMsgs;
 };
 
-template <> void TModInfo<CFloodDetachMod>(CModInfo& Info)
+template <> void TModInfo<NoFloodDetachMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("flooddetach");
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("This user module takes up to two arguments. Arguments are msgs and secs numbers.");
 }
 
-USERMODULEDEFS(CFloodDetachMod, "Detach channels when flooded")
+USERMODULEDEFS(NoFloodDetachMod, "Detach channels when flooded")

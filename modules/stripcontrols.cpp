@@ -16,52 +16,52 @@
 
 #include <znc/nomodules.h>
 
-class CStripControlsMod : public CModule
+class NoStripControlsMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CStripControlsMod) {}
+    MODCONSTRUCTOR(NoStripControlsMod) {}
 
-    EModRet OnPrivCTCP(CNick& Nick, CString& sMessage) override
+    EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
         sMessage.StripControls();
         return CONTINUE;
     }
 
-    EModRet OnChanCTCP(CNick& Nick, CChannel& Channel, CString& sMessage) override
+    EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         sMessage.StripControls();
         return CONTINUE;
     }
 
-    EModRet OnPrivNotice(CNick& Nick, CString& sMessage) override
+    EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         sMessage.StripControls();
         return CONTINUE;
     }
 
-    EModRet OnChanNotice(CNick& Nick, CChannel& Channel, CString& sMessage) override
+    EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         sMessage.StripControls();
         return CONTINUE;
     }
 
-    EModRet OnPrivMsg(CNick& Nick, CString& sMessage) override
+    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         sMessage.StripControls();
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
+    EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         sMessage.StripControls();
         return CONTINUE;
     }
 };
 
-template <> void TModInfo<CStripControlsMod>(CModInfo& Info)
+template <> void TModInfo<NoStripControlsMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("stripcontrols");
-    Info.AddType(CModInfo::UserModule);
+    Info.AddType(NoModInfo::UserModule);
 }
 
-NETWORKMODULEDEFS(CStripControlsMod, "Strips control codes (Colors, Bold, ..) from channel and private messages.")
+NETWORKMODULEDEFS(NoStripControlsMod, "Strips control codes (Colors, Bold, ..) from channel and private messages.")

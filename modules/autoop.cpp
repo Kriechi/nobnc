@@ -21,51 +21,51 @@ using std::map;
 using std::set;
 using std::vector;
 
-class CAutoOpMod;
+class NoAutoOpMod;
 
 #define AUTOOP_CHALLENGE_LENGTH 32
 
-class CAutoOpTimer : public CTimer
+class NoAutoOpTimer : public NoTimer
 {
 public:
-    CAutoOpTimer(CAutoOpMod* pModule)
-        : CTimer((CModule*)pModule, 20, 0, "AutoOpChecker", "Check channels for auto op candidates")
+    NoAutoOpTimer(NoAutoOpMod* pModule)
+        : NoTimer((NoModule*)pModule, 20, 0, "AutoOpChecker", "Check channels for auto op candidates")
     {
         m_pParent = pModule;
     }
 
-    virtual ~CAutoOpTimer() {}
+    virtual ~NoAutoOpTimer() {}
 
 private:
 protected:
     void RunJob() override;
 
-    CAutoOpMod* m_pParent;
+    NoAutoOpMod* m_pParent;
 };
 
-class CAutoOpUser
+class NoAutoOpUser
 {
 public:
-    CAutoOpUser() {}
+    NoAutoOpUser() {}
 
-    CAutoOpUser(const CString& sLine) { FromString(sLine); }
+    NoAutoOpUser(const NoString& sLine) { FromString(sLine); }
 
-    CAutoOpUser(const CString& sUsername, const CString& sUserKey, const CString& sHostmasks, const CString& sChannels)
+    NoAutoOpUser(const NoString& sUsername, const NoString& sUserKey, const NoString& sHostmasks, const NoString& sChannels)
         : m_sUsername(sUsername), m_sUserKey(sUserKey)
     {
         AddHostmasks(sHostmasks);
         AddChans(sChannels);
     }
 
-    virtual ~CAutoOpUser() {}
+    virtual ~NoAutoOpUser() {}
 
-    const CString& GetUsername() const { return m_sUsername; }
-    const CString& GetUserKey() const { return m_sUserKey; }
+    const NoString& GetUsername() const { return m_sUsername; }
+    const NoString& GetUserKey() const { return m_sUserKey; }
 
-    bool ChannelMatches(const CString& sChan) const
+    bool ChannelMatches(const NoString& sChan) const
     {
-        for (set<CString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
-            if (sChan.AsLower().WildCmp(*it, CString::CaseInsensitive)) {
+        for (set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
+            if (sChan.AsLower().WildCmp(*it, NoString::CaseInsensitive)) {
                 return true;
             }
         }
@@ -73,23 +73,23 @@ public:
         return false;
     }
 
-    bool HostMatches(const CString& sHostmask)
+    bool HostMatches(const NoString& sHostmask)
     {
-        for (set<CString>::const_iterator it = m_ssHostmasks.begin(); it != m_ssHostmasks.end(); ++it) {
-            if (sHostmask.WildCmp(*it, CString::CaseInsensitive)) {
+        for (set<NoString>::const_iterator it = m_ssHostmasks.begin(); it != m_ssHostmasks.end(); ++it) {
+            if (sHostmask.WildCmp(*it, NoString::CaseInsensitive)) {
                 return true;
             }
         }
         return false;
     }
 
-    CString GetHostmasks() const { return CString(",").Join(m_ssHostmasks.begin(), m_ssHostmasks.end()); }
+    NoString GetHostmasks() const { return NoString(",").Join(m_ssHostmasks.begin(), m_ssHostmasks.end()); }
 
-    CString GetChannels() const { return CString(" ").Join(m_ssChans.begin(), m_ssChans.end()); }
+    NoString GetChannels() const { return NoString(" ").Join(m_ssChans.begin(), m_ssChans.end()); }
 
-    bool DelHostmasks(const CString& sHostmasks)
+    bool DelHostmasks(const NoString& sHostmasks)
     {
-        VCString vsHostmasks;
+        NoStringVector vsHostmasks;
         sHostmasks.Split(",", vsHostmasks);
 
         for (unsigned int a = 0; a < vsHostmasks.size(); a++) {
@@ -99,9 +99,9 @@ public:
         return m_ssHostmasks.empty();
     }
 
-    void AddHostmasks(const CString& sHostmasks)
+    void AddHostmasks(const NoString& sHostmasks)
     {
-        VCString vsHostmasks;
+        NoStringVector vsHostmasks;
         sHostmasks.Split(",", vsHostmasks);
 
         for (unsigned int a = 0; a < vsHostmasks.size(); a++) {
@@ -109,9 +109,9 @@ public:
         }
     }
 
-    void DelChans(const CString& sChans)
+    void DelChans(const NoString& sChans)
     {
-        VCString vsChans;
+        NoStringVector vsChans;
         sChans.Split(" ", vsChans);
 
         for (unsigned int a = 0; a < vsChans.size(); a++) {
@@ -119,9 +119,9 @@ public:
         }
     }
 
-    void AddChans(const CString& sChans)
+    void AddChans(const NoString& sChans)
     {
-        VCString vsChans;
+        NoStringVector vsChans;
         sChans.Split(" ", vsChans);
 
         for (unsigned int a = 0; a < vsChans.size(); a++) {
@@ -129,9 +129,9 @@ public:
         }
     }
 
-    CString ToString() const { return m_sUsername + "\t" + GetHostmasks() + "\t" + m_sUserKey + "\t" + GetChannels(); }
+    NoString ToString() const { return m_sUsername + "\t" + GetHostmasks() + "\t" + m_sUserKey + "\t" + GetChannels(); }
 
-    bool FromString(const CString& sLine)
+    bool FromString(const NoString& sLine)
     {
         m_sUsername = sLine.Token(0, false, "\t");
         sLine.Token(1, false, "\t").Split(",", m_ssHostmasks);
@@ -143,56 +143,56 @@ public:
 
 private:
 protected:
-    CString m_sUsername;
-    CString m_sUserKey;
-    set<CString> m_ssHostmasks;
-    set<CString> m_ssChans;
+    NoString m_sUsername;
+    NoString m_sUserKey;
+    set<NoString> m_ssHostmasks;
+    set<NoString> m_ssChans;
 };
 
-class CAutoOpMod : public CModule
+class NoAutoOpMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CAutoOpMod)
+    MODCONSTRUCTOR(NoAutoOpMod)
     {
         AddHelpCommand();
         AddCommand("ListUsers",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoOpMod::OnListUsersCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnListUsersCommand),
                    "",
                    "List all users");
         AddCommand("AddChans",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoOpMod::OnAddChansCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnAddChansCommand),
                    "<user> <channel> [channel] ...",
                    "Adds channels to a user");
         AddCommand("DelChans",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoOpMod::OnDelChansCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnDelChansCommand),
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");
         AddCommand("AddMasks",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoOpMod::OnAddMasksCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnAddMasksCommand),
                    "<user> <mask>,[mask] ...",
                    "Adds masks to a user");
         AddCommand("DelMasks",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoOpMod::OnDelMasksCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnDelMasksCommand),
                    "<user> <mask>,[mask] ...",
                    "Removes masks from a user");
         AddCommand("AddUser",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoOpMod::OnAddUserCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnAddUserCommand),
                    "<user> <hostmask>[,<hostmasks>...] <key> [channels]",
                    "Adds a user");
         AddCommand("DelUser",
-                   static_cast<CModCommand::ModCmdFunc>(&CAutoOpMod::OnDelUserCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnDelUserCommand),
                    "<user>",
                    "Removes a user");
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        AddTimer(new CAutoOpTimer(this));
+        AddTimer(new NoAutoOpTimer(this));
 
         // Load the users
-        for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {
-            const CString& sLine = it->second;
-            CAutoOpUser* pUser = new CAutoOpUser;
+        for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
+            const NoString& sLine = it->second;
+            NoAutoOpUser* pUser = new NoAutoOpUser;
 
             if (!pUser->FromString(sLine) || FindUser(pUser->GetUsername().AsLower())) {
                 delete pUser;
@@ -204,35 +204,35 @@ public:
         return true;
     }
 
-    virtual ~CAutoOpMod()
+    virtual ~NoAutoOpMod()
     {
-        for (map<CString, CAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             delete it->second;
         }
         m_msUsers.clear();
     }
 
-    void OnJoin(const CNick& Nick, CChannel& Channel) override
+    void OnJoin(const NoNick& Nick, NoChannel& Channel) override
     {
         // If we have ops in this chan
-        if (Channel.HasPerm(CChannel::Op)) {
+        if (Channel.HasPerm(NoChannel::Op)) {
             CheckAutoOp(Nick, Channel);
         }
     }
 
-    void OnQuit(const CNick& Nick, const CString& sMessage, const vector<CChannel*>& vChans) override
+    void OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) override
     {
-        MCString::iterator it = m_msQueue.find(Nick.GetNick().AsLower());
+        NoStringMap::iterator it = m_msQueue.find(Nick.GetNick().AsLower());
 
         if (it != m_msQueue.end()) {
             m_msQueue.erase(it);
         }
     }
 
-    void OnNick(const CNick& OldNick, const CString& sNewNick, const vector<CChannel*>& vChans) override
+    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const vector<NoChannel*>& vChans) override
     {
         // Update the queue with nick changes
-        MCString::iterator it = m_msQueue.find(OldNick.GetNick().AsLower());
+        NoStringMap::iterator it = m_msQueue.find(OldNick.GetNick().AsLower());
 
         if (it != m_msQueue.end()) {
             m_msQueue[sNewNick.AsLower()] = it->second;
@@ -240,13 +240,13 @@ public:
         }
     }
 
-    EModRet OnPrivNotice(CNick& Nick, CString& sMessage) override
+    EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         if (!sMessage.Token(0).Equals("!ZNCAO")) {
             return CONTINUE;
         }
 
-        CString sCommand = sMessage.Token(1);
+        NoString sCommand = sMessage.Token(1);
 
         if (sCommand.Equals("CHALLENGE")) {
             ChallengeRespond(Nick, sMessage.Token(2));
@@ -257,22 +257,22 @@ public:
         return HALTCORE;
     }
 
-    void OnOp2(const CNick* pOpNick, const CNick& Nick, CChannel& Channel, bool bNoChange) override
+    void OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        if (Nick.GetNick() == GetNetwork()->GetIRCNick().GetNick()) {
-            const map<CString, CNick>& msNicks = Channel.GetNicks();
+        if (Nick.GetNick() == GetNetwork()->GetIRNoNick().GetNick()) {
+            const map<NoString, NoNick>& msNicks = Channel.GetNicks();
 
-            for (map<CString, CNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
-                if (!it->second.HasPerm(CChannel::Op)) {
+            for (map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
+                if (!it->second.HasPerm(NoChannel::Op)) {
                     CheckAutoOp(it->second, Channel);
                 }
             }
         }
     }
 
-    void OnModCommand(const CString& sLine) override
+    void OnModCommand(const NoString& sLine) override
     {
-        CString sCommand = sLine.Token(0).AsUpper();
+        NoString sCommand = sLine.Token(0).AsUpper();
         if (sCommand.Equals("TIMERS")) {
             // for testing purposes - hidden from help
             ListTimers();
@@ -281,16 +281,16 @@ public:
         }
     }
 
-    void OnAddUserCommand(const CString& sLine)
+    void OnAddUserCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
-        CString sHost = sLine.Token(2);
-        CString sKey = sLine.Token(3);
+        NoString sUser = sLine.Token(1);
+        NoString sHost = sLine.Token(2);
+        NoString sKey = sLine.Token(3);
 
         if (sHost.empty()) {
             PutModule("Usage: AddUser <user> <hostmask>[,<hostmasks>...] <key> [channels]");
         } else {
-            CAutoOpUser* pUser = AddUser(sUser, sKey, sHost, sLine.Token(4, true));
+            NoAutoOpUser* pUser = AddUser(sUser, sKey, sHost, sLine.Token(4, true));
 
             if (pUser) {
                 SetNV(sUser, pUser->ToString());
@@ -298,9 +298,9 @@ public:
         }
     }
 
-    void OnDelUserCommand(const CString& sLine)
+    void OnDelUserCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
+        NoString sUser = sLine.Token(1);
 
         if (sUser.empty()) {
             PutModule("Usage: DelUser <user>");
@@ -310,22 +310,22 @@ public:
         }
     }
 
-    void OnListUsersCommand(const CString& sLine)
+    void OnListUsersCommand(const NoString& sLine)
     {
         if (m_msUsers.empty()) {
             PutModule("There are no users defined");
             return;
         }
 
-        CTable Table;
+        NoTable Table;
 
         Table.AddColumn("User");
         Table.AddColumn("Hostmasks");
         Table.AddColumn("Key");
         Table.AddColumn("Channels");
 
-        for (map<CString, CAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
-            VCString vsHostmasks;
+        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+            NoStringVector vsHostmasks;
             it->second->GetHostmasks().Split(",", vsHostmasks);
             for (unsigned int a = 0; a < vsHostmasks.size(); a++) {
                 Table.AddRow();
@@ -345,17 +345,17 @@ public:
         PutModule(Table);
     }
 
-    void OnAddChansCommand(const CString& sLine)
+    void OnAddChansCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
-        CString sChans = sLine.Token(2, true);
+        NoString sUser = sLine.Token(1);
+        NoString sChans = sLine.Token(2, true);
 
         if (sChans.empty()) {
             PutModule("Usage: AddChans <user> <channel> [channel] ...");
             return;
         }
 
-        CAutoOpUser* pUser = FindUser(sUser);
+        NoAutoOpUser* pUser = FindUser(sUser);
 
         if (!pUser) {
             PutModule("No such user");
@@ -367,17 +367,17 @@ public:
         SetNV(pUser->GetUsername(), pUser->ToString());
     }
 
-    void OnDelChansCommand(const CString& sLine)
+    void OnDelChansCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
-        CString sChans = sLine.Token(2, true);
+        NoString sUser = sLine.Token(1);
+        NoString sChans = sLine.Token(2, true);
 
         if (sChans.empty()) {
             PutModule("Usage: DelChans <user> <channel> [channel] ...");
             return;
         }
 
-        CAutoOpUser* pUser = FindUser(sUser);
+        NoAutoOpUser* pUser = FindUser(sUser);
 
         if (!pUser) {
             PutModule("No such user");
@@ -389,17 +389,17 @@ public:
         SetNV(pUser->GetUsername(), pUser->ToString());
     }
 
-    void OnAddMasksCommand(const CString& sLine)
+    void OnAddMasksCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
-        CString sHostmasks = sLine.Token(2, true);
+        NoString sUser = sLine.Token(1);
+        NoString sHostmasks = sLine.Token(2, true);
 
         if (sHostmasks.empty()) {
             PutModule("Usage: AddMasks <user> <mask>,[mask] ...");
             return;
         }
 
-        CAutoOpUser* pUser = FindUser(sUser);
+        NoAutoOpUser* pUser = FindUser(sUser);
 
         if (!pUser) {
             PutModule("No such user");
@@ -411,17 +411,17 @@ public:
         SetNV(pUser->GetUsername(), pUser->ToString());
     }
 
-    void OnDelMasksCommand(const CString& sLine)
+    void OnDelMasksCommand(const NoString& sLine)
     {
-        CString sUser = sLine.Token(1);
-        CString sHostmasks = sLine.Token(2, true);
+        NoString sUser = sLine.Token(1);
+        NoString sHostmasks = sLine.Token(2, true);
 
         if (sHostmasks.empty()) {
             PutModule("Usage: DelMasks <user> <mask>,[mask] ...");
             return;
         }
 
-        CAutoOpUser* pUser = FindUser(sUser);
+        NoAutoOpUser* pUser = FindUser(sUser);
 
         if (!pUser) {
             PutModule("No such user");
@@ -439,17 +439,17 @@ public:
         }
     }
 
-    CAutoOpUser* FindUser(const CString& sUser)
+    NoAutoOpUser* FindUser(const NoString& sUser)
     {
-        map<CString, CAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
 
         return (it != m_msUsers.end()) ? it->second : nullptr;
     }
 
-    CAutoOpUser* FindUserByHost(const CString& sHostmask, const CString& sChannel = "")
+    NoAutoOpUser* FindUserByHost(const NoString& sHostmask, const NoString& sChannel = "")
     {
-        for (map<CString, CAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
-            CAutoOpUser* pUser = it->second;
+        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+            NoAutoOpUser* pUser = it->second;
 
             if (pUser->HostMatches(sHostmask) && (sChannel.empty() || pUser->ChannelMatches(sChannel))) {
                 return pUser;
@@ -459,9 +459,9 @@ public:
         return nullptr;
     }
 
-    bool CheckAutoOp(const CNick& Nick, CChannel& Channel)
+    bool CheckAutoOp(const NoNick& Nick, NoChannel& Channel)
     {
-        CAutoOpUser* pUser = FindUserByHost(Nick.GetHostMask(), Channel.GetName());
+        NoAutoOpUser* pUser = FindUserByHost(Nick.GetHostMask(), Channel.GetName());
 
         if (!pUser) {
             return false;
@@ -471,7 +471,7 @@ public:
             PutIRC("MODE " + Channel.GetName() + " +o " + Nick.GetNick());
         } else {
             // then insert this nick into the queue, the timer does the rest
-            CString sNick = Nick.GetNick().AsLower();
+            NoString sNick = Nick.GetNick().AsLower();
             if (m_msQueue.find(sNick) == m_msQueue.end()) {
                 m_msQueue[sNick] = "";
             }
@@ -480,9 +480,9 @@ public:
         return true;
     }
 
-    void DelUser(const CString& sUser)
+    void DelUser(const NoString& sUser)
     {
-        map<CString, CAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
 
         if (it == m_msUsers.end()) {
             PutModule("That user does not exist");
@@ -494,42 +494,42 @@ public:
         PutModule("User [" + sUser + "] removed");
     }
 
-    CAutoOpUser* AddUser(const CString& sUser, const CString& sKey, const CString& sHosts, const CString& sChans)
+    NoAutoOpUser* AddUser(const NoString& sUser, const NoString& sKey, const NoString& sHosts, const NoString& sChans)
     {
         if (m_msUsers.find(sUser) != m_msUsers.end()) {
             PutModule("That user already exists");
             return nullptr;
         }
 
-        CAutoOpUser* pUser = new CAutoOpUser(sUser, sKey, sHosts, sChans);
+        NoAutoOpUser* pUser = new NoAutoOpUser(sUser, sKey, sHosts, sChans);
         m_msUsers[sUser.AsLower()] = pUser;
         PutModule("User [" + sUser + "] added with hostmask(s) [" + sHosts + "]");
         return pUser;
     }
 
-    bool ChallengeRespond(const CNick& Nick, const CString& sChallenge)
+    bool ChallengeRespond(const NoNick& Nick, const NoString& sChallenge)
     {
         // Validate before responding - don't blindly trust everyone
         bool bValid = false;
         bool bMatchedHost = false;
-        CAutoOpUser* pUser = nullptr;
+        NoAutoOpUser* pUser = nullptr;
 
-        for (map<CString, CAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             pUser = it->second;
 
             // First verify that the person who challenged us matches a user's host
             if (pUser->HostMatches(Nick.GetHostMask())) {
-                const vector<CChannel*>& Chans = GetNetwork()->GetChans();
+                const vector<NoChannel*>& Chans = GetNetwork()->GetChans();
                 bMatchedHost = true;
 
                 // Also verify that they are opped in at least one of the user's chans
                 for (size_t a = 0; a < Chans.size(); a++) {
-                    const CChannel& Chan = *Chans[a];
+                    const NoChannel& Chan = *Chans[a];
 
-                    const CNick* pNick = Chan.FindNick(Nick.GetNick());
+                    const NoNick* pNick = Chan.FindNick(Nick.GetNick());
 
                     if (pNick) {
-                        if (pNick->HasPerm(CChannel::Op) && pUser->ChannelMatches(Chan.GetName())) {
+                        if (pNick->HasPerm(NoChannel::Op) && pUser->ChannelMatches(Chan.GetName())) {
                             bValid = true;
                             break;
                         }
@@ -558,26 +558,26 @@ public:
             return false;
         }
 
-        CString sResponse = pUser->GetUserKey() + "::" + sChallenge;
+        NoString sResponse = pUser->GetUserKey() + "::" + sChallenge;
         PutIRC("NOTICE " + Nick.GetNick() + " :!ZNCAO RESPONSE " + sResponse.MD5());
         return false;
     }
 
-    bool VerifyResponse(const CNick& Nick, const CString& sResponse)
+    bool VerifyResponse(const NoNick& Nick, const NoString& sResponse)
     {
-        MCString::iterator itQueue = m_msQueue.find(Nick.GetNick().AsLower());
+        NoStringMap::iterator itQueue = m_msQueue.find(Nick.GetNick().AsLower());
 
         if (itQueue == m_msQueue.end()) {
             PutModule("[" + Nick.GetHostMask() + "] sent an unchallenged response.  This could be due to lag.");
             return false;
         }
 
-        CString sChallenge = itQueue->second;
+        NoString sChallenge = itQueue->second;
         m_msQueue.erase(itQueue);
 
-        for (map<CString, CAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
+        for (map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             if (it->second->HostMatches(Nick.GetHostMask())) {
-                if (sResponse == CString(it->second->GetUserKey() + "::" + sChallenge).MD5()) {
+                if (sResponse == NoString(it->second->GetUserKey() + "::" + sChallenge).MD5()) {
                     OpUser(Nick, *it->second);
                     return true;
                 } else {
@@ -601,7 +601,7 @@ public:
         while (bRemoved) {
             bRemoved = false;
 
-            for (MCString::iterator it = m_msQueue.begin(); it != m_msQueue.end(); ++it) {
+            for (NoStringMap::iterator it = m_msQueue.begin(); it != m_msQueue.end(); ++it) {
                 if (!it->second.empty()) {
                     m_msQueue.erase(it);
                     bRemoved = true;
@@ -611,23 +611,23 @@ public:
         }
 
         // Now issue challenges for the new users in the queue
-        for (MCString::iterator it = m_msQueue.begin(); it != m_msQueue.end(); ++it) {
-            it->second = CString::RandomString(AUTOOP_CHALLENGE_LENGTH);
+        for (NoStringMap::iterator it = m_msQueue.begin(); it != m_msQueue.end(); ++it) {
+            it->second = NoString::RandomString(AUTOOP_CHALLENGE_LENGTH);
             PutIRC("NOTICE " + it->first + " :!ZNCAO CHALLENGE " + it->second);
         }
     }
 
-    void OpUser(const CNick& Nick, const CAutoOpUser& User)
+    void OpUser(const NoNick& Nick, const NoAutoOpUser& User)
     {
-        const vector<CChannel*>& Chans = GetNetwork()->GetChans();
+        const vector<NoChannel*>& Chans = GetNetwork()->GetChans();
 
         for (size_t a = 0; a < Chans.size(); a++) {
-            const CChannel& Chan = *Chans[a];
+            const NoChannel& Chan = *Chans[a];
 
-            if (Chan.HasPerm(CChannel::Op) && User.ChannelMatches(Chan.GetName())) {
-                const CNick* pNick = Chan.FindNick(Nick.GetNick());
+            if (Chan.HasPerm(NoChannel::Op) && User.ChannelMatches(Chan.GetName())) {
+                const NoNick* pNick = Chan.FindNick(Nick.GetNick());
 
-                if (pNick && !pNick->HasPerm(CChannel::Op)) {
+                if (pNick && !pNick->HasPerm(NoChannel::Op)) {
                     PutIRC("MODE " + Chan.GetName() + " +o " + Nick.GetNick());
                 }
             }
@@ -635,12 +635,12 @@ public:
     }
 
 private:
-    map<CString, CAutoOpUser*> m_msUsers;
-    MCString m_msQueue;
+    map<NoString, NoAutoOpUser*> m_msUsers;
+    NoStringMap m_msQueue;
 };
 
-void CAutoOpTimer::RunJob() { m_pParent->ProcessQueue(); }
+void NoAutoOpTimer::RunJob() { m_pParent->ProcessQueue(); }
 
-template <> void TModInfo<CAutoOpMod>(CModInfo& Info) { Info.SetWikiPage("autoop"); }
+template <> void TModInfo<NoAutoOpMod>(NoModInfo& Info) { Info.SetWikiPage("autoop"); }
 
-NETWORKMODULEDEFS(CAutoOpMod, "Auto op the good people")
+NETWORKMODULEDEFS(NoAutoOpMod, "Auto op the good people")

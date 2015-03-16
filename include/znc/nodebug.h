@@ -34,13 +34,13 @@
  */
 #define DEBUG(f)                 \
     do {                         \
-        if (CDebug::Debug()) {   \
-            CDebugStream sDebug; \
+        if (NoDebug::Debug()) {   \
+            NoDebugStream sDebug; \
             sDebug << f;         \
         }                        \
     } while (0)
 
-class CDebug
+class NoDebug
 {
 public:
     static void SetStdoutIsTTY(bool b) { stdoutIsTTY = b; }
@@ -53,10 +53,10 @@ private:
     static bool debug;
 };
 
-class CDebugStream : public std::ostringstream
+class NoDebugStream : public std::ostringstream
 {
 public:
-    ~CDebugStream();
+    ~NoDebugStream();
 };
 
 #endif // !NODEBUG_H

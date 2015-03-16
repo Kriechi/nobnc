@@ -25,17 +25,17 @@
 #include <sstream>
 #include <sys/types.h>
 
-#define _SQL(s) CString("'" + CString(s).Escape_n(CString::ESQL) + "'")
-#define _URL(s) CString(s).Escape_n(CString::EURL)
-#define _HTML(s) CString(s).Escape_n(CString::EHTML)
-#define _NAMEDFMT(s) CString(s).Escape_n(CString::ENAMEDFMT)
+#define _SQL(s) NoString("'" + NoString(s).Escape_n(NoString::ESQL) + "'")
+#define _URL(s) NoString(s).Escape_n(NoString::EURL)
+#define _HTML(s) NoString(s).Escape_n(NoString::EHTML)
+#define _NAMEDFMT(s) NoString(s).Escape_n(NoString::ENAMEDFMT)
 
-class CString;
-class MCString;
+class NoString;
+class NoStringMap;
 
-typedef std::set<CString> SCString;
-typedef std::vector<CString> VCString;
-typedef std::vector<std::pair<CString, CString>> VPair;
+typedef std::set<NoString> NoStringSet;
+typedef std::vector<NoString> NoStringVector;
+typedef std::vector<std::pair<NoString, NoString>> NoStringPairVector;
 
 static const unsigned char XX = 0xff;
 static const unsigned char base64_table[256] = {
@@ -59,7 +59,7 @@ enum class CaseSensitivity { CaseInsensitive, CaseSensitive };
  * class. It provides helpful functions for parsing input like Token() and
  * Split().
  */
-class CString : public std::string
+class NoString : public std::string
 {
 public:
     typedef enum {
@@ -76,29 +76,29 @@ public:
     static const CaseSensitivity CaseSensitive = CaseSensitivity::CaseSensitive;
     static const CaseSensitivity CaseInsensitive = CaseSensitivity::CaseInsensitive;
 
-    explicit CString(bool b) : std::string(b ? "true" : "false") {}
-    explicit CString(char c);
-    explicit CString(unsigned char c);
-    explicit CString(short i);
-    explicit CString(unsigned short i);
-    explicit CString(int i);
-    explicit CString(unsigned int i);
-    explicit CString(long i);
-    explicit CString(unsigned long i);
-    explicit CString(long long i);
-    explicit CString(unsigned long long i);
-    explicit CString(double i, int precision = 2);
-    explicit CString(float i, int precision = 2);
+    explicit NoString(bool b) : std::string(b ? "true" : "false") {}
+    explicit NoString(char c);
+    explicit NoString(unsigned char c);
+    explicit NoString(short i);
+    explicit NoString(unsigned short i);
+    explicit NoString(int i);
+    explicit NoString(unsigned int i);
+    explicit NoString(long i);
+    explicit NoString(unsigned long i);
+    explicit NoString(long long i);
+    explicit NoString(unsigned long long i);
+    explicit NoString(double i, int precision = 2);
+    explicit NoString(float i, int precision = 2);
 
-    CString() : std::string() {}
-    CString(const char* c) : std::string(c) {}
-    CString(const char* c, size_t l) : std::string(c, l) {}
-    CString(const std::string& s) : std::string(s) {}
-    CString(size_t n, char c) : std::string(n, c) {}
-    ~CString() {}
+    NoString() : std::string() {}
+    NoString(const char* c) : std::string(c) {}
+    NoString(const char* c, size_t l) : std::string(c, l) {}
+    NoString(const std::string& s) : std::string(s) {}
+    NoString(size_t n, char c) : std::string(n, c) {}
+    ~NoString() {}
 
     /**
-     * Casts a CString to another type.  Implemented via std::stringstream, you use this
+     * Casts a NoString to another type.  Implemented via std::stringstream, you use this
      * for any class that has an operator<<(std::ostream, YourClass).
      * @param target The object to cast into. If the cast fails, its state is unspecified.
      * @return True if the cast succeeds, and false if it fails.
@@ -117,14 +117,14 @@ public:
      * @param i_end An iterator pointing past the end of a group of objects.
      * @return The joined string
      */
-    template <typename Iterator> CString Join(Iterator i_start, const Iterator& i_end) const
+    template <typename Iterator> NoString Join(Iterator i_start, const Iterator& i_end) const
     {
-        if (i_start == i_end) return CString("");
+        if (i_start == i_end) return NoString("");
         std::ostringstream output;
         output << *i_start;
         while (true) {
             ++i_start;
-            if (i_start == i_end) return CString(output.str());
+            if (i_start == i_end) return NoString(output.str());
             output << *this;
             output << *i_start;
         }
@@ -137,7 +137,7 @@ public:
      * @return An integer less than, equal to, or greater than zero if this
      *         string smaller, equal.... to the given string.
      */
-    int CaseCmp(const CString& s, CString::size_type uLen = CString::npos) const;
+    int CaseCmp(const NoString& s, NoString::size_type uLen = NoString::npos) const;
     /**
      * Compare this string case sensitively to some other string.
      * @param s The string to compare to.
@@ -145,7 +145,7 @@ public:
      * @return An integer less than, equal to, or greater than zero if this
      *         string smaller, equal.... to the given string.
      */
-    int StrCmp(const CString& s, CString::size_type uLen = CString::npos) const;
+    int StrCmp(const NoString& s, NoString::size_type uLen = NoString::npos) const;
     /**
      * Check if this string is equal to some other string.
      * @param s The string to compare to.
@@ -153,11 +153,11 @@ public:
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return True if the strings are equal.
      */
-    bool Equals(const CString& s, CaseSensitivity cs = CaseInsensitive) const;
+    bool Equals(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
     /**
      * @deprecated
      */
-    bool Equals(const CString& s, bool bCaseSensitive, CString::size_type uLen = CString::npos) const;
+    bool Equals(const NoString& s, bool bCaseSensitive, NoString::size_type uLen = NoString::npos) const;
     /**
      * Do a wildcard comparison between two strings.
      * For example, the following returns true:
@@ -169,7 +169,7 @@ public:
      * @todo Make cs CaseInsensitive by default.
      * @return true if the wildcard matches.
      */
-    static bool WildCmp(const CString& sWild, const CString& sString, CaseSensitivity cs = CaseSensitive);
+    static bool WildCmp(const NoString& sWild, const NoString& sString, CaseSensitivity cs = CaseSensitive);
     /**
      * Do a wild compare on this string.
      * @param sWild The wildcards used to for the comparison.
@@ -178,36 +178,36 @@ public:
      * @todo Make cs CaseInsensitive by default.
      * @return The result of <code>this->WildCmp(sWild, *this);</code>.
      */
-    bool WildCmp(const CString& sWild, CaseSensitivity cs = CaseSensitive) const;
+    bool WildCmp(const NoString& sWild, CaseSensitivity cs = CaseSensitive) const;
 
     /**
      * Turn all characters in this string into their upper-case equivalent.
      * @returns A reference to *this.
      */
-    CString& MakeUpper();
+    NoString& MakeUpper();
     /**
      * Turn all characters in this string into their lower-case equivalent.
      * @returns A reference to *this.
      */
-    CString& MakeLower();
+    NoString& MakeLower();
     /**
      * Return a copy of this string with all characters turned into
      * upper-case.
      * @return The new string.
      */
-    CString AsUpper() const;
+    NoString AsUpper() const;
     /**
      * Return a copy of this string with all characters turned into
      * lower-case.
      * @return The new string.
      */
-    CString AsLower() const;
+    NoString AsLower() const;
 
-    static EEscape ToEscape(const CString& sEsc);
-    CString Escape_n(EEscape eFrom, EEscape eTo) const;
-    CString Escape_n(EEscape eTo) const;
-    CString& Escape(EEscape eFrom, EEscape eTo);
-    CString& Escape(EEscape eTo);
+    static EEscape ToEscape(const NoString& sEsc);
+    NoString Escape_n(EEscape eFrom, EEscape eTo) const;
+    NoString Escape_n(EEscape eTo) const;
+    NoString& Escape(EEscape eFrom, EEscape eTo);
+    NoString& Escape(EEscape eTo);
 
     /** Replace all occurrences in a string.
      *
@@ -229,15 +229,15 @@ public:
      *                      sRight are removed.
      * @returns The number of replacements done.
      */
-    static unsigned int Replace(CString& sStr,
-                                const CString& sReplace,
-                                const CString& sWith,
-                                const CString& sLeft = "",
-                                const CString& sRight = "",
+    static unsigned int Replace(NoString& sStr,
+                                const NoString& sReplace,
+                                const NoString& sWith,
+                                const NoString& sLeft = "",
+                                const NoString& sRight = "",
                                 bool bRemoveDelims = false);
 
     /** Replace all occurrences in the current string.
-     * @see CString::Replace
+     * @see NoString::Replace
      * @param sReplace The string to look for.
      * @param sWith The replacement to use.
      * @param sLeft The delimiter at the beginning of a safe zone.
@@ -246,13 +246,13 @@ public:
      * @return The result of the replacing. The current string is left
      *         unchanged.
      */
-    CString Replace_n(const CString& sReplace,
-                      const CString& sWith,
-                      const CString& sLeft = "",
-                      const CString& sRight = "",
+    NoString Replace_n(const NoString& sReplace,
+                      const NoString& sWith,
+                      const NoString& sLeft = "",
+                      const NoString& sRight = "",
                       bool bRemoveDelims = false) const;
     /** Replace all occurrences in the current string.
-     * @see CString::Replace
+     * @see NoString::Replace
      * @param sReplace The string to look for.
      * @param sWith The replacement to use.
      * @param sLeft The delimiter at the beginning of a safe zone.
@@ -261,29 +261,29 @@ public:
      * @returns The number of replacements done.
      */
     unsigned int
-    Replace(const CString& sReplace, const CString& sWith, const CString& sLeft = "", const CString& sRight = "", bool bRemoveDelims = false);
+    Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft = "", const NoString& sRight = "", bool bRemoveDelims = false);
     /** Ellipsize the current string.
      * For example, ellipsizing "Hello, I'm Bob" to the length 9 would
      * result in "Hello,...".
      * @param uLen The length to ellipsize to.
      * @return The ellipsized string.
      */
-    CString Ellipsize(unsigned int uLen) const;
+    NoString Ellipsize(unsigned int uLen) const;
     /** Return the left part of the string.
      * @param uCount The number of characters to keep.
      * @return The resulting string.
      */
-    CString Left(size_type uCount) const;
+    NoString Left(size_type uCount) const;
     /** Return the right part of the string.
      * @param uCount The number of characters to keep.
      * @return The resulting string.
      */
-    CString Right(size_type uCount) const;
+    NoString Right(size_type uCount) const;
 
     /** Get the first line of this string.
      * @return The first line of text.
      */
-    CString FirstLine() const { return Token(0, false, "\n"); }
+    NoString FirstLine() const { return Token(0, false, "\n"); }
 
     /** Get a token out of this string. For example in the string "a bc d  e",
      *  each of "a", "bc", "d" and "e" are tokens.
@@ -300,18 +300,18 @@ public:
      *         after it.
      * @see Split() if you need a string split into all of its tokens.
      */
-    CString Token(size_t uPos, bool bRest = false, const CString& sSep = " ", bool bAllowEmpty = false) const;
+    NoString Token(size_t uPos, bool bRest = false, const NoString& sSep = " ", bool bAllowEmpty = false) const;
 
     /** Get a token out of this string. This function behaves much like the
      *  other Token() function in this class. The extra arguments are
      *  handled similarly to Split().
      */
-    CString
-    Token(size_t uPos, bool bRest, const CString& sSep, bool bAllowEmpty, const CString& sLeft, const CString& sRight, bool bTrimQuotes = true) const;
+    NoString
+    Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
 
-    size_type URLSplit(MCString& msRet) const;
-    size_type OptionSplit(MCString& msRet, bool bUpperKeys = false) const;
-    size_type QuoteSplit(VCString& vsRet) const;
+    size_type URLSplit(NoStringMap& msRet) const;
+    size_type OptionSplit(NoStringMap& msRet, bool bUpperKeys = false) const;
+    size_type QuoteSplit(NoStringVector& vsRet) const;
 
     /** Split up this string into tokens.
      * Via sLeft and sRight you can define "markers" like with Replace().
@@ -324,27 +324,27 @@ public:
      * @param sRight Right delimiter like with Replace().
      * @param bTrimQuotes Should sLeft and sRight be removed from the token
      *                    they mark?
-     * @param bTrimWhiteSpace If this is true, CString::Trim() is called on
+     * @param bTrimWhiteSpace If this is true, NoString::Trim() is called on
      *                        each token.
      * @return The number of tokens found.
      */
-    size_type Split(const CString& sDelim,
-                    VCString& vsRet,
+    size_type Split(const NoString& sDelim,
+                    NoStringVector& vsRet,
                     bool bAllowEmpty = true,
-                    const CString& sLeft = "",
-                    const CString& sRight = "",
+                    const NoString& sLeft = "",
+                    const NoString& sRight = "",
                     bool bTrimQuotes = true,
                     bool bTrimWhiteSpace = false) const;
 
     /** Split up this string into tokens.
-     * This function is identical to the other CString::Split(), except that
-     * the result is returned as a SCString instead of a VCString.
+     * This function is identical to the other NoString::Split(), except that
+     * the result is returned as a NoStringSet instead of a NoStringVector.
      */
-    size_type Split(const CString& sDelim,
-                    SCString& ssRet,
+    size_type Split(const NoString& sDelim,
+                    NoStringSet& ssRet,
                     bool bAllowEmpty = true,
-                    const CString& sLeft = "",
-                    const CString& sRight = "",
+                    const NoString& sLeft = "",
+                    const NoString& sRight = "",
                     bool bTrimQuotes = true,
                     bool bTrimWhiteSpace = false) const;
 
@@ -356,33 +356,33 @@ public:
      * @param msValues A map of named parameters to their values.
      * @return The string with named parameters replaced.
      */
-    static CString NamedFormat(const CString& sFormat, const MCString& msValues);
+    static NoString NamedFormat(const NoString& sFormat, const NoStringMap& msValues);
 
     /** Produces a random string.
      * @param uLength The length of the resulting string.
      * @return A random string.
      */
-    static CString RandomString(unsigned int uLength);
+    static NoString RandomString(unsigned int uLength);
 
     /** @return The MD5 hash of this string. */
-    CString MD5() const;
+    NoString MD5() const;
     /** @return The SHA256 hash of this string. */
-    CString SHA256() const;
+    NoString SHA256() const;
 
     /** Treat this string as base64-encoded data and decode it.
      * @param sRet String to which the result of the decode is safed.
      * @return The length of the resulting string.
      */
-    unsigned long Base64Decode(CString& sRet) const;
+    unsigned long Base64Decode(NoString& sRet) const;
     /** Treat this string as base64-encoded data and decode it.
-     *  The result is saved in this CString instance.
+     *  The result is saved in this NoString instance.
      * @return The length of the resulting string.
      */
     unsigned long Base64Decode();
     /** Treat this string as base64-encoded data and decode it.
      * @return The decoded string.
      */
-    CString Base64Decode_n() const;
+    NoString Base64Decode_n() const;
     /** Base64-encode the current string.
      * @param sRet String where the result is saved.
      * @param uWrap A boolean(!?!) that decides if the result should be
@@ -391,7 +391,7 @@ public:
      * @todo WTF @ uWrap.
      * @todo This only returns false if some formula we use was wrong?!
      */
-    bool Base64Encode(CString& sRet, unsigned int uWrap = 0) const;
+    bool Base64Encode(NoString& sRet, unsigned int uWrap = 0) const;
     /** Base64-encode the current string.
      *  This string is overwritten with the result of the encode.
      *  @todo return value and param are as with Base64Encode() from above.
@@ -401,31 +401,31 @@ public:
      * @todo uWrap is as broken as Base64Encode()'s uWrap.
      * @return The encoded string.
      */
-    CString Base64Encode_n(unsigned int uWrap = 0) const;
+    NoString Base64Encode_n(unsigned int uWrap = 0) const;
 
 #ifdef HAVE_LIBSSL
-    CString Encrypt_n(const CString& sPass, const CString& sIvec = "") const;
-    CString Decrypt_n(const CString& sPass, const CString& sIvec = "") const;
-    void Encrypt(const CString& sPass, const CString& sIvec = "");
-    void Decrypt(const CString& sPass, const CString& sIvec = "");
-    void Crypt(const CString& sPass, bool bEncrypt, const CString& sIvec = "");
+    NoString Encrypt_n(const NoString& sPass, const NoString& sIvec = "") const;
+    NoString Decrypt_n(const NoString& sPass, const NoString& sIvec = "") const;
+    void Encrypt(const NoString& sPass, const NoString& sIvec = "");
+    void Decrypt(const NoString& sPass, const NoString& sIvec = "");
+    void Crypt(const NoString& sPass, bool bEncrypt, const NoString& sIvec = "");
 #endif
 
     /** Pretty-print a percent value.
      * @param d The percent value. This should be in range 0-100.
      * @return The "pretty" string.
      */
-    static CString ToPercent(double d);
+    static NoString ToPercent(double d);
     /** Pretty-print a number of bytes.
      * @param d The number of bytes.
      * @return A string describing the number of bytes.
      */
-    static CString ToByteStr(unsigned long long d);
+    static NoString ToByteStr(unsigned long long d);
     /** Pretty-print a time span.
      * @param s Number of seconds to print.
      * @return A string like "4w 6d 4h 3m 58s".
      */
-    static CString ToTimeStr(unsigned long s);
+    static NoString ToTimeStr(unsigned long s);
 
     /** @return True if this string is not "false". */
     bool ToBool() const;
@@ -453,87 +453,87 @@ public:
      * @param s A list of characters that should be trimmed.
      * @return true if this string was modified.
      */
-    bool Trim(const CString& s = " \t\r\n");
+    bool Trim(const NoString& s = " \t\r\n");
     /** Trim this string. All leading occurences of characters from s are
      *  removed.
      * @param s A list of characters that should be trimmed.
      * @return true if this string was modified.
      */
-    bool TrimLeft(const CString& s = " \t\r\n");
+    bool TrimLeft(const NoString& s = " \t\r\n");
     /** Trim this string. All trailing occurences of characters from s are
      *  removed.
      * @param s A list of characters that should be trimmed.
      * @return true if this string was modified.
      */
-    bool TrimRight(const CString& s = " \t\r\n");
+    bool TrimRight(const NoString& s = " \t\r\n");
     /** Trim this string. All leading/trailing occurences of characters from
-     *  s are removed. This CString instance is not modified.
+     *  s are removed. This NoString instance is not modified.
      * @param s A list of characters that should be trimmed.
      * @return The trimmed string.
      */
-    CString Trim_n(const CString& s = " \t\r\n") const;
+    NoString Trim_n(const NoString& s = " \t\r\n") const;
     /** Trim this string. All leading occurences of characters from s are
-     *  removed. This CString instance is not modified.
+     *  removed. This NoString instance is not modified.
      * @param s A list of characters that should be trimmed.
      * @return The trimmed string.
      */
-    CString TrimLeft_n(const CString& s = " \t\r\n") const;
+    NoString TrimLeft_n(const NoString& s = " \t\r\n") const;
     /** Trim this string. All trailing occurences of characters from s are
-     *  removed. This CString instance is not modified.
+     *  removed. This NoString instance is not modified.
      * @param s A list of characters that should be trimmed.
      * @return The trimmed string.
      */
-    CString TrimRight_n(const CString& s = " \t\r\n") const;
+    NoString TrimRight_n(const NoString& s = " \t\r\n") const;
 
     /** Trim a given prefix.
      * @param sPrefix The prefix that should be removed.
      * @return True if this string was modified.
      */
-    bool TrimPrefix(const CString& sPrefix = ":");
+    bool TrimPrefix(const NoString& sPrefix = ":");
     /** Trim a given suffix.
      * @param sSuffix The suffix that should be removed.
      * @return True if this string was modified.
      */
-    bool TrimSuffix(const CString& sSuffix);
+    bool TrimSuffix(const NoString& sSuffix);
     /** Trim a given prefix.
      * @param sPrefix The prefix that should be removed.
      * @return A copy of this string without the prefix.
      */
-    CString TrimPrefix_n(const CString& sPrefix = ":") const;
+    NoString TrimPrefix_n(const NoString& sPrefix = ":") const;
     /** Trim a given suffix.
      * @param sSuffix The suffix that should be removed.
      * @return A copy of this string without the prefix.
      */
-    CString TrimSuffix_n(const CString& sSuffix) const;
+    NoString TrimSuffix_n(const NoString& sSuffix) const;
 
     /** Find the position of the given substring.
      * @param s The substring to search for.
      * @param cs CaseSensitive if you want the comparison to be case
      *                       sensitive, CaseInsensitive (default) otherwise.
-     * @return The position of the substring if found, CString::npos otherwise.
+     * @return The position of the substring if found, NoString::npos otherwise.
      */
-    size_t Find(const CString& s, CaseSensitivity cs = CaseInsensitive) const;
+    size_t Find(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
     /** Check whether the string starts with a given prefix.
      * @param sPrefix The prefix.
      * @param cs CaseSensitive if you want the comparison to be case
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return True if the string starts with prefix, false otherwise.
      */
-    bool StartsWith(const CString& sPrefix, CaseSensitivity cs = CaseInsensitive) const;
+    bool StartsWith(const NoString& sPrefix, CaseSensitivity cs = CaseInsensitive) const;
     /** Check whether the string ends with a given suffix.
      * @param sSuffix The suffix.
      * @param cs CaseSensitive if you want the comparison to be case
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return True if the string ends with suffix, false otherwise.
      */
-    bool EndsWith(const CString& sSuffix, CaseSensitivity cs = CaseInsensitive) const;
+    bool EndsWith(const NoString& sSuffix, CaseSensitivity cs = CaseInsensitive) const;
     /**
      * Check whether the string contains a given string.
      * @param s The string to search.
      * @param bCaseSensitive Whether the search is case sensitive.
      * @return True if this string contains the other string, falser otherwise.
      */
-    bool Contains(const CString& s, CaseSensitivity cs = CaseInsensitive) const;
+    bool Contains(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
 
     /** Remove characters from the beginning of this string.
      * @param uLen The number of characters to remove.
@@ -550,26 +550,26 @@ public:
      * @param uLen The number of characters to remove.
      * @return The result of the conversion.
      */
-    CString LeftChomp_n(size_type uLen = 1) const;
+    NoString LeftChomp_n(size_type uLen = 1) const;
     /** Remove characters from the end of this string.
      * This string object isn't modified.
      * @param uLen The number of characters to remove.
      * @return The result of the conversion.
      */
-    CString RightChomp_n(size_type uLen = 1) const;
+    NoString RightChomp_n(size_type uLen = 1) const;
     /** Remove controls characters from this string.
      * Controls characters are color codes, and those in C0 set
      * See https://en.wikipedia.org/wiki/C0_and_C1_control_codes
      * @return The result of the conversion.
      */
-    CString& StripControls();
+    NoString& StripControls();
     /** Remove controls characters from this string.
      * Controls characters are color codes, and those in C0 set
      * See https://en.wikipedia.org/wiki/C0_and_C1_control_codes
      * This string object isn't modified.
      * @return The result of the conversion.
      */
-    CString StripControls_n() const;
+    NoString StripControls_n() const;
 
 private:
     unsigned char* strnchr(const unsigned char* src,
@@ -584,16 +584,16 @@ private:
  *
  * This class maps strings to other strings.
  */
-class MCString : public std::map<CString, CString>
+class NoStringMap : public std::map<NoString, NoString>
 {
 public:
-    /** Construct an empty MCString. */
-    MCString() : std::map<CString, CString>() {}
-    /** Destruct this MCString. */
-    virtual ~MCString() { clear(); }
+    /** Construct an empty NoStringMap. */
+    NoStringMap() : std::map<NoString, NoString>() {}
+    /** Destruct this NoStringMap. */
+    virtual ~NoStringMap() { clear(); }
 
     /** A static instance of an empty map. */
-    static const MCString EmptyMap;
+    static const NoStringMap EmptyMap;
 
     /** Status codes that can be returned by WriteToDisk() and
      * ReadFromDisk(). */
@@ -616,13 +616,13 @@ public:
      * @return The result of the operation.
      * @see WriteFilter.
      */
-    enum status_t WriteToDisk(const CString& sPath, mode_t iMode = 0644) const;
+    enum status_t WriteToDisk(const NoString& sPath, mode_t iMode = 0644) const;
     /** Read a map from a file.
      * @param sPath The file name to read from.
      * @return The result of the operation.
      * @see ReadFilter.
      */
-    enum status_t ReadFromDisk(const CString& sPath);
+    enum status_t ReadFromDisk(const NoString& sPath);
 
     /** Filter used while writing this map. This function is called by
      * WriteToDisk() for each pair that is going to be written. This
@@ -631,7 +631,7 @@ public:
      * @param sValue The value that will be written. Can be modified.
      * @return true unless WriteToDisk() should fail with MCS_EWRITEFIL.
      */
-    virtual bool WriteFilter(CString& sKey, CString& sValue) const { return true; }
+    virtual bool WriteFilter(NoString& sKey, NoString& sValue) const { return true; }
     /** Filter used while reading this map. This function is called by
      * ReadFromDisk() for each pair that is beging read. This function has
      * the chance to modify the data that is being read.
@@ -639,14 +639,14 @@ public:
      * @param sValue The value that was read. Can be modified.
      * @return true unless ReadFromDisk() should fail with MCS_EWRITEFIL.
      */
-    virtual bool ReadFilter(CString& sKey, CString& sValue) const { return true; }
+    virtual bool ReadFilter(NoString& sKey, NoString& sValue) const { return true; }
 
     /** Encode a value so that it can safely be parsed by ReadFromDisk().
      * This is an internal function.
      */
-    virtual CString& Encode(CString& sValue) const;
+    virtual NoString& Encode(NoString& sValue) const;
     /** Undo the effects of Encode(). This is an internal function. */
-    virtual CString& Decode(CString& sValue) const;
+    virtual NoString& Decode(NoString& sValue) const;
 };
 
 #endif // !NOSTRING_H

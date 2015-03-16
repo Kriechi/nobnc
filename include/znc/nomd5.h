@@ -22,16 +22,16 @@ typedef struct
     uint8 buffer[64];
 } md5_context;
 
-class CMD5
+class NoMD5
 {
 protected:
     char m_szMD5[33];
 
 public:
-    CMD5();
-    CMD5(const string& sText);
-    CMD5(const char* szText, uint32 nTextLen);
-    ~CMD5();
+    NoMD5();
+    NoMD5(const string& sText);
+    NoMD5(const char* szText, uint32 nTextLen);
+    ~NoMD5();
 
     operator string() const { return (string)m_szMD5; }
 

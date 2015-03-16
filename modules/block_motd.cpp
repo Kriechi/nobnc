@@ -16,16 +16,16 @@
 
 #include <znc/nomodules.h>
 
-class CBlockMotd : public CModule
+class NoBlockMotd : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CBlockMotd) {}
+    MODCONSTRUCTOR(NoBlockMotd) {}
 
-    virtual ~CBlockMotd() {}
+    virtual ~NoBlockMotd() {}
 
-    EModRet OnRaw(CString& sLine) override
+    EModRet OnRaw(NoString& sLine) override
     {
-        const CString sCmd = sLine.Token(1);
+        const NoString sCmd = sLine.Token(1);
 
         if (sCmd == "375" /* begin of MOTD */
             ||
@@ -38,11 +38,11 @@ public:
     }
 };
 
-template <> void TModInfo<CBlockMotd>(CModInfo& Info)
+template <> void TModInfo<NoBlockMotd>(NoModInfo& Info)
 {
-    Info.AddType(CModInfo::NetworkModule);
-    Info.AddType(CModInfo::GlobalModule);
+    Info.AddType(NoModInfo::NetworkModule);
+    Info.AddType(NoModInfo::GlobalModule);
     Info.SetWikiPage("block_motd");
 }
 
-USERMODULEDEFS(CBlockMotd, "Block the MOTD from IRC so it's not sent to your client(s).")
+USERMODULEDEFS(NoBlockMotd, "Block the MOTD from IRC so it's not sent to your client(s).")

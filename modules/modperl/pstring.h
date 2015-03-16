@@ -16,7 +16,7 @@
 
 #pragma once
 
-class PString : public CString {
+class PString : public NoString {
 	public:
 		enum EType {
 			STRING,
@@ -26,17 +26,17 @@ class PString : public CString {
 			BOOL
 		};
 
-		PString() : CString() { m_eType = STRING; }
-		PString(const char* c) : CString(c) { m_eType = STRING; }
-		PString(const CString& s) : CString(s) { m_eType = STRING; }
-		PString(int i) : CString(i) { m_eType = INT; }
-		PString(u_int i) : CString(i) { m_eType = UINT; }
-		PString(long i) : CString(i) { m_eType = INT; }
-		PString(u_long i) : CString(i) { m_eType = UINT; }
-		PString(long long i) : CString(i) { m_eType = INT; }
-		PString(unsigned long long i) : CString(i) { m_eType = UINT; }
-		PString(double i) : CString(i) { m_eType = NUM; }
-		PString(bool b) : CString((b ? "1" : "0")) { m_eType = BOOL; }
+		PString() : NoString() { m_eType = STRING; }
+		PString(const char* c) : NoString(c) { m_eType = STRING; }
+		PString(const NoString& s) : NoString(s) { m_eType = STRING; }
+		PString(int i) : NoString(i) { m_eType = INT; }
+		PString(u_int i) : NoString(i) { m_eType = UINT; }
+		PString(long i) : NoString(i) { m_eType = INT; }
+		PString(u_long i) : NoString(i) { m_eType = UINT; }
+		PString(long long i) : NoString(i) { m_eType = INT; }
+		PString(unsigned long long i) : NoString(i) { m_eType = UINT; }
+		PString(double i) : NoString(i) { m_eType = NUM; }
+		PString(bool b) : NoString((b ? "1" : "0")) { m_eType = BOOL; }
 		PString(SV* sv) {
 			STRLEN len = SvCUR(sv);
 			char* c = SvPV(sv, len);

@@ -58,10 +58,10 @@ using std::allocator;
 // Just makes generated python code slightly more beautiful.
 %feature("python:defaultargs");
 // Probably can be removed when swig is fixed to not produce bad code for some cases
-%feature("python:defaultargs", "0") CDir::MakeDir; // 0700 doesn't work in python3
-%feature("python:defaultargs", "0") CUtils::GetNumInput; // SyntaxError: non-default argument follows default argument
-%feature("python:defaultargs", "0") CModules::GetAvailableMods; // NameError: name 'UserModule' is not defined
-%feature("python:defaultargs", "0") CModules::GetDefaultMods; // NameError: name 'UserModule' is not defined
+%feature("python:defaultargs", "0") NoDir::MakeDir; // 0700 doesn't work in python3
+%feature("python:defaultargs", "0") NoUtils::GetNumInput; // SyntaxError: non-default argument follows default argument
+%feature("python:defaultargs", "0") NoModules::GetAvailableMods; // NameError: name 'UserModule' is not defined
+%feature("python:defaultargs", "0") NoModules::GetDefaultMods; // NameError: name 'UserModule' is not defined
 
 %begin %{
 #include "znc/noconfig.h"
@@ -75,14 +75,14 @@ using std::allocator;
 %include <std_deque.i>
 %include <std_shared_ptr.i>
 
-%shared_ptr(CAuthBase);
-%shared_ptr(CWebSession);
-%shared_ptr(CClientAuth);
+%shared_ptr(NoAuthBase);
+%shared_ptr(NoWebSession);
+%shared_ptr(NoClientAuth);
 
 %include "cstring.i"
-%template(_stringlist) std::list<CString>;
+%template(_stringlist) std::list<NoString>;
 
-%typemap(out) CModules::ModDirList %{
+%typemap(out) NoModules::ModDirList %{
 	$result = PyList_New($1.size());
 	if ($result) {
 		for (size_t i = 0; !$1.empty(); $1.pop(), ++i) {
@@ -91,23 +91,23 @@ using std::allocator;
 	}
 %}
 
-%template(VIRCNetworks) std::vector<CNetwork*>;
-%template(VChannels) std::vector<CChannel*>;
-%template(MNicks) std::map<CString, CNick>;
-%template(SModInfo) std::set<CModInfo>;
-%template(SCString) std::set<CString>;
-typedef std::set<CString> SCString;
-%template(VCString) std::vector<CString>;
-typedef std::vector<CString> VCString;
-%template(PyMCString) std::map<CString, CString>;
-%template(PyMStringVString) std::map<CString, VCString>;
-class MCString : public std::map<CString, CString> {};
-%template(PyModulesVector) std::vector<CModule*>;
-%template(VListeners) std::vector<CListener*>;
-%template(BufLines) std::deque<CMessage>;
-%template(VVString) std::vector<VCString>;
+%template(VIRNoNetworks) std::vector<NoNetwork*>;
+%template(VChannels) std::vector<NoChannel*>;
+%template(MNicks) std::map<NoString, NoNick>;
+%template(SModInfo) std::set<NoModInfo>;
+%template(NoStringSet) std::set<NoString>;
+typedef std::set<NoString> NoStringSet;
+%template(NoStringVector) std::vector<NoString>;
+typedef std::vector<NoString> NoStringVector;
+%template(PyNoStringMap) std::map<NoString, NoString>;
+%template(PyMStringVString) std::map<NoString, NoStringVector>;
+class NoStringMap : public std::map<NoString, NoString> {};
+%template(PyModulesVector) std::vector<NoModule*>;
+%template(VListeners) std::vector<NoListener*>;
+%template(BufLines) std::deque<NoMessage>;
+%template(VVString) std::vector<NoStringVector>;
 
-%typemap(in) CString& {
+%typemap(in) NoString& {
 	String* p;
 	int res = SWIG_IsOK(SWIG_ConvertPtr($input, (void**)&p, SWIG_TypeQuery("String*"), 0));
 	if (SWIG_IsOK(res)) {
@@ -117,7 +117,7 @@ class MCString : public std::map<CString, CString> {};
 	}
 }
 
-%typemap(out) CString&, CString* {
+%typemap(out) NoString&, NoString* {
 	if ($1) {
 		$result = CPyRetString::wrap(*$1);
 	} else {
@@ -126,7 +126,7 @@ class MCString : public std::map<CString, CString> {};
 	}
 }
 
-%typemap(typecheck) CString&, CString* {
+%typemap(typecheck) NoString&, NoString* {
     String* p;
     $1 = SWIG_IsOK(SWIG_ConvertPtr($input, (void**)&p, SWIG_TypeQuery("String*"), 0));
 }
@@ -151,7 +151,7 @@ class MCString : public std::map<CString, CString> {};
 %include "../include/znc/nothreads.h"
 %include "../include/znc/nosettings.h"
 %include "../include/znc/Csocket.h"
-%template(ZNCSocketManager) TSocketManager<CZNCSock>;
+%template(ZNNoSocketManager) TSocketManager<NoBaseSocket>;
 %include "../include/znc/nosocket.h"
 %include "../include/znc/nofile.h"
 %include "../include/znc/nodir.h"
@@ -175,21 +175,21 @@ class MCString : public std::map<CString, CString> {};
 
 %include "module.h"
 
-/* Really it's CString& inside, but SWIG shouldn't know that :) */
+/* Really it's NoString& inside, but SWIG shouldn't know that :) */
 class CPyRetString {
 	CPyRetString();
 public:
-	CString s;
+	NoString s;
 };
 
 %extend CPyRetString {
-	CString __str__() {
+	NoString __str__() {
 		return $self->s;
 	}
 };
 
 %extend String {
-	CString __str__() {
+	NoString __str__() {
 		return $self->s;
 	}
 };
@@ -225,21 +225,21 @@ class CPyRetBool {
     }
 }
 
-%extend CModule {
-	CString __str__() {
+%extend NoModule {
+	NoString __str__() {
 		return $self->GetModName();
 	}
-	MCString_iter BeginNV_() {
-		return MCString_iter($self->BeginNV());
+	NoStringMap_iter BeginNV_() {
+		return NoStringMap_iter($self->BeginNV());
 	}
-	bool ExistsNV(const CString& sName) {
+	bool ExistsNV(const NoString& sName) {
 		return $self->EndNV() != $self->FindNV(sName);
 	}
 }
 
-%extend CModules {
-	bool removeModule(CModule* p) {
-		for (CModules::iterator i = $self->begin(); $self->end() != i; ++i) {
+%extend NoModules {
+	bool removeModule(NoModule* p) {
+		for (NoModules::iterator i = $self->begin(); $self->end() != i; ++i) {
 			if (*i == p) {
 				$self->erase(i);
 				return true;
@@ -249,55 +249,55 @@ class CPyRetBool {
 	}
 }
 
-%extend CUser {
-	CString __str__() {
+%extend NoUser {
+	NoString __str__() {
 		return $self->GetUserName();
 	}
-	CString __repr__() {
-		return "<CUser " + $self->GetUserName() + ">";
+	NoString __repr__() {
+		return "<NoUser " + $self->GetUserName() + ">";
 	}
-	std::vector<CNetwork*> GetNetworks_() {
+	std::vector<NoNetwork*> GetNetworks_() {
 		return $self->GetNetworks();
 	}
 };
 
-%extend CNetwork {
-	CString __str__() {
+%extend NoNetwork {
+	NoString __str__() {
 		return $self->GetName();
 	}
-	CString __repr__() {
-		return "<CNetwork " + $self->GetName() + ">";
+	NoString __repr__() {
+		return "<NoNetwork " + $self->GetName() + ">";
 	}
-	std::vector<CChannel*> GetChans_() {
+	std::vector<NoChannel*> GetChans_() {
 		return $self->GetChans();
 	}
 }
 
-%extend CChannel {
-	CString __str__() {
+%extend NoChannel {
+	NoString __str__() {
 		return $self->GetName();
 	}
-	CString __repr__() {
-		return "<CChannel " + $self->GetName() + ">";
+	NoString __repr__() {
+		return "<NoChannel " + $self->GetName() + ">";
 	}
-	std::map<CString, CNick> GetNicks_() {
+	std::map<NoString, NoNick> GetNicks_() {
 		return $self->GetNicks();
 	}
 };
 
-%extend CNick {
-	CString __str__() {
+%extend NoNick {
+	NoString __str__() {
 		return $self->GetNick();
 	}
-	CString __repr__() {
-		return "<CNick " + $self->GetHostMask() + ">";
+	NoString __repr__() {
+		return "<NoNick " + $self->GetHostMask() + ">";
 	}
 };
 
 %extend CZNC {
     PyObject* GetUserMap_() {
         PyObject* result = PyDict_New();
-        auto user_type = SWIG_TypeQuery("CUser*");
+        auto user_type = SWIG_TypeQuery("NoUser*");
         for (const auto& p : $self->GetUserMap()) {
             PyObject* user = SWIG_NewInstanceObj(p.second, user_type, 0);
             PyDict_SetItemString(result, p.first.c_str(), user);
@@ -308,11 +308,11 @@ class CPyRetBool {
 };
 
 /* To allow module-loaders to be written on python.
- * They can call CreatePyModule() to create CModule* object, but one of arguments to CreatePyModule() is "CModule* pModPython"
- * Pointer to modpython is already accessible to python modules as self.GetModPython(), but it's just a pointer to something, not to CModule*.
- * So make it known that CModPython is really a CModule.
+ * They can call CreatePyModule() to create NoModule* object, but one of arguments to CreatePyModule() is "NoModule* pModPython"
+ * Pointer to modpython is already accessible to python modules as self.GetModPython(), but it's just a pointer to something, not to NoModule*.
+ * So make it known that CModPython is really a NoModule.
  */
-class CModPython : public CModule {
+class CModPython : public NoModule {
 private:
 	CModPython();
 	CModPython(const CModPython&);
@@ -321,27 +321,27 @@ private:
 
 /* Web */
 
-%template(StrPair) std::pair<CString, CString>;
-%template(VPair) std::vector<std::pair<CString, CString> >;
-typedef std::vector<std::pair<CString, CString> > VPair;
+%template(StrPair) std::pair<NoString, NoString>;
+%template(NoStringPairVector) std::vector<std::pair<NoString, NoString> >;
+typedef std::vector<std::pair<NoString, NoString> > NoStringPairVector;
 %template(VWebSubPages) std::vector<TWebSubPage>;
 
 %inline %{
-	void VPair_Add2Str_(VPair* self, const CString& a, const CString& b) {
+	void NoStringPairVector_Add2Str_(NoStringPairVector* self, const NoString& a, const NoString& b) {
 		self->push_back(std::make_pair(a, b));
 	}
 %}
 
-%extend CTemplate {
-	void set(const CString& key, const CString& value) {
-		DEBUG("WARNING: modpython's CTemplate.set is deprecated and will be removed. Use normal dict's operations like Tmpl['foo'] = 'bar'");
+%extend NoTemplate {
+	void set(const NoString& key, const NoString& value) {
+		DEBUG("WARNING: modpython's NoTemplate.set is deprecated and will be removed. Use normal dict's operations like Tmpl['foo'] = 'bar'");
 		(*$self)[key] = value;
 	}
 }
 
 %inline %{
-	TWebSubPage CreateWebSubPage_(const CString& sName, const CString& sTitle, const VPair& vParams, unsigned int uFlags) {
-		return std::make_shared<CWebSubPage>(sName, sTitle, vParams, uFlags);
+	TWebSubPage CreateWebSubPage_(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, unsigned int uFlags) {
+		return std::make_shared<NoWebSubPage>(sName, sTitle, vParams, uFlags);
 	}
 %}
 

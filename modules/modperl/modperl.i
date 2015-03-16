@@ -74,10 +74,10 @@ namespace std {
 		set(const set<K>&);
 	};
 }
-%include "CString.i"
-%template(_stringlist) std::list<CString>;
-%typemap(out) std::list<CString> {
-	std::list<CString>::const_iterator i;
+%include "NoString.i"
+%template(_stringlist) std::list<NoString>;
+%typemap(out) std::list<NoString> {
+	std::list<NoString>::const_iterator i;
 	unsigned int j;
 	int len = $1.size();
 	SV **svs = new SV*[len];
@@ -92,25 +92,25 @@ namespace std {
 	argvi++;
 }
 
-%template(VIRCNetworks) std::vector<CNetwork*>;
-%template(VChannels) std::vector<CChannel*>;
-%template(VCString) std::vector<CString>;
-typedef std::vector<CString> VCString;
-/*%template(MNicks) std::map<CString, CNick>;*/
-/*%template(SModInfo) std::set<CModInfo>;
-%template(SCString) std::set<CString>;
-typedef std::set<CString> SCString;*/
-%template(PerlMCString) std::map<CString, CString>;
-class MCString : public std::map<CString, CString> {};
-/*%template(PerlModulesVector) std::vector<CModule*>;*/
-%template(VListeners) std::vector<CListener*>;
-%template(BufLines) std::deque<CMessage>;
-%template(VVString) std::vector<VCString>;
+%template(VIRNoNetworks) std::vector<NoNetwork*>;
+%template(VChannels) std::vector<NoChannel*>;
+%template(NoStringVector) std::vector<NoString>;
+typedef std::vector<NoString> NoStringVector;
+/*%template(MNicks) std::map<NoString, NoNick>;*/
+/*%template(SModInfo) std::set<NoModInfo>;
+%template(NoStringSet) std::set<NoString>;
+typedef std::set<NoString> NoStringSet;*/
+%template(PerlNoStringMap) std::map<NoString, NoString>;
+class NoStringMap : public std::map<NoString, NoString> {};
+/*%template(PerlModulesVector) std::vector<NoModule*>;*/
+%template(VListeners) std::vector<NoListener*>;
+%template(BufLines) std::deque<NoMessage>;
+%template(VVString) std::vector<NoStringVector>;
 
-%typemap(out) std::map<CString, CNick> {
+%typemap(out) std::map<NoString, NoNick> {
 	HV* myhv = newHV();
-	for (std::map<CString, CNick>::const_iterator i = $1.begin(); i != $1.end(); ++i) {
-		SV* val = SWIG_NewInstanceObj(const_cast<CNick*>(&i->second), SWIG_TypeQuery("CNick*"), SWIG_SHADOW);
+	for (std::map<NoString, NoNick>::const_iterator i = $1.begin(); i != $1.end(); ++i) {
+		SV* val = SWIG_NewInstanceObj(const_cast<NoNick*>(&i->second), SWIG_TypeQuery("NoNick*"), SWIG_SHADOW);
 		SvREFCNT_inc(val);// it was created mortal
 		hv_store(myhv, i->first.c_str(), i->first.length(), val, 0);
 	}
@@ -128,7 +128,7 @@ class MCString : public std::map<CString, CString> {};
 %include "../include/znc/nothreads.h"
 %include "../include/znc/nosettings.h"
 %include "../include/znc/Csocket.h"
-%template(ZNCSocketManager) TSocketManager<CZNCSock>;
+%template(ZNNoSocketManager) TSocketManager<NoBaseSocket>;
 %include "../include/znc/nosocket.h"
 %include "../include/znc/nofile.h"
 %include "../include/znc/nodir.h"
@@ -153,54 +153,54 @@ class MCString : public std::map<CString, CString> {};
 %include "module.h"
 
 %inline %{
-	class String : public CString {
+	class String : public NoString {
 		public:
 			String() {}
-			String(const CString& s)	: CString(s) {}
-			String(double d, int prec=2): CString(d, prec) {}
-			String(float f, int prec=2) : CString(f, prec) {}
-			String(int i)			   : CString(i) {}
-			String(unsigned int i)	  : CString(i) {}
-			String(long int i)		  : CString(i) {}
-			String(unsigned long int i) : CString(i) {}
-			String(char c)			  : CString(c) {}
-			String(unsigned char c)	 : CString(c) {}
-			String(short int i)		 : CString(i) {}
-			String(unsigned short int i): CString(i) {}
-			String(bool b)			  : CString(b) {}
-			CString GetPerlStr() {
+			String(const NoString& s)	: NoString(s) {}
+			String(double d, int prec=2): NoString(d, prec) {}
+			String(float f, int prec=2) : NoString(f, prec) {}
+			String(int i)			   : NoString(i) {}
+			String(unsigned int i)	  : NoString(i) {}
+			String(long int i)		  : NoString(i) {}
+			String(unsigned long int i) : NoString(i) {}
+			String(char c)			  : NoString(c) {}
+			String(unsigned char c)	 : NoString(c) {}
+			String(short int i)		 : NoString(i) {}
+			String(unsigned short int i): NoString(i) {}
+			String(bool b)			  : NoString(b) {}
+			NoString GetPerlStr() {
 				return *this;
 			}
 	};
 %}
 
-%extend CModule {
-	std::list<CString> _GetNVKeys() {
-		std::list<CString> res;
-		for (MCString::iterator i = $self->BeginNV(); i != $self->EndNV(); ++i) {
+%extend NoModule {
+	std::list<NoString> _GetNVKeys() {
+		std::list<NoString> res;
+		for (NoStringMap::iterator i = $self->BeginNV(); i != $self->EndNV(); ++i) {
 			res.push_back(i->first);
 		}
 		return res;
 	}
-	bool ExistsNV(const CString& sName) {
+	bool ExistsNV(const NoString& sName) {
 		return $self->EndNV() != $self->FindNV(sName);
 	}
 }
 
 %perlcode %{
-	package ZNC::CModule;
+	package ZNC::NoModule;
 	sub GetNVKeys {
 		my $result = _GetNVKeys(@_);
 		return @$result;
 	}
 %}
 
-%extend CModules {
-	void push_back(CModule* p) {
+%extend NoModules {
+	void push_back(NoModule* p) {
 		$self->push_back(p);
 	}
-	bool removeModule(CModule* p) {
-		for (CModules::iterator i = $self->begin(); $self->end() != i; ++i) {
+	bool removeModule(NoModule* p) {
+		for (NoModules::iterator i = $self->begin(); $self->end() != i; ++i) {
 			if (*i == p) {
 				$self->erase(i);
 				return true;
@@ -210,46 +210,46 @@ class MCString : public std::map<CString, CString> {};
 	}
 }
 
-%extend CUser {
-	std::vector<CNetwork*> GetNetworks_() {
+%extend NoUser {
+	std::vector<NoNetwork*> GetNetworks_() {
 		return $self->GetNetworks();
 	}
 }
 
-%extend CNetwork {
-	std::vector<CChannel*> GetChans_() {
+%extend NoNetwork {
+	std::vector<NoChannel*> GetChans_() {
 		return $self->GetChans();
 	}
 }
 
-%extend CChannel {
-	std::map<CString, CNick> GetNicks_() {
+%extend NoChannel {
+	std::map<NoString, NoNick> GetNicks_() {
 		return $self->GetNicks();
 	}
 }
 
 /* Web */
 
-%template(StrPair) std::pair<CString, CString>;
-%template(VPair) std::vector<std::pair<CString, CString> >;
-typedef std::vector<std::pair<CString, CString> > VPair;
+%template(StrPair) std::pair<NoString, NoString>;
+%template(NoStringPairVector) std::vector<std::pair<NoString, NoString> >;
+typedef std::vector<std::pair<NoString, NoString> > NoStringPairVector;
 %template(VWebSubPages) std::vector<TWebSubPage>;
 
 %inline %{
-	void _VPair_Add2Str(VPair* self, const CString& a, const CString& b) {
+	void _NoStringPairVector_Add2Str(NoStringPairVector* self, const NoString& a, const NoString& b) {
 		self->push_back(std::make_pair(a, b));
 	}
 %}
 
-%extend CTemplate {
-	void set(const CString& key, const CString& value) {
+%extend NoTemplate {
+	void set(const NoString& key, const NoString& value) {
 		(*$self)[key] = value;
 	}
 }
 
 %inline %{
-	TWebSubPage _CreateWebSubPage(const CString& sName, const CString& sTitle, const VPair& vParams, unsigned int uFlags) {
-		return std::make_shared<CWebSubPage>(sName, sTitle, vParams, uFlags);
+	TWebSubPage _CreateWebSubPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, unsigned int uFlags) {
+		return std::make_shared<NoWebSubPage>(sName, sTitle, vParams, uFlags);
 	}
 %}
 
@@ -258,37 +258,37 @@ typedef std::vector<std::pair<CString, CString> > VPair;
 	sub CreateWebSubPage {
 		my ($name, %arg) = @_;
 		my $params = $arg{params}//{};
-		my $vpair = ZNC::VPair->new;
+		my $vpair = ZNC::NoStringPairVector->new;
 		while (my ($key, $val) = each %$params) {
-			ZNC::_VPair_Add2Str($vpair, $key, $val);
+			ZNC::_NoStringPairVector_Add2Str($vpair, $key, $val);
 		}
 		my $flags = 0;
-		$flags |= $ZNC::CWebSubPage::F_ADMIN if $arg{admin}//0;
+		$flags |= $ZNC::NoWebSubPage::F_ADMIN if $arg{admin}//0;
 		return _CreateWebSubPage($name, $arg{title}//'', $vpair, $flags);
 	}
 %}
 
 %inline %{
-	void _CleanupStash(const CString& sModname) {
+	void _CleanupStash(const NoString& sModname) {
 		hv_clear(gv_stashpv(sModname.c_str(), 0));
 	}
 %}
 
 %perlcode %{
 	package ZNC;
-	*CONTINUE = *ZNC::CModule::CONTINUE;
-	*HALT = *ZNC::CModule::HALT;
-	*HALTMODS = *ZNC::CModule::HALTMODS;
-	*HALTCORE = *ZNC::CModule::HALTCORE;
-	*UNLOAD = *ZNC::CModule::UNLOAD;
+	*CONTINUE = *ZNC::NoModule::CONTINUE;
+	*HALT = *ZNC::NoModule::HALT;
+	*HALTMODS = *ZNC::NoModule::HALTMODS;
+	*HALTCORE = *ZNC::NoModule::HALTCORE;
+	*UNLOAD = *ZNC::NoModule::UNLOAD;
 
-	package ZNC::CNetwork;
+	package ZNC::NoNetwork;
 	*GetChans = *GetChans_;
 
-	package ZNC::CUser;
+	package ZNC::NoUser;
 	*GetNetworks = *GetNetworks_;
 
-	package ZNC::CChannel;
+	package ZNC::NoChannel;
 	sub _GetNicks_ {
 		my $result = GetNicks_(@_);
 		return %$result;

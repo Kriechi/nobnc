@@ -18,13 +18,13 @@
 #include <znc/nofile.h>
 #include <znc/nosettings.h>
 
-class CSettingsTest : public ::testing::Test
+class NoSettingsTest : public ::testing::Test
 {
 public:
-    virtual ~CSettingsTest() { m_File.Delete(); }
+    virtual ~NoSettingsTest() { m_File.Delete(); }
 
 protected:
-    CFile& WriteFile(const CString& sConfig)
+    NoFile& WriteFile(const NoString& sConfig)
     {
         char sName[] = "./temp-XXXXXX";
         int fd = mkstemp(sName);
@@ -37,51 +37,51 @@ protected:
     }
 
 private:
-    CFile m_File;
+    NoFile m_File;
 };
 
-class CSettingsErrorTest : public CSettingsTest
+class NoSettingsErrorTest : public NoSettingsTest
 {
 public:
-    void TEST_ERROR(const CString& sConfig, const CString& sExpectError)
+    void TEST_ERROR(const NoString& sConfig, const NoString& sExpectError)
     {
-        CFile& File = WriteFile(sConfig);
+        NoFile& File = WriteFile(sConfig);
 
-        CSettings conf;
-        CString sError;
+        NoSettings conf;
+        NoString sError;
         EXPECT_FALSE(conf.Parse(File, sError));
 
         EXPECT_EQ(sExpectError, sError);
     }
 };
 
-class CSettingsSuccessTest : public CSettingsTest
+class NoSettingsSuccessTest : public NoSettingsTest
 {
 public:
-    void TEST_SUCCESS(const CString& sConfig, const CString& sExpectedOutput)
+    void TEST_SUCCESS(const NoString& sConfig, const NoString& sExpectedOutput)
     {
-        CFile& File = WriteFile(sConfig);
+        NoFile& File = WriteFile(sConfig);
         // Verify that Parse() rewinds the file
         File.Seek(12);
 
-        CSettings conf;
-        CString sError;
+        NoSettings conf;
+        NoString sError;
         EXPECT_TRUE(conf.Parse(File, sError)) << sError;
         EXPECT_TRUE(sError.empty()) << "Non-empty error string!";
 
-        CString sOutput;
+        NoString sOutput;
         ToString(sOutput, conf);
 
         EXPECT_EQ(sExpectedOutput, sOutput);
     }
 
-    void ToString(CString& sRes, CSettings& conf)
+    void ToString(NoString& sRes, NoSettings& conf)
     {
-        CSettings::EntryMapIterator it = conf.BeginEntries();
+        NoSettings::EntryMapIterator it = conf.BeginEntries();
         while (it != conf.EndEntries()) {
-            const CString& sKey = it->first;
-            const VCString& vsEntries = it->second;
-            VCString::const_iterator i = vsEntries.begin();
+            const NoString& sKey = it->first;
+            const NoStringVector& vsEntries = it->second;
+            NoStringVector::const_iterator i = vsEntries.begin();
             if (i == vsEntries.end())
                 sRes += sKey + " <- Error, empty list!\n";
             else
@@ -92,9 +92,9 @@ public:
             ++it;
         }
 
-        CSettings::SubConfigMapIterator it2 = conf.BeginSubConfigs();
+        NoSettings::SubConfigMapIterator it2 = conf.BeginSubConfigs();
         while (it2 != conf.EndSubConfigs()) {
-            std::map<CString, CSettingsEntry>::const_iterator it3 = it2->second.begin();
+            std::map<NoString, NoSettingsEntry>::const_iterator it3 = it2->second.begin();
 
             while (it3 != it2->second.end()) {
                 sRes += "->" + it2->first + "/" + it3->first + "\n";
@@ -110,48 +110,48 @@ public:
 private:
 };
 
-TEST_F(CSettingsSuccessTest, Empty) { TEST_SUCCESS("", ""); }
+TEST_F(NoSettingsSuccessTest, Empty) { TEST_SUCCESS("", ""); }
 
 /* duplicate entries */
-TEST_F(CSettingsSuccessTest, Duble1) { TEST_SUCCESS("Foo = bar\nFoo = baz\n", "foo=bar\nfoo=baz\n"); }
-TEST_F(CSettingsSuccessTest, Duble2) { TEST_SUCCESS("Foo = baz\nFoo = bar\n", "foo=baz\nfoo=bar\n"); }
+TEST_F(NoSettingsSuccessTest, Duble1) { TEST_SUCCESS("Foo = bar\nFoo = baz\n", "foo=bar\nfoo=baz\n"); }
+TEST_F(NoSettingsSuccessTest, Duble2) { TEST_SUCCESS("Foo = baz\nFoo = bar\n", "foo=baz\nfoo=bar\n"); }
 
 /* sub configs */
-TEST_F(CSettingsErrorTest, SubConf1) { TEST_ERROR("</foo>", "Error on line 1: Closing tag \"foo\" which is not open."); }
-TEST_F(CSettingsErrorTest, SubConf2)
+TEST_F(NoSettingsErrorTest, SubConf1) { TEST_ERROR("</foo>", "Error on line 1: Closing tag \"foo\" which is not open."); }
+TEST_F(NoSettingsErrorTest, SubConf2)
 {
     TEST_ERROR("<foo a>\n</bar>\n", "Error on line 2: Closing tag \"bar\" which is not open.");
 }
-TEST_F(CSettingsErrorTest, SubConf3)
+TEST_F(NoSettingsErrorTest, SubConf3)
 {
     TEST_ERROR("<foo bar>",
                "Error on line 1: Not all tags are closed at the end of the file. Inner-most open tag is \"foo\".");
 }
-TEST_F(CSettingsErrorTest, SubConf4)
+TEST_F(NoSettingsErrorTest, SubConf4)
 {
     TEST_ERROR("<foo>\n</foo>", "Error on line 1: Empty block name at begin of block.");
 }
-TEST_F(CSettingsErrorTest, SubConf5)
+TEST_F(NoSettingsErrorTest, SubConf5)
 {
     TEST_ERROR("<foo 1>\n</foo>\n<foo 1>\n</foo>", "Error on line 4: Duplicate entry for tag \"foo\" name \"1\".");
 }
-TEST_F(CSettingsSuccessTest, SubConf6) { TEST_SUCCESS("<foo a>\n</foo>", "->foo/a\n<-\n"); }
-TEST_F(CSettingsSuccessTest, SubConf7) { TEST_SUCCESS("<a b>\n  <c d>\n </c>\n</a>", "->a/b\n->c/d\n<-\n<-\n"); }
-TEST_F(CSettingsSuccessTest, SubConf8)
+TEST_F(NoSettingsSuccessTest, SubConf6) { TEST_SUCCESS("<foo a>\n</foo>", "->foo/a\n<-\n"); }
+TEST_F(NoSettingsSuccessTest, SubConf7) { TEST_SUCCESS("<a b>\n  <c d>\n </c>\n</a>", "->a/b\n->c/d\n<-\n<-\n"); }
+TEST_F(NoSettingsSuccessTest, SubConf8)
 {
     TEST_SUCCESS(" \t <A B>\nfoo = bar\n\tFooO = bar\n</a>", "->a/B\nfoo=bar\nfooo=bar\n<-\n");
 }
 
 /* comments */
-TEST_F(CSettingsSuccessTest, Comment1) { TEST_SUCCESS("Foo = bar // baz\n// Bar = baz", "foo=bar // baz\n"); }
-TEST_F(CSettingsSuccessTest, Comment2)
+TEST_F(NoSettingsSuccessTest, Comment1) { TEST_SUCCESS("Foo = bar // baz\n// Bar = baz", "foo=bar // baz\n"); }
+TEST_F(NoSettingsSuccessTest, Comment2)
 {
     TEST_SUCCESS("Foo = bar /* baz */\n/*** Foo = baz ***/\n   /**** asdsdfdf \n Some quite invalid stuff ***/\n",
                  "foo=bar /* baz */\n");
 }
-TEST_F(CSettingsErrorTest, Comment3)
+TEST_F(NoSettingsErrorTest, Comment3)
 {
     TEST_ERROR("<foo foo>\n/* Just a comment\n</foo>", "Error on line 3: Comment not closed at end of file.");
 }
-TEST_F(CSettingsSuccessTest, Comment4) { TEST_SUCCESS("/* Foo\n/* Bar */", ""); }
-TEST_F(CSettingsSuccessTest, Comment5) { TEST_SUCCESS("/* Foo\n// */", ""); }
+TEST_F(NoSettingsSuccessTest, Comment4) { TEST_SUCCESS("/* Foo\n/* Bar */", ""); }
+TEST_F(NoSettingsSuccessTest, Comment5) { TEST_SUCCESS("/* Foo\n// */", ""); }

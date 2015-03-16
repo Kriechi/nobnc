@@ -23,20 +23,20 @@
 
 #include <deque>
 
-class CChannel;
-class CUser;
-class CNetwork;
-class CClient;
+class NoChannel;
+class NoUser;
+class NoNetwork;
+class NoClient;
 
 // TODO: This class needs new name
-class CIRCSock : public CIRCSocket
+class NoIrcSock : public NoIrcSocket
 {
 public:
-    CIRCSock(CNetwork* pNetwork);
-    virtual ~CIRCSock();
+    NoIrcSock(NoNetwork* pNetwork);
+    virtual ~NoIrcSock();
 
-    CIRCSock(const CIRCSock&) = delete;
-    CIRCSock& operator=(const CIRCSock&) = delete;
+    NoIrcSock(const NoIrcSock&) = delete;
+    NoIrcSock& operator=(const NoIrcSock&) = delete;
 
     typedef enum {
         // These values must line up with their position in the CHANMODE argument to raw 005
@@ -46,30 +46,30 @@ public:
         NoArg = 3
     } EChanModeArgs;
 
-    bool OnCTCPReply(CNick& Nick, CString& sMessage);
-    bool OnPrivCTCP(CNick& Nick, CString& sMessage);
-    bool OnChanCTCP(CNick& Nick, const CString& sChan, CString& sMessage);
-    bool OnGeneralCTCP(CNick& Nick, CString& sMessage);
-    bool OnPrivMsg(CNick& Nick, CString& sMessage);
-    bool OnChanMsg(CNick& Nick, const CString& sChan, CString& sMessage);
-    bool OnPrivNotice(CNick& Nick, CString& sMessage);
-    bool OnChanNotice(CNick& Nick, const CString& sChan, CString& sMessage);
-    bool OnServerCapAvailable(const CString& sCap);
+    bool OnCTCPReply(NoNick& Nick, NoString& sMessage);
+    bool OnPrivCTCP(NoNick& Nick, NoString& sMessage);
+    bool OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMessage);
+    bool OnGeneralCTCP(NoNick& Nick, NoString& sMessage);
+    bool OnPrivMsg(NoNick& Nick, NoString& sMessage);
+    bool OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage);
+    bool OnPrivNotice(NoNick& Nick, NoString& sMessage);
+    bool OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage);
+    bool OnServerCapAvailable(const NoString& sCap);
 
-    void ReadLine(const CString& sData) override;
+    void ReadLine(const NoString& sData) override;
     void Connected() override;
     void Disconnected() override;
     void ConnectionRefused() override;
-    void SockError(int iErrno, const CString& sDescription) override;
+    void SockError(int iErrno, const NoString& sDescription) override;
     void Timeout() override;
     void ReachedMaxBuffer() override;
 
-    void PutIRC(const CString& sLine);
-    void PutIRCQuick(const CString& sLine); //!< Should be used for PONG only
+    void PutIRC(const NoString& sLine);
+    void PutIRCQuick(const NoString& sLine); //!< Should be used for PONG only
     void ResetChans();
-    void Quit(const CString& sQuitMsg = "");
+    void Quit(const NoString& sQuitMsg = "");
 
-    /** You can call this from CModule::OnServerCapResult to suspend
+    /** You can call this from NoModule::OnServerCapResult to suspend
      *  sending other CAP requests and CAP END for a while. Each
      *  call to PauseCap should be balanced with a call to ResumeCap.
      */
@@ -79,71 +79,71 @@ public:
      */
     void ResumeCap();
 
-    void SetPass(const CString& s) { m_sPass = s; }
+    void SetPass(const NoString& s) { m_sPass = s; }
 
     unsigned int GetMaxNickLen() const { return m_uMaxNickLen; }
     EChanModeArgs GetModeType(unsigned char uMode) const;
     unsigned char GetPermFromMode(unsigned char uMode) const;
     const std::map<unsigned char, EChanModeArgs>& GetChanModes() const { return m_mueChanModes; }
-    bool IsPermChar(const char c) const { return (c != '\0' && GetPerms().find(c) != CString::npos); }
-    bool IsPermMode(const char c) const { return (c != '\0' && GetPermModes().find(c) != CString::npos); }
-    const CString& GetPerms() const { return m_sPerms; }
-    const CString& GetPermModes() const { return m_sPermModes; }
-    CString GetNickMask() const { return m_Nick.GetNickMask(); }
-    const CString& GetNick() const { return m_Nick.GetNick(); }
-    const CString& GetPass() const { return m_sPass; }
-    CNetwork* GetNetwork() const { return m_pNetwork; }
+    bool IsPermChar(const char c) const { return (c != '\0' && GetPerms().find(c) != NoString::npos); }
+    bool IsPermMode(const char c) const { return (c != '\0' && GetPermModes().find(c) != NoString::npos); }
+    const NoString& GetPerms() const { return m_sPerms; }
+    const NoString& GetPermModes() const { return m_sPermModes; }
+    NoString GetNickMask() const { return m_Nick.GetNickMask(); }
+    const NoString& GetNick() const { return m_Nick.GetNick(); }
+    const NoString& GetPass() const { return m_sPass; }
+    NoNetwork* GetNetwork() const { return m_pNetwork; }
     bool HasNamesx() const { return m_bNamesx; }
     bool HasUHNames() const { return m_bUHNames; }
     const std::set<unsigned char>& GetUserModes() const { return m_scUserModes; }
     // This is true if we are past raw 001
     bool IsAuthed() const { return m_bAuthed; }
-    bool IsCapAccepted(const CString& sCap) { return 1 == m_ssAcceptedCaps.count(sCap); }
-    const MCString& GetISupport() const { return m_mISupport; }
-    CString GetISupport(const CString& sKey, const CString& sDefault = "") const;
+    bool IsCapAccepted(const NoString& sCap) { return 1 == m_ssAcceptedCaps.count(sCap); }
+    const NoStringMap& GetISupport() const { return m_mISupport; }
+    NoString GetISupport(const NoString& sKey, const NoString& sDefault = "") const;
 
     // This handles NAMESX and UHNAMES in a raw 353 reply
-    void ForwardRaw353(const CString& sLine) const;
-    void ForwardRaw353(const CString& sLine, CClient* pClient) const;
+    void ForwardRaw353(const NoString& sLine) const;
+    void ForwardRaw353(const NoString& sLine, NoClient* pClient) const;
 
-    // TODO move this function to CNetwork and make it non-static?
+    // TODO move this function to NoNetwork and make it non-static?
     static bool IsFloodProtected(double fRate);
 
 private:
-    void SetNick(const CString& sNick);
-    void ParseISupport(const CString& sLine);
+    void SetNick(const NoString& sNick);
+    void ParseISupport(const NoString& sLine);
     // This is called when we connect and the nick we want is already taken
-    void SendAltNick(const CString& sBadNick);
+    void SendAltNick(const NoString& sBadNick);
     void SendNextCap();
     void TrySend();
 
     bool m_bAuthed;
     bool m_bNamesx;
     bool m_bUHNames;
-    CString m_sPerms;
-    CString m_sPermModes;
+    NoString m_sPerms;
+    NoString m_sPermModes;
     std::set<unsigned char> m_scUserModes;
     std::map<unsigned char, EChanModeArgs> m_mueChanModes;
-    CNetwork* m_pNetwork;
-    CNick m_Nick;
-    CString m_sPass;
-    std::map<CString, CChannel*> m_msChans;
+    NoNetwork* m_pNetwork;
+    NoNick m_Nick;
+    NoString m_sPass;
+    std::map<NoString, NoChannel*> m_msChans;
     unsigned int m_uMaxNickLen;
     unsigned int m_uCapPaused;
-    SCString m_ssAcceptedCaps;
-    SCString m_ssPendingCaps;
+    NoStringSet m_ssAcceptedCaps;
+    NoStringSet m_ssPendingCaps;
     time_t m_lastCTCP;
     unsigned int m_uNumCTCP;
     static const time_t m_uCTCPFloodTime;
     static const unsigned int m_uCTCPFloodCount;
-    MCString m_mISupport;
-    std::deque<CString> m_vsSendQueue;
+    NoStringMap m_mISupport;
+    std::deque<NoString> m_vsSendQueue;
     short int m_iSendsAllowed;
     unsigned short int m_uFloodBurst;
     double m_fFloodRate;
     bool m_bFloodProtection;
 
-    friend class CIRCFloodTimer;
+    friend class NoIrcFloodTimer;
 };
 
 #endif // !NOIRCSOCK_H

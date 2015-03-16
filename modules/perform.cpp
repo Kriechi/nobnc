@@ -16,11 +16,11 @@
 
 #include <znc/nonetwork.h>
 
-class CPerform : public CModule
+class NoPerform : public NoModule
 {
-    void Add(const CString& sCommand)
+    void Add(const NoString& sCommand)
     {
-        CString sPerf = sCommand.Token(1, true);
+        NoString sPerf = sCommand.Token(1, true);
 
         if (sPerf.empty()) {
             PutModule("Usage: add <command>");
@@ -32,7 +32,7 @@ class CPerform : public CModule
         Save();
     }
 
-    void Del(const CString& sCommand)
+    void Del(const NoString& sCommand)
     {
         u_int iNum = sCommand.Token(1, true).ToUInt();
 
@@ -46,21 +46,21 @@ class CPerform : public CModule
         Save();
     }
 
-    void List(const CString& sCommand)
+    void List(const NoString& sCommand)
     {
-        CTable Table;
+        NoTable Table;
         unsigned int index = 1;
 
         Table.AddColumn("Id");
         Table.AddColumn("Perform");
         Table.AddColumn("Expanded");
 
-        for (VCString::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it, index++) {
+        for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it, index++) {
             Table.AddRow();
-            Table.SetCell("Id", CString(index));
+            Table.SetCell("Id", NoString(index));
             Table.SetCell("Perform", *it);
 
-            CString sExpanded = ExpandString(*it);
+            NoString sExpanded = ExpandString(*it);
 
             if (sExpanded != *it) {
                 Table.SetCell("Expanded", sExpanded);
@@ -72,13 +72,13 @@ class CPerform : public CModule
         }
     }
 
-    void Execute(const CString& sCommand)
+    void Execute(const NoString& sCommand)
     {
         OnIRCConnected();
         PutModule("perform commands sent");
     }
 
-    void Swap(const CString& sCommand)
+    void Swap(const NoString& sCommand)
     {
         u_int iNumA = sCommand.Token(1).ToUInt();
         u_int iNumB = sCommand.Token(2).ToUInt();
@@ -93,21 +93,21 @@ class CPerform : public CModule
     }
 
 public:
-    MODCONSTRUCTOR(CPerform)
+    MODCONSTRUCTOR(NoPerform)
     {
         AddHelpCommand();
-        AddCommand("Add", static_cast<CModCommand::ModCmdFunc>(&CPerform::Add), "<command>");
-        AddCommand("Del", static_cast<CModCommand::ModCmdFunc>(&CPerform::Del), "<nr>");
-        AddCommand("List", static_cast<CModCommand::ModCmdFunc>(&CPerform::List));
-        AddCommand("Execute", static_cast<CModCommand::ModCmdFunc>(&CPerform::Execute));
-        AddCommand("Swap", static_cast<CModCommand::ModCmdFunc>(&CPerform::Swap), "<nr> <nr>");
+        AddCommand("Add", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::Add), "<command>");
+        AddCommand("Del", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::Del), "<nr>");
+        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::List));
+        AddCommand("Execute", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::Execute));
+        AddCommand("Swap", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::Swap), "<nr> <nr>");
     }
 
-    virtual ~CPerform() {}
+    virtual ~NoPerform() {}
 
-    CString ParsePerform(const CString& sArg) const
+    NoString ParsePerform(const NoString& sArg) const
     {
-        CString sPerf = sArg;
+        NoString sPerf = sArg;
 
         if (sPerf.Left(1) == "/") sPerf.LeftChomp();
 
@@ -122,7 +122,7 @@ public:
         return sPerf;
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         GetNV("Perform").Split("\n", m_vPerform, false);
 
@@ -131,14 +131,14 @@ public:
 
     void OnIRCConnected() override
     {
-        for (VCString::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
+        for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
             PutIRC(ExpandString(*it));
         }
     }
 
-    CString GetWebMenuTitle() override { return "Perform"; }
+    NoString GetWebMenuTitle() override { return "Perform"; }
 
-    bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName != "index") {
             // only accept requests to index
@@ -146,18 +146,18 @@ public:
         }
 
         if (WebSock.IsPost()) {
-            VCString vsPerf;
+            NoStringVector vsPerf;
             WebSock.GetRawParam("perform", true).Split("\n", vsPerf, false);
             m_vPerform.clear();
 
-            for (VCString::const_iterator it = vsPerf.begin(); it != vsPerf.end(); ++it)
+            for (NoStringVector::const_iterator it = vsPerf.begin(); it != vsPerf.end(); ++it)
                 m_vPerform.push_back(ParsePerform(*it));
 
             Save();
         }
 
-        for (VCString::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
-            CTemplate& Row = Tmpl.AddRow("PerformLoop");
+        for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
+            NoTemplate& Row = Tmpl.AddRow("PerformLoop");
             Row["Perform"] = *it;
         }
 
@@ -167,21 +167,21 @@ public:
 private:
     void Save()
     {
-        CString sBuffer = "";
+        NoString sBuffer = "";
 
-        for (VCString::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
+        for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
             sBuffer += *it + "\n";
         }
         SetNV("Perform", sBuffer);
     }
 
-    VCString m_vPerform;
+    NoStringVector m_vPerform;
 };
 
-template <> void TModInfo<CPerform>(CModInfo& Info)
+template <> void TModInfo<NoPerform>(NoModInfo& Info)
 {
-    Info.AddType(CModInfo::UserModule);
+    Info.AddType(NoModInfo::UserModule);
     Info.SetWikiPage("perform");
 }
 
-NETWORKMODULEDEFS(CPerform, "Keeps a list of commands to be executed when ZNC connects to IRC.")
+NETWORKMODULEDEFS(NoPerform, "Keeps a list of commands to be executed when ZNC connects to IRC.")

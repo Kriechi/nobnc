@@ -30,8 +30,8 @@ using std::map;
    // i will be name of local variable, see below
    // pUser can be nullptr if only global modules are needed
    FOR_EACH_MODULE(i, pUser) {
-       // i is local variable of type CModules::iterator,
-       // so *i has type CModule*
+       // i is local variable of type NoModules::iterator,
+       // so *i has type NoModule*
    }
 */
 struct FOR_EACH_MODULE_Type
@@ -41,19 +41,19 @@ struct FOR_EACH_MODULE_Type
         AtUser,
         AtNetwork,
     } where;
-    CModules CMtemp;
-    CModules& CMuser;
-    CModules& CMnet;
-    FOR_EACH_MODULE_Type(CUser* pUser) : CMuser(pUser ? pUser->GetModules() : CMtemp), CMnet(CMtemp)
+    NoModules CMtemp;
+    NoModules& CMuser;
+    NoModules& CMnet;
+    FOR_EACH_MODULE_Type(NoUser* pUser) : CMuser(pUser ? pUser->GetModules() : CMtemp), CMnet(CMtemp)
     {
         where = AtGlobal;
     }
-    FOR_EACH_MODULE_Type(CNetwork* pNetwork)
+    FOR_EACH_MODULE_Type(NoNetwork* pNetwork)
         : CMuser(pNetwork ? pNetwork->GetUser()->GetModules() : CMtemp), CMnet(pNetwork ? pNetwork->GetModules() : CMtemp)
     {
         where = AtGlobal;
     }
-    FOR_EACH_MODULE_Type(std::pair<CUser*, CNetwork*> arg)
+    FOR_EACH_MODULE_Type(std::pair<NoUser*, NoNetwork*> arg)
         : CMuser(arg.first ? arg.first->GetModules() : CMtemp), CMnet(arg.second ? arg.second->GetModules() : CMtemp)
     {
         where = AtGlobal;
@@ -61,7 +61,7 @@ struct FOR_EACH_MODULE_Type
     operator bool() { return false; }
 };
 
-inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, CModules::iterator& i)
+inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, NoModules::iterator& i)
 {
     if (state.where == FOR_EACH_MODULE_Type::AtGlobal && i == CZNC::Get().GetModules().end()) {
         i = state.CMuser.begin();
@@ -77,26 +77,26 @@ inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, CModules::i
 #define FOR_EACH_MODULE(I, pUserOrNetwork)                           \
     if (FOR_EACH_MODULE_Type FOR_EACH_MODULE_Var = pUserOrNetwork) { \
     } else                                                           \
-        for (CModules::iterator I = CZNC::Get().GetModules().begin(); FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Var, I); ++I)
+        for (NoModules::iterator I = CZNC::Get().GetModules().begin(); FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Var, I); ++I)
 
-class CWebAdminMod : public CModule
+class NoWebAdminMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CWebAdminMod)
+    MODCONSTRUCTOR(NoWebAdminMod)
     {
-        VPair vParams;
+        NoStringPairVector vParams;
         vParams.push_back(make_pair("user", ""));
-        AddSubPage(std::make_shared<CWebSubPage>("settings", "Global Settings", CWebSubPage::F_ADMIN));
-        AddSubPage(std::make_shared<CWebSubPage>("edituser", "Your Settings", vParams));
-        AddSubPage(std::make_shared<CWebSubPage>("traffic", "Traffic Info", CWebSubPage::F_ADMIN));
-        AddSubPage(std::make_shared<CWebSubPage>("listusers", "Manage Users", CWebSubPage::F_ADMIN));
+        AddSubPage(std::make_shared<NoWebSubPage>("settings", "Global Settings", NoWebSubPage::F_ADMIN));
+        AddSubPage(std::make_shared<NoWebSubPage>("edituser", "Your Settings", vParams));
+        AddSubPage(std::make_shared<NoWebSubPage>("traffic", "Traffic Info", NoWebSubPage::F_ADMIN));
+        AddSubPage(std::make_shared<NoWebSubPage>("listusers", "Manage Users", NoWebSubPage::F_ADMIN));
     }
 
-    virtual ~CWebAdminMod() {}
+    virtual ~NoWebAdminMod() {}
 
-    bool OnLoad(const CString& sArgStr, CString& sMessage) override
+    bool OnLoad(const NoString& sArgStr, NoString& sMessage) override
     {
-        if (sArgStr.empty() || CModInfo::GlobalModule != GetType()) return true;
+        if (sArgStr.empty() || NoModInfo::GlobalModule != GetType()) return true;
 
         // We don't accept any arguments, but for backwards
         // compatibility we have to do some magic here.
@@ -106,13 +106,13 @@ public:
         bool bIPv6 = false;
         bool bShareIRCPorts = true;
         unsigned short uPort = 8080;
-        CString sArgs(sArgStr);
-        CString sPort;
-        CString sListenHost;
-        CString sURIPrefix;
+        NoString sArgs(sArgStr);
+        NoString sPort;
+        NoString sListenHost;
+        NoString sURIPrefix;
 
         while (sArgs.Left(1) == "-") {
-            CString sOpt = sArgs.Token(0);
+            NoString sOpt = sArgs.Token(0);
             sArgs = sArgs.Token(1, true);
 
             if (sOpt.Equals("-IPV6")) {
@@ -132,7 +132,7 @@ public:
         // No arguments left: Only port sharing
         if (sArgs.empty() && bShareIRCPorts) return true;
 
-        if (sArgs.find(" ") != CString::npos) {
+        if (sArgs.find(" ") != NoString::npos) {
             sListenHost = sArgs.Token(0);
             sPort = sArgs.Token(1, true);
         } else {
@@ -150,16 +150,16 @@ public:
 
         if (!bShareIRCPorts) {
             // Make all existing listeners IRC-only
-            const vector<CListener*>& vListeners = CZNC::Get().GetListeners();
-            vector<CListener*>::const_iterator it;
+            const vector<NoListener*>& vListeners = CZNC::Get().GetListeners();
+            vector<NoListener*>::const_iterator it;
             for (it = vListeners.begin(); it != vListeners.end(); ++it) {
-                (*it)->SetAcceptType(CListener::ACCEPT_IRC);
+                (*it)->SetAcceptType(NoListener::ACCEPT_IRC);
             }
         }
 
         // Now turn that into a listener instance
-        CListener* pListener =
-        new CListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? ADDR_IPV4ONLY : ADDR_ALL), CListener::ACCEPT_HTTP);
+        NoListener* pListener =
+        new NoListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? ADDR_IPV4ONLY : ADDR_ALL), NoListener::ACCEPT_HTTP);
 
         if (!pListener->Listen()) {
             sMessage = "Failed to add backwards-compatible listener";
@@ -171,10 +171,10 @@ public:
         return true;
     }
 
-    CUser* GetNewUser(CWebSock& WebSock, CUser* pUser)
+    NoUser* GetNewUser(NoWebSock& WebSock, NoUser* pUser)
     {
-        std::shared_ptr<CWebSession> spSession = WebSock.GetSession();
-        CString sUsername = WebSock.GetParam("newuser");
+        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
+        NoString sUsername = WebSock.GetParam("newuser");
 
         if (sUsername.empty()) {
             sUsername = WebSock.GetParam("user");
@@ -190,22 +190,22 @@ public:
             sUsername = pUser->GetUserName();
         }
 
-        CString sArg = WebSock.GetParam("password");
+        NoString sArg = WebSock.GetParam("password");
 
         if (sArg != WebSock.GetParam("password2")) {
             WebSock.PrintErrorPage("Invalid Submission [Passwords do not match]");
             return nullptr;
         }
 
-        CUser* pNewUser = new CUser(sUsername);
+        NoUser* pNewUser = new NoUser(sUsername);
 
         if (!sArg.empty()) {
-            CString sSalt = CUtils::GetSalt();
-            CString sHash = CUser::SaltedHash(sArg, sSalt);
-            pNewUser->SetPass(sHash, CUser::HASH_DEFAULT, sSalt);
+            NoString sSalt = NoUtils::GetSalt();
+            NoString sHash = NoUser::SaltedHash(sArg, sSalt);
+            pNewUser->SetPass(sHash, NoUser::HASH_DEFAULT, sSalt);
         }
 
-        VCString vsArgs;
+        NoStringVector vsArgs;
         unsigned int a = 0;
 
         WebSock.GetRawParam("allowedips").Split("\n", vsArgs);
@@ -219,7 +219,7 @@ public:
 
         WebSock.GetRawParam("ctcpreplies").Split("\n", vsArgs);
         for (a = 0; a < vsArgs.size(); a++) {
-            CString sReply = vsArgs[a].TrimRight_n("\r");
+            NoString sReply = vsArgs[a].TrimRight_n("\r");
             pNewUser->AddCTCPReply(sReply.Token(0).Trim_n(), sReply.Token(1, true).Trim_n());
         }
 
@@ -259,7 +259,7 @@ public:
         sArg = WebSock.GetParam("bindhost");
         // To change BindHosts be admin or don't have DenySetBindHost
         if (spSession->IsAdmin() || !spSession->GetUser()->DenySetBindHost()) {
-            CString sArg2 = WebSock.GetParam("dccbindhost");
+            NoString sArg2 = WebSock.GetParam("dccbindhost");
             if (!sArg.empty()) {
                 pNewUser->SetBindHost(sArg);
             }
@@ -267,9 +267,9 @@ public:
                 pNewUser->SetDCCBindHost(sArg2);
             }
 
-            const VCString& vsHosts = CZNC::Get().GetBindHosts();
+            const NoStringVector& vsHosts = CZNC::Get().GetBindHosts();
             if (!spSession->IsAdmin() && !vsHosts.empty()) {
-                VCString::const_iterator it;
+                NoStringVector::const_iterator it;
                 bool bFound = false;
                 bool bFoundDCC = false;
 
@@ -314,11 +314,11 @@ public:
         pNewUser->SetMaxQueryBuffers(WebSock.GetParam("maxquerybuffers").ToUInt());
 
 #ifdef HAVE_ICU
-        CString sEncodingUtf = WebSock.GetParam("encoding_utf");
+        NoString sEncodingUtf = WebSock.GetParam("encoding_utf");
         if (sEncodingUtf == "legacy") {
             pNewUser->SetClientEncoding("");
         }
-        CString sEncoding = WebSock.GetParam("encoding");
+        NoString sEncoding = WebSock.GetParam("encoding");
         if (sEncoding.empty()) {
             sEncoding = "UTF-8";
         }
@@ -354,10 +354,10 @@ public:
             WebSock.GetParamValues("loadmod", vsArgs);
 
             // disallow unload webadmin from itself
-            if (CModInfo::UserModule == GetType() && pUser == CZNC::Get().FindUser(WebSock.GetUser())) {
+            if (NoModInfo::UserModule == GetType() && pUser == CZNC::Get().FindUser(WebSock.GetUser())) {
                 bool bLoadedWebadmin = false;
                 for (a = 0; a < vsArgs.size(); ++a) {
-                    CString sModName = vsArgs[a].TrimRight_n("\r");
+                    NoString sModName = vsArgs[a].TrimRight_n("\r");
                     if (sModName == GetModName()) {
                         bLoadedWebadmin = true;
                         break;
@@ -369,15 +369,15 @@ public:
             }
 
             for (a = 0; a < vsArgs.size(); a++) {
-                CString sModRet;
-                CString sModName = vsArgs[a].TrimRight_n("\r");
-                CString sModLoadError;
+                NoString sModRet;
+                NoString sModName = vsArgs[a].TrimRight_n("\r");
+                NoString sModLoadError;
 
                 if (!sModName.empty()) {
-                    CString sArgs = WebSock.GetParam("modargs_" + sModName);
+                    NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
                     try {
-                        if (!pNewUser->GetModules().LoadModule(sModName, sArgs, CModInfo::UserModule, pNewUser, nullptr, sModRet)) {
+                        if (!pNewUser->GetModules().LoadModule(sModName, sArgs, NoModInfo::UserModule, pNewUser, nullptr, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } catch (...) {
@@ -391,16 +391,16 @@ public:
                 }
             }
         } else if (pUser) {
-            CModules& Modules = pUser->GetModules();
+            NoModules& Modules = pUser->GetModules();
 
             for (a = 0; a < Modules.size(); a++) {
-                CString sModName = Modules[a]->GetModName();
-                CString sArgs = Modules[a]->GetArgs();
-                CString sModRet;
-                CString sModLoadError;
+                NoString sModName = Modules[a]->GetModName();
+                NoString sArgs = Modules[a]->GetArgs();
+                NoString sModRet;
+                NoString sModLoadError;
 
                 try {
-                    if (!pNewUser->GetModules().LoadModule(sModName, sArgs, CModInfo::UserModule, pNewUser, nullptr, sModRet)) {
+                    if (!pNewUser->GetModules().LoadModule(sModName, sArgs, NoModInfo::UserModule, pNewUser, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } catch (...) {
@@ -417,9 +417,9 @@ public:
         return pNewUser;
     }
 
-    CString SafeGetUserNameParam(CWebSock& WebSock)
+    NoString SafeGetUserNameParam(NoWebSock& WebSock)
     {
-        CString sUserName = WebSock.GetParam("user"); // check for POST param
+        NoString sUserName = WebSock.GetParam("user"); // check for POST param
         if (sUserName.empty() && !WebSock.IsPost()) {
             // if no POST param named user has been given and we are not
             // saving this form, fall back to using the GET parameter.
@@ -428,9 +428,9 @@ public:
         return sUserName;
     }
 
-    CString SafeGetNetworkParam(CWebSock& WebSock)
+    NoString SafeGetNetworkParam(NoWebSock& WebSock)
     {
-        CString sNetwork = WebSock.GetParam("network"); // check for POST param
+        NoString sNetwork = WebSock.GetParam("network"); // check for POST param
         if (sNetwork.empty() && !WebSock.IsPost()) {
             // if no POST param named user has been given and we are not
             // saving this form, fall back to using the GET parameter.
@@ -439,12 +439,12 @@ public:
         return sNetwork;
     }
 
-    CUser* SafeGetUserFromParam(CWebSock& WebSock) { return CZNC::Get().FindUser(SafeGetUserNameParam(WebSock)); }
+    NoUser* SafeGetUserFromParam(NoWebSock& WebSock) { return CZNC::Get().FindUser(SafeGetUserNameParam(WebSock)); }
 
-    CNetwork* SafeGetNetworkFromParam(CWebSock& WebSock)
+    NoNetwork* SafeGetNetworkFromParam(NoWebSock& WebSock)
     {
-        CUser* pUser = CZNC::Get().FindUser(SafeGetUserNameParam(WebSock));
-        CNetwork* pNetwork = nullptr;
+        NoUser* pUser = CZNC::Get().FindUser(SafeGetUserNameParam(WebSock));
+        NoNetwork* pNetwork = nullptr;
 
         if (pUser) {
             pNetwork = pUser->FindNetwork(SafeGetNetworkParam(WebSock));
@@ -453,10 +453,10 @@ public:
         return pNetwork;
     }
 
-    CString GetWebMenuTitle() override { return "webadmin"; }
-    bool OnWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    NoString GetWebMenuTitle() override { return "webadmin"; }
+    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
-        std::shared_ptr<CWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
 
         if (sPageName == "settings") {
             // Admin Check
@@ -473,7 +473,7 @@ public:
 
             return UserPage(WebSock, Tmpl);
         } else if (sPageName == "addnetwork") {
-            CUser* pUser = SafeGetUserFromParam(WebSock);
+            NoUser* pUser = SafeGetUserFromParam(WebSock);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || spSession->GetUser() != pUser)) {
@@ -487,7 +487,7 @@ public:
             WebSock.PrintErrorPage("No such username");
             return true;
         } else if (sPageName == "editnetwork") {
-            CNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
@@ -502,12 +502,12 @@ public:
             return NetworkPage(WebSock, Tmpl, pNetwork->GetUser(), pNetwork);
 
         } else if (sPageName == "delnetwork") {
-            CString sUser = WebSock.GetParam("user");
+            NoString sUser = WebSock.GetParam("user");
             if (sUser.empty() && !WebSock.IsPost()) {
                 sUser = WebSock.GetParam("user", false);
             }
 
-            CUser* pUser = CZNC::Get().FindUser(sUser);
+            NoUser* pUser = CZNC::Get().FindUser(sUser);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || spSession->GetUser() != pUser)) {
@@ -516,7 +516,7 @@ public:
 
             return DelNetwork(WebSock, pUser, Tmpl);
         } else if (sPageName == "editchan") {
-            CNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
@@ -528,11 +528,11 @@ public:
                 return true;
             }
 
-            CString sChan = WebSock.GetParam("name");
+            NoString sChan = WebSock.GetParam("name");
             if (sChan.empty() && !WebSock.IsPost()) {
                 sChan = WebSock.GetParam("name", false);
             }
-            CChannel* pChan = pNetwork->FindChan(sChan);
+            NoChannel* pChan = pNetwork->FindChan(sChan);
             if (!pChan) {
                 WebSock.PrintErrorPage("No such channel");
                 return true;
@@ -540,7 +540,7 @@ public:
 
             return ChanPage(WebSock, Tmpl, pNetwork, pChan);
         } else if (sPageName == "addchan") {
-            CNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
@@ -554,7 +554,7 @@ public:
             WebSock.PrintErrorPage("No such username or network");
             return true;
         } else if (sPageName == "delchan") {
-            CNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
             if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
@@ -575,8 +575,8 @@ public:
             if (!WebSock.IsPost()) {
                 // Show the "Are you sure?" page:
 
-                CString sUser = WebSock.GetParam("user", false);
-                CUser* pUser = CZNC::Get().FindUser(sUser);
+                NoString sUser = WebSock.GetParam("user", false);
+                NoUser* pUser = CZNC::Get().FindUser(sUser);
 
                 if (!pUser) {
                     WebSock.PrintErrorPage("No such username");
@@ -591,8 +591,8 @@ public:
             // The "Are you sure?" page has been submitted with "Yes",
             // so we actually delete the user now:
 
-            CString sUser = WebSock.GetParam("user");
-            CUser* pUser = CZNC::Get().FindUser(sUser);
+            NoString sUser = WebSock.GetParam("user");
+            NoUser* pUser = CZNC::Get().FindUser(sUser);
 
             if (pUser && pUser == spSession->GetUser()) {
                 WebSock.PrintErrorPage("Please don't delete yourself, suicide is not the answer!");
@@ -605,8 +605,8 @@ public:
             WebSock.PrintErrorPage("No such username");
             return true;
         } else if (sPageName == "edituser") {
-            CString sUserName = SafeGetUserNameParam(WebSock);
-            CUser* pUser = CZNC::Get().FindUser(sUserName);
+            NoString sUserName = SafeGetUserNameParam(WebSock);
+            NoUser* pUser = CZNC::Get().FindUser(sUserName);
 
             if (!pUser) {
                 if (sUserName.empty()) {
@@ -650,11 +650,11 @@ public:
         return false;
     }
 
-    bool ChanPage(CWebSock& WebSock, CTemplate& Tmpl, CNetwork* pNetwork, CChannel* pChan = nullptr)
+    bool ChanPage(NoWebSock& WebSock, NoTemplate& Tmpl, NoNetwork* pNetwork, NoChannel* pChan = nullptr)
     {
-        std::shared_ptr<CWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_chan.tmpl");
-        CUser* pUser = pNetwork->GetUser();
+        NoUser* pUser = pNetwork->GetUser();
 
         if (!pUser) {
             WebSock.PrintErrorPage("That user doesn't exist");
@@ -668,10 +668,10 @@ public:
             if (pChan) {
                 Tmpl["Action"] = "editchan";
                 Tmpl["Edit"] = "true";
-                Tmpl["Title"] = "Edit Channel" + CString(" [" + pChan->GetName() + "]") + " of Network [" +
+                Tmpl["Title"] = "Edit Channel" + NoString(" [" + pChan->GetName() + "]") + " of Network [" +
                                 pNetwork->GetName() + "] of User [" + pNetwork->GetUser()->GetUserName() + "]";
                 Tmpl["ChanName"] = pChan->GetName();
-                Tmpl["BufferCount"] = CString(pChan->GetBufferCount());
+                Tmpl["BufferCount"] = NoString(pChan->GetBufferCount());
                 Tmpl["DefModes"] = pChan->GetDefaultModes();
                 Tmpl["Key"] = pChan->GetKey();
 
@@ -680,15 +680,15 @@ public:
                 }
             } else {
                 Tmpl["Action"] = "addchan";
-                Tmpl["Title"] = "Add Channel" + CString(" for User [" + pUser->GetUserName() + "]");
-                Tmpl["BufferCount"] = CString(pUser->GetBufferCount());
-                Tmpl["DefModes"] = CString(pUser->GetDefaultChanModes());
+                Tmpl["Title"] = "Add Channel" + NoString(" for User [" + pUser->GetUserName() + "]");
+                Tmpl["BufferCount"] = NoString(pUser->GetBufferCount());
+                Tmpl["DefModes"] = NoString(pUser->GetDefaultChanModes());
                 Tmpl["InConfig"] = "true";
             }
 
             // o1 used to be AutoCycle which was removed
 
-            CTemplate& o2 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o2 = Tmpl.AddRow("OptionLoop");
             o2["Name"] = "autoclearchanbuffer";
             o2["DisplayName"] = "Auto Clear Chan Buffer";
             o2["Tooltip"] = "Automatically Clear Channel Buffer After Playback";
@@ -696,14 +696,14 @@ public:
                 o2["Checked"] = "true";
             }
 
-            CTemplate& o3 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o3 = Tmpl.AddRow("OptionLoop");
             o3["Name"] = "detached";
             o3["DisplayName"] = "Detached";
             if (pChan && pChan->IsDetached()) {
                 o3["Checked"] = "true";
             }
 
-            CTemplate& o4 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o4 = Tmpl.AddRow("OptionLoop");
             o4["Name"] = "disabled";
             o4["DisplayName"] = "Disabled";
             if (pChan && pChan->IsDisabled()) {
@@ -712,7 +712,7 @@ public:
 
             FOR_EACH_MODULE(i, pNetwork)
             {
-                CTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
+                NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
                 if ((*i)->OnEmbeddedWebRequest(WebSock, "webadmin/channel", mod)) {
@@ -724,7 +724,7 @@ public:
             return true;
         }
 
-        CString sChanName = WebSock.GetParam("name").Trim_n();
+        NoString sChanName = WebSock.GetParam("name").Trim_n();
 
         if (!pChan) {
             if (sChanName.empty()) {
@@ -733,7 +733,7 @@ public:
             }
 
             // This could change the channel name and e.g. add a "#" prefix
-            pChan = new CChannel(sChanName, pNetwork, true);
+            pChan = new NoChannel(sChanName, pNetwork, true);
 
             if (pNetwork->FindChan(pChan->GetName())) {
                 WebSock.PrintErrorPage("Channel [" + pChan->GetName() + "] already exists");
@@ -774,7 +774,7 @@ public:
         else
             pChan->Enable();
 
-        CTemplate TmplMod;
+        NoTemplate TmplMod;
         TmplMod["User"] = pUser->GetUserName();
         TmplMod["ChanName"] = pChan->GetName();
         TmplMod["WebadminAction"] = "change";
@@ -786,38 +786,38 @@ public:
         }
 
         if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + pUser->GetUserName().Escape_n(CString::EURL) +
-                             "&network=" + pNetwork->GetName().Escape_n(CString::EURL));
+            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + pUser->GetUserName().Escape_n(NoString::EURL) +
+                             "&network=" + pNetwork->GetName().Escape_n(NoString::EURL));
         } else {
-            WebSock.Redirect(GetWebPath() + "editchan?user=" + pUser->GetUserName().Escape_n(CString::EURL) +
-                             "&network=" + pNetwork->GetName().Escape_n(CString::EURL) + "&name=" +
-                             pChan->GetName().Escape_n(CString::EURL));
+            WebSock.Redirect(GetWebPath() + "editchan?user=" + pUser->GetUserName().Escape_n(NoString::EURL) +
+                             "&network=" + pNetwork->GetName().Escape_n(NoString::EURL) + "&name=" +
+                             pChan->GetName().Escape_n(NoString::EURL));
         }
         return true;
     }
 
-    bool NetworkPage(CWebSock& WebSock, CTemplate& Tmpl, CUser* pUser, CNetwork* pNetwork = nullptr)
+    bool NetworkPage(NoWebSock& WebSock, NoTemplate& Tmpl, NoUser* pUser, NoNetwork* pNetwork = nullptr)
     {
-        std::shared_ptr<CWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_network.tmpl");
 
         if (!WebSock.GetParam("submitted").ToUInt()) {
             Tmpl["Username"] = pUser->GetUserName();
 
-            set<CModInfo> ssNetworkMods;
-            CZNC::Get().GetModules().GetAvailableMods(ssNetworkMods, CModInfo::NetworkModule);
-            for (set<CModInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
-                const CModInfo& Info = *it;
-                CTemplate& l = Tmpl.AddRow("ModuleLoop");
+            set<NoModInfo> ssNetworkMods;
+            CZNC::Get().GetModules().GetAvailableMods(ssNetworkMods, NoModInfo::NetworkModule);
+            for (set<NoModInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
+                const NoModInfo& Info = *it;
+                NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
                 l["Name"] = Info.GetName();
                 l["Description"] = Info.GetDescription();
                 l["Wiki"] = Info.GetWikiPage();
-                l["HasArgs"] = CString(Info.GetHasArgs());
+                l["HasArgs"] = NoString(Info.GetHasArgs());
                 l["ArgsHelpText"] = Info.GetArgsHelpText();
 
                 if (pNetwork) {
-                    CModule* pModule = pNetwork->GetModules().FindModule(Info.GetName());
+                    NoModule* pModule = pNetwork->GetModules().FindModule(Info.GetName());
                     if (pModule) {
                         l["Checked"] = "true";
                         l["Args"] = pModule->GetArgs();
@@ -825,12 +825,12 @@ public:
                 }
 
                 // Check if module is loaded globally
-                l["CanBeLoadedGlobally"] = CString(Info.SupportsType(CModInfo::GlobalModule));
-                l["LoadedGlobally"] = CString(CZNC::Get().GetModules().FindModule(Info.GetName()) != nullptr);
+                l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(NoModInfo::GlobalModule));
+                l["LoadedGlobally"] = NoString(CZNC::Get().GetModules().FindModule(Info.GetName()) != nullptr);
 
                 // Check if module is loaded by user
-                l["CanBeLoadedByUser"] = CString(Info.SupportsType(CModInfo::UserModule));
-                l["LoadedByUser"] = CString(pUser->GetModules().FindModule(Info.GetName()) != nullptr);
+                l["CanBeLoadedByUser"] = NoString(Info.SupportsType(NoModInfo::UserModule));
+                l["LoadedByUser"] = NoString(pUser->GetModules().FindModule(Info.GetName()) != nullptr);
 
                 if (!spSession->IsAdmin() && pUser->DenyLoadMod()) {
                     l["Disabled"] = "true";
@@ -840,7 +840,7 @@ public:
             // To change BindHosts be admin or don't have DenySetBindHost
             if (spSession->IsAdmin() || !spSession->GetUser()->DenySetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
-                const VCString& vsBindHosts = CZNC::Get().GetBindHosts();
+                const NoStringVector& vsBindHosts = CZNC::Get().GetBindHosts();
                 if (vsBindHosts.empty()) {
                     if (pNetwork) {
                         Tmpl["BindHost"] = pNetwork->GetBindHost();
@@ -848,8 +848,8 @@ public:
                 } else {
                     bool bFoundBindHost = false;
                     for (unsigned int b = 0; b < vsBindHosts.size(); b++) {
-                        const CString& sBindHost = vsBindHosts[b];
-                        CTemplate& l = Tmpl.AddRow("BindHostLoop");
+                        const NoString& sBindHost = vsBindHosts[b];
+                        NoTemplate& l = Tmpl.AddRow("BindHostLoop");
 
                         l["BindHost"] = sBindHost;
 
@@ -861,7 +861,7 @@ public:
 
                     // If our current bindhost is not in the global list...
                     if (pNetwork && !bFoundBindHost && !pNetwork->GetBindHost().empty()) {
-                        CTemplate& l = Tmpl.AddRow("BindHostLoop");
+                        NoTemplate& l = Tmpl.AddRow("BindHostLoop");
 
                         l["BindHost"] = pNetwork->GetBindHost();
                         l["Checked"] = "true";
@@ -873,7 +873,7 @@ public:
                 Tmpl["Action"] = "editnetwork";
                 Tmpl["Edit"] = "true";
                 Tmpl["Title"] =
-                "Edit Network" + CString(" [" + pNetwork->GetName() + "]") + " of User [" + pUser->GetUserName() + "]";
+                "Edit Network" + NoString(" [" + pNetwork->GetName() + "]") + " of User [" + pUser->GetUserName() + "]";
                 Tmpl["Name"] = pNetwork->GetName();
 
                 Tmpl["Nick"] = pNetwork->GetNick();
@@ -883,24 +883,24 @@ public:
 
                 Tmpl["QuitMsg"] = pNetwork->GetQuitMsg();
 
-                Tmpl["FloodProtection"] = CString(CIRCSock::IsFloodProtected(pNetwork->GetFloodRate()));
-                Tmpl["FloodRate"] = CString(pNetwork->GetFloodRate());
-                Tmpl["FloodBurst"] = CString(pNetwork->GetFloodBurst());
+                Tmpl["FloodProtection"] = NoString(NoIrcSock::IsFloodProtected(pNetwork->GetFloodRate()));
+                Tmpl["FloodRate"] = NoString(pNetwork->GetFloodRate());
+                Tmpl["FloodBurst"] = NoString(pNetwork->GetFloodBurst());
 
-                Tmpl["JoinDelay"] = CString(pNetwork->GetJoinDelay());
+                Tmpl["JoinDelay"] = NoString(pNetwork->GetJoinDelay());
 
-                Tmpl["IRCConnectEnabled"] = CString(pNetwork->GetIRCConnectEnabled());
+                Tmpl["IRCConnectEnabled"] = NoString(pNetwork->GetIRCConnectEnabled());
 
-                const vector<CServer*>& vServers = pNetwork->GetServers();
+                const vector<NoServer*>& vServers = pNetwork->GetServers();
                 for (unsigned int a = 0; a < vServers.size(); a++) {
-                    CTemplate& l = Tmpl.AddRow("ServerLoop");
+                    NoTemplate& l = Tmpl.AddRow("ServerLoop");
                     l["Server"] = vServers[a]->GetString();
                 }
 
-                const vector<CChannel*>& Channels = pNetwork->GetChans();
+                const vector<NoChannel*>& Channels = pNetwork->GetChans();
                 for (unsigned int c = 0; c < Channels.size(); c++) {
-                    CChannel* pChan = Channels[c];
-                    CTemplate& l = Tmpl.AddRow("ChannelLoop");
+                    NoChannel* pChan = Channels[c];
+                    NoTemplate& l = Tmpl.AddRow("ChannelLoop");
 
                     l["Network"] = pNetwork->GetName();
                     l["Username"] = pUser->GetUserName();
@@ -909,9 +909,9 @@ public:
                     l["CurModes"] = pChan->GetModeString();
                     l["DefModes"] = pChan->GetDefaultModes();
                     if (pChan->HasBufferCountSet()) {
-                        l["BufferCount"] = CString(pChan->GetBufferCount());
+                        l["BufferCount"] = NoString(pChan->GetBufferCount());
                     } else {
-                        l["BufferCount"] = CString(pChan->GetBufferCount()) + " (default)";
+                        l["BufferCount"] = NoString(pChan->GetBufferCount()) + " (default)";
                     }
                     l["Options"] = pChan->GetOptions();
 
@@ -919,8 +919,8 @@ public:
                         l["InConfig"] = "true";
                     }
                 }
-                for (const CString& sFP : pNetwork->GetTrustedFingerprints()) {
-                    CTemplate& l = Tmpl.AddRow("TrustedFingerprints");
+                for (const NoString& sFP : pNetwork->GetTrustedFingerprints()) {
+                    NoTemplate& l = Tmpl.AddRow("TrustedFingerprints");
                     l["FP"] = sFP;
                 }
             } else {
@@ -941,7 +941,7 @@ public:
 
             FOR_EACH_MODULE(i, make_pair(pUser, pNetwork))
             {
-                CTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
+                NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
                 if ((*i)->OnEmbeddedWebRequest(WebSock, "webadmin/network", mod)) {
@@ -951,11 +951,11 @@ public:
             }
 
 #ifdef HAVE_ICU
-            for (const CString& sEncoding : CUtils::GetEncodings()) {
-                CTemplate& l = Tmpl.AddRow("EncodingLoop");
+            for (const NoString& sEncoding : NoUtils::GetEncodings()) {
+                NoTemplate& l = Tmpl.AddRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
-            const CString sEncoding = pNetwork ? pNetwork->GetEncoding() : "^UTF-8";
+            const NoString sEncoding = pNetwork ? pNetwork->GetEncoding() : "^UTF-8";
             if (sEncoding.empty()) {
                 Tmpl["EncodingUtf"] = "legacy";
             } else if (sEncoding[0] == '*') {
@@ -976,7 +976,7 @@ public:
             return true;
         }
 
-        CString sName = WebSock.GetParam("name").Trim_n();
+        NoString sName = WebSock.GetParam("name").Trim_n();
         if (sName.empty()) {
             WebSock.PrintErrorPage("Network name is a required argument");
             return true;
@@ -987,16 +987,16 @@ public:
             return true;
         }
         if (!pNetwork || pNetwork->GetName() != sName) {
-            CString sNetworkAddError;
-            CNetwork* pOldNetwork = pNetwork;
+            NoString sNetworkAddError;
+            NoNetwork* pOldNetwork = pNetwork;
             pNetwork = pUser->AddNetwork(sName, sNetworkAddError);
             if (!pNetwork) {
                 WebSock.PrintErrorPage(sNetworkAddError);
                 return true;
             }
             if (pOldNetwork) {
-                for (CModule* pModule : pOldNetwork->GetModules()) {
-                    CString sPath = pUser->GetUserPath() + "/networks/" + sName + "/moddata/" + pModule->GetModName();
+                for (NoModule* pModule : pOldNetwork->GetModules()) {
+                    NoString sPath = pUser->GetUserPath() + "/networks/" + sName + "/moddata/" + pModule->GetModName();
                     pModule->MoveRegistry(sPath);
                 }
                 pNetwork->Clone(*pOldNetwork, false);
@@ -1004,7 +1004,7 @@ public:
             }
         }
 
-        CString sArg;
+        NoString sArg;
 
         pNetwork->SetNick(WebSock.GetParam("nick"));
         pNetwork->SetAltNick(WebSock.GetParam("altnick"));
@@ -1018,10 +1018,10 @@ public:
         sArg = WebSock.GetParam("bindhost");
         // To change BindHosts be admin or don't have DenySetBindHost
         if (spSession->IsAdmin() || !spSession->GetUser()->DenySetBindHost()) {
-            CString sHost = WebSock.GetParam("bindhost");
-            const VCString& vsHosts = CZNC::Get().GetBindHosts();
+            NoString sHost = WebSock.GetParam("bindhost");
+            const NoStringVector& vsHosts = CZNC::Get().GetBindHosts();
             if (!spSession->IsAdmin() && !vsHosts.empty()) {
-                VCString::const_iterator it;
+                NoStringVector::const_iterator it;
                 bool bFound = false;
 
                 for (it = vsHosts.begin(); it != vsHosts.end(); ++it) {
@@ -1048,11 +1048,11 @@ public:
         pNetwork->SetJoinDelay(WebSock.GetParam("joindelay").ToUShort());
 
 #ifdef HAVE_ICU
-        CString sEncodingUtf = WebSock.GetParam("encoding_utf");
+        NoString sEncodingUtf = WebSock.GetParam("encoding_utf");
         if (sEncodingUtf == "legacy") {
             pNetwork->SetEncoding("");
         }
-        CString sEncoding = WebSock.GetParam("encoding");
+        NoString sEncoding = WebSock.GetParam("encoding");
         if (sEncoding.empty()) {
             sEncoding = "UTF-8";
         }
@@ -1065,7 +1065,7 @@ public:
         }
 #endif
 
-        VCString vsArgs;
+        NoStringVector vsArgs;
 
         pNetwork->DelServers();
         WebSock.GetRawParam("servers").Split("\n", vsArgs);
@@ -1077,34 +1077,34 @@ public:
         while (!pNetwork->GetTrustedFingerprints().empty()) {
             pNetwork->DelTrustedFingerprint(*pNetwork->GetTrustedFingerprints().begin());
         }
-        for (const CString& sFP : vsArgs) {
+        for (const NoString& sFP : vsArgs) {
             pNetwork->AddTrustedFingerprint(sFP);
         }
 
         WebSock.GetParamValues("channel", vsArgs);
         for (unsigned int a = 0; a < vsArgs.size(); a++) {
-            const CString& sChan = vsArgs[a];
-            CChannel* pChan = pNetwork->FindChan(sChan.TrimRight_n("\r"));
+            const NoString& sChan = vsArgs[a];
+            NoChannel* pChan = pNetwork->FindChan(sChan.TrimRight_n("\r"));
             if (pChan) {
                 pChan->SetInConfig(WebSock.GetParam("save_" + sChan).ToBool());
             }
         }
 
-        set<CString> ssArgs;
+        set<NoString> ssArgs;
         WebSock.GetParamValues("loadmod", ssArgs);
         if (spSession->IsAdmin() || !pUser->DenyLoadMod()) {
-            for (set<CString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
-                CString sModRet;
-                CString sModName = (*it).TrimRight_n("\r");
-                CString sModLoadError;
+            for (set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
+                NoString sModRet;
+                NoString sModName = (*it).TrimRight_n("\r");
+                NoString sModLoadError;
 
                 if (!sModName.empty()) {
-                    CString sArgs = WebSock.GetParam("modargs_" + sModName);
+                    NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
-                    CModule* pMod = pNetwork->GetModules().FindModule(sModName);
+                    NoModule* pMod = pNetwork->GetModules().FindModule(sModName);
 
                     if (!pMod) {
-                        if (!pNetwork->GetModules().LoadModule(sModName, sArgs, CModInfo::NetworkModule, pUser, pNetwork, sModRet)) {
+                        if (!pNetwork->GetModules().LoadModule(sModName, sArgs, NoModInfo::NetworkModule, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } else if (pMod->GetArgs() != sArgs) {
@@ -1121,22 +1121,22 @@ public:
             }
         }
 
-        const CModules& vCurMods = pNetwork->GetModules();
-        set<CString> ssUnloadMods;
+        const NoModules& vCurMods = pNetwork->GetModules();
+        set<NoString> ssUnloadMods;
 
         for (unsigned int a = 0; a < vCurMods.size(); a++) {
-            CModule* pCurMod = vCurMods[a];
+            NoModule* pCurMod = vCurMods[a];
 
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() && pCurMod->GetModName() != GetModName()) {
                 ssUnloadMods.insert(pCurMod->GetModName());
             }
         }
 
-        for (set<CString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
+        for (set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
             pNetwork->GetModules().UnloadModule(*it2);
         }
 
-        CTemplate TmplMod;
+        NoTemplate TmplMod;
         TmplMod["Username"] = pUser->GetUserName();
         TmplMod["Name"] = pNetwork->GetName();
         TmplMod["WebadminAction"] = "change";
@@ -1151,17 +1151,17 @@ public:
         }
 
         if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->GetUserName().Escape_n(CString::EURL));
+            WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->GetUserName().Escape_n(NoString::EURL));
         } else {
-            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + pUser->GetUserName().Escape_n(CString::EURL) +
-                             "&network=" + pNetwork->GetName().Escape_n(CString::EURL));
+            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + pUser->GetUserName().Escape_n(NoString::EURL) +
+                             "&network=" + pNetwork->GetName().Escape_n(NoString::EURL));
         }
         return true;
     }
 
-    bool DelNetwork(CWebSock& WebSock, CUser* pUser, CTemplate& Tmpl)
+    bool DelNetwork(NoWebSock& WebSock, NoUser* pUser, NoTemplate& Tmpl)
     {
-        CString sNetwork = WebSock.GetParam("name");
+        NoString sNetwork = WebSock.GetParam("name");
         if (sNetwork.empty() && !WebSock.IsPost()) {
             sNetwork = WebSock.GetParam("name", false);
         }
@@ -1192,13 +1192,13 @@ public:
             return true;
         }
 
-        WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->GetUserName().Escape_n(CString::EURL));
+        WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->GetUserName().Escape_n(NoString::EURL));
         return false;
     }
 
-    bool DelChan(CWebSock& WebSock, CNetwork* pNetwork)
+    bool DelChan(NoWebSock& WebSock, NoNetwork* pNetwork)
     {
-        CString sChan = WebSock.GetParam("name", false);
+        NoString sChan = WebSock.GetParam("name", false);
 
         if (sChan.empty()) {
             WebSock.PrintErrorPage("That channel doesn't exist for this user");
@@ -1213,14 +1213,14 @@ public:
             return true;
         }
 
-        WebSock.Redirect(GetWebPath() + "editnetwork?user=" + pNetwork->GetUser()->GetUserName().Escape_n(CString::EURL) +
-                         "&network=" + pNetwork->GetName().Escape_n(CString::EURL));
+        WebSock.Redirect(GetWebPath() + "editnetwork?user=" + pNetwork->GetUser()->GetUserName().Escape_n(NoString::EURL) +
+                         "&network=" + pNetwork->GetName().Escape_n(NoString::EURL));
         return false;
     }
 
-    bool UserPage(CWebSock& WebSock, CTemplate& Tmpl, CUser* pUser = nullptr)
+    bool UserPage(NoWebSock& WebSock, NoTemplate& Tmpl, NoUser* pUser = nullptr)
     {
-        std::shared_ptr<CWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_user.tmpl");
 
         if (!WebSock.GetParam("submitted").ToUInt()) {
@@ -1229,7 +1229,7 @@ public:
                 Tmpl["Title"] = "Edit User [" + pUser->GetUserName() + "]";
                 Tmpl["Edit"] = "true";
             } else {
-                CString sUsername = WebSock.GetParam("clone", false);
+                NoString sUsername = WebSock.GetParam("clone", false);
                 pUser = CZNC::Get().FindUser(sUsername);
 
                 if (pUser) {
@@ -1239,7 +1239,7 @@ public:
                 }
             }
 
-            Tmpl["ImAdmin"] = CString(spSession->IsAdmin());
+            Tmpl["ImAdmin"] = NoString(spSession->IsAdmin());
 
             if (pUser) {
                 Tmpl["Username"] = pUser->GetUserName();
@@ -1250,36 +1250,36 @@ public:
                 Tmpl["RealName"] = pUser->GetRealName();
                 Tmpl["QuitMsg"] = pUser->GetQuitMsg();
                 Tmpl["DefaultChanModes"] = pUser->GetDefaultChanModes();
-                Tmpl["BufferCount"] = CString(pUser->GetBufferCount());
+                Tmpl["BufferCount"] = NoString(pUser->GetBufferCount());
                 Tmpl["TimestampFormat"] = pUser->GetTimestampFormat();
                 Tmpl["Timezone"] = pUser->GetTimezone();
-                Tmpl["JoinTries"] = CString(pUser->JoinTries());
-                Tmpl["MaxNetworks"] = CString(pUser->MaxNetworks());
-                Tmpl["MaxJoins"] = CString(pUser->MaxJoins());
-                Tmpl["MaxQueryBuffers"] = CString(pUser->MaxQueryBuffers());
+                Tmpl["JoinTries"] = NoString(pUser->JoinTries());
+                Tmpl["MaxNetworks"] = NoString(pUser->MaxNetworks());
+                Tmpl["MaxJoins"] = NoString(pUser->MaxJoins());
+                Tmpl["MaxQueryBuffers"] = NoString(pUser->MaxQueryBuffers());
 
-                const set<CString>& ssAllowedHosts = pUser->GetAllowedHosts();
-                for (set<CString>::const_iterator it = ssAllowedHosts.begin(); it != ssAllowedHosts.end(); ++it) {
-                    CTemplate& l = Tmpl.AddRow("AllowedHostLoop");
+                const set<NoString>& ssAllowedHosts = pUser->GetAllowedHosts();
+                for (set<NoString>::const_iterator it = ssAllowedHosts.begin(); it != ssAllowedHosts.end(); ++it) {
+                    NoTemplate& l = Tmpl.AddRow("AllowedHostLoop");
                     l["Host"] = *it;
                 }
 
-                const vector<CNetwork*>& vNetworks = pUser->GetNetworks();
+                const vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
                 for (unsigned int a = 0; a < vNetworks.size(); a++) {
-                    CTemplate& l = Tmpl.AddRow("NetworkLoop");
+                    NoTemplate& l = Tmpl.AddRow("NetworkLoop");
                     l["Name"] = vNetworks[a]->GetName();
                     l["Username"] = pUser->GetUserName();
-                    l["Clients"] = CString(vNetworks[a]->GetClients().size());
-                    l["IRCNick"] = vNetworks[a]->GetIRCNick().GetNick();
-                    CServer* pServer = vNetworks[a]->GetCurrentServer();
+                    l["Clients"] = NoString(vNetworks[a]->GetClients().size());
+                    l["IRNoNick"] = vNetworks[a]->GetIRNoNick().GetNick();
+                    NoServer* pServer = vNetworks[a]->GetCurrentServer();
                     if (pServer) {
-                        l["Server"] = pServer->GetName() + ":" + (pServer->IsSSL() ? "+" : "") + CString(pServer->GetPort());
+                        l["Server"] = pServer->GetName() + ":" + (pServer->IsSSL() ? "+" : "") + NoString(pServer->GetPort());
                     }
                 }
 
-                const MCString& msCTCPReplies = pUser->GetCTCPReplies();
-                for (MCString::const_iterator it2 = msCTCPReplies.begin(); it2 != msCTCPReplies.end(); ++it2) {
-                    CTemplate& l = Tmpl.AddRow("CTCPLoop");
+                const NoStringMap& msCTCPReplies = pUser->GetCTCPReplies();
+                for (NoStringMap::const_iterator it2 = msCTCPReplies.begin(); it2 != msCTCPReplies.end(); ++it2) {
+                    NoTemplate& l = Tmpl.AddRow("CTCPLoop");
                     l["CTCP"] = it2->first + " " + it2->second;
                 }
             } else {
@@ -1288,18 +1288,18 @@ public:
                 Tmpl["StatusPrefix"] = "*";
             }
 
-            SCString ssTimezones = CUtils::GetTimezones();
-            for (SCString::iterator i = ssTimezones.begin(); i != ssTimezones.end(); ++i) {
-                CTemplate& l = Tmpl.AddRow("TZLoop");
+            NoStringSet ssTimezones = NoUtils::GetTimezones();
+            for (NoStringSet::iterator i = ssTimezones.begin(); i != ssTimezones.end(); ++i) {
+                NoTemplate& l = Tmpl.AddRow("TZLoop");
                 l["TZ"] = *i;
             }
 
 #ifdef HAVE_ICU
-            for (const CString& sEncoding : CUtils::GetEncodings()) {
-                CTemplate& l = Tmpl.AddRow("EncodingLoop");
+            for (const NoString& sEncoding : NoUtils::GetEncodings()) {
+                NoTemplate& l = Tmpl.AddRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
-            const CString sEncoding = pUser ? pUser->GetClientEncoding() : "^UTF-8";
+            const NoString sEncoding = pUser ? pUser->GetClientEncoding() : "^UTF-8";
             if (sEncoding.empty()) {
                 Tmpl["EncodingUtf"] = "legacy";
             } else if (sEncoding[0] == '*') {
@@ -1320,7 +1320,7 @@ public:
             // To change BindHosts be admin or don't have DenySetBindHost
             if (spSession->IsAdmin() || !spSession->GetUser()->DenySetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
-                const VCString& vsBindHosts = CZNC::Get().GetBindHosts();
+                const NoStringVector& vsBindHosts = CZNC::Get().GetBindHosts();
                 if (vsBindHosts.empty()) {
                     if (pUser) {
                         Tmpl["BindHost"] = pUser->GetBindHost();
@@ -1330,9 +1330,9 @@ public:
                     bool bFoundBindHost = false;
                     bool bFoundDCCBindHost = false;
                     for (unsigned int b = 0; b < vsBindHosts.size(); b++) {
-                        const CString& sBindHost = vsBindHosts[b];
-                        CTemplate& l = Tmpl.AddRow("BindHostLoop");
-                        CTemplate& k = Tmpl.AddRow("DCCBindHostLoop");
+                        const NoString& sBindHost = vsBindHosts[b];
+                        NoTemplate& l = Tmpl.AddRow("BindHostLoop");
+                        NoTemplate& k = Tmpl.AddRow("DCCBindHostLoop");
 
                         l["BindHost"] = sBindHost;
                         k["BindHost"] = sBindHost;
@@ -1350,13 +1350,13 @@ public:
 
                     // If our current bindhost is not in the global list...
                     if (pUser && !bFoundBindHost && !pUser->GetBindHost().empty()) {
-                        CTemplate& l = Tmpl.AddRow("BindHostLoop");
+                        NoTemplate& l = Tmpl.AddRow("BindHostLoop");
 
                         l["BindHost"] = pUser->GetBindHost();
                         l["Checked"] = "true";
                     }
                     if (pUser && !bFoundDCCBindHost && !pUser->GetDCCBindHost().empty()) {
-                        CTemplate& l = Tmpl.AddRow("DCCBindHostLoop");
+                        NoTemplate& l = Tmpl.AddRow("DCCBindHostLoop");
 
                         l["BindHost"] = pUser->GetDCCBindHost();
                         l["Checked"] = "true";
@@ -1364,12 +1364,12 @@ public:
                 }
             }
 
-            vector<CString> vDirs;
+            vector<NoString> vDirs;
             WebSock.GetAvailSkins(vDirs);
 
             for (unsigned int d = 0; d < vDirs.size(); d++) {
-                const CString& SubDir = vDirs[d];
-                CTemplate& l = Tmpl.AddRow("SkinLoop");
+                const NoString& SubDir = vDirs[d];
+                NoTemplate& l = Tmpl.AddRow("SkinLoop");
                 l["Name"] = SubDir;
 
                 if (pUser && SubDir == pUser->GetSkinName()) {
@@ -1377,53 +1377,53 @@ public:
                 }
             }
 
-            set<CModInfo> ssUserMods;
+            set<NoModInfo> ssUserMods;
             CZNC::Get().GetModules().GetAvailableMods(ssUserMods);
 
-            for (set<CModInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
-                const CModInfo& Info = *it;
-                CTemplate& l = Tmpl.AddRow("ModuleLoop");
+            for (set<NoModInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
+                const NoModInfo& Info = *it;
+                NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
                 l["Name"] = Info.GetName();
                 l["Description"] = Info.GetDescription();
                 l["Wiki"] = Info.GetWikiPage();
-                l["HasArgs"] = CString(Info.GetHasArgs());
+                l["HasArgs"] = NoString(Info.GetHasArgs());
                 l["ArgsHelpText"] = Info.GetArgsHelpText();
 
-                CModule* pModule = nullptr;
+                NoModule* pModule = nullptr;
                 if (pUser) {
                     pModule = pUser->GetModules().FindModule(Info.GetName());
                     // Check if module is loaded by all or some networks
-                    const vector<CNetwork*>& userNetworks = pUser->GetNetworks();
+                    const vector<NoNetwork*>& userNetworks = pUser->GetNetworks();
                     unsigned int networksWithRenderedModuleCount = 0;
                     for (unsigned int networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
-                        const CNetwork* pCurrentNetwork = userNetworks[networkIndex];
-                        const CModules& networkModules = pCurrentNetwork->GetModules();
+                        const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
+                        const NoModules& networkModules = pCurrentNetwork->GetModules();
                         if (networkModules.FindModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
                     }
-                    l["CanBeLoadedByNetwork"] = CString(Info.SupportsType(CModInfo::NetworkModule));
-                    l["LoadedByAllNetworks"] = CString(networksWithRenderedModuleCount == userNetworks.size());
-                    l["LoadedBySomeNetworks"] = CString(networksWithRenderedModuleCount != 0);
+                    l["CanBeLoadedByNetwork"] = NoString(Info.SupportsType(NoModInfo::NetworkModule));
+                    l["LoadedByAllNetworks"] = NoString(networksWithRenderedModuleCount == userNetworks.size());
+                    l["LoadedBySomeNetworks"] = NoString(networksWithRenderedModuleCount != 0);
                 }
                 if (pModule) {
                     l["Checked"] = "true";
                     l["Args"] = pModule->GetArgs();
-                    if (CModInfo::UserModule == GetType() && Info.GetName() == GetModName()) {
+                    if (NoModInfo::UserModule == GetType() && Info.GetName() == GetModName()) {
                         l["Disabled"] = "true";
                     }
                 }
-                l["CanBeLoadedGlobally"] = CString(Info.SupportsType(CModInfo::GlobalModule));
+                l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(NoModInfo::GlobalModule));
                 // Check if module is loaded globally
-                l["LoadedGlobally"] = CString(CZNC::Get().GetModules().FindModule(Info.GetName()) != nullptr);
+                l["LoadedGlobally"] = NoString(CZNC::Get().GetModules().FindModule(Info.GetName()) != nullptr);
 
                 if (!spSession->IsAdmin() && pUser && pUser->DenyLoadMod()) {
                     l["Disabled"] = "true";
                 }
             }
 
-            CTemplate& o1 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o1 = Tmpl.AddRow("OptionLoop");
             o1["Name"] = "autoclearchanbuffer";
             o1["DisplayName"] = "Auto Clear Chan Buffer";
             o1["Tooltip"] = "Automatically Clear Channel Buffer After Playback (the default value for new channels)";
@@ -1433,21 +1433,21 @@ public:
 
             /* o2 used to be auto cycle which was removed */
 
-            CTemplate& o4 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o4 = Tmpl.AddRow("OptionLoop");
             o4["Name"] = "multiclients";
             o4["DisplayName"] = "Multi Clients";
             if (!pUser || pUser->MultiClients()) {
                 o4["Checked"] = "true";
             }
 
-            CTemplate& o7 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o7 = Tmpl.AddRow("OptionLoop");
             o7["Name"] = "appendtimestamp";
             o7["DisplayName"] = "Append Timestamps";
             if (pUser && pUser->GetTimestampAppend()) {
                 o7["Checked"] = "true";
             }
 
-            CTemplate& o8 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o8 = Tmpl.AddRow("OptionLoop");
             o8["Name"] = "prependtimestamp";
             o8["DisplayName"] = "Prepend Timestamps";
             if (pUser && pUser->GetTimestampPrepend()) {
@@ -1455,14 +1455,14 @@ public:
             }
 
             if (spSession->IsAdmin()) {
-                CTemplate& o9 = Tmpl.AddRow("OptionLoop");
+                NoTemplate& o9 = Tmpl.AddRow("OptionLoop");
                 o9["Name"] = "denyloadmod";
                 o9["DisplayName"] = "Deny LoadMod";
                 if (pUser && pUser->DenyLoadMod()) {
                     o9["Checked"] = "true";
                 }
 
-                CTemplate& o10 = Tmpl.AddRow("OptionLoop");
+                NoTemplate& o10 = Tmpl.AddRow("OptionLoop");
                 o10["Name"] = "isadmin";
                 o10["DisplayName"] = "Admin";
                 if (pUser && pUser->IsAdmin()) {
@@ -1472,7 +1472,7 @@ public:
                     o10["Disabled"] = "true";
                 }
 
-                CTemplate& o11 = Tmpl.AddRow("OptionLoop");
+                NoTemplate& o11 = Tmpl.AddRow("OptionLoop");
                 o11["Name"] = "denysetbindhost";
                 o11["DisplayName"] = "Deny SetBindHost";
                 if (pUser && pUser->DenySetBindHost()) {
@@ -1480,7 +1480,7 @@ public:
                 }
             }
 
-            CTemplate& o12 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o12 = Tmpl.AddRow("OptionLoop");
             o12["Name"] = "autoclearquerybuffer";
             o12["DisplayName"] = "Auto Clear Query Buffer";
             o12["Tooltip"] = "Automatically Clear Query Buffer After Playback";
@@ -1490,7 +1490,7 @@ public:
 
             FOR_EACH_MODULE(i, pUser)
             {
-                CTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
+                NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
                 if ((*i)->OnEmbeddedWebRequest(WebSock, "webadmin/user", mod)) {
@@ -1504,24 +1504,24 @@ public:
 
         /* If pUser is nullptr, we are adding a user, else we are editing this one */
 
-        CString sUsername = WebSock.GetParam("user");
+        NoString sUsername = WebSock.GetParam("user");
         if (!pUser && CZNC::Get().FindUser(sUsername)) {
             WebSock.PrintErrorPage("Invalid Submission [User " + sUsername + " already exists]");
             return true;
         }
 
-        CUser* pNewUser = GetNewUser(WebSock, pUser);
+        NoUser* pNewUser = GetNewUser(WebSock, pUser);
         if (!pNewUser) {
             WebSock.PrintErrorPage("Invalid user settings");
             return true;
         }
 
-        CString sErr;
-        CString sAction;
+        NoString sErr;
+        NoString sAction;
 
         if (!pUser) {
-            CString sClone = WebSock.GetParam("clone");
-            if (CUser* pCloneUser = CZNC::Get().FindUser(sClone)) {
+            NoString sClone = WebSock.GetParam("clone");
+            if (NoUser* pCloneUser = CZNC::Get().FindUser(sClone)) {
                 pNewUser->CloneNetworks(*pCloneUser);
             }
 
@@ -1546,7 +1546,7 @@ public:
             sAction = "edited";
         }
 
-        CTemplate TmplMod;
+        NoTemplate TmplMod;
         TmplMod["Username"] = sUsername;
         TmplMod["WebadminAction"] = "change";
         FOR_EACH_MODULE(it, pUser) { (*it)->OnEmbeddedWebRequest(WebSock, "webadmin/user", TmplMod); }
@@ -1566,22 +1566,22 @@ public:
         return false;
     }
 
-    bool ListUsersPage(CWebSock& WebSock, CTemplate& Tmpl)
+    bool ListUsersPage(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
-        std::shared_ptr<CWebSession> spSession = WebSock.GetSession();
-        const map<CString, CUser*>& msUsers = CZNC::Get().GetUserMap();
+        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
+        const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
         Tmpl["Title"] = "Manage Users";
         Tmpl["Action"] = "listusers";
 
         unsigned int a = 0;
 
-        for (map<CString, CUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it, a++) {
-            CTemplate& l = Tmpl.AddRow("UserLoop");
-            CUser& User = *it->second;
+        for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it, a++) {
+            NoTemplate& l = Tmpl.AddRow("UserLoop");
+            NoUser& User = *it->second;
 
             l["Username"] = User.GetUserName();
-            l["Clients"] = CString(User.GetAllClients().size());
-            l["Networks"] = CString(User.GetNetworks().size());
+            l["Clients"] = NoString(User.GetAllClients().size());
+            l["Networks"] = NoString(User.GetNetworks().size());
 
             if (&User == spSession->GetUser()) {
                 l["IsSelf"] = "true";
@@ -1591,22 +1591,22 @@ public:
         return true;
     }
 
-    bool TrafficPage(CWebSock& WebSock, CTemplate& Tmpl)
+    bool TrafficPage(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
         Tmpl["Title"] = "Traffic Info";
         Tmpl["Uptime"] = CZNC::Get().GetUptime();
 
-        const map<CString, CUser*>& msUsers = CZNC::Get().GetUserMap();
-        Tmpl["TotalUsers"] = CString(msUsers.size());
+        const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
+        Tmpl["TotalUsers"] = NoString(msUsers.size());
 
         size_t uiNetworks = 0, uiAttached = 0, uiClients = 0, uiServers = 0;
 
-        for (map<CString, CUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
-            CUser& User = *it->second;
-            vector<CNetwork*> vNetworks = User.GetNetworks();
+        for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
+            NoUser& User = *it->second;
+            vector<NoNetwork*> vNetworks = User.GetNetworks();
 
-            for (vector<CNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
-                CNetwork* pNetwork = *it2;
+            for (vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
+                NoNetwork* pNetwork = *it2;
                 uiNetworks++;
 
                 if (pNetwork->IsIRCConnected()) {
@@ -1623,44 +1623,44 @@ public:
             uiClients += User.GetUserClients().size();
         }
 
-        Tmpl["TotalNetworks"] = CString(uiNetworks);
-        Tmpl["AttachedNetworks"] = CString(uiAttached);
-        Tmpl["TotalCConnections"] = CString(uiClients);
-        Tmpl["TotalIRCConnections"] = CString(uiServers);
+        Tmpl["TotalNetworks"] = NoString(uiNetworks);
+        Tmpl["AttachedNetworks"] = NoString(uiAttached);
+        Tmpl["TotalCConnections"] = NoString(uiClients);
+        Tmpl["TotalIRCConnections"] = NoString(uiServers);
 
         CZNC::TrafficStatsPair Users, ZNC, Total;
         CZNC::TrafficStatsMap traffic = CZNC::Get().GetTrafficStats(Users, ZNC, Total);
         CZNC::TrafficStatsMap::const_iterator it;
 
         for (it = traffic.begin(); it != traffic.end(); ++it) {
-            CTemplate& l = Tmpl.AddRow("TrafficLoop");
+            NoTemplate& l = Tmpl.AddRow("TrafficLoop");
 
             l["Username"] = it->first;
-            l["In"] = CString::ToByteStr(it->second.first);
-            l["Out"] = CString::ToByteStr(it->second.second);
-            l["Total"] = CString::ToByteStr(it->second.first + it->second.second);
+            l["In"] = NoString::ToByteStr(it->second.first);
+            l["Out"] = NoString::ToByteStr(it->second.second);
+            l["Total"] = NoString::ToByteStr(it->second.first + it->second.second);
         }
 
-        Tmpl["UserIn"] = CString::ToByteStr(Users.first);
-        Tmpl["UserOut"] = CString::ToByteStr(Users.second);
-        Tmpl["UserTotal"] = CString::ToByteStr(Users.first + Users.second);
+        Tmpl["UserIn"] = NoString::ToByteStr(Users.first);
+        Tmpl["UserOut"] = NoString::ToByteStr(Users.second);
+        Tmpl["UserTotal"] = NoString::ToByteStr(Users.first + Users.second);
 
-        Tmpl["ZNCIn"] = CString::ToByteStr(ZNC.first);
-        Tmpl["ZNCOut"] = CString::ToByteStr(ZNC.second);
-        Tmpl["ZNCTotal"] = CString::ToByteStr(ZNC.first + ZNC.second);
+        Tmpl["ZNCIn"] = NoString::ToByteStr(ZNC.first);
+        Tmpl["ZNCOut"] = NoString::ToByteStr(ZNC.second);
+        Tmpl["ZNCTotal"] = NoString::ToByteStr(ZNC.first + ZNC.second);
 
-        Tmpl["AllIn"] = CString::ToByteStr(Total.first);
-        Tmpl["AllOut"] = CString::ToByteStr(Total.second);
-        Tmpl["AllTotal"] = CString::ToByteStr(Total.first + Total.second);
+        Tmpl["AllIn"] = NoString::ToByteStr(Total.first);
+        Tmpl["AllOut"] = NoString::ToByteStr(Total.second);
+        Tmpl["AllTotal"] = NoString::ToByteStr(Total.first + Total.second);
 
         return true;
     }
 
-    bool AddListener(CWebSock& WebSock, CTemplate& Tmpl)
+    bool AddListener(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
         unsigned short uPort = WebSock.GetParam("port").ToUShort();
-        CString sHost = WebSock.GetParam("host");
-        CString sURIPrefix = WebSock.GetParam("uriprefix");
+        NoString sHost = WebSock.GetParam("host");
+        NoString sURIPrefix = WebSock.GetParam("uriprefix");
         if (sHost == "*") sHost = "";
         bool bSSL = WebSock.GetParam("ssl").ToBool();
         bool bIPv4 = WebSock.GetParam("ipv4").ToBool();
@@ -1684,23 +1684,23 @@ public:
             }
         }
 
-        CListener::EAcceptType eAccept;
+        NoListener::EAcceptType eAccept;
         if (bIRC) {
             if (bWeb) {
-                eAccept = CListener::ACCEPT_ALL;
+                eAccept = NoListener::ACCEPT_ALL;
             } else {
-                eAccept = CListener::ACCEPT_IRC;
+                eAccept = NoListener::ACCEPT_IRC;
             }
         } else {
             if (bWeb) {
-                eAccept = CListener::ACCEPT_HTTP;
+                eAccept = NoListener::ACCEPT_HTTP;
             } else {
                 WebSock.GetSession()->AddError("Choose either IRC or Web or both.");
                 return SettingsPage(WebSock, Tmpl);
             }
         }
 
-        CString sMessage;
+        NoString sMessage;
         if (CZNC::Get().AddListener(uPort, sHost, sURIPrefix, bSSL, eAddr, eAccept, sMessage)) {
             if (!sMessage.empty()) {
                 WebSock.GetSession()->AddSuccess(sMessage);
@@ -1715,10 +1715,10 @@ public:
         return SettingsPage(WebSock, Tmpl);
     }
 
-    bool DelListener(CWebSock& WebSock, CTemplate& Tmpl)
+    bool DelListener(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
         unsigned short uPort = WebSock.GetParam("port").ToUShort();
-        CString sHost = WebSock.GetParam("host");
+        NoString sHost = WebSock.GetParam("host");
         bool bIPv4 = WebSock.GetParam("ipv4").ToBool();
         bool bIPv6 = WebSock.GetParam("ipv6").ToBool();
 
@@ -1738,7 +1738,7 @@ public:
             }
         }
 
-        CListener* pListener = CZNC::Get().FindListener(uPort, sHost, eAddr);
+        NoListener* pListener = CZNC::Get().FindListener(uPort, sHost, eAddr);
         if (pListener) {
             CZNC::Get().DelListener(pListener);
             if (!CZNC::Get().WriteConfig()) {
@@ -1751,49 +1751,49 @@ public:
         return SettingsPage(WebSock, Tmpl);
     }
 
-    bool SettingsPage(CWebSock& WebSock, CTemplate& Tmpl)
+    bool SettingsPage(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
         Tmpl.SetFile("settings.tmpl");
         if (!WebSock.GetParam("submitted").ToUInt()) {
             Tmpl["Action"] = "settings";
             Tmpl["Title"] = "Settings";
             Tmpl["StatusPrefix"] = CZNC::Get().GetStatusPrefix();
-            Tmpl["MaxBufferSize"] = CString(CZNC::Get().GetMaxBufferSize());
-            Tmpl["ConnectDelay"] = CString(CZNC::Get().GetConnectDelay());
-            Tmpl["ServerThrottle"] = CString(CZNC::Get().GetServerThrottle());
-            Tmpl["AnonIPLimit"] = CString(CZNC::Get().GetAnonIPLimit());
-            Tmpl["ProtectWebSessions"] = CString(CZNC::Get().GetProtectWebSessions());
-            Tmpl["HideVersion"] = CString(CZNC::Get().GetHideVersion());
+            Tmpl["MaxBufferSize"] = NoString(CZNC::Get().GetMaxBufferSize());
+            Tmpl["ConnectDelay"] = NoString(CZNC::Get().GetConnectDelay());
+            Tmpl["ServerThrottle"] = NoString(CZNC::Get().GetServerThrottle());
+            Tmpl["AnonIPLimit"] = NoString(CZNC::Get().GetAnonIPLimit());
+            Tmpl["ProtectWebSessions"] = NoString(CZNC::Get().GetProtectWebSessions());
+            Tmpl["HideVersion"] = NoString(CZNC::Get().GetHideVersion());
 
-            const VCString& vsBindHosts = CZNC::Get().GetBindHosts();
+            const NoStringVector& vsBindHosts = CZNC::Get().GetBindHosts();
             for (unsigned int a = 0; a < vsBindHosts.size(); a++) {
-                CTemplate& l = Tmpl.AddRow("BindHostLoop");
+                NoTemplate& l = Tmpl.AddRow("BindHostLoop");
                 l["BindHost"] = vsBindHosts[a];
             }
 
-            const VCString& vsMotd = CZNC::Get().GetMotd();
+            const NoStringVector& vsMotd = CZNC::Get().GetMotd();
             for (unsigned int b = 0; b < vsMotd.size(); b++) {
-                CTemplate& l = Tmpl.AddRow("MOTDLoop");
+                NoTemplate& l = Tmpl.AddRow("MOTDLoop");
                 l["Line"] = vsMotd[b];
             }
 
-            const vector<CListener*>& vpListeners = CZNC::Get().GetListeners();
+            const vector<NoListener*>& vpListeners = CZNC::Get().GetListeners();
             for (unsigned int c = 0; c < vpListeners.size(); c++) {
-                CListener* pListener = vpListeners[c];
-                CTemplate& l = Tmpl.AddRow("ListenLoop");
+                NoListener* pListener = vpListeners[c];
+                NoTemplate& l = Tmpl.AddRow("ListenLoop");
 
-                l["Port"] = CString(pListener->GetPort());
+                l["Port"] = NoString(pListener->GetPort());
                 l["BindHost"] = pListener->GetBindHost();
 
-                l["IsWeb"] = CString(pListener->GetAcceptType() != CListener::ACCEPT_IRC);
-                l["IsIRC"] = CString(pListener->GetAcceptType() != CListener::ACCEPT_HTTP);
+                l["IsWeb"] = NoString(pListener->GetAcceptType() != NoListener::ACCEPT_IRC);
+                l["IsIRC"] = NoString(pListener->GetAcceptType() != NoListener::ACCEPT_HTTP);
 
                 l["URIPrefix"] = pListener->GetURIPrefix() + "/";
 
                 // simple protection for user from shooting his own foot
                 // TODO check also for hosts/families
                 // such check is only here, user still can forge HTTP request to delete web port
-                l["SuggestDeletion"] = CString(pListener->GetPort() != WebSock.GetLocalPort());
+                l["SuggestDeletion"] = NoString(pListener->GetPort() != WebSock.GetLocalPort());
 
 #ifdef HAVE_LIBSSL
                 if (pListener->IsSSL()) {
@@ -1819,12 +1819,12 @@ public:
 #endif
             }
 
-            vector<CString> vDirs;
+            vector<NoString> vDirs;
             WebSock.GetAvailSkins(vDirs);
 
             for (unsigned int d = 0; d < vDirs.size(); d++) {
-                const CString& SubDir = vDirs[d];
-                CTemplate& l = Tmpl.AddRow("SkinLoop");
+                const NoString& SubDir = vDirs[d];
+                NoTemplate& l = Tmpl.AddRow("SkinLoop");
                 l["Name"] = SubDir;
 
                 if (SubDir == CZNC::Get().GetSkinName()) {
@@ -1832,18 +1832,18 @@ public:
                 }
             }
 
-            set<CModInfo> ssGlobalMods;
-            CZNC::Get().GetModules().GetAvailableMods(ssGlobalMods, CModInfo::GlobalModule);
+            set<NoModInfo> ssGlobalMods;
+            CZNC::Get().GetModules().GetAvailableMods(ssGlobalMods, NoModInfo::GlobalModule);
 
-            for (set<CModInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
-                const CModInfo& Info = *it;
-                CTemplate& l = Tmpl.AddRow("ModuleLoop");
+            for (set<NoModInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
+                const NoModInfo& Info = *it;
+                NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
-                CModule* pModule = CZNC::Get().GetModules().FindModule(Info.GetName());
+                NoModule* pModule = CZNC::Get().GetModules().FindModule(Info.GetName());
                 if (pModule) {
                     l["Checked"] = "true";
                     l["Args"] = pModule->GetArgs();
-                    if (CModInfo::GlobalModule == GetType() && Info.GetName() == GetModName()) {
+                    if (NoModInfo::GlobalModule == GetType() && Info.GetName() == GetModName()) {
                         l["Disabled"] = "true";
                     }
                 }
@@ -1851,45 +1851,45 @@ public:
                 l["Name"] = Info.GetName();
                 l["Description"] = Info.GetDescription();
                 l["Wiki"] = Info.GetWikiPage();
-                l["HasArgs"] = CString(Info.GetHasArgs());
+                l["HasArgs"] = NoString(Info.GetHasArgs());
                 l["ArgsHelpText"] = Info.GetArgsHelpText();
 
                 // Check if the module is loaded by all or some users, and/or by all or some networks
                 unsigned int usersWithRenderedModuleCount = 0;
                 unsigned int networksWithRenderedModuleCount = 0;
                 unsigned int networksCount = 0;
-                const map<CString, CUser*>& allUsers = CZNC::Get().GetUserMap();
-                for (map<CString, CUser*>::const_iterator usersIt = allUsers.begin(); usersIt != allUsers.end(); ++usersIt) {
-                    const CUser& User = *usersIt->second;
+                const map<NoString, NoUser*>& allUsers = CZNC::Get().GetUserMap();
+                for (map<NoString, NoUser*>::const_iterator usersIt = allUsers.begin(); usersIt != allUsers.end(); ++usersIt) {
+                    const NoUser& User = *usersIt->second;
 
                     // Count users which has loaded a render module
-                    const CModules& userModules = User.GetModules();
+                    const NoModules& userModules = User.GetModules();
                     if (userModules.FindModule(Info.GetName())) {
                         usersWithRenderedModuleCount++;
                     }
                     // Count networks which has loaded a render module
-                    const vector<CNetwork*>& userNetworks = User.GetNetworks();
+                    const vector<NoNetwork*>& userNetworks = User.GetNetworks();
                     networksCount += userNetworks.size();
                     for (unsigned int networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
-                        const CNetwork* pCurrentNetwork = userNetworks[networkIndex];
+                        const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
                         if (pCurrentNetwork->GetModules().FindModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
                     }
                 }
-                l["CanBeLoadedByNetwork"] = CString(Info.SupportsType(CModInfo::NetworkModule));
-                l["LoadedByAllNetworks"] = CString(networksWithRenderedModuleCount == networksCount);
-                l["LoadedBySomeNetworks"] = CString(networksWithRenderedModuleCount != 0);
+                l["CanBeLoadedByNetwork"] = NoString(Info.SupportsType(NoModInfo::NetworkModule));
+                l["LoadedByAllNetworks"] = NoString(networksWithRenderedModuleCount == networksCount);
+                l["LoadedBySomeNetworks"] = NoString(networksWithRenderedModuleCount != 0);
 
-                l["CanBeLoadedByUser"] = CString(Info.SupportsType(CModInfo::UserModule));
-                l["LoadedByAllUsers"] = CString(usersWithRenderedModuleCount == allUsers.size());
-                l["LoadedBySomeUsers"] = CString(usersWithRenderedModuleCount != 0);
+                l["CanBeLoadedByUser"] = NoString(Info.SupportsType(NoModInfo::UserModule));
+                l["LoadedByAllUsers"] = NoString(usersWithRenderedModuleCount == allUsers.size());
+                l["LoadedBySomeUsers"] = NoString(usersWithRenderedModuleCount != 0);
             }
 
             return true;
         }
 
-        CString sArg;
+        NoString sArg;
         sArg = WebSock.GetParam("statusprefix");
         CZNC::Get().SetStatusPrefix(sArg);
         sArg = WebSock.GetParam("maxbufsize");
@@ -1905,7 +1905,7 @@ public:
         sArg = WebSock.GetParam("hideversion");
         CZNC::Get().SetHideVersion(sArg.ToBool());
 
-        VCString vsArgs;
+        NoStringVector vsArgs;
         WebSock.GetRawParam("motd").Split("\n", vsArgs);
         CZNC::Get().ClearMotd();
 
@@ -1923,20 +1923,20 @@ public:
 
         CZNC::Get().SetSkinName(WebSock.GetParam("skin"));
 
-        set<CString> ssArgs;
+        set<NoString> ssArgs;
         WebSock.GetParamValues("loadmod", ssArgs);
 
-        for (set<CString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
-            CString sModRet;
-            CString sModName = (*it).TrimRight_n("\r");
-            CString sModLoadError;
+        for (set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
+            NoString sModRet;
+            NoString sModName = (*it).TrimRight_n("\r");
+            NoString sModLoadError;
 
             if (!sModName.empty()) {
-                CString sArgs = WebSock.GetParam("modargs_" + sModName);
+                NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
-                CModule* pMod = CZNC::Get().GetModules().FindModule(sModName);
+                NoModule* pMod = CZNC::Get().GetModules().FindModule(sModName);
                 if (!pMod) {
-                    if (!CZNC::Get().GetModules().LoadModule(sModName, sArgs, CModInfo::GlobalModule, nullptr, nullptr, sModRet)) {
+                    if (!CZNC::Get().GetModules().LoadModule(sModName, sArgs, NoModInfo::GlobalModule, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } else if (pMod->GetArgs() != sArgs) {
@@ -1952,19 +1952,19 @@ public:
             }
         }
 
-        const CModules& vCurMods = CZNC::Get().GetModules();
-        set<CString> ssUnloadMods;
+        const NoModules& vCurMods = CZNC::Get().GetModules();
+        set<NoString> ssUnloadMods;
 
         for (a = 0; a < vCurMods.size(); a++) {
-            CModule* pCurMod = vCurMods[a];
+            NoModule* pCurMod = vCurMods[a];
 
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() &&
-                (CModInfo::GlobalModule != GetType() || pCurMod->GetModName() != GetModName())) {
+                (NoModInfo::GlobalModule != GetType() || pCurMod->GetModName() != GetModName())) {
                 ssUnloadMods.insert(pCurMod->GetModName());
             }
         }
 
-        for (set<CString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
+        for (set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
             CZNC::Get().GetModules().UnloadModule(*it2);
         }
 
@@ -1978,10 +1978,10 @@ public:
     }
 };
 
-template <> void TModInfo<CWebAdminMod>(CModInfo& Info)
+template <> void TModInfo<NoWebAdminMod>(NoModInfo& Info)
 {
-    Info.AddType(CModInfo::UserModule);
+    Info.AddType(NoModInfo::UserModule);
     Info.SetWikiPage("webadmin");
 }
 
-GLOBALMODULEDEFS(CWebAdminMod, "Web based administration module.")
+GLOBALMODULEDEFS(NoWebAdminMod, "Web based administration module.")

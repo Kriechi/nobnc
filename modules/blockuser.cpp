@@ -21,30 +21,30 @@ using std::vector;
 
 #define MESSAGE "Your account has been disabled. Contact your administrator."
 
-class CBlockUser : public CModule
+class NoBlockUser : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CBlockUser)
+    MODCONSTRUCTOR(NoBlockUser)
     {
         AddHelpCommand();
-        AddCommand("List", static_cast<CModCommand::ModCmdFunc>(&CBlockUser::OnListCommand), "", "List blocked users");
+        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoBlockUser::OnListCommand), "", "List blocked users");
         AddCommand("Block",
-                   static_cast<CModCommand::ModCmdFunc>(&CBlockUser::OnBlockCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoBlockUser::OnBlockCommand),
                    "<user>",
                    "Block a user");
         AddCommand("Unblock",
-                   static_cast<CModCommand::ModCmdFunc>(&CBlockUser::OnUnblockCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoBlockUser::OnUnblockCommand),
                    "<user>",
                    "Unblock a user");
     }
 
-    virtual ~CBlockUser() {}
+    virtual ~NoBlockUser() {}
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        VCString vArgs;
-        VCString::iterator it;
-        MCString::iterator it2;
+        NoStringVector vArgs;
+        NoStringVector::iterator it;
+        NoStringMap::iterator it2;
 
         // Load saved settings
         for (it2 = BeginNV(); it2 != EndNV(); ++it2) {
@@ -65,7 +65,7 @@ public:
         return true;
     }
 
-    EModRet OnLoginAttempt(std::shared_ptr<CAuthBase> Auth) override
+    EModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
     {
         if (IsBlocked(Auth->GetUsername())) {
             Auth->RefuseLogin(MESSAGE);
@@ -75,7 +75,7 @@ public:
         return CONTINUE;
     }
 
-    void OnModCommand(const CString& sCommand) override
+    void OnModCommand(const NoString& sCommand) override
     {
         if (!GetUser()->IsAdmin()) {
             PutModule("Access denied");
@@ -84,10 +84,10 @@ public:
         }
     }
 
-    void OnListCommand(const CString& sCommand)
+    void OnListCommand(const NoString& sCommand)
     {
-        CTable Table;
-        MCString::iterator it;
+        NoTable Table;
+        NoStringMap::iterator it;
 
         Table.AddColumn("Blocked user");
 
@@ -99,9 +99,9 @@ public:
         if (PutModule(Table) == 0) PutModule("No users blocked");
     }
 
-    void OnBlockCommand(const CString& sCommand)
+    void OnBlockCommand(const NoString& sCommand)
     {
-        CString sUser = sCommand.Token(1, true);
+        NoString sUser = sCommand.Token(1, true);
 
         if (sUser.empty()) {
             PutModule("Usage: Block <user>");
@@ -119,9 +119,9 @@ public:
             PutModule("Could not block [" + sUser + "] (misspelled?)");
     }
 
-    void OnUnblockCommand(const CString& sCommand)
+    void OnUnblockCommand(const NoString& sCommand)
     {
-        CString sUser = sCommand.Token(1, true);
+        NoString sUser = sCommand.Token(1, true);
 
         if (sUser.empty()) {
             PutModule("Usage: Unblock <user>");
@@ -134,13 +134,13 @@ public:
             PutModule("This user is not blocked");
     }
 
-    bool OnEmbeddedWebRequest(CWebSock& WebSock, const CString& sPageName, CTemplate& Tmpl) override
+    bool OnEmbeddedWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/user" && WebSock.GetSession()->IsAdmin()) {
-            CString sAction = Tmpl["WebadminAction"];
+            NoString sAction = Tmpl["WebadminAction"];
             if (sAction == "display") {
-                Tmpl["Blocked"] = CString(IsBlocked(Tmpl["Username"]));
-                Tmpl["Self"] = CString(Tmpl["Username"].Equals(WebSock.GetSession()->GetUser()->GetUserName()));
+                Tmpl["Blocked"] = NoString(IsBlocked(Tmpl["Username"]));
+                Tmpl["Self"] = NoString(Tmpl["Username"].Equals(WebSock.GetSession()->GetUser()->GetUserName()));
                 return true;
             }
             if (sAction == "change" && WebSock.GetParam("embed_blockuser_presented").ToBool()) {
@@ -169,9 +169,9 @@ public:
     }
 
 private:
-    bool IsBlocked(const CString& sUser)
+    bool IsBlocked(const NoString& sUser)
     {
-        MCString::iterator it;
+        NoStringMap::iterator it;
         for (it = BeginNV(); it != EndNV(); ++it) {
             if (sUser == it->first) {
                 return true;
@@ -180,23 +180,23 @@ private:
         return false;
     }
 
-    bool Block(const CString& sUser)
+    bool Block(const NoString& sUser)
     {
-        CUser* pUser = CZNC::Get().FindUser(sUser);
+        NoUser* pUser = CZNC::Get().FindUser(sUser);
 
         if (!pUser) return false;
 
         // Disconnect all clients
-        vector<CClient*> vpClients = pUser->GetAllClients();
-        vector<CClient*>::iterator it;
+        vector<NoClient*> vpClients = pUser->GetAllClients();
+        vector<NoClient*>::iterator it;
         for (it = vpClients.begin(); it != vpClients.end(); ++it) {
             (*it)->PutStatusNotice(MESSAGE);
             (*it)->Close(Csock::CLT_AFTERWRITE);
         }
 
         // Disconnect all networks from irc
-        vector<CNetwork*> vNetworks = pUser->GetNetworks();
-        for (vector<CNetwork*>::iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
+        vector<NoNetwork*> vNetworks = pUser->GetNetworks();
+        for (vector<NoNetwork*>::iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
             (*it2)->SetIRCConnectEnabled(false);
         }
 
@@ -205,11 +205,11 @@ private:
     }
 };
 
-template <> void TModInfo<CBlockUser>(CModInfo& Info)
+template <> void TModInfo<NoBlockUser>(NoModInfo& Info)
 {
     Info.SetWikiPage("blockuser");
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("Enter one or more user names. Separate them by spaces.");
 }
 
-GLOBALMODULEDEFS(CBlockUser, "Block certain users from logging in.")
+GLOBALMODULEDEFS(NoBlockUser, "Block certain users from logging in.")

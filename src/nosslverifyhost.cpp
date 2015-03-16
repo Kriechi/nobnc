@@ -407,7 +407,7 @@ static HostnameValidationResult validate_hostname(const char* hostname, const X5
 ///////////////////////////////////////////////////////////////////////////
 } // namespace ZNC_iSECPartners
 
-bool ZNC_SSLVerifyHost(const CString& sHost, const X509* pCert, CString& sError)
+bool ZNC_SSLVerifyHost(const NoString& sHost, const X509* pCert, NoString& sError)
 {
     DEBUG("SSLVerifyHost: checking " << sHost);
     ZNC_iSECPartners::HostnameValidationResult eResult = ZNC_iSECPartners::validate_hostname(sHost.c_str(), pCert);

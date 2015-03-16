@@ -45,7 +45,7 @@ void boot_DynaLoader(pTHX_ CV* cv);
 static void xs_init(pTHX) { newXS("DynaLoader::boot_DynaLoader", boot_DynaLoader, __FILE__); }
 }
 
-class CModPerl : public CModule
+class CModPerl : public NoModule
 {
     PerlInterpreter* m_pPerl;
 
@@ -73,14 +73,14 @@ public:
 #define PUSH_STR(s) XPUSHs(PString(s).GetSV())
 #define PUSH_PTR(type, p) XPUSHs(SWIG_NewInstanceObj(const_cast<type>(p), SWIG_TypeQuery(#type), SWIG_SHADOW))
 
-    bool OnLoad(const CString& sArgsi, CString& sMessage) override
+    bool OnLoad(const NoString& sArgsi, NoString& sMessage) override
     {
-        CString sModPath, sTmp;
-        if (!CModules::FindModPath("modperl/startup.pl", sModPath, sTmp)) {
+        NoString sModPath, sTmp;
+        if (!NoModules::FindModPath("modperl/startup.pl", sModPath, sTmp)) {
             sMessage = "startup.pl not found.";
             return false;
         }
-        sTmp = CDir::ChangeDir(sModPath, "..");
+        sTmp = NoDir::ChangeDir(sModPath, "..");
         int argc = 6;
         char* pArgv[] = { "",                              "-T",                                "-w",   "-I",
                           const_cast<char*>(sTmp.c_str()), const_cast<char*>(sModPath.c_str()), nullptr };
@@ -113,15 +113,15 @@ public:
     }
 
     virtual EModRet
-    OnModuleLoading(const CString& sModName, const CString& sArgs, CModInfo::EModuleType eType, bool& bSuccess, CString& sRetMsg) override
+    OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::EModuleType eType, bool& bSuccess, NoString& sRetMsg) override
     {
         EModRet result = HALT;
         PSTART;
         PUSH_STR(sModName);
         PUSH_STR(sArgs);
         mXPUSHi(eType);
-        PUSH_PTR(CUser*, GetUser());
-        PUSH_PTR(CNetwork*, GetNetwork());
+        PUSH_PTR(NoUser*, GetUser());
+        PUSH_PTR(NoNetwork*, GetNetwork());
         PCALL("ZNC::Core::LoadModule");
 
         if (SvTRUE(ERRSV)) {
@@ -130,7 +130,7 @@ public:
             result = HALT;
             DEBUG("Perl ZNC::Core::LoadModule died: " << sRetMsg);
         } else if (ret < 1 || 2 < ret) {
-            sRetMsg = "Error: Perl ZNC::Core::LoadModule returned " + CString(ret) + " values.";
+            sRetMsg = "Error: Perl ZNC::Core::LoadModule returned " + NoString(ret) + " values.";
             bSuccess = false;
             result = HALT;
         } else {
@@ -148,12 +148,12 @@ public:
         return result;
     }
 
-    EModRet OnModuleUnloading(CModule* pModule, bool& bSuccess, CString& sRetMsg) override
+    EModRet OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg) override
     {
         CPerlModule* pMod = AsPerlModule(pModule);
         if (pMod) {
             EModRet result = HALT;
-            CString sModName = pMod->GetModName();
+            NoString sModName = pMod->GetModName();
             PSTART;
             XPUSHs(pMod->GetPerlObj());
             PCALL("ZNC::Core::UnloadModule");
@@ -161,7 +161,7 @@ public:
                 bSuccess = false;
                 sRetMsg = PString(ERRSV);
             } else if (ret < 1 || 2 < ret) {
-                sRetMsg = "Error: Perl ZNC::Core::UnloadModule returned " + CString(ret) + " values.";
+                sRetMsg = "Error: Perl ZNC::Core::UnloadModule returned " + NoString(ret) + " values.";
                 bSuccess = false;
                 result = HALT;
             } else {
@@ -182,11 +182,11 @@ public:
         return CONTINUE;
     }
 
-    virtual EModRet OnGetModInfo(CModInfo& ModInfo, const CString& sModule, bool& bSuccess, CString& sRetMsg) override
+    virtual EModRet OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg) override
     {
         PSTART;
         PUSH_STR(sModule);
-        PUSH_PTR(CModInfo*, &ModInfo);
+        PUSH_PTR(NoModInfo*, &ModInfo);
         PCALL("ZNC::Core::GetModInfo");
         EModRet result = CONTINUE;
         if (SvTRUE(ERRSV)) {
@@ -225,28 +225,28 @@ public:
         return result;
     }
 
-    void OnGetAvailableMods(set<CModInfo>& ssMods, CModInfo::EModuleType eType) override
+    void OnGetAvailableMods(set<NoModInfo>& ssMods, NoModInfo::EModuleType eType) override
     {
 
         unsigned int a = 0;
-        CDir Dir;
+        NoDir Dir;
 
-        CModules::ModDirList dirs = CModules::GetModDirs();
+        NoModules::ModDirList dirs = NoModules::GetModDirs();
 
         while (!dirs.empty()) {
             Dir.FillByWildcard(dirs.front().first, "*.pm");
             dirs.pop();
 
             for (a = 0; a < Dir.size(); a++) {
-                CFile& File = *Dir[a];
-                CString sName = File.GetShortName();
-                CString sPath = File.GetLongName();
-                CModInfo ModInfo;
+                NoFile& File = *Dir[a];
+                NoString sName = File.GetShortName();
+                NoString sPath = File.GetLongName();
+                NoModInfo ModInfo;
                 sName.RightChomp(3);
                 PSTART;
                 PUSH_STR(sPath);
                 PUSH_STR(sName);
-                PUSH_PTR(CModInfo*, &ModInfo);
+                PUSH_PTR(NoModInfo*, &ModInfo);
                 PCALL("ZNC::Core::ModInfoByPath");
                 if (SvTRUE(ERRSV)) {
                     DEBUG(__PRETTY_FUNCTION__ << ": " << sPath << ": " << PString(ERRSV));
@@ -277,7 +277,7 @@ VWebSubPages& CPerlModule::GetSubPages()
 {
     VWebSubPages* result = _GetSubPages();
     if (!result) {
-        return CModule::GetSubPages();
+        return NoModule::GetSubPages();
     }
     return *result;
 }
@@ -342,7 +342,7 @@ void CPerlSocket::ReadData(const char* data, size_t len)
         SOCKCBCHECK();
     }
 }
-void CPerlSocket::ReadLine(const CString& sLine)
+void CPerlSocket::ReadLine(const NoString& sLine)
 {
     CPerlModule* pMod = AsPerlModule(GetModule());
     if (pMod) {
@@ -352,7 +352,7 @@ void CPerlSocket::ReadLine(const CString& sLine)
         SOCKCBCHECK();
     }
 }
-Csock* CPerlSocket::GetSockObj(const CString& sHost, unsigned short uPort)
+Csock* CPerlSocket::GetSockObj(const NoString& sHost, unsigned short uPort)
 {
     CPerlModule* pMod = AsPerlModule(GetModule());
     Csock* result = nullptr;
@@ -377,6 +377,6 @@ CPerlSocket::~CPerlSocket()
     }
 }
 
-template <> void TModInfo<CModPerl>(CModInfo& Info) { Info.SetWikiPage("modperl"); }
+template <> void TModInfo<CModPerl>(NoModInfo& Info) { Info.SetWikiPage("modperl"); }
 
 GLOBALMODULEDEFS(CModPerl, "Loads perl scripts as ZNC modules")

@@ -20,23 +20,23 @@
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
 
-class CServer
+class NoServer
 {
 public:
-    CServer(const CString& sName, unsigned short uPort = 6667, const CString& sPass = "", bool bSSL = false);
-    ~CServer();
+    NoServer(const NoString& sName, unsigned short uPort = 6667, const NoString& sPass = "", bool bSSL = false);
+    ~NoServer();
 
-    const CString& GetName() const;
+    const NoString& GetName() const;
     unsigned short GetPort() const;
-    const CString& GetPass() const;
+    const NoString& GetPass() const;
     bool IsSSL() const;
-    CString GetString(bool bIncludePassword = true) const;
-    static bool IsValidHostName(const CString& sHostName);
+    NoString GetString(bool bIncludePassword = true) const;
+    static bool IsValidHostName(const NoString& sHostName);
 
 private:
-    CString m_sName;
+    NoString m_sName;
     unsigned short m_uPort;
-    CString m_sPass;
+    NoString m_sPass;
     bool m_bSSL;
 };
 

@@ -21,35 +21,35 @@
 #include <znc/nostring.h>
 #include <znc/nobuffer.h>
 
-class CClient;
-class CNetwork;
+class NoClient;
+class NoNetwork;
 
-class CQuery
+class NoQuery
 {
 public:
-    CQuery(const CString& sName, CNetwork* pNetwork);
-    ~CQuery();
+    NoQuery(const NoString& sName, NoNetwork* pNetwork);
+    ~NoQuery();
 
-    CQuery(const CQuery&) = delete;
-    CQuery& operator=(const CQuery&) = delete;
+    NoQuery(const NoQuery&) = delete;
+    NoQuery& operator=(const NoQuery&) = delete;
 
-    const CBuffer& GetBuffer() const { return m_Buffer; }
+    const NoBuffer& GetBuffer() const { return m_Buffer; }
     unsigned int GetBufferCount() const { return m_Buffer.GetLimit(); }
     bool SetBufferCount(unsigned int u, bool bForce = false) { return m_Buffer.SetLimit(u, bForce); }
-    size_t AddBuffer(const CString& sFormat, const CString& sText = "", const timeval* ts = nullptr)
+    size_t AddBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr)
     {
         return m_Buffer.AddLine(sFormat, sText, ts);
     }
     void ClearBuffer() { m_Buffer.Clear(); }
-    void SendBuffer(CClient* pClient);
-    void SendBuffer(CClient* pClient, const CBuffer& Buffer);
+    void SendBuffer(NoClient* pClient);
+    void SendBuffer(NoClient* pClient, const NoBuffer& Buffer);
 
-    const CString& GetName() const { return m_sName; }
+    const NoString& GetName() const { return m_sName; }
 
 private:
-    CString m_sName;
-    CNetwork* m_pNetwork;
-    CBuffer m_Buffer;
+    NoString m_sName;
+    NoNetwork* m_pNetwork;
+    NoBuffer m_Buffer;
 };
 
 #endif // !NOQUERY_H

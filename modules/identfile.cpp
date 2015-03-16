@@ -19,53 +19,53 @@
 #include <znc/nouser.h>
 #include <znc/nonetwork.h>
 
-class CIdentFileModule : public CModule
+class NoIdentFileModule : public NoModule
 {
-    CString m_sOrigISpoof;
-    CFile* m_pISpoofLockFile;
-    CIRCSock* m_pIRCSock;
+    NoString m_sOrigISpoof;
+    NoFile* m_pISpoofLockFile;
+    NoIrcSock* m_pIRCSock;
 
 public:
-    MODCONSTRUCTOR(CIdentFileModule)
+    MODCONSTRUCTOR(NoIdentFileModule)
     {
         AddHelpCommand();
-        AddCommand("GetFile", static_cast<CModCommand::ModCmdFunc>(&CIdentFileModule::GetFile));
-        AddCommand("SetFile", static_cast<CModCommand::ModCmdFunc>(&CIdentFileModule::SetFile), "<file>");
-        AddCommand("GetFormat", static_cast<CModCommand::ModCmdFunc>(&CIdentFileModule::GetFormat));
-        AddCommand("SetFormat", static_cast<CModCommand::ModCmdFunc>(&CIdentFileModule::SetFormat), "<format>");
-        AddCommand("Show", static_cast<CModCommand::ModCmdFunc>(&CIdentFileModule::Show));
+        AddCommand("GetFile", static_cast<NoModCommand::ModCmdFunc>(&NoIdentFileModule::GetFile));
+        AddCommand("SetFile", static_cast<NoModCommand::ModCmdFunc>(&NoIdentFileModule::SetFile), "<file>");
+        AddCommand("GetFormat", static_cast<NoModCommand::ModCmdFunc>(&NoIdentFileModule::GetFormat));
+        AddCommand("SetFormat", static_cast<NoModCommand::ModCmdFunc>(&NoIdentFileModule::SetFormat), "<format>");
+        AddCommand("Show", static_cast<NoModCommand::ModCmdFunc>(&NoIdentFileModule::Show));
 
         m_pISpoofLockFile = nullptr;
         m_pIRCSock = nullptr;
     }
 
-    virtual ~CIdentFileModule() { ReleaseISpoof(); }
+    virtual ~NoIdentFileModule() { ReleaseISpoof(); }
 
-    void GetFile(const CString& sLine) { PutModule("File is set to: " + GetNV("File")); }
+    void GetFile(const NoString& sLine) { PutModule("File is set to: " + GetNV("File")); }
 
-    void SetFile(const CString& sLine)
+    void SetFile(const NoString& sLine)
     {
         SetNV("File", sLine.Token(1, true));
         PutModule("File has been set to: " + GetNV("File"));
     }
 
-    void SetFormat(const CString& sLine)
+    void SetFormat(const NoString& sLine)
     {
         SetNV("Format", sLine.Token(1, true));
         PutModule("Format has been set to: " + GetNV("Format"));
         PutModule("Format would be expanded to: " + ExpandString(GetNV("Format")));
     }
 
-    void GetFormat(const CString& sLine)
+    void GetFormat(const NoString& sLine)
     {
         PutModule("Format is set to: " + GetNV("Format"));
         PutModule("Format would be expanded to: " + ExpandString(GetNV("Format")));
     }
 
-    void Show(const CString& sLine)
+    void Show(const NoString& sLine)
     {
-        PutModule("m_pISpoofLockFile = " + CString((long long)m_pISpoofLockFile));
-        PutModule("m_pIRCSock = " + CString((long long)m_pIRCSock));
+        PutModule("m_pISpoofLockFile = " + NoString((long long)m_pISpoofLockFile));
+        PutModule("m_pIRCSock = " + NoString((long long)m_pIRCSock));
         if (m_pIRCSock) {
             PutModule("user/network - " + m_pIRCSock->GetNetwork()->GetUser()->GetUserName() + "/" +
                       m_pIRCSock->GetNetwork()->GetName());
@@ -74,7 +74,7 @@ public:
         }
     }
 
-    void OnModCommand(const CString& sCommand) override
+    void OnModCommand(const NoString& sCommand) override
     {
         if (GetUser()->IsAdmin()) {
             HandleCommand(sCommand);
@@ -83,7 +83,7 @@ public:
         }
     }
 
-    void SetIRCSock(CIRCSock* pIRCSock)
+    void SetIRCSock(NoIrcSock* pIRCSock)
     {
         if (m_pIRCSock) {
             CZNC::Get().ResumeConnectQueue();
@@ -102,7 +102,7 @@ public:
             return false;
         }
 
-        m_pISpoofLockFile = new CFile;
+        m_pISpoofLockFile = new NoFile;
         if (!m_pISpoofLockFile->TryExLock(GetNV("File"), O_RDWR | O_CREAT)) {
             delete m_pISpoofLockFile;
             m_pISpoofLockFile = nullptr;
@@ -120,7 +120,7 @@ public:
             return false;
         }
 
-        CString sData = ExpandString(GetNV("Format"));
+        NoString sData = ExpandString(GetNV("Format"));
 
         // If the format doesn't contain anything expandable, we'll
         // assume this is an "old"-style format string.
@@ -154,7 +154,7 @@ public:
         }
     }
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         m_pISpoofLockFile = nullptr;
         m_pIRCSock = nullptr;
@@ -170,7 +170,7 @@ public:
         return true;
     }
 
-    EModRet OnIRCConnecting(CIRCSock* pIRCSock) override
+    EModRet OnIRCConnecting(NoIrcSock* pIRCSock) override
     {
         if (m_pISpoofLockFile != nullptr) {
             DEBUG("Aborting connection, ident spoof lock file exists");
@@ -196,7 +196,7 @@ public:
         }
     }
 
-    void OnIRCConnectionError(CIRCSock* pIRCSock) override
+    void OnIRCConnectionError(NoIrcSock* pIRCSock) override
     {
         if (m_pIRCSock == pIRCSock) {
             ReleaseISpoof();
@@ -211,6 +211,6 @@ public:
     }
 };
 
-template <> void TModInfo<CIdentFileModule>(CModInfo& Info) { Info.SetWikiPage("identfile"); }
+template <> void TModInfo<NoIdentFileModule>(NoModInfo& Info) { Info.SetWikiPage("identfile"); }
 
-GLOBALMODULEDEFS(CIdentFileModule, "Write the ident of a user to a file when they are trying to connect.")
+GLOBALMODULEDEFS(NoIdentFileModule, "Write the ident of a user to a file when they are trying to connect.")

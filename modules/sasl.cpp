@@ -29,7 +29,7 @@ static const struct
 #define NV_REQUIRE_AUTH "require_auth"
 #define NV_MECHANISMS "mechanisms"
 
-class Mechanisms : public VCString
+class Mechanisms : public NoStringVector
 {
 public:
     void SetIndex(unsigned int uiIndex) { m_uiIndex = uiIndex; }
@@ -40,9 +40,9 @@ public:
 
     void IncrementIndex() { m_uiIndex++; }
 
-    CString GetCurrent() const { return at(m_uiIndex); }
+    NoString GetCurrent() const { return at(m_uiIndex); }
 
-    CString GetNext() const
+    NoString GetNext() const
     {
         if (HasNext()) {
             return at(m_uiIndex + 1);
@@ -55,36 +55,36 @@ private:
     unsigned int m_uiIndex;
 };
 
-class CSASLMod : public CModule
+class NoSaslMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CSASLMod)
+    MODCONSTRUCTOR(NoSaslMod)
     {
         AddCommand("Help",
-                   static_cast<CModCommand::ModCmdFunc>(&CSASLMod::PrintHelp),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSaslMod::PrintHelp),
                    "search",
                    "Generate this output");
         AddCommand("Set",
-                   static_cast<CModCommand::ModCmdFunc>(&CSASLMod::Set),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSaslMod::Set),
                    "<username> [<password>]",
                    "Set username and password for the mechanisms that need them. Password is optional");
         AddCommand("Mechanism",
-                   static_cast<CModCommand::ModCmdFunc>(&CSASLMod::SetMechanismCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSaslMod::SetMechanismCommand),
                    "[mechanism[ ...]]",
                    "Set the mechanisms to be attempted (in order)");
         AddCommand("RequireAuth",
-                   static_cast<CModCommand::ModCmdFunc>(&CSASLMod::RequireAuthCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSaslMod::RequireAuthCommand),
                    "[yes|no]",
                    "Don't connect unless SASL authentication succeeds");
 
         m_bAuthenticated = false;
     }
 
-    void PrintHelp(const CString& sLine)
+    void PrintHelp(const NoString& sLine)
     {
         HandleHelpCommand(sLine);
 
-        CTable Mechanisms;
+        NoTable Mechanisms;
         Mechanisms.AddColumn("Mechanism");
         Mechanisms.AddColumn("Description");
 
@@ -98,7 +98,7 @@ public:
         PutModule(Mechanisms);
     }
 
-    void Set(const CString& sLine)
+    void Set(const NoString& sLine)
     {
         SetNV("username", sLine.Token(1));
         SetNV("password", sLine.Token(2));
@@ -107,15 +107,15 @@ public:
         PutModule("Password has been set to [" + GetNV("password") + "]");
     }
 
-    void SetMechanismCommand(const CString& sLine)
+    void SetMechanismCommand(const NoString& sLine)
     {
-        CString sMechanisms = sLine.Token(1, true).AsUpper();
+        NoString sMechanisms = sLine.Token(1, true).AsUpper();
 
         if (!sMechanisms.empty()) {
-            VCString vsMechanisms;
+            NoStringVector vsMechanisms;
             sMechanisms.Split(" ", vsMechanisms);
 
-            for (VCString::const_iterator it = vsMechanisms.begin(); it != vsMechanisms.end(); ++it) {
+            for (NoStringVector::const_iterator it = vsMechanisms.begin(); it != vsMechanisms.end(); ++it) {
                 if (!SupportsMechanism(*it)) {
                     PutModule("Unsupported mechanism: " + *it);
                     return;
@@ -128,7 +128,7 @@ public:
         PutModule("Current mechanisms set: " + GetMechanismsString());
     }
 
-    void RequireAuthCommand(const CString& sLine)
+    void RequireAuthCommand(const NoString& sLine)
     {
         if (!sLine.Token(1).empty()) {
             SetNV(NV_REQUIRE_AUTH, sLine.Token(1));
@@ -141,7 +141,7 @@ public:
         }
     }
 
-    bool SupportsMechanism(const CString& sMechanism) const
+    bool SupportsMechanism(const NoString& sMechanism) const
     {
         for (size_t i = 0; SupportedMechanisms[i].szName != nullptr; i++) {
             if (sMechanism.Equals(SupportedMechanisms[i].szName)) {
@@ -152,10 +152,10 @@ public:
         return false;
     }
 
-    CString GetMechanismsString() const
+    NoString GetMechanismsString() const
     {
         if (GetNV(NV_MECHANISMS).empty()) {
-            CString sDefaults = "";
+            NoString sDefaults = "";
 
             for (size_t i = 0; SupportedMechanisms[i].szName != nullptr; i++) {
                 if (SupportedMechanisms[i].bDefault) {
@@ -185,10 +185,10 @@ public:
         return false;
     }
 
-    void Authenticate(const CString& sLine)
+    void Authenticate(const NoString& sLine)
     {
         if (m_Mechanisms.GetCurrent().Equals("PLAIN") && sLine.Equals("+")) {
-            CString sAuthLine = GetNV("username") + '\0' + GetNV("username") + '\0' + GetNV("password");
+            NoString sAuthLine = GetNV("username") + '\0' + GetNV("username") + '\0' + GetNV("password");
             sAuthLine.Base64Encode();
             PutIRC("AUTHENTICATE " + sAuthLine);
         } else {
@@ -197,9 +197,9 @@ public:
         }
     }
 
-    bool OnServerCapAvailable(const CString& sCap) override { return sCap.Equals("sasl"); }
+    bool OnServerCapAvailable(const NoString& sCap) override { return sCap.Equals("sasl"); }
 
-    void OnServerCapResult(const CString& sCap, bool bSuccess) override
+    void OnServerCapResult(const NoString& sCap, bool bSuccess) override
     {
         if (sCap.Equals("sasl")) {
             if (bSuccess) {
@@ -220,7 +220,7 @@ public:
         }
     }
 
-    EModRet OnRaw(CString& sLine) override
+    EModRet OnRaw(NoString& sLine) override
     {
         if (sLine.Token(0).Equals("AUTHENTICATE")) {
             Authenticate(sLine.Token(1, true));
@@ -270,6 +270,6 @@ private:
     bool m_bAuthenticated;
 };
 
-template <> void TModInfo<CSASLMod>(CModInfo& Info) { Info.SetWikiPage("sasl"); }
+template <> void TModInfo<NoSaslMod>(NoModInfo& Info) { Info.SetWikiPage("sasl"); }
 
-NETWORKMODULEDEFS(CSASLMod, "Adds support for sasl authentication capability to authenticate to an IRC server")
+NETWORKMODULEDEFS(NoSaslMod, "Adds support for sasl authentication capability to authenticate to an IRC server")

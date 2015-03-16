@@ -20,30 +20,30 @@
 #include <znc/noconfig.h>
 #include <znc/nosocket.h>
 
-class CRealListener;
+class NoRealListener;
 
-class CListener
+class NoListener
 {
 public:
     typedef enum { ACCEPT_IRC, ACCEPT_HTTP, ACCEPT_ALL } EAcceptType;
 
-    CListener(unsigned short uPort, const CString& sBindHost, const CString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept)
+    NoListener(unsigned short uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept)
         : m_bSSL(bSSL), m_eAddr(eAddr), m_uPort(uPort), m_sBindHost(sBindHost), m_sURIPrefix(sURIPrefix),
           m_pListener(nullptr), m_eAcceptType(eAccept)
     {
     }
 
-    ~CListener();
+    ~NoListener();
 
-    CListener(const CListener&) = delete;
-    CListener& operator=(const CListener&) = delete;
+    NoListener(const NoListener&) = delete;
+    NoListener& operator=(const NoListener&) = delete;
 
     bool IsSSL() const { return m_bSSL; }
     EAddrType GetAddrType() const { return m_eAddr; }
     unsigned short GetPort() const { return m_uPort; }
-    const CString& GetBindHost() const { return m_sBindHost; }
-    CRealListener* GetRealListener() const { return m_pListener; }
-    const CString& GetURIPrefix() const { return m_sURIPrefix; }
+    const NoString& GetBindHost() const { return m_sBindHost; }
+    NoRealListener* GetRealListener() const { return m_pListener; }
+    const NoString& GetURIPrefix() const { return m_sURIPrefix; }
     EAcceptType GetAcceptType() const { return m_eAcceptType; }
 
     // It doesn't make sense to change any of the settings after Listen()
@@ -57,37 +57,37 @@ private:
     bool m_bSSL;
     EAddrType m_eAddr;
     unsigned short m_uPort;
-    CString m_sBindHost;
-    CString m_sURIPrefix;
-    CRealListener* m_pListener;
+    NoString m_sBindHost;
+    NoString m_sURIPrefix;
+    NoRealListener* m_pListener;
     EAcceptType m_eAcceptType;
 };
 
-class CRealListener : public CZNCSock
+class NoRealListener : public NoBaseSocket
 {
 public:
-    CRealListener(CListener& listener) : CZNCSock(), m_Listener(listener) {}
-    virtual ~CRealListener();
+    NoRealListener(NoListener& listener) : NoBaseSocket(), m_Listener(listener) {}
+    virtual ~NoRealListener();
 
-    bool ConnectionFrom(const CString& sHost, unsigned short uPort) override;
-    Csock* GetSockObj(const CString& sHost, unsigned short uPort) override;
-    void SockError(int iErrno, const CString& sDescription) override;
+    bool ConnectionFrom(const NoString& sHost, unsigned short uPort) override;
+    Csock* GetSockObj(const NoString& sHost, unsigned short uPort) override;
+    void SockError(int iErrno, const NoString& sDescription) override;
 
 private:
-    CListener& m_Listener;
+    NoListener& m_Listener;
 };
 
-class CIncomingConnection : public CZNCSock
+class NoIncomingConnection : public NoBaseSocket
 {
 public:
-    CIncomingConnection(const CString& sHostname, unsigned short uPort, CListener::EAcceptType eAcceptType, const CString& sURIPrefix);
-    virtual ~CIncomingConnection() {}
-    void ReadLine(const CString& sData) override;
+    NoIncomingConnection(const NoString& sHostname, unsigned short uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix);
+    virtual ~NoIncomingConnection() {}
+    void ReadLine(const NoString& sData) override;
     void ReachedMaxBuffer() override;
 
 private:
-    CListener::EAcceptType m_eAcceptType;
-    const CString m_sURIPrefix;
+    NoListener::EAcceptType m_eAcceptType;
+    const NoString m_sURIPrefix;
 };
 
 #endif // !NOLISTENER_H

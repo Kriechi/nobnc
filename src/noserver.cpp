@@ -16,25 +16,25 @@
 
 #include "noserver.h"
 
-CServer::CServer(const CString& sName, unsigned short uPort, const CString& sPass, bool bSSL)
+NoServer::NoServer(const NoString& sName, unsigned short uPort, const NoString& sPass, bool bSSL)
     : m_sName(sName), m_uPort((uPort) ? uPort : (unsigned short)6667), m_sPass(sPass), m_bSSL(bSSL)
 {
 }
 
-CServer::~CServer() {}
+NoServer::~NoServer() {}
 
-bool CServer::IsValidHostName(const CString& sHostName)
+bool NoServer::IsValidHostName(const NoString& sHostName)
 {
-    return (!sHostName.empty() && (sHostName.find(' ') == CString::npos));
+    return (!sHostName.empty() && (sHostName.find(' ') == NoString::npos));
 }
 
-const CString& CServer::GetName() const { return m_sName; }
-unsigned short CServer::GetPort() const { return m_uPort; }
-const CString& CServer::GetPass() const { return m_sPass; }
-bool CServer::IsSSL() const { return m_bSSL; }
+const NoString& NoServer::GetName() const { return m_sName; }
+unsigned short NoServer::GetPort() const { return m_uPort; }
+const NoString& NoServer::GetPass() const { return m_sPass; }
+bool NoServer::IsSSL() const { return m_bSSL; }
 
-CString CServer::GetString(bool bIncludePassword) const
+NoString NoServer::GetString(bool bIncludePassword) const
 {
-    return m_sName + " " + CString(m_bSSL ? "+" : "") + CString(m_uPort) +
-           CString(bIncludePassword ? (m_sPass.empty() ? "" : " " + m_sPass) : "");
+    return m_sName + " " + NoString(m_bSSL ? "+" : "") + NoString(m_uPort) +
+           NoString(bIncludePassword ? (m_sPass.empty() ? "" : " " + m_sPass) : "");
 }

@@ -21,32 +21,32 @@
 #define SIMPLE_AWAY_DEFAULT_TIME 60
 
 
-class CSimpleAway;
+class NoSimpleAway;
 
-class CSimpleAwayJob : public CTimer
+class NoSimpleAwayJob : public NoTimer
 {
 public:
-    CSimpleAwayJob(CModule* pModule, unsigned int uInterval, unsigned int uCycles, const CString& sLabel, const CString& sDescription)
-        : CTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoSimpleAwayJob(NoModule* pModule, unsigned int uInterval, unsigned int uCycles, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }
 
-    virtual ~CSimpleAwayJob() {}
+    virtual ~NoSimpleAwayJob() {}
 
 protected:
     void RunJob() override;
 };
 
-class CSimpleAway : public CModule
+class NoSimpleAway : public NoModule
 {
 private:
-    CString m_sReason;
+    NoString m_sReason;
     unsigned int m_iAwayWait;
     bool m_bClientSetAway;
     bool m_bWeSetAway;
 
 public:
-    MODCONSTRUCTOR(CSimpleAway)
+    MODCONSTRUCTOR(NoSimpleAway)
     {
         m_sReason = SIMPLE_AWAY_DEFAULT_REASON;
         m_iAwayWait = SIMPLE_AWAY_DEFAULT_TIME;
@@ -55,31 +55,31 @@ public:
 
         AddHelpCommand();
         AddCommand("Reason",
-                   static_cast<CModCommand::ModCmdFunc>(&CSimpleAway::OnReasonCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSimpleAway::OnReasonCommand),
                    "[<text>]",
                    "Prints or sets the away reason (%s is replaced with the time you were set away)");
         AddCommand("Timer",
-                   static_cast<CModCommand::ModCmdFunc>(&CSimpleAway::OnTimerCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSimpleAway::OnTimerCommand),
                    "",
                    "Prints the current time to wait before setting you away");
         AddCommand("SetTimer",
-                   static_cast<CModCommand::ModCmdFunc>(&CSimpleAway::OnSetTimerCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSimpleAway::OnSetTimerCommand),
                    "<seconds>",
                    "Sets the time to wait before setting you away");
         AddCommand("DisableTimer",
-                   static_cast<CModCommand::ModCmdFunc>(&CSimpleAway::OnDisableTimerCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoSimpleAway::OnDisableTimerCommand),
                    "",
                    "Disables the wait time before setting you away");
     }
 
-    virtual ~CSimpleAway() {}
+    virtual ~NoSimpleAway() {}
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        CString sReasonArg;
+        NoString sReasonArg;
 
         // Load AwayWait
-        CString sFirstArg = sArgs.Token(0);
+        NoString sFirstArg = sArgs.Token(0);
         if (sFirstArg.Equals("-notimer")) {
             SetAwayWait(0);
             sReasonArg = sArgs.Token(1, true);
@@ -87,7 +87,7 @@ public:
             SetAwayWait(sArgs.Token(1).ToUInt());
             sReasonArg = sArgs.Token(2, true);
         } else {
-            CString sAwayWait = GetNV("awaywait");
+            NoString sAwayWait = GetNV("awaywait");
             if (!sAwayWait.empty()) SetAwayWait(sAwayWait.ToUInt(), false);
             sReasonArg = sArgs;
         }
@@ -96,7 +96,7 @@ public:
         if (!sReasonArg.empty()) {
             SetReason(sReasonArg);
         } else {
-            CString sSavedReason = GetNV("reason");
+            NoString sSavedReason = GetNV("reason");
             if (!sSavedReason.empty()) SetReason(sSavedReason, false);
         }
 
@@ -122,9 +122,9 @@ public:
         if (!GetNetwork()->IsUserAttached()) SetAway();
     }
 
-    void OnReasonCommand(const CString& sLine)
+    void OnReasonCommand(const NoString& sLine)
     {
-        CString sReason = sLine.Token(1, true);
+        NoString sReason = sLine.Token(1, true);
 
         if (!sReason.empty()) {
             SetReason(sReason);
@@ -135,33 +135,33 @@ public:
         }
     }
 
-    void OnTimerCommand(const CString& sLine)
+    void OnTimerCommand(const NoString& sLine)
     {
-        PutModule("Current timer setting: " + CString(m_iAwayWait) + " seconds");
+        PutModule("Current timer setting: " + NoString(m_iAwayWait) + " seconds");
     }
 
-    void OnSetTimerCommand(const CString& sLine)
+    void OnSetTimerCommand(const NoString& sLine)
     {
         SetAwayWait(sLine.Token(1).ToUInt());
 
         if (m_iAwayWait == 0)
             PutModule("Timer disabled");
         else
-            PutModule("Timer set to " + CString(m_iAwayWait) + " seconds");
+            PutModule("Timer set to " + NoString(m_iAwayWait) + " seconds");
     }
 
-    void OnDisableTimerCommand(const CString& sLine)
+    void OnDisableTimerCommand(const NoString& sLine)
     {
         SetAwayWait(0);
         PutModule("Timer disabled");
     }
 
-    EModRet OnUserRaw(CString& sLine) override
+    EModRet OnUserRaw(NoString& sLine) override
     {
         if (!sLine.Token(0).Equals("AWAY")) return CONTINUE;
 
         // If a client set us away, we don't touch that away message
-        const CString sArg = sLine.Token(1, true).Trim_n(" ");
+        const NoString sArg = sLine.Token(1, true).Trim_n(" ");
         if (sArg.empty() || sArg == ":")
             m_bClientSetAway = false;
         else
@@ -176,7 +176,7 @@ public:
     {
         if (bTimer) {
             RemTimer("simple_away");
-            AddTimer(new CSimpleAwayJob(this, m_iAwayWait, 1, "simple_away", "Sets you away after detach"));
+            AddTimer(new NoSimpleAwayJob(this, m_iAwayWait, 1, "simple_away", "Sets you away after detach"));
         } else {
             if (!m_bClientSetAway) {
                 PutIRC("AWAY :" + ExpandReason());
@@ -195,20 +195,20 @@ public:
     }
 
 private:
-    CString ExpandReason()
+    NoString ExpandReason()
     {
-        CString sReason = m_sReason;
+        NoString sReason = m_sReason;
         if (sReason.empty()) sReason = SIMPLE_AWAY_DEFAULT_REASON;
 
         time_t iTime = time(nullptr);
-        CString sTime = CUtils::CTime(iTime, GetUser()->GetTimezone());
+        NoString sTime = NoUtils::CTime(iTime, GetUser()->GetTimezone());
         sReason.Replace("%s", sTime);
 
         return sReason;
     }
 
     /* Settings */
-    void SetReason(CString& sReason, bool bSave = true)
+    void SetReason(NoString& sReason, bool bSave = true)
     {
         if (bSave) SetNV("reason", sReason);
         m_sReason = sReason;
@@ -216,19 +216,19 @@ private:
 
     void SetAwayWait(unsigned int iAwayWait, bool bSave = true)
     {
-        if (bSave) SetNV("awaywait", CString(iAwayWait));
+        if (bSave) SetNV("awaywait", NoString(iAwayWait));
         m_iAwayWait = iAwayWait;
     }
 };
 
-void CSimpleAwayJob::RunJob() { ((CSimpleAway*)GetModule())->SetAway(false); }
+void NoSimpleAwayJob::RunJob() { ((NoSimpleAway*)GetModule())->SetAway(false); }
 
-template <> void TModInfo<CSimpleAway>(CModInfo& Info)
+template <> void TModInfo<NoSimpleAway>(NoModInfo& Info)
 {
     Info.SetWikiPage("simple_away");
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("You might enter up to 3 arguments, like -notimer awaymessage or -timer 5 awaymessage.");
 }
 
-NETWORKMODULEDEFS(CSimpleAway,
+NETWORKMODULEDEFS(NoSimpleAway,
                   "This module will automatically set you away on IRC while you are disconnected from the bouncer.")

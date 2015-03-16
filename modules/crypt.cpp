@@ -38,32 +38,32 @@
 #define REQUIRESSL 1
 #define NICK_PREFIX_KEY "[nick-prefix]"
 
-class CCryptMod : public CModule
+class NoCryptMod : public NoModule
 {
-    CString NickPrefix()
+    NoString NickPrefix()
     {
-        MCString::iterator it = FindNV(NICK_PREFIX_KEY);
+        NoStringMap::iterator it = FindNV(NICK_PREFIX_KEY);
         return it != EndNV() ? it->second : "*";
     }
 
 public:
-    MODCONSTRUCTOR(CCryptMod)
+    MODCONSTRUCTOR(NoCryptMod)
     {
         AddHelpCommand();
         AddCommand("DelKey",
-                   static_cast<CModCommand::ModCmdFunc>(&CCryptMod::OnDelKeyCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoCryptMod::OnDelKeyCommand),
                    "<#chan|Nick>",
                    "Remove a key for nick or channel");
-        AddCommand("SetKey", static_cast<CModCommand::ModCmdFunc>(&CCryptMod::OnSetKeyCommand), "<#chan|Nick> <Key>", "Set a key for nick or channel");
+        AddCommand("SetKey", static_cast<NoModCommand::ModCmdFunc>(&NoCryptMod::OnSetKeyCommand), "<#chan|Nick> <Key>", "Set a key for nick or channel");
         AddCommand("ListKeys",
-                   static_cast<CModCommand::ModCmdFunc>(&CCryptMod::OnListKeysCommand),
+                   static_cast<NoModCommand::ModCmdFunc>(&NoCryptMod::OnListKeysCommand),
                    "",
                    "List all keys");
     }
 
-    virtual ~CCryptMod() {}
+    virtual ~NoCryptMod() {}
 
-    EModRet OnUserMsg(CString& sTarget, CString& sMessage) override
+    EModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         sTarget.TrimLeft(NickPrefix());
 
@@ -72,11 +72,11 @@ public:
             return CONTINUE;
         }
 
-        MCString::iterator it = FindNV(sTarget.AsLower());
+        NoStringMap::iterator it = FindNV(sTarget.AsLower());
 
         if (it != EndNV()) {
-            CChannel* pChan = GetNetwork()->FindChan(sTarget);
-            CString sNickMask = GetNetwork()->GetIRCNick().GetNickMask();
+            NoChannel* pChan = GetNetwork()->FindChan(sTarget);
+            NoString sNickMask = GetNetwork()->GetIRNoNick().GetNickMask();
             if (pChan) {
                 if (!pChan->AutoClearChanBuffer())
                     pChan->AddBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +
@@ -85,7 +85,7 @@ public:
                 GetUser()->PutUser(":" + NickPrefix() + sNickMask + " PRIVMSG " + sTarget + " :" + sMessage, nullptr, GetClient());
             }
 
-            CString sMsg = MakeIvec() + sMessage;
+            NoString sMsg = MakeIvec() + sMessage;
             sMsg.Encrypt(it->second);
             sMsg.Base64Encode();
             sMsg = "+OK *" + sMsg;
@@ -97,22 +97,22 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnPrivMsg(CNick& Nick, CString& sMessage) override
+    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         FilterIncoming(Nick.GetNick(), Nick, sMessage);
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(CNick& Nick, CChannel& Channel, CString& sMessage) override
+    EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         FilterIncoming(Channel.GetName(), Nick, sMessage);
         return CONTINUE;
     }
 
-    void FilterIncoming(const CString& sTarget, CNick& Nick, CString& sMessage)
+    void FilterIncoming(const NoString& sTarget, NoNick& Nick, NoString& sMessage)
     {
         if (sMessage.Left(5) == "+OK *") {
-            MCString::iterator it = FindNV(sTarget.AsLower());
+            NoStringMap::iterator it = FindNV(sTarget.AsLower());
 
             if (it != EndNV()) {
                 sMessage.LeftChomp(5);
@@ -125,9 +125,9 @@ public:
         }
     }
 
-    void OnDelKeyCommand(const CString& sCommand)
+    void OnDelKeyCommand(const NoString& sCommand)
     {
-        CString sTarget = sCommand.Token(1);
+        NoString sTarget = sCommand.Token(1);
 
         if (!sTarget.empty()) {
             if (DelNV(sTarget.AsLower())) {
@@ -140,10 +140,10 @@ public:
         }
     }
 
-    void OnSetKeyCommand(const CString& sCommand)
+    void OnSetKeyCommand(const NoString& sCommand)
     {
-        CString sTarget = sCommand.Token(1);
-        CString sKey = sCommand.Token(2, true);
+        NoString sTarget = sCommand.Token(1);
+        NoString sKey = sCommand.Token(2, true);
 
         // Strip "cbc:" from beginning of string incase someone pastes directly from mircryption
         sKey.TrimPrefix("cbc:");
@@ -156,22 +156,22 @@ public:
         }
     }
 
-    void OnListKeysCommand(const CString& sCommand)
+    void OnListKeysCommand(const NoString& sCommand)
     {
         if (BeginNV() == EndNV()) {
             PutModule("You have no encryption keys set.");
         } else {
-            CTable Table;
+            NoTable Table;
             Table.AddColumn("Target");
             Table.AddColumn("Key");
 
-            for (MCString::iterator it = BeginNV(); it != EndNV(); ++it) {
+            for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
                 Table.AddRow();
                 Table.SetCell("Target", it->first);
                 Table.SetCell("Key", it->second);
             }
 
-            MCString::iterator it = FindNV(NICK_PREFIX_KEY);
+            NoStringMap::iterator it = FindNV(NICK_PREFIX_KEY);
             if (it == EndNV()) {
                 Table.AddRow();
                 Table.SetCell("Target", NICK_PREFIX_KEY);
@@ -182,9 +182,9 @@ public:
         }
     }
 
-    CString MakeIvec()
+    NoString MakeIvec()
     {
-        CString sRet;
+        NoString sRet;
         time_t t;
         time(&t);
         int r = rand();
@@ -195,6 +195,6 @@ public:
     }
 };
 
-template <> void TModInfo<CCryptMod>(CModInfo& Info) { Info.SetWikiPage("crypt"); }
+template <> void TModInfo<NoCryptMod>(NoModInfo& Info) { Info.SetWikiPage("crypt"); }
 
-NETWORKMODULEDEFS(CCryptMod, "Encryption for channel/private messages")
+NETWORKMODULEDEFS(NoCryptMod, "Encryption for channel/private messages")

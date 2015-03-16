@@ -34,25 +34,25 @@
  * This class represents a non-recursive mutex. Only a single thread may own the
  * mutex at any point in time.
  */
-class CMutex
+class NoMutex
 {
 public:
-    friend class CConditionVariable;
+    friend class NoConditionVariable;
 
-    CMutex() : m_mutex()
+    NoMutex() : m_mutex()
     {
         int i = pthread_mutex_init(&m_mutex, nullptr);
         if (i) {
-            CUtils::PrintError("Can't initialize mutex: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't initialize mutex: " + NoString(strerror(errno)));
             exit(1);
         }
     }
 
-    ~CMutex()
+    ~NoMutex()
     {
         int i = pthread_mutex_destroy(&m_mutex);
         if (i) {
-            CUtils::PrintError("Can't destroy mutex: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't destroy mutex: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -61,7 +61,7 @@ public:
     {
         int i = pthread_mutex_lock(&m_mutex);
         if (i) {
-            CUtils::PrintError("Can't lock mutex: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't lock mutex: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -70,15 +70,15 @@ public:
     {
         int i = pthread_mutex_unlock(&m_mutex);
         if (i) {
-            CUtils::PrintError("Can't unlock mutex: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't unlock mutex: " + NoString(strerror(errno)));
             exit(1);
         }
     }
 
 private:
     // Undefined copy constructor and assignment operator
-    CMutex(const CMutex&);
-    CMutex& operator=(const CMutex&);
+    NoMutex(const NoMutex&);
+    NoMutex& operator=(const NoMutex&);
 
     pthread_mutex_t m_mutex;
 };
@@ -88,15 +88,15 @@ private:
  * class makes sure that the mutex is unlocked when this class is destructed.
  * For example, this makes it easier to make code exception-safe.
  */
-class CMutexLocker
+class NoMutexLocker
 {
 public:
-    CMutexLocker(CMutex& mutex, bool initiallyLocked = true) : m_mutex(mutex), m_locked(false)
+    NoMutexLocker(NoMutex& mutex, bool initiallyLocked = true) : m_mutex(mutex), m_locked(false)
     {
         if (initiallyLocked) lock();
     }
 
-    ~CMutexLocker()
+    ~NoMutexLocker()
     {
         if (m_locked) unlock();
     }
@@ -117,10 +117,10 @@ public:
 
 private:
     // Undefined copy constructor and assignment operator
-    CMutexLocker(const CMutexLocker&);
-    CMutexLocker& operator=(const CMutexLocker&);
+    NoMutexLocker(const NoMutexLocker&);
+    NoMutexLocker& operator=(const NoMutexLocker&);
 
-    CMutex& m_mutex;
+    NoMutex& m_mutex;
     bool m_locked;
 };
 
@@ -128,32 +128,32 @@ private:
  * A condition variable makes it possible for threads to wait until some
  * condition is reached at which point the thread can wake up again.
  */
-class CConditionVariable
+class NoConditionVariable
 {
 public:
-    CConditionVariable() : m_cond()
+    NoConditionVariable() : m_cond()
     {
         int i = pthread_cond_init(&m_cond, nullptr);
         if (i) {
-            CUtils::PrintError("Can't initialize condition variable: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't initialize condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
 
-    ~CConditionVariable()
+    ~NoConditionVariable()
     {
         int i = pthread_cond_destroy(&m_cond);
         if (i) {
-            CUtils::PrintError("Can't destroy condition variable: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't destroy condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
 
-    void wait(CMutex& mutex)
+    void wait(NoMutex& mutex)
     {
         int i = pthread_cond_wait(&m_cond, &mutex.m_mutex);
         if (i) {
-            CUtils::PrintError("Can't wait on condition variable: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't wait on condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -162,7 +162,7 @@ public:
     {
         int i = pthread_cond_signal(&m_cond);
         if (i) {
-            CUtils::PrintError("Can't signal condition variable: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't signal condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -171,20 +171,20 @@ public:
     {
         int i = pthread_cond_broadcast(&m_cond);
         if (i) {
-            CUtils::PrintError("Can't broadcast condition variable: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't broadcast condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
 
 private:
     // Undefined copy constructor and assignment operator
-    CConditionVariable(const CConditionVariable&);
-    CConditionVariable& operator=(const CConditionVariable&);
+    NoConditionVariable(const NoConditionVariable&);
+    NoConditionVariable& operator=(const NoConditionVariable&);
 
     pthread_cond_t m_cond;
 };
 
-class CThread
+class NoThread
 {
 public:
     typedef void* threadRoutine(void*);
@@ -202,14 +202,14 @@ public:
         i |= pthread_sigmask(SIG_SETMASK, &old_sigmask, nullptr);
         i |= pthread_detach(thr);
         if (i) {
-            CUtils::PrintError("Can't start new thread: " + CString(strerror(errno)));
+            NoUtils::PrintError("Can't start new thread: " + NoString(strerror(errno)));
             exit(1);
         }
     }
 
 private:
     // Undefined constructor
-    CThread();
+    NoThread();
 };
 
 /**
@@ -220,22 +220,22 @@ private:
  * thread after runThread() finishes.
  *
  * After you create a new instance of your class, you can pass it to
- * CThreadPool()::Get().addJob(job) to start it. The thread pool automatically
+ * NoThreadPool()::Get().addJob(job) to start it. The thread pool automatically
  * deletes your class after it finished.
  *
- * For modules you should use CModuleJob instead.
+ * For modules you should use NoModuleJob instead.
  */
-class CJob
+class NoJob
 {
 public:
-    friend class CThreadPool;
+    friend class NoThreadPool;
 
     enum EJobState { READY, RUNNING, DONE, CANCELLED };
 
-    CJob() : m_eState(READY) {}
+    NoJob() : m_eState(READY) {}
 
     /// Destructor, always called from the main thread.
-    virtual ~CJob() {}
+    virtual ~NoJob() {}
 
     /// This function is called in a separate thread and can do heavy, blocking work.
     virtual void runThread() = 0;
@@ -251,69 +251,69 @@ public:
 
 private:
     // Undefined copy constructor and assignment operator
-    CJob(const CJob&);
-    CJob& operator=(const CJob&);
+    NoJob(const NoJob&);
+    NoJob& operator=(const NoJob&);
 
     // Synchronized via the thread pool's mutex! Do not access without that mutex!
     EJobState m_eState;
 };
 
-class CThreadPool
+class NoThreadPool
 {
 private:
-    friend class CJob;
+    friend class NoJob;
 
-    CThreadPool();
-    ~CThreadPool();
+    NoThreadPool();
+    ~NoThreadPool();
 
 public:
-    static CThreadPool& Get();
+    static NoThreadPool& Get();
 
     /// Add a job to the thread pool and run it. The job will be deleted when done.
-    void addJob(CJob* job);
+    void addJob(NoJob* job);
 
     /// Cancel a job that was previously passed to addJob(). This *might*
     /// mean that runThread() and/or runMain() will not be called on the job.
     /// This function BLOCKS until the job finishes!
-    void cancelJob(CJob* job);
+    void cancelJob(NoJob* job);
 
     /// Cancel some jobs that were previously passed to addJob(). This *might*
     /// mean that runThread() and/or runMain() will not be called on some of
     /// the jobs. This function BLOCKS until all jobs finish!
-    void cancelJobs(const std::set<CJob*>& jobs);
+    void cancelJobs(const std::set<NoJob*>& jobs);
 
     int getReadFD() const { return m_iJobPipe[0]; }
 
     void handlePipeReadable() const;
 
 private:
-    void jobDone(CJob* pJob);
+    void jobDone(NoJob* pJob);
 
     // Check if the calling thread is still needed, must be called with m_mutex held
     bool threadNeeded() const;
 
-    CJob* getJobFromPipe() const;
-    void finishJob(CJob*) const;
+    NoJob* getJobFromPipe() const;
+    void finishJob(NoJob*) const;
 
     void threadFunc();
     static void* threadPoolFunc(void* arg)
     {
-        CThreadPool& pool = *reinterpret_cast<CThreadPool*>(arg);
+        NoThreadPool& pool = *reinterpret_cast<NoThreadPool*>(arg);
         pool.threadFunc();
         return nullptr;
     }
 
     // mutex protecting all of these members
-    CMutex m_mutex;
+    NoMutex m_mutex;
 
     // condition variable for waiting idle threads
-    CConditionVariable m_cond;
+    NoConditionVariable m_cond;
 
     // condition variable for reporting finished cancellation
-    CConditionVariable m_cancellationCond;
+    NoConditionVariable m_cancellationCond;
 
     // condition variable for waiting running threads == 0
-    CConditionVariable m_exit_cond;
+    NoConditionVariable m_exit_cond;
 
     // when this is true, all threads should exit
     bool m_done;
@@ -328,7 +328,7 @@ private:
     int m_iJobPipe[2];
 
     // list of pending jobs
-    std::list<CJob*> m_jobs;
+    std::list<NoJob*> m_jobs;
 };
 
 #endif // HAVE_PTHREAD

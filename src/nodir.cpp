@@ -21,28 +21,28 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-CString CDir::ChangeDir(const CString& sPath, const CString& sAdd, const CString& sHome)
+NoString NoDir::ChangeDir(const NoString& sPath, const NoString& sAdd, const NoString& sHome)
 {
-    CString sHomeDir(sHome);
+    NoString sHomeDir(sHome);
 
     if (sHomeDir.empty()) {
-        sHomeDir = CFile::GetHomePath();
+        sHomeDir = NoFile::GetHomePath();
     }
 
     if (sAdd == "~") {
         return sHomeDir;
     }
 
-    CString sAddDir(sAdd);
+    NoString sAddDir(sAdd);
 
     if (sAddDir.Left(2) == "~/") {
         sAddDir.LeftChomp();
         sAddDir = sHomeDir + sAddDir;
     }
 
-    CString sRet = ((sAddDir.size()) && (sAddDir[0] == '/')) ? "" : sPath;
+    NoString sRet = ((sAddDir.size()) && (sAddDir[0] == '/')) ? "" : sPath;
     sAddDir += "/";
-    CString sCurDir;
+    NoString sCurDir;
 
     if (sRet.Right(1) == "/") {
         sRet.RightChomp();
@@ -68,20 +68,20 @@ CString CDir::ChangeDir(const CString& sPath, const CString& sAdd, const CString
     return (sRet.empty()) ? "/" : sRet;
 }
 
-CString CDir::CheckPathPrefix(const CString& sPath, const CString& sAdd, const CString& sHomeDir)
+NoString NoDir::CheckPathPrefix(const NoString& sPath, const NoString& sAdd, const NoString& sHomeDir)
 {
-    CString sPrefix = sPath.Replace_n("//", "/").TrimRight_n("/") + "/";
-    CString sAbsolutePath = ChangeDir(sPrefix, sAdd, sHomeDir);
+    NoString sPrefix = sPath.Replace_n("//", "/").TrimRight_n("/") + "/";
+    NoString sAbsolutePath = ChangeDir(sPrefix, sAdd, sHomeDir);
 
     if (sAbsolutePath.Left(sPrefix.length()) != sPrefix) return "";
     return sAbsolutePath;
 }
 
-bool CDir::MakeDir(const CString& sPath, mode_t iMode)
+bool NoDir::MakeDir(const NoString& sPath, mode_t iMode)
 {
-    CString sDir;
-    VCString dirs;
-    VCString::iterator it;
+    NoString sDir;
+    NoStringVector dirs;
+    NoStringVector::iterator it;
 
     // Just in case someone tries this...
     if (sPath.empty()) {
@@ -105,7 +105,7 @@ bool CDir::MakeDir(const CString& sPath, mode_t iMode)
             if (errno != EEXIST) return false;
 
             // If it's EEXIST we have to make sure it's a dir
-            if (!CFile::IsDir(sDir)) return false;
+            if (!NoFile::IsDir(sDir)) return false;
         }
 
         sDir += "/";

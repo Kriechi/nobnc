@@ -27,23 +27,23 @@
 #include <unistd.h>
 #include <vector>
 
-class CFile
+class NoFile
 {
 public:
-    CFile();
-    CFile(const CString& sLongName);
-    ~CFile();
+    NoFile();
+    NoFile(const NoString& sLongName);
+    ~NoFile();
 
     enum EFileTypes { FT_REGULAR, FT_DIRECTORY, FT_CHARACTER, FT_BLOCK, FT_FIFO, FT_LINK, FT_SOCK };
 
-    void SetFileName(const CString& sLongName);
-    static bool IsReg(const CString& sLongName, bool bUseLstat = false);
-    static bool IsDir(const CString& sLongName, bool bUseLstat = false);
-    static bool IsChr(const CString& sLongName, bool bUseLstat = false);
-    static bool IsBlk(const CString& sLongName, bool bUseLstat = false);
-    static bool IsFifo(const CString& sLongName, bool bUseLstat = false);
-    static bool IsLnk(const CString& sLongName, bool bUseLstat = true);
-    static bool IsSock(const CString& sLongName, bool bUseLstat = false);
+    void SetFileName(const NoString& sLongName);
+    static bool IsReg(const NoString& sLongName, bool bUseLstat = false);
+    static bool IsDir(const NoString& sLongName, bool bUseLstat = false);
+    static bool IsChr(const NoString& sLongName, bool bUseLstat = false);
+    static bool IsBlk(const NoString& sLongName, bool bUseLstat = false);
+    static bool IsFifo(const NoString& sLongName, bool bUseLstat = false);
+    static bool IsLnk(const NoString& sLongName, bool bUseLstat = true);
+    static bool IsSock(const NoString& sLongName, bool bUseLstat = false);
 
     bool IsReg(bool bUseLstat = false) const;
     bool IsDir(bool bUseLstat = false) const;
@@ -54,7 +54,7 @@ public:
     bool IsSock(bool bUseLstat = false) const;
 
     // for gettin file types, using fstat instead
-    static bool FType(const CString& sFileName, EFileTypes eType, bool bUseLstat = false);
+    static bool FType(const NoString& sFileName, EFileTypes eType, bool bUseLstat = false);
 
     enum EFileAttr { FA_Name, FA_Size, FA_ATime, FA_MTime, FA_CTime, FA_UID };
 
@@ -65,67 +65,67 @@ public:
     time_t GetCTime() const;
     uid_t GetUID() const;
     gid_t GetGID() const;
-    static bool Exists(const CString& sFile);
+    static bool Exists(const NoString& sFile);
 
-    static off_t GetSize(const CString& sFile);
-    static time_t GetATime(const CString& sFile);
-    static time_t GetMTime(const CString& sFile);
-    static time_t GetCTime(const CString& sFile);
-    static uid_t GetUID(const CString& sFile);
-    static gid_t GetGID(const CString& sFile);
-    static int GetInfo(const CString& sFile, struct stat& st);
+    static off_t GetSize(const NoString& sFile);
+    static time_t GetATime(const NoString& sFile);
+    static time_t GetMTime(const NoString& sFile);
+    static time_t GetCTime(const NoString& sFile);
+    static uid_t GetUID(const NoString& sFile);
+    static gid_t GetGID(const NoString& sFile);
+    static int GetInfo(const NoString& sFile, struct stat& st);
 
     bool Delete();
-    bool Move(const CString& sNewFileName, bool bOverwrite = false);
-    bool Copy(const CString& sNewFileName, bool bOverwrite = false);
+    bool Move(const NoString& sNewFileName, bool bOverwrite = false);
+    bool Copy(const NoString& sNewFileName, bool bOverwrite = false);
 
-    static bool Delete(const CString& sFileName);
-    static bool Move(const CString& sOldFileName, const CString& sNewFileName, bool bOverwrite = false);
-    static bool Copy(const CString& sOldFileName, const CString& sNewFileName, bool bOverwrite = false);
+    static bool Delete(const NoString& sFileName);
+    static bool Move(const NoString& sOldFileName, const NoString& sNewFileName, bool bOverwrite = false);
+    static bool Copy(const NoString& sOldFileName, const NoString& sNewFileName, bool bOverwrite = false);
     bool Chmod(mode_t mode);
-    static bool Chmod(const CString& sFile, mode_t mode);
+    static bool Chmod(const NoString& sFile, mode_t mode);
     bool Seek(off_t uPos);
     bool Truncate();
     bool Sync();
-    bool Open(const CString& sFileName, int iFlags = O_RDONLY, mode_t iMode = 0644);
+    bool Open(const NoString& sFileName, int iFlags = O_RDONLY, mode_t iMode = 0644);
     bool Open(int iFlags = O_RDONLY, mode_t iMode = 0644);
     ssize_t Read(char* pszBuffer, int iBytes);
-    bool ReadLine(CString& sData, const CString& sDelimiter = "\n");
-    bool ReadFile(CString& sData, size_t iMaxSize = 512 * 1024);
+    bool ReadLine(NoString& sData, const NoString& sDelimiter = "\n");
+    bool ReadFile(NoString& sData, size_t iMaxSize = 512 * 1024);
     ssize_t Write(const char* pszBuffer, size_t iBytes);
-    ssize_t Write(const CString& sData);
+    ssize_t Write(const NoString& sData);
     void Close();
     void ClearBuffer();
 
-    bool TryExLock(const CString& sLockFile, int iFlags = O_RDWR | O_CREAT);
+    bool TryExLock(const NoString& sLockFile, int iFlags = O_RDWR | O_CREAT);
     bool TryExLock();
     bool ExLock();
     bool UnLock();
 
     bool IsOpen() const;
-    CString GetLongName() const;
-    CString GetShortName() const;
-    CString GetDir() const;
+    NoString GetLongName() const;
+    NoString GetShortName() const;
+    NoString GetDir() const;
 
     bool HadError() const { return m_bHadError; }
     void ResetError() { m_bHadError = false; }
 
-    static void InitHomePath(const CString& sFallback);
-    static const CString& GetHomePath() { return m_sHomePath; }
+    static void InitHomePath(const NoString& sFallback);
+    static const NoString& GetHomePath() { return m_sHomePath; }
 
 private:
     // fcntl() locking wrapper
     bool Lock(short iType, bool bBlocking);
 
-    CString m_sBuffer;
+    NoString m_sBuffer;
     int m_iFD;
     bool m_bHadError;
 
-    static CString m_sHomePath;
+    static NoString m_sHomePath;
 
 protected:
-    CString m_sLongName; //!< Absolute filename (m_sPath + "/" + m_sShortName)
-    CString m_sShortName; //!< Filename alone, without path
+    NoString m_sLongName; //!< Absolute filename (m_sPath + "/" + m_sShortName)
+    NoString m_sShortName; //!< Filename alone, without path
 };
 
 #endif // !NOFILE_H

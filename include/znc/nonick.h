@@ -21,48 +21,48 @@
 #include <znc/nostring.h>
 #include <vector>
 
-class CNetwork;
-class CChannel;
+class NoNetwork;
+class NoChannel;
 
-class CNick
+class NoNick
 {
 public:
-    CNick();
-    CNick(const CString& sNick);
-    ~CNick();
+    NoNick();
+    NoNick(const NoString& sNick);
+    ~NoNick();
 
-    CNick(const CNick&) = default;
-    CNick& operator=(const CNick&) = default;
+    NoNick(const NoNick&) = default;
+    NoNick& operator=(const NoNick&) = default;
 
     void Reset();
-    void Parse(const CString& sNickMask);
-    CString GetHostMask() const;
-    size_t GetCommonChans(std::vector<CChannel*>& vChans, CNetwork* pNetwork) const;
-    bool NickEquals(const CString& nickname) const;
+    void Parse(const NoString& sNickMask);
+    NoString GetHostMask() const;
+    size_t GetCommonChans(std::vector<NoChannel*>& vChans, NoNetwork* pNetwork) const;
+    bool NickEquals(const NoString& nickname) const;
 
-    void SetNetwork(CNetwork* pNetwork);
-    void SetNick(const CString& s);
-    void SetIdent(const CString& s);
-    void SetHost(const CString& s);
+    void SetNetwork(NoNetwork* pNetwork);
+    void SetNick(const NoString& s);
+    void SetIdent(const NoString& s);
+    void SetHost(const NoString& s);
     bool AddPerm(unsigned char uPerm);
     bool RemPerm(unsigned char uPerm);
 
-    CString GetPermStr() const;
+    NoString GetPermStr() const;
     unsigned char GetPermChar() const;
     bool HasPerm(unsigned char uPerm) const;
-    const CString& GetNick() const;
-    const CString& GetIdent() const;
-    const CString& GetHost() const;
-    CString GetNickMask() const;
+    const NoString& GetNick() const;
+    const NoString& GetIdent() const;
+    const NoString& GetHost() const;
+    NoString GetNickMask() const;
 
-    void Clone(const CNick& SourceNick);
+    void Clone(const NoNick& SourceNick);
 
 private:
-    CString m_sChanPerms;
-    CNetwork* m_pNetwork;
-    CString m_sNick;
-    CString m_sIdent;
-    CString m_sHost;
+    NoString m_sChanPerms;
+    NoNetwork* m_pNetwork;
+    NoString m_sNick;
+    NoString m_sIdent;
+    NoString m_sHost;
 };
 
 #endif // !NONICK_H

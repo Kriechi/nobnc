@@ -22,12 +22,12 @@
 #include <signal.h>
 
 //! @author imaginos@imaginos.net
-class CExecSock : public CZNCSock
+class NoExecSock : public NoBaseSocket
 {
 public:
-    CExecSock() : CZNCSock(0), m_iPid(-1) {}
+    NoExecSock() : NoBaseSocket(0), m_iPid(-1) {}
 
-    int Execute(const CString& sExec)
+    int Execute(const NoString& sExec)
     {
         int iReadFD, iWriteFD;
         m_iPid = popen2(iReadFD, iWriteFD, sExec);
@@ -41,14 +41,14 @@ public:
         kill(m_iPid, iSignal);
         Close();
     }
-    virtual ~CExecSock()
+    virtual ~NoExecSock()
     {
         close2(m_iPid, GetRSock(), GetWSock());
         SetRSock(-1);
         SetWSock(-1);
     }
 
-    int popen2(int& iReadFD, int& iWriteFD, const CString& sCommand);
+    int popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand);
     void close2(int iPid, int iReadFD, int iWriteFD);
 
 private:

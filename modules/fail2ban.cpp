@@ -16,16 +16,16 @@
 
 #include <znc/noznc.h>
 
-class CFailToBanMod : public CModule
+class NoFailToBanMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(CFailToBanMod) {}
-    virtual ~CFailToBanMod() {}
+    MODCONSTRUCTOR(NoFailToBanMod) {}
+    virtual ~NoFailToBanMod() {}
 
-    bool OnLoad(const CString& sArgs, CString& sMessage) override
+    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        CString sTimeout = sArgs.Token(0);
-        CString sAttempts = sArgs.Token(1);
+        NoString sTimeout = sArgs.Token(0);
+        NoString sAttempts = sArgs.Token(1);
         unsigned int timeout = sTimeout.ToUInt();
 
         if (sAttempts.empty())
@@ -51,16 +51,16 @@ public:
 
     void OnPostRehash() override { m_Cache.Clear(); }
 
-    void Add(const CString& sHost, unsigned int count) { m_Cache.AddItem(sHost, count, m_Cache.GetTTL()); }
+    void Add(const NoString& sHost, unsigned int count) { m_Cache.AddItem(sHost, count, m_Cache.GetTTL()); }
 
-    void OnModCommand(const CString& sCommand) override
+    void OnModCommand(const NoString& sCommand) override
     {
         PutModule("This module can only be configured through its arguments.");
         PutModule("The module argument is the number of minutes an IP");
         PutModule("is blocked after a failed login.");
     }
 
-    void OnClientConnect(CZNCSock* pClient, const CString& sHost, unsigned short uPort) override
+    void OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, unsigned short uPort) override
     {
         unsigned int* pCount = m_Cache.GetItem(sHost);
         if (sHost.empty() || pCount == nullptr || *pCount < m_uiAllowedFailed) {
@@ -74,7 +74,7 @@ public:
         pClient->Close(Csock::CLT_AFTERWRITE);
     }
 
-    void OnFailedLogin(const CString& sUsername, const CString& sRemoteIP) override
+    void OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
     {
         unsigned int* pCount = m_Cache.GetItem(sRemoteIP);
         if (pCount)
@@ -83,10 +83,10 @@ public:
             Add(sRemoteIP, 1);
     }
 
-    EModRet OnLoginAttempt(std::shared_ptr<CAuthBase> Auth) override
+    EModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
     {
         // e.g. webadmin ends up here
-        const CString& sRemoteIP = Auth->GetRemoteIP();
+        const NoString& sRemoteIP = Auth->GetRemoteIP();
 
         if (sRemoteIP.empty()) return CONTINUE;
 
@@ -101,11 +101,11 @@ public:
     }
 
 private:
-    TCacheMap<CString, unsigned int> m_Cache;
+    TCacheMap<NoString, unsigned int> m_Cache;
     unsigned int m_uiAllowedFailed;
 };
 
-template <> void TModInfo<CFailToBanMod>(CModInfo& Info)
+template <> void TModInfo<NoFailToBanMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("fail2ban");
     Info.SetHasArgs(true);
@@ -113,4 +113,4 @@ template <> void TModInfo<CFailToBanMod>(CModInfo& Info)
                          "before any action is taken.");
 }
 
-GLOBALMODULEDEFS(CFailToBanMod, "Block IPs for some time after a failed login.")
+GLOBALMODULEDEFS(NoFailToBanMod, "Block IPs for some time after a failed login.")
