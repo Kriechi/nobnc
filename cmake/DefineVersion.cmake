@@ -1,10 +1,10 @@
-if(NOT DEFINED ZNC_VERSION_MAJOR OR NOT DEFINED ZNC_VERSION_MINOR OR NOT DEFINED ZNC_VERSION_PATCH OR NOT DEFINED ZNC_VERSION_STR)
-    message(FATAL_ERROR "ZNC_VERSION_(MAJOR|MINOR|PATCH|STR) must be defined in the beginning of the root CMakeLists.txt.")
+if(NOT DEFINED NO_VERSION_MAJOR OR NOT DEFINED NO_VERSION_MINOR OR NOT DEFINED NO_VERSION_PATCH OR NOT DEFINED NO_VERSION_STR)
+    message(FATAL_ERROR "NO_VERSION_(MAJOR|MINOR|PATCH|STR) must be defined in the beginning of the root CMakeLists.txt.")
 endif()
 
-if(NOT DEFINED ZNC_VERSION_EXTRA)
-    set(ZNC_VERSION_EXTRA $ENV{ZNC_VERSION_EXTRA})
-    if(NOT ZNC_VERSION_EXTRA)
+if(NOT DEFINED NO_VERSION_EXTRA)
+    set(NO_VERSION_EXTRA $ENV{NO_VERSION_EXTRA})
+    if(NOT NO_VERSION_EXTRA)
         if(GIT_EXECUTABLE)
             execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
                             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -12,29 +12,29 @@ if(NOT DEFINED ZNC_VERSION_EXTRA)
                             OUTPUT_VARIABLE GIT_SHA1
                             OUTPUT_STRIP_TRAILING_WHITESPACE)
             if(NOT GIT_RES)
-                set(ZNC_VERSION_EXTRA "git-${GIT_SHA1}")
+                set(NO_VERSION_EXTRA "git-${GIT_SHA1}")
             endif()
         endif()
     endif()
 endif()
 
-if(ZNC_VERSION_EXTRA)
-    set(ZNC_VERSION ${ZNC_VERSION_MAJOR}.${ZNC_VERSION_MINOR}-${ZNC_VERSION_EXTRA})
+if(NO_VERSION_EXTRA)
+    set(NO_VERSION ${NO_VERSION_MAJOR}.${NO_VERSION_MINOR}-${NO_VERSION_EXTRA})
 else()
-    set(ZNC_VERSION ${ZNC_VERSION_MAJOR}.${ZNC_VERSION_MINOR}.${ZNC_VERSION_PATCH})
+    set(NO_VERSION ${NO_VERSION_MAJOR}.${NO_VERSION_MINOR}.${NO_VERSION_PATCH})
 endif()
 
-if(ZNC_VERSION_INPUT AND ZNC_VERSION_OUTPUT)
-    configure_file(${ZNC_VERSION_INPUT} ${ZNC_VERSION_OUTPUT})
+if(NO_VERSION_INPUT AND NO_VERSION_OUTPUT)
+    configure_file(${NO_VERSION_INPUT} ${NO_VERSION_OUTPUT})
 else()
     add_custom_target(version ${CMAKE_COMMAND}
                   -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
                   -D PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
-                  -D ZNC_VERSION_MAJOR=${ZNC_VERSION_MAJOR}
-                  -D ZNC_VERSION_MINOR=${ZNC_VERSION_MINOR}
-                  -D ZNC_VERSION_PATCH=${ZNC_VERSION_PATCH}
-                  -D ZNC_VERSION_STR=${ZNC_VERSION_STR}
-                  -D ZNC_VERSION_INPUT=${PROJECT_SOURCE_DIR}/src/noversion.cpp.in
-                  -D ZNC_VERSION_OUTPUT=${PROJECT_BINARY_DIR}/src/noversion.cpp
+                  -D NO_VERSION_MAJOR=${NO_VERSION_MAJOR}
+                  -D NO_VERSION_MINOR=${NO_VERSION_MINOR}
+                  -D NO_VERSION_PATCH=${NO_VERSION_PATCH}
+                  -D NO_VERSION_STR=${NO_VERSION_STR}
+                  -D NO_VERSION_INPUT=${PROJECT_SOURCE_DIR}/src/noversion.cpp.in
+                  -D NO_VERSION_OUTPUT=${PROJECT_BINARY_DIR}/src/noversion.cpp
                   -P ${PROJECT_SOURCE_DIR}/cmake/DefineVersion.cmake)
 endif()

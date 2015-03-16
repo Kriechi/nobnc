@@ -59,7 +59,7 @@ class CModInfo;
     MODULE_EXPORT bool ZNCModInfo(double dCoreVersion, CModInfo& Info); \
     bool ZNCModInfo(double dCoreVersion, CModInfo& Info)                \
     {                                                                   \
-        if (dCoreVersion != VERSION) return false;                      \
+        if (dCoreVersion != NO_VERSION) return false;                      \
         Info.SetDescription(DESCRIPTION);                               \
         Info.SetDefaultType(TYPE);                                      \
         Info.AddType(TYPE);                                             \
@@ -785,7 +785,7 @@ public:
     virtual EModRet OnSendToIRC(CString& sLine);
 
     ModHandle GetDLL() { return m_pDLL; }
-    static double GetCoreVersion() { return VERSION; }
+    static double GetCoreVersion() { return NO_VERSION; }
 
     /** This function sends a given raw IRC line to the IRC server, if we
      *  are connected to one. Else this line is discarded.

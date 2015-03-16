@@ -184,19 +184,19 @@ inline int _GetSOMAXCONN() {
 }
 
 inline int GetVersionMajor() {
-	return VERSION_MAJOR;
+	return NO_VERSION_MAJOR;
 }
 
 inline int GetVersionMinor() {
-	return VERSION_MINOR;
+	return NO_VERSION_MINOR;
 }
 
 inline double GetVersion() {
-	return VERSION;
+	return NO_VERSION;
 }
 
 inline CString GetVersionExtra() {
-	return ZNC_VERSION_EXTRA;
+	return NO_VERSION_EXTRA;
 }
 #if HAVE_VISIBILITY
 #pragma GCC visibility pop

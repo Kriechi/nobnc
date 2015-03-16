@@ -89,7 +89,7 @@ CZNC::~CZNC()
     DeletePidFile();
 }
 
-CString CZNC::GetVersion() { return CString(VERSION_STR) + CString(ZNC_VERSION_EXTRA); }
+CString CZNC::GetVersion() { return CString(NO_VERSION_STR) + CString(NO_VERSION_EXTRA); }
 
 CString CZNC::GetTag(bool bIncludeVersion, bool bHTML)
 {
@@ -448,7 +448,7 @@ bool CZNC::WriteConfig()
     config.AddKeyValuePair("SSLCertFile", CString(m_sSSLCertFile));
     config.AddKeyValuePair("ProtectWebSessions", CString(m_bProtectWebSessions));
     config.AddKeyValuePair("HideVersion", CString(m_bHideVersion));
-    config.AddKeyValuePair("Version", CString(VERSION_STR));
+    config.AddKeyValuePair("Version", CString(NO_VERSION_STR));
 
     unsigned int l = 0;
     for (CListener* pListener : m_vpListeners) {
@@ -577,7 +577,7 @@ bool CZNC::WriteNewConfig(const CString& sConfigFile)
     VCString vsLines;
 
     vsLines.push_back(MakeConfigHeader());
-    vsLines.push_back("Version = " + CString(VERSION_STR));
+    vsLines.push_back("Version = " + CString(NO_VERSION_STR));
 
     m_sConfigFile = ExpandConfigPath(sConfigFile);
 
@@ -976,13 +976,13 @@ bool CZNC::DoRehash(CString& sError)
     config.FindStringEntry("version", sSavedVersion);
     tuple<unsigned int, unsigned int> tSavedVersion =
     make_tuple(sSavedVersion.Token(0, false, ".").ToUInt(), sSavedVersion.Token(1, false, ".").ToUInt());
-    tuple<unsigned int, unsigned int> tCurrentVersion = make_tuple(VERSION_MAJOR, VERSION_MINOR);
+    tuple<unsigned int, unsigned int> tCurrentVersion = make_tuple(NO_VERSION_MAJOR, NO_VERSION_MINOR);
     if (tSavedVersion < tCurrentVersion) {
         if (sSavedVersion.empty()) {
             sSavedVersion = "< 0.203";
         }
         CUtils::PrintMessage("Found old config from ZNC " + sSavedVersion + ". Saving a backup of it.");
-        BackupConfigOnce("pre-" + CString(VERSION_STR));
+        BackupConfigOnce("pre-" + CString(NO_VERSION_STR));
     } else if (tSavedVersion > tCurrentVersion) {
         CUtils::PrintError("Config was saved from ZNC " + sSavedVersion + ". It may or may not work with current ZNC " + GetVersion());
     }

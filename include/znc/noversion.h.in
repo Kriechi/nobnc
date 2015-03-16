@@ -2,15 +2,15 @@
 #define NOVERSION_H
 
 // The following defines are for #if comparison (preprocessor only likes ints)
-#define VERSION_MAJOR @ZNC_VERSION_MAJOR@
-#define VERSION_MINOR @ZNC_VERSION_MINOR@
-#define VERSION_PATCH @ZNC_VERSION_PATCH@
+#define NO_VERSION_MAJOR @NO_VERSION_MAJOR@
+#define NO_VERSION_MINOR @NO_VERSION_MINOR@
+#define NO_VERSION_PATCH @NO_VERSION_PATCH@
 // This one is for display purpose
-#define VERSION_STR "@ZNC_VERSION_STR@"
-// This one is for ZNCModInfo
-#define VERSION (VERSION_MAJOR + VERSION_MINOR / 10.0)
+#define NO_VERSION_STR "@NO_VERSION_STR@"
+// This one is for NoModInfo
+#define NO_VERSION (NO_VERSION_MAJOR + NO_VERSION_MINOR / 10.0)
 
-// You can add -DVERSION_EXTRA="stuff" to your CXXFLAGS!
-extern const char* ZNC_VERSION_EXTRA;
+// You can add -DNO_VERSION_EXTRA="stuff" to your CXXFLAGS!
+extern const char* NO_VERSION_EXTRA;
 
 #endif // !NOVERSION_H

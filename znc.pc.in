@@ -13,7 +13,7 @@ cxx=@CMAKE_CXX_COMPILER@
 cxxflags=@ZNC_CXXFLAGS@
 ldflags=@ZNC_LDFLAGS@
 
-version=@ZNC_VERSION@
+version=@NO_VERSION@
 
 Name: ZNC
 Description: An advanced IRC proxy
