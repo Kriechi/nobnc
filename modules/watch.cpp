@@ -191,7 +191,7 @@ public:
 
         size_t uSize = m_Buffer.size();
         for (unsigned int uIdx = 0; uIdx < uSize; uIdx++) {
-            PutUser(m_Buffer.getLine(uIdx, *GetClient(), msParams));
+            PutUser(m_Buffer.getMessage(uIdx, *GetClient(), msParams));
         }
         m_Buffer.clear();
     }
@@ -366,7 +366,7 @@ private:
                 if (pNetwork->IsUserAttached()) {
                     pNetwork->PutUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " + pNetwork->GetCurNick() + " :" + sMessage);
                 } else {
-                    m_Buffer.addLine(":" + _NAMEDFMT(WatchEntry.GetTarget()) + "!watch@znc.in PRIVMSG {target} :{text}", sMessage);
+                    m_Buffer.addMessage(":" + _NAMEDFMT(WatchEntry.GetTarget()) + "!watch@znc.in PRIVMSG {target} :{text}", sMessage);
                 }
                 sHandledTargets.insert(WatchEntry.GetTarget());
             }

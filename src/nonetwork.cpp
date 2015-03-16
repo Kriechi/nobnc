@@ -562,7 +562,7 @@ void NoNetwork::ClientConnected(NoClient* pClient)
 
         uSize = m_RawBuffer.size();
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            pClient->PutClient(m_RawBuffer.getLine(uIdx, *pClient, msParams));
+            pClient->PutClient(m_RawBuffer.getMessage(uIdx, *pClient, msParams));
         }
 
         const NoNick& Nick = GetIRNoNick();
@@ -579,7 +579,7 @@ void NoNetwork::ClientConnected(NoClient* pClient)
     uSize = m_MotdBuffer.size();
     if (uSize > 0) {
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            pClient->PutClient(m_MotdBuffer.getLine(uIdx, *pClient, msParams));
+            pClient->PutClient(m_MotdBuffer.getMessage(uIdx, *pClient, msParams));
         }
     }
 

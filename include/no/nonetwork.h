@@ -151,28 +151,28 @@ public:
 
     bool PutIRC(const NoString& sLine);
 
-    void AddRawBuffer(const NoString& sFormat, const NoString& sText = "") { m_RawBuffer.addLine(sFormat, sText); }
+    void AddRawBuffer(const NoString& sFormat, const NoString& sText = "") { m_RawBuffer.addMessage(sFormat, sText); }
     void UpdateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
     {
-        m_RawBuffer.updateLine(sMatch, sFormat, sText);
+        m_RawBuffer.updateMessage(sMatch, sFormat, sText);
     }
     void UpdateExactRawBuffer(const NoString& sFormat, const NoString& sText = "")
     {
-        m_RawBuffer.updateExactLine(sFormat, sText);
+        m_RawBuffer.updateExactMessage(sFormat, sText);
     }
     void ClearRawBuffer() { m_RawBuffer.clear(); }
 
-    void AddMotdBuffer(const NoString& sFormat, const NoString& sText = "") { m_MotdBuffer.addLine(sFormat, sText); }
+    void AddMotdBuffer(const NoString& sFormat, const NoString& sText = "") { m_MotdBuffer.addMessage(sFormat, sText); }
     void UpdateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
     {
-        m_MotdBuffer.updateLine(sMatch, sFormat, sText);
+        m_MotdBuffer.updateMessage(sMatch, sFormat, sText);
     }
     void ClearMotdBuffer() { m_MotdBuffer.clear(); }
 
-    void AddNoticeBuffer(const NoString& sFormat, const NoString& sText = "") { m_NoticeBuffer.addLine(sFormat, sText); }
+    void AddNoticeBuffer(const NoString& sFormat, const NoString& sText = "") { m_NoticeBuffer.addMessage(sFormat, sText); }
     void UpdateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
     {
-        m_NoticeBuffer.updateLine(sMatch, sFormat, sText);
+        m_NoticeBuffer.updateMessage(sMatch, sFormat, sText);
     }
     void ClearNoticeBuffer() { m_NoticeBuffer.clear(); }
 

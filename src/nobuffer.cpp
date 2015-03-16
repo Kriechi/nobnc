@@ -27,7 +27,7 @@ NoBuffer::~NoBuffer()
 {
 }
 
-unsigned int NoBuffer::addLine(const NoString& format, const NoString& text, const timeval* ts)
+unsigned int NoBuffer::addMessage(const NoString& format, const NoString& text, const timeval* ts)
 {
     if (!m_limit) {
         return 0;
@@ -41,7 +41,7 @@ unsigned int NoBuffer::addLine(const NoString& format, const NoString& text, con
     return m_lines.size();
 }
 
-unsigned int NoBuffer::updateLine(const NoString& match, const NoString& format, const NoString& text)
+unsigned int NoBuffer::updateMessage(const NoString& match, const NoString& format, const NoString& text)
 {
     for (NoMessage& line : m_lines) {
         if (line.GetFormat().compare(0, match.length(), match) == 0) {
@@ -52,10 +52,10 @@ unsigned int NoBuffer::updateLine(const NoString& match, const NoString& format,
         }
     }
 
-    return addLine(format, text);
+    return addMessage(format, text);
 }
 
-unsigned int NoBuffer::updateExactLine(const NoString& format, const NoString& text)
+unsigned int NoBuffer::updateExactMessage(const NoString& format, const NoString& text)
 {
     for (const NoMessage& line : m_lines) {
         if (line.GetFormat() == format && line.GetText() == text) {
@@ -63,7 +63,7 @@ unsigned int NoBuffer::updateExactLine(const NoString& format, const NoString& t
         }
     }
 
-    return addLine(format, text);
+    return addMessage(format, text);
 }
 
 const NoMessage& NoBuffer::getMessage(unsigned int idx) const
@@ -71,9 +71,29 @@ const NoMessage& NoBuffer::getMessage(unsigned int idx) const
     return m_lines[idx];
 }
 
-NoString NoBuffer::getLine(unsigned int idx, const NoClient& client, const NoStringMap& params) const
+NoString NoBuffer::getMessage(unsigned int idx, const NoClient& client, const NoStringMap& params) const
 {
     return m_lines[idx].GetLine(client, params);
+}
+
+unsigned int NoBuffer::size() const
+{
+    return m_lines.size();
+}
+
+bool NoBuffer::isEmpty() const
+{
+    return m_lines.empty();
+}
+
+void NoBuffer::clear()
+{
+    m_lines.clear();
+}
+
+unsigned int NoBuffer::getLimit() const
+{
+    return m_limit;
 }
 
 bool NoBuffer::setLimit(unsigned int limit, bool force)

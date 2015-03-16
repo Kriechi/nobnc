@@ -31,19 +31,18 @@ public:
     NoBuffer(unsigned int limit = 100);
     ~NoBuffer();
 
-    unsigned int addLine(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
-    /// Same as addLine, but replaces a line whose format string starts with match if there is one.
-    unsigned int updateLine(const NoString& match, const NoString& format, const NoString& text = "");
-    /// Same as updateLine, but does nothing if this exact line already exists.
-    /// We need this because "/version" sends us the 005 raws again
-    unsigned int updateExactLine(const NoString& format, const NoString& text = "");
-    const NoMessage& getMessage(unsigned int idx) const;
-    NoString getLine(unsigned int idx, const NoClient& client, const NoStringMap& params = NoStringMap::EmptyMap) const;
-    unsigned int size() const { return m_lines.size(); }
-    bool isEmpty() const { return m_lines.empty(); }
-    void clear() { m_lines.clear(); }
+    unsigned int addMessage(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
+    unsigned int updateMessage(const NoString& match, const NoString& format, const NoString& text = "");
+    unsigned int updateExactMessage(const NoString& format, const NoString& text = "");
 
-    unsigned int getLimit() const { return m_limit; }
+    const NoMessage& getMessage(unsigned int idx) const;
+    NoString getMessage(unsigned int idx, const NoClient& client, const NoStringMap& params = NoStringMap::EmptyMap) const;
+
+    unsigned int size() const;
+    bool isEmpty() const;
+    void clear();
+
+    unsigned int getLimit() const;
     bool setLimit(unsigned int limit, bool force = false);
 
 private:

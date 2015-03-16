@@ -94,7 +94,7 @@ public:
     }
     size_t addBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr)
     {
-        return m_buffer.addLine(sFormat, sText, ts);
+        return m_buffer.addMessage(sFormat, sText, ts);
     }
     void clearBuffer() { m_buffer.clear(); }
     void sendBuffer(NoClient* pClient);
