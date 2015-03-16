@@ -17,13 +17,13 @@
 #include <gtest/gtest.h>
 #include <znc/nonetwork.h>
 #include <znc/nouser.h>
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 
 class NetworkTest : public ::testing::Test
 {
 protected:
-    void SetUp() { CZNC::CreateInstance(); }
-    void TearDown() { CZNC::DestroyInstance(); }
+    void SetUp() { NoApp::CreateInstance(); }
+    void TearDown() { NoApp::DestroyInstance(); }
 };
 
 TEST_F(NetworkTest, FindChan)

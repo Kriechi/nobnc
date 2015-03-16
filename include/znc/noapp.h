@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef NOZNC_H
-#define NOZNC_H
+#ifndef NOAPP_H
+#define NOAPP_H
 
 #include <znc/noconfig.h>
 #include <znc/noclient.h>
@@ -32,14 +32,14 @@ class NoConnectQueueTimer;
 class NoSettings;
 class NoFile;
 
-class CZNC
+class NoApp
 {
 public:
-    CZNC();
-    ~CZNC();
+    NoApp();
+    ~NoApp();
 
-    CZNC(const CZNC&) = delete;
-    CZNC& operator=(const CZNC&) = delete;
+    NoApp(const NoApp&) = delete;
+    NoApp& operator=(const NoApp&) = delete;
 
     enum ConfigState { ECONFIG_NOTHING, ECONFIG_NEED_REHASH, ECONFIG_NEED_WRITE, ECONFIG_NEED_VERBOSE_WRITE };
 
@@ -128,7 +128,7 @@ public:
     }
 
     static void CreateInstance();
-    static CZNC& Get();
+    static NoApp& Get();
     static void DestroyInstance();
     NoUser* FindUser(const NoString& sUsername);
     NoModule* FindModule(const NoString& sModName, const NoString& sUsername);
@@ -239,4 +239,4 @@ private:
     bool m_bHideVersion;
 };
 
-#endif // !NOZNC_H
+#endif // !NOAPP_H

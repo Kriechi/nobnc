@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 
 using std::map;
 
@@ -90,7 +90,7 @@ public:
 
     EModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
     {
-        NoUser* pUser = CZNC::Get().FindUser(Auth->GetUsername());
+        NoUser* pUser = NoApp::Get().FindUser(Auth->GetUsername());
 
         if (!pUser) { // @todo Will want to do some sort of && !m_bAllowCreate in the future
             Auth->RefuseLogin("Invalid User - Halting IMAP Lookup");
@@ -145,7 +145,7 @@ void NoImapSock::ReadLine(const NoString& sLine)
 
         Write("AUTH LOGIN " + sUsername + " " + m_spAuth->GetPassword() + "\r\n");
     } else if (sLine.Left(5) == "AUTH ") {
-        NoUser* pUser = CZNC::Get().FindUser(m_spAuth->GetUsername());
+        NoUser* pUser = NoApp::Get().FindUser(m_spAuth->GetUsername());
 
         if (pUser && sLine.StartsWith("AUTH OK")) {
             m_spAuth->AcceptLogin(*pUser);

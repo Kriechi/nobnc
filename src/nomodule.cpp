@@ -20,7 +20,7 @@
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nowebmodules.h"
-#include "noznc.h"
+#include "noapp.h"
 #include <dlfcn.h>
 
 using std::map;
@@ -32,7 +32,7 @@ NoModule::NoModule(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoS
 #ifdef HAVE_PTHREAD
       m_sJobs(),
 #endif
-      m_pDLL(pDLL), m_pManager(&(CZNC::Get().GetManager())), m_pUser(pUser), m_pNetwork(pNetwork), m_pClient(nullptr),
+      m_pDLL(pDLL), m_pManager(&(NoApp::Get().GetManager())), m_pUser(pUser), m_pNetwork(pNetwork), m_pClient(nullptr),
       m_sModName(sModName), m_sDataDir(sDataDir), m_sSavePath(""), m_sArgs(""), m_sModPath(""), m_mssRegistry(),
       m_vSubPages(), m_mCommands()
 {
@@ -41,7 +41,7 @@ NoModule::NoModule(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoS
     } else if (m_pUser) {
         m_sSavePath = m_pUser->GetUserPath() + "/moddata/" + m_sModName;
     } else {
-        m_sSavePath = CZNC::Get().GetZNCPath() + "/moddata/" + m_sModName;
+        m_sSavePath = NoApp::Get().GetZNCPath() + "/moddata/" + m_sModName;
     }
     LoadRegistry();
 }

@@ -116,7 +116,7 @@ public:
         m_sPemFile = sArgs;
 
         if (m_sPemFile.empty()) {
-            m_sPemFile = CZNC::Get().GetPemLocation();
+            m_sPemFile = NoApp::Get().GetPemLocation();
         }
 
         if (!NoFile::Exists(m_sPemFile)) {

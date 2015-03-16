@@ -152,7 +152,7 @@ class NoAdminMod : public NoModule
     NoUser* FindUser(const NoString& sUsername)
     {
         if (sUsername.Equals("$me") || sUsername.Equals("$user")) return GetUser();
-        NoUser* pUser = CZNC::Get().FindUser(sUsername);
+        NoUser* pUser = NoApp::Get().FindUser(sUsername);
         if (!pUser) {
             PutModule("Error: User [" + sUsername + "] not found.");
             return nullptr;
@@ -291,7 +291,7 @@ class NoAdminMod : public NoModule
                     return;
                 }
 
-                const NoStringVector& vsHosts = CZNC::Get().GetBindHosts();
+                const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
                 if (!GetUser()->IsAdmin() && !vsHosts.empty()) {
                     NoStringVector::const_iterator it;
                     bool bFound = false;
@@ -347,7 +347,7 @@ class NoAdminMod : public NoModule
             if (pUser->SetBufferCount(i, GetUser()->IsAdmin())) {
                 PutModule("BufferCount = " + sValue);
             } else {
-                PutModule("Setting failed, limit is " + NoString(CZNC::Get().GetMaxBufferSize()));
+                PutModule("Setting failed, limit is " + NoString(NoApp::Get().GetMaxBufferSize()));
             }
         } else if (sVar == "keepbuffer") { // XXX compatibility crap, added in 0.207
             bool b = !sValue.ToBool();
@@ -536,7 +536,7 @@ class NoAdminMod : public NoModule
                     return;
                 }
 
-                const NoStringVector& vsHosts = CZNC::Get().GetBindHosts();
+                const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
                 if (!GetUser()->IsAdmin() && !vsHosts.empty()) {
                     NoStringVector::const_iterator it;
                     bool bFound = false;
@@ -744,7 +744,7 @@ class NoAdminMod : public NoModule
                 if (pChan->SetBufferCount(i, GetUser()->IsAdmin())) {
                     PutModule(pChan->GetName() + ": Buffer = " + sValue);
                 } else {
-                    PutModule("Setting failed, limit is " + NoString(CZNC::Get().GetMaxBufferSize()));
+                    PutModule("Setting failed, limit is " + NoString(NoApp::Get().GetMaxBufferSize()));
                     return;
                 }
             } else if (sVar == "inconfig") {
@@ -782,7 +782,7 @@ class NoAdminMod : public NoModule
     {
         if (!GetUser()->IsAdmin()) return;
 
-        const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
+        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
         Table.AddColumn("Username");
         Table.AddColumn("Realname");
@@ -822,7 +822,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (CZNC::Get().FindUser(sUsername)) {
+        if (NoApp::Get().FindUser(sUsername)) {
             PutModule("Error: User [" + sUsername + "] already exists!");
             return;
         }
@@ -832,7 +832,7 @@ class NoAdminMod : public NoModule
         pNewUser->SetPass(NoUser::SaltedHash(sPassword, sSalt), NoUser::HASH_DEFAULT, sSalt);
 
         NoString sErr;
-        if (!CZNC::Get().AddUser(pNewUser, sErr)) {
+        if (!NoApp::Get().AddUser(pNewUser, sErr)) {
             delete pNewUser;
             PutModule("Error: User not added! [" + sErr + "]");
             return;
@@ -855,7 +855,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* pUser = CZNC::Get().FindUser(sUsername);
+        NoUser* pUser = NoApp::Get().FindUser(sUsername);
 
         if (!pUser) {
             PutModule("Error: User [" + sUsername + "] does not exist!");
@@ -867,7 +867,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (!CZNC::Get().DeleteUser(pUser->GetUserName())) {
+        if (!NoApp::Get().DeleteUser(pUser->GetUserName())) {
             // This can't happen, because we got the user from FindUser()
             PutModule("Error: Internal error!");
             return;
@@ -891,7 +891,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* pOldUser = CZNC::Get().FindUser(sOldUsername);
+        NoUser* pOldUser = NoApp::Get().FindUser(sOldUsername);
 
         if (!pOldUser) {
             PutModule("Error: User [" + sOldUsername + "] not found!");
@@ -906,7 +906,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (!CZNC::Get().AddUser(pNewUser, sError)) {
+        if (!NoApp::Get().AddUser(pNewUser, sError)) {
             delete pNewUser;
             PutModule("Error: User not added! [" + sError + "]");
             return;

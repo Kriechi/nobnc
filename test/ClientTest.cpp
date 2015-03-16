@@ -16,13 +16,13 @@
 
 #include <gtest/gtest.h>
 #include <znc/noclient.h>
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 
 class ClientTest : public ::testing::Test
 {
 protected:
-    void SetUp() { CZNC::CreateInstance(); }
-    void TearDown() { CZNC::DestroyInstance(); }
+    void SetUp() { NoApp::CreateInstance(); }
+    void TearDown() { NoApp::DestroyInstance(); }
     void testPass(const NoString& sInput, const NoString& sUser, const NoString& sIdentifier, const NoString& sNetwork, const NoString& sPass) const
     {
         NoClient client;

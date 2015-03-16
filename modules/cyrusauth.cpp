@@ -23,7 +23,7 @@
 
 #define REQUIRECYRUS
 
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 #include <znc/nouser.h>
 
 #include <sasl/sasl.h>
@@ -93,7 +93,7 @@ public:
     {
         const NoString& sUsername = Auth->GetUsername();
         const NoString& sPassword = Auth->GetPassword();
-        NoUser* pUser(CZNC::Get().FindUser(sUsername));
+        NoUser* pUser(NoApp::Get().FindUser(sUsername));
         sasl_conn_t* sasl_conn(nullptr);
         bool bSuccess = false;
 
@@ -122,7 +122,7 @@ public:
                 pUser = new NoUser(sUsername);
 
                 if (ShouldCloneUser()) {
-                    NoUser* pBaseUser = CZNC::Get().FindUser(CloneUser());
+                    NoUser* pBaseUser = NoApp::Get().FindUser(CloneUser());
 
                     if (!pBaseUser) {
                         DEBUG("saslauth: Clone User [" << CloneUser() << "] User not found");
@@ -142,7 +142,7 @@ public:
                     pUser->SetPass("::", NoUser::HASH_MD5, "::");
                 }
 
-                if (pUser && !CZNC::Get().AddUser(pUser, sErr)) {
+                if (pUser && !NoApp::Get().AddUser(pUser, sErr)) {
                     DEBUG("saslauth: Add user [" << sUsername << "] failed: " << sErr);
                     delete pUser;
                     pUser = nullptr;

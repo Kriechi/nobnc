@@ -15,7 +15,8 @@ include(DefineVersion)
 
 ### SOURCES
 
-list(APPEND NO_SOURCES src/nobuffer.cpp
+list(APPEND NO_SOURCES src/noapp.cpp
+                       src/nobuffer.cpp
                        src/nochannel.cpp
                        src/noclient.cpp
                        src/noclientcommand.cpp
@@ -44,7 +45,6 @@ list(APPEND NO_SOURCES src/nobuffer.cpp
                        src/nouser.cpp
                        src/noutils.cpp
                        src/nowebmodules.cpp
-                       src/noznc.cpp
                        ${PROJECT_BINARY_DIR}/src/Csocket.cpp
                        ${PROJECT_BINARY_DIR}/src/noversion.cpp
 )

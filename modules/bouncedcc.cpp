@@ -483,7 +483,7 @@ Csock* NoDccBounce::GetSockObj(const NoString& sHost, unsigned short uPort)
     pRemoteSock->SetRemote(true);
     pSock->SetRemote(false);
 
-    CZNC::Get().GetManager().Connect(m_sConnectIP,
+    NoApp::Get().GetManager().Connect(m_sConnectIP,
                                      m_uRemotePort,
                                      "DCC::" + NoString((m_bIsChat) ? "Chat" : "XFER") + "::Remote::" + m_sRemoteNick,
                                      60,
@@ -519,7 +519,7 @@ unsigned short NoDccBounce::DCCRequest(const NoString& sNick,
                                       const NoString& sRemoteIP)
 {
     NoDccBounce* pDCCBounce = new NoDccBounce(pMod, uLongIP, uPort, sFileName, sNick, sRemoteIP, bIsChat);
-    unsigned short uListenPort = CZNC::Get().GetManager().ListenRand(
+    unsigned short uListenPort = NoApp::Get().GetManager().ListenRand(
     "DCC::" + NoString((bIsChat) ? "Chat" : "Xfer") + "::Local::" + sNick, pMod->GetLocalDCCIP(), false, SOMAXCONN, pDCCBounce, 120);
 
     return uListenPort;

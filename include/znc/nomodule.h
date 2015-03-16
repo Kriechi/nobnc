@@ -105,7 +105,7 @@ class NoModInfo;
  */
 #define MODULEDEFS(CLASS, DESCRIPTION) NETWORKMODULEDEFS(CLASS, DESCRIPTION)
 
-class CZNC;
+class NoApp;
 class NoUser;
 class NoNick;
 class NoChannel;

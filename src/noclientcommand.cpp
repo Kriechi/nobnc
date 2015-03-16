@@ -141,8 +141,8 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
         PutStatus("Detached [" + NoString(uDetached) + "] channels");
     } else if (sCommand.Equals("VERSION")) {
-        PutStatus(CZNC::GetTag());
-        PutStatus(CZNC::GetCompileOptionsString());
+        PutStatus(NoApp::GetTag());
+        PutStatus(NoApp::GetCompileOptionsString());
     } else if (sCommand.Equals("MOTD") || sCommand.Equals("ShowMOTD")) {
         if (!SendMotd()) {
             PutStatus("There is no MOTD set.");
@@ -150,14 +150,14 @@ void NoClient::UserCommand(NoString& sLine)
     } else if (m_pUser->IsAdmin() && sCommand.Equals("Rehash")) {
         NoString sRet;
 
-        if (CZNC::Get().RehashConfig(sRet)) {
+        if (NoApp::Get().RehashConfig(sRet)) {
             PutStatus("Rehashing succeeded!");
         } else {
             PutStatus("Rehashing failed: " + sRet);
         }
     } else if (m_pUser->IsAdmin() && sCommand.Equals("SaveConfig")) {
-        if (CZNC::Get().WriteConfig()) {
-            PutStatus("Wrote config to [" + CZNC::Get().GetConfigFile() + "]");
+        if (NoApp::Get().WriteConfig()) {
+            PutStatus("Wrote config to [" + NoApp::Get().GetConfigFile() + "]");
         } else {
             PutStatus("Error while trying to write config.");
         }
@@ -171,7 +171,7 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            pUser = CZNC::Get().FindUser(sNick);
+            pUser = NoApp::Get().FindUser(sNick);
 
             if (!pUser) {
                 PutStatus("No such user [" + sNick + "]");
@@ -202,7 +202,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (m_pUser->IsAdmin() && sCommand.Equals("LISTUSERS")) {
-        const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
+        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
         Table.AddColumn("Username");
         Table.AddColumn("Networks");
@@ -217,7 +217,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (m_pUser->IsAdmin() && sCommand.Equals("LISTALLUSERNETWORKS")) {
-        const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
+        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
         Table.AddColumn("Username");
         Table.AddColumn("Network");
@@ -262,7 +262,7 @@ void NoClient::UserCommand(NoString& sLine)
         if (sMessage.empty()) {
             PutStatus("Usage: SetMOTD <message>");
         } else {
-            CZNC::Get().SetMotd(sMessage);
+            NoApp::Get().SetMotd(sMessage);
             PutStatus("MOTD set to [" + sMessage + "]");
         }
     } else if (m_pUser->IsAdmin() && sCommand.Equals("AddMOTD")) {
@@ -271,14 +271,14 @@ void NoClient::UserCommand(NoString& sLine)
         if (sMessage.empty()) {
             PutStatus("Usage: AddMOTD <message>");
         } else {
-            CZNC::Get().AddMotd(sMessage);
+            NoApp::Get().AddMotd(sMessage);
             PutStatus("Added [" + sMessage + "] to MOTD");
         }
     } else if (m_pUser->IsAdmin() && sCommand.Equals("ClearMOTD")) {
-        CZNC::Get().ClearMotd();
+        NoApp::Get().ClearMotd();
         PutStatus("Cleared MOTD");
     } else if (m_pUser->IsAdmin() && sCommand.Equals("BROADCAST")) {
-        CZNC::Get().Broadcast(sLine.Token(1, true));
+        NoApp::Get().Broadcast(sLine.Token(1, true));
     } else if (m_pUser->IsAdmin() && (sCommand.Equals("SHUTDOWN") || sCommand.Equals("RESTART"))) {
         bool bRestart = sCommand.Equals("RESTART");
         NoString sMessage = sLine.Token(1, true);
@@ -293,11 +293,11 @@ void NoClient::UserCommand(NoString& sLine)
             sMessage = (bRestart ? "ZNC is being restarted NOW!" : "ZNC is being shut down NOW!");
         }
 
-        if (!CZNC::Get().WriteConfig() && !bForce) {
+        if (!NoApp::Get().WriteConfig() && !bForce) {
             PutStatus("ERROR: Writing config file to disk failed! Aborting. Use " + sCommand.AsUpper() +
                       " FORCE to ignore.");
         } else {
-            CZNC::Get().Broadcast(sMessage);
+            NoApp::Get().Broadcast(sMessage);
             throw NoException(bRestart ? NoException::EX_Restart : NoException::EX_Shutdown);
         }
     } else if (sCommand.Equals("JUMP") || sCommand.Equals("CONNECT")) {
@@ -505,7 +505,7 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            NoUser* pUser = CZNC::Get().FindUser(sNick);
+            NoUser* pUser = NoApp::Get().FindUser(sNick);
 
             if (!pUser) {
                 PutStatus("No such user [" + sNick + "]");
@@ -596,7 +596,7 @@ void NoClient::UserCommand(NoString& sLine)
         NoUser* pUser = m_pUser;
 
         if (m_pUser->IsAdmin() && !sLine.Token(1).empty()) {
-            pUser = CZNC::Get().FindUser(sLine.Token(1));
+            pUser = NoApp::Get().FindUser(sLine.Token(1));
 
             if (!pUser) {
                 PutStatus("User not found " + sLine.Token(1));
@@ -648,7 +648,7 @@ void NoClient::UserCommand(NoString& sLine)
             sNewNetwork = sOldNetwork;
         }
 
-        NoUser* pOldUser = CZNC::Get().FindUser(sOldUser);
+        NoUser* pOldUser = NoApp::Get().FindUser(sOldUser);
         if (!pOldUser) {
             PutStatus("Old user [" + sOldUser + "] not found.");
             return;
@@ -660,7 +660,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoUser* pNewUser = CZNC::Get().FindUser(sNewUser);
+        NoUser* pNewUser = NoApp::Get().FindUser(sNewUser);
         if (!pNewUser) {
             PutStatus("New user [" + sOldUser + "] not found.");
             return;
@@ -862,7 +862,7 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(Table);
     } else if (sCommand.Equals("LISTMODS") || sCommand.Equals("LISTMODULES")) {
         if (m_pUser->IsAdmin()) {
-            NoModules& GModules = CZNC::Get().GetModules();
+            NoModules& GModules = NoApp::Get().GetModules();
 
             if (!GModules.size()) {
                 PutStatus("No global modules loaded.");
@@ -930,7 +930,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         if (m_pUser->IsAdmin()) {
             set<NoModInfo> ssGlobalMods;
-            CZNC::Get().GetModules().GetAvailableMods(ssGlobalMods, NoModInfo::GlobalModule);
+            NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, NoModInfo::GlobalModule);
 
             if (ssGlobalMods.empty()) {
                 PutStatus("No global modules available.");
@@ -942,7 +942,7 @@ void NoClient::UserCommand(NoString& sLine)
 
                 for (const NoModInfo& Info : ssGlobalMods) {
                     GTable.AddRow();
-                    GTable.SetCell("Name", (CZNC::Get().GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
+                    GTable.SetCell("Name", (NoApp::Get().GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
                     GTable.SetCell("Description", Info.GetDescription().Ellipsize(128));
                 }
 
@@ -951,7 +951,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         set<NoModInfo> ssUserMods;
-        CZNC::Get().GetModules().GetAvailableMods(ssUserMods);
+        NoApp::Get().GetModules().GetAvailableMods(ssUserMods);
 
         if (ssUserMods.empty()) {
             PutStatus("No user modules available.");
@@ -971,7 +971,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         set<NoModInfo> ssNetworkMods;
-        CZNC::Get().GetModules().GetAvailableMods(ssNetworkMods, NoModInfo::NetworkModule);
+        NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, NoModInfo::NetworkModule);
 
         if (ssNetworkMods.empty()) {
             PutStatus("No network modules available.");
@@ -1023,7 +1023,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         NoModInfo ModInfo;
         NoString sRetMsg;
-        if (!CZNC::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
+        if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
             PutStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
             return;
         }
@@ -1047,7 +1047,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         switch (eType) {
         case NoModInfo::GlobalModule:
-            b = CZNC::Get().GetModules().LoadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
+            b = NoApp::Get().GetModules().LoadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
             break;
         case NoModInfo::UserModule:
             b = m_pUser->GetModules().LoadModule(sMod, sArgs, eType, m_pUser, nullptr, sModRet);
@@ -1093,7 +1093,7 @@ void NoClient::UserCommand(NoString& sLine)
         if (sType.Equals("default")) {
             NoModInfo ModInfo;
             NoString sRetMsg;
-            if (!CZNC::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
+            if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
                 PutStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
                 return;
             }
@@ -1115,7 +1115,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         switch (eType) {
         case NoModInfo::GlobalModule:
-            CZNC::Get().GetModules().UnloadModule(sMod, sModRet);
+            NoApp::Get().GetModules().UnloadModule(sMod, sModRet);
             break;
         case NoModInfo::UserModule:
             m_pUser->GetModules().UnloadModule(sMod, sModRet);
@@ -1163,7 +1163,7 @@ void NoClient::UserCommand(NoString& sLine)
         if (sType.Equals("default")) {
             NoModInfo ModInfo;
             NoString sRetMsg;
-            if (!CZNC::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
+            if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
                 PutStatus("Unable to find modinfo for [" + sMod + "] [" + sRetMsg + "]");
                 return;
             }
@@ -1185,7 +1185,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         switch (eType) {
         case NoModInfo::GlobalModule:
-            CZNC::Get().GetModules().ReloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
+            NoApp::Get().GetModules().ReloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
             break;
         case NoModInfo::UserModule:
             m_pUser->GetModules().ReloadModule(sMod, sArgs, m_pUser, nullptr, sModRet);
@@ -1208,7 +1208,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         PutStatus("Reloading [" + sMod + "] everywhere");
-        if (CZNC::Get().UpdateModule(sMod)) {
+        if (NoApp::Get().UpdateModule(sMod)) {
             PutStatus("Done");
         } else {
             PutStatus("Done, but there were errors, [" + sMod + "] could not be loaded everywhere.");
@@ -1221,7 +1221,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (CZNC::Get().AddBindHost(sHost)) {
+        if (NoApp::Get().AddBindHost(sHost)) {
             PutStatus("Done");
         } else {
             PutStatus("The host [" + sHost + "] is already in the list");
@@ -1236,14 +1236,14 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (CZNC::Get().RemBindHost(sHost)) {
+        if (NoApp::Get().RemBindHost(sHost)) {
             PutStatus("Done");
         } else {
             PutStatus("The host [" + sHost + "] is not in the list");
         }
     } else if ((sCommand.Equals("LISTBINDHOSTS") || sCommand.Equals("LISTVHOSTS")) &&
                (m_pUser->IsAdmin() || !m_pUser->DenySetBindHost())) {
-        const NoStringVector& vsHosts = CZNC::Get().GetBindHosts();
+        const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
 
         if (vsHosts.empty()) {
             PutStatus("No bind hosts configured");
@@ -1276,7 +1276,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const NoStringVector& vsHosts = CZNC::Get().GetBindHosts();
+        const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
         if (!m_pUser->IsAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
@@ -1308,7 +1308,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const NoStringVector& vsHosts = CZNC::Get().GetBindHosts();
+        const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
         if (!m_pUser->IsAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
@@ -1483,11 +1483,11 @@ void NoClient::UserCommand(NoString& sLine)
         if (uFail > 0) {
             PutStatus("Setting BufferCount failed for [" + NoString(uFail) + "] buffers, "
                                                                             "max buffer count is " +
-                      NoString(CZNC::Get().GetMaxBufferSize()));
+                      NoString(NoApp::Get().GetMaxBufferSize()));
         }
     } else if (m_pUser->IsAdmin() && sCommand.Equals("TRAFFIC")) {
-        CZNC::TrafficStatsPair Users, ZNC, Total;
-        CZNC::TrafficStatsMap traffic = CZNC::Get().GetTrafficStats(Users, ZNC, Total);
+        NoApp::TrafficStatsPair Users, ZNC, Total;
+        NoApp::TrafficStatsMap traffic = NoApp::Get().GetTrafficStats(Users, ZNC, Total);
 
         NoTable Table;
         Table.AddColumn("Username");
@@ -1523,7 +1523,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (sCommand.Equals("UPTIME")) {
-        PutStatus("Running for " + CZNC::Get().GetUptime());
+        PutStatus("Running for " + NoApp::Get().GetUptime());
     } else if (m_pUser->IsAdmin() &&
                (sCommand.Equals("LISTPORTS") || sCommand.Equals("ADDPORT") || sCommand.Equals("DELPORT"))) {
         UserPortCommand(sLine);
@@ -1546,7 +1546,7 @@ void NoClient::UserPortCommand(NoString& sLine)
         Table.AddColumn("URIPrefix");
 
         vector<NoListener*>::const_iterator it;
-        const vector<NoListener*>& vpListeners = CZNC::Get().GetListeners();
+        const vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
 
         for (const NoListener* pListener : vpListeners) {
             Table.AddRow();
@@ -1612,7 +1612,7 @@ void NoClient::UserPortCommand(NoString& sLine)
                 delete pListener;
                 PutStatus("Unable to bind [" + NoString(strerror(errno)) + "]");
             } else {
-                if (CZNC::Get().AddListener(pListener))
+                if (NoApp::Get().AddListener(pListener))
                     PutStatus("Port Added");
                 else
                     PutStatus("Error?!");
@@ -1624,10 +1624,10 @@ void NoClient::UserPortCommand(NoString& sLine)
         } else {
             const NoString sBindHost = sLine.Token(3);
 
-            NoListener* pListener = CZNC::Get().FindListener(uPort, sBindHost, eAddr);
+            NoListener* pListener = NoApp::Get().FindListener(uPort, sBindHost, eAddr);
 
             if (pListener) {
-                CZNC::Get().DelListener(pListener);
+                NoApp::Get().DelListener(pListener);
                 PutStatus("Deleted Port");
             } else {
                 PutStatus("Unable to find a matching port");

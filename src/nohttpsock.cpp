@@ -17,7 +17,7 @@
 #include "nohttpsock.h"
 #include "nofile.h"
 #include "nodir.h"
-#include "noznc.h"
+#include "noapp.h"
 #include <iomanip>
 
 
@@ -129,7 +129,7 @@ void NoHttpSock::ReadLine(const NoString& sData)
     } else if (sName.Equals("X-Forwarded-For:")) {
         // X-Forwarded-For: client, proxy1, proxy2
         if (m_sForwardedIP.empty()) {
-            const NoStringVector& vsTrustedProxies = CZNC::Get().GetTrustedProxies();
+            const NoStringVector& vsTrustedProxies = NoApp::Get().GetTrustedProxies();
             NoString sIP = GetRemoteIP();
 
             NoStringVector vsIPs;
@@ -630,7 +630,7 @@ bool NoHttpSock::PrintErrorPage(unsigned int uStatusId, const NoString& sStatusM
                     sMessage.Escape_n(NoString::EHTML) + "</p>\r\n"
                                                         "<hr/>\r\n"
                                                         "<address>" +
-                    CZNC::GetTag(false, /* bHTML = */ true) + " at " + GetLocalIP().Escape_n(NoString::EHTML) +
+                    NoApp::GetTag(false, /* bHTML = */ true) + " at " + GetLocalIP().Escape_n(NoString::EHTML) +
                     " Port " + NoString(GetLocalPort()) + "</address>\r\n"
                                                          "</body>\r\n"
                                                          "</html>\r\n";
@@ -653,7 +653,7 @@ bool NoHttpSock::ForceLogin()
         return false;
     }
 
-    AddHeader("WWW-Authenticate", "Basic realm=\"" + CZNC::GetTag(false) + "\"");
+    AddHeader("WWW-Authenticate", "Basic realm=\"" + NoApp::GetTag(false) + "\"");
     PrintErrorPage(401, "Unauthorized", "You need to login to view this page.");
 
     return false;
@@ -682,7 +682,7 @@ bool NoHttpSock::PrintHeader(off_t uContentLength, const NoString& sContentType,
 
     Write("HTTP/" + NoString(m_bHTTP10Client ? "1.0 " : "1.1 ") + NoString(uStatusId) + " " + sStatusMsg + "\r\n");
     Write("Date: " + GetDate() + "\r\n");
-    Write("Server: " + CZNC::GetTag(false) + "\r\n");
+    Write("Server: " + NoApp::GetTag(false) + "\r\n");
     if (uContentLength > 0) {
         Write("Content-Length: " + NoString(uContentLength) + "\r\n");
     }

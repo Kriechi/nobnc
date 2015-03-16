@@ -21,7 +21,7 @@
 #include <znc/nostring.h>
 #include <znc/nobuffer.h>
 #include <znc/nonick.h>
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 
 class NoModules;
 class NoUser;

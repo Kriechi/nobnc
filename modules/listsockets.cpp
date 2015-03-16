@@ -15,7 +15,7 @@
  */
 
 #include <znc/nouser.h>
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 
 class NoSocketSorter
 {
@@ -83,7 +83,7 @@ public:
 
     std::priority_queue<NoSocketSorter> GetSockets()
     {
-        NoSocketManager& m = CZNC::Get().GetManager();
+        NoSocketManager& m = NoApp::Get().GetManager();
         std::priority_queue<NoSocketSorter> ret;
 
         for (unsigned int a = 0; a < m.size(); a++) {
@@ -105,7 +105,7 @@ public:
     bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            if (CZNC::Get().GetManager().empty()) {
+            if (NoApp::Get().GetManager().empty()) {
                 return false;
             }
 
@@ -212,7 +212,7 @@ public:
 
     void ShowSocks(bool bShowHosts)
     {
-        if (CZNC::Get().GetManager().empty()) {
+        if (NoApp::Get().GetManager().empty()) {
             PutStatus("You have no open sockets.");
             return;
         }

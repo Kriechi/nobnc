@@ -23,7 +23,7 @@
 #include <znc/main.h>
 #include <memory>
 
-class CZNC;
+class NoApp;
 class NoUser;
 class NoNetwork;
 class NoIrcSock;

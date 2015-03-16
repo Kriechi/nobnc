@@ -61,14 +61,14 @@ NoUser::NoUser(const NoString& sUserName)
       m_sIdent(m_sCleanUserName), m_sRealName(sUserName), m_sBindHost(""), m_sDCCBindHost(""), m_sPass(""),
       m_sPassSalt(""), m_sStatusPrefix("*"), m_sDefaultChanModes(""), m_sClientEncoding(""), m_sQuitMsg(""),
       m_mssCTCPReplies(), m_sTimestampFormat("[%H:%M:%S]"), m_sTimezone(""), m_eHashType(HASH_NONE),
-      m_sUserPath(CZNC::Get().GetUserPath() + "/" + sUserName), m_bMultiClients(true), m_bDenyLoadMod(false),
+      m_sUserPath(NoApp::Get().GetUserPath() + "/" + sUserName), m_bMultiClients(true), m_bDenyLoadMod(false),
       m_bAdmin(false), m_bDenySetBindHost(false), m_bAutoClearChanBuffer(true), m_bAutoClearQueryBuffer(true),
       m_bBeingDeleted(false), m_bAppendTimestamp(false), m_bPrependTimestamp(true), m_pUserTimer(nullptr), m_vIRNoNetworks(),
       m_vClients(), m_ssAllowedHosts(), m_uBufferCount(50), m_uBytesRead(0), m_uBytesWritten(0), m_uMaxJoinTries(10),
       m_uMaxNetworks(1), m_uMaxQueryBuffers(50), m_uMaxJoins(0), m_sSkinName(""), m_pModules(new NoModules)
 {
     m_pUserTimer = new NoUserTimer(this);
-    CZNC::Get().GetManager().AddCron(m_pUserTimer);
+    NoApp::Get().GetManager().AddCron(m_pUserTimer);
 }
 
 NoUser::~NoUser()
@@ -80,7 +80,7 @@ NoUser::~NoUser()
 
     // Delete clients
     while (!m_vClients.empty()) {
-        CZNC::Get().GetManager().DelSockByAddr(m_vClients[0]);
+        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]);
     }
     m_vClients.clear();
 
@@ -88,10 +88,10 @@ NoUser::~NoUser()
     delete m_pModules;
     m_pModules = nullptr;
 
-    CZNC::Get().GetManager().DelCronByAddr(m_pUserTimer);
+    NoApp::Get().GetManager().DelCronByAddr(m_pUserTimer);
 
-    CZNC::Get().AddBytesRead(BytesRead());
-    CZNC::Get().AddBytesWritten(BytesWritten());
+    NoApp::Get().AddBytesRead(BytesRead());
+    NoApp::Get().AddBytesWritten(BytesWritten());
 }
 
 template <class T> struct TOption
@@ -287,7 +287,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             sError = "Unhandled lines in config!";
             NoUtils::PrintError(sError);
 
-            CZNC::DumpConfig(pSubConf);
+            NoApp::DumpConfig(pSubConf);
             return false;
         }
         ++subIt;
@@ -513,9 +513,9 @@ NoString& NoUser::ExpandString(const NoString& sStr, NoString& sRet) const
     sRet.Replace("%realname%", GetRealName());
     sRet.Replace("%vhost%", GetBindHost());
     sRet.Replace("%bindhost%", GetBindHost());
-    sRet.Replace("%version%", CZNC::GetVersion());
+    sRet.Replace("%version%", NoApp::GetVersion());
     sRet.Replace("%time%", sTime);
-    sRet.Replace("%uptime%", CZNC::Get().GetUptime());
+    sRet.Replace("%uptime%", NoApp::Get().GetUptime());
     // The following lines do not exist. You must be on DrUgS!
     sRet.Replace("%znc%", "All your IRC are belong to ZNC");
     // Chosen by fair zocchihedron dice roll by SilverLeo
@@ -855,7 +855,7 @@ NoSettings NoUser::ToConfig() const
     config.AddKeyValuePair("BindHost", GetBindHost());
     config.AddKeyValuePair("DCCBindHost", GetDCCBindHost());
     config.AddKeyValuePair("QuitMsg", GetQuitMsg());
-    if (CZNC::Get().GetStatusPrefix() != GetStatusPrefix()) config.AddKeyValuePair("StatusPrefix", GetStatusPrefix());
+    if (NoApp::Get().GetStatusPrefix() != GetStatusPrefix()) config.AddKeyValuePair("StatusPrefix", GetStatusPrefix());
     config.AddKeyValuePair("Skin", GetSkinName());
     config.AddKeyValuePair("ChanModes", GetDefaultChanModes());
     config.AddKeyValuePair("Buffer", NoString(GetBufferCount()));
@@ -927,7 +927,7 @@ bool NoUser::CheckPass(const NoString& sPass) const
 
 /*NoClient* NoUser::GetClient() {
     // Todo: optimize this by saving a pointer to the sock
-    NoSocketManager& Manager = CZNC::Get().GetManager();
+    NoSocketManager& Manager = NoApp::Get().GetManager();
     NoString sSockName = "USR::" + m_sUserName;
 
     for (unsigned int a = 0; a < Manager.size(); a++) {
@@ -939,7 +939,7 @@ bool NoUser::CheckPass(const NoString& sPass) const
         }
     }
 
-    return (NoClient*) CZNC::Get().GetManager().FindSockByName(sSockName);
+    return (NoClient*) NoApp::Get().GetManager().FindSockByName(sSockName);
 }*/
 
 NoString NoUser::GetLocalDCCIP() const
@@ -1073,7 +1073,7 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
     NoString sModRet;
 
     NoModInfo ModInfo;
-    if (!CZNC::Get().GetModules().GetModInfo(ModInfo, sModName, sModRet)) {
+    if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sModName, sModRet)) {
         sError = "Unable to find modinfo [" + sModName + "] [" + sModRet + "]";
         return false;
     }
@@ -1145,7 +1145,7 @@ void NoUser::SetAutoClearQueryBuffer(bool b) { m_bAutoClearQueryBuffer = b; }
 
 bool NoUser::SetBufferCount(unsigned int u, bool bForce)
 {
-    if (!bForce && u > CZNC::Get().GetMaxBufferSize()) return false;
+    if (!bForce && u > NoApp::Get().GetMaxBufferSize()) return false;
     for (NoNetwork* pNetwork : m_vIRNoNetworks) {
         for (NoChannel* pChan : pNetwork->GetChans()) {
             pChan->InheritBufferCount(u, bForce);
@@ -1229,12 +1229,12 @@ const NoString& NoUser::GetDefaultChanModes() const { return m_sDefaultChanModes
 const NoString& NoUser::GetClientEncoding() const { return m_sClientEncoding; }
 bool NoUser::HasSpaceForNewNetwork() const { return GetNetworks().size() < MaxNetworks(); }
 
-NoString NoUser::GetQuitMsg() const { return (!m_sQuitMsg.Trim_n().empty()) ? m_sQuitMsg : CZNC::GetTag(false); }
+NoString NoUser::GetQuitMsg() const { return (!m_sQuitMsg.Trim_n().empty()) ? m_sQuitMsg : NoApp::GetTag(false); }
 const NoStringMap& NoUser::GetCTCPReplies() const { return m_mssCTCPReplies; }
 unsigned int NoUser::GetBufferCount() const { return m_uBufferCount; }
 bool NoUser::AutoClearChanBuffer() const { return m_bAutoClearChanBuffer; }
 bool NoUser::AutoClearQueryBuffer() const { return m_bAutoClearQueryBuffer; }
-// NoString NoUser::GetSkinName() const { return (!m_sSkinName.empty()) ? m_sSkinName : CZNC::Get().GetSkinName(); }
+// NoString NoUser::GetSkinName() const { return (!m_sSkinName.empty()) ? m_sSkinName : NoApp::Get().GetSkinName(); }
 NoString NoUser::GetSkinName() const { return m_sSkinName; }
 const NoString& NoUser::GetUserPath() const
 {

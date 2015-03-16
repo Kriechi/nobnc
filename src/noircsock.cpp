@@ -904,7 +904,7 @@ bool NoIrcSock::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
 
     if (!bHaveReply && !m_pNetwork->IsUserAttached()) {
         if (sQuery == "VERSION") {
-            sReply = CZNC::GetTag(false);
+            sReply = NoApp::GetTag(false);
         } else if (sQuery == "PING") {
             sReply = sMessage.Token(1, true);
         }

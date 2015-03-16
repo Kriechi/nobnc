@@ -182,7 +182,7 @@ private:
 
     bool Block(const NoString& sUser)
     {
-        NoUser* pUser = CZNC::Get().FindUser(sUser);
+        NoUser* pUser = NoApp::Get().FindUser(sUser);
 
         if (!pUser) return false;
 

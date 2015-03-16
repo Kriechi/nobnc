@@ -259,7 +259,7 @@ public:
     void SockError(int iErrno, const NoString& sDescription) override;
 
     //! This limits the global connections from this IP to defeat DoS attacks, feel free to override. The ACL used is
-    // provided by the main interface @see CZNC::AllowConnectionFrom
+    // provided by the main interface @see NoApp::AllowConnectionFrom
     bool ConnectionFrom(const NoString& sHost, unsigned short uPort) override;
 
     //! Ease of use Connect, assigns to the manager and is subsequently tracked

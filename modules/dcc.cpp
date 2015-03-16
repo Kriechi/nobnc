@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 #include <znc/nouser.h>
 #include <znc/nofile.h>
 #include <znc/nodir.h>
@@ -104,7 +104,7 @@ public:
 
     bool SendFile(const NoString& sRemoteNick, const NoString& sFileName)
     {
-        NoString sFullPath = NoDir::ChangeDir(GetSavePath(), sFileName, CZNC::Get().GetHomePath());
+        NoString sFullPath = NoDir::ChangeDir(GetSavePath(), sFileName, NoApp::Get().GetHomePath());
         NoDccSock* pSock = new NoDccSock(this, sRemoteNick, sFullPath);
 
         NoFile* pFile = pSock->OpenFile(false);
@@ -116,7 +116,7 @@ public:
 
         NoString sLocalDCCIP = GetUser()->GetLocalDCCIP();
         unsigned short uPort =
-        CZNC::Get().GetManager().ListenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
+        NoApp::Get().GetManager().ListenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
 
         if (GetUser()->GetNick().Equals(sRemoteNick)) {
             PutUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
@@ -144,7 +144,7 @@ public:
             return false;
         }
 
-        CZNC::Get().GetManager().Connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, GetUser()->GetLocalDCCIP(), pSock);
+        NoApp::Get().GetManager().Connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, GetUser()->GetLocalDCCIP(), pSock);
 
         PutModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - Attempting to connect to [" + sRemoteIP + "]");
         return true;

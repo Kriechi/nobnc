@@ -16,7 +16,7 @@
 
 #include <znc/nouser.h>
 #include <znc/nonetwork.h>
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 
 class NoFakeOnlineModule : public NoModule
 {
@@ -31,7 +31,7 @@ public:
 
         NoString sModNick = sNick.substr(sPrefix.length());
         if (sModNick.Equals("status") || GetNetwork()->GetModules().FindModule(sModNick) ||
-            GetUser()->GetModules().FindModule(sModNick) || CZNC::Get().GetModules().FindModule(sModNick))
+            GetUser()->GetModules().FindModule(sModNick) || NoApp::Get().GetModules().FindModule(sModNick))
             return true;
         return false;
     }

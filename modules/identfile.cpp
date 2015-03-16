@@ -86,13 +86,13 @@ public:
     void SetIRCSock(NoIrcSock* pIRCSock)
     {
         if (m_pIRCSock) {
-            CZNC::Get().ResumeConnectQueue();
+            NoApp::Get().ResumeConnectQueue();
         }
 
         m_pIRCSock = pIRCSock;
 
         if (m_pIRCSock) {
-            CZNC::Get().PauseConnectQueue();
+            NoApp::Get().PauseConnectQueue();
         }
     }
 

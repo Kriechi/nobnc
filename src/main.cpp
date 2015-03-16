@@ -15,7 +15,7 @@
  */
 
 #include "main.h"
-#include "noznc.h"
+#include "noapp.h"
 #include <signal.h>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)
@@ -138,7 +138,7 @@ static void die(int sig)
 
     NoUtils::PrintMessage("Exiting on SIG [" + NoString(sig) + "]");
 
-    CZNC::DestroyInstance();
+    NoApp::DestroyInstance();
     exit(sig);
 }
 
@@ -147,11 +147,11 @@ static void signalHandler(int sig)
     switch (sig) {
     case SIGHUP:
         NoUtils::PrintMessage("Caught SIGHUP");
-        CZNC::Get().SetConfigState(CZNC::ECONFIG_NEED_REHASH);
+        NoApp::Get().SetConfigState(NoApp::ECONFIG_NEED_REHASH);
         break;
     case SIGUSR1:
         NoUtils::PrintMessage("Caught SIGUSR1");
-        CZNC::Get().SetConfigState(CZNC::ECONFIG_NEED_VERBOSE_WRITE);
+        NoApp::Get().SetConfigState(NoApp::ECONFIG_NEED_VERBOSE_WRITE);
         break;
     default:
         NoUtils::PrintMessage("WTF? Signal handler called for a signal it doesn't know?");
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
 #ifdef HAVE_LIBSSL
     bool bMakePem = false;
 #endif
-    CZNC::CreateInstance();
+    NoApp::CreateInstance();
 
     while ((iArg = getopt_long(argc, argv, "hvnrcspd:Df", g_LongOpts, &iOptIndex)) != -1) {
         switch (iArg) {
@@ -215,8 +215,8 @@ int main(int argc, char** argv)
             GenerateHelp(argv[0]);
             return 0;
         case 'v':
-            cout << CZNC::GetTag() << endl;
-            cout << CZNC::GetCompileOptionsString() << endl;
+            cout << NoApp::GetTag() << endl;
+            cout << NoApp::GetCompileOptionsString() << endl;
             return 0;
         case 'n':
             NoDebug::SetStdoutIsTTY(false);
@@ -261,14 +261,14 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    CZNC* pZNC = &CZNC::Get();
+    NoApp* pZNC = &NoApp::Get();
     pZNC->InitDirs(((argc) ? argv[0] : ""), sDataDir);
 
 #ifdef HAVE_LIBSSL
     if (bMakePem) {
         pZNC->WritePemFile();
 
-        CZNC::DestroyInstance();
+        NoApp::DestroyInstance();
         return 0;
     }
 #endif /* HAVE_LIBSSL */
@@ -287,7 +287,7 @@ int main(int argc, char** argv)
         std::cout << "</Pass>" << std::endl;
         NoUtils::PrintMessage("After that start ZNC again, and you should be able to login with the new password.");
 
-        CZNC::DestroyInstance();
+        NoApp::DestroyInstance();
         return 0;
     }
 
@@ -304,7 +304,7 @@ int main(int argc, char** argv)
             NoUtils::PrintError("No modules found. Perhaps you didn't install ZNC properly?");
             NoUtils::PrintError("Read http://wiki.znc.in/Installation for instructions.");
             if (!NoUtils::GetBoolInput("Do you really want to run ZNC without any modules?", false)) {
-                CZNC::DestroyInstance();
+                NoApp::DestroyInstance();
                 return 1;
             }
         }
@@ -315,7 +315,7 @@ int main(int argc, char** argv)
         NoUtils::PrintError("You are running ZNC as root! Don't do that! There are not many valid");
         NoUtils::PrintError("reasons for this and it can, in theory, cause great damage!");
         if (!bAllowRoot) {
-            CZNC::DestroyInstance();
+            NoApp::DestroyInstance();
             return 1;
         }
         NoUtils::PrintError("You have been warned.");
@@ -326,7 +326,7 @@ int main(int argc, char** argv)
 
     if (bMakeConf) {
         if (!pZNC->WriteNewConfig(sConfig)) {
-            CZNC::DestroyInstance();
+            NoApp::DestroyInstance();
             return 0;
         }
         /* Fall through to normal bootup */
@@ -335,13 +335,13 @@ int main(int argc, char** argv)
     NoString sConfigError;
     if (!pZNC->ParseConfig(sConfig, sConfigError)) {
         NoUtils::PrintError("Unrecoverable config error.");
-        CZNC::DestroyInstance();
+        NoApp::DestroyInstance();
         return 1;
     }
 
     if (!pZNC->OnBoot()) {
         NoUtils::PrintError("Exiting due to module boot errors.");
-        CZNC::DestroyInstance();
+        NoApp::DestroyInstance();
         return 1;
     }
 
@@ -350,7 +350,7 @@ int main(int argc, char** argv)
         NoUtils::PrintMessage("Staying open for debugging [pid: " + NoString(iPid) + "]");
 
         pZNC->WritePidFile(iPid);
-        NoUtils::PrintMessage(CZNC::GetTag());
+        NoUtils::PrintMessage(NoApp::GetTag());
     } else {
         NoUtils::PrintAction("Forking into the background");
 
@@ -358,7 +358,7 @@ int main(int argc, char** argv)
 
         if (iPid == -1) {
             NoUtils::PrintStatus(false, strerror(errno));
-            CZNC::DestroyInstance();
+            NoApp::DestroyInstance();
             return 1;
         }
 
@@ -367,7 +367,7 @@ int main(int argc, char** argv)
             NoUtils::PrintStatus(true, "[pid: " + NoString(iPid) + "]");
 
             pZNC->WritePidFile(iPid);
-            NoUtils::PrintMessage(CZNC::GetTag());
+            NoUtils::PrintMessage(NoApp::GetTag());
             /* Don't destroy pZNC here or it will delete the pid file. */
             return 0;
         }
@@ -378,7 +378,7 @@ int main(int argc, char** argv)
          */
         if (!pZNC->WaitForChildLock()) {
             NoUtils::PrintError("Child was unable to obtain lock on config file.");
-            CZNC::DestroyInstance();
+            NoApp::DestroyInstance();
             return 1;
         }
 
@@ -441,7 +441,7 @@ int main(int argc, char** argv)
             // The above code adds 3 entries to args tops
             // which means the array should be big enough
 
-            CZNC::DestroyInstance();
+            NoApp::DestroyInstance();
             execvp(args[0], args);
             NoUtils::PrintError("Unable to restart ZNC [" + NoString(strerror(errno)) + "]");
         } /* Fall through */
@@ -450,7 +450,7 @@ int main(int argc, char** argv)
         }
     }
 
-    CZNC::DestroyInstance();
+    NoApp::DestroyInstance();
 
     return iRet;
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "noznc.h"
+#include "noapp.h"
 #include "nodir.h"
 #include "nofile.h"
 #include "noircsock.h"
@@ -40,7 +40,7 @@ static inline NoString FormatBindError()
     return "Unable to bind [" + sError + "]";
 }
 
-CZNC::CZNC()
+NoApp::NoApp()
     : m_TimeStarted(time(nullptr)), m_eConfigState(ECONFIG_NOTHING), m_vpListeners(), m_msUsers(), m_msDelUsers(),
       m_Manager(), m_sCurPath(""), m_sZNCPath(""), m_sConfigFile(""), m_sSkinName(""), m_sStatusPrefix(""),
       m_sPidFile(""), m_sSSLCertFile(""), m_sSSLCiphers(""), m_sSSLProtocols(""), m_vsBindHosts(), m_vsTrustedProxies(),
@@ -56,7 +56,7 @@ CZNC::CZNC()
     m_sConnectThrottle.SetTTL(30000);
 }
 
-CZNC::~CZNC()
+NoApp::~NoApp()
 {
     m_pModules->UnloadAll();
 
@@ -89,9 +89,9 @@ CZNC::~CZNC()
     DeletePidFile();
 }
 
-NoString CZNC::GetVersion() { return NoString(NO_VERSION_STR) + NoString(NO_VERSION_EXTRA); }
+NoString NoApp::GetVersion() { return NoString(NO_VERSION_STR) + NoString(NO_VERSION_EXTRA); }
 
-NoString CZNC::GetTag(bool bIncludeVersion, bool bHTML)
+NoString NoApp::GetTag(bool bIncludeVersion, bool bHTML)
 {
     if (!Get().m_bHideVersion) {
         bIncludeVersion = true;
@@ -107,7 +107,7 @@ NoString CZNC::GetTag(bool bIncludeVersion, bool bHTML)
     return "ZNC - " + sVersion + " - " + sAddress;
 }
 
-NoString CZNC::GetCompileOptionsString()
+NoString NoApp::GetCompileOptionsString()
 {
     return "IPv6: "
 #ifdef HAVE_IPV6
@@ -136,13 +136,13 @@ NoString CZNC::GetCompileOptionsString()
     ;
 }
 
-NoString CZNC::GetUptime() const
+NoString NoApp::GetUptime() const
 {
     time_t now = time(nullptr);
     return NoString::ToTimeStr(now - TimeStarted());
 }
 
-bool CZNC::OnBoot()
+bool NoApp::OnBoot()
 {
     bool bFail = false;
     ALLMODULECALL(OnBoot(), &bFail);
@@ -151,7 +151,7 @@ bool CZNC::OnBoot()
     return true;
 }
 
-bool CZNC::HandleUserDeletion()
+bool NoApp::HandleUserDeletion()
 {
     if (m_msDelUsers.empty()) return false;
 
@@ -173,7 +173,7 @@ bool CZNC::HandleUserDeletion()
     return true;
 }
 
-void CZNC::Loop()
+void NoApp::Loop()
 {
     while (true) {
         NoString sError;
@@ -216,7 +216,7 @@ void CZNC::Loop()
     }
 }
 
-NoFile* CZNC::InitPidFile()
+NoFile* NoApp::InitPidFile()
 {
     if (!m_sPidFile.empty()) {
         NoString sFile;
@@ -233,7 +233,7 @@ NoFile* CZNC::InitPidFile()
     return nullptr;
 }
 
-bool CZNC::WritePidFile(int iPid)
+bool NoApp::WritePidFile(int iPid)
 {
     NoFile* File = InitPidFile();
     if (File == nullptr) return false;
@@ -252,7 +252,7 @@ bool CZNC::WritePidFile(int iPid)
     return bRet;
 }
 
-bool CZNC::DeletePidFile()
+bool NoApp::DeletePidFile()
 {
     NoFile* File = InitPidFile();
     if (File == nullptr) return false;
@@ -266,7 +266,7 @@ bool CZNC::DeletePidFile()
     return bRet;
 }
 
-bool CZNC::WritePemFile()
+bool NoApp::WritePemFile()
 {
 #ifndef HAVE_LIBSSL
     NoUtils::PrintError("ZNC was not compiled with ssl support.");
@@ -299,7 +299,7 @@ bool CZNC::WritePemFile()
 #endif
 }
 
-void CZNC::DeleteUsers()
+void NoApp::DeleteUsers()
 {
     for (const auto& it : m_msUsers) {
         it.second->SetBeingDeleted(true);
@@ -310,7 +310,7 @@ void CZNC::DeleteUsers()
     DisableConnectQueue();
 }
 
-bool CZNC::IsHostAllowed(const NoString& sHostMask) const
+bool NoApp::IsHostAllowed(const NoString& sHostMask) const
 {
     for (const auto& it : m_msUsers) {
         if (it.second->IsHostAllowed(sHostMask)) {
@@ -321,13 +321,13 @@ bool CZNC::IsHostAllowed(const NoString& sHostMask) const
     return false;
 }
 
-bool CZNC::AllowConnectionFrom(const NoString& sIP) const
+bool NoApp::AllowConnectionFrom(const NoString& sIP) const
 {
     if (m_uiAnonIPLimit == 0) return true;
     return (GetManager().GetAnonConnectionCount(sIP) < m_uiAnonIPLimit);
 }
 
-void CZNC::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
+void NoApp::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
 {
     // If the bin was not ran from the current directory, we need to add that dir onto our cwd
     NoString::size_type uPos = sArgvPath.rfind('/');
@@ -348,7 +348,7 @@ void CZNC::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
     m_sSSLCertFile = m_sZNCPath + "/znc.pem";
 }
 
-NoString CZNC::GetConfPath(bool bAllowMkDir) const
+NoString NoApp::GetConfPath(bool bAllowMkDir) const
 {
     NoString sConfPath = m_sZNCPath + "/configs";
     if (bAllowMkDir && !NoFile::Exists(sConfPath)) {
@@ -358,7 +358,7 @@ NoString CZNC::GetConfPath(bool bAllowMkDir) const
     return sConfPath;
 }
 
-NoString CZNC::GetUserPath() const
+NoString NoApp::GetUserPath() const
 {
     NoString sUserPath = m_sZNCPath + "/users";
     if (!NoFile::Exists(sUserPath)) {
@@ -368,14 +368,14 @@ NoString CZNC::GetUserPath() const
     return sUserPath;
 }
 
-NoString CZNC::GetModPath() const
+NoString NoApp::GetModPath() const
 {
     NoString sModPath = m_sZNCPath + "/modules";
 
     return sModPath;
 }
 
-const NoString& CZNC::GetCurPath() const
+const NoString& NoApp::GetCurPath() const
 {
     if (!NoFile::Exists(m_sCurPath)) {
         NoDir::MakeDir(m_sCurPath);
@@ -383,9 +383,9 @@ const NoString& CZNC::GetCurPath() const
     return m_sCurPath;
 }
 
-const NoString& CZNC::GetHomePath() const { return NoFile::GetHomePath(); }
+const NoString& NoApp::GetHomePath() const { return NoFile::GetHomePath(); }
 
-const NoString& CZNC::GetZNCPath() const
+const NoString& NoApp::GetZNCPath() const
 {
     if (!NoFile::Exists(m_sZNCPath)) {
         NoDir::MakeDir(m_sZNCPath);
@@ -393,9 +393,9 @@ const NoString& CZNC::GetZNCPath() const
     return m_sZNCPath;
 }
 
-NoString CZNC::GetPemLocation() const { return NoDir::ChangeDir("", m_sSSLCertFile); }
+NoString NoApp::GetPemLocation() const { return NoDir::ChangeDir("", m_sSSLCertFile); }
 
-NoString CZNC::ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir)
+NoString NoApp::ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir)
 {
     NoString sRetPath;
 
@@ -414,7 +414,7 @@ NoString CZNC::ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir)
     return sRetPath;
 }
 
-bool CZNC::WriteConfig()
+bool NoApp::WriteConfig()
 {
     if (GetConfigFile().empty()) {
         DEBUG("Config file name is empty?!");
@@ -558,7 +558,7 @@ bool CZNC::WriteConfig()
     return true;
 }
 
-NoString CZNC::MakeConfigHeader()
+NoString NoApp::MakeConfigHeader()
 {
     return "// WARNING\n"
            "//\n"
@@ -571,7 +571,7 @@ NoString CZNC::MakeConfigHeader()
            "// Also check http://en.znc.in/wiki/Configuration\n";
 }
 
-bool CZNC::WriteNewConfig(const NoString& sConfigFile)
+bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 {
     NoString sAnswer, sUser, sNetwork;
     NoStringVector vsLines;
@@ -874,7 +874,7 @@ bool CZNC::WriteNewConfig(const NoString& sConfigFile)
     return bFileOpen && NoUtils::GetBoolInput("Launch ZNC now?", true);
 }
 
-void CZNC::BackupConfigOnce(const NoString& sSuffix)
+void NoApp::BackupConfigOnce(const NoString& sSuffix)
 {
     static bool didBackup = false;
     if (didBackup) return;
@@ -889,14 +889,14 @@ void CZNC::BackupConfigOnce(const NoString& sSuffix)
         NoUtils::PrintStatus(false, strerror(errno));
 }
 
-bool CZNC::ParseConfig(const NoString& sConfig, NoString& sError)
+bool NoApp::ParseConfig(const NoString& sConfig, NoString& sError)
 {
     m_sConfigFile = ExpandConfigPath(sConfig, false);
 
     return DoRehash(sError);
 }
 
-bool CZNC::RehashConfig(NoString& sError)
+bool NoApp::RehashConfig(NoString& sError)
 {
     ALLMODULECALL(OnPreRehash(), NOTHING);
 
@@ -923,7 +923,7 @@ bool CZNC::RehashConfig(NoString& sError)
     return false;
 }
 
-bool CZNC::DoRehash(NoString& sError)
+bool NoApp::DoRehash(NoString& sError)
 {
     sError.clear();
 
@@ -1164,7 +1164,7 @@ bool CZNC::DoRehash(NoString& sError)
             sError = "Unhandled lines in Listener config!";
             NoUtils::PrintError(sError);
 
-            CZNC::DumpConfig(pSubConf);
+            NoApp::DumpConfig(pSubConf);
             return false;
         }
     }
@@ -1274,7 +1274,7 @@ bool CZNC::DoRehash(NoString& sError)
     return true;
 }
 
-void CZNC::DumpConfig(const NoSettings* pConfig)
+void NoApp::DumpConfig(const NoSettings* pConfig)
 {
     NoSettings::EntryMapIterator eit = pConfig->BeginEntries();
     for (; eit != pConfig->EndEntries(); ++eit) {
@@ -1299,9 +1299,9 @@ void CZNC::DumpConfig(const NoSettings* pConfig)
     }
 }
 
-void CZNC::ClearBindHosts() { m_vsBindHosts.clear(); }
+void NoApp::ClearBindHosts() { m_vsBindHosts.clear(); }
 
-bool CZNC::AddBindHost(const NoString& sHost)
+bool NoApp::AddBindHost(const NoString& sHost)
 {
     if (sHost.empty()) {
         return false;
@@ -1317,7 +1317,7 @@ bool CZNC::AddBindHost(const NoString& sHost)
     return true;
 }
 
-bool CZNC::RemBindHost(const NoString& sHost)
+bool NoApp::RemBindHost(const NoString& sHost)
 {
     NoStringVector::iterator it;
     for (it = m_vsBindHosts.begin(); it != m_vsBindHosts.end(); ++it) {
@@ -1330,9 +1330,9 @@ bool CZNC::RemBindHost(const NoString& sHost)
     return false;
 }
 
-void CZNC::ClearTrustedProxies() { m_vsTrustedProxies.clear(); }
+void NoApp::ClearTrustedProxies() { m_vsTrustedProxies.clear(); }
 
-bool CZNC::AddTrustedProxy(const NoString& sHost)
+bool NoApp::AddTrustedProxy(const NoString& sHost)
 {
     if (sHost.empty()) {
         return false;
@@ -1348,7 +1348,7 @@ bool CZNC::AddTrustedProxy(const NoString& sHost)
     return true;
 }
 
-bool CZNC::RemTrustedProxy(const NoString& sHost)
+bool NoApp::RemTrustedProxy(const NoString& sHost)
 {
     NoStringVector::iterator it;
     for (it = m_vsTrustedProxies.begin(); it != m_vsTrustedProxies.end(); ++it) {
@@ -1361,7 +1361,7 @@ bool CZNC::RemTrustedProxy(const NoString& sHost)
     return false;
 }
 
-void CZNC::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUser, NoClient* pSkipClient)
+void NoApp::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUser, NoClient* pSkipClient)
 {
     for (const auto& it : m_msUsers) {
         if (bAdminOnly && !it.second->IsAdmin()) continue;
@@ -1378,10 +1378,10 @@ void CZNC::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUse
     }
 }
 
-NoModule* CZNC::FindModule(const NoString& sModName, const NoString& sUsername)
+NoModule* NoApp::FindModule(const NoString& sModName, const NoString& sUsername)
 {
     if (sUsername.empty()) {
-        return CZNC::Get().GetModules().FindModule(sModName);
+        return NoApp::Get().GetModules().FindModule(sModName);
     }
 
     NoUser* pUser = FindUser(sUsername);
@@ -1389,16 +1389,16 @@ NoModule* CZNC::FindModule(const NoString& sModName, const NoString& sUsername)
     return (!pUser) ? nullptr : pUser->GetModules().FindModule(sModName);
 }
 
-NoModule* CZNC::FindModule(const NoString& sModName, NoUser* pUser)
+NoModule* NoApp::FindModule(const NoString& sModName, NoUser* pUser)
 {
     if (pUser) {
         return pUser->GetModules().FindModule(sModName);
     }
 
-    return CZNC::Get().GetModules().FindModule(sModName);
+    return NoApp::Get().GetModules().FindModule(sModName);
 }
 
-bool CZNC::UpdateModule(const NoString& sModule)
+bool NoApp::UpdateModule(const NoString& sModule)
 {
     NoModule* pModule;
 
@@ -1475,7 +1475,7 @@ bool CZNC::UpdateModule(const NoString& sModule)
     return !bError;
 }
 
-NoUser* CZNC::FindUser(const NoString& sUsername)
+NoUser* NoApp::FindUser(const NoString& sUsername)
 {
     map<NoString, NoUser*>::iterator it = m_msUsers.find(sUsername);
 
@@ -1486,7 +1486,7 @@ NoUser* CZNC::FindUser(const NoString& sUsername)
     return nullptr;
 }
 
-bool CZNC::DeleteUser(const NoString& sUsername)
+bool NoApp::DeleteUser(const NoString& sUsername)
 {
     NoUser* pUser = FindUser(sUsername);
 
@@ -1498,7 +1498,7 @@ bool CZNC::DeleteUser(const NoString& sUsername)
     return true;
 }
 
-bool CZNC::AddUser(NoUser* pUser, NoString& sErrorRet)
+bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
 {
     if (FindUser(pUser->GetUserName()) != nullptr) {
         sErrorRet = "User already exists";
@@ -1519,7 +1519,7 @@ bool CZNC::AddUser(NoUser* pUser, NoString& sErrorRet)
     return true;
 }
 
-NoListener* CZNC::FindListener(u_short uPort, const NoString& sBindHost, EAddrType eAddr)
+NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, EAddrType eAddr)
 {
     for (NoListener* pListener : m_vpListeners) {
         if (pListener->GetPort() != uPort) continue;
@@ -1530,7 +1530,7 @@ NoListener* CZNC::FindListener(u_short uPort, const NoString& sBindHost, EAddrTy
     return nullptr;
 }
 
-bool CZNC::AddListener(const NoString& sLine, NoString& sError)
+bool NoApp::AddListener(const NoString& sLine, NoString& sError)
 {
     NoString sName = sLine.Token(0);
     NoString sValue = sLine.Token(1, true);
@@ -1575,7 +1575,7 @@ bool CZNC::AddListener(const NoString& sLine, NoString& sError)
     return AddListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
 }
 
-bool CZNC::AddListener(unsigned short uPort,
+bool NoApp::AddListener(unsigned short uPort,
                        const NoString& sBindHost,
                        const NoString& sURIPrefixRaw,
                        bool bSSL,
@@ -1669,7 +1669,7 @@ bool CZNC::AddListener(unsigned short uPort,
     return true;
 }
 
-bool CZNC::AddListener(NoSettings* pConfig, NoString& sError)
+bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
 {
     NoString sBindHost;
     NoString sURIPrefix;
@@ -1725,7 +1725,7 @@ bool CZNC::AddListener(NoSettings* pConfig, NoString& sError)
     return AddListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
 }
 
-bool CZNC::AddListener(NoListener* pListener)
+bool NoApp::AddListener(NoListener* pListener)
 {
     if (!pListener->GetRealListener()) {
         // Listener doesnt actually listen
@@ -1740,7 +1740,7 @@ bool CZNC::AddListener(NoListener* pListener)
     return true;
 }
 
-bool CZNC::DelListener(NoListener* pListener)
+bool NoApp::DelListener(NoListener* pListener)
 {
     auto it = std::find(m_vpListeners.begin(), m_vpListeners.end(), pListener);
     if (it != m_vpListeners.end()) {
@@ -1752,28 +1752,28 @@ bool CZNC::DelListener(NoListener* pListener)
     return false;
 }
 
-static CZNC* s_pZNC = nullptr;
+static NoApp* s_pZNC = nullptr;
 
-void CZNC::CreateInstance()
+void NoApp::CreateInstance()
 {
     if (s_pZNC) abort();
 
-    s_pZNC = new CZNC();
+    s_pZNC = new NoApp();
 }
 
-CZNC& CZNC::Get() { return *s_pZNC; }
+NoApp& NoApp::Get() { return *s_pZNC; }
 
-void CZNC::DestroyInstance()
+void NoApp::DestroyInstance()
 {
     delete s_pZNC;
     s_pZNC = nullptr;
 }
 
-CZNC::TrafficStatsMap CZNC::GetTrafficStats(TrafficStatsPair& Users, TrafficStatsPair& ZNC, TrafficStatsPair& Total)
+NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficStatsPair& ZNC, TrafficStatsPair& Total)
 {
     TrafficStatsMap ret;
     unsigned long long uiUsers_in, uiUsers_out, uiZNC_in, uiZNC_out;
-    const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
+    const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
 
     uiUsers_in = uiUsers_out = 0;
     uiZNC_in = BytesRead();
@@ -1811,7 +1811,7 @@ CZNC::TrafficStatsMap CZNC::GetTrafficStats(TrafficStatsPair& Users, TrafficStat
     return ret;
 }
 
-void CZNC::AuthUser(std::shared_ptr<NoAuthBase> AuthClass)
+void NoApp::AuthUser(std::shared_ptr<NoAuthBase> AuthClass)
 {
     // TODO unless the auth module calls it, NoUser::IsHostAllowed() is not honoured
     bool bReturn = false;
@@ -1848,22 +1848,22 @@ public:
     virtual ~NoConnectQueueTimer()
     {
         // This is only needed when ZNC shuts down:
-        // CZNC::~CZNC() sets its NoConnectQueueTimer pointer to nullptr and
+        // NoApp::~NoApp() sets its NoConnectQueueTimer pointer to nullptr and
         // calls the manager's Cleanup() which destroys all sockets and
-        // timers. If something calls CZNC::EnableConnectQueue() here
+        // timers. If something calls NoApp::EnableConnectQueue() here
         // (e.g. because a NoIrcSock is destroyed), the socket manager
-        // deletes that timer almost immediately, but CZNC now got a
+        // deletes that timer almost immediately, but NoApp now got a
         // dangling pointer to this timer which can crash later on.
         //
         // Unlikely but possible ;)
-        CZNC::Get().LeakConnectQueueTimer(this);
+        NoApp::Get().LeakConnectQueueTimer(this);
     }
 
 protected:
     void RunJob() override
     {
         list<NoNetwork*> ConnectionQueue;
-        list<NoNetwork*>& RealConnectionQueue = CZNC::Get().GetConnectionQueue();
+        list<NoNetwork*>& RealConnectionQueue = NoApp::Get().GetConnectionQueue();
 
         // Problem: If a network can't connect right now because e.g. it
         // is throttled, it will re-insert itself into the connection
@@ -1890,12 +1890,12 @@ protected:
 
         if (RealConnectionQueue.empty()) {
             DEBUG("ConnectQueueTimer done");
-            CZNC::Get().DisableConnectQueue();
+            NoApp::Get().DisableConnectQueue();
         }
     }
 };
 
-void CZNC::SetConnectDelay(unsigned int i)
+void NoApp::SetConnectDelay(unsigned int i)
 {
     if (i < 1) {
         // Don't hammer server with our failed connects
@@ -1907,7 +1907,7 @@ void CZNC::SetConnectDelay(unsigned int i)
     m_uiConnectDelay = i;
 }
 
-void CZNC::EnableConnectQueue()
+void NoApp::EnableConnectQueue()
 {
     if (!m_pConnectQueueTimer && !m_uiConnectPaused && !m_lpConnectQueue.empty()) {
         m_pConnectQueueTimer = new NoConnectQueueTimer(m_uiConnectDelay);
@@ -1915,7 +1915,7 @@ void CZNC::EnableConnectQueue()
     }
 }
 
-void CZNC::DisableConnectQueue()
+void NoApp::DisableConnectQueue()
 {
     if (m_pConnectQueueTimer) {
         // This will kill the cron
@@ -1924,7 +1924,7 @@ void CZNC::DisableConnectQueue()
     }
 }
 
-void CZNC::PauseConnectQueue()
+void NoApp::PauseConnectQueue()
 {
     DEBUG("Connection queue paused");
     m_uiConnectPaused++;
@@ -1934,7 +1934,7 @@ void CZNC::PauseConnectQueue()
     }
 }
 
-void CZNC::ResumeConnectQueue()
+void NoApp::ResumeConnectQueue()
 {
     DEBUG("Connection queue resumed");
     m_uiConnectPaused--;
@@ -1945,7 +1945,7 @@ void CZNC::ResumeConnectQueue()
     }
 }
 
-void CZNC::AddNetworkToQueue(NoNetwork* pNetwork)
+void NoApp::AddNetworkToQueue(NoNetwork* pNetwork)
 {
     // Make sure we are not already in the queue
     if (std::find(m_lpConnectQueue.begin(), m_lpConnectQueue.end(), pNetwork) != m_lpConnectQueue.end()) {
@@ -1956,9 +1956,9 @@ void CZNC::AddNetworkToQueue(NoNetwork* pNetwork)
     EnableConnectQueue();
 }
 
-void CZNC::LeakConnectQueueTimer(NoConnectQueueTimer* pTimer)
+void NoApp::LeakConnectQueueTimer(NoConnectQueueTimer* pTimer)
 {
     if (m_pConnectQueueTimer == pTimer) m_pConnectQueueTimer = nullptr;
 }
 
-bool CZNC::WaitForChildLock() { return m_pLockFile && m_pLockFile->ExLock(); }
+bool NoApp::WaitForChildLock() { return m_pLockFile && m_pLockFile->ExLock(); }

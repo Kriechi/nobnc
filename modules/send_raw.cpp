@@ -24,7 +24,7 @@ class NoSendRawMod : public NoModule
 {
     void SendClient(const NoString& sLine)
     {
-        NoUser* pUser = CZNC::Get().FindUser(sLine.Token(1));
+        NoUser* pUser = NoApp::Get().FindUser(sLine.Token(1));
 
         if (pUser) {
             NoNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
@@ -42,7 +42,7 @@ class NoSendRawMod : public NoModule
 
     void SendServer(const NoString& sLine)
     {
-        NoUser* pUser = CZNC::Get().FindUser(sLine.Token(1));
+        NoUser* pUser = NoApp::Get().FindUser(sLine.Token(1));
 
         if (pUser) {
             NoNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
@@ -84,7 +84,7 @@ public:
     {
         if (sPageName == "index") {
             if (WebSock.IsPost()) {
-                NoUser* pUser = CZNC::Get().FindUser(WebSock.GetParam("network").Token(0, false, "/"));
+                NoUser* pUser = NoApp::Get().FindUser(WebSock.GetParam("network").Token(0, false, "/"));
                 if (!pUser) {
                     WebSock.GetSession()->AddError("User not found");
                     return true;
@@ -112,7 +112,7 @@ public:
                 WebSock.GetSession()->AddSuccess("Line sent");
             }
 
-            const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
+            const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
             for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
                 NoTemplate& l = Tmpl.AddRow("UserLoop");
                 l["Username"] = (*it->second).GetUserName();

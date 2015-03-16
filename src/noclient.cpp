@@ -50,7 +50,7 @@ using std::vector;
                     (USER)->GetModules().UnloadModule(MOD);                   \
                 }                                                             \
             }                                                                 \
-        } else if ((pModule = CZNC::Get().GetModules().FindModule(MOD))) {    \
+        } else if ((pModule = NoApp::Get().GetModules().FindModule(MOD))) {    \
             try {                                                             \
                 pModule->SetClient(CLIENT);                                   \
                 pModule->SetNetwork(NETWORK);                                 \
@@ -61,7 +61,7 @@ using std::vector;
                 pModule->SetUser(nullptr);                                    \
             } catch (const NoModule::EModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
-                    CZNC::Get().GetModules().UnloadModule(MOD);               \
+                    NoApp::Get().GetModules().UnloadModule(MOD);               \
                 }                                                             \
             }                                                                 \
         } else {                                                              \
@@ -242,7 +242,7 @@ void NoClient::ReadLine(const NoString& sData)
                 sCTCP.RightChomp();
 
                 if (sCTCP.Token(0) == "VERSION") {
-                    sCTCP += " via " + CZNC::GetTag(false);
+                    sCTCP += " via " + NoApp::GetTag(false);
                 }
 
                 NETWORKMODULECALL(OnUserCTCPReply(sTarget, sCTCP), m_pUser, m_pNetwork, this, &bContinue);
@@ -606,13 +606,13 @@ void NoClient::StatusCTCP(const NoString& sLine)
     if (sCommand.Equals("PING")) {
         PutStatusNotice("\001PING " + sLine.Token(1, true) + "\001");
     } else if (sCommand.Equals("VERSION")) {
-        PutStatusNotice("\001VERSION " + CZNC::GetTag() + "\001");
+        PutStatusNotice("\001VERSION " + NoApp::GetTag() + "\001");
     }
 }
 
 bool NoClient::SendMotd()
 {
-    const NoStringVector& vsMotd = CZNC::Get().GetMotd();
+    const NoStringVector& vsMotd = NoApp::Get().GetMotd();
 
     if (!vsMotd.size()) {
         return false;
@@ -635,7 +635,7 @@ void NoClient::AuthUser()
 
     m_spAuth = std::make_shared<NoClientAuth>(this, m_sUser, m_sPass);
 
-    CZNC::Get().AuthUser(m_spAuth);
+    NoApp::Get().AuthUser(m_spAuth);
 }
 
 NoClientAuth::NoClientAuth(NoClient* pClient, const NoString& sUsername, const NoString& sPassword)
@@ -670,7 +670,7 @@ void NoAuthBase::RefuseLogin(const NoString& sReason)
 {
     if (!m_pSock) return;
 
-    NoUser* pUser = CZNC::Get().FindUser(GetUsername());
+    NoUser* pUser = NoApp::Get().FindUser(GetUsername());
 
     // If the username is valid, notify that user that someone tried to
     // login. Use sReason because there are other reasons than "wrong

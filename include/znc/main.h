@@ -25,12 +25,12 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define ALLMODULECALL(macFUNC, macEXITER)                                      \
     do {                                                                       \
-        NoModules& GMods = CZNC::Get().GetModules();                            \
+        NoModules& GMods = NoApp::Get().GetModules();                            \
         bool bAllExit = false;                                                 \
         if (GMods.macFUNC) {                                                   \
             bAllExit = true;                                                   \
         } else {                                                               \
-            const map<NoString, NoUser*>& mUsers = CZNC::Get().GetUserMap();     \
+            const map<NoString, NoUser*>& mUsers = NoApp::Get().GetUserMap();     \
             map<NoString, NoUser*>::const_iterator it;                           \
             for (it = mUsers.begin(); it != mUsers.end(); ++it) {              \
                 NoModules& UMods = it->second->GetModules();                    \
@@ -55,7 +55,7 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define _GLOBALMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, macEXITER) \
     do {                                                                      \
-        NoModules& GMods = CZNC::Get().GetModules();                           \
+        NoModules& GMods = NoApp::Get().GetModules();                           \
         NoUser* pOldGUser = GMods.GetUser();                                   \
         NoNetwork* pOldGNetwork = GMods.GetNetwork();                       \
         NoClient* pOldGClient = GMods.GetClient();                             \

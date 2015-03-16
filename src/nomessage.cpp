@@ -17,7 +17,7 @@
 #include "nobuffer.h"
 #include "noclient.h"
 #include "nouser.h"
-#include "noznc.h"
+#include "noapp.h"
 
 NoMessage::NoMessage(const NoString& format, const NoString& text, const timeval* ts)
     : m_format(format), m_text(text), m_time()

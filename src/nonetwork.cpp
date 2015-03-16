@@ -135,10 +135,10 @@ NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName)
     m_NoticeBuffer.SetLimit(250, true);
 
     m_pPingTimer = new NoNetworkPingTimer(this);
-    CZNC::Get().GetManager().AddCron(m_pPingTimer);
+    NoApp::Get().GetManager().AddCron(m_pPingTimer);
 
     m_pJoinTimer = new NoNetworkJoinTimer(this);
-    CZNC::Get().GetManager().AddCron(m_pJoinTimer);
+    NoApp::Get().GetManager().AddCron(m_pJoinTimer);
 
     SetIRCConnectEnabled(true);
 }
@@ -255,13 +255,13 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
 NoNetwork::~NoNetwork()
 {
     if (m_pIRCSock) {
-        CZNC::Get().GetManager().DelSockByAddr(m_pIRCSock);
+        NoApp::Get().GetManager().DelSockByAddr(m_pIRCSock);
         m_pIRCSock = nullptr;
     }
 
     // Delete clients
     while (!m_vClients.empty()) {
-        CZNC::Get().GetManager().DelSockByAddr(m_vClients[0]);
+        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]);
     }
     m_vClients.clear();
 
@@ -287,10 +287,10 @@ NoNetwork::~NoNetwork()
     SetUser(nullptr);
 
     // Make sure we are not in the connection queue
-    CZNC::Get().GetConnectionQueue().remove(this);
+    NoApp::Get().GetConnectionQueue().remove(this);
 
-    CZNC::Get().GetManager().DelCronByAddr(m_pPingTimer);
-    CZNC::Get().GetManager().DelCronByAddr(m_pJoinTimer);
+    NoApp::Get().GetManager().DelCronByAddr(m_pPingTimer);
+    NoApp::Get().GetManager().DelCronByAddr(m_pJoinTimer);
 }
 
 void NoNetwork::DelServers()
@@ -439,7 +439,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
                      "], Channel [" + sChanName + "]!";
             NoUtils::PrintError(sError);
 
-            CZNC::DumpConfig(pSubConf);
+            NoApp::DumpConfig(pSubConf);
             return false;
         }
 
@@ -1165,19 +1165,19 @@ bool NoNetwork::Connect()
     NoServer* pServer = GetNextServer();
     if (!pServer) return false;
 
-    if (CZNC::Get().GetServerThrottle(pServer->GetName())) {
+    if (NoApp::Get().GetServerThrottle(pServer->GetName())) {
         // Can't connect right now, schedule retry later
-        CZNC::Get().AddNetworkToQueue(this);
+        NoApp::Get().AddNetworkToQueue(this);
         return false;
     }
 
-    CZNC::Get().AddServerThrottle(pServer->GetName());
+    NoApp::Get().AddServerThrottle(pServer->GetName());
 
     bool bSSL = pServer->IsSSL();
 #ifndef HAVE_LIBSSL
     if (bSSL) {
         PutStatus("Cannot connect to [" + pServer->GetString(false) + "], ZNC is not compiled with SSL.");
-        CZNC::Get().AddNetworkToQueue(this);
+        NoApp::Get().AddNetworkToQueue(this);
         return false;
     }
 #endif
@@ -1194,12 +1194,12 @@ bool NoNetwork::Connect()
         DEBUG("Some module aborted the connection attempt");
         PutStatus("Some module aborted the connection attempt");
         delete pIRCSock;
-        CZNC::Get().AddNetworkToQueue(this);
+        NoApp::Get().AddNetworkToQueue(this);
         return false;
     }
 
     NoString sSockName = "IRC::" + m_pUser->GetUserName() + "::" + m_sName;
-    CZNC::Get().GetManager().Connect(pServer->GetName(), pServer->GetPort(), sSockName, 120, bSSL, GetBindHost(), pIRCSock);
+    NoApp::Get().GetManager().Connect(pServer->GetName(), pServer->GetPort(), sSockName, 120, bSSL, GetBindHost(), pIRCSock);
 
     return true;
 }
@@ -1250,7 +1250,7 @@ void NoNetwork::SetIRCConnectEnabled(bool b)
 void NoNetwork::CheckIRCConnect()
 {
     // Do we want to connect?
-    if (GetIRCConnectEnabled() && GetIRCSock() == nullptr) CZNC::Get().AddNetworkToQueue(this);
+    if (GetIRCConnectEnabled() && GetIRCSock() == nullptr) NoApp::Get().AddNetworkToQueue(this);
 }
 
 bool NoNetwork::PutIRC(const NoString& sLine)

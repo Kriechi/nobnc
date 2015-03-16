@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 
 class NoFailToBanMod : public NoModule
 {

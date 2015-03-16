@@ -19,7 +19,7 @@
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nosettings.h"
-#include "noznc.h"
+#include "noapp.h"
 
 using std::set;
 using std::vector;
@@ -648,7 +648,7 @@ void NoChannel::SetKey(const NoString& s)
     if (m_sKey != s) {
         m_sKey = s;
         if (m_bInConfig) {
-            CZNC::Get().SetConfigState(CZNC::ECONFIG_NEED_WRITE);
+            NoApp::Get().SetConfigState(NoApp::ECONFIG_NEED_WRITE);
         }
     }
 }
@@ -658,7 +658,7 @@ void NoChannel::SetInConfig(bool b)
     if (m_bInConfig != b) {
         m_bInConfig = b;
         if (m_bInConfig) {
-            CZNC::Get().SetConfigState(CZNC::ECONFIG_NEED_WRITE);
+            NoApp::Get().SetConfigState(NoApp::ECONFIG_NEED_WRITE);
         }
     }
 }

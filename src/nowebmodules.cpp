@@ -19,7 +19,7 @@
 #include "nodir.h"
 #include "nouser.h"
 #include "nonetwork.h"
-#include "noznc.h"
+#include "noapp.h"
 #include <algorithm>
 #include <sstream>
 
@@ -94,7 +94,7 @@ NoTagHandler::NoTagHandler(NoWebSock& WebSock) : NoTemplateTagHandler(), m_WebSo
 bool NoTagHandler::HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
 {
     if (sName.Equals("URLPARAM")) {
-        // sOutput = CZNC::Get()
+        // sOutput = NoApp::Get()
         sOutput = m_WebSock.GetParam(sArgs.Token(0), false);
         return true;
     }
@@ -221,8 +221,8 @@ NoWebSock::~NoWebSock()
         pUser->AddBytesWritten(GetBytesWritten());
         pUser->AddBytesRead(GetBytesRead());
     } else {
-        CZNC::Get().AddBytesWritten(GetBytesWritten());
-        CZNC::Get().AddBytesRead(GetBytesRead());
+        NoApp::Get().AddBytesWritten(GetBytesWritten());
+        NoApp::Get().AddBytesRead(GetBytesRead());
     }
 
     // bytes have been accounted for, so make sure they don't get again:
@@ -264,7 +264,7 @@ void NoWebSock::GetAvailSkins(NoStringVector& vRet) const
 
 NoStringVector NoWebSock::GetDirs(NoModule* pModule, bool bIsTemplate)
 {
-    NoString sHomeSkinsDir(CZNC::Get().GetZNCPath() + "/webskins/");
+    NoString sHomeSkinsDir(NoApp::Get().GetZNCPath() + "/webskins/");
     NoString sSkinName(GetSkinName());
     NoStringVector vsResult;
 
@@ -340,8 +340,8 @@ void NoWebSock::SetVars()
 {
     m_Template["SessionUser"] = GetUser();
     m_Template["SessionIP"] = GetRemoteIP();
-    m_Template["Tag"] = CZNC::GetTag(GetSession()->GetUser() != nullptr, true);
-    m_Template["Version"] = CZNC::GetVersion();
+    m_Template["Tag"] = NoApp::GetTag(GetSession()->GetUser() != nullptr, true);
+    m_Template["Version"] = NoApp::GetVersion();
     m_Template["SkinName"] = GetSkinName();
     m_Template["_CSRF_Check"] = GetCSRFCheck();
     m_Template["URIPrefix"] = GetURIPrefix();
@@ -354,7 +354,7 @@ void NoWebSock::SetVars()
     GetSession()->ClearMessageLoops();
 
     // Global Mods
-    NoModules& vgMods = CZNC::Get().GetModules();
+    NoModules& vgMods = NoApp::Get().GetModules();
     for (NoModule* pgMod : vgMods) {
         AddModLoop("GlobalModLoop", *pgMod);
     }
@@ -522,10 +522,10 @@ NoWebSock::EPageReqResult NoWebSock::PrintTemplate(const NoString& sPageName, No
 
 NoString NoWebSock::GetSkinPath(const NoString& sSkinName)
 {
-    NoString sRet = CZNC::Get().GetZNCPath() + "/webskins/" + sSkinName;
+    NoString sRet = NoApp::Get().GetZNCPath() + "/webskins/" + sSkinName;
 
     if (!NoFile::IsDir(sRet)) {
-        sRet = CZNC::Get().GetCurPath() + "/webskins/" + sSkinName;
+        sRet = NoApp::Get().GetCurPath() + "/webskins/" + sSkinName;
 
         if (!NoFile::IsDir(sRet)) {
             sRet = NoString(_SKINDIR_) + "/" + sSkinName;
@@ -604,7 +604,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
     //
     // When their IP is wrong, we give them an invalid cookie. This makes
     // sure that they will get a new cookie on their next request.
-    if (CZNC::Get().GetProtectWebSessions() && GetSession()->GetIP() != GetRemoteIP()) {
+    if (NoApp::Get().GetProtectWebSessions() && GetSession()->GetIP() != GetRemoteIP()) {
         DEBUG("Expected IP: " << GetSession()->GetIP());
         DEBUG("Remote IP:   " << GetRemoteIP());
         SendCookie("SessionId", "WRONG_IP_FOR_SESSION");
@@ -743,7 +743,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
 
         switch (eModType) {
         case NoModInfo::GlobalModule:
-            pModule = CZNC::Get().GetModules().FindModule(m_sModName);
+            pModule = NoApp::Get().GetModules().FindModule(m_sModName);
             break;
         case NoModInfo::UserModule:
             pModule = GetSession()->GetUser()->GetModules().FindModule(m_sModName);
@@ -908,7 +908,7 @@ bool NoWebSock::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasi
     // Some authentication module could need some time, block this socket
     // until then. CWebAuth will UnPauseRead().
     PauseRead();
-    CZNC::Get().AuthUser(m_spAuth);
+    NoApp::Get().AuthUser(m_spAuth);
 
     // If CWebAuth already set this, don't change it.
     return IsLoggedIn();
@@ -930,5 +930,5 @@ NoString NoWebSock::GetSkinName()
         return spSession->GetUser()->GetSkinName();
     }
 
-    return CZNC::Get().GetSkinName();
+    return NoApp::Get().GetSkinName();
 }

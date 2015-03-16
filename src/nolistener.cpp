@@ -15,11 +15,11 @@
  */
 
 #include "nolistener.h"
-#include "noznc.h"
+#include "noapp.h"
 
 NoListener::~NoListener()
 {
-    if (m_pListener) CZNC::Get().GetManager().DelSockByAddr(m_pListener);
+    if (m_pListener) NoApp::Get().GetManager().DelSockByAddr(m_pListener);
 }
 
 bool NoListener::Listen()
@@ -35,7 +35,7 @@ bool NoListener::Listen()
 #ifdef HAVE_LIBSSL
     if (IsSSL()) {
         bSSL = true;
-        m_pListener->SetPemLocation(CZNC::Get().GetPemLocation());
+        m_pListener->SetPemLocation(NoApp::Get().GetPemLocation());
     }
 #endif
 
@@ -43,7 +43,7 @@ bool NoListener::Listen()
     // Make sure there is a consistent error message, not something random
     // which might even be "Error: Success".
     errno = EINVAL;
-    return CZNC::Get().GetManager().ListenHost(m_uPort, "_LISTENER", m_sBindHost, bSSL, SOMAXCONN, m_pListener, 0, m_eAddr);
+    return NoApp::Get().GetManager().ListenHost(m_uPort, "_LISTENER", m_sBindHost, bSSL, SOMAXCONN, m_pListener, 0, m_eAddr);
 }
 
 void NoListener::ResetRealListener() { m_pListener = nullptr; }
@@ -52,7 +52,7 @@ NoRealListener::~NoRealListener() { m_Listener.ResetRealListener(); }
 
 bool NoRealListener::ConnectionFrom(const NoString& sHost, unsigned short uPort)
 {
-    bool bHostAllowed = CZNC::Get().IsHostAllowed(sHost);
+    bool bHostAllowed = NoApp::Get().IsHostAllowed(sHost);
     DEBUG(GetSockName() << " == ConnectionFrom(" << sHost << ", " << uPort << ") ["
                         << (bHostAllowed ? "Allowed" : "Not allowed") << "]");
     return bHostAllowed;
@@ -61,7 +61,7 @@ bool NoRealListener::ConnectionFrom(const NoString& sHost, unsigned short uPort)
 Csock* NoRealListener::GetSockObj(const NoString& sHost, unsigned short uPort)
 {
     NoIncomingConnection* pClient = new NoIncomingConnection(sHost, uPort, m_Listener.GetAcceptType(), m_Listener.GetURIPrefix());
-    if (CZNC::Get().AllowConnectionFrom(sHost)) {
+    if (NoApp::Get().AllowConnectionFrom(sHost)) {
         GLOBALMODULECALL(OnClientConnect(pClient, sHost, uPort), NOTHING);
     } else {
         pClient->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
@@ -77,9 +77,9 @@ void NoRealListener::SockError(int iErrno, const NoString& sDescription)
     if (iErrno == EMFILE) {
         // We have too many open fds, let's close this listening port to be able to continue
         // to work, next rehash will (try to) reopen it.
-        CZNC::Get().Broadcast("We hit the FD limit, closing listening socket on [" + GetLocalIP() + " : " +
+        NoApp::Get().Broadcast("We hit the FD limit, closing listening socket on [" + GetLocalIP() + " : " +
                               NoString(GetLocalPort()) + "]");
-        CZNC::Get().Broadcast("An admin has to rehash to reopen the listening port");
+        NoApp::Get().Broadcast("An admin has to rehash to reopen the listening port");
         Close();
     }
 }
@@ -126,7 +126,7 @@ void NoIncomingConnection::ReadLine(const NoString& sLine)
         }
 
         pSock = new NoClient();
-        CZNC::Get().GetManager().SwapSockByAddr(pSock, this);
+        NoApp::Get().GetManager().SwapSockByAddr(pSock, this);
 
         // And don't forget to give it some sane name / timeout
         pSock->SetSockName("USR::???");
@@ -142,7 +142,7 @@ void NoIncomingConnection::ReadLine(const NoString& sLine)
         }
 
         pSock = new NoWebSock(m_sURIPrefix);
-        CZNC::Get().GetManager().SwapSockByAddr(pSock, this);
+        NoApp::Get().GetManager().SwapSockByAddr(pSock, this);
 
         // And don't forget to give it some sane name / timeout
         pSock->SetSockName("WebMod::Client");

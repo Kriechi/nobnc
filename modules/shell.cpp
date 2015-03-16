@@ -17,7 +17,7 @@
 #include <znc/nodir.h>
 #include <znc/nofile.h>
 #include <znc/nouser.h>
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 #include <znc/noexecsock.h>
 
 using std::vector;
@@ -59,7 +59,7 @@ private:
 class NoShellMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoShellMod) { m_sPath = CZNC::Get().GetHomePath(); }
+    MODCONSTRUCTOR(NoShellMod) { m_sPath = NoApp::Get().GetHomePath(); }
 
     virtual ~NoShellMod()
     {
@@ -88,7 +88,7 @@ public:
         if (sCommand.Equals("cd")) {
             NoString sArg = sLine.Token(1, true);
             NoString sPath =
-            NoDir::ChangeDir(m_sPath, (sArg.empty() ? NoString(CZNC::Get().GetHomePath()) : sArg), CZNC::Get().GetHomePath());
+            NoDir::ChangeDir(m_sPath, (sArg.empty() ? NoString(NoApp::Get().GetHomePath()) : sArg), NoApp::Get().GetHomePath());
             NoFile Dir(sPath);
 
             if (Dir.IsDir()) {

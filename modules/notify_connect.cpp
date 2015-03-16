@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 #include <znc/nouser.h>
 
 class NoNotifyConnectMod : public NoModule
@@ -33,7 +33,7 @@ public:
     }
 
 private:
-    void SendAdmins(const NoString& msg) { CZNC::Get().Broadcast(msg, true, nullptr, GetClient()); }
+    void SendAdmins(const NoString& msg) { NoApp::Get().Broadcast(msg, true, nullptr, GetClient()); }
 };
 
 template <> void TModInfo<NoNotifyConnectMod>(NoModInfo& Info) { Info.SetWikiPage("notify_connect"); }

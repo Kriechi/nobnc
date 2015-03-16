@@ -18,7 +18,7 @@
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nosslverifyhost.h"
-#include "noznc.h"
+#include "noapp.h"
 #include <signal.h>
 #include <random>
 
@@ -52,8 +52,8 @@ NoBaseSocket::NoBaseSocket(int timeout)
 #ifdef HAVE_LIBSSL
     DisableSSLCompression();
     FollowSSLCipherServerPreference();
-    DisableSSLProtocols(CZNC::Get().GetDisabledSSLProtocols());
-    NoString sCipher = CZNC::Get().GetSSLCiphers();
+    DisableSSLProtocols(NoApp::Get().GetDisabledSSLProtocols());
+    NoString sCipher = NoApp::Get().GetSSLCiphers();
     if (sCipher.empty()) {
         sCipher = ZNC_DefaultCipher();
     }
@@ -67,7 +67,7 @@ NoBaseSocket::NoBaseSocket(const NoString& sHost, u_short port, int timeout)
 #ifdef HAVE_LIBSSL
     DisableSSLCompression();
     FollowSSLCipherServerPreference();
-    DisableSSLProtocols(CZNC::Get().GetDisabledSSLProtocols());
+    DisableSSLProtocols(NoApp::Get().GetDisabledSSLProtocols());
 #endif
 }
 
@@ -409,7 +409,7 @@ void NoSocketManager::FinishConnect(const NoString& sHostname,
     C.SetIsSSL(bSSL);
     C.SetBindHost(sBindHost);
 #ifdef HAVE_LIBSSL
-    NoString sCipher = CZNC::Get().GetSSLCiphers();
+    NoString sCipher = NoApp::Get().GetSSLCiphers();
     if (sCipher.empty()) {
         sCipher = ZNC_DefaultCipher();
     }
@@ -450,8 +450,8 @@ NoSocket::~NoSocket()
         pUser->AddBytesWritten(GetBytesWritten());
         pUser->AddBytesRead(GetBytesRead());
     } else {
-        CZNC::Get().AddBytesWritten(GetBytesWritten());
-        CZNC::Get().AddBytesRead(GetBytesRead());
+        NoApp::Get().AddBytesWritten(GetBytesWritten());
+        NoApp::Get().AddBytesRead(GetBytesRead());
     }
 }
 
@@ -473,7 +473,7 @@ void NoSocket::SockError(int iErrno, const NoString& sDescription)
 
 bool NoSocket::ConnectionFrom(const NoString& sHost, unsigned short uPort)
 {
-    return CZNC::Get().AllowConnectionFrom(sHost);
+    return NoApp::Get().AllowConnectionFrom(sHost);
 }
 
 bool NoSocket::Connect(const NoString& sHostname, unsigned short uPort, bool bSSL, unsigned int uTimeout)

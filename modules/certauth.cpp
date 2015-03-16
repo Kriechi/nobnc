@@ -17,7 +17,7 @@
 #define REQUIRESSL
 
 #include <znc/nouser.h>
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 
 using std::map;
 using std::vector;
@@ -46,7 +46,7 @@ public:
 
     bool OnBoot() override
     {
-        const vector<NoListener*>& vListeners = CZNC::Get().GetListeners();
+        const vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
         vector<NoListener*>::const_iterator it;
 
         // We need the SSL_VERIFY_PEER flag on all listeners, or else
@@ -57,7 +57,7 @@ public:
         for (NoStringMap::const_iterator it1 = BeginNV(); it1 != EndNV(); ++it1) {
             NoStringVector vsKeys;
 
-            if (CZNC::Get().FindUser(it1->first) == nullptr) {
+            if (NoApp::Get().FindUser(it1->first) == nullptr) {
                 DEBUG("Unknown user in saved data [" + it1->first + "]");
                 continue;
             }
@@ -110,7 +110,7 @@ public:
     {
         const NoString sUser = Auth->GetUsername();
         Csock* pSock = Auth->GetSocket();
-        NoUser* pUser = CZNC::Get().FindUser(sUser);
+        NoUser* pUser = NoApp::Get().FindUser(sUser);
 
         if (pSock == nullptr || pUser == nullptr) return CONTINUE;
 

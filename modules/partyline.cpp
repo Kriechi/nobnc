@@ -93,7 +93,7 @@ public:
             set<NoString> ssNicks = (*it)->GetNicks();
 
             for (set<NoString>::const_iterator it2 = ssNicks.begin(); it2 != ssNicks.end(); ++it2) {
-                NoUser* pUser = CZNC::Get().FindUser(*it2);
+                NoUser* pUser = NoApp::Get().FindUser(*it2);
                 vector<NoClient*> vClients = pUser->GetAllClients();
 
                 for (vector<NoClient*>::const_iterator it3 = vClients.begin(); it3 != vClients.end(); ++it3) {
@@ -120,7 +120,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
+        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
 
         for (map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             NoUser* pUser = it->second;
@@ -527,7 +527,7 @@ public:
                     false);
         } else {
             NoString sNick = sTarget.LeftChomp_n(1);
-            NoUser* pTargetUser = CZNC::Get().FindUser(sNick);
+            NoUser* pTargetUser = NoApp::Get().FindUser(sNick);
 
             if (pTargetUser) {
                 vector<NoClient*> vClients = pTargetUser->GetAllClients();
@@ -613,7 +613,7 @@ public:
                  NoUser* pUser = nullptr,
                  NoClient* pClient = nullptr)
     {
-        const map<NoString, NoUser*>& msUsers = CZNC::Get().GetUserMap();
+        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
 
         if (!pUser) pUser = GetUser();
         if (!pClient) pClient = GetClient();
@@ -645,7 +645,7 @@ public:
         NoString sNickList;
 
         for (set<NoString>::const_iterator it = ssNicks.begin(); it != ssNicks.end(); ++it) {
-            NoUser* pChanUser = CZNC::Get().FindUser(*it);
+            NoUser* pChanUser = NoApp::Get().FindUser(*it);
 
             if (pChanUser == pUser) {
                 continue;

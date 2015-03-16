@@ -16,7 +16,7 @@
 
 #include "nomodules.h"
 #include "nodir.h"
-#include "noznc.h"
+#include "noapp.h"
 #include <dlfcn.h>
 
 using std::map;
@@ -522,7 +522,7 @@ bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, NoMod
     NoModule* pModule = Info.GetLoader()(p, pUser, pNetwork, sModule, sDataPath, eType);
     pModule->SetDescription(Info.GetDescription());
     pModule->SetArgs(sArgs);
-    pModule->SetModPath(NoDir::ChangeDir(CZNC::Get().GetCurPath(), sModPath));
+    pModule->SetModPath(NoDir::ChangeDir(NoApp::Get().GetCurPath(), sModPath));
     push_back(pModule);
 
     bool bLoaded;
@@ -737,7 +737,7 @@ NoModules::ModDirList NoModules::GetModDirs()
     NoString sDir;
 
     // ~/.znc/modules
-    sDir = CZNC::Get().GetModPath() + "/";
+    sDir = NoApp::Get().GetModPath() + "/";
     ret.push(std::make_pair(sDir, sDir));
 
     // <moduledir> and <datadir> (<prefix>/lib/znc)

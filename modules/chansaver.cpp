@@ -43,7 +43,7 @@ public:
 
     void LoadUsers()
     {
-        const std::map<NoString, NoUser*>& vUsers = CZNC::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& vUsers = NoApp::Get().GetUserMap();
         for (const auto& user : vUsers) {
             LoadUser(user.second);
         }

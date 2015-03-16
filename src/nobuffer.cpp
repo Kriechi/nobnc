@@ -17,7 +17,7 @@
 #include "nobuffer.h"
 #include "noclient.h"
 #include "nouser.h"
-#include "noznc.h"
+#include "noapp.h"
 
 NoBuffer::NoBuffer(unsigned int limit) : m_limit(limit)
 {
@@ -78,7 +78,7 @@ NoString NoBuffer::GetLine(unsigned int idx, const NoClient& client, const NoStr
 
 bool NoBuffer::SetLimit(unsigned int limit, bool force)
 {
-    if (!force && limit > CZNC::Get().GetMaxBufferSize()) {
+    if (!force && limit > NoApp::Get().GetMaxBufferSize()) {
         return false;
     }
 

@@ -15,7 +15,7 @@
  */
 
 #include <znc/nouser.h>
-#include <znc/noznc.h>
+#include <znc/noapp.h>
 
 using std::map;
 using std::pair;
@@ -50,7 +50,7 @@ private:
             return;
         }
 
-        const MUsers& mUsers = CZNC::Get().GetUserMap();
+        const MUsers& mUsers = NoApp::Get().GetUserMap();
         MUsers::const_iterator it;
         NoTable Table;
 
@@ -95,11 +95,11 @@ public:
     bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            NoModules& GModules = CZNC::Get().GetModules();
+            NoModules& GModules = NoApp::Get().GetModules();
             Tmpl["WebAdminLoaded"] = NoString(GModules.FindModule("webadmin") != nullptr);
 
             MTimeMulti mmSorted;
-            const MUsers& mUsers = CZNC::Get().GetUserMap();
+            const MUsers& mUsers = NoApp::Get().GetUserMap();
 
             for (MUsers::const_iterator uit = mUsers.begin(); uit != mUsers.end(); ++uit) {
                 mmSorted.insert(pair<time_t, NoUser*>(GetTime(uit->second), uit->second));
@@ -123,7 +123,7 @@ public:
     bool OnEmbeddedWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/user" && WebSock.GetSession()->IsAdmin()) {
-            NoUser* pUser = CZNC::Get().FindUser(Tmpl["Username"]);
+            NoUser* pUser = NoApp::Get().FindUser(Tmpl["Username"]);
             if (pUser) {
                 Tmpl["LastSeen"] = FormatLastSeen(pUser);
             }
