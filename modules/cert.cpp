@@ -16,10 +16,10 @@
 
 #define REQUIRESSL
 
-#include <znc/nofile.h>
-#include <znc/nouser.h>
-#include <znc/nomodules.h>
-#include <znc/noircsock.h>
+#include <no/nofile.h>
+#include <no/nouser.h>
+#include <no/nomodules.h>
+#include <no/noircsock.h>
 
 class NoCertMod : public NoModule
 {

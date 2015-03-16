@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/nonetwork.h>
+#include <no/nonetwork.h>
 
 class NoPerform : public NoModule
 {

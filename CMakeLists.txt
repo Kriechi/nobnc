@@ -15,40 +15,40 @@ include(DefineVersion)
 
 ### SOURCES
 
-list(APPEND NO_HEADERS include/znc/defines.h
-                       include/znc/main.h
-                       include/znc/noapp.h
-                       include/znc/nobuffer.h
-                       include/znc/nochannel.h
-                       include/znc/noclient.h
-                       include/znc/nodebug.h
-                       include/znc/nodir.h
-                       include/znc/noexecsock.h
-                       include/znc/nofile.h
-                       include/znc/nohttpsock.h
-                       include/znc/noircsock.h
-                       include/znc/nolistener.h
-                       include/znc/nomd5.h
-                       include/znc/nomessage.h
-                       include/znc/nomodule.h
-                       include/znc/nomodules.h
-                       include/znc/nonetwork.h
-                       include/znc/nonick.h
-                       include/znc/noquery.h
-                       include/znc/noserver.h
-                       include/znc/nosettings.h
-                       include/znc/nosha256.h
-                       include/znc/nosocket.h
-                       include/znc/nosslverifyhost.h
-                       include/znc/nostring.h
-                       include/znc/notemplate.h
-                       include/znc/nothreads.h
-                       include/znc/notimer.h
-                       include/znc/nouser.h
-                       include/znc/noutils.h
-                       include/znc/nowebmodules.h
-                       ${PROJECT_BINARY_DIR}/include/znc/Csocket.h
-                       ${PROJECT_BINARY_DIR}/include/znc/noversion.h
+list(APPEND NO_HEADERS include/no/defines.h
+                       include/no/main.h
+                       include/no/noapp.h
+                       include/no/nobuffer.h
+                       include/no/nochannel.h
+                       include/no/noclient.h
+                       include/no/nodebug.h
+                       include/no/nodir.h
+                       include/no/noexecsock.h
+                       include/no/nofile.h
+                       include/no/nohttpsock.h
+                       include/no/noircsock.h
+                       include/no/nolistener.h
+                       include/no/nomd5.h
+                       include/no/nomessage.h
+                       include/no/nomodule.h
+                       include/no/nomodules.h
+                       include/no/nonetwork.h
+                       include/no/nonick.h
+                       include/no/noquery.h
+                       include/no/noserver.h
+                       include/no/nosettings.h
+                       include/no/nosha256.h
+                       include/no/nosocket.h
+                       include/no/nosslverifyhost.h
+                       include/no/nostring.h
+                       include/no/notemplate.h
+                       include/no/nothreads.h
+                       include/no/notimer.h
+                       include/no/nouser.h
+                       include/no/noutils.h
+                       include/no/nowebmodules.h
+                       ${PROJECT_BINARY_DIR}/include/no/Csocket.h
+                       ${PROJECT_BINARY_DIR}/include/no/noversion.h
 )
 
 list(APPEND NO_SOURCES src/noapp.cpp
@@ -89,8 +89,8 @@ list(APPEND NO_SOURCES src/noapp.cpp
 
 add_library(libno SHARED ${NO_SOURCES} ${NO_HEADERS})
 include_directories(${NO_INCLUDEDIRS})
-include_directories(${PROJECT_SOURCE_DIR}/include/znc) ### TODO: cleanup
-include_directories(${PROJECT_BINARY_DIR}/include/znc) ### TODO: cleanup
+include_directories(${PROJECT_SOURCE_DIR}/include/no) ### TODO: cleanup
+include_directories(${PROJECT_BINARY_DIR}/include/no) ### TODO: cleanup
 target_link_libraries(libno ${NO_LIBRARIES})
 set_target_properties(libno PROPERTIES OUTPUT_NAME no)
 add_dependencies(libno version)
@@ -111,27 +111,27 @@ if(NOT DEVELOPER_BUILD)
     install(TARGETS libno LIBRARY DESTINATION ${INSTALL_LIBDIR}
                           RUNTIME DESTINATION ${INSTALL_BINDIR}
                           ARCHIVE DESTINATION ${INSTALL_LIBDIR})
-    install(DIRECTORY include/znc DESTINATION ${INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN *.h)
+    install(DIRECTORY include/no DESTINATION ${INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN *.h)
 endif()
 
 ### GENERATED FILES
 
-configure_file("${PROJECT_SOURCE_DIR}/include/znc/noconfig.h.in"
-               "${PROJECT_BINARY_DIR}/include/znc/noconfig.h")
-configure_file("${PROJECT_SOURCE_DIR}/include/znc/noversion.h.in"
-               "${PROJECT_BINARY_DIR}/include/znc/noversion.h")
+configure_file("${PROJECT_SOURCE_DIR}/include/no/noconfig.h.in"
+               "${PROJECT_BINARY_DIR}/include/no/noconfig.h")
+configure_file("${PROJECT_SOURCE_DIR}/include/no/noversion.h.in"
+               "${PROJECT_BINARY_DIR}/include/no/noversion.h")
 configure_file("${PROJECT_SOURCE_DIR}/src/noversion.cpp.in"
                "${PROJECT_BINARY_DIR}/src/noversion.cpp")
 configure_file("${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.cc"
                "${PROJECT_BINARY_DIR}/src/Csocket.cpp" COPYONLY)
 configure_file("${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.h"
-               "${PROJECT_BINARY_DIR}/include/znc/Csocket.h" COPYONLY)
+               "${PROJECT_BINARY_DIR}/include/no/Csocket.h" COPYONLY)
 
 if(NOT DEVELOPER_BUILD)
-    install(FILES "${PROJECT_BINARY_DIR}/include/znc/noconfig.h"
-            DESTINATION ${INSTALL_INCLUDEDIR}/znc)
-    install(FILES "${PROJECT_BINARY_DIR}/include/znc/noversion.h"
-            DESTINATION ${INSTALL_INCLUDEDIR}/znc)
+    install(FILES "${PROJECT_BINARY_DIR}/include/no/noconfig.h"
+            DESTINATION ${INSTALL_INCLUDEDIR}/no)
+    install(FILES "${PROJECT_BINARY_DIR}/include/no/noversion.h"
+            DESTINATION ${INSTALL_INCLUDEDIR}/no)
 endif()
 
 process_definitions("${NO_DEFINITIONS}" NO_DEFINITION_FLAGS)

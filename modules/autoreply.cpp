@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <znc/nonetwork.h>
-#include <znc/noircsock.h>
+#include <no/nonetwork.h>
+#include <no/noircsock.h>
 
 class NoAutoReplyMod : public NoModule
 {

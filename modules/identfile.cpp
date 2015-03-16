@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/nofile.h>
-#include <znc/noircsock.h>
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
+#include <no/nofile.h>
+#include <no/noircsock.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
 
 class NoIdentFileModule : public NoModule
 {

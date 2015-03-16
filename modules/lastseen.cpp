@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/nouser.h>
-#include <znc/noapp.h>
+#include <no/nouser.h>
+#include <no/noapp.h>
 
 using std::map;
 using std::pair;

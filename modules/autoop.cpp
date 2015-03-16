@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/nonetwork.h>
-#include <znc/nochannel.h>
+#include <no/nonetwork.h>
+#include <no/nochannel.h>
 
 using std::map;
 using std::set;

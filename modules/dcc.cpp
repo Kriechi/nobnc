@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/noapp.h>
-#include <znc/nouser.h>
-#include <znc/nofile.h>
-#include <znc/nodir.h>
+#include <no/noapp.h>
+#include <no/nouser.h>
+#include <no/nofile.h>
+#include <no/nodir.h>
 
 using std::set;
 

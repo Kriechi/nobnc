@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/nofile.h>
-#include <znc/noserver.h>
-#include <znc/nonetwork.h>
-#include <znc/nouser.h>
+#include <no/nofile.h>
+#include <no/noserver.h>
+#include <no/nonetwork.h>
+#include <no/nouser.h>
 
 #include <syslog.h>
 

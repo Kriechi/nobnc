@@ -17,10 +17,10 @@
  * limitations under the License.
  */
 
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
-#include <znc/nochannel.h>
-#include <znc/noircsock.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
+#include <no/nochannel.h>
+#include <no/noircsock.h>
 
 using std::map;
 using std::vector;

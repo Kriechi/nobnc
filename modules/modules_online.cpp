@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
-#include <znc/noapp.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
+#include <no/noapp.h>
 
 class NoFakeOnlineModule : public NoModule
 {

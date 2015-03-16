@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/nochannel.h>
-#include <znc/nonetwork.h>
+#include <no/nochannel.h>
+#include <no/nonetwork.h>
 
 using std::list;
 using std::vector;

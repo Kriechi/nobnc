@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/noapp.h>
+#include <no/noapp.h>
 
 using std::stringstream;
 

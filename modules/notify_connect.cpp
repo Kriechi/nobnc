@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/noapp.h>
-#include <znc/nouser.h>
+#include <no/noapp.h>
+#include <no/nouser.h>
 
 class NoNotifyConnectMod : public NoModule
 {

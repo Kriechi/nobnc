@@ -15,7 +15,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <znc/nothreads.h>
+#include <no/nothreads.h>
 
 class CWaitingJob : public NoJob
 {

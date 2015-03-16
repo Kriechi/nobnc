@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
-#include <znc/noircsock.h>
-#include <znc/nochannel.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
+#include <no/noircsock.h>
+#include <no/nochannel.h>
 
 using std::set;
 

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/noclient.h>
-#include <znc/nochannel.h>
-#include <znc/nomodules.h>
-#include <znc/nonetwork.h>
+#include <no/noclient.h>
+#include <no/nochannel.h>
+#include <no/nomodules.h>
+#include <no/nonetwork.h>
 
 #include <sstream>
 #include <stdexcept>

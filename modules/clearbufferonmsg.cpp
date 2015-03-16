@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <znc/nonetwork.h>
-#include <znc/nouser.h>
-#include <znc/nochannel.h>
-#include <znc/noquery.h>
+#include <no/nonetwork.h>
+#include <no/nouser.h>
+#include <no/nochannel.h>
+#include <no/noquery.h>
 
 using std::vector;
 

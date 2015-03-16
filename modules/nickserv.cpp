@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/nomodules.h>
-#include <znc/nouser.h>
+#include <no/nomodules.h>
+#include <no/nouser.h>
 
 class NoNickServ : public NoModule
 {

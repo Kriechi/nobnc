@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include <znc/nochannel.h>
-#include <znc/noserver.h>
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
-#include <znc/noircsock.h>
+#include <no/nochannel.h>
+#include <no/noserver.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
+#include <no/noircsock.h>
 
 using std::stringstream;
 using std::make_pair;

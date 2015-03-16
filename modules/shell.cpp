@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include <znc/nodir.h>
-#include <znc/nofile.h>
-#include <znc/nouser.h>
-#include <znc/noapp.h>
-#include <znc/noexecsock.h>
+#include <no/nodir.h>
+#include <no/nofile.h>
+#include <no/nouser.h>
+#include <no/noapp.h>
+#include <no/noexecsock.h>
 
 using std::vector;
 

@@ -22,8 +22,8 @@
  *
  */
 
-#include <znc/nochannel.h>
-#include <znc/nonetwork.h>
+#include <no/nochannel.h>
+#include <no/nonetwork.h>
 
 class NoRejoinJob : public NoTimer
 {

@@ -15,7 +15,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <znc/nostring.h>
+#include <no/nostring.h>
 
 // GTest uses this function to output objects
 static void PrintTo(const NoString& s, std::ostream* o)

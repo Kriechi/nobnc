@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <znc/nodir.h>
-#include <znc/nofile.h>
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
-#include <znc/nochannel.h>
-#include <znc/noserver.h>
+#include <no/nodir.h>
+#include <no/nofile.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
+#include <no/nochannel.h>
+#include <no/noserver.h>
 #include <algorithm>
 
 using std::vector;

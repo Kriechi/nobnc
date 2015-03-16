@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
 
 #define SIMPLE_AWAY_DEFAULT_REASON "Auto away at %s"
 #define SIMPLE_AWAY_DEFAULT_TIME 60

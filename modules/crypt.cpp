@@ -31,9 +31,9 @@
 //       and gets sent to your client in plain text.
 //
 
-#include <znc/nochannel.h>
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
+#include <no/nochannel.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
 
 #define REQUIRESSL 1
 #define NICK_PREFIX_KEY "[nick-prefix]"

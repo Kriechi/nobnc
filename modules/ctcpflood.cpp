@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/nomodules.h>
-#include <znc/nochannel.h>
+#include <no/nomodules.h>
+#include <no/nochannel.h>
 
 class NoCtcpFloodMod : public NoModule
 {

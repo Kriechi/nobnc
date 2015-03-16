@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
 
 using std::set;
 

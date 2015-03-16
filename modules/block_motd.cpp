@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <znc/nomodules.h>
+#include <no/nomodules.h>
 
 class NoBlockMotd : public NoModule
 {

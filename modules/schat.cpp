@@ -21,9 +21,9 @@
 
 #define REQUIRESSL
 
-#include <znc/nofile.h>
-#include <znc/nouser.h>
-#include <znc/nonetwork.h>
+#include <no/nofile.h>
+#include <no/nouser.h>
+#include <no/nonetwork.h>
 
 using std::pair;
 using std::stringstream;
