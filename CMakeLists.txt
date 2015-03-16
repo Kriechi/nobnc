@@ -15,6 +15,42 @@ include(DefineVersion)
 
 ### SOURCES
 
+list(APPEND NO_HEADERS include/znc/defines.h
+                       include/znc/main.h
+                       include/znc/noapp.h
+                       include/znc/nobuffer.h
+                       include/znc/nochannel.h
+                       include/znc/noclient.h
+                       include/znc/nodebug.h
+                       include/znc/nodir.h
+                       include/znc/noexecsock.h
+                       include/znc/nofile.h
+                       include/znc/nohttpsock.h
+                       include/znc/noircsock.h
+                       include/znc/nolistener.h
+                       include/znc/nomd5.h
+                       include/znc/nomessage.h
+                       include/znc/nomodule.h
+                       include/znc/nomodules.h
+                       include/znc/nonetwork.h
+                       include/znc/nonick.h
+                       include/znc/noquery.h
+                       include/znc/noserver.h
+                       include/znc/nosettings.h
+                       include/znc/nosha256.h
+                       include/znc/nosocket.h
+                       include/znc/nosslverifyhost.h
+                       include/znc/nostring.h
+                       include/znc/notemplate.h
+                       include/znc/nothreads.h
+                       include/znc/notimer.h
+                       include/znc/nouser.h
+                       include/znc/noutils.h
+                       include/znc/nowebmodules.h
+                       ${PROJECT_BINARY_DIR}/include/znc/Csocket.h
+                       ${PROJECT_BINARY_DIR}/include/znc/noversion.h
+)
+
 list(APPEND NO_SOURCES src/noapp.cpp
                        src/nobuffer.cpp
                        src/nochannel.cpp
@@ -33,9 +69,9 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nonetwork.cpp
                        src/nonick.cpp
                        src/noquery.cpp
-                       src/nosha256.cpp
                        src/noserver.cpp
                        src/nosettings.cpp
+                       src/nosha256.cpp
                        src/nosocket.cpp
                        src/nosslverifyhost.cpp
                        src/nostring.cpp
@@ -51,7 +87,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
 
 ### TARGETS
 
-add_library(libznc SHARED ${NO_SOURCES})
+add_library(libznc SHARED ${NO_SOURCES} ${NO_HEADERS})
 include_directories(${NO_INCLUDEDIRS})
 include_directories(${PROJECT_SOURCE_DIR}/include/znc) ### TODO: cleanup
 include_directories(${PROJECT_BINARY_DIR}/include/znc) ### TODO: cleanup
