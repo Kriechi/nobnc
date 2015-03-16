@@ -18,7 +18,7 @@
 #include "nouser.h"
 #include "nonetwork.h"
 
-NoQuery::NoQuery(const NoString& sName, NoNetwork* pNetwork) : m_name(sName), m_network(pNetwork), m_buffer()
+NoQuery::NoQuery(const NoString& name, NoNetwork* network) : m_name(name), m_network(network), m_buffer()
 {
     setBufferCount(m_network->GetUser()->GetBufferCount(), true);
 }
@@ -42,14 +42,14 @@ unsigned int NoQuery::getBufferCount() const
     return m_buffer.getLimit();
 }
 
-bool NoQuery::setBufferCount(unsigned int u, bool bForce)
+bool NoQuery::setBufferCount(unsigned int count, bool force)
 {
-    return m_buffer.setLimit(u, bForce);
+    return m_buffer.setLimit(count, force);
 }
 
-size_t NoQuery::addBuffer(const NoString& sFormat, const NoString& sText, const timeval* ts)
+size_t NoQuery::addBuffer(const NoString& format, const NoString& text, const timeval* ts)
 {
-    return m_buffer.addMessage(sFormat, sText, ts);
+    return m_buffer.addMessage(format, text, ts);
 }
 
 void NoQuery::clearBuffer()
@@ -57,67 +57,67 @@ void NoQuery::clearBuffer()
     m_buffer.clear();
 }
 
-void NoQuery::sendBuffer(NoClient* pClient)
+void NoQuery::sendBuffer(NoClient* client)
 {
-    sendBuffer(pClient, m_buffer);
+    sendBuffer(client, m_buffer);
 }
 
-void NoQuery::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
+void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
 {
     if (m_network && m_network->IsUserAttached()) {
         // Based on NoChannel::SendBuffer()
-        if (!Buffer.isEmpty()) {
-            const std::vector<NoClient*>& vClients = m_network->GetClients();
-            for (NoClient* pEachClient : vClients) {
-                NoClient* pUseClient = (pClient ? pClient : pEachClient);
+        if (!buffer.isEmpty()) {
+            const std::vector<NoClient*>& clients = m_network->GetClients();
+            for (NoClient* eachClient : clients) {
+                NoClient* useClient = (client ? client : eachClient);
 
-                NoStringMap msParams;
-                msParams["target"] = pUseClient->GetNick();
+                NoStringMap params;
+                params["target"] = useClient->GetNick();
 
-                bool bWasPlaybackActive = pUseClient->IsPlaybackActive();
-                pUseClient->SetPlaybackActive(true);
+                bool wasPlaybackActive = useClient->IsPlaybackActive();
+                useClient->SetPlaybackActive(true);
 
-                bool bBatch = pUseClient->HasBatch();
-                NoString sBatchName = m_name.MD5();
+                bool batch = useClient->HasBatch();
+                NoString batchName = m_name.MD5();
 
-                if (bBatch) {
-                    m_network->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + m_name, pUseClient);
+                if (batch) {
+                    m_network->PutUser(":znc.in BATCH +" + batchName + " znc.in/playback " + m_name, useClient);
                 }
 
-                size_t uSize = Buffer.size();
-                for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
-                    const NoMessage& BufLine = Buffer.getMessage(uIdx);
+                size_t size = buffer.size();
+                for (size_t uIdx = 0; uIdx < size; uIdx++) {
+                    const NoMessage& message = buffer.getMessage(uIdx);
 
-                    if (!pUseClient->HasSelfMessage()) {
-                        NoNick Sender(BufLine.GetFormat().Token(0));
-                        if (Sender.NickEquals(pUseClient->GetNick())) {
+                    if (!useClient->HasSelfMessage()) {
+                        NoNick sender(message.GetFormat().Token(0));
+                        if (sender.NickEquals(useClient->GetNick())) {
                             continue;
                         }
                     }
 
-                    NoString sLine = BufLine.GetLine(*pUseClient, msParams);
-                    if (bBatch) {
-                        NoStringMap msBatchTags = NoUtils::GetMessageTags(sLine);
-                        msBatchTags["batch"] = sBatchName;
-                        NoUtils::SetMessageTags(sLine, msBatchTags);
+                    NoString line = message.GetLine(*useClient, params);
+                    if (batch) {
+                        NoStringMap tags = NoUtils::GetMessageTags(line);
+                        tags["batch"] = batchName;
+                        NoUtils::SetMessageTags(line, tags);
                     }
-                    bool bContinue = false;
-                    NETWORKMODULECALL(OnPrivBufferPlayLine2(*pUseClient, sLine, BufLine.GetTime()),
+                    bool skip = false;
+                    NETWORKMODULECALL(OnPrivBufferPlayLine2(*useClient, line, message.GetTime()),
                                       m_network->GetUser(),
                                       m_network,
                                       nullptr,
-                                      &bContinue);
-                    if (bContinue) continue;
-                    m_network->PutUser(sLine, pUseClient);
+                                      &skip);
+                    if (skip) continue;
+                    m_network->PutUser(line, useClient);
                 }
 
-                if (bBatch) {
-                    m_network->PutUser(":znc.in BATCH -" + sBatchName, pUseClient);
+                if (batch) {
+                    m_network->PutUser(":znc.in BATCH -" + batchName, useClient);
                 }
 
-                pUseClient->SetPlaybackActive(bWasPlaybackActive);
+                useClient->SetPlaybackActive(wasPlaybackActive);
 
-                if (pClient) break;
+                if (client) break;
             }
         }
     }

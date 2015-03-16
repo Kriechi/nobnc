@@ -27,7 +27,7 @@ class NoNetwork;
 class NoQuery
 {
 public:
-    NoQuery(const NoString& sName, NoNetwork* pNetwork);
+    NoQuery(const NoString& name, NoNetwork* network);
     ~NoQuery();
 
     NoQuery(const NoQuery&) = delete;
@@ -37,12 +37,12 @@ public:
 
     const NoBuffer& getBuffer() const;
     unsigned int getBufferCount() const;
-    bool setBufferCount(unsigned int u, bool bForce = false);
-    size_t addBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr);
+    bool setBufferCount(unsigned int count, bool force = false);
+    size_t addBuffer(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
     void clearBuffer();
 
-    void sendBuffer(NoClient* pClient);
-    void sendBuffer(NoClient* pClient, const NoBuffer& Buffer);
+    void sendBuffer(NoClient* client);
+    void sendBuffer(NoClient* client, const NoBuffer& buffer);
 
 private:
     NoString m_name;
