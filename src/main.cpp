@@ -77,10 +77,6 @@ static void thread_setup()
 #define thread_setup()
 #endif
 
-using std::cout;
-using std::endl;
-using std::set;
-
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
 #else
@@ -215,8 +211,8 @@ int main(int argc, char** argv)
             GenerateHelp(argv[0]);
             return 0;
         case 'v':
-            cout << NoApp::GetTag() << endl;
-            cout << NoApp::GetCompileOptionsString() << endl;
+            std::cout << NoApp::GetTag() << std::endl;
+            std::cout << NoApp::GetCompileOptionsString() << std::endl;
             return 0;
         case 'n':
             NoDebug::SetStdoutIsTTY(false);
@@ -292,9 +288,9 @@ int main(int argc, char** argv)
     }
 
     {
-        set<NoModInfo> ssGlobalMods;
-        set<NoModInfo> ssUserMods;
-        set<NoModInfo> ssNetworkMods;
+        std::set<NoModInfo> ssGlobalMods;
+        std::set<NoModInfo> ssUserMods;
+        std::set<NoModInfo> ssNetworkMods;
         NoUtils::PrintAction("Checking for list of available modules");
         pZNC->GetModules().GetAvailableMods(ssGlobalMods, NoModInfo::GlobalModule);
         pZNC->GetModules().GetAvailableMods(ssUserMods, NoModInfo::UserModule);

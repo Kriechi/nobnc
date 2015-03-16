@@ -25,15 +25,6 @@
 #include <tuple>
 #include <algorithm>
 
-using std::endl;
-using std::cout;
-using std::map;
-using std::set;
-using std::vector;
-using std::list;
-using std::tuple;
-using std::make_tuple;
-
 static inline NoString FormatBindError()
 {
     NoString sError = (errno == 0 ? NoString("unknown error, check the host name") : NoString(strerror(errno)));
@@ -63,7 +54,7 @@ NoApp::~NoApp()
     for (const auto& it : m_msUsers) {
         it.second->GetModules().UnloadAll();
 
-        const vector<NoNetwork*>& networks = it.second->GetNetworks();
+        const std::vector<NoNetwork*>& networks = it.second->GetNetworks();
         for (NoNetwork* pNetwork : networks) {
             pNetwork->GetModules().UnloadAll();
         }
@@ -658,9 +649,9 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     vsLines.push_back("</Listener>");
     // !Listen
 
-    set<NoModInfo> ssGlobalMods;
+    std::set<NoModInfo> ssGlobalMods;
     GetModules().GetDefaultMods(ssGlobalMods, NoModInfo::GlobalModule);
-    vector<NoString> vsGlobalModNames;
+    std::vector<NoString> vsGlobalModNames;
     for (const NoModInfo& Info : ssGlobalMods) {
         vsGlobalModNames.push_back(Info.GetName());
         vsLines.push_back("LoadModule = " + Info.GetName());
@@ -700,9 +691,9 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         vsLines.push_back("\tBindHost   = " + sAnswer);
     }
 
-    set<NoModInfo> ssUserMods;
+    std::set<NoModInfo> ssUserMods;
     GetModules().GetDefaultMods(ssUserMods, NoModInfo::UserModule);
-    vector<NoString> vsUserModNames;
+    std::vector<NoString> vsUserModNames;
     for (const NoModInfo& Info : ssUserMods) {
         vsUserModNames.push_back(Info.GetName());
         vsLines.push_back("\tLoadModule = " + Info.GetName());
@@ -723,9 +714,9 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
         vsLines.push_back("\t<Network " + sNetwork + ">");
 
-        set<NoModInfo> ssNetworkMods;
+        std::set<NoModInfo> ssNetworkMods;
         GetModules().GetDefaultMods(ssNetworkMods, NoModInfo::NetworkModule);
-        vector<NoString> vsNetworkModNames;
+        std::vector<NoString> vsNetworkModNames;
         for (const NoModInfo& Info : ssNetworkMods) {
             vsNetworkModNames.push_back(Info.GetName());
             vsLines.push_back("\t\tLoadModule = " + Info.GetName());
@@ -825,14 +816,14 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         NoUtils::PrintMessage("");
         NoUtils::PrintMessage("Printing the new config to stdout:");
         NoUtils::PrintMessage("");
-        cout << endl << "----------------------------------------------------------------------------" << endl << endl;
+        std::cout << std::endl << "----------------------------------------------------------------------------" << std::endl << std::endl;
     }
 
     for (const NoString& sLine : vsLines) {
         if (bFileOpen) {
             File.Write(sLine + "\n");
         } else {
-            cout << sLine << endl;
+            std::cout << sLine << std::endl;
         }
     }
 
@@ -843,17 +834,17 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         else
             NoUtils::PrintStatus(true);
     } else {
-        cout << endl << "----------------------------------------------------------------------------" << endl << endl;
+        std::cout << std::endl << "----------------------------------------------------------------------------" << std::endl << std::endl;
     }
 
     if (File.HadError()) {
         bFileOpen = false;
         NoUtils::PrintMessage("Printing the new config to stdout instead:");
-        cout << endl << "----------------------------------------------------------------------------" << endl << endl;
+        std::cout << std::endl << "----------------------------------------------------------------------------" << std::endl << std::endl;
         for (const NoString& sLine : vsLines) {
-            cout << sLine << endl;
+            std::cout << sLine << std::endl;
         }
-        cout << endl << "----------------------------------------------------------------------------" << endl << endl;
+        std::cout << std::endl << "----------------------------------------------------------------------------" << std::endl << std::endl;
     }
 
     const NoString sProtocol(bListenSSL ? "https" : "http");
@@ -974,9 +965,9 @@ bool NoApp::DoRehash(NoString& sError)
 
     NoString sSavedVersion;
     config.FindStringEntry("version", sSavedVersion);
-    tuple<unsigned int, unsigned int> tSavedVersion =
-    make_tuple(sSavedVersion.Token(0, false, ".").ToUInt(), sSavedVersion.Token(1, false, ".").ToUInt());
-    tuple<unsigned int, unsigned int> tCurrentVersion = make_tuple(NO_VERSION_MAJOR, NO_VERSION_MINOR);
+    std::tuple<unsigned int, unsigned int> tSavedVersion =
+    std::make_tuple(sSavedVersion.Token(0, false, ".").ToUInt(), sSavedVersion.Token(1, false, ".").ToUInt());
+    std::tuple<unsigned int, unsigned int> tCurrentVersion = std::make_tuple(NO_VERSION_MAJOR, NO_VERSION_MINOR);
     if (tSavedVersion < tCurrentVersion) {
         if (sSavedVersion.empty()) {
             sSavedVersion = "< 0.203";
@@ -1005,7 +996,7 @@ bool NoApp::DoRehash(NoString& sError)
         NoString sModName = sModLine.Token(0);
         NoString sArgs = sModLine.Token(1, true);
 
-        if (sModName == "saslauth" && tSavedVersion < make_tuple(0, 207)) {
+        if (sModName == "saslauth" && tSavedVersion < std::make_tuple(0, 207)) {
             // XXX compatibility crap, added in 0.207
             NoUtils::PrintMessage("saslauth module was renamed to cyrusauth. Loading cyrusauth instead.");
             sModName = "cyrusauth";
@@ -1178,7 +1169,7 @@ bool NoApp::DoRehash(NoString& sError)
         NoUtils::PrintMessage("Loading user [" + sUserName + "]");
 
         // Either create a NoUser* or use an existing one
-        map<NoString, NoUser*>::iterator it = m_msDelUsers.find(sUserName);
+        std::map<NoString, NoUser*>::iterator it = m_msDelUsers.find(sUserName);
 
         if (it != m_msDelUsers.end()) {
             pRealUser = it->second;
@@ -1247,7 +1238,7 @@ bool NoApp::DoRehash(NoString& sError)
 
 
     // Unload modules which are no longer in the config
-    set<NoString> ssUnload;
+    std::set<NoString> ssUnload;
     for (NoModule* pCurMod : GetModules()) {
         if (msModules.find(pCurMod->GetModName()) == msModules.end()) ssUnload.insert(pCurMod->GetModName());
     }
@@ -1402,8 +1393,8 @@ bool NoApp::UpdateModule(const NoString& sModule)
 {
     NoModule* pModule;
 
-    map<NoUser*, NoString> musLoaded;
-    map<NoNetwork*, NoString> mnsLoaded;
+    std::map<NoUser*, NoString> musLoaded;
+    std::map<NoNetwork*, NoString> mnsLoaded;
 
     // Unload the module for every user and network
     for (const auto& it : m_msUsers) {
@@ -1416,7 +1407,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
         }
 
         // See if the user has this module loaded to a network
-        vector<NoNetwork*> vNetworks = pUser->GetNetworks();
+        std::vector<NoNetwork*> vNetworks = pUser->GetNetworks();
         for (NoNetwork* pNetwork : vNetworks) {
             pModule = pNetwork->GetModules().FindModule(sModule);
             if (pModule) {
@@ -1477,7 +1468,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
 
 NoUser* NoApp::FindUser(const NoString& sUsername)
 {
-    map<NoString, NoUser*>::iterator it = m_msUsers.find(sUsername);
+    std::map<NoString, NoUser*>::iterator it = m_msUsers.find(sUsername);
 
     if (it != m_msUsers.end()) {
         return it->second;
@@ -1773,7 +1764,7 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
 {
     TrafficStatsMap ret;
     unsigned long long uiUsers_in, uiUsers_out, uiZNC_in, uiZNC_out;
-    const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+    const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
 
     uiUsers_in = uiUsers_out = 0;
     uiZNC_in = BytesRead();
@@ -1862,8 +1853,8 @@ public:
 protected:
     void RunJob() override
     {
-        list<NoNetwork*> ConnectionQueue;
-        list<NoNetwork*>& RealConnectionQueue = NoApp::Get().GetConnectionQueue();
+        std::list<NoNetwork*> ConnectionQueue;
+        std::list<NoNetwork*>& RealConnectionQueue = NoApp::Get().GetConnectionQueue();
 
         // Problem: If a network can't connect right now because e.g. it
         // is throttled, it will re-insert itself into the connection

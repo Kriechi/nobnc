@@ -20,13 +20,6 @@
 #include "nodebug.h"
 #include <algorithm>
 
-using std::stringstream;
-using std::vector;
-using std::list;
-using std::ostream;
-using std::pair;
-using std::map;
-
 void NoTemplateOptions::Parse(const NoString& sLine)
 {
     NoString sName = sLine.Token(0, false, "=").Trim_n().AsUpper();
@@ -87,7 +80,7 @@ NoString NoTemplateLoopContext::GetValue(const NoString& sName, bool bFromIf)
 NoTemplate::~NoTemplate()
 {
     for (const auto& it : m_mvLoops) {
-        const vector<NoTemplate*>& vLoop = it.second;
+        const std::vector<NoTemplate*>& vLoop = it.second;
         for (NoTemplate* pTemplate : vLoop) {
             delete pTemplate;
         }
@@ -249,7 +242,7 @@ NoTemplate& NoTemplate::AddRow(const NoString& sName)
 
 NoTemplate* NoTemplate::GetRow(const NoString& sName, unsigned int uIndex)
 {
-    vector<NoTemplate*>* pvLoop = GetLoop(sName);
+    std::vector<NoTemplate*>* pvLoop = GetLoop(sName);
 
     if (pvLoop) {
         if (pvLoop->size() > uIndex) {
@@ -260,7 +253,7 @@ NoTemplate* NoTemplate::GetRow(const NoString& sName, unsigned int uIndex)
     return nullptr;
 }
 
-vector<NoTemplate*>* NoTemplate::GetLoop(const NoString& sName)
+std::vector<NoTemplate*>* NoTemplate::GetLoop(const NoString& sName)
 {
     NoTemplateLoopContext* pContext = GetCurLoopContext();
 
@@ -272,7 +265,7 @@ vector<NoTemplate*>* NoTemplate::GetLoop(const NoString& sName)
         }
     }
 
-    map<NoString, vector<NoTemplate*>>::iterator it = m_mvLoops.find(sName);
+    std::map<NoString, std::vector<NoTemplate*>>::iterator it = m_mvLoops.find(sName);
 
     if (it != m_mvLoops.end()) {
         return &(it->second);
@@ -284,7 +277,7 @@ vector<NoTemplate*>* NoTemplate::GetLoop(const NoString& sName)
 bool NoTemplate::PrintString(NoString& sRet)
 {
     sRet.clear();
-    stringstream sStream;
+    std::stringstream sStream;
     bool bRet = Print(sStream);
 
     sRet = sStream.str();
@@ -292,9 +285,9 @@ bool NoTemplate::PrintString(NoString& sRet)
     return bRet;
 }
 
-bool NoTemplate::Print(ostream& oOut) { return Print(m_sFileName, oOut); }
+bool NoTemplate::Print(std::ostream& oOut) { return Print(m_sFileName, oOut); }
 
-bool NoTemplate::Print(const NoString& sFileName, ostream& oOut)
+bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 {
     if (sFileName.empty()) {
         DEBUG("Empty filename in NoTemplate::Print()");
@@ -471,7 +464,7 @@ bool NoTemplate::Print(const NoString& sFileName, ostream& oOut)
                             NoString sLoopName = sArgs.Token(0);
                             bool bReverse = (sArgs.Token(1).Equals("REVERSE"));
                             bool bSort = (sArgs.Token(1).Left(4).Equals("SORT"));
-                            vector<NoTemplate*>* pvLoop = GetLoop(sLoopName);
+                            std::vector<NoTemplate*>* pvLoop = GetLoop(sLoopName);
 
                             if (bSort && pvLoop != nullptr && pvLoop->size() > 1) {
                                 NoString sKey;
@@ -598,7 +591,7 @@ bool NoTemplate::Print(const NoString& sFileName, ostream& oOut)
                     }
                 } else if (bNotFound) {
                     // Unknown tag that isn't being skipped...
-                    vector<std::shared_ptr<NoTemplateTagHandler>>& vspTagHandlers = GetTagHandlers();
+                    std::vector<std::shared_ptr<NoTemplateTagHandler>>& vspTagHandlers = GetTagHandlers();
 
                     if (!vspTagHandlers.empty()) { // @todo this should go up to the top to grab handlers
                         NoTemplate* pTmpl = GetCurTemplate();
@@ -829,7 +822,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
 	if (msArgs.find("CONFIG") != msArgs.end()) {
 		sRet = NoSettings::GetValue(sName);
 	} else*/ if (msArgs.find("ROWS") != msArgs.end()) {
-        vector<NoTemplate*>* pLoop = GetLoop(sName);
+        std::vector<NoTemplate*>* pLoop = GetLoop(sName);
         sRet = NoString((pLoop) ? pLoop->size() : 0);
     } else if (msArgs.find("TOP") == msArgs.end() && pContext) {
         sRet = pContext->GetValue(sArgs, bFromIf);
@@ -848,7 +841,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
         sRet = (it != end()) ? it->second : "";
     }
 
-    vector<std::shared_ptr<NoTemplateTagHandler>>& vspTagHandlers = GetTagHandlers();
+    std::vector<std::shared_ptr<NoTemplateTagHandler>>& vspTagHandlers = GetTagHandlers();
 
     if (!vspTagHandlers.empty()) { // @todo this should go up to the top to grab handlers
         NoTemplate* pTmpl = GetCurTemplate();

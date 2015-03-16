@@ -21,78 +21,76 @@
 #include "nosha256.h"
 #include <sstream>
 
-using std::stringstream;
-
-NoString::NoString(char c) : string()
+NoString::NoString(char c) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << c;
     *this = s.str();
 }
-NoString::NoString(unsigned char c) : string()
+NoString::NoString(unsigned char c) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << c;
     *this = s.str();
 }
-NoString::NoString(short i) : string()
+NoString::NoString(short i) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << i;
     *this = s.str();
 }
-NoString::NoString(unsigned short i) : string()
+NoString::NoString(unsigned short i) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << i;
     *this = s.str();
 }
-NoString::NoString(int i) : string()
+NoString::NoString(int i) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << i;
     *this = s.str();
 }
-NoString::NoString(unsigned int i) : string()
+NoString::NoString(unsigned int i) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << i;
     *this = s.str();
 }
-NoString::NoString(long i) : string()
+NoString::NoString(long i) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << i;
     *this = s.str();
 }
-NoString::NoString(unsigned long i) : string()
+NoString::NoString(unsigned long i) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << i;
     *this = s.str();
 }
-NoString::NoString(long long i) : string()
+NoString::NoString(long long i) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << i;
     *this = s.str();
 }
-NoString::NoString(unsigned long long i) : string()
+NoString::NoString(unsigned long long i) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s << i;
     *this = s.str();
 }
-NoString::NoString(double i, int precision) : string()
+NoString::NoString(double i, int precision) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s.precision(precision);
     s << std::fixed << i;
     *this = s.str();
 }
-NoString::NoString(float i, int precision) : string()
+NoString::NoString(float i, int precision) : std::string()
 {
-    stringstream s;
+    std::stringstream s;
     s.precision(precision);
     s << std::fixed << i;
     *this = s.str();
@@ -732,7 +730,7 @@ NoString NoString::Ellipsize(unsigned int uLen) const
         return *this;
     }
 
-    string sRet;
+    std::string sRet;
 
     // @todo this looks suspect
     if (uLen < 4) {

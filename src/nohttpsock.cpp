@@ -25,9 +25,6 @@
 #include <zlib.h>
 #endif
 
-using std::map;
-using std::set;
-
 #define MAX_POST_SIZE 1024 * 1024
 
 NoHttpSock::NoHttpSock(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSock(pMod, sURIPrefix, "", 0) { Init(); }
@@ -467,7 +464,7 @@ void NoHttpSock::ParseURI()
 
 NoString NoHttpSock::GetPath() const { return m_sURI.Token(0, false, "?"); }
 
-void NoHttpSock::ParseParams(const NoString& sParams, map<NoString, NoStringVector>& msvsParams)
+void NoHttpSock::ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams)
 {
     msvsParams.clear();
 
@@ -512,11 +509,11 @@ NoString NoHttpSock::GetRawParam(const NoString& sName, bool bPost) const
     return GetRawParam(sName, m_msvsGETParams);
 }
 
-NoString NoHttpSock::GetRawParam(const NoString& sName, const map<NoString, NoStringVector>& msvsParams)
+NoString NoHttpSock::GetRawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams)
 {
     NoString sRet;
 
-    map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
+    std::map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
 
     if (it != msvsParams.end() && it->second.size() > 0) {
         sRet = it->second[0];
@@ -531,7 +528,7 @@ NoString NoHttpSock::GetParam(const NoString& sName, bool bPost, const NoString&
     return GetParam(sName, m_msvsGETParams, sFilter);
 }
 
-NoString NoHttpSock::GetParam(const NoString& sName, const map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+NoString NoHttpSock::GetParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
     NoString sRet = GetRawParam(sName, msvsParams);
     sRet.Trim();
@@ -543,17 +540,17 @@ NoString NoHttpSock::GetParam(const NoString& sName, const map<NoString, NoStrin
     return sRet;
 }
 
-size_t NoHttpSock::GetParamValues(const NoString& sName, set<NoString>& ssRet, bool bPost, const NoString& sFilter) const
+size_t NoHttpSock::GetParamValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost, const NoString& sFilter) const
 {
     if (bPost) return GetParamValues(sName, ssRet, m_msvsPOSTParams, sFilter);
     return GetParamValues(sName, ssRet, m_msvsGETParams, sFilter);
 }
 
-size_t NoHttpSock::GetParamValues(const NoString& sName, set<NoString>& ssRet, const map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+size_t NoHttpSock::GetParamValues(const NoString& sName, std::set<NoString>& ssRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
     ssRet.clear();
 
-    map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
+    std::map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
 
     if (it != msvsParams.end()) {
         for (NoString sParam : it->second) {
@@ -575,11 +572,11 @@ size_t NoHttpSock::GetParamValues(const NoString& sName, NoStringVector& vsRet, 
     return GetParamValues(sName, vsRet, m_msvsGETParams, sFilter);
 }
 
-size_t NoHttpSock::GetParamValues(const NoString& sName, NoStringVector& vsRet, const map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+size_t NoHttpSock::GetParamValues(const NoString& sName, NoStringVector& vsRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
     vsRet.clear();
 
-    map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
+    std::map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
 
     if (it != msvsParams.end()) {
         for (NoString sParam : it->second) {
@@ -595,7 +592,7 @@ size_t NoHttpSock::GetParamValues(const NoString& sName, NoStringVector& vsRet, 
     return vsRet.size();
 }
 
-const map<NoString, NoStringVector>& NoHttpSock::GetParams(bool bPost) const
+const std::map<NoString, NoStringVector>& NoHttpSock::GetParams(bool bPost) const
 {
     if (bPost) return m_msvsPOSTParams;
     return m_msvsGETParams;

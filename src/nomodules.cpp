@@ -19,10 +19,6 @@
 #include "noapp.h"
 #include <dlfcn.h>
 
-using std::map;
-using std::set;
-using std::vector;
-
 bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #ifndef RTLD_LOCAL
@@ -250,12 +246,12 @@ bool NoModules::OnUserTopic(NoString& sChannel, NoString& sTopic) { MODHALTCHK(O
 bool NoModules::OnUserTopicRequest(NoString& sChannel) { MODHALTCHK(OnUserTopicRequest(sChannel)); }
 bool NoModules::OnUserQuit(NoString& sMessage) { MODHALTCHK(OnUserQuit(sMessage)); }
 
-bool NoModules::OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans)
+bool NoModules::OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans)
 {
     MODUNLOADCHK(OnQuit(Nick, sMessage, vChans));
     return false;
 }
-bool NoModules::OnNick(const NoNick& Nick, const NoString& sNewNick, const vector<NoChannel*>& vChans)
+bool NoModules::OnNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans)
 {
     MODUNLOADCHK(OnNick(Nick, sNewNick, vChans));
     return false;
@@ -449,7 +445,7 @@ bool NoModules::OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& 
     MODHALTCHK(OnGetModInfo(ModInfo, sModule, bSuccess, sRetMsg));
 }
 
-bool NoModules::OnGetAvailableMods(set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
+bool NoModules::OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
 {
     MODUNLOADCHK(OnGetAvailableMods(ssMods, eType));
     return false;
@@ -656,7 +652,7 @@ bool NoModules::GetModPathInfo(NoModInfo& ModInfo, const NoString& sModule, cons
     return true;
 }
 
-void NoModules::GetAvailableMods(set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
+void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
 {
     ssMods.clear();
 
@@ -688,12 +684,12 @@ void NoModules::GetAvailableMods(set<NoModInfo>& ssMods, NoModInfo::EModuleType 
     GLOBALMODULECALL(OnGetAvailableMods(ssMods, eType), NOTHING);
 }
 
-void NoModules::GetDefaultMods(set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
+void NoModules::GetDefaultMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
 {
 
     GetAvailableMods(ssMods, eType);
 
-    const map<NoString, NoModInfo::EModuleType> ns = { { "chansaver", NoModInfo::UserModule },
+    const std::map<NoString, NoModInfo::EModuleType> ns = { { "chansaver", NoModInfo::UserModule },
                                                      { "controlpanel", NoModInfo::UserModule },
                                                      { "simple_away", NoModInfo::NetworkModule },
                                                      { "webadmin", NoModInfo::GlobalModule } };

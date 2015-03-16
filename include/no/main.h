@@ -30,16 +30,16 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
         if (GMods.macFUNC) {                                                   \
             bAllExit = true;                                                   \
         } else {                                                               \
-            const map<NoString, NoUser*>& mUsers = NoApp::Get().GetUserMap();     \
-            map<NoString, NoUser*>::const_iterator it;                           \
+            const std::map<NoString, NoUser*>& mUsers = NoApp::Get().GetUserMap();     \
+            std::map<NoString, NoUser*>::const_iterator it;                           \
             for (it = mUsers.begin(); it != mUsers.end(); ++it) {              \
                 NoModules& UMods = it->second->GetModules();                    \
                 if (UMods.macFUNC) {                                           \
                     bAllExit = true;                                           \
                     break;                                                     \
                 }                                                              \
-                const vector<NoNetwork*>& mNets = it->second->GetNetworks(); \
-                vector<NoNetwork*>::const_iterator it2;                      \
+                const std::vector<NoNetwork*>& mNets = it->second->GetNetworks(); \
+                std::vector<NoNetwork*>::const_iterator it2;                      \
                 for (it2 = mNets.begin(); it2 != mNets.end(); ++it2) {         \
                     NoModules& NMods = (*it2)->GetModules();                    \
                     if (NMods.macFUNC) {                                       \

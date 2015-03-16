@@ -25,9 +25,6 @@
 #include <algorithm>
 #include <memory>
 
-using std::vector;
-using std::set;
-
 class NoNetworkPingTimer : public CCron
 {
 public:
@@ -51,7 +48,7 @@ protected:
             pIRCSock->PutIRC("PING :ZNC");
         }
 
-        const vector<NoClient*>& vClients = m_pNetwork->GetClients();
+        const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
         for (NoClient* pClient : vClients) {
             if (pClient->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
                 pClient->PutClient("PING :ZNC");
@@ -165,7 +162,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     m_ssTrustedFingerprints = Network.m_ssTrustedFingerprints;
 
     // Servers
-    const vector<NoServer*>& vServers = Network.GetServers();
+    const std::vector<NoServer*>& vServers = Network.GetServers();
     NoString sServer;
     NoServer* pCurServ = GetCurrentServer();
 
@@ -198,7 +195,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     // !Servers
 
     // Chans
-    const vector<NoChannel*>& vChans = Network.GetChans();
+    const std::vector<NoChannel*>& vChans = Network.GetChans();
     for (NoChannel* pNewChan : vChans) {
         NoChannel* pChan = FindChan(pNewChan->GetName());
 
@@ -221,7 +218,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     // !Chans
 
     // Modules
-    set<NoString> ssUnloadMods;
+    std::set<NoString> ssUnloadMods;
     NoModules& vCurMods = GetModules();
     const NoModules& vNewMods = Network.GetModules();
 
@@ -588,7 +585,7 @@ void NoNetwork::ClientConnected(NoClient* pClient)
 
     if (GetIRCSock() != nullptr) {
         NoString sUserMode("");
-        const set<unsigned char>& scUserModes = GetIRCSock()->GetUserModes();
+        const std::set<unsigned char>& scUserModes = GetIRCSock()->GetUserModes();
         for (unsigned char cMode : scUserModes) {
             sUserMode += cMode;
         }
@@ -603,7 +600,7 @@ void NoNetwork::ClientConnected(NoClient* pClient)
         pClient->PutClient(":irc.znc.in 306 " + GetIRNoNick().GetNick() + " :You have been marked as being away");
     }
 
-    const vector<NoChannel*>& vChans = GetChans();
+    const std::vector<NoChannel*>& vChans = GetChans();
     for (NoChannel* pChan : vChans) {
         if ((pChan->IsOn()) && (!pChan->IsDetached())) {
             pChan->AttachUser(pClient);
@@ -740,7 +737,7 @@ bool NoNetwork::PutModule(const NoString& sModule, const NoString& sLine, NoClie
 
 // Channels
 
-const vector<NoChannel*>& NoNetwork::GetChans() const { return m_vChans; }
+const std::vector<NoChannel*>& NoNetwork::GetChans() const { return m_vChans; }
 
 NoChannel* NoNetwork::FindChan(NoString sName) const
 {
@@ -799,7 +796,7 @@ bool NoNetwork::AddChan(const NoString& sName, bool bInConfig)
 
 bool NoNetwork::DelChan(const NoString& sName)
 {
-    for (vector<NoChannel*>::iterator a = m_vChans.begin(); a != m_vChans.end(); ++a) {
+    for (std::vector<NoChannel*>::iterator a = m_vChans.begin(); a != m_vChans.end(); ++a) {
         if (sName.Equals((*a)->GetName())) {
             delete *a;
             m_vChans.erase(a);
@@ -820,7 +817,7 @@ void NoNetwork::JoinChans()
     // still be able to join the rest of your channels.
     unsigned int start = rand() % m_vChans.size();
     unsigned int uJoins = m_pUser->MaxJoins();
-    set<NoChannel*> sChans;
+    std::set<NoChannel*> sChans;
     for (unsigned int a = 0; a < m_vChans.size(); a++) {
         unsigned int idx = (start + a) % m_vChans.size();
         NoChannel* pChan = m_vChans[idx];
@@ -841,14 +838,14 @@ void NoNetwork::JoinChans()
     while (!sChans.empty()) JoinChans(sChans);
 }
 
-void NoNetwork::JoinChans(set<NoChannel*>& sChans)
+void NoNetwork::JoinChans(std::set<NoChannel*>& sChans)
 {
     NoString sKeys, sJoin;
     bool bHaveKey = false;
     size_t uiJoinLength = strlen("JOIN ");
 
     while (!sChans.empty()) {
-        set<NoChannel*>::iterator it = sChans.begin();
+        std::set<NoChannel*>::iterator it = sChans.begin();
         const NoString& sName = (*it)->GetName();
         const NoString& sKey = (*it)->GetKey();
         size_t len = sName.length() + sKey.length();
@@ -905,7 +902,7 @@ bool NoNetwork::IsChan(const NoString& sChan) const
 
 // Queries
 
-const vector<NoQuery*>& NoNetwork::GetQueries() const { return m_vQueries; }
+const std::vector<NoQuery*>& NoNetwork::GetQueries() const { return m_vQueries; }
 
 NoQuery* NoNetwork::FindQuery(const NoString& sName) const
 {
@@ -953,7 +950,7 @@ NoQuery* NoNetwork::AddQuery(const NoString& sName)
 
 bool NoNetwork::DelQuery(const NoString& sName)
 {
-    for (vector<NoQuery*>::iterator a = m_vQueries.begin(); a != m_vQueries.end(); ++a) {
+    for (std::vector<NoQuery*>::iterator a = m_vQueries.begin(); a != m_vQueries.end(); ++a) {
         if (sName.Equals((*a)->GetName())) {
             delete *a;
             m_vQueries.erase(a);
@@ -966,7 +963,7 @@ bool NoNetwork::DelQuery(const NoString& sName)
 
 // Server list
 
-const vector<NoServer*>& NoNetwork::GetServers() const { return m_vServers; }
+const std::vector<NoServer*>& NoNetwork::GetServers() const { return m_vServers; }
 
 NoServer* NoNetwork::FindServer(const NoString& sName) const
 {
@@ -989,7 +986,7 @@ bool NoNetwork::DelServer(const NoString& sName, unsigned short uPort, const NoS
     bool bSawCurrentServer = false;
     NoServer* pCurServer = GetCurrentServer();
 
-    for (vector<NoServer*>::iterator it = m_vServers.begin(); it != m_vServers.end(); ++it, a++) {
+    for (std::vector<NoServer*>::iterator it = m_vServers.begin(); it != m_vServers.end(); ++it, a++) {
         NoServer* pServer = *it;
 
         if (pServer == pCurServer) bSawCurrentServer = true;

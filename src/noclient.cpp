@@ -21,10 +21,6 @@
 #include "nonetwork.h"
 #include "noquery.h"
 
-using std::set;
-using std::map;
-using std::vector;
-
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                             \
     {                                                                         \
         NoModule* pModule = nullptr;                                           \
@@ -270,7 +266,7 @@ void NoClient::ReadLine(const NoString& sData)
                 }
 
                 // Relay to the rest of the clients that may be connected to this user
-                const vector<NoClient*>& vClients = GetClients();
+                const std::vector<NoClient*>& vClients = GetClients();
 
                 for (NoClient* pClient : vClients) {
                     if (pClient != this && (m_pNetwork->IsChan(sTarget) || pClient->HasSelfMessage())) {
@@ -332,7 +328,7 @@ void NoClient::ReadLine(const NoString& sData)
                         }
 
                         // Relay to the rest of the clients that may be connected to this user
-                        const vector<NoClient*>& vClients = GetClients();
+                        const std::vector<NoClient*>& vClients = GetClients();
 
                         for (NoClient* pClient : vClients) {
                             if (pClient != this && (m_pNetwork->IsChan(sTarget) || pClient->HasSelfMessage())) {
@@ -391,7 +387,7 @@ void NoClient::ReadLine(const NoString& sData)
                 PutIRC("PRIVMSG " + sTarget + " :" + sMsg);
 
                 // Relay to the rest of the clients that may be connected to this user
-                const vector<NoClient*>& vClients = GetClients();
+                const std::vector<NoClient*>& vClients = GetClients();
 
                 for (NoClient* pClient : vClients) {
                     if (pClient != this && (m_pNetwork->IsChan(sTarget) || pClient->HasSelfMessage())) {
@@ -420,9 +416,9 @@ void NoClient::ReadLine(const NoString& sData)
         sPatterns.Replace(",", " ");
         sPatterns.Split(" ", vsChans, false, "", "", true, true);
 
-        set<NoChannel*> sChans;
+        std::set<NoChannel*> sChans;
         for (const NoString& sChan : vsChans) {
-            vector<NoChannel*> vChans = m_pNetwork->FindChans(sChan);
+            std::vector<NoChannel*> vChans = m_pNetwork->FindChans(sChan);
             sChans.insert(vChans.begin(), vChans.end());
         }
 
@@ -550,7 +546,7 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
             m_pNetwork->ClientDisconnected(this);
 
             // Tell the client they are no longer in these channels.
-            const vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+            const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
             for (const NoChannel* pChan : vChans) {
                 if (!(pChan->IsDetached())) {
                     PutClient(":" + m_pNetwork->GetIRNoNick().GetNickMask() + " PART " + pChan->GetName());
@@ -572,7 +568,7 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
     }
 }
 
-const vector<NoClient*>& NoClient::GetClients() const
+const std::vector<NoClient*>& NoClient::GetClients() const
 {
     if (m_pNetwork) {
         return m_pNetwork->GetClients();

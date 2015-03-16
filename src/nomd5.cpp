@@ -25,7 +25,7 @@
 
 NoMD5::NoMD5() { *m_szMD5 = '\0'; }
 
-NoMD5::NoMD5(const string& sText) { MakeHash(sText.c_str(), sText.length()); }
+NoMD5::NoMD5(const std::string& sText) { MakeHash(sText.c_str(), sText.length()); }
 
 NoMD5::NoMD5(const char* szText, uint32 nTextLen) { MakeHash(szText, nTextLen); }
 

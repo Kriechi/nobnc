@@ -5,7 +5,6 @@
 
 #include <no/noconfig.h>
 #include <string>
-using std::string;
 
 #ifndef uint8
 #define uint8 unsigned char
@@ -29,11 +28,11 @@ protected:
 
 public:
     NoMD5();
-    NoMD5(const string& sText);
+    NoMD5(const std::string& sText);
     NoMD5(const char* szText, uint32 nTextLen);
     ~NoMD5();
 
-    operator string() const { return (string)m_szMD5; }
+    operator std::string() const { return (std::string)m_szMD5; }
 
     operator char*() const { return (char*)m_szMD5; }
 

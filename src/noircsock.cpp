@@ -21,10 +21,6 @@
 #include "noserver.h"
 #include "noquery.h"
 
-using std::set;
-using std::vector;
-using std::map;
-
 #define IRCSOCKMODULECALL(macFUNC, macEXITER) \
     NETWORKMODULECALL(macFUNC, m_pNetwork->GetUser(), m_pNetwork, nullptr, macEXITER)
 // These are used in OnGeneralCTCP()
@@ -93,7 +89,7 @@ NoIrcSock::~NoIrcSock()
         IRCSOCKMODULECALL(OnIRCConnectionError(this), NOTHING);
     }
 
-    const vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+    const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
     for (NoChannel* pChan : vChans) {
         pChan->Reset();
     }
@@ -178,7 +174,7 @@ void NoIrcSock::ReadLine(const NoString& sData)
             m_bAuthed = true;
             m_pNetwork->PutStatus("Connected!");
 
-            const vector<NoClient*>& vClients = m_pNetwork->GetClients();
+            const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
 
             for (NoClient* pClient : vClients) {
                 NoString sClientNick = pClient->GetNick(false);
@@ -339,7 +335,7 @@ void NoIrcSock::ReadLine(const NoString& sData)
             m_pNetwork->SetIRNoNick(m_Nick);
             m_pNetwork->SetIRNoServer(sServer);
 
-            const vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+            const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
 
             for (NoChannel* pChan : vChans) {
                 pChan->OnWho(sNick, sIdent, sHost);
@@ -348,7 +344,7 @@ void NoIrcSock::ReadLine(const NoString& sData)
             if (m_bNamesx && (sNick.size() > 1) && IsPermChar(sNick[1])) {
                 // sLine uses multi-prefix
 
-                const vector<NoClient*>& vClients = m_pNetwork->GetClients();
+                const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
                 for (NoClient* pClient : vClients) {
                     if (pClient->HasNamesx()) {
                         m_pNetwork->PutUser(sLine, pClient);
@@ -491,8 +487,8 @@ void NoIrcSock::ReadLine(const NoString& sData)
             NoString sNewNick = sRest.TrimPrefix_n();
             bool bIsVisible = false;
 
-            vector<NoChannel*> vFoundChans;
-            const vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+            std::vector<NoChannel*> vFoundChans;
+            const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
 
             for (NoChannel* pChan : vChans) {
                 if (pChan->ChangeNick(Nick.GetNick(), sNewNick)) {
@@ -530,8 +526,8 @@ void NoIrcSock::ReadLine(const NoString& sData)
                 return;
             }
 
-            vector<NoChannel*> vFoundChans;
-            const vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+            std::vector<NoChannel*> vFoundChans;
+            const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
 
             for (NoChannel* pChan : vChans) {
                 if (pChan->RemNick(Nick.GetNick())) {
@@ -1263,7 +1259,7 @@ NoString NoIrcSock::GetISupport(const NoString& sKey, const NoString& sDefault) 
 
 void NoIrcSock::ForwardRaw353(const NoString& sLine) const
 {
-    const vector<NoClient*>& vClients = m_pNetwork->GetClients();
+    const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
 
     for (NoClient* pClient : vClients) {
         ForwardRaw353(sLine, pClient);
@@ -1377,7 +1373,7 @@ unsigned char NoIrcSock::GetPermFromMode(unsigned char uMode) const
 
 NoIrcSock::EChanModeArgs NoIrcSock::GetModeType(unsigned char uMode) const
 {
-    map<unsigned char, EChanModeArgs>::const_iterator it = m_mueChanModes.find(uMode);
+    std::map<unsigned char, EChanModeArgs>::const_iterator it = m_mueChanModes.find(uMode);
 
     if (it == m_mueChanModes.end()) {
         return NoArg;

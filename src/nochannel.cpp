@@ -21,10 +21,6 @@
 #include "nosettings.h"
 #include "noapp.h"
 
-using std::set;
-using std::vector;
-using std::map;
-
 NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig, NoSettings* pConfig)
     : m_detached(false), m_isOn(false), m_autoClearChanBuffer(pNetwork->GetUser()->AutoClearChanBuffer()),
       m_inConfig(bInConfig), m_disabled(false), m_hasBufferCountSet(false), m_hasAutoClearChanBufferSet(false),
@@ -137,7 +133,7 @@ void NoChannel::AttachUser(NoClient* pClient)
     NoString sLine = sPre;
     NoString sPerm, sNick;
 
-    const vector<NoClient*>& vpClients = m_network->GetClients();
+    const std::vector<NoClient*>& vpClients = m_network->GetClients();
     for (NoClient* pEachClient : vpClients) {
         NoClient* pThisClient;
         if (!pClient)
@@ -145,7 +141,7 @@ void NoChannel::AttachUser(NoClient* pClient)
         else
             pThisClient = pClient;
 
-        for (map<NoString, NoNick>::iterator a = m_nicks.begin(); a != m_nicks.end(); ++a) {
+        for (std::map<NoString, NoNick>::iterator a = m_nicks.begin(); a != m_nicks.end(); ++a) {
             if (pThisClient->HasNamesx()) {
                 sPerm = a->second.GetPermStr();
             } else {
@@ -393,7 +389,7 @@ NoString NoChannel::GetOptions() const
 NoString NoChannel::GetModeArg(unsigned char uMode) const
 {
     if (uMode) {
-        map<unsigned char, NoString>::const_iterator it = m_modes.find(uMode);
+        std::map<unsigned char, NoString>::const_iterator it = m_modes.find(uMode);
 
         if (it != m_modes.end()) {
             return it->second;
@@ -493,9 +489,9 @@ bool NoChannel::AddNick(const NoString& sNick)
     return true;
 }
 
-map<char, unsigned int> NoChannel::GetPermCounts() const
+std::map<char, unsigned int> NoChannel::GetPermCounts() const
 {
-    map<char, unsigned int> mRet;
+    std::map<char, unsigned int> mRet;
 
     for (const auto& it : m_nicks) {
         NoString sPerms = it.second.GetPermStr();
@@ -510,8 +506,8 @@ map<char, unsigned int> NoChannel::GetPermCounts() const
 
 bool NoChannel::RemNick(const NoString& sNick)
 {
-    map<NoString, NoNick>::iterator it;
-    set<unsigned char>::iterator it2;
+    std::map<NoString, NoNick>::iterator it;
+    std::set<unsigned char>::iterator it2;
 
     it = m_nicks.find(sNick);
     if (it == m_nicks.end()) {
@@ -525,7 +521,7 @@ bool NoChannel::RemNick(const NoString& sNick)
 
 bool NoChannel::ChangeNick(const NoString& sOldNick, const NoString& sNewNick)
 {
-    map<NoString, NoNick>::iterator it = m_nicks.find(sOldNick);
+    std::map<NoString, NoNick>::iterator it = m_nicks.find(sOldNick);
 
     if (it == m_nicks.end()) {
         return false;
@@ -543,13 +539,13 @@ bool NoChannel::ChangeNick(const NoString& sOldNick, const NoString& sNewNick)
 
 const NoNick* NoChannel::FindNick(const NoString& sNick) const
 {
-    map<NoString, NoNick>::const_iterator it = m_nicks.find(sNick);
+    std::map<NoString, NoNick>::const_iterator it = m_nicks.find(sNick);
     return (it != m_nicks.end()) ? &it->second : nullptr;
 }
 
 NoNick* NoChannel::FindNick(const NoString& sNick)
 {
-    map<NoString, NoNick>::iterator it = m_nicks.find(sNick);
+    std::map<NoString, NoNick>::iterator it = m_nicks.find(sNick);
     return (it != m_nicks.end()) ? &it->second : nullptr;
 }
 
@@ -579,7 +575,7 @@ void NoChannel::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
         //
         // Rework this if you like ...
         if (!Buffer.isEmpty()) {
-            const vector<NoClient*>& vClients = m_network->GetClients();
+            const std::vector<NoClient*>& vClients = m_network->GetClients();
             for (NoClient* pEachClient : vClients) {
                 NoClient* pUseClient = (pClient ? pClient : pEachClient);
 

@@ -24,9 +24,6 @@
 #include <math.h>
 #include <algorithm>
 
-using std::vector;
-using std::set;
-
 class NoUserTimer : public CCron
 {
 public:
@@ -44,7 +41,7 @@ private:
 protected:
     void RunJob() override
     {
-        const vector<NoClient*>& vUserClients = m_pUser->GetUserClients();
+        const std::vector<NoClient*>& vUserClients = m_pUser->GetUserClients();
 
         for (NoClient* pUserClient : vUserClients) {
             if (pUserClient->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
@@ -492,7 +489,7 @@ NoNetwork* NoUser::FindNetwork(const NoString& sNetwork) const
     return nullptr;
 }
 
-const vector<NoNetwork*>& NoUser::GetNetworks() const { return m_vIRNoNetworks; }
+const std::vector<NoNetwork*>& NoUser::GetNetworks() const { return m_vIRNoNetworks; }
 
 NoString NoUser::ExpandString(const NoString& sStr) const
 {
@@ -601,7 +598,7 @@ void NoUser::UserDisconnected(NoClient* pClient)
 
 void NoUser::CloneNetworks(const NoUser& User)
 {
-    const vector<NoNetwork*>& vNetworks = User.GetNetworks();
+    const std::vector<NoNetwork*>& vNetworks = User.GetNetworks();
     for (NoNetwork* pUserNetwork : vNetworks) {
         NoNetwork* pNetwork = FindNetwork(pUserNetwork->GetName());
 
@@ -612,7 +609,7 @@ void NoUser::CloneNetworks(const NoUser& User)
         }
     }
 
-    set<NoString> ssDeleteNetworks;
+    std::set<NoString> ssDeleteNetworks;
     for (NoNetwork* pNetwork : m_vIRNoNetworks) {
         if (!(User.FindNetwork(pNetwork->GetName()))) {
             ssDeleteNetworks.insert(pNetwork->GetName());
@@ -625,7 +622,7 @@ void NoUser::CloneNetworks(const NoUser& User)
         // have requested the rehash. Then when we do
         // client->PutStatus("Rehashing succeeded!") we would
         // crash if there was no client anymore.
-        const vector<NoClient*>& vClients = FindNetwork(sNetwork)->GetClients();
+        const std::vector<NoClient*>& vClients = FindNetwork(sNetwork)->GetClients();
 
         while (vClients.begin() != vClients.end()) {
             NoClient* pClient = vClients.front();
@@ -676,7 +673,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 
     // Allowed Hosts
     m_ssAllowedHosts.clear();
-    const set<NoString>& ssHosts = User.GetAllowedHosts();
+    const std::set<NoString>& ssHosts = User.GetAllowedHosts();
     for (const NoString& sHost : ssHosts) {
         AddAllowedHost(sHost);
     }
@@ -719,7 +716,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     // !Flags
 
     // Modules
-    set<NoString> ssUnloadMods;
+    std::set<NoString> ssUnloadMods;
     NoModules& vCurMods = GetModules();
     const NoModules& vNewMods = User.GetModules();
 
@@ -750,7 +747,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     return true;
 }
 
-const set<NoString>& NoUser::GetAllowedHosts() const { return m_ssAllowedHosts; }
+const std::set<NoString>& NoUser::GetAllowedHosts() const { return m_ssAllowedHosts; }
 bool NoUser::AddAllowedHost(const NoString& sHostMask)
 {
     if (sHostMask.empty() || m_ssAllowedHosts.find(sHostMask) != m_ssAllowedHosts.end()) {
@@ -990,7 +987,7 @@ bool NoUser::PutAllUser(const NoString& sLine, NoClient* pClient, NoClient* pSki
 
 bool NoUser::PutStatus(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    vector<NoClient*> vClients = GetAllClients();
+    std::vector<NoClient*> vClients = GetAllClients();
     for (NoClient* pEachClient : vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutStatus(sLine);
@@ -1006,7 +1003,7 @@ bool NoUser::PutStatus(const NoString& sLine, NoClient* pClient, NoClient* pSkip
 
 bool NoUser::PutStatusNotice(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    vector<NoClient*> vClients = GetAllClients();
+    std::vector<NoClient*> vClients = GetAllClients();
     for (NoClient* pEachClient : vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutStatusNotice(sLine);
@@ -1183,9 +1180,9 @@ bool NoUser::SetStatusPrefix(const NoString& s)
 // !Setters
 
 // Getters
-vector<NoClient*> NoUser::GetAllClients() const
+std::vector<NoClient*> NoUser::GetAllClients() const
 {
-    vector<NoClient*> vClients;
+    std::vector<NoClient*> vClients;
 
     for (NoNetwork* pNetwork : m_vIRNoNetworks) {
         for (NoClient* pClient : pNetwork->GetClients()) {

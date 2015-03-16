@@ -18,8 +18,6 @@
 #include "nouser.h"
 #include "nonetwork.h"
 
-using std::vector;
-
 NoQuery::NoQuery(const NoString& sName, NoNetwork* pNetwork) : m_sName(sName), m_pNetwork(pNetwork), m_Buffer()
 {
     SetBufferCount(m_pNetwork->GetUser()->GetBufferCount(), true);
@@ -34,7 +32,7 @@ void NoQuery::SendBuffer(NoClient* pClient, const NoBuffer& Buffer)
     if (m_pNetwork && m_pNetwork->IsUserAttached()) {
         // Based on NoChannel::SendBuffer()
         if (!Buffer.isEmpty()) {
-            const vector<NoClient*>& vClients = m_pNetwork->GetClients();
+            const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
             for (NoClient* pEachClient : vClients) {
                 NoClient* pUseClient = (pClient ? pClient : pEachClient);
 

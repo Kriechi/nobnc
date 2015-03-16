@@ -33,9 +33,6 @@
 #include <cstdlib>
 #include <iomanip>
 
-using std::map;
-using std::vector;
-
 NoUtils::NoUtils() {}
 NoUtils::~NoUtils() {}
 

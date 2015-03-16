@@ -23,10 +23,6 @@
 #include "noapp.h"
 #include <dlfcn.h>
 
-using std::map;
-using std::set;
-using std::vector;
-
 NoModule::NoModule(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, NoModInfo::EModuleType eType)
     : m_eType(eType), m_sDescription(""), m_sTimers(), m_sSockets(),
 #ifdef HAVE_PTHREAD
@@ -393,7 +389,7 @@ bool NoModule::CancelJob(const NoString& sJobName)
 
 void NoModule::CancelJobs(const std::set<NoModuleJob*>& sJobs)
 {
-    set<NoJob*> sPlainJobs(sJobs.begin(), sJobs.end());
+    std::set<NoJob*> sPlainJobs(sJobs.begin(), sJobs.end());
 
     // Destructor calls UnlinkJob and removes the jobs from m_sJobs
     NoThreadPool::Get().cancelJobs(sPlainJobs);
@@ -556,8 +552,8 @@ void NoModule::OnUnknownModCommand(const NoString& sLine)
         PutModule("Unknown command!");
 }
 
-void NoModule::OnQuit(const NoNick& Nick, const NoString& sMessage, const vector<NoChannel*>& vChans) {}
-void NoModule::OnNick(const NoNick& Nick, const NoString& sNewNick, const vector<NoChannel*>& vChans) {}
+void NoModule::OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) {}
+void NoModule::OnNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) {}
 void NoModule::OnKick(const NoNick& Nick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) {}
 NoModule::EModRet NoModule::OnJoining(NoChannel& Channel) { return CONTINUE; }
 void NoModule::OnJoin(const NoNick& Nick, NoChannel& Channel) {}
@@ -675,7 +671,7 @@ NoModule::EModRet NoModule::OnGetModInfo(NoModInfo& ModInfo, const NoString& sMo
 {
     return CONTINUE;
 }
-void NoModule::OnGetAvailableMods(set<NoModInfo>& ssMods, NoModInfo::EModuleType eType) {}
+void NoModule::OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType) {}
 
 NoModCommand::NoModCommand() : m_sCmd(), m_pFunc(nullptr), m_sArgs(), m_sDesc() {}
 

@@ -23,10 +23,6 @@
 #include "nouser.h"
 #include "noquery.h"
 
-using std::vector;
-using std::set;
-using std::map;
-
 void NoClient::UserCommand(NoString& sLine)
 {
     if (!m_pUser) {
@@ -70,7 +66,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const map<NoString, NoNick>& msNicks = pChan->GetNicks();
+        const std::map<NoString, NoNick>& msNicks = pChan->GetNicks();
         NoIrcSock* pIRCSock = m_pNetwork->GetIRCSock();
         const NoString& sPerms = (pIRCSock) ? pIRCSock->GetPerms() : "";
 
@@ -125,9 +121,9 @@ void NoClient::UserCommand(NoString& sLine)
         sPatterns.Replace(",", " ");
         sPatterns.Split(" ", vsChans, false, "", "", true, true);
 
-        set<NoChannel*> sChans;
+        std::set<NoChannel*> sChans;
         for (const NoString& sChan : vsChans) {
-            vector<NoChannel*> vChans = m_pNetwork->FindChans(sChan);
+            std::vector<NoChannel*> vChans = m_pNetwork->FindChans(sChan);
             sChans.insert(vChans.begin(), vChans.end());
         }
 
@@ -179,7 +175,7 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        vector<NoClient*> vClients = pUser->GetAllClients();
+        std::vector<NoClient*> vClients = pUser->GetAllClients();
 
         if (vClients.empty()) {
             PutStatus("No clients are connected");
@@ -202,7 +198,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (m_pUser->IsAdmin() && sCommand.Equals("LISTUSERS")) {
-        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
         Table.AddColumn("Username");
         Table.AddColumn("Networks");
@@ -217,7 +213,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (m_pUser->IsAdmin() && sCommand.Equals("LISTALLUSERNETWORKS")) {
-        const map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
         Table.AddColumn("Username");
         Table.AddColumn("Network");
@@ -233,7 +229,7 @@ void NoClient::UserCommand(NoString& sLine)
             Table.SetCell("Network", "N/A");
             Table.SetCell("Clients", NoString(it.second->GetUserClients().size()));
 
-            const vector<NoNetwork*>& vNetworks = it.second->GetNetworks();
+            const std::vector<NoNetwork*>& vNetworks = it.second->GetNetworks();
 
             for (const NoNetwork* pNetwork : vNetworks) {
                 Table.AddRow();
@@ -375,9 +371,9 @@ void NoClient::UserCommand(NoString& sLine)
             sPatterns.Replace(",", " ");
             sPatterns.Split(" ", vsChans, false, "", "", true, true);
 
-            set<NoChannel*> sChans;
+            std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {
-                vector<NoChannel*> vChans = m_pNetwork->FindChans(sChan);
+                std::vector<NoChannel*> vChans = m_pNetwork->FindChans(sChan);
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
@@ -406,9 +402,9 @@ void NoClient::UserCommand(NoString& sLine)
             sPatterns.Replace(",", " ");
             sPatterns.Split(" ", vsChans, false, "", "", true, true);
 
-            set<NoChannel*> sChans;
+            std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {
-                vector<NoChannel*> vChans = m_pNetwork->FindChans(sChan);
+                std::vector<NoChannel*> vChans = m_pNetwork->FindChans(sChan);
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
@@ -480,7 +476,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             NoIrcSock* pIRCSock = m_pNetwork->GetIRCSock();
             const NoString& sPerms = pIRCSock ? pIRCSock->GetPerms() : "";
-            map<char, unsigned int> mPerms = pChan->GetPermCounts();
+            std::map<char, unsigned int> mPerms = pChan->GetPermCounts();
             for (char cPerm : sPerms) {
                 vsUsers.push_back(NoString(cPerm) + ": " + NoString(mPerms[cPerm]));
             }
@@ -519,7 +515,7 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        const vector<NoChannel*>& vChans = pNetwork->GetChans();
+        const std::vector<NoChannel*>& vChans = pNetwork->GetChans();
 
         if (vChans.empty()) {
             PutStatus("There are no channels defined.");
@@ -604,7 +600,7 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        const vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
+        const std::vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
 
         NoTable Table;
         Table.AddColumn("Network");
@@ -782,7 +778,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (m_pNetwork->HasServers()) {
-            const vector<NoServer*>& vServers = m_pNetwork->GetServers();
+            const std::vector<NoServer*>& vServers = m_pNetwork->GetServers();
             NoServer* pCurServ = m_pNetwork->GetCurrentServer();
             NoTable Table;
             Table.AddColumn("Host");
@@ -846,7 +842,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+        const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
         NoTable Table;
         Table.AddColumn("Name");
         Table.AddColumn("Set By");
@@ -929,7 +925,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (m_pUser->IsAdmin()) {
-            set<NoModInfo> ssGlobalMods;
+            std::set<NoModInfo> ssGlobalMods;
             NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, NoModInfo::GlobalModule);
 
             if (ssGlobalMods.empty()) {
@@ -950,7 +946,7 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        set<NoModInfo> ssUserMods;
+        std::set<NoModInfo> ssUserMods;
         NoApp::Get().GetModules().GetAvailableMods(ssUserMods);
 
         if (ssUserMods.empty()) {
@@ -970,7 +966,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus(Table);
         }
 
-        set<NoModInfo> ssNetworkMods;
+        std::set<NoModInfo> ssNetworkMods;
         NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, NoModInfo::NetworkModule);
 
         if (ssNetworkMods.empty()) {
@@ -1406,14 +1402,14 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         unsigned int uMatches = 0;
-        vector<NoChannel*> vChans = m_pNetwork->FindChans(sBuffer);
+        std::vector<NoChannel*> vChans = m_pNetwork->FindChans(sBuffer);
         for (NoChannel* pChan : vChans) {
             uMatches++;
 
             pChan->ClearBuffer();
         }
 
-        vector<NoQuery*> vQueries = m_pNetwork->FindQueries(sBuffer);
+        std::vector<NoQuery*> vQueries = m_pNetwork->FindQueries(sBuffer);
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
@@ -1465,14 +1461,14 @@ void NoClient::UserCommand(NoString& sLine)
 
         unsigned int uLineCount = sLine.Token(2).ToUInt();
         unsigned int uMatches = 0, uFail = 0;
-        vector<NoChannel*> vChans = m_pNetwork->FindChans(sBuffer);
+        std::vector<NoChannel*> vChans = m_pNetwork->FindChans(sBuffer);
         for (NoChannel* pChan : vChans) {
             uMatches++;
 
             if (!pChan->SetBufferCount(uLineCount)) uFail++;
         }
 
-        vector<NoQuery*> vQueries = m_pNetwork->FindQueries(sBuffer);
+        std::vector<NoQuery*> vQueries = m_pNetwork->FindQueries(sBuffer);
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
@@ -1545,8 +1541,8 @@ void NoClient::UserPortCommand(NoString& sLine)
         Table.AddColumn("IRC/Web");
         Table.AddColumn("URIPrefix");
 
-        vector<NoListener*>::const_iterator it;
-        const vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
+        std::vector<NoListener*>::const_iterator it;
+        const std::vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
 
         for (const NoListener* pListener : vpListeners) {
             Table.AddRow();

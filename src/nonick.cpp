@@ -19,9 +19,6 @@
 #include "noircsock.h"
 #include "nonetwork.h"
 
-using std::vector;
-using std::map;
-
 NoNick::NoNick() : m_sChanPerms(""), m_pNetwork(nullptr), m_sNick(""), m_sIdent(""), m_sHost("") {}
 
 NoNick::NoNick(const NoString& sNick) : NoNick() { Parse(sNick); }
@@ -56,14 +53,14 @@ void NoNick::Parse(const NoString& sNickMask)
     }
 }
 
-size_t NoNick::GetCommonChans(vector<NoChannel*>& vRetChans, NoNetwork* pNetwork) const
+size_t NoNick::GetCommonChans(std::vector<NoChannel*>& vRetChans, NoNetwork* pNetwork) const
 {
     vRetChans.clear();
 
-    const vector<NoChannel*>& vChans = pNetwork->GetChans();
+    const std::vector<NoChannel*>& vChans = pNetwork->GetChans();
 
     for (NoChannel* pChan : vChans) {
-        const map<NoString, NoNick>& msNicks = pChan->GetNicks();
+        const std::map<NoString, NoNick>& msNicks = pChan->GetNicks();
 
         for (const auto& it : msNicks) {
             if (it.first.Equals(m_sNick)) {

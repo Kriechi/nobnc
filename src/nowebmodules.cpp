@@ -23,9 +23,6 @@
 #include <algorithm>
 #include <sstream>
 
-using std::pair;
-using std::vector;
-
 /// @todo Do we want to make this a configure option?
 #define _SKINDIR_ _DATADIR_ "/webskins"
 
@@ -76,7 +73,7 @@ void NoWebSock::FinishUserSessions(const NoUser& User) { Sessions.m_mspSessions.
 NoWebSession::~NoWebSession()
 {
     // Find our entry in mIPSessions
-    pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(m_sIP);
+    std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(m_sIP);
     mIPSessionsIterator it = p.first;
     mIPSessionsIterator end = p.second;
 
@@ -367,7 +364,7 @@ void NoWebSock::SetVars()
             AddModLoop("UserModLoop", *pMod);
         }
 
-        vector<NoNetwork*> vNetworks = GetSession()->GetUser()->GetNetworks();
+        std::vector<NoNetwork*> vNetworks = GetSession()->GetUser()->GetNetworks();
         for (NoNetwork* pNetwork : vNetworks) {
             NoModules& vnMods = pNetwork->GetModules();
 
@@ -449,7 +446,7 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
             NoString& sParams = SubRow["Params"];
 
             const NoStringPairVector& vParams = SubPage->GetParams();
-            for (const pair<NoString, NoString>& ssNV : vParams) {
+            for (const std::pair<NoString, NoString>& ssNV : vParams) {
                 if (!sParams.empty()) {
                     sParams += "&";
                 }
@@ -869,7 +866,7 @@ std::shared_ptr<NoWebSession> NoWebSock::GetSession()
     }
 
     if (Sessions.m_mIPSessions.count(GetRemoteIP()) > m_uiMaxSessions) {
-        pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(GetRemoteIP());
+        std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(GetRemoteIP());
         mIPSessionsIterator it = std::min_element(p.first, p.second, compareLastActive);
         DEBUG("Remote IP:   " << GetRemoteIP() << "; discarding session [" << it->second->GetId() << "]");
         Sessions.m_mspSessions.RemItem(it->second->GetId());
