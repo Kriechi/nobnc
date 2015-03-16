@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_MESSAGE_H
-#define ZNC_MESSAGE_H
+#ifndef NOMESSAGE_H
+#define NOMESSAGE_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -48,4 +48,4 @@ private:
     timeval m_time;
 };
 
-#endif // !ZNC_MESSAGE_H
+#endif // !NOMESSAGE_H

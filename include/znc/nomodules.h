@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_MODULES_H
-#define ZNC_MODULES_H
+#ifndef NOMODULES_H
+#define NOMODULES_H
 
 #include <znc/noconfig.h>
 #include <znc/nomodule.h>
@@ -171,4 +171,4 @@ private:
     CClient* m_pClient;
 };
 
-#endif // !ZNC_MODULES_H
+#endif // !NOMODULES_H

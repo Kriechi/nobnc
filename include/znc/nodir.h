@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_DIR_H
-#define ZNC_DIR_H
+#ifndef NODIR_H
+#define NODIR_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -141,4 +141,4 @@ private:
     bool m_bDesc;
 };
 
-#endif // !ZNC_DIR_H
+#endif // !NODIR_H

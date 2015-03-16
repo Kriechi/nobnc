@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_QUERY_H
-#define ZNC_QUERY_H
+#ifndef NOQUERY_H
+#define NOQUERY_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -52,4 +52,4 @@ private:
     CBuffer m_Buffer;
 };
 
-#endif // !ZNC_QUERY_H
+#endif // !NOQUERY_H

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_FILE_H
-#define ZNC_FILE_H
+#ifndef NOFILE_H
+#define NOFILE_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -128,4 +128,4 @@ protected:
     CString m_sShortName; //!< Filename alone, without path
 };
 
-#endif // !ZNC_FILE_H
+#endif // !NOFILE_H

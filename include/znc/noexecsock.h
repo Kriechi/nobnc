@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_EXECSOCK_H
-#define ZNC_EXECSOCK_H
+#ifndef NOEXECSOCK_H
+#define NOEXECSOCK_H
 
 #include <znc/noconfig.h>
 #include <znc/nosocket.h>
@@ -55,4 +55,4 @@ private:
     int m_iPid;
 };
 
-#endif // !ZNC_EXECSOCK_H
+#endif // !NOEXECSOCK_H

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_USER_H
-#define ZNC_USER_H
+#ifndef NOUSER_H
+#define NOUSER_H
 
 #include <znc/noconfig.h>
 #include <znc/noutils.h>
@@ -236,4 +236,4 @@ private:
     bool LoadModule(const CString& sModName, const CString& sArgs, const CString& sNotice, CString& sError);
 };
 
-#endif // !ZNC_USER_H
+#endif // !NOUSER_H

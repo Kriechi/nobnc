@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNCSTRING_H
-#define ZNCSTRING_H
+#ifndef NOSTRING_H
+#define NOSTRING_H
 
 #include <znc/noconfig.h>
 #include <map>
@@ -649,4 +649,4 @@ public:
     virtual CString& Decode(CString& sValue) const;
 };
 
-#endif // !ZNCSTRING_H
+#endif // !NOSTRING_H

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_SSLVERIFYHOST_H
-#define ZNC_SSLVERIFYHOST_H
+#ifndef NOSSLVERIFYHOST_H
+#define NOSSLVERIFYHOST_H
 
 #include <znc/noconfig.h>
 #include <znc/Csocket.h>
@@ -27,4 +27,4 @@ bool ZNC_SSLVerifyHost(const CString& sHost, const X509* pCert, CString& sError)
 
 #endif /* HAVE_LIBSSL */
 
-#endif /* ZNC_SSLVERIFYHOST_H */
+#endif /* NOSSLVERIFYHOST_H */

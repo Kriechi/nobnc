@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_MODULE_H
-#define ZNC_MODULE_H
+#ifndef NOMODULE_H
+#define NOMODULE_H
 
 #include <znc/noconfig.h>
 #include <znc/nowebmodules.h>
@@ -1051,4 +1051,4 @@ private:
     std::map<CString, CModCommand> m_mCommands;
 };
 
-#endif // !ZNC_MODULE_H
+#endif // !NOMODULE_H

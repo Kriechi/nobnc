@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_NICK_H
-#define ZNC_NICK_H
+#ifndef NONICK_H
+#define NONICK_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -65,4 +65,4 @@ private:
     CString m_sHost;
 };
 
-#endif // !ZNC_NICK_H
+#endif // !NONICK_H

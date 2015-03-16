@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_NETWORK_H
-#define ZNC_NETWORK_H
+#ifndef NONETWORK_H
+#define NONETWORK_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -253,4 +253,4 @@ private:
     unsigned short int m_uJoinDelay;
 };
 
-#endif // !ZNC_NETWORK_H
+#endif // !NONETWORK_H

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_TEMPLATE_H
-#define ZNC_TEMPLATE_H
+#ifndef NOTEMPLATE_H
+#define NOTEMPLATE_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -195,4 +195,4 @@ private:
     std::vector<std::shared_ptr<CTemplateTagHandler>> m_vspTagHandlers;
 };
 
-#endif // !ZNC_TEMPLATE_H
+#endif // !NOTEMPLATE_H

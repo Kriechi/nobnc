@@ -1,5 +1,5 @@
-#ifndef ZNCCONFIG_H
-#define ZNCCONFIG_H
+#ifndef NOCONFIG_H
+#define NOCONFIG_H
 
 /* Use poll() instead of select() */
 #cmakedefine CSOCK_USE_POLL
@@ -71,4 +71,4 @@
 /* Define for large files, on AIX-style hosts. */
 #cmakedefine _LARGE_FILES
 
-#endif /* ZNCCONFIG_H */
+#endif /* NOCONFIG_H */

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_UTILS_H
-#define ZNC_UTILS_H
+#ifndef NOUTILS_H
+#define NOUTILS_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -360,4 +360,4 @@ private:
     unsigned int m_uTTL; //!< Default time-to-live duration
 };
 
-#endif // !ZNC_UTILS_H
+#endif // !NOUTILS_H

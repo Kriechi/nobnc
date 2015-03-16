@@ -1,7 +1,7 @@
 /* C implementation by Christophe Devine, C++ "class-ified" by [T3] */
 
-#ifndef ZNC_MD5_H
-#define ZNC_MD5_H
+#ifndef NOMD5_H
+#define NOMD5_H
 
 #include <znc/noconfig.h>
 #include <string>
@@ -48,4 +48,4 @@ private:
     void md5_process(md5_context* ctx, const uint8 data[64]) const;
 };
 
-#endif /* ZNC_MD5_H */
+#endif /* NOMD5_H */

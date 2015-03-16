@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_TIMER_H
-#define ZNC_TIMER_H
+#ifndef NOTIMER_H
+#define NOTIMER_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -72,4 +72,4 @@ private:
     FPTimer_t m_pFBCallback;
 };
 
-#endif // !ZNC_TIMER_H
+#endif // !NOTIMER_H

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_BUFFER_H
-#define ZNC_BUFFER_H
+#ifndef NOBUFFER_H
+#define NOBUFFER_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -51,4 +51,4 @@ private:
     std::deque<CMessage> m_lines;
 };
 
-#endif // !ZNC_BUFFER_H
+#endif // !NOBUFFER_H

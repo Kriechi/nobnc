@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_H
-#define ZNC_H
+#ifndef NOZNC_H
+#define NOZNC_H
 
 #include <znc/noconfig.h>
 #include <znc/noclient.h>
@@ -239,4 +239,4 @@ private:
     bool m_bHideVersion;
 };
 
-#endif // !ZNC_H
+#endif // !NOZNC_H

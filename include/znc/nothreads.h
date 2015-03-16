@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_THREADS_H
-#define ZNC_THREADS_H
+#ifndef NOTHREADS_H
+#define NOTHREADS_H
 
 #include <znc/noconfig.h>
 
@@ -332,4 +332,4 @@ private:
 };
 
 #endif // HAVE_PTHREAD
-#endif // !ZNC_THREADS_H
+#endif // !NOTHREADS_H

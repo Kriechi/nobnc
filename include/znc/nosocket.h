@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_SOCKET_H
-#define ZNC_SOCKET_H
+#ifndef NOSOCKET_H
+#define NOSOCKET_H
 
 #include <znc/noconfig.h>
 #include <znc/Csocket.h>
@@ -306,4 +306,4 @@ public:
 #endif
 };
 
-#endif /* ZNC_SOCKET_H */
+#endif /* NOSOCKET_H */

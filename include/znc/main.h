@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_MAIN_H
-#define ZNC_MAIN_H
+#ifndef NOMAIN_H
+#define NOMAIN_H
 
 #include <znc/noconfig.h>
 #include <znc/noversion.h>
@@ -139,4 +139,4 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
  *  Feel free to also look at existing modules.
  */
 
-#endif // !ZNC_MAIN_H
+#endif // !NOMAIN_H

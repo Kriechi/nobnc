@@ -1,5 +1,5 @@
-#ifndef ZNC_VERSION_H
-#define ZNC_VERSION_H
+#ifndef NOVERSION_H
+#define NOVERSION_H
 
 // The following defines are for #if comparison (preprocessor only likes ints)
 #define VERSION_MAJOR @ZNC_VERSION_MAJOR@
@@ -13,4 +13,4 @@
 // You can add -DVERSION_EXTRA="stuff" to your CXXFLAGS!
 extern const char* ZNC_VERSION_EXTRA;
 
-#endif // !ZNC_VERSION_H
+#endif // !NOVERSION_H

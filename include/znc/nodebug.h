@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNCDEBUG_H
-#define ZNCDEBUG_H
+#ifndef NODEBUG_H
+#define NODEBUG_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -59,4 +59,4 @@ public:
     ~CDebugStream();
 };
 
-#endif // !ZNCDEBUG_H
+#endif // !NODEBUG_H

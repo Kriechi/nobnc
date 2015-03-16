@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ZNC_CONFIG_H
-#define ZNC_CONFIG_H
+#ifndef NOSETTINGS_H
+#define NOSETTINGS_H
 
 #include <znc/noconfig.h>
 #include <znc/nostring.h>
@@ -169,4 +169,4 @@ private:
     SubConfigMap m_SubConfigs;
 };
 
-#endif // !ZNC_CONFIG_H
+#endif // !NOSETTINGS_H
