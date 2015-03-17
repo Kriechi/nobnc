@@ -17,7 +17,7 @@
 #ifndef NOIRCSOCK_H
 #define NOIRCSOCK_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nosocket.h>
 #include <no/nonick.h>
 

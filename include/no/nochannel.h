@@ -17,7 +17,7 @@
 #ifndef NOCHANNEL_H
 #define NOCHANNEL_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nonick.h>
 #include <no/nostring.h>
 #include <no/nobuffer.h>

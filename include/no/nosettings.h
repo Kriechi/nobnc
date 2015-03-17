@@ -17,7 +17,7 @@
 #ifndef NOSETTINGS_H
 #define NOSETTINGS_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 
 class NoFile;

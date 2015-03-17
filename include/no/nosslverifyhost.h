@@ -17,7 +17,7 @@
 #ifndef NOSSLVERIFYHOST_H
 #define NOSSLVERIFYHOST_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/Csocket.h>
 #include <no/nostring.h>
 

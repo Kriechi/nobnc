@@ -17,7 +17,7 @@
 #ifndef NOMESSAGE_H
 #define NOMESSAGE_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <sys/time.h>
 

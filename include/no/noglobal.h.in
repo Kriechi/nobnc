@@ -17,6 +17,8 @@
 #ifndef NOGLOBAL_H
 #define NOGLOBAL_H
 
+#include <no/noconfig.h>
+
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;

@@ -17,7 +17,7 @@
 #ifndef NONICK_H
 #define NONICK_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <vector>
 

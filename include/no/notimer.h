@@ -17,7 +17,7 @@
 #ifndef NOTIMER_H
 #define NOTIMER_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/Csocket.h>
 

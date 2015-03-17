@@ -17,7 +17,7 @@
 #ifndef NOSERVER_H
 #define NOSERVER_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 
 class NoServer

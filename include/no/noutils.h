@@ -17,7 +17,7 @@
 #ifndef NOUTILS_H
 #define NOUTILS_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <assert.h>
 #include <cstdio>

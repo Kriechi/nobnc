@@ -17,7 +17,7 @@
 #ifndef NOWEBMODULES_H
 #define NOWEBMODULES_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/notemplate.h>
 #include <no/nohttpsock.h>
 #include <no/noutils.h>

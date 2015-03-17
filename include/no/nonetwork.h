@@ -17,7 +17,7 @@
 #ifndef NONETWORK_H
 #define NONETWORK_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/nobuffer.h>
 #include <no/nonick.h>

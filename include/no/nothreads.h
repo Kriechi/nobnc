@@ -17,7 +17,7 @@
 #ifndef NOTHREADS_H
 #define NOTHREADS_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 
 #ifdef HAVE_PTHREAD
 

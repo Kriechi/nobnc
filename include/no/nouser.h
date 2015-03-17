@@ -17,7 +17,7 @@
 #ifndef NOUSER_H
 #define NOUSER_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/noutils.h>
 #include <no/nobuffer.h>
 #include <no/nonick.h>

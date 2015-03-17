@@ -17,7 +17,7 @@
 #ifndef NOLISTENER_H
 #define NOLISTENER_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nosocket.h>
 
 class NoRealListener;

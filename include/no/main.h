@@ -17,7 +17,6 @@
 #ifndef NOMAIN_H
 #define NOMAIN_H
 
-#include <no/noconfig.h>
 #include <no/noglobal.h>
 
 extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;

@@ -17,7 +17,7 @@
 #ifndef NODEBUG_H
 #define NODEBUG_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <sstream>
 

@@ -17,7 +17,7 @@
 #ifndef NOSTRING_H
 #define NOSTRING_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <map>
 #include <set>
 #include <string>

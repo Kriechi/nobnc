@@ -17,7 +17,7 @@
 #ifndef NOBUFFER_H
 #define NOBUFFER_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/nomessage.h>
 #include <sys/time.h>

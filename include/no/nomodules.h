@@ -17,7 +17,7 @@
 #ifndef NOMODULES_H
 #define NOMODULES_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nomodule.h>
 
 class NoAuthBase;

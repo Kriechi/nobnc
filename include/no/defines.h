@@ -17,7 +17,7 @@
 #ifndef NODEFINES_H
 #define NODEFINES_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 
 // This header file is just for Csocket
 

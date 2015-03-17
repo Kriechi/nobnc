@@ -3,7 +3,7 @@
 #ifndef NOMD5_H
 #define NOMD5_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <string>
 
 #ifndef uint8

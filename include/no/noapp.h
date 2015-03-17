@@ -17,7 +17,7 @@
 #ifndef NOAPP_H
 #define NOAPP_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/noclient.h>
 #include <no/nomodules.h>
 #include <no/nosocket.h>

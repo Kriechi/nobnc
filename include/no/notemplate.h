@@ -17,7 +17,7 @@
 #ifndef NOTEMPLATE_H
 #define NOTEMPLATE_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <iostream>
 #include <list>

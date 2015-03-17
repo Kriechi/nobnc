@@ -17,7 +17,7 @@
 #ifndef NOSOCKET_H
 #define NOSOCKET_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/Csocket.h>
 #include <no/nothreads.h>
 

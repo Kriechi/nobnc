@@ -17,7 +17,7 @@
 #ifndef NODIR_H
 #define NODIR_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/nofile.h>
 #include <dirent.h>

@@ -17,7 +17,7 @@
 #ifndef NOQUERY_H
 #define NOQUERY_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/nobuffer.h>
 

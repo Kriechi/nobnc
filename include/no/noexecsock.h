@@ -17,7 +17,7 @@
 #ifndef NOEXECSOCK_H
 #define NOEXECSOCK_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nosocket.h>
 #include <signal.h>
 

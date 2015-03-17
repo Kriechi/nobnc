@@ -8,9 +8,9 @@
 *.a
 
 # Generated sources
-/src/noglobal.cpp
 /include/no/noconfig.h
 /include/no/noglobal.h
+/src/noglobal.cpp
 
 # Genrated docs
 /share/man/*.gz

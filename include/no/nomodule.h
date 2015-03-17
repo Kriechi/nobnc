@@ -17,7 +17,7 @@
 #ifndef NOMODULE_H
 #define NOMODULE_H
 
-#include <no/noconfig.h>
+#include <no/noglobal.h>
 #include <no/nowebmodules.h>
 #include <no/noutils.h>
 #include <no/nothreads.h>
