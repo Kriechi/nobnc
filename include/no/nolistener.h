@@ -20,38 +20,31 @@
 #include <no/noglobal.h>
 #include <no/nosocket.h>
 
-class NoRealListener;
-
 class NO_EXPORT NoListener
 {
 public:
     typedef enum { ACCEPT_IRC, ACCEPT_HTTP, ACCEPT_ALL } EAcceptType;
 
-    NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept)
-        : m_bSSL(bSSL), m_eAddr(eAddr), m_uPort(uPort), m_sBindHost(sBindHost), m_sURIPrefix(sURIPrefix),
-          m_pListener(nullptr), m_eAcceptType(eAccept)
-    {
-    }
-
+    NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept);
     ~NoListener();
 
     NoListener(const NoListener&) = delete;
     NoListener& operator=(const NoListener&) = delete;
 
-    bool IsSSL() const { return m_bSSL; }
-    EAddrType GetAddrType() const { return m_eAddr; }
-    ushort GetPort() const { return m_uPort; }
-    const NoString& GetBindHost() const { return m_sBindHost; }
-    NoRealListener* GetRealListener() const { return m_pListener; }
-    const NoString& GetURIPrefix() const { return m_sURIPrefix; }
-    EAcceptType GetAcceptType() const { return m_eAcceptType; }
+    bool IsSSL() const;
+    EAddrType GetAddrType() const;
+    ushort GetPort() const;
+    const NoString& GetBindHost() const;
+    NoBaseSocket* GetSocket() const;
+    const NoString& GetURIPrefix() const;
+    EAcceptType GetAcceptType() const;
 
     // It doesn't make sense to change any of the settings after Listen()
     // except this one, so don't add other setters!
-    void SetAcceptType(EAcceptType eType) { m_eAcceptType = eType; }
+    void SetAcceptType(EAcceptType eType);
 
     bool Listen();
-    void ResetRealListener();
+    void ResetSocket();
 
 private:
     bool m_bSSL;
@@ -59,35 +52,8 @@ private:
     ushort m_uPort;
     NoString m_sBindHost;
     NoString m_sURIPrefix;
-    NoRealListener* m_pListener;
+    NoBaseSocket* m_pSocket;
     EAcceptType m_eAcceptType;
-};
-
-class NO_EXPORT NoRealListener : public NoBaseSocket
-{
-public:
-    NoRealListener(NoListener& listener) : NoBaseSocket(), m_Listener(listener) {}
-    virtual ~NoRealListener();
-
-    bool ConnectionFrom(const NoString& sHost, ushort uPort) override;
-    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
-    void SockError(int iErrno, const NoString& sDescription) override;
-
-private:
-    NoListener& m_Listener;
-};
-
-class NO_EXPORT NoIncomingConnection : public NoBaseSocket
-{
-public:
-    NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix);
-    virtual ~NoIncomingConnection() {}
-    void ReadLine(const NoString& sData) override;
-    void ReachedMaxBuffer() override;
-
-private:
-    NoListener::EAcceptType m_eAcceptType;
-    const NoString m_sURIPrefix;
 };
 
 #endif // NOLISTENER_H

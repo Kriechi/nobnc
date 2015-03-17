@@ -47,7 +47,7 @@ public:
         // We need the SSL_VERIFY_PEER flag on all listeners, or else
         // the client doesn't send a ssl cert
         for (it = vListeners.begin(); it != vListeners.end(); ++it)
-            (*it)->GetRealListener()->SetRequireClientCertFlags(SSL_VERIFY_PEER);
+            (*it)->GetSocket()->SetRequireClientCertFlags(SSL_VERIFY_PEER);
 
         for (NoStringMap::const_iterator it1 = BeginNV(); it1 != EndNV(); ++it1) {
             NoStringVector vsKeys;

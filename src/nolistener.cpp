@@ -17,25 +17,99 @@
 #include "nolistener.h"
 #include "noapp.h"
 
+class NoRealListener : public NoBaseSocket
+{
+public:
+    NoRealListener(NoListener& listener);
+    virtual ~NoRealListener();
+
+    bool ConnectionFrom(const NoString& sHost, ushort uPort) override;
+    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
+    void SockError(int iErrno, const NoString& sDescription) override;
+
+private:
+    NoListener& m_Listener;
+};
+
+class NoIncomingConnection : public NoBaseSocket
+{
+public:
+    NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix);
+    virtual ~NoIncomingConnection() {}
+    void ReadLine(const NoString& sData) override;
+    void ReachedMaxBuffer() override;
+
+private:
+    NoListener::EAcceptType m_eAcceptType;
+    const NoString m_sURIPrefix;
+};
+
+NoListener::NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept)
+    : m_bSSL(bSSL), m_eAddr(eAddr), m_uPort(uPort), m_sBindHost(sBindHost), m_sURIPrefix(sURIPrefix),
+      m_pSocket(nullptr), m_eAcceptType(eAccept)
+{
+}
+
 NoListener::~NoListener()
 {
-    if (m_pListener) NoApp::Get().GetManager().DelSockByAddr(m_pListener);
+    if (m_pSocket)
+        NoApp::Get().GetManager().DelSockByAddr(m_pSocket);
+}
+
+bool NoListener::IsSSL() const
+{
+    return m_bSSL;
+}
+
+EAddrType NoListener::GetAddrType() const
+{
+    return m_eAddr;
+}
+
+ushort NoListener::GetPort() const
+{
+    return m_uPort;
+}
+
+const NoString& NoListener::GetBindHost() const
+{
+    return m_sBindHost;
+}
+
+NoBaseSocket* NoListener::GetSocket() const
+{
+    return m_pSocket;
+}
+
+const NoString& NoListener::GetURIPrefix() const
+{
+    return m_sURIPrefix;
+}
+
+NoListener::EAcceptType NoListener::GetAcceptType() const
+{
+    return m_eAcceptType;
+}
+
+void NoListener::SetAcceptType(EAcceptType eType)
+{
+    m_eAcceptType = eType;
 }
 
 bool NoListener::Listen()
 {
-    if (!m_uPort || m_pListener) {
+    if (!m_uPort || m_pSocket) {
         errno = EINVAL;
         return false;
     }
 
-    m_pListener = new NoRealListener(*this);
+    m_pSocket = new NoRealListener(*this);
 
     bool bSSL = false;
 #ifdef HAVE_LIBSSL
     if (IsSSL()) {
         bSSL = true;
-        m_pListener->SetPemLocation(NoApp::Get().GetPemLocation());
+        m_pSocket->SetPemLocation(NoApp::Get().GetPemLocation());
     }
 #endif
 
@@ -43,12 +117,22 @@ bool NoListener::Listen()
     // Make sure there is a consistent error message, not something random
     // which might even be "Error: Success".
     errno = EINVAL;
-    return NoApp::Get().GetManager().ListenHost(m_uPort, "_LISTENER", m_sBindHost, bSSL, SOMAXCONN, m_pListener, 0, m_eAddr);
+    return NoApp::Get().GetManager().ListenHost(m_uPort, "_LISTENER", m_sBindHost, bSSL, SOMAXCONN, m_pSocket, 0, m_eAddr);
 }
 
-void NoListener::ResetRealListener() { m_pListener = nullptr; }
+void NoListener::ResetSocket()
+{
+    m_pSocket = nullptr;
+}
 
-NoRealListener::~NoRealListener() { m_Listener.ResetRealListener(); }
+NoRealListener::NoRealListener(NoListener& listener) : NoBaseSocket(), m_Listener(listener)
+{
+}
+
+NoRealListener::~NoRealListener()
+{
+    m_Listener.ResetSocket();
+}
 
 bool NoRealListener::ConnectionFrom(const NoString& sHost, ushort uPort)
 {

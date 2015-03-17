@@ -1813,7 +1813,7 @@ bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
 
 bool NoApp::AddListener(NoListener* pListener)
 {
-    if (!pListener->GetRealListener()) {
+    if (!pListener->GetSocket()) {
         // Listener doesnt actually listen
         delete pListener;
         return false;
