@@ -406,7 +406,7 @@ private:
 
 void NoSaveBuffJob::RunJob()
 {
-    NoSaveBuff* p = (NoSaveBuff*)GetModule();
+    NoSaveBuff* p = (NoSaveBuff*)module();
     p->SaveBuffersToDisk();
 }
 

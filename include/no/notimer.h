@@ -26,50 +26,29 @@ class NoModule;
 class NO_EXPORT NoTimer : public CCron
 {
 public:
-    NoTimer(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription);
-
+    NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description);
     virtual ~NoTimer();
 
     NoTimer(const NoTimer&) = delete;
     NoTimer& operator=(const NoTimer&) = delete;
 
-    void SetModule(NoModule* p);
-    void SetDescription(const NoString& s);
+    NoModule* module() const;
+    void setModule(NoModule* module);
 
-    NoModule* GetModule() const;
-    const NoString& GetDescription() const;
+    NoString description() const;
+    void setDescription(const NoString& description);
 
-private:
-    NoModule* m_pModule;
-    NoString m_sDescription;
-};
-
-class NoFPTimer;
-
-typedef void (*FPTimer_t)(NoModule*, NoFPTimer*);
-
-class NO_EXPORT NoFPTimer : public NoTimer
-{
-public:
-    NoFPTimer(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription), m_pFBCallback(nullptr)
-    {
-    }
-
-    virtual ~NoFPTimer() {}
-
-    void SetFPCallback(FPTimer_t p) { m_pFBCallback = p; }
+    typedef void (*Callback)(NoModule*, NoTimer*);
+    Callback callback() const;
+    void setCallback(Callback callback);
 
 protected:
-    void RunJob() override
-    {
-        if (m_pFBCallback) {
-            m_pFBCallback(GetModule(), this);
-        }
-    }
+    void RunJob() override;
 
 private:
-    FPTimer_t m_pFBCallback;
+    NoModule* m_module;
+    NoString m_description;
+    Callback m_callback;
 };
 
 #endif // NOTIMER_H

@@ -221,7 +221,7 @@ private:
     }
 };
 
-void NoSimpleAwayJob::RunJob() { ((NoSimpleAway*)GetModule())->SetAway(false); }
+void NoSimpleAwayJob::RunJob() { ((NoSimpleAway*)module())->SetAway(false); }
 
 template <> void TModInfo<NoSimpleAway>(NoModInfo& Info)
 {

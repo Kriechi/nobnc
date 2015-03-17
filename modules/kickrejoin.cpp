@@ -38,12 +38,12 @@ public:
 protected:
     void RunJob() override
     {
-        NoNetwork* pNetwork = GetModule()->GetNetwork();
+        NoNetwork* pNetwork = module()->GetNetwork();
         NoChannel* pChan = pNetwork->FindChan(GetName().Token(1, true));
 
         if (pChan) {
             pChan->enable();
-            GetModule()->PutIRC("JOIN " + pChan->getName() + " " + pChan->getKey());
+            module()->PutIRC("JOIN " + pChan->getName() + " " + pChan->getKey());
         }
     }
 };

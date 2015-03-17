@@ -61,7 +61,7 @@ public:
 
 private:
 protected:
-    void RunJob() override { GetModule()->PutModule("TEST!!!!"); }
+    void RunJob() override { module()->PutModule("TEST!!!!"); }
 };
 
 class NoSampleMod : public NoModule

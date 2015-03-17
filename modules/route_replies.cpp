@@ -448,7 +448,7 @@ private:
 
 void NoRouteTimeout::RunJob()
 {
-    NoRouteRepliesMod* pMod = (NoRouteRepliesMod*)GetModule();
+    NoRouteRepliesMod* pMod = (NoRouteRepliesMod*)module();
     pMod->Timeout();
 }
 

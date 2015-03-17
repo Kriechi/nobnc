@@ -447,7 +447,7 @@ void NoSChatSock::Timeout()
 
 void NoRemMarkerJob::RunJob()
 {
-    NoSChat* p = (NoSChat*)GetModule();
+    NoSChat* p = (NoSChat*)module();
     p->RemoveMarker(m_sNick);
 
     // store buffer

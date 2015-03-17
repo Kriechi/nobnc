@@ -212,10 +212,10 @@ bool NoModule::AddTimer(NoTimer* pTimer)
     return true;
 }
 
-bool NoModule::AddTimer(FPTimer_t pFBCallback, const NoString& sLabel, u_int uInterval, u_int uCycles, const NoString& sDescription)
+bool NoModule::AddTimer(NoTimer::Callback pFBCallback, const NoString& sLabel, u_int uInterval, u_int uCycles, const NoString& sDescription)
 {
-    NoFPTimer* pTimer = new NoFPTimer(this, uInterval, uCycles, sLabel, sDescription);
-    pTimer->SetFPCallback(pFBCallback);
+    NoTimer* pTimer = new NoTimer(this, uInterval, uCycles, sLabel, sDescription);
+    pTimer->setCallback(pFBCallback);
 
     return AddTimer(pTimer);
 }
@@ -274,7 +274,7 @@ void NoModule::ListTimers()
                       NoString(Interval.tv_sec) + "seconds" +
                       (Interval.tv_usec ? " " + NoString(Interval.tv_usec) + " microseconds" : ""));
         Table.SetCell("Cycles", ((uCycles) ? NoString(uCycles) : "INF"));
-        Table.SetCell("Description", pTimer->GetDescription());
+        Table.SetCell("Description", pTimer->description());
     }
 
     PutModule(Table);

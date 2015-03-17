@@ -189,7 +189,7 @@ public:
 };
 
 
-static void RunTimer(NoModule* pModule, NoFPTimer* pTimer) { ((NoStickyChan*)pModule)->RunJob(); }
+static void RunTimer(NoModule* pModule, NoTimer* pTimer) { ((NoStickyChan*)pModule)->RunJob(); }
 
 bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
 {

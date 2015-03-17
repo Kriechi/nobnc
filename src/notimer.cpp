@@ -17,21 +17,54 @@
 #include "notimer.h"
 #include "nomodules.h"
 
-NoTimer::NoTimer(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
-    : CCron(), m_pModule(pModule), m_sDescription(sDescription)
+NoTimer::NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description)
+    : CCron(), m_module(module), m_description(description)
 {
-    SetName(sLabel);
+    SetName(label);
 
-    if (uCycles) {
-        StartMaxCycles(uInterval, uCycles);
-    } else {
-        Start(uInterval);
-    }
+    if (cycles)
+        StartMaxCycles(interval, cycles);
+    else
+        Start(interval);
 }
 
-NoTimer::~NoTimer() { m_pModule->UnlinkTimer(this); }
+NoTimer::~NoTimer()
+{
+    m_module->UnlinkTimer(this);
+}
 
-void NoTimer::SetModule(NoModule* p) { m_pModule = p; }
-void NoTimer::SetDescription(const NoString& s) { m_sDescription = s; }
-NoModule* NoTimer::GetModule() const { return m_pModule; }
-const NoString& NoTimer::GetDescription() const { return m_sDescription; }
+NoModule* NoTimer::module() const
+{
+    return m_module;
+}
+
+void NoTimer::setModule(NoModule* module)
+{
+    m_module = module;
+}
+
+NoString NoTimer::description() const
+{
+    return m_description;
+}
+
+void NoTimer::setDescription(const NoString& description)
+{
+    m_description = description;
+}
+
+NoTimer::Callback NoTimer::callback() const
+{
+    return m_callback;
+}
+
+void NoTimer::setCallback(Callback callback)
+{
+    m_callback = callback;
+}
+
+void NoTimer::RunJob()
+{
+    if (m_callback)
+        m_callback(m_module, this);
+}

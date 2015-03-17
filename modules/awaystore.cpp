@@ -473,7 +473,7 @@ private:
 
 void NoAwayJob::RunJob()
 {
-    NoAway* p = (NoAway*)GetModule();
+    NoAway* p = (NoAway*)module();
     p->SaveBufferToDisk();
 
     if (!p->IsAway()) {
