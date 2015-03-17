@@ -78,7 +78,7 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                 useClient->SetPlaybackActive(true);
 
                 bool batch = useClient->HasBatch();
-                NoString batchName = m_name.MD5();
+                NoString batchName = NoUtils::MD5(m_name);
 
                 if (batch) {
                     m_network->PutUser(":znc.in BATCH +" + batchName + " znc.in/playback " + m_name, useClient);

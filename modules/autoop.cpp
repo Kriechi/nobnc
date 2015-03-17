@@ -555,7 +555,7 @@ public:
         }
 
         NoString sResponse = pUser->GetUserKey() + "::" + sChallenge;
-        PutIRC("NOTICE " + Nick.GetNick() + " :!ZNCAO RESPONSE " + sResponse.MD5());
+        PutIRC("NOTICE " + Nick.GetNick() + " :!ZNCAO RESPONSE " + NoUtils::MD5(sResponse));
         return false;
     }
 
@@ -573,7 +573,7 @@ public:
 
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             if (it->second->HostMatches(Nick.GetHostMask())) {
-                if (sResponse == NoString(it->second->GetUserKey() + "::" + sChallenge).MD5()) {
+                if (sResponse == NoUtils::MD5(it->second->GetUserKey() + "::" + sChallenge)) {
                     OpUser(Nick, *it->second);
                     return true;
                 } else {

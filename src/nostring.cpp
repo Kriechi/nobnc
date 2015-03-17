@@ -17,7 +17,6 @@
 #include "nostring.h"
 #include "nofile.h"
 #include "noutils.h"
-#include "nomd5.h"
 #include "nosha256.h"
 #include "noblowfish.h"
 #include <sstream>
@@ -1158,11 +1157,6 @@ ulong NoString::Base64Decode(NoString& sRet) const
     delete[] out;
 
     return uRet;
-}
-
-NoString NoString::MD5() const
-{
-    return (const char*)NoMD5(*this);
 }
 
 NoString NoString::SHA256() const

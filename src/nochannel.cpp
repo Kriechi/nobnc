@@ -590,7 +590,7 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                 }
 
                 bool bBatch = pUseClient->HasBatch();
-                NoString sBatchName = getName().MD5();
+                NoString sBatchName = NoUtils::MD5(getName());
 
                 if (bBatch) {
                     m_network->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + getName(), pUseClient);

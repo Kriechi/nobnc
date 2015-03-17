@@ -37,6 +37,7 @@ public:
 
     static NoString GetSaltedHashPass(NoString& sSalt);
     static NoString GetSalt();
+    static NoString MD5(const NoString& sStr);
     static NoString SaltedMD5Hash(const NoString& sPass, const NoString& sSalt);
     static NoString SaltedSHA256Hash(const NoString& sPass, const NoString& sSalt);
     static NoString GetPass(const NoString& sPrompt);

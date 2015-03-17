@@ -18,6 +18,7 @@
 #include "nodebug.h"
 #include "nofile.h"
 #include "nodir.h"
+#include "nomd5.h"
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -92,7 +93,9 @@ NoString NoUtils::GetSaltedHashPass(NoString& sSalt)
 
 NoString NoUtils::GetSalt() { return NoString::RandomString(20); }
 
-NoString NoUtils::SaltedMD5Hash(const NoString& sPass, const NoString& sSalt) { return NoString(sPass + sSalt).MD5(); }
+NoString NoUtils::MD5(const NoString& sStr) { return (const char*) NoMD5(sStr); }
+
+NoString NoUtils::SaltedMD5Hash(const NoString& sPass, const NoString& sSalt) { return MD5(sPass + sSalt); }
 
 NoString NoUtils::SaltedSHA256Hash(const NoString& sPass, const NoString& sSalt) { return NoString(sPass + sSalt).SHA256(); }
 

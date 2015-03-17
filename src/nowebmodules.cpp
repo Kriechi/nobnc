@@ -894,7 +894,7 @@ std::shared_ptr<NoWebSession> NoWebSock::GetSession()
 NoString NoWebSock::GetCSRFCheck()
 {
     std::shared_ptr<NoWebSession> pSession = GetSession();
-    return pSession->GetId().MD5();
+    return NoUtils::MD5(pSession->GetId());
 }
 
 bool NoWebSock::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic)

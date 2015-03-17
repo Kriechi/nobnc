@@ -101,7 +101,7 @@ public:
             return CONTINUE;
         }
 
-        const NoString sCacheKey(NoString(sUsername + ":" + sPassword).MD5());
+        const NoString sCacheKey(NoUtils::MD5(sUsername + ":" + sPassword));
         if (m_Cache.HasItem(sCacheKey)) {
             bSuccess = true;
             DEBUG("saslauth: Found [" + sUsername + "] in cache");

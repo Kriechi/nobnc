@@ -347,8 +347,6 @@ public:
      */
     static NoString RandomString(uint uLength);
 
-    /** @return The MD5 hash of this string. */
-    NoString MD5() const;
     /** @return The SHA256 hash of this string. */
     NoString SHA256() const;
 
