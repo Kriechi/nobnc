@@ -21,20 +21,11 @@
 #include <no/nostring.h>
 #include <assert.h>
 #include <cstdio>
-#include <fcntl.h>
 #include <map>
 #include <sys/file.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <vector>
-
-static inline void SetFdCloseOnExec(int fd)
-{
-    int flags = fcntl(fd, F_GETFD, 0);
-    if (flags < 0) return; // Ignore errors
-    // When we execve() a new process this fd is now automatically closed.
-    fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
-}
 
 class NO_EXPORT NoUtils
 {

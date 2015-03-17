@@ -31,6 +31,14 @@
 #define O_BINARY 0
 #endif
 
+static inline void SetFdCloseOnExec(int fd)
+{
+    int flags = fcntl(fd, F_GETFD, 0);
+    if (flags < 0) return; // Ignore errors
+    // When we execve() a new process this fd is now automatically closed.
+    fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
+}
+
 NoString NoFile::m_sHomePath;
 
 NoFile::NoFile() : NoFile("") {}
