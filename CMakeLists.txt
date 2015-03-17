@@ -19,6 +19,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/noapp.h
                        include/no/noblowfish.h
                        include/no/nobuffer.h
+                       include/no/nocachemap.h
                        include/no/nochannel.h
                        include/no/noclient.h
                        include/no/nodebug.h

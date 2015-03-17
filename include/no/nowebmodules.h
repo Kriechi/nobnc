@@ -21,6 +21,7 @@
 #include <no/notemplate.h>
 #include <no/nohttpsock.h>
 #include <no/noutils.h>
+#include <no/nocachemap.h>
 
 class NoAuthBase;
 class NoUser;
