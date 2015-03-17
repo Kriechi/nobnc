@@ -24,7 +24,6 @@
 #include <vector>
 #include <sstream>
 #include <cstring>
-#include <sys/types.h>
 
 #define _SQL(s) NoString("'" + NoString(s).Escape_n(NoString::ESQL) + "'")
 #define _URL(s) NoString(s).Escape_n(NoString::EURL)
@@ -37,19 +36,6 @@ class NoStringMap;
 typedef std::set<NoString> NoStringSet;
 typedef std::vector<NoString> NoStringVector;
 typedef std::vector<std::pair<NoString, NoString>> NoStringPairVector;
-
-static const uchar XX = 0xff;
-static const uchar base64_table[256] = {
-    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
-    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, 62, XX, XX, XX, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-    XX, XX, XX, XX, XX, XX, XX, 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24, 25, XX, XX, XX, XX, XX, XX, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44,
-    45, 46, 47, 48, 49, 50, 51, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
-    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
-    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
-    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
-    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
-};
 
 enum class CaseSensitivity { CaseInsensitive, CaseSensitive };
 
@@ -77,7 +63,12 @@ public:
     static const CaseSensitivity CaseSensitive = CaseSensitivity::CaseSensitive;
     static const CaseSensitivity CaseInsensitive = CaseSensitivity::CaseInsensitive;
 
-    explicit NoString(bool b) : std::string(b ? "true" : "false") {}
+    NoString();
+    NoString(const char* c);
+    NoString(const char* c, size_t l);
+    NoString(const std::string& s);
+    NoString(size_t n, char c);
+    explicit NoString(bool b);
     explicit NoString(char c);
     explicit NoString(uchar c);
     explicit NoString(short i);
@@ -90,13 +81,6 @@ public:
     explicit NoString(ulonglong i);
     explicit NoString(double i, int precision = 2);
     explicit NoString(float i, int precision = 2);
-
-    NoString() : std::string() {}
-    NoString(const char* c) : std::string(c) {}
-    NoString(const char* c, size_t l) : std::string(c, l) {}
-    NoString(const std::string& s) : std::string(s) {}
-    NoString(size_t n, char c) : std::string(n, c) {}
-    ~NoString() {}
 
     /**
      * Casts a NoString to another type.  Implemented via std::stringstream, you use this
@@ -261,8 +245,7 @@ public:
      * @param bRemoveDelims If true, all matching delimiters are removed.
      * @returns The number of replacements done.
      */
-    uint
-    Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft = "", const NoString& sRight = "", bool bRemoveDelims = false);
+    uint Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft = "", const NoString& sRight = "", bool bRemoveDelims = false);
     /** Ellipsize the current string.
      * For example, ellipsizing "Hello, I'm Bob" to the length 9 would
      * result in "Hello,...".
@@ -307,8 +290,7 @@ public:
      *  other Token() function in this class. The extra arguments are
      *  handled similarly to Split().
      */
-    NoString
-    Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
+    NoString Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
 
     size_type URLSplit(NoStringMap& msRet) const;
     size_type OptionSplit(NoStringMap& msRet, bool bUpperKeys = false) const;

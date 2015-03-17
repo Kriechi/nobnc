@@ -22,66 +22,113 @@
 #include "noblowfish.h"
 #include <sstream>
 
+static const uchar XX = 0xff;
+static const uchar base64_table[256] = {
+    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
+    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, 62, XX, XX, XX, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+    XX, XX, XX, XX, XX, XX, XX, 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    22, 23, 24, 25, XX, XX, XX, XX, XX, XX, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44,
+    45, 46, 47, 48, 49, 50, 51, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
+    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
+    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
+    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
+    XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
+};
+
+NoString::NoString() : std::string()
+{
+}
+
+NoString::NoString(const char* c) : std::string(c)
+{
+}
+
+NoString::NoString(const char* c, size_t l) : std::string(c, l)
+{
+}
+
+NoString::NoString(const std::string& s) : std::string(s)
+{
+}
+
+NoString::NoString(size_t n, char c) : std::string(n, c)
+{
+}
+
+NoString::NoString(bool b) : std::string(b ? "true" : "false")
+{
+}
+
 NoString::NoString(char c) : std::string()
 {
     std::stringstream s;
     s << c;
     *this = s.str();
 }
+
 NoString::NoString(uchar c) : std::string()
 {
     std::stringstream s;
     s << c;
     *this = s.str();
 }
+
 NoString::NoString(short i) : std::string()
 {
     std::stringstream s;
     s << i;
     *this = s.str();
 }
+
 NoString::NoString(ushort i) : std::string()
 {
     std::stringstream s;
     s << i;
     *this = s.str();
 }
+
 NoString::NoString(int i) : std::string()
 {
     std::stringstream s;
     s << i;
     *this = s.str();
 }
+
 NoString::NoString(uint i) : std::string()
 {
     std::stringstream s;
     s << i;
     *this = s.str();
 }
+
 NoString::NoString(long i) : std::string()
 {
     std::stringstream s;
     s << i;
     *this = s.str();
 }
+
 NoString::NoString(ulong i) : std::string()
 {
     std::stringstream s;
     s << i;
     *this = s.str();
 }
+
 NoString::NoString(long long i) : std::string()
 {
     std::stringstream s;
     s << i;
     *this = s.str();
 }
+
 NoString::NoString(ulonglong i) : std::string()
 {
     std::stringstream s;
     s << i;
     *this = s.str();
 }
+
 NoString::NoString(double i, int precision) : std::string()
 {
     std::stringstream s;
@@ -89,6 +136,7 @@ NoString::NoString(double i, int precision) : std::string()
     s << std::fixed << i;
     *this = s.str();
 }
+
 NoString::NoString(float i, int precision) : std::string()
 {
     std::stringstream s;
@@ -97,8 +145,7 @@ NoString::NoString(float i, int precision) : std::string()
     *this = s.str();
 }
 
-uchar*
-NoString::strnchr(const uchar* src, uchar c, uint iMaxBytes, uchar* pFill, uint* piCount) const
+uchar* NoString::strnchr(const uchar* src, uchar c, uint iMaxBytes, uchar* pFill, uint* piCount) const
 {
     for (uint a = 0; a < iMaxBytes && *src; a++, src++) {
         if (pFill) {
@@ -208,7 +255,10 @@ bool NoString::WildCmp(const NoString& sWild, const NoString& sString, CaseSensi
     return (*wild == 0);
 }
 
-bool NoString::WildCmp(const NoString& sWild, CaseSensitivity cs) const { return NoString::WildCmp(sWild, *this, cs); }
+bool NoString::WildCmp(const NoString& sWild, CaseSensitivity cs) const
+{
+    return NoString::WildCmp(sWild, *this, cs);
+}
 
 NoString& NoString::MakeUpper()
 {
@@ -590,11 +640,20 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
     return sRet;
 }
 
-NoString NoString::Escape_n(EEscape eTo) const { return Escape_n(EASCII, eTo); }
+NoString NoString::Escape_n(EEscape eTo) const
+{
+    return Escape_n(EASCII, eTo);
+}
 
-NoString& NoString::Escape(EEscape eFrom, EEscape eTo) { return (*this = Escape_n(eFrom, eTo)); }
+NoString& NoString::Escape(EEscape eFrom, EEscape eTo)
+{
+    return (*this = Escape_n(eFrom, eTo));
+}
 
-NoString& NoString::Escape(EEscape eTo) { return (*this = Escape_n(eTo)); }
+NoString& NoString::Escape(EEscape eTo)
+{
+    return (*this = Escape_n(eTo));
+}
 
 NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims) const
 {
@@ -608,8 +667,7 @@ uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const No
     return NoString::Replace(*this, sReplace, sWith, sLeft, sRight, bRemoveDelims);
 }
 
-uint
-NoString::Replace(NoString& sStr, const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
+uint NoString::Replace(NoString& sStr, const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
 {
     uint uRet = 0;
     NoString sCopy = sStr;
@@ -816,8 +874,7 @@ NoString::size_type NoString::QuoteSplit(NoStringVector& vsRet) const
     return Split(" ", vsRet, false, "\"", "\"", true);
 }
 
-NoString::size_type
-NoString::Split(const NoString& sDelim, NoStringVector& vsRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
+NoString::size_type NoString::Split(const NoString& sDelim, NoStringVector& vsRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
 {
     vsRet.clear();
 
@@ -894,8 +951,7 @@ NoString::Split(const NoString& sDelim, NoStringVector& vsRet, bool bAllowEmpty,
     return vsRet.size();
 }
 
-NoString::size_type
-NoString::Split(const NoString& sDelim, NoStringSet& ssRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
+NoString::size_type NoString::Split(const NoString& sDelim, NoStringSet& ssRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
 {
     NoStringVector vsTokens;
 
@@ -1104,7 +1160,10 @@ ulong NoString::Base64Decode(NoString& sRet) const
     return uRet;
 }
 
-NoString NoString::MD5() const { return (const char*)NoMD5(*this); }
+NoString NoString::MD5() const
+{
+    return (const char*)NoMD5(*this);
+}
 
 NoString NoString::SHA256() const
 {
@@ -1171,9 +1230,15 @@ NoString NoString::Decrypt_n(const NoString& sPass, const NoString& sIvec) const
     return sRet;
 }
 
-void NoString::Encrypt(const NoString& sPass, const NoString& sIvec) { Crypt(sPass, true, sIvec); }
+void NoString::Encrypt(const NoString& sPass, const NoString& sIvec)
+{
+    Crypt(sPass, true, sIvec);
+}
 
-void NoString::Decrypt(const NoString& sPass, const NoString& sIvec) { Crypt(sPass, false, sIvec); }
+void NoString::Decrypt(const NoString& sPass, const NoString& sIvec)
+{
+    Crypt(sPass, false, sIvec);
+}
 
 void NoString::Crypt(const NoString& sPass, bool bEncrypt, const NoString& sIvec)
 {
@@ -1262,16 +1327,50 @@ bool NoString::ToBool() const
             !sTrimmed.Equals("no") && !sTrimmed.Equals("n"));
 }
 
-short NoString::ToShort() const { return (short int)strtol(this->c_str(), (char**)nullptr, 10); }
-ushort NoString::ToUShort() const { return (ushort)strtoul(this->c_str(), (char**)nullptr, 10); }
-uint NoString::ToUInt() const { return (uint)strtoul(this->c_str(), (char**)nullptr, 10); }
-int NoString::ToInt() const { return (int)strtol(this->c_str(), (char**)nullptr, 10); }
-long NoString::ToLong() const { return strtol(this->c_str(), (char**)nullptr, 10); }
-ulong NoString::ToULong() const { return strtoul(c_str(), nullptr, 10); }
-ulonglong NoString::ToULongLong() const { return strtoull(c_str(), nullptr, 10); }
-long long NoString::ToLongLong() const { return strtoll(c_str(), nullptr, 10); }
-double NoString::ToDouble() const { return strtod(c_str(), nullptr); }
+short NoString::ToShort() const
+{
+    return (short int)strtol(this->c_str(), (char**)nullptr, 10);
+}
 
+ushort NoString::ToUShort() const
+{
+    return (ushort)strtoul(this->c_str(), (char**)nullptr, 10);
+}
+
+uint NoString::ToUInt() const
+{
+    return (uint)strtoul(this->c_str(), (char**)nullptr, 10);
+}
+
+int NoString::ToInt() const
+{
+    return (int)strtol(this->c_str(), (char**)nullptr, 10);
+}
+
+long NoString::ToLong() const
+{
+    return strtol(this->c_str(), (char**)nullptr, 10);
+}
+
+ulong NoString::ToULong() const
+{
+    return strtoul(c_str(), nullptr, 10);
+}
+
+ulonglong NoString::ToULongLong() const
+{
+    return strtoull(c_str(), nullptr, 10);
+}
+
+long long NoString::ToLongLong() const
+{
+    return strtoll(c_str(), nullptr, 10);
+}
+
+double NoString::ToDouble() const
+{
+    return strtod(c_str(), nullptr);
+}
 
 bool NoString::Trim(const NoString& s)
 {
@@ -1367,8 +1466,10 @@ bool NoString::EndsWith(const NoString& sSuffix, CaseSensitivity cs) const
     return Right(sSuffix.length()).Equals(sSuffix, cs);
 }
 
-bool NoString::Contains(const NoString& s, CaseSensitivity cs) const { return Find(s, cs) != npos; }
-
+bool NoString::Contains(const NoString& s, CaseSensitivity cs) const
+{
+    return Find(s, cs) != npos;
+}
 
 NoString NoString::TrimPrefix_n(const NoString& sPrefix) const
 {
@@ -1470,7 +1571,10 @@ NoString NoString::StripControls_n() const
     return sRet;
 }
 
-NoString& NoString::StripControls() { return (*this = StripControls_n()); }
+NoString& NoString::StripControls()
+{
+    return (*this = StripControls_n());
+}
 
 //////////////// NoStringMap ////////////////
 const NoStringMap NoStringMap::EmptyMap;
@@ -1534,7 +1638,6 @@ NoStringMap::status_t NoStringMap::ReadFromDisk(const NoString& sPath)
 
     return MCS_SUCCESS;
 }
-
 
 static const char hexdigits[] = "0123456789abcdef";
 
