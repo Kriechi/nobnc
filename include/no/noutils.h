@@ -36,8 +36,6 @@ static inline void SetFdCloseOnExec(int fd)
     fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
 }
 
-static const char g_HexDigits[] = "0123456789abcdef";
-
 class NO_EXPORT NoUtils
 {
 public:
@@ -190,47 +188,6 @@ private:
     size_type m_uPreferredWidth;
     mutable NoStringVector m_vsOutput; // Rendered table
 };
-
-
-#ifdef HAVE_LIBSSL
-#include <openssl/aes.h>
-#include <openssl/blowfish.h>
-#include <openssl/md5.h>
-//! does Blowfish w/64 bit feedback, no padding
-class NO_EXPORT NoBlowfish
-{
-public:
-    /**
-     * @param sPassword key to encrypt with
-     * @param iEncrypt encrypt method (BF_DECRYPT or BF_ENCRYPT)
-     * @param sIvec what to set the ivector to start with, default sets it all 0's
-     */
-    NoBlowfish(const NoString& sPassword, int iEncrypt, const NoString& sIvec = "");
-    ~NoBlowfish();
-
-    NoBlowfish(const NoBlowfish&) = default;
-    NoBlowfish& operator=(const NoBlowfish&) = default;
-
-    //! output must be freed
-    static uchar* MD5(const uchar* input, u_int ilen);
-
-    //! returns an md5 of the NoString (not hex encoded)
-    static NoString MD5(const NoString& sInput, bool bHexEncode = false);
-
-    //! output must be the same size as input
-    void Crypt(uchar* input, uchar* output, u_int ibytes);
-
-    //! must free result
-    uchar* Crypt(uchar* input, u_int ibytes);
-    NoString Crypt(const NoString& sData);
-
-private:
-    uchar* m_ivec;
-    BF_KEY m_bkey;
-    int m_iEncrypt, m_num;
-};
-
-#endif /* HAVE_LIBSSL */
 
 /**
  * @class TCacheMap

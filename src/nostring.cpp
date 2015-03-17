@@ -19,6 +19,7 @@
 #include "noutils.h"
 #include "nomd5.h"
 #include "nosha256.h"
+#include "noblowfish.h"
 #include <sstream>
 
 NoString::NoString(char c) : std::string()

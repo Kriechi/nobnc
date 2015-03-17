@@ -32,6 +32,7 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/nofile.h>
+#include <no/noblowfish.h>
 
 #define CRYPT_VERIFICATION_TOKEN "::__:AWAY:__::"
 

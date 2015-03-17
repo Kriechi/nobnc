@@ -17,6 +17,7 @@ include(DefineVersion)
 
 list(APPEND NO_HEADERS include/no/defines.h
                        include/no/noapp.h
+                       include/no/noblowfish.h
                        include/no/nobuffer.h
                        include/no/nochannel.h
                        include/no/noclient.h
@@ -53,6 +54,7 @@ list(APPEND NO_HEADERS include/no/defines.h
 )
 
 list(APPEND NO_SOURCES src/noapp.cpp
+                       src/noblowfish.cpp
                        src/nobuffer.cpp
                        src/nochannel.cpp
                        src/noclient.cpp
