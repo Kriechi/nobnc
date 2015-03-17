@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cstring>
 #include <sys/types.h>
 
 #define _SQL(s) NoString("'" + NoString(s).Escape_n(NoString::ESQL) + "'")
