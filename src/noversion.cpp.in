@@ -1,2 +1,0 @@
-#include "noversion.h"
-const char* NO_VERSION_EXTRA = "@NO_VERSION_EXTRA@";

@@ -25,7 +25,6 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nodir.h
                        include/no/noexecsock.h
                        include/no/nofile.h
-                       include/no/noglobal.h
                        include/no/nohttpsock.h
                        include/no/noircsock.h
                        include/no/nolistener.h
@@ -49,7 +48,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/noutils.h
                        include/no/nowebmodules.h
                        ${PROJECT_BINARY_DIR}/include/no/Csocket.h
-                       ${PROJECT_BINARY_DIR}/include/no/noversion.h
+                       ${PROJECT_BINARY_DIR}/include/no/noglobal.h
 )
 
 list(APPEND NO_SOURCES src/noapp.cpp
@@ -83,7 +82,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/noutils.cpp
                        src/nowebmodules.cpp
                        ${PROJECT_BINARY_DIR}/src/Csocket.cpp
-                       ${PROJECT_BINARY_DIR}/src/noversion.cpp
+                       ${PROJECT_BINARY_DIR}/src/noglobal.cpp
 )
 
 ### TARGETS
@@ -121,10 +120,8 @@ configure_file("${PROJECT_SOURCE_DIR}/include/no/noglobal.h.in"
                "${PROJECT_BINARY_DIR}/include/no/noglobal.h")
 configure_file("${PROJECT_SOURCE_DIR}/include/no/noconfig.h.in"
                "${PROJECT_BINARY_DIR}/include/no/noconfig.h")
-configure_file("${PROJECT_SOURCE_DIR}/include/no/noversion.h.in"
-               "${PROJECT_BINARY_DIR}/include/no/noversion.h")
-configure_file("${PROJECT_SOURCE_DIR}/src/noversion.cpp.in"
-               "${PROJECT_BINARY_DIR}/src/noversion.cpp")
+configure_file("${PROJECT_SOURCE_DIR}/src/noglobal.cpp.in"
+               "${PROJECT_BINARY_DIR}/src/noglobal.cpp")
 configure_file("${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.cc"
                "${PROJECT_BINARY_DIR}/src/Csocket.cpp" COPYONLY)
 configure_file("${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.h"
@@ -133,7 +130,7 @@ configure_file("${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.h"
 if(NOT DEVELOPER_BUILD)
     install(FILES "${PROJECT_BINARY_DIR}/include/no/noconfig.h"
             DESTINATION ${INSTALL_INCLUDEDIR}/no)
-    install(FILES "${PROJECT_BINARY_DIR}/include/no/noversion.h"
+    install(FILES "${PROJECT_BINARY_DIR}/include/no/noglobal.h"
             DESTINATION ${INSTALL_INCLUDEDIR}/no)
 endif()
 

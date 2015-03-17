@@ -8,8 +8,7 @@
 *.a
 
 # Generated sources
-/src/noversion.cpp
-/include/no/noversion.h
+/src/noglobal.cpp
 /include/no/noconfig.h
 /include/no/noglobal.h
 

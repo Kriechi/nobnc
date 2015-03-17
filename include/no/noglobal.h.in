@@ -23,6 +23,14 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 typedef unsigned long long ulonglong;
 
+#define NO_VERSION_MAJOR @NO_VERSION_MAJOR@
+#define NO_VERSION_MINOR @NO_VERSION_MINOR@
+#define NO_VERSION_PATCH @NO_VERSION_PATCH@
+#define NO_VERSION_STR "@NO_VERSION_STR@"
+#define NO_VERSION (NO_VERSION_MAJOR + NO_VERSION_MINOR / 10.0)
+
+extern const char* NO_VERSION_EXTRA;
+
 #define NO_DECL_EXPORT @DEFINE_EXPORT@
 #define NO_DECL_IMPORT @DEFINE_IMPORT@
 

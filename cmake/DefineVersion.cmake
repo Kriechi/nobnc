@@ -34,7 +34,7 @@ else()
                   -D NO_VERSION_MINOR=${NO_VERSION_MINOR}
                   -D NO_VERSION_PATCH=${NO_VERSION_PATCH}
                   -D NO_VERSION_STR=${NO_VERSION_STR}
-                  -D NO_VERSION_INPUT=${PROJECT_SOURCE_DIR}/src/noversion.cpp.in
-                  -D NO_VERSION_OUTPUT=${PROJECT_BINARY_DIR}/src/noversion.cpp
+                  -D NO_VERSION_INPUT=${PROJECT_SOURCE_DIR}/src/noglobal.cpp.in
+                  -D NO_VERSION_OUTPUT=${PROJECT_BINARY_DIR}/src/noglobal.cpp
                   -P ${PROJECT_SOURCE_DIR}/cmake/DefineVersion.cmake)
 endif()
