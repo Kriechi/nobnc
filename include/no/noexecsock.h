@@ -25,28 +25,11 @@
 class NO_EXPORT NoExecSock : public NoBaseSocket
 {
 public:
-    NoExecSock() : NoBaseSocket(0), m_iPid(-1) {}
+    NoExecSock();
+    virtual ~NoExecSock();
 
-    int Execute(const NoString& sExec)
-    {
-        int iReadFD, iWriteFD;
-        m_iPid = popen2(iReadFD, iWriteFD, sExec);
-        if (m_iPid != -1) {
-            ConnectFD(iReadFD, iWriteFD, "0.0.0.0:0");
-        }
-        return (m_iPid);
-    }
-    void Kill(int iSignal)
-    {
-        kill(m_iPid, iSignal);
-        Close();
-    }
-    virtual ~NoExecSock()
-    {
-        close2(m_iPid, GetRSock(), GetWSock());
-        SetRSock(-1);
-        SetWSock(-1);
-    }
+    int Execute(const NoString& sExec);
+    void Kill(int iSignal);
 
     int popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand);
     void close2(int iPid, int iReadFD, int iWriteFD);

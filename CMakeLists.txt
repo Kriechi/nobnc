@@ -64,6 +64,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nodebug.cpp
                        src/nodir.cpp
                        src/noexception.cpp
+                       src/noexecsock.cpp
                        src/nofile.cpp
                        src/nohttpsock.cpp
                        src/noircsock.cpp
