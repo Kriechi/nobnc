@@ -20,6 +20,7 @@
 #include <no/noglobal.h>
 #include <no/nowebmodules.h>
 #include <no/noutils.h>
+#include <no/notable.h>
 #include <no/nothreads.h>
 #include <no/notimer.h>
 #include <no/nomodulecall.h>

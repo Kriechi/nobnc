@@ -20,6 +20,7 @@
 #include <no/noglobal.h>
 #include <no/nosocket.h>
 #include <no/noutils.h>
+#include <no/notable.h>
 #include <memory>
 
 class NoApp;
