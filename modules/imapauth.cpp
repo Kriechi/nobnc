@@ -122,7 +122,7 @@ private:
     NoString m_sUserFormat;
     // !Settings
 
-    TCacheMap<NoString> m_Cache;
+    NoCacheMap<NoString> m_Cache;
 };
 
 void NoImapSock::ReadLine(const NoString& sLine)

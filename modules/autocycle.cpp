@@ -225,7 +225,7 @@ protected:
 private:
     std::vector<NoString> m_vsChans;
     std::vector<NoString> m_vsNegChans;
-    TCacheMap<NoString> m_recentlyCycled;
+    NoCacheMap<NoString> m_recentlyCycled;
 };
 
 template <> void TModInfo<NoAutoCycleMod>(NoModInfo& Info)

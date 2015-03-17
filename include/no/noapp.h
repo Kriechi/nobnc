@@ -234,7 +234,7 @@ private:
     std::list<NoNetwork*> m_lpConnectQueue;
     NoConnectQueueTimer* m_pConnectQueueTimer;
     uint m_uiConnectPaused;
-    TCacheMap<NoString> m_sConnectThrottle;
+    NoCacheMap<NoString> m_sConnectThrottle;
     bool m_bProtectWebSessions;
     bool m_bHideVersion;
 };

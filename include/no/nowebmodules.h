@@ -116,10 +116,10 @@ private:
     NoStringPairVector m_vParams;
 };
 
-class NO_EXPORT NoWebSessionMap : public TCacheMap<NoString, std::shared_ptr<NoWebSession>>
+class NO_EXPORT NoWebSessionMap : public NoCacheMap<NoString, std::shared_ptr<NoWebSession>>
 {
 public:
-    NoWebSessionMap(uint uTTL = 5000) : TCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
+    NoWebSessionMap(uint uTTL = 5000) : NoCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
     void FinishUserSessions(const NoUser& User);
 };
 

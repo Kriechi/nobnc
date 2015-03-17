@@ -92,7 +92,7 @@ public:
     }
 
 private:
-    TCacheMap<NoString> m_Messaged;
+    NoCacheMap<NoString> m_Messaged;
 };
 
 template <> void TModInfo<NoAutoReplyMod>(NoModInfo& Info)

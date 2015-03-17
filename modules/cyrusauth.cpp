@@ -203,7 +203,7 @@ public:
     bool ShouldCloneUser() { return !GetNV("CloneUser").empty(); }
 
 protected:
-    TCacheMap<NoString> m_Cache;
+    NoCacheMap<NoString> m_Cache;
 
     sasl_callback_t m_cbs[2];
     NoString m_sMethod;

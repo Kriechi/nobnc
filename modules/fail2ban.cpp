@@ -101,7 +101,7 @@ public:
     }
 
 private:
-    TCacheMap<NoString, uint> m_Cache;
+    NoCacheMap<NoString, uint> m_Cache;
     uint m_uiAllowedFailed;
 };
 

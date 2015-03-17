@@ -80,16 +80,16 @@ public:
 };
 
 /**
- * @class TCacheMap
+ * @class NoCacheMap
  * @author prozac <prozac@rottenboy.com>
  * @brief Insert an object with a time-to-live and check later if it still exists
  */
-template <typename K, typename V = bool> class TCacheMap
+template <typename K, typename V = bool> class NoCacheMap
 {
 public:
-    TCacheMap(uint uTTL = 5000) : m_mItems(), m_uTTL(uTTL) {}
+    NoCacheMap(uint uTTL = 5000) : m_mItems(), m_uTTL(uTTL) {}
 
-    virtual ~TCacheMap() {}
+    virtual ~NoCacheMap() {}
 
     /**
      * @brief This function adds an item to the cache using the default time-to-live value
