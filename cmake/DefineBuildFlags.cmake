@@ -62,7 +62,7 @@ if(CYGWIN)
     # strerror_r, fdopen and strcasecmp etc. (their declarations in system headers are between ifdef)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U__STRICT_ANSI__")
 elseif(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wno-unused-parameter -Woverloaded-virtual -Wshadow")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wno-unused-parameter -Woverloaded-virtual")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         # These enable some debug options in g++'s STL, e.g. invalid use of iterators
         # But they cause crashes on cygwin while loading modules
