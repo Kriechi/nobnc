@@ -36,7 +36,7 @@ class NoIrcSock;
 class NoNetworkPingTimer;
 class NoNetworkJoinTimer;
 
-class NoNetwork
+class NO_EXPORT NoNetwork
 {
 public:
     static bool IsValidNetwork(const NoString& sNetwork);

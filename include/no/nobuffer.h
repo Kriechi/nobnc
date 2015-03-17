@@ -25,7 +25,7 @@
 
 class NoClient;
 
-class NoBuffer
+class NO_EXPORT NoBuffer
 {
 public:
     NoBuffer(uint limit = 100);

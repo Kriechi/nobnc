@@ -22,7 +22,7 @@
 
 class NoRealListener;
 
-class NoListener
+class NO_EXPORT NoListener
 {
 public:
     typedef enum { ACCEPT_IRC, ACCEPT_HTTP, ACCEPT_ALL } EAcceptType;
@@ -63,7 +63,7 @@ private:
     EAcceptType m_eAcceptType;
 };
 
-class NoRealListener : public NoBaseSocket
+class NO_EXPORT NoRealListener : public NoBaseSocket
 {
 public:
     NoRealListener(NoListener& listener) : NoBaseSocket(), m_Listener(listener) {}
@@ -77,7 +77,7 @@ private:
     NoListener& m_Listener;
 };
 
-class NoIncomingConnection : public NoBaseSocket
+class NO_EXPORT NoIncomingConnection : public NoBaseSocket
 {
 public:
     NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix);

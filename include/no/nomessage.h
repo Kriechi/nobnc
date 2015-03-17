@@ -23,7 +23,7 @@
 
 class NoClient;
 
-class NoMessage
+class NO_EXPORT NoMessage
 {
 public:
     NoMessage(const NoString& format = "", const NoString& text = "", const timeval* ts = nullptr);

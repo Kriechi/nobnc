@@ -38,7 +38,7 @@ static inline void SetFdCloseOnExec(int fd)
 
 static const char g_HexDigits[] = "0123456789abcdef";
 
-class NoUtils
+class NO_EXPORT NoUtils
 {
 public:
     NoUtils();
@@ -90,7 +90,7 @@ public:
     static void SetMessageTags(NoString& sLine, const NoStringMap& mssTags);
 };
 
-class NoException
+class NO_EXPORT NoException
 {
 public:
     typedef enum { EX_Shutdown, EX_Restart } EType;
@@ -130,7 +130,7 @@ private:
 | hello | world |
 +-------+-------+@endverbatim
  */
-class NoTable : protected std::vector<std::vector<NoString>>
+class NO_EXPORT NoTable : protected std::vector<std::vector<NoString>>
 {
 public:
     /** Constructor
@@ -212,7 +212,7 @@ private:
 #include <openssl/blowfish.h>
 #include <openssl/md5.h>
 //! does Blowfish w/64 bit feedback, no padding
-class NoBlowfish
+class NO_EXPORT NoBlowfish
 {
 public:
     /**

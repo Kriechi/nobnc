@@ -59,7 +59,7 @@ enum class CaseSensitivity { CaseInsensitive, CaseSensitive };
  * class. It provides helpful functions for parsing input like Token() and
  * Split().
  */
-class NoString : public std::string
+class NO_EXPORT NoString : public std::string
 {
 public:
     typedef enum {
@@ -584,7 +584,7 @@ private:
  *
  * This class maps strings to other strings.
  */
-class NoStringMap : public std::map<NoString, NoString>
+class NO_EXPORT NoStringMap : public std::map<NoString, NoString>
 {
 public:
     /** Construct an empty NoStringMap. */

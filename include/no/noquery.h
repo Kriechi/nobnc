@@ -24,7 +24,7 @@
 class NoClient;
 class NoNetwork;
 
-class NoQuery
+class NO_EXPORT NoQuery
 {
 public:
     NoQuery(const NoString& name, NoNetwork* network);

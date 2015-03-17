@@ -28,7 +28,7 @@ class NoNetwork;
 class NoIrcSock;
 class NoClient;
 
-class NoAuthBase
+class NO_EXPORT NoAuthBase
 {
 public:
     NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoBaseSocket* pSock)
@@ -71,7 +71,7 @@ private:
 };
 
 
-class NoClientAuth : public NoAuthBase
+class NO_EXPORT NoClientAuth : public NoAuthBase
 {
 public:
     NoClientAuth(NoClient* pClient, const NoString& sUsername, const NoString& sPassword);
@@ -92,7 +92,7 @@ private:
     NoClient* m_pClient;
 };
 
-class NoClient : public NoIrcSocket
+class NO_EXPORT NoClient : public NoIrcSocket
 {
 public:
     NoClient()

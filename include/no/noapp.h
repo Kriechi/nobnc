@@ -32,7 +32,7 @@ class NoConnectQueueTimer;
 class NoSettings;
 class NoFile;
 
-class NoApp
+class NO_EXPORT NoApp
 {
 public:
     NoApp();

@@ -29,7 +29,7 @@ class NoNetwork;
 class NoClient;
 
 // TODO: This class needs new name
-class NoIrcSock : public NoIrcSocket
+class NO_EXPORT NoIrcSock : public NoIrcSocket
 {
 public:
     NoIrcSock(NoNetwork* pNetwork);

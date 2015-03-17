@@ -21,7 +21,7 @@ typedef struct
     uint8 buffer[64];
 } md5_context;
 
-class NoMD5
+class NO_EXPORT NoMD5
 {
 protected:
     char m_szMD5[33];

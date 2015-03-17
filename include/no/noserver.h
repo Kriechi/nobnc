@@ -20,7 +20,7 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 
-class NoServer
+class NO_EXPORT NoServer
 {
 public:
     NoServer(const NoString& sName, ushort uPort = 6667, const NoString& sPass = "", bool bSSL = false);

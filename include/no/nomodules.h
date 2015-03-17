@@ -29,7 +29,7 @@ class NoTemplate;
 class NoIrcSock;
 class NoNick;
 
-class NoModules : public std::vector<NoModule*>
+class NO_EXPORT NoModules : public std::vector<NoModule*>
 {
 public:
     NoModules();

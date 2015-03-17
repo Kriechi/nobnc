@@ -34,7 +34,7 @@
  * This class represents a non-recursive mutex. Only a single thread may own the
  * mutex at any point in time.
  */
-class NoMutex
+class NO_EXPORT NoMutex
 {
 public:
     friend class NoConditionVariable;
@@ -88,7 +88,7 @@ private:
  * class makes sure that the mutex is unlocked when this class is destructed.
  * For example, this makes it easier to make code exception-safe.
  */
-class NoMutexLocker
+class NO_EXPORT NoMutexLocker
 {
 public:
     NoMutexLocker(NoMutex& mutex, bool initiallyLocked = true) : m_mutex(mutex), m_locked(false)
@@ -128,7 +128,7 @@ private:
  * A condition variable makes it possible for threads to wait until some
  * condition is reached at which point the thread can wake up again.
  */
-class NoConditionVariable
+class NO_EXPORT NoConditionVariable
 {
 public:
     NoConditionVariable() : m_cond()
@@ -184,7 +184,7 @@ private:
     pthread_cond_t m_cond;
 };
 
-class NoThread
+class NO_EXPORT NoThread
 {
 public:
     typedef void* threadRoutine(void*);
@@ -225,7 +225,7 @@ private:
  *
  * For modules you should use NoModuleJob instead.
  */
-class NoJob
+class NO_EXPORT NoJob
 {
 public:
     friend class NoThreadPool;
@@ -258,7 +258,7 @@ private:
     EJobState m_eState;
 };
 
-class NoThreadPool
+class NO_EXPORT NoThreadPool
 {
 private:
     friend class NoJob;

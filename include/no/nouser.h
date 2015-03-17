@@ -34,7 +34,7 @@ class NoIrcSock;
 class NoUserTimer;
 class NoServer;
 
-class NoUser
+class NO_EXPORT NoUser
 {
 public:
     NoUser(const NoString& sUserName);

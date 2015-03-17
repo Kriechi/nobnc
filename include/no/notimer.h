@@ -23,7 +23,7 @@
 
 class NoModule;
 
-class NoTimer : public CCron
+class NO_EXPORT NoTimer : public CCron
 {
 public:
     NoTimer(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription);
@@ -48,7 +48,7 @@ class NoFPTimer;
 
 typedef void (*FPTimer_t)(NoModule*, NoFPTimer*);
 
-class NoFPTimer : public NoTimer
+class NO_EXPORT NoFPTimer : public NoTimer
 {
 public:
     NoFPTimer(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)

@@ -23,7 +23,7 @@
 class NoFile;
 class NoSettings;
 
-struct NoSettingsEntry
+struct NO_EXPORT NoSettingsEntry
 {
     NoSettingsEntry();
     NoSettingsEntry(const NoSettings& Config);
@@ -34,7 +34,7 @@ struct NoSettingsEntry
     NoSettings* m_pSubConfig;
 };
 
-class NoSettings
+class NO_EXPORT NoSettings
 {
 public:
     NoSettings() : m_ConfigEntries(), m_SubConfigs() {}

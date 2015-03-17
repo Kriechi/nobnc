@@ -29,7 +29,7 @@ class NoClient;
 class NoSettings;
 class NoFile;
 
-class NoChannel
+class NO_EXPORT NoChannel
 {
 public:
     typedef enum { Voice = '+', HalfOp = '%', Op = '@', Admin = '!', Owner = '*' } EUserPerms;

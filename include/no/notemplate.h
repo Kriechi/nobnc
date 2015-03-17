@@ -25,7 +25,7 @@
 
 class NoTemplate;
 
-class NoTemplateTagHandler
+class NO_EXPORT NoTemplateTagHandler
 {
 public:
     NoTemplateTagHandler() {}
@@ -52,7 +52,7 @@ private:
 };
 class NoTemplate;
 
-class NoTemplateOptions
+class NO_EXPORT NoTemplateOptions
 {
 public:
     NoTemplateOptions() : m_eEscapeFrom(NoString::EASCII), m_eEscapeTo(NoString::EASCII) {}
@@ -70,7 +70,7 @@ private:
 };
 
 
-class NoTemplateLoopContext
+class NO_EXPORT NoTemplateLoopContext
 {
 public:
     NoTemplateLoopContext(ulong uFilePos, const NoString& sLoopName, bool bReverse, std::vector<NoTemplate*>* pRows)
@@ -119,7 +119,7 @@ private:
 };
 
 
-class NoTemplate : public NoStringMap
+class NO_EXPORT NoTemplate : public NoStringMap
 {
 public:
     NoTemplate() : NoTemplate("") {}

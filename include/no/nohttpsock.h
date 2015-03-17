@@ -23,7 +23,7 @@
 
 class NoModule;
 
-class NoHttpSock : public NoSocket
+class NO_EXPORT NoHttpSock : public NoSocket
 {
 public:
     NoHttpSock(NoModule* pMod, const NoString& sURIPrefix);

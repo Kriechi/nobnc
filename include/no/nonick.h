@@ -24,7 +24,7 @@
 class NoNetwork;
 class NoChannel;
 
-class NoNick
+class NO_EXPORT NoNick
 {
 public:
     NoNick();

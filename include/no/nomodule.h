@@ -115,7 +115,7 @@ class NoSocketManager;
 #ifdef HAVE_PTHREAD
 /// A NoJob version which can be safely used in modules. The job will be
 /// cancelled when the module is unloaded.
-class NoModuleJob : public NoJob
+class NO_EXPORT NoModuleJob : public NoJob
 {
 public:
     NoModuleJob(NoModule* pModule, const NoString& sName, const NoString& sDesc)
@@ -140,7 +140,7 @@ private:
 
 typedef void* ModHandle;
 
-class NoModInfo
+class NO_EXPORT NoModInfo
 {
 public:
     typedef enum { GlobalModule, UserModule, NetworkModule } EModuleType;
@@ -215,7 +215,7 @@ TModLoad(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModNa
 }
 
 /** A helper class for handling commands in modules. */
-class NoModCommand
+class NO_EXPORT NoModCommand
 {
 public:
     /// Type for the callback function that handles the actual command.
@@ -282,7 +282,7 @@ private:
  *
  *  @see MODCONSTRUCTOR and MODULEDEFS
  */
-class NoModule
+class NO_EXPORT NoModule
 {
 public:
     NoModule(ModHandle pDLL,

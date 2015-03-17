@@ -27,7 +27,7 @@
 #include <unistd.h>
 #include <vector>
 
-class NoFile
+class NO_EXPORT NoFile
 {
 public:
     NoFile();

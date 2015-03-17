@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <vector>
 
-class NoDir : public std::vector<NoFile*>
+class NO_EXPORT NoDir : public std::vector<NoFile*>
 {
 public:
     NoDir(const NoString& sDir) : m_eSortAttr(NoFile::FA_Name), m_bDesc(false) { Fill(sDir); }

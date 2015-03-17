@@ -31,7 +31,7 @@ class NoWebSubPage;
 typedef std::shared_ptr<NoWebSubPage> TWebSubPage;
 typedef std::vector<TWebSubPage> VWebSubPages;
 
-class NoTagHandler : public NoTemplateTagHandler
+class NO_EXPORT NoTagHandler : public NoTemplateTagHandler
 {
 public:
     NoTagHandler(NoWebSock& pWebSock);
@@ -44,7 +44,7 @@ private:
 };
 
 
-class NoWebSession
+class NO_EXPORT NoWebSession
 {
 public:
     NoWebSession(const NoString& sId, const NoString& sIP);
@@ -82,7 +82,7 @@ private:
 };
 
 
-class NoWebSubPage
+class NO_EXPORT NoWebSubPage
 {
 public:
     NoWebSubPage(const NoString& sName, const NoString& sTitle = "", uint uFlags = 0)
@@ -116,14 +116,14 @@ private:
     NoStringPairVector m_vParams;
 };
 
-class NoWebSessionMap : public TCacheMap<NoString, std::shared_ptr<NoWebSession>>
+class NO_EXPORT NoWebSessionMap : public TCacheMap<NoString, std::shared_ptr<NoWebSession>>
 {
 public:
     NoWebSessionMap(uint uTTL = 5000) : TCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
     void FinishUserSessions(const NoUser& User);
 };
 
-class NoWebSock : public NoHttpSock
+class NO_EXPORT NoWebSock : public NoHttpSock
 {
 public:
     enum EPageReqResult {

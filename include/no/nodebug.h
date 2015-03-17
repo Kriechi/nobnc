@@ -40,7 +40,7 @@
         }                        \
     } while (0)
 
-class NoDebug
+class NO_EXPORT NoDebug
 {
 public:
     static void SetStdoutIsTTY(bool b) { stdoutIsTTY = b; }
@@ -53,7 +53,7 @@ private:
     static bool debug;
 };
 
-class NoDebugStream : public std::ostringstream
+class NO_EXPORT NoDebugStream : public std::ostringstream
 {
 public:
     ~NoDebugStream();

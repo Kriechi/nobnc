@@ -23,7 +23,7 @@
 
 class NoModule;
 
-class NoBaseSocket : public Csock
+class NO_EXPORT NoBaseSocket : public Csock
 {
 public:
     NoBaseSocket(int timeout = 60);
@@ -59,7 +59,7 @@ private:
 
 enum EAddrType { ADDR_IPV4ONLY, ADDR_IPV6ONLY, ADDR_ALL };
 
-class NoSocketManager : public TSocketManager<NoBaseSocket>
+class NO_EXPORT NoSocketManager : public TSocketManager<NoBaseSocket>
 {
 public:
     NoSocketManager();
@@ -230,7 +230,7 @@ protected:
  * - EnableReadLine is default to true in this class
  * - MaxBuffer for readline is set to 10240, in the event this is reached the socket is closed (@see ReachedMaxBuffer)
  */
-class NoSocket : public NoBaseSocket
+class NO_EXPORT NoSocket : public NoBaseSocket
 {
 public:
     /**
@@ -278,7 +278,7 @@ protected:
  * @class NoIrcSocket
  * @brief Base IRC socket for client<->ZNC, and ZNC<->server
  */
-class NoIrcSocket : public NoBaseSocket
+class NO_EXPORT NoIrcSocket : public NoBaseSocket
 {
 public:
 #ifdef HAVE_ICU
