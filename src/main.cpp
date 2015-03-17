@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "main.h"
 #include "noapp.h"
+#include "nomodulecall.h"
 #include <signal.h>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)

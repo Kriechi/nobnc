@@ -16,7 +16,6 @@ include(DefineVersion)
 ### SOURCES
 
 list(APPEND NO_HEADERS include/no/defines.h
-                       include/no/main.h
                        include/no/noapp.h
                        include/no/nobuffer.h
                        include/no/nochannel.h
@@ -31,6 +30,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nomd5.h
                        include/no/nomessage.h
                        include/no/nomodule.h
+                       include/no/nomodulecall.h
                        include/no/nomodules.h
                        include/no/nonetwork.h
                        include/no/nonick.h

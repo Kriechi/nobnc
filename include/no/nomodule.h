@@ -22,7 +22,7 @@
 #include <no/noutils.h>
 #include <no/nothreads.h>
 #include <no/notimer.h>
-#include <no/main.h>
+#include <no/nomodulecall.h>
 #include <functional>
 #include <set>
 #include <queue>
