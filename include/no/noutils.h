@@ -90,21 +90,6 @@ public:
     static void SetMessageTags(NoString& sLine, const NoStringMap& mssTags);
 };
 
-class NO_EXPORT NoException
-{
-public:
-    typedef enum { EX_Shutdown, EX_Restart } EType;
-
-    NoException(EType e) : m_eType(e) {}
-    virtual ~NoException() {}
-
-    EType GetType() const { return m_eType; }
-
-private:
-    EType m_eType;
-};
-
-
 /** Generate a grid-like output from a given input.
  *
  *  @code

@@ -16,6 +16,7 @@
 
 #include "noapp.h"
 #include "nomodulecall.h"
+#include "noexception.h"
 #include <signal.h>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)
@@ -419,11 +420,11 @@ int main(int argc, char** argv)
     try {
         pZNC->Loop();
     } catch (const NoException& e) {
-        switch (e.GetType()) {
-        case NoException::EX_Shutdown:
+        switch (e.type()) {
+        case NoException::Shutdown:
             iRet = 0;
             break;
-        case NoException::EX_Restart: {
+        case NoException::Restart: {
             // strdup() because GCC is stupid
             char* args[] = { strdup(argv[0]), strdup("--datadir"), strdup(pZNC->GetZNCPath().c_str()), nullptr,
                              nullptr,         nullptr,             nullptr };

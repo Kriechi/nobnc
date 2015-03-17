@@ -22,6 +22,7 @@
 #include "noserver.h"
 #include "nouser.h"
 #include "noquery.h"
+#include "noexception.h"
 
 void NoClient::UserCommand(NoString& sLine)
 {
@@ -294,7 +295,7 @@ void NoClient::UserCommand(NoString& sLine)
                       " FORCE to ignore.");
         } else {
             NoApp::Get().Broadcast(sMessage);
-            throw NoException(bRestart ? NoException::EX_Restart : NoException::EX_Shutdown);
+            throw NoException(bRestart ? NoException::Restart : NoException::Shutdown);
         }
     } else if (sCommand.Equals("JUMP") || sCommand.Equals("CONNECT")) {
         if (!m_pNetwork) {
