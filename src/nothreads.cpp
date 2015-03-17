@@ -20,6 +20,7 @@
 
 #include "nodebug.h"
 #include <algorithm>
+#include <unistd.h>
 
 /* Just an arbitrary limit for the number of idle threads */
 static const size_t MAX_IDLE_THREADS = 3;

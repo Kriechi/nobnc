@@ -19,20 +19,10 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <assert.h>
-#include <cstdio>
-#include <map>
-#include <sys/file.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <vector>
 
 class NO_EXPORT NoUtils
 {
 public:
-    NoUtils();
-    ~NoUtils();
-
     static NoString GetIP(ulong addr);
     static ulong GetLongIP(const NoString& sIP);
 
@@ -56,18 +46,7 @@ public:
     static bool
     GetNumInput(const NoString& sPrompt, uint& uRet, uint uMin = 0, uint uMax = ~0, uint uDefault = ~0);
 
-    static ulonglong GetMillTime()
-    {
-        struct timeval tv;
-        ulonglong iTime = 0;
-        gettimeofday(&tv, nullptr);
-        iTime = (ulonglong)tv.tv_sec * 1000;
-        iTime += ((ulonglong)tv.tv_usec / 1000);
-        return iTime;
-    }
-#ifdef HAVE_LIBSSL
-    static void GenerateCert(FILE* pOut, const NoString& sHost = "");
-#endif /* HAVE_LIBSSL */
+    static ulonglong GetMillTime();
 
     static NoString CTime(time_t t, const NoString& sTZ);
     static NoString FormatTime(time_t t, const NoString& sFormat, const NoString& sTZ);
