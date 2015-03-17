@@ -11,6 +11,7 @@
 /src/noversion.cpp
 /include/no/noversion.h
 /include/no/noconfig.h
+/include/no/noglobal.h
 
 # Genrated docs
 /share/man/*.gz

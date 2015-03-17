@@ -93,7 +93,7 @@ include_directories(${NO_INCLUDEDIRS})
 include_directories(${PROJECT_SOURCE_DIR}/include/no) ### TODO: cleanup
 include_directories(${PROJECT_BINARY_DIR}/include/no) ### TODO: cleanup
 target_link_libraries(libno ${NO_LIBRARIES})
-set_target_properties(libno PROPERTIES OUTPUT_NAME no)
+set_target_properties(libno PROPERTIES OUTPUT_NAME no DEFINE_SYMBOL EXPORT_NO)
 add_dependencies(libno version)
 
 list(APPEND NO_LIBRARIES libno)
@@ -117,6 +117,8 @@ endif()
 
 ### GENERATED FILES
 
+configure_file("${PROJECT_SOURCE_DIR}/include/no/noglobal.h.in"
+               "${PROJECT_BINARY_DIR}/include/no/noglobal.h")
 configure_file("${PROJECT_SOURCE_DIR}/include/no/noconfig.h.in"
                "${PROJECT_BINARY_DIR}/include/no/noconfig.h")
 configure_file("${PROJECT_SOURCE_DIR}/include/no/noversion.h.in"

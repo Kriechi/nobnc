@@ -5,7 +5,8 @@ include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckSymbolExists)
 include(CheckIncludeFiles)
-include(DefineVisibility)
+include(DefineExportMacro)
+include(DefineVisibility) ### TODO: remove - superceded by export macro
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_BINARY_DIR}/include")
