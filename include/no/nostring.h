@@ -25,9 +25,6 @@
 #include <sstream>
 #include <cstring>
 
-#define _SQL(s) NoString("'" + NoString(s).Escape_n(NoString::ESQL) + "'")
-#define _URL(s) NoString(s).Escape_n(NoString::EURL)
-#define _HTML(s) NoString(s).Escape_n(NoString::EHTML)
 #define _NAMEDFMT(s) NoString(s).Escape_n(NoString::ENAMEDFMT)
 
 class NoString;
