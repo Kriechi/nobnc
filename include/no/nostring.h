@@ -292,7 +292,6 @@ public:
      */
     NoString Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
 
-    size_type URLSplit(NoStringMap& msRet) const;
     size_type OptionSplit(NoStringMap& msRet, bool bUpperKeys = false) const;
     size_type QuoteSplit(NoStringVector& vsRet) const;
 

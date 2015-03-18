@@ -812,21 +812,6 @@ NoString NoString::Right(size_type uCount) const
     return substr(length() - uCount, uCount);
 }
 
-NoString::size_type NoString::URLSplit(NoStringMap& msRet) const
-{
-    msRet.clear();
-
-    NoStringVector vsPairs;
-    Split("&", vsPairs);
-
-    for (const NoString& sPair : vsPairs) {
-        msRet[sPair.Token(0, false, "=").Escape(NoString::EURL, NoString::EASCII)] =
-        sPair.Token(1, true, "=").Escape(NoString::EURL, NoString::EASCII);
-    }
-
-    return msRet.size();
-}
-
 NoString::size_type NoString::OptionSplit(NoStringMap& msRet, bool bUpperKeys) const
 {
     NoString sName;
