@@ -76,17 +76,17 @@ TEST(StringTest, Cmp)
     EXPECT_EQ(NoString("Bbb"), s);
     EXPECT_LT(NoString("Aaa"), s);
     EXPECT_GT(NoString("Ccc"), s);
-    EXPECT_EQ(0, s.StrCmp("Bbb"));
-    EXPECT_GT(0, s.StrCmp("bbb"));
-    EXPECT_LT(0, s.StrCmp("Aaa"));
-    EXPECT_GT(0, s.StrCmp("Ccc"));
-    EXPECT_EQ(0, s.CaseCmp("Bbb"));
-    EXPECT_EQ(0, s.CaseCmp("bbb"));
-    EXPECT_LT(0, s.CaseCmp("Aaa"));
-    EXPECT_GT(0, s.CaseCmp("Ccc"));
+    EXPECT_EQ(0, s.Compare("Bbb", NoString::CaseSensitive));
+    EXPECT_GT(0, s.Compare("bbb", NoString::CaseSensitive));
+    EXPECT_LT(0, s.Compare("Aaa", NoString::CaseSensitive));
+    EXPECT_GT(0, s.Compare("Ccc", NoString::CaseSensitive));
+    EXPECT_EQ(0, s.Compare("Bbb", NoString::CaseInsensitive));
+    EXPECT_EQ(0, s.Compare("bbb", NoString::CaseInsensitive));
+    EXPECT_LT(0, s.Compare("Aaa", NoString::CaseInsensitive));
+    EXPECT_GT(0, s.Compare("Ccc", NoString::CaseInsensitive));
 
     EXPECT_TRUE(s.Equals("bbb"));
-    EXPECT_FALSE(s.Equals("bbb", true));
+    EXPECT_FALSE(s.Equals("bbb", NoString::CaseSensitive));
     EXPECT_FALSE(s.Equals("bb"));
 }
 
@@ -171,14 +171,6 @@ TEST(StringTest, Split)
     vexpected.push_back("c");
     CS("a b c").Split(" ", vresult);
     EXPECT_EQ(vexpected, vresult);
-
-    NoStringMap mexpected;
-    NoStringMap mresult;
-
-    mexpected["a"] = "b";
-    mexpected["c"] = "d";
-    CS("a=x&c=d&a=b").URLSplit(mresult);
-    EXPECT_EQ(mexpected, mresult) << "URLSplit";
 }
 
 TEST(StringTest, NamedFormat)
@@ -193,8 +185,6 @@ TEST(StringTest, Equals)
     EXPECT_TRUE(CS("ABC").Equals("abc"));
     EXPECT_TRUE(CS("ABC").Equals("abc", NoString::CaseInsensitive));
     EXPECT_FALSE(CS("ABC").Equals("abc", NoString::CaseSensitive));
-    EXPECT_TRUE(CS("ABC").Equals("abc", false)); // deprecated
-    EXPECT_FALSE(CS("ABC").Equals("abc", true)); // deprecated
 }
 
 TEST(StringTest, Find)
