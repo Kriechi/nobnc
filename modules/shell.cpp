@@ -113,7 +113,9 @@ public:
 
     void RunCommand(const NoString& sCommand)
     {
-        GetManager()->AddSock(new NoShellSock(this, GetClient(), "cd " + m_sPath + " && " + sCommand), "SHELL");
+        // TODO: who deletes the instance?
+        NoShellSock* sock = new NoShellSock(this, GetClient(), "cd " + m_sPath + " && " + sCommand);
+        GetManager()->AddSock(sock->GetHandle(), "SHELL");
     }
 
 private:

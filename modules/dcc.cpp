@@ -216,7 +216,7 @@ public:
                 Table.SetCell("Type", "Getting");
             }
 
-            if (pSock->GetType() == Csock::LISTENER) {
+            if (pSock->IsListener()) {
                 Table.SetCell("State", "Waiting");
             } else {
                 Table.SetCell("State", NoString::ToPercent(pSock->GetProgress()));

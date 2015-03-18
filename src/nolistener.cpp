@@ -53,7 +53,7 @@ NoListener::NoListener(ushort uPort, const NoString& sBindHost, const NoString& 
 NoListener::~NoListener()
 {
     if (m_pSocket)
-        NoApp::Get().GetManager().DelSockByAddr(m_pSocket);
+        NoApp::Get().GetManager().DelSockByAddr(m_pSocket->GetHandle());
 }
 
 bool NoListener::IsSSL() const

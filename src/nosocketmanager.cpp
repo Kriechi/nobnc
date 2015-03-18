@@ -92,7 +92,7 @@ static void* TDNSThread(void* argument);
 static void FinishConnect(NoSocketManager* manager, const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoBaseSocket* pcSock);
 #endif
 
-NoSocketManager::NoSocketManager() : m_instance(new TSocketManager<NoBaseSocket>)
+NoSocketManager::NoSocketManager() : m_instance(new CSocketManager)
 {
 #ifdef HAVE_PTHREAD
     m_instance->MonitorFD(new NoDnsMonitorFD());
@@ -133,7 +133,7 @@ bool NoSocketManager::ListenHost(u_short iPort,
     }
 #endif
 
-    return m_instance->Listen(L, pcSock);
+    return m_instance->Listen(L, pcSock->GetHandle());
 }
 
 bool NoSocketManager::ListenAll(u_short iPort,
@@ -177,7 +177,7 @@ u_short NoSocketManager::ListenRand(const NoString& sSockName,
     }
 #endif
 
-    m_instance->Listen(L, pcSock, &uPort);
+    m_instance->Listen(L, pcSock->GetHandle(), &uPort);
 
     return uPort;
 }
@@ -484,5 +484,5 @@ void FinishConnect(NoSocketManager* manager, const NoString& sHostname,
     C.SetCipher(sCipher);
 #endif
 
-    manager->DoConnect(C, pcSock);
+    manager->DoConnect(C, pcSock->GetHandle());
 }

@@ -77,7 +77,7 @@ NoUser::~NoUser()
 
     // Delete clients
     while (!m_vClients.empty()) {
-        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]);
+        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]->GetHandle());
     }
     m_vClients.clear();
 

@@ -54,7 +54,7 @@ public:
 
     const NoString& GetUsername() const { return m_sUsername; }
     const NoString& GetPassword() const { return m_sPassword; }
-    Csock* GetSocket() const { return m_pSock; }
+    NoBaseSocket* GetSocket() const { return m_pSock; }
     NoString GetRemoteIP() const;
 
     // Invalidate this NoAuthBase instance which means it will no longer use

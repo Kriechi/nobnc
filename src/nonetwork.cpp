@@ -252,13 +252,13 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
 NoNetwork::~NoNetwork()
 {
     if (m_pIRCSock) {
-        NoApp::Get().GetManager().DelSockByAddr(m_pIRCSock);
+        NoApp::Get().GetManager().DelSockByAddr(m_pIRCSock->GetHandle());
         m_pIRCSock = nullptr;
     }
 
     // Delete clients
     while (!m_vClients.empty()) {
-        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]);
+        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]->GetHandle());
     }
     m_vClients.clear();
 

@@ -23,12 +23,14 @@
 
 class NoModule;
 
-class NO_EXPORT NoBaseSocket : public Csock
+class NO_EXPORT NoBaseSocket : protected Csock
 {
 public:
     NoBaseSocket(int timeout = 60);
     NoBaseSocket(const NoString& sHost, u_short port, int timeout = 60);
     ~NoBaseSocket() {}
+
+    Csock* GetHandle() const;
 
     int ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const override;
 #ifdef HAVE_LIBSSL
@@ -44,6 +46,32 @@ public:
     void SetEncoding(const NoString&) {}
 #endif
     virtual NoString GetRemoteIP() const { return Csock::GetRemoteIP(); }
+
+    void SetPemLocation( const NoString & sPemFile ) { Csock::SetPemLocation(sPemFile); }
+    virtual bool Write( const char *data, size_t len ) { return Csock::Write(data, len); }
+    virtual bool Write( const NoString & sData ) { return Csock::Write(sData); }
+    void Close( ECloseType eCloseType = CLT_NOW ) { Csock::Close(eCloseType); }
+    time_t GetTimeSinceLastDataTransaction( time_t iNow = 0 ) const { return Csock::GetTimeSinceLastDataTransaction(iNow); }
+    const NoString & GetSockName() const { return Csock::GetSockName(); }
+    void SetSockName( const NoString & sName ) { Csock::SetSockName(sName); }
+    bool IsListener() const { return Csock::GetType() == Csock::LISTENER; }
+    bool IsOutbound() const { return Csock::GetType() == Csock::OUTBOUND; }
+    bool IsInbound() const { return Csock::GetType() == Csock::INBOUND; }
+    virtual bool IsConnected() const { return Csock::IsConnected(); }
+    uint16_t GetLocalPort() const { return Csock::GetLocalPort(); }
+    uint16_t GetRemotePort() const { return Csock::GetRemotePort(); }
+    bool GetSSL() const { return Csock::GetSSL(); }
+    virtual void SockError( int iErrno, const NoString & sDescription ) { Csock::SockError(iErrno, sDescription); }
+    void UnPauseRead() { Csock::UnPauseRead(); }
+    NoString GetLocalIP() const { return Csock::GetLocalIP(); }
+#ifdef HAVE_LIBSSL
+    void SetCipher( const NoString & sCipher ) { Csock::SetCipher(sCipher); }
+    long GetPeerFingerprint( NoString & sFP ) const { return Csock::GetPeerFingerprint(sFP); }
+    void SetRequireClientCertFlags( uint32_t iRequireClientCertFlags ) { Csock::SetRequireClientCertFlags(iRequireClientCertFlags); }
+    SSL_SESSION * GetSSLSession() const { return Csock::GetSSLSession(); }
+#endif
+    double GetAvgRead( uint64_t iSample = 1000 ) const { return Csock::GetAvgRead(iSample); }
+    uint64_t GetStartTime() const { return Csock::GetStartTime(); }
 
 protected:
     // All existing errno codes seem to be in range 1-300

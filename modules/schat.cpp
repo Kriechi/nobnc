@@ -127,7 +127,7 @@ public:
         for (it = BeginSockets(); it != EndSockets(); ++it) {
             NoSChatSock* p = (NoSChatSock*)*it;
 
-            if (p->GetType() == NoSChatSock::LISTENER) continue;
+            if (p->IsListener()) continue;
 
             p->DumpBuffer();
         }
@@ -209,7 +209,7 @@ public:
                     Table.SetCell("Created", sTime);
                 }
 
-                if (pSock->GetType() != NoSChatSock::LISTENER) {
+                if (!pSock->IsListener()) {
                     Table.SetCell("Status", "Established");
                     Table.SetCell("Host", pSock->GetRemoteIP());
                     Table.SetCell("Port", NoString(pSock->GetRemotePort()));
@@ -252,7 +252,7 @@ public:
             std::set<NoSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 Table.AddRow();
-                Csock* pSock = *it;
+                NoSocket* pSock = *it;
                 Table.SetCell("SockName", pSock->GetSockName());
                 ulonglong iStartTime = pSock->GetStartTime();
                 time_t iTime = iStartTime / 1000;
@@ -263,8 +263,8 @@ public:
                     Table.SetCell("Created", sTime);
                 }
 
-                if (pSock->GetType() != Csock::LISTENER) {
-                    if (pSock->GetType() == Csock::OUTBOUND)
+                if (!pSock->IsListener()) {
+                    if (pSock->IsOutbound())
                         Table.SetCell("Type", "Outbound");
                     else
                         Table.SetCell("Type", "Inbound");
