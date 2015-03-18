@@ -18,10 +18,11 @@
 #define NOSSLVERIFYHOST_H
 
 #include <no/noglobal.h>
-#include <no/Csocket.h>
 #include <no/nostring.h>
 
 #ifdef HAVE_LIBSSL
+
+#include <openssl/ssl.h>
 
 bool ZNC_SSLVerifyHost(const NoString& sHost, const X509* pCert, NoString& sError);
 

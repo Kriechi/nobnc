@@ -15,6 +15,7 @@
  */
 
 #include "nosslverifyhost.h"
+#include "Csocket/Csocket.h"
 
 #ifdef HAVE_LIBSSL
 
