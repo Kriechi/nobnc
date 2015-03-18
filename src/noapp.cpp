@@ -24,6 +24,7 @@
 #include "nosettings.h"
 #include <tuple>
 #include <algorithm>
+#include "Csocket/Csocket.h"
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>

@@ -20,6 +20,7 @@
 #include "nonetwork.h"
 #include "noserver.h"
 #include "noquery.h"
+#include "Csocket/Csocket.h"
 
 #define IRCSOCKMODULECALL(macFUNC, macEXITER) \
     NETWORKMODULECALL(macFUNC, m_pNetwork->GetUser(), m_pNetwork, nullptr, macEXITER)

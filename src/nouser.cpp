@@ -21,6 +21,7 @@
 #include "nonetwork.h"
 #include "noircsock.h"
 #include "nochannel.h"
+#include "Csocket/Csocket.h"
 #include <math.h>
 #include <algorithm>
 
