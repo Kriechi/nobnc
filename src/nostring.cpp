@@ -971,24 +971,6 @@ NoString NoString::NamedFormat(const NoString& sFormat, const NoStringMap& msVal
     return sRet;
 }
 
-NoString NoString::RandomString(uint uLength)
-{
-    const char chars[] = "abcdefghijklmnopqrstuvwxyz"
-                         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                         "0123456789!?.,:;/*-+_()";
-    // -1 because sizeof() includes the trailing '\0' byte
-    const size_t len = sizeof(chars) / sizeof(chars[0]) - 1;
-    size_t p;
-    NoString sRet;
-
-    for (uint a = 0; a < uLength; a++) {
-        p = (size_t)(len * (rand() / (RAND_MAX + 1.0)));
-        sRet += chars[p];
-    }
-
-    return sRet;
-}
-
 bool NoString::Base64Encode(uint uWrap)
 {
     NoString sCopy(*this);

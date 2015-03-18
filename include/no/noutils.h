@@ -106,6 +106,12 @@ public:
      * @return A string without control codes.
      */
     static NoString StripControls(const NoString& str);
+
+    /** Produces a random string.
+     * @param uLength The length of the resulting string.
+     * @return A random string.
+     */
+    static NoString RandomString(uint uLength);
 };
 
 #endif // NOUTILS_H

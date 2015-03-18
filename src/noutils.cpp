@@ -133,7 +133,7 @@ NoString NoUtils::GetSaltedHashPass(NoString& sSalt)
     }
 }
 
-NoString NoUtils::GetSalt() { return NoString::RandomString(20); }
+NoString NoUtils::GetSalt() { return RandomString(20); }
 
 NoString NoUtils::MD5(const NoString& sStr) { return MD5::md5(sStr); }
 
@@ -753,5 +753,23 @@ NoString NoUtils::StripControls(const NoString& str)
     }
 
     sRet.reserve(0);
+    return sRet;
+}
+
+NoString NoUtils::RandomString(uint uLength)
+{
+    const char chars[] = "abcdefghijklmnopqrstuvwxyz"
+                         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                         "0123456789!?.,:;/*-+_()";
+    // -1 because sizeof() includes the trailing '\0' byte
+    const size_t len = sizeof(chars) / sizeof(chars[0]) - 1;
+    size_t p;
+    NoString sRet;
+
+    for (uint a = 0; a < uLength; a++) {
+        p = (size_t)(len * (rand() / (RAND_MAX + 1.0)));
+        sRet += chars[p];
+    }
+
     return sRet;
 }

@@ -875,7 +875,7 @@ std::shared_ptr<NoWebSession> NoWebSock::GetSession()
 
     NoString sSessionID;
     do {
-        sSessionID = NoString::RandomString(32);
+        sSessionID = NoUtils::RandomString(32);
         sSessionID += ":" + GetRemoteIP() + ":" + NoString(GetRemotePort());
         sSessionID += ":" + GetLocalIP() + ":" + NoString(GetLocalPort());
         sSessionID += ":" + NoString(time(nullptr));

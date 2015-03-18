@@ -608,7 +608,7 @@ public:
 
         // Now issue challenges for the new users in the queue
         for (NoStringMap::iterator it = m_msQueue.begin(); it != m_msQueue.end(); ++it) {
-            it->second = NoString::RandomString(AUTOOP_CHALLENGE_LENGTH);
+            it->second = NoUtils::RandomString(AUTOOP_CHALLENGE_LENGTH);
             PutIRC("NOTICE " + it->first + " :!ZNCAO CHALLENGE " + it->second);
         }
     }

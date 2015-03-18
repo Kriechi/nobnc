@@ -327,12 +327,6 @@ public:
      */
     static NoString NamedFormat(const NoString& sFormat, const NoStringMap& msValues);
 
-    /** Produces a random string.
-     * @param uLength The length of the resulting string.
-     * @return A random string.
-     */
-    static NoString RandomString(uint uLength);
-
     /** Treat this string as base64-encoded data and decode it.
      * @param sRet String to which the result of the decode is safed.
      * @return The length of the resulting string.
