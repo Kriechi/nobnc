@@ -23,7 +23,7 @@
 
 class NoModule;
 
-class NO_EXPORT NoTimer : public CCron
+class NO_EXPORT NoTimer : private CCron
 {
 public:
     NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description);
@@ -31,6 +31,12 @@ public:
 
     NoTimer(const NoTimer&) = delete;
     NoTimer& operator=(const NoTimer&) = delete;
+
+    CCron* GetHandle() const;
+    NoString GetName() const;
+    uint GetCyclesLeft() const;
+    timeval GetInterval() const;
+    void Stop();
 
     NoModule* module() const;
     void setModule(NoModule* module);

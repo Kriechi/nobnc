@@ -208,7 +208,7 @@ bool NoModule::AddTimer(NoTimer* pTimer)
         // Was already added
         return true;
 
-    m_pManager->AddCron(pTimer);
+    m_pManager->AddCron(pTimer->GetHandle());
     return true;
 }
 
@@ -223,7 +223,7 @@ bool NoModule::AddTimer(NoTimer::Callback pFBCallback, const NoString& sLabel, u
 bool NoModule::RemTimer(NoTimer* pTimer)
 {
     if (m_sTimers.erase(pTimer) == 0) return false;
-    m_pManager->DelCronByAddr(pTimer);
+    m_pManager->DelCronByAddr(pTimer->GetHandle());
     return true;
 }
 

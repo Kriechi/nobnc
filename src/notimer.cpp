@@ -33,6 +33,31 @@ NoTimer::~NoTimer()
     m_module->UnlinkTimer(this);
 }
 
+CCron* NoTimer::GetHandle() const
+{
+    return const_cast<NoTimer*>(this);
+}
+
+NoString NoTimer::GetName() const
+{
+    return CCron::GetName();
+}
+
+uint NoTimer::GetCyclesLeft() const
+{
+    return CCron::GetCyclesLeft();
+}
+
+timeval NoTimer::GetInterval() const
+{
+    return CCron::GetInterval();
+}
+
+void NoTimer::Stop()
+{
+    CCron::Stop();
+}
+
 NoModule* NoTimer::module() const
 {
     return m_module;
