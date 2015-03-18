@@ -19,6 +19,7 @@
 
 #include <no/noglobal.h>
 #include <no/nosocket.h>
+#include <no/nosocketmanager.h>
 
 class NO_EXPORT NoListener
 {

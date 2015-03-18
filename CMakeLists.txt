@@ -40,6 +40,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/noserver.h
                        include/no/nosettings.h
                        include/no/nosocket.h
+                       include/no/nosocketmanager.h
                        include/no/nosslverifyhost.h
                        include/no/nostring.h
                        include/no/notable.h
@@ -78,6 +79,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/noserver.cpp
                        src/nosettings.cpp
                        src/nosocket.cpp
+                       src/nosocketmanager.cpp
                        src/nosslverifyhost.cpp
                        src/nostring.cpp
                        src/notable.cpp
