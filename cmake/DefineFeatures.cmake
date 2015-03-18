@@ -58,7 +58,7 @@ option(FEATURE_LARGEFILE "Enable large file support" ON)
 cmake_dependent_option(_LARGE_FILES "Enable large file support" ON "FEATURE_LARGEFILE" OFF)
 mark_as_advanced(_LARGE_FILES)
 
-option(FEATURE_CYRUS "Enable Cyrus support" OFF)
+option(FEATURE_CYRUS "Enable Cyrus support" ON)
 if(FEATURE_CYRUS)
     find_package(Sasl2)
     if(SASL2_FOUND)
