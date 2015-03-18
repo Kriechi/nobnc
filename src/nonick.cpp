@@ -19,11 +19,10 @@
 #include "noircsock.h"
 #include "nonetwork.h"
 
-NoNick::NoNick() : m_sChanPerms(""), m_pNetwork(nullptr), m_sNick(""), m_sIdent(""), m_sHost("") {}
-
-NoNick::NoNick(const NoString& sNick) : NoNick() { Parse(sNick); }
-
-NoNick::~NoNick() {}
+NoNick::NoNick(const NoString& sNick) : m_sChanPerms(""), m_pNetwork(nullptr), m_sNick(""), m_sIdent(""), m_sHost("")
+{
+    Parse(sNick);
+}
 
 void NoNick::Reset()
 {

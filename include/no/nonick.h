@@ -27,9 +27,7 @@ class NoChannel;
 class NO_EXPORT NoNick
 {
 public:
-    NoNick();
-    NoNick(const NoString& sNick);
-    ~NoNick();
+    NoNick(const NoString& sNick = "");
 
     NoNick(const NoNick&) = default;
     NoNick& operator=(const NoNick&) = default;
