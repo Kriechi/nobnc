@@ -124,21 +124,19 @@ NoBaseSocket::NoBaseSocket(const NoString& sHost, u_short port, int timeout)
 
 std::vector<Csock*> NoSocketManager::GetSockets() const
 {
-    return *this;
+    return *m_instance;
 }
 
 std::vector<Csock*> NoSocketManager::FindSocksByName(const NoString& sName)
 {
-    return TSocketManager::FindSocksByName(sName);
+    return m_instance->FindSocksByName(sName);
 }
 
 uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
 {
-    const_iterator it;
     uint ret = 0;
 
-    for (it = begin(); it != end(); ++it) {
-        Csock* pSock = *it;
+    for (Csock* pSock : *m_instance) {
         // Logged in NoClients have "USR::<username>" as their sockname
         if (pSock->GetType() == Csock::INBOUND && pSock->GetRemoteIP() == sIP &&
             pSock->GetSockName().Left(5) != "USR::") {
@@ -153,42 +151,42 @@ uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
 
 void NoSocketManager::Cleanup()
 {
-    TSocketManager::Cleanup();
+    m_instance->Cleanup();
 }
 
 void NoSocketManager::DynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution)
 {
-    TSocketManager::DynamicSelectLoop(iLowerBounds, iUpperBounds, iMaxResolution);
+    m_instance->DynamicSelectLoop(iLowerBounds, iUpperBounds, iMaxResolution);
 }
 
 void NoSocketManager::AddSock(Csock* pcSock, const NoString& sSockName)
 {
-    TSocketManager::AddSock(pcSock, sSockName);
+    m_instance->AddSock(pcSock, sSockName);
 }
 
 void NoSocketManager::DelSockByAddr(Csock* socket)
 {
-    TSocketManager::DelSockByAddr(socket);
+    m_instance->DelSockByAddr(socket);
 }
 
 bool NoSocketManager::SwapSockByAddr(Csock* newSocket, Csock* originalSocket)
 {
-    return TSocketManager::SwapSockByAddr(newSocket, originalSocket);
+    return m_instance->SwapSockByAddr(newSocket, originalSocket);
 }
 
 void NoSocketManager::AddCron(CCron* cron)
 {
-    TSocketManager::AddCron(cron);
+    m_instance->AddCron(cron);
 }
 
 void NoSocketManager::DelCronByAddr(CCron* cron)
 {
-    TSocketManager::DelCronByAddr(cron);
+    m_instance->DelCronByAddr(cron);
 }
 
 void NoSocketManager::DoConnect(const CSConnection& cCon, Csock* pcSock)
 {
-    TSocketManager::Connect(cCon, pcSock);
+    m_instance->Connect(cCon, pcSock);
 }
 
 int NoBaseSocket::ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const
@@ -470,10 +468,10 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
 }
 #endif /* HAVE_THREADED_DNS */
 
-NoSocketManager::NoSocketManager()
+NoSocketManager::NoSocketManager() : m_instance(new TSocketManager<NoBaseSocket>)
 {
 #ifdef HAVE_PTHREAD
-    MonitorFD(new NoDnsMonitorFD());
+    m_instance->MonitorFD(new NoDnsMonitorFD());
 #endif
 }
 
@@ -511,7 +509,7 @@ bool NoSocketManager::ListenHost(u_short iPort,
     }
 #endif
 
-    return Listen(L, pcSock);
+    return m_instance->Listen(L, pcSock);
 }
 
 bool NoSocketManager::ListenAll(u_short iPort,
@@ -555,7 +553,7 @@ u_short NoSocketManager::ListenRand(const NoString& sSockName,
     }
 #endif
 
-    Listen(L, pcSock, &uPort);
+    m_instance->Listen(L, pcSock, &uPort);
 
     return uPort;
 }
@@ -567,7 +565,7 @@ u_short NoSocketManager::ListenAllRand(const NoString& sSockName,
                       u_int iTimeout,
                       EAddrType eAddr)
 {
-    return (ListenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr));
+    return ListenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
 }
 
 void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoBaseSocket* pcSock)

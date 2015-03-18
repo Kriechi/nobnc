@@ -59,11 +59,11 @@ private:
 
 enum EAddrType { ADDR_IPV4ONLY, ADDR_IPV6ONLY, ADDR_ALL };
 
-class NO_EXPORT NoSocketManager : private TSocketManager<NoBaseSocket>
+class NO_EXPORT NoSocketManager
 {
 public:
     NoSocketManager();
-    virtual ~NoSocketManager();
+    ~NoSocketManager();
 
     bool ListenHost(u_short iPort,
                     const NoString& sSockName,
@@ -117,6 +117,9 @@ public:
     void AddCron(CCron* cron);
     void DelCronByAddr(CCron* cron);
     void DoConnect(const CSConnection& cCon, Csock* pcSock = NULL);
+
+private:
+    CSocketManager* m_instance;
 };
 
 /**
