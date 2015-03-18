@@ -18,6 +18,15 @@
 #include <no/nofile.h>
 #include <no/noutils.h>
 
+TEST(StringTest, Hash)
+{
+    EXPECT_EQ("d41d8cd98f00b204e9800998ecf8427e", NoUtils::MD5(""));
+    EXPECT_EQ("0cc175b9c0f1b6a831c399e269772661", NoUtils::MD5("a"));
+
+    EXPECT_EQ("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", NoUtils::SHA256(""));
+    EXPECT_EQ("ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", NoUtils::SHA256("a"));
+}
+
 TEST(IRC32, GetMessageTags)
 {
     EXPECT_EQ(NoStringMap(), NoUtils::GetMessageTags(""));

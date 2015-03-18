@@ -188,15 +188,6 @@ TEST(StringTest, NamedFormat)
     EXPECT_EQ("{xbyb", NoString::NamedFormat(CS("\\{x{a}y{a}"), m));
 }
 
-TEST(StringTest, Hash)
-{
-    EXPECT_EQ("d41d8cd98f00b204e9800998ecf8427e", CS("").MD5());
-    EXPECT_EQ("0cc175b9c0f1b6a831c399e269772661", CS("a").MD5());
-
-    EXPECT_EQ("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", CS("").SHA256());
-    EXPECT_EQ("ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", CS("a").SHA256());
-}
-
 TEST(StringTest, Equals)
 {
     EXPECT_TRUE(CS("ABC").Equals("abc"));
