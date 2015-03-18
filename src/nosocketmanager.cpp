@@ -19,6 +19,7 @@
 #include "nothreads.h"
 #include "noapp.h"
 #include "Csocket/Csocket.h"
+#include <algorithm>
 #include <random>
 
 #ifdef HAVE_LIBSSL
