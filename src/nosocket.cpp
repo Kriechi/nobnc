@@ -141,6 +141,11 @@ void NoBaseSocket::SSLHandShakeFinished()
 }
 #endif
 
+void NoBaseSocket::SetHostToVerifySSL(const NoString& sHost)
+{
+    m_HostToVerifySSL = sHost;
+}
+
 NoString NoBaseSocket::GetSSLPeerFingerprint() const
 {
 #ifdef HAVE_LIBSSL
@@ -164,6 +169,11 @@ NoString NoBaseSocket::GetSSLPeerFingerprint() const
 #else
     return "";
 #endif
+}
+
+void NoBaseSocket::SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs)
+{
+    m_ssTrustedFingerprints = ssFPs;
 }
 
 #ifdef HAVE_PTHREAD
@@ -366,7 +376,98 @@ NoSocketManager::NoSocketManager()
 #endif
 }
 
-NoSocketManager::~NoSocketManager() {}
+NoSocketManager::~NoSocketManager()
+{
+}
+
+bool NoSocketManager::ListenHost(u_short iPort,
+                const NoString& sSockName,
+                const NoString& sBindHost,
+                bool bSSL,
+                int iMaxConns,
+                NoBaseSocket* pcSock,
+                u_int iTimeout,
+                EAddrType eAddr)
+{
+    CSListener L(iPort, sBindHost);
+
+    L.SetSockName(sSockName);
+    L.SetIsSSL(bSSL);
+    L.SetTimeout(iTimeout);
+    L.SetMaxConns(iMaxConns);
+
+#ifdef HAVE_IPV6
+    switch (eAddr) {
+    case ADDR_IPV4ONLY:
+        L.SetAFRequire(CSSockAddr::RAF_INET);
+        break;
+    case ADDR_IPV6ONLY:
+        L.SetAFRequire(CSSockAddr::RAF_INET6);
+        break;
+    case ADDR_ALL:
+        L.SetAFRequire(CSSockAddr::RAF_ANY);
+        break;
+    }
+#endif
+
+    return Listen(L, pcSock);
+}
+
+bool NoSocketManager::ListenAll(u_short iPort,
+               const NoString& sSockName,
+               bool bSSL,
+               int iMaxConns,
+               NoBaseSocket* pcSock,
+               u_int iTimeout,
+               EAddrType eAddr)
+{
+    return ListenHost(iPort, sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
+}
+
+u_short NoSocketManager::ListenRand(const NoString& sSockName,
+                   const NoString& sBindHost,
+                   bool bSSL,
+                   int iMaxConns,
+                   NoBaseSocket* pcSock,
+                   u_int iTimeout,
+                   EAddrType eAddr)
+{
+    ushort uPort = 0;
+    CSListener L(0, sBindHost);
+
+    L.SetSockName(sSockName);
+    L.SetIsSSL(bSSL);
+    L.SetTimeout(iTimeout);
+    L.SetMaxConns(iMaxConns);
+
+#ifdef HAVE_IPV6
+    switch (eAddr) {
+    case ADDR_IPV4ONLY:
+        L.SetAFRequire(CSSockAddr::RAF_INET);
+        break;
+    case ADDR_IPV6ONLY:
+        L.SetAFRequire(CSSockAddr::RAF_INET6);
+        break;
+    case ADDR_ALL:
+        L.SetAFRequire(CSSockAddr::RAF_ANY);
+        break;
+    }
+#endif
+
+    Listen(L, pcSock, &uPort);
+
+    return uPort;
+}
+
+u_short NoSocketManager::ListenAllRand(const NoString& sSockName,
+                      bool bSSL,
+                      int iMaxConns,
+                      NoBaseSocket* pcSock,
+                      u_int iTimeout,
+                      EAddrType eAddr)
+{
+    return (ListenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr));
+}
 
 void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoBaseSocket* pcSock)
 {

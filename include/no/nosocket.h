@@ -35,9 +35,9 @@ public:
     int VerifyPeerCertificate(int iPreVerify, X509_STORE_CTX* pStoreCTX) override;
     void SSLHandShakeFinished() override;
 #endif
-    void SetHostToVerifySSL(const NoString& sHost) { m_HostToVerifySSL = sHost; }
+    void SetHostToVerifySSL(const NoString& sHost);
     NoString GetSSLPeerFingerprint() const;
-    void SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs) { m_ssTrustedFingerprints = ssFPs; }
+    void SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs);
 
 #ifndef HAVE_ICU
     // Don't fail to compile when ICU is not enabled
@@ -72,31 +72,7 @@ public:
                     int iMaxConns = SOMAXCONN,
                     NoBaseSocket* pcSock = nullptr,
                     u_int iTimeout = 0,
-                    EAddrType eAddr = ADDR_ALL)
-    {
-        CSListener L(iPort, sBindHost);
-
-        L.SetSockName(sSockName);
-        L.SetIsSSL(bSSL);
-        L.SetTimeout(iTimeout);
-        L.SetMaxConns(iMaxConns);
-
-#ifdef HAVE_IPV6
-        switch (eAddr) {
-        case ADDR_IPV4ONLY:
-            L.SetAFRequire(CSSockAddr::RAF_INET);
-            break;
-        case ADDR_IPV6ONLY:
-            L.SetAFRequire(CSSockAddr::RAF_INET6);
-            break;
-        case ADDR_ALL:
-            L.SetAFRequire(CSSockAddr::RAF_ANY);
-            break;
-        }
-#endif
-
-        return Listen(L, pcSock);
-    }
+                    EAddrType eAddr = ADDR_ALL);
 
     bool ListenAll(u_short iPort,
                    const NoString& sSockName,
@@ -104,10 +80,7 @@ public:
                    int iMaxConns = SOMAXCONN,
                    NoBaseSocket* pcSock = nullptr,
                    u_int iTimeout = 0,
-                   EAddrType eAddr = ADDR_ALL)
-    {
-        return ListenHost(iPort, sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
-    }
+                   EAddrType eAddr = ADDR_ALL);
 
     u_short ListenRand(const NoString& sSockName,
                        const NoString& sBindHost,
@@ -115,44 +88,14 @@ public:
                        int iMaxConns = SOMAXCONN,
                        NoBaseSocket* pcSock = nullptr,
                        u_int iTimeout = 0,
-                       EAddrType eAddr = ADDR_ALL)
-    {
-        ushort uPort = 0;
-        CSListener L(0, sBindHost);
-
-        L.SetSockName(sSockName);
-        L.SetIsSSL(bSSL);
-        L.SetTimeout(iTimeout);
-        L.SetMaxConns(iMaxConns);
-
-#ifdef HAVE_IPV6
-        switch (eAddr) {
-        case ADDR_IPV4ONLY:
-            L.SetAFRequire(CSSockAddr::RAF_INET);
-            break;
-        case ADDR_IPV6ONLY:
-            L.SetAFRequire(CSSockAddr::RAF_INET6);
-            break;
-        case ADDR_ALL:
-            L.SetAFRequire(CSSockAddr::RAF_ANY);
-            break;
-        }
-#endif
-
-        Listen(L, pcSock, &uPort);
-
-        return uPort;
-    }
+                       EAddrType eAddr = ADDR_ALL);
 
     u_short ListenAllRand(const NoString& sSockName,
                           bool bSSL = false,
                           int iMaxConns = SOMAXCONN,
                           NoBaseSocket* pcSock = nullptr,
                           u_int iTimeout = 0,
-                          EAddrType eAddr = ADDR_ALL)
-    {
-        return (ListenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr));
-    }
+                          EAddrType eAddr = ADDR_ALL);
 
     void Connect(const NoString& sHostname,
                  u_short iPort,
@@ -217,7 +160,6 @@ private:
     void SetTDNSThreadFinished(NoDnsTask* task, bool bBind, addrinfo* aiResult);
     static void* TDNSThread(void* argument);
 #endif
-protected:
 };
 
 /**
