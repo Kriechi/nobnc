@@ -32,30 +32,33 @@ public:
     NoNick(const NoNick&) = default;
     NoNick& operator=(const NoNick&) = default;
 
-    void Reset();
-    void Parse(const NoString& sNickMask);
-    NoString GetHostMask() const;
-    size_t GetCommonChans(std::vector<NoChannel*>& vChans, NoNetwork* pNetwork) const;
-    bool NickEquals(const NoString& nickname) const;
-
-    void SetNetwork(NoNetwork* pNetwork);
+    NoString GetNick() const;
     void SetNick(const NoString& s);
+
+    NoString GetIdent() const;
     void SetIdent(const NoString& s);
+
+    NoString GetHost() const;
     void SetHost(const NoString& s);
+
+    NoString GetNickMask() const;
+    NoString GetHostMask() const;
+
+    NoNetwork* GetNetwork() const;
+    void SetNetwork(NoNetwork* pNetwork);
+
+    uchar GetPermChar() const;
+    NoString GetPermStr() const;
+    bool HasPerm(uchar uPerm) const;
     bool AddPerm(uchar uPerm);
     bool RemPerm(uchar uPerm);
 
-    NoString GetPermStr() const;
-    uchar GetPermChar() const;
-    bool HasPerm(uchar uPerm) const;
-    const NoString& GetNick() const;
-    const NoString& GetIdent() const;
-    const NoString& GetHost() const;
-    NoString GetNickMask() const;
-
-    void Clone(const NoNick& SourceNick);
+    bool NickEquals(const NoString& nickname) const; // TODO
+    void Reset(); // TODO
 
 private:
+    void Parse(const NoString& sNickMask);
+
     NoString m_sChanPerms;
     NoNetwork* m_pNetwork;
     NoString m_sNick;

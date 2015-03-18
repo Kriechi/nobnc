@@ -90,7 +90,7 @@ public:
     const NoString& GetPerms() const { return m_sPerms; }
     const NoString& GetPermModes() const { return m_sPermModes; }
     NoString GetNickMask() const { return m_Nick.GetNickMask(); }
-    const NoString& GetNick() const { return m_Nick.GetNick(); }
+    NoString GetNick() const { return m_Nick.GetNick(); }
     const NoString& GetPass() const { return m_sPass; }
     NoNetwork* GetNetwork() const { return m_pNetwork; }
     bool HasNamesx() const { return m_bNamesx; }

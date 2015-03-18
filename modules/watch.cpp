@@ -50,8 +50,7 @@ public:
         m_bDetachedChannelOnly = false;
         m_sPattern = (sPattern.size()) ? sPattern : "*";
 
-        NoNick Nick;
-        Nick.Parse(sHostMask);
+        NoNick Nick(sHostMask);
 
         m_sHostMask = (Nick.GetNick().size()) ? Nick.GetNick() : "*";
         m_sHostMask += "!";
