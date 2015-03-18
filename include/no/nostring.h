@@ -347,9 +347,6 @@ public:
      */
     static NoString RandomString(uint uLength);
 
-    /** @return The SHA256 hash of this string. */
-    NoString SHA256() const;
-
     /** Treat this string as base64-encoded data and decode it.
      * @param sRet String to which the result of the decode is safed.
      * @return The length of the resulting string.

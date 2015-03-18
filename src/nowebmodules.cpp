@@ -878,7 +878,7 @@ std::shared_ptr<NoWebSession> NoWebSock::GetSession()
         sSessionID += ":" + GetRemoteIP() + ":" + NoString(GetRemotePort());
         sSessionID += ":" + GetLocalIP() + ":" + NoString(GetLocalPort());
         sSessionID += ":" + NoString(time(nullptr));
-        sSessionID = sSessionID.SHA256();
+        sSessionID = NoUtils::SHA256(sSessionID);
 
         DEBUG("Auto generated session: [" + sSessionID + "]");
     } while (Sessions.m_mspSessions.HasItem(sSessionID));

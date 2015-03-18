@@ -425,8 +425,8 @@ private:
         if (m_bAuthed) return;
 
         NoString sUsername = m_sUsername.AsLower().Replace_n("[", "{").Replace_n("]", "}").Replace_n("\\", "|");
-        NoString sPasswordHash = m_sPassword.Left(10).SHA256();
-        NoString sKey = NoString(sUsername + ":" + sPasswordHash).SHA256();
+        NoString sPasswordHash = NoUtils::SHA256(m_sPassword.Left(10));
+        NoString sKey = NoUtils::SHA256(sUsername + ":" + sPasswordHash);
         NoString sResponse = HMAC_SHA256(sKey, sChallenge);
 
         PutModule("Auth: Received challenge, sending CHALLENGEAUTH request...");
@@ -558,7 +558,7 @@ private:
     {
         NoString sRealKey;
         if (sKey.length() > 64)
-            PackHex(sKey.SHA256(), sRealKey);
+            PackHex(NoUtils::SHA256(sKey), sRealKey);
         else
             sRealKey = sKey;
 
@@ -571,8 +571,8 @@ private:
         }
 
         NoString sInnerHash;
-        PackHex(NoString(sInnerKey + sData).SHA256(), sInnerHash);
-        return NoString(sOuterKey + sInnerHash).SHA256();
+        PackHex(NoUtils::SHA256(sInnerKey + sData), sInnerHash);
+        return NoUtils::SHA256(sOuterKey + sInnerHash);
     }
 
     /* Settings */
