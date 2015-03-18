@@ -71,7 +71,7 @@ public:
         Add(sHost, *pCount);
 
         pClient->Write("ERROR :Closing link [Please try again later - reconnecting too fast]\r\n");
-        pClient->Close(Csock::CLT_AFTERWRITE);
+        pClient->Close(NoBaseSocket::CLT_AFTERWRITE);
     }
 
     void OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override

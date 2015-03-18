@@ -1119,7 +1119,7 @@ void NoIrcSock::SockError(int iErrno, const NoString& sDescription)
 
     DEBUG(GetSockName() << " == SockError(" << iErrno << " " << sError << ")");
     if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
-        if (GetConState() != CST_OK) {
+        if (IsConOK()) {
             m_pNetwork->PutStatus("Cannot connect to IRC (" + sError + "). Retrying...");
         } else {
             m_pNetwork->PutStatus("Disconnected from IRC (" + sError + "). Reconnecting...");

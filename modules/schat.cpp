@@ -50,7 +50,7 @@ public:
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout = 60);
     ~NoSChatSock() {}
 
-    Csock* GetSockObj(const CS_STRING& sHostname, u_short iPort) override
+    NoBaseSocket* GetSockObjImpl(const CS_STRING& sHostname, u_short iPort) override
     {
         NoSChatSock* p = new NoSChatSock(m_pModule, m_sChatNick, sHostname, iPort);
         return (p);
@@ -438,7 +438,7 @@ void NoSChatSock::Connected()
 void NoSChatSock::Timeout()
 {
     if (m_pModule) {
-        if (GetType() == LISTENER)
+        if (IsListener())
             m_pModule->PutModule("Timeout while waiting for [" + m_sChatNick + "]");
         else
             PutQuery("*** Connection Timed out.");

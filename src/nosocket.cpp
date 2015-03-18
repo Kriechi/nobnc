@@ -270,7 +270,7 @@ NoModule* NoSocket::GetModule() const { return m_pModule; }
 /////////////////// !NoSocket ///////////////////
 
 #ifdef HAVE_ICU
-void NoIrcSocket::IcuExtToUCallback(UConverterToUnicodeArgs* toArgs,
+void NoIrcSocket::IcuExtToUCallbackImpl(UConverterToUnicodeArgs* toArgs,
                                    const char* codeUnits,
                                    int32_t length,
                                    UConverterCallbackReason reason,
@@ -298,10 +298,10 @@ void NoIrcSocket::IcuExtToUCallback(UConverterToUnicodeArgs* toArgs,
         ucnv_cbToUWriteUChars(toArgs, &c, 1, 0, err);
         return;
     }
-    Csock::IcuExtToUCallback(toArgs, codeUnits, length, reason, err);
+    NoBaseSocket::IcuExtToUCallbackImpl(toArgs, codeUnits, length, reason, err);
 }
 
-void NoIrcSocket::IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs,
+void NoIrcSocket::IcuExtFromUCallbackImpl(UConverterFromUnicodeArgs* fromArgs,
                                      const UChar* codeUnits,
                                      int32_t length,
                                      UChar32 codePoint,
@@ -316,6 +316,6 @@ void NoIrcSocket::IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs,
         ucnv_cbFromUWriteBytes(fromArgs, &c, 1, 0, err);
         return;
     }
-    Csock::IcuExtFromUCallback(fromArgs, codeUnits, length, codePoint, reason, err);
+    NoBaseSocket::IcuExtFromUCallbackImpl(fromArgs, codeUnits, length, codePoint, reason, err);
 }
 #endif

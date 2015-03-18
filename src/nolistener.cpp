@@ -24,7 +24,7 @@ public:
     virtual ~NoRealListener();
 
     bool ConnectionFrom(const NoString& sHost, ushort uPort) override;
-    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
+    NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
     void SockError(int iErrno, const NoString& sDescription) override;
 
 private:
@@ -142,14 +142,14 @@ bool NoRealListener::ConnectionFrom(const NoString& sHost, ushort uPort)
     return bHostAllowed;
 }
 
-Csock* NoRealListener::GetSockObj(const NoString& sHost, ushort uPort)
+NoBaseSocket* NoRealListener::GetSockObjImpl(const NoString& sHost, ushort uPort)
 {
     NoIncomingConnection* pClient = new NoIncomingConnection(sHost, uPort, m_Listener.GetAcceptType(), m_Listener.GetURIPrefix());
     if (NoApp::Get().AllowConnectionFrom(sHost)) {
         GLOBALMODULECALL(OnClientConnect(pClient, sHost, uPort), NOTHING);
     } else {
         pClient->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
-        pClient->Close(Csock::CLT_AFTERWRITE);
+        pClient->Close(NoBaseSocket::CLT_AFTERWRITE);
         GLOBALMODULECALL(OnFailedLogin("", sHost), NOTHING);
     }
     return pClient;
@@ -196,7 +196,7 @@ void NoIncomingConnection::ReadLine(const NoString& sLine)
     bool bIsHTTP = (sLine.WildCmp("GET * HTTP/1.?\r\n") || sLine.WildCmp("POST * HTTP/1.?\r\n"));
     bool bAcceptHTTP = (m_eAcceptType == NoListener::ACCEPT_ALL) || (m_eAcceptType == NoListener::ACCEPT_HTTP);
     bool bAcceptIRC = (m_eAcceptType == NoListener::ACCEPT_ALL) || (m_eAcceptType == NoListener::ACCEPT_IRC);
-    Csock* pSock = nullptr;
+    NoBaseSocket* pSock = nullptr;
 
     if (!bIsHTTP) {
         // Let's assume it's an IRC connection
@@ -210,7 +210,7 @@ void NoIncomingConnection::ReadLine(const NoString& sLine)
         }
 
         pSock = new NoClient();
-        NoApp::Get().GetManager().SwapSockByAddr(pSock, this);
+        NoApp::Get().GetManager().SwapSockByAddr(pSock->GetHandle(), GetHandle());
 
         // And don't forget to give it some sane name / timeout
         pSock->SetSockName("USR::???");
@@ -226,7 +226,7 @@ void NoIncomingConnection::ReadLine(const NoString& sLine)
         }
 
         pSock = new NoWebSock(m_sURIPrefix);
-        NoApp::Get().GetManager().SwapSockByAddr(pSock, this);
+        NoApp::Get().GetManager().SwapSockByAddr(pSock->GetHandle(), GetHandle());
 
         // And don't forget to give it some sane name / timeout
         pSock->SetSockName("WebMod::Client");

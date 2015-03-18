@@ -35,7 +35,7 @@ public:
     void Connected() override;
     void Disconnected() override;
     void SendPacket();
-    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
+    NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
     NoFile* OpenFile(bool bWrite = true);
     bool Seek(ulong uPos);
 
@@ -435,7 +435,7 @@ void NoDccSock::SendPacket()
     }
 }
 
-Csock* NoDccSock::GetSockObj(const NoString& sHost, ushort uPort)
+NoBaseSocket* NoDccSock::GetSockObjImpl(const NoString& sHost, ushort uPort)
 {
     Close();
 

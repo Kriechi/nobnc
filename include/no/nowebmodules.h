@@ -150,7 +150,7 @@ public:
 
     std::shared_ptr<NoWebSession> GetSession();
 
-    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
+    NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
     static NoString GetSkinPath(const NoString& sSkinName);
     void GetAvailSkins(NoStringVector& vRet) const;
     NoString GetSkinName();
