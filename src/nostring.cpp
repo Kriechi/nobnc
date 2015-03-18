@@ -1484,9 +1484,6 @@ NoStringMap::status_t NoStringMap::WriteToDisk(const NoString& sPath, mode_t iMo
     for (const auto& it : *this) {
         NoString sKey = it.first;
         NoString sValue = it.second;
-        if (!WriteFilter(sKey, sValue)) {
-            return MCS_EWRITEFIL;
-        }
 
         if (sKey.empty()) {
             continue;
@@ -1518,8 +1515,6 @@ NoStringMap::status_t NoStringMap::ReadFromDisk(const NoString& sPath)
         NoString sValue = sBuffer.Token(1);
         Decode(sKey);
         Decode(sValue);
-
-        if (!ReadFilter(sKey, sValue)) return MCS_EREADFIL;
 
         (*this)[sKey] = sValue;
     }

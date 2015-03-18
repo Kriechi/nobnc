@@ -574,10 +574,6 @@ public:
         MCS_EOPEN = 1,
         /// Writing to the file failed.
         MCS_EWRITE = 2,
-        /// WriteFilter() failed.
-        MCS_EWRITEFIL = 3,
-        /// ReadFilter() failed.
-        MCS_EREADFIL = 4
     };
 
     /** Write this map to a file.
@@ -593,23 +589,6 @@ public:
      * @see ReadFilter.
      */
     enum status_t ReadFromDisk(const NoString& sPath);
-
-    /** Filter used while writing this map. This function is called by
-     * WriteToDisk() for each pair that is going to be written. This
-     * function has the chance to modify the data that will be written.
-     * @param sKey The key that will be written. Can be modified.
-     * @param sValue The value that will be written. Can be modified.
-     * @return true unless WriteToDisk() should fail with MCS_EWRITEFIL.
-     */
-    virtual bool WriteFilter(NoString& sKey, NoString& sValue) const { return true; }
-    /** Filter used while reading this map. This function is called by
-     * ReadFromDisk() for each pair that is beging read. This function has
-     * the chance to modify the data that is being read.
-     * @param sKey The key that was read. Can be modified.
-     * @param sValue The value that was read. Can be modified.
-     * @return true unless ReadFromDisk() should fail with MCS_EWRITEFIL.
-     */
-    virtual bool ReadFilter(NoString& sKey, NoString& sValue) const { return true; }
 
     /** Encode a value so that it can safely be parsed by ReadFromDisk().
      * This is an internal function.
