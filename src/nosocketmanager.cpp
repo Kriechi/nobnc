@@ -455,7 +455,7 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
     } catch (const char* s) {
         DEBUG(task->sSockName << ", dns resolving error: " << s);
         task->pcSock->SetSockName(task->sSockName);
-        task->pcSock->SockError(-1, s);
+        task->pcSock->SockErrorImpl(-1, s);
         delete task->pcSock;
     }
 

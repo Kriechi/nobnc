@@ -88,7 +88,7 @@ void NoClient::SendRequiredPasswordNotice()
               "or /quote PASS <username>/<network>:<password> to connect to a specific network.");
 }
 
-void NoClient::ReadLine(const NoString& sData)
+void NoClient::ReadLineImpl(const NoString& sData)
 {
     NoString sLine = sData;
 
@@ -741,13 +741,13 @@ void NoClient::AcceptLogin(NoUser& User)
     NETWORKMODULECALL(OnClientLogin(), m_pUser, m_pNetwork, this, NOTHING);
 }
 
-void NoClient::Timeout() { PutClient("ERROR :Closing link [Timeout]"); }
+void NoClient::TimeoutImpl() { PutClient("ERROR :Closing link [Timeout]"); }
 
-void NoClient::Connected() { DEBUG(GetSockName() << " == Connected();"); }
+void NoClient::ConnectedImpl() { DEBUG(GetSockName() << " == Connected();"); }
 
-void NoClient::ConnectionRefused() { DEBUG(GetSockName() << " == ConnectionRefused()"); }
+void NoClient::ConnectionRefusedImpl() { DEBUG(GetSockName() << " == ConnectionRefused()"); }
 
-void NoClient::Disconnected()
+void NoClient::DisconnectedImpl()
 {
     DEBUG(GetSockName() << " == Disconnected()");
     NoNetwork* pNetwork = m_pNetwork;
@@ -758,7 +758,7 @@ void NoClient::Disconnected()
     }
 }
 
-void NoClient::ReachedMaxBuffer()
+void NoClient::ReachedMaxBufferImpl()
 {
     DEBUG(GetSockName() << " == ReachedMaxBuffer()");
     if (IsAttached()) {

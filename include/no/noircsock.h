@@ -56,13 +56,13 @@ public:
     bool OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage);
     bool OnServerCapAvailable(const NoString& sCap);
 
-    void ReadLine(const NoString& sData) override;
-    void Connected() override;
-    void Disconnected() override;
-    void ConnectionRefused() override;
-    void SockError(int iErrno, const NoString& sDescription) override;
-    void Timeout() override;
-    void ReachedMaxBuffer() override;
+    void ReadLineImpl(const NoString& sData) override;
+    void ConnectedImpl() override;
+    void DisconnectedImpl() override;
+    void ConnectionRefusedImpl() override;
+    void SockErrorImpl(int iErrno, const NoString& sDescription) override;
+    void TimeoutImpl() override;
+    void ReachedMaxBufferImpl() override;
 
     void PutIRC(const NoString& sLine);
     void PutIRCQuick(const NoString& sLine); //!< Should be used for PONG only

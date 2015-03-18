@@ -36,7 +36,7 @@ public:
         }
     }
 
-    void ReadLine(const NoString& sLine) override;
+    void ReadLineImpl(const NoString& sLine) override;
 
 private:
 protected:
@@ -125,7 +125,7 @@ private:
     NoCacheMap<NoString> m_Cache;
 };
 
-void NoImapSock::ReadLine(const NoString& sLine)
+void NoImapSock::ReadLineImpl(const NoString& sLine)
 {
     if (!m_bSentLogin) {
         NoString sUsername = m_spAuth->GetUsername();

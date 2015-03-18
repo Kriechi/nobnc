@@ -56,21 +56,21 @@ public:
         return (p);
     }
 
-    bool ConnectionFrom(const CS_STRING& sHost, u_short iPort) override
+    bool ConnectionFromImpl(const CS_STRING& sHost, u_short iPort) override
     {
         Close(); // close the listener after the first connection
         return (true);
     }
 
-    void Connected() override;
-    void Timeout() override;
+    void ConnectedImpl() override;
+    void TimeoutImpl() override;
 
     const NoString& GetChatNick() const { return (m_sChatNick); }
 
     void PutQuery(const NoString& sText);
 
-    void ReadLine(const CS_STRING& sLine) override;
-    void Disconnected() override;
+    void ReadLineImpl(const CS_STRING& sLine) override;
+    void DisconnectedImpl() override;
 
     void AddLine(const NoString& sLine)
     {
@@ -83,11 +83,11 @@ public:
         if (m_vBuffer.empty()) {
             // Always show a message to the user, so he knows
             // this schat still exists.
-            ReadLine("*** Reattached.");
+            ReadLineImpl("*** Reattached.");
         } else {
             // Buffer playback
             std::vector<CS_STRING>::reverse_iterator it = m_vBuffer.rbegin();
-            for (; it != m_vBuffer.rend(); ++it) ReadLine(*it);
+            for (; it != m_vBuffer.rend(); ++it) ReadLineImpl(*it);
 
             m_vBuffer.clear();
         }
@@ -410,7 +410,7 @@ void NoSChatSock::PutQuery(const NoString& sText)
     m_pModule->SendToUser(m_sChatNick + "!" + m_sChatNick + "@" + GetRemoteIP(), sText);
 }
 
-void NoSChatSock::ReadLine(const CS_STRING& sLine)
+void NoSChatSock::ReadLineImpl(const CS_STRING& sLine)
 {
     if (m_pModule) {
         NoString sText = sLine;
@@ -424,18 +424,18 @@ void NoSChatSock::ReadLine(const CS_STRING& sLine)
     }
 }
 
-void NoSChatSock::Disconnected()
+void NoSChatSock::DisconnectedImpl()
 {
     if (m_pModule) PutQuery("*** Disconnected.");
 }
 
-void NoSChatSock::Connected()
+void NoSChatSock::ConnectedImpl()
 {
     SetTimeout(0);
     if (m_pModule) PutQuery("*** Connected.");
 }
 
-void NoSChatSock::Timeout()
+void NoSChatSock::TimeoutImpl()
 {
     if (m_pModule) {
         if (IsListener())

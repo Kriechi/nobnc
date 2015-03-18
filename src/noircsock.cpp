@@ -120,7 +120,7 @@ void NoIrcSock::Quit(const NoString& sQuitMsg)
     Close(CLT_AFTERWRITE);
 }
 
-void NoIrcSock::ReadLine(const NoString& sData)
+void NoIrcSock::ReadLineImpl(const NoString& sData)
 {
     NoString sLine = sData;
 
@@ -1058,7 +1058,7 @@ void NoIrcSock::SetNick(const NoString& sNick)
     m_pNetwork->SetIRNoNick(m_Nick);
 }
 
-void NoIrcSock::Connected()
+void NoIrcSock::ConnectedImpl()
 {
     DEBUG(GetSockName() << " == Connected()");
 
@@ -1084,7 +1084,7 @@ void NoIrcSock::Connected()
     m_Nick.setNick(sNick);
 }
 
-void NoIrcSock::Disconnected()
+void NoIrcSock::DisconnectedImpl()
 {
     IRCSOCKMODULECALL(OnIRCDisconnected(), NOTHING);
 
@@ -1113,7 +1113,7 @@ void NoIrcSock::Disconnected()
     m_scUserModes.clear();
 }
 
-void NoIrcSock::SockError(int iErrno, const NoString& sDescription)
+void NoIrcSock::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
     NoString sError = sDescription;
 
@@ -1160,7 +1160,7 @@ void NoIrcSock::SockError(int iErrno, const NoString& sDescription)
     m_scUserModes.clear();
 }
 
-void NoIrcSock::Timeout()
+void NoIrcSock::TimeoutImpl()
 {
     DEBUG(GetSockName() << " == Timeout()");
     if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
@@ -1173,7 +1173,7 @@ void NoIrcSock::Timeout()
     m_scUserModes.clear();
 }
 
-void NoIrcSock::ConnectionRefused()
+void NoIrcSock::ConnectionRefusedImpl()
 {
     DEBUG(GetSockName() << " == ConnectionRefused()");
     if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
@@ -1183,7 +1183,7 @@ void NoIrcSock::ConnectionRefused()
     m_pNetwork->ClearMotdBuffer();
 }
 
-void NoIrcSock::ReachedMaxBuffer()
+void NoIrcSock::ReachedMaxBufferImpl()
 {
     DEBUG(GetSockName() << " == ReachedMaxBuffer()");
     m_pNetwork->PutStatus("Received a too long line from the IRC server!");

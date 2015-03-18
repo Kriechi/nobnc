@@ -23,9 +23,9 @@ public:
     NoRealListener(NoListener& listener);
     virtual ~NoRealListener();
 
-    bool ConnectionFrom(const NoString& sHost, ushort uPort) override;
+    bool ConnectionFromImpl(const NoString& sHost, ushort uPort) override;
     NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
-    void SockError(int iErrno, const NoString& sDescription) override;
+    void SockErrorImpl(int iErrno, const NoString& sDescription) override;
 
 private:
     NoListener& m_Listener;
@@ -36,8 +36,8 @@ class NoIncomingConnection : public NoBaseSocket
 public:
     NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix);
     virtual ~NoIncomingConnection() {}
-    void ReadLine(const NoString& sData) override;
-    void ReachedMaxBuffer() override;
+    void ReadLineImpl(const NoString& sData) override;
+    void ReachedMaxBufferImpl() override;
 
 private:
     NoListener::EAcceptType m_eAcceptType;
@@ -134,7 +134,7 @@ NoRealListener::~NoRealListener()
     m_Listener.ResetSocket();
 }
 
-bool NoRealListener::ConnectionFrom(const NoString& sHost, ushort uPort)
+bool NoRealListener::ConnectionFromImpl(const NoString& sHost, ushort uPort)
 {
     bool bHostAllowed = NoApp::Get().IsHostAllowed(sHost);
     DEBUG(GetSockName() << " == ConnectionFrom(" << sHost << ", " << uPort << ") ["
@@ -155,7 +155,7 @@ NoBaseSocket* NoRealListener::GetSockObjImpl(const NoString& sHost, ushort uPort
     return pClient;
 }
 
-void NoRealListener::SockError(int iErrno, const NoString& sDescription)
+void NoRealListener::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
     DEBUG(GetSockName() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
     if (iErrno == EMFILE) {
@@ -179,7 +179,7 @@ NoIncomingConnection::NoIncomingConnection(const NoString& sHostname, ushort uPo
     EnableReadLine();
 }
 
-void NoIncomingConnection::ReachedMaxBuffer()
+void NoIncomingConnection::ReachedMaxBufferImpl()
 {
     if (GetCloseType() != CLT_DONT) return; // Already closing
 
@@ -191,7 +191,7 @@ void NoIncomingConnection::ReachedMaxBuffer()
     Close();
 }
 
-void NoIncomingConnection::ReadLine(const NoString& sLine)
+void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
 {
     bool bIsHTTP = (sLine.WildCmp("GET * HTTP/1.?\r\n") || sLine.WildCmp("POST * HTTP/1.?\r\n"));
     bool bAcceptHTTP = (m_eAcceptType == NoListener::ACCEPT_ALL) || (m_eAcceptType == NoListener::ACCEPT_HTTP);
@@ -233,6 +233,6 @@ void NoIncomingConnection::ReadLine(const NoString& sLine)
     }
 
     // TODO can we somehow get rid of this?
-    pSock->ReadLine(sLine);
-    pSock->PushBuff("", 0, true);
+    pSock->ReadLineImpl(sLine);
+    pSock->PushBuffImpl("", 0, true);
 }

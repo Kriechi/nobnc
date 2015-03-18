@@ -148,15 +148,15 @@ public:
 
     bool IsCapEnabled(const NoString& sCap) const { return 1 == m_ssAcceptedCaps.count(sCap); }
 
-    void ReadLine(const NoString& sData) override;
+    void ReadLineImpl(const NoString& sData) override;
     bool SendMotd();
     void HelpUser(const NoString& sFilter = "");
     void AuthUser();
-    void Connected() override;
-    void Timeout() override;
-    void Disconnected() override;
-    void ConnectionRefused() override;
-    void ReachedMaxBuffer() override;
+    void ConnectedImpl() override;
+    void TimeoutImpl() override;
+    void DisconnectedImpl() override;
+    void ConnectionRefusedImpl() override;
+    void ReachedMaxBufferImpl() override;
 
     void SetNick(const NoString& s);
     void SetAway(bool bAway) { m_bAway = bAway; }

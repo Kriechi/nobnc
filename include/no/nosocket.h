@@ -18,12 +18,33 @@
 #define NOSOCKET_H
 
 #include <no/noglobal.h>
-#include <no/Csocket.h>
 #include <no/nothreads.h>
+#include <sys/socket.h>
 
+#ifdef HAVE_ICU
+# include <unicode/ucnv.h>
+#endif
+
+#ifdef HAVE_LIBSSL
+#include <openssl/ssl.h>
+#endif
+
+#ifdef _WIN32
+typedef SOCKET no_sock_t;
+#else
+typedef int no_sock_t;
+#endif
+
+class Csock;
+class CCron;
 class NoModule;
 
-class NO_EXPORT NoBaseSocket : private Csock
+// All existing errno codes seem to be in range 1-300
+enum {
+    errnoBadSSLCert = 12569 // TODO
+};
+
+class NO_EXPORT NoBaseSocket
 {
 public:
     NoBaseSocket(int timeout = 60);
@@ -32,40 +53,36 @@ public:
 
     Csock* GetHandle() const;
 
-    int ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const override;
-#ifdef HAVE_LIBSSL
-    int VerifyPeerCertificate(int iPreVerify, X509_STORE_CTX* pStoreCTX) override;
-    void SSLHandShakeFinished() override;
-#endif
+    NoString GetHostToVerifySSL() const;
     void SetHostToVerifySSL(const NoString& sHost);
+
     NoString GetSSLPeerFingerprint() const;
+
+    NoStringSet GetSSLTrustedPeerFingerprints() const;
     void SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs);
 
     void SetEncoding(const NoString& sEncoding);
 #ifdef HAVE_ICU
-    void IcuExtToUCallback(UConverterToUnicodeArgs* toArgs, const char* codeUnits, int32_t length, UConverterCallbackReason reason, UErrorCode* err ) override;
     virtual void IcuExtToUCallbackImpl(UConverterToUnicodeArgs* toArgs, const char* codeUnits, int32_t length, UConverterCallbackReason reason, UErrorCode* err );
-    void IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs, const UChar* codeUnits, int32_t length, UChar32 codePoint, UConverterCallbackReason reason, UErrorCode* err ) override;
     virtual void IcuExtFromUCallbackImpl(UConverterFromUnicodeArgs* fromArgs, const UChar* codeUnits, int32_t length, UChar32 codePoint, UConverterCallbackReason reason, UErrorCode* err );
 #endif
     virtual NoString GetRemoteIP() const;
 
     void SetPemLocation( const NoString & sPemFile );
-    bool Write( const char *data, size_t len ) override;
-    bool Write( const NoString & sData ) override;
+    bool Write( const char *data, size_t len );
+    bool Write( const NoString & sData );
     time_t GetTimeSinceLastDataTransaction( time_t iNow = 0 ) const;
     const NoString & GetSockName() const;
     void SetSockName( const NoString & sName );
     bool IsListener() const;
     bool IsOutbound() const;
     bool IsInbound() const;
-    bool IsConnected() const override;
+    bool IsConnected() const;
     uint16_t GetPort() const;
     const NoString & GetHostName() const;
     uint16_t GetLocalPort() const;
     uint16_t GetRemotePort() const;
     bool GetSSL() const;
-    void SockError( int iErrno, const NoString & sDescription ) override;
     void PauseRead();
     void UnPauseRead();
     NoString GetLocalIP() const;
@@ -83,42 +100,45 @@ public:
     double GetAvgRead( uint64_t iSample = 1000 ) const;
     double GetAvgWrite( uint64_t iSample = 1000 ) const;
     uint64_t GetStartTime() const;
-    bool Connect() override;
-    bool Listen( uint16_t iPort, int iMaxConns = SOMAXCONN, const NoString & sBindHost = "", uint32_t iTimeout = 0, bool bDetach = false ) override;
+    bool Connect();
+    bool Listen( uint16_t iPort, int iMaxConns = SOMAXCONN, const NoString & sBindHost = "", uint32_t iTimeout = 0, bool bDetach = false );
     void EnableReadLine();
     void DisableReadLine();
     void SetMaxBufferThreshold( uint32_t iThreshold );
-    cs_sock_t & GetRSock();
-    void SetRSock( cs_sock_t iSock );
-    cs_sock_t & GetWSock();
-    void SetWSock( cs_sock_t iSock );
-    bool ConnectFD( int iReadFD, int iWriteFD, const CS_STRING & sName, bool bIsSSL = false);
+    no_sock_t & GetRSock();
+    void SetRSock( no_sock_t iSock );
+    no_sock_t & GetWSock();
+    void SetWSock( no_sock_t iSock );
+    bool ConnectFD( int iReadFD, int iWriteFD, const NoString & sName, bool bIsSSL = false);
     enum { TMO_READ = 1, TMO_WRITE = 2, TMO_ACCEPT = 4, TMO_ALL = TMO_READ|TMO_WRITE|TMO_ACCEPT };
     void SetTimeout( int iTimeout, uint32_t iTimeoutType = TMO_ALL );
-    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
     virtual NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort);
     enum ECloseType { CLT_DONT, CLT_NOW, CLT_AFTERWRITE, CLT_DEREFERENCE };
     ECloseType GetCloseType() const;
     void Close(ECloseType type = CLT_NOW);
     NoString & GetInternalReadBuffer();
     NoString & GetInternalWriteBuffer();
-    void ReadLine( const NoString & sLine ) override;
     virtual void ReadLineImpl( const NoString & sLine);
-    void PushBuff( const char *data, size_t len, bool bStartAtZero = false ) override;
-    void AddCron( CCron * pcCron ) override;
+    virtual void ReadDataImpl(const char* data, size_t len);
+    virtual void PushBuffImpl( const char *data, size_t len, bool bStartAtZero = false );
+    void AddCron( CCron * pcCron );
     bool StartTLS();
     bool IsConOK() const;
 
-protected:
-    // All existing errno codes seem to be in range 1-300
-    enum {
-        errnoBadSSLCert = 12569,
-    };
+    virtual void ConnectedImpl();
+    virtual void TimeoutImpl();
+    virtual void DisconnectedImpl();
+    virtual void ConnectionRefusedImpl();
+
+    virtual void ReadPausedImpl();
+    virtual void ReachedMaxBufferImpl();
+    virtual void SockErrorImpl(int iErrno, const NoString& sDescription);
+    virtual bool ConnectionFromImpl(const NoString& sHost, ushort uPort);
 
 private:
+    Csock* m_csock;
     NoString m_HostToVerifySSL;
     NoStringSet m_ssTrustedFingerprints;
-    NoStringSet m_ssCertVerificationErrors;
 };
 
 /**
@@ -156,12 +176,12 @@ public:
     using NoBaseSocket::Listen;
 
     //! This defaults to closing the socket, feel free to override
-    void ReachedMaxBuffer() override;
-    void SockError(int iErrno, const NoString& sDescription) override;
+    void ReachedMaxBufferImpl() override;
+    void SockErrorImpl(int iErrno, const NoString& sDescription) override;
 
     //! This limits the global connections from this IP to defeat DoS attacks, feel free to override. The ACL used is
     // provided by the main interface @see NoApp::AllowConnectionFrom
-    bool ConnectionFrom(const NoString& sHost, ushort uPort) override;
+    bool ConnectionFromImpl(const NoString& sHost, ushort uPort) override;
 
     //! Ease of use Connect, assigns to the manager and is subsequently tracked
     bool Connect(const NoString& sHostname, ushort uPort, bool bSSL = false, uint uTimeout = 60);

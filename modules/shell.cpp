@@ -35,7 +35,7 @@ public:
         if (Execute(sExec) == -1) {
             NoString s = "Failed to execute: ";
             s += strerror(errno);
-            ReadLine(s);
+            ReadLineImpl(s);
             return;
         }
 
@@ -45,8 +45,8 @@ public:
         SetWSock(open("/dev/null", O_WRONLY));
     }
     // These next two function's bodies are at the bottom of the file since they reference NoShellMod
-    void ReadLine(const NoString& sData) override;
-    void Disconnected() override;
+    void ReadLineImpl(const NoString& sData) override;
+    void DisconnectedImpl() override;
 
     NoShellMod* m_pParent;
 
@@ -122,7 +122,7 @@ private:
     NoString m_sPath;
 };
 
-void NoShellSock::ReadLine(const NoString& sData)
+void NoShellSock::ReadLineImpl(const NoString& sData)
 {
     NoString sLine = sData;
 
@@ -134,12 +134,12 @@ void NoShellSock::ReadLine(const NoString& sData)
     m_pParent->SetClient(nullptr);
 }
 
-void NoShellSock::Disconnected()
+void NoShellSock::DisconnectedImpl()
 {
     // If there is some incomplete line in the buffer, read it
     // (e.g. echo echo -n "hi" triggered this)
     NoString& sBuffer = GetInternalReadBuffer();
-    if (!sBuffer.empty()) ReadLine(sBuffer);
+    if (!sBuffer.empty()) ReadLineImpl(sBuffer);
 
     m_pParent->SetClient(m_pClient);
     m_pParent->PutShell("znc$");

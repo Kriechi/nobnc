@@ -46,7 +46,7 @@ void NoHttpSock::Init()
 
 NoHttpSock::~NoHttpSock() {}
 
-void NoHttpSock::ReadData(const char* data, size_t len)
+void NoHttpSock::ReadDataImpl(const char* data, size_t len)
 {
     if (!m_bDone && m_bGotHeader && m_bPost) {
         m_sPostData.append(data, len);
@@ -82,7 +82,7 @@ void NoHttpSock::CheckPost()
     }
 }
 
-void NoHttpSock::ReadLine(const NoString& sData)
+void NoHttpSock::ReadLineImpl(const NoString& sData)
 {
     if (m_bGotHeader) {
         return;
@@ -726,4 +726,4 @@ bool NoHttpSock::Redirect(const NoString& sURL)
     }
 }
 
-void NoHttpSock::Connected() { SetTimeout(120); }
+void NoHttpSock::ConnectedImpl() { SetTimeout(120); }

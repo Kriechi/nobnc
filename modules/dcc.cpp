@@ -28,12 +28,12 @@ public:
     NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sLocalFile, ulong uFileSize);
     virtual ~NoDccSock();
 
-    void ReadData(const char* data, size_t len) override;
-    void ConnectionRefused() override;
-    void SockError(int iErrno, const NoString& sDescription) override;
-    void Timeout() override;
-    void Connected() override;
-    void Disconnected() override;
+    void ReadDataImpl(const char* data, size_t len) override;
+    void ConnectionRefusedImpl() override;
+    void SockErrorImpl(int iErrno, const NoString& sDescription) override;
+    void TimeoutImpl() override;
+    void ConnectedImpl() override;
+    void DisconnectedImpl() override;
     void SendPacket();
     NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
     NoFile* OpenFile(bool bWrite = true);
@@ -309,7 +309,7 @@ NoDccSock::~NoDccSock()
     }
 }
 
-void NoDccSock::ReadData(const char* data, size_t len)
+void NoDccSock::ReadDataImpl(const char* data, size_t len)
 {
     if (!m_pFile) {
         DEBUG("File not open! closing get.");
@@ -348,27 +348,27 @@ void NoDccSock::ReadData(const char* data, size_t len)
     }
 }
 
-void NoDccSock::ConnectionRefused()
+void NoDccSock::ConnectionRefusedImpl()
 {
     DEBUG(GetSockName() << " == ConnectionRefused()");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Connection Refused.");
 }
 
-void NoDccSock::Timeout()
+void NoDccSock::TimeoutImpl()
 {
     DEBUG(GetSockName() << " == Timeout()");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - Timed Out.");
 }
 
-void NoDccSock::SockError(int iErrno, const NoString& sDescription)
+void NoDccSock::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
     DEBUG(GetSockName() << " == SockError(" << iErrno << ", " << sDescription << ")");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Socket Error [" + sDescription + "]");
 }
 
-void NoDccSock::Connected()
+void NoDccSock::ConnectedImpl()
 {
     DEBUG(GetSockName() << " == Connected(" << GetRemoteIP() << ")");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
@@ -381,7 +381,7 @@ void NoDccSock::Connected()
     SetTimeout(120);
 }
 
-void NoDccSock::Disconnected()
+void NoDccSock::DisconnectedImpl()
 {
     const NoString sStart = ((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - ";
 

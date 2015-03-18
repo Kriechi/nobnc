@@ -30,9 +30,9 @@ public:
     NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort, int iTimeout = 60);
     virtual ~NoHttpSock();
 
-    void ReadData(const char* data, size_t len) override;
-    void ReadLine(const NoString& sData) override;
-    void Connected() override;
+    void ReadDataImpl(const char* data, size_t len) override;
+    void ReadLineImpl(const NoString& sData) override;
+    void ConnectedImpl() override;
     NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override = 0;
 
     virtual bool ForceLogin();
