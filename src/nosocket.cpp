@@ -242,6 +242,7 @@ bool NoBaseSocket::Write( const char *data, size_t len ) { return m_csock->Write
 bool NoBaseSocket::Write( const NoString & sData ) { return m_csock->Write(sData); }
 time_t NoBaseSocket::GetTimeSinceLastDataTransaction( time_t iNow ) const { return m_csock->GetTimeSinceLastDataTransaction(iNow); }
 const NoString & NoBaseSocket::GetSockName() const { return m_csock->GetSockName(); }
+const NoString & NoBaseSocket::GetBindHost() const { return m_csock->GetBindHost(); }
 void NoBaseSocket::SetSockName( const NoString & sName ) { m_csock->SetSockName(sName); }
 bool NoBaseSocket::IsListener() const { return m_csock->GetType() == Csock::LISTENER; }
 bool NoBaseSocket::IsOutbound() const { return m_csock->GetType() == Csock::OUTBOUND; }
