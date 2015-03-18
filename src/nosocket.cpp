@@ -68,6 +68,10 @@ NoBaseSocket::NoBaseSocket(const NoString& sHost, u_short port, int timeout)
 #endif
 }
 
+NoBaseSocket::~NoBaseSocket()
+{
+}
+
 Csock* NoBaseSocket::GetHandle() const
 {
     return const_cast<NoBaseSocket*>(this);
@@ -158,6 +162,106 @@ void NoBaseSocket::SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs)
 {
     m_ssTrustedFingerprints = ssFPs;
 }
+
+void NoBaseSocket::SetEncoding(const NoString& sEncoding)
+{
+#ifdef HAVE_ICU
+    Csock::SetEncoding(sEncoding);
+#endif
+}
+#ifdef HAVE_ICU
+void NoBaseSocket::IcuExtToUCallback(UConverterToUnicodeArgs* toArgs, const char* codeUnits, int32_t length, UConverterCallbackReason reason, UErrorCode* err )
+{
+    IcuExtToUCallbackImpl(toArgs, codeUnits, length, reason, err);
+}
+void NoBaseSocket::IcuExtToUCallbackImpl(UConverterToUnicodeArgs* toArgs, const char* codeUnits, int32_t length, UConverterCallbackReason reason, UErrorCode* err )
+{
+    Csock::IcuExtToUCallback(toArgs, codeUnits, length, reason, err);
+}
+void NoBaseSocket::IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs, const UChar* codeUnits, int32_t length, UChar32 codePoint, UConverterCallbackReason reason, UErrorCode* err )
+{
+    IcuExtFromUCallbackImpl(fromArgs, codeUnits, length, codePoint, reason, err);
+}
+void NoBaseSocket::IcuExtFromUCallbackImpl(UConverterFromUnicodeArgs* fromArgs, const UChar* codeUnits, int32_t length, UChar32 codePoint, UConverterCallbackReason reason, UErrorCode* err )
+{
+    Csock::IcuExtFromUCallback(fromArgs, codeUnits, length, codePoint, reason, err);
+}
+#endif
+NoString NoBaseSocket::GetRemoteIP() const { return Csock::GetRemoteIP(); }
+
+void NoBaseSocket::SetPemLocation( const NoString & sPemFile ) { Csock::SetPemLocation(sPemFile); }
+bool NoBaseSocket::Write( const char *data, size_t len ) { return Csock::Write(data, len); }
+bool NoBaseSocket::Write( const NoString & sData ) { return Csock::Write(sData); }
+time_t NoBaseSocket::GetTimeSinceLastDataTransaction( time_t iNow ) const { return Csock::GetTimeSinceLastDataTransaction(iNow); }
+const NoString & NoBaseSocket::GetSockName() const { return Csock::GetSockName(); }
+void NoBaseSocket::SetSockName( const NoString & sName ) { Csock::SetSockName(sName); }
+bool NoBaseSocket::IsListener() const { return Csock::GetType() == Csock::LISTENER; }
+bool NoBaseSocket::IsOutbound() const { return Csock::GetType() == Csock::OUTBOUND; }
+bool NoBaseSocket::IsInbound() const { return Csock::GetType() == Csock::INBOUND; }
+bool NoBaseSocket::IsConnected() const { return Csock::IsConnected(); }
+uint16_t NoBaseSocket::GetPort() const { return Csock::GetPort(); }
+const NoString & NoBaseSocket::GetHostName() const { return Csock::GetHostName(); }
+uint16_t NoBaseSocket::GetLocalPort() const { return Csock::GetLocalPort(); }
+uint16_t NoBaseSocket::GetRemotePort() const { return Csock::GetRemotePort(); }
+bool NoBaseSocket::GetSSL() const { return Csock::GetSSL(); }
+void NoBaseSocket::SockError( int iErrno, const NoString & sDescription ) { Csock::SockError(iErrno, sDescription); }
+void NoBaseSocket::PauseRead() { Csock::PauseRead(); }
+void NoBaseSocket::UnPauseRead() { Csock::UnPauseRead(); }
+NoString NoBaseSocket::GetLocalIP() const { return Csock::GetLocalIP(); }
+#ifdef HAVE_LIBSSL
+void NoBaseSocket::SetCipher( const NoString & sCipher ) { Csock::SetCipher(sCipher); }
+long NoBaseSocket::GetPeerFingerprint( NoString & sFP ) const { return Csock::GetPeerFingerprint(sFP); }
+void NoBaseSocket::SetRequireClientCertFlags( uint32_t iRequireClientCertFlags ) { Csock::SetRequireClientCertFlags(iRequireClientCertFlags); }
+SSL_SESSION * NoBaseSocket::GetSSLSession() const { return Csock::GetSSLSession(); }
+X509 *NoBaseSocket::GetX509() const { return Csock::GetX509(); }
+#endif
+uint64_t NoBaseSocket::GetBytesRead() const { return Csock::GetBytesRead(); }
+void NoBaseSocket::ResetBytesRead() { Csock::ResetBytesRead(); }
+uint64_t NoBaseSocket::GetBytesWritten() const { return Csock::GetBytesWritten(); }
+void NoBaseSocket::ResetBytesWritten() { Csock::ResetBytesWritten(); }
+double NoBaseSocket::GetAvgRead( uint64_t iSample ) const { return Csock::GetAvgRead(iSample); }
+double NoBaseSocket::GetAvgWrite( uint64_t iSample ) const { return Csock::GetAvgWrite(iSample); }
+uint64_t NoBaseSocket::GetStartTime() const { return Csock::GetStartTime(); }
+bool NoBaseSocket::Connect() { return Csock::Connect(); }
+bool NoBaseSocket::Listen( uint16_t iPort, int iMaxConns, const NoString & sBindHost, uint32_t iTimeout, bool bDetach )
+{
+    return Csock::Listen(iPort, iMaxConns, sBindHost, iTimeout, bDetach);
+}
+void NoBaseSocket::EnableReadLine() { Csock::EnableReadLine(); }
+void NoBaseSocket::DisableReadLine() { Csock::DisableReadLine(); }
+void NoBaseSocket::SetMaxBufferThreshold( uint32_t iThreshold ) { Csock::SetMaxBufferThreshold(iThreshold); }
+cs_sock_t & NoBaseSocket::GetRSock() { return Csock::GetRSock(); }
+void NoBaseSocket::SetRSock( cs_sock_t iSock ) { Csock::SetRSock(iSock); }
+cs_sock_t & NoBaseSocket::GetWSock() { return Csock::GetWSock(); }
+void NoBaseSocket::SetWSock( cs_sock_t iSock ) { Csock::SetWSock(iSock); }
+bool NoBaseSocket::ConnectFD( int iReadFD, int iWriteFD, const CS_STRING & sName, bool bIsSSL)
+{
+    return Csock::ConnectFD(iReadFD, iWriteFD, sName, bIsSSL, INBOUND);
+}
+void NoBaseSocket::SetTimeout( int iTimeout, uint32_t iTimeoutType ) { Csock::SetTimeout(iTimeout, iTimeoutType); }
+
+Csock* NoBaseSocket::GetSockObj(const NoString& sHost, ushort uPort)
+{
+    NoBaseSocket* sockObj = GetSockObjImpl(sHost, uPort);
+    if (sockObj)
+        return sockObj->GetHandle();
+    return Csock::GetSockObj(sHost, uPort);
+}
+NoBaseSocket* NoBaseSocket::GetSockObjImpl(const NoString& sHost, ushort uPort) { return nullptr; }
+
+NoBaseSocket::ECloseType NoBaseSocket::GetCloseType() const { return static_cast<ECloseType>(Csock::GetCloseType()); }
+void NoBaseSocket::Close(ECloseType type) { Csock::Close(static_cast<Csock::ECloseType>(type)); }
+NoString & NoBaseSocket::GetInternalReadBuffer() { return Csock::GetInternalReadBuffer(); }
+NoString & NoBaseSocket::GetInternalWriteBuffer() { return Csock::GetInternalWriteBuffer(); }
+void NoBaseSocket::ReadLine( const NoString & sLine ) { ReadLineImpl(sLine); }
+void NoBaseSocket::ReadLineImpl( const NoString & sLine) { }
+void NoBaseSocket::PushBuff( const char *data, size_t len, bool bStartAtZero )
+{
+    Csock::PushBuff(data, len, bStartAtZero);
+}
+void NoBaseSocket::AddCron( CCron * pcCron ) { Csock::AddCron(pcCron); }
+bool NoBaseSocket::StartTLS() { return Csock::StartTLS(); }
+bool NoBaseSocket::IsConOK() const { return GetConState() == CST_OK; }
 
 /////////////////// NoSocket ///////////////////
 NoSocket::NoSocket(NoModule* pModule) : NoBaseSocket(), m_pModule(pModule)
