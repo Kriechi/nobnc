@@ -57,10 +57,8 @@ void NoHttpSock::ReadData(const char* data, size_t len)
 bool NoHttpSock::SendCookie(const NoString& sKey, const NoString& sValue)
 {
     if (!sKey.empty() && !sValue.empty()) {
-        if (m_msRequestCookies.find(sKey) == m_msRequestCookies.end() || m_msRequestCookies[sKey].StrCmp(sValue) != 0) {
-            // only queue a Set-Cookie to be sent if the client didn't send a Cookie header of the same name+value.
-            m_msResponseCookies[sKey] = sValue;
-        }
+        // only queue a Set-Cookie to be sent if the client didn't send a Cookie header of the same name+value.
+        m_msResponseCookies[sKey] = sValue;
         return true;
     }
 

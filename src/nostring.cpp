@@ -171,38 +171,17 @@ uchar* NoString::strnchr(const uchar* src, uchar c, uint iMaxBytes, uchar* pFill
     return nullptr;
 }
 
-int NoString::CaseCmp(const NoString& s, NoString::size_type uLen) const
+int NoString::Compare(const NoString& s, CaseSensitivity cs) const
 {
-    if (uLen != NoString::npos) {
-        return strncasecmp(c_str(), s.c_str(), uLen);
-    }
-    return strcasecmp(c_str(), s.c_str());
-}
-
-int NoString::StrCmp(const NoString& s, NoString::size_type uLen) const
-{
-    if (uLen != NoString::npos) {
-        return strncmp(c_str(), s.c_str(), uLen);
-    }
-    return strcmp(c_str(), s.c_str());
+    if (cs == CaseSensitive)
+        return strcmp(c_str(), s.c_str());
+    else
+        return strcasecmp(c_str(), s.c_str());
 }
 
 bool NoString::Equals(const NoString& s, CaseSensitivity cs) const
 {
-    if (cs == CaseSensitive) {
-        return (StrCmp(s) == 0);
-    } else {
-        return (CaseCmp(s) == 0);
-    }
-}
-
-bool NoString::Equals(const NoString& s, bool bCaseSensitive, NoString::size_type uLen) const
-{
-    if (bCaseSensitive) {
-        return (StrCmp(s, uLen) == 0);
-    } else {
-        return (CaseCmp(s, uLen) == 0);
-    }
+    return Compare(s, cs) == 0;
 }
 
 bool NoString::WildCmp(const NoString& sWild, const NoString& sString, CaseSensitivity cs)

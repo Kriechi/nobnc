@@ -114,21 +114,14 @@ public:
     }
 
     /**
-     * Compare this string caselessly to some other string.
+     * Compare this string to some other string.
      * @param s The string to compare to.
-     * @param uLen The number of characters to compare.
+     * @param cs CaseSensitive if you want the comparison to be case
+     *                       sensitive, CaseInsensitive (default) otherwise.
      * @return An integer less than, equal to, or greater than zero if this
      *         string smaller, equal.... to the given string.
      */
-    int CaseCmp(const NoString& s, NoString::size_type uLen = NoString::npos) const;
-    /**
-     * Compare this string case sensitively to some other string.
-     * @param s The string to compare to.
-     * @param uLen The number of characters to compare.
-     * @return An integer less than, equal to, or greater than zero if this
-     *         string smaller, equal.... to the given string.
-     */
-    int StrCmp(const NoString& s, NoString::size_type uLen = NoString::npos) const;
+    int Compare(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
     /**
      * Check if this string is equal to some other string.
      * @param s The string to compare to.
@@ -137,10 +130,6 @@ public:
      * @return True if the strings are equal.
      */
     bool Equals(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
-    /**
-     * @deprecated
-     */
-    bool Equals(const NoString& s, bool bCaseSensitive, NoString::size_type uLen = NoString::npos) const;
     /**
      * Do a wildcard comparison between two strings.
      * For example, the following returns true:

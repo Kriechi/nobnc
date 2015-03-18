@@ -44,12 +44,12 @@ public:
         if (bHisEmpty && !bMyEmpty) return true;
 
         if (!bMyEmpty && !bHisEmpty) {
-            int c = sMyName2.StrCmp(sHisName2);
+            int c = sMyName2.Compare(sHisName2, NoString::CaseSensitive);
             if (c < 0) return false;
             if (c > 0) return true;
         }
         // and finally sort by the whole socket name
-        return sMyName.StrCmp(sHisName) > 0;
+        return sMyName.Compare(sHisName, NoString::CaseSensitive) > 0;
     }
     Csock* GetSock() const { return m_pSock; }
 
