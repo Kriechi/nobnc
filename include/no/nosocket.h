@@ -106,60 +106,6 @@ public:
                  NoBaseSocket* pcSock = nullptr);
 
     uint GetAnonConnectionCount(const NoString& sIP) const;
-
-private:
-    void FinishConnect(const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoBaseSocket* pcSock);
-
-    class NoDnsMonitorFD;
-    friend class NoDnsMonitorFD;
-#ifdef HAVE_THREADED_DNS
-    struct NoDnsTask
-    {
-        NoDnsTask()
-            : sHostname(""), iPort(0), sSockName(""), iTimeout(0), bSSL(false), sBindhost(""), pcSock(nullptr),
-              bDoneTarget(false), bDoneBind(false), aiTarget(nullptr), aiBind(nullptr)
-        {
-        }
-
-        NoDnsTask(const NoDnsTask&) = delete;
-        NoDnsTask& operator=(const NoDnsTask&) = delete;
-
-        NoString sHostname;
-        u_short iPort;
-        NoString sSockName;
-        int iTimeout;
-        bool bSSL;
-        NoString sBindhost;
-        NoBaseSocket* pcSock;
-
-        bool bDoneTarget;
-        bool bDoneBind;
-        addrinfo* aiTarget;
-        addrinfo* aiBind;
-    };
-    class NoDnsJob : public NoJob
-    {
-    public:
-        NoDnsJob() : sHostname(""), task(nullptr), pManager(nullptr), bBind(false), iRes(0), aiResult(nullptr) {}
-
-        NoDnsJob(const NoDnsJob&) = delete;
-        NoDnsJob& operator=(const NoDnsJob&) = delete;
-
-        NoString sHostname;
-        NoDnsTask* task;
-        NoSocketManager* pManager;
-        bool bBind;
-
-        int iRes;
-        addrinfo* aiResult;
-
-        void runThread() override;
-        void runMain() override;
-    };
-    void StartTDNSThread(NoDnsTask* task, bool bBind);
-    void SetTDNSThreadFinished(NoDnsTask* task, bool bBind, addrinfo* aiResult);
-    static void* TDNSThread(void* argument);
-#endif
 };
 
 /**

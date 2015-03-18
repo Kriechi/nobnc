@@ -46,6 +46,57 @@ static NoString ZNC_DefaultCipher()
 }
 #endif
 
+#ifdef HAVE_THREADED_DNS
+struct NoDnsTask
+{
+    NoDnsTask()
+        : sHostname(""), iPort(0), sSockName(""), iTimeout(0), bSSL(false), sBindhost(""), pcSock(nullptr),
+          bDoneTarget(false), bDoneBind(false), aiTarget(nullptr), aiBind(nullptr)
+    {
+    }
+
+    NoDnsTask(const NoDnsTask&) = delete;
+    NoDnsTask& operator=(const NoDnsTask&) = delete;
+
+    NoString sHostname;
+    u_short iPort;
+    NoString sSockName;
+    int iTimeout;
+    bool bSSL;
+    NoString sBindhost;
+    NoBaseSocket* pcSock;
+
+    bool bDoneTarget;
+    bool bDoneBind;
+    addrinfo* aiTarget;
+    addrinfo* aiBind;
+};
+class NoDnsJob : public NoJob
+{
+public:
+    NoDnsJob() : sHostname(""), task(nullptr), pManager(nullptr), bBind(false), iRes(0), aiResult(nullptr) {}
+
+    NoDnsJob(const NoDnsJob&) = delete;
+    NoDnsJob& operator=(const NoDnsJob&) = delete;
+
+    NoString sHostname;
+    NoDnsTask* task;
+    NoSocketManager* pManager;
+    bool bBind;
+
+    int iRes;
+    addrinfo* aiResult;
+
+    void runThread() override;
+    void runMain() override;
+};
+
+static void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind);
+static void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind, addrinfo* aiResult);
+static void* TDNSThread(void* argument);
+static void FinishConnect(NoSocketManager* manager, const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoBaseSocket* pcSock);
+#endif
+
 NoBaseSocket::NoBaseSocket(int timeout)
     : Csock(timeout), m_HostToVerifySSL(""), m_ssTrustedFingerprints(), m_ssCertVerificationErrors()
 {
@@ -177,10 +228,10 @@ void NoBaseSocket::SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs)
 }
 
 #ifdef HAVE_PTHREAD
-class NoSocketManager::NoDnsMonitorFD : public CSMonitorFD
+class NoDnsMonitorFD : public CSMonitorFD
 {
 public:
-    NoDnsMonitorFD() { Add(NoThreadPool::Get().getReadFD(), ECT_Read); }
+    NoDnsMonitorFD() { Add(NoThreadPool::Get().getReadFD(), NoSocketManager::ECT_Read); }
 
     bool FDsThatTriggered(const std::map<int, short>& miiReadyFds) override
     {
@@ -193,7 +244,7 @@ public:
 #endif
 
 #ifdef HAVE_THREADED_DNS
-void NoSocketManager::NoDnsJob::runThread()
+void NoDnsJob::runThread()
 {
     int iCount = 0;
     while (true) {
@@ -217,7 +268,7 @@ void NoSocketManager::NoDnsJob::runThread()
     }
 }
 
-void NoSocketManager::NoDnsJob::runMain()
+void NoDnsJob::runMain()
 {
     if (0 != this->iRes) {
         DEBUG("Error in threaded DNS: " << gai_strerror(this->iRes));
@@ -226,17 +277,17 @@ void NoSocketManager::NoDnsJob::runMain()
         }
         this->aiResult = nullptr; // just for case. Maybe to call freeaddrinfo()?
     }
-    pManager->SetTDNSThreadFinished(this->task, this->bBind, this->aiResult);
+    SetTDNSThreadFinished(this->pManager, this->task, this->bBind, this->aiResult);
 }
 
-void NoSocketManager::StartTDNSThread(NoDnsTask* task, bool bBind)
+void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind)
 {
     NoString sHostname = bBind ? task->sBindhost : task->sHostname;
     NoDnsJob* arg = new NoDnsJob;
     arg->sHostname = sHostname;
     arg->task = task;
     arg->bBind = bBind;
-    arg->pManager = this;
+    arg->pManager = manager;
 
     NoThreadPool::Get().addJob(arg);
 }
@@ -267,7 +318,7 @@ static std::tuple<NoString, bool> RandomFrom2SetsWithBias(const NoStringSet& ss4
     return std::make_tuple(RandomFromSet(sSet, gen), bUseIPv6);
 }
 
-void NoSocketManager::SetTDNSThreadFinished(NoDnsTask* task, bool bBind, addrinfo* aiResult)
+void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind, addrinfo* aiResult)
 {
     if (bBind) {
         task->aiBind = aiResult;
@@ -357,7 +408,7 @@ void NoSocketManager::SetTDNSThreadFinished(NoDnsTask* task, bool bBind, addrinf
         }
 
         DEBUG("TDNS: " << task->sSockName << ", connecting to [" << sTargetHost << "] using bindhost [" << sBindhost << "]");
-        FinishConnect(sTargetHost, task->iPort, task->sSockName, task->iTimeout, task->bSSL, sBindhost, task->pcSock);
+        FinishConnect(manager, sTargetHost, task->iPort, task->sSockName, task->iTimeout, task->bSSL, sBindhost, task->pcSock);
     } catch (const char* s) {
         DEBUG(task->sSockName << ", dns resolving error: " << s);
         task->pcSock->SetSockName(task->sSockName);
@@ -487,16 +538,16 @@ void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const No
     if (sBindHost.empty()) {
         task->bDoneBind = true;
     } else {
-        StartTDNSThread(task, true);
+        StartTDNSThread(this, task, true);
     }
-    StartTDNSThread(task, false);
+    StartTDNSThread(this, task, false);
 #else /* HAVE_THREADED_DNS */
     // Just let Csocket handle DNS itself
-    FinishConnect(sHostname, iPort, sSockName, iTimeout, bSSL, sBindHost, pcSock);
+    FinishConnect(this, sHostname, iPort, sSockName, iTimeout, bSSL, sBindHost, pcSock);
 #endif
 }
 
-void NoSocketManager::FinishConnect(const NoString& sHostname,
+void FinishConnect(NoSocketManager* manager, const NoString& sHostname,
                                  u_short iPort,
                                  const NoString& sSockName,
                                  int iTimeout,
@@ -517,7 +568,7 @@ void NoSocketManager::FinishConnect(const NoString& sHostname,
     C.SetCipher(sCipher);
 #endif
 
-    TSocketManager<NoBaseSocket>::Connect(C, pcSock);
+    manager->TSocketManager<NoBaseSocket>::Connect(C, pcSock);
 }
 
 
