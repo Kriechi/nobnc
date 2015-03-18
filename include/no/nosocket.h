@@ -59,7 +59,7 @@ private:
 
 enum EAddrType { ADDR_IPV4ONLY, ADDR_IPV6ONLY, ADDR_ALL };
 
-class NO_EXPORT NoSocketManager : public TSocketManager<NoBaseSocket>
+class NO_EXPORT NoSocketManager : private TSocketManager<NoBaseSocket>
 {
 public:
     NoSocketManager();
@@ -105,7 +105,18 @@ public:
                  const NoString& sBindHost = "",
                  NoBaseSocket* pcSock = nullptr);
 
+    std::vector<Csock*> GetSockets() const;
+    std::vector<Csock*> FindSocksByName(const NoString& sName);
     uint GetAnonConnectionCount(const NoString& sIP) const;
+
+    void Cleanup();
+    void DynamicSelectLoop( uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution = 3600 );
+    void AddSock(Csock* pcSock, const NoString& sSockName);
+    void DelSockByAddr(Csock* socket);
+    bool SwapSockByAddr(Csock* newSocket, Csock* originalSocket);
+    void AddCron(CCron* cron);
+    void DelCronByAddr(CCron* cron);
+    void DoConnect(const CSConnection& cCon, Csock* pcSock = NULL);
 };
 
 /**

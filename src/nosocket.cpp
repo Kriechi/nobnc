@@ -122,6 +122,16 @@ NoBaseSocket::NoBaseSocket(const NoString& sHost, u_short port, int timeout)
 #endif
 }
 
+std::vector<Csock*> NoSocketManager::GetSockets() const
+{
+    return *this;
+}
+
+std::vector<Csock*> NoSocketManager::FindSocksByName(const NoString& sName)
+{
+    return TSocketManager::FindSocksByName(sName);
+}
+
 uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
 {
     const_iterator it;
@@ -139,6 +149,46 @@ uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
     DEBUG("There are [" << ret << "] clients from [" << sIP << "]");
 
     return ret;
+}
+
+void NoSocketManager::Cleanup()
+{
+    TSocketManager::Cleanup();
+}
+
+void NoSocketManager::DynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution)
+{
+    TSocketManager::DynamicSelectLoop(iLowerBounds, iUpperBounds, iMaxResolution);
+}
+
+void NoSocketManager::AddSock(Csock* pcSock, const NoString& sSockName)
+{
+    TSocketManager::AddSock(pcSock, sSockName);
+}
+
+void NoSocketManager::DelSockByAddr(Csock* socket)
+{
+    TSocketManager::DelSockByAddr(socket);
+}
+
+bool NoSocketManager::SwapSockByAddr(Csock* newSocket, Csock* originalSocket)
+{
+    return TSocketManager::SwapSockByAddr(newSocket, originalSocket);
+}
+
+void NoSocketManager::AddCron(CCron* cron)
+{
+    TSocketManager::AddCron(cron);
+}
+
+void NoSocketManager::DelCronByAddr(CCron* cron)
+{
+    TSocketManager::DelCronByAddr(cron);
+}
+
+void NoSocketManager::DoConnect(const CSConnection& cCon, Csock* pcSock)
+{
+    TSocketManager::Connect(cCon, pcSock);
 }
 
 int NoBaseSocket::ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const
@@ -231,7 +281,7 @@ void NoBaseSocket::SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs)
 class NoDnsMonitorFD : public CSMonitorFD
 {
 public:
-    NoDnsMonitorFD() { Add(NoThreadPool::Get().getReadFD(), NoSocketManager::ECT_Read); }
+    NoDnsMonitorFD() { Add(NoThreadPool::Get().getReadFD(), CSocketManager::ECT_Read); }
 
     bool FDsThatTriggered(const std::map<int, short>& miiReadyFds) override
     {
@@ -568,7 +618,7 @@ void FinishConnect(NoSocketManager* manager, const NoString& sHostname,
     C.SetCipher(sCipher);
 #endif
 
-    manager->TSocketManager<NoBaseSocket>::Connect(C, pcSock);
+    manager->DoConnect(C, pcSock);
 }
 
 

@@ -1871,7 +1871,7 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
         uiUsers_out += it.second->BytesWritten();
     }
 
-    for (Csock* pSock : m_Manager) {
+    for (Csock* pSock : m_Manager.GetSockets()) {
         NoUser* pUser = nullptr;
         if (pSock->GetSockName().Left(5) == "IRC::") {
             pUser = ((NoIrcSock*)pSock)->GetNetwork()->GetUser();
