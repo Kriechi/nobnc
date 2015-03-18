@@ -31,10 +31,10 @@
 #define _NAMEDFMT(s) NoString(s).Escape_n(NoString::ENAMEDFMT)
 
 class NoString;
-class NoStringMap;
 
 typedef std::set<NoString> NoStringSet;
 typedef std::vector<NoString> NoStringVector;
+typedef std::map<NoString, NoString> NoStringMap;
 typedef std::vector<std::pair<NoString, NoString>> NoStringPairVector;
 
 enum class CaseSensitivity { CaseInsensitive, CaseSensitive };
@@ -547,23 +547,6 @@ private:
                            uint iMaxBytes,
                            uchar* pFill = nullptr,
                            uint* piCount = nullptr) const;
-};
-
-/**
- * @brief A dictionary for strings.
- *
- * This class maps strings to other strings.
- */
-class NO_EXPORT NoStringMap : public std::map<NoString, NoString>
-{
-public:
-    /** Construct an empty NoStringMap. */
-    NoStringMap() : std::map<NoString, NoString>() {}
-    /** Destruct this NoStringMap. */
-    virtual ~NoStringMap() { clear(); }
-
-    /** A static instance of an empty map. */
-    static const NoStringMap EmptyMap;
 };
 
 #endif // NOSTRING_H

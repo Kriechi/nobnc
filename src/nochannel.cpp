@@ -599,7 +599,7 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                 size_t uSize = Buffer.size();
                 for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
                     const NoMessage& BufLine = Buffer.getMessage(uIdx);
-                    NoString sLine = BufLine.GetLine(*pUseClient, NoStringMap::EmptyMap);
+                    NoString sLine = BufLine.GetLine(*pUseClient, NoStringMap());
                     if (bBatch) {
                         NoStringMap msBatchTags = NoUtils::GetMessageTags(sLine);
                         msBatchTags["batch"] = sBatchName;

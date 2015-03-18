@@ -543,7 +543,7 @@ NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
         }
         return mssTags;
     }
-    return NoStringMap::EmptyMap;
+    return NoStringMap();
 }
 
 void NoUtils::SetMessageTags(NoString& sLine, const NoStringMap& mssTags)

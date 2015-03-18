@@ -15,7 +15,6 @@
  */
 
 #include "nostring.h"
-#include "nofile.h"
 #include <sstream>
 
 static const uchar XX = 0xff;
@@ -1464,6 +1463,3 @@ NoString& NoString::StripControls()
 {
     return (*this = StripControls_n());
 }
-
-//////////////// NoStringMap ////////////////
-const NoStringMap NoStringMap::EmptyMap;
