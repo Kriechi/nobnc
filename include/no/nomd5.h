@@ -6,13 +6,8 @@
 #include <no/noglobal.h>
 #include <string>
 
-#ifndef uint8
-#define uint8 uchar
-#endif
-
-#ifndef uint32
-#define uint32 unsigned long int
-#endif
+typedef unsigned char uint8;
+typedef unsigned int uint32;
 
 typedef struct
 {
