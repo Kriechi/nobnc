@@ -88,6 +88,17 @@ public:
      * @see ReadFilter.
      */
     static status_t ReadFromDisk(NoStringMap& values, const NoString& sPath);
+
+    /** Pretty-print a number of bytes.
+     * @param d The number of bytes.
+     * @return A string describing the number of bytes.
+     */
+    static NoString ToByteStr(ulonglong d);
+    /** Pretty-print a time span.
+     * @param s Number of seconds to print.
+     * @return A string like "4w 6d 4h 3m 58s".
+     */
+    static NoString ToTimeStr(ulong s);
 };
 
 #endif // NOUTILS_H

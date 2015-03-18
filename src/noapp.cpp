@@ -135,7 +135,7 @@ NoString NoApp::GetCompileOptionsString()
 NoString NoApp::GetUptime() const
 {
     time_t now = time(nullptr);
-    return NoString::ToTimeStr(now - TimeStarted());
+    return NoUtils::ToTimeStr(now - TimeStarted());
 }
 
 bool NoApp::OnBoot()

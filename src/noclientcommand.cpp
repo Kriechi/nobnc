@@ -1495,28 +1495,28 @@ void NoClient::UserCommand(NoString& sLine)
         for (const auto& it : traffic) {
             Table.AddRow();
             Table.SetCell("Username", it.first);
-            Table.SetCell("In", NoString::ToByteStr(it.second.first));
-            Table.SetCell("Out", NoString::ToByteStr(it.second.second));
-            Table.SetCell("Total", NoString::ToByteStr(it.second.first + it.second.second));
+            Table.SetCell("In", NoUtils::ToByteStr(it.second.first));
+            Table.SetCell("Out", NoUtils::ToByteStr(it.second.second));
+            Table.SetCell("Total", NoUtils::ToByteStr(it.second.first + it.second.second));
         }
 
         Table.AddRow();
         Table.SetCell("Username", "<Users>");
-        Table.SetCell("In", NoString::ToByteStr(Users.first));
-        Table.SetCell("Out", NoString::ToByteStr(Users.second));
-        Table.SetCell("Total", NoString::ToByteStr(Users.first + Users.second));
+        Table.SetCell("In", NoUtils::ToByteStr(Users.first));
+        Table.SetCell("Out", NoUtils::ToByteStr(Users.second));
+        Table.SetCell("Total", NoUtils::ToByteStr(Users.first + Users.second));
 
         Table.AddRow();
         Table.SetCell("Username", "<ZNC>");
-        Table.SetCell("In", NoString::ToByteStr(ZNC.first));
-        Table.SetCell("Out", NoString::ToByteStr(ZNC.second));
-        Table.SetCell("Total", NoString::ToByteStr(ZNC.first + ZNC.second));
+        Table.SetCell("In", NoUtils::ToByteStr(ZNC.first));
+        Table.SetCell("Out", NoUtils::ToByteStr(ZNC.second));
+        Table.SetCell("Total", NoUtils::ToByteStr(ZNC.first + ZNC.second));
 
         Table.AddRow();
         Table.SetCell("Username", "<Total>");
-        Table.SetCell("In", NoString::ToByteStr(Total.first));
-        Table.SetCell("Out", NoString::ToByteStr(Total.second));
-        Table.SetCell("Total", NoString::ToByteStr(Total.first + Total.second));
+        Table.SetCell("In", NoUtils::ToByteStr(Total.first));
+        Table.SetCell("Out", NoUtils::ToByteStr(Total.second));
+        Table.SetCell("Total", NoUtils::ToByteStr(Total.first + Total.second));
 
         PutStatus(Table);
     } else if (sCommand.Equals("UPTIME")) {

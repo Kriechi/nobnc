@@ -372,16 +372,6 @@ public:
      * @return The "pretty" string.
      */
     static NoString ToPercent(double d);
-    /** Pretty-print a number of bytes.
-     * @param d The number of bytes.
-     * @return A string describing the number of bytes.
-     */
-    static NoString ToByteStr(ulonglong d);
-    /** Pretty-print a time span.
-     * @param s Number of seconds to print.
-     * @return A string like "4w 6d 4h 3m 58s".
-     */
-    static NoString ToTimeStr(ulong s);
 
     /** @return True if this string is not "false". */
     bool ToBool() const;

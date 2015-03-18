@@ -1631,22 +1631,22 @@ public:
             NoTemplate& l = Tmpl.AddRow("TrafficLoop");
 
             l["Username"] = it->first;
-            l["In"] = NoString::ToByteStr(it->second.first);
-            l["Out"] = NoString::ToByteStr(it->second.second);
-            l["Total"] = NoString::ToByteStr(it->second.first + it->second.second);
+            l["In"] = NoUtils::ToByteStr(it->second.first);
+            l["Out"] = NoUtils::ToByteStr(it->second.second);
+            l["Total"] = NoUtils::ToByteStr(it->second.first + it->second.second);
         }
 
-        Tmpl["UserIn"] = NoString::ToByteStr(Users.first);
-        Tmpl["UserOut"] = NoString::ToByteStr(Users.second);
-        Tmpl["UserTotal"] = NoString::ToByteStr(Users.first + Users.second);
+        Tmpl["UserIn"] = NoUtils::ToByteStr(Users.first);
+        Tmpl["UserOut"] = NoUtils::ToByteStr(Users.second);
+        Tmpl["UserTotal"] = NoUtils::ToByteStr(Users.first + Users.second);
 
-        Tmpl["ZNCIn"] = NoString::ToByteStr(ZNC.first);
-        Tmpl["ZNCOut"] = NoString::ToByteStr(ZNC.second);
-        Tmpl["ZNCTotal"] = NoString::ToByteStr(ZNC.first + ZNC.second);
+        Tmpl["ZNCIn"] = NoUtils::ToByteStr(ZNC.first);
+        Tmpl["ZNCOut"] = NoUtils::ToByteStr(ZNC.second);
+        Tmpl["ZNCTotal"] = NoUtils::ToByteStr(ZNC.first + ZNC.second);
 
-        Tmpl["AllIn"] = NoString::ToByteStr(Total.first);
-        Tmpl["AllOut"] = NoString::ToByteStr(Total.second);
-        Tmpl["AllTotal"] = NoString::ToByteStr(Total.first + Total.second);
+        Tmpl["AllIn"] = NoUtils::ToByteStr(Total.first);
+        Tmpl["AllOut"] = NoUtils::ToByteStr(Total.second);
+        Tmpl["AllTotal"] = NoUtils::ToByteStr(Total.first + Total.second);
 
         return true;
     }

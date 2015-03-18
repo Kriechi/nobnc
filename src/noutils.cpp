@@ -661,3 +661,49 @@ NoUtils::status_t NoUtils::ReadFromDisk(NoStringMap& values, const NoString& sPa
 
     return MCS_SUCCESS;
 }
+
+NoString NoUtils::ToByteStr(ulonglong d)
+{
+    const ulonglong KiB = 1024;
+    const ulonglong MiB = KiB * 1024;
+    const ulonglong GiB = MiB * 1024;
+    const ulonglong TiB = GiB * 1024;
+
+    if (d > TiB) {
+        return NoString(d / TiB) + " TiB";
+    } else if (d > GiB) {
+        return NoString(d / GiB) + " GiB";
+    } else if (d > MiB) {
+        return NoString(d / MiB) + " MiB";
+    } else if (d > KiB) {
+        return NoString(d / KiB) + " KiB";
+    }
+
+    return NoString(d) + " B";
+}
+
+NoString NoUtils::ToTimeStr(ulong s)
+{
+    const ulong m = 60;
+    const ulong h = m * 60;
+    const ulong d = h * 24;
+    const ulong w = d * 7;
+    const ulong y = d * 365;
+    NoString sRet;
+
+#define TIMESPAN(time, str)                  \
+    if (s >= time) {                         \
+        sRet += NoString(s / time) + str " "; \
+        s = s % time;                        \
+    }
+    TIMESPAN(y, "y");
+    TIMESPAN(w, "w");
+    TIMESPAN(d, "d");
+    TIMESPAN(h, "h");
+    TIMESPAN(m, "m");
+    TIMESPAN(1, "s");
+
+    if (sRet.empty()) return "0s";
+
+    return sRet.RightChomp_n();
+}
