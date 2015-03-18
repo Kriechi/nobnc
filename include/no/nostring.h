@@ -35,7 +35,8 @@ class NoString;
 typedef std::set<NoString> NoStringSet;
 typedef std::vector<NoString> NoStringVector;
 typedef std::map<NoString, NoString> NoStringMap;
-typedef std::vector<std::pair<NoString, NoString>> NoStringPairVector;
+typedef std::pair<NoString, NoString> NoStringPair;
+typedef std::vector<NoStringPair> NoStringPairVector;
 
 enum class CaseSensitivity { CaseInsensitive, CaseSensitive };
 
