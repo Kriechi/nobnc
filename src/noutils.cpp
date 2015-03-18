@@ -564,3 +564,100 @@ void NoUtils::SetMessageTags(NoString& sLine, const NoStringMap& mssTags)
         sLine = "@" + sTags + " " + sLine;
     }
 }
+
+static const char hexdigits[] = "0123456789abcdef";
+
+static NoString& Encode(NoString& sValue)
+{
+    NoString sTmp;
+    for (uchar c : sValue) {
+        // isalnum() needs uchar as argument and this code
+        // assumes unsigned, too.
+        if (isalnum(c)) {
+            sTmp += c;
+        } else {
+            sTmp += "%";
+            sTmp += hexdigits[c >> 4];
+            sTmp += hexdigits[c & 0xf];
+            sTmp += ";";
+        }
+    }
+    sValue = sTmp;
+    return sValue;
+}
+
+NoUtils::status_t NoUtils::WriteToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode)
+{
+    NoFile cFile(sPath);
+
+    if (values.empty()) {
+        if (!cFile.Exists()) return MCS_SUCCESS;
+        if (cFile.Delete()) return MCS_SUCCESS;
+    }
+
+    if (!cFile.Open(O_WRONLY | O_CREAT | O_TRUNC, iMode))
+        return MCS_EOPEN;
+
+    for (const auto& it : values) {
+        NoString sKey = it.first;
+        NoString sValue = it.second;
+
+        if (sKey.empty()) {
+            continue;
+        }
+
+        if (cFile.Write(Encode(sKey) + " " + Encode(sValue) + "\n") <= 0) {
+            return MCS_EWRITE;
+        }
+    }
+
+    cFile.Close();
+
+    return MCS_SUCCESS;
+}
+
+static NoString& Decode(NoString& sValue)
+{
+    const char* pTmp = sValue.c_str();
+    char* endptr;
+    NoString sTmp;
+
+    while (*pTmp) {
+        if (*pTmp != '%') {
+            sTmp += *pTmp++;
+        } else {
+            char ch = (char)strtol(pTmp + 1, &endptr, 16);
+            if (*endptr == ';') {
+                sTmp += ch;
+                pTmp = ++endptr;
+            } else {
+                sTmp += *pTmp++;
+            }
+        }
+    }
+
+    sValue = sTmp;
+    return sValue;
+}
+
+NoUtils::status_t NoUtils::ReadFromDisk(NoStringMap& values, const NoString& sPath)
+{
+    NoFile cFile(sPath);
+    if (!cFile.Open(O_RDONLY))
+        return MCS_EOPEN;
+
+    NoString sBuffer;
+
+    while (cFile.ReadLine(sBuffer)) {
+        sBuffer.Trim();
+        NoString sKey = sBuffer.Token(0);
+        NoString sValue = sBuffer.Token(1);
+        Decode(sKey);
+        Decode(sValue);
+
+        values[sKey] = sValue;
+    }
+    cFile.Close();
+
+    return MCS_SUCCESS;
+}

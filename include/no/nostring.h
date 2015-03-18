@@ -564,31 +564,6 @@ public:
 
     /** A static instance of an empty map. */
     static const NoStringMap EmptyMap;
-
-    /** Status codes that can be returned by WriteToDisk() and
-     * ReadFromDisk(). */
-    enum status_t {
-        /// No errors.
-        MCS_SUCCESS = 0,
-        /// Opening the file failed.
-        MCS_EOPEN = 1,
-        /// Writing to the file failed.
-        MCS_EWRITE = 2,
-    };
-
-    /** Write this map to a file.
-     * @param sPath The file name to write to.
-     * @param iMode The mode for the file.
-     * @return The result of the operation.
-     * @see WriteFilter.
-     */
-    enum status_t WriteToDisk(const NoString& sPath, mode_t iMode = 0644) const;
-    /** Read a map from a file.
-     * @param sPath The file name to read from.
-     * @return The result of the operation.
-     * @see ReadFilter.
-     */
-    enum status_t ReadFromDisk(const NoString& sPath);
 };
 
 #endif // NOSTRING_H

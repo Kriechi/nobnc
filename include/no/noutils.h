@@ -63,6 +63,31 @@ public:
 
     static NoStringMap GetMessageTags(const NoString& sLine);
     static void SetMessageTags(NoString& sLine, const NoStringMap& mssTags);
+
+    /** Status codes that can be returned by WriteToDisk() and
+     * ReadFromDisk(). */
+    enum status_t {
+        /// No errors.
+        MCS_SUCCESS = 0,
+        /// Opening the file failed.
+        MCS_EOPEN = 1,
+        /// Writing to the file failed.
+        MCS_EWRITE = 2,
+    };
+
+    /** Write a map to a file.
+     * @param sPath The file name to write to.
+     * @param iMode The mode for the file.
+     * @return The result of the operation.
+     * @see WriteFilter.
+     */
+    static status_t WriteToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode = 0644);
+    /** Read a map from a file.
+     * @param sPath The file name to read from.
+     * @return The result of the operation.
+     * @see ReadFilter.
+     */
+    static status_t ReadFromDisk(NoStringMap& values, const NoString& sPath);
 };
 
 #endif // NOUTILS_H
