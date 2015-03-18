@@ -32,6 +32,11 @@ public:
     static void PrintAction(const NoString& sMessage);
     static void PrintStatus(bool bSuccess, const NoString& sMessage = "");
 
+#ifdef HAVE_LIBSSL
+    static NoString Encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
+    static NoString Decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
+#endif
+
     // TODO refactor this
     static const NoString sDefaultHash;
 

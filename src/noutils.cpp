@@ -20,6 +20,7 @@
 #include "nodir.h"
 #include "nomd5.h"
 #include "nosha256.h"
+#include "noblowfish.h"
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -66,6 +67,46 @@ ulong NoUtils::GetLongIP(const NoString& sIP)
 
     return ret;
 }
+
+#ifdef HAVE_LIBSSL
+static NoString Crypt(const NoString& sStr, const NoString& sPass, bool bEncrypt, const NoString& sIvec)
+{
+    NoString ret = sStr;
+
+    uchar szIvec[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    BF_KEY bKey;
+
+    if (sIvec.length() >= 8)
+        memcpy(szIvec, sIvec.data(), 8);
+
+    BF_set_key(&bKey, (uint)sPass.length(), (uchar*)sPass.data());
+    uint uPad = ret.length() % 8;
+
+    if (uPad) {
+        uPad = 8 - uPad;
+        ret.append(uPad, '\0');
+    }
+
+    size_t uLen = ret.length();
+    uchar* szBuff = (uchar*)malloc(uLen);
+    BF_cbc_encrypt((const uchar*)ret.data(), szBuff, uLen, &bKey, szIvec, ((bEncrypt) ? BF_ENCRYPT : BF_DECRYPT));
+
+    ret.clear();
+    ret.append((const char*)szBuff, uLen);
+    free(szBuff);
+    return ret;
+}
+
+NoString NoUtils::Encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec)
+{
+    return Crypt(sStr, sPass, true, sIvec);
+}
+
+NoString NoUtils::Decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec)
+{
+    return Crypt(sStr, sPass, false, sIvec);
+}
+#endif // HAVE_LIBSSL
 
 // If you change this here and in GetSaltedHashPass(),
 // don't forget NoUser::HASH_DEFAULT!

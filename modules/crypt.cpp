@@ -86,7 +86,7 @@ public:
             }
 
             NoString sMsg = MakeIvec() + sMessage;
-            sMsg.Encrypt(it->second);
+            sMsg = NoUtils::Encrypt(sMsg, it->second);
             sMsg.Base64Encode();
             sMsg = "+OK *" + sMsg;
 
@@ -117,7 +117,7 @@ public:
             if (it != EndNV()) {
                 sMessage.LeftChomp(5);
                 sMessage.Base64Decode();
-                sMessage.Decrypt(it->second);
+                sMessage = NoUtils::Decrypt(sMessage, it->second);
                 sMessage.LeftChomp(8);
                 sMessage = sMessage.c_str();
                 Nick.SetNick(NickPrefix() + Nick.GetNick());

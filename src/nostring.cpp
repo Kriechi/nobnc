@@ -16,7 +16,6 @@
 
 #include "nostring.h"
 #include "nofile.h"
-#include "noblowfish.h"
 #include <sstream>
 
 static const uchar XX = 0xff;
@@ -1156,58 +1155,6 @@ ulong NoString::Base64Decode(NoString& sRet) const
 
     return uRet;
 }
-
-#ifdef HAVE_LIBSSL
-NoString NoString::Encrypt_n(const NoString& sPass, const NoString& sIvec) const
-{
-    NoString sRet;
-    sRet.Encrypt(sPass, sIvec);
-    return sRet;
-}
-
-NoString NoString::Decrypt_n(const NoString& sPass, const NoString& sIvec) const
-{
-    NoString sRet;
-    sRet.Decrypt(sPass, sIvec);
-    return sRet;
-}
-
-void NoString::Encrypt(const NoString& sPass, const NoString& sIvec)
-{
-    Crypt(sPass, true, sIvec);
-}
-
-void NoString::Decrypt(const NoString& sPass, const NoString& sIvec)
-{
-    Crypt(sPass, false, sIvec);
-}
-
-void NoString::Crypt(const NoString& sPass, bool bEncrypt, const NoString& sIvec)
-{
-    uchar szIvec[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    BF_KEY bKey;
-
-    if (sIvec.length() >= 8) {
-        memcpy(szIvec, sIvec.data(), 8);
-    }
-
-    BF_set_key(&bKey, (uint)sPass.length(), (uchar*)sPass.data());
-    uint uPad = (length() % 8);
-
-    if (uPad) {
-        uPad = 8 - uPad;
-        append(uPad, '\0');
-    }
-
-    size_t uLen = length();
-    uchar* szBuff = (uchar*)malloc(uLen);
-    BF_cbc_encrypt((const uchar*)data(), szBuff, uLen, &bKey, szIvec, ((bEncrypt) ? BF_ENCRYPT : BF_DECRYPT));
-
-    clear();
-    append((const char*)szBuff, uLen);
-    free(szBuff);
-}
-#endif // HAVE_LIBSSL
 
 NoString NoString::ToPercent(double d)
 {

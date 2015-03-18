@@ -381,14 +381,6 @@ public:
      */
     NoString Base64Encode_n(uint uWrap = 0) const;
 
-#ifdef HAVE_LIBSSL
-    NoString Encrypt_n(const NoString& sPass, const NoString& sIvec = "") const;
-    NoString Decrypt_n(const NoString& sPass, const NoString& sIvec = "") const;
-    void Encrypt(const NoString& sPass, const NoString& sIvec = "");
-    void Decrypt(const NoString& sPass, const NoString& sIvec = "");
-    void Crypt(const NoString& sPass, bool bEncrypt, const NoString& sIvec = "");
-#endif
-
     /** Pretty-print a percent value.
      * @param d The percent value. This should be in range 0-100.
      * @return The "pretty" string.
