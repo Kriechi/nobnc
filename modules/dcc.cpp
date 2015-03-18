@@ -20,6 +20,9 @@
 #include <no/nodir.h>
 #include <no/nodebug.h>
 
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 class NoDccMod;
 
 class NoDccSock : public NoSocket
