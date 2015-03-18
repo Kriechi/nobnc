@@ -75,14 +75,14 @@ public:
                  const NoString& sBindHost = "",
                  NoBaseSocket* pcSock = nullptr);
 
-    std::vector<Csock*> GetSockets() const;
-    std::vector<Csock*> FindSocksByName(const NoString& sName);
+    std::vector<NoBaseSocket*> GetSockets() const;
+    std::vector<NoBaseSocket*> FindSocksByName(const NoString& sName);
     uint GetAnonConnectionCount(const NoString& sIP) const;
 
     void Cleanup();
     void DynamicSelectLoop( uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution = 3600 );
-    void AddSock(Csock* pcSock, const NoString& sSockName);
-    void DelSockByAddr(Csock* socket);
+    void AddSock(NoBaseSocket* pcSock, const NoString& sSockName);
+    void DelSockByAddr(NoBaseSocket* socket);
     bool SwapSockByAddr(Csock* newSocket, Csock* originalSocket);
     void AddCron(CCron* cron);
     void DelCronByAddr(CCron* cron);
@@ -90,6 +90,7 @@ public:
 
 private:
     CSocketManager* m_instance;
+    std::vector<NoBaseSocket*> m_sockets;
 };
 
 #endif // NOSOCKETMANAGER_H

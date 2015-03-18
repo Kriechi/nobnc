@@ -219,14 +219,19 @@ void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const No
 #endif
 }
 
-std::vector<Csock*> NoSocketManager::GetSockets() const
+std::vector<NoBaseSocket*> NoSocketManager::GetSockets() const
 {
-    return *m_instance;
+    return m_sockets;
 }
 
-std::vector<Csock*> NoSocketManager::FindSocksByName(const NoString& sName)
+std::vector<NoBaseSocket*> NoSocketManager::FindSocksByName(const NoString& sName)
 {
-    return m_instance->FindSocksByName(sName);
+    std::vector<NoBaseSocket*> sockets;
+    for (NoBaseSocket* socket : m_sockets) {
+        if (socket->GetSockName() == sName)
+            sockets.push_back(socket);
+    }
+    return sockets;
 }
 
 uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
@@ -256,14 +261,19 @@ void NoSocketManager::DynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBo
     m_instance->DynamicSelectLoop(iLowerBounds, iUpperBounds, iMaxResolution);
 }
 
-void NoSocketManager::AddSock(Csock* pcSock, const NoString& sSockName)
+void NoSocketManager::AddSock(NoBaseSocket* pcSock, const NoString& sSockName)
 {
-    m_instance->AddSock(pcSock, sSockName);
+    m_sockets.push_back(pcSock);
+    m_instance->AddSock(pcSock->GetHandle(), sSockName);
 }
 
-void NoSocketManager::DelSockByAddr(Csock* socket)
+void NoSocketManager::DelSockByAddr(NoBaseSocket* socket)
 {
-    m_instance->DelSockByAddr(socket);
+    auto it = std::find(m_sockets.begin(), m_sockets.end(), socket);
+    if (it != m_sockets.end())
+        m_sockets.erase(it);
+    m_instance->DelSockByAddr(socket->GetHandle());
+    delete socket;
 }
 
 bool NoSocketManager::SwapSockByAddr(Csock* newSocket, Csock* originalSocket)

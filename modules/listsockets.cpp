@@ -16,12 +16,12 @@
 
 #include <no/nouser.h>
 #include <no/noapp.h>
-#include <no/Csocket.h> // ### FIXME
+#include <no/nosocket.h>
 
 class NoSocketSorter
 {
 public:
-    NoSocketSorter(Csock* p) { m_pSock = p; }
+    NoSocketSorter(NoBaseSocket* p) { m_pSock = p; }
     bool operator<(const NoSocketSorter& other) const
     {
         // The 'biggest' item is displayed first.
@@ -29,9 +29,9 @@ public:
         // return true: other is first
 
         // Listeners go to the top
-        if (m_pSock->GetType() != other.m_pSock->GetType()) {
-            if (m_pSock->GetType() == Csock::LISTENER) return false;
-            if (other.m_pSock->GetType() == Csock::LISTENER) return true;
+        if (m_pSock->IsListener() != other.m_pSock->IsListener()) {
+            if (m_pSock->IsListener()) return false;
+            if (other.m_pSock->IsListener()) return true;
         }
         const NoString& sMyName = m_pSock->GetSockName();
         const NoString& sMyName2 = sMyName.Token(1, true, "::");
@@ -52,10 +52,10 @@ public:
         // and finally sort by the whole socket name
         return sMyName.Compare(sHisName, NoString::CaseSensitive) > 0;
     }
-    Csock* GetSock() const { return m_pSock; }
+    NoBaseSocket* GetSock() const { return m_pSock; }
 
 private:
-    Csock* m_pSock;
+    NoBaseSocket* m_pSock;
 };
 
 class NoListSockets : public NoModule
@@ -87,12 +87,12 @@ public:
         NoSocketManager& m = NoApp::Get().GetManager();
         std::priority_queue<NoSocketSorter> ret;
 
-        for (Csock* pSock : m.GetSockets()) {
+        for (NoBaseSocket* pSock : m.GetSockets()) {
             // These sockets went through SwapSockByAddr. That means
             // another socket took over the connection from this
             // socket. So ignore this to avoid listing the
             // connection twice.
-            if (pSock->GetCloseType() == Csock::CLT_DEREFERENCE) continue;
+            if (pSock->GetCloseType() == NoBaseSocket::CLT_DEREFERENCE) continue;
             ret.push(pSock);
         }
 
@@ -112,7 +112,7 @@ public:
             std::priority_queue<NoSocketSorter> socks = GetSockets();
 
             while (!socks.empty()) {
-                Csock* pSocket = socks.top().GetSock();
+                NoBaseSocket* pSocket = socks.top().GetSock();
                 socks.pop();
 
                 NoTemplate& Row = Tmpl.AddRow("SocketsLoop");
@@ -143,14 +143,13 @@ public:
         ShowSocks(bShowHosts);
     }
 
-    NoString GetSocketState(Csock* pSocket)
+    NoString GetSocketState(NoBaseSocket* pSocket)
     {
-        switch (pSocket->GetType()) {
-        case Csock::LISTENER:
+        if (pSocket->IsListener())
             return "Listener";
-        case Csock::INBOUND:
+        if (pSocket->IsInbound())
             return "Inbound";
-        case Csock::OUTBOUND:
+        if (pSocket->IsOutbound()) {
             if (pSocket->IsConnected())
                 return "Outbound";
             else
@@ -160,14 +159,14 @@ public:
         return "UNKNOWN";
     }
 
-    NoString GetCreatedTime(Csock* pSocket)
+    NoString GetCreatedTime(NoBaseSocket* pSocket)
     {
         ulonglong iStartTime = pSocket->GetStartTime();
         time_t iTime = iStartTime / 1000;
         return NoUtils::FormatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->GetTimezone());
     }
 
-    NoString GetLocalHost(Csock* pSocket, bool bShowHosts)
+    NoString GetLocalHost(NoBaseSocket* pSocket, bool bShowHosts)
     {
         NoString sBindHost;
 
@@ -182,7 +181,7 @@ public:
         return sBindHost + " " + NoString(pSocket->GetLocalPort());
     }
 
-    NoString GetRemoteHost(Csock* pSocket, bool bShowHosts)
+    NoString GetRemoteHost(NoBaseSocket* pSocket, bool bShowHosts)
     {
         NoString sHost;
         u_short uPort;
@@ -197,7 +196,7 @@ public:
         }
 
         // While connecting, GetRemotePort() would return 0
-        if (pSocket->GetType() == Csock::OUTBOUND) {
+        if (pSocket->IsOutbound()) {
             uPort = pSocket->GetPort();
         } else {
             uPort = pSocket->GetRemotePort();
@@ -232,7 +231,7 @@ public:
         Table.AddColumn("Out");
 
         while (!socks.empty()) {
-            Csock* pSocket = socks.top().GetSock();
+            NoBaseSocket* pSocket = socks.top().GetSock();
             socks.pop();
 
             Table.AddRow();

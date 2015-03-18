@@ -293,7 +293,7 @@ bool NoModule::AddSocket(NoSocket* pSocket)
 bool NoModule::RemSocket(NoSocket* pSocket)
 {
     if (m_sSockets.erase(pSocket)) {
-        m_pManager->DelSockByAddr(pSocket->GetHandle());
+        m_pManager->DelSockByAddr(pSocket);
         return true;
     }
 
@@ -305,7 +305,7 @@ bool NoModule::RemSocket(const NoString& sSockName)
     for (NoSocket* pSocket : m_sSockets) {
         if (pSocket->GetSockName().Equals(sSockName)) {
             m_sSockets.erase(pSocket);
-            m_pManager->DelSockByAddr(pSocket->GetHandle());
+            m_pManager->DelSockByAddr(pSocket);
             return true;
         }
     }
