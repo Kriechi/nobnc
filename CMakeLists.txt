@@ -52,7 +52,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nowebmodules.h
                        third_party/md5/md5.h
                        third_party/sha2/sha2.h
-                       ${PROJECT_BINARY_DIR}/include/no/Csocket.h
+                       third_party/Csocket/Csocket.h
                        ${PROJECT_BINARY_DIR}/include/no/noglobal.h
 )
 
@@ -91,7 +91,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nowebmodules.cpp
                        third_party/md5/md5.cpp
                        third_party/sha2/sha2.c
-                       ${PROJECT_BINARY_DIR}/src/Csocket.cpp
+                       third_party/Csocket/Csocket.cc
                        ${PROJECT_BINARY_DIR}/src/noglobal.cpp
 )
 
@@ -132,10 +132,6 @@ configure_file("${PROJECT_SOURCE_DIR}/include/no/noconfig.h.in"
                "${PROJECT_BINARY_DIR}/include/no/noconfig.h")
 configure_file("${PROJECT_SOURCE_DIR}/src/noglobal.cpp.in"
                "${PROJECT_BINARY_DIR}/src/noglobal.cpp")
-configure_file("${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.cc"
-               "${PROJECT_BINARY_DIR}/src/Csocket.cpp" COPYONLY)
-configure_file("${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.h"
-               "${PROJECT_BINARY_DIR}/include/no/Csocket.h" COPYONLY)
 
 if(NOT DEVELOPER_BUILD)
     install(FILES "${PROJECT_BINARY_DIR}/include/no/noconfig.h"
