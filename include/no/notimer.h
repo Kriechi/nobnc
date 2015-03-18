@@ -19,11 +19,11 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <no/Csocket.h>
 
+class CCron;
 class NoModule;
 
-class NO_EXPORT NoTimer : private CCron
+class NO_EXPORT NoTimer
 {
 public:
     NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description);
@@ -49,12 +49,15 @@ public:
     void setCallback(Callback callback);
 
 protected:
-    void RunJob() override;
+    virtual void RunJob();
 
 private:
+    CCron* m_cron;
     NoModule* m_module;
     NoString m_description;
     Callback m_callback;
+
+    friend class NoCCron;
 };
 
 #endif // NOTIMER_H

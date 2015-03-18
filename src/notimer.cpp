@@ -16,16 +16,27 @@
 
 #include "notimer.h"
 #include "nomodules.h"
+#include "Csocket/Csocket.h"
+
+class NoCCron : public CCron
+{
+public:
+    NoCCron(NoTimer* q) : q_ptr(q) { }
+protected:
+    void RunJob() override { q_ptr->RunJob(); }
+private:
+    NoTimer* q_ptr;
+};
 
 NoTimer::NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description)
-    : CCron(), m_module(module), m_description(description)
+    : m_cron(new NoCCron(this)), m_module(module), m_description(description)
 {
-    SetName(label);
+    m_cron->SetName(label);
 
     if (cycles)
-        StartMaxCycles(interval, cycles);
+        m_cron->StartMaxCycles(interval, cycles);
     else
-        Start(interval);
+        m_cron->Start(interval);
 }
 
 NoTimer::~NoTimer()
@@ -35,27 +46,27 @@ NoTimer::~NoTimer()
 
 CCron* NoTimer::GetHandle() const
 {
-    return const_cast<NoTimer*>(this);
+    return m_cron;
 }
 
 NoString NoTimer::GetName() const
 {
-    return CCron::GetName();
+    return m_cron->GetName();
 }
 
 uint NoTimer::GetCyclesLeft() const
 {
-    return CCron::GetCyclesLeft();
+    return m_cron->GetCyclesLeft();
 }
 
 timeval NoTimer::GetInterval() const
 {
-    return CCron::GetInterval();
+    return m_cron->GetInterval();
 }
 
 void NoTimer::Stop()
 {
-    CCron::Stop();
+    m_cron->Stop();
 }
 
 NoModule* NoTimer::module() const
