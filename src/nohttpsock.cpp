@@ -15,6 +15,7 @@
  */
 
 #include "nohttpsock.h"
+#include "nodebug.h"
 #include "nofile.h"
 #include "nodir.h"
 #include "noapp.h"

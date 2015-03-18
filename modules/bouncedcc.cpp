@@ -16,6 +16,7 @@
 
 #include <no/nouser.h>
 #include <no/nonetwork.h>
+#include <no/nodebug.h>
 
 class NoBounceDccMod;
 

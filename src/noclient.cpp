@@ -17,6 +17,7 @@
 #include "noclient.h"
 #include "nochannel.h"
 #include "noircsock.h"
+#include "nodebug.h"
 #include "nouser.h"
 #include "nonetwork.h"
 #include "noquery.h"

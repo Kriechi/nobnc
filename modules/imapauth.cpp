@@ -15,6 +15,7 @@
  */
 
 #include <no/noapp.h>
+#include <no/nodebug.h>
 
 class NoImapAuthMod;
 

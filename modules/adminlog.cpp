@@ -18,6 +18,7 @@
 #include <no/noserver.h>
 #include <no/nonetwork.h>
 #include <no/nouser.h>
+#include <no/nodebug.h>
 
 #include <syslog.h>
 

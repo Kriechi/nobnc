@@ -18,6 +18,7 @@
 #include <no/noircsock.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
+#include <no/nodebug.h>
 
 class NoIdentFileModule : public NoModule
 {

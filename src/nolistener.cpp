@@ -15,6 +15,7 @@
  */
 
 #include "nolistener.h"
+#include "nodebug.h"
 #include "noapp.h"
 
 class NoRealListener : public NoBaseSocket

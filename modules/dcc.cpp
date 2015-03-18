@@ -18,6 +18,7 @@
 #include <no/nouser.h>
 #include <no/nofile.h>
 #include <no/nodir.h>
+#include <no/nodebug.h>
 
 class NoDccMod;
 

@@ -21,6 +21,7 @@
 #include <no/nonetwork.h>
 #include <no/nochannel.h>
 #include <no/noserver.h>
+#include <no/nodebug.h>
 #include <algorithm>
 
 class NoLogRule

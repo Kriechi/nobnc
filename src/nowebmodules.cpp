@@ -19,6 +19,7 @@
 #include "nodir.h"
 #include "nouser.h"
 #include "nonetwork.h"
+#include "nodebug.h"
 #include "noapp.h"
 #include <algorithm>
 #include <sstream>

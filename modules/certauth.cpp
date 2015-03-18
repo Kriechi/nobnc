@@ -18,6 +18,7 @@
 
 #include <no/nouser.h>
 #include <no/noapp.h>
+#include <no/nodebug.h>
 
 class NoSslClientCertMod : public NoModule
 {

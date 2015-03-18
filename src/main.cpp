@@ -17,6 +17,7 @@
 #include "noapp.h"
 #include "nomodulecall.h"
 #include "noexception.h"
+#include "nodebug.h"
 #include <signal.h>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)

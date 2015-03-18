@@ -19,6 +19,7 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/noircsock.h>
+#include <no/nodebug.h>
 
 /* Stuff to be able to write this:
    // i will be name of local variable, see below
