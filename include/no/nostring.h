@@ -589,13 +589,6 @@ public:
      * @see ReadFilter.
      */
     enum status_t ReadFromDisk(const NoString& sPath);
-
-    /** Encode a value so that it can safely be parsed by ReadFromDisk().
-     * This is an internal function.
-     */
-    virtual NoString& Encode(NoString& sValue) const;
-    /** Undo the effects of Encode(). This is an internal function. */
-    virtual NoString& Decode(NoString& sValue) const;
 };
 
 #endif // NOSTRING_H

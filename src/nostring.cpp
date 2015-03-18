@@ -1468,6 +1468,27 @@ NoString& NoString::StripControls()
 //////////////// NoStringMap ////////////////
 const NoStringMap NoStringMap::EmptyMap;
 
+static const char hexdigits[] = "0123456789abcdef";
+
+static NoString& Encode(NoString& sValue)
+{
+    NoString sTmp;
+    for (uchar c : sValue) {
+        // isalnum() needs uchar as argument and this code
+        // assumes unsigned, too.
+        if (isalnum(c)) {
+            sTmp += c;
+        } else {
+            sTmp += "%";
+            sTmp += hexdigits[c >> 4];
+            sTmp += hexdigits[c & 0xf];
+            sTmp += ";";
+        }
+    }
+    sValue = sTmp;
+    return sValue;
+}
+
 NoStringMap::status_t NoStringMap::WriteToDisk(const NoString& sPath, mode_t iMode) const
 {
     NoFile cFile(sPath);
@@ -1499,6 +1520,30 @@ NoStringMap::status_t NoStringMap::WriteToDisk(const NoString& sPath, mode_t iMo
     return MCS_SUCCESS;
 }
 
+static NoString& Decode(NoString& sValue)
+{
+    const char* pTmp = sValue.c_str();
+    char* endptr;
+    NoString sTmp;
+
+    while (*pTmp) {
+        if (*pTmp != '%') {
+            sTmp += *pTmp++;
+        } else {
+            char ch = (char)strtol(pTmp + 1, &endptr, 16);
+            if (*endptr == ';') {
+                sTmp += ch;
+                pTmp = ++endptr;
+            } else {
+                sTmp += *pTmp++;
+            }
+        }
+    }
+
+    sValue = sTmp;
+    return sValue;
+}
+
 NoStringMap::status_t NoStringMap::ReadFromDisk(const NoString& sPath)
 {
     clear();
@@ -1521,49 +1566,4 @@ NoStringMap::status_t NoStringMap::ReadFromDisk(const NoString& sPath)
     cFile.Close();
 
     return MCS_SUCCESS;
-}
-
-static const char hexdigits[] = "0123456789abcdef";
-
-NoString& NoStringMap::Encode(NoString& sValue) const
-{
-    NoString sTmp;
-    for (uchar c : sValue) {
-        // isalnum() needs uchar as argument and this code
-        // assumes unsigned, too.
-        if (isalnum(c)) {
-            sTmp += c;
-        } else {
-            sTmp += "%";
-            sTmp += hexdigits[c >> 4];
-            sTmp += hexdigits[c & 0xf];
-            sTmp += ";";
-        }
-    }
-    sValue = sTmp;
-    return sValue;
-}
-
-NoString& NoStringMap::Decode(NoString& sValue) const
-{
-    const char* pTmp = sValue.c_str();
-    char* endptr;
-    NoString sTmp;
-
-    while (*pTmp) {
-        if (*pTmp != '%') {
-            sTmp += *pTmp++;
-        } else {
-            char ch = (char)strtol(pTmp + 1, &endptr, 16);
-            if (*endptr == ';') {
-                sTmp += ch;
-                pTmp = ++endptr;
-            } else {
-                sTmp += *pTmp++;
-            }
-        }
-    }
-
-    sValue = sTmp;
-    return sValue;
 }
