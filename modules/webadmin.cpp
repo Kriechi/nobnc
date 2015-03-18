@@ -1264,7 +1264,7 @@ public:
                     l["Name"] = vNetworks[a]->GetName();
                     l["Username"] = pUser->GetUserName();
                     l["Clients"] = NoString(vNetworks[a]->GetClients().size());
-                    l["IRNoNick"] = vNetworks[a]->GetIRNoNick().GetNick();
+                    l["IRNoNick"] = vNetworks[a]->GetIRNoNick().nick();
                     NoServer* pServer = vNetworks[a]->GetCurrentServer();
                     if (pServer) {
                         l["Server"] = pServer->GetName() + ":" + (pServer->IsSSL() ? "+" : "") + NoString(pServer->GetPort());

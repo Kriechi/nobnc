@@ -549,7 +549,7 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
             const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
             for (const NoChannel* pChan : vChans) {
                 if (!(pChan->isDetached())) {
-                    PutClient(":" + m_pNetwork->GetIRNoNick().GetNickMask() + " PART " + pChan->getName());
+                    PutClient(":" + m_pNetwork->GetIRNoNick().nickMask() + " PART " + pChan->getName());
                 }
             }
         } else if (m_pUser) {

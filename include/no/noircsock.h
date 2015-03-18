@@ -89,8 +89,8 @@ public:
     bool IsPermMode(const char c) const { return (c != '\0' && GetPermModes().find(c) != NoString::npos); }
     const NoString& GetPerms() const { return m_sPerms; }
     const NoString& GetPermModes() const { return m_sPermModes; }
-    NoString GetNickMask() const { return m_Nick.GetNickMask(); }
-    NoString GetNick() const { return m_Nick.GetNick(); }
+    NoString GetNickMask() const { return m_Nick.nickMask(); }
+    NoString GetNick() const { return m_Nick.nick(); }
     const NoString& GetPass() const { return m_sPass; }
     NoNetwork* GetNetwork() const { return m_pNetwork; }
     bool HasNamesx() const { return m_bNamesx; }

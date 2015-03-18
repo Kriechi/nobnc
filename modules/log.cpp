@@ -244,7 +244,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
 
 void NoLogMod::PutLog(const NoString& sLine, const NoChannel& Channel) { PutLog(sLine, Channel.getName()); }
 
-void NoLogMod::PutLog(const NoString& sLine, const NoNick& Nick) { PutLog(sLine, Nick.GetNick()); }
+void NoLogMod::PutLog(const NoString& sLine, const NoNick& Nick) { PutLog(sLine, Nick.nick()); }
 
 NoString NoLogMod::GetServer()
 {
@@ -321,40 +321,40 @@ NoModule::EModRet NoLogMod::OnBroadcast(NoString& sMessage)
 
 void NoLogMod::OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs)
 {
-    const NoString sNick = pOpNick ? pOpNick->GetNick() : "Server";
+    const NoString sNick = pOpNick ? pOpNick->nick() : "Server";
     PutLog("*** " + sNick + " sets mode: " + sModes + " " + sArgs, Channel);
 }
 
 void NoLogMod::OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage)
 {
-    PutLog("*** " + sKickedNick + " was kicked by " + OpNick.GetNick() + " (" + sMessage + ")", Channel);
+    PutLog("*** " + sKickedNick + " was kicked by " + OpNick.nick() + " (" + sMessage + ")", Channel);
 }
 
 void NoLogMod::OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans)
 {
     for (std::vector<NoChannel*>::const_iterator pChan = vChans.begin(); pChan != vChans.end(); ++pChan)
-        PutLog("*** Quits: " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") (" + sMessage + ")", **pChan);
+        PutLog("*** Quits: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") (" + sMessage + ")", **pChan);
 }
 
 void NoLogMod::OnJoin(const NoNick& Nick, NoChannel& Channel)
 {
-    PutLog("*** Joins: " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ")", Channel);
+    PutLog("*** Joins: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ")", Channel);
 }
 
 void NoLogMod::OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage)
 {
-    PutLog("*** Parts: " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") (" + sMessage + ")", Channel);
+    PutLog("*** Parts: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") (" + sMessage + ")", Channel);
 }
 
 void NoLogMod::OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans)
 {
     for (std::vector<NoChannel*>::const_iterator pChan = vChans.begin(); pChan != vChans.end(); ++pChan)
-        PutLog("*** " + OldNick.GetNick() + " is now known as " + sNewNick, **pChan);
+        PutLog("*** " + OldNick.nick() + " is now known as " + sNewNick, **pChan);
 }
 
 NoModule::EModRet NoLogMod::OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic)
 {
-    PutLog("*** " + Nick.GetNick() + " changes topic to '" + sTopic + "'", Channel);
+    PutLog("*** " + Nick.nick() + " changes topic to '" + sTopic + "'", Channel);
     return CONTINUE;
 }
 
@@ -371,13 +371,13 @@ NoModule::EModRet NoLogMod::OnUserNotice(NoString& sTarget, NoString& sMessage)
 
 NoModule::EModRet NoLogMod::OnPrivNotice(NoNick& Nick, NoString& sMessage)
 {
-    PutLog("-" + Nick.GetNick() + "- " + sMessage, Nick);
+    PutLog("-" + Nick.nick() + "- " + sMessage, Nick);
     return CONTINUE;
 }
 
 NoModule::EModRet NoLogMod::OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
-    PutLog("-" + Nick.GetNick() + "- " + sMessage, Channel);
+    PutLog("-" + Nick.nick() + "- " + sMessage, Channel);
     return CONTINUE;
 }
 
@@ -394,13 +394,13 @@ NoModule::EModRet NoLogMod::OnUserAction(NoString& sTarget, NoString& sMessage)
 
 NoModule::EModRet NoLogMod::OnPrivAction(NoNick& Nick, NoString& sMessage)
 {
-    PutLog("* " + Nick.GetNick() + " " + sMessage, Nick);
+    PutLog("* " + Nick.nick() + " " + sMessage, Nick);
     return CONTINUE;
 }
 
 NoModule::EModRet NoLogMod::OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
-    PutLog("* " + Nick.GetNick() + " " + sMessage, Channel);
+    PutLog("* " + Nick.nick() + " " + sMessage, Channel);
     return CONTINUE;
 }
 
@@ -417,13 +417,13 @@ NoModule::EModRet NoLogMod::OnUserMsg(NoString& sTarget, NoString& sMessage)
 
 NoModule::EModRet NoLogMod::OnPrivMsg(NoNick& Nick, NoString& sMessage)
 {
-    PutLog("<" + Nick.GetNick() + "> " + sMessage, Nick);
+    PutLog("<" + Nick.nick() + "> " + sMessage, Nick);
     return CONTINUE;
 }
 
 NoModule::EModRet NoLogMod::OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
-    PutLog("<" + Nick.GetNick() + "> " + sMessage, Channel);
+    PutLog("<" + Nick.nick() + "> " + sMessage, Channel);
     return CONTINUE;
 }
 

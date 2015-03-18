@@ -35,35 +35,35 @@ public:
 
     void OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
     {
-        const NoString sNickMask = pOpNick ? pOpNick->GetNickMask() : "Server";
+        const NoString sNickMask = pOpNick ? pOpNick->nickMask() : "Server";
         AddBuffer(Channel, sNickMask + " set mode: " + sModes + " " + sArgs);
     }
 
     void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
-        AddBuffer(Channel, OpNick.GetNickMask() + " kicked " + sKickedNick + " Reason: [" + sMessage + "]");
+        AddBuffer(Channel, OpNick.nickMask() + " kicked " + sKickedNick + " Reason: [" + sMessage + "]");
     }
 
     void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         std::vector<NoChannel*>::const_iterator it;
-        NoString sMsg = Nick.GetNickMask() + " quit with message: [" + sMessage + "]";
+        NoString sMsg = Nick.nickMask() + " quit with message: [" + sMessage + "]";
         for (it = vChans.begin(); it != vChans.end(); ++it) {
             AddBuffer(**it, sMsg);
         }
     }
 
-    void OnJoin(const NoNick& Nick, NoChannel& Channel) override { AddBuffer(Channel, Nick.GetNickMask() + " joined"); }
+    void OnJoin(const NoNick& Nick, NoChannel& Channel) override { AddBuffer(Channel, Nick.nickMask() + " joined"); }
 
     void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
-        AddBuffer(Channel, Nick.GetNickMask() + " parted with message: [" + sMessage + "]");
+        AddBuffer(Channel, Nick.nickMask() + " parted with message: [" + sMessage + "]");
     }
 
     void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         std::vector<NoChannel*>::const_iterator it;
-        NoString sMsg = OldNick.GetNickMask() + " is now known as " + sNewNick;
+        NoString sMsg = OldNick.nickMask() + " is now known as " + sNewNick;
         for (it = vChans.begin(); it != vChans.end(); ++it) {
             AddBuffer(**it, sMsg);
         }
@@ -71,7 +71,7 @@ public:
 
     EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
-        AddBuffer(Channel, Nick.GetNickMask() + " changed the topic to: " + sTopic);
+        AddBuffer(Channel, Nick.nickMask() + " changed the topic to: " + sTopic);
 
         return CONTINUE;
     }

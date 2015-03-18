@@ -101,7 +101,7 @@ public:
     void HandleMessage(NoNick& Nick, const NoString& sMessage)
     {
         NoString sNickServName = (!GetNV("NickServName").empty()) ? GetNV("NickServName") : "NickServ";
-        if (!GetNV("Password").empty() && Nick.NickEquals(sNickServName) &&
+        if (!GetNV("Password").empty() && Nick.equals(sNickServName) &&
             (sMessage.find("msg") != NoString::npos || sMessage.find("authenticate") != NoString::npos ||
              sMessage.find("choose a different nickname") != NoString::npos ||
              sMessage.find("please choose a different nick") != NoString::npos ||

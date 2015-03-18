@@ -15,173 +15,153 @@
  */
 
 #include "nonick.h"
-#include "nochannel.h"
 #include "noircsock.h"
 #include "nonetwork.h"
 
-NoNick::NoNick(const NoString& sNick) : m_sChanPerms(""), m_pNetwork(nullptr), m_sNick(""), m_sIdent(""), m_sHost("")
+NoNick::NoNick(const NoString& mask) : m_perms(""), m_network(nullptr), m_nick(""), m_ident(""), m_host("")
 {
-    Parse(sNick);
+    parse(mask);
 }
 
-NoString NoNick::GetNick() const
-{
-    return m_sNick;
-}
-
-void NoNick::SetNick(const NoString& s)
-{
-    m_sNick = s;
-}
-
-NoString NoNick::GetIdent() const
-{
-    return m_sIdent;
-}
-
-void NoNick::SetIdent(const NoString& s)
-{
-    m_sIdent = s;
-}
-
-NoString NoNick::GetHost() const
-{
-    return m_sHost;
-}
-
-void NoNick::SetHost(const NoString& s)
-{
-    m_sHost = s;
-}
-
-NoString NoNick::GetNickMask() const
-{
-    NoString sRet = m_sNick;
-
-    if (!m_sHost.empty()) {
-        if (!m_sIdent.empty()) sRet += "!" + m_sIdent;
-        sRet += "@" + m_sHost;
-    }
-
-    return sRet;
-}
-
-NoString NoNick::GetHostMask() const
-{
-    NoString sRet = m_sNick;
-
-    if (!m_sIdent.empty()) {
-        sRet += "!" + m_sIdent;
-    }
-
-    if (!m_sHost.empty()) {
-        sRet += "@" + m_sHost;
-    }
-
-    return (sRet);
-}
-
-NoNetwork* NoNick::GetNetwork() const
-{
-    return m_pNetwork;
-}
-
-void NoNick::SetNetwork(NoNetwork* pNetwork)
-{
-    m_pNetwork = pNetwork;
-}
-
-bool NoNick::HasPerm(uchar uPerm) const
-{
-    return (uPerm && m_sChanPerms.find(uPerm) != NoString::npos);
-}
-
-bool NoNick::AddPerm(uchar uPerm)
-{
-    if (!uPerm || HasPerm(uPerm)) {
-        return false;
-    }
-
-    m_sChanPerms.append(1, uPerm);
-
-    return true;
-}
-
-bool NoNick::RemPerm(uchar uPerm)
-{
-    NoString::size_type uPos = m_sChanPerms.find(uPerm);
-    if (uPos == NoString::npos) {
-        return false;
-    }
-
-    m_sChanPerms.erase(uPos, 1);
-
-    return true;
-}
-
-uchar NoNick::GetPermChar() const
-{
-    NoIrcSock* pIRCSock = (!m_pNetwork) ? nullptr : m_pNetwork->GetIRCSock();
-    const NoString& sChanPerms = (!pIRCSock) ? "@+" : pIRCSock->GetPerms();
-
-    for (uint a = 0; a < sChanPerms.size(); a++) {
-        const uchar& c = sChanPerms[a];
-        if (HasPerm(c)) {
-            return c;
-        }
-    }
-
-    return '\0';
-}
-
-NoString NoNick::GetPermStr() const
-{
-    NoIrcSock* pIRCSock = (!m_pNetwork) ? nullptr : m_pNetwork->GetIRCSock();
-    const NoString& sChanPerms = (!pIRCSock) ? "@+" : pIRCSock->GetPerms();
-    NoString sRet;
-
-    for (uint a = 0; a < sChanPerms.size(); a++) {
-        const uchar& c = sChanPerms[a];
-
-        if (HasPerm(c)) {
-            sRet += c;
-        }
-    }
-
-    return sRet;
-}
-
-bool NoNick::NickEquals(const NoString& nickname) const
+bool NoNick::equals(const NoString& nick) const
 {
     // TODO add proper IRC case mapping here
     // https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.1
-    return m_sNick.Equals(nickname);
+    return m_nick.Equals(nick);
 }
 
-void NoNick::Reset()
+NoString NoNick::nick() const
 {
-    m_sChanPerms.clear();
-    m_pNetwork = nullptr;
+    return m_nick;
 }
 
-void NoNick::Parse(const NoString& sNickMask)
+void NoNick::setNick(const NoString& nick)
 {
-    if (sNickMask.empty()) {
-        return;
+    m_nick = nick;
+}
+
+NoString NoNick::ident() const
+{
+    return m_ident;
+}
+
+void NoNick::setIdent(const NoString& ident)
+{
+    m_ident = ident;
+}
+
+NoString NoNick::host() const
+{
+    return m_host;
+}
+
+void NoNick::setHost(const NoString& host)
+{
+    m_host = host;
+}
+
+NoString NoNick::nickMask() const
+{
+    NoString mask = m_nick;
+    if (!m_host.empty()) {
+        if (!m_ident.empty())
+            mask += "!" + m_ident;
+        mask += "@" + m_host;
     }
+    return mask;
+}
 
-    NoString::size_type uPos = sNickMask.find('!');
+NoString NoNick::hostMask() const
+{
+    NoString mask = m_nick;
+    if (!m_ident.empty())
+        mask += "!" + m_ident;
+    if (!m_host.empty())
+        mask += "@" + m_host;
+    return mask;
+}
 
-    if (uPos == NoString::npos) {
-        m_sNick = sNickMask.substr((sNickMask[0] == ':'));
-        return;
+NoNetwork* NoNick::network() const
+{
+    return m_network;
+}
+
+void NoNick::setNetwork(NoNetwork* network)
+{
+    m_network = network;
+}
+
+bool NoNick::hasPerm(uchar perm) const
+{
+    return perm && m_perms.find(perm) != NoString::npos;
+}
+
+void NoNick::addPerm(uchar perm)
+{
+    if (perm && !hasPerm(perm))
+        m_perms.append(1, perm);
+}
+
+void NoNick::removePerm(uchar perm)
+{
+    ulong pos = m_perms.find(perm);
+    if (pos != NoString::npos)
+        m_perms.erase(pos, 1);
+}
+
+static NoString availablePerms(NoNetwork* network)
+{
+    NoString perms = "@+";
+    if (network) {
+        NoIrcSock* socket = network->GetIRCSock();
+        if (socket)
+            perms = socket->GetPerms();
     }
+    return perms;
+}
 
-    m_sNick = sNickMask.substr((sNickMask[0] == ':'), uPos - (sNickMask[0] == ':'));
-    m_sHost = sNickMask.substr(uPos + 1);
+uchar NoNick::perm() const
+{
+    for (const uchar& perm : availablePerms(m_network)) {
+        if (hasPerm(perm))
+            return perm;
+    }
+    return '\0';
+}
 
-    if ((uPos = m_sHost.find('@')) != NoString::npos) {
-        m_sIdent = m_sHost.substr(0, uPos);
-        m_sHost = m_sHost.substr(uPos + 1);
+NoString NoNick::perms() const
+{
+    NoString perms;
+    for (const uchar& perm : availablePerms(m_network)) {
+        if (hasPerm(perm))
+            perms += perm;
+    }
+    return perms;
+}
+
+void NoNick::reset()
+{
+    m_perms.clear();
+    m_network = nullptr;
+}
+
+void NoNick::parse(const NoString& mask)
+{
+    if (mask.empty())
+        return;
+
+    m_nick = mask;
+    m_nick.TrimLeft(":");
+
+    ulong pos = mask.find('!');
+    if (pos != NoString::npos) {
+        m_nick.resize(pos);
+        m_host = mask.substr(pos + 1);
+
+        pos = m_host.find('@');
+        if (pos != NoString::npos) {
+            m_ident = m_host.substr(0, pos);
+            m_host = m_host.substr(pos + 1);
+        }
     }
 }

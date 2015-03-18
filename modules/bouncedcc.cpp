@@ -246,21 +246,21 @@ public:
             ulong uFileSize = sMessage.Token(5, false, " ", false, "\"", "\"", true).ToULong();
 
             if (sType.Equals("CHAT")) {
-                NoNick FromNick(Nick.GetNickMask());
+                NoNick FromNick(Nick.nickMask());
                 ushort uBNCPort =
-                NoDccBounce::DCCRequest(FromNick.GetNick(), uLongIP, uPort, "", true, this, NoUtils::GetIP(uLongIP));
+                NoDccBounce::DCCRequest(FromNick.nick(), uLongIP, uPort, "", true, this, NoUtils::GetIP(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
-                    PutUser(":" + Nick.GetNickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC CHAT chat " +
+                    PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC CHAT chat " +
                             NoString(NoUtils::GetLongIP(sIP)) + " " + NoString(uBNCPort) + "\001");
                 }
             } else if (sType.Equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
                 ushort uBNCPort =
-                NoDccBounce::DCCRequest(Nick.GetNick(), uLongIP, uPort, sFile, false, this, NoUtils::GetIP(uLongIP));
+                NoDccBounce::DCCRequest(Nick.nick(), uLongIP, uPort, sFile, false, this, NoUtils::GetIP(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
-                    PutUser(":" + Nick.GetNickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC SEND " + sFile + " " +
+                    PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC SEND " + sFile + " " +
                             NoString(NoUtils::GetLongIP(sIP)) + " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.Equals("RESUME")) {
@@ -272,7 +272,7 @@ public:
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 
                     if (pSock->GetLocalPort() == uResumePort) {
-                        PutUser(":" + Nick.GetNickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
+                        PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
                                 " " + sFile + " " + NoString(pSock->GetUserPort()) + " " + sMessage.Token(4) + "\001");
                     }
                 }
@@ -283,7 +283,7 @@ public:
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 
                     if (pSock->GetUserPort() == sMessage.Token(3).ToUShort()) {
-                        PutUser(":" + Nick.GetNickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
+                        PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
                                 " " + sFile + " " + NoString(pSock->GetLocalPort()) + " " + sMessage.Token(4) + "\001");
                     }
                 }

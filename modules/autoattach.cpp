@@ -187,7 +187,7 @@ public:
     void TryAttach(const NoNick& Nick, NoChannel& Channel, NoString& Message)
     {
         const NoString& sChan = Channel.getName();
-        const NoString& sHost = Nick.GetHostMask();
+        const NoString& sHost = Nick.hostMask();
         const NoString& sMessage = Message;
         VAttachIter it;
 

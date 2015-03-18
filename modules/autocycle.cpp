@@ -130,7 +130,7 @@ protected:
 
         // Is that person us and we don't have op?
         const NoNick& pNick = Channel.getNicks().begin()->second;
-        if (!pNick.HasPerm(NoChannel::Op) && pNick.NickEquals(GetNetwork()->GetCurNick())) {
+        if (!pNick.hasPerm(NoChannel::Op) && pNick.equals(GetNetwork()->GetCurNick())) {
             Channel.cycle();
             m_recentlyCycled.AddItem(Channel.getName());
         }

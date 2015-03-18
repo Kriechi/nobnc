@@ -100,10 +100,10 @@ public:
     void sendBuffer(NoClient* pClient);
     void sendBuffer(NoClient* pClient, const NoBuffer& Buffer);
 
-    NoString getPermStr() const { return m_nick.GetPermStr(); }
-    bool hasPerm(uchar uPerm) const { return m_nick.HasPerm(uPerm); }
-    bool addPerm(uchar uPerm) { return m_nick.AddPerm(uPerm); }
-    bool remPerm(uchar uPerm) { return m_nick.RemPerm(uPerm); }
+    NoString getPermStr() const { return m_nick.perms(); }
+    bool hasPerm(uchar uPerm) const { return m_nick.hasPerm(uPerm); }
+    void addPerm(uchar uPerm) { m_nick.addPerm(uPerm); }
+    void remPerm(uchar uPerm) { m_nick.removePerm(uPerm); }
 
     void setModeKnown(bool b) { m_modeKnown = b; }
     void setIsOn(bool b)

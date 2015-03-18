@@ -92,16 +92,16 @@ void NoClient::UserCommand(NoString& sLine)
             Table.AddRow();
 
             for (uint b = 0; b < sPerms.size(); b++) {
-                if (it.second.HasPerm(sPerms[b])) {
+                if (it.second.hasPerm(sPerms[b])) {
                     NoString sPerm;
                     sPerm += sPerms[b];
                     Table.SetCell(sPerm, sPerm);
                 }
             }
 
-            Table.SetCell("Nick", it.second.GetNick());
-            Table.SetCell("Ident", it.second.GetIdent());
-            Table.SetCell("Host", it.second.GetHost());
+            Table.SetCell("Nick", it.second.nick());
+            Table.SetCell("Ident", it.second.ident());
+            Table.SetCell("Host", it.second.host());
         }
 
         PutStatus(Table);
@@ -244,7 +244,7 @@ void NoClient::UserCommand(NoString& sLine)
                 if (pNetwork->IsIRCConnected()) {
                     Table.SetCell("OnIRC", "Yes");
                     Table.SetCell("IRC Server", pNetwork->GetIRNoServer());
-                    Table.SetCell("IRC User", pNetwork->GetIRNoNick().GetNickMask());
+                    Table.SetCell("IRC User", pNetwork->GetIRNoNick().nickMask());
                     Table.SetCell("Channels", NoString(pNetwork->GetChans().size()));
                 } else {
                     Table.SetCell("OnIRC", "No");
@@ -616,7 +616,7 @@ void NoClient::UserCommand(NoString& sLine)
             if (pNetwork->IsIRCConnected()) {
                 Table.SetCell("OnIRC", "Yes");
                 Table.SetCell("IRC Server", pNetwork->GetIRNoServer());
-                Table.SetCell("IRC User", pNetwork->GetIRNoNick().GetNickMask());
+                Table.SetCell("IRC User", pNetwork->GetIRNoNick().nickMask());
                 Table.SetCell("Channels", NoString(pNetwork->GetChans().size()));
             } else {
                 Table.SetCell("OnIRC", "No");

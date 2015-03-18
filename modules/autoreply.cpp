@@ -76,7 +76,7 @@ public:
 
     EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
-        Handle(Nick.GetNick());
+        Handle(Nick.nick());
         return CONTINUE;
     }
 

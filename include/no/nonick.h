@@ -19,51 +19,50 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <vector>
 
 class NoNetwork;
-class NoChannel;
 
 class NO_EXPORT NoNick
 {
 public:
-    NoNick(const NoString& sNick = "");
+    NoNick(const NoString& mask = "");
 
     NoNick(const NoNick&) = default;
     NoNick& operator=(const NoNick&) = default;
 
-    NoString GetNick() const;
-    void SetNick(const NoString& s);
+    bool equals(const NoString& nick) const;
 
-    NoString GetIdent() const;
-    void SetIdent(const NoString& s);
+    NoString nick() const;
+    void setNick(const NoString& nick);
 
-    NoString GetHost() const;
-    void SetHost(const NoString& s);
+    NoString ident() const;
+    void setIdent(const NoString& ident);
 
-    NoString GetNickMask() const;
-    NoString GetHostMask() const;
+    NoString host() const;
+    void setHost(const NoString& host);
 
-    NoNetwork* GetNetwork() const;
-    void SetNetwork(NoNetwork* pNetwork);
+    NoString nickMask() const;
+    NoString hostMask() const;
 
-    uchar GetPermChar() const;
-    NoString GetPermStr() const;
-    bool HasPerm(uchar uPerm) const;
-    bool AddPerm(uchar uPerm);
-    bool RemPerm(uchar uPerm);
+    NoNetwork* network() const;
+    void setNetwork(NoNetwork* network);
 
-    bool NickEquals(const NoString& nickname) const; // TODO
-    void Reset(); // TODO
+    uchar perm() const;
+    NoString perms() const;
+    bool hasPerm(uchar perm) const;
+    void addPerm(uchar perm);
+    void removePerm(uchar perm);
+
+    void reset(); // TODO
 
 private:
-    void Parse(const NoString& sNickMask);
+    void parse(const NoString& mask);
 
-    NoString m_sChanPerms;
-    NoNetwork* m_pNetwork;
-    NoString m_sNick;
-    NoString m_sIdent;
-    NoString m_sHost;
+    NoString m_perms;
+    NoNetwork* m_network;
+    NoString m_nick;
+    NoString m_ident;
+    NoString m_host;
 };
 
 #endif // NONICK_H

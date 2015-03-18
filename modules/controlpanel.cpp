@@ -1018,7 +1018,7 @@ class NoAdminMod : public NoModule
             if (pNetwork->IsIRCConnected()) {
                 Table.SetCell("OnIRC", "Yes");
                 Table.SetCell("IRC Server", pNetwork->GetIRNoServer());
-                Table.SetCell("IRC User", pNetwork->GetIRNoNick().GetNickMask());
+                Table.SetCell("IRC User", pNetwork->GetIRNoNick().nickMask());
                 Table.SetCell("Channels", NoString(pNetwork->GetChans().size()));
             } else {
                 Table.SetCell("OnIRC", "No");

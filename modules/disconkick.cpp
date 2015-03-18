@@ -28,7 +28,7 @@ public:
 
         for (std::vector<NoChannel*>::const_iterator it = vChans.begin(); it != vChans.end(); ++it) {
             if ((*it)->isOn()) {
-                PutUser(":ZNC!znc@znc.in KICK " + (*it)->getName() + " " + GetNetwork()->GetIRNoNick().GetNick() +
+                PutUser(":ZNC!znc@znc.in KICK " + (*it)->getName() + " " + GetNetwork()->GetIRNoNick().nick() +
                         " :You have been disconnected from the IRC server");
             }
         }

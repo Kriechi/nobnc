@@ -76,7 +76,7 @@ public:
 
         if (it != EndNV()) {
             NoChannel* pChan = GetNetwork()->FindChan(sTarget);
-            NoString sNickMask = GetNetwork()->GetIRNoNick().GetNickMask();
+            NoString sNickMask = GetNetwork()->GetIRNoNick().nickMask();
             if (pChan) {
                 if (!pChan->autoClearChanBuffer())
                     pChan->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +
@@ -99,7 +99,7 @@ public:
 
     EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
-        FilterIncoming(Nick.GetNick(), Nick, sMessage);
+        FilterIncoming(Nick.nick(), Nick, sMessage);
         return CONTINUE;
     }
 
@@ -120,7 +120,7 @@ public:
                 sMessage = NoUtils::Decrypt(sMessage, it->second);
                 sMessage.LeftChomp(8);
                 sMessage = sMessage.c_str();
-                Nick.SetNick(NickPrefix() + Nick.GetNick());
+                Nick.setNick(NickPrefix() + Nick.nick());
             }
         }
     }

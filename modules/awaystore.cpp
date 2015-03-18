@@ -451,8 +451,8 @@ private:
 
     void AddMessage(time_t iTime, const NoNick& Nick, const NoString& sMessage)
     {
-        if (Nick.GetNick() == GetNetwork()->GetIRNoNick().GetNick()) return; // ignore messages from self
-        AddMessage(NoString(iTime) + " " + Nick.GetNickMask() + " " + sMessage);
+        if (Nick.nick() == GetNetwork()->GetIRNoNick().nick()) return; // ignore messages from self
+        AddMessage(NoString(iTime) + " " + Nick.nickMask() + " " + sMessage);
     }
 
     void AddMessage(const NoString& sText)

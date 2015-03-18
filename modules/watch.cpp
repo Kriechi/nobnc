@@ -52,17 +52,17 @@ public:
 
         NoNick Nick(sHostMask);
 
-        m_sHostMask = (Nick.GetNick().size()) ? Nick.GetNick() : "*";
+        m_sHostMask = (Nick.nick().size()) ? Nick.nick() : "*";
         m_sHostMask += "!";
-        m_sHostMask += (Nick.GetIdent().size()) ? Nick.GetIdent() : "*";
+        m_sHostMask += (Nick.ident().size()) ? Nick.ident() : "*";
         m_sHostMask += "@";
-        m_sHostMask += (Nick.GetHost().size()) ? Nick.GetHost() : "*";
+        m_sHostMask += (Nick.host().size()) ? Nick.host() : "*";
 
         if (sTarget.size()) {
             m_sTarget = sTarget;
         } else {
             m_sTarget = "$";
-            m_sTarget += Nick.GetNick();
+            m_sTarget += Nick.nick();
         }
     }
     virtual ~NoWatchEntry() {}
@@ -92,7 +92,7 @@ public:
         }
 
         if (!bGoodSource) return false;
-        if (!Nick.GetHostMask().WildCmp(m_sHostMask, NoString::CaseInsensitive)) return false;
+        if (!Nick.hostMask().WildCmp(m_sHostMask, NoString::CaseInsensitive)) return false;
         return (sText.WildCmp(pNetwork->ExpandString(m_sPattern), NoString::CaseInsensitive));
     }
 
@@ -180,7 +180,7 @@ public:
 
     void OnRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
     {
-        Process(OpNick, "* " + OpNick.GetNick() + " sets mode: " + sModes + " " + sArgs + " on " + Channel.getName(), Channel.getName());
+        Process(OpNick, "* " + OpNick.nick() + " sets mode: " + sModes + " " + sArgs + " on " + Channel.getName(), Channel.getName());
     }
 
     void OnClientLogin() override
@@ -198,14 +198,14 @@ public:
     void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
         Process(OpNick,
-                "* " + OpNick.GetNick() + " kicked " + sKickedNick + " from " + Channel.getName() + " because [" + sMessage + "]",
+                "* " + OpNick.nick() + " kicked " + sKickedNick + " from " + Channel.getName() + " because [" + sMessage + "]",
                 Channel.getName());
     }
 
     void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         Process(Nick,
-                "* Quits: " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") "
+                "* Quits: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") "
                                                                                                "(" +
                 sMessage + ")",
                 "");
@@ -214,39 +214,39 @@ public:
     void OnJoin(const NoNick& Nick, NoChannel& Channel) override
     {
         Process(Nick,
-                "* " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") joins " + Channel.getName(),
+                "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") joins " + Channel.getName(),
                 Channel.getName());
     }
 
     void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
         Process(Nick,
-                "* " + Nick.GetNick() + " (" + Nick.GetIdent() + "@" + Nick.GetHost() + ") parts " + Channel.getName() +
+                "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") parts " + Channel.getName() +
                 "(" + sMessage + ")",
                 Channel.getName());
     }
 
     void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
-        Process(OldNick, "* " + OldNick.GetNick() + " is now known as " + sNewNick, "");
+        Process(OldNick, "* " + OldNick.nick() + " is now known as " + sNewNick, "");
     }
 
     EModRet OnCTCPReply(NoNick& Nick, NoString& sMessage) override
     {
-        Process(Nick, "* CTCP: " + Nick.GetNick() + " reply [" + sMessage + "]", "priv");
+        Process(Nick, "* CTCP: " + Nick.nick() + " reply [" + sMessage + "]", "priv");
         return CONTINUE;
     }
 
     EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
-        Process(Nick, "* CTCP: " + Nick.GetNick() + " [" + sMessage + "]", "priv");
+        Process(Nick, "* CTCP: " + Nick.nick() + " [" + sMessage + "]", "priv");
         return CONTINUE;
     }
 
     EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Process(Nick,
-                "* CTCP: " + Nick.GetNick() + " [" + sMessage + "] to "
+                "* CTCP: " + Nick.nick() + " [" + sMessage + "] to "
                                                                 "[" +
                 Channel.getName() + "]",
                 Channel.getName());
@@ -255,25 +255,25 @@ public:
 
     EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
-        Process(Nick, "-" + Nick.GetNick() + "- " + sMessage, "priv");
+        Process(Nick, "-" + Nick.nick() + "- " + sMessage, "priv");
         return CONTINUE;
     }
 
     EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        Process(Nick, "-" + Nick.GetNick() + ":" + Channel.getName() + "- " + sMessage, Channel.getName());
+        Process(Nick, "-" + Nick.nick() + ":" + Channel.getName() + "- " + sMessage, Channel.getName());
         return CONTINUE;
     }
 
     EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
-        Process(Nick, "<" + Nick.GetNick() + "> " + sMessage, "priv");
+        Process(Nick, "<" + Nick.nick() + "> " + sMessage, "priv");
         return CONTINUE;
     }
 
     EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        Process(Nick, "<" + Nick.GetNick() + ":" + Channel.getName() + "> " + sMessage, Channel.getName());
+        Process(Nick, "<" + Nick.nick() + ":" + Channel.getName() + "> " + sMessage, Channel.getName());
         return CONTINUE;
     }
 

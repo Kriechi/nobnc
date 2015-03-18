@@ -86,7 +86,7 @@ public:
         if (m_iNumCTCP < m_iThresholdMsgs)
             return CONTINUE;
         else if (m_iNumCTCP == m_iThresholdMsgs)
-            PutModule("Limit reached by [" + Nick.GetHostMask() + "], blocking all CTCP");
+            PutModule("Limit reached by [" + Nick.hostMask() + "], blocking all CTCP");
 
         // Reset the timeout so that we continue blocking messages
         m_tLastCTCP = time(nullptr);

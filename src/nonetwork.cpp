@@ -566,14 +566,14 @@ void NoNetwork::ClientConnected(NoClient* pClient)
         }
 
         const NoNick& Nick = GetIRNoNick();
-        if (sClientNick != Nick.GetNick()) { // case-sensitive match
-            pClient->PutClient(":" + sClientNick + "!" + Nick.GetIdent() + "@" + Nick.GetHost() + " NICK :" + Nick.GetNick());
-            pClient->SetNick(Nick.GetNick());
+        if (sClientNick != Nick.nick()) { // case-sensitive match
+            pClient->PutClient(":" + sClientNick + "!" + Nick.ident() + "@" + Nick.host() + " NICK :" + Nick.nick());
+            pClient->SetNick(Nick.nick());
         }
     }
 
     NoStringMap msParams;
-    msParams["target"] = GetIRNoNick().GetNick();
+    msParams["target"] = GetIRNoNick().nick();
 
     // Send the cached MOTD
     uSize = m_MotdBuffer.size();
@@ -590,14 +590,14 @@ void NoNetwork::ClientConnected(NoClient* pClient)
             sUserMode += cMode;
         }
         if (!sUserMode.empty()) {
-            pClient->PutClient(":" + GetIRNoNick().GetNickMask() + " MODE " + GetIRNoNick().GetNick() + " :+" + sUserMode);
+            pClient->PutClient(":" + GetIRNoNick().nickMask() + " MODE " + GetIRNoNick().nick() + " :+" + sUserMode);
         }
     }
 
     if (m_bIRNoAway) {
         // If they want to know their away reason they'll have to whois
         // themselves. At least we can tell them their away status...
-        pClient->PutClient(":irc.znc.in 306 " + GetIRNoNick().GetNick() + " :You have been marked as being away");
+        pClient->PutClient(":irc.znc.in 306 " + GetIRNoNick().nick() + " :You have been marked as being away");
     }
 
     const std::vector<NoChannel*>& vChans = GetChans();
@@ -1136,7 +1136,7 @@ void NoNetwork::SetIRNoNick(const NoNick& n)
     m_IRNoNick = n;
 
     for (NoClient* pClient : m_vClients) {
-        pClient->SetNick(n.GetNick());
+        pClient->SetNick(n.nick());
     }
 }
 

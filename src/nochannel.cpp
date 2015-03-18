@@ -32,7 +32,7 @@ NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig,
         m_name = "#" + m_name;
     }
 
-    m_nick.SetNetwork(m_network);
+    m_nick.setNetwork(m_network);
     m_buffer.setLimit(m_network->GetUser()->GetBufferCount(), true);
 
     if (pConfig) {
@@ -63,7 +63,7 @@ void NoChannel::reset()
     m_topicOwner = "";
     m_topicDate = 0;
     m_creationDate = 0;
-    m_nick.Reset();
+    m_nick.reset();
     clearNicks();
     resetJoinTries();
 }
@@ -117,18 +117,18 @@ void NoChannel::joinUser(const NoString& sKey)
 
 void NoChannel::attachUser(NoClient* pClient)
 {
-    m_network->PutUser(":" + m_network->GetIRNoNick().GetNickMask() + " JOIN :" + getName(), pClient);
+    m_network->PutUser(":" + m_network->GetIRNoNick().nickMask() + " JOIN :" + getName(), pClient);
 
     if (!getTopic().empty()) {
-        m_network->PutUser(":" + m_network->GetIRNoServer() + " 332 " + m_network->GetIRNoNick().GetNick() + " " +
+        m_network->PutUser(":" + m_network->GetIRNoServer() + " 332 " + m_network->GetIRNoNick().nick() + " " +
                             getName() + " :" + getTopic(),
                             pClient);
-        m_network->PutUser(":" + m_network->GetIRNoServer() + " 333 " + m_network->GetIRNoNick().GetNick() + " " +
+        m_network->PutUser(":" + m_network->GetIRNoServer() + " 333 " + m_network->GetIRNoNick().nick() + " " +
                             getName() + " " + getTopicOwner() + " " + NoString(getTopicDate()),
                             pClient);
     }
 
-    NoString sPre = ":" + m_network->GetIRNoServer() + " 353 " + m_network->GetIRNoNick().GetNick() + " " +
+    NoString sPre = ":" + m_network->GetIRNoServer() + " 353 " + m_network->GetIRNoNick().nick() + " " +
                    getModeForNames() + " " + getName() + " :";
     NoString sLine = sPre;
     NoString sPerm, sNick;
@@ -143,16 +143,16 @@ void NoChannel::attachUser(NoClient* pClient)
 
         for (std::map<NoString, NoNick>::iterator a = m_nicks.begin(); a != m_nicks.end(); ++a) {
             if (pThisClient->HasNamesx()) {
-                sPerm = a->second.GetPermStr();
+                sPerm = a->second.perms();
             } else {
-                char c = a->second.GetPermChar();
+                char c = a->second.perm();
                 sPerm = "";
                 if (c != '\0') {
                     sPerm += c;
                 }
             }
-            if (pThisClient->HasUHNames() && !a->second.GetIdent().empty() && !a->second.GetHost().empty()) {
-                sNick = a->first + "!" + a->second.GetIdent() + "@" + a->second.GetHost();
+            if (pThisClient->HasUHNames() && !a->second.ident().empty() && !a->second.host().empty()) {
+                sNick = a->first + "!" + a->second.ident() + "@" + a->second.host();
             } else {
                 sNick = a->first;
             }
@@ -171,7 +171,7 @@ void NoChannel::attachUser(NoClient* pClient)
             break;
     }
 
-    m_network->PutUser(":" + m_network->GetIRNoServer() + " 366 " + m_network->GetIRNoNick().GetNick() + " " + getName() + " :End of /NAMES list.",
+    m_network->PutUser(":" + m_network->GetIRNoServer() + " 366 " + m_network->GetIRNoNick().nick() + " " + getName() + " :End of /NAMES list.",
                         pClient);
     m_detached = false;
 
@@ -182,7 +182,7 @@ void NoChannel::attachUser(NoClient* pClient)
 void NoChannel::detachUser()
 {
     if (!m_detached) {
-        m_network->PutUser(":" + m_network->GetIRNoNick().GetNickMask() + " PART " + getName());
+        m_network->PutUser(":" + m_network->GetIRNoNick().nickMask() + " PART " + getName());
         m_detached = true;
     }
 }
@@ -248,8 +248,8 @@ void NoChannel::onWho(const NoString& sNick, const NoString& sIdent, const NoStr
     NoNick* pNick = findNick(sNick);
 
     if (pNick) {
-        pNick->SetIdent(sIdent);
-        pNick->SetHost(sHost);
+        pNick->setIdent(sIdent);
+        pNick->setHost(sHost);
     }
 }
 
@@ -262,7 +262,7 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
     /* Try to find a NoNick* from this channel so that pOpNick->HasPerm()
      * works as expected. */
     if (pOpNick) {
-        NoNick* OpNick = findNick(pOpNick->GetNick());
+        NoNick* OpNick = findNick(pOpNick->nick());
         /* If nothing was found, use the original pOpNick, else use the
          * NoNick* from FindNick() */
         if (OpNick) pOpNick = OpNick;
@@ -284,18 +284,18 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
                 uchar uPerm = m_network->GetIRCSock()->GetPermFromMode(uMode);
 
                 if (uPerm) {
-                    bool bNoChange = (pNick->HasPerm(uPerm) == bAdd);
+                    bool bNoChange = (pNick->hasPerm(uPerm) == bAdd);
 
                     if (bAdd) {
-                        pNick->AddPerm(uPerm);
+                        pNick->addPerm(uPerm);
 
-                        if (pNick->NickEquals(m_network->GetCurNick())) {
+                        if (pNick->equals(m_network->GetCurNick())) {
                             addPerm(uPerm);
                         }
                     } else {
-                        pNick->RemPerm(uPerm);
+                        pNick->removePerm(uPerm);
 
-                        if (pNick->NickEquals(m_network->GetCurNick())) {
+                        if (pNick->equals(m_network->GetCurNick())) {
                             remPerm(uPerm);
                         }
                     }
@@ -468,23 +468,23 @@ bool NoChannel::addNick(const NoString& sNick)
     NoNick* pNick = findNick(sTmp);
     if (!pNick) {
         pNick = &tmpNick;
-        pNick->SetNetwork(m_network);
+        pNick->setNetwork(m_network);
     }
 
-    if (!sIdent.empty()) pNick->SetIdent(sIdent);
-    if (!sHost.empty()) pNick->SetHost(sHost);
+    if (!sIdent.empty()) pNick->setIdent(sIdent);
+    if (!sHost.empty()) pNick->setHost(sHost);
 
     for (NoString::size_type i = 0; i < sPrefix.length(); i++) {
-        pNick->AddPerm(sPrefix[i]);
+        pNick->addPerm(sPrefix[i]);
     }
 
-    if (pNick->NickEquals(m_network->GetCurNick())) {
+    if (pNick->equals(m_network->GetCurNick())) {
         for (NoString::size_type i = 0; i < sPrefix.length(); i++) {
             addPerm(sPrefix[i]);
         }
     }
 
-    m_nicks[pNick->GetNick()] = *pNick;
+    m_nicks[pNick->nick()] = *pNick;
 
     return true;
 }
@@ -494,7 +494,7 @@ std::map<char, uint> NoChannel::getPermCounts() const
     std::map<char, uint> mRet;
 
     for (const auto& it : m_nicks) {
-        NoString sPerms = it.second.GetPermStr();
+        NoString sPerms = it.second.perms();
 
         for (uint p = 0; p < sPerms.size(); p++) {
             mRet[sPerms[p]]++;
@@ -528,7 +528,7 @@ bool NoChannel::changeNick(const NoString& sOldNick, const NoString& sNewNick)
     }
 
     // Rename this nick
-    it->second.SetNick(sNewNick);
+    it->second.setNick(sNewNick);
 
     // Insert a new element into the map then erase the old one, do this to change the key to the new nick
     m_nicks[sNewNick] = it->second;

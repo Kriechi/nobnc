@@ -93,7 +93,7 @@ public:
     {
         if (sNewNick == GetNetwork()->GetIRCSock()->GetNick()) {
             // We are changing our own nick
-            if (Nick.NickEquals(GetNick())) {
+            if (Nick.equals(GetNick())) {
                 // We are changing our nick away from the conf setting.
                 // Let's assume the user wants this and disable
                 // this module (to avoid fighting nickserv).
@@ -107,7 +107,7 @@ public:
         }
 
         // If the nick we want is free now, be fast and get the nick
-        if (Nick.NickEquals(GetNick())) {
+        if (Nick.equals(GetNick())) {
             KeepNick();
         }
     }
@@ -115,7 +115,7 @@ public:
     void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         // If someone with the nick we want quits, be fast and get the nick
-        if (Nick.NickEquals(GetNick())) {
+        if (Nick.equals(GetNick())) {
             KeepNick();
         }
     }
@@ -169,7 +169,7 @@ public:
 
         // Indeed trying to change to this nick, generate a 433 for it.
         // This way we can *always* block incoming 433s from the server.
-        PutUser(":" + GetNetwork()->GetIRNoServer() + " 433 " + GetNetwork()->GetIRNoNick().GetNick() + " " + sNick +
+        PutUser(":" + GetNetwork()->GetIRNoServer() + " 433 " + GetNetwork()->GetIRNoNick().nick() + " " + sNick +
                 " :ZNC is already trying to get this nickname");
         return CONTINUE;
     }

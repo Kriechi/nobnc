@@ -218,7 +218,7 @@ public:
 
     void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
-        NoStringMap::iterator it = m_msQueue.find(Nick.GetNick().AsLower());
+        NoStringMap::iterator it = m_msQueue.find(Nick.nick().AsLower());
 
         if (it != m_msQueue.end()) {
             m_msQueue.erase(it);
@@ -228,7 +228,7 @@ public:
     void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         // Update the queue with nick changes
-        NoStringMap::iterator it = m_msQueue.find(OldNick.GetNick().AsLower());
+        NoStringMap::iterator it = m_msQueue.find(OldNick.nick().AsLower());
 
         if (it != m_msQueue.end()) {
             m_msQueue[sNewNick.AsLower()] = it->second;
@@ -255,11 +255,11 @@ public:
 
     void OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        if (Nick.GetNick() == GetNetwork()->GetIRNoNick().GetNick()) {
+        if (Nick.nick() == GetNetwork()->GetIRNoNick().nick()) {
             const std::map<NoString, NoNick>& msNicks = Channel.getNicks();
 
             for (std::map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
-                if (!it->second.HasPerm(NoChannel::Op)) {
+                if (!it->second.hasPerm(NoChannel::Op)) {
                     CheckAutoOp(it->second, Channel);
                 }
             }
@@ -457,17 +457,17 @@ public:
 
     bool CheckAutoOp(const NoNick& Nick, NoChannel& Channel)
     {
-        NoAutoOpUser* pUser = FindUserByHost(Nick.GetHostMask(), Channel.getName());
+        NoAutoOpUser* pUser = FindUserByHost(Nick.hostMask(), Channel.getName());
 
         if (!pUser) {
             return false;
         }
 
         if (pUser->GetUserKey().Equals("__NOKEY__")) {
-            PutIRC("MODE " + Channel.getName() + " +o " + Nick.GetNick());
+            PutIRC("MODE " + Channel.getName() + " +o " + Nick.nick());
         } else {
             // then insert this nick into the queue, the timer does the rest
-            NoString sNick = Nick.GetNick().AsLower();
+            NoString sNick = Nick.nick().AsLower();
             if (m_msQueue.find(sNick) == m_msQueue.end()) {
                 m_msQueue[sNick] = "";
             }
@@ -514,7 +514,7 @@ public:
             pUser = it->second;
 
             // First verify that the person who challenged us matches a user's host
-            if (pUser->HostMatches(Nick.GetHostMask())) {
+            if (pUser->HostMatches(Nick.hostMask())) {
                 const std::vector<NoChannel*>& Chans = GetNetwork()->GetChans();
                 bMatchedHost = true;
 
@@ -522,10 +522,10 @@ public:
                 for (size_t a = 0; a < Chans.size(); a++) {
                     const NoChannel& Chan = *Chans[a];
 
-                    const NoNick* pNick = Chan.findNick(Nick.GetNick());
+                    const NoNick* pNick = Chan.findNick(Nick.nick());
 
                     if (pNick) {
-                        if (pNick->HasPerm(NoChannel::Op) && pUser->ChannelMatches(Chan.getName())) {
+                        if (pNick->hasPerm(NoChannel::Op) && pUser->ChannelMatches(Chan.getName())) {
                             bValid = true;
                             break;
                         }
@@ -540,31 +540,31 @@ public:
 
         if (!bValid) {
             if (bMatchedHost) {
-                PutModule("[" + Nick.GetHostMask() +
+                PutModule("[" + Nick.hostMask() +
                           "] sent us a challenge but they are not opped in any defined channels.");
             } else {
-                PutModule("[" + Nick.GetHostMask() + "] sent us a challenge but they do not match a defined user.");
+                PutModule("[" + Nick.hostMask() + "] sent us a challenge but they do not match a defined user.");
             }
 
             return false;
         }
 
         if (sChallenge.length() != AUTOOP_CHALLENGE_LENGTH) {
-            PutModule("WARNING! [" + Nick.GetHostMask() + "] sent an invalid challenge.");
+            PutModule("WARNING! [" + Nick.hostMask() + "] sent an invalid challenge.");
             return false;
         }
 
         NoString sResponse = pUser->GetUserKey() + "::" + sChallenge;
-        PutIRC("NOTICE " + Nick.GetNick() + " :!ZNCAO RESPONSE " + NoUtils::MD5(sResponse));
+        PutIRC("NOTICE " + Nick.nick() + " :!ZNCAO RESPONSE " + NoUtils::MD5(sResponse));
         return false;
     }
 
     bool VerifyResponse(const NoNick& Nick, const NoString& sResponse)
     {
-        NoStringMap::iterator itQueue = m_msQueue.find(Nick.GetNick().AsLower());
+        NoStringMap::iterator itQueue = m_msQueue.find(Nick.nick().AsLower());
 
         if (itQueue == m_msQueue.end()) {
-            PutModule("[" + Nick.GetHostMask() + "] sent an unchallenged response.  This could be due to lag.");
+            PutModule("[" + Nick.hostMask() + "] sent an unchallenged response.  This could be due to lag.");
             return false;
         }
 
@@ -572,19 +572,19 @@ public:
         m_msQueue.erase(itQueue);
 
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
-            if (it->second->HostMatches(Nick.GetHostMask())) {
+            if (it->second->HostMatches(Nick.hostMask())) {
                 if (sResponse == NoUtils::MD5(it->second->GetUserKey() + "::" + sChallenge)) {
                     OpUser(Nick, *it->second);
                     return true;
                 } else {
-                    PutModule("WARNING! [" + Nick.GetHostMask() +
+                    PutModule("WARNING! [" + Nick.hostMask() +
                               "] sent a bad response.  Please verify that you have their correct password.");
                     return false;
                 }
             }
         }
 
-        PutModule("WARNING! [" + Nick.GetHostMask() + "] sent a response but did not match any defined users.");
+        PutModule("WARNING! [" + Nick.hostMask() + "] sent a response but did not match any defined users.");
         return false;
     }
 
@@ -621,10 +621,10 @@ public:
             const NoChannel& Chan = *Chans[a];
 
             if (Chan.hasPerm(NoChannel::Op) && User.ChannelMatches(Chan.getName())) {
-                const NoNick* pNick = Chan.findNick(Nick.GetNick());
+                const NoNick* pNick = Chan.findNick(Nick.nick());
 
-                if (pNick && !pNick->HasPerm(NoChannel::Op)) {
-                    PutIRC("MODE " + Chan.getName() + " +o " + Nick.GetNick());
+                if (pNick && !pNick->hasPerm(NoChannel::Op)) {
+                    PutIRC("MODE " + Chan.getName() + " +o " + Nick.nick());
                 }
             }
         }

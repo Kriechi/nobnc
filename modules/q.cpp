@@ -300,7 +300,7 @@ public:
 
     EModRet OnInvite(const NoNick& Nick, const NoString& sChan) override
     {
-        if (!Nick.NickEquals("Q") || !Nick.GetHost().Equals("CServe.quakenet.org")) return CONTINUE;
+        if (!Nick.equals("Q") || !Nick.host().Equals("CServe.quakenet.org")) return CONTINUE;
         if (m_bJoinOnInvite) GetNetwork()->AddChan(sChan, false);
         return CONTINUE;
     }
@@ -435,7 +435,7 @@ private:
 
     EModRet HandleMessage(const NoNick& Nick, NoString sMessage)
     {
-        if (!Nick.NickEquals("Q") || !Nick.GetHost().Equals("CServe.quakenet.org")) return CONTINUE;
+        if (!Nick.equals("Q") || !Nick.host().Equals("CServe.quakenet.org")) return CONTINUE;
 
         sMessage.Trim();
 
@@ -535,7 +535,7 @@ private:
         return pIRCSock && pIRCSock->IsAuthed();
     }
 
-    bool IsSelf(const NoNick& Nick) { return Nick.NickEquals(GetNetwork()->GetCurNick()); }
+    bool IsSelf(const NoNick& Nick) { return Nick.equals(GetNetwork()->GetCurNick()); }
 
     bool PackHex(const NoString& sHex, NoString& sPackedHex)
     {

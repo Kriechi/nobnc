@@ -316,13 +316,13 @@ public:
 
                 pTmp.first = iIP;
                 pTmp.second = iPort;
-                sMask = "(s)" + Nick.GetNick() + "!" + "(s)" + Nick.GetNick() + "@" + NoUtils::GetIP(iIP);
+                sMask = "(s)" + Nick.nick() + "!" + "(s)" + Nick.nick() + "@" + NoUtils::GetIP(iIP);
 
-                m_siiWaitingChats["(s)" + Nick.GetNick()] = pTmp;
+                m_siiWaitingChats["(s)" + Nick.nick()] = pTmp;
                 SendToUser(sMask, "*** Incoming DCC SCHAT, Accept ? (yes/no)");
                 NoRemMarkerJob* p = new NoRemMarkerJob(
-                this, 60, 1, "Remove (s)" + Nick.GetNick(), "Removes this nicks entry for waiting DCC.");
-                p->SetNick("(s)" + Nick.GetNick());
+                this, 60, 1, "Remove (s)" + Nick.nick(), "Removes this nicks entry for waiting DCC.");
+                p->SetNick("(s)" + Nick.nick());
                 AddTimer(p);
                 return (HALT);
             }

@@ -124,7 +124,7 @@ public:
                 NoNetwork* pNetwork = *i;
                 if (pNetwork->GetIRCSock()) {
                     if (pNetwork->GetChanPrefixes().find(CHAN_PREFIX_1) == NoString::npos) {
-                        pNetwork->PutUser(":" + GetIRNoServer(pNetwork) + " 005 " + pNetwork->GetIRNoNick().GetNick() +
+                        pNetwork->PutUser(":" + GetIRNoServer(pNetwork) + " 005 " + pNetwork->GetIRNoNick().nick() +
                                           " CHANTYPES=" + pNetwork->GetChanPrefixes() + CHAN_PREFIX_1
                                           " :are supported by this server.");
                     }
