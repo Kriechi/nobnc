@@ -122,9 +122,9 @@ public:
     bool GetProtectWebSessions() const { return m_bProtectWebSessions; }
     bool GetHideVersion() const { return m_bHideVersion; }
     NoString GetSSLCiphers() const { return m_sSSLCiphers; }
-    Csock::EDisableProtocol GetDisabledSSLProtocols() const
+    uint GetDisabledSSLProtocols() const
     {
-        return static_cast<Csock::EDisableProtocol>(m_uDisabledSSLProtocols);
+        return m_uDisabledSSLProtocols;
     }
 
     static void CreateInstance();
