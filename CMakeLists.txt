@@ -30,7 +30,6 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nohttpsock.h
                        include/no/noircsock.h
                        include/no/nolistener.h
-                       include/no/nomd5.h
                        include/no/nomessage.h
                        include/no/nomodule.h
                        include/no/nomodulecall.h
@@ -50,6 +49,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nouser.h
                        include/no/noutils.h
                        include/no/nowebmodules.h
+                       third_party/md5/md5.h
                        third_party/sha2/sha2.h
                        ${PROJECT_BINARY_DIR}/include/no/Csocket.h
                        ${PROJECT_BINARY_DIR}/include/no/noglobal.h
@@ -69,7 +69,6 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nohttpsock.cpp
                        src/noircsock.cpp
                        src/nolistener.cpp
-                       src/nomd5.cpp
                        src/nomessage.cpp
                        src/nomodule.cpp
                        src/nomodules.cpp
@@ -88,6 +87,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nouser.cpp
                        src/noutils.cpp
                        src/nowebmodules.cpp
+                       third_party/md5/md5.cpp
                        third_party/sha2/sha2.c
                        ${PROJECT_BINARY_DIR}/src/Csocket.cpp
                        ${PROJECT_BINARY_DIR}/src/noglobal.cpp
