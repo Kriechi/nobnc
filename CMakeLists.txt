@@ -40,7 +40,6 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/noquery.h
                        include/no/noserver.h
                        include/no/nosettings.h
-                       include/no/nosha256.h
                        include/no/nosocket.h
                        include/no/nosslverifyhost.h
                        include/no/nostring.h
@@ -51,6 +50,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nouser.h
                        include/no/noutils.h
                        include/no/nowebmodules.h
+                       third_party/sha2/sha2.h
                        ${PROJECT_BINARY_DIR}/include/no/Csocket.h
                        ${PROJECT_BINARY_DIR}/include/no/noglobal.h
 )
@@ -78,7 +78,6 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/noquery.cpp
                        src/noserver.cpp
                        src/nosettings.cpp
-                       src/nosha256.cpp
                        src/nosocket.cpp
                        src/nosslverifyhost.cpp
                        src/nostring.cpp
@@ -89,6 +88,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nouser.cpp
                        src/noutils.cpp
                        src/nowebmodules.cpp
+                       third_party/sha2/sha2.c
                        ${PROJECT_BINARY_DIR}/src/Csocket.cpp
                        ${PROJECT_BINARY_DIR}/src/noglobal.cpp
 )
@@ -96,7 +96,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
 ### TARGETS
 
 add_library(libno SHARED ${NO_SOURCES} ${NO_HEADERS})
-include_directories(${NO_INCLUDEDIRS})
+include_directories(${NO_INCLUDEDIRS} third_party)
 include_directories(${PROJECT_SOURCE_DIR}/include/no) ### TODO: cleanup
 include_directories(${PROJECT_BINARY_DIR}/include/no) ### TODO: cleanup
 target_link_libraries(libno ${NO_LIBRARIES})

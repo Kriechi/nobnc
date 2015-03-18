@@ -19,8 +19,8 @@
 #include "nofile.h"
 #include "nodir.h"
 #include "nomd5.h"
-#include "nosha256.h"
 #include "noblowfish.h"
+#include "sha2/sha2.h"
 #include <sys/time.h>
 #include <unistd.h>
 
