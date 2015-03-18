@@ -50,13 +50,13 @@ public:
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout = 60);
     ~NoSChatSock() {}
 
-    NoBaseSocket* GetSockObjImpl(const CS_STRING& sHostname, u_short iPort) override
+    NoBaseSocket* GetSockObjImpl(const NoString& sHostname, u_short iPort) override
     {
         NoSChatSock* p = new NoSChatSock(m_pModule, m_sChatNick, sHostname, iPort);
         return (p);
     }
 
-    bool ConnectionFromImpl(const CS_STRING& sHost, u_short iPort) override
+    bool ConnectionFromImpl(const NoString& sHost, u_short iPort) override
     {
         Close(); // close the listener after the first connection
         return (true);
@@ -69,7 +69,7 @@ public:
 
     void PutQuery(const NoString& sText);
 
-    void ReadLineImpl(const CS_STRING& sLine) override;
+    void ReadLineImpl(const NoString& sLine) override;
     void DisconnectedImpl() override;
 
     void AddLine(const NoString& sLine)
@@ -86,7 +86,7 @@ public:
             ReadLineImpl("*** Reattached.");
         } else {
             // Buffer playback
-            std::vector<CS_STRING>::reverse_iterator it = m_vBuffer.rbegin();
+            std::vector<NoString>::reverse_iterator it = m_vBuffer.rbegin();
             for (; it != m_vBuffer.rend(); ++it) ReadLineImpl(*it);
 
             m_vBuffer.clear();
@@ -410,7 +410,7 @@ void NoSChatSock::PutQuery(const NoString& sText)
     m_pModule->SendToUser(m_sChatNick + "!" + m_sChatNick + "@" + GetRemoteIP(), sText);
 }
 
-void NoSChatSock::ReadLineImpl(const CS_STRING& sLine)
+void NoSChatSock::ReadLineImpl(const NoString& sLine)
 {
     if (m_pModule) {
         NoString sText = sLine;
