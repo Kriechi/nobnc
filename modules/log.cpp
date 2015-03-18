@@ -238,7 +238,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
     if (!NoFile::Exists(sLogDir)) NoDir::MakeDir(sLogDir, ModDirInfo.st_mode);
     if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT)) {
         LogFile.Write(NoUtils::FormatTime(curtime, "[%H:%M:%S] ", GetUser()->GetTimezone()) +
-                      (m_bSanitize ? sLine.StripControls_n() : sLine) + "\n");
+                      (m_bSanitize ? NoUtils::StripControls(sLine) : sLine) + "\n");
     } else
         DEBUG("Could not open log file [" << sPath << "]: " << strerror(errno));
 }

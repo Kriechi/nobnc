@@ -503,19 +503,6 @@ public:
      * @return The result of the conversion.
      */
     NoString RightChomp_n(size_type uLen = 1) const;
-    /** Remove controls characters from this string.
-     * Controls characters are color codes, and those in C0 set
-     * See https://en.wikipedia.org/wiki/C0_and_C1_control_codes
-     * @return The result of the conversion.
-     */
-    NoString& StripControls();
-    /** Remove controls characters from this string.
-     * Controls characters are color codes, and those in C0 set
-     * See https://en.wikipedia.org/wiki/C0_and_C1_control_codes
-     * This string object isn't modified.
-     * @return The result of the conversion.
-     */
-    NoString StripControls_n() const;
 
 private:
     uchar* strnchr(const uchar* src,

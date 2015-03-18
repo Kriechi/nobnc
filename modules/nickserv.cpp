@@ -108,8 +108,8 @@ public:
              sMessage.find("If this is your nick, identify yourself with") != NoString::npos ||
              sMessage.find("If this is your nick, type") != NoString::npos ||
              sMessage.find("This is a registered nickname, please identify") != NoString::npos ||
-             sMessage.StripControls_n().find("type /NickServ IDENTIFY password") != NoString::npos ||
-             sMessage.StripControls_n().find("type /msg NickServ IDENTIFY password") != NoString::npos) &&
+             NoUtils::StripControls(sMessage).find("type /NickServ IDENTIFY password") != NoString::npos ||
+             NoUtils::StripControls(sMessage).find("type /msg NickServ IDENTIFY password") != NoString::npos) &&
             sMessage.AsUpper().find("IDENTIFY") != NoString::npos && sMessage.find("help") == NoString::npos) {
             NoStringMap msValues;
             msValues["password"] = GetNV("Password");

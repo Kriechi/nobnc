@@ -707,3 +707,51 @@ NoString NoUtils::ToTimeStr(ulong s)
 
     return sRet.RightChomp_n();
 }
+
+NoString NoUtils::StripControls(const NoString& str)
+{
+    NoString sRet;
+    const uchar* pStart = (const uchar*)str.data();
+    uchar ch = *pStart;
+    ulong iLength = str.length();
+    sRet.reserve(iLength);
+    bool colorCode = false;
+    uint digits = 0;
+    bool comma = false;
+
+    for (uint a = 0; a < iLength; a++, ch = pStart[a]) {
+        // Color code. Format: \x03([0-9]{1,2}(,[0-9]{1,2})?)?
+        if (ch == 0x03) {
+            colorCode = true;
+            digits = 0;
+            comma = false;
+            continue;
+        }
+        if (colorCode) {
+            if (isdigit(ch) && digits < 2) {
+                digits++;
+                continue;
+            }
+            if (ch == ',' && !comma && digits > 0) {
+                comma = true;
+                digits = 0;
+                continue;
+            }
+
+            colorCode = false;
+
+            if (digits == 0 && comma) { // There was a ',' which wasn't followed by digits, we should print it.
+                sRet += ',';
+            }
+        }
+        // CO controls codes
+        if (ch < 0x20 || ch == 0x7F) continue;
+        sRet += ch;
+    }
+    if (colorCode && digits == 0 && comma) {
+        sRet += ',';
+    }
+
+    sRet.reserve(0);
+    return sRet;
+}

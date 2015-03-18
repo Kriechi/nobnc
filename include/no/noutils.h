@@ -99,6 +99,13 @@ public:
      * @return A string like "4w 6d 4h 3m 58s".
      */
     static NoString ToTimeStr(ulong s);
+
+    /** Remove controls characters from the string.
+     * Controls characters are color codes, and those in C0 set
+     * See https://en.wikipedia.org/wiki/C0_and_C1_control_codes
+     * @return A string without control codes.
+     */
+    static NoString StripControls(const NoString& str);
 };
 
 #endif // NOUTILS_H

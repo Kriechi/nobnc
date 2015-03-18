@@ -15,6 +15,7 @@
  */
 
 #include <no/nomodules.h>
+#include <no/noutils.h>
 
 class NoStripControlsMod : public NoModule
 {
@@ -23,37 +24,37 @@ public:
 
     EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
-        sMessage.StripControls();
+        sMessage = NoUtils::StripControls(sMessage);
         return CONTINUE;
     }
 
     EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        sMessage.StripControls();
+        sMessage = NoUtils::StripControls(sMessage);
         return CONTINUE;
     }
 
     EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
-        sMessage.StripControls();
+        sMessage = NoUtils::StripControls(sMessage);
         return CONTINUE;
     }
 
     EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        sMessage.StripControls();
+        sMessage = NoUtils::StripControls(sMessage);
         return CONTINUE;
     }
 
     EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
-        sMessage.StripControls();
+        sMessage = NoUtils::StripControls(sMessage);
         return CONTINUE;
     }
 
     EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        sMessage.StripControls();
+        sMessage = NoUtils::StripControls(sMessage);
         return CONTINUE;
     }
 };
