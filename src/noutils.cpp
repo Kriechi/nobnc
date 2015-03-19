@@ -849,6 +849,8 @@ NoString NoUtils::Ellipsize(const NoString& str, uint uLen)
     return sRet;
 }
 
+extern NoStringVector Split_helper(const NoString& str, const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
+
 NoStringMap NoUtils::OptionSplit(const NoString& str)
 {
     NoString sName;
@@ -863,7 +865,7 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
             continue;
         }
 
-        NoStringVector vsNames = sName.Split(" ", false, "\"", "\"");
+        NoStringVector vsNames = Split_helper(sName, " ", false, "\"", "\"", true);
 
         for (uint a = 0; a < vsNames.size(); a++) {
             NoString sKeyName = vsNames[a];
@@ -882,5 +884,5 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
 
 NoStringVector NoUtils::QuoteSplit(const NoString& str)
 {
-    return str.Split(" ", false, "\"", "\"", true);
+    return Split_helper(str, " ", false, "\"", "\"", true);
 }

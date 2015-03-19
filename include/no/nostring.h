@@ -221,25 +221,11 @@ public:
     NoString Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
 
     /** Split up this string into tokens.
-     * Via sLeft and sRight you can define "markers" like with Replace().
-     * Anything in such a marked section is treated as a single token. All
-     * occurences of sDelim in such a block are ignored.
      * @param sDelim Delimiter between tokens.
-     * @param vsRet Vector for returning the result.
      * @param bAllowEmpty Do empty tokens count as a valid token?
-     * @param sLeft Left delimiter like with Replace().
-     * @param sRight Right delimiter like with Replace().
-     * @param bTrimQuotes Should sLeft and sRight be removed from the token
-     *                    they mark?
-     * @param bTrimWhiteSpace If this is true, NoString::Trim() is called on
-     *                        each token.
-     * @return The number of tokens found.
+     * @return A vector of tokens.
      */
-    NoStringVector Split(const NoString& sDelim,
-                         bool bAllowEmpty = true,
-                         const NoString& sLeft = "",
-                         const NoString& sRight = "",
-                         bool bTrimQuotes = true) const;
+    NoStringVector Split(const NoString& sDelim, bool bAllowEmpty = true) const;
 
     /** Decode the give base64-encoded string.
      * @return The decoded string.

@@ -17,6 +17,8 @@
 #include "nostring.h"
 #include <sstream>
 
+NoStringVector Split_helper(const NoString& str, const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
+
 static const uchar XX = 0xff;
 static const uchar base64_table[256] = {
     XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX,
@@ -268,7 +270,7 @@ uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const No
 
 NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
 {
-    NoStringVector vsTokens = Split(sSep, bAllowEmpty, sLeft, sRight, bTrimQuotes);
+    NoStringVector vsTokens = Split_helper(*this, sSep, bAllowEmpty, sLeft, sRight, bTrimQuotes);
     if (vsTokens.size() > uPos) {
         NoString sRet;
 
@@ -353,20 +355,20 @@ NoString NoString::Right(size_type uCount) const
     return substr(length() - uCount, uCount);
 }
 
-NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
+NoStringVector Split_helper(const NoString& str, const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes)
 {
     NoStringVector vsRet;
 
-    if (empty()) {
+    if (str.empty()) {
         return vsRet;
     }
 
     NoString sTmp;
     bool bInside = false;
-    size_type uDelimLen = sDelim.length();
-    size_type uLeftLen = sLeft.length();
-    size_type uRightLen = sRight.length();
-    const char* p = c_str();
+    NoString::size_type uDelimLen = sDelim.length();
+    NoString::size_type uLeftLen = sLeft.length();
+    NoString::size_type uRightLen = sRight.length();
+    const char* p = str.c_str();
 
     if (!bAllowEmpty) {
         while (strncasecmp(p, sDelim.c_str(), uDelimLen) == 0) {
@@ -420,6 +422,11 @@ NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty, const N
     }
 
     return vsRet;
+}
+
+NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty) const
+{
+    return Split_helper(*this, sDelim, bAllowEmpty, "", "", true);
 }
 
 NoString NoString::ToBase64(uint uWrap) const
