@@ -826,3 +826,25 @@ NoString NoUtils::NamedFormat(const NoString& sFormat, const NoStringMap& msValu
 
     return sRet;
 }
+
+NoString NoUtils::Ellipsize(const NoString& str, uint uLen)
+{
+    if (uLen >= str.size()) {
+        return str;
+    }
+
+    NoString sRet;
+
+    // @todo this looks suspect
+    if (uLen < 4) {
+        for (uint a = 0; a < uLen; a++) {
+            sRet += ".";
+        }
+
+        return sRet;
+    }
+
+    sRet = str.substr(0, uLen - 3) + "...";
+
+    return sRet;
+}

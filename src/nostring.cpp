@@ -747,28 +747,6 @@ NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAl
     return substr(start_pos);
 }
 
-NoString NoString::Ellipsize(uint uLen) const
-{
-    if (uLen >= size()) {
-        return *this;
-    }
-
-    std::string sRet;
-
-    // @todo this looks suspect
-    if (uLen < 4) {
-        for (uint a = 0; a < uLen; a++) {
-            sRet += ".";
-        }
-
-        return sRet;
-    }
-
-    sRet = substr(0, uLen - 3) + "...";
-
-    return sRet;
-}
-
 NoString NoString::Left(size_type uCount) const
 {
     uCount = (uCount > length()) ? length() : uCount;

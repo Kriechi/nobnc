@@ -135,12 +135,8 @@ TEST(StringTest, Replace)
     EXPECT_EQ("a(b)", NoString("(a()a)").Replace_n("a", "b", "(", ")", true));
 }
 
-TEST(StringTest, Misc)
+TEST(StringTest, LeftRight)
 {
-    EXPECT_EQ("Hello,...", NoString("Hello, I'm Bob").Ellipsize(9));
-    EXPECT_EQ("Hello, I'm Bob", NoString("Hello, I'm Bob").Ellipsize(90));
-    EXPECT_EQ("..", NoString("Hello, I'm Bob").Ellipsize(2));
-
     EXPECT_EQ("Xy", CS("Xyz").Left(2));
     EXPECT_EQ("Xyz", CS("Xyz").Left(20));
 

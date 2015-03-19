@@ -210,13 +210,6 @@ public:
                  const NoString& sLeft = "",
                  const NoString& sRight = "",
                  bool bRemoveDelims = false);
-    /** Ellipsize the current string.
-     * For example, ellipsizing "Hello, I'm Bob" to the length 9 would
-     * result in "Hello,...".
-     * @param uLen The length to ellipsize to.
-     * @return The ellipsized string.
-     */
-    NoString Ellipsize(uint uLen) const;
     /** Return the left part of the string.
      * @param uCount The number of characters to keep.
      * @return The resulting string.

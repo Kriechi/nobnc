@@ -940,7 +940,7 @@ void NoClient::UserCommand(NoString& sLine)
                 for (const NoModInfo& Info : ssGlobalMods) {
                     GTable.AddRow();
                     GTable.SetCell("Name", (NoApp::Get().GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
-                    GTable.SetCell("Description", Info.GetDescription().Ellipsize(128));
+                    GTable.SetCell("Description", NoUtils::Ellipsize(Info.GetDescription(), 128));
                 }
 
                 PutStatus(GTable);
@@ -961,7 +961,7 @@ void NoClient::UserCommand(NoString& sLine)
             for (const NoModInfo& Info : ssUserMods) {
                 Table.AddRow();
                 Table.SetCell("Name", (m_pUser->GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
-                Table.SetCell("Description", Info.GetDescription().Ellipsize(128));
+                Table.SetCell("Description", NoUtils::Ellipsize(Info.GetDescription(), 128));
             }
 
             PutStatus(Table);
@@ -981,7 +981,7 @@ void NoClient::UserCommand(NoString& sLine)
             for (const NoModInfo& Info : ssNetworkMods) {
                 Table.AddRow();
                 Table.SetCell("Name", ((m_pNetwork && m_pNetwork->GetModules().FindModule(Info.GetName())) ? "*" : " ") + Info.GetName());
-                Table.SetCell("Description", Info.GetDescription().Ellipsize(128));
+                Table.SetCell("Description", NoUtils::Ellipsize(Info.GetDescription(), 128));
             }
 
             PutStatus(Table);

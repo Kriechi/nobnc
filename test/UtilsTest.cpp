@@ -111,3 +111,10 @@ TEST(UtilsTest, NamedFormat)
     m["a"] = "b";
     EXPECT_EQ("{xbyb", NoUtils::NamedFormat(NoString("\\{x{a}y{a}"), m));
 }
+
+TEST(UtilsTest, Ellipsize)
+{
+    EXPECT_EQ("Hello,...", NoUtils::Ellipsize("Hello, I'm Bob", 9));
+    EXPECT_EQ("Hello, I'm Bob", NoUtils::Ellipsize("Hello, I'm Bob", 90));
+    EXPECT_EQ("..", NoUtils::Ellipsize("Hello, I'm Bob", 2));
+}

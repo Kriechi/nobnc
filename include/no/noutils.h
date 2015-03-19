@@ -127,6 +127,14 @@ public:
      * @return The string with named parameters replaced.
      */
     static NoString NamedFormat(const NoString& sFormat, const NoStringMap& msValues);
+
+    /** Ellipsize the current string.
+     * For example, ellipsizing "Hello, I'm Bob" to the length 9 would
+     * result in "Hello,...".
+     * @param uLen The length to ellipsize to.
+     * @return The ellipsized string.
+     */
+    static NoString Ellipsize(const NoString& str, uint uLen);
 };
 
 #endif // NOUTILS_H
