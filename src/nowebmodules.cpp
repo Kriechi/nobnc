@@ -29,6 +29,13 @@
 
 const uint NoWebSock::m_uiMaxSessions = 5;
 
+class NoWebSessionMap : public NoCacheMap<NoString, std::shared_ptr<NoWebSession>>
+{
+public:
+    NoWebSessionMap(uint uTTL = 5000) : NoCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
+    void FinishUserSessions(const NoUser& User);
+};
+
 // We need this class to make sure the contained maps and their content is
 // destroyed in the order that we want.
 struct CSessionManager
