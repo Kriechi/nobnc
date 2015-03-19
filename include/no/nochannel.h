@@ -81,76 +81,60 @@ public:
     bool remNick(const NoString& sNick);
     bool changeNick(const NoString& sOldNick, const NoString& sNewNick);
 
-    const NoBuffer& getBuffer() const { return m_buffer; }
-    uint getBufferCount() const { return m_buffer.getLimit(); }
-    bool setBufferCount(uint u, bool bForce = false)
-    {
-        m_hasBufferCountSet = true;
-        return m_buffer.setLimit(u, bForce);
-    }
-    void inheritBufferCount(uint u, bool bForce = false)
-    {
-        if (!m_hasBufferCountSet) m_buffer.setLimit(u, bForce);
-    }
-    size_t addBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr)
-    {
-        return m_buffer.addMessage(sFormat, sText, ts);
-    }
-    void clearBuffer() { m_buffer.clear(); }
+    const NoBuffer& getBuffer() const;
+    uint getBufferCount() const;
+    bool setBufferCount(uint u, bool bForce = false);
+    void inheritBufferCount(uint u, bool bForce = false);
+    size_t addBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr);
+    void clearBuffer();
     void sendBuffer(NoClient* pClient);
     void sendBuffer(NoClient* pClient, const NoBuffer& Buffer);
 
-    NoString getPermStr() const { return m_nick.perms(); }
-    bool hasPerm(uchar uPerm) const { return m_nick.hasPerm(uPerm); }
-    void addPerm(uchar uPerm) { m_nick.addPerm(uPerm); }
-    void remPerm(uchar uPerm) { m_nick.removePerm(uPerm); }
+    NoString getPermStr() const;
+    bool hasPerm(uchar uPerm) const;
+    void addPerm(uchar uPerm);
+    void remPerm(uchar uPerm);
 
-    void setModeKnown(bool b) { m_modeKnown = b; }
-    void setIsOn(bool b)
-    {
-        m_isOn = b;
-        if (!b) {
-            reset();
-        }
-    }
+    void setModeKnown(bool b);
+    void setIsOn(bool b);
     void setKey(const NoString& s);
-    void setTopic(const NoString& s) { m_topic = s; }
-    void setTopicOwner(const NoString& s) { m_topicOwner = s; }
-    void setTopicDate(ulong u) { m_topicDate = u; }
-    void setDefaultModes(const NoString& s) { m_defaultModes = s; }
+    void setTopic(const NoString& s);
+    void setTopicOwner(const NoString& s);
+    void setTopicDate(ulong u);
+    void setDefaultModes(const NoString& s);
     void setAutoClearChanBuffer(bool b);
     void inheritAutoClearChanBuffer(bool b);
-    void setDetached(bool b = true) { m_detached = b; }
+    void setDetached(bool b = true);
     void setInConfig(bool b);
-    void setCreationDate(ulong u) { m_creationDate = u; }
-    void disable() { m_disabled = true; }
+    void setCreationDate(ulong u);
+    void disable();
     void enable();
-    void incJoinTries() { m_joinTries++; }
-    void resetJoinTries() { m_joinTries = 0; }
+    void incJoinTries();
+    void resetJoinTries();
 
-    bool isModeKnown() const { return m_modeKnown; }
+    bool isModeKnown() const;
     bool hasMode(uchar uMode) const;
     NoString getOptions() const;
     NoString getModeArg(uchar uMode) const;
     std::map<char, uint> getPermCounts() const;
-    bool isOn() const { return m_isOn; }
-    const NoString& getName() const { return m_name; }
-    const std::map<uchar, NoString>& getModes() const { return m_modes; }
-    const NoString& getKey() const { return m_key; }
-    const NoString& getTopic() const { return m_topic; }
-    const NoString& getTopicOwner() const { return m_topicOwner; }
-    ulong getTopicDate() const { return m_topicDate; }
-    const NoString& getDefaultModes() const { return m_defaultModes; }
-    const std::map<NoString, NoNick>& getNicks() const { return m_nicks; }
-    size_t getNickCount() const { return m_nicks.size(); }
-    bool autoClearChanBuffer() const { return m_autoClearChanBuffer; }
-    bool isDetached() const { return m_detached; }
-    bool inConfig() const { return m_inConfig; }
-    ulong getCreationDate() const { return m_creationDate; }
-    bool isDisabled() const { return m_disabled; }
-    uint getJoinTries() const { return m_joinTries; }
-    bool hasBufferCountSet() const { return m_hasBufferCountSet; }
-    bool hasAutoClearChanBufferSet() const { return m_hasAutoClearChanBufferSet; }
+    bool isOn() const;
+    const NoString& getName() const;
+    const std::map<uchar, NoString>& getModes() const;
+    const NoString& getKey() const;
+    const NoString& getTopic() const;
+    const NoString& getTopicOwner() const;
+    ulong getTopicDate() const;
+    const NoString& getDefaultModes() const;
+    const std::map<NoString, NoNick>& getNicks() const;
+    size_t getNickCount() const;
+    bool autoClearChanBuffer() const;
+    bool isDetached() const;
+    bool inConfig() const;
+    ulong getCreationDate() const;
+    bool isDisabled() const;
+    uint getJoinTries() const;
+    bool hasBufferCountSet() const;
+    bool hasAutoClearChanBufferSet() const;
 
 private:
     bool m_detached;

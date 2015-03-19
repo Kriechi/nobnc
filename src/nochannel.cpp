@@ -547,6 +547,23 @@ NoNick* NoChannel::findNick(const NoString& sNick)
     return (it != m_nicks.end()) ? &it->second : nullptr;
 }
 
+const NoBuffer& NoChannel::getBuffer() const { return m_buffer; }
+uint NoChannel::getBufferCount() const { return m_buffer.getLimit(); }
+bool NoChannel::setBufferCount(uint u, bool bForce)
+{
+    m_hasBufferCountSet = true;
+    return m_buffer.setLimit(u, bForce);
+}
+void NoChannel::inheritBufferCount(uint u, bool bForce)
+{
+    if (!m_hasBufferCountSet) m_buffer.setLimit(u, bForce);
+}
+size_t NoChannel::addBuffer(const NoString& sFormat, const NoString& sText, const timeval* ts)
+{
+    return m_buffer.addMessage(sFormat, sText, ts);
+}
+void NoChannel::clearBuffer() { m_buffer.clear(); }
+
 void NoChannel::sendBuffer(NoClient* pClient)
 {
     sendBuffer(pClient, m_buffer);
@@ -631,10 +648,19 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
     }
 }
 
-void NoChannel::enable()
+NoString NoChannel::getPermStr() const { return m_nick.perms(); }
+bool NoChannel::hasPerm(uchar uPerm) const { return m_nick.hasPerm(uPerm); }
+void NoChannel::addPerm(uchar uPerm) { m_nick.addPerm(uPerm); }
+void NoChannel::remPerm(uchar uPerm) { m_nick.removePerm(uPerm); }
+
+bool NoChannel::isModeKnown() const { return m_modeKnown; }
+void NoChannel::setModeKnown(bool b) { m_modeKnown = b; }
+void NoChannel::setIsOn(bool b)
 {
-    resetJoinTries();
-    m_disabled = false;
+    m_isOn = b;
+    if (!b) {
+        reset();
+    }
 }
 
 void NoChannel::setKey(const NoString& s)
@@ -647,6 +673,24 @@ void NoChannel::setKey(const NoString& s)
     }
 }
 
+void NoChannel::setTopic(const NoString& s) { m_topic = s; }
+void NoChannel::setTopicOwner(const NoString& s) { m_topicOwner = s; }
+void NoChannel::setTopicDate(ulong u) { m_topicDate = u; }
+void NoChannel::setDefaultModes(const NoString& s) { m_defaultModes = s; }
+void NoChannel::setDetached(bool b) { m_detached = b; }
+
+void NoChannel::setCreationDate(ulong u) { m_creationDate = u; }
+void NoChannel::disable() { m_disabled = true; }
+
+void NoChannel::enable()
+{
+    resetJoinTries();
+    m_disabled = false;
+}
+
+void NoChannel::incJoinTries() { m_joinTries++; }
+void NoChannel::resetJoinTries() { m_joinTries = 0; }
+
 void NoChannel::setInConfig(bool b)
 {
     if (m_inConfig != b) {
@@ -656,3 +700,22 @@ void NoChannel::setInConfig(bool b)
         }
     }
 }
+
+bool NoChannel::isOn() const { return m_isOn; }
+const NoString& NoChannel::getName() const { return m_name; }
+const std::map<uchar, NoString>& NoChannel::getModes() const { return m_modes; }
+const NoString& NoChannel::getKey() const { return m_key; }
+const NoString& NoChannel::getTopic() const { return m_topic; }
+const NoString& NoChannel::getTopicOwner() const { return m_topicOwner; }
+ulong NoChannel::getTopicDate() const { return m_topicDate; }
+const NoString& NoChannel::getDefaultModes() const { return m_defaultModes; }
+const std::map<NoString, NoNick>& NoChannel::getNicks() const { return m_nicks; }
+size_t NoChannel::getNickCount() const { return m_nicks.size(); }
+bool NoChannel::autoClearChanBuffer() const { return m_autoClearChanBuffer; }
+bool NoChannel::isDetached() const { return m_detached; }
+bool NoChannel::inConfig() const { return m_inConfig; }
+ulong NoChannel::getCreationDate() const { return m_creationDate; }
+bool NoChannel::isDisabled() const { return m_disabled; }
+uint NoChannel::getJoinTries() const { return m_joinTries; }
+bool NoChannel::hasBufferCountSet() const { return m_hasBufferCountSet; }
+bool NoChannel::hasAutoClearChanBufferSet() const { return m_hasAutoClearChanBufferSet; }
