@@ -118,3 +118,26 @@ TEST(UtilsTest, Ellipsize)
     EXPECT_EQ("Hello, I'm Bob", NoUtils::Ellipsize("Hello, I'm Bob", 90));
     EXPECT_EQ("..", NoUtils::Ellipsize("Hello, I'm Bob", 2));
 }
+
+TEST(UtilsTest, QuoteSplit)
+{
+    NoStringVector expected;
+
+    expected = NoStringVector{"a  b  c"};
+    EXPECT_EQ(expected, NoUtils::QuoteSplit("  \"a  b  c\"  "));
+
+    expected = NoStringVector{"a b", "c d"};
+    EXPECT_EQ(expected, NoUtils::QuoteSplit("\"a b\" \"c d\""));
+
+    expected = NoStringVector{"a", "b c", "d"};
+    EXPECT_EQ(expected, NoUtils::QuoteSplit("a \"b c\" d"));
+
+    expected = NoStringVector{" a ", " b "};
+    EXPECT_EQ(expected, NoUtils::QuoteSplit("\" a \" \" b \""));
+
+    expected = NoStringVector{" "};
+    EXPECT_EQ(expected, NoUtils::QuoteSplit("\" \""));
+
+    expected = NoStringVector{ };
+    EXPECT_EQ(expected, NoUtils::QuoteSplit("\"\""));
+}
