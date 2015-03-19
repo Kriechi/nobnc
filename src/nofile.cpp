@@ -524,4 +524,4 @@ void NoFile::InitHomePath(const NoString& sFallback)
     }
 }
 
-const NoString&NoFile::GetHomePath() { return m_sHomePath; }
+const NoString& NoFile::GetHomePath() { return m_sHomePath; }

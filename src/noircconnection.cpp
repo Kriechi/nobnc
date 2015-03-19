@@ -1378,15 +1378,15 @@ bool NoIrcConnection::IsPermChar(const char c) const { return (c != '\0' && GetP
 
 bool NoIrcConnection::IsPermMode(const char c) const { return (c != '\0' && GetPermModes().find(c) != NoString::npos); }
 
-const NoString&NoIrcConnection::GetPerms() const { return m_sPerms; }
+const NoString& NoIrcConnection::GetPerms() const { return m_sPerms; }
 
-const NoString&NoIrcConnection::GetPermModes() const { return m_sPermModes; }
+const NoString& NoIrcConnection::GetPermModes() const { return m_sPermModes; }
 
 NoString NoIrcConnection::GetNickMask() const { return m_Nick.nickMask(); }
 
 NoString NoIrcConnection::GetNick() const { return m_Nick.nick(); }
 
-const NoString&NoIrcConnection::GetPass() const { return m_sPass; }
+const NoString& NoIrcConnection::GetPass() const { return m_sPass; }
 
 NoNetwork*NoIrcConnection::GetNetwork() const { return m_pNetwork; }
 
