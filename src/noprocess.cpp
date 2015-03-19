@@ -17,6 +17,7 @@
 #include "noprocess.h"
 #include <sys/wait.h>
 #include <unistd.h>
+#include <signal.h>
 
 NoProcess::NoProcess() : NoSocket(0), m_iPid(-1)
 {

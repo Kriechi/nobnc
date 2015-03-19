@@ -18,7 +18,7 @@
 #define NOSOCKET_H
 
 #include <no/noglobal.h>
-#include <no/nothreads.h>
+#include <no/nostring.h>
 #include <sys/socket.h>
 
 #ifdef HAVE_ICU

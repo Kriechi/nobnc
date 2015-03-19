@@ -19,13 +19,9 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <dirent.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <vector>
+#include <fcntl.h>
 
 class NO_EXPORT NoFile
 {

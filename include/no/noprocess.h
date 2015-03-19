@@ -19,7 +19,6 @@
 
 #include <no/noglobal.h>
 #include <no/nosocket.h>
-#include <signal.h>
 
 //! @author imaginos@imaginos.net
 class NO_EXPORT NoProcess : public NoSocket

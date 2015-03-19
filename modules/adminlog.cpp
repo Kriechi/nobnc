@@ -23,6 +23,8 @@
 #include <no/noclient.h>
 
 #include <syslog.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 class NoAdminLogMod : public NoModule
 {

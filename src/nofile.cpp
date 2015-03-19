@@ -17,9 +17,7 @@
 #include "nofile.h"
 #include "noutils.h"
 #include "nodebug.h"
-#include <fcntl.h>
 #include <pwd.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 
 #ifndef HAVE_LSTAT
