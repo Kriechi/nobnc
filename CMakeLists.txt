@@ -24,6 +24,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/noclient.h
                        include/no/nodebug.h
                        include/no/nodir.h
+                       include/no/noescape.h
                        include/no/noexception.h
                        include/no/noexecsock.h
                        include/no/nofile.h
@@ -65,6 +66,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/noclientcommand.cpp
                        src/nodebug.cpp
                        src/nodir.cpp
+                       src/noescape.cpp
                        src/noexception.cpp
                        src/noexecsock.cpp
                        src/nofile.cpp

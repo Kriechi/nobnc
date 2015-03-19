@@ -19,6 +19,7 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
+#include <no/noescape.h>
 #include <iostream>
 #include <list>
 #include <memory>

@@ -780,12 +780,12 @@ public:
         }
 
         if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + pUser->GetUserName().Escape_n(No::UrlFormat) +
-                             "&network=" + pNetwork->GetName().Escape_n(No::UrlFormat));
+            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::Escape_n(pUser->GetUserName(), No::UrlFormat) +
+                             "&network=" + No::Escape_n(pNetwork->GetName(), No::UrlFormat));
         } else {
-            WebSock.Redirect(GetWebPath() + "editchan?user=" + pUser->GetUserName().Escape_n(No::UrlFormat) +
-                             "&network=" + pNetwork->GetName().Escape_n(No::UrlFormat) + "&name=" +
-                             pChan->getName().Escape_n(No::UrlFormat));
+            WebSock.Redirect(GetWebPath() + "editchan?user=" + No::Escape_n(pUser->GetUserName(), No::UrlFormat) +
+                             "&network=" + No::Escape_n(pNetwork->GetName(), No::UrlFormat) + "&name=" +
+                             No::Escape_n(pChan->getName(), No::UrlFormat));
         }
         return true;
     }
@@ -1143,10 +1143,10 @@ public:
         }
 
         if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->GetUserName().Escape_n(No::UrlFormat));
+            WebSock.Redirect(GetWebPath() + "edituser?user=" + No::Escape_n(pUser->GetUserName(), No::UrlFormat));
         } else {
-            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + pUser->GetUserName().Escape_n(No::UrlFormat) +
-                             "&network=" + pNetwork->GetName().Escape_n(No::UrlFormat));
+            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::Escape_n(pUser->GetUserName(), No::UrlFormat) +
+                             "&network=" + No::Escape_n(pNetwork->GetName(), No::UrlFormat));
         }
         return true;
     }
@@ -1184,7 +1184,7 @@ public:
             return true;
         }
 
-        WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->GetUserName().Escape_n(No::UrlFormat));
+        WebSock.Redirect(GetWebPath() + "edituser?user=" + No::Escape_n(pUser->GetUserName(), No::UrlFormat));
         return false;
     }
 
@@ -1205,8 +1205,8 @@ public:
             return true;
         }
 
-        WebSock.Redirect(GetWebPath() + "editnetwork?user=" + pNetwork->GetUser()->GetUserName().Escape_n(No::UrlFormat) +
-                         "&network=" + pNetwork->GetName().Escape_n(No::UrlFormat));
+        WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::Escape_n(pNetwork->GetUser()->GetUserName(), No::UrlFormat) +
+                         "&network=" + No::Escape_n(pNetwork->GetName(), No::UrlFormat));
         return false;
     }
 

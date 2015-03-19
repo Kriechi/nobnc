@@ -18,6 +18,7 @@
 #include "nodebug.h"
 #include "nofile.h"
 #include "nodir.h"
+#include "noescape.h"
 #include "noblowfish.h"
 #include "md5/md5.h"
 #include "sha2/sha2.h"
@@ -538,7 +539,7 @@ NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
         for (const NoString& sTag : vsTags) {
             NoString sKey = sTag.Token(0, false, "=", true);
             NoString sValue = sTag.Token(1, true, "=", true);
-            mssTags[sKey] = sValue.Escape_n(No::MsgTagFormat, No::AsciiFormat);
+            mssTags[sKey] = No::Escape_n(sValue, No::MsgTagFormat, No::AsciiFormat);
         }
         return mssTags;
     }
@@ -558,7 +559,7 @@ void NoUtils::SetMessageTags(NoString& sLine, const NoStringMap& mssTags)
                 sTags += ";";
             }
             sTags += it.first;
-            if (!it.second.empty()) sTags += "=" + it.second.Escape_n(No::MsgTagFormat);
+            if (!it.second.empty()) sTags += "=" + No::Escape_n(it.second, No::MsgTagFormat);
         }
         sLine = "@" + sTags + " " + sLine;
     }

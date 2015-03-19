@@ -26,8 +26,6 @@
 #include <sstream>
 #include <cstring>
 
-#define _NAMEDFMT(s) NoString(s).Escape_n(No::NamedFormat)
-
 class NoString;
 
 typedef std::set<NoString> NoStringSet;
@@ -139,9 +137,6 @@ public:
      * @return The new string.
      */
     NoString AsLower() const;
-
-    NoString Escape_n(No::EscapeFormat eFrom, No::EscapeFormat eTo) const;
-    NoString Escape_n(No::EscapeFormat eTo) const;
 
     /** Replace all occurrences in the current string.
      * You can specify a "safe zone" via sLeft and sRight. Anything inside
@@ -387,13 +382,6 @@ public:
      * @return The result of the conversion.
      */
     NoString RightChomp_n(size_type uLen) const;
-
-private:
-    uchar* strnchr(const uchar* src,
-                           uchar c,
-                           uint iMaxBytes,
-                           uchar* pFill = nullptr,
-                           uint* piCount = nullptr) const;
 };
 
 #endif // NOSTRING_H

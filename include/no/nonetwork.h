@@ -20,6 +20,7 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/nobuffer.h>
+#include <no/noescape.h>
 #include <no/nonick.h>
 #include <no/noapp.h>
 
@@ -126,7 +127,7 @@ public:
     const NoStringSet& GetTrustedFingerprints() const { return m_ssTrustedFingerprints; }
     void AddTrustedFingerprint(const NoString& sFP)
     {
-        m_ssTrustedFingerprints.insert(sFP.Escape_n(No::HexColonFormat, No::HexColonFormat));
+        m_ssTrustedFingerprints.insert(No::Escape_n(sFP, No::HexColonFormat, No::HexColonFormat));
     }
     void DelTrustedFingerprint(const NoString& sFP) { m_ssTrustedFingerprints.erase(sFP); }
 

@@ -16,11 +16,12 @@
 
 #include <gtest/gtest.h>
 #include <no/nostring.h>
+#include <no/noescape.h>
 
 // GTest uses this function to output objects
 static void PrintTo(const NoString& s, std::ostream* o)
 {
-    *o << '"' << s.Escape_n(No::AsciiFormat, No::DebugFormat) << '"';
+    *o << '"' << No::Escape_n(s, No::AsciiFormat, No::DebugFormat) << '"';
 }
 
 class EscapeTest : public ::testing::Test
@@ -29,9 +30,9 @@ protected:
     void testEncode(const NoString& in, const NoString& expectedOut, No::EscapeFormat format)
     {
         // Encode, then decode again and check we still got the same string
-        NoString out = in.Escape_n(No::AsciiFormat, format);
+        NoString out = No::Escape_n(in, No::AsciiFormat, format);
         EXPECT_EQ(expectedOut, out);
-        out = out.Escape_n(format, No::AsciiFormat);
+        out = No::Escape_n(out, format, No::AsciiFormat);
         EXPECT_EQ(in, out);
     }
 

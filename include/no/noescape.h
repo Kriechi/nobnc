@@ -14,14 +14,29 @@
  * limitations under the License.
  */
 
-#ifndef NONAMESPACE_H
-#define NONAMESPACE_H
+#ifndef NOESCAPE_H
+#define NOESCAPE_H
 
 #include <no/noglobal.h>
+#include <no/nostring.h>
+
+#define _NAMEDFMT(s) No::Escape_n(s, No::NamedFormat)
 
 namespace No
 {
-    enum CaseSensitivity { CaseInsensitive, CaseSensitive };
+    enum EscapeFormat {
+        AsciiFormat,
+        UrlFormat,
+        HtmlFormat,
+        SqlFormat,
+        NamedFormat,
+        DebugFormat,
+        MsgTagFormat,
+        HexColonFormat
+    };
+
+    NO_EXPORT NoString Escape_n(const NoString& str, No::EscapeFormat eTo);
+    NO_EXPORT NoString Escape_n(const NoString& str, No::EscapeFormat eFrom, No::EscapeFormat eTo);
 }
 
-#endif // NONAMESPACE_H
+#endif // NOESCAPE_H

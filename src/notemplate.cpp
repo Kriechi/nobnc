@@ -428,7 +428,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                                             sOutput += sDelim;
                                         }
 
-                                        sOutput += sValue.Escape_n(eEscape);
+                                        sOutput += No::Escape_n(sValue, eEscape);
                                         bFoundOne = true;
                                     }
                                 }
@@ -895,10 +895,10 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
             NoStringVector vsEscs = it->second.Split(",", false);
 
             for (const NoString& sEsc : vsEscs) {
-                sRet = sRet.Escape_n(ToEscapeFormat(sEsc));
+                sRet = No::Escape_n(sRet, ToEscapeFormat(sEsc));
             }
         } else {
-            sRet = sRet.Escape_n(m_spOptions->GetEscapeFrom(), m_spOptions->GetEscapeTo());
+            sRet = No::Escape_n(sRet, m_spOptions->GetEscapeFrom(), m_spOptions->GetEscapeTo());
         }
     }
 
