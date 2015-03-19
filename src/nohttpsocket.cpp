@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "nohttpsock.h"
+#include "nohttpsocket.h"
 #include "nodebug.h"
 #include "nofile.h"
 #include "nodir.h"
@@ -28,9 +28,9 @@
 
 #define MAX_POST_SIZE 1024 * 1024
 
-NoHttpSock::NoHttpSock(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSock(pMod, sURIPrefix, "", 0) { Init(); }
+NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSocket(pMod, sURIPrefix, "", 0) { Init(); }
 
-NoHttpSock::NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort, int iTimeout)
+NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort, int iTimeout)
     : NoModuleSocket(pMod, sHostname, uPort, iTimeout), m_bSentHeader(false), m_bGotHeader(false), m_bLoggedIn(false), m_bPost(false),
       m_bDone(false), m_uPostLen(0), m_sPostData(""), m_sURI(""), m_sUser(""), m_sPass(""), m_sContentType(""),
       m_sDocRoot(""), m_sForwardedIP(""), m_msvsPOSTParams(), m_msvsGETParams(), m_msHeaders(), m_bHTTP10Client(false),
@@ -39,15 +39,15 @@ NoHttpSock::NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoStrin
     Init();
 }
 
-void NoHttpSock::Init()
+void NoHttpSocket::Init()
 {
     EnableReadLine();
     SetMaxBufferThreshold(10240);
 }
 
-NoHttpSock::~NoHttpSock() {}
+NoHttpSocket::~NoHttpSocket() {}
 
-void NoHttpSock::ReadDataImpl(const char* data, size_t len)
+void NoHttpSocket::ReadDataImpl(const char* data, size_t len)
 {
     if (!m_bDone && m_bGotHeader && m_bPost) {
         m_sPostData.append(data, len);
@@ -55,7 +55,7 @@ void NoHttpSock::ReadDataImpl(const char* data, size_t len)
     }
 }
 
-bool NoHttpSock::SendCookie(const NoString& sKey, const NoString& sValue)
+bool NoHttpSocket::SendCookie(const NoString& sKey, const NoString& sValue)
 {
     if (!sKey.empty() && !sValue.empty()) {
         // only queue a Set-Cookie to be sent if the client didn't send a Cookie header of the same name+value.
@@ -66,14 +66,14 @@ bool NoHttpSock::SendCookie(const NoString& sKey, const NoString& sValue)
     return false;
 }
 
-NoString NoHttpSock::GetRequestCookie(const NoString& sKey) const
+NoString NoHttpSocket::GetRequestCookie(const NoString& sKey) const
 {
     NoStringMap::const_iterator it = m_msRequestCookies.find(sKey);
 
     return it != m_msRequestCookies.end() ? it->second : "";
 }
 
-void NoHttpSock::CheckPost()
+void NoHttpSocket::CheckPost()
 {
     if (m_sPostData.size() >= m_uPostLen) {
         ParseParams(m_sPostData.Left(m_uPostLen), m_msvsPOSTParams);
@@ -83,7 +83,7 @@ void NoHttpSock::CheckPost()
     }
 }
 
-void NoHttpSock::ReadLineImpl(const NoString& sData)
+void NoHttpSocket::ReadLineImpl(const NoString& sData)
 {
     if (m_bGotHeader) {
         return;
@@ -175,7 +175,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
     }
 }
 
-NoString NoHttpSock::GetRemoteIP() const
+NoString NoHttpSocket::GetRemoteIP() const
 {
     if (!m_sForwardedIP.empty()) {
         return m_sForwardedIP;
@@ -184,7 +184,7 @@ NoString NoHttpSock::GetRemoteIP() const
     return NoModuleSocket::GetRemoteIP();
 }
 
-NoString NoHttpSock::GetDate(time_t stamp)
+NoString NoHttpSocket::GetDate(time_t stamp)
 {
     struct tm tm;
     std::stringstream stream;
@@ -205,7 +205,7 @@ NoString NoHttpSock::GetDate(time_t stamp)
     return stream.str();
 }
 
-void NoHttpSock::GetPage()
+void NoHttpSocket::GetPage()
 {
     DEBUG("Page Request [" << m_sURI << "] ");
 
@@ -235,7 +235,7 @@ static bool InitZlibStream(z_stream* zStrm, const char* buf)
 }
 #endif
 
-void NoHttpSock::PrintPage(const NoString& sPage)
+void NoHttpSocket::PrintPage(const NoString& sPage)
 {
 #ifdef HAVE_ZLIB
     if (m_bAcceptGzip && !SentHeader()) {
@@ -281,7 +281,7 @@ void NoHttpSock::PrintPage(const NoString& sPage)
     Close(NoSocket::CLT_AFTERWRITE);
 }
 
-bool NoHttpSock::PrintFile(const NoString& sFileName, NoString sContentType)
+bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
 {
     NoString sFilePath = sFileName;
 
@@ -380,7 +380,7 @@ bool NoHttpSock::PrintFile(const NoString& sFileName, NoString sContentType)
     return true;
 }
 
-void NoHttpSock::WriteFileUncompressed(NoFile& File)
+void NoHttpSocket::WriteFileUncompressed(NoFile& File)
 {
     char szBuf[4096];
     off_t iLen = 0;
@@ -399,7 +399,7 @@ void NoHttpSock::WriteFileUncompressed(NoFile& File)
 }
 
 #ifdef HAVE_ZLIB
-void NoHttpSock::WriteFileGzipped(NoFile& File)
+void NoHttpSocket::WriteFileGzipped(NoFile& File)
 {
     char szBufIn[8192];
     char szBufOut[8192];
@@ -454,15 +454,15 @@ void NoHttpSock::WriteFileGzipped(NoFile& File)
 }
 #endif
 
-void NoHttpSock::ParseURI()
+void NoHttpSocket::ParseURI()
 {
     ParseParams(m_sURI.Tokens(1, "?"), m_msvsGETParams);
     m_sURI = m_sURI.Token(0, "?");
 }
 
-NoString NoHttpSock::GetPath() const { return m_sURI.Token(0, "?"); }
+NoString NoHttpSocket::GetPath() const { return m_sURI.Token(0, "?"); }
 
-void NoHttpSock::ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams)
+void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams)
 {
     msvsParams.clear();
 
@@ -476,37 +476,37 @@ void NoHttpSock::ParseParams(const NoString& sParams, std::map<NoString, NoStrin
     }
 }
 
-void NoHttpSock::SetDocRoot(const NoString& s)
+void NoHttpSocket::SetDocRoot(const NoString& s)
 {
     m_sDocRoot = s + "/";
     m_sDocRoot.Replace("//", "/");
 }
 
-const NoString& NoHttpSock::GetDocRoot() const { return m_sDocRoot; }
+const NoString& NoHttpSocket::GetDocRoot() const { return m_sDocRoot; }
 
-const NoString& NoHttpSock::GetUser() const { return m_sUser; }
+const NoString& NoHttpSocket::GetUser() const { return m_sUser; }
 
-const NoString& NoHttpSock::GetPass() const { return m_sPass; }
+const NoString& NoHttpSocket::GetPass() const { return m_sPass; }
 
-const NoString& NoHttpSock::GetContentType() const { return m_sContentType; }
+const NoString& NoHttpSocket::GetContentType() const { return m_sContentType; }
 
-const NoString& NoHttpSock::GetParamString() const { return m_sPostData; }
+const NoString& NoHttpSocket::GetParamString() const { return m_sPostData; }
 
-const NoString& NoHttpSock::GetURIPrefix() const { return m_sURIPrefix; }
+const NoString& NoHttpSocket::GetURIPrefix() const { return m_sURIPrefix; }
 
-bool NoHttpSock::HasParam(const NoString& sName, bool bPost) const
+bool NoHttpSocket::HasParam(const NoString& sName, bool bPost) const
 {
     if (bPost) return (m_msvsPOSTParams.find(sName) != m_msvsPOSTParams.end());
     return (m_msvsGETParams.find(sName) != m_msvsGETParams.end());
 }
 
-NoString NoHttpSock::GetRawParam(const NoString& sName, bool bPost) const
+NoString NoHttpSocket::GetRawParam(const NoString& sName, bool bPost) const
 {
     if (bPost) return GetRawParam(sName, m_msvsPOSTParams);
     return GetRawParam(sName, m_msvsGETParams);
 }
 
-NoString NoHttpSock::GetRawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams)
+NoString NoHttpSocket::GetRawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams)
 {
     NoString sRet;
 
@@ -519,13 +519,13 @@ NoString NoHttpSock::GetRawParam(const NoString& sName, const std::map<NoString,
     return sRet;
 }
 
-NoString NoHttpSock::GetParam(const NoString& sName, bool bPost, const NoString& sFilter) const
+NoString NoHttpSocket::GetParam(const NoString& sName, bool bPost, const NoString& sFilter) const
 {
     if (bPost) return GetParam(sName, m_msvsPOSTParams, sFilter);
     return GetParam(sName, m_msvsGETParams, sFilter);
 }
 
-NoString NoHttpSock::GetParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+NoString NoHttpSocket::GetParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
     NoString sRet = GetRawParam(sName, msvsParams);
     sRet.Trim();
@@ -537,13 +537,13 @@ NoString NoHttpSock::GetParam(const NoString& sName, const std::map<NoString, No
     return sRet;
 }
 
-size_t NoHttpSock::GetParamValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost, const NoString& sFilter) const
+size_t NoHttpSocket::GetParamValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost, const NoString& sFilter) const
 {
     if (bPost) return GetParamValues(sName, ssRet, m_msvsPOSTParams, sFilter);
     return GetParamValues(sName, ssRet, m_msvsGETParams, sFilter);
 }
 
-size_t NoHttpSock::GetParamValues(const NoString& sName, std::set<NoString>& ssRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+size_t NoHttpSocket::GetParamValues(const NoString& sName, std::set<NoString>& ssRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
     ssRet.clear();
 
@@ -563,13 +563,13 @@ size_t NoHttpSock::GetParamValues(const NoString& sName, std::set<NoString>& ssR
     return ssRet.size();
 }
 
-size_t NoHttpSock::GetParamValues(const NoString& sName, NoStringVector& vsRet, bool bPost, const NoString& sFilter) const
+size_t NoHttpSocket::GetParamValues(const NoString& sName, NoStringVector& vsRet, bool bPost, const NoString& sFilter) const
 {
     if (bPost) return GetParamValues(sName, vsRet, m_msvsPOSTParams, sFilter);
     return GetParamValues(sName, vsRet, m_msvsGETParams, sFilter);
 }
 
-size_t NoHttpSock::GetParamValues(const NoString& sName, NoStringVector& vsRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+size_t NoHttpSocket::GetParamValues(const NoString& sName, NoStringVector& vsRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
     vsRet.clear();
 
@@ -589,20 +589,20 @@ size_t NoHttpSock::GetParamValues(const NoString& sName, NoStringVector& vsRet, 
     return vsRet.size();
 }
 
-const std::map<NoString, NoStringVector>& NoHttpSock::GetParams(bool bPost) const
+const std::map<NoString, NoStringVector>& NoHttpSocket::GetParams(bool bPost) const
 {
     if (bPost) return m_msvsPOSTParams;
     return m_msvsGETParams;
 }
 
-bool NoHttpSock::IsPost() const { return m_bPost; }
+bool NoHttpSocket::IsPost() const { return m_bPost; }
 
-bool NoHttpSock::PrintNotFound()
+bool NoHttpSocket::PrintNotFound()
 {
     return PrintErrorPage(404, "Not Found", "The requested URL was not found on this server.");
 }
 
-bool NoHttpSock::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage)
+bool NoHttpSocket::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage)
 {
     if (SentHeader()) {
         DEBUG("PrintErrorPage(): Header was already sent");
@@ -636,7 +636,7 @@ bool NoHttpSock::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, cons
     return true;
 }
 
-bool NoHttpSock::ForceLogin()
+bool NoHttpSocket::ForceLogin()
 {
     if (m_bLoggedIn) {
         return true;
@@ -653,11 +653,11 @@ bool NoHttpSock::ForceLogin()
     return false;
 }
 
-bool NoHttpSock::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic) { return false; }
+bool NoHttpSocket::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic) { return false; }
 
-bool NoHttpSock::SentHeader() const { return m_bSentHeader; }
+bool NoHttpSocket::SentHeader() const { return m_bSentHeader; }
 
-bool NoHttpSock::PrintHeader(off_t uContentLength, const NoString& sContentType, uint uStatusId, const NoString& sStatusMsg)
+bool NoHttpSocket::PrintHeader(off_t uContentLength, const NoString& sContentType, uint uStatusId, const NoString& sStatusMsg)
 {
     if (SentHeader()) {
         DEBUG("PrintHeader(): Header was already sent!");
@@ -699,11 +699,11 @@ bool NoHttpSock::PrintHeader(off_t uContentLength, const NoString& sContentType,
     return true;
 }
 
-void NoHttpSock::SetContentType(const NoString& sContentType) { m_sContentType = sContentType; }
+void NoHttpSocket::SetContentType(const NoString& sContentType) { m_sContentType = sContentType; }
 
-void NoHttpSock::AddHeader(const NoString& sName, const NoString& sValue) { m_msHeaders[sName] = sValue; }
+void NoHttpSocket::AddHeader(const NoString& sName, const NoString& sValue) { m_msHeaders[sName] = sValue; }
 
-bool NoHttpSock::Redirect(const NoString& sURL)
+bool NoHttpSocket::Redirect(const NoString& sURL)
 {
     if (SentHeader()) {
         DEBUG("Redirect() - Header was already sent");
@@ -725,4 +725,4 @@ bool NoHttpSock::Redirect(const NoString& sURL)
     }
 }
 
-void NoHttpSock::ConnectedImpl() { SetTimeout(120); }
+void NoHttpSocket::ConnectedImpl() { SetTimeout(120); }

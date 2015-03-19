@@ -19,7 +19,7 @@
 
 #include <no/noglobal.h>
 #include <no/notemplate.h>
-#include <no/nohttpsock.h>
+#include <no/nohttpsocket.h>
 #include <no/noutils.h>
 #include <no/nocachemap.h>
 
@@ -124,7 +124,7 @@ public:
     void FinishUserSessions(const NoUser& User);
 };
 
-class NO_EXPORT NoWebSock : public NoHttpSock
+class NO_EXPORT NoWebSock : public NoHttpSocket
 {
 public:
     enum EPageReqResult {
@@ -161,7 +161,7 @@ public:
     static void FinishUserSessions(const NoUser& User);
 
 protected:
-    using NoHttpSock::PrintErrorPage;
+    using NoHttpSocket::PrintErrorPage;
 
     bool AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemplate* pTemplate = nullptr);
     NoStringVector GetDirs(NoModule* pModule, bool bIsTemplate);

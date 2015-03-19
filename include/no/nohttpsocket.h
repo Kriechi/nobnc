@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef NOHTTPSOCK_H
-#define NOHTTPSOCK_H
+#ifndef NOHTTPSOCKET_H
+#define NOHTTPSOCKET_H
 
 #include <no/noglobal.h>
 #include <no/nomodulesocket.h>
@@ -23,12 +23,12 @@
 
 class NoModule;
 
-class NO_EXPORT NoHttpSock : public NoModuleSocket
+class NO_EXPORT NoHttpSocket : public NoModuleSocket
 {
 public:
-    NoHttpSock(NoModule* pMod, const NoString& sURIPrefix);
-    NoHttpSock(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort, int iTimeout = 60);
-    virtual ~NoHttpSock();
+    NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix);
+    NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort, int iTimeout = 60);
+    virtual ~NoHttpSocket();
 
     void ReadDataImpl(const char* data, size_t len) override;
     void ReadLineImpl(const NoString& sData) override;
@@ -117,4 +117,4 @@ protected:
     NoString m_sURIPrefix;
 };
 
-#endif // NOHTTPSOCK_H
+#endif // NOHTTPSOCKET_H

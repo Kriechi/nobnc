@@ -200,7 +200,7 @@ void NoWebAuth::Invalidate()
 }
 
 NoWebSock::NoWebSock(const NoString& sURIPrefix)
-    : NoHttpSock(nullptr, sURIPrefix), m_bPathsSet(false), m_Template(), m_spAuth(), m_sModName(""), m_sPath(""),
+    : NoHttpSocket(nullptr, sURIPrefix), m_bPathsSet(false), m_Template(), m_spAuth(), m_sModName(""), m_sPath(""),
       m_sPage(""), m_spSession()
 {
     m_Template.AddTagHandler(std::make_shared<NoTagHandler>(*this));
@@ -550,11 +550,11 @@ NoString NoWebSock::GetRequestCookie(const NoString& sKey)
     NoString sRet;
 
     if (!m_sModName.empty()) {
-        sRet = NoHttpSock::GetRequestCookie("Mod-" + m_sModName + "-" + sPrefixedKey);
+        sRet = NoHttpSocket::GetRequestCookie("Mod-" + m_sModName + "-" + sPrefixedKey);
     }
 
     if (sRet.empty()) {
-        return NoHttpSock::GetRequestCookie(sPrefixedKey);
+        return NoHttpSocket::GetRequestCookie(sPrefixedKey);
     }
 
     return sRet;
@@ -565,10 +565,10 @@ bool NoWebSock::SendCookie(const NoString& sKey, const NoString& sValue)
     const NoString sPrefixedKey = NoString(GetLocalPort()) + "-" + sKey;
 
     if (!m_sModName.empty()) {
-        return NoHttpSock::SendCookie("Mod-" + m_sModName + "-" + sPrefixedKey, sValue);
+        return NoHttpSocket::SendCookie("Mod-" + m_sModName + "-" + sPrefixedKey, sValue);
     }
 
-    return NoHttpSock::SendCookie(sPrefixedKey, sValue);
+    return NoHttpSocket::SendCookie(sPrefixedKey, sValue);
 }
 
 void NoWebSock::OnPageRequest(const NoString& sURI)
