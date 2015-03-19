@@ -179,11 +179,13 @@ public:
     EModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
     {
         if (sMessage.StartsWith("DCC ")) {
-            NoString sType = sMessage.Token(1, false, " ", "\"", "\"").Trim_n("\"");
-            NoString sFile = sMessage.Token(2, false, " ", "\"", "\"");
-            ulong uLongIP = sMessage.Token(3, false, " ", "\"", "\"").Trim_n("\"").ToULong();
-            ushort uPort = sMessage.Token(4, false, " ", "\"", "\"").Trim_n("\"").ToUShort();
-            ulong uFileSize = sMessage.Token(5, false, " ", "\"", "\"").Trim_n("\"").ToULong();
+            NoStringVector tokens = NoUtils::QuoteSplit(sMessage);
+            tokens.resize(6);
+            NoString sType = tokens.at(1).Trim_n("\"");
+            NoString sFile = tokens.at(2);
+            ulong uLongIP = tokens.at(3).Trim_n("\"").ToULong();
+            ushort uPort = tokens.at(4).Trim_n("\"").ToUShort();
+            ulong uFileSize = tokens.at(5).Trim_n("\"").ToULong();
             NoString sIP = GetLocalDCCIP();
 
             if (!UseClientIP()) {
@@ -240,11 +242,13 @@ public:
         NoNetwork* pNetwork = GetNetwork();
         if (sMessage.StartsWith("DCC ") && pNetwork->IsUserAttached()) {
             // DCC CHAT chat 2453612361 44592
-            NoString sType = sMessage.Token(1, false, " ", "\"", "\"").Trim_n("\"");
-            NoString sFile = sMessage.Token(2, false, " ", "\"", "\"");
-            ulong uLongIP = sMessage.Token(3, false, " ", "\"", "\"").Trim_n("\"").ToULong();
-            ushort uPort = sMessage.Token(4, false, " ", "\"", "\"").Trim_n("\"").ToUShort();
-            ulong uFileSize = sMessage.Token(5, false, " ", "\"", "\"").Trim_n("\"").ToULong();
+            NoStringVector tokens = NoUtils::QuoteSplit(sMessage);
+            tokens.resize(6);
+            NoString sType = tokens.at(1).Trim_n("\"");
+            NoString sFile = tokens.at(2);
+            ulong uLongIP = tokens.at(3).Trim_n("\"").ToULong();
+            ushort uPort = tokens.at(4).Trim_n("\"").ToUShort();
+            ulong uFileSize = tokens.at(5).Trim_n("\"").ToULong();
 
             if (sType.Equals("CHAT")) {
                 NoNick FromNick(Nick.nickMask());
