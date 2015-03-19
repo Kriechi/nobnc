@@ -440,9 +440,9 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
             Row["Username"] = Module.GetUser()->GetUserName();
         }
 
-        VWebSubPages& vSubPages = Module.GetSubPages();
+        no::shared_vector<NoWebSubPage>& vSubPages = Module.GetSubPages();
 
-        for (TWebSubPage& SubPage : vSubPages) {
+        for (std::shared_ptr<NoWebSubPage>& SubPage : vSubPages) {
             // bActive is whether or not the current url matches this subpage (params will be checked below)
             bool bActive = (m_sModName == Module.GetModName() && m_sPage == SubPage->GetName() && bActiveModule);
 
@@ -783,9 +783,9 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
             return PAGE_DEFERRED;
         }
 
-        VWebSubPages& vSubPages = pModule->GetSubPages();
+        no::shared_vector<NoWebSubPage>& vSubPages = pModule->GetSubPages();
 
-        for (TWebSubPage& SubPage : vSubPages) {
+        for (std::shared_ptr<NoWebSubPage>& SubPage : vSubPages) {
             bool bActive = (m_sModName == pModule->GetModName() && m_sPage == SubPage->GetName());
 
             if (bActive && SubPage->RequiresAdmin() && !GetSession()->IsAdmin()) {

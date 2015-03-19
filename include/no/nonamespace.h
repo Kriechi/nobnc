@@ -18,11 +18,19 @@
 #define NONAMESPACE_H
 
 #include <no/noglobal.h>
+#include <vector>
+#include <memory>
 
 namespace No
 {
     enum CaseSensitivity { CaseInsensitive, CaseSensitive };
     enum SplitBehavior { KeepEmptyParts, SkipEmptyParts };
+}
+
+namespace no
+{
+    template <typename T>
+    using shared_vector = std::vector<std::shared_ptr<T>>;
 }
 
 #endif // NONAMESPACE_H

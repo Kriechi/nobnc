@@ -29,9 +29,6 @@ class NoWebSock;
 class NoModule;
 class NoWebSubPage;
 
-typedef std::shared_ptr<NoWebSubPage> TWebSubPage;
-typedef std::vector<TWebSubPage> VWebSubPages;
-
 class NO_EXPORT NoWebSession
 {
 public:

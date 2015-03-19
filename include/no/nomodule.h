@@ -386,14 +386,14 @@ public:
     /** Registers a sub page for the sidebar.
      *  @param spSubPage The SubPage instance.
      */
-    virtual void AddSubPage(TWebSubPage spSubPage) { m_vSubPages.push_back(spSubPage); }
+    virtual void AddSubPage(std::shared_ptr<NoWebSubPage> spSubPage) { m_vSubPages.push_back(spSubPage); }
     /** Removes all registered (AddSubPage'd) SubPages.
      */
     virtual void ClearSubPages() { m_vSubPages.clear(); }
     /** Returns a list of all registered SubPages. Don't mess with it too much.
      *  @return The List.
      */
-    virtual VWebSubPages& GetSubPages() { return m_vSubPages; }
+    virtual no::shared_vector<NoWebSubPage>& GetSubPages() { return m_vSubPages; }
     /** Using this hook, module can embed web stuff directly to different places.
      *  This method is called whenever embededded modules I/O happens.
      *  Name of used .tmpl file (if any) is up to caller.
@@ -1048,7 +1048,7 @@ private:
 
 private:
     NoStringMap m_mssRegistry; //!< way to save name/value pairs. Note there is no encryption involved in this
-    VWebSubPages m_vSubPages;
+    no::shared_vector<NoWebSubPage> m_vSubPages;
     std::map<NoString, NoModCommand> m_mCommands;
 };
 
