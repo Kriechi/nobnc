@@ -123,7 +123,6 @@ private:
 
     static NoString m_sHomePath;
 
-protected:
     NoString m_sLongName; //!< Absolute filename (m_sPath + "/" + m_sShortName)
     NoString m_sShortName; //!< Filename alone, without path
 };
