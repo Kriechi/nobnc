@@ -126,9 +126,13 @@ public:
     bool FromString(const NoString& sLine)
     {
         m_sUsername = sLine.Token(0, false, "\t");
-        sLine.Token(1, false, "\t").Split(",", m_ssHostmasks);
         m_sUserKey = sLine.Token(2, false, "\t");
-        sLine.Token(3, false, "\t").Split(" ", m_ssChans);
+
+        NoStringVector vsHostMasks = sLine.Token(1, false, "\t").Split(",");
+        m_ssHostmasks = NoStringSet(vsHostMasks.begin(), vsHostMasks.end());
+
+        NoStringVector vsChans = sLine.Token(3, false, "\t").Split(" ");
+        m_ssChans = NoStringSet(vsChans.begin(), vsChans.end());
 
         return !m_sUserKey.empty();
     }

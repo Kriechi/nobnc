@@ -20,7 +20,7 @@
 #include "nodir.h"
 #include "noapp.h"
 #include <iomanip>
-
+#include <algorithm>
 
 #ifdef HAVE_ZLIB
 #include <zlib.h>
@@ -154,10 +154,9 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
         // this is for proper client cache support (HTTP 304) on static files:
         m_sIfNoneMatch = sLine.Token(1, true);
     } else if (sName.Equals("Accept-Encoding:") && !m_bHTTP10Client) {
-        NoStringSet ssEncodings;
         // trimming whitespace from the tokens is important:
-        sLine.Token(1, true).Split(",", ssEncodings, false, "", "", false, true);
-        m_bAcceptGzip = (ssEncodings.find("gzip") != ssEncodings.end());
+        NoStringVector vsEncodings = sLine.Token(1, true).Split(",", false, "", "", false, true);
+        m_bAcceptGzip = (std::find(vsEncodings.begin(), vsEncodings.end(), "gzip") != vsEncodings.end());
     } else if (sLine.empty()) {
         m_bGotHeader = true;
 

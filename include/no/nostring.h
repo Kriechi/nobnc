@@ -261,18 +261,6 @@ public:
                          bool bTrimQuotes = true,
                          bool bTrimWhiteSpace = false) const;
 
-    /** Split up this string into tokens.
-     * This function is identical to the other NoString::Split(), except that
-     * the result is returned as a NoStringSet instead of a NoStringVector.
-     */
-    size_type Split(const NoString& sDelim,
-                    NoStringSet& ssRet,
-                    bool bAllowEmpty = true,
-                    const NoString& sLeft = "",
-                    const NoString& sRight = "",
-                    bool bTrimQuotes = true,
-                    bool bTrimWhiteSpace = false) const;
-
     /** Decode the give base64-encoded string.
      * @return The decoded string.
      */

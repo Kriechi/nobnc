@@ -822,19 +822,6 @@ NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty, const N
     return vsRet;
 }
 
-NoString::size_type NoString::Split(const NoString& sDelim, NoStringSet& ssRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
-{
-    NoStringVector vsTokens = Split(sDelim, bAllowEmpty, sLeft, sRight, bTrimQuotes, bTrimWhiteSpace);
-
-    ssRet.clear();
-
-    for (const NoString& sToken : vsTokens) {
-        ssRet.insert(sToken);
-    }
-
-    return ssRet.size();
-}
-
 NoString NoString::ToBase64(uint uWrap) const
 {
     const char b64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

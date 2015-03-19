@@ -100,7 +100,9 @@ public:
     {
         m_sUsername = sLine.Token(0, false, "\t");
         m_sHostmask = sLine.Token(1, false, "\t");
-        sLine.Token(2, false, "\t").Split(" ", m_ssChans);
+
+        NoStringVector vsChans = sLine.Token(2, false, "\t").Split(" ");
+        m_ssChans = NoStringSet(vsChans.begin(), vsChans.end());
 
         return !m_sHostmask.empty();
     }
