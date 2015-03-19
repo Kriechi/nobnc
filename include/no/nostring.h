@@ -158,8 +158,7 @@ public:
     NoString Replace_n(const NoString& sReplace,
                        const NoString& sWith,
                        const NoString& sLeft = "",
-                       const NoString& sRight = "",
-                       bool bRemoveDelims = false) const;
+                       const NoString& sRight = "") const;
     /** Replace all occurrences in the current string.
      * You can specify a "safe zone" via sLeft and sRight. Anything inside
      * of such a zone will not be replaced. This does not do recursion, so
@@ -179,8 +178,7 @@ public:
     uint Replace(const NoString& sReplace,
                  const NoString& sWith,
                  const NoString& sLeft = "",
-                 const NoString& sRight = "",
-                 bool bRemoveDelims = false);
+                 const NoString& sRight = "");
     /** Return the left part of the string.
      * @param uCount The number of characters to keep.
      * @return The resulting string.

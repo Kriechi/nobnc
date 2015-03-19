@@ -688,10 +688,10 @@ bool NoTemplate::ValidIf(const NoString& sArgs)
 {
     NoString sArgStr = sArgs;
     // sArgStr.Replace(" ", "", "\"", "\"", true);
-    sArgStr.Replace(" &&", "&&", "\"", "\"", false);
-    sArgStr.Replace("&& ", "&&", "\"", "\"", false);
-    sArgStr.Replace(" ||", "||", "\"", "\"", false);
-    sArgStr.Replace("|| ", "||", "\"", "\"", false);
+    sArgStr.Replace(" &&", "&&", "\"", "\"");
+    sArgStr.Replace("&& ", "&&", "\"", "\"");
+    sArgStr.Replace(" ||", "||", "\"", "\"");
+    sArgStr.Replace("|| ", "||", "\"", "\"");
 
     NoString::size_type uOrPos = sArgStr.find("||");
     NoString::size_type uAndPos = sArgStr.find("&&");

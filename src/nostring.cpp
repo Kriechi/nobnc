@@ -220,14 +220,14 @@ NoString NoString::AsLower() const
     return sRet;
 }
 
-NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims) const
+NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight) const
 {
     NoString sRet = *this;
-    sRet.Replace(sReplace, sWith, sLeft, sRight, bRemoveDelims);
+    sRet.Replace(sReplace, sWith, sLeft, sRight);
     return sRet;
 }
 
-uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
+uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight)
 {
     uint uRet = 0;
     NoString sCopy = *this;
@@ -241,16 +241,12 @@ uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const No
 
     while (*p) {
         if (!bInside && uLeftWidth && strncmp(p, sLeft.c_str(), uLeftWidth) == 0) {
-            if (!bRemoveDelims) {
-                append(sLeft);
-            }
+            append(sLeft);
 
             p += uLeftWidth - 1;
             bInside = true;
         } else if (bInside && uRightWidth && strncmp(p, sRight.c_str(), uRightWidth) == 0) {
-            if (!bRemoveDelims) {
-                append(sRight);
-            }
+            append(sRight);
 
             p += uRightWidth - 1;
             bInside = false;
