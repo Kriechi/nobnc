@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <no/nomodules.h>
+#include <no/nomodule.h>
 
 class NoRawMod : public NoModule
 {

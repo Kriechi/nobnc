@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <no/nomodule.h>
 #include <no/nodir.h>
 #include <no/nofile.h>
 #include <no/nouser.h>

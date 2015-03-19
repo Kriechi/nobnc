@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+#include <no/nomodule.h>
 #include <no/nofile.h>
 #include <no/noircconnection.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/nodebug.h>
+#include <no/noapp.h>
 
 class NoIdentFileModule : public NoModule
 {

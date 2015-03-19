@@ -21,9 +21,11 @@
 
 #define REQUIRESSL
 
+#include <no/nomodule.h>
 #include <no/nofile.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
+#include <no/noapp.h>
 
 class NoSChat;
 

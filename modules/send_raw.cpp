@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+#include <no/nomodule.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
+#include <no/noapp.h>
 
 class NoSendRawMod : public NoModule
 {

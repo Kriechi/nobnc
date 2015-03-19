@@ -29,10 +29,12 @@
 
 #define REQUIRESSL
 
+#include <no/nomodule.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/nofile.h>
 #include <no/noblowfish.h>
+#include <no/noclient.h>
 
 #define CRYPT_VERIFICATION_TOKEN "::__:AWAY:__::"
 

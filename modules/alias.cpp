@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+#include <no/nomodule.h>
 #include <no/noclient.h>
 #include <no/nochannel.h>
-#include <no/nomodules.h>
 #include <no/nonetwork.h>
 
 #include <sstream>

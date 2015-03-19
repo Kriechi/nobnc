@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <no/nomodules.h>
+#include <no/nomodule.h>
 #include <no/noutils.h>
 #include <no/nouser.h>
 #include <no/nonick.h>

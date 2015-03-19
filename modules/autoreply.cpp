@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <no/nomodule.h>
 #include <no/nonetwork.h>
 #include <no/noircconnection.h>
 

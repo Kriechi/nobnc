@@ -31,6 +31,7 @@
 //       and gets sent to your client in plain text.
 //
 
+#include <no/nomodule.h>
 #include <no/nochannel.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>

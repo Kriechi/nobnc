@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
+#include <no/nomodule.h>
+#include <no/nomodules.h>
 #include <no/nochannel.h>
 #include <no/noserver.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/noircconnection.h>
 #include <no/nodebug.h>
+#include <no/noapp.h>
 
 /* Stuff to be able to write this:
    // i will be name of local variable, see below

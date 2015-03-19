@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+#include <no/nomodule.h>
 #include <no/nofile.h>
 #include <no/noserver.h>
 #include <no/nonetwork.h>
 #include <no/nouser.h>
 #include <no/nodebug.h>
+#include <no/noclient.h>
 
 #include <syslog.h>
 

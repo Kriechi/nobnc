@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+#include <no/nomodule.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
+#include <no/noclient.h>
+#include <no/noapp.h>
 
 #define MESSAGE "Your account has been disabled. Contact your administrator."
 

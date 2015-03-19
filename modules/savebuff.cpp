@@ -24,6 +24,7 @@
 
 #define REQUIRESSL
 
+#include <no/nomodule.h>
 #include <no/nochannel.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <no/nomodule.h>
 #include <no/nonetwork.h>
 
 class NoPerform : public NoModule

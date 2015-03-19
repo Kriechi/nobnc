@@ -16,9 +16,9 @@
 
 #define REQUIRESSL
 
+#include <no/nomodule.h>
 #include <no/nofile.h>
 #include <no/nouser.h>
-#include <no/nomodules.h>
 #include <no/noircconnection.h>
 
 class NoCertMod : public NoModule
