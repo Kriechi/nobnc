@@ -20,103 +20,29 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/nofile.h>
-#include <dirent.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <vector>
 
 class NO_EXPORT NoDir : public std::vector<NoFile*>
 {
 public:
-    NoDir(const NoString& sDir) : m_eSortAttr(NoFile::FA_Name), m_bDesc(false) { Fill(sDir); }
+    NoDir(const NoString& sDir = "");
+    ~NoDir();
 
-    NoDir() : m_eSortAttr(NoFile::FA_Name), m_bDesc(false) {}
+    void CleanUp();
 
-    ~NoDir() { CleanUp(); }
+    size_t Fill(const NoString& sDir);
 
-    void CleanUp()
-    {
-        for (uint a = 0; a < size(); a++) {
-            delete (*this)[a];
-        }
+    size_t FillByWildcard(const NoString& sDir, const NoString& sWildcard);
 
-        clear();
-    }
+    static uint Chmod(mode_t mode, const NoString& sWildcard, const NoString& sDir = ".");
 
-    size_t Fill(const NoString& sDir) { return FillByWildcard(sDir, "*"); }
+    uint Chmod(mode_t mode);
 
-    size_t FillByWildcard(const NoString& sDir, const NoString& sWildcard)
-    {
-        CleanUp();
-        DIR* dir = opendir((sDir.empty()) ? "." : sDir.c_str());
+    static uint Delete(const NoString& sWildcard, const NoString& sDir = ".");
 
-        if (!dir) {
-            return 0;
-        }
+    uint Delete();
 
-        struct dirent* de;
-
-        while ((de = readdir(dir)) != nullptr) {
-            if ((strcmp(de->d_name, ".") == 0) || (strcmp(de->d_name, "..") == 0)) {
-                continue;
-            }
-            if ((!sWildcard.empty()) && (!NoString(de->d_name).WildCmp(sWildcard))) {
-                continue;
-            }
-
-            NoFile* file =
-            new NoFile(sDir.TrimSuffix_n("/") + "/" +
-                      de->d_name /*, this*/); // @todo need to pass pointer to 'this' if we want to do Sort()
-            push_back(file);
-        }
-
-        closedir(dir);
-        return size();
-    }
-
-    static uint Chmod(mode_t mode, const NoString& sWildcard, const NoString& sDir = ".")
-    {
-        NoDir cDir;
-        cDir.FillByWildcard(sDir, sWildcard);
-        return cDir.Chmod(mode);
-    }
-
-    uint Chmod(mode_t mode)
-    {
-        uint uRet = 0;
-        for (uint a = 0; a < size(); a++) {
-            if ((*this)[a]->Chmod(mode)) {
-                uRet++;
-            }
-        }
-
-        return uRet;
-    }
-
-    static uint Delete(const NoString& sWildcard, const NoString& sDir = ".")
-    {
-        NoDir cDir;
-        cDir.FillByWildcard(sDir, sWildcard);
-        return cDir.Delete();
-    }
-
-    uint Delete()
-    {
-        uint uRet = 0;
-        for (uint a = 0; a < size(); a++) {
-            if ((*this)[a]->Delete()) {
-                uRet++;
-            }
-        }
-
-        return uRet;
-    }
-
-    NoFile::EFileAttr GetSortAttr() const { return m_eSortAttr; }
-    bool IsDescending() const { return m_bDesc; }
+    NoFile::EFileAttr GetSortAttr() const;
+    bool IsDescending() const;
 
     // Check if sPath + "/" + sAdd (~/ is handled) is an absolute path which
     // resides under sPath. Returns absolute path on success, else "".
@@ -124,17 +50,7 @@ public:
     static NoString ChangeDir(const NoString& sPath, const NoString& sAdd, const NoString& sHomeDir = "");
     static bool MakeDir(const NoString& sPath, mode_t iMode = 0700);
 
-    static NoString GetCWD()
-    {
-        NoString sRet;
-        char* pszCurDir = getcwd(nullptr, 0);
-        if (pszCurDir) {
-            sRet = pszCurDir;
-            free(pszCurDir);
-        }
-
-        return sRet;
-    }
+    static NoString GetCWD();
 
 private:
     NoFile::EFileAttr m_eSortAttr;
