@@ -16,6 +16,7 @@
 
 #include "nobuffer.h"
 #include "noclient.h"
+#include "noutils.h"
 #include "nouser.h"
 #include "noapp.h"
 
@@ -46,10 +47,10 @@ NoString NoMessage::GetLine(const NoClient& client, const NoStringMap& params) c
 
     if (client.HasServerTime()) {
         copy["text"] = m_text;
-        NoString str = NoString::NamedFormat(m_format, copy);
+        NoString str = NoUtils::NamedFormat(m_format, copy);
         return "@time=" + NoUtils::FormatServerTime(m_time) + " " + str;
     } else {
         copy["text"] = client.GetUser()->AddTimestamp(m_time.tv_sec, m_text);
-        return NoString::NamedFormat(m_format, copy);
+        return NoUtils::NamedFormat(m_format, copy);
     }
 }

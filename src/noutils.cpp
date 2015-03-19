@@ -780,3 +780,49 @@ NoString NoUtils::RandomString(uint uLength)
 
     return sRet;
 }
+
+NoString NoUtils::NamedFormat(const NoString& sFormat, const NoStringMap& msValues)
+{
+    NoString sRet;
+
+    NoString sKey;
+    bool bEscape = false;
+    bool bParam = false;
+    const char* p = sFormat.c_str();
+
+    while (*p) {
+        if (!bParam) {
+            if (bEscape) {
+                sRet += *p;
+                bEscape = false;
+            } else if (*p == '\\') {
+                bEscape = true;
+            } else if (*p == '{') {
+                bParam = true;
+                sKey.clear();
+            } else {
+                sRet += *p;
+            }
+
+        } else {
+            if (bEscape) {
+                sKey += *p;
+                bEscape = false;
+            } else if (*p == '\\') {
+                bEscape = true;
+            } else if (*p == '}') {
+                bParam = false;
+                NoStringMap::const_iterator it = msValues.find(sKey);
+                if (it != msValues.end()) {
+                    sRet += (*it).second;
+                }
+            } else {
+                sKey += *p;
+            }
+        }
+
+        p++;
+    }
+
+    return sRet;
+}

@@ -117,6 +117,16 @@ public:
      * @return A random string.
      */
     static NoString RandomString(uint uLength);
+
+    /** Build a string from a format string, replacing values from a map.
+     * The format specification can contain simple named parameters that match
+     * keys in the given map. For example in the string "a {b} c", the key "b"
+     * is looked up in the map, and inserted for "{b}".
+     * @param sFormat The format specification.
+     * @param msValues A map of named parameters to their values.
+     * @return The string with named parameters replaced.
+     */
+    static NoString NamedFormat(const NoString& sFormat, const NoStringMap& msValues);
 };
 
 #endif // NOUTILS_H

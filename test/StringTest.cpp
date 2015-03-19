@@ -173,13 +173,6 @@ TEST(StringTest, Split)
     EXPECT_EQ(vexpected, vresult);
 }
 
-TEST(StringTest, NamedFormat)
-{
-    NoStringMap m;
-    m["a"] = "b";
-    EXPECT_EQ("{xbyb", NoString::NamedFormat(CS("\\{x{a}y{a}"), m));
-}
-
 TEST(StringTest, Equals)
 {
     EXPECT_TRUE(CS("ABC").Equals("abc"));

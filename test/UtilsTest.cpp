@@ -18,7 +18,7 @@
 #include <no/nofile.h>
 #include <no/noutils.h>
 
-TEST(StringTest, Hash)
+TEST(UtilsTest, Hash)
 {
     EXPECT_EQ("d41d8cd98f00b204e9800998ecf8427e", NoUtils::MD5(""));
     EXPECT_EQ("0cc175b9c0f1b6a831c399e269772661", NoUtils::MD5("a"));
@@ -27,7 +27,7 @@ TEST(StringTest, Hash)
     EXPECT_EQ("ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", NoUtils::SHA256("a"));
 }
 
-TEST(IRC32, GetMessageTags)
+TEST(UtilsTest, GetMessageTags)
 {
     EXPECT_EQ(NoStringMap(), NoUtils::GetMessageTags(""));
     EXPECT_EQ(NoStringMap(), NoUtils::GetMessageTags(":nick!ident@host PRIVMSG #chan :hello world"));
@@ -68,7 +68,7 @@ TEST(IRC32, GetMessageTags)
     exp.clear();
 }
 
-TEST(IRC32, SetMessageTags)
+TEST(UtilsTest, SetMessageTags)
 {
     NoString sLine;
 
@@ -103,4 +103,11 @@ TEST(IRC32, SetMessageTags)
     tags["a"] = "; \\\r\n";
     NoUtils::SetMessageTags(sLine, tags);
     EXPECT_EQ(R"(@a=\:\s\\\r\n :rest)", sLine);
+}
+
+TEST(UtilsTest, NamedFormat)
+{
+    NoStringMap m;
+    m["a"] = "b";
+    EXPECT_EQ("{xbyb", NoUtils::NamedFormat(NoString("\\{x{a}y{a}"), m));
 }

@@ -15,6 +15,7 @@
  */
 
 #include <no/nomodules.h>
+#include <no/noutils.h>
 #include <no/nouser.h>
 
 class NoNickServ : public NoModule
@@ -24,7 +25,7 @@ class NoNickServ : public NoModule
         NoStringMap msValues;
         msValues["nickname"] = sNick;
         msValues["password"] = GetNV("Password");
-        PutIRC(NoString::NamedFormat(GetNV(sCmd), msValues));
+        PutIRC(NoUtils::NamedFormat(GetNV(sCmd), msValues));
     }
 
 public:
@@ -113,7 +114,7 @@ public:
             sMessage.AsUpper().find("IDENTIFY") != NoString::npos && sMessage.find("help") == NoString::npos) {
             NoStringMap msValues;
             msValues["password"] = GetNV("Password");
-            PutIRC(NoString::NamedFormat(GetNV("IdentifyCmd"), msValues));
+            PutIRC(NoUtils::NamedFormat(GetNV("IdentifyCmd"), msValues));
         }
     }
 
