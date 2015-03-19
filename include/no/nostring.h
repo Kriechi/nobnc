@@ -212,13 +212,13 @@ public:
      *         after it.
      * @see Split() if you need a string split into all of its tokens.
      */
-    NoString Token(size_t uPos, bool bRest = false, const NoString& sSep = " ", bool bAllowEmpty = false) const;
+    NoString Token(size_t uPos, bool bRest = false, const NoString& sSep = " ", No::SplitBehavior behavior = No::SkipEmptyParts) const;
 
     /** Get a token out of this string. This function behaves much like the
      *  other Token() function in this class. The extra arguments are
      *  handled similarly to Split().
      */
-    NoString Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
+    NoString Token(size_t uPos, bool bRest, const NoString& sSep, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
 
     /** Split up this string into tokens.
      * @param separator The separator between tokens.
@@ -226,7 +226,7 @@ public:
                        appear in the result. By default, empty entries are kept.
      * @return A vector of tokens.
      */
-    NoStringVector Split(const NoString& separator, No::SplitBehavior = No::KeepEmptyParts) const;
+    NoStringVector Split(const NoString& separator, No::SplitBehavior behavior = No::KeepEmptyParts) const;
 
     /** Decode the give base64-encoded string.
      * @return The decoded string.

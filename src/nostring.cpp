@@ -268,9 +268,9 @@ uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const No
     return uRet;
 }
 
-NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
+NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
 {
-    NoStringVector vsTokens = Split_helper(*this, sSep, bAllowEmpty ? No::KeepEmptyParts : No::SkipEmptyParts, sLeft, sRight, bTrimQuotes);
+    NoStringVector vsTokens = Split_helper(*this, sSep, behavior, sLeft, sRight, bTrimQuotes);
     if (vsTokens.size() > uPos) {
         NoString sRet;
 
@@ -289,10 +289,10 @@ NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAl
         return sRet;
     }
 
-    return Token(uPos, bRest, sSep, bAllowEmpty);
+    return Token(uPos, bRest, sSep, behavior);
 }
 
-NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty) const
+NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, No::SplitBehavior behavior) const
 {
     const char* sep_str = sSep.c_str();
     size_t sep_len = sSep.length();
@@ -301,7 +301,7 @@ NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAl
     size_t start_pos = 0;
     size_t end_pos;
 
-    if (!bAllowEmpty) {
+    if (behavior == No::SkipEmptyParts) {
         while (strncmp(&str[start_pos], sep_str, sep_len) == 0) {
             start_pos += sep_len;
         }
@@ -311,7 +311,7 @@ NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAl
     while (uPos != 0 && start_pos < str_len) {
         bool bFoundSep = false;
 
-        while (strncmp(&str[start_pos], sep_str, sep_len) == 0 && (!bFoundSep || !bAllowEmpty)) {
+        while (strncmp(&str[start_pos], sep_str, sep_len) == 0 && (!bFoundSep || behavior == No::SkipEmptyParts)) {
             start_pos += sep_len;
             bFoundSep = true;
         }

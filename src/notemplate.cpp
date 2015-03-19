@@ -737,26 +737,26 @@ bool NoTemplate::ValidExpr(const NoString& sExpression)
 
     if (sExpr.find("!=") != NoString::npos) {
         sName = sExpr.Token(0, false, "!=").Trim_n();
-        sValue = sExpr.Token(1, true, "!=", false, "\"", "\"", true).Trim_n();
+        sValue = sExpr.Token(1, true, "!=", No::SkipEmptyParts, "\"", "\"", true).Trim_n();
         bNegate = !bNegate;
     } else if (sExpr.find("==") != NoString::npos) {
         sName = sExpr.Token(0, false, "==").Trim_n();
-        sValue = sExpr.Token(1, true, "==", false, "\"", "\"", true).Trim_n();
+        sValue = sExpr.Token(1, true, "==", No::SkipEmptyParts, "\"", "\"", true).Trim_n();
     } else if (sExpr.find(">=") != NoString::npos) {
         sName = sExpr.Token(0, false, ">=").Trim_n();
-        sValue = sExpr.Token(1, true, ">=", false, "\"", "\"", true).Trim_n();
+        sValue = sExpr.Token(1, true, ">=", No::SkipEmptyParts, "\"", "\"", true).Trim_n();
         return (GetValue(sName, true).ToLong() >= sValue.ToLong());
     } else if (sExpr.find("<=") != NoString::npos) {
         sName = sExpr.Token(0, false, "<=").Trim_n();
-        sValue = sExpr.Token(1, true, "<=", false, "\"", "\"", true).Trim_n();
+        sValue = sExpr.Token(1, true, "<=", No::SkipEmptyParts, "\"", "\"", true).Trim_n();
         return (GetValue(sName, true).ToLong() <= sValue.ToLong());
     } else if (sExpr.find(">") != NoString::npos) {
         sName = sExpr.Token(0, false, ">").Trim_n();
-        sValue = sExpr.Token(1, true, ">", false, "\"", "\"", true).Trim_n();
+        sValue = sExpr.Token(1, true, ">", No::SkipEmptyParts, "\"", "\"", true).Trim_n();
         return (GetValue(sName, true).ToLong() > sValue.ToLong());
     } else if (sExpr.find("<") != NoString::npos) {
         sName = sExpr.Token(0, false, "<").Trim_n();
-        sValue = sExpr.Token(1, true, "<", false, "\"", "\"", true).Trim_n();
+        sValue = sExpr.Token(1, true, "<", No::SkipEmptyParts, "\"", "\"", true).Trim_n();
         return (GetValue(sName, true).ToLong() < sValue.ToLong());
     } else {
         sName = sExpr.Trim_n();

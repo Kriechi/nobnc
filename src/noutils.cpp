@@ -537,8 +537,8 @@ NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
 
         NoStringMap mssTags;
         for (const NoString& sTag : vsTags) {
-            NoString sKey = sTag.Token(0, false, "=", true);
-            NoString sValue = sTag.Token(1, true, "=", true);
+            NoString sKey = sTag.Token(0, false, "=", No::KeepEmptyParts);
+            NoString sValue = sTag.Token(1, true, "=", No::KeepEmptyParts);
             mssTags[sKey] = No::Escape_n(sValue, No::MsgTagFormat, No::AsciiFormat);
         }
         return mssTags;
@@ -858,8 +858,8 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
     NoStringMap msRet;
 
     while (!sCopy.empty()) {
-        sName = sCopy.Token(0, false, "=", false, "\"", "\"", false).Trim_n();
-        sCopy = sCopy.Token(1, true, "=", false, "\"", "\"", false).TrimLeft_n();
+        sName = sCopy.Token(0, false, "=", No::SkipEmptyParts, "\"", "\"", false).Trim_n();
+        sCopy = sCopy.Token(1, true, "=", No::SkipEmptyParts, "\"", "\"", false).TrimLeft_n();
 
         if (sName.empty()) {
             continue;
@@ -871,8 +871,8 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
             NoString sKeyName = vsNames[a];
 
             if ((a + 1) == vsNames.size()) {
-                msRet[sKeyName] = sCopy.Token(0, false, " ", false, "\"", "\"");
-                sCopy = sCopy.Token(1, true, " ", false, "\"", "\"", false);
+                msRet[sKeyName] = sCopy.Token(0, false, " ", No::SkipEmptyParts, "\"", "\"");
+                sCopy = sCopy.Token(1, true, " ", No::SkipEmptyParts, "\"", "\"", false);
             } else {
                 msRet[sKeyName] = "";
             }
