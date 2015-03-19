@@ -218,7 +218,7 @@ public:
      *  other Token() function in this class. The extra arguments are
      *  handled similarly to Split().
      */
-    NoString Token(size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
+    NoString Token(size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight) const;
 
     /** Split up this string into tokens.
      * @param separator The separator between tokens.

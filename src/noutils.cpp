@@ -863,8 +863,8 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
     NoStringMap msRet;
 
     while (!sCopy.empty()) {
-        sName = sCopy.Token(0, false, "=", "\"", "\"", false).Trim_n();
-        sCopy = sCopy.Token(1, true, "=", "\"", "\"", false).TrimLeft_n();
+        sName = sCopy.Token(0, false, "=", "\"", "\"").Trim_n();
+        sCopy = sCopy.Token(1, true, "=", "\"", "\"").TrimLeft_n();
 
         if (sName.empty()) {
             continue;
@@ -877,7 +877,7 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
 
             if ((a + 1) == vsNames.size()) {
                 msRet[sKeyName] = sCopy.Token(0, false, " ", "\"", "\"");
-                sCopy = sCopy.Token(1, true, " ", "\"", "\"", false);
+                sCopy = sCopy.Token(1, true, " ", "\"", "\"");
             } else {
                 msRet[sKeyName] = "";
             }
