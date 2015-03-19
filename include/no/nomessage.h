@@ -31,14 +31,14 @@ public:
 
     NoString GetLine(const NoClient& client, const NoStringMap& params) const;
 
-    NoString GetFormat() const { return m_format; }
-    void SetFormat(const NoString& format) { m_format = format; }
+    NoString GetFormat() const;
+    void SetFormat(const NoString& format);
 
-    NoString GetText() const { return m_text; }
-    void SetText(const NoString& text) { m_text = text; }
+    NoString GetText() const;
+    void SetText(const NoString& text);
 
-    timeval GetTime() const { return m_time; }
-    void SetTime(const timeval& ts) { m_time = ts; }
+    timeval GetTime() const;
+    void SetTime(const timeval& ts);
 
     void UpdateTime();
 

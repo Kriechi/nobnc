@@ -54,3 +54,15 @@ NoString NoMessage::GetLine(const NoClient& client, const NoStringMap& params) c
         return NoUtils::NamedFormat(m_format, copy);
     }
 }
+
+NoString NoMessage::GetFormat() const { return m_format; }
+
+void NoMessage::SetFormat(const NoString& format) { m_format = format; }
+
+NoString NoMessage::GetText() const { return m_text; }
+
+void NoMessage::SetText(const NoString& text) { m_text = text; }
+
+timeval NoMessage::GetTime() const { return m_time; }
+
+void NoMessage::SetTime(const timeval& ts) { m_time = ts; }
