@@ -127,19 +127,9 @@ public:
      */
     bool Equals(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
     /**
-     * Do a wildcard comparison between two strings.
+     * Do a wildcard comparison on this string.
      * For example, the following returns true:
      * <code>WildCmp("*!?bar@foo", "I_am!~bar@foo");</code>
-     * @param sWild The wildcards used for the comparison.
-     * @param sString The string that is used for comparing.
-     * @param cs CaseSensitive (default) if you want the comparison
-     *           to be case sensitive, CaseInsensitive otherwise.
-     * @todo Make cs CaseInsensitive by default.
-     * @return true if the wildcard matches.
-     */
-    static bool WildCmp(const NoString& sWild, const NoString& sString, CaseSensitivity cs = CaseSensitive);
-    /**
-     * Do a wild compare on this string.
      * @param sWild The wildcards used to for the comparison.
      * @param cs CaseSensitive (default) if you want the comparison
      *           to be case sensitive, CaseInsensitive otherwise.
@@ -177,8 +167,7 @@ public:
     NoString& Escape(EEscape eFrom, EEscape eTo);
     NoString& Escape(EEscape eTo);
 
-    /** Replace all occurrences in a string.
-     *
+    /** Replace all occurrences in the current string.
      * You can specify a "safe zone" via sLeft and sRight. Anything inside
      * of such a zone will not be replaced. This does not do recursion, so
      * e.g. with <code>Replace("(a()a)", "a", "b", "(", ")", true)</code>
@@ -186,25 +175,6 @@ public:
      * second closing brace would not be seen as a delimitered and thus
      * wouldn't be removed. The first a is inside a "safe zone" and thus is
      * left alone, too.
-     *
-     * @param sStr The string to do the replacing on. This will also contain
-     *             the result when this function returns.
-     * @param sReplace The string that should be replaced.
-     * @param sWith The replacement to use.
-     * @param sLeft The string that marks the begin of the "safe zone".
-     * @param sRight The string that marks the end of the "safe zone".
-     * @param bRemoveDelims If this is true, all matches for sLeft and
-     *                      sRight are removed.
-     * @returns The number of replacements done.
-     */
-    static uint Replace(NoString& sStr,
-                                const NoString& sReplace,
-                                const NoString& sWith,
-                                const NoString& sLeft = "",
-                                const NoString& sRight = "",
-                                bool bRemoveDelims = false);
-
-    /** Replace all occurrences in the current string.
      * @see NoString::Replace
      * @param sReplace The string to look for.
      * @param sWith The replacement to use.
@@ -215,11 +185,18 @@ public:
      *         unchanged.
      */
     NoString Replace_n(const NoString& sReplace,
-                      const NoString& sWith,
-                      const NoString& sLeft = "",
-                      const NoString& sRight = "",
-                      bool bRemoveDelims = false) const;
+                       const NoString& sWith,
+                       const NoString& sLeft = "",
+                       const NoString& sRight = "",
+                       bool bRemoveDelims = false) const;
     /** Replace all occurrences in the current string.
+     * You can specify a "safe zone" via sLeft and sRight. Anything inside
+     * of such a zone will not be replaced. This does not do recursion, so
+     * e.g. with <code>Replace("(a()a)", "a", "b", "(", ")", true)</code>
+     * you would get "a(b)" as result. The second opening brace and the
+     * second closing brace would not be seen as a delimitered and thus
+     * wouldn't be removed. The first a is inside a "safe zone" and thus is
+     * left alone, too.
      * @see NoString::Replace
      * @param sReplace The string to look for.
      * @param sWith The replacement to use.
@@ -228,7 +205,11 @@ public:
      * @param bRemoveDelims If true, all matching delimiters are removed.
      * @returns The number of replacements done.
      */
-    uint Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft = "", const NoString& sRight = "", bool bRemoveDelims = false);
+    uint Replace(const NoString& sReplace,
+                 const NoString& sWith,
+                 const NoString& sLeft = "",
+                 const NoString& sRight = "",
+                 bool bRemoveDelims = false);
     /** Ellipsize the current string.
      * For example, ellipsizing "Hello, I'm Bob" to the length 9 would
      * result in "Hello,...".

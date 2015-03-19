@@ -184,13 +184,13 @@ bool NoString::Equals(const NoString& s, CaseSensitivity cs) const
     return Compare(s, cs) == 0;
 }
 
-bool NoString::WildCmp(const NoString& sWild, const NoString& sString, CaseSensitivity cs)
+bool NoString::WildCmp(const NoString& sWild, CaseSensitivity cs) const
 {
     // avoid a copy when cs == CaseSensitive (C++ deliberately specifies that binding
     // a temporary object to a reference to const on the stack lengthens the lifetime
     // of the temporary to the lifetime of the reference itself)
     const NoString& sWld = (cs == CaseSensitive ? sWild : sWild.AsLower());
-    const NoString& sStr = (cs == CaseSensitive ? sString : sString.AsLower());
+    const NoString& sStr = (cs == CaseSensitive ? *this : AsLower());
 
     // Written by Jack Handy - jakkhandy@hotmail.com
     const char* wild = sWld.c_str(), *NoString = sStr.c_str();
@@ -227,11 +227,6 @@ bool NoString::WildCmp(const NoString& sWild, const NoString& sString, CaseSensi
     }
 
     return (*wild == 0);
-}
-
-bool NoString::WildCmp(const NoString& sWild, CaseSensitivity cs) const
-{
-    return NoString::WildCmp(sWild, *this, cs);
 }
 
 NoString& NoString::MakeUpper()
@@ -632,48 +627,43 @@ NoString& NoString::Escape(EEscape eTo)
 NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims) const
 {
     NoString sRet = *this;
-    NoString::Replace(sRet, sReplace, sWith, sLeft, sRight, bRemoveDelims);
+    sRet.Replace(sReplace, sWith, sLeft, sRight, bRemoveDelims);
     return sRet;
 }
 
 uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
 {
-    return NoString::Replace(*this, sReplace, sWith, sLeft, sRight, bRemoveDelims);
-}
-
-uint NoString::Replace(NoString& sStr, const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims)
-{
     uint uRet = 0;
-    NoString sCopy = sStr;
-    sStr.clear();
+    NoString sCopy = *this;
+    clear();
 
-    size_type uReplaceWidth = sReplace.length();
-    size_type uLeftWidth = sLeft.length();
-    size_type uRightWidth = sRight.length();
+    NoString::size_type uReplaceWidth = sReplace.length();
+    NoString::size_type uLeftWidth = sLeft.length();
+    NoString::size_type uRightWidth = sRight.length();
     const char* p = sCopy.c_str();
     bool bInside = false;
 
     while (*p) {
         if (!bInside && uLeftWidth && strncmp(p, sLeft.c_str(), uLeftWidth) == 0) {
             if (!bRemoveDelims) {
-                sStr += sLeft;
+                append(sLeft);
             }
 
             p += uLeftWidth - 1;
             bInside = true;
         } else if (bInside && uRightWidth && strncmp(p, sRight.c_str(), uRightWidth) == 0) {
             if (!bRemoveDelims) {
-                sStr += sRight;
+                append(sRight);
             }
 
             p += uRightWidth - 1;
             bInside = false;
         } else if (!bInside && strncmp(p, sReplace.c_str(), uReplaceWidth) == 0) {
-            sStr += sWith;
+            append(sWith);
             p += uReplaceWidth - 1;
             uRet++;
         } else {
-            sStr.append(p, 1);
+            append(p, 1);
         }
 
         p++;
