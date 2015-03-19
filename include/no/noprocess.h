@@ -31,10 +31,10 @@ public:
     int Execute(const NoString& sExec);
     void Kill(int iSignal);
 
+private:
     int popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand);
     void close2(int iPid, int iReadFD, int iWriteFD);
 
-private:
     int m_iPid;
 };
 
