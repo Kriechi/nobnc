@@ -19,15 +19,13 @@
 
 #include <no/noglobal.h>
 #include <no/noircsocket.h>
-#include <no/noutils.h>
-#include <no/notable.h>
 #include <memory>
 
-class NoApp;
 class NoUser;
 class NoNetwork;
 class NoIrcConnection;
 class NoClient;
+class NoTable;
 
 class NO_EXPORT NoAuthBase
 {
