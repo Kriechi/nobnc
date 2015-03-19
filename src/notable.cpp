@@ -18,6 +18,11 @@
 #include "nodebug.h"
 #include <iomanip>
 
+NoTable::NoTable(ulong uPreferredWidth)
+    : m_vsHeaders(), m_vuMaxWidths(), m_vuMinWidths(), m_vbWrappable(), m_uPreferredWidth(uPreferredWidth), m_vsOutput()
+{
+}
+
 bool NoTable::AddColumn(const NoString& sName, bool bWrappable)
 {
     for (const NoString& sHeader : m_vsHeaders) {

@@ -54,11 +54,7 @@ public:
      *  @param uPreferredWidth If width of table is bigger than this, text in cells will be wrapped to several lines, if
      *possible
      */
-    explicit NoTable(size_type uPreferredWidth = 110)
-        : m_vsHeaders(), m_vuMaxWidths(), m_vuMinWidths(), m_vbWrappable(), m_uPreferredWidth(uPreferredWidth), m_vsOutput()
-    {
-    }
-    virtual ~NoTable() {}
+    explicit NoTable(ulong uPreferredWidth = 110);
 
     /** Adds a new column to the table.
      *  Please note that you should add all columns before starting to fill
