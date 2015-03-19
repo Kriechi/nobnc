@@ -109,7 +109,7 @@ public:
     {
         NoString sPerf = sArg;
 
-        if (sPerf.Left(1) == "/") sPerf.LeftChomp();
+        if (sPerf.Left(1) == "/") sPerf.LeftChomp(1);
 
         if (sPerf.Token(0).Equals("MSG")) {
             sPerf = "PRIVMSG " + sPerf.Token(1, true);

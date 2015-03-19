@@ -1042,7 +1042,7 @@ bool NoNetwork::AddServer(const NoString& sName)
 
     if (sPort.Left(1) == "+") {
         bSSL = true;
-        sPort.LeftChomp();
+        sPort.LeftChomp(1);
     }
 
     ushort uPort = sPort.ToUShort();

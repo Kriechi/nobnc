@@ -283,7 +283,7 @@ bool NoUtils::GetInput(const NoString& sPrompt, NoString& sRet, const NoString& 
     sInput = szBuf;
 
     if (sInput.Right(1) == "\n") {
-        sInput.RightChomp();
+        sInput.RightChomp(1);
     }
 
     if (sInput.empty()) {
@@ -705,7 +705,7 @@ NoString NoUtils::ToTimeStr(ulong s)
 
     if (sRet.empty()) return "0s";
 
-    return sRet.RightChomp_n();
+    return sRet.RightChomp_n(1);
 }
 
 NoString NoUtils::ToPercent(double d)

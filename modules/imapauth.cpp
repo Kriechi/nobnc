@@ -75,7 +75,7 @@ public:
 
         if (sPort.Left(1) == "+") {
             m_bSSL = true;
-            sPort.LeftChomp();
+            sPort.LeftChomp(1);
         }
 
         ushort uPort = sPort.ToUShort();

@@ -77,7 +77,7 @@ public:
             // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
             // ERROR :Closing Link: nick[24.24.24.24] Killer (Local kill by Killer (reason))
             NoString sError(sLine.substr(6));
-            if (sError.Left(1) == ":") sError.LeftChomp();
+            if (sError.Left(1) == ":") sError.LeftChomp(1);
             Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC: " +
                 GetNetwork()->GetCurrentServer()->GetName() + " [" + sError + "]",
                 LOG_NOTICE);

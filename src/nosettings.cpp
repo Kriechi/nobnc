@@ -91,8 +91,8 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
         }
 
         if ((sLine.Left(1) == "<") && (sLine.Right(1) == ">")) {
-            sLine.LeftChomp();
-            sLine.RightChomp();
+            sLine.LeftChomp(1);
+            sLine.RightChomp(1);
             sLine.Trim();
 
             NoString sTag = sLine.Token(0);
@@ -142,7 +142,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 
         // Only remove the first space, people might want
         // leading spaces (e.g. in the MOTD).
-        if (sValue.Left(1) == " ") sValue.LeftChomp();
+        if (sValue.Left(1) == " ") sValue.LeftChomp(1);
 
         // We don't have any names with spaces, trim all
         // leading/trailing spaces.

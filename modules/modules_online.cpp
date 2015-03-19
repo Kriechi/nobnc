@@ -53,7 +53,7 @@ public:
                 }
             }
             // Remove the leading space
-            sBNNoNicks.LeftChomp();
+            sBNNoNicks.LeftChomp(1);
 
             if (!GetNetwork()->GetIRCSock()) {
                 // if we are not connected to any IRC server, send

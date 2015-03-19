@@ -152,7 +152,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
     NoString sCmd = sLine.Token(1);
 
     if ((sCmd.length() == 3) && (isdigit(sCmd[0])) && (isdigit(sCmd[1])) && (isdigit(sCmd[2]))) {
-        NoString sServer = sLine.Token(0).LeftChomp_n();
+        NoString sServer = sLine.Token(0).LeftChomp_n(1);
         uint uRaw = sCmd.ToUInt();
         NoString sNick = sLine.Token(2);
         NoString sRest = sLine.Token(3, true);
@@ -291,7 +291,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
 
             if (pChan) {
                 NoString sTopic = sLine.Token(4, true);
-                sTopic.LeftChomp();
+                sTopic.LeftChomp(1);
                 pChan->setTopic(sTopic);
                 if (pChan->isDetached()) {
                     return;
@@ -326,7 +326,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             NoString sIdent = sLine.Token(4);
             NoString sHost = sLine.Token(5);
 
-            sServer.LeftChomp();
+            sServer.LeftChomp(1);
 
             if (sNick.Equals(GetNick())) {
                 m_Nick.setIdent(sIdent);
@@ -635,7 +635,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             NoString sChan = sRest.Token(0);
             NoString sKickedNick = sRest.Token(1);
             NoString sMsg = sRest.Token(2, true);
-            sMsg.LeftChomp();
+            sMsg.LeftChomp(1);
 
             NoChannel* pChan = m_pNetwork->FindChan(sChan);
 
@@ -660,11 +660,11 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             // :nick!ident@host.com NOTICE #chan :Message
             NoString sTarget = sRest.Token(0);
             NoString sMsg = sRest.Token(1, true);
-            sMsg.LeftChomp();
+            sMsg.LeftChomp(1);
 
             if (sMsg.WildCmp("\001*\001")) {
-                sMsg.LeftChomp();
-                sMsg.RightChomp();
+                sMsg.LeftChomp(1);
+                sMsg.RightChomp(1);
 
                 if (sTarget.Equals(GetNick())) {
                     if (OnCTCPReply(Nick, sMsg)) {
@@ -699,7 +699,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
 
             if (pChan) {
                 NoString sTopic = sLine.Token(3, true);
-                sTopic.LeftChomp();
+                sTopic.LeftChomp(1);
 
                 IRCSOCKMODULECALL(OnTopic(Nick, *pChan, sTopic), &bReturn);
                 if (bReturn) return;
@@ -720,8 +720,8 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             NoString sMsg = sRest.Token(1, true).TrimPrefix_n();
 
             if (sMsg.WildCmp("\001*\001")) {
-                sMsg.LeftChomp();
-                sMsg.RightChomp();
+                sMsg.LeftChomp(1);
+                sMsg.RightChomp(1);
 
                 if (sTarget.Equals(GetNick())) {
                     if (OnPrivCTCP(Nick, sMsg)) {

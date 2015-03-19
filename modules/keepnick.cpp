@@ -163,7 +163,7 @@ public:
         NoString sNick = sLine.Token(1);
 
         // Don't even think of using spaces in your nick!
-        if (sNick.Left(1) == ":") sNick.LeftChomp();
+        if (sNick.Left(1) == ":") sNick.LeftChomp(1);
 
         if (!sNick.Equals(GetNick())) return CONTINUE;
 

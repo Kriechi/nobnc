@@ -1652,7 +1652,7 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
     }
 
     if (sPort.Left(1) == "+") {
-        sPort.LeftChomp();
+        sPort.LeftChomp(1);
         bSSL = true;
     }
 

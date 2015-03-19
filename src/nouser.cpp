@@ -231,7 +231,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     // 'Salted hash' means hash of 'password' + 'salt'
     // Possible hashes are md5 and sha256
     if (sValue.Right(1) == "-") {
-        sValue.RightChomp();
+        sValue.RightChomp(1);
         sValue.Trim();
         SetPass(sValue, NoUser::HASH_MD5);
     } else {

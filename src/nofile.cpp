@@ -494,7 +494,7 @@ NoString NoFile::GetDir() const
     NoString sDir(m_sLongName);
 
     while (!sDir.empty() && sDir.Right(1) != "/" && sDir.Right(1) != "\\") {
-        sDir.RightChomp();
+        sDir.RightChomp(1);
     }
 
     return sDir;

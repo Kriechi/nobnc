@@ -409,24 +409,24 @@ public:
      * @param uLen The number of characters to remove.
      * @return true if this string was modified.
      */
-    bool LeftChomp(size_type uLen = 1);
+    bool LeftChomp(size_type uLen);
     /** Remove characters from the end of this string.
      * @param uLen The number of characters to remove.
      * @return true if this string was modified.
      */
-    bool RightChomp(size_type uLen = 1);
+    bool RightChomp(size_type uLen);
     /** Remove characters from the beginning of this string.
      * This string object isn't modified.
      * @param uLen The number of characters to remove.
      * @return The result of the conversion.
      */
-    NoString LeftChomp_n(size_type uLen = 1) const;
+    NoString LeftChomp_n(size_type uLen) const;
     /** Remove characters from the end of this string.
      * This string object isn't modified.
      * @param uLen The number of characters to remove.
      * @return The result of the conversion.
      */
-    NoString RightChomp_n(size_type uLen = 1) const;
+    NoString RightChomp_n(size_type uLen) const;
 
 private:
     uchar* strnchr(const uchar* src,

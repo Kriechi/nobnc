@@ -36,7 +36,7 @@ NoString NoDir::ChangeDir(const NoString& sPath, const NoString& sAdd, const NoS
     NoString sAddDir(sAdd);
 
     if (sAddDir.Left(2) == "~/") {
-        sAddDir.LeftChomp();
+        sAddDir.LeftChomp(1);
         sAddDir = sHomeDir + sAddDir;
     }
 
@@ -45,7 +45,7 @@ NoString NoDir::ChangeDir(const NoString& sPath, const NoString& sAdd, const NoS
     NoString sCurDir;
 
     if (sRet.Right(1) == "/") {
-        sRet.RightChomp();
+        sRet.RightChomp(1);
     }
 
     for (uint a = 0; a < sAddDir.size(); a++) {

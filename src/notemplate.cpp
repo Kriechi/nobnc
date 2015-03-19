@@ -713,7 +713,7 @@ bool NoTemplate::ValidExpr(const NoString& sExpression)
 
     if (sExpr.Left(1) == "!") {
         bNegate = true;
-        sExpr.LeftChomp();
+        sExpr.LeftChomp(1);
     }
 
     if (sExpr.find("!=") != NoString::npos) {

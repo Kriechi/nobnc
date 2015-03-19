@@ -235,8 +235,8 @@ void NoClient::ReadLineImpl(const NoString& sData)
             bool bContinue = false;
             if (sMsg.WildCmp("\001*\001")) {
                 NoString sCTCP = sMsg;
-                sCTCP.LeftChomp();
-                sCTCP.RightChomp();
+                sCTCP.LeftChomp(1);
+                sCTCP.RightChomp(1);
 
                 if (sCTCP.Token(0) == "VERSION") {
                     sCTCP += " via " + NoApp::GetTag(false);
@@ -291,8 +291,8 @@ void NoClient::ReadLineImpl(const NoString& sData)
             bool bContinue = false;
             if (sMsg.WildCmp("\001*\001")) {
                 NoString sCTCP = sMsg;
-                sCTCP.LeftChomp();
-                sCTCP.RightChomp();
+                sCTCP.LeftChomp(1);
+                sCTCP.RightChomp(1);
 
                 if (sTarget.TrimPrefix(m_pUser->GetStatusPrefix())) {
                     if (sTarget.Equals("status")) {
