@@ -96,18 +96,7 @@ private:
 class NO_EXPORT NoClient : public NoIrcSocket
 {
 public:
-    NoClient()
-        : NoIrcSocket(), m_bGotPass(false), m_bGotNick(false), m_bGotUser(false), m_bInCap(false), m_bNamesx(false),
-          m_bUHNames(false), m_bAway(false), m_bServerTime(false), m_bBatch(false), m_bSelfMessage(false),
-          m_bPlaybackActive(false), m_pUser(nullptr), m_pNetwork(nullptr), m_sNick("unknown-nick"), m_sPass(""),
-          m_sUser(""), m_sNetwork(""), m_sIdentifier(""), m_spAuth(), m_ssAcceptedCaps()
-    {
-        EnableReadLine();
-        // RFC says a line can have 512 chars max, but we are
-        // a little more gentle ;)
-        SetMaxBufferThreshold(1024);
-    }
-
+    NoClient();
     virtual ~NoClient();
 
     NoClient(const NoClient&) = delete;
@@ -119,13 +108,13 @@ public:
 
     NoString GetNick(bool bAllowIRCNick = true) const;
     NoString GetNickMask() const;
-    NoString GetIdentifier() const { return m_sIdentifier; }
-    bool HasNamesx() const { return m_bNamesx; }
-    bool HasUHNames() const { return m_bUHNames; }
-    bool IsAway() const { return m_bAway; }
-    bool HasServerTime() const { return m_bServerTime; }
-    bool HasBatch() const { return m_bBatch; }
-    bool HasSelfMessage() const { return m_bSelfMessage; }
+    NoString GetIdentifier() const;
+    bool HasNamesx() const;
+    bool HasUHNames() const;
+    bool IsAway() const;
+    bool HasServerTime() const;
+    bool HasBatch() const;
+    bool HasSelfMessage() const;
 
     static bool IsValidIdentifier(const NoString& sIdentifier);
 
@@ -133,10 +122,10 @@ public:
     void UserPortCommand(NoString& sLine);
     void StatusCTCP(const NoString& sCommand);
     void BouncedOff();
-    bool IsAttached() const { return m_pUser != nullptr; }
+    bool IsAttached() const;
 
-    bool IsPlaybackActive() const { return m_bPlaybackActive; }
-    void SetPlaybackActive(bool bActive) { m_bPlaybackActive = bActive; }
+    bool IsPlaybackActive() const;
+    void SetPlaybackActive(bool bActive);
 
     void PutIRC(const NoString& sLine);
     void PutClient(const NoString& sLine);
@@ -146,7 +135,7 @@ public:
     void PutModule(const NoString& sModule, const NoString& sLine);
     void PutModNotice(const NoString& sModule, const NoString& sLine);
 
-    bool IsCapEnabled(const NoString& sCap) const { return 1 == m_ssAcceptedCaps.count(sCap); }
+    bool IsCapEnabled(const NoString& sCap) const;
 
     void ReadLineImpl(const NoString& sData) override;
     bool SendMotd();
@@ -159,10 +148,10 @@ public:
     void ReachedMaxBufferImpl() override;
 
     void SetNick(const NoString& s);
-    void SetAway(bool bAway) { m_bAway = bAway; }
-    NoUser* GetUser() const { return m_pUser; }
+    void SetAway(bool bAway);
+    NoUser* GetUser() const;
     void SetNetwork(NoNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
-    NoNetwork* GetNetwork() const { return m_pNetwork; }
+    NoNetwork* GetNetwork() const;
     std::vector<NoClient*> GetClients() const;
     NoIrcConnection* GetIRCSock() const;
     NoString GetFullName() const;

@@ -66,6 +66,17 @@
         }                                                                     \
     }
 
+NoClient::NoClient() : NoIrcSocket(), m_bGotPass(false), m_bGotNick(false), m_bGotUser(false), m_bInCap(false), m_bNamesx(false),
+      m_bUHNames(false), m_bAway(false), m_bServerTime(false), m_bBatch(false), m_bSelfMessage(false),
+      m_bPlaybackActive(false), m_pUser(nullptr), m_pNetwork(nullptr), m_sNick("unknown-nick"), m_sPass(""),
+      m_sUser(""), m_sNetwork(""), m_sIdentifier(""), m_spAuth(), m_ssAcceptedCaps()
+{
+    EnableReadLine();
+    // RFC says a line can have 512 chars max, but we are
+    // a little more gentle ;)
+    SetMaxBufferThreshold(1024);
+}
+
 NoClient::~NoClient()
 {
     if (m_spAuth) {
@@ -532,6 +543,10 @@ void NoClient::ReadLineImpl(const NoString& sData)
 
 void NoClient::SetNick(const NoString& s) { m_sNick = s; }
 
+void NoClient::SetAway(bool bAway) { m_bAway = bAway; }
+NoUser* NoClient::GetUser() const { return m_pUser; }
+
+NoNetwork* NoClient::GetNetwork() const { return m_pNetwork; }
 void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect)
 {
     if (bDisconnect) {
@@ -757,6 +772,11 @@ void NoClient::BouncedOff()
     Close(NoSocket::CLT_AFTERWRITE);
 }
 
+bool NoClient::IsAttached() const { return m_pUser != nullptr; }
+
+bool NoClient::IsPlaybackActive() const { return m_bPlaybackActive; }
+void NoClient::SetPlaybackActive(bool bActive) { m_bPlaybackActive = bActive; }
+
 void NoClient::PutIRC(const NoString& sLine)
 {
     if (m_pNetwork) {
@@ -823,6 +843,8 @@ void NoClient::PutModule(const NoString& sModule, const NoString& sLine)
     }
 }
 
+bool NoClient::IsCapEnabled(const NoString& sCap) const { return 1 == m_ssAcceptedCaps.count(sCap); }
+
 NoString NoClient::GetNick(bool bAllowIRCNick) const
 {
     NoString sRet;
@@ -848,6 +870,14 @@ NoString NoClient::GetNickMask() const
 
     return GetNick() + "!" + (m_pNetwork ? m_pNetwork->GetBindHost() : m_pUser->GetIdent()) + "@" + sHost;
 }
+
+NoString NoClient::GetIdentifier() const { return m_sIdentifier; }
+bool NoClient::HasNamesx() const { return m_bNamesx; }
+bool NoClient::HasUHNames() const { return m_bUHNames; }
+bool NoClient::IsAway() const { return m_bAway; }
+bool NoClient::HasServerTime() const { return m_bServerTime; }
+bool NoClient::HasBatch() const { return m_bBatch; }
+bool NoClient::HasSelfMessage() const { return m_bSelfMessage; }
 
 bool NoClient::IsValidIdentifier(const NoString& sIdentifier)
 {
