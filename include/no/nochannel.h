@@ -23,11 +23,9 @@
 #include <no/nobuffer.h>
 #include <map>
 
-class NoUser;
 class NoNetwork;
 class NoClient;
 class NoSettings;
-class NoFile;
 
 class NO_EXPORT NoChannel
 {
