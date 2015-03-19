@@ -76,9 +76,9 @@ public:
     void ClientDisconnected(NoClient* pClient);
 
     NoUser* GetUser() const;
-    const NoString& GetName() const;
+    NoString GetName() const;
     bool IsNetworkAttached() const { return !m_vClients.empty(); }
-    const std::vector<NoClient*>& GetClients() const { return m_vClients; }
+    std::vector<NoClient*> GetClients() const { return m_vClients; }
     std::vector<NoClient*> FindClients(const NoString& sIdentifier) const;
 
     void SetUser(NoUser* pUser);
@@ -91,7 +91,7 @@ public:
     bool PutStatus(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
     bool PutModule(const NoString& sModule, const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
 
-    const std::vector<NoChannel*>& GetChans() const;
+    std::vector<NoChannel*> GetChans() const;
     NoChannel* FindChan(NoString sName) const;
     std::vector<NoChannel*> FindChans(const NoString& sWild) const;
     bool AddChan(NoChannel* pChan);
@@ -99,17 +99,17 @@ public:
     bool DelChan(const NoString& sName);
     void JoinChans();
 
-    const std::vector<NoQuery*>& GetQueries() const;
+    std::vector<NoQuery*> GetQueries() const;
     NoQuery* FindQuery(const NoString& sName) const;
     std::vector<NoQuery*> FindQueries(const NoString& sWild) const;
     NoQuery* AddQuery(const NoString& sName);
     bool DelQuery(const NoString& sName);
 
-    const NoString& GetChanPrefixes() const { return m_sChanPrefixes; }
+    NoString GetChanPrefixes() const { return m_sChanPrefixes; }
     void SetChanPrefixes(const NoString& s) { m_sChanPrefixes = s; }
     bool IsChan(const NoString& sChan) const;
 
-    const std::vector<NoServer*>& GetServers() const;
+    std::vector<NoServer*> GetServers() const;
     bool HasServers() const { return !m_vServers.empty(); }
     NoServer* FindServer(const NoString& sName) const;
     bool DelServer(const NoString& sName, ushort uPort, const NoString& sPass);
@@ -121,7 +121,7 @@ public:
     bool SetNextServer(const NoServer* pServer);
     bool IsLastServer() const;
 
-    const NoStringSet& GetTrustedFingerprints() const { return m_ssTrustedFingerprints; }
+    NoStringSet GetTrustedFingerprints() const { return m_ssTrustedFingerprints; }
     void AddTrustedFingerprint(const NoString& sFP)
     {
         m_ssTrustedFingerprints.insert(No::Escape_n(sFP, No::HexColonFormat, No::HexColonFormat));
@@ -132,7 +132,7 @@ public:
     bool GetIRCConnectEnabled() const { return m_bIRCConnectEnabled; }
 
     NoIrcConnection* GetIRCSock() const { return m_pIRCSock; }
-    const NoString& GetIRCServer() const;
+    NoString GetIRCServer() const;
     const NoNick& GetIRCNick() const;
     void SetIRCNick(const NoNick& n);
     NoString GetCurNick() const;
@@ -175,12 +175,12 @@ public:
 
     void ClearQueryBuffer();
 
-    const NoString& GetNick(const bool bAllowDefault = true) const;
-    const NoString& GetAltNick(const bool bAllowDefault = true) const;
-    const NoString& GetIdent(const bool bAllowDefault = true) const;
-    const NoString& GetRealName() const;
-    const NoString& GetBindHost() const;
-    const NoString& GetEncoding() const;
+    NoString GetNick(const bool bAllowDefault = true) const;
+    NoString GetAltNick(const bool bAllowDefault = true) const;
+    NoString GetIdent(const bool bAllowDefault = true) const;
+    NoString GetRealName() const;
+    NoString GetBindHost() const;
+    NoString GetEncoding() const;
     NoString GetQuitMsg() const;
 
     void SetNick(const NoString& s);

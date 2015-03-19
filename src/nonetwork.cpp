@@ -648,7 +648,7 @@ void NoNetwork::ClientDisconnected(NoClient* pClient)
 
 NoUser* NoNetwork::GetUser() const { return m_pUser; }
 
-const NoString& NoNetwork::GetName() const { return m_sName; }
+NoString NoNetwork::GetName() const { return m_sName; }
 
 std::vector<NoClient*> NoNetwork::FindClients(const NoString& sIdentifier) const
 {
@@ -738,7 +738,7 @@ bool NoNetwork::PutModule(const NoString& sModule, const NoString& sLine, NoClie
 
 // Channels
 
-const std::vector<NoChannel*>& NoNetwork::GetChans() const { return m_vChans; }
+std::vector<NoChannel*> NoNetwork::GetChans() const { return m_vChans; }
 
 NoChannel* NoNetwork::FindChan(NoString sName) const
 {
@@ -903,7 +903,7 @@ bool NoNetwork::IsChan(const NoString& sChan) const
 
 // Queries
 
-const std::vector<NoQuery*>& NoNetwork::GetQueries() const { return m_vQueries; }
+std::vector<NoQuery*> NoNetwork::GetQueries() const { return m_vQueries; }
 
 NoQuery* NoNetwork::FindQuery(const NoString& sName) const
 {
@@ -964,7 +964,7 @@ bool NoNetwork::DelQuery(const NoString& sName)
 
 // Server list
 
-const std::vector<NoServer*>& NoNetwork::GetServers() const { return m_vServers; }
+std::vector<NoServer*> NoNetwork::GetServers() const { return m_vServers; }
 
 NoServer* NoNetwork::FindServer(const NoString& sName) const
 {
@@ -1129,7 +1129,7 @@ bool NoNetwork::SetNextServer(const NoServer* pServer)
 
 bool NoNetwork::IsLastServer() const { return (m_uServerIdx >= m_vServers.size()); }
 
-const NoString& NoNetwork::GetIRCServer() const { return m_sIRCServer; }
+NoString NoNetwork::GetIRCServer() const { return m_sIRCServer; }
 const NoNick& NoNetwork::GetIRCNick() const { return m_IRCNick; }
 
 void NoNetwork::SetIRCNick(const NoNick& n)
@@ -1269,7 +1269,7 @@ void NoNetwork::ClearQueryBuffer()
     m_vQueries.clear();
 }
 
-const NoString& NoNetwork::GetNick(const bool bAllowDefault) const
+NoString NoNetwork::GetNick(const bool bAllowDefault) const
 {
     if (m_sNick.empty()) {
         return m_pUser->GetNick(bAllowDefault);
@@ -1278,7 +1278,7 @@ const NoString& NoNetwork::GetNick(const bool bAllowDefault) const
     return m_sNick;
 }
 
-const NoString& NoNetwork::GetAltNick(const bool bAllowDefault) const
+NoString NoNetwork::GetAltNick(const bool bAllowDefault) const
 {
     if (m_sAltNick.empty()) {
         return m_pUser->GetAltNick(bAllowDefault);
@@ -1287,7 +1287,7 @@ const NoString& NoNetwork::GetAltNick(const bool bAllowDefault) const
     return m_sAltNick;
 }
 
-const NoString& NoNetwork::GetIdent(const bool bAllowDefault) const
+NoString NoNetwork::GetIdent(const bool bAllowDefault) const
 {
     if (m_sIdent.empty()) {
         return m_pUser->GetIdent(bAllowDefault);
@@ -1296,7 +1296,7 @@ const NoString& NoNetwork::GetIdent(const bool bAllowDefault) const
     return m_sIdent;
 }
 
-const NoString& NoNetwork::GetRealName() const
+NoString NoNetwork::GetRealName() const
 {
     if (m_sRealName.empty()) {
         return m_pUser->GetRealName();
@@ -1305,7 +1305,7 @@ const NoString& NoNetwork::GetRealName() const
     return m_sRealName;
 }
 
-const NoString& NoNetwork::GetBindHost() const
+NoString NoNetwork::GetBindHost() const
 {
     if (m_sBindHost.empty()) {
         return m_pUser->GetBindHost();
@@ -1314,7 +1314,7 @@ const NoString& NoNetwork::GetBindHost() const
     return m_sBindHost;
 }
 
-const NoString& NoNetwork::GetEncoding() const { return m_sEncoding; }
+NoString NoNetwork::GetEncoding() const { return m_sEncoding; }
 
 NoString NoNetwork::GetQuitMsg() const
 {
