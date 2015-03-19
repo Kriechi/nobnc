@@ -49,6 +49,25 @@ typedef std::multimap<NoString, NoWebSession*>::iterator mIPSessionsIterator;
 
 static CSessionManager Sessions;
 
+class NoTagHandler : public NoTemplateTagHandler
+{
+public:
+    NoTagHandler(NoWebSock& WebSock) : NoTemplateTagHandler(), m_WebSock(WebSock) {}
+
+    bool HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override
+    {
+        if (sName.Equals("URLPARAM")) {
+            // sOutput = NoApp::Get()
+            sOutput = m_WebSock.GetParam(sArgs.Token(0), false);
+            return true;
+        }
+        return false;
+    }
+
+private:
+    NoWebSock& m_WebSock;
+};
+
 class NoWebAuth : public NoAuthBase
 {
 public:
@@ -85,19 +104,6 @@ NoWebSession::~NoWebSession()
             ++it;
         }
     }
-}
-
-NoTagHandler::NoTagHandler(NoWebSock& WebSock) : NoTemplateTagHandler(), m_WebSock(WebSock) {}
-
-bool NoTagHandler::HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
-{
-    if (sName.Equals("URLPARAM")) {
-        // sOutput = NoApp::Get()
-        sOutput = m_WebSock.GetParam(sArgs.Token(0), false);
-        return true;
-    }
-
-    return false;
 }
 
 NoWebSession::NoWebSession(const NoString& sId, const NoString& sIP)

@@ -32,19 +32,6 @@ class NoWebSubPage;
 typedef std::shared_ptr<NoWebSubPage> TWebSubPage;
 typedef std::vector<TWebSubPage> VWebSubPages;
 
-class NO_EXPORT NoTagHandler : public NoTemplateTagHandler
-{
-public:
-    NoTagHandler(NoWebSock& pWebSock);
-    virtual ~NoTagHandler() {}
-
-    bool HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override;
-
-private:
-    NoWebSock& m_WebSock;
-};
-
-
 class NO_EXPORT NoWebSession
 {
 public:
