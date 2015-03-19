@@ -462,6 +462,8 @@ void NoHttpSocket::ParseURI()
 
 NoString NoHttpSocket::GetPath() const { return m_sURI.Token(0, "?"); }
 
+bool NoHttpSocket::IsLoggedIn() const { return m_bLoggedIn; }
+
 void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams)
 {
     msvsParams.clear();
@@ -481,6 +483,8 @@ void NoHttpSocket::SetDocRoot(const NoString& s)
     m_sDocRoot = s + "/";
     m_sDocRoot.Replace("//", "/");
 }
+
+void NoHttpSocket::SetLoggedIn(bool b) { m_bLoggedIn = b; }
 
 const NoString& NoHttpSocket::GetDocRoot() const { return m_sDocRoot; }
 

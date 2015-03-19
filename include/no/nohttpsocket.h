@@ -59,10 +59,10 @@ public:
     bool SendCookie(const NoString& sKey, const NoString& sValue);
 
     void SetDocRoot(const NoString& s);
-    void SetLoggedIn(bool b) { m_bLoggedIn = b; }
+    void SetLoggedIn(bool b);
 
     NoString GetPath() const;
-    bool IsLoggedIn() const { return m_bLoggedIn; }
+    bool IsLoggedIn() const;
     const NoString& GetDocRoot() const;
     const NoString& GetUser() const;
     const NoString& GetPass() const;
