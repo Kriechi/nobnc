@@ -26,15 +26,10 @@ static void PrintTo(const NoString& s, std::ostream* o)
 class EscapeTest : public ::testing::Test
 {
 protected:
-    void testEncode(const NoString& in, const NoString& expectedOut, const NoString& sformat)
+    void testEncode(const NoString& in, const NoString& expectedOut, No::EscapeFormat format)
     {
-        No::EscapeFormat format = NoString::ToEscape(sformat);
-        NoString out;
-
-        SCOPED_TRACE("Format: " + sformat);
-
         // Encode, then decode again and check we still got the same string
-        out = in.Escape_n(No::AsciiFormat, format);
+        NoString out = in.Escape_n(No::AsciiFormat, format);
         EXPECT_EQ(expectedOut, out);
         out = out.Escape_n(format, No::AsciiFormat);
         EXPECT_EQ(in, out);
@@ -44,10 +39,10 @@ protected:
     {
         SCOPED_TRACE("String: " + in);
 
-        testEncode(in, url, "URL");
-        testEncode(in, html, "HTML");
-        testEncode(in, sql, "SQL");
-        testEncode(in, tag, "MSGTAG");
+        testEncode(in, url, No::UrlFormat);
+        testEncode(in, html, No::HtmlFormat);
+        testEncode(in, sql, No::SqlFormat);
+        testEncode(in, tag, No::MsgTagFormat);
     }
 };
 

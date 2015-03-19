@@ -140,7 +140,6 @@ public:
      */
     NoString AsLower() const;
 
-    static No::EscapeFormat ToEscape(const NoString& sEsc);
     NoString Escape_n(No::EscapeFormat eFrom, No::EscapeFormat eTo) const;
     NoString Escape_n(No::EscapeFormat eTo) const;
     NoString& Escape(No::EscapeFormat eFrom, No::EscapeFormat eTo);

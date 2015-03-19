@@ -21,15 +21,38 @@
 #include "noutils.h"
 #include <algorithm>
 
+static No::EscapeFormat ToEscapeFormat(const NoString& sEsc)
+{
+    if (sEsc.Equals("ASCII")) {
+        return No::AsciiFormat;
+    } else if (sEsc.Equals("HTML")) {
+        return No::HtmlFormat;
+    } else if (sEsc.Equals("URL")) {
+        return No::UrlFormat;
+    } else if (sEsc.Equals("SQL")) {
+        return No::SqlFormat;
+    } else if (sEsc.Equals("NAMEDFMT")) {
+        return No::NamedFormat;
+    } else if (sEsc.Equals("DEBUG")) {
+        return No::DebugFormat;
+    } else if (sEsc.Equals("MSGTAG")) {
+        return No::MsgTagFormat;
+    } else if (sEsc.Equals("HEXCOLON")) {
+        return No::HexColonFormat;
+    }
+
+    return No::AsciiFormat;
+}
+
 void NoTemplateOptions::Parse(const NoString& sLine)
 {
     NoString sName = sLine.Token(0, false, "=").Trim_n().AsUpper();
     NoString sValue = sLine.Token(1, true, "=").Trim_n();
 
     if (sName == "ESC") {
-        m_eEscapeTo = NoString::ToEscape(sValue);
+        m_eEscapeTo = ToEscapeFormat(sValue);
     } else if (sName == "ESCFROM") {
-        m_eEscapeFrom = NoString::ToEscape(sValue);
+        m_eEscapeFrom = ToEscapeFormat(sValue);
     }
 }
 
@@ -396,7 +419,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
                             for (const NoString& sArg : vsArgs) {
                                 if (sArg.StartsWith("ESC=")) {
-                                    eEscape = NoString::ToEscape(sArg.LeftChomp_n(4));
+                                    eEscape = ToEscapeFormat(sArg.LeftChomp_n(4));
                                 } else {
                                     NoString sValue = GetValue(sArg);
 
@@ -872,7 +895,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
             NoStringVector vsEscs = it->second.Split(",", false);
 
             for (const NoString& sEsc : vsEscs) {
-                sRet.Escape(NoString::ToEscape(sEsc));
+                sRet.Escape(ToEscapeFormat(sEsc));
             }
         } else {
             sRet.Escape(m_spOptions->GetEscapeFrom(), m_spOptions->GetEscapeTo());

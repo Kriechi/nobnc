@@ -249,29 +249,6 @@ NoString NoString::AsLower() const
     return sRet;
 }
 
-No::EscapeFormat NoString::ToEscape(const NoString& sEsc)
-{
-    if (sEsc.Equals("ASCII")) {
-        return No::AsciiFormat;
-    } else if (sEsc.Equals("HTML")) {
-        return No::HtmlFormat;
-    } else if (sEsc.Equals("URL")) {
-        return No::UrlFormat;
-    } else if (sEsc.Equals("SQL")) {
-        return No::SqlFormat;
-    } else if (sEsc.Equals("NAMEDFMT")) {
-        return No::NamedFormat;
-    } else if (sEsc.Equals("DEBUG")) {
-        return No::DebugFormat;
-    } else if (sEsc.Equals("MSGTAG")) {
-        return No::MsgTagFormat;
-    } else if (sEsc.Equals("HEXCOLON")) {
-        return No::HexColonFormat;
-    }
-
-    return No::AsciiFormat;
-}
-
 NoString NoString::Escape_n(No::EscapeFormat eFrom, No::EscapeFormat eTo) const
 {
     NoString sRet;
