@@ -500,6 +500,10 @@ NoString NoFile::GetDir() const
     return sDir;
 }
 
+bool NoFile::HadError() const { return m_bHadError; }
+
+void NoFile::ResetError() { m_bHadError = false; }
+
 void NoFile::InitHomePath(const NoString& sFallback)
 {
     const char* home = getenv("HOME");
@@ -521,3 +525,5 @@ void NoFile::InitHomePath(const NoString& sFallback)
         m_sHomePath = sFallback;
     }
 }
+
+const NoString&NoFile::GetHomePath() { return m_sHomePath; }

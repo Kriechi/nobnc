@@ -107,11 +107,11 @@ public:
     NoString GetShortName() const;
     NoString GetDir() const;
 
-    bool HadError() const { return m_bHadError; }
-    void ResetError() { m_bHadError = false; }
+    bool HadError() const;
+    void ResetError();
 
     static void InitHomePath(const NoString& sFallback);
-    static const NoString& GetHomePath() { return m_sHomePath; }
+    static const NoString& GetHomePath();
 
 private:
     // fcntl() locking wrapper
