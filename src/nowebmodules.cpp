@@ -38,11 +38,11 @@ public:
 
 // We need this class to make sure the contained maps and their content is
 // destroyed in the order that we want.
-struct CSessionManager
+struct NoWebSessionManager
 {
     // Sessions are valid for a day, (24h, ...)
-    CSessionManager() : m_mspSessions(24 * 60 * 60 * 1000), m_mIPSessions() {}
-    ~CSessionManager()
+    NoWebSessionManager() : m_mspSessions(24 * 60 * 60 * 1000), m_mIPSessions() {}
+    ~NoWebSessionManager()
     {
         // Make sure all sessions are destroyed before any of our maps
         // are destroyed
@@ -54,7 +54,7 @@ struct CSessionManager
 };
 typedef std::multimap<NoString, NoWebSession*>::iterator mIPSessionsIterator;
 
-static CSessionManager Sessions;
+static NoWebSessionManager Sessions;
 
 class NoTagHandler : public NoTemplateTagHandler
 {
