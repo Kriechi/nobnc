@@ -70,7 +70,6 @@ public:
     NoModule* GetModule() const;
 
 private:
-protected:
     NoModule* m_pModule; //!< pointer to the module that this sock instance belongs to
 };
 
