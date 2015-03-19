@@ -63,6 +63,8 @@ void NoModule::SetUser(NoUser* pUser) { m_pUser = pUser; }
 void NoModule::SetNetwork(NoNetwork* pNetwork) { m_pNetwork = pNetwork; }
 void NoModule::SetClient(NoClient* pClient) { m_pClient = pClient; }
 
+void NoModule::Unload() { throw UNLOAD; }
+
 NoString NoModule::ExpandString(const NoString& sStr) const
 {
     NoString sRet;
@@ -83,6 +85,30 @@ NoString& NoModule::ExpandString(const NoString& sStr, NoString& sRet) const
 
     return sRet;
 }
+
+void NoModule::SetType(NoModInfo::EModuleType eType) { m_eType = eType; }
+
+void NoModule::SetDescription(const NoString& s) { m_sDescription = s; }
+
+void NoModule::SetModPath(const NoString& s) { m_sModPath = s; }
+
+void NoModule::SetArgs(const NoString& s) { m_sArgs = s; }
+
+NoModInfo::EModuleType NoModule::GetType() const { return m_eType; }
+
+const NoString& NoModule::GetDescription() const { return m_sDescription; }
+
+const NoString& NoModule::GetArgs() const { return m_sArgs; }
+
+const NoString& NoModule::GetModPath() const { return m_sModPath; }
+
+NoUser* NoModule::GetUser() const { return m_pUser; }
+
+NoNetwork* NoModule::GetNetwork() const { return m_pNetwork; }
+
+NoClient* NoModule::GetClient() const { return m_pClient; }
+
+NoSocketManager* NoModule::GetManager() const { return m_pManager; }
 
 const NoString& NoModule::GetSavePath() const
 {
@@ -187,6 +213,14 @@ bool NoModule::DelNV(const NoString& sName, bool bWriteToDisk)
     return true;
 }
 
+NoStringMap::iterator NoModule::FindNV(const NoString& sName) { return m_mssRegistry.find(sName); }
+
+NoStringMap::iterator NoModule::EndNV() { return m_mssRegistry.end(); }
+
+NoStringMap::iterator NoModule::BeginNV() { return m_mssRegistry.begin(); }
+
+void NoModule::DelNV(NoStringMap::iterator it) { m_mssRegistry.erase(it); }
+
 bool NoModule::ClearNV(bool bWriteToDisk)
 {
     m_mssRegistry.clear();
@@ -250,6 +284,10 @@ NoTimer* NoModule::FindTimer(const NoString& sLabel)
 
     return nullptr;
 }
+
+std::set<NoTimer*>::const_iterator NoModule::BeginTimers() const { return m_sTimers.begin(); }
+
+std::set<NoTimer*>::const_iterator NoModule::EndTimers() const { return m_sTimers.end(); }
 
 void NoModule::ListTimers()
 {
@@ -325,6 +363,10 @@ NoModuleSocket* NoModule::FindSocket(const NoString& sSockName)
 
     return nullptr;
 }
+
+std::set<NoModuleSocket*>::const_iterator NoModule::BeginSockets() const { return m_sSockets.begin(); }
+
+std::set<NoModuleSocket*>::const_iterator NoModule::EndSockets() const { return m_sSockets.end(); }
 
 void NoModule::ListSockets()
 {
@@ -469,9 +511,17 @@ void NoModule::HandleHelpCommand(const NoString& sLine)
 
 NoString NoModule::GetModNick() const { return ((m_pUser) ? m_pUser->GetStatusPrefix() : "*") + m_sModName; }
 
+const NoString& NoModule::GetModDataDir() const { return m_sDataDir; }
+
 // Webmods
 bool NoModule::OnWebPreRequest(NoWebSock& WebSock, const NoString& sPageName) { return false; }
 bool NoModule::OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
+
+void NoModule::AddSubPage(TWebSubPage spSubPage) { m_vSubPages.push_back(spSubPage); }
+
+void NoModule::ClearSubPages() { m_vSubPages.clear(); }
+
+VWebSubPages& NoModule::GetSubPages() { return m_vSubPages; }
 bool NoModule::OnEmbeddedWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
 // !Webmods
 
@@ -481,6 +531,12 @@ bool NoModule::OnLoad(const NoString& sArgs, NoString& sMessage)
     return true;
 }
 bool NoModule::OnBoot() { return true; }
+
+bool NoModule::WebRequiresLogin() { return true; }
+
+bool NoModule::WebRequiresAdmin() { return false; }
+
+NoString NoModule::GetWebMenuTitle() { return ""; }
 void NoModule::OnPreRehash() {}
 void NoModule::OnPostRehash() {}
 void NoModule::OnIRCDisconnected() {}
@@ -605,6 +661,10 @@ NoModule::EModRet NoModule::OnDeleteNetwork(NoNetwork& Network) { return CONTINU
 NoModule::EModRet NoModule::OnSendToClient(NoString& sLine, NoClient& Client) { return CONTINUE; }
 NoModule::EModRet NoModule::OnSendToIRC(NoString& sLine) { return CONTINUE; }
 
+ModHandle NoModule::GetDLL() { return m_pDLL; }
+
+double NoModule::GetCoreVersion() { return NO_VERSION; }
+
 bool NoModule::OnServerCapAvailable(const NoString& sCap) { return false; }
 void NoModule::OnServerCapResult(const NoString& sCap, bool bSuccess) {}
 
@@ -648,6 +708,8 @@ bool NoModule::PutModNotice(const NoString& sLine)
 
     return m_pUser->PutModNotice(GetModName(), sLine);
 }
+
+const NoString& NoModule::GetModName() const { return m_sModName; }
 
 ///////////////////
 // Global Module //

@@ -334,7 +334,7 @@ public:
 
     /** This function throws NoModule::UNLOAD which causes this module to be unloaded.
      */
-    void Unload() { throw UNLOAD; }
+    void Unload();
 
     /** This module hook is called when a module is loaded
      *  @param sArgsi The arguments for the modules.
@@ -353,15 +353,15 @@ public:
     /** Modules which can only be used with an active user session have to return true here.
      *  @return false for modules that can do stuff for non-logged in web users as well.
      */
-    virtual bool WebRequiresLogin() { return true; }
+    virtual bool WebRequiresLogin();
     /** Return true if this module should only be usable for admins on the web.
      *  @return false if normal users can use this module's web pages as well.
      */
-    virtual bool WebRequiresAdmin() { return false; }
+    virtual bool WebRequiresAdmin();
     /** Return the title of the module's section in the web interface's side bar.
      *  @return The Title.
      */
-    virtual NoString GetWebMenuTitle() { return ""; }
+    virtual NoString GetWebMenuTitle();
     virtual NoString GetWebPath();
     virtual NoString GetWebFilesPath();
     /** For WebMods: Called before the list of registered SubPages will be checked.
@@ -386,14 +386,14 @@ public:
     /** Registers a sub page for the sidebar.
      *  @param spSubPage The SubPage instance.
      */
-    virtual void AddSubPage(TWebSubPage spSubPage) { m_vSubPages.push_back(spSubPage); }
+    virtual void AddSubPage(TWebSubPage spSubPage);
     /** Removes all registered (AddSubPage'd) SubPages.
      */
-    virtual void ClearSubPages() { m_vSubPages.clear(); }
+    virtual void ClearSubPages();
     /** Returns a list of all registered SubPages. Don't mess with it too much.
      *  @return The List.
      */
-    virtual VWebSubPages& GetSubPages() { return m_vSubPages; }
+    virtual VWebSubPages& GetSubPages();
     /** Using this hook, module can embed web stuff directly to different places.
      *  This method is called whenever embededded modules I/O happens.
      *  Name of used .tmpl file (if any) is up to caller.
@@ -785,8 +785,8 @@ public:
      */
     virtual EModRet OnSendToIRC(NoString& sLine);
 
-    ModHandle GetDLL() { return m_pDLL; }
-    static double GetCoreVersion() { return NO_VERSION; }
+    ModHandle GetDLL();
+    static double GetCoreVersion();
 
     /** This function sends a given raw IRC line to the IRC server, if we
      *  are connected to one. Else this line is discarded.
@@ -831,7 +831,7 @@ public:
     virtual bool PutModNotice(const NoString& sLine);
 
     /** @returns The name of the module. */
-    const NoString& GetModName() const { return m_sModName; }
+    const NoString& GetModName() const;
 
     /** @returns The nick of the module. This is just the module name
      *           prefixed by the status prefix.
@@ -842,7 +842,7 @@ public:
      *  Modules can be accompanied by static data, e.g. skins for webadmin.
      *  These function will return the path to that data.
      */
-    const NoString& GetModDataDir() const { return m_sDataDir; }
+    const NoString& GetModDataDir() const;
 
     bool AddTimer(NoTimer* pTimer);
     bool AddTimer(NoTimer::Callback pFBCallback, const NoString& sLabel, u_int uInterval, u_int uCycles = 0, const NoString& sDescription = "");
@@ -850,8 +850,8 @@ public:
     bool RemTimer(const NoString& sLabel);
     bool UnlinkTimer(NoTimer* pTimer);
     NoTimer* FindTimer(const NoString& sLabel);
-    std::set<NoTimer*>::const_iterator BeginTimers() const { return m_sTimers.begin(); }
-    std::set<NoTimer*>::const_iterator EndTimers() const { return m_sTimers.end(); }
+    std::set<NoTimer*>::const_iterator BeginTimers() const;
+    std::set<NoTimer*>::const_iterator EndTimers() const;
     virtual void ListTimers();
 
     bool AddSocket(NoModuleSocket* pSocket);
@@ -859,8 +859,8 @@ public:
     bool RemSocket(const NoString& sSockName);
     bool UnlinkSocket(NoModuleSocket* pSocket);
     NoModuleSocket* FindSocket(const NoString& sSockName);
-    std::set<NoModuleSocket*>::const_iterator BeginSockets() const { return m_sSockets.begin(); }
-    std::set<NoModuleSocket*>::const_iterator EndSockets() const { return m_sSockets.end(); }
+    std::set<NoModuleSocket*>::const_iterator BeginSockets() const;
+    std::set<NoModuleSocket*>::const_iterator EndSockets() const;
     virtual void ListSockets();
 
 #ifdef HAVE_PTHREAD
@@ -902,38 +902,38 @@ public:
     bool SetNV(const NoString& sName, const NoString& sValue, bool bWriteToDisk = true);
     NoString GetNV(const NoString& sName) const;
     bool DelNV(const NoString& sName, bool bWriteToDisk = true);
-    NoStringMap::iterator FindNV(const NoString& sName) { return m_mssRegistry.find(sName); }
-    NoStringMap::iterator EndNV() { return m_mssRegistry.end(); }
-    NoStringMap::iterator BeginNV() { return m_mssRegistry.begin(); }
-    void DelNV(NoStringMap::iterator it) { m_mssRegistry.erase(it); }
+    NoStringMap::iterator FindNV(const NoString& sName);
+    NoStringMap::iterator EndNV();
+    NoStringMap::iterator BeginNV();
+    void DelNV(NoStringMap::iterator it);
     bool ClearNV(bool bWriteToDisk = true);
 
     const NoString& GetSavePath() const;
     NoString ExpandString(const NoString& sStr) const;
     NoString& ExpandString(const NoString& sStr, NoString& sRet) const;
 
-    void SetType(NoModInfo::EModuleType eType) { m_eType = eType; }
-    void SetDescription(const NoString& s) { m_sDescription = s; }
-    void SetModPath(const NoString& s) { m_sModPath = s; }
-    void SetArgs(const NoString& s) { m_sArgs = s; }
+    void SetType(NoModInfo::EModuleType eType);
+    void SetDescription(const NoString& s);
+    void SetModPath(const NoString& s);
+    void SetArgs(const NoString& s);
 
-    NoModInfo::EModuleType GetType() const { return m_eType; }
-    const NoString& GetDescription() const { return m_sDescription; }
-    const NoString& GetArgs() const { return m_sArgs; }
-    const NoString& GetModPath() const { return m_sModPath; }
+    NoModInfo::EModuleType GetType() const;
+    const NoString& GetDescription() const;
+    const NoString& GetArgs() const;
+    const NoString& GetModPath() const;
 
     /** @returns For user modules this returns the user for which this
      *           module was loaded. For global modules this returns nullptr,
      *           except when we are in a user-specific module hook in which
      *           case this is the user pointer.
      */
-    NoUser* GetUser() const { return m_pUser; }
+    NoUser* GetUser() const;
     /** @returns nullptr except when we are in a client-specific module hook in
      *           which case this is the client for which the hook is called.
      */
-    NoNetwork* GetNetwork() const { return m_pNetwork; }
-    NoClient* GetClient() const { return m_pClient; }
-    NoSocketManager* GetManager() const { return m_pManager; }
+    NoNetwork* GetNetwork() const;
+    NoClient* GetClient() const;
+    NoSocketManager* GetManager() const;
 
     /** This module hook is called when a user is being added.
      * @param User The user which will be added.
