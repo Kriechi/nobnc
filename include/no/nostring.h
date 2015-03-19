@@ -18,6 +18,7 @@
 #define NOSTRING_H
 
 #include <no/noglobal.h>
+#include <no/nonamespace.h>
 #include <map>
 #include <set>
 #include <string>
@@ -55,7 +56,6 @@ public:
         EMSGTAG,
         EHEXCOLON,
     };
-    enum CaseSensitivity { CaseInsensitive, CaseSensitive };
 
     NoString();
     NoString(const char* c);
@@ -117,7 +117,7 @@ public:
      * @return An integer less than, equal to, or greater than zero if this
      *         string smaller, equal.... to the given string.
      */
-    int Compare(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
+    int Compare(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /**
      * Check if this string is equal to some other string.
      * @param s The string to compare to.
@@ -125,7 +125,7 @@ public:
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return True if the strings are equal.
      */
-    bool Equals(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
+    bool Equals(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /**
      * Do a wildcard comparison on this string.
      * For example, the following returns true:
@@ -136,7 +136,7 @@ public:
      * @todo Make cs CaseInsensitive by default.
      * @return The result of <code>this->WildCmp(sWild, *this);</code>.
      */
-    bool WildCmp(const NoString& sWild, CaseSensitivity cs = CaseSensitive) const;
+    bool WildCmp(const NoString& sWild, No::CaseSensitivity cs = No::CaseSensitive) const;
 
     /**
      * Return a copy of this string with all characters turned into
@@ -356,28 +356,28 @@ public:
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return The position of the substring if found, NoString::npos otherwise.
      */
-    size_t Find(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
+    size_t Find(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /** Check whether the string starts with a given prefix.
      * @param sPrefix The prefix.
      * @param cs CaseSensitive if you want the comparison to be case
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return True if the string starts with prefix, false otherwise.
      */
-    bool StartsWith(const NoString& sPrefix, CaseSensitivity cs = CaseInsensitive) const;
+    bool StartsWith(const NoString& sPrefix, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /** Check whether the string ends with a given suffix.
      * @param sSuffix The suffix.
      * @param cs CaseSensitive if you want the comparison to be case
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return True if the string ends with suffix, false otherwise.
      */
-    bool EndsWith(const NoString& sSuffix, CaseSensitivity cs = CaseInsensitive) const;
+    bool EndsWith(const NoString& sSuffix, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /**
      * Check whether the string contains a given string.
      * @param s The string to search.
      * @param bCaseSensitive Whether the search is case sensitive.
      * @return True if this string contains the other string, falser otherwise.
      */
-    bool Contains(const NoString& s, CaseSensitivity cs = CaseInsensitive) const;
+    bool Contains(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
 
     /** Remove characters from the beginning of this string.
      * @param uLen The number of characters to remove.

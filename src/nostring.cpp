@@ -171,26 +171,26 @@ uchar* NoString::strnchr(const uchar* src, uchar c, uint iMaxBytes, uchar* pFill
     return nullptr;
 }
 
-int NoString::Compare(const NoString& s, CaseSensitivity cs) const
+int NoString::Compare(const NoString& s, No::CaseSensitivity cs) const
 {
-    if (cs == CaseSensitive)
+    if (cs == No::CaseSensitive)
         return strcmp(c_str(), s.c_str());
     else
         return strcasecmp(c_str(), s.c_str());
 }
 
-bool NoString::Equals(const NoString& s, CaseSensitivity cs) const
+bool NoString::Equals(const NoString& s, No::CaseSensitivity cs) const
 {
     return Compare(s, cs) == 0;
 }
 
-bool NoString::WildCmp(const NoString& sWild, CaseSensitivity cs) const
+bool NoString::WildCmp(const NoString& sWild, No::CaseSensitivity cs) const
 {
-    // avoid a copy when cs == CaseSensitive (C++ deliberately specifies that binding
+    // avoid a copy when cs == No::CaseSensitive (C++ deliberately specifies that binding
     // a temporary object to a reference to const on the stack lengthens the lifetime
     // of the temporary to the lifetime of the reference itself)
-    const NoString& sWld = (cs == CaseSensitive ? sWild : sWild.AsLower());
-    const NoString& sStr = (cs == CaseSensitive ? *this : AsLower());
+    const NoString& sWld = (cs == No::CaseSensitive ? sWild : sWild.AsLower());
+    const NoString& sStr = (cs == No::CaseSensitive ? *this : AsLower());
 
     // Written by Jack Handy - jakkhandy@hotmail.com
     const char* wild = sWld.c_str(), *NoString = sStr.c_str();
@@ -1053,26 +1053,26 @@ bool NoString::TrimSuffix(const NoString& sSuffix)
     }
 }
 
-size_t NoString::Find(const NoString& s, CaseSensitivity cs) const
+size_t NoString::Find(const NoString& s, No::CaseSensitivity cs) const
 {
-    if (cs == CaseSensitive) {
+    if (cs == No::CaseSensitive) {
         return find(s);
     } else {
         return AsLower().find(s.AsLower());
     }
 }
 
-bool NoString::StartsWith(const NoString& sPrefix, CaseSensitivity cs) const
+bool NoString::StartsWith(const NoString& sPrefix, No::CaseSensitivity cs) const
 {
     return Left(sPrefix.length()).Equals(sPrefix, cs);
 }
 
-bool NoString::EndsWith(const NoString& sSuffix, CaseSensitivity cs) const
+bool NoString::EndsWith(const NoString& sSuffix, No::CaseSensitivity cs) const
 {
     return Right(sSuffix.length()).Equals(sSuffix, cs);
 }
 
-bool NoString::Contains(const NoString& s, CaseSensitivity cs) const
+bool NoString::Contains(const NoString& s, No::CaseSensitivity cs) const
 {
     return Find(s, cs) != npos;
 }

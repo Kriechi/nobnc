@@ -30,6 +30,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nohttpsock.h
                        include/no/noircsock.h
                        include/no/nolistener.h
+                       include/no/nonamespace.h
                        include/no/nomessage.h
                        include/no/nomodule.h
                        include/no/nomodulecall.h

@@ -124,7 +124,7 @@ NoString NoUtils::GetSaltedHashPass(NoString& sSalt)
 
         NoString pass2 = NoUtils::GetPass("Confirm password");
 
-        if (!pass1.Equals(pass2, NoString::CaseSensitive)) {
+        if (!pass1.Equals(pass2, No::CaseSensitive)) {
             NoUtils::PrintError("The supplied passwords did not match");
         } else {
             // Construct the salted pass

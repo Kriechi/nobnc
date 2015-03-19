@@ -456,7 +456,7 @@ void NoModule::HandleHelpCommand(const NoString& sLine)
     NoModCommand::InitHelp(Table);
     for (const auto& it : m_mCommands) {
         NoString sCmd = it.second.GetCommand().AsLower();
-        if (sFilter.empty() || (sCmd.StartsWith(sFilter, NoString::CaseSensitive)) || sCmd.WildCmp(sFilter)) {
+        if (sFilter.empty() || (sCmd.StartsWith(sFilter, No::CaseSensitive)) || sCmd.WildCmp(sFilter)) {
             it.second.AddHelp(Table);
         }
     }

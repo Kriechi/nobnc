@@ -336,7 +336,7 @@ bool NoHttpSock::PrintFile(const NoString& sFileName, NoString sContentType)
 
         if (!m_sIfNoneMatch.empty()) {
             m_sIfNoneMatch.Trim("\\\"'");
-            bNotModified = (m_sIfNoneMatch.Equals(sETag, NoString::CaseSensitive));
+            bNotModified = (m_sIfNoneMatch.Equals(sETag, No::CaseSensitive));
         }
     }
 
