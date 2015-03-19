@@ -100,7 +100,6 @@ public:
     bool AddChan(const NoString& sName, bool bInConfig);
     bool DelChan(const NoString& sName);
     void JoinChans();
-    void JoinChans(std::set<NoChannel*>& sChans);
 
     const std::vector<NoQuery*>& GetQueries() const;
     NoQuery* FindQuery(const NoString& sName) const;
@@ -208,6 +207,7 @@ public:
 
 private:
     bool JoinChan(NoChannel* pChan);
+    void JoinChans(std::set<NoChannel*>& sChans);
     bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 
     NoString m_sName;
