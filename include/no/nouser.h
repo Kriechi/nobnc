@@ -102,7 +102,6 @@ public:
 
     void CloneNetworks(const NoUser& User);
     bool Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks = true);
-    void BounceAllClients();
 
     void AddBytesRead(ulonglong u) { m_uBytesRead += u; }
     void AddBytesWritten(ulonglong u) { m_uBytesWritten += u; }
@@ -183,6 +182,8 @@ public:
     uint MaxQueryBuffers() const { return m_uMaxQueryBuffers; }
 
 private:
+    void BounceAllClients();
+
     const NoString m_sUserName;
     const NoString m_sCleanUserName;
     NoString m_sNick;

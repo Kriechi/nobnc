@@ -70,8 +70,6 @@ public:
     bool ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade = false);
     NoSettings ToConfig() const;
 
-    void BounceAllClients();
-
     bool IsUserAttached() const { return !m_vClients.empty(); }
     bool IsUserOnline() const;
     void ClientConnected(NoClient* pClient);
@@ -206,6 +204,7 @@ public:
     NoString& ExpandString(const NoString& sStr, NoString& sRet) const;
 
 private:
+    void BounceAllClients();
     bool JoinChan(NoChannel* pChan);
     void JoinChans(std::set<NoChannel*>& sChans);
     bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
