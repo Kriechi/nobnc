@@ -953,7 +953,7 @@ public:
      *  @param sHost The IP the client is connecting from.
      *  @param uPort The port the client is connecting from.
      */
-    virtual void OnClientConnect(NoBaseSocket* pSock, const NoString& sHost, ushort uPort);
+    virtual void OnClientConnect(NoSocket* pSock, const NoString& sHost, ushort uPort);
     /** This module hook is called when a client tries to login. If your
      *  module wants to handle the login attempt, it must return
      *  NoModule::EModRet::HALT;

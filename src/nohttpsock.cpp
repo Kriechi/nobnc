@@ -264,7 +264,7 @@ void NoHttpSock::PrintPage(const NoString& sPage)
                 }
             } while (zStatus == Z_OK);
 
-            Close(NoBaseSocket::CLT_AFTERWRITE);
+            Close(NoSocket::CLT_AFTERWRITE);
             deflateEnd(&zStrm);
             return;
         }
@@ -278,7 +278,7 @@ void NoHttpSock::PrintPage(const NoString& sPage)
     }
 
     Write(sPage);
-    Close(NoBaseSocket::CLT_AFTERWRITE);
+    Close(NoSocket::CLT_AFTERWRITE);
 }
 
 bool NoHttpSock::PrintFile(const NoString& sFileName, NoString sContentType)
@@ -375,7 +375,7 @@ bool NoHttpSock::PrintFile(const NoString& sFileName, NoString sContentType)
 
     DEBUG("- ETag: [" << sETag << "] / If-None-Match [" << m_sIfNoneMatch << "]");
 
-    Close(NoBaseSocket::CLT_AFTERWRITE);
+    Close(NoSocket::CLT_AFTERWRITE);
 
     return true;
 }
@@ -631,7 +631,7 @@ bool NoHttpSock::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, cons
 
     PrintHeader(sPage.length(), "text/html; charset=utf-8", uStatusId, sStatusMsg);
     Write(sPage);
-    Close(NoBaseSocket::CLT_AFTERWRITE);
+    Close(NoSocket::CLT_AFTERWRITE);
 
     return true;
 }

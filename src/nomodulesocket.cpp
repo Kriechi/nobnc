@@ -21,7 +21,7 @@
 #include "noapp.h"
 #include "nodebug.h"
 
-NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoBaseSocket(), m_pModule(pModule)
+NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_pModule(pModule)
 {
     if (m_pModule) m_pModule->AddSocket(this);
     EnableReadLine();
@@ -29,7 +29,7 @@ NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoBaseSocket(), m_pModule(pM
 }
 
 NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort, int iTimeout)
-    : NoBaseSocket(sHostname, uPort, iTimeout), m_pModule(pModule)
+    : NoSocket(sHostname, uPort, iTimeout), m_pModule(pModule)
 {
     if (m_pModule) m_pModule->AddSocket(this);
     EnableReadLine();

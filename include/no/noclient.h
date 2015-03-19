@@ -32,7 +32,7 @@ class NoClient;
 class NO_EXPORT NoAuthBase
 {
 public:
-    NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoBaseSocket* pSock)
+    NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
         : m_sUsername(sUsername), m_sPassword(sPassword), m_pSock(pSock)
     {
     }
@@ -42,7 +42,7 @@ public:
     NoAuthBase(const NoAuthBase&) = delete;
     NoAuthBase& operator=(const NoAuthBase&) = delete;
 
-    virtual void SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoBaseSocket* pSock)
+    virtual void SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
     {
         m_sUsername = sUsername;
         m_sPassword = sPassword;
@@ -54,7 +54,7 @@ public:
 
     const NoString& GetUsername() const { return m_sUsername; }
     const NoString& GetPassword() const { return m_sPassword; }
-    NoBaseSocket* GetSocket() const { return m_pSock; }
+    NoSocket* GetSocket() const { return m_pSock; }
     NoString GetRemoteIP() const;
 
     // Invalidate this NoAuthBase instance which means it will no longer use
@@ -68,7 +68,7 @@ protected:
 private:
     NoString m_sUsername;
     NoString m_sPassword;
-    NoBaseSocket* m_pSock;
+    NoSocket* m_pSock;
 };
 
 

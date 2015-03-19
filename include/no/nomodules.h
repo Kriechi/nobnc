@@ -150,7 +150,7 @@ public:
 
     bool OnAddUser(NoUser& User, NoString& sErrorRet);
     bool OnDeleteUser(NoUser& User);
-    bool OnClientConnect(NoBaseSocket* pSock, const NoString& sHost, ushort uPort);
+    bool OnClientConnect(NoSocket* pSock, const NoString& sHost, ushort uPort);
     bool OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth);
     bool OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP);
     bool OnUnknownUserRaw(NoClient* pClient, NoString& sLine);

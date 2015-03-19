@@ -203,7 +203,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         NoString sMsg = sLine.Tokens(1).TrimPrefix_n();
         NETWORKMODULECALL(OnUserQuit(sMsg), m_pUser, m_pNetwork, this, &bReturn);
         if (bReturn) return;
-        Close(NoBaseSocket::CLT_AFTERWRITE); // Treat a client quit as a detach
+        Close(NoSocket::CLT_AFTERWRITE); // Treat a client quit as a detach
         return; // Don't forward this msg.  We don't want the client getting us disconnected.
     } else if (sCommand.Equals("PROTOCTL")) {
         NoStringVector vsTokens = sLine.Tokens(1).Split(" ", No::SkipEmptyParts);
@@ -679,7 +679,7 @@ void NoClient::RefuseLogin(const NoString& sReason)
 {
     PutStatus("Bad username and/or password.");
     PutClient(":irc.znc.in 464 " + GetNick() + " :" + sReason);
-    Close(NoBaseSocket::CLT_AFTERWRITE);
+    Close(NoSocket::CLT_AFTERWRITE);
 }
 
 void NoClientAuth::AcceptedLogin(NoUser& User)
@@ -763,7 +763,7 @@ void NoClient::ReachedMaxBufferImpl()
 void NoClient::BouncedOff()
 {
     PutStatusNotice("You are being disconnected because another user just authenticated as you.");
-    Close(NoBaseSocket::CLT_AFTERWRITE);
+    Close(NoSocket::CLT_AFTERWRITE);
 }
 
 void NoClient::PutIRC(const NoString& sLine)

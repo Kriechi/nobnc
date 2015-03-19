@@ -36,7 +36,7 @@ public:
     EAddrType GetAddrType() const;
     ushort GetPort() const;
     const NoString& GetBindHost() const;
-    NoBaseSocket* GetSocket() const;
+    NoSocket* GetSocket() const;
     const NoString& GetURIPrefix() const;
     EAcceptType GetAcceptType() const;
 
@@ -53,7 +53,7 @@ private:
     ushort m_uPort;
     NoString m_sBindHost;
     NoString m_sURIPrefix;
-    NoBaseSocket* m_pSocket;
+    NoSocket* m_pSocket;
     EAcceptType m_eAcceptType;
 };
 

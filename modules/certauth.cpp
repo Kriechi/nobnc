@@ -103,7 +103,7 @@ public:
     EModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
     {
         const NoString sUser = Auth->GetUsername();
-        NoBaseSocket* pSock = Auth->GetSocket();
+        NoSocket* pSock = Auth->GetSocket();
         NoUser* pUser = NoApp::Get().FindUser(sUser);
 
         if (pSock == nullptr || pUser == nullptr) return CONTINUE;
@@ -220,7 +220,7 @@ public:
         Save();
     }
 
-    NoString GetKey(NoBaseSocket* pSock)
+    NoString GetKey(NoSocket* pSock)
     {
         NoString sRes;
         long int res = pSock->GetPeerFingerprint(sRes);

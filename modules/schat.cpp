@@ -50,7 +50,7 @@ public:
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout = 60);
     ~NoSChatSock() {}
 
-    NoBaseSocket* GetSockObjImpl(const NoString& sHostname, u_short iPort) override
+    NoSocket* GetSockObjImpl(const NoString& sHostname, u_short iPort) override
     {
         NoSChatSock* p = new NoSChatSock(m_pModule, m_sChatNick, sHostname, iPort);
         return (p);

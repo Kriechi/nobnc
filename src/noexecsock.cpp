@@ -18,7 +18,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-NoExecSock::NoExecSock() : NoBaseSocket(0), m_iPid(-1)
+NoExecSock::NoExecSock() : NoSocket(0), m_iPid(-1)
 {
 }
 

@@ -24,7 +24,7 @@
  * @class NoIrcSocket
  * @brief Base IRC socket for client<->ZNC, and ZNC<->server
  */
-class NO_EXPORT NoIrcSocket : public NoBaseSocket
+class NO_EXPORT NoIrcSocket : public NoSocket
 {
 public:
 #ifdef HAVE_ICU

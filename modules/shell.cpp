@@ -61,7 +61,7 @@ public:
 
     virtual ~NoShellMod()
     {
-        std::vector<NoBaseSocket*> vSocks = GetManager()->FindSocksByName("SHELL");
+        std::vector<NoSocket*> vSocks = GetManager()->FindSocksByName("SHELL");
 
         for (uint a = 0; a < vSocks.size(); a++) {
             GetManager()->DelSockByAddr(vSocks[a]);

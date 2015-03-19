@@ -49,7 +49,7 @@ void NoIrcSocket::IcuExtToUCallbackImpl(UConverterToUnicodeArgs* toArgs,
         ucnv_cbToUWriteUChars(toArgs, &c, 1, 0, err);
         return;
     }
-    NoBaseSocket::IcuExtToUCallbackImpl(toArgs, codeUnits, length, reason, err);
+    NoSocket::IcuExtToUCallbackImpl(toArgs, codeUnits, length, reason, err);
 }
 
 void NoIrcSocket::IcuExtFromUCallbackImpl(UConverterFromUnicodeArgs* fromArgs,
@@ -67,6 +67,6 @@ void NoIrcSocket::IcuExtFromUCallbackImpl(UConverterFromUnicodeArgs* fromArgs,
         ucnv_cbFromUWriteBytes(fromArgs, &c, 1, 0, err);
         return;
     }
-    NoBaseSocket::IcuExtFromUCallbackImpl(fromArgs, codeUnits, length, codePoint, reason, err);
+    NoSocket::IcuExtFromUCallbackImpl(fromArgs, codeUnits, length, codePoint, reason, err);
 }
 #endif

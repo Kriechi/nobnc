@@ -321,7 +321,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             // If we are already connecting to some server,
             // we have to abort that attempt
-            NoBaseSocket* pIRCSock = GetIRCSock();
+            NoSocket* pIRCSock = GetIRCSock();
             if (pIRCSock && !pIRCSock->IsConnected()) {
                 pIRCSock->Close();
             }

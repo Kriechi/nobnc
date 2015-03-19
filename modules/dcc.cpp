@@ -39,7 +39,7 @@ public:
     void ConnectedImpl() override;
     void DisconnectedImpl() override;
     void SendPacket();
-    NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
+    NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
     NoFile* OpenFile(bool bWrite = true);
     bool Seek(ulong uPos);
 
@@ -439,7 +439,7 @@ void NoDccSock::SendPacket()
     }
 }
 
-NoBaseSocket* NoDccSock::GetSockObjImpl(const NoString& sHost, ushort uPort)
+NoSocket* NoDccSock::GetSockObjImpl(const NoString& sHost, ushort uPort)
 {
     Close();
 

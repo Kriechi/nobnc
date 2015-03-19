@@ -60,7 +60,7 @@ public:
         PutModule("is blocked after a failed login.");
     }
 
-    void OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, ushort uPort) override
+    void OnClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort) override
     {
         uint* pCount = m_Cache.GetItem(sHost);
         if (sHost.empty() || pCount == nullptr || *pCount < m_uiAllowedFailed) {
@@ -71,7 +71,7 @@ public:
         Add(sHost, *pCount);
 
         pClient->Write("ERROR :Closing link [Please try again later - reconnecting too fast]\r\n");
-        pClient->Close(NoBaseSocket::CLT_AFTERWRITE);
+        pClient->Close(NoSocket::CLT_AFTERWRITE);
     }
 
     void OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override

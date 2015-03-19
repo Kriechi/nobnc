@@ -654,7 +654,7 @@ bool NoModule::PutModNotice(const NoString& sLine)
 ///////////////////
 NoModule::EModRet NoModule::OnAddUser(NoUser& User, NoString& sErrorRet) { return CONTINUE; }
 NoModule::EModRet NoModule::OnDeleteUser(NoUser& User) { return CONTINUE; }
-void NoModule::OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, ushort uPort) {}
+void NoModule::OnClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort) {}
 NoModule::EModRet NoModule::OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) { return CONTINUE; }
 void NoModule::OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) {}
 NoModule::EModRet NoModule::OnUnknownUserRaw(NoClient* pClient, NoString& sLine) { return CONTINUE; }

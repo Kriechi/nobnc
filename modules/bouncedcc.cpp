@@ -57,7 +57,7 @@ public:
     void SockErrorImpl(int iErrno, const NoString& sDescription) override;
     void ConnectedImpl() override;
     void DisconnectedImpl() override;
-    NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
+    NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
     void Shutdown();
     void PutServ(const NoString& sLine);
     void PutPeer(const NoString& sLine);
@@ -408,9 +408,9 @@ void NoDccBounce::TimeoutImpl()
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
     if (IsRemote()) {
-        NoString sHost = NoBaseSocket::GetHostName();
+        NoString sHost = NoSocket::GetHostName();
         if (!sHost.empty()) {
-            sHost = " to [" + sHost + " " + NoString(NoBaseSocket::GetPort()) + "]";
+            sHost = " to [" + sHost + " " + NoString(NoSocket::GetPort()) + "]";
         } else {
             sHost = ".";
         }
@@ -418,8 +418,8 @@ void NoDccBounce::TimeoutImpl()
         m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Timeout while connecting" + sHost);
     } else {
         m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick +
-                             "): Timeout waiting for incoming connection [" + NoBaseSocket::GetLocalIP() + ":" +
-                             NoString(NoBaseSocket::GetLocalPort()) + "]");
+                             "): Timeout waiting for incoming connection [" + NoSocket::GetLocalIP() + ":" +
+                             NoString(NoSocket::GetLocalPort()) + "]");
     }
 }
 
@@ -428,9 +428,9 @@ void NoDccBounce::ConnectionRefusedImpl()
     DEBUG(GetSockName() << " == ConnectionRefused()");
 
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
-    NoString sHost = NoBaseSocket::GetHostName();
+    NoString sHost = NoSocket::GetHostName();
     if (!sHost.empty()) {
-        sHost = " to [" + sHost + " " + NoString(NoBaseSocket::GetPort()) + "]";
+        sHost = " to [" + sHost + " " + NoString(NoSocket::GetPort()) + "]";
     } else {
         sHost = ".";
     }
@@ -444,15 +444,15 @@ void NoDccBounce::SockErrorImpl(int iErrno, const NoString& sDescription)
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
     if (IsRemote()) {
-        NoString sHost = NoBaseSocket::GetHostName();
+        NoString sHost = NoSocket::GetHostName();
         if (!sHost.empty()) {
-            sHost = "[" + sHost + " " + NoString(NoBaseSocket::GetPort()) + "]";
+            sHost = "[" + sHost + " " + NoString(NoSocket::GetPort()) + "]";
         }
 
         m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "]" + sHost);
     } else {
         m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "] [" +
-                             NoBaseSocket::GetLocalIP() + ":" + NoString(NoBaseSocket::GetLocalPort()) + "]");
+                             NoSocket::GetLocalIP() + ":" + NoString(NoSocket::GetLocalPort()) + "]");
     }
 }
 
@@ -471,7 +471,7 @@ void NoDccBounce::Shutdown()
     Close();
 }
 
-NoBaseSocket* NoDccBounce::GetSockObjImpl(const NoString& sHost, ushort uPort)
+NoSocket* NoDccBounce::GetSockObjImpl(const NoString& sHost, ushort uPort)
 {
     Close();
 

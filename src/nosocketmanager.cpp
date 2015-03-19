@@ -60,7 +60,7 @@ struct NoDnsTask
     int iTimeout;
     bool bSSL;
     NoString sBindhost;
-    NoBaseSocket* pcSock;
+    NoSocket* pcSock;
 
     bool bDoneTarget;
     bool bDoneBind;
@@ -90,7 +90,7 @@ public:
 static void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind);
 static void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind, addrinfo* aiResult);
 static void* TDNSThread(void* argument);
-static void FinishConnect(NoSocketManager* manager, const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoBaseSocket* pcSock);
+static void FinishConnect(NoSocketManager* manager, const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoSocket* pcSock);
 #endif
 
 NoSocketManager::NoSocketManager() : m_instance(new CSocketManager)
@@ -109,7 +109,7 @@ bool NoSocketManager::ListenHost(u_short iPort,
                 const NoString& sBindHost,
                 bool bSSL,
                 int iMaxConns,
-                NoBaseSocket* pcSock,
+                NoSocket* pcSock,
                 u_int iTimeout,
                 EAddrType eAddr)
 {
@@ -141,7 +141,7 @@ bool NoSocketManager::ListenAll(u_short iPort,
                const NoString& sSockName,
                bool bSSL,
                int iMaxConns,
-               NoBaseSocket* pcSock,
+               NoSocket* pcSock,
                u_int iTimeout,
                EAddrType eAddr)
 {
@@ -152,7 +152,7 @@ u_short NoSocketManager::ListenRand(const NoString& sSockName,
                    const NoString& sBindHost,
                    bool bSSL,
                    int iMaxConns,
-                   NoBaseSocket* pcSock,
+                   NoSocket* pcSock,
                    u_int iTimeout,
                    EAddrType eAddr)
 {
@@ -186,14 +186,14 @@ u_short NoSocketManager::ListenRand(const NoString& sSockName,
 u_short NoSocketManager::ListenAllRand(const NoString& sSockName,
                       bool bSSL,
                       int iMaxConns,
-                      NoBaseSocket* pcSock,
+                      NoSocket* pcSock,
                       u_int iTimeout,
                       EAddrType eAddr)
 {
     return ListenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
 }
 
-void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoBaseSocket* pcSock)
+void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoSocket* pcSock)
 {
     if (pcSock) {
         pcSock->SetHostToVerifySSL(sHostname);
@@ -220,15 +220,15 @@ void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const No
 #endif
 }
 
-std::vector<NoBaseSocket*> NoSocketManager::GetSockets() const
+std::vector<NoSocket*> NoSocketManager::GetSockets() const
 {
     return m_sockets;
 }
 
-std::vector<NoBaseSocket*> NoSocketManager::FindSocksByName(const NoString& sName)
+std::vector<NoSocket*> NoSocketManager::FindSocksByName(const NoString& sName)
 {
-    std::vector<NoBaseSocket*> sockets;
-    for (NoBaseSocket* socket : m_sockets) {
+    std::vector<NoSocket*> sockets;
+    for (NoSocket* socket : m_sockets) {
         if (socket->GetSockName() == sName)
             sockets.push_back(socket);
     }
@@ -262,13 +262,13 @@ void NoSocketManager::DynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBo
     m_instance->DynamicSelectLoop(iLowerBounds, iUpperBounds, iMaxResolution);
 }
 
-void NoSocketManager::AddSock(NoBaseSocket* pcSock, const NoString& sSockName)
+void NoSocketManager::AddSock(NoSocket* pcSock, const NoString& sSockName)
 {
     m_sockets.push_back(pcSock);
     m_instance->AddSock(pcSock->GetHandle(), sSockName);
 }
 
-void NoSocketManager::DelSockByAddr(NoBaseSocket* socket)
+void NoSocketManager::DelSockByAddr(NoSocket* socket)
 {
     auto it = std::find(m_sockets.begin(), m_sockets.end(), socket);
     if (it != m_sockets.end())
@@ -480,7 +480,7 @@ void FinishConnect(NoSocketManager* manager, const NoString& sHostname,
                                  int iTimeout,
                                  bool bSSL,
                                  const NoString& sBindHost,
-                                 NoBaseSocket* pcSock)
+                                 NoSocket* pcSock)
 {
     CSConnection C(sHostname, iPort, iTimeout);
 

@@ -21,7 +21,7 @@
 class NoSocketSorter
 {
 public:
-    NoSocketSorter(NoBaseSocket* p) { m_pSock = p; }
+    NoSocketSorter(NoSocket* p) { m_pSock = p; }
     bool operator<(const NoSocketSorter& other) const
     {
         // The 'biggest' item is displayed first.
@@ -52,10 +52,10 @@ public:
         // and finally sort by the whole socket name
         return sMyName.Compare(sHisName, No::CaseSensitive) > 0;
     }
-    NoBaseSocket* GetSock() const { return m_pSock; }
+    NoSocket* GetSock() const { return m_pSock; }
 
 private:
-    NoBaseSocket* m_pSock;
+    NoSocket* m_pSock;
 };
 
 class NoListSockets : public NoModule
@@ -87,12 +87,12 @@ public:
         NoSocketManager& m = NoApp::Get().GetManager();
         std::priority_queue<NoSocketSorter> ret;
 
-        for (NoBaseSocket* pSock : m.GetSockets()) {
+        for (NoSocket* pSock : m.GetSockets()) {
             // These sockets went through SwapSockByAddr. That means
             // another socket took over the connection from this
             // socket. So ignore this to avoid listing the
             // connection twice.
-            if (pSock->GetCloseType() == NoBaseSocket::CLT_DEREFERENCE) continue;
+            if (pSock->GetCloseType() == NoSocket::CLT_DEREFERENCE) continue;
             ret.push(pSock);
         }
 
@@ -112,7 +112,7 @@ public:
             std::priority_queue<NoSocketSorter> socks = GetSockets();
 
             while (!socks.empty()) {
-                NoBaseSocket* pSocket = socks.top().GetSock();
+                NoSocket* pSocket = socks.top().GetSock();
                 socks.pop();
 
                 NoTemplate& Row = Tmpl.AddRow("SocketsLoop");
@@ -143,7 +143,7 @@ public:
         ShowSocks(bShowHosts);
     }
 
-    NoString GetSocketState(NoBaseSocket* pSocket)
+    NoString GetSocketState(NoSocket* pSocket)
     {
         if (pSocket->IsListener())
             return "Listener";
@@ -159,14 +159,14 @@ public:
         return "UNKNOWN";
     }
 
-    NoString GetCreatedTime(NoBaseSocket* pSocket)
+    NoString GetCreatedTime(NoSocket* pSocket)
     {
         ulonglong iStartTime = pSocket->GetStartTime();
         time_t iTime = iStartTime / 1000;
         return NoUtils::FormatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->GetTimezone());
     }
 
-    NoString GetLocalHost(NoBaseSocket* pSocket, bool bShowHosts)
+    NoString GetLocalHost(NoSocket* pSocket, bool bShowHosts)
     {
         NoString sBindHost;
 
@@ -181,7 +181,7 @@ public:
         return sBindHost + " " + NoString(pSocket->GetLocalPort());
     }
 
-    NoString GetRemoteHost(NoBaseSocket* pSocket, bool bShowHosts)
+    NoString GetRemoteHost(NoSocket* pSocket, bool bShowHosts)
     {
         NoString sHost;
         u_short uPort;
@@ -231,7 +231,7 @@ public:
         Table.AddColumn("Out");
 
         while (!socks.empty()) {
-            NoBaseSocket* pSocket = socks.top().GetSock();
+            NoSocket* pSocket = socks.top().GetSock();
             socks.pop();
 
             Table.AddRow();

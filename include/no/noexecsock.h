@@ -22,7 +22,7 @@
 #include <signal.h>
 
 //! @author imaginos@imaginos.net
-class NO_EXPORT NoExecSock : public NoBaseSocket
+class NO_EXPORT NoExecSock : public NoSocket
 {
 public:
     NoExecSock();

@@ -18,21 +18,21 @@
 #include "nodebug.h"
 #include "noapp.h"
 
-class NoRealListener : public NoBaseSocket
+class NoRealListener : public NoSocket
 {
 public:
     NoRealListener(NoListener& listener);
     virtual ~NoRealListener();
 
     bool ConnectionFromImpl(const NoString& sHost, ushort uPort) override;
-    NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
+    NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
     void SockErrorImpl(int iErrno, const NoString& sDescription) override;
 
 private:
     NoListener& m_Listener;
 };
 
-class NoIncomingConnection : public NoBaseSocket
+class NoIncomingConnection : public NoSocket
 {
 public:
     NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix);
@@ -77,7 +77,7 @@ const NoString& NoListener::GetBindHost() const
     return m_sBindHost;
 }
 
-NoBaseSocket* NoListener::GetSocket() const
+NoSocket* NoListener::GetSocket() const
 {
     return m_pSocket;
 }
@@ -126,7 +126,7 @@ void NoListener::ResetSocket()
     m_pSocket = nullptr;
 }
 
-NoRealListener::NoRealListener(NoListener& listener) : NoBaseSocket(), m_Listener(listener)
+NoRealListener::NoRealListener(NoListener& listener) : NoSocket(), m_Listener(listener)
 {
 }
 
@@ -143,14 +143,14 @@ bool NoRealListener::ConnectionFromImpl(const NoString& sHost, ushort uPort)
     return bHostAllowed;
 }
 
-NoBaseSocket* NoRealListener::GetSockObjImpl(const NoString& sHost, ushort uPort)
+NoSocket* NoRealListener::GetSockObjImpl(const NoString& sHost, ushort uPort)
 {
     NoIncomingConnection* pClient = new NoIncomingConnection(sHost, uPort, m_Listener.GetAcceptType(), m_Listener.GetURIPrefix());
     if (NoApp::Get().AllowConnectionFrom(sHost)) {
         GLOBALMODULECALL(OnClientConnect(pClient, sHost, uPort), NOTHING);
     } else {
         pClient->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
-        pClient->Close(NoBaseSocket::CLT_AFTERWRITE);
+        pClient->Close(NoSocket::CLT_AFTERWRITE);
         GLOBALMODULECALL(OnFailedLogin("", sHost), NOTHING);
     }
     return pClient;
@@ -170,7 +170,7 @@ void NoRealListener::SockErrorImpl(int iErrno, const NoString& sDescription)
 }
 
 NoIncomingConnection::NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix)
-    : NoBaseSocket(sHostname, uPort), m_eAcceptType(eAcceptType), m_sURIPrefix(sURIPrefix)
+    : NoSocket(sHostname, uPort), m_eAcceptType(eAcceptType), m_sURIPrefix(sURIPrefix)
 {
     // The socket will time out in 120 secs, no matter what.
     // This has to be fixed up later, if desired.
@@ -197,7 +197,7 @@ void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
     bool bIsHTTP = (sLine.WildCmp("GET * HTTP/1.?\r\n") || sLine.WildCmp("POST * HTTP/1.?\r\n"));
     bool bAcceptHTTP = (m_eAcceptType == NoListener::ACCEPT_ALL) || (m_eAcceptType == NoListener::ACCEPT_HTTP);
     bool bAcceptIRC = (m_eAcceptType == NoListener::ACCEPT_ALL) || (m_eAcceptType == NoListener::ACCEPT_IRC);
-    NoBaseSocket* pSock = nullptr;
+    NoSocket* pSock = nullptr;
 
     if (!bIsHTTP) {
         // Let's assume it's an IRC connection

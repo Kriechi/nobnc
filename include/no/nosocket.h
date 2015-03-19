@@ -44,12 +44,12 @@ enum {
     errnoBadSSLCert = 12569 // TODO
 };
 
-class NO_EXPORT NoBaseSocket
+class NO_EXPORT NoSocket
 {
 public:
-    NoBaseSocket(int timeout = 60);
-    NoBaseSocket(const NoString& sHost, u_short port, int timeout = 60);
-    ~NoBaseSocket();
+    NoSocket(int timeout = 60);
+    NoSocket(const NoString& sHost, u_short port, int timeout = 60);
+    ~NoSocket();
 
     Csock* GetHandle() const;
 
@@ -113,7 +113,7 @@ public:
     bool ConnectFD( int iReadFD, int iWriteFD, const NoString & sName, bool bIsSSL = false);
     enum { TMO_READ = 1, TMO_WRITE = 2, TMO_ACCEPT = 4, TMO_ALL = TMO_READ|TMO_WRITE|TMO_ACCEPT };
     void SetTimeout( int iTimeout, uint32_t iTimeoutType = TMO_ALL );
-    virtual NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort);
+    virtual NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort);
     enum ECloseType { CLT_DONT, CLT_NOW, CLT_AFTERWRITE, CLT_DEREFERENCE };
     ECloseType GetCloseType() const;
     void Close(ECloseType type = CLT_NOW);

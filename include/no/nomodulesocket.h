@@ -30,7 +30,7 @@
  * - EnableReadLine is default to true in this class
  * - MaxBuffer for readline is set to 10240, in the event this is reached the socket is closed (@see ReachedMaxBuffer)
  */
-class NO_EXPORT NoModuleSocket : public NoBaseSocket
+class NO_EXPORT NoModuleSocket : public NoSocket
 {
 public:
     /**
@@ -51,8 +51,8 @@ public:
     NoModuleSocket(const NoModuleSocket&) = delete;
     NoModuleSocket& operator=(const NoModuleSocket&) = delete;
 
-    using NoBaseSocket::Connect;
-    using NoBaseSocket::Listen;
+    using NoSocket::Connect;
+    using NoSocket::Listen;
 
     //! This defaults to closing the socket, feel free to override
     void ReachedMaxBufferImpl() override;

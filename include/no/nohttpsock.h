@@ -33,7 +33,7 @@ public:
     void ReadDataImpl(const char* data, size_t len) override;
     void ReadLineImpl(const NoString& sData) override;
     void ConnectedImpl() override;
-    NoBaseSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override = 0;
+    NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override = 0;
 
     virtual bool ForceLogin();
     virtual bool OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic);

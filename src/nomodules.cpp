@@ -375,7 +375,7 @@ bool NoModules::OnAddUser(NoUser& User, NoString& sErrorRet) { MODHALTCHK(OnAddU
 
 bool NoModules::OnDeleteUser(NoUser& User) { MODHALTCHK(OnDeleteUser(User)); }
 
-bool NoModules::OnClientConnect(NoBaseSocket* pClient, const NoString& sHost, ushort uPort)
+bool NoModules::OnClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort)
 {
     MODUNLOADCHK(OnClientConnect(pClient, sHost, uPort));
     return false;
