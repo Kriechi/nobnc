@@ -268,9 +268,9 @@ uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const No
     return uRet;
 }
 
-NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
+NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
 {
-    NoStringVector vsTokens = Split_helper(*this, sSep, behavior, sLeft, sRight, bTrimQuotes);
+    NoStringVector vsTokens = Split_helper(*this, sSep, No::SkipEmptyParts, sLeft, sRight, bTrimQuotes);
     if (vsTokens.size() > uPos) {
         NoString sRet;
 
@@ -289,7 +289,7 @@ NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, No::Spli
         return sRet;
     }
 
-    return Token(uPos, bRest, sSep, behavior);
+    return Token(uPos, bRest, sSep, No::SkipEmptyParts);
 }
 
 NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, No::SplitBehavior behavior) const
