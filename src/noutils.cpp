@@ -848,3 +848,42 @@ NoString NoUtils::Ellipsize(const NoString& str, uint uLen)
 
     return sRet;
 }
+
+NoStringMap NoUtils::OptionSplit(const NoString& str)
+{
+    NoString sName;
+    NoString sCopy(str);
+    NoStringMap msRet;
+
+    while (!sCopy.empty()) {
+        sName = sCopy.Token(0, false, "=", false, "\"", "\"", false).Trim_n();
+        sCopy = sCopy.Token(1, true, "=", false, "\"", "\"", false).TrimLeft_n();
+
+        if (sName.empty()) {
+            continue;
+        }
+
+        NoStringVector vsNames;
+        sName.Split(" ", vsNames, false, "\"", "\"");
+
+        for (uint a = 0; a < vsNames.size(); a++) {
+            NoString sKeyName = vsNames[a];
+
+            if ((a + 1) == vsNames.size()) {
+                msRet[sKeyName] = sCopy.Token(0, false, " ", false, "\"", "\"");
+                sCopy = sCopy.Token(1, true, " ", false, "\"", "\"", false);
+            } else {
+                msRet[sKeyName] = "";
+            }
+        }
+    }
+
+    return msRet;
+}
+
+NoStringVector NoUtils::QuoteSplit(const NoString& str)
+{
+    NoStringVector ret;
+    str.Split(" ", ret, false, "\"", "\"", true);
+    return ret;
+}

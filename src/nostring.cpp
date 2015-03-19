@@ -759,48 +759,6 @@ NoString NoString::Right(size_type uCount) const
     return substr(length() - uCount, uCount);
 }
 
-NoString::size_type NoString::OptionSplit(NoStringMap& msRet, bool bUpperKeys) const
-{
-    NoString sName;
-    NoString sCopy(*this);
-    msRet.clear();
-
-    while (!sCopy.empty()) {
-        sName = sCopy.Token(0, false, "=", false, "\"", "\"", false).Trim_n();
-        sCopy = sCopy.Token(1, true, "=", false, "\"", "\"", false).TrimLeft_n();
-
-        if (sName.empty()) {
-            continue;
-        }
-
-        NoStringVector vsNames;
-        sName.Split(" ", vsNames, false, "\"", "\"");
-
-        for (uint a = 0; a < vsNames.size(); a++) {
-            NoString sKeyName = vsNames[a];
-
-            if (bUpperKeys) {
-                sKeyName.MakeUpper();
-            }
-
-            if ((a + 1) == vsNames.size()) {
-                msRet[sKeyName] = sCopy.Token(0, false, " ", false, "\"", "\"");
-                sCopy = sCopy.Token(1, true, " ", false, "\"", "\"", false);
-            } else {
-                msRet[sKeyName] = "";
-            }
-        }
-    }
-
-    return msRet.size();
-}
-
-NoString::size_type NoString::QuoteSplit(NoStringVector& vsRet) const
-{
-    vsRet.clear();
-    return Split(" ", vsRet, false, "\"", "\"", true);
-}
-
 NoString::size_type NoString::Split(const NoString& sDelim, NoStringVector& vsRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
 {
     vsRet.clear();

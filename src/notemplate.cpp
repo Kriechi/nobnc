@@ -18,6 +18,7 @@
 #include "nofile.h"
 #include "nodir.h"
 #include "nodebug.h"
+#include "noutils.h"
 #include <algorithm>
 
 void NoTemplateOptions::Parse(const NoString& sLine)
@@ -374,9 +375,8 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         m_spOptions->Parse(sArgs);
                     } else if (sAction.Equals("ADDROW")) {
                         NoString sLoopName = sArgs.Token(0);
-                        NoStringMap msRow;
-
-                        if (sArgs.Token(1, true, " ").OptionSplit(msRow)) {
+                        NoStringMap msRow = NoUtils::OptionSplit(sArgs.Token(1, true, " "));
+                        if (!msRow.empty()) {
                             NoTemplate& NewRow = AddRow(sLoopName);
 
                             for (const auto& it : msRow) {
@@ -389,10 +389,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
                         (*this)[sName] = sValue;
                     } else if (sAction.Equals("JOIN")) {
-                        NoStringVector vsArgs;
-                        // sArgs.Split(" ", vsArgs, false, "\"", "\"");
-                        sArgs.QuoteSplit(vsArgs);
-
+                        NoStringVector vsArgs = NoUtils::QuoteSplit(sArgs);
                         if (vsArgs.size() > 1) {
                             NoString sDelim = vsArgs[0];
                             bool bFoundOne = false;
@@ -808,10 +805,8 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
     while (sRest.Replace("= ", "=", "\"", "\"")) {
     }
 
-    NoStringVector vArgs;
+    NoStringVector vArgs = NoUtils::QuoteSplit(sRest);
     NoStringMap msArgs;
-    // sRest.Split(" ", vArgs, false, "\"", "\"");
-    sRest.QuoteSplit(vArgs);
 
     for (const NoString& sArg : vArgs) {
         msArgs[sArg.Token(0, false, "=").AsUpper()] = sArg.Token(1, true, "=");

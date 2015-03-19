@@ -135,6 +135,9 @@ public:
      * @return The ellipsized string.
      */
     static NoString Ellipsize(const NoString& str, uint uLen);
+
+    static NoStringMap OptionSplit(const NoString& str);
+    static NoStringVector QuoteSplit(const NoString& str);
 };
 
 #endif // NOUTILS_H

@@ -249,9 +249,6 @@ public:
      */
     NoString Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
 
-    size_type OptionSplit(NoStringMap& msRet, bool bUpperKeys = false) const;
-    size_type QuoteSplit(NoStringVector& vsRet) const;
-
     /** Split up this string into tokens.
      * Via sLeft and sRight you can define "markers" like with Replace().
      * Anything in such a marked section is treated as a single token. All
