@@ -284,10 +284,9 @@ public:
     {
         NoString sFile;
         if (DecryptMessages(sFile)) {
-            NoStringVector vsLines;
             NoStringVector::iterator it;
 
-            sFile.Split("\n", vsLines);
+            NoStringVector vsLines = sFile.Split("\n");
 
             for (it = vsLines.begin(); it != vsLines.end(); ++it) {
                 NoString sLine(*it);

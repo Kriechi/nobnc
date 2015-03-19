@@ -33,6 +33,8 @@ static const struct
 class Mechanisms : public NoStringVector
 {
 public:
+    Mechanisms& operator=(const NoStringVector& other) { *this = other; return *this; }
+
     void SetIndex(uint uiIndex) { m_uiIndex = uiIndex; }
 
     uint GetIndex() const { return m_uiIndex; }
@@ -113,8 +115,7 @@ public:
         NoString sMechanisms = sLine.Token(1, true).AsUpper();
 
         if (!sMechanisms.empty()) {
-            NoStringVector vsMechanisms;
-            sMechanisms.Split(" ", vsMechanisms);
+            NoStringVector vsMechanisms = sMechanisms.Split(" ");
 
             for (NoStringVector::const_iterator it = vsMechanisms.begin(); it != vsMechanisms.end(); ++it) {
                 if (!SupportsMechanism(*it)) {
@@ -204,7 +205,7 @@ public:
     {
         if (sCap.Equals("sasl")) {
             if (bSuccess) {
-                GetMechanismsString().Split(" ", m_Mechanisms);
+                m_Mechanisms = GetMechanismsString().Split(" ");
 
                 if (m_Mechanisms.empty()) {
                     CheckRequireAuth();

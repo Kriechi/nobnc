@@ -68,8 +68,7 @@ bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, size_type
     }
 
     if (m_vbWrappable[uColIdx]) {
-        NoStringVector vsWords;
-        sValue.Split(" ", vsWords);
+        NoStringVector vsWords = sValue.Split(" ");
         size_type uMaxWord = 0;
         for (const NoString& sWord : vsWords) {
             if (sWord.length() > uMaxWord) {
@@ -202,8 +201,7 @@ NoStringVector NoTable::Render() const
 
 NoStringVector NoTable::WrapWords(const NoString& s, size_type uWidth)
 {
-    NoStringVector vsWords;
-    s.Split(" ", vsWords);
+    NoStringVector vsWords = s.Split(" ");
     NoStringVector vsResult;
     vsResult.emplace_back("");
     for (const NoString& sWord : vsWords) {

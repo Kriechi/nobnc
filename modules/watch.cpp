@@ -141,9 +141,8 @@ public:
     void SetDetachedChannelOnly(bool b = true) { m_bDetachedChannelOnly = b; }
     void SetSources(const NoString& sSources)
     {
-        NoStringVector vsSources;
+        NoStringVector vsSources = sSources.Split(" ", false);
         NoStringVector::iterator it;
-        sSources.Split(" ", vsSources, false);
 
         m_vsSources.clear();
 
@@ -680,8 +679,7 @@ private:
         bool bWarn = false;
 
         for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
-            NoStringVector vList;
-            it->first.Split("\n", vList);
+            NoStringVector vList = it->first.Split("\n");
 
             // Backwards compatibility with the old save format
             if (vList.size() != 5 && vList.size() != 7) {

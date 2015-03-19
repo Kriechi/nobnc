@@ -254,13 +254,12 @@ public:
      *                        each token.
      * @return The number of tokens found.
      */
-    size_type Split(const NoString& sDelim,
-                    NoStringVector& vsRet,
-                    bool bAllowEmpty = true,
-                    const NoString& sLeft = "",
-                    const NoString& sRight = "",
-                    bool bTrimQuotes = true,
-                    bool bTrimWhiteSpace = false) const;
+    NoStringVector Split(const NoString& sDelim,
+                         bool bAllowEmpty = true,
+                         const NoString& sLeft = "",
+                         const NoString& sRight = "",
+                         bool bTrimQuotes = true,
+                         bool bTrimWhiteSpace = false) const;
 
     /** Split up this string into tokens.
      * This function is identical to the other NoString::Split(), except that

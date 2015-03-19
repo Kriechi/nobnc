@@ -139,10 +139,9 @@ public:
     {
         if (!pTarget->getBuffer().isEmpty()) return; // in this case the module was probably reloaded
 
-        NoStringVector vsLines;
         NoStringVector::iterator it;
 
-        sContent.Split("\n", vsLines);
+        NoStringVector vsLines = sContent.Split("\n");
 
         for (it = vsLines.begin(); it != vsLines.end(); ++it) {
             NoString sLine(*it);
@@ -242,10 +241,8 @@ public:
             NoString sFile;
             NoString sName;
             if (DecryptBuffer(GetPath(sArgs), sFile, sName)) {
-                NoStringVector vsLines;
+                NoStringVector vsLines = sFile.Split("\n");
                 NoStringVector::iterator it;
-
-                sFile.Split("\n", vsLines);
 
                 for (it = vsLines.begin(); it != vsLines.end(); ++it) {
                     NoString sLine(*it);
@@ -279,10 +276,8 @@ public:
         NoString sName;
         PutUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Buffer Playback...");
         if (DecryptBuffer(GetPath(sBuffer), sFile, sName)) {
-            NoStringVector vsLines;
+            NoStringVector vsLines = sFile.Split("\n");
             NoStringVector::iterator it;
-
-            sFile.Split("\n", vsLines);
 
             for (it = vsLines.begin(); it != vsLines.end(); ++it) {
                 NoString sLine(*it);

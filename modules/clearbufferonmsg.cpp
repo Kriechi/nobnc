@@ -143,9 +143,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        NoStringVector vsOpts;
-
-        sArgs.Split(" ", vsOpts, false);
+        NoStringVector vsOpts = sArgs.Split(" ", false);
 
         for (NoString& sOpt : vsOpts) {
             if (sOpt.StartsWith("!"))

@@ -57,7 +57,7 @@ public:
         if (i == module->EndNV()) return false;
         alias.parent = module;
         alias.name = line;
-        i->second.Split("\n", alias.alias_cmds, false);
+        alias.alias_cmds = i->second.Split("\n", false);
         return true;
     }
 
@@ -327,8 +327,7 @@ public:
                 ClearNV();
                 return HALT;
             } else if (NoAlias::AliasGet(current_alias, this, sLine)) {
-                NoStringVector rawLines;
-                current_alias.Imprint(sLine).Split("\n", rawLines, false);
+                NoStringVector rawLines = current_alias.Imprint(sLine).Split("\n", false);
                 sending_lines = true;
 
                 for (size_t i = 0; i < rawLines.size(); ++i) {

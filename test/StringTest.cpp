@@ -160,12 +160,10 @@ TEST(StringTest, Split)
     EXPECT_EQ("d", CS("a (b c) d").Token(2, false, " ", false, "(", ")", false));
 
     NoStringVector vexpected;
-    NoStringVector vresult;
-
     vexpected.push_back("a");
     vexpected.push_back("b");
     vexpected.push_back("c");
-    CS("a b c").Split(" ", vresult);
+    NoStringVector vresult = CS("a b c").Split(" ");
     EXPECT_EQ(vexpected, vresult);
 }
 

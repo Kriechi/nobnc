@@ -372,9 +372,8 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             if (sMod.Token(uIndex).Equals("-force")) {
                 uIndex++;
             }
-            NoStringVector vsClient, vsServer;
-            sMod.Token(uIndex).Split(",", vsClient);
-            sMod.Token(uIndex + 1).Split(",", vsServer);
+            NoStringVector vsClient = sMod.Token(uIndex).Split(",");
+            NoStringVector vsServer = sMod.Token(uIndex + 1).Split(",");
             if (vsClient.empty() || vsServer.empty()) {
                 NoUtils::PrintStatus(false, "charset module was loaded with wrong parameters.");
                 continue;

@@ -65,8 +65,7 @@ public:
 
     void DelChans(const NoString& sChans)
     {
-        NoStringVector vsChans;
-        sChans.Split(" ", vsChans);
+        NoStringVector vsChans = sChans.Split(" ");
 
         for (uint a = 0; a < vsChans.size(); a++) {
             m_ssChans.erase(vsChans[a].AsLower());
@@ -75,8 +74,7 @@ public:
 
     void AddChans(const NoString& sChans)
     {
-        NoStringVector vsChans;
-        sChans.Split(" ", vsChans);
+        NoStringVector vsChans = sChans.Split(" ");
 
         for (uint a = 0; a < vsChans.size(); a++) {
             m_ssChans.insert(vsChans[a].AsLower());
@@ -146,8 +144,7 @@ public:
     {
         // Load the chans from the command line
         uint a = 0;
-        NoStringVector vsChans;
-        sArgs.Split(" ", vsChans, false);
+        NoStringVector vsChans = sArgs.Split(" ", false);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             NoString sName = "Args";

@@ -85,8 +85,7 @@ public:
 
     bool DelHostmasks(const NoString& sHostmasks)
     {
-        NoStringVector vsHostmasks;
-        sHostmasks.Split(",", vsHostmasks);
+        NoStringVector vsHostmasks = sHostmasks.Split(",");
 
         for (uint a = 0; a < vsHostmasks.size(); a++) {
             m_ssHostmasks.erase(vsHostmasks[a]);
@@ -97,8 +96,7 @@ public:
 
     void AddHostmasks(const NoString& sHostmasks)
     {
-        NoStringVector vsHostmasks;
-        sHostmasks.Split(",", vsHostmasks);
+        NoStringVector vsHostmasks = sHostmasks.Split(",");
 
         for (uint a = 0; a < vsHostmasks.size(); a++) {
             m_ssHostmasks.insert(vsHostmasks[a]);
@@ -107,8 +105,7 @@ public:
 
     void DelChans(const NoString& sChans)
     {
-        NoStringVector vsChans;
-        sChans.Split(" ", vsChans);
+        NoStringVector vsChans = sChans.Split(" ");
 
         for (uint a = 0; a < vsChans.size(); a++) {
             m_ssChans.erase(vsChans[a].AsLower());
@@ -117,8 +114,7 @@ public:
 
     void AddChans(const NoString& sChans)
     {
-        NoStringVector vsChans;
-        sChans.Split(" ", vsChans);
+        NoStringVector vsChans = sChans.Split(" ");
 
         for (uint a = 0; a < vsChans.size(); a++) {
             m_ssChans.insert(vsChans[a].AsLower());
@@ -321,8 +317,7 @@ public:
         Table.AddColumn("Channels");
 
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
-            NoStringVector vsHostmasks;
-            it->second->GetHostmasks().Split(",", vsHostmasks);
+            NoStringVector vsHostmasks = it->second->GetHostmasks().Split(",");
             for (uint a = 0; a < vsHostmasks.size(); a++) {
                 Table.AddRow();
                 if (a == 0) {

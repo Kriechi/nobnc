@@ -783,8 +783,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
                 }
 
                 if (sSubCmd == "LS") {
-                    NoStringVector vsTokens;
-                    sArgs.Split(" ", vsTokens, false);
+                    NoStringVector vsTokens = sArgs.Split(" ", false);
 
                     for (const NoString& sCap : vsTokens) {
                         if (OnServerCapAvailable(sCap) || sCap == "multi-prefix" || sCap == "userhost-in-names") {
@@ -1138,8 +1137,7 @@ void NoIrcSock::SockErrorImpl(int iErrno, const NoString& sDescription)
                 NoString sCert(pCertStr, iLen);
                 BIO_free(mem);
 
-                NoStringVector vsCert;
-                sCert.Split("\n", vsCert);
+                NoStringVector vsCert = sCert.Split("\n");
                 for (const NoString& s : vsCert) {
                     // It shouldn't contain any bad characters, but let's be safe...
                     m_pNetwork->PutStatus("|" + s.Escape_n(NoString::EDEBUG));
@@ -1193,9 +1191,7 @@ void NoIrcSock::ReachedMaxBufferImpl()
 
 void NoIrcSock::ParseISupport(const NoString& sLine)
 {
-    NoStringVector vsTokens;
-
-    sLine.Split(" ", vsTokens, false);
+    NoStringVector vsTokens = sLine.Split(" ", false);
 
     for (const NoString& sToken : vsTokens) {
         NoString sName = sToken.Token(0, false, "=");
@@ -1278,10 +1274,8 @@ void NoIrcSock::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
         // Get everything except the actual user list
         NoString sTmp = sLine.Token(0, false, " :") + " :";
 
-        NoStringVector vsNicks;
-
         // This loop runs once for every nick on the channel
-        sNicks.Split(" ", vsNicks, false);
+        NoStringVector vsNicks = sNicks.Split(" ", false);
         for (NoString sNick : vsNicks) {
             if (sNick.empty()) break;
 

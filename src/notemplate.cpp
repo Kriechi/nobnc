@@ -155,8 +155,7 @@ NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
 
 void NoTemplate::SetPath(const NoString& sPaths)
 {
-    NoStringVector vsDirs;
-    sPaths.Split(":", vsDirs, false);
+    NoStringVector vsDirs = sPaths.Split(":", false);
 
     for (const NoString& sDir : vsDirs) {
         AppendPath(sDir, false);
@@ -870,8 +869,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
         NoStringMap::iterator it = msArgs.find("ESC");
 
         if (it != msArgs.end()) {
-            NoStringVector vsEscs;
-            it->second.Split(",", vsEscs, false);
+            NoStringVector vsEscs = it->second.Split(",", false);
 
             for (const NoString& sEsc : vsEscs) {
                 sRet.Escape(NoString::ToEscape(sEsc));

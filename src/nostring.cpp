@@ -660,8 +660,8 @@ uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const No
 
 NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
 {
-    NoStringVector vsTokens;
-    if (Split(sSep, vsTokens, bAllowEmpty, sLeft, sRight, bTrimQuotes) > uPos) {
+    NoStringVector vsTokens = Split(sSep, bAllowEmpty, sLeft, sRight, bTrimQuotes);
+    if (vsTokens.size() > uPos) {
         NoString sRet;
 
         for (size_t a = uPos; a < vsTokens.size(); a++) {
@@ -745,12 +745,12 @@ NoString NoString::Right(size_type uCount) const
     return substr(length() - uCount, uCount);
 }
 
-NoString::size_type NoString::Split(const NoString& sDelim, NoStringVector& vsRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
+NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
 {
-    vsRet.clear();
+    NoStringVector vsRet;
 
     if (empty()) {
-        return 0;
+        return vsRet;
     }
 
     NoString sTmp;
@@ -819,14 +819,12 @@ NoString::size_type NoString::Split(const NoString& sDelim, NoStringVector& vsRe
         vsRet.push_back(sTmp);
     }
 
-    return vsRet.size();
+    return vsRet;
 }
 
 NoString::size_type NoString::Split(const NoString& sDelim, NoStringSet& ssRet, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
 {
-    NoStringVector vsTokens;
-
-    Split(sDelim, vsTokens, bAllowEmpty, sLeft, sRight, bTrimQuotes, bTrimWhiteSpace);
+    NoStringVector vsTokens = Split(sDelim, bAllowEmpty, sLeft, sRight, bTrimQuotes, bTrimWhiteSpace);
 
     ssRet.clear();
 

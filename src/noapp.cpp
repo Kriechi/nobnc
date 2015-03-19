@@ -845,10 +845,9 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         NoString sChans;
         if (NoUtils::GetInput("Initial channels", sChans)) {
             vsLines.push_back("");
-            NoStringVector vsChans;
             sChans.Replace(",", " ");
             sChans.Replace(";", " ");
-            sChans.Split(" ", vsChans, false, "", "", true, true);
+            NoStringVector vsChans = sChans.Split(" ", false, "", "", true, true);
             for (const NoString& sChan : vsChans) {
                 vsLines.push_back("\t\t<Chan " + sChan + ">");
                 vsLines.push_back("\t\t</Chan>");
@@ -1192,8 +1191,7 @@ bool NoApp::DoRehash(NoString& sError)
     if (config.FindStringEntry("hideversion", sVal)) m_bHideVersion = sVal.ToBool();
 
     if (config.FindStringEntry("sslprotocols", m_sSSLProtocols)) {
-        NoStringVector vsProtocols;
-        m_sSSLProtocols.Split(" ", vsProtocols, false, "", "", true, true);
+        NoStringVector vsProtocols = m_sSSLProtocols.Split(" ", false, "", "", true, true);
 
         for (NoString& sProtocol : vsProtocols) {
 

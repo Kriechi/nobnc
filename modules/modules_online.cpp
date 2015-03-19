@@ -40,11 +40,10 @@ public:
     {
         // Handle ISON
         if (sLine.Token(0).Equals("ison")) {
-            NoStringVector vsNicks;
             NoStringVector::const_iterator it;
 
             // Get the list of nicks which are being asked for
-            sLine.Token(1, true).TrimLeft_n(":").Split(" ", vsNicks, false);
+            NoStringVector vsNicks = sLine.Token(1, true).TrimLeft_n(":").Split(" ", false);
 
             NoString sBNNoNicks;
             for (it = vsNicks.begin(); it != vsNicks.end(); ++it) {

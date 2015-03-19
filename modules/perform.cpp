@@ -124,7 +124,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        GetNV("Perform").Split("\n", m_vPerform, false);
+        m_vPerform = GetNV("Perform").Split("\n", false);
 
         return true;
     }
@@ -146,8 +146,7 @@ public:
         }
 
         if (WebSock.IsPost()) {
-            NoStringVector vsPerf;
-            WebSock.GetRawParam("perform", true).Split("\n", vsPerf, false);
+            NoStringVector vsPerf = WebSock.GetRawParam("perform", true).Split("\n", false);
             m_vPerform.clear();
 
             for (NoStringVector::const_iterator it = vsPerf.begin(); it != vsPerf.end(); ++it)

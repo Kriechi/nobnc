@@ -174,8 +174,7 @@ NoStringVector NoLogMod::SplitRules(const NoString& sRules) const
     NoString sCopy = sRules;
     sCopy.Replace(",", " ");
 
-    NoStringVector vsRules;
-    sCopy.Split(" ", vsRules, false, "", "", true, true);
+    NoStringVector vsRules = sCopy.Split(" ", false, "", "", true, true);
 
     return vsRules;
 }

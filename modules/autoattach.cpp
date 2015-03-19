@@ -154,8 +154,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        NoStringVector vsChans;
-        sArgs.Split(" ", vsChans, false);
+        NoStringVector vsChans = sArgs.Split(" ", false);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             NoString sAdd = *it;

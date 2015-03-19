@@ -532,8 +532,7 @@ NoStringSet NoUtils::GetEncodings()
 NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
 {
     if (sLine.StartsWith("@")) {
-        NoStringVector vsTags;
-        sLine.Token(0).TrimPrefix_n("@").Split(";", vsTags, false);
+        NoStringVector vsTags = sLine.Token(0).TrimPrefix_n("@").Split(";", false);
 
         NoStringMap mssTags;
         for (const NoString& sTag : vsTags) {
@@ -863,8 +862,7 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
             continue;
         }
 
-        NoStringVector vsNames;
-        sName.Split(" ", vsNames, false, "\"", "\"");
+        NoStringVector vsNames = sName.Split(" ", false, "\"", "\"");
 
         for (uint a = 0; a < vsNames.size(); a++) {
             NoString sKeyName = vsNames[a];
@@ -883,7 +881,5 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
 
 NoStringVector NoUtils::QuoteSplit(const NoString& str)
 {
-    NoStringVector ret;
-    str.Split(" ", ret, false, "\"", "\"", true);
-    return ret;
+    return str.Split(" ", false, "\"", "\"", true);
 }

@@ -132,9 +132,8 @@ public:
             }
         }
 
-        NoStringVector vsChans;
         NoStringVector::const_iterator it;
-        sArgs.Split(" ", vsChans, false);
+        NoStringVector vsChans = sArgs.Split(" ", false);
 
         for (it = vsChans.begin(); it != vsChans.end(); ++it) {
             if (it->Left(2) == CHAN_PREFIX) {

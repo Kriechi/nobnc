@@ -104,9 +104,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
         m_sURI = sLine.Token(1);
         ParseURI();
     } else if (sName.Equals("Cookie:")) {
-        NoStringVector vsNV;
-
-        sLine.Token(1, true).Split(";", vsNV, false, "", "", true, true);
+        NoStringVector vsNV = sLine.Token(1, true).Split(";", false, "", "", true, true);
 
         for (const NoString& s : vsNV) {
             m_msRequestCookies[s.Token(0, false, "=").Escape_n(NoString::EURL, NoString::EASCII)] =
@@ -127,8 +125,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
             const NoStringVector& vsTrustedProxies = NoApp::Get().GetTrustedProxies();
             NoString sIP = GetRemoteIP();
 
-            NoStringVector vsIPs;
-            sLine.Token(1, true).Split(",", vsIPs, false, "", "", false, true);
+            NoStringVector vsIPs = sLine.Token(1, true).Split(",", false, "", "", false, true);
 
             while (!vsIPs.empty()) {
                 // sIP told us that it got connection from vsIPs.back()
@@ -466,8 +463,7 @@ void NoHttpSock::ParseParams(const NoString& sParams, std::map<NoString, NoStrin
 {
     msvsParams.clear();
 
-    NoStringVector vsPairs;
-    sParams.Split("&", vsPairs, true);
+    NoStringVector vsPairs = sParams.Split("&", true);
 
     for (const NoString& sPair : vsPairs) {
         NoString sName = sPair.Token(0, false, "=").Escape_n(NoString::EURL, NoString::EASCII);

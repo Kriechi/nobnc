@@ -51,14 +51,12 @@ public:
             (*it)->GetSocket()->SetRequireClientCertFlags(SSL_VERIFY_PEER);
 
         for (NoStringMap::const_iterator it1 = BeginNV(); it1 != EndNV(); ++it1) {
-            NoStringVector vsKeys;
-
             if (NoApp::Get().FindUser(it1->first) == nullptr) {
                 DEBUG("Unknown user in saved data [" + it1->first + "]");
                 continue;
             }
 
-            it1->second.Split(" ", vsKeys, false);
+            NoStringVector vsKeys = it1->second.Split(" ", false);
             for (NoStringVector::const_iterator it2 = vsKeys.begin(); it2 != vsKeys.end(); ++it2) {
                 m_PubKeys[it1->first].insert(it2->AsLower());
             }

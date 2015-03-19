@@ -80,7 +80,6 @@ NoString NoDir::CheckPathPrefix(const NoString& sPath, const NoString& sAdd, con
 bool NoDir::MakeDir(const NoString& sPath, mode_t iMode)
 {
     NoString sDir;
-    NoStringVector dirs;
     NoStringVector::iterator it;
 
     // Just in case someone tries this...
@@ -93,7 +92,7 @@ bool NoDir::MakeDir(const NoString& sPath, mode_t iMode)
     if (sPath.Left(1) == "/") sDir = "/";
 
     // For every single subpath, do...
-    sPath.Split("/", dirs, false);
+    NoStringVector dirs = sPath.Split("/", false);
     for (it = dirs.begin(); it != dirs.end(); ++it) {
         // Add this to the path we already created
         sDir += *it;

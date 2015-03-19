@@ -40,7 +40,6 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        NoStringVector vArgs;
         NoStringVector::iterator it;
         NoStringMap::iterator it2;
 
@@ -51,7 +50,7 @@ public:
         }
 
         // Parse arguments, each argument is a user name to block
-        sArgs.Split(" ", vArgs, false);
+        NoStringVector vArgs = sArgs.Split(" ", false);
 
         for (it = vArgs.begin(); it != vArgs.end(); ++it) {
             if (!Block(*it)) {

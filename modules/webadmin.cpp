@@ -200,10 +200,9 @@ public:
             pNewUser->SetPass(sHash, NoUser::HASH_DEFAULT, sSalt);
         }
 
-        NoStringVector vsArgs;
+        NoStringVector vsArgs = WebSock.GetRawParam("allowedips").Split("\n");
         uint a = 0;
 
-        WebSock.GetRawParam("allowedips").Split("\n", vsArgs);
         if (vsArgs.size()) {
             for (a = 0; a < vsArgs.size(); a++) {
                 pNewUser->AddAllowedHost(vsArgs[a].Trim_n());
@@ -212,7 +211,7 @@ public:
             pNewUser->AddAllowedHost("*");
         }
 
-        WebSock.GetRawParam("ctcpreplies").Split("\n", vsArgs);
+        vsArgs = WebSock.GetRawParam("ctcpreplies").Split("\n");
         for (a = 0; a < vsArgs.size(); a++) {
             NoString sReply = vsArgs[a].TrimRight_n("\r");
             pNewUser->AddCTCPReply(sReply.Token(0).Trim_n(), sReply.Token(1, true).Trim_n());
@@ -1060,15 +1059,13 @@ public:
         }
 #endif
 
-        NoStringVector vsArgs;
-
         pNetwork->DelServers();
-        WebSock.GetRawParam("servers").Split("\n", vsArgs);
+        NoStringVector vsArgs = WebSock.GetRawParam("servers").Split("\n");
         for (uint a = 0; a < vsArgs.size(); a++) {
             pNetwork->AddServer(vsArgs[a].Trim_n());
         }
 
-        WebSock.GetRawParam("fingerprints").Split("\n", vsArgs);
+        vsArgs = WebSock.GetRawParam("fingerprints").Split("\n");
         while (!pNetwork->GetTrustedFingerprints().empty()) {
             pNetwork->DelTrustedFingerprint(*pNetwork->GetTrustedFingerprints().begin());
         }
@@ -1900,8 +1897,7 @@ public:
         sArg = WebSock.GetParam("hideversion");
         NoApp::Get().SetHideVersion(sArg.ToBool());
 
-        NoStringVector vsArgs;
-        WebSock.GetRawParam("motd").Split("\n", vsArgs);
+        NoStringVector vsArgs = WebSock.GetRawParam("motd").Split("\n");
         NoApp::Get().ClearMotd();
 
         uint a = 0;
@@ -1909,7 +1905,7 @@ public:
             NoApp::Get().AddMotd(vsArgs[a].TrimRight_n());
         }
 
-        WebSock.GetRawParam("bindhosts").Split("\n", vsArgs);
+        vsArgs = WebSock.GetRawParam("bindhosts").Split("\n");
         NoApp::Get().ClearBindHosts();
 
         for (a = 0; a < vsArgs.size(); a++) {
