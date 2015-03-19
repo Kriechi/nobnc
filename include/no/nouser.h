@@ -19,20 +19,12 @@
 
 #include <no/noglobal.h>
 #include <no/noutils.h>
-#include <no/nobuffer.h>
-#include <no/nonick.h>
-#include <set>
-#include <vector>
 
 class NoModules;
-class NoChannel;
 class NoClient;
 class NoSettings;
-class NoFile;
 class NoNetwork;
-class NoIrcConnection;
 class NoUserTimer;
-class NoServer;
 
 class NO_EXPORT NoUser
 {

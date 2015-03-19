@@ -17,6 +17,7 @@
 #include <no/nomodules.h>
 #include <no/noutils.h>
 #include <no/nouser.h>
+#include <no/nonick.h>
 
 class NoNickServ : public NoModule
 {
