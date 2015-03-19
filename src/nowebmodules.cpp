@@ -17,6 +17,7 @@
 #include "nowebmodules.h"
 #include "nofile.h"
 #include "nodir.h"
+#include "noclient.h"
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nodebug.h"

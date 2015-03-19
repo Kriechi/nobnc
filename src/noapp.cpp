@@ -22,6 +22,7 @@
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nosettings.h"
+#include "noclient.h"
 #include <tuple>
 #include <algorithm>
 #include "Csocket/Csocket.h"

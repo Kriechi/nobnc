@@ -15,6 +15,7 @@
  */
 
 #include "nolistener.h"
+#include "noclient.h"
 #include "nodebug.h"
 #include "noapp.h"
 

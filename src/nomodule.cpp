@@ -20,6 +20,7 @@
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nowebmodules.h"
+#include "noclient.h"
 #include "noapp.h"
 #include <dlfcn.h>
 

@@ -23,6 +23,7 @@
 #include "nochannel.h"
 #include "noquery.h"
 #include "noescape.h"
+#include "noclient.h"
 #include "noapp.h"
 #include "Csocket/Csocket.h"
 #include <algorithm>

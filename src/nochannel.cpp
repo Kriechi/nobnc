@@ -19,6 +19,7 @@
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nosettings.h"
+#include "noclient.h"
 #include "noapp.h"
 
 NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig, NoSettings* pConfig)

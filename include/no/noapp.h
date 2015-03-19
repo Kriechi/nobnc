@@ -18,14 +18,13 @@
 #define NOAPP_H
 
 #include <no/noglobal.h>
-#include <no/noclient.h>
+#include <no/nostring.h>
+#include <no/nosocketmanager.h>
 #include <no/nomodules.h>
-#include <no/nosocket.h>
 #include <no/nolistener.h>
-#include <map>
-#include <list>
 
-class NoListener;
+class NoClient;
+class NoAuthBase;
 class NoUser;
 class NoNetwork;
 class NoConnectQueueTimer;

@@ -20,6 +20,7 @@
 #include "nonetwork.h"
 #include "noserver.h"
 #include "nomodulecall.h"
+#include "noclient.h"
 #include "noapp.h"
 #include "noquery.h"
 #include "Csocket/Csocket.h"
