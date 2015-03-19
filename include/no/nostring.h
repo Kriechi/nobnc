@@ -139,46 +139,20 @@ public:
     NoString AsLower() const;
 
     /** Replace all occurrences in the current string.
-     * You can specify a "safe zone" via sLeft and sRight. Anything inside
-     * of such a zone will not be replaced. This does not do recursion, so
-     * e.g. with <code>Replace("(a()a)", "a", "b", "(", ")", true)</code>
-     * you would get "a(b)" as result. The second opening brace and the
-     * second closing brace would not be seen as a delimitered and thus
-     * wouldn't be removed. The first a is inside a "safe zone" and thus is
-     * left alone, too.
      * @see NoString::Replace
      * @param sReplace The string to look for.
      * @param sWith The replacement to use.
-     * @param sLeft The delimiter at the beginning of a safe zone.
-     * @param sRight The delimiter at the end of a safe zone.
-     * @param bRemoveDelims If true, all matching delimiters are removed.
      * @return The result of the replacing. The current string is left
      *         unchanged.
      */
-    NoString Replace_n(const NoString& sReplace,
-                       const NoString& sWith,
-                       const NoString& sLeft = "",
-                       const NoString& sRight = "") const;
+    NoString Replace_n(const NoString& sReplace, const NoString& sWith) const;
     /** Replace all occurrences in the current string.
-     * You can specify a "safe zone" via sLeft and sRight. Anything inside
-     * of such a zone will not be replaced. This does not do recursion, so
-     * e.g. with <code>Replace("(a()a)", "a", "b", "(", ")", true)</code>
-     * you would get "a(b)" as result. The second opening brace and the
-     * second closing brace would not be seen as a delimitered and thus
-     * wouldn't be removed. The first a is inside a "safe zone" and thus is
-     * left alone, too.
      * @see NoString::Replace
      * @param sReplace The string to look for.
      * @param sWith The replacement to use.
-     * @param sLeft The delimiter at the beginning of a safe zone.
-     * @param sRight The delimiter at the end of a safe zone.
-     * @param bRemoveDelims If true, all matching delimiters are removed.
      * @returns The number of replacements done.
      */
-    uint Replace(const NoString& sReplace,
-                 const NoString& sWith,
-                 const NoString& sLeft = "",
-                 const NoString& sRight = "");
+    uint Replace(const NoString& sReplace, const NoString& sWith);
     /** Return the left part of the string.
      * @param uCount The number of characters to keep.
      * @return The resulting string.

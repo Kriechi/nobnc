@@ -44,6 +44,43 @@ static No::EscapeFormat ToEscapeFormat(const NoString& sEsc)
     return No::AsciiFormat;
 }
 
+static uint SafeReplace(NoString& str, const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight)
+{
+    uint uRet = 0;
+    NoString sCopy = str;
+    str.clear();
+
+    NoString::size_type uReplaceWidth = sReplace.length();
+    NoString::size_type uLeftWidth = sLeft.length();
+    NoString::size_type uRightWidth = sRight.length();
+    const char* p = sCopy.c_str();
+    bool bInside = false;
+
+    while (*p) {
+        if (!bInside && uLeftWidth && strncmp(p, sLeft.c_str(), uLeftWidth) == 0) {
+            str.append(sLeft);
+
+            p += uLeftWidth - 1;
+            bInside = true;
+        } else if (bInside && uRightWidth && strncmp(p, sRight.c_str(), uRightWidth) == 0) {
+            str.append(sRight);
+
+            p += uRightWidth - 1;
+            bInside = false;
+        } else if (!bInside && strncmp(p, sReplace.c_str(), uReplaceWidth) == 0) {
+            str.append(sWith);
+            p += uReplaceWidth - 1;
+            uRet++;
+        } else {
+            str.append(p, 1);
+        }
+
+        p++;
+    }
+
+    return uRet;
+}
+
 void NoTemplateOptions::Parse(const NoString& sLine)
 {
     NoString sName = sLine.Token(0, "=").Trim_n().AsUpper();
@@ -687,11 +724,11 @@ NoTemplateLoopContext* NoTemplate::GetCurLoopContext()
 bool NoTemplate::ValidIf(const NoString& sArgs)
 {
     NoString sArgStr = sArgs;
-    // sArgStr.Replace(" ", "", "\"", "\"", true);
-    sArgStr.Replace(" &&", "&&", "\"", "\"");
-    sArgStr.Replace("&& ", "&&", "\"", "\"");
-    sArgStr.Replace(" ||", "||", "\"", "\"");
-    sArgStr.Replace("|| ", "||", "\"", "\"");
+    // SafeReplace(sArgStr, " ", "", "\"", "\"", true);
+    SafeReplace(sArgStr, " &&", "&&", "\"", "\"");
+    SafeReplace(sArgStr, "&& ", "&&", "\"", "\"");
+    SafeReplace(sArgStr, " ||", "||", "\"", "\"");
+    SafeReplace(sArgStr, "|| ", "||", "\"", "\"");
 
     NoString::size_type uOrPos = sArgStr.find("||");
     NoString::size_type uAndPos = sArgStr.find("&&");
@@ -825,9 +862,9 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
     NoString sRest = sArgs.Tokens(1);
     NoString sRet;
 
-    while (sRest.Replace(" =", "=", "\"", "\"")) {
+    while (SafeReplace(sRest, " =", "=", "\"", "\"")) {
     }
-    while (sRest.Replace("= ", "=", "\"", "\"")) {
+    while (SafeReplace(sRest, "= ", "=", "\"", "\"")) {
     }
 
     NoStringVector vArgs = NoUtils::QuoteSplit(sRest);

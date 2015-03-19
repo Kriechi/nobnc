@@ -220,37 +220,24 @@ NoString NoString::AsLower() const
     return sRet;
 }
 
-NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight) const
+NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith) const
 {
     NoString sRet = *this;
-    sRet.Replace(sReplace, sWith, sLeft, sRight);
+    sRet.Replace(sReplace, sWith);
     return sRet;
 }
 
-uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight)
+uint NoString::Replace(const NoString& sReplace, const NoString& sWith)
 {
     uint uRet = 0;
     NoString sCopy = *this;
     clear();
 
     NoString::size_type uReplaceWidth = sReplace.length();
-    NoString::size_type uLeftWidth = sLeft.length();
-    NoString::size_type uRightWidth = sRight.length();
     const char* p = sCopy.c_str();
-    bool bInside = false;
 
     while (*p) {
-        if (!bInside && uLeftWidth && strncmp(p, sLeft.c_str(), uLeftWidth) == 0) {
-            append(sLeft);
-
-            p += uLeftWidth - 1;
-            bInside = true;
-        } else if (bInside && uRightWidth && strncmp(p, sRight.c_str(), uRightWidth) == 0) {
-            append(sRight);
-
-            p += uRightWidth - 1;
-            bInside = false;
-        } else if (!bInside && strncmp(p, sReplace.c_str(), uReplaceWidth) == 0) {
+        if (strncmp(p, sReplace.c_str(), uReplaceWidth) == 0) {
             append(sWith);
             p += uReplaceWidth - 1;
             uRet++;
