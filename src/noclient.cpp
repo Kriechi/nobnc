@@ -409,7 +409,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         }
 
         sPatterns.Replace(",", " ");
-        NoStringVector vsChans = sPatterns.Split(" ", false, "", "", true, true);
+        NoStringVector vsChans = sPatterns.Split(" ", false);
 
         std::set<NoChannel*> sChans;
         for (const NoString& sChan : vsChans) {

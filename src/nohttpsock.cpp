@@ -104,9 +104,10 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
         m_sURI = sLine.Token(1);
         ParseURI();
     } else if (sName.Equals("Cookie:")) {
-        NoStringVector vsNV = sLine.Token(1, true).Split(";", false, "", "", true, true);
+        NoStringVector vsNV = sLine.Token(1, true).Split(";", false, "", "", true);
 
-        for (const NoString& s : vsNV) {
+        for (NoString& s : vsNV) {
+            s.Trim();
             m_msRequestCookies[No::Escape_n(s.Token(0, false, "="), No::UrlFormat, No::AsciiFormat)] =
             No::Escape_n(s.Token(1, true, "="), No::UrlFormat, No::AsciiFormat);
         }
@@ -125,7 +126,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
             const NoStringVector& vsTrustedProxies = NoApp::Get().GetTrustedProxies();
             NoString sIP = GetRemoteIP();
 
-            NoStringVector vsIPs = sLine.Token(1, true).Split(",", false, "", "", false, true);
+            NoStringVector vsIPs = sLine.Token(1, true).Split(",", false, "", "", false);
 
             while (!vsIPs.empty()) {
                 // sIP told us that it got connection from vsIPs.back()
@@ -139,7 +140,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
                 }
                 if (bTrusted) {
                     // sIP is trusted proxy, so use vsIPs.back() as new sIP
-                    sIP = vsIPs.back();
+                    sIP = vsIPs.back().Trim_n();
                     vsIPs.pop_back();
                 } else {
                     break;
@@ -155,8 +156,11 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
         m_sIfNoneMatch = sLine.Token(1, true);
     } else if (sName.Equals("Accept-Encoding:") && !m_bHTTP10Client) {
         // trimming whitespace from the tokens is important:
-        NoStringVector vsEncodings = sLine.Token(1, true).Split(",", false, "", "", false, true);
-        m_bAcceptGzip = (std::find(vsEncodings.begin(), vsEncodings.end(), "gzip") != vsEncodings.end());
+        NoStringVector vsEncodings = sLine.Token(1, true).Split(",", false, "", "", false);
+        for (NoString& sEncoding : vsEncodings) {
+            if (sEncoding.Trim_n().Equals("gzip"))
+                m_bAcceptGzip = true;
+        }
     } else if (sLine.empty()) {
         m_bGotHeader = true;
 

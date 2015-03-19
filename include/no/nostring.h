@@ -239,8 +239,7 @@ public:
                          bool bAllowEmpty = true,
                          const NoString& sLeft = "",
                          const NoString& sRight = "",
-                         bool bTrimQuotes = true,
-                         bool bTrimWhiteSpace = false) const;
+                         bool bTrimQuotes = true) const;
 
     /** Decode the give base64-encoded string.
      * @return The decoded string.

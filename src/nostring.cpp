@@ -353,7 +353,7 @@ NoString NoString::Right(size_type uCount) const
     return substr(length() - uCount, uCount);
 }
 
-NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes, bool bTrimWhiteSpace) const
+NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
 {
     NoStringVector vsRet;
 
@@ -396,10 +396,6 @@ NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty, const N
         }
 
         if (uDelimLen && !bInside && strncasecmp(p, sDelim.c_str(), uDelimLen) == 0) {
-            if (bTrimWhiteSpace) {
-                sTmp.Trim();
-            }
-
             vsRet.push_back(sTmp);
             sTmp.clear();
             p += uDelimLen;
@@ -420,10 +416,6 @@ NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty, const N
     }
 
     if (!sTmp.empty()) {
-        if (bTrimWhiteSpace) {
-            sTmp.Trim();
-        }
-
         vsRet.push_back(sTmp);
     }
 
