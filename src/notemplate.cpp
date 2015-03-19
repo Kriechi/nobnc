@@ -723,6 +723,9 @@ bool NoTemplate::ValidIf(const NoString& sArgs)
     return false;
 }
 
+// TODO: cleanup
+extern NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight);
+
 bool NoTemplate::ValidExpr(const NoString& sExpression)
 {
     bool bNegate = false;
@@ -737,26 +740,26 @@ bool NoTemplate::ValidExpr(const NoString& sExpression)
 
     if (sExpr.find("!=") != NoString::npos) {
         sName = sExpr.Token(0, false, "!=").Trim_n();
-        sValue = sExpr.Token(1, true, "!=", "\"", "\"").Trim_n().Trim_n("\"");
+        sValue = Token_helper(sExpr, 1, true, "!=", "\"", "\"").Trim_n().Trim_n("\"");
         bNegate = !bNegate;
     } else if (sExpr.find("==") != NoString::npos) {
         sName = sExpr.Token(0, false, "==").Trim_n();
-        sValue = sExpr.Token(1, true, "==", "\"", "\"").Trim_n().Trim_n("\"");
+        sValue = Token_helper(sExpr, 1, true, "==", "\"", "\"").Trim_n().Trim_n("\"");
     } else if (sExpr.find(">=") != NoString::npos) {
         sName = sExpr.Token(0, false, ">=").Trim_n();
-        sValue = sExpr.Token(1, true, ">=", "\"", "\"").Trim_n().Trim_n("\"");
+        sValue = Token_helper(sExpr, 1, true, ">=", "\"", "\"").Trim_n().Trim_n("\"");
         return (GetValue(sName, true).ToLong() >= sValue.ToLong());
     } else if (sExpr.find("<=") != NoString::npos) {
         sName = sExpr.Token(0, false, "<=").Trim_n();
-        sValue = sExpr.Token(1, true, "<=", "\"", "\"").Trim_n().Trim_n("\"");
+        sValue = Token_helper(sExpr, 1, true, "<=", "\"", "\"").Trim_n().Trim_n("\"");
         return (GetValue(sName, true).ToLong() <= sValue.ToLong());
     } else if (sExpr.find(">") != NoString::npos) {
         sName = sExpr.Token(0, false, ">").Trim_n();
-        sValue = sExpr.Token(1, true, ">", "\"", "\"").Trim_n().Trim_n("\"");
+        sValue = Token_helper(sExpr, 1, true, ">", "\"", "\"").Trim_n().Trim_n("\"");
         return (GetValue(sName, true).ToLong() > sValue.ToLong());
     } else if (sExpr.find("<") != NoString::npos) {
         sName = sExpr.Token(0, false, "<").Trim_n();
-        sValue = sExpr.Token(1, true, "<", "\"", "\"").Trim_n().Trim_n("\"");
+        sValue = Token_helper(sExpr, 1, true, "<", "\"", "\"").Trim_n().Trim_n("\"");
         return (GetValue(sName, true).ToLong() < sValue.ToLong());
     } else {
         sName = sExpr.Trim_n();

@@ -854,6 +854,8 @@ NoString NoUtils::Ellipsize(const NoString& str, uint uLen)
     return sRet;
 }
 
+// TODO: cleanup
+extern NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight);
 extern NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
 
 NoStringMap NoUtils::OptionSplit(const NoString& str)
@@ -863,8 +865,8 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
     NoStringMap msRet;
 
     while (!sCopy.empty()) {
-        sName = sCopy.Token(0, false, "=", "\"", "\"").Trim_n();
-        sCopy = sCopy.Token(1, true, "=", "\"", "\"").TrimLeft_n();
+        sName = Token_helper(sCopy, 0, false, "=", "\"", "\"").Trim_n();
+        sCopy = Token_helper(sCopy, 1, true, "=", "\"", "\"").TrimLeft_n();
 
         if (sName.empty()) {
             continue;
@@ -876,8 +878,8 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
             NoString sKeyName = vsNames[a];
 
             if ((a + 1) == vsNames.size()) {
-                msRet[sKeyName] = sCopy.Token(0, false, " ", "\"", "\"");
-                sCopy = sCopy.Token(1, true, " ", "\"", "\"");
+                msRet[sKeyName] = Token_helper(sCopy, 0, false, " ", "\"", "\"");
+                sCopy = Token_helper(sCopy, 1, true, " ", "\"", "\"");
             } else {
                 msRet[sKeyName] = "";
             }

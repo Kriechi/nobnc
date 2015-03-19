@@ -214,12 +214,6 @@ public:
      */
     NoString Token(size_t uPos, bool bRest = false, const NoString& sSep = " ") const;
 
-    /** Get a token out of this string. This function behaves much like the
-     *  other Token() function in this class. The extra arguments are
-     *  handled similarly to Split().
-     */
-    NoString Token(size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight) const;
-
     /** Split up this string into tokens.
      * @param separator The separator between tokens.
      * @param behavior If behavior is No::SkipEmptyParts, empty entries don't
