@@ -70,8 +70,8 @@ public:
     static bool IsValidUserName(const NoString& sUserName);
     static NoString MakeCleanUserName(const NoString& sUserName);
 
-    NoModules& GetModules() { return *m_pModules; }
-    const NoModules& GetModules() const { return *m_pModules; }
+    NoModules& GetModules();
+    const NoModules& GetModules() const;
 
     NoNetwork* AddNetwork(const NoString& sNetwork, NoString& sErrorRet);
     bool DeleteNetwork(const NoString& sNetwork);
@@ -103,8 +103,8 @@ public:
     void CloneNetworks(const NoUser& User);
     bool Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks = true);
 
-    void AddBytesRead(ulonglong u) { m_uBytesRead += u; }
-    void AddBytesWritten(ulonglong u) { m_uBytesWritten += u; }
+    void AddBytesRead(ulonglong u);
+    void AddBytesWritten(ulonglong u);
 
     void SetNick(const NoString& s);
     void SetAltNick(const NoString& s);
@@ -127,18 +127,18 @@ public:
     void SetAutoClearChanBuffer(bool b);
     void SetAutoClearQueryBuffer(bool b);
 
-    void SetBeingDeleted(bool b) { m_bBeingDeleted = b; }
-    void SetTimestampFormat(const NoString& s) { m_sTimestampFormat = s; }
-    void SetTimestampAppend(bool b) { m_bAppendTimestamp = b; }
-    void SetTimestampPrepend(bool b) { m_bPrependTimestamp = b; }
-    void SetTimezone(const NoString& s) { m_sTimezone = s; }
-    void SetJoinTries(uint i) { m_uMaxJoinTries = i; }
-    void SetMaxJoins(uint i) { m_uMaxJoins = i; }
-    void SetSkinName(const NoString& s) { m_sSkinName = s; }
-    void SetMaxNetworks(uint i) { m_uMaxNetworks = i; }
-    void SetMaxQueryBuffers(uint i) { m_uMaxQueryBuffers = i; }
+    void SetBeingDeleted(bool b);
+    void SetTimestampFormat(const NoString& s);
+    void SetTimestampAppend(bool b);
+    void SetTimestampPrepend(bool b);
+    void SetTimezone(const NoString& s);
+    void SetJoinTries(uint i);
+    void SetMaxJoins(uint i);
+    void SetSkinName(const NoString& s);
+    void SetMaxNetworks(uint i);
+    void SetMaxQueryBuffers(uint i);
 
-    std::vector<NoClient*> GetUserClients() const { return m_vClients; }
+    std::vector<NoClient*> GetUserClients() const;
     std::vector<NoClient*> GetAllClients() const;
     NoString GetUserName() const;
     NoString GetCleanUserName() const;
@@ -171,18 +171,20 @@ public:
     uint GetBufferCount() const;
     bool AutoClearChanBuffer() const;
     bool AutoClearQueryBuffer() const;
-    bool IsBeingDeleted() const { return m_bBeingDeleted; }
-    NoString GetTimezone() const { return m_sTimezone; }
-    ulonglong BytesRead() const { return m_uBytesRead; }
-    ulonglong BytesWritten() const { return m_uBytesWritten; }
-    uint JoinTries() const { return m_uMaxJoinTries; }
-    uint MaxJoins() const { return m_uMaxJoins; }
+    bool IsBeingDeleted() const;
+    NoString GetTimezone() const;
+    ulonglong BytesRead() const;
+    ulonglong BytesWritten() const;
+    uint JoinTries() const;
+    uint MaxJoins() const;
     NoString GetSkinName() const;
-    uint MaxNetworks() const { return m_uMaxNetworks; }
-    uint MaxQueryBuffers() const { return m_uMaxQueryBuffers; }
+    uint MaxNetworks() const;
+    uint MaxQueryBuffers() const;
 
 private:
     void BounceAllClients();
+    void SetKeepBuffer(bool b); // XXX compatibility crap, added in 0.207
+    bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 
     const NoString m_sUserName;
     const NoString m_sCleanUserName;
@@ -231,10 +233,6 @@ private:
     NoString m_sSkinName;
 
     NoModules* m_pModules;
-
-private:
-    void SetKeepBuffer(bool b) { SetAutoClearChanBuffer(!b); } // XXX compatibility crap, added in 0.207
-    bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 };
 
 #endif // NOUSER_H

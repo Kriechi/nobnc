@@ -577,6 +577,8 @@ void NoUser::BounceAllClients()
     m_vClients.clear();
 }
 
+void NoUser::SetKeepBuffer(bool b) { SetAutoClearChanBuffer(!b); }
+
 void NoUser::UserConnected(NoClient* pClient)
 {
     if (!MultiClients()) {
@@ -746,6 +748,10 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 
     return true;
 }
+
+void NoUser::AddBytesRead(ulonglong u) { m_uBytesRead += u; }
+
+void NoUser::AddBytesWritten(ulonglong u) { m_uBytesWritten += u; }
 
 std::set<NoString> NoUser::GetAllowedHosts() const { return m_ssAllowedHosts; }
 bool NoUser::AddAllowedHost(const NoString& sHostMask)
@@ -1049,6 +1055,10 @@ bool NoUser::PutModNotice(const NoString& sModule, const NoString& sLine, NoClie
 
 NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return sUserName.Token(0, "@").Replace_n(".", ""); }
 
+NoModules&NoUser::GetModules() { return *m_pModules; }
+
+const NoModules&NoUser::GetModules() const { return *m_pModules; }
+
 bool NoUser::IsUserAttached() const
 {
     if (!m_vClients.empty()) {
@@ -1139,6 +1149,28 @@ void NoUser::SetAutoClearChanBuffer(bool b)
     m_bAutoClearChanBuffer = b;
 }
 void NoUser::SetAutoClearQueryBuffer(bool b) { m_bAutoClearQueryBuffer = b; }
+
+void NoUser::SetBeingDeleted(bool b) { m_bBeingDeleted = b; }
+
+void NoUser::SetTimestampFormat(const NoString& s) { m_sTimestampFormat = s; }
+
+void NoUser::SetTimestampAppend(bool b) { m_bAppendTimestamp = b; }
+
+void NoUser::SetTimestampPrepend(bool b) { m_bPrependTimestamp = b; }
+
+void NoUser::SetTimezone(const NoString& s) { m_sTimezone = s; }
+
+void NoUser::SetJoinTries(uint i) { m_uMaxJoinTries = i; }
+
+void NoUser::SetMaxJoins(uint i) { m_uMaxJoins = i; }
+
+void NoUser::SetSkinName(const NoString& s) { m_sSkinName = s; }
+
+void NoUser::SetMaxNetworks(uint i) { m_uMaxNetworks = i; }
+
+void NoUser::SetMaxQueryBuffers(uint i) { m_uMaxQueryBuffers = i; }
+
+std::vector<NoClient*> NoUser::GetUserClients() const { return m_vClients; }
 
 bool NoUser::SetBufferCount(uint u, bool bForce)
 {
@@ -1231,8 +1263,24 @@ NoStringMap NoUser::GetCTCPReplies() const { return m_mssCTCPReplies; }
 uint NoUser::GetBufferCount() const { return m_uBufferCount; }
 bool NoUser::AutoClearChanBuffer() const { return m_bAutoClearChanBuffer; }
 bool NoUser::AutoClearQueryBuffer() const { return m_bAutoClearQueryBuffer; }
+
+bool NoUser::IsBeingDeleted() const { return m_bBeingDeleted; }
+
+NoString NoUser::GetTimezone() const { return m_sTimezone; }
+
+ulonglong NoUser::BytesRead() const { return m_uBytesRead; }
+
+ulonglong NoUser::BytesWritten() const { return m_uBytesWritten; }
+
+uint NoUser::JoinTries() const { return m_uMaxJoinTries; }
+
+uint NoUser::MaxJoins() const { return m_uMaxJoins; }
 // NoString NoUser::GetSkinName() const { return (!m_sSkinName.empty()) ? m_sSkinName : NoApp::Get().GetSkinName(); }
 NoString NoUser::GetSkinName() const { return m_sSkinName; }
+
+uint NoUser::MaxNetworks() const { return m_uMaxNetworks; }
+
+uint NoUser::MaxQueryBuffers() const { return m_uMaxQueryBuffers; }
 NoString NoUser::GetUserPath() const
 {
     if (!NoFile::Exists(m_sUserPath)) {
