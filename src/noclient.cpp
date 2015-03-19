@@ -561,7 +561,7 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
     }
 }
 
-const std::vector<NoClient*>& NoClient::GetClients() const
+std::vector<NoClient*> NoClient::GetClients() const
 {
     if (m_pNetwork) {
         return m_pNetwork->GetClients();

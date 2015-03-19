@@ -163,7 +163,7 @@ public:
     NoUser* GetUser() const { return m_pUser; }
     void SetNetwork(NoNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
     NoNetwork* GetNetwork() const { return m_pNetwork; }
-    const std::vector<NoClient*>& GetClients() const;
+    std::vector<NoClient*> GetClients() const;
     const NoIrcConnection* GetIRCSock() const;
     NoIrcConnection* GetIRCSock();
     NoString GetFullName() const;
