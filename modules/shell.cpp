@@ -20,6 +20,7 @@
 #include <no/nouser.h>
 #include <no/noapp.h>
 #include <no/noprocess.h>
+#include <no/noclient.h>
 
 // Forward Declaration
 class NoShellMod;

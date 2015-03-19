@@ -16,6 +16,7 @@
 
 #include <no/nomodule.h>
 #include <no/noapp.h>
+#include <no/noclient.h>
 
 class NoNotesMod : public NoModule
 {

@@ -20,6 +20,7 @@
 #include <no/nofile.h>
 #include <no/nodir.h>
 #include <no/nodebug.h>
+#include <no/noclient.h>
 
 #include <netinet/in.h>
 #include <arpa/inet.h>

@@ -27,6 +27,7 @@
 #include <no/noapp.h>
 #include <no/nouser.h>
 #include <no/nodebug.h>
+#include <no/noclient.h>
 
 #include <sasl/sasl.h>
 
