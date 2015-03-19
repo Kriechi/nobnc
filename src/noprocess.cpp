@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-#include "noexecsock.h"
+#include "noprocess.h"
 #include <sys/wait.h>
 #include <unistd.h>
 
-NoExecSock::NoExecSock() : NoSocket(0), m_iPid(-1)
+NoProcess::NoProcess() : NoSocket(0), m_iPid(-1)
 {
 }
 
-NoExecSock::~NoExecSock()
+NoProcess::~NoProcess()
 {
     close2(m_iPid, GetRSock(), GetWSock());
     SetRSock(-1);
     SetWSock(-1);
 }
 
-int NoExecSock::Execute(const NoString& sExec)
+int NoProcess::Execute(const NoString& sExec)
 {
     int iReadFD, iWriteFD;
     m_iPid = popen2(iReadFD, iWriteFD, sExec);
@@ -38,13 +38,13 @@ int NoExecSock::Execute(const NoString& sExec)
     }
     return (m_iPid);
 }
-void NoExecSock::Kill(int iSignal)
+void NoProcess::Kill(int iSignal)
 {
     kill(m_iPid, iSignal);
     Close();
 }
 
-int NoExecSock::popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand)
+int NoProcess::popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand)
 {
     int rpipes[2] = { -1, -1 };
     int wpipes[2] = { -1, -1 };
@@ -93,7 +93,7 @@ int NoExecSock::popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand)
     return iPid;
 }
 
-void NoExecSock::close2(int iPid, int iReadFD, int iWriteFD)
+void NoProcess::close2(int iPid, int iReadFD, int iWriteFD)
 {
     close(iReadFD);
     close(iWriteFD);

@@ -26,7 +26,6 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nodir.h
                        include/no/noescape.h
                        include/no/noexception.h
-                       include/no/noexecsock.h
                        include/no/nofile.h
                        include/no/nohttpsocket.h
                        include/no/noircconnection.h
@@ -40,6 +39,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nomodulesocket.h
                        include/no/nonetwork.h
                        include/no/nonick.h
+                       include/no/noprocess.h
                        include/no/noquery.h
                        include/no/noserver.h
                        include/no/nosettings.h
@@ -70,7 +70,6 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nodir.cpp
                        src/noescape.cpp
                        src/noexception.cpp
-                       src/noexecsock.cpp
                        src/nofile.cpp
                        src/nohttpsocket.cpp
                        src/noircconnection.cpp
@@ -82,6 +81,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nomodulesocket.cpp
                        src/nonetwork.cpp
                        src/nonick.cpp
+                       src/noprocess.cpp
                        src/noquery.cpp
                        src/noserver.cpp
                        src/nosettings.cpp

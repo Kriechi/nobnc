@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef NOEXECSOCK_H
-#define NOEXECSOCK_H
+#ifndef NOPROCESS_H
+#define NOPROCESS_H
 
 #include <no/noglobal.h>
 #include <no/nosocket.h>
 #include <signal.h>
 
 //! @author imaginos@imaginos.net
-class NO_EXPORT NoExecSock : public NoSocket
+class NO_EXPORT NoProcess : public NoSocket
 {
 public:
-    NoExecSock();
-    virtual ~NoExecSock();
+    NoProcess();
+    virtual ~NoProcess();
 
     int Execute(const NoString& sExec);
     void Kill(int iSignal);
@@ -38,4 +38,4 @@ private:
     int m_iPid;
 };
 
-#endif // NOEXECSOCK_H
+#endif // NOPROCESS_H

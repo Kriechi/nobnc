@@ -18,15 +18,15 @@
 #include <no/nofile.h>
 #include <no/nouser.h>
 #include <no/noapp.h>
-#include <no/noexecsock.h>
+#include <no/noprocess.h>
 
 // Forward Declaration
 class NoShellMod;
 
-class NoShellSock : public NoExecSock
+class NoShellSock : public NoProcess
 {
 public:
-    NoShellSock(NoShellMod* pShellMod, NoClient* pClient, const NoString& sExec) : NoExecSock()
+    NoShellSock(NoShellMod* pShellMod, NoClient* pClient, const NoString& sExec) : NoProcess()
     {
         EnableReadLine();
         m_pParent = pShellMod;
