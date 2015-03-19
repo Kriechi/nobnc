@@ -99,7 +99,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
 
     if (sLine.Left(1) == "@") {
         // TODO support message-tags properly
-        sLine = sLine.Token(1, true);
+        sLine = sLine.Tokens(1);
     }
 
     bool bReturn = false;
@@ -114,7 +114,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
     if (sCommand.Left(1) == ":") {
         // Evil client! Sending a nickmask prefix on client's command
         // is bad, bad, bad, bad, bad, bad, bad, bad, BAD, B A D!
-        sLine = sLine.Token(1, true);
+        sLine = sLine.Tokens(1);
         sCommand = sLine.Token(0);
     }
 
@@ -122,7 +122,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         if (sCommand.Equals("PASS")) {
             m_bGotPass = true;
 
-            NoString sAuthLine = sLine.Token(1, true).TrimPrefix_n();
+            NoString sAuthLine = sLine.Tokens(1).TrimPrefix_n();
             ParsePass(sAuthLine);
 
             AuthUser();
@@ -171,10 +171,10 @@ void NoClient::ReadLineImpl(const NoString& sData)
         NoString sModCommand;
 
         if (sTarget.TrimPrefix(m_pUser->GetStatusPrefix())) {
-            sModCommand = sLine.Token(2, true);
+            sModCommand = sLine.Tokens(2);
         } else {
             sTarget = "status";
-            sModCommand = sLine.Token(1, true);
+            sModCommand = sLine.Tokens(1);
         }
 
         if (sTarget.Equals("status")) {
@@ -200,13 +200,13 @@ void NoClient::ReadLineImpl(const NoString& sData)
         // Block PONGs, we already responded to the pings
         return;
     } else if (sCommand.Equals("QUIT")) {
-        NoString sMsg = sLine.Token(1, true).TrimPrefix_n();
+        NoString sMsg = sLine.Tokens(1).TrimPrefix_n();
         NETWORKMODULECALL(OnUserQuit(sMsg), m_pUser, m_pNetwork, this, &bReturn);
         if (bReturn) return;
         Close(NoBaseSocket::CLT_AFTERWRITE); // Treat a client quit as a detach
         return; // Don't forward this msg.  We don't want the client getting us disconnected.
     } else if (sCommand.Equals("PROTOCTL")) {
-        NoStringVector vsTokens = sLine.Token(1, true).Split(" ", No::SkipEmptyParts);
+        NoStringVector vsTokens = sLine.Tokens(1).Split(" ", No::SkipEmptyParts);
 
         for (const NoString& sToken : vsTokens) {
             if (sToken == "NAMESX") {
@@ -218,7 +218,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         return; // If the server understands it, we already enabled namesx / uhnames
     } else if (sCommand.Equals("NOTICE")) {
         NoString sTargets = sLine.Token(1).TrimPrefix_n();
-        NoString sMsg = sLine.Token(2, true).TrimPrefix_n();
+        NoString sMsg = sLine.Tokens(2).TrimPrefix_n();
         NoStringVector vTargets = sTargets.Split(",", No::SkipEmptyParts);
 
         for (NoString& sTarget : vTargets) {
@@ -279,7 +279,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         return;
     } else if (sCommand.Equals("PRIVMSG")) {
         NoString sTargets = sLine.Token(1);
-        NoString sMsg = sLine.Token(2, true).TrimPrefix_n();
+        NoString sMsg = sLine.Tokens(2).TrimPrefix_n();
         NoStringVector vTargets = sTargets.Split(",", No::SkipEmptyParts);
 
         for (NoString& sTarget : vTargets) {
@@ -300,7 +300,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
 
                 if (m_pNetwork) {
                     if (sCTCP.Token(0).Equals("ACTION")) {
-                        NoString sMessage = sCTCP.Token(1, true);
+                        NoString sMessage = sCTCP.Tokens(1);
                         NETWORKMODULECALL(OnUserAction(sTarget, sMessage), m_pUser, m_pNetwork, this, &bContinue);
                         if (bContinue) continue;
                         sCTCP = "ACTION " + sMessage;
@@ -401,7 +401,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
     }
 
     if (sCommand.Equals("DETACH")) {
-        NoString sPatterns = sLine.Token(1, true);
+        NoString sPatterns = sLine.Tokens(1);
 
         if (sPatterns.empty()) {
             PutStatusNotice("Usage: /detach <#chans>");
@@ -465,7 +465,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         }
     } else if (sCommand.Equals("PART")) {
         NoString sChans = sLine.Token(1).TrimPrefix_n();
-        NoString sMessage = sLine.Token(2, true).TrimPrefix_n();
+        NoString sMessage = sLine.Tokens(2).TrimPrefix_n();
 
         NoStringVector vsChans = sChans.Split(",", No::SkipEmptyParts);
         sChans.clear();
@@ -496,7 +496,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         }
     } else if (sCommand.Equals("TOPIC")) {
         NoString sChan = sLine.Token(1);
-        NoString sTopic = sLine.Token(2, true).TrimPrefix_n();
+        NoString sTopic = sLine.Tokens(2).TrimPrefix_n();
 
         if (!sTopic.empty()) {
             NETWORKMODULECALL(OnUserTopic(sChan, sTopic), m_pUser, m_pNetwork, this, &bReturn);
@@ -508,7 +508,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         }
     } else if (sCommand.Equals("MODE")) {
         NoString sTarget = sLine.Token(1);
-        NoString sModes = sLine.Token(2, true);
+        NoString sModes = sLine.Tokens(2);
 
         if (m_pNetwork->IsChan(sTarget) && sModes.empty()) {
             // If we are on that channel and already received a
@@ -593,7 +593,7 @@ void NoClient::StatusCTCP(const NoString& sLine)
     NoString sCommand = sLine.Token(0);
 
     if (sCommand.Equals("PING")) {
-        PutStatusNotice("\001PING " + sLine.Token(1, true) + "\001");
+        PutStatusNotice("\001PING " + sLine.Tokens(1) + "\001");
     } else if (sCommand.Equals("VERSION")) {
         PutStatusNotice("\001VERSION " + NoApp::GetTag() + "\001");
     }
@@ -906,7 +906,7 @@ void NoClient::HandleCap(const NoString& sLine)
             }
         }
     } else if (sSubCmd.Equals("REQ")) {
-        NoStringVector vsTokens = sLine.Token(2, true).TrimPrefix_n(":").Split(" ", No::SkipEmptyParts);
+        NoStringVector vsTokens = sLine.Tokens(2).TrimPrefix_n(":").Split(" ", No::SkipEmptyParts);
 
         for (const NoString& sToken : vsTokens) {
             bool bVal = true;
@@ -919,7 +919,7 @@ void NoClient::HandleCap(const NoString& sLine)
 
             if (!bAccepted) {
                 // Some unsupported capability is requested
-                RespondCap("NAK :" + sLine.Token(2, true).TrimPrefix_n(":"));
+                RespondCap("NAK :" + sLine.Tokens(2).TrimPrefix_n(":"));
                 return;
             }
         }
@@ -950,7 +950,7 @@ void NoClient::HandleCap(const NoString& sLine)
             }
         }
 
-        RespondCap("ACK :" + sLine.Token(2, true).TrimPrefix_n(":"));
+        RespondCap("ACK :" + sLine.Tokens(2).TrimPrefix_n(":"));
     } else if (sSubCmd.Equals("LIST")) {
         NoString sList = NoString(" ").Join(m_ssAcceptedCaps.begin(), m_ssAcceptedCaps.end());
         RespondCap("LIST :" + sList);

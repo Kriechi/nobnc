@@ -27,8 +27,8 @@ class NoSendRawMod : public NoModule
             NoNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
 
             if (pNetwork) {
-                pNetwork->PutUser(sLine.Token(3, true));
-                PutModule("Sent [" + sLine.Token(3, true) + "] to " + pUser->GetUserName() + "/" + pNetwork->GetName());
+                pNetwork->PutUser(sLine.Tokens(3));
+                PutModule("Sent [" + sLine.Tokens(3) + "] to " + pUser->GetUserName() + "/" + pNetwork->GetName());
             } else {
                 PutModule("Network [" + sLine.Token(2) + "] not found for user [" + sLine.Token(1) + "]");
             }
@@ -45,8 +45,8 @@ class NoSendRawMod : public NoModule
             NoNetwork* pNetwork = pUser->FindNetwork(sLine.Token(2));
 
             if (pNetwork) {
-                pNetwork->PutIRC(sLine.Token(3, true));
-                PutModule("Sent [" + sLine.Token(3, true) + "] to IRC Server of " + pUser->GetUserName() + "/" + pNetwork->GetName());
+                pNetwork->PutIRC(sLine.Tokens(3));
+                PutModule("Sent [" + sLine.Tokens(3) + "] to IRC Server of " + pUser->GetUserName() + "/" + pNetwork->GetName());
             } else {
                 PutModule("Network [" + sLine.Token(2) + "] not found for user [" + sLine.Token(1) + "]");
             }
@@ -57,7 +57,7 @@ class NoSendRawMod : public NoModule
 
     void CurrentClient(const NoString& sLine)
     {
-        NoString sData = sLine.Token(1, true);
+        NoString sData = sLine.Tokens(1);
         GetClient()->PutClient(sData);
     }
 
@@ -81,13 +81,13 @@ public:
     {
         if (sPageName == "index") {
             if (WebSock.IsPost()) {
-                NoUser* pUser = NoApp::Get().FindUser(WebSock.GetParam("network").Token(0, false, "/"));
+                NoUser* pUser = NoApp::Get().FindUser(WebSock.GetParam("network").Token(0, "/"));
                 if (!pUser) {
                     WebSock.GetSession()->AddError("User not found");
                     return true;
                 }
 
-                NoNetwork* pNetwork = pUser->FindNetwork(WebSock.GetParam("network").Token(1, false, "/"));
+                NoNetwork* pNetwork = pUser->FindNetwork(WebSock.GetParam("network").Token(1, "/"));
                 if (!pNetwork) {
                     WebSock.GetSession()->AddError("Network not found");
                     return true;

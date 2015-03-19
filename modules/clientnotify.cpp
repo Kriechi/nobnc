@@ -104,7 +104,7 @@ public:
 
     void OnMethodCommand(const NoString& sCommand)
     {
-        const NoString& sArg = sCommand.Token(1, true).AsLower();
+        const NoString& sArg = sCommand.Tokens(1).AsLower();
 
         if (sArg != "notice" && sArg != "message" && sArg != "off") {
             PutModule("Usage: Method <message|notice|off>");
@@ -118,7 +118,7 @@ public:
 
     void OnNewOnlyCommand(const NoString& sCommand)
     {
-        const NoString& sArg = sCommand.Token(1, true).AsLower();
+        const NoString& sArg = sCommand.Tokens(1).AsLower();
 
         if (sArg.empty()) {
             PutModule("Usage: NewOnly <on|off>");
@@ -132,7 +132,7 @@ public:
 
     void OnDisconnectCommand(const NoString& sCommand)
     {
-        const NoString& sArg = sCommand.Token(1, true).AsLower();
+        const NoString& sArg = sCommand.Tokens(1).AsLower();
 
         if (sArg.empty()) {
             PutModule("Usage: OnDisconnect <on|off>");

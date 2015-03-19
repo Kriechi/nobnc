@@ -104,17 +104,17 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
         m_sURI = sLine.Token(1);
         ParseURI();
     } else if (sName.Equals("Cookie:")) {
-        NoStringVector vsNV = sLine.Token(1, true).Split(";", No::SkipEmptyParts);
+        NoStringVector vsNV = sLine.Tokens(1).Split(";", No::SkipEmptyParts);
 
         for (NoString& s : vsNV) {
             s.Trim();
-            m_msRequestCookies[No::Escape_n(s.Token(0, false, "="), No::UrlFormat, No::AsciiFormat)] =
-            No::Escape_n(s.Token(1, true, "="), No::UrlFormat, No::AsciiFormat);
+            m_msRequestCookies[No::Escape_n(s.Token(0, "="), No::UrlFormat, No::AsciiFormat)] =
+            No::Escape_n(s.Tokens(1, "="), No::UrlFormat, No::AsciiFormat);
         }
     } else if (sName.Equals("Authorization:")) {
         NoString sUnhashed = NoString::FromBase64(sLine.Token(2));
-        m_sUser = sUnhashed.Token(0, false, ":");
-        m_sPass = sUnhashed.Token(1, true, ":");
+        m_sUser = sUnhashed.Token(0, ":");
+        m_sPass = sUnhashed.Tokens(1, ":");
         m_bLoggedIn = OnLogin(m_sUser, m_sPass, true);
     } else if (sName.Equals("Content-Length:")) {
         m_uPostLen = sLine.Token(1).ToULong();
@@ -126,7 +126,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
             const NoStringVector& vsTrustedProxies = NoApp::Get().GetTrustedProxies();
             NoString sIP = GetRemoteIP();
 
-            NoStringVector vsIPs = sLine.Token(1, true).Split(",", No::SkipEmptyParts);
+            NoStringVector vsIPs = sLine.Tokens(1).Split(",", No::SkipEmptyParts);
 
             while (!vsIPs.empty()) {
                 // sIP told us that it got connection from vsIPs.back()
@@ -153,10 +153,10 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
         }
     } else if (sName.Equals("If-None-Match:")) {
         // this is for proper client cache support (HTTP 304) on static files:
-        m_sIfNoneMatch = sLine.Token(1, true);
+        m_sIfNoneMatch = sLine.Tokens(1);
     } else if (sName.Equals("Accept-Encoding:") && !m_bHTTP10Client) {
         // trimming whitespace from the tokens is important:
-        NoStringVector vsEncodings = sLine.Token(1, true).Split(",", No::SkipEmptyParts);
+        NoStringVector vsEncodings = sLine.Tokens(1).Split(",", No::SkipEmptyParts);
         for (NoString& sEncoding : vsEncodings) {
             if (sEncoding.Trim_n().Equals("gzip"))
                 m_bAcceptGzip = true;
@@ -456,11 +456,11 @@ void NoHttpSock::WriteFileGzipped(NoFile& File)
 
 void NoHttpSock::ParseURI()
 {
-    ParseParams(m_sURI.Token(1, true, "?"), m_msvsGETParams);
-    m_sURI = m_sURI.Token(0, false, "?");
+    ParseParams(m_sURI.Tokens(1, "?"), m_msvsGETParams);
+    m_sURI = m_sURI.Token(0, "?");
 }
 
-NoString NoHttpSock::GetPath() const { return m_sURI.Token(0, false, "?"); }
+NoString NoHttpSock::GetPath() const { return m_sURI.Token(0, "?"); }
 
 void NoHttpSock::ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams)
 {
@@ -469,8 +469,8 @@ void NoHttpSock::ParseParams(const NoString& sParams, std::map<NoString, NoStrin
     NoStringVector vsPairs = sParams.Split("&");
 
     for (const NoString& sPair : vsPairs) {
-        NoString sName = No::Escape_n(sPair.Token(0, false, "="), No::UrlFormat, No::AsciiFormat);
-        NoString sValue = No::Escape_n(sPair.Token(1, true, "="), No::UrlFormat, No::AsciiFormat);
+        NoString sName = No::Escape_n(sPair.Token(0, "="), No::UrlFormat, No::AsciiFormat);
+        NoString sValue = No::Escape_n(sPair.Tokens(1, "="), No::UrlFormat, No::AsciiFormat);
 
         msvsParams[sName].push_back(sValue);
     }

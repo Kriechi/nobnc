@@ -87,7 +87,7 @@ public:
 
     void OnSetCommand(const NoString& sCommand)
     {
-        SetReply(sCommand.Token(1, true));
+        SetReply(sCommand.Tokens(1));
         PutModule("New reply set");
     }
 

@@ -112,7 +112,7 @@ public:
 
     void SetMechanismCommand(const NoString& sLine)
     {
-        NoString sMechanisms = sLine.Token(1, true).AsUpper();
+        NoString sMechanisms = sLine.Tokens(1).AsUpper();
 
         if (!sMechanisms.empty()) {
             NoStringVector vsMechanisms = sMechanisms.Split(" ");
@@ -225,7 +225,7 @@ public:
     EModRet OnRaw(NoString& sLine) override
     {
         if (sLine.Token(0).Equals("AUTHENTICATE")) {
-            Authenticate(sLine.Token(1, true));
+            Authenticate(sLine.Tokens(1));
         } else if (sLine.Token(1).Equals("903")) {
             /* SASL success! */
             GetNetwork()->GetIRCSock()->ResumeCap();

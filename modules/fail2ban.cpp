@@ -36,7 +36,7 @@ public:
 
         if (sArgs.empty()) {
             timeout = 1;
-        } else if (timeout == 0 || m_uiAllowedFailed == 0 || !sArgs.Token(2, true).empty()) {
+        } else if (timeout == 0 || m_uiAllowedFailed == 0 || !sArgs.Tokens(2).empty()) {
             sMessage = "Invalid argument, must be the number of minutes "
                        "IPs are blocked after a failed login and can be "
                        "followed by number of allowed failed login attempts";

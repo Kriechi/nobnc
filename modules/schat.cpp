@@ -151,7 +151,7 @@ public:
     void OnModCommand(const NoString& sCommand) override
     {
         NoString sCom = sCommand.Token(0);
-        NoString sArgs = sCommand.Token(1, true);
+        NoString sArgs = sCommand.Tokens(1);
 
         if (sCom.Equals("chat") && !sArgs.empty()) {
             NoString sNick = "(s)" + sArgs;

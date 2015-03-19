@@ -46,8 +46,8 @@ static No::EscapeFormat ToEscapeFormat(const NoString& sEsc)
 
 void NoTemplateOptions::Parse(const NoString& sLine)
 {
-    NoString sName = sLine.Token(0, false, "=").Trim_n().AsUpper();
-    NoString sValue = sLine.Token(1, true, "=").Trim_n();
+    NoString sName = sLine.Token(0, "=").Trim_n().AsUpper();
+    NoString sValue = sLine.Tokens(1, "=").Trim_n();
 
     if (sName == "ESC") {
         m_eEscapeTo = ToEscapeFormat(sValue);
@@ -379,7 +379,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
             if (sMid.find("<?") == NoString::npos) {
                 sLine = sLine.substr(iPos2 + 2);
                 NoString sAction = sMid.Token(0);
-                NoString sArgs = sMid.Token(1, true);
+                NoString sArgs = sMid.Tokens(1);
                 bool bNotFound = false;
 
                 // If we're breaking or continuing from within a loop, skip all tags that aren't ENDLOOP
@@ -397,7 +397,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         m_spOptions->Parse(sArgs);
                     } else if (sAction.Equals("ADDROW")) {
                         NoString sLoopName = sArgs.Token(0);
-                        NoStringMap msRow = NoUtils::OptionSplit(sArgs.Token(1, true, " "));
+                        NoStringMap msRow = NoUtils::OptionSplit(sArgs.Tokens(1, " "));
                         if (!msRow.empty()) {
                             NoTemplate& NewRow = AddRow(sLoopName);
 
@@ -407,7 +407,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         }
                     } else if (sAction.Equals("SET")) {
                         NoString sName = sArgs.Token(0);
-                        NoString sValue = sArgs.Token(1, true);
+                        NoString sValue = sArgs.Tokens(1);
 
                         (*this)[sName] = sValue;
                     } else if (sAction.Equals("JOIN")) {
@@ -601,7 +601,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                     if (!bValidLastIf && uSkip == 1) {
                         NoString sArg = sArgs.Token(0);
 
-                        if (sArg.empty() || (sArg.Equals("IF") && ValidIf(sArgs.Token(1, true)))) {
+                        if (sArg.empty() || (sArg.Equals("IF") && ValidIf(sArgs.Tokens(1)))) {
                             uSkip = 0;
                             bValidLastIf = true;
                         }
@@ -648,7 +648,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
         if (!bFoundATag || bTmplLoopHasData || sOutput.find_first_not_of(" \t\r\n") != NoString::npos) {
             if (bInSetBlock) {
                 NoString sName = sSetBlockVar.Token(0);
-                // NoString sValue = sSetBlockVar.Token(1, true);
+                // NoString sValue = sSetBlockVar.Tokens(1);
                 (*this)[sName] += sOutput;
             } else {
                 oOut << sOutput;
@@ -703,8 +703,8 @@ bool NoTemplate::ValidIf(const NoString& sArgs)
             bAnd = true;
         }
 
-        NoString sExpr = sArgStr.Token(0, false, ((bAnd) ? "&&" : "||"));
-        sArgStr = sArgStr.Token(1, true, ((bAnd) ? "&&" : "||"));
+        NoString sExpr = sArgStr.Token(0, ((bAnd) ? "&&" : "||"));
+        sArgStr = sArgStr.Tokens(1, ((bAnd) ? "&&" : "||"));
 
         if (ValidExpr(sExpr)) {
             if (!bAnd) {
@@ -739,26 +739,26 @@ bool NoTemplate::ValidExpr(const NoString& sExpression)
     }
 
     if (sExpr.find("!=") != NoString::npos) {
-        sName = sExpr.Token(0, false, "!=").Trim_n();
+        sName = sExpr.Token(0, "!=").Trim_n();
         sValue = Token_helper(sExpr, 1, true, "!=", "\"", "\"").Trim_n().Trim_n("\"");
         bNegate = !bNegate;
     } else if (sExpr.find("==") != NoString::npos) {
-        sName = sExpr.Token(0, false, "==").Trim_n();
+        sName = sExpr.Token(0, "==").Trim_n();
         sValue = Token_helper(sExpr, 1, true, "==", "\"", "\"").Trim_n().Trim_n("\"");
     } else if (sExpr.find(">=") != NoString::npos) {
-        sName = sExpr.Token(0, false, ">=").Trim_n();
+        sName = sExpr.Token(0, ">=").Trim_n();
         sValue = Token_helper(sExpr, 1, true, ">=", "\"", "\"").Trim_n().Trim_n("\"");
         return (GetValue(sName, true).ToLong() >= sValue.ToLong());
     } else if (sExpr.find("<=") != NoString::npos) {
-        sName = sExpr.Token(0, false, "<=").Trim_n();
+        sName = sExpr.Token(0, "<=").Trim_n();
         sValue = Token_helper(sExpr, 1, true, "<=", "\"", "\"").Trim_n().Trim_n("\"");
         return (GetValue(sName, true).ToLong() <= sValue.ToLong());
     } else if (sExpr.find(">") != NoString::npos) {
-        sName = sExpr.Token(0, false, ">").Trim_n();
+        sName = sExpr.Token(0, ">").Trim_n();
         sValue = Token_helper(sExpr, 1, true, ">", "\"", "\"").Trim_n().Trim_n("\"");
         return (GetValue(sName, true).ToLong() > sValue.ToLong());
     } else if (sExpr.find("<") != NoString::npos) {
-        sName = sExpr.Token(0, false, "<").Trim_n();
+        sName = sExpr.Token(0, "<").Trim_n();
         sValue = Token_helper(sExpr, 1, true, "<", "\"", "\"").Trim_n().Trim_n("\"");
         return (GetValue(sName, true).ToLong() < sValue.ToLong());
     } else {
@@ -822,7 +822,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
 {
     NoTemplateLoopContext* pContext = GetCurLoopContext();
     NoString sName = sArgs.Token(0);
-    NoString sRest = sArgs.Token(1, true);
+    NoString sRest = sArgs.Tokens(1);
     NoString sRet;
 
     while (sRest.Replace(" =", "=", "\"", "\"")) {
@@ -835,7 +835,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
 
     for (NoString& sArg : vArgs) {
         sArg.Trim("\"");
-        msArgs[sArg.Token(0, false, "=").AsUpper()] = sArg.Token(1, true, "=");
+        msArgs[sArg.Token(0, "=").AsUpper()] = sArg.Tokens(1, "=");
     }
 
     /* We have no NoSettings in ZNC land
@@ -871,10 +871,10 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
             for (const auto& spTagHandler : vspTagHandlers) {
                 NoString sCustomOutput;
 
-                if (!bFromIf && spTagHandler->HandleVar(*pTmpl, sArgs.Token(0), sArgs.Token(1, true), sCustomOutput)) {
+                if (!bFromIf && spTagHandler->HandleVar(*pTmpl, sArgs.Token(0), sArgs.Tokens(1), sCustomOutput)) {
                     sRet = sCustomOutput;
                     break;
-                } else if (bFromIf && spTagHandler->HandleIf(*pTmpl, sArgs.Token(0), sArgs.Token(1, true), sCustomOutput)) {
+                } else if (bFromIf && spTagHandler->HandleIf(*pTmpl, sArgs.Token(0), sArgs.Tokens(1), sCustomOutput)) {
                     sRet = sCustomOutput;
                     break;
                 }

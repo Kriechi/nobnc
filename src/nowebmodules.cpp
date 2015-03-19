@@ -401,7 +401,7 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
         Row["Title"] = sTitle;
 
         if (m_sModName == Module.GetModName()) {
-            NoString sModuleType = GetPath().Token(1, false, "/");
+            NoString sModuleType = GetPath().Token(1, "/");
             if (sModuleType == "global" && Module.GetType() == NoModInfo::GlobalModule) {
                 bActiveModule = true;
             } else if (sModuleType == "user" && Module.GetType() == NoModInfo::UserModule) {
@@ -409,7 +409,7 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
             } else if (sModuleType == "network" && Module.GetType() == NoModInfo::NetworkModule) {
                 NoNetwork* Network = Module.GetNetwork();
                 if (Network) {
-                    NoString sNetworkName = GetPath().Token(2, false, "/");
+                    NoString sNetworkName = GetPath().Token(2, "/");
                     if (sNetworkName == Network->GetName()) {
                         bActiveModule = true;
                     }
@@ -695,8 +695,8 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
         m_sPath.TrimPrefix("mods/");
         m_sPath.TrimPrefix("modfiles/");
 
-        NoString sType = m_sPath.Token(0, false, "/");
-        m_sPath = m_sPath.Token(1, true, "/");
+        NoString sType = m_sPath.Token(0, "/");
+        m_sPath = m_sPath.Tokens(1, "/");
 
         NoModInfo::EModuleType eModType;
         if (sType.Equals("global")) {
@@ -717,8 +717,8 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
 
         NoNetwork* pNetwork = nullptr;
         if (eModType == NoModInfo::NetworkModule) {
-            NoString sNetwork = m_sPath.Token(0, false, "/");
-            m_sPath = m_sPath.Token(1, true, "/");
+            NoString sNetwork = m_sPath.Token(0, "/");
+            m_sPath = m_sPath.Tokens(1, "/");
 
             pNetwork = GetSession()->GetUser()->FindNetwork(sNetwork);
 
@@ -728,8 +728,8 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
             }
         }
 
-        m_sModName = m_sPath.Token(0, false, "/");
-        m_sPage = m_sPath.Token(1, true, "/");
+        m_sModName = m_sPath.Token(0, "/");
+        m_sPage = m_sPath.Tokens(1, "/");
 
         if (m_sPage.empty()) {
             m_sPage = "index";

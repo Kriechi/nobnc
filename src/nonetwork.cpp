@@ -385,7 +385,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
             }
 
             NoString sModRet;
-            NoString sArgs = sValue.Token(1, true);
+            NoString sArgs = sValue.Tokens(1);
 
             bool bModRet = LoadModule(sModName, sArgs, sNotice, sModRet);
 
@@ -1046,7 +1046,7 @@ bool NoNetwork::AddServer(const NoString& sName)
     }
 
     ushort uPort = sPort.ToUShort();
-    NoString sPass = sLine.Token(2, true);
+    NoString sPass = sLine.Tokens(2);
 
     return AddServer(sHost, uPort, sPass, bSSL);
 }

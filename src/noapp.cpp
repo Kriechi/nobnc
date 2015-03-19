@@ -1061,7 +1061,7 @@ bool NoApp::DoRehash(NoString& sError)
     NoString sSavedVersion;
     config.FindStringEntry("version", sSavedVersion);
     std::tuple<uint, uint> tSavedVersion =
-    std::make_tuple(sSavedVersion.Token(0, false, ".").ToUInt(), sSavedVersion.Token(1, false, ".").ToUInt());
+    std::make_tuple(sSavedVersion.Token(0, ".").ToUInt(), sSavedVersion.Token(1, ".").ToUInt());
     std::tuple<uint, uint> tCurrentVersion = std::make_tuple(NO_VERSION_MAJOR, NO_VERSION_MINOR);
     if (tSavedVersion < tCurrentVersion) {
         if (sSavedVersion.empty()) {
@@ -1089,7 +1089,7 @@ bool NoApp::DoRehash(NoString& sError)
     config.FindStringVector("loadmodule", vsList);
     for (const NoString& sModLine : vsList) {
         NoString sModName = sModLine.Token(0);
-        NoString sArgs = sModLine.Token(1, true);
+        NoString sArgs = sModLine.Tokens(1);
 
         if (sModName == "saslauth" && tSavedVersion < std::make_tuple(0, 207)) {
             // XXX compatibility crap, added in 0.207
@@ -1619,7 +1619,7 @@ NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, EAddrT
 bool NoApp::AddListener(const NoString& sLine, NoString& sError)
 {
     NoString sName = sLine.Token(0);
-    NoString sValue = sLine.Token(1, true);
+    NoString sValue = sLine.Tokens(1);
 
     EAddrType eAddr = ADDR_ALL;
     if (sName.Equals("Listen4") || sName.Equals("Listen") || sName.Equals("Listener4")) {
@@ -1644,8 +1644,8 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
     }
 
     if (sValue.find(" ") != NoString::npos) {
-        sBindHost = sValue.Token(0, false, " ");
-        sPort = sValue.Token(1, true, " ");
+        sBindHost = sValue.Token(0, " ");
+        sPort = sValue.Tokens(1, " ");
     } else {
         sPort = sValue;
     }

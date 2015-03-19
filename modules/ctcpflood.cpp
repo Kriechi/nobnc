@@ -100,7 +100,7 @@ public:
 
     void OnSecsCommand(const NoString& sCommand)
     {
-        const NoString& sArg = sCommand.Token(1, true);
+        const NoString& sArg = sCommand.Tokens(1);
 
         if (sArg.empty()) {
             PutModule("Usage: Secs <limit>");
@@ -116,7 +116,7 @@ public:
 
     void OnLinesCommand(const NoString& sCommand)
     {
-        const NoString& sArg = sCommand.Token(1, true);
+        const NoString& sArg = sCommand.Tokens(1);
 
         if (sArg.empty()) {
             PutModule("Usage: Lines <limit>");

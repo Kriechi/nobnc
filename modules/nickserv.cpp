@@ -31,7 +31,7 @@ class NoNickServ : public NoModule
 public:
     void SetCommand(const NoString& sLine)
     {
-        SetNV("Password", sLine.Token(1, true));
+        SetNV("Password", sLine.Tokens(1));
         PutModule("Password set");
     }
 
@@ -39,7 +39,7 @@ public:
 
     void SetNSNameCommand(const NoString& sLine)
     {
-        SetNV("NickServName", sLine.Token(1, true));
+        SetNV("NickServName", sLine.Tokens(1));
         PutModule("NickServ name set");
     }
 
@@ -50,7 +50,7 @@ public:
     void SetCommandCommand(const NoString& sLine)
     {
         NoString sCmd = sLine.Token(1);
-        NoString sNewCmd = sLine.Token(2, true);
+        NoString sNewCmd = sLine.Tokens(2);
         if (sCmd.Equals("IDENTIFY")) {
             SetNV("IdentifyCmd", sNewCmd);
         } else {

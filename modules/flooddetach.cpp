@@ -180,7 +180,7 @@ public:
 
     void SecsCommand(const NoString& sLine)
     {
-        const NoString sArg = sLine.Token(1, true);
+        const NoString sArg = sLine.Tokens(1);
 
         if (sArg.empty()) {
             PutModule("Seconds limit is [" + NoString(m_iThresholdSecs) + "]");
@@ -195,7 +195,7 @@ public:
 
     void LinesCommand(const NoString& sLine)
     {
-        const NoString sArg = sLine.Token(1, true);
+        const NoString sArg = sLine.Tokens(1);
 
         if (sArg.empty()) {
             PutModule("Lines limit is [" + NoString(m_iThresholdMsgs) + "]");
@@ -210,7 +210,7 @@ public:
 
     void SilentCommand(const NoString& sLine)
     {
-        const NoString sArg = sLine.Token(1, true);
+        const NoString sArg = sLine.Tokens(1);
 
         if (!sArg.empty()) {
             SetNV("silent", NoString(sArg.ToBool()));

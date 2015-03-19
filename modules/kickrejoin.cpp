@@ -39,7 +39,7 @@ protected:
     void RunJob() override
     {
         NoNetwork* pNetwork = module()->GetNetwork();
-        NoChannel* pChan = pNetwork->FindChan(GetName().Token(1, true));
+        NoChannel* pChan = pNetwork->FindChan(GetName().Tokens(1));
 
         if (pChan) {
             pChan->enable();

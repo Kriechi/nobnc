@@ -154,7 +154,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     }
     pConfig->FindStringVector("ctcpreply", vsList);
     for (const NoString& sReply : vsList) {
-        AddCTCPReply(sReply.Token(0), sReply.Token(1, true));
+        AddCTCPReply(sReply.Token(0), sReply.Tokens(1));
     }
 
     NoString sValue;
@@ -235,14 +235,14 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         sValue.Trim();
         SetPass(sValue, NoUser::HASH_MD5);
     } else {
-        NoString sMethod = sValue.Token(0, false, "#");
-        NoString sPass = sValue.Token(1, true, "#");
+        NoString sMethod = sValue.Token(0, "#");
+        NoString sPass = sValue.Tokens(1, "#");
         if (sMethod == "md5" || sMethod == "sha256") {
             NoUser::eHashType type = NoUser::HASH_MD5;
             if (sMethod == "sha256") type = NoUser::HASH_SHA256;
 
-            NoString sSalt = sPass.Token(1, false, "#");
-            sPass = sPass.Token(0, false, "#");
+            NoString sSalt = sPass.Token(1, "#");
+            sPass = sPass.Token(0, "#");
             SetPass(sPass, type, sSalt);
         } else if (sMethod == "plain") {
             SetPass(sPass, NoUser::HASH_NONE);
@@ -387,7 +387,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         }
 
         NoString sModRet;
-        NoString sArgs = sMod.Token(1, true);
+        NoString sArgs = sMod.Tokens(1);
 
         bool bModRet = LoadModule(sModName, sArgs, sNotice, sModRet);
 
@@ -1047,7 +1047,7 @@ bool NoUser::PutModNotice(const NoString& sModule, const NoString& sLine, NoClie
     return (pClient == nullptr);
 }
 
-NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return sUserName.Token(0, false, "@").Replace_n(".", ""); }
+NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return sUserName.Token(0, "@").Replace_n(".", ""); }
 
 bool NoUser::IsUserAttached() const
 {

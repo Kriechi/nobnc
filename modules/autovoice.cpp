@@ -98,10 +98,10 @@ public:
 
     bool FromString(const NoString& sLine)
     {
-        m_sUsername = sLine.Token(0, false, "\t");
-        m_sHostmask = sLine.Token(1, false, "\t");
+        m_sUsername = sLine.Token(0, "\t");
+        m_sHostmask = sLine.Token(1, "\t");
 
-        NoStringVector vsChans = sLine.Token(2, false, "\t").Split(" ");
+        NoStringVector vsChans = sLine.Token(2, "\t").Split(" ");
         m_ssChans = NoStringSet(vsChans.begin(), vsChans.end());
 
         return !m_sHostmask.empty();
@@ -200,7 +200,7 @@ public:
         if (sHost.empty()) {
             PutModule("Usage: AddUser <user> <hostmask> [channels]");
         } else {
-            NoAutoVoiceUser* pUser = AddUser(sUser, sHost, sLine.Token(3, true));
+            NoAutoVoiceUser* pUser = AddUser(sUser, sHost, sLine.Tokens(3));
 
             if (pUser) {
                 SetNV(sUser, pUser->ToString());
@@ -246,7 +246,7 @@ public:
     void OnAddChansCommand(const NoString& sLine)
     {
         NoString sUser = sLine.Token(1);
-        NoString sChans = sLine.Token(2, true);
+        NoString sChans = sLine.Tokens(2);
 
         if (sChans.empty()) {
             PutModule("Usage: AddChans <user> <channel> [channel] ...");
@@ -269,7 +269,7 @@ public:
     void OnDelChansCommand(const NoString& sLine)
     {
         NoString sUser = sLine.Token(1);
-        NoString sChans = sLine.Token(2, true);
+        NoString sChans = sLine.Tokens(2);
 
         if (sChans.empty()) {
             PutModule("Usage: DelChans <user> <channel> [channel] ...");

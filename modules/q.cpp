@@ -455,7 +455,7 @@ private:
             m_bRequestedWhoami = true;
         } else if (m_bRequestedWhoami && sMessage.WildCmp("#*")) {
             NoString sChannel = sMessage.Token(0);
-            NoString sFlags = sMessage.Token(1, true).Trim_n().TrimLeft_n("+");
+            NoString sFlags = sMessage.Tokens(1).Trim_n().TrimLeft_n("+");
             m_msChanModes[sChannel] = sFlags;
         } else if (m_bRequestedWhoami && m_bCatchResponse &&
                    (sMessage.Equals("End of list.") || sMessage.Equals("account, or HELLO to create an account."))) {

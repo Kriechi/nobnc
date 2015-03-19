@@ -46,13 +46,13 @@ public:
 
     void SetFile(const NoString& sLine)
     {
-        SetNV("File", sLine.Token(1, true));
+        SetNV("File", sLine.Tokens(1));
         PutModule("File has been set to: " + GetNV("File"));
     }
 
     void SetFormat(const NoString& sLine)
     {
-        SetNV("Format", sLine.Token(1, true));
+        SetNV("Format", sLine.Tokens(1));
         PutModule("Format has been set to: " + GetNV("Format"));
         PutModule("Format would be expanded to: " + ExpandString(GetNV("Format")));
     }

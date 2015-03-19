@@ -150,10 +150,10 @@ public:
                 NoString sTimestamp = sLine.Token(0);
                 sTimestamp.TrimLeft("@");
                 timeval ts;
-                ts.tv_sec = sTimestamp.Token(0, false, ",").ToLongLong();
-                ts.tv_usec = sTimestamp.Token(1, false, ",").ToLong();
+                ts.tv_sec = sTimestamp.Token(0, ",").ToLongLong();
+                ts.tv_usec = sTimestamp.Token(1, ",").ToLong();
 
-                NoString sFormat = sLine.Token(1, true);
+                NoString sFormat = sLine.Tokens(1);
 
                 NoString sText(*++it);
                 sText.Trim();
@@ -223,7 +223,7 @@ public:
 
     void OnSetPassCommand(const NoString& sCmdLine)
     {
-        NoString sArgs = sCmdLine.Token(1, true);
+        NoString sArgs = sCmdLine.Tokens(1);
 
         if (sArgs.empty()) sArgs = CRYPT_LAME_PASS;
 
@@ -234,7 +234,7 @@ public:
     void OnModCommand(const NoString& sCmdLine) override
     {
         NoString sCommand = sCmdLine.Token(0);
-        NoString sArgs = sCmdLine.Token(1, true);
+        NoString sArgs = sCmdLine.Tokens(1);
 
         if (sCommand.Equals("dumpbuff")) {
             // for testing purposes - hidden from help
@@ -258,7 +258,7 @@ public:
 
     void OnReplayCommand(const NoString& sCmdLine)
     {
-        NoString sArgs = sCmdLine.Token(1, true);
+        NoString sArgs = sCmdLine.Tokens(1);
 
         Replay(sArgs);
         PutModule("Replayed " + sArgs);

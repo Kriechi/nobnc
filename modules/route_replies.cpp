@@ -308,7 +308,7 @@ public:
 
             // If there are arguments to a mode change,
             // we must not route it.
-            if (!sLine.Token(3, true).empty()) return CONTINUE;
+            if (!sLine.Tokens(3).empty()) return CONTINUE;
 
             // Grab the mode change parameter
             NoString sMode = sLine.Token(2);

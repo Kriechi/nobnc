@@ -133,7 +133,7 @@ public:
 
     void OnTargetCommand(const NoString& sCommand)
     {
-        NoString sArg = sCommand.Token(1, true);
+        NoString sArg = sCommand.Tokens(1);
         NoString sTarget;
         NoString sMessage;
         LogMode mode;

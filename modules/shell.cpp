@@ -84,7 +84,7 @@ public:
     {
         NoString sCommand = sLine.Token(0);
         if (sCommand.Equals("cd")) {
-            NoString sArg = sLine.Token(1, true);
+            NoString sArg = sLine.Tokens(1);
             NoString sPath =
             NoDir::ChangeDir(m_sPath, (sArg.empty() ? NoString(NoApp::Get().GetHomePath()) : sArg), NoApp::Get().GetHomePath());
             NoFile Dir(sPath);

@@ -280,7 +280,7 @@ public:
     {
         NoString sCmdName = sCommand.Token(0);
         if (sCmdName.Equals("ADD") || sCmdName.Equals("WATCH")) {
-            Watch(sCommand.Token(1), sCommand.Token(2), sCommand.Token(3, true));
+            Watch(sCommand.Token(1), sCommand.Token(2), sCommand.Tokens(3));
         } else if (sCmdName.Equals("HELP")) {
             Help();
         } else if (sCmdName.Equals("LIST")) {
@@ -322,7 +322,7 @@ public:
                 SetDetachedChannelOnly(sTok.ToUInt(), bDetachedchannelOnly);
             }
         } else if (sCmdName.Equals("SETSOURCES")) {
-            SetSources(sCommand.Token(1).ToUInt(), sCommand.Token(2, true));
+            SetSources(sCommand.Token(1).ToUInt(), sCommand.Tokens(2));
         } else if (sCmdName.Equals("CLEAR")) {
             m_lsWatchers.clear();
             PutModule("All entries cleared.");

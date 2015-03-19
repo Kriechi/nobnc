@@ -152,8 +152,8 @@ public:
         NoPartylineChannel* pChannel;
         for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
             if (it->first.find(":") != NoString::npos) {
-                sAction = it->first.Token(0, false, ":");
-                sKey = it->first.Token(1, true, ":");
+                sAction = it->first.Token(0, ":");
+                sKey = it->first.Tokens(1, ":");
             } else {
                 // backwards compatibility for older NV data
                 sAction = "fixedchan";
@@ -293,7 +293,7 @@ public:
             return HALT;
         } else if (sLine.StartsWith("TOPIC " CHAN_PREFIX)) {
             NoString sChannel = sLine.Token(1);
-            NoString sTopic = sLine.Token(2, true);
+            NoString sTopic = sLine.Tokens(2);
 
             sTopic.TrimPrefix(":");
 

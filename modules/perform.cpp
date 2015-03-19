@@ -20,7 +20,7 @@ class NoPerform : public NoModule
 {
     void Add(const NoString& sCommand)
     {
-        NoString sPerf = sCommand.Token(1, true);
+        NoString sPerf = sCommand.Tokens(1);
 
         if (sPerf.empty()) {
             PutModule("Usage: add <command>");
@@ -34,7 +34,7 @@ class NoPerform : public NoModule
 
     void Del(const NoString& sCommand)
     {
-        u_int iNum = sCommand.Token(1, true).ToUInt();
+        u_int iNum = sCommand.Tokens(1).ToUInt();
 
         if (iNum > m_vPerform.size() || iNum <= 0) {
             PutModule("Illegal # Requested");
@@ -112,11 +112,11 @@ public:
         if (sPerf.Left(1) == "/") sPerf.LeftChomp(1);
 
         if (sPerf.Token(0).Equals("MSG")) {
-            sPerf = "PRIVMSG " + sPerf.Token(1, true);
+            sPerf = "PRIVMSG " + sPerf.Tokens(1);
         }
 
         if ((sPerf.Token(0).Equals("PRIVMSG") || sPerf.Token(0).Equals("NOTICE")) && sPerf.Token(2).Left(1) != ":") {
-            sPerf = sPerf.Token(0) + " " + sPerf.Token(1) + " :" + sPerf.Token(2, true);
+            sPerf = sPerf.Token(0) + " " + sPerf.Token(1) + " :" + sPerf.Tokens(2);
         }
 
         return sPerf;

@@ -61,10 +61,10 @@ class NoAway : public NoModule
         time(&curtime);
 
         if (sCommand.Token(1) != "-quiet") {
-            sReason = NoUtils::FormatTime(curtime, sCommand.Token(1, true), GetUser()->GetTimezone());
+            sReason = NoUtils::FormatTime(curtime, sCommand.Tokens(1), GetUser()->GetTimezone());
             PutModNotice("You have been marked as away");
         } else {
-            sReason = NoUtils::FormatTime(curtime, sCommand.Token(2, true), GetUser()->GetTimezone());
+            sReason = NoUtils::FormatTime(curtime, sCommand.Tokens(2), GetUser()->GetTimezone());
         }
 
         Away(false, sReason);
@@ -86,8 +86,8 @@ class NoAway : public NoModule
     {
         NoString nick = GetClient()->GetNick();
         for (u_int a = 0; a < m_vMessages.size(); a++) {
-            NoString sWhom = m_vMessages[a].Token(1, false, ":");
-            NoString sMessage = m_vMessages[a].Token(2, true, ":");
+            NoString sWhom = m_vMessages[a].Token(1, ":");
+            NoString sMessage = m_vMessages[a].Tokens(2, ":");
             PutUser(":" + sWhom + " PRIVMSG " + nick + " :" + sMessage);
         }
     }
@@ -140,9 +140,9 @@ class NoAway : public NoModule
     {
         std::map<NoString, std::vector<NoString>> msvOutput;
         for (u_int a = 0; a < m_vMessages.size(); a++) {
-            NoString sTime = m_vMessages[a].Token(0, false);
-            NoString sWhom = m_vMessages[a].Token(1, false);
-            NoString sMessage = m_vMessages[a].Token(2, true);
+            NoString sTime = m_vMessages[a].Token(0);
+            NoString sWhom = m_vMessages[a].Token(1);
+            NoString sMessage = m_vMessages[a].Tokens(2);
 
             if ((sTime.empty()) || (sWhom.empty()) || (sMessage.empty())) {
                 // illegal format
@@ -248,10 +248,10 @@ public:
         }
         if (sMyArgs.Token(uIndex) == "-notimer") {
             SetAwayTime(0);
-            sMyArgs = sMyArgs.Token(uIndex + 1, true);
+            sMyArgs = sMyArgs.Tokens(uIndex + 1);
         } else if (sMyArgs.Token(uIndex) == "-timer") {
             SetAwayTime(sMyArgs.Token(uIndex + 1).ToInt());
-            sMyArgs = sMyArgs.Token(uIndex + 2, true);
+            sMyArgs = sMyArgs.Tokens(uIndex + 2);
         }
         if (m_saveMessages) {
             if (!sMyArgs.empty()) {

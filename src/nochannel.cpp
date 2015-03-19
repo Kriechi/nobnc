@@ -256,7 +256,7 @@ void NoChannel::onWho(const NoString& sNick, const NoString& sIdent, const NoStr
 void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
 {
     NoString sModeArg = sModes.Token(0);
-    NoString sArgs = sModes.Token(1, true);
+    NoString sArgs = sModes.Tokens(1);
     bool bAdd = true;
 
     /* Try to find a NoNick* from this channel so that pOpNick->HasPerm()
@@ -456,11 +456,11 @@ bool NoChannel::addNick(const NoString& sNick)
     sTmp = p;
 
     // The UHNames extension gets us nick!ident@host instead of just plain nick
-    sIdent = sTmp.Token(1, true, "!");
-    sHost = sIdent.Token(1, true, "@");
-    sIdent = sIdent.Token(0, false, "@");
+    sIdent = sTmp.Tokens(1, "!");
+    sHost = sIdent.Tokens(1, "@");
+    sIdent = sIdent.Token(0, "@");
     // Get the nick
-    sTmp = sTmp.Token(0, false, "!");
+    sTmp = sTmp.Token(0, "!");
 
     NoNick tmpNick(sTmp);
     NoNick* pNick = findNick(sTmp);

@@ -194,7 +194,7 @@ public:
 
     void HandleDelCommand(const NoString& sLine)
     {
-        uint id = sLine.Token(1, true).ToUInt();
+        uint id = sLine.Tokens(1).ToUInt();
         MNoStringSet::iterator it = m_PubKeys.find(GetUser()->GetUserName());
 
         if (it == m_PubKeys.end()) {

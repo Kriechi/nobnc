@@ -98,7 +98,7 @@ public:
 
     void OnBlockCommand(const NoString& sCommand)
     {
-        NoString sUser = sCommand.Token(1, true);
+        NoString sUser = sCommand.Tokens(1);
 
         if (sUser.empty()) {
             PutModule("Usage: Block <user>");
@@ -118,7 +118,7 @@ public:
 
     void OnUnblockCommand(const NoString& sCommand)
     {
-        NoString sUser = sCommand.Token(1, true);
+        NoString sUser = sCommand.Tokens(1);
 
         if (sUser.empty()) {
             PutModule("Usage: Unblock <user>");

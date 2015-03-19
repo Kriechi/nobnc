@@ -111,7 +111,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sPatterns = sLine.Token(1, true);
+        NoString sPatterns = sLine.Tokens(1);
 
         if (sPatterns.empty()) {
             PutStatus("Usage: Detach <#chans>");
@@ -253,7 +253,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (m_pUser->IsAdmin() && sCommand.Equals("SetMOTD")) {
-        NoString sMessage = sLine.Token(1, true);
+        NoString sMessage = sLine.Tokens(1);
 
         if (sMessage.empty()) {
             PutStatus("Usage: SetMOTD <message>");
@@ -262,7 +262,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("MOTD set to [" + sMessage + "]");
         }
     } else if (m_pUser->IsAdmin() && sCommand.Equals("AddMOTD")) {
-        NoString sMessage = sLine.Token(1, true);
+        NoString sMessage = sLine.Tokens(1);
 
         if (sMessage.empty()) {
             PutStatus("Usage: AddMOTD <message>");
@@ -274,15 +274,15 @@ void NoClient::UserCommand(NoString& sLine)
         NoApp::Get().ClearMotd();
         PutStatus("Cleared MOTD");
     } else if (m_pUser->IsAdmin() && sCommand.Equals("BROADCAST")) {
-        NoApp::Get().Broadcast(sLine.Token(1, true));
+        NoApp::Get().Broadcast(sLine.Tokens(1));
     } else if (m_pUser->IsAdmin() && (sCommand.Equals("SHUTDOWN") || sCommand.Equals("RESTART"))) {
         bool bRestart = sCommand.Equals("RESTART");
-        NoString sMessage = sLine.Token(1, true);
+        NoString sMessage = sLine.Tokens(1);
         bool bForce = false;
 
         if (sMessage.Token(0).Equals("FORCE")) {
             bForce = true;
-            sMessage = sMessage.Token(1, true);
+            sMessage = sMessage.Tokens(1);
         }
 
         if (sMessage.empty()) {
@@ -307,7 +307,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sArgs = sLine.Token(1, true);
+        NoString sArgs = sLine.Tokens(1);
         sArgs.Trim();
         NoServer* pServer = nullptr;
 
@@ -349,7 +349,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (GetIRCSock()) {
-            NoString sQuitMsg = sLine.Token(1, true);
+            NoString sQuitMsg = sLine.Tokens(1);
             GetIRCSock()->Quit(sQuitMsg);
         }
 
@@ -362,7 +362,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sPatterns = sLine.Token(1, true);
+        NoString sPatterns = sLine.Tokens(1);
 
         if (sPatterns.empty()) {
             PutStatus("Usage: EnableChan <#chans>");
@@ -392,7 +392,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sPatterns = sLine.Token(1, true);
+        NoString sPatterns = sLine.Tokens(1);
 
         if (sPatterns.empty()) {
             PutStatus("Usage: DisableChan <#chans>");
@@ -422,7 +422,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sChan = sLine.Token(1, true);
+        NoString sChan = sLine.Tokens(1);
         if (sChan.empty()) {
             PutStatus("Usage: ShowChan <#chan>");
             return;
@@ -738,7 +738,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (m_pNetwork->AddServer(sLine.Token(1, true))) {
+        if (m_pNetwork->AddServer(sLine.Tokens(1))) {
             PutStatus("Server added");
         } else {
             PutStatus("Unable to add that server");
@@ -988,7 +988,7 @@ void NoClient::UserCommand(NoString& sLine)
         NoModInfo::EModuleType eType;
         NoString sType = sLine.Token(1);
         NoString sMod = sLine.Token(2);
-        NoString sArgs = sLine.Token(3, true);
+        NoString sArgs = sLine.Tokens(3);
 
         // TODO use proper library for parsing arguments
         if (sType.Equals("--type=global")) {
@@ -999,7 +999,7 @@ void NoClient::UserCommand(NoString& sLine)
             eType = NoModInfo::NetworkModule;
         } else {
             sMod = sType;
-            sArgs = sLine.Token(2, true);
+            sArgs = sLine.Tokens(2);
             sType = "default";
             // Will be set correctly later
             eType = NoModInfo::UserModule;
@@ -1127,7 +1127,7 @@ void NoClient::UserCommand(NoString& sLine)
         NoModInfo::EModuleType eType;
         NoString sType = sLine.Token(1);
         NoString sMod = sLine.Token(2);
-        NoString sArgs = sLine.Token(3, true);
+        NoString sArgs = sLine.Tokens(3);
 
         if (m_pUser->DenyLoadMod()) {
             PutStatus("Unable to reload modules. Access Denied.");
@@ -1143,7 +1143,7 @@ void NoClient::UserCommand(NoString& sLine)
             eType = NoModInfo::NetworkModule;
         } else {
             sMod = sType;
-            sArgs = sLine.Token(2, true);
+            sArgs = sLine.Tokens(2);
             sType = "default";
             // Will be set correctly later
             eType = NoModInfo::UserModule;

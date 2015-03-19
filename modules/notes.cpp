@@ -25,7 +25,7 @@ class NoNotesMod : public NoModule
     void AddNoteCommand(const NoString& sLine)
     {
         NoString sKey(sLine.Token(1));
-        NoString sValue(sLine.Token(2, true));
+        NoString sValue(sLine.Tokens(2));
 
         if (!GetNV(sKey).empty()) {
             PutModule("That note already exists.  Use MOD <key> <note> to overwrite.");
@@ -39,7 +39,7 @@ class NoNotesMod : public NoModule
     void ModCommand(const NoString& sLine)
     {
         NoString sKey(sLine.Token(1));
-        NoString sValue(sLine.Token(2, true));
+        NoString sValue(sLine.Tokens(2));
 
         if (AddNote(sKey, sValue)) {
             PutModule("Set note for [" + sKey + "]");
@@ -50,7 +50,7 @@ class NoNotesMod : public NoModule
 
     void GetCommand(const NoString& sLine)
     {
-        NoString sNote = GetNV(sLine.Token(1, true));
+        NoString sNote = GetNV(sLine.Tokens(1));
 
         if (sNote.empty()) {
             PutModule("This note doesn't exist.");
@@ -126,7 +126,7 @@ public:
             sKey = sLine.Token(0).LeftChomp_n(1);
         }
 
-        NoString sValue(sLine.Token(1, true));
+        NoString sValue(sLine.Tokens(1));
 
         if (!sKey.empty()) {
             if (!bOverwrite && FindNV(sKey) != EndNV()) {

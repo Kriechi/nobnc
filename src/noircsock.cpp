@@ -155,7 +155,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
         NoString sServer = sLine.Token(0).LeftChomp_n(1);
         uint uRaw = sCmd.ToUInt();
         NoString sNick = sLine.Token(2);
-        NoString sRest = sLine.Token(3, true);
+        NoString sRest = sLine.Tokens(3);
         NoString sTmp;
 
         switch (uRaw) {
@@ -206,7 +206,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
         case 10: { // :irc.server.com 010 nick <hostname> <port> :<info>
             NoString sHost = sRest.Token(0);
             NoString sPort = sRest.Token(1);
-            NoString sInfo = sRest.Token(2, true).TrimPrefix_n();
+            NoString sInfo = sRest.Tokens(2).TrimPrefix_n();
             m_pNetwork->PutStatus("Server [" + m_pNetwork->GetCurrentServer()->GetString(false) +
                                   "] redirects us to [" + sHost + ":" + sPort + "] with reason [" + sInfo + "]");
             m_pNetwork->PutStatus("Perhaps you want to add it as a new server.");
@@ -237,7 +237,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             NoChannel* pChan = m_pNetwork->FindChan(sRest.Token(0));
 
             if (pChan) {
-                pChan->setModes(sRest.Token(1, true));
+                pChan->setModes(sRest.Tokens(1));
 
                 // We don't SetModeKnown(true) here,
                 // because a 329 will follow
@@ -290,7 +290,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             NoChannel* pChan = m_pNetwork->FindChan(sLine.Token(3));
 
             if (pChan) {
-                NoString sTopic = sLine.Token(4, true);
+                NoString sTopic = sLine.Tokens(4);
                 sTopic.LeftChomp(1);
                 pChan->setTopic(sTopic);
                 if (pChan->isDetached()) {
@@ -359,7 +359,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
                             sNewNick = sNick[0] + sNick.substr(pos);
                         }
                         NoString sNewLine = sServer + " 352 " + sLine.Token(2) + " " + sChan + " " + sIdent + " " +
-                                           sHost + " " + sLine.Token(6) + " " + sNewNick + " " + sLine.Token(8, true);
+                                           sHost + " " + sLine.Token(6) + " " + sNewNick + " " + sLine.Tokens(8);
                         m_pNetwork->PutUser(sNewLine, pClient);
                     }
                 }
@@ -381,7 +381,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             // If we don't know that channel, some client might have
             // requested a /names for it and we really should forward this.
             if (pChan) {
-                NoString sNicks = sRest.Token(2, true).TrimPrefix_n();
+                NoString sNicks = sRest.Tokens(2).TrimPrefix_n();
                 pChan->addNicks(sNicks);
                 if (pChan->isDetached()) {
                     return;
@@ -482,7 +482,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
     } else {
         NoNick Nick(sLine.Token(0).TrimPrefix_n());
         sCmd = sLine.Token(1);
-        NoString sRest = sLine.Token(2, true);
+        NoString sRest = sLine.Tokens(2);
 
         if (sCmd.Equals("NICK")) {
             NoString sNewNick = sRest.TrimPrefix_n();
@@ -571,7 +571,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             }
         } else if (sCmd.Equals("PART")) {
             NoString sChan = sRest.Token(0).TrimPrefix_n();
-            NoString sMsg = sRest.Token(1, true).TrimPrefix_n();
+            NoString sMsg = sRest.Tokens(1).TrimPrefix_n();
 
             NoChannel* pChan = m_pNetwork->FindChan(sChan);
             bool bDetached = false;
@@ -597,7 +597,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             }
         } else if (sCmd.Equals("MODE")) {
             NoString sTarget = sRest.Token(0);
-            NoString sModes = sRest.Token(1, true);
+            NoString sModes = sRest.Tokens(1);
             if (sModes.Left(1) == ":") sModes = sModes.substr(1);
 
             NoChannel* pChan = m_pNetwork->FindChan(sTarget);
@@ -634,7 +634,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             // :opnick!ident@host.com KICK #chan nick :msg
             NoString sChan = sRest.Token(0);
             NoString sKickedNick = sRest.Token(1);
-            NoString sMsg = sRest.Token(2, true);
+            NoString sMsg = sRest.Tokens(2);
             sMsg.LeftChomp(1);
 
             NoChannel* pChan = m_pNetwork->FindChan(sChan);
@@ -659,7 +659,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
         } else if (sCmd.Equals("NOTICE")) {
             // :nick!ident@host.com NOTICE #chan :Message
             NoString sTarget = sRest.Token(0);
-            NoString sMsg = sRest.Token(1, true);
+            NoString sMsg = sRest.Tokens(1);
             sMsg.LeftChomp(1);
 
             if (sMsg.WildCmp("\001*\001")) {
@@ -698,7 +698,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             NoChannel* pChan = m_pNetwork->FindChan(sLine.Token(2));
 
             if (pChan) {
-                NoString sTopic = sLine.Token(3, true);
+                NoString sTopic = sLine.Tokens(3);
                 sTopic.LeftChomp(1);
 
                 IRCSOCKMODULECALL(OnTopic(Nick, *pChan, sTopic), &bReturn);
@@ -717,7 +717,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
         } else if (sCmd.Equals("PRIVMSG")) {
             // :nick!ident@host.com PRIVMSG #chan :Message
             NoString sTarget = sRest.Token(0);
-            NoString sMsg = sRest.Token(1, true).TrimPrefix_n();
+            NoString sMsg = sRest.Tokens(1).TrimPrefix_n();
 
             if (sMsg.WildCmp("\001*\001")) {
                 sMsg.LeftChomp(1);
@@ -751,7 +751,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
             }
         } else if (sCmd.Equals("WALLOPS")) {
             // :blub!dummy@rox-8DBEFE92 WALLOPS :this is a test
-            NoString sMsg = sRest.Token(0, true).TrimPrefix_n();
+            NoString sMsg = sRest.Tokens(0).TrimPrefix_n();
 
             if (!m_pNetwork->IsUserOnline()) {
                 m_pNetwork->AddNoticeBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " WALLOPS :{text}", sMsg);
@@ -777,9 +777,9 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
                 // of this reply.
                 NoString sArgs;
                 if (sRest.Token(2) == "*") {
-                    sArgs = sRest.Token(3, true).TrimPrefix_n();
+                    sArgs = sRest.Tokens(3).TrimPrefix_n();
                 } else {
-                    sArgs = sRest.Token(2, true).TrimPrefix_n();
+                    sArgs = sRest.Tokens(2).TrimPrefix_n();
                 }
 
                 if (sSubCmd == "LS") {
@@ -902,7 +902,7 @@ bool NoIrcSock::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
         if (sQuery == "VERSION") {
             sReply = NoApp::GetTag(false);
         } else if (sQuery == "PING") {
-            sReply = sMessage.Token(1, true);
+            sReply = sMessage.Tokens(1);
         }
     }
 
@@ -1194,8 +1194,8 @@ void NoIrcSock::ParseISupport(const NoString& sLine)
     NoStringVector vsTokens = sLine.Split(" ", No::SkipEmptyParts);
 
     for (const NoString& sToken : vsTokens) {
-        NoString sName = sToken.Token(0, false, "=");
-        NoString sValue = sToken.Token(1, true, "=");
+        NoString sName = sToken.Token(0, "=");
+        NoString sValue = sToken.Tokens(1, "=");
 
         if (0 < sName.length() && ':' == sName[0]) {
             break;
@@ -1204,8 +1204,8 @@ void NoIrcSock::ParseISupport(const NoString& sLine)
         m_mISupport[sName] = sValue;
 
         if (sName.Equals("PREFIX")) {
-            NoString sPrefixes = sValue.Token(1, false, ")");
-            NoString sPermModes = sValue.Token(0, false, ")");
+            NoString sPrefixes = sValue.Token(1, ")");
+            NoString sPermModes = sValue.Token(0, ")");
             sPermModes.TrimLeft("(");
 
             if (!sPrefixes.empty() && sPermModes.size() == sPrefixes.size()) {
@@ -1225,7 +1225,7 @@ void NoIrcSock::ParseISupport(const NoString& sLine)
                 m_mueChanModes.clear();
 
                 for (uint a = 0; a < 4; a++) {
-                    NoString sModes = sValue.Token(a, false, ",");
+                    NoString sModes = sValue.Token(a, ",");
 
                     for (uint b = 0; b < sModes.size(); b++) {
                         m_mueChanModes[sModes[b]] = (EChanModeArgs)a;
@@ -1265,14 +1265,14 @@ void NoIrcSock::ForwardRaw353(const NoString& sLine) const
 
 void NoIrcSock::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
 {
-    NoString sNicks = sLine.Token(5, true).TrimPrefix_n();
+    NoString sNicks = sLine.Tokens(5).TrimPrefix_n();
 
     if ((!m_bNamesx || pClient->HasNamesx()) && (!m_bUHNames || pClient->HasUHNames())) {
         // Client and server have both the same UHNames and Namesx stuff enabled
         m_pNetwork->PutUser(sLine, pClient);
     } else {
         // Get everything except the actual user list
-        NoString sTmp = sLine.Token(0, false, " :") + " :";
+        NoString sTmp = sLine.Token(0, " :") + " :";
 
         // This loop runs once for every nick on the channel
         NoStringVector vsNicks = sNicks.Split(" ", No::SkipEmptyParts);
@@ -1290,7 +1290,7 @@ void NoIrcSock::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
             if (m_bUHNames && !pClient->HasUHNames()) {
                 // Server has, client hasnt UHNAMES,
                 // so we strip away ident and host.
-                sNick = sNick.Token(0, false, "!");
+                sNick = sNick.Token(0, "!");
             }
 
             sTmp += sNick + " ";

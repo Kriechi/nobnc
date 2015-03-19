@@ -82,10 +82,10 @@ public:
         NoString sFirstArg = sArgs.Token(0);
         if (sFirstArg.Equals("-notimer")) {
             SetAwayWait(0);
-            sReasonArg = sArgs.Token(1, true);
+            sReasonArg = sArgs.Tokens(1);
         } else if (sFirstArg.Equals("-timer")) {
             SetAwayWait(sArgs.Token(1).ToUInt());
-            sReasonArg = sArgs.Token(2, true);
+            sReasonArg = sArgs.Tokens(2);
         } else {
             NoString sAwayWait = GetNV("awaywait");
             if (!sAwayWait.empty()) SetAwayWait(sAwayWait.ToUInt(), false);
@@ -124,7 +124,7 @@ public:
 
     void OnReasonCommand(const NoString& sLine)
     {
-        NoString sReason = sLine.Token(1, true);
+        NoString sReason = sLine.Tokens(1);
 
         if (!sReason.empty()) {
             SetReason(sReason);
@@ -161,7 +161,7 @@ public:
         if (!sLine.Token(0).Equals("AWAY")) return CONTINUE;
 
         // If a client set us away, we don't touch that away message
-        const NoString sArg = sLine.Token(1, true).Trim_n(" ");
+        const NoString sArg = sLine.Tokens(1).Trim_n(" ");
         if (sArg.empty() || sArg == ":")
             m_bClientSetAway = false;
         else

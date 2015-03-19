@@ -268,36 +268,12 @@ uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const No
     return uRet;
 }
 
-NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight)
-{
-    NoStringVector vsTokens = Split_helper(str, sSep, No::SkipEmptyParts, sLeft, sRight, false);
-    if (vsTokens.size() > uPos) {
-        NoString sRet;
-
-        for (size_t a = uPos; a < vsTokens.size(); a++) {
-            if (a > uPos) {
-                sRet += sSep;
-            }
-
-            sRet += vsTokens[a];
-
-            if (!bRest) {
-                break;
-            }
-        }
-
-        return sRet;
-    }
-
-    return str.Token(uPos, bRest, sSep);
-}
-
-NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep) const
+static NoString Token_impl(const NoString& s, size_t uPos, bool bRest, const NoString& sSep)
 {
     const char* sep_str = sSep.c_str();
     size_t sep_len = sSep.length();
-    const char* str = c_str();
-    size_t str_len = length();
+    const char* str = s.c_str();
+    size_t str_len = s.length();
     size_t start_pos = 0;
     size_t end_pos;
 
@@ -326,19 +302,53 @@ NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep) const
 
     // If they want everything from here on, give it to them
     if (bRest) {
-        return substr(start_pos);
+        return s.substr(start_pos);
     }
 
     // Now look for the end of the token they want
     end_pos = start_pos;
     while (end_pos < str_len) {
-        if (strncmp(&str[end_pos], sep_str, sep_len) == 0) return substr(start_pos, end_pos - start_pos);
+        if (strncmp(&str[end_pos], sep_str, sep_len) == 0) return s.substr(start_pos, end_pos - start_pos);
 
         end_pos++;
     }
 
     // They want the last token in the string, not something in between
-    return substr(start_pos);
+    return s.substr(start_pos);
+}
+
+NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight)
+{
+    NoStringVector vsTokens = Split_helper(str, sSep, No::SkipEmptyParts, sLeft, sRight, false);
+    if (vsTokens.size() > uPos) {
+        NoString sRet;
+
+        for (size_t a = uPos; a < vsTokens.size(); a++) {
+            if (a > uPos) {
+                sRet += sSep;
+            }
+
+            sRet += vsTokens[a];
+
+            if (!bRest) {
+                break;
+            }
+        }
+
+        return sRet;
+    }
+
+    return Token_impl(str, uPos, bRest, sSep);
+}
+
+NoString NoString::Token(size_t uPos, const NoString& sSep) const
+{
+    return Token_impl(*this, uPos, false, sSep);
+}
+
+NoString NoString::Tokens(size_t uPos, const NoString& sSep) const
+{
+    return Token_impl(*this, uPos, true, sSep);
 }
 
 NoString NoString::Left(size_type uCount) const

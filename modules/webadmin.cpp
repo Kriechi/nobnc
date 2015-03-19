@@ -108,7 +108,7 @@ public:
 
         while (sArgs.Left(1) == "-") {
             NoString sOpt = sArgs.Token(0);
-            sArgs = sArgs.Token(1, true);
+            sArgs = sArgs.Tokens(1);
 
             if (sOpt.Equals("-IPV6")) {
                 bIPv6 = true;
@@ -129,7 +129,7 @@ public:
 
         if (sArgs.find(" ") != NoString::npos) {
             sListenHost = sArgs.Token(0);
-            sPort = sArgs.Token(1, true);
+            sPort = sArgs.Tokens(1);
         } else {
             sPort = sArgs;
         }
@@ -214,7 +214,7 @@ public:
         vsArgs = WebSock.GetRawParam("ctcpreplies").Split("\n");
         for (a = 0; a < vsArgs.size(); a++) {
             NoString sReply = vsArgs[a].TrimRight_n("\r");
-            pNewUser->AddCTCPReply(sReply.Token(0).Trim_n(), sReply.Token(1, true).Trim_n());
+            pNewUser->AddCTCPReply(sReply.Token(0).Trim_n(), sReply.Tokens(1).Trim_n());
         }
 
         sArg = WebSock.GetParam("nick");

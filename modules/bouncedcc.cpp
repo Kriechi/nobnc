@@ -149,7 +149,7 @@ public:
 
     void UseClientIPCommand(const NoString& sLine)
     {
-        NoString sValue = sLine.Token(1, true);
+        NoString sValue = sLine.Tokens(1);
 
         if (!sValue.empty()) {
             SetNV("UseClientIP", sValue);

@@ -78,7 +78,7 @@ public:
 private:
     void HandleAdd(const NoString& sLine)
     {
-        NoString sMsg = sLine.Token(1, true);
+        NoString sMsg = sLine.Tokens(1);
         bool bHelp = false;
         bool bNegated = sMsg.TrimPrefix("!");
         NoString sChan = sMsg.Token(0);
@@ -90,7 +90,7 @@ private:
         } else if (Add(bNegated, sChan, sSearch, sHost)) {
             PutModule("Added to list");
         } else {
-            PutModule(sLine.Token(1, true) + " is already added");
+            PutModule(sLine.Tokens(1) + " is already added");
             bHelp = true;
         }
         if (bHelp) {
@@ -101,7 +101,7 @@ private:
 
     void HandleDel(const NoString& sLine)
     {
-        NoString sMsg = sLine.Token(1, true);
+        NoString sMsg = sLine.Tokens(1);
         bool bNegated = sMsg.TrimPrefix("!");
         NoString sChan = sMsg.Token(0);
         NoString sSearch = sMsg.Token(1);
@@ -161,7 +161,7 @@ public:
             bool bNegated = sAdd.TrimPrefix("!");
             NoString sChan = sAdd.Token(0);
             NoString sSearch = sAdd.Token(1);
-            NoString sHost = sAdd.Token(2, true);
+            NoString sHost = sAdd.Tokens(2);
 
             if (!Add(bNegated, sChan, sSearch, sHost)) {
                 PutModule("Unable to add [" + *it + "]");
@@ -175,7 +175,7 @@ public:
             bool bNegated = sAdd.TrimPrefix("!");
             NoString sChan = sAdd.Token(0);
             NoString sSearch = sAdd.Token(1);
-            NoString sHost = sAdd.Token(2, true);
+            NoString sHost = sAdd.Tokens(2);
 
             Add(bNegated, sChan, sSearch, sHost);
         }

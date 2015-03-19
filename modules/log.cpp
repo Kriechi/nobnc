@@ -114,7 +114,7 @@ private:
 
 void NoLogMod::SetRulesCmd(const NoString& sLine)
 {
-    NoStringVector vsRules = SplitRules(sLine.Token(1, true));
+    NoStringVector vsRules = SplitRules(sLine.Tokens(1));
 
     if (vsRules.empty()) {
         PutModule("Usage: SetRules <rules>");

@@ -67,8 +67,8 @@ class NoAdminMod : public NoModule
         static const char* integer = "Integer";
         static const char* doublenum = "Double";
 
-        const NoString sCmdFilter = sLine.Token(1, false);
-        const NoString sVarFilter = sLine.Token(2, true).AsLower();
+        const NoString sCmdFilter = sLine.Token(1);
+        const NoString sVarFilter = sLine.Tokens(2).AsLower();
 
         if (sCmdFilter.empty() || sCmdFilter.StartsWith("Set") || sCmdFilter.StartsWith("Get")) {
             static const char* vars[][2] = {
@@ -180,7 +180,7 @@ class NoAdminMod : public NoModule
     void Get(const NoString& sLine)
     {
         const NoString sVar = sLine.Token(1).AsLower();
-        NoString sUsername = sLine.Token(2, true);
+        NoString sUsername = sLine.Tokens(2);
         NoUser* pUser;
 
         if (sVar.empty()) {
@@ -259,7 +259,7 @@ class NoAdminMod : public NoModule
     {
         const NoString sVar = sLine.Token(1).AsLower();
         NoString sUserName = sLine.Token(2);
-        NoString sValue = sLine.Token(3, true);
+        NoString sValue = sLine.Tokens(3);
 
         if (sValue.empty()) {
             PutModule("Usage: Set <variable> <username> <value>");
@@ -489,7 +489,7 @@ class NoAdminMod : public NoModule
         const NoString sVar = sLine.Token(1).AsLower();
         const NoString sUsername = sLine.Token(2);
         const NoString sNetwork = sLine.Token(3);
-        const NoString sValue = sLine.Token(4, true);
+        const NoString sValue = sLine.Tokens(4);
 
         NoUser* pUser = nullptr;
         NoNetwork* pNetwork = nullptr;
@@ -652,7 +652,7 @@ class NoAdminMod : public NoModule
         const NoString sVar = sLine.Token(1).AsLower();
         NoString sUsername = sLine.Token(2);
         NoString sNetwork = sLine.Token(3);
-        NoString sChan = sLine.Token(4, true);
+        NoString sChan = sLine.Tokens(4);
 
         if (sChan.empty()) {
             PutModule("Usage: GetChan <variable> <username> <network> <chan>");
@@ -710,7 +710,7 @@ class NoAdminMod : public NoModule
         NoString sUsername = sLine.Token(2);
         NoString sNetwork = sLine.Token(3);
         NoString sChan = sLine.Token(4);
-        NoString sValue = sLine.Token(5, true);
+        NoString sValue = sLine.Tokens(5);
 
         if (sValue.empty()) {
             PutModule("Usage: SetChan <variable> <username> <network> <chan> <value>");
@@ -846,7 +846,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sUsername = sLine.Token(1, true);
+        const NoString sUsername = sLine.Tokens(1);
         if (sUsername.empty()) {
             PutModule("Usage: DelUser <username>");
             return;
@@ -881,7 +881,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sOldUsername = sLine.Token(1), sNewUsername = sLine.Token(2, true);
+        const NoString sOldUsername = sLine.Token(1), sNewUsername = sLine.Tokens(2);
 
         if (sOldUsername.empty() || sNewUsername.empty()) {
             PutModule("Usage: CloneUser <old username> <new username>");
@@ -1034,7 +1034,7 @@ class NoAdminMod : public NoModule
     {
         NoString sUsername = sLine.Token(1);
         NoString sNetwork = sLine.Token(2);
-        NoString sServer = sLine.Token(3, true);
+        NoString sServer = sLine.Tokens(3);
 
         if (sServer.empty()) {
             PutModule("Usage: AddServer <username> <network> <server>");
@@ -1060,7 +1060,7 @@ class NoAdminMod : public NoModule
     {
         NoString sUsername = sLine.Token(1);
         NoString sNetwork = sLine.Token(2);
-        NoString sServer = sLine.Token(3, true);
+        NoString sServer = sLine.Tokens(3);
         ushort uPort = sLine.Token(4).ToUShort();
         NoString sPass = sLine.Token(5);
 
@@ -1148,7 +1148,7 @@ class NoAdminMod : public NoModule
 
     void ListCTCP(const NoString& sLine)
     {
-        NoString sUserName = sLine.Token(1, true);
+        NoString sUserName = sLine.Tokens(1);
 
         if (sUserName.empty()) {
             sUserName = GetUser()->GetUserName();
@@ -1178,11 +1178,11 @@ class NoAdminMod : public NoModule
     {
         NoString sUserName = sLine.Token(1);
         NoString sCTCPRequest = sLine.Token(2);
-        NoString sCTCPReply = sLine.Token(3, true);
+        NoString sCTCPReply = sLine.Tokens(3);
 
         if (sCTCPRequest.empty()) {
             sCTCPRequest = sUserName;
-            sCTCPReply = sLine.Token(2, true);
+            sCTCPReply = sLine.Tokens(2);
             sUserName = GetUser()->GetUserName();
         }
         if (sCTCPRequest.empty()) {
@@ -1204,7 +1204,7 @@ class NoAdminMod : public NoModule
     void DelCTCP(const NoString& sLine)
     {
         NoString sUserName = sLine.Token(1);
-        NoString sCTCPRequest = sLine.Token(2, true);
+        NoString sCTCPRequest = sLine.Tokens(2);
 
         if (sCTCPRequest.empty()) {
             sCTCPRequest = sUserName;
@@ -1254,7 +1254,7 @@ class NoAdminMod : public NoModule
     {
         NoString sUsername = sLine.Token(1);
         NoString sModName = sLine.Token(2);
-        NoString sArgs = sLine.Token(3, true);
+        NoString sArgs = sLine.Tokens(3);
 
         if (sModName.empty()) {
             PutModule("Usage: LoadModule <username> <modulename> [args]");
@@ -1272,7 +1272,7 @@ class NoAdminMod : public NoModule
         NoString sUsername = sLine.Token(1);
         NoString sNetwork = sLine.Token(2);
         NoString sModName = sLine.Token(3);
-        NoString sArgs = sLine.Token(4, true);
+        NoString sArgs = sLine.Tokens(4);
 
         if (sModName.empty()) {
             PutModule("Usage: LoadNetModule <username> <network> <modulename> [args]");

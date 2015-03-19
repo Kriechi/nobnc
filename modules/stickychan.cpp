@@ -198,7 +198,7 @@ bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
 
     for (it = vsChans.begin(); it != vsChans.end(); ++it) {
         NoString sChan = it->Token(0);
-        NoString sKey = it->Token(1, true);
+        NoString sKey = it->Tokens(1);
         SetNV(sChan, sKey);
     }
 

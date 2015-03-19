@@ -143,7 +143,7 @@ public:
     void OnSetKeyCommand(const NoString& sCommand)
     {
         NoString sTarget = sCommand.Token(1);
-        NoString sKey = sCommand.Token(2, true);
+        NoString sKey = sCommand.Tokens(2);
 
         // Strip "cbc:" from beginning of string incase someone pastes directly from mircryption
         sKey.TrimPrefix("cbc:");
