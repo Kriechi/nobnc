@@ -78,27 +78,27 @@ public:
      */
     void ResumeCap();
 
-    void SetPass(const NoString& s) { m_sPass = s; }
+    void SetPass(const NoString& s);
 
-    uint GetMaxNickLen() const { return m_uMaxNickLen; }
+    uint GetMaxNickLen() const;
     EChanModeArgs GetModeType(uchar uMode) const;
     uchar GetPermFromMode(uchar uMode) const;
-    const std::map<uchar, EChanModeArgs>& GetChanModes() const { return m_mueChanModes; }
-    bool IsPermChar(const char c) const { return (c != '\0' && GetPerms().find(c) != NoString::npos); }
-    bool IsPermMode(const char c) const { return (c != '\0' && GetPermModes().find(c) != NoString::npos); }
-    const NoString& GetPerms() const { return m_sPerms; }
-    const NoString& GetPermModes() const { return m_sPermModes; }
-    NoString GetNickMask() const { return m_Nick.nickMask(); }
-    NoString GetNick() const { return m_Nick.nick(); }
-    const NoString& GetPass() const { return m_sPass; }
-    NoNetwork* GetNetwork() const { return m_pNetwork; }
-    bool HasNamesx() const { return m_bNamesx; }
-    bool HasUHNames() const { return m_bUHNames; }
-    const std::set<uchar>& GetUserModes() const { return m_scUserModes; }
+    const std::map<uchar, EChanModeArgs>& GetChanModes() const;
+    bool IsPermChar(const char c) const;
+    bool IsPermMode(const char c) const;
+    const NoString& GetPerms() const;
+    const NoString& GetPermModes() const;
+    NoString GetNickMask() const;
+    NoString GetNick() const;
+    const NoString& GetPass() const;
+    NoNetwork* GetNetwork() const;
+    bool HasNamesx() const;
+    bool HasUHNames() const;
+    const std::set<uchar>& GetUserModes() const;
     // This is true if we are past raw 001
-    bool IsAuthed() const { return m_bAuthed; }
-    bool IsCapAccepted(const NoString& sCap) { return 1 == m_ssAcceptedCaps.count(sCap); }
-    const NoStringMap& GetISupport() const { return m_mISupport; }
+    bool IsAuthed() const;
+    bool IsCapAccepted(const NoString& sCap);
+    const NoStringMap& GetISupport() const;
     NoString GetISupport(const NoString& sKey, const NoString& sDefault = "") const;
 
     // This handles NAMESX and UHNAMES in a raw 353 reply

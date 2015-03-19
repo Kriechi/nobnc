@@ -841,6 +841,10 @@ void NoIrcConnection::ResumeCap()
     SendNextCap();
 }
 
+void NoIrcConnection::SetPass(const NoString& s) { m_sPass = s; }
+
+uint NoIrcConnection::GetMaxNickLen() const { return m_uMaxNickLen; }
+
 bool NoIrcConnection::OnServerCapAvailable(const NoString& sCap)
 {
     bool bResult = false;
@@ -1365,6 +1369,36 @@ uchar NoIrcConnection::GetPermFromMode(uchar uMode) const
 
     return 0;
 }
+
+const std::map<uchar, NoIrcConnection::EChanModeArgs>&NoIrcConnection::GetChanModes() const { return m_mueChanModes; }
+
+bool NoIrcConnection::IsPermChar(const char c) const { return (c != '\0' && GetPerms().find(c) != NoString::npos); }
+
+bool NoIrcConnection::IsPermMode(const char c) const { return (c != '\0' && GetPermModes().find(c) != NoString::npos); }
+
+const NoString&NoIrcConnection::GetPerms() const { return m_sPerms; }
+
+const NoString&NoIrcConnection::GetPermModes() const { return m_sPermModes; }
+
+NoString NoIrcConnection::GetNickMask() const { return m_Nick.nickMask(); }
+
+NoString NoIrcConnection::GetNick() const { return m_Nick.nick(); }
+
+const NoString&NoIrcConnection::GetPass() const { return m_sPass; }
+
+NoNetwork*NoIrcConnection::GetNetwork() const { return m_pNetwork; }
+
+bool NoIrcConnection::HasNamesx() const { return m_bNamesx; }
+
+bool NoIrcConnection::HasUHNames() const { return m_bUHNames; }
+
+const std::set<uchar>&NoIrcConnection::GetUserModes() const { return m_scUserModes; }
+
+bool NoIrcConnection::IsAuthed() const { return m_bAuthed; }
+
+bool NoIrcConnection::IsCapAccepted(const NoString& sCap) { return 1 == m_ssAcceptedCaps.count(sCap); }
+
+const NoStringMap&NoIrcConnection::GetISupport() const { return m_mISupport; }
 
 NoIrcConnection::EChanModeArgs NoIrcConnection::GetModeType(uchar uMode) const
 {
