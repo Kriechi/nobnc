@@ -49,6 +49,125 @@ NoSettingsEntry& NoSettingsEntry::operator=(const NoSettingsEntry& other)
     return *this;
 }
 
+NoSettings::NoSettings() : m_ConfigEntries(), m_SubConfigs() {}
+
+NoSettings::EntryMapIterator NoSettings::BeginEntries() const { return m_ConfigEntries.begin(); }
+
+NoSettings::EntryMapIterator NoSettings::EndEntries() const { return m_ConfigEntries.end(); }
+
+NoSettings::SubConfigMapIterator NoSettings::BeginSubConfigs() const { return m_SubConfigs.begin(); }
+
+NoSettings::SubConfigMapIterator NoSettings::EndSubConfigs() const { return m_SubConfigs.end(); }
+
+void NoSettings::AddKeyValuePair(const NoString& sName, const NoString& sValue)
+{
+    if (sName.empty() || sValue.empty()) {
+        return;
+    }
+
+    m_ConfigEntries[sName].push_back(sValue);
+}
+
+bool NoSettings::AddSubConfig(const NoString& sTag, const NoString& sName, NoSettings Config)
+{
+    SubConfig& conf = m_SubConfigs[sTag];
+    SubConfig::const_iterator it = conf.find(sName);
+
+    if (it != conf.end()) {
+        return false;
+    }
+
+    conf[sName] = Config;
+    return true;
+}
+
+bool NoSettings::FindStringVector(const NoString& sName, NoStringVector& vsList, bool bErase)
+{
+    EntryMap::iterator it = m_ConfigEntries.find(sName);
+    vsList.clear();
+    if (it == m_ConfigEntries.end()) return false;
+    vsList = it->second;
+
+    if (bErase) {
+        m_ConfigEntries.erase(it);
+    }
+
+    return true;
+}
+
+bool NoSettings::FindStringEntry(const NoString& sName, NoString& sRes, const NoString& sDefault)
+{
+    EntryMap::iterator it = m_ConfigEntries.find(sName);
+    sRes = sDefault;
+    if (it == m_ConfigEntries.end() || it->second.empty()) return false;
+    sRes = it->second.front();
+    it->second.erase(it->second.begin());
+    if (it->second.empty()) m_ConfigEntries.erase(it);
+    return true;
+}
+
+bool NoSettings::FindBoolEntry(const NoString& sName, bool& bRes, bool bDefault)
+{
+    NoString s;
+    if (FindStringEntry(sName, s)) {
+        bRes = s.ToBool();
+        return true;
+    }
+    bRes = bDefault;
+    return false;
+}
+
+bool NoSettings::FindUIntEntry(const NoString& sName, uint& uRes, uint uDefault)
+{
+    NoString s;
+    if (FindStringEntry(sName, s)) {
+        uRes = s.ToUInt();
+        return true;
+    }
+    uRes = uDefault;
+    return false;
+}
+
+bool NoSettings::FindUShortEntry(const NoString& sName, ushort& uRes, ushort uDefault)
+{
+    NoString s;
+    if (FindStringEntry(sName, s)) {
+        uRes = s.ToUShort();
+        return true;
+    }
+    uRes = uDefault;
+    return false;
+}
+
+bool NoSettings::FindDoubleEntry(const NoString& sName, double& fRes, double fDefault)
+{
+    NoString s;
+    if (FindStringEntry(sName, s)) {
+        fRes = s.ToDouble();
+        return true;
+    }
+    fRes = fDefault;
+    return false;
+}
+
+bool NoSettings::FindSubConfig(const NoString& sName, NoSettings::SubConfig& Config, bool bErase)
+{
+    SubConfigMap::iterator it = m_SubConfigs.find(sName);
+    if (it == m_SubConfigs.end()) {
+        Config.clear();
+        return false;
+    }
+    Config = it->second;
+
+    if (bErase) {
+        m_SubConfigs.erase(it);
+    }
+
+    return true;
+}
+
+bool NoSettings::empty() const { return m_ConfigEntries.empty() && m_SubConfigs.empty(); }
+
 bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 {
     NoString sLine;
