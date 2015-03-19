@@ -338,12 +338,6 @@ public:
      */
     NoString Base64Encode_n(uint uWrap = 0) const;
 
-    /** Pretty-print a percent value.
-     * @param d The percent value. This should be in range 0-100.
-     * @return The "pretty" string.
-     */
-    static NoString ToPercent(double d);
-
     /** @return True if this string is not "false". */
     bool ToBool() const;
     /** @return The numerical value of this string similar to atoi(). */

@@ -99,6 +99,11 @@ public:
      * @return A string like "4w 6d 4h 3m 58s".
      */
     static NoString ToTimeStr(ulong s);
+    /** Pretty-print a percent value.
+     * @param d The percent value. This should be in range 0-100.
+     * @return The "pretty" string.
+     */
+    static NoString ToPercent(double d);
 
     /** Remove controls characters from the string.
      * Controls characters are color codes, and those in C0 set

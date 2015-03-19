@@ -1091,13 +1091,6 @@ ulong NoString::Base64Decode(NoString& sRet) const
     return uRet;
 }
 
-NoString NoString::ToPercent(double d)
-{
-    char szRet[32];
-    snprintf(szRet, 32, "%.02f%%", d);
-    return szRet;
-}
-
 bool NoString::ToBool() const
 {
     NoString sTrimmed = Trim_n();

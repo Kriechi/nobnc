@@ -223,7 +223,7 @@ public:
             if (pSock->IsListener()) {
                 Table.SetCell("State", "Waiting");
             } else {
-                Table.SetCell("State", NoString::ToPercent(pSock->GetProgress()));
+                Table.SetCell("State", NoUtils::ToPercent(pSock->GetProgress()));
                 Table.SetCell("Speed", NoString((int)(pSock->GetAvgRead() / 1024.0)) + " KiB/s");
             }
         }

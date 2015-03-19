@@ -708,6 +708,13 @@ NoString NoUtils::ToTimeStr(ulong s)
     return sRet.RightChomp_n();
 }
 
+NoString NoUtils::ToPercent(double d)
+{
+    char szRet[32];
+    snprintf(szRet, 32, "%.02f%%", d);
+    return szRet;
+}
+
 NoString NoUtils::StripControls(const NoString& str)
 {
     NoString sRet;
