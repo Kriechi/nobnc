@@ -889,5 +889,5 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
 
 NoStringVector NoUtils::QuoteSplit(const NoString& str)
 {
-    return Split_helper(str, " ", No::SkipEmptyParts, "\"", "\"", true);
+    return Split_helper(str, " ", No::SkipEmptyParts, "\"", "\"", false);
 }

@@ -413,7 +413,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                     } else if (sAction.Equals("JOIN")) {
                         NoStringVector vsArgs = NoUtils::QuoteSplit(sArgs);
                         if (vsArgs.size() > 1) {
-                            NoString sDelim = vsArgs[0];
+                            NoString sDelim = vsArgs[0].Trim_n("\"");
                             bool bFoundOne = false;
                             No::EscapeFormat eEscape = No::AsciiFormat;
 
@@ -830,7 +830,8 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
     NoStringVector vArgs = NoUtils::QuoteSplit(sRest);
     NoStringMap msArgs;
 
-    for (const NoString& sArg : vArgs) {
+    for (NoString& sArg : vArgs) {
+        sArg.Trim("\"");
         msArgs[sArg.Token(0, false, "=").AsUpper()] = sArg.Token(1, true, "=");
     }
 

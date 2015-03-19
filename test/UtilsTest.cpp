@@ -123,21 +123,21 @@ TEST(UtilsTest, QuoteSplit)
 {
     NoStringVector expected;
 
-    expected = NoStringVector{"a  b  c"};
+    expected = NoStringVector{"\"a  b  c\""};
     EXPECT_EQ(expected, NoUtils::QuoteSplit("  \"a  b  c\"  "));
 
-    expected = NoStringVector{"a b", "c d"};
+    expected = NoStringVector{"\"a b\"", "\"c d\""};
     EXPECT_EQ(expected, NoUtils::QuoteSplit("\"a b\" \"c d\""));
 
-    expected = NoStringVector{"a", "b c", "d"};
+    expected = NoStringVector{"a", "\"b c\"", "d"};
     EXPECT_EQ(expected, NoUtils::QuoteSplit("a \"b c\" d"));
 
-    expected = NoStringVector{" a ", " b "};
+    expected = NoStringVector{"\" a \"", "\" b \""};
     EXPECT_EQ(expected, NoUtils::QuoteSplit("\" a \" \" b \""));
 
-    expected = NoStringVector{" "};
+    expected = NoStringVector{"\" \""};
     EXPECT_EQ(expected, NoUtils::QuoteSplit("\" \""));
 
-    expected = NoStringVector{ };
+    expected = NoStringVector{ "\"\"" };
     EXPECT_EQ(expected, NoUtils::QuoteSplit("\"\""));
 }
