@@ -570,16 +570,7 @@ std::vector<NoClient*> NoClient::GetClients() const
     return m_pUser->GetUserClients();
 }
 
-const NoIrcConnection* NoClient::GetIRCSock() const
-{
-    if (m_pNetwork) {
-        return m_pNetwork->GetIRCSock();
-    }
-
-    return nullptr;
-}
-
-NoIrcConnection* NoClient::GetIRCSock()
+NoIrcConnection* NoClient::GetIRCSock() const
 {
     if (m_pNetwork) {
         return m_pNetwork->GetIRCSock();

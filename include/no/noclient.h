@@ -164,8 +164,7 @@ public:
     void SetNetwork(NoNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
     NoNetwork* GetNetwork() const { return m_pNetwork; }
     std::vector<NoClient*> GetClients() const;
-    const NoIrcConnection* GetIRCSock() const;
-    NoIrcConnection* GetIRCSock();
+    NoIrcConnection* GetIRCSock() const;
     NoString GetFullName() const;
 
 private:
