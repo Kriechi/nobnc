@@ -24,7 +24,7 @@
 class NO_EXPORT NoListener
 {
 public:
-    typedef enum { ACCEPT_IRC, ACCEPT_HTTP, ACCEPT_ALL } EAcceptType;
+    enum EAcceptType { ACCEPT_IRC, ACCEPT_HTTP, ACCEPT_ALL };
 
     NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept);
     ~NoListener();

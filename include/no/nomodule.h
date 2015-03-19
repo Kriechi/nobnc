@@ -144,7 +144,7 @@ typedef void* ModHandle;
 class NO_EXPORT NoModInfo
 {
 public:
-    typedef enum { GlobalModule, UserModule, NetworkModule } EModuleType;
+    enum EModuleType { GlobalModule, UserModule, NetworkModule };
 
     typedef NoModule* (*ModLoader)(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, EModuleType eType);
 
@@ -301,7 +301,7 @@ public:
      *  return, ZNC then decides what to do with the event which caused the
      *  module hook.
      */
-    typedef enum {
+    enum EModRet {
         /** ZNC will continue event processing normally. This is what
          *  you should return normally.
          */
@@ -319,14 +319,14 @@ public:
          *  given event won't be forwarded to the connected users)
          */
         HALTCORE = 4
-    } EModRet;
+    };
 
-    typedef enum {
+    enum EModException {
         /** Your module can throw this enum at any given time. When this
          * is thrown, the module will be unloaded.
          */
         UNLOAD
-    } EModException;
+    };
 
     void SetUser(NoUser* pUser);
     void SetNetwork(NoNetwork* pNetwork);

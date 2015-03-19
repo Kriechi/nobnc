@@ -35,8 +35,6 @@ typedef std::map<NoString, NoString> NoStringMap;
 typedef std::pair<NoString, NoString> NoStringPair;
 typedef std::vector<NoStringPair> NoStringPairVector;
 
-enum class CaseSensitivity { CaseInsensitive, CaseSensitive };
-
 /**
  * @brief String class that is used inside ZNC.
  *
@@ -47,7 +45,7 @@ enum class CaseSensitivity { CaseInsensitive, CaseSensitive };
 class NO_EXPORT NoString : public std::string
 {
 public:
-    typedef enum {
+    enum EEscape {
         EASCII,
         EURL,
         EHTML,
@@ -56,10 +54,8 @@ public:
         EDEBUG,
         EMSGTAG,
         EHEXCOLON,
-    } EEscape;
-
-    static const CaseSensitivity CaseSensitive = CaseSensitivity::CaseSensitive;
-    static const CaseSensitivity CaseInsensitive = CaseSensitivity::CaseInsensitive;
+    };
+    enum CaseSensitivity { CaseInsensitive, CaseSensitive };
 
     NoString();
     NoString(const char* c);

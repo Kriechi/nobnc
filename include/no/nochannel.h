@@ -32,9 +32,9 @@ class NoFile;
 class NO_EXPORT NoChannel
 {
 public:
-    typedef enum { Voice = '+', HalfOp = '%', Op = '@', Admin = '!', Owner = '*' } EUserPerms;
+    enum EUserPerms { Voice = '+', HalfOp = '%', Op = '@', Admin = '!', Owner = '*' };
 
-    typedef enum {
+    enum EModes {
         M_Private = 'p',
         M_Secret = 's',
         M_Moderated = 'm',
@@ -47,7 +47,7 @@ public:
         M_Voice = 'v',
         M_Ban = 'b',
         M_Except = 'e'
-    } EModes;
+    };
 
     NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig, NoSettings* pConfig = nullptr);
     ~NoChannel();

@@ -38,13 +38,13 @@ public:
     NoIrcSock(const NoIrcSock&) = delete;
     NoIrcSock& operator=(const NoIrcSock&) = delete;
 
-    typedef enum {
+    enum EChanModeArgs {
         // These values must line up with their position in the CHANMODE argument to raw 005
         ListArg = 0,
         HasArg = 1,
         ArgWhenSet = 2,
         NoArg = 3
-    } EChanModeArgs;
+    };
 
     bool OnCTCPReply(NoNick& Nick, NoString& sMessage);
     bool OnPrivCTCP(NoNick& Nick, NoString& sMessage);
