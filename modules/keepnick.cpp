@@ -169,7 +169,7 @@ public:
 
         // Indeed trying to change to this nick, generate a 433 for it.
         // This way we can *always* block incoming 433s from the server.
-        PutUser(":" + GetNetwork()->GetIRNoServer() + " 433 " + GetNetwork()->GetIRNoNick().nick() + " " + sNick +
+        PutUser(":" + GetNetwork()->GetIRCServer() + " 433 " + GetNetwork()->GetIRCNick().nick() + " " + sNick +
                 " :ZNC is already trying to get this nickname");
         return CONTINUE;
     }

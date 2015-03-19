@@ -242,8 +242,8 @@ void NoClient::UserCommand(NoString& sLine)
                 Table.SetCell("Clients", NoString(pNetwork->GetClients().size()));
                 if (pNetwork->IsIRCConnected()) {
                     Table.SetCell("OnIRC", "Yes");
-                    Table.SetCell("IRC Server", pNetwork->GetIRNoServer());
-                    Table.SetCell("IRC User", pNetwork->GetIRNoNick().nickMask());
+                    Table.SetCell("IRC Server", pNetwork->GetIRCServer());
+                    Table.SetCell("IRC User", pNetwork->GetIRCNick().nickMask());
                     Table.SetCell("Channels", NoString(pNetwork->GetChans().size()));
                 } else {
                     Table.SetCell("OnIRC", "No");
@@ -612,8 +612,8 @@ void NoClient::UserCommand(NoString& sLine)
             Table.SetCell("Network", pNetwork->GetName());
             if (pNetwork->IsIRCConnected()) {
                 Table.SetCell("OnIRC", "Yes");
-                Table.SetCell("IRC Server", pNetwork->GetIRNoServer());
-                Table.SetCell("IRC User", pNetwork->GetIRNoNick().nickMask());
+                Table.SetCell("IRC Server", pNetwork->GetIRCServer());
+                Table.SetCell("IRC User", pNetwork->GetIRCNick().nickMask());
                 Table.SetCell("Channels", NoString(pNetwork->GetChans().size()));
             } else {
                 Table.SetCell("OnIRC", "No");

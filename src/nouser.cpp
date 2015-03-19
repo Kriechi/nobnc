@@ -61,7 +61,7 @@ NoUser::NoUser(const NoString& sUserName)
       m_mssCTCPReplies(), m_sTimestampFormat("[%H:%M:%S]"), m_sTimezone(""), m_eHashType(HASH_NONE),
       m_sUserPath(NoApp::Get().GetUserPath() + "/" + sUserName), m_bMultiClients(true), m_bDenyLoadMod(false),
       m_bAdmin(false), m_bDenySetBindHost(false), m_bAutoClearChanBuffer(true), m_bAutoClearQueryBuffer(true),
-      m_bBeingDeleted(false), m_bAppendTimestamp(false), m_bPrependTimestamp(true), m_pUserTimer(nullptr), m_vIRNoNetworks(),
+      m_bBeingDeleted(false), m_bAppendTimestamp(false), m_bPrependTimestamp(true), m_pUserTimer(nullptr), m_vIRCNetworks(),
       m_vClients(), m_ssAllowedHosts(), m_uBufferCount(50), m_uBytesRead(0), m_uBytesWritten(0), m_uMaxJoinTries(10),
       m_uMaxNetworks(1), m_uMaxQueryBuffers(50), m_uMaxJoins(0), m_sSkinName(""), m_pModules(new NoModules)
 {
@@ -72,8 +72,8 @@ NoUser::NoUser(const NoString& sUserName)
 NoUser::~NoUser()
 {
     // Delete networks
-    while (!m_vIRNoNetworks.empty()) {
-        delete *m_vIRNoNetworks.begin();
+    while (!m_vIRCNetworks.empty()) {
+        delete *m_vIRCNetworks.begin();
     }
 
     // Delete clients
@@ -379,7 +379,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
                 continue;
             }
             SetClientEncoding(vsClient[0]);
-            for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+            for (NoNetwork* pNetwork : m_vIRCNetworks) {
                 pNetwork->SetEncoding(vsServer[0]);
             }
             NoUtils::PrintStatus(true, "Using [" + vsClient[0] + "] for clients, and [" + vsServer[0] + "] for servers");
@@ -412,7 +412,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
 
     // Move ircconnectenabled to the networks
     if (pConfig->FindStringEntry("ircconnectenabled", sValue)) {
-        for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+        for (NoNetwork* pNetwork : m_vIRCNetworks) {
             pNetwork->SetIRCConnectEnabled(sValue.ToBool());
         }
     }
@@ -449,16 +449,16 @@ bool NoUser::AddNetwork(NoNetwork* pNetwork)
         return false;
     }
 
-    m_vIRNoNetworks.push_back(pNetwork);
+    m_vIRCNetworks.push_back(pNetwork);
 
     return true;
 }
 
 void NoUser::RemoveNetwork(NoNetwork* pNetwork)
 {
-    auto it = std::find(m_vIRNoNetworks.begin(), m_vIRNoNetworks.end(), pNetwork);
-    if (it != m_vIRNoNetworks.end()) {
-        m_vIRNoNetworks.erase(it);
+    auto it = std::find(m_vIRCNetworks.begin(), m_vIRCNetworks.end(), pNetwork);
+    if (it != m_vIRCNetworks.end()) {
+        m_vIRCNetworks.erase(it);
     }
 }
 
@@ -480,7 +480,7 @@ bool NoUser::DeleteNetwork(const NoString& sNetwork)
 
 NoNetwork* NoUser::FindNetwork(const NoString& sNetwork) const
 {
-    for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+    for (NoNetwork* pNetwork : m_vIRCNetworks) {
         if (pNetwork->GetName().Equals(sNetwork)) {
             return pNetwork;
         }
@@ -489,7 +489,7 @@ NoNetwork* NoUser::FindNetwork(const NoString& sNetwork) const
     return nullptr;
 }
 
-const std::vector<NoNetwork*>& NoUser::GetNetworks() const { return m_vIRNoNetworks; }
+const std::vector<NoNetwork*>& NoUser::GetNetworks() const { return m_vIRCNetworks; }
 
 NoString NoUser::ExpandString(const NoString& sStr) const
 {
@@ -610,7 +610,7 @@ void NoUser::CloneNetworks(const NoUser& User)
     }
 
     std::set<NoString> ssDeleteNetworks;
-    for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+    for (NoNetwork* pNetwork : m_vIRCNetworks) {
         if (!(User.FindNetwork(pNetwork->GetName()))) {
             ssDeleteNetworks.insert(pNetwork->GetName());
         }
@@ -902,7 +902,7 @@ NoSettings NoUser::ToConfig() const
     }
 
     // Networks
-    for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+    for (NoNetwork* pNetwork : m_vIRCNetworks) {
         config.AddSubConfig("Network", pNetwork->GetName(), pNetwork->ToConfig());
     }
 
@@ -943,7 +943,7 @@ NoString NoUser::GetLocalDCCIP() const
 {
     if (!GetDCCBindHost().empty()) return GetDCCBindHost();
 
-    for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+    for (NoNetwork* pNetwork : m_vIRCNetworks) {
         NoIrcConnection* pIRCSock = pNetwork->GetIRCSock();
         if (pIRCSock) {
             return pIRCSock->GetLocalIP();
@@ -976,7 +976,7 @@ bool NoUser::PutAllUser(const NoString& sLine, NoClient* pClient, NoClient* pSki
 {
     PutUser(sLine, pClient, pSkipClient);
 
-    for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+    for (NoNetwork* pNetwork : m_vIRCNetworks) {
         if (pNetwork->PutUser(sLine, pClient, pSkipClient)) {
             return true;
         }
@@ -1055,7 +1055,7 @@ bool NoUser::IsUserAttached() const
         return true;
     }
 
-    for (const NoNetwork* pNetwork : m_vIRNoNetworks) {
+    for (const NoNetwork* pNetwork : m_vIRCNetworks) {
         if (pNetwork->IsUserAttached()) {
             return true;
         }
@@ -1084,7 +1084,7 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
         // Do they have old NV?
         NoFile fNVFile = NoFile(GetUserPath() + "/moddata/" + sModName + "/.registry");
 
-        for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+        for (NoNetwork* pNetwork : m_vIRCNetworks) {
             if (fNVFile.Exists()) {
                 NoString sNetworkModPath = pNetwork->GetNetworkPath() + "/moddata/" + sModName;
                 if (!NoFile::Exists(sNetworkModPath)) {
@@ -1131,7 +1131,7 @@ void NoUser::SetClientEncoding(const NoString& s) { m_sClientEncoding = s; }
 void NoUser::SetQuitMsg(const NoString& s) { m_sQuitMsg = s; }
 void NoUser::SetAutoClearChanBuffer(bool b)
 {
-    for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+    for (NoNetwork* pNetwork : m_vIRCNetworks) {
         for (NoChannel* pChan : pNetwork->GetChans()) {
             pChan->inheritAutoClearChanBuffer(b);
         }
@@ -1143,7 +1143,7 @@ void NoUser::SetAutoClearQueryBuffer(bool b) { m_bAutoClearQueryBuffer = b; }
 bool NoUser::SetBufferCount(uint u, bool bForce)
 {
     if (!bForce && u > NoApp::Get().GetMaxBufferSize()) return false;
-    for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+    for (NoNetwork* pNetwork : m_vIRCNetworks) {
         for (NoChannel* pChan : pNetwork->GetChans()) {
             pChan->inheritBufferCount(u, bForce);
         }
@@ -1184,7 +1184,7 @@ std::vector<NoClient*> NoUser::GetAllClients() const
 {
     std::vector<NoClient*> vClients;
 
-    for (NoNetwork* pNetwork : m_vIRNoNetworks) {
+    for (NoNetwork* pNetwork : m_vIRCNetworks) {
         for (NoClient* pClient : pNetwork->GetClients()) {
             vClients.push_back(pClient);
         }

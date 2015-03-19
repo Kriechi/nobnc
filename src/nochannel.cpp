@@ -117,18 +117,18 @@ void NoChannel::joinUser(const NoString& sKey)
 
 void NoChannel::attachUser(NoClient* pClient)
 {
-    m_network->PutUser(":" + m_network->GetIRNoNick().nickMask() + " JOIN :" + getName(), pClient);
+    m_network->PutUser(":" + m_network->GetIRCNick().nickMask() + " JOIN :" + getName(), pClient);
 
     if (!getTopic().empty()) {
-        m_network->PutUser(":" + m_network->GetIRNoServer() + " 332 " + m_network->GetIRNoNick().nick() + " " +
+        m_network->PutUser(":" + m_network->GetIRCServer() + " 332 " + m_network->GetIRCNick().nick() + " " +
                             getName() + " :" + getTopic(),
                             pClient);
-        m_network->PutUser(":" + m_network->GetIRNoServer() + " 333 " + m_network->GetIRNoNick().nick() + " " +
+        m_network->PutUser(":" + m_network->GetIRCServer() + " 333 " + m_network->GetIRCNick().nick() + " " +
                             getName() + " " + getTopicOwner() + " " + NoString(getTopicDate()),
                             pClient);
     }
 
-    NoString sPre = ":" + m_network->GetIRNoServer() + " 353 " + m_network->GetIRNoNick().nick() + " " +
+    NoString sPre = ":" + m_network->GetIRCServer() + " 353 " + m_network->GetIRCNick().nick() + " " +
                    getModeForNames() + " " + getName() + " :";
     NoString sLine = sPre;
     NoString sPerm, sNick;
@@ -171,7 +171,7 @@ void NoChannel::attachUser(NoClient* pClient)
             break;
     }
 
-    m_network->PutUser(":" + m_network->GetIRNoServer() + " 366 " + m_network->GetIRNoNick().nick() + " " + getName() + " :End of /NAMES list.",
+    m_network->PutUser(":" + m_network->GetIRCServer() + " 366 " + m_network->GetIRCNick().nick() + " " + getName() + " :End of /NAMES list.",
                         pClient);
     m_detached = false;
 
@@ -182,7 +182,7 @@ void NoChannel::attachUser(NoClient* pClient)
 void NoChannel::detachUser()
 {
     if (!m_detached) {
-        m_network->PutUser(":" + m_network->GetIRNoNick().nickMask() + " PART " + getName());
+        m_network->PutUser(":" + m_network->GetIRCNick().nickMask() + " PART " + getName());
         m_detached = true;
     }
 }

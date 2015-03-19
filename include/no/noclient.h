@@ -117,7 +117,7 @@ public:
     void AcceptLogin(NoUser& User);
     void RefuseLogin(const NoString& sReason);
 
-    NoString GetNick(bool bAllowIRNoNick = true) const;
+    NoString GetNick(bool bAllowIRCNick = true) const;
     NoString GetNickMask() const;
     NoString GetIdentifier() const { return m_sIdentifier; }
     bool HasNamesx() const { return m_bNamesx; }

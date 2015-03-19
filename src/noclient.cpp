@@ -517,9 +517,9 @@ void NoClient::ReadLineImpl(const NoString& sData)
 
             NoChannel* pChan = m_pNetwork->FindChan(sTarget);
             if (pChan && pChan->isOn() && !pChan->getModeString().empty()) {
-                PutClient(":" + m_pNetwork->GetIRNoServer() + " 324 " + GetNick() + " " + sTarget + " " + pChan->getModeString());
+                PutClient(":" + m_pNetwork->GetIRCServer() + " 324 " + GetNick() + " " + sTarget + " " + pChan->getModeString());
                 if (pChan->getCreationDate() > 0) {
-                    PutClient(":" + m_pNetwork->GetIRNoServer() + " 329 " + GetNick() + " " + sTarget + " " +
+                    PutClient(":" + m_pNetwork->GetIRCServer() + " 329 " + GetNick() + " " + sTarget + " " +
                               NoString(pChan->getCreationDate()));
                 }
                 return;
@@ -542,7 +542,7 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
             const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
             for (const NoChannel* pChan : vChans) {
                 if (!(pChan->isDetached())) {
-                    PutClient(":" + m_pNetwork->GetIRNoNick().nickMask() + " PART " + pChan->getName());
+                    PutClient(":" + m_pNetwork->GetIRCNick().nickMask() + " PART " + pChan->getName());
                 }
             }
         } else if (m_pUser) {
@@ -832,12 +832,12 @@ void NoClient::PutModule(const NoString& sModule, const NoString& sLine)
     }
 }
 
-NoString NoClient::GetNick(bool bAllowIRNoNick) const
+NoString NoClient::GetNick(bool bAllowIRCNick) const
 {
     NoString sRet;
 
     const NoIrcConnection* pSock = GetIRCSock();
-    if (bAllowIRNoNick && pSock && pSock->IsAuthed()) {
+    if (bAllowIRCNick && pSock && pSock->IsAuthed()) {
         sRet = pSock->GetNick();
     }
 

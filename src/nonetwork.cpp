@@ -121,8 +121,8 @@ bool NoNetwork::IsValidNetwork(const NoString& sNetwork)
 NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName)
     : m_sName(sName), m_pUser(nullptr), m_sNick(""), m_sAltNick(""), m_sIdent(""), m_sRealName(""), m_sBindHost(""),
       m_sEncoding(""), m_sQuitMsg(""), m_ssTrustedFingerprints(), m_pModules(new NoModules), m_vClients(),
-      m_pIRCSock(nullptr), m_vChans(), m_vQueries(), m_sChanPrefixes(""), m_bIRCConnectEnabled(true), m_sIRNoServer(""),
-      m_vServers(), m_uServerIdx(0), m_IRNoNick(), m_bIRNoAway(false), m_fFloodRate(1), m_uFloodBurst(4), m_RawBuffer(),
+      m_pIRCSock(nullptr), m_vChans(), m_vQueries(), m_sChanPrefixes(""), m_bIRCConnectEnabled(true), m_sIRCServer(""),
+      m_vServers(), m_uServerIdx(0), m_IRCNick(), m_bIRCAway(false), m_fFloodRate(1), m_uFloodBurst(4), m_RawBuffer(),
       m_MotdBuffer(), m_NoticeBuffer(), m_pPingTimer(nullptr), m_pJoinTimer(nullptr), m_uJoinDelay(0)
 {
     SetUser(pUser);
@@ -566,7 +566,7 @@ void NoNetwork::ClientConnected(NoClient* pClient)
             pClient->PutClient(m_RawBuffer.getMessage(uIdx, *pClient, msParams));
         }
 
-        const NoNick& Nick = GetIRNoNick();
+        const NoNick& Nick = GetIRCNick();
         if (sClientNick != Nick.nick()) { // case-sensitive match
             pClient->PutClient(":" + sClientNick + "!" + Nick.ident() + "@" + Nick.host() + " NICK :" + Nick.nick());
             pClient->SetNick(Nick.nick());
@@ -574,7 +574,7 @@ void NoNetwork::ClientConnected(NoClient* pClient)
     }
 
     NoStringMap msParams;
-    msParams["target"] = GetIRNoNick().nick();
+    msParams["target"] = GetIRCNick().nick();
 
     // Send the cached MOTD
     uSize = m_MotdBuffer.size();
@@ -591,14 +591,14 @@ void NoNetwork::ClientConnected(NoClient* pClient)
             sUserMode += cMode;
         }
         if (!sUserMode.empty()) {
-            pClient->PutClient(":" + GetIRNoNick().nickMask() + " MODE " + GetIRNoNick().nick() + " :+" + sUserMode);
+            pClient->PutClient(":" + GetIRCNick().nickMask() + " MODE " + GetIRCNick().nick() + " :+" + sUserMode);
         }
     }
 
-    if (m_bIRNoAway) {
+    if (m_bIRCAway) {
         // If they want to know their away reason they'll have to whois
         // themselves. At least we can tell them their away status...
-        pClient->PutClient(":irc.znc.in 306 " + GetIRNoNick().nick() + " :You have been marked as being away");
+        pClient->PutClient(":irc.znc.in 306 " + GetIRCNick().nick() + " :You have been marked as being away");
     }
 
     const std::vector<NoChannel*>& vChans = GetChans();
@@ -1113,7 +1113,7 @@ NoServer* NoNetwork::GetCurrentServer() const
     return m_vServers[uIdx];
 }
 
-void NoNetwork::SetIRNoServer(const NoString& s) { m_sIRNoServer = s; }
+void NoNetwork::SetIRCServer(const NoString& s) { m_sIRCServer = s; }
 
 bool NoNetwork::SetNextServer(const NoServer* pServer)
 {
@@ -1129,12 +1129,12 @@ bool NoNetwork::SetNextServer(const NoServer* pServer)
 
 bool NoNetwork::IsLastServer() const { return (m_uServerIdx >= m_vServers.size()); }
 
-const NoString& NoNetwork::GetIRNoServer() const { return m_sIRNoServer; }
-const NoNick& NoNetwork::GetIRNoNick() const { return m_IRNoNick; }
+const NoString& NoNetwork::GetIRCServer() const { return m_sIRCServer; }
+const NoNick& NoNetwork::GetIRCNick() const { return m_IRCNick; }
 
-void NoNetwork::SetIRNoNick(const NoNick& n)
+void NoNetwork::SetIRCNick(const NoNick& n)
 {
-    m_IRNoNick = n;
+    m_IRCNick = n;
 
     for (NoClient* pClient : m_vClients) {
         pClient->SetNick(n.nick());
@@ -1208,7 +1208,7 @@ bool NoNetwork::IsIRCConnected() const
     return (pSock && pSock->IsAuthed());
 }
 
-void NoNetwork::SetIRNoSocket(NoIrcConnection* pIRCSock) { m_pIRCSock = pIRCSock; }
+void NoNetwork::SetIRCSocket(NoIrcConnection* pIRCSock) { m_pIRCSock = pIRCSock; }
 
 void NoNetwork::IRCConnected()
 {
@@ -1223,8 +1223,8 @@ void NoNetwork::IRCDisconnected()
 {
     m_pIRCSock = nullptr;
 
-    SetIRNoServer("");
-    m_bIRNoAway = false;
+    SetIRCServer("");
+    m_bIRCAway = false;
 
     // Get the reconnect going
     CheckIRCConnect();

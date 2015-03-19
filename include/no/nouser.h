@@ -218,7 +218,7 @@ private:
 
     NoUserTimer* m_pUserTimer;
 
-    std::vector<NoNetwork*> m_vIRNoNetworks;
+    std::vector<NoNetwork*> m_vIRCNetworks;
     std::vector<NoClient*> m_vClients;
     std::set<NoString> m_ssAllowedHosts;
     uint m_uBufferCount;

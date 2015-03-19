@@ -75,7 +75,7 @@ NoIrcConnection::NoIrcConnection(NoNetwork* pNetwork)
     m_mueChanModes['i'] = NoArg;
     m_mueChanModes['n'] = NoArg;
 
-    pNetwork->SetIRNoSocket(this);
+    pNetwork->SetIRCSocket(this);
 
     // RFC says a line can have 512 chars max, but we don't care ;)
     SetMaxBufferThreshold(1024);
@@ -167,7 +167,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
                 return;
             }
 
-            m_pNetwork->SetIRNoServer(sServer);
+            m_pNetwork->SetIRCServer(sServer);
             SetTimeout(NoNetwork::NO_TRAFFIC_TIMEOUT,
                        TMO_READ); // Now that we are connected, let nature take its course
             PutIRC("WHO " + sNick);
@@ -227,10 +227,10 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             m_pNetwork->UpdateRawBuffer(sTmp, sTmp + " {target} " + _NAMEDFMT(sRest));
             break;
         case 305:
-            m_pNetwork->SetIRNoAway(false);
+            m_pNetwork->SetIRCAway(false);
             break;
         case 306:
-            m_pNetwork->SetIRNoAway(true);
+            m_pNetwork->SetIRCAway(true);
             break;
         case 324: { // MODE
             sRest.Trim();
@@ -333,8 +333,8 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
                 m_Nick.setHost(sHost);
             }
 
-            m_pNetwork->SetIRNoNick(m_Nick);
-            m_pNetwork->SetIRNoServer(sServer);
+            m_pNetwork->SetIRCNick(m_Nick);
+            m_pNetwork->SetIRCServer(sServer);
 
             const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
 
@@ -422,12 +422,12 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         }
         case 375: // begin motd
         case 422: // MOTD File is missing
-            if (m_pNetwork->GetIRNoServer().Equals(sServer)) {
+            if (m_pNetwork->GetIRCServer().Equals(sServer)) {
                 m_pNetwork->ClearMotdBuffer();
             }
         case 372: // motd
         case 376: // end motd
-            if (m_pNetwork->GetIRNoServer().Equals(sServer)) {
+            if (m_pNetwork->GetIRCServer().Equals(sServer)) {
                 m_pNetwork->AddMotdBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
             }
             break;
@@ -686,7 +686,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
                 }
             }
 
-            if (Nick.equals(m_pNetwork->GetIRNoServer())) {
+            if (Nick.equals(m_pNetwork->GetIRCServer())) {
                 m_pNetwork->PutUser(":" + Nick.nick() + " NOTICE " + sTarget + " :" + sMsg);
             } else {
                 m_pNetwork->PutUser(":" + Nick.nickMask() + " NOTICE " + sTarget + " :" + sMsg);
@@ -1055,7 +1055,7 @@ void NoIrcConnection::TrySend()
 void NoIrcConnection::SetNick(const NoString& sNick)
 {
     m_Nick.setNick(sNick);
-    m_pNetwork->SetIRNoNick(m_Nick);
+    m_pNetwork->SetIRCNick(m_Nick);
 }
 
 void NoIrcConnection::ConnectedImpl()
@@ -1105,8 +1105,8 @@ void NoIrcConnection::DisconnectedImpl()
         sUserMode += cMode;
     }
     if (!sUserMode.empty()) {
-        m_pNetwork->PutUser(":" + m_pNetwork->GetIRNoNick().nickMask() + " MODE " +
-                            m_pNetwork->GetIRNoNick().nick() + " :-" + sUserMode);
+        m_pNetwork->PutUser(":" + m_pNetwork->GetIRCNick().nickMask() + " MODE " +
+                            m_pNetwork->GetIRCNick().nick() + " :-" + sUserMode);
     }
 
     // also clear the user modes in our space:

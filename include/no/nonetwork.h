@@ -117,7 +117,7 @@ public:
     bool AddServer(const NoString& sName, ushort uPort, const NoString& sPass = "", bool bSSL = false);
     NoServer* GetNextServer();
     NoServer* GetCurrentServer() const;
-    void SetIRNoServer(const NoString& s);
+    void SetIRCServer(const NoString& s);
     bool SetNextServer(const NoServer* pServer);
     bool IsLastServer() const;
 
@@ -133,16 +133,16 @@ public:
 
     NoIrcConnection* GetIRCSock() { return m_pIRCSock; }
     const NoIrcConnection* GetIRCSock() const { return m_pIRCSock; }
-    const NoString& GetIRNoServer() const;
-    const NoNick& GetIRNoNick() const;
-    void SetIRNoNick(const NoNick& n);
+    const NoString& GetIRCServer() const;
+    const NoNick& GetIRCNick() const;
+    void SetIRCNick(const NoNick& n);
     NoString GetCurNick() const;
-    bool IsIRNoAway() const { return m_bIRNoAway; }
-    void SetIRNoAway(bool b) { m_bIRNoAway = b; }
+    bool IsIRCAway() const { return m_bIRCAway; }
+    void SetIRCAway(bool b) { m_bIRCAway = b; }
 
     bool Connect();
     bool IsIRCConnected() const;
-    void SetIRNoSocket(NoIrcConnection* pIRCSock);
+    void SetIRCSocket(NoIrcConnection* pIRCSock);
     void IRCConnected();
     void IRCDisconnected();
     void CheckIRCConnect();
@@ -233,12 +233,12 @@ private:
     NoString m_sChanPrefixes;
 
     bool m_bIRCConnectEnabled;
-    NoString m_sIRNoServer;
+    NoString m_sIRCServer;
     std::vector<NoServer*> m_vServers;
     size_t m_uServerIdx; ///< Index in m_vServers of our current server + 1
 
-    NoNick m_IRNoNick;
-    bool m_bIRNoAway;
+    NoNick m_IRCNick;
+    bool m_bIRCAway;
 
     double m_fFloodRate; ///< Set to -1 to disable protection.
     ushort m_uFloodBurst;

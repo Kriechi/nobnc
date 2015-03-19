@@ -255,7 +255,7 @@ public:
 
     void OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        if (Nick.nick() == GetNetwork()->GetIRNoNick().nick()) {
+        if (Nick.nick() == GetNetwork()->GetIRCNick().nick()) {
             const std::map<NoString, NoNick>& msNicks = Channel.getNicks();
 
             for (std::map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {

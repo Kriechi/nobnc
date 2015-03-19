@@ -76,7 +76,7 @@ public:
 
         if (it != EndNV()) {
             NoChannel* pChan = GetNetwork()->FindChan(sTarget);
-            NoString sNickMask = GetNetwork()->GetIRNoNick().nickMask();
+            NoString sNickMask = GetNetwork()->GetIRCNick().nickMask();
             if (pChan) {
                 if (!pChan->autoClearChanBuffer())
                     pChan->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +
