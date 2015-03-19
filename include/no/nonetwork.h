@@ -131,8 +131,7 @@ public:
     void SetIRCConnectEnabled(bool b);
     bool GetIRCConnectEnabled() const { return m_bIRCConnectEnabled; }
 
-    NoIrcConnection* GetIRCSock() { return m_pIRCSock; }
-    const NoIrcConnection* GetIRCSock() const { return m_pIRCSock; }
+    NoIrcConnection* GetIRCSock() const { return m_pIRCSock; }
     const NoString& GetIRCServer() const;
     const NoNick& GetIRCNick() const;
     void SetIRCNick(const NoNick& n);
