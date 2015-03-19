@@ -87,7 +87,7 @@ public:
 
             NoString sMsg = MakeIvec() + sMessage;
             sMsg = NoUtils::Encrypt(sMsg, it->second);
-            sMsg.Base64Encode();
+            sMsg = sMsg.ToBase64();
             sMsg = "+OK *" + sMsg;
 
             PutIRC("PRIVMSG " + sTarget + " :" + sMsg);
@@ -116,7 +116,7 @@ public:
 
             if (it != EndNV()) {
                 sMessage.LeftChomp(5);
-                sMessage.Base64Decode();
+                sMessage = NoString::FromBase64(sMessage);
                 sMessage = NoUtils::Decrypt(sMessage, it->second);
                 sMessage.LeftChomp(8);
                 sMessage = sMessage.c_str();

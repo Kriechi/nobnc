@@ -961,36 +961,10 @@ NoString NoString::NamedFormat(const NoString& sFormat, const NoStringMap& msVal
     return sRet;
 }
 
-bool NoString::Base64Encode(uint uWrap)
-{
-    NoString sCopy(*this);
-    return sCopy.Base64Encode(*this, uWrap);
-}
-
-ulong NoString::Base64Decode()
-{
-    NoString sCopy(*this);
-    return sCopy.Base64Decode(*this);
-}
-
-NoString NoString::Base64Encode_n(uint uWrap) const
-{
-    NoString sRet;
-    Base64Encode(sRet, uWrap);
-    return sRet;
-}
-
-NoString NoString::Base64Decode_n() const
-{
-    NoString sRet;
-    Base64Decode(sRet);
-    return sRet;
-}
-
-bool NoString::Base64Encode(NoString& sRet, uint uWrap) const
+NoString NoString::ToBase64(uint uWrap) const
 {
     const char b64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    sRet.clear();
+    NoString sRet;
     size_t len = size();
     const uchar* input = (const uchar*)c_str();
     uchar* output, *p;
@@ -1005,7 +979,7 @@ bool NoString::Base64Encode(NoString& sRet, uint uWrap) const
     }
 
     if (toalloc < len) {
-        return 0;
+        return sRet;
     }
 
     p = output = new uchar[toalloc];
@@ -1045,12 +1019,12 @@ bool NoString::Base64Encode(NoString& sRet, uint uWrap) const
     *p = 0;
     sRet = (char*)output;
     delete[] output;
-    return true;
+    return sRet;
 }
 
-ulong NoString::Base64Decode(NoString& sRet) const
+NoString NoString::FromBase64(const NoString& base64)
 {
-    NoString sTmp(*this);
+    NoString sTmp(base64);
     // remove new lines
     sTmp.Replace("\r", "");
     sTmp.Replace("\n", "");
@@ -1084,11 +1058,11 @@ ulong NoString::Base64Decode(NoString& sRet) const
 
     *p = '\0';
     ulong uRet = p - out;
-    sRet.clear();
+    NoString sRet;
     sRet.append(out, uRet);
     delete[] out;
 
-    return uRet;
+    return sRet;
 }
 
 bool NoString::ToBool() const

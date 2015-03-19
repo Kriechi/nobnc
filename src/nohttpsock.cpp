@@ -113,8 +113,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
             s.Token(1, true, "=").Escape_n(NoString::EURL, NoString::EASCII);
         }
     } else if (sName.Equals("Authorization:")) {
-        NoString sUnhashed;
-        sLine.Token(2).Base64Decode(sUnhashed);
+        NoString sUnhashed = NoString::FromBase64(sLine.Token(2));
         m_sUser = sUnhashed.Token(0, false, ":");
         m_sPass = sUnhashed.Token(1, true, ":");
         m_bLoggedIn = OnLogin(m_sUser, m_sPass, true);

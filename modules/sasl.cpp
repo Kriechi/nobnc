@@ -190,7 +190,7 @@ public:
     {
         if (m_Mechanisms.GetCurrent().Equals("PLAIN") && sLine.Equals("+")) {
             NoString sAuthLine = GetNV("username") + '\0' + GetNV("username") + '\0' + GetNV("password");
-            sAuthLine.Base64Encode();
+            sAuthLine = sAuthLine.ToBase64();
             PutIRC("AUTHENTICATE " + sAuthLine);
         } else {
             /* Send blank authenticate for other mechanisms (like EXTERNAL). */

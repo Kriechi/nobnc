@@ -304,39 +304,15 @@ public:
      */
     static NoString NamedFormat(const NoString& sFormat, const NoStringMap& msValues);
 
-    /** Treat this string as base64-encoded data and decode it.
-     * @param sRet String to which the result of the decode is safed.
-     * @return The length of the resulting string.
-     */
-    ulong Base64Decode(NoString& sRet) const;
-    /** Treat this string as base64-encoded data and decode it.
-     *  The result is saved in this NoString instance.
-     * @return The length of the resulting string.
-     */
-    ulong Base64Decode();
-    /** Treat this string as base64-encoded data and decode it.
+    /** Decode the give base64-encoded string.
      * @return The decoded string.
      */
-    NoString Base64Decode_n() const;
-    /** Base64-encode the current string.
-     * @param sRet String where the result is saved.
-     * @param uWrap A boolean(!?!) that decides if the result should be
-     *              wrapped after everywhere 57 characters.
-     * @return true unless this code is buggy.
-     * @todo WTF @ uWrap.
-     * @todo This only returns false if some formula we use was wrong?!
-     */
-    bool Base64Encode(NoString& sRet, uint uWrap = 0) const;
-    /** Base64-encode the current string.
-     *  This string is overwritten with the result of the encode.
-     *  @todo return value and param are as with Base64Encode() from above.
-     */
-    bool Base64Encode(uint uWrap = 0);
+    static NoString FromBase64(const NoString& base64);
     /** Base64-encode the current string
      * @todo uWrap is as broken as Base64Encode()'s uWrap.
      * @return The encoded string.
      */
-    NoString Base64Encode_n(uint uWrap = 0) const;
+    NoString ToBase64(uint uWrap = 0) const;
 
     /** @return True if this string is not "false". */
     bool ToBool() const;
