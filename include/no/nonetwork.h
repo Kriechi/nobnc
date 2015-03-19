@@ -70,22 +70,22 @@ public:
     bool ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade = false);
     NoSettings ToConfig() const;
 
-    bool IsUserAttached() const { return !m_vClients.empty(); }
+    bool IsUserAttached() const;
     bool IsUserOnline() const;
     void ClientConnected(NoClient* pClient);
     void ClientDisconnected(NoClient* pClient);
 
     NoUser* GetUser() const;
     NoString GetName() const;
-    bool IsNetworkAttached() const { return !m_vClients.empty(); }
-    std::vector<NoClient*> GetClients() const { return m_vClients; }
+    bool IsNetworkAttached() const;
+    std::vector<NoClient*> GetClients() const;
     std::vector<NoClient*> FindClients(const NoString& sIdentifier) const;
 
     void SetUser(NoUser* pUser);
     bool SetName(const NoString& sName);
 
-    NoModules& GetModules() { return *m_pModules; }
-    const NoModules& GetModules() const { return *m_pModules; }
+    NoModules& GetModules();
+    const NoModules& GetModules() const;
 
     bool PutUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
     bool PutStatus(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
@@ -105,12 +105,12 @@ public:
     NoQuery* AddQuery(const NoString& sName);
     bool DelQuery(const NoString& sName);
 
-    NoString GetChanPrefixes() const { return m_sChanPrefixes; }
-    void SetChanPrefixes(const NoString& s) { m_sChanPrefixes = s; }
+    NoString GetChanPrefixes() const;
+    void SetChanPrefixes(const NoString& s);
     bool IsChan(const NoString& sChan) const;
 
     std::vector<NoServer*> GetServers() const;
-    bool HasServers() const { return !m_vServers.empty(); }
+    bool HasServers() const;
     NoServer* FindServer(const NoString& sName) const;
     bool DelServer(const NoString& sName, ushort uPort, const NoString& sPass);
     bool AddServer(const NoString& sName);
@@ -121,23 +121,20 @@ public:
     bool SetNextServer(const NoServer* pServer);
     bool IsLastServer() const;
 
-    NoStringSet GetTrustedFingerprints() const { return m_ssTrustedFingerprints; }
-    void AddTrustedFingerprint(const NoString& sFP)
-    {
-        m_ssTrustedFingerprints.insert(No::Escape_n(sFP, No::HexColonFormat, No::HexColonFormat));
-    }
-    void DelTrustedFingerprint(const NoString& sFP) { m_ssTrustedFingerprints.erase(sFP); }
+    NoStringSet GetTrustedFingerprints() const;
+    void AddTrustedFingerprint(const NoString& sFP);
+    void DelTrustedFingerprint(const NoString& sFP);
 
     void SetIRCConnectEnabled(bool b);
-    bool GetIRCConnectEnabled() const { return m_bIRCConnectEnabled; }
+    bool GetIRCConnectEnabled() const;
 
-    NoIrcConnection* GetIRCSock() const { return m_pIRCSock; }
+    NoIrcConnection* GetIRCSock() const;
     NoString GetIRCServer() const;
     const NoNick& GetIRCNick() const;
     void SetIRCNick(const NoNick& n);
     NoString GetCurNick() const;
-    bool IsIRCAway() const { return m_bIRCAway; }
-    void SetIRCAway(bool b) { m_bIRCAway = b; }
+    bool IsIRCAway() const;
+    void SetIRCAway(bool b);
 
     bool Connect();
     bool IsIRCConnected() const;
@@ -148,30 +145,18 @@ public:
 
     bool PutIRC(const NoString& sLine);
 
-    void AddRawBuffer(const NoString& sFormat, const NoString& sText = "") { m_RawBuffer.addMessage(sFormat, sText); }
-    void UpdateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
-    {
-        m_RawBuffer.updateMessage(sMatch, sFormat, sText);
-    }
-    void UpdateExactRawBuffer(const NoString& sFormat, const NoString& sText = "")
-    {
-        m_RawBuffer.updateExactMessage(sFormat, sText);
-    }
-    void ClearRawBuffer() { m_RawBuffer.clear(); }
+    void AddRawBuffer(const NoString& sFormat, const NoString& sText = "");
+    void UpdateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "");
+    void UpdateExactRawBuffer(const NoString& sFormat, const NoString& sText = "");
+    void ClearRawBuffer();
 
-    void AddMotdBuffer(const NoString& sFormat, const NoString& sText = "") { m_MotdBuffer.addMessage(sFormat, sText); }
-    void UpdateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
-    {
-        m_MotdBuffer.updateMessage(sMatch, sFormat, sText);
-    }
-    void ClearMotdBuffer() { m_MotdBuffer.clear(); }
+    void AddMotdBuffer(const NoString& sFormat, const NoString& sText = "");
+    void UpdateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "");
+    void ClearMotdBuffer();
 
-    void AddNoticeBuffer(const NoString& sFormat, const NoString& sText = "") { m_NoticeBuffer.addMessage(sFormat, sText); }
-    void UpdateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "")
-    {
-        m_NoticeBuffer.updateMessage(sMatch, sFormat, sText);
-    }
-    void ClearNoticeBuffer() { m_NoticeBuffer.clear(); }
+    void AddNoticeBuffer(const NoString& sFormat, const NoString& sText = "");
+    void UpdateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "");
+    void ClearNoticeBuffer();
 
     void ClearQueryBuffer();
 
@@ -191,13 +176,13 @@ public:
     void SetEncoding(const NoString& s);
     void SetQuitMsg(const NoString& s);
 
-    double GetFloodRate() const { return m_fFloodRate; }
-    ushort GetFloodBurst() const { return m_uFloodBurst; }
-    void SetFloodRate(double fFloodRate) { m_fFloodRate = fFloodRate; }
-    void SetFloodBurst(ushort uFloodBurst) { m_uFloodBurst = uFloodBurst; }
+    double GetFloodRate() const;
+    ushort GetFloodBurst() const;
+    void SetFloodRate(double fFloodRate);
+    void SetFloodBurst(ushort uFloodBurst);
 
-    ushort GetJoinDelay() const { return m_uJoinDelay; }
-    void SetJoinDelay(ushort uJoinDelay) { m_uJoinDelay = uJoinDelay; }
+    ushort GetJoinDelay() const;
+    void SetJoinDelay(ushort uJoinDelay);
 
     NoString ExpandString(const NoString& sStr) const;
     NoString& ExpandString(const NoString& sStr, NoString& sRet) const;

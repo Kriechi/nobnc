@@ -531,6 +531,8 @@ void NoNetwork::BounceAllClients()
     m_vClients.clear();
 }
 
+bool NoNetwork::IsUserAttached() const { return !m_vClients.empty(); }
+
 bool NoNetwork::IsUserOnline() const
 {
     for (NoClient* pClient : m_vClients) {
@@ -650,6 +652,9 @@ NoUser* NoNetwork::GetUser() const { return m_pUser; }
 
 NoString NoNetwork::GetName() const { return m_sName; }
 
+bool NoNetwork::IsNetworkAttached() const { return !m_vClients.empty(); }
+std::vector<NoClient*> NoNetwork::GetClients() const { return m_vClients; }
+
 std::vector<NoClient*> NoNetwork::FindClients(const NoString& sIdentifier) const
 {
     std::vector<NoClient*> vClients;
@@ -690,6 +695,9 @@ bool NoNetwork::SetName(const NoString& sName)
 
     return false;
 }
+
+NoModules& NoNetwork::GetModules() { return *m_pModules; }
+const NoModules& NoNetwork::GetModules() const { return *m_pModules; }
 
 bool NoNetwork::PutUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
@@ -893,6 +901,9 @@ bool NoNetwork::JoinChan(NoChannel* pChan)
     return false;
 }
 
+NoString NoNetwork::GetChanPrefixes() const { return m_sChanPrefixes; }
+void NoNetwork::SetChanPrefixes(const NoString& s) { m_sChanPrefixes = s; }
+
 bool NoNetwork::IsChan(const NoString& sChan) const
 {
     if (sChan.empty()) return false; // There is no way this is a chan
@@ -965,6 +976,8 @@ bool NoNetwork::DelQuery(const NoString& sName)
 // Server list
 
 std::vector<NoServer*> NoNetwork::GetServers() const { return m_vServers; }
+
+bool NoNetwork::HasServers() const { return !m_vServers.empty(); }
 
 NoServer* NoNetwork::FindServer(const NoString& sName) const
 {
@@ -1129,6 +1142,14 @@ bool NoNetwork::SetNextServer(const NoServer* pServer)
 
 bool NoNetwork::IsLastServer() const { return (m_uServerIdx >= m_vServers.size()); }
 
+NoStringSet NoNetwork::GetTrustedFingerprints() const { return m_ssTrustedFingerprints; }
+void NoNetwork::AddTrustedFingerprint(const NoString& sFP)
+{
+    m_ssTrustedFingerprints.insert(No::Escape_n(sFP, No::HexColonFormat, No::HexColonFormat));
+}
+void NoNetwork::DelTrustedFingerprint(const NoString& sFP) { m_ssTrustedFingerprints.erase(sFP); }
+
+NoIrcConnection* NoNetwork::GetIRCSock() const { return m_pIRCSock; }
 NoString NoNetwork::GetIRCServer() const { return m_sIRCServer; }
 const NoNick& NoNetwork::GetIRCNick() const { return m_IRCNick; }
 
@@ -1155,6 +1176,9 @@ NoString NoNetwork::GetCurNick() const
 
     return "";
 }
+
+bool NoNetwork::IsIRCAway() const { return m_bIRCAway; }
+void NoNetwork::SetIRCAway(bool b) { m_bIRCAway = b; }
 
 bool NoNetwork::Connect()
 {
@@ -1230,6 +1254,8 @@ void NoNetwork::IRCDisconnected()
     CheckIRCConnect();
 }
 
+bool NoNetwork::GetIRCConnectEnabled() const { return m_bIRCConnectEnabled; }
+
 void NoNetwork::SetIRCConnectEnabled(bool b)
 {
     m_bIRCConnectEnabled = b;
@@ -1262,6 +1288,31 @@ bool NoNetwork::PutIRC(const NoString& sLine)
     pIRCSock->PutIRC(sLine);
     return true;
 }
+
+void NoNetwork::AddRawBuffer(const NoString& sFormat, const NoString& sText) { m_RawBuffer.addMessage(sFormat, sText); }
+void NoNetwork::UpdateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText)
+{
+    m_RawBuffer.updateMessage(sMatch, sFormat, sText);
+}
+void NoNetwork::UpdateExactRawBuffer(const NoString& sFormat, const NoString& sText)
+{
+    m_RawBuffer.updateExactMessage(sFormat, sText);
+}
+void NoNetwork::ClearRawBuffer() { m_RawBuffer.clear(); }
+
+void NoNetwork::AddMotdBuffer(const NoString& sFormat, const NoString& sText) { m_MotdBuffer.addMessage(sFormat, sText); }
+void NoNetwork::UpdateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText)
+{
+    m_MotdBuffer.updateMessage(sMatch, sFormat, sText);
+}
+void NoNetwork::ClearMotdBuffer() { m_MotdBuffer.clear(); }
+
+void NoNetwork::AddNoticeBuffer(const NoString& sFormat, const NoString& sText) { m_NoticeBuffer.addMessage(sFormat, sText); }
+void NoNetwork::UpdateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText)
+{
+    m_NoticeBuffer.updateMessage(sMatch, sFormat, sText);
+}
+void NoNetwork::ClearNoticeBuffer() { m_NoticeBuffer.clear(); }
 
 void NoNetwork::ClearQueryBuffer()
 {
@@ -1380,6 +1431,14 @@ void NoNetwork::SetQuitMsg(const NoString& s)
         m_sQuitMsg = s;
     }
 }
+
+double NoNetwork::GetFloodRate() const { return m_fFloodRate; }
+ushort NoNetwork::GetFloodBurst() const { return m_uFloodBurst; }
+void NoNetwork::SetFloodRate(double fFloodRate) { m_fFloodRate = fFloodRate; }
+void NoNetwork::SetFloodBurst(ushort uFloodBurst) { m_uFloodBurst = uFloodBurst; }
+
+ushort NoNetwork::GetJoinDelay() const { return m_uJoinDelay; }
+void NoNetwork::SetJoinDelay(ushort uJoinDelay) { m_uJoinDelay = uJoinDelay; }
 
 NoString NoNetwork::ExpandString(const NoString& sStr) const
 {
