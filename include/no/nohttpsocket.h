@@ -19,8 +19,8 @@
 
 #include <no/noglobal.h>
 #include <no/nomodulesocket.h>
-#include <no/nofile.h>
 
+class NoFile;
 class NoModule;
 
 class NO_EXPORT NoHttpSocket : public NoModuleSocket

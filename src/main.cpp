@@ -19,6 +19,9 @@
 #include "noexception.h"
 #include "nodebug.h"
 #include <signal.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)
 #include "nothreads.h"

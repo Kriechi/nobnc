@@ -18,8 +18,10 @@
 #define NOLISTENER_H
 
 #include <no/noglobal.h>
-#include <no/nosocket.h>
+#include <no/nostring.h>
 #include <no/nosocketmanager.h>
+
+class NoSocket;
 
 class NO_EXPORT NoListener
 {
