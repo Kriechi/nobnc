@@ -23,6 +23,8 @@
 #include "nouser.h"
 #include "noquery.h"
 #include "noexception.h"
+#include "nomodulecall.h"
+#include "noapp.h"
 
 void NoClient::UserCommand(NoString& sLine)
 {

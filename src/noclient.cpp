@@ -21,6 +21,8 @@
 #include "nouser.h"
 #include "nonetwork.h"
 #include "noquery.h"
+#include "nomodulecall.h"
+#include "noapp.h"
 
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                             \
     {                                                                         \

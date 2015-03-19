@@ -20,14 +20,10 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/nobuffer.h>
-#include <no/noescape.h>
 #include <no/nonick.h>
-#include <no/noapp.h>
 
 class NoModules;
 class NoUser;
-class NoFile;
-class NoSettings;
 class NoClient;
 class NoSettings;
 class NoChannel;
