@@ -702,14 +702,14 @@ void NoChannel::setInConfig(bool b)
 }
 
 bool NoChannel::isOn() const { return m_isOn; }
-const NoString& NoChannel::getName() const { return m_name; }
-const std::map<uchar, NoString>& NoChannel::getModes() const { return m_modes; }
-const NoString& NoChannel::getKey() const { return m_key; }
-const NoString& NoChannel::getTopic() const { return m_topic; }
-const NoString& NoChannel::getTopicOwner() const { return m_topicOwner; }
+NoString NoChannel::getName() const { return m_name; }
+std::map<uchar, NoString> NoChannel::getModes() const { return m_modes; }
+NoString NoChannel::getKey() const { return m_key; }
+NoString NoChannel::getTopic() const { return m_topic; }
+NoString NoChannel::getTopicOwner() const { return m_topicOwner; }
 ulong NoChannel::getTopicDate() const { return m_topicDate; }
-const NoString& NoChannel::getDefaultModes() const { return m_defaultModes; }
-const std::map<NoString, NoNick>& NoChannel::getNicks() const { return m_nicks; }
+NoString NoChannel::getDefaultModes() const { return m_defaultModes; }
+std::map<NoString, NoNick> NoChannel::getNicks() const { return m_nicks; }
 size_t NoChannel::getNickCount() const { return m_nicks.size(); }
 bool NoChannel::autoClearChanBuffer() const { return m_autoClearChanBuffer; }
 bool NoChannel::isDetached() const { return m_detached; }
