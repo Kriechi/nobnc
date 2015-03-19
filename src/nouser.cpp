@@ -489,7 +489,7 @@ NoNetwork* NoUser::FindNetwork(const NoString& sNetwork) const
     return nullptr;
 }
 
-const std::vector<NoNetwork*>& NoUser::GetNetworks() const { return m_vIRCNetworks; }
+std::vector<NoNetwork*> NoUser::GetNetworks() const { return m_vIRCNetworks; }
 
 NoString NoUser::ExpandString(const NoString& sStr) const
 {
@@ -747,7 +747,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     return true;
 }
 
-const std::set<NoString>& NoUser::GetAllowedHosts() const { return m_ssAllowedHosts; }
+std::set<NoString> NoUser::GetAllowedHosts() const { return m_ssAllowedHosts; }
 bool NoUser::AddAllowedHost(const NoString& sHostMask)
 {
     if (sHostMask.empty() || m_ssAllowedHosts.find(sHostMask) != m_ssAllowedHosts.end()) {
@@ -773,7 +773,7 @@ bool NoUser::IsHostAllowed(const NoString& sHostMask) const
     return false;
 }
 
-const NoString& NoUser::GetTimestampFormat() const { return m_sTimestampFormat; }
+NoString NoUser::GetTimestampFormat() const { return m_sTimestampFormat; }
 bool NoUser::GetTimestampAppend() const { return m_bAppendTimestamp; }
 bool NoUser::GetTimestampPrepend() const { return m_bPrependTimestamp; }
 
@@ -1197,43 +1197,43 @@ std::vector<NoClient*> NoUser::GetAllClients() const
     return vClients;
 }
 
-const NoString& NoUser::GetUserName() const { return m_sUserName; }
-const NoString& NoUser::GetCleanUserName() const { return m_sCleanUserName; }
-const NoString& NoUser::GetNick(bool bAllowDefault) const
+NoString NoUser::GetUserName() const { return m_sUserName; }
+NoString NoUser::GetCleanUserName() const { return m_sCleanUserName; }
+NoString NoUser::GetNick(bool bAllowDefault) const
 {
     return (bAllowDefault && m_sNick.empty()) ? GetCleanUserName() : m_sNick;
 }
-const NoString& NoUser::GetAltNick(bool bAllowDefault) const
+NoString NoUser::GetAltNick(bool bAllowDefault) const
 {
     return (bAllowDefault && m_sAltNick.empty()) ? GetCleanUserName() : m_sAltNick;
 }
-const NoString& NoUser::GetIdent(bool bAllowDefault) const
+NoString NoUser::GetIdent(bool bAllowDefault) const
 {
     return (bAllowDefault && m_sIdent.empty()) ? GetCleanUserName() : m_sIdent;
 }
-const NoString& NoUser::GetRealName() const { return m_sRealName.empty() ? m_sUserName : m_sRealName; }
-const NoString& NoUser::GetBindHost() const { return m_sBindHost; }
-const NoString& NoUser::GetDCCBindHost() const { return m_sDCCBindHost; }
-const NoString& NoUser::GetPass() const { return m_sPass; }
+NoString NoUser::GetRealName() const { return m_sRealName.empty() ? m_sUserName : m_sRealName; }
+NoString NoUser::GetBindHost() const { return m_sBindHost; }
+NoString NoUser::GetDCCBindHost() const { return m_sDCCBindHost; }
+NoString NoUser::GetPass() const { return m_sPass; }
 NoUser::eHashType NoUser::GetPassHashType() const { return m_eHashType; }
-const NoString& NoUser::GetPassSalt() const { return m_sPassSalt; }
+NoString NoUser::GetPassSalt() const { return m_sPassSalt; }
 bool NoUser::DenyLoadMod() const { return m_bDenyLoadMod; }
 bool NoUser::IsAdmin() const { return m_bAdmin; }
 bool NoUser::DenySetBindHost() const { return m_bDenySetBindHost; }
 bool NoUser::MultiClients() const { return m_bMultiClients; }
-const NoString& NoUser::GetStatusPrefix() const { return m_sStatusPrefix; }
-const NoString& NoUser::GetDefaultChanModes() const { return m_sDefaultChanModes; }
-const NoString& NoUser::GetClientEncoding() const { return m_sClientEncoding; }
+NoString NoUser::GetStatusPrefix() const { return m_sStatusPrefix; }
+NoString NoUser::GetDefaultChanModes() const { return m_sDefaultChanModes; }
+NoString NoUser::GetClientEncoding() const { return m_sClientEncoding; }
 bool NoUser::HasSpaceForNewNetwork() const { return GetNetworks().size() < MaxNetworks(); }
 
 NoString NoUser::GetQuitMsg() const { return (!m_sQuitMsg.Trim_n().empty()) ? m_sQuitMsg : NoApp::GetTag(false); }
-const NoStringMap& NoUser::GetCTCPReplies() const { return m_mssCTCPReplies; }
+NoStringMap NoUser::GetCTCPReplies() const { return m_mssCTCPReplies; }
 uint NoUser::GetBufferCount() const { return m_uBufferCount; }
 bool NoUser::AutoClearChanBuffer() const { return m_bAutoClearChanBuffer; }
 bool NoUser::AutoClearQueryBuffer() const { return m_bAutoClearQueryBuffer; }
 // NoString NoUser::GetSkinName() const { return (!m_sSkinName.empty()) ? m_sSkinName : NoApp::Get().GetSkinName(); }
 NoString NoUser::GetSkinName() const { return m_sSkinName; }
-const NoString& NoUser::GetUserPath() const
+NoString NoUser::GetUserPath() const
 {
     if (!NoFile::Exists(m_sUserPath)) {
         NoDir::MakeDir(m_sUserPath);

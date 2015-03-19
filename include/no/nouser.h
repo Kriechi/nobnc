@@ -78,7 +78,7 @@ public:
     bool AddNetwork(NoNetwork* pNetwork);
     void RemoveNetwork(NoNetwork* pNetwork);
     NoNetwork* FindNetwork(const NoString& sNetwork) const;
-    const std::vector<NoNetwork*>& GetNetworks() const;
+    std::vector<NoNetwork*> GetNetworks() const;
     bool HasSpaceForNewNetwork() const;
 
     bool PutUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
@@ -138,36 +138,36 @@ public:
     void SetMaxNetworks(uint i) { m_uMaxNetworks = i; }
     void SetMaxQueryBuffers(uint i) { m_uMaxQueryBuffers = i; }
 
-    const std::vector<NoClient*>& GetUserClients() const { return m_vClients; }
+    std::vector<NoClient*> GetUserClients() const { return m_vClients; }
     std::vector<NoClient*> GetAllClients() const;
-    const NoString& GetUserName() const;
-    const NoString& GetCleanUserName() const;
-    const NoString& GetNick(bool bAllowDefault = true) const;
-    const NoString& GetAltNick(bool bAllowDefault = true) const;
-    const NoString& GetIdent(bool bAllowDefault = true) const;
-    const NoString& GetRealName() const;
-    const NoString& GetBindHost() const;
-    const NoString& GetDCCBindHost() const;
-    const NoString& GetPass() const;
+    NoString GetUserName() const;
+    NoString GetCleanUserName() const;
+    NoString GetNick(bool bAllowDefault = true) const;
+    NoString GetAltNick(bool bAllowDefault = true) const;
+    NoString GetIdent(bool bAllowDefault = true) const;
+    NoString GetRealName() const;
+    NoString GetBindHost() const;
+    NoString GetDCCBindHost() const;
+    NoString GetPass() const;
     eHashType GetPassHashType() const;
-    const NoString& GetPassSalt() const;
-    const std::set<NoString>& GetAllowedHosts() const;
-    const NoString& GetTimestampFormat() const;
-    const NoString& GetClientEncoding() const;
+    NoString GetPassSalt() const;
+    std::set<NoString> GetAllowedHosts() const;
+    NoString GetTimestampFormat() const;
+    NoString GetClientEncoding() const;
     bool GetTimestampAppend() const;
     bool GetTimestampPrepend() const;
 
-    const NoString& GetUserPath() const;
+    NoString GetUserPath() const;
 
     bool DenyLoadMod() const;
     bool IsAdmin() const;
     bool DenySetBindHost() const;
     bool MultiClients() const;
-    const NoString& GetStatusPrefix() const;
-    const NoString& GetDefaultChanModes() const;
+    NoString GetStatusPrefix() const;
+    NoString GetDefaultChanModes() const;
 
     NoString GetQuitMsg() const;
-    const NoStringMap& GetCTCPReplies() const;
+    NoStringMap GetCTCPReplies() const;
     uint GetBufferCount() const;
     bool AutoClearChanBuffer() const;
     bool AutoClearQueryBuffer() const;
