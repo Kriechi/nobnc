@@ -18,7 +18,7 @@
 #define NOIRCCONNECTION_H
 
 #include <no/noglobal.h>
-#include <no/nosocket.h>
+#include <no/noircsocket.h>
 #include <no/nonick.h>
 
 #include <deque>

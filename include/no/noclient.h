@@ -18,7 +18,7 @@
 #define NOCLIENT_H
 
 #include <no/noglobal.h>
-#include <no/nosocket.h>
+#include <no/noircsocket.h>
 #include <no/noutils.h>
 #include <no/notable.h>
 #include <memory>
