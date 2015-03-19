@@ -18,7 +18,7 @@
 #include "nouser.h"
 #include "nodir.h"
 #include "nosettings.h"
-#include "noircsock.h"
+#include "noircconnection.h"
 #include "noserver.h"
 #include "nochannel.h"
 #include "noquery.h"
@@ -43,7 +43,7 @@ public:
 protected:
     void RunJob() override
     {
-        NoIrcSock* pIRCSock = m_pNetwork->GetIRCSock();
+        NoIrcConnection* pIRCSock = m_pNetwork->GetIRCSock();
 
         if (pIRCSock && pIRCSock->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
             pIRCSock->PutIRC("PING :ZNC");
@@ -186,7 +186,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     }
     if (m_uServerIdx == 0) {
         m_uServerIdx = m_vServers.size();
-        NoIrcSock* pSock = GetIRCSock();
+        NoIrcConnection* pSock = GetIRCSock();
 
         if (pSock) {
             PutStatus("Jumping servers because this server is no longer in the list");
@@ -1001,7 +1001,7 @@ bool NoNetwork::DelServer(const NoString& sName, ushort uPort, const NoString& s
         m_vServers.erase(it);
 
         if (pServer == pCurServer) {
-            NoIrcSock* pIRCSock = GetIRCSock();
+            NoIrcConnection* pIRCSock = GetIRCSock();
 
             // Make sure we don't skip the next server in the list!
             if (m_uServerIdx) {
@@ -1143,7 +1143,7 @@ void NoNetwork::SetIRNoNick(const NoNick& n)
 
 NoString NoNetwork::GetCurNick() const
 {
-    const NoIrcSock* pIRCSock = GetIRCSock();
+    const NoIrcConnection* pIRCSock = GetIRCSock();
 
     if (pIRCSock) {
         return pIRCSock->GetNick();
@@ -1180,7 +1180,7 @@ bool NoNetwork::Connect()
     }
 #endif
 
-    NoIrcSock* pIRCSock = new NoIrcSock(this);
+    NoIrcConnection* pIRCSock = new NoIrcConnection(this);
     pIRCSock->SetPass(pServer->GetPass());
     pIRCSock->SetSSLTrustedPeerFingerprints(m_ssTrustedFingerprints);
 
@@ -1204,11 +1204,11 @@ bool NoNetwork::Connect()
 
 bool NoNetwork::IsIRCConnected() const
 {
-    const NoIrcSock* pSock = GetIRCSock();
+    const NoIrcConnection* pSock = GetIRCSock();
     return (pSock && pSock->IsAuthed());
 }
 
-void NoNetwork::SetIRNoSocket(NoIrcSock* pIRCSock) { m_pIRCSock = pIRCSock; }
+void NoNetwork::SetIRNoSocket(NoIrcConnection* pIRCSock) { m_pIRCSock = pIRCSock; }
 
 void NoNetwork::IRCConnected()
 {
@@ -1253,7 +1253,7 @@ void NoNetwork::CheckIRCConnect()
 
 bool NoNetwork::PutIRC(const NoString& sLine)
 {
-    NoIrcSock* pIRCSock = GetIRCSock();
+    NoIrcConnection* pIRCSock = GetIRCSock();
 
     if (!pIRCSock) {
         return false;

@@ -18,7 +18,7 @@
 #include "nochannel.h"
 #include "nodir.h"
 #include "nonetwork.h"
-#include "noircsock.h"
+#include "noircconnection.h"
 #include "noserver.h"
 #include "nouser.h"
 #include "noquery.h"
@@ -68,7 +68,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         const std::map<NoString, NoNick>& msNicks = pChan->getNicks();
-        NoIrcSock* pIRCSock = m_pNetwork->GetIRCSock();
+        NoIrcConnection* pIRCSock = m_pNetwork->GetIRCSock();
         const NoString& sPerms = (pIRCSock) ? pIRCSock->GetPerms() : "";
 
         if (msNicks.empty()) {
@@ -472,7 +472,7 @@ void NoClient::UserCommand(NoString& sLine)
             NoStringVector vsUsers;
             vsUsers.push_back("All: " + NoString(pChan->getNickCount()));
 
-            NoIrcSock* pIRCSock = m_pNetwork->GetIRCSock();
+            NoIrcConnection* pIRCSock = m_pNetwork->GetIRCSock();
             const NoString& sPerms = pIRCSock ? pIRCSock->GetPerms() : "";
             std::map<char, uint> mPerms = pChan->getPermCounts();
             for (char cPerm : sPerms) {

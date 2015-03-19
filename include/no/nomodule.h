@@ -35,7 +35,7 @@ class NoNetwork;
 class NoClient;
 class NoWebSock;
 class NoTemplate;
-class NoIrcSock;
+class NoIrcConnection;
 class NoModule;
 class NoModInfo;
 
@@ -419,12 +419,12 @@ public:
      *  @param pIRCSock The socket that will be used for the connection.
      *  @return See NoModule::EModRet.
      */
-    virtual EModRet OnIRCConnecting(NoIrcSock* pIRCSock);
+    virtual EModRet OnIRCConnecting(NoIrcConnection* pIRCSock);
     /** This module hook is called when a NoIrcSock fails to connect or
      *  a module returned HALTCORE from OnIRCConnecting.
      *  @param pIRCSock The socket that failed to connect.
      */
-    virtual void OnIRCConnectionError(NoIrcSock* pIRCSock);
+    virtual void OnIRCConnectionError(NoIrcConnection* pIRCSock);
     /** This module hook is called before loging in to the IRC server. The
      *  low-level connection is established at this point, but SSL
      *  handshakes didn't necessarily finish yet.

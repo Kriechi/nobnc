@@ -33,7 +33,7 @@ class NoSettings;
 class NoChannel;
 class NoQuery;
 class NoServer;
-class NoIrcSock;
+class NoIrcConnection;
 class NoNetworkPingTimer;
 class NoNetworkJoinTimer;
 
@@ -134,8 +134,8 @@ public:
     void SetIRCConnectEnabled(bool b);
     bool GetIRCConnectEnabled() const { return m_bIRCConnectEnabled; }
 
-    NoIrcSock* GetIRCSock() { return m_pIRCSock; }
-    const NoIrcSock* GetIRCSock() const { return m_pIRCSock; }
+    NoIrcConnection* GetIRCSock() { return m_pIRCSock; }
+    const NoIrcConnection* GetIRCSock() const { return m_pIRCSock; }
     const NoString& GetIRNoServer() const;
     const NoNick& GetIRNoNick() const;
     void SetIRNoNick(const NoNick& n);
@@ -145,7 +145,7 @@ public:
 
     bool Connect();
     bool IsIRCConnected() const;
-    void SetIRNoSocket(NoIrcSock* pIRCSock);
+    void SetIRNoSocket(NoIrcConnection* pIRCSock);
     void IRCConnected();
     void IRCDisconnected();
     void CheckIRCConnect();
@@ -226,7 +226,7 @@ private:
 
     std::vector<NoClient*> m_vClients;
 
-    NoIrcSock* m_pIRCSock;
+    NoIrcConnection* m_pIRCSock;
 
     std::vector<NoChannel*> m_vChans;
     std::vector<NoQuery*> m_vQueries;

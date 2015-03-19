@@ -15,7 +15,7 @@
  */
 
 #include <no/nonetwork.h>
-#include <no/noircsock.h>
+#include <no/noircconnection.h>
 #include <no/nodebug.h>
 
 static const struct

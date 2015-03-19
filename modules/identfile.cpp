@@ -15,7 +15,7 @@
  */
 
 #include <no/nofile.h>
-#include <no/noircsock.h>
+#include <no/noircconnection.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/nodebug.h>
@@ -24,7 +24,7 @@ class NoIdentFileModule : public NoModule
 {
     NoString m_sOrigISpoof;
     NoFile* m_pISpoofLockFile;
-    NoIrcSock* m_pIRCSock;
+    NoIrcConnection* m_pIRCSock;
 
 public:
     MODCONSTRUCTOR(NoIdentFileModule)
@@ -84,7 +84,7 @@ public:
         }
     }
 
-    void SetIRCSock(NoIrcSock* pIRCSock)
+    void SetIRCSock(NoIrcConnection* pIRCSock)
     {
         if (m_pIRCSock) {
             NoApp::Get().ResumeConnectQueue();
@@ -171,7 +171,7 @@ public:
         return true;
     }
 
-    EModRet OnIRCConnecting(NoIrcSock* pIRCSock) override
+    EModRet OnIRCConnecting(NoIrcConnection* pIRCSock) override
     {
         if (m_pISpoofLockFile != nullptr) {
             DEBUG("Aborting connection, ident spoof lock file exists");
@@ -197,7 +197,7 @@ public:
         }
     }
 
-    void OnIRCConnectionError(NoIrcSock* pIRCSock) override
+    void OnIRCConnectionError(NoIrcConnection* pIRCSock) override
     {
         if (m_pIRCSock == pIRCSock) {
             ReleaseISpoof();

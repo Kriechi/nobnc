@@ -16,7 +16,7 @@
  */
 
 #include <no/nonetwork.h>
-#include <no/noircsock.h>
+#include <no/noircconnection.h>
 
 class NoAutoReplyMod : public NoModule
 {
@@ -61,7 +61,7 @@ public:
 
     void Handle(const NoString& sNick)
     {
-        NoIrcSock* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcConnection* pIRCSock = GetNetwork()->GetIRCSock();
         if (!pIRCSock)
             // WTF?
             return;

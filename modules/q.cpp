@@ -16,7 +16,7 @@
 
 #include <no/nouser.h>
 #include <no/nonetwork.h>
-#include <no/noircsock.h>
+#include <no/noircconnection.h>
 #include <no/nochannel.h>
 
 #ifndef Q_DEBUG_COMMUNICATION
@@ -531,7 +531,7 @@ private:
     /* Utility Functions */
     bool IsIRCConnected()
     {
-        NoIrcSock* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcConnection* pIRCSock = GetNetwork()->GetIRCSock();
         return pIRCSock && pIRCSock->IsAuthed();
     }
 

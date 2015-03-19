@@ -16,7 +16,7 @@
 
 #include "noclient.h"
 #include "nochannel.h"
-#include "noircsock.h"
+#include "noircconnection.h"
 #include "nodebug.h"
 #include "nouser.h"
 #include "nonetwork.h"
@@ -570,7 +570,7 @@ const std::vector<NoClient*>& NoClient::GetClients() const
     return m_pUser->GetUserClients();
 }
 
-const NoIrcSock* NoClient::GetIRCSock() const
+const NoIrcConnection* NoClient::GetIRCSock() const
 {
     if (m_pNetwork) {
         return m_pNetwork->GetIRCSock();
@@ -579,7 +579,7 @@ const NoIrcSock* NoClient::GetIRCSock() const
     return nullptr;
 }
 
-NoIrcSock* NoClient::GetIRCSock()
+NoIrcConnection* NoClient::GetIRCSock()
 {
     if (m_pNetwork) {
         return m_pNetwork->GetIRCSock();
@@ -836,7 +836,7 @@ NoString NoClient::GetNick(bool bAllowIRNoNick) const
 {
     NoString sRet;
 
-    const NoIrcSock* pSock = GetIRCSock();
+    const NoIrcConnection* pSock = GetIRCSock();
     if (bAllowIRNoNick && pSock && pSock->IsAuthed()) {
         sRet = pSock->GetNick();
     }

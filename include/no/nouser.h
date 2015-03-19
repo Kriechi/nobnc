@@ -30,7 +30,7 @@ class NoClient;
 class NoSettings;
 class NoFile;
 class NoNetwork;
-class NoIrcSock;
+class NoIrcConnection;
 class NoUserTimer;
 class NoServer;
 

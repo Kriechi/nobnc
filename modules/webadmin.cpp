@@ -18,7 +18,7 @@
 #include <no/noserver.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
-#include <no/noircsock.h>
+#include <no/noircconnection.h>
 #include <no/nodebug.h>
 
 /* Stuff to be able to write this:
@@ -877,7 +877,7 @@ public:
 
                 Tmpl["QuitMsg"] = pNetwork->GetQuitMsg();
 
-                Tmpl["FloodProtection"] = NoString(NoIrcSock::IsFloodProtected(pNetwork->GetFloodRate()));
+                Tmpl["FloodProtection"] = NoString(NoIrcConnection::IsFloodProtected(pNetwork->GetFloodRate()));
                 Tmpl["FloodRate"] = NoString(pNetwork->GetFloodRate());
                 Tmpl["FloodBurst"] = NoString(pNetwork->GetFloodBurst());
 

@@ -15,7 +15,7 @@
  */
 
 #include "nonick.h"
-#include "noircsock.h"
+#include "noircconnection.h"
 #include "nonetwork.h"
 
 NoNick::NoNick(const NoString& mask) : m_perms(""), m_network(nullptr), m_nick(""), m_ident(""), m_host("")
@@ -113,7 +113,7 @@ static NoString availablePerms(NoNetwork* network)
 {
     NoString perms = "@+";
     if (network) {
-        NoIrcSock* socket = network->GetIRCSock();
+        NoIrcConnection* socket = network->GetIRCSock();
         if (socket)
             perms = socket->GetPerms();
     }

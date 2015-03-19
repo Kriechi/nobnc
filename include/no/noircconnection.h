@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef NOIRCSOCK_H
-#define NOIRCSOCK_H
+#ifndef NOIRCCONNECTION_H
+#define NOIRCCONNECTION_H
 
 #include <no/noglobal.h>
 #include <no/nosocket.h>
@@ -28,15 +28,14 @@ class NoUser;
 class NoNetwork;
 class NoClient;
 
-// TODO: This class needs new name
-class NO_EXPORT NoIrcSock : public NoIrcSocket
+class NO_EXPORT NoIrcConnection : public NoIrcSocket
 {
 public:
-    NoIrcSock(NoNetwork* pNetwork);
-    virtual ~NoIrcSock();
+    NoIrcConnection(NoNetwork* pNetwork);
+    virtual ~NoIrcConnection();
 
-    NoIrcSock(const NoIrcSock&) = delete;
-    NoIrcSock& operator=(const NoIrcSock&) = delete;
+    NoIrcConnection(const NoIrcConnection&) = delete;
+    NoIrcConnection& operator=(const NoIrcConnection&) = delete;
 
     enum EChanModeArgs {
         // These values must line up with their position in the CHANMODE argument to raw 005
@@ -146,4 +145,4 @@ private:
     friend class NoIrcFloodTimer;
 };
 
-#endif // NOIRCSOCK_H
+#endif // NOIRCCONNECTION_H

@@ -29,7 +29,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/noexecsock.h
                        include/no/nofile.h
                        include/no/nohttpsock.h
-                       include/no/noircsock.h
+                       include/no/noircconnection.h
                        include/no/nolistener.h
                        include/no/nonamespace.h
                        include/no/nomessage.h
@@ -71,7 +71,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/noexecsock.cpp
                        src/nofile.cpp
                        src/nohttpsock.cpp
-                       src/noircsock.cpp
+                       src/noircconnection.cpp
                        src/nolistener.cpp
                        src/nomessage.cpp
                        src/nomodule.cpp

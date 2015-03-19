@@ -26,7 +26,7 @@
 class NoApp;
 class NoUser;
 class NoNetwork;
-class NoIrcSock;
+class NoIrcConnection;
 class NoClient;
 
 class NO_EXPORT NoAuthBase
@@ -164,8 +164,8 @@ public:
     void SetNetwork(NoNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
     NoNetwork* GetNetwork() const { return m_pNetwork; }
     const std::vector<NoClient*>& GetClients() const;
-    const NoIrcSock* GetIRCSock() const;
-    NoIrcSock* GetIRCSock();
+    const NoIrcConnection* GetIRCSock() const;
+    NoIrcConnection* GetIRCSock();
     NoString GetFullName() const;
 
 private:

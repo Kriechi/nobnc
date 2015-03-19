@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "noircsock.h"
+#include "noircconnection.h"
 #include "nochannel.h"
 #include "nouser.h"
 #include "nonetwork.h"
@@ -25,8 +25,8 @@
 #define IRCSOCKMODULECALL(macFUNC, macEXITER) \
     NETWORKMODULECALL(macFUNC, m_pNetwork->GetUser(), m_pNetwork, nullptr, macEXITER)
 // These are used in OnGeneralCTCP()
-const time_t NoIrcSock::m_uCTCPFloodTime = 5;
-const uint NoIrcSock::m_uCTCPFloodCount = 5;
+const time_t NoIrcConnection::m_uCTCPFloodTime = 5;
+const uint NoIrcConnection::m_uCTCPFloodCount = 5;
 
 // It will be bad if user sets it to 0.00000000000001
 // If you want no flood protection, set network's flood rate to -1
@@ -35,10 +35,10 @@ static const double FLOOD_MINIMAL_RATE = 0.3;
 
 class NoIrcFloodTimer : public CCron
 {
-    NoIrcSock* m_pSock;
+    NoIrcConnection* m_pSock;
 
 public:
-    NoIrcFloodTimer(NoIrcSock* pSock) : m_pSock(pSock) { StartMaxCycles(m_pSock->m_fFloodRate, 0); }
+    NoIrcFloodTimer(NoIrcConnection* pSock) : m_pSock(pSock) { StartMaxCycles(m_pSock->m_fFloodRate, 0); }
     NoIrcFloodTimer(const NoIrcFloodTimer&) = delete;
     NoIrcFloodTimer& operator=(const NoIrcFloodTimer&) = delete;
     void RunJob() override
@@ -50,9 +50,9 @@ public:
     }
 };
 
-bool NoIrcSock::IsFloodProtected(double fRate) { return fRate > FLOOD_MINIMAL_RATE; }
+bool NoIrcConnection::IsFloodProtected(double fRate) { return fRate > FLOOD_MINIMAL_RATE; }
 
-NoIrcSock::NoIrcSock(NoNetwork* pNetwork)
+NoIrcConnection::NoIrcConnection(NoNetwork* pNetwork)
     : NoIrcSocket(), m_bAuthed(false), m_bNamesx(false), m_bUHNames(false), m_sPerms("*!@%+"), m_sPermModes("qaohv"),
       m_scUserModes(), m_mueChanModes(), m_pNetwork(pNetwork), m_Nick(), m_sPass(""), m_msChans(), m_uMaxNickLen(9),
       m_uCapPaused(0), m_ssAcceptedCaps(), m_ssPendingCaps(), m_lastCTCP(0), m_uNumCTCP(0), m_mISupport(),
@@ -84,7 +84,7 @@ NoIrcSock::NoIrcSock(NoNetwork* pNetwork)
     }
 }
 
-NoIrcSock::~NoIrcSock()
+NoIrcConnection::~NoIrcConnection()
 {
     if (!m_bAuthed) {
         IRCSOCKMODULECALL(OnIRCConnectionError(this), NOTHING);
@@ -107,7 +107,7 @@ NoIrcSock::~NoIrcSock()
     m_pNetwork->GetUser()->AddBytesWritten(GetBytesWritten());
 }
 
-void NoIrcSock::Quit(const NoString& sQuitMsg)
+void NoIrcConnection::Quit(const NoString& sQuitMsg)
 {
     if (!m_bAuthed) {
         Close(CLT_NOW);
@@ -121,7 +121,7 @@ void NoIrcSock::Quit(const NoString& sQuitMsg)
     Close(CLT_AFTERWRITE);
 }
 
-void NoIrcSock::ReadLineImpl(const NoString& sData)
+void NoIrcConnection::ReadLineImpl(const NoString& sData)
 {
     NoString sLine = sData;
 
@@ -819,7 +819,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
     m_pNetwork->PutUser(sLine);
 }
 
-void NoIrcSock::SendNextCap()
+void NoIrcConnection::SendNextCap()
 {
     if (!m_uCapPaused) {
         if (m_ssPendingCaps.empty()) {
@@ -833,22 +833,22 @@ void NoIrcSock::SendNextCap()
     }
 }
 
-void NoIrcSock::PauseCap() { ++m_uCapPaused; }
+void NoIrcConnection::PauseCap() { ++m_uCapPaused; }
 
-void NoIrcSock::ResumeCap()
+void NoIrcConnection::ResumeCap()
 {
     --m_uCapPaused;
     SendNextCap();
 }
 
-bool NoIrcSock::OnServerCapAvailable(const NoString& sCap)
+bool NoIrcConnection::OnServerCapAvailable(const NoString& sCap)
 {
     bool bResult = false;
     IRCSOCKMODULECALL(OnServerCapAvailable(sCap), &bResult);
     return bResult;
 }
 
-bool NoIrcSock::OnCTCPReply(NoNick& Nick, NoString& sMessage)
+bool NoIrcConnection::OnCTCPReply(NoNick& Nick, NoString& sMessage)
 {
     bool bResult = false;
     IRCSOCKMODULECALL(OnCTCPReply(Nick, sMessage), &bResult);
@@ -856,7 +856,7 @@ bool NoIrcSock::OnCTCPReply(NoNick& Nick, NoString& sMessage)
     return bResult;
 }
 
-bool NoIrcSock::OnPrivCTCP(NoNick& Nick, NoString& sMessage)
+bool NoIrcConnection::OnPrivCTCP(NoNick& Nick, NoString& sMessage)
 {
     bool bResult = false;
     IRCSOCKMODULECALL(OnPrivCTCP(Nick, sMessage), &bResult);
@@ -881,7 +881,7 @@ bool NoIrcSock::OnPrivCTCP(NoNick& Nick, NoString& sMessage)
     return OnGeneralCTCP(Nick, sMessage);
 }
 
-bool NoIrcSock::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
+bool NoIrcConnection::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
 {
     const NoStringMap& mssCTCPReplies = m_pNetwork->GetUser()->GetCTCPReplies();
     NoString sQuery = sMessage.Token(0).AsUpper();
@@ -925,7 +925,7 @@ bool NoIrcSock::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
     return false;
 }
 
-bool NoIrcSock::OnPrivNotice(NoNick& Nick, NoString& sMessage)
+bool NoIrcConnection::OnPrivNotice(NoNick& Nick, NoString& sMessage)
 {
     bool bResult = false;
     IRCSOCKMODULECALL(OnPrivNotice(Nick, sMessage), &bResult);
@@ -939,7 +939,7 @@ bool NoIrcSock::OnPrivNotice(NoNick& Nick, NoString& sMessage)
     return false;
 }
 
-bool NoIrcSock::OnPrivMsg(NoNick& Nick, NoString& sMessage)
+bool NoIrcConnection::OnPrivMsg(NoNick& Nick, NoString& sMessage)
 {
     bool bResult = false;
     IRCSOCKMODULECALL(OnPrivMsg(Nick, sMessage), &bResult);
@@ -955,7 +955,7 @@ bool NoIrcSock::OnPrivMsg(NoNick& Nick, NoString& sMessage)
     return false;
 }
 
-bool NoIrcSock::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMessage)
+bool NoIrcConnection::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
     NoChannel* pChan = m_pNetwork->FindChan(sChan);
     if (pChan) {
@@ -982,7 +982,7 @@ bool NoIrcSock::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMessa
     return (pChan && pChan->isDetached());
 }
 
-bool NoIrcSock::OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage)
+bool NoIrcConnection::OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
     NoChannel* pChan = m_pNetwork->FindChan(sChan);
     if (pChan) {
@@ -998,7 +998,7 @@ bool NoIrcSock::OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMes
     return ((pChan) && (pChan->isDetached()));
 }
 
-bool NoIrcSock::OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage)
+bool NoIrcConnection::OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
     NoChannel* pChan = m_pNetwork->FindChan(sChan);
     if (pChan) {
@@ -1014,7 +1014,7 @@ bool NoIrcSock::OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessag
     return ((pChan) && (pChan->isDetached()));
 }
 
-void NoIrcSock::PutIRC(const NoString& sLine)
+void NoIrcConnection::PutIRC(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (m_bFloodProtection && m_iSendsAllowed <= 0) {
@@ -1024,7 +1024,7 @@ void NoIrcSock::PutIRC(const NoString& sLine)
     TrySend();
 }
 
-void NoIrcSock::PutIRCQuick(const NoString& sLine)
+void NoIrcConnection::PutIRCQuick(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (m_bFloodProtection && m_iSendsAllowed <= 0) {
@@ -1035,7 +1035,7 @@ void NoIrcSock::PutIRCQuick(const NoString& sLine)
     TrySend();
 }
 
-void NoIrcSock::TrySend()
+void NoIrcConnection::TrySend()
 {
     // This condition must be the same as in PutIRC() and PutIRCQuick()!
     while (!m_vsSendQueue.empty() && (!m_bFloodProtection || m_iSendsAllowed > 0)) {
@@ -1052,13 +1052,13 @@ void NoIrcSock::TrySend()
     }
 }
 
-void NoIrcSock::SetNick(const NoString& sNick)
+void NoIrcConnection::SetNick(const NoString& sNick)
 {
     m_Nick.setNick(sNick);
     m_pNetwork->SetIRNoNick(m_Nick);
 }
 
-void NoIrcSock::ConnectedImpl()
+void NoIrcConnection::ConnectedImpl()
 {
     DEBUG(GetSockName() << " == Connected()");
 
@@ -1084,7 +1084,7 @@ void NoIrcSock::ConnectedImpl()
     m_Nick.setNick(sNick);
 }
 
-void NoIrcSock::DisconnectedImpl()
+void NoIrcConnection::DisconnectedImpl()
 {
     IRCSOCKMODULECALL(OnIRCDisconnected(), NOTHING);
 
@@ -1113,7 +1113,7 @@ void NoIrcSock::DisconnectedImpl()
     m_scUserModes.clear();
 }
 
-void NoIrcSock::SockErrorImpl(int iErrno, const NoString& sDescription)
+void NoIrcConnection::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
     NoString sError = sDescription;
 
@@ -1159,7 +1159,7 @@ void NoIrcSock::SockErrorImpl(int iErrno, const NoString& sDescription)
     m_scUserModes.clear();
 }
 
-void NoIrcSock::TimeoutImpl()
+void NoIrcConnection::TimeoutImpl()
 {
     DEBUG(GetSockName() << " == Timeout()");
     if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
@@ -1172,7 +1172,7 @@ void NoIrcSock::TimeoutImpl()
     m_scUserModes.clear();
 }
 
-void NoIrcSock::ConnectionRefusedImpl()
+void NoIrcConnection::ConnectionRefusedImpl()
 {
     DEBUG(GetSockName() << " == ConnectionRefused()");
     if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
@@ -1182,14 +1182,14 @@ void NoIrcSock::ConnectionRefusedImpl()
     m_pNetwork->ClearMotdBuffer();
 }
 
-void NoIrcSock::ReachedMaxBufferImpl()
+void NoIrcConnection::ReachedMaxBufferImpl()
 {
     DEBUG(GetSockName() << " == ReachedMaxBuffer()");
     m_pNetwork->PutStatus("Received a too long line from the IRC server!");
     Quit();
 }
 
-void NoIrcSock::ParseISupport(const NoString& sLine)
+void NoIrcConnection::ParseISupport(const NoString& sLine)
 {
     NoStringVector vsTokens = sLine.Split(" ", No::SkipEmptyParts);
 
@@ -1244,7 +1244,7 @@ void NoIrcSock::ParseISupport(const NoString& sLine)
     }
 }
 
-NoString NoIrcSock::GetISupport(const NoString& sKey, const NoString& sDefault) const
+NoString NoIrcConnection::GetISupport(const NoString& sKey, const NoString& sDefault) const
 {
     NoStringMap::const_iterator i = m_mISupport.find(sKey.AsUpper());
     if (i == m_mISupport.end()) {
@@ -1254,7 +1254,7 @@ NoString NoIrcSock::GetISupport(const NoString& sKey, const NoString& sDefault) 
     }
 }
 
-void NoIrcSock::ForwardRaw353(const NoString& sLine) const
+void NoIrcConnection::ForwardRaw353(const NoString& sLine) const
 {
     const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
 
@@ -1263,7 +1263,7 @@ void NoIrcSock::ForwardRaw353(const NoString& sLine) const
     }
 }
 
-void NoIrcSock::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
+void NoIrcConnection::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
 {
     NoString sNicks = sLine.Tokens(5).TrimPrefix_n();
 
@@ -1301,7 +1301,7 @@ void NoIrcSock::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
     }
 }
 
-void NoIrcSock::SendAltNick(const NoString& sBadNick)
+void NoIrcConnection::SendAltNick(const NoString& sBadNick)
 {
     const NoString& sLastNick = m_Nick.nick();
 
@@ -1353,7 +1353,7 @@ void NoIrcSock::SendAltNick(const NoString& sBadNick)
     m_Nick.setNick(sNewNick);
 }
 
-uchar NoIrcSock::GetPermFromMode(uchar uMode) const
+uchar NoIrcConnection::GetPermFromMode(uchar uMode) const
 {
     if (m_sPermModes.size() == m_sPerms.size()) {
         for (uint a = 0; a < m_sPermModes.size(); a++) {
@@ -1366,7 +1366,7 @@ uchar NoIrcSock::GetPermFromMode(uchar uMode) const
     return 0;
 }
 
-NoIrcSock::EChanModeArgs NoIrcSock::GetModeType(uchar uMode) const
+NoIrcConnection::EChanModeArgs NoIrcConnection::GetModeType(uchar uMode) const
 {
     std::map<uchar, EChanModeArgs>::const_iterator it = m_mueChanModes.find(uMode);
 
@@ -1377,7 +1377,7 @@ NoIrcSock::EChanModeArgs NoIrcSock::GetModeType(uchar uMode) const
     return it->second;
 }
 
-void NoIrcSock::ResetChans()
+void NoIrcConnection::ResetChans()
 {
     for (const auto& it : m_msChans) {
         it.second->reset();

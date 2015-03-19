@@ -20,7 +20,7 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/nochannel.h>
-#include <no/noircsock.h>
+#include <no/noircconnection.h>
 
 template <std::size_t N> struct array_size_helper
 {
@@ -1105,7 +1105,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoIrcSock* pIRCSock = pNetwork->GetIRCSock();
+        NoIrcConnection* pIRCSock = pNetwork->GetIRCSock();
         // cancel connection attempt:
         if (pIRCSock && !pIRCSock->IsConnected()) {
             pIRCSock->Close();

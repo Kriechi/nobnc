@@ -15,7 +15,7 @@
  */
 
 #include <no/nonetwork.h>
-#include <no/noircsock.h>
+#include <no/noircconnection.h>
 
 class NoKeepNickMod;
 
@@ -69,7 +69,7 @@ public:
             // No timer means we are turned off
             return;
 
-        NoIrcSock* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcConnection* pIRCSock = GetNetwork()->GetIRCSock();
 
         if (!pIRCSock) return;
 
@@ -82,7 +82,7 @@ public:
     NoString GetNick()
     {
         NoString sConfNick = GetNetwork()->GetNick();
-        NoIrcSock* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcConnection* pIRCSock = GetNetwork()->GetIRCSock();
 
         if (pIRCSock) sConfNick = sConfNick.Left(pIRCSock->GetMaxNickLen());
 
