@@ -195,7 +195,7 @@ NoString NoBaseSocket::GetSSLPeerFingerprint() const
         DEBUG(GetSockName() + ": GetSSLPeerFingerprint: Couldn't find digest");
         return "";
     }
-    return NoString(reinterpret_cast<const char*>(buf), sizeof buf).Escape_n(NoString::EASCII, NoString::EHEXCOLON);
+    return NoString(reinterpret_cast<const char*>(buf), sizeof buf).Escape_n(No::AsciiFormat, No::HexColonFormat);
 #else
     return "";
 #endif

@@ -26,7 +26,7 @@
 #include <sstream>
 #include <cstring>
 
-#define _NAMEDFMT(s) NoString(s).Escape_n(NoString::ENAMEDFMT)
+#define _NAMEDFMT(s) NoString(s).Escape_n(No::NamedFormat)
 
 class NoString;
 
@@ -46,17 +46,6 @@ typedef std::vector<NoStringPair> NoStringPairVector;
 class NO_EXPORT NoString : public std::string
 {
 public:
-    enum EEscape {
-        EASCII,
-        EURL,
-        EHTML,
-        ESQL,
-        ENAMEDFMT,
-        EDEBUG,
-        EMSGTAG,
-        EHEXCOLON,
-    };
-
     NoString();
     NoString(const char* c);
     NoString(const char* c, size_t l);
@@ -151,11 +140,11 @@ public:
      */
     NoString AsLower() const;
 
-    static EEscape ToEscape(const NoString& sEsc);
-    NoString Escape_n(EEscape eFrom, EEscape eTo) const;
-    NoString Escape_n(EEscape eTo) const;
-    NoString& Escape(EEscape eFrom, EEscape eTo);
-    NoString& Escape(EEscape eTo);
+    static No::EscapeFormat ToEscape(const NoString& sEsc);
+    NoString Escape_n(No::EscapeFormat eFrom, No::EscapeFormat eTo) const;
+    NoString Escape_n(No::EscapeFormat eTo) const;
+    NoString& Escape(No::EscapeFormat eFrom, No::EscapeFormat eTo);
+    NoString& Escape(No::EscapeFormat eTo);
 
     /** Replace all occurrences in the current string.
      * You can specify a "safe zone" via sLeft and sRight. Anything inside

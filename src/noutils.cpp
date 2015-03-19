@@ -538,7 +538,7 @@ NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
         for (const NoString& sTag : vsTags) {
             NoString sKey = sTag.Token(0, false, "=", true);
             NoString sValue = sTag.Token(1, true, "=", true);
-            mssTags[sKey] = sValue.Escape(NoString::EMSGTAG, NoString::NoString::EASCII);
+            mssTags[sKey] = sValue.Escape(No::MsgTagFormat, No::AsciiFormat);
         }
         return mssTags;
     }
@@ -558,7 +558,7 @@ void NoUtils::SetMessageTags(NoString& sLine, const NoStringMap& mssTags)
                 sTags += ";";
             }
             sTags += it.first;
-            if (!it.second.empty()) sTags += "=" + it.second.Escape_n(NoString::EMSGTAG);
+            if (!it.second.empty()) sTags += "=" + it.second.Escape_n(No::MsgTagFormat);
         }
         sLine = "@" + sTags + " " + sLine;
     }

@@ -22,6 +22,17 @@
 namespace No
 {
     enum CaseSensitivity { CaseInsensitive, CaseSensitive };
+
+    enum EscapeFormat {
+        AsciiFormat,
+        UrlFormat,
+        HtmlFormat,
+        SqlFormat,
+        NamedFormat,
+        DebugFormat,
+        MsgTagFormat,
+        HexColonFormat
+    };
 }
 
 #endif // NONAMESPACE_H

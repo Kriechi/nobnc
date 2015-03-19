@@ -392,7 +392,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         if (vsArgs.size() > 1) {
                             NoString sDelim = vsArgs[0];
                             bool bFoundOne = false;
-                            NoString::EEscape eEscape = NoString::EASCII;
+                            No::EscapeFormat eEscape = No::AsciiFormat;
 
                             for (const NoString& sArg : vsArgs) {
                                 if (sArg.StartsWith("ESC=")) {

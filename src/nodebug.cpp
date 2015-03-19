@@ -38,5 +38,5 @@ NoDebugStream::~NoDebugStream()
     strftime(sTime, sizeof(sTime), "%Y-%m-%d %H:%M:%S", &tM);
     char sUsec[7] = {};
     snprintf(sUsec, sizeof(sUsec), "%06lu", (ulong)tTime.tv_usec);
-    std::cout << "[" << sTime << "." << sUsec << "] " << NoString(this->str()).Escape_n(NoString::EDEBUG) << std::endl;
+    std::cout << "[" << sTime << "." << sUsec << "] " << NoString(this->str()).Escape_n(No::DebugFormat) << std::endl;
 }

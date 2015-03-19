@@ -20,7 +20,7 @@
 // GTest uses this function to output objects
 static void PrintTo(const NoString& s, std::ostream* o)
 {
-    *o << '"' << s.Escape_n(NoString::EASCII, NoString::EDEBUG) << '"';
+    *o << '"' << s.Escape_n(No::AsciiFormat, No::DebugFormat) << '"';
 }
 
 class EscapeTest : public ::testing::Test
@@ -28,15 +28,15 @@ class EscapeTest : public ::testing::Test
 protected:
     void testEncode(const NoString& in, const NoString& expectedOut, const NoString& sformat)
     {
-        NoString::EEscape format = NoString::ToEscape(sformat);
+        No::EscapeFormat format = NoString::ToEscape(sformat);
         NoString out;
 
         SCOPED_TRACE("Format: " + sformat);
 
         // Encode, then decode again and check we still got the same string
-        out = in.Escape_n(NoString::EASCII, format);
+        out = in.Escape_n(No::AsciiFormat, format);
         EXPECT_EQ(expectedOut, out);
-        out = out.Escape_n(format, NoString::EASCII);
+        out = out.Escape_n(format, No::AsciiFormat);
         EXPECT_EQ(in, out);
     }
 

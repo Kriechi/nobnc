@@ -55,18 +55,18 @@ class NoTemplate;
 class NO_EXPORT NoTemplateOptions
 {
 public:
-    NoTemplateOptions() : m_eEscapeFrom(NoString::EASCII), m_eEscapeTo(NoString::EASCII) {}
+    NoTemplateOptions() : m_eEscapeFrom(No::AsciiFormat), m_eEscapeTo(No::AsciiFormat) {}
 
     virtual ~NoTemplateOptions() {}
 
     void Parse(const NoString& sLine);
 
-    NoString::EEscape GetEscapeFrom() const { return m_eEscapeFrom; }
-    NoString::EEscape GetEscapeTo() const { return m_eEscapeTo; }
+    No::EscapeFormat GetEscapeFrom() const { return m_eEscapeFrom; }
+    No::EscapeFormat GetEscapeTo() const { return m_eEscapeTo; }
 
 private:
-    NoString::EEscape m_eEscapeFrom;
-    NoString::EEscape m_eEscapeTo;
+    No::EscapeFormat m_eEscapeFrom;
+    No::EscapeFormat m_eEscapeTo;
 };
 
 

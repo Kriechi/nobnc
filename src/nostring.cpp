@@ -249,30 +249,30 @@ NoString NoString::AsLower() const
     return sRet;
 }
 
-NoString::EEscape NoString::ToEscape(const NoString& sEsc)
+No::EscapeFormat NoString::ToEscape(const NoString& sEsc)
 {
     if (sEsc.Equals("ASCII")) {
-        return EASCII;
+        return No::AsciiFormat;
     } else if (sEsc.Equals("HTML")) {
-        return EHTML;
+        return No::HtmlFormat;
     } else if (sEsc.Equals("URL")) {
-        return EURL;
+        return No::UrlFormat;
     } else if (sEsc.Equals("SQL")) {
-        return ESQL;
+        return No::SqlFormat;
     } else if (sEsc.Equals("NAMEDFMT")) {
-        return ENAMEDFMT;
+        return No::NamedFormat;
     } else if (sEsc.Equals("DEBUG")) {
-        return EDEBUG;
+        return No::DebugFormat;
     } else if (sEsc.Equals("MSGTAG")) {
-        return EMSGTAG;
+        return No::MsgTagFormat;
     } else if (sEsc.Equals("HEXCOLON")) {
-        return EHEXCOLON;
+        return No::HexColonFormat;
     }
 
-    return EASCII;
+    return No::AsciiFormat;
 }
 
-NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
+NoString NoString::Escape_n(No::EscapeFormat eFrom, No::EscapeFormat eTo) const
 {
     NoString sRet;
     const char szHex[] = "0123456789ABCDEF";
@@ -287,7 +287,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
         uchar ch = 0;
 
         switch (eFrom) {
-        case EHTML:
+        case No::HtmlFormat:
             if ((*p == '&') && (strnchr((uchar*)p, ';', sizeof(pTmp) - 1, pTmp, &iCounted))) {
                 // please note that we do not have any Unicode or UTF-8 support here at all.
 
@@ -328,10 +328,10 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
                 ch = *p;
             }
             break;
-        case EASCII:
+        case No::AsciiFormat:
             ch = *p;
             break;
-        case EURL:
+        case No::UrlFormat:
             if (*p == '%' && (a + 2) < iLength && isxdigit(*(p + 1)) && isxdigit(*(p + 2))) {
                 p++;
                 if (isdigit(*p)) {
@@ -355,7 +355,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case ESQL:
+        case No::SqlFormat:
             if (*p != '\\' || iLength < (a + 1)) {
                 ch = *p;
             } else {
@@ -378,7 +378,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case ENAMEDFMT:
+        case No::NamedFormat:
             if (*p != '\\' || iLength < (a + 1)) {
                 ch = *p;
             } else {
@@ -388,7 +388,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case EDEBUG:
+        case No::DebugFormat:
             if (*p == '\\' && (a + 3) < iLength && *(p + 1) == 'x' && isxdigit(*(p + 2)) && isxdigit(*(p + 3))) {
                 p += 2;
                 if (isdigit(*p)) {
@@ -414,7 +414,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case EMSGTAG:
+        case No::MsgTagFormat:
             if (*p != '\\' || iLength < (a + 1)) {
                 ch = *p;
             } else {
@@ -439,7 +439,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case EHEXCOLON: {
+        case No::HexColonFormat: {
             while (!isxdigit(*p) && a < iLength) {
                 a++;
                 p++;
@@ -470,7 +470,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
         }
 
         switch (eTo) {
-        case EHTML:
+        case No::HtmlFormat:
             if (ch == '<')
                 sRet += "&lt;";
             else if (ch == '>')
@@ -484,10 +484,10 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case EASCII:
+        case No::AsciiFormat:
             sRet += ch;
             break;
-        case EURL:
+        case No::UrlFormat:
             if (isalnum(ch) || ch == '_' || ch == '.' || ch == '-') {
                 sRet += ch;
             } else if (ch == ' ') {
@@ -499,7 +499,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case ESQL:
+        case No::SqlFormat:
             if (ch == '\0') {
                 sRet += '\\';
                 sRet += '0';
@@ -529,7 +529,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case ENAMEDFMT:
+        case No::NamedFormat:
             if (ch == '\\') {
                 sRet += '\\';
                 sRet += '\\';
@@ -544,7 +544,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case EDEBUG:
+        case No::DebugFormat:
             if (ch < 0x20 || ch == 0x7F) {
                 sRet += "\\x";
                 sRet += szHex[ch >> 4];
@@ -556,7 +556,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case EMSGTAG:
+        case No::MsgTagFormat:
             if (ch == ';') {
                 sRet += '\\';
                 sRet += ':';
@@ -580,7 +580,7 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
             }
 
             break;
-        case EHEXCOLON: {
+        case No::HexColonFormat: {
             sRet += tolower(szHex[ch >> 4]);
             sRet += tolower(szHex[ch & 0xf]);
             sRet += ":";
@@ -588,24 +588,24 @@ NoString NoString::Escape_n(EEscape eFrom, EEscape eTo) const
         }
     }
 
-    if (eTo == EHEXCOLON) {
+    if (eTo == No::HexColonFormat) {
         sRet.TrimRight(":");
     }
 
     return sRet;
 }
 
-NoString NoString::Escape_n(EEscape eTo) const
+NoString NoString::Escape_n(No::EscapeFormat eTo) const
 {
-    return Escape_n(EASCII, eTo);
+    return Escape_n(No::AsciiFormat, eTo);
 }
 
-NoString& NoString::Escape(EEscape eFrom, EEscape eTo)
+NoString& NoString::Escape(No::EscapeFormat eFrom, No::EscapeFormat eTo)
 {
     return (*this = Escape_n(eFrom, eTo));
 }
 
-NoString& NoString::Escape(EEscape eTo)
+NoString& NoString::Escape(No::EscapeFormat eTo)
 {
     return (*this = Escape_n(eTo));
 }

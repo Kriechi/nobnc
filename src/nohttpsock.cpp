@@ -107,8 +107,8 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
         NoStringVector vsNV = sLine.Token(1, true).Split(";", false, "", "", true, true);
 
         for (const NoString& s : vsNV) {
-            m_msRequestCookies[s.Token(0, false, "=").Escape_n(NoString::EURL, NoString::EASCII)] =
-            s.Token(1, true, "=").Escape_n(NoString::EURL, NoString::EASCII);
+            m_msRequestCookies[s.Token(0, false, "=").Escape_n(No::UrlFormat, No::AsciiFormat)] =
+            s.Token(1, true, "=").Escape_n(No::UrlFormat, No::AsciiFormat);
         }
     } else if (sName.Equals("Authorization:")) {
         NoString sUnhashed = NoString::FromBase64(sLine.Token(2));
@@ -465,8 +465,8 @@ void NoHttpSock::ParseParams(const NoString& sParams, std::map<NoString, NoStrin
     NoStringVector vsPairs = sParams.Split("&", true);
 
     for (const NoString& sPair : vsPairs) {
-        NoString sName = sPair.Token(0, false, "=").Escape_n(NoString::EURL, NoString::EASCII);
-        NoString sValue = sPair.Token(1, true, "=").Escape_n(NoString::EURL, NoString::EASCII);
+        NoString sName = sPair.Token(0, false, "=").Escape_n(No::UrlFormat, No::AsciiFormat);
+        NoString sValue = sPair.Token(1, true, "=").Escape_n(No::UrlFormat, No::AsciiFormat);
 
         msvsParams[sName].push_back(sValue);
     }
@@ -611,16 +611,16 @@ bool NoHttpSock::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, cons
                     "<head>\r\n"
                     "<meta charset=\"UTF-8\"/>\r\n"
                     "<title>" +
-                    NoString(uStatusId) + " " + sStatusMsg.Escape_n(NoString::EHTML) + "</title>\r\n"
+                    NoString(uStatusId) + " " + sStatusMsg.Escape_n(No::HtmlFormat) + "</title>\r\n"
                                                                                      "</head>\r\n"
                                                                                      "<body>\r\n"
                                                                                      "<h1>" +
-                    sStatusMsg.Escape_n(NoString::EHTML) + "</h1>\r\n"
+                    sStatusMsg.Escape_n(No::HtmlFormat) + "</h1>\r\n"
                                                           "<p>" +
-                    sMessage.Escape_n(NoString::EHTML) + "</p>\r\n"
+                    sMessage.Escape_n(No::HtmlFormat) + "</p>\r\n"
                                                         "<hr/>\r\n"
                                                         "<address>" +
-                    NoApp::GetTag(false, /* bHTML = */ true) + " at " + GetLocalIP().Escape_n(NoString::EHTML) +
+                    NoApp::GetTag(false, /* bHTML = */ true) + " at " + GetLocalIP().Escape_n(No::HtmlFormat) +
                     " Port " + NoString(GetLocalPort()) + "</address>\r\n"
                                                          "</body>\r\n"
                                                          "</html>\r\n";
@@ -679,7 +679,7 @@ bool NoHttpSock::PrintHeader(off_t uContentLength, const NoString& sContentType,
     Write("Content-Type: " + m_sContentType + "\r\n");
 
     for (const auto& it : m_msResponseCookies) {
-        Write("Set-Cookie: " + it.first.Escape_n(NoString::EURL) + "=" + it.second.Escape_n(NoString::EURL) +
+        Write("Set-Cookie: " + it.first.Escape_n(No::UrlFormat) + "=" + it.second.Escape_n(No::UrlFormat) +
               "; path=/;" + (GetSSL() ? "Secure;" : "") + "\r\n");
     }
 
@@ -715,7 +715,7 @@ bool NoHttpSock::Redirect(const NoString& sURL)
         AddHeader("Location", location);
         PrintErrorPage(302,
                        "Found",
-                       "The document has moved <a href=\"" + location.Escape_n(NoString::EHTML) + "\">here</a>.");
+                       "The document has moved <a href=\"" + location.Escape_n(No::HtmlFormat) + "\">here</a>.");
 
         return true;
     }

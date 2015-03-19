@@ -126,7 +126,7 @@ public:
     const NoStringSet& GetTrustedFingerprints() const { return m_ssTrustedFingerprints; }
     void AddTrustedFingerprint(const NoString& sFP)
     {
-        m_ssTrustedFingerprints.insert(sFP.Escape_n(NoString::EHEXCOLON, NoString::EHEXCOLON));
+        m_ssTrustedFingerprints.insert(sFP.Escape_n(No::HexColonFormat, No::HexColonFormat));
     }
     void DelTrustedFingerprint(const NoString& sFP) { m_ssTrustedFingerprints.erase(sFP); }
 
