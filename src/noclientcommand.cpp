@@ -119,7 +119,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         sPatterns.Replace(",", " ");
-        NoStringVector vsChans = sPatterns.Split(" ", false);
+        NoStringVector vsChans = sPatterns.Split(" ", No::SkipEmptyParts);
 
         std::set<NoChannel*> sChans;
         for (const NoString& sChan : vsChans) {
@@ -368,7 +368,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Usage: EnableChan <#chans>");
         } else {
             sPatterns.Replace(",", " ");
-            NoStringVector vsChans = sPatterns.Split(" ", false);
+            NoStringVector vsChans = sPatterns.Split(" ", No::SkipEmptyParts);
 
             std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {
@@ -398,7 +398,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Usage: DisableChan <#chans>");
         } else {
             sPatterns.Replace(",", " ");
-            NoStringVector vsChans = sPatterns.Split(" ", false);
+            NoStringVector vsChans = sPatterns.Split(" ", No::SkipEmptyParts);
 
             std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {

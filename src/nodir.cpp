@@ -92,7 +92,7 @@ bool NoDir::MakeDir(const NoString& sPath, mode_t iMode)
     if (sPath.Left(1) == "/") sDir = "/";
 
     // For every single subpath, do...
-    NoStringVector dirs = sPath.Split("/", false);
+    NoStringVector dirs = sPath.Split("/", No::SkipEmptyParts);
     for (it = dirs.begin(); it != dirs.end(); ++it) {
         // Add this to the path we already created
         sDir += *it;

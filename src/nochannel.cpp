@@ -429,7 +429,7 @@ void NoChannel::clearNicks() { m_nicks.clear(); }
 int NoChannel::addNicks(const NoString& sNicks)
 {
     int iRet = 0;
-    NoStringVector vsNicks = sNicks.Split(" ", false);
+    NoStringVector vsNicks = sNicks.Split(" ", No::SkipEmptyParts);
 
     for (const NoString& sNick : vsNicks) {
         if (addNick(sNick)) {

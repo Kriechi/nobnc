@@ -56,7 +56,7 @@ public:
                 continue;
             }
 
-            NoStringVector vsKeys = it1->second.Split(" ", false);
+            NoStringVector vsKeys = it1->second.Split(" ", No::SkipEmptyParts);
             for (NoStringVector::const_iterator it2 = vsKeys.begin(); it2 != vsKeys.end(); ++it2) {
                 m_PubKeys[it1->first].insert(it2->AsLower());
             }

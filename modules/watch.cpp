@@ -141,7 +141,7 @@ public:
     void SetDetachedChannelOnly(bool b = true) { m_bDetachedChannelOnly = b; }
     void SetSources(const NoString& sSources)
     {
-        NoStringVector vsSources = sSources.Split(" ", false);
+        NoStringVector vsSources = sSources.Split(" ", No::SkipEmptyParts);
         NoStringVector::iterator it;
 
         m_vsSources.clear();

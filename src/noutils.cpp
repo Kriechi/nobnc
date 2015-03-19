@@ -533,7 +533,7 @@ NoStringSet NoUtils::GetEncodings()
 NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
 {
     if (sLine.StartsWith("@")) {
-        NoStringVector vsTags = sLine.Token(0).TrimPrefix_n("@").Split(";", false);
+        NoStringVector vsTags = sLine.Token(0).TrimPrefix_n("@").Split(";", No::SkipEmptyParts);
 
         NoStringMap mssTags;
         for (const NoString& sTag : vsTags) {
@@ -849,7 +849,7 @@ NoString NoUtils::Ellipsize(const NoString& str, uint uLen)
     return sRet;
 }
 
-extern NoStringVector Split_helper(const NoString& str, const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
+extern NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
 
 NoStringMap NoUtils::OptionSplit(const NoString& str)
 {
@@ -865,7 +865,7 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
             continue;
         }
 
-        NoStringVector vsNames = Split_helper(sName, " ", false, "\"", "\"", true);
+        NoStringVector vsNames = Split_helper(sName, " ", No::SkipEmptyParts, "\"", "\"", true);
 
         for (uint a = 0; a < vsNames.size(); a++) {
             NoString sKeyName = vsNames[a];
@@ -884,5 +884,5 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
 
 NoStringVector NoUtils::QuoteSplit(const NoString& str)
 {
-    return Split_helper(str, " ", false, "\"", "\"", true);
+    return Split_helper(str, " ", No::SkipEmptyParts, "\"", "\"", true);
 }

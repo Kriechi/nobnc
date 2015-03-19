@@ -50,7 +50,7 @@ public:
         }
 
         // Parse arguments, each argument is a user name to block
-        NoStringVector vArgs = sArgs.Split(" ", false);
+        NoStringVector vArgs = sArgs.Split(" ", No::SkipEmptyParts);
 
         for (it = vArgs.begin(); it != vArgs.end(); ++it) {
             if (!Block(*it)) {

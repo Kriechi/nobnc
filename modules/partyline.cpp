@@ -133,7 +133,7 @@ public:
         }
 
         NoStringVector::const_iterator it;
-        NoStringVector vsChans = sArgs.Split(" ", false);
+        NoStringVector vsChans = sArgs.Split(" ", No::SkipEmptyParts);
 
         for (it = vsChans.begin(); it != vsChans.end(); ++it) {
             if (it->Left(2) == CHAN_PREFIX) {

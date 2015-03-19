@@ -56,7 +56,7 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector::const_iterator it;
-        NoStringVector vsArgs = sArgs.Split(" ", false);
+        NoStringVector vsArgs = sArgs.Split(" ", No::SkipEmptyParts);
 
         for (it = vsArgs.begin(); it != vsArgs.end(); ++it) {
             if (it->Equals("saslauthd") || it->Equals("auxprop")) {

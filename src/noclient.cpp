@@ -206,7 +206,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         Close(NoBaseSocket::CLT_AFTERWRITE); // Treat a client quit as a detach
         return; // Don't forward this msg.  We don't want the client getting us disconnected.
     } else if (sCommand.Equals("PROTOCTL")) {
-        NoStringVector vsTokens = sLine.Token(1, true).Split(" ", false);
+        NoStringVector vsTokens = sLine.Token(1, true).Split(" ", No::SkipEmptyParts);
 
         for (const NoString& sToken : vsTokens) {
             if (sToken == "NAMESX") {
@@ -219,7 +219,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
     } else if (sCommand.Equals("NOTICE")) {
         NoString sTargets = sLine.Token(1).TrimPrefix_n();
         NoString sMsg = sLine.Token(2, true).TrimPrefix_n();
-        NoStringVector vTargets = sTargets.Split(",", false);
+        NoStringVector vTargets = sTargets.Split(",", No::SkipEmptyParts);
 
         for (NoString& sTarget : vTargets) {
             if (sTarget.TrimPrefix(m_pUser->GetStatusPrefix())) {
@@ -280,7 +280,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
     } else if (sCommand.Equals("PRIVMSG")) {
         NoString sTargets = sLine.Token(1);
         NoString sMsg = sLine.Token(2, true).TrimPrefix_n();
-        NoStringVector vTargets = sTargets.Split(",", false);
+        NoStringVector vTargets = sTargets.Split(",", No::SkipEmptyParts);
 
         for (NoString& sTarget : vTargets) {
             bool bContinue = false;
@@ -409,7 +409,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         }
 
         sPatterns.Replace(",", " ");
-        NoStringVector vsChans = sPatterns.Split(" ", false);
+        NoStringVector vsChans = sPatterns.Split(" ", No::SkipEmptyParts);
 
         std::set<NoChannel*> sChans;
         for (const NoString& sChan : vsChans) {
@@ -432,7 +432,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         NoString sChans = sLine.Token(1).TrimPrefix_n();
         NoString sKey = sLine.Token(2);
 
-        NoStringVector vsChans = sChans.Split(",", false);
+        NoStringVector vsChans = sChans.Split(",", No::SkipEmptyParts);
         sChans.clear();
 
         for (NoString& sChannel : vsChans) {
@@ -467,7 +467,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         NoString sChans = sLine.Token(1).TrimPrefix_n();
         NoString sMessage = sLine.Token(2, true).TrimPrefix_n();
 
-        NoStringVector vsChans = sChans.Split(",", false);
+        NoStringVector vsChans = sChans.Split(",", No::SkipEmptyParts);
         sChans.clear();
 
         for (NoString& sChan : vsChans) {
@@ -906,7 +906,7 @@ void NoClient::HandleCap(const NoString& sLine)
             }
         }
     } else if (sSubCmd.Equals("REQ")) {
-        NoStringVector vsTokens = sLine.Token(2, true).TrimPrefix_n(":").Split(" ", false);
+        NoStringVector vsTokens = sLine.Token(2, true).TrimPrefix_n(":").Split(" ", No::SkipEmptyParts);
 
         for (const NoString& sToken : vsTokens) {
             bool bVal = true;

@@ -221,11 +221,12 @@ public:
     NoString Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes = true) const;
 
     /** Split up this string into tokens.
-     * @param sDelim Delimiter between tokens.
-     * @param bAllowEmpty Do empty tokens count as a valid token?
+     * @param separator The separator between tokens.
+     * @param behavior If behavior is No::SkipEmptyParts, empty entries don't
+                       appear in the result. By default, empty entries are kept.
      * @return A vector of tokens.
      */
-    NoStringVector Split(const NoString& sDelim, bool bAllowEmpty = true) const;
+    NoStringVector Split(const NoString& separator, No::SplitBehavior = No::KeepEmptyParts) const;
 
     /** Decode the give base64-encoded string.
      * @return The decoded string.

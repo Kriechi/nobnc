@@ -22,6 +22,7 @@
 namespace No
 {
     enum CaseSensitivity { CaseInsensitive, CaseSensitive };
+    enum SplitBehavior { KeepEmptyParts, SkipEmptyParts };
 }
 
 #endif // NONAMESPACE_H

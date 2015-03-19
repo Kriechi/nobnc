@@ -193,7 +193,7 @@ static void RunTimer(NoModule* pModule, NoTimer* pTimer) { ((NoStickyChan*)pModu
 
 bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
 {
-    NoStringVector vsChans = sArgs.Split(",", false);
+    NoStringVector vsChans = sArgs.Split(",", No::SkipEmptyParts);
     NoStringVector::iterator it;
 
     for (it = vsChans.begin(); it != vsChans.end(); ++it) {

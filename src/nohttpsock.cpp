@@ -104,7 +104,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
         m_sURI = sLine.Token(1);
         ParseURI();
     } else if (sName.Equals("Cookie:")) {
-        NoStringVector vsNV = sLine.Token(1, true).Split(";", false);
+        NoStringVector vsNV = sLine.Token(1, true).Split(";", No::SkipEmptyParts);
 
         for (NoString& s : vsNV) {
             s.Trim();
@@ -126,7 +126,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
             const NoStringVector& vsTrustedProxies = NoApp::Get().GetTrustedProxies();
             NoString sIP = GetRemoteIP();
 
-            NoStringVector vsIPs = sLine.Token(1, true).Split(",", false);
+            NoStringVector vsIPs = sLine.Token(1, true).Split(",", No::SkipEmptyParts);
 
             while (!vsIPs.empty()) {
                 // sIP told us that it got connection from vsIPs.back()
@@ -156,7 +156,7 @@ void NoHttpSock::ReadLineImpl(const NoString& sData)
         m_sIfNoneMatch = sLine.Token(1, true);
     } else if (sName.Equals("Accept-Encoding:") && !m_bHTTP10Client) {
         // trimming whitespace from the tokens is important:
-        NoStringVector vsEncodings = sLine.Token(1, true).Split(",", false);
+        NoStringVector vsEncodings = sLine.Token(1, true).Split(",", No::SkipEmptyParts);
         for (NoString& sEncoding : vsEncodings) {
             if (sEncoding.Trim_n().Equals("gzip"))
                 m_bAcceptGzip = true;
@@ -466,7 +466,7 @@ void NoHttpSock::ParseParams(const NoString& sParams, std::map<NoString, NoStrin
 {
     msvsParams.clear();
 
-    NoStringVector vsPairs = sParams.Split("&", true);
+    NoStringVector vsPairs = sParams.Split("&");
 
     for (const NoString& sPair : vsPairs) {
         NoString sName = No::Escape_n(sPair.Token(0, false, "="), No::UrlFormat, No::AsciiFormat);

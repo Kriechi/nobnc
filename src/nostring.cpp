@@ -17,7 +17,7 @@
 #include "nostring.h"
 #include <sstream>
 
-NoStringVector Split_helper(const NoString& str, const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
+NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
 
 static const uchar XX = 0xff;
 static const uchar base64_table[256] = {
@@ -270,7 +270,7 @@ uint NoString::Replace(const NoString& sReplace, const NoString& sWith, const No
 
 NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes) const
 {
-    NoStringVector vsTokens = Split_helper(*this, sSep, bAllowEmpty, sLeft, sRight, bTrimQuotes);
+    NoStringVector vsTokens = Split_helper(*this, sSep, bAllowEmpty ? No::KeepEmptyParts : No::SkipEmptyParts, sLeft, sRight, bTrimQuotes);
     if (vsTokens.size() > uPos) {
         NoString sRet;
 
@@ -355,7 +355,7 @@ NoString NoString::Right(size_type uCount) const
     return substr(length() - uCount, uCount);
 }
 
-NoStringVector Split_helper(const NoString& str, const NoString& sDelim, bool bAllowEmpty, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes)
+NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes)
 {
     NoStringVector vsRet;
 
@@ -370,7 +370,7 @@ NoStringVector Split_helper(const NoString& str, const NoString& sDelim, bool bA
     NoString::size_type uRightLen = sRight.length();
     const char* p = str.c_str();
 
-    if (!bAllowEmpty) {
+    if (behavior == No::SkipEmptyParts) {
         while (strncasecmp(p, sDelim.c_str(), uDelimLen) == 0) {
             p += uDelimLen;
         }
@@ -402,7 +402,7 @@ NoStringVector Split_helper(const NoString& str, const NoString& sDelim, bool bA
             sTmp.clear();
             p += uDelimLen;
 
-            if (!bAllowEmpty) {
+            if (behavior == No::SkipEmptyParts) {
                 while (strncasecmp(p, sDelim.c_str(), uDelimLen) == 0) {
                     p += uDelimLen;
                 }
@@ -424,9 +424,9 @@ NoStringVector Split_helper(const NoString& str, const NoString& sDelim, bool bA
     return vsRet;
 }
 
-NoStringVector NoString::Split(const NoString& sDelim, bool bAllowEmpty) const
+NoStringVector NoString::Split(const NoString& separator, No::SplitBehavior behavior) const
 {
-    return Split_helper(*this, sDelim, bAllowEmpty, "", "", true);
+    return Split_helper(*this, separator, behavior, "", "", true);
 }
 
 NoString NoString::ToBase64(uint uWrap) const

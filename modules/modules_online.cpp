@@ -43,7 +43,7 @@ public:
             NoStringVector::const_iterator it;
 
             // Get the list of nicks which are being asked for
-            NoStringVector vsNicks = sLine.Token(1, true).TrimLeft_n(":").Split(" ", false);
+            NoStringVector vsNicks = sLine.Token(1, true).TrimLeft_n(":").Split(" ", No::SkipEmptyParts);
 
             NoString sBNNoNicks;
             for (it = vsNicks.begin(); it != vsNicks.end(); ++it) {

@@ -783,7 +783,7 @@ void NoIrcSock::ReadLineImpl(const NoString& sData)
                 }
 
                 if (sSubCmd == "LS") {
-                    NoStringVector vsTokens = sArgs.Split(" ", false);
+                    NoStringVector vsTokens = sArgs.Split(" ", No::SkipEmptyParts);
 
                     for (const NoString& sCap : vsTokens) {
                         if (OnServerCapAvailable(sCap) || sCap == "multi-prefix" || sCap == "userhost-in-names") {
@@ -1191,7 +1191,7 @@ void NoIrcSock::ReachedMaxBufferImpl()
 
 void NoIrcSock::ParseISupport(const NoString& sLine)
 {
-    NoStringVector vsTokens = sLine.Split(" ", false);
+    NoStringVector vsTokens = sLine.Split(" ", No::SkipEmptyParts);
 
     for (const NoString& sToken : vsTokens) {
         NoString sName = sToken.Token(0, false, "=");
@@ -1275,7 +1275,7 @@ void NoIrcSock::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
         NoString sTmp = sLine.Token(0, false, " :") + " :";
 
         // This loop runs once for every nick on the channel
-        NoStringVector vsNicks = sNicks.Split(" ", false);
+        NoStringVector vsNicks = sNicks.Split(" ", No::SkipEmptyParts);
         for (NoString sNick : vsNicks) {
             if (sNick.empty()) break;
 

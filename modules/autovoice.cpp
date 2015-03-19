@@ -146,7 +146,7 @@ public:
     {
         // Load the chans from the command line
         uint a = 0;
-        NoStringVector vsChans = sArgs.Split(" ", false);
+        NoStringVector vsChans = sArgs.Split(" ", No::SkipEmptyParts);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             NoString sName = "Args";
