@@ -142,8 +142,6 @@ public:
 
     NoString Escape_n(No::EscapeFormat eFrom, No::EscapeFormat eTo) const;
     NoString Escape_n(No::EscapeFormat eTo) const;
-    NoString& Escape(No::EscapeFormat eFrom, No::EscapeFormat eTo);
-    NoString& Escape(No::EscapeFormat eTo);
 
     /** Replace all occurrences in the current string.
      * You can specify a "safe zone" via sLeft and sRight. Anything inside

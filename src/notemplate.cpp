@@ -895,10 +895,10 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
             NoStringVector vsEscs = it->second.Split(",", false);
 
             for (const NoString& sEsc : vsEscs) {
-                sRet.Escape(ToEscapeFormat(sEsc));
+                sRet = sRet.Escape_n(ToEscapeFormat(sEsc));
             }
         } else {
-            sRet.Escape(m_spOptions->GetEscapeFrom(), m_spOptions->GetEscapeTo());
+            sRet = sRet.Escape_n(m_spOptions->GetEscapeFrom(), m_spOptions->GetEscapeTo());
         }
     }
 

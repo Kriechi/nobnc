@@ -577,16 +577,6 @@ NoString NoString::Escape_n(No::EscapeFormat eTo) const
     return Escape_n(No::AsciiFormat, eTo);
 }
 
-NoString& NoString::Escape(No::EscapeFormat eFrom, No::EscapeFormat eTo)
-{
-    return (*this = Escape_n(eFrom, eTo));
-}
-
-NoString& NoString::Escape(No::EscapeFormat eTo)
-{
-    return (*this = Escape_n(eTo));
-}
-
 NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith, const NoString& sLeft, const NoString& sRight, bool bRemoveDelims) const
 {
     NoString sRet = *this;
