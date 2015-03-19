@@ -854,13 +854,13 @@ public:
     std::set<NoTimer*>::const_iterator EndTimers() const { return m_sTimers.end(); }
     virtual void ListTimers();
 
-    bool AddSocket(NoSocket* pSocket);
-    bool RemSocket(NoSocket* pSocket);
+    bool AddSocket(NoModuleSocket* pSocket);
+    bool RemSocket(NoModuleSocket* pSocket);
     bool RemSocket(const NoString& sSockName);
-    bool UnlinkSocket(NoSocket* pSocket);
-    NoSocket* FindSocket(const NoString& sSockName);
-    std::set<NoSocket*>::const_iterator BeginSockets() const { return m_sSockets.begin(); }
-    std::set<NoSocket*>::const_iterator EndSockets() const { return m_sSockets.end(); }
+    bool UnlinkSocket(NoModuleSocket* pSocket);
+    NoModuleSocket* FindSocket(const NoString& sSockName);
+    std::set<NoModuleSocket*>::const_iterator BeginSockets() const { return m_sSockets.begin(); }
+    std::set<NoModuleSocket*>::const_iterator EndSockets() const { return m_sSockets.end(); }
     virtual void ListSockets();
 
 #ifdef HAVE_PTHREAD
@@ -1031,7 +1031,7 @@ private:
     NoModInfo::EModuleType m_eType;
     NoString m_sDescription;
     std::set<NoTimer*> m_sTimers;
-    std::set<NoSocket*> m_sSockets;
+    std::set<NoModuleSocket*> m_sSockets;
 #ifdef HAVE_PTHREAD
     std::set<NoModuleJob*> m_sJobs;
 #endif

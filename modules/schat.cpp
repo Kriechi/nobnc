@@ -43,7 +43,7 @@ protected:
     NoString m_sNick;
 };
 
-class NoSChatSock : public NoSocket
+class NoSChatSock : public NoModuleSocket
 {
 public:
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick);
@@ -123,7 +123,7 @@ public:
 
     void OnClientLogin() override
     {
-        std::set<NoSocket*>::const_iterator it;
+        std::set<NoModuleSocket*>::const_iterator it;
         for (it = BeginSockets(); it != EndSockets(); ++it) {
             NoSChatSock* p = (NoSChatSock*)*it;
 
@@ -155,7 +155,7 @@ public:
 
         if (sCom.Equals("chat") && !sArgs.empty()) {
             NoString sNick = "(s)" + sArgs;
-            std::set<NoSocket*>::const_iterator it;
+            std::set<NoModuleSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 NoSChatSock* pSock = (NoSChatSock*)*it;
 
@@ -194,7 +194,7 @@ public:
             Table.AddColumn("Status");
             Table.AddColumn("Cipher");
 
-            std::set<NoSocket*>::const_iterator it;
+            std::set<NoModuleSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 Table.AddRow();
 
@@ -230,7 +230,7 @@ public:
         } else if (sCom.Equals("close")) {
             if (!sArgs.StartsWith("(s)")) sArgs = "(s)" + sArgs;
 
-            std::set<NoSocket*>::const_iterator it;
+            std::set<NoModuleSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 NoSChatSock* pSock = (NoSChatSock*)*it;
 
@@ -249,10 +249,10 @@ public:
             Table.AddColumn("Type");
             Table.AddColumn("Cipher");
 
-            std::set<NoSocket*>::const_iterator it;
+            std::set<NoModuleSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 Table.AddRow();
-                NoSocket* pSock = *it;
+                NoModuleSocket* pSock = *it;
                 Table.SetCell("SockName", pSock->GetSockName());
                 ulonglong iStartTime = pSock->GetStartTime();
                 time_t iTime = iStartTime / 1000;
@@ -389,7 +389,7 @@ private:
 
 //////////////////// methods ////////////////
 
-NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoSocket(pMod)
+NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoModuleSocket(pMod)
 {
     m_pModule = pMod;
     m_sChatNick = sChatNick;
@@ -397,7 +397,7 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoSocket(pM
 }
 
 NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout)
-    : NoSocket(pMod, sHost, iPort, iTimeout)
+    : NoModuleSocket(pMod, sHost, iPort, iTimeout)
 {
     m_pModule = pMod;
     EnableReadLine();

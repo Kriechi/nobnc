@@ -18,12 +18,12 @@
 #define NOHTTPSOCK_H
 
 #include <no/noglobal.h>
-#include <no/nosocket.h>
+#include <no/nomodulesocket.h>
 #include <no/nofile.h>
 
 class NoModule;
 
-class NO_EXPORT NoHttpSock : public NoSocket
+class NO_EXPORT NoHttpSock : public NoModuleSocket
 {
 public:
     NoHttpSock(NoModule* pMod, const NoString& sURIPrefix);

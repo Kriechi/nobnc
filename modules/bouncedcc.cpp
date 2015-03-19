@@ -20,7 +20,7 @@
 
 class NoBounceDccMod;
 
-class NoDccBounce : public NoSocket
+class NoDccBounce : public NoModuleSocket
 {
 public:
     NoDccBounce(NoBounceDccMod* pMod,
@@ -114,7 +114,7 @@ public:
         Table.AddColumn("IP");
         Table.AddColumn("File");
 
-        std::set<NoSocket*>::const_iterator it;
+        std::set<NoModuleSocket*>::const_iterator it;
         for (it = BeginSockets(); it != EndSockets(); ++it) {
             NoDccBounce* pSock = (NoDccBounce*)*it;
             NoString sSockName = pSock->GetSockName();
@@ -209,7 +209,7 @@ public:
                 // PRIVMSG user :DCC RESUME "znc.o" 58810 151552
                 ushort uResumePort = sMessage.Token(3).ToUShort();
 
-                std::set<NoSocket*>::const_iterator it;
+                std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 
@@ -221,7 +221,7 @@ public:
             } else if (sType.Equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
 
-                std::set<NoSocket*>::const_iterator it;
+                std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
                     if (pSock->GetUserPort() == sMessage.Token(3).ToUShort()) {
@@ -272,7 +272,7 @@ public:
                 // Need to lookup the connection by port, filter the port, and forward to the user
                 ushort uResumePort = sMessage.Token(3).ToUShort();
 
-                std::set<NoSocket*>::const_iterator it;
+                std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 
@@ -283,7 +283,7 @@ public:
                 }
             } else if (sType.Equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
-                std::set<NoSocket*>::const_iterator it;
+                std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 
@@ -308,7 +308,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
                        const NoString& sRemoteNick,
                        const NoString& sRemoteIP,
                        bool bIsChat)
-    : NoSocket(pMod)
+    : NoModuleSocket(pMod)
 {
     m_uRemotePort = uPort;
     m_sConnectIP = NoUtils::GetIP(uLongIP);
@@ -336,7 +336,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
                        const NoString& sFileName,
                        int iTimeout,
                        bool bIsChat)
-    : NoSocket(pMod, sHostname, uPort, iTimeout)
+    : NoModuleSocket(pMod, sHostname, uPort, iTimeout)
 {
     m_uRemotePort = 0;
     m_bIsChat = bIsChat;

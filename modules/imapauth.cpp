@@ -19,10 +19,10 @@
 
 class NoImapAuthMod;
 
-class NoImapSock : public NoSocket
+class NoImapSock : public NoModuleSocket
 {
 public:
-    NoImapSock(NoImapAuthMod* pModule, std::shared_ptr<NoAuthBase> Auth) : NoSocket((NoModule*)pModule), m_spAuth(Auth)
+    NoImapSock(NoImapAuthMod* pModule, std::shared_ptr<NoAuthBase> Auth) : NoModuleSocket((NoModule*)pModule), m_spAuth(Auth)
     {
         m_pIMAPMod = pModule;
         m_bSentReply = false;

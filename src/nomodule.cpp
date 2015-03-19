@@ -280,7 +280,7 @@ void NoModule::ListTimers()
     PutModule(Table);
 }
 
-bool NoModule::AddSocket(NoSocket* pSocket)
+bool NoModule::AddSocket(NoModuleSocket* pSocket)
 {
     if (!pSocket) {
         return false;
@@ -290,7 +290,7 @@ bool NoModule::AddSocket(NoSocket* pSocket)
     return true;
 }
 
-bool NoModule::RemSocket(NoSocket* pSocket)
+bool NoModule::RemSocket(NoModuleSocket* pSocket)
 {
     if (m_sSockets.erase(pSocket)) {
         m_pManager->DelSockByAddr(pSocket);
@@ -302,7 +302,7 @@ bool NoModule::RemSocket(NoSocket* pSocket)
 
 bool NoModule::RemSocket(const NoString& sSockName)
 {
-    for (NoSocket* pSocket : m_sSockets) {
+    for (NoModuleSocket* pSocket : m_sSockets) {
         if (pSocket->GetSockName().Equals(sSockName)) {
             m_sSockets.erase(pSocket);
             m_pManager->DelSockByAddr(pSocket);
@@ -313,11 +313,11 @@ bool NoModule::RemSocket(const NoString& sSockName)
     return false;
 }
 
-bool NoModule::UnlinkSocket(NoSocket* pSocket) { return m_sSockets.erase(pSocket); }
+bool NoModule::UnlinkSocket(NoModuleSocket* pSocket) { return m_sSockets.erase(pSocket); }
 
-NoSocket* NoModule::FindSocket(const NoString& sSockName)
+NoModuleSocket* NoModule::FindSocket(const NoString& sSockName)
 {
-    for (NoSocket* pSocket : m_sSockets) {
+    for (NoModuleSocket* pSocket : m_sSockets) {
         if (pSocket->GetSockName().Equals(sSockName)) {
             return pSocket;
         }
@@ -341,7 +341,7 @@ void NoModule::ListSockets()
     Table.AddColumn("RemoteIP");
     Table.AddColumn("RemotePort");
 
-    for (const NoSocket* pSocket : m_sSockets) {
+    for (const NoModuleSocket* pSocket : m_sSockets) {
         Table.AddRow();
         Table.SetCell("Name", pSocket->GetSockName());
 

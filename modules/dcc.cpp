@@ -25,7 +25,7 @@
 
 class NoDccMod;
 
-class NoDccSock : public NoSocket
+class NoDccSock : public NoModuleSocket
 {
 public:
     NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize = 0, NoFile* pFile = nullptr);
@@ -205,7 +205,7 @@ public:
         Table.AddColumn("IP");
         Table.AddColumn("File");
 
-        std::set<NoSocket*>::const_iterator it;
+        std::set<NoModuleSocket*>::const_iterator it;
         for (it = BeginSockets(); it != EndSockets(); ++it) {
             NoDccSock* pSock = (NoDccSock*)*it;
 
@@ -240,7 +240,7 @@ public:
             ushort uResumePort = sMessage.Token(3).ToUShort();
             ulong uResumeSize = sMessage.Token(4).ToULong();
 
-            std::set<NoSocket*>::const_iterator it;
+            std::set<NoModuleSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 NoDccSock* pSock = (NoDccSock*)*it;
 
@@ -270,7 +270,7 @@ public:
 };
 
 NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize, NoFile* pFile)
-    : NoSocket(pMod)
+    : NoModuleSocket(pMod)
 {
     m_sRemoteNick = sRemoteNick;
     m_uFileSize = uFileSize;
@@ -290,7 +290,7 @@ NoDccSock::NoDccSock(NoDccMod* pMod,
                    ushort uRemotePort,
                    const NoString& sLocalFile,
                    ulong uFileSize)
-    : NoSocket(pMod)
+    : NoModuleSocket(pMod)
 {
     m_sRemoteNick = sRemoteNick;
     m_sRemoteIP = sRemoteIP;
