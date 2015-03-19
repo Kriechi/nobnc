@@ -537,9 +537,14 @@ NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
 
         NoStringMap mssTags;
         for (const NoString& sTag : vsTags) {
-            NoString sKey = sTag.Token(0, false, "=", No::KeepEmptyParts);
-            NoString sValue = sTag.Token(1, true, "=", No::KeepEmptyParts);
-            mssTags[sKey] = No::Escape_n(sValue, No::MsgTagFormat, No::AsciiFormat);
+            size_t eq = sTag.find("=");
+            if (eq != NoString::npos) {
+                NoString sKey = sTag.substr(0, eq);
+                NoString sValue = sTag.substr(eq + 1);
+                mssTags[sKey] = No::Escape_n(sValue, No::MsgTagFormat, No::AsciiFormat);
+            } else {
+                mssTags[sTag] = "";
+            }
         }
         return mssTags;
     }

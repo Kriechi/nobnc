@@ -212,7 +212,7 @@ public:
      *         after it.
      * @see Split() if you need a string split into all of its tokens.
      */
-    NoString Token(size_t uPos, bool bRest = false, const NoString& sSep = " ", No::SplitBehavior behavior = No::SkipEmptyParts) const;
+    NoString Token(size_t uPos, bool bRest = false, const NoString& sSep = " ") const;
 
     /** Get a token out of this string. This function behaves much like the
      *  other Token() function in this class. The extra arguments are

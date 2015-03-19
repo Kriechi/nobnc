@@ -289,10 +289,10 @@ NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, const No
         return sRet;
     }
 
-    return Token(uPos, bRest, sSep, No::SkipEmptyParts);
+    return Token(uPos, bRest, sSep);
 }
 
-NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, No::SplitBehavior behavior) const
+NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep) const
 {
     const char* sep_str = sSep.c_str();
     size_t sep_len = sSep.length();
@@ -301,17 +301,15 @@ NoString NoString::Token(size_t uPos, bool bRest, const NoString& sSep, No::Spli
     size_t start_pos = 0;
     size_t end_pos;
 
-    if (behavior == No::SkipEmptyParts) {
-        while (strncmp(&str[start_pos], sep_str, sep_len) == 0) {
-            start_pos += sep_len;
-        }
+    while (strncmp(&str[start_pos], sep_str, sep_len) == 0) {
+        start_pos += sep_len;
     }
 
     // First, find the start of our token
     while (uPos != 0 && start_pos < str_len) {
         bool bFoundSep = false;
 
-        while (strncmp(&str[start_pos], sep_str, sep_len) == 0 && (!bFoundSep || behavior == No::SkipEmptyParts)) {
+        while (strncmp(&str[start_pos], sep_str, sep_len) == 0) {
             start_pos += sep_len;
             bFoundSep = true;
         }

@@ -147,13 +147,13 @@ TEST(StringTest, Split)
     EXPECT_EQ("", CS("a b c").Token(100));
     EXPECT_EQ("b c", CS("a b c").Token(1, true));
     EXPECT_EQ("c", CS("a  c").Token(1));
-    EXPECT_EQ("", CS("a  c").Token(1, false, " ", true));
+    EXPECT_EQ("c", CS("a  c").Token(1, false, " "));
     EXPECT_EQ("c", CS("a  c").Token(1, false, "  "));
     EXPECT_EQ(" c", CS("a   c").Token(1, false, "  "));
     EXPECT_EQ("c", CS("a    c").Token(1, false, "  "));
-    EXPECT_EQ("b c", CS("a (b c) d").Token(1, false, " ", false, "(", ")"));
-    EXPECT_EQ("(b c)", CS("a (b c) d").Token(1, false, " ", false, "(", ")", false));
-    EXPECT_EQ("d", CS("a (b c) d").Token(2, false, " ", false, "(", ")", false));
+    EXPECT_EQ("b c", CS("a (b c) d").Token(1, false, " ", "(", ")"));
+    EXPECT_EQ("(b c)", CS("a (b c) d").Token(1, false, " ", "(", ")", false));
+    EXPECT_EQ("d", CS("a (b c) d").Token(2, false, " ", "(", ")", false));
 
     NoStringVector vexpected;
     vexpected.push_back("a");
