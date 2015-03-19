@@ -139,16 +139,6 @@ public:
     bool WildCmp(const NoString& sWild, CaseSensitivity cs = CaseSensitive) const;
 
     /**
-     * Turn all characters in this string into their upper-case equivalent.
-     * @returns A reference to *this.
-     */
-    NoString& MakeUpper();
-    /**
-     * Turn all characters in this string into their lower-case equivalent.
-     * @returns A reference to *this.
-     */
-    NoString& MakeLower();
-    /**
      * Return a copy of this string with all characters turned into
      * upper-case.
      * @return The new string.

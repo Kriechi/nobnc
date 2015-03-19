@@ -36,8 +36,7 @@ public:
     // name should be a single, all uppercase word
     void SetName(const NoString& newname)
     {
-        name = newname.Token(0, false, " ");
-        name.MakeUpper();
+        name = newname.Token(0, false, " ").AsUpper();
     }
 
     // combined getter/setter for command list
@@ -46,14 +45,14 @@ public:
     // check registry if alias exists
     static bool AliasExists(NoModule* module, NoString alias_name)
     {
-        alias_name = alias_name.Token(0, false, " ").MakeUpper();
+        alias_name = alias_name.Token(0, false, " ").AsUpper();
         return (module->FindNV(alias_name) != module->EndNV());
     }
 
     // populate alias from stored settings in registry, or return false if none exists
     static bool AliasGet(NoAlias& alias, NoModule* module, NoString line)
     {
-        line = line.Token(0, false, " ").MakeUpper();
+        line = line.Token(0, false, " ").AsUpper();
         NoStringMap::iterator i = module->FindNV(line);
         if (i == module->EndNV()) return false;
         alias.parent = module;

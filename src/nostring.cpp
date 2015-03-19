@@ -229,37 +229,23 @@ bool NoString::WildCmp(const NoString& sWild, CaseSensitivity cs) const
     return (*wild == 0);
 }
 
-NoString& NoString::MakeUpper()
-{
-    for (char& c : *this) {
-        // TODO use unicode
-        c = (char)toupper(c);
-    }
-
-    return *this;
-}
-
-NoString& NoString::MakeLower()
-{
-    for (char& c : *this) {
-        // TODO use unicode
-        c = (char)tolower(c);
-    }
-
-    return *this;
-}
-
 NoString NoString::AsUpper() const
 {
     NoString sRet = *this;
-    sRet.MakeUpper();
+    for (char& c : sRet) {
+        // TODO use unicode
+        c = (char)toupper(c);
+    }
     return sRet;
 }
 
 NoString NoString::AsLower() const
 {
     NoString sRet = *this;
-    sRet.MakeLower();
+    for (char& c : sRet) {
+        // TODO use unicode
+        c = (char)tolower(c);
+    }
     return sRet;
 }
 
