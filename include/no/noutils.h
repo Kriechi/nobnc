@@ -37,10 +37,8 @@ public:
     static NoString decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
 #endif
 
-    // TODO refactor this
-    static const NoString sDefaultHash;
-
     static NoString salt();
+    static NoString defaultHash();
     static NoString md5(const NoString& sStr);
     static NoString sha256(const NoString& sStr);
     static NoString saltedMd5(const NoString& sPass, const NoString& sSalt);

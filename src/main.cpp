@@ -283,7 +283,7 @@ int main(int argc, char** argv)
         NoUtils::printMessage("Then replace password in the <User> section of your config with this:");
         // Not PrintMessage(), to remove [**] from the beginning, to ease copypasting
         std::cout << "<Pass password>" << std::endl;
-        std::cout << "\tMethod = " << NoUtils::sDefaultHash << std::endl;
+        std::cout << "\tMethod = " << NoUtils::defaultHash() << std::endl;
         std::cout << "\tHash = " << sHash << std::endl;
         std::cout << "\tSalt = " << sSalt << std::endl;
         std::cout << "</Pass>" << std::endl;

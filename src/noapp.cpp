@@ -800,7 +800,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     vsLines.push_back("<User " + sUser + ">");
     NoString sSalt;
     sAnswer = NoUtils::getSaltedHashPass(sSalt);
-    vsLines.push_back("\tPass       = " + NoUtils::sDefaultHash + "#" + sAnswer + "#" + sSalt + "#");
+    vsLines.push_back("\tPass       = " + NoUtils::defaultHash() + "#" + sAnswer + "#" + sSalt + "#");
 
     vsLines.push_back("\tAdmin      = true");
 

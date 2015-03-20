@@ -109,10 +109,6 @@ NoString NoUtils::decrypt(const NoString& sStr, const NoString& sPass, const NoS
 }
 #endif // HAVE_LIBSSL
 
-// If you change this here and in GetSaltedHashPass(),
-// don't forget NoUser::HASH_DEFAULT!
-// TODO refactor this
-const NoString NoUtils::sDefaultHash = "sha256";
 NoString NoUtils::getSaltedHashPass(NoString& sSalt)
 {
     sSalt = salt();
@@ -135,6 +131,11 @@ NoString NoUtils::getSaltedHashPass(NoString& sSalt)
 }
 
 NoString NoUtils::salt() { return randomString(20); }
+
+// If you change this here and in GetSaltedHashPass(),
+// don't forget NoUser::HASH_DEFAULT!
+// TODO refactor this
+NoString NoUtils::defaultHash() { return "sha256"; }
 
 NoString NoUtils::md5(const NoString& sStr) { return MD5::md5(sStr); }
 
