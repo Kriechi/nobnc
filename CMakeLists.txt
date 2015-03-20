@@ -13,6 +13,18 @@ include(DefineDirectories)
 include(DefineBuildFlags)
 include(DefineVersion)
 
+### SUB MODULES
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.h")
+    message(FATAL_ERROR "Run 'git submodule update --init' (third_party/Csocket missing).")
+endif()
+
+message(STATUS "${PROJECT_SOURCE_DIR}")
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/third_party/sha2/sha2.h")
+    message(FATAL_ERROR "Run 'git submodule update --init' (third_party/sha2 missing).")
+endif()
+
 ### SOURCES
 
 list(APPEND NO_HEADERS include/no/defines.h
