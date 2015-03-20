@@ -23,7 +23,7 @@
 #include <no/noutils.h>
 #include <no/nocachemap.h>
 
-class NoAuthBase;
+class NoAuthenticator;
 class NoUser;
 class NoWebSock;
 class NoModule;
@@ -152,7 +152,7 @@ private:
 
     bool m_bPathsSet;
     NoTemplate m_Template;
-    std::shared_ptr<NoAuthBase> m_spAuth;
+    std::shared_ptr<NoAuthenticator> m_spAuth;
     NoString m_sModName;
     NoString m_sPath;
     NoString m_sPage;

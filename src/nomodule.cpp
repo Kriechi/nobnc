@@ -718,7 +718,7 @@ const NoString& NoModule::GetModName() const { return m_sModName; }
 NoModule::ModRet NoModule::OnAddUser(NoUser& User, NoString& sErrorRet) { return CONTINUE; }
 NoModule::ModRet NoModule::OnDeleteUser(NoUser& User) { return CONTINUE; }
 void NoModule::OnClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort) {}
-NoModule::ModRet NoModule::OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) { return CONTINUE; }
+NoModule::ModRet NoModule::OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) { return CONTINUE; }
 void NoModule::OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) {}
 NoModule::ModRet NoModule::OnUnknownUserRaw(NoClient* pClient, NoString& sLine) { return CONTINUE; }
 void NoModule::OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps) {}

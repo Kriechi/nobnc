@@ -92,7 +92,7 @@ public:
         return true;
     }
 
-    ModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
+    ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         const NoString& sUsername = Auth->GetUsername();
         const NoString& sPassword = Auth->GetPassword();

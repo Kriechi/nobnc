@@ -29,7 +29,7 @@
 #include <queue>
 #include <sys/time.h>
 
-class NoAuthBase;
+class NoAuthenticator;
 class NoChannel;
 class NoNetwork;
 class NoClient;
@@ -960,7 +960,7 @@ public:
      *  @param Auth The necessary authentication info for this login attempt.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth);
+    virtual ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth);
     /** Called after a client login was rejected.
      *  @param sUsername The username that tried to log in.
      *  @param sRemoteIP The IP address from which the client tried to login.

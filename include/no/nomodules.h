@@ -20,7 +20,7 @@
 #include <no/noglobal.h>
 #include <no/nomodule.h>
 
-class NoAuthBase;
+class NoAuthenticator;
 class NoChannel;
 class NoNetwork;
 class NoClient;
@@ -151,7 +151,7 @@ public:
     bool OnAddUser(NoUser& User, NoString& sErrorRet);
     bool OnDeleteUser(NoUser& User);
     bool OnClientConnect(NoSocket* pSock, const NoString& sHost, ushort uPort);
-    bool OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth);
+    bool OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth);
     bool OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP);
     bool OnUnknownUserRaw(NoClient* pClient, NoString& sLine);
     bool OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps);

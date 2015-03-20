@@ -1963,7 +1963,7 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
     return ret;
 }
 
-void NoApp::AuthUser(std::shared_ptr<NoAuthBase> AuthClass)
+void NoApp::AuthUser(std::shared_ptr<NoAuthenticator> AuthClass)
 {
     // TODO unless the auth module calls it, NoUser::IsHostAllowed() is not honoured
     bool bReturn = false;

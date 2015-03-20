@@ -101,7 +101,7 @@ public:
         return pair.second;
     }
 
-    ModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
+    ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         const NoString sUser = Auth->GetUsername();
         NoSocket* pSock = Auth->GetSocket();

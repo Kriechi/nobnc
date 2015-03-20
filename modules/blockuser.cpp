@@ -64,7 +64,7 @@ public:
         return true;
     }
 
-    ModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
+    ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         if (IsBlocked(Auth->GetUsername())) {
             Auth->RefuseLogin(MESSAGE);

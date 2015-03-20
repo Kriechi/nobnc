@@ -23,14 +23,14 @@
 class NoUser;
 class NoSocket;
 
-class NO_EXPORT NoAuthBase
+class NO_EXPORT NoAuthenticator
 {
 public:
-    NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock);
-    virtual ~NoAuthBase();
+    NoAuthenticator(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock);
+    virtual ~NoAuthenticator();
 
-    NoAuthBase(const NoAuthBase&) = delete;
-    NoAuthBase& operator=(const NoAuthBase&) = delete;
+    NoAuthenticator(const NoAuthenticator&) = delete;
+    NoAuthenticator& operator=(const NoAuthenticator&) = delete;
 
     virtual void SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock);
 
@@ -42,7 +42,7 @@ public:
     NoSocket* GetSocket() const;
     NoString GetRemoteIP() const;
 
-    // Invalidate this NoAuthBase instance which means it will no longer use
+    // Invalidate this NoAuthenticator instance which means it will no longer use
     // m_pSock and AcceptLogin() or RefusedLogin() will have no effect.
     virtual void Invalidate();
 

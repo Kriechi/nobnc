@@ -24,7 +24,7 @@
 class NoUser;
 class NoNetwork;
 class NoIrcConnection;
-class NoAuthBase;
+class NoAuthenticator;
 class NoTable;
 
 class NO_EXPORT NoClient : public NoIrcSocket
@@ -116,7 +116,7 @@ private:
     NoString m_sUser;
     NoString m_sNetwork;
     NoString m_sIdentifier;
-    std::shared_ptr<NoAuthBase> m_spAuth;
+    std::shared_ptr<NoAuthenticator> m_spAuth;
     NoStringSet m_ssAcceptedCaps;
 
     friend class ClientTest;

@@ -19,32 +19,32 @@
 #include "nouser.h"
 #include "noapp.h"
 
-NoString NoAuthBase::GetRemoteIP() const
+NoString NoAuthenticator::GetRemoteIP() const
 {
     if (m_pSock)
         return m_pSock->GetRemoteIP();
     return "";
 }
 
-void NoAuthBase::Invalidate() { m_pSock = nullptr; }
+void NoAuthenticator::Invalidate() { m_pSock = nullptr; }
 
-NoAuthBase::NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
+NoAuthenticator::NoAuthenticator(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
     : m_sUsername(sUsername), m_sPassword(sPassword), m_pSock(pSock)
 {
 }
 
-NoAuthBase::~NoAuthBase()
+NoAuthenticator::~NoAuthenticator()
 {
 }
 
-void NoAuthBase::SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
+void NoAuthenticator::SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
 {
     m_sUsername = sUsername;
     m_sPassword = sPassword;
     m_pSock = pSock;
 }
 
-void NoAuthBase::AcceptLogin(NoUser& User)
+void NoAuthenticator::AcceptLogin(NoUser& User)
 {
     if (m_pSock) {
         AcceptedLogin(User);
@@ -52,7 +52,7 @@ void NoAuthBase::AcceptLogin(NoUser& User)
     }
 }
 
-void NoAuthBase::RefuseLogin(const NoString& sReason)
+void NoAuthenticator::RefuseLogin(const NoString& sReason)
 {
     if (!m_pSock) return;
 
@@ -72,8 +72,8 @@ void NoAuthBase::RefuseLogin(const NoString& sReason)
     Invalidate();
 }
 
-const NoString& NoAuthBase::GetUsername() const { return m_sUsername; }
+const NoString& NoAuthenticator::GetUsername() const { return m_sUsername; }
 
-const NoString& NoAuthBase::GetPassword() const { return m_sPassword; }
+const NoString& NoAuthenticator::GetPassword() const { return m_sPassword; }
 
-NoSocket* NoAuthBase::GetSocket() const { return m_pSock; }
+NoSocket* NoAuthenticator::GetSocket() const { return m_pSock; }

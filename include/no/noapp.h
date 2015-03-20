@@ -24,7 +24,7 @@
 #include <no/nolistener.h>
 
 class NoClient;
-class NoAuthBase;
+class NoAuthenticator;
 class NoUser;
 class NoNetwork;
 class NoConnectQueueTimer;
@@ -82,8 +82,8 @@ public:
     // generated through ZNC.
     TrafficStatsMap GetTrafficStats(TrafficStatsPair& Users, TrafficStatsPair& ZNC, TrafficStatsPair& Total);
 
-    // The result is passed back via callbacks to NoAuthBase.
-    void AuthUser(std::shared_ptr<NoAuthBase> AuthClass);
+    // The result is passed back via callbacks to NoAuthenticator.
+    void AuthUser(std::shared_ptr<NoAuthenticator> AuthClass);
 
     void SetConfigState(ConfigState e);
     void SetSkinName(const NoString& s);

@@ -77,7 +77,7 @@ private:
     NoWebSock& m_WebSock;
 };
 
-class NoWebAuth : public NoAuthBase
+class NoWebAuth : public NoAuthenticator
 {
 public:
     NoWebAuth(NoWebSock* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic);
@@ -126,7 +126,7 @@ void NoWebSession::UpdateLastActive() { time(&m_tmLastActive); }
 bool NoWebSession::IsAdmin() const { return IsLoggedIn() && m_pUser->IsAdmin(); }
 
 NoWebAuth::NoWebAuth(NoWebSock* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic)
-    : NoAuthBase(sUsername, sPassword, pWebSock), m_pWebSock(pWebSock), m_bBasic(bBasic)
+    : NoAuthenticator(sUsername, sPassword, pWebSock), m_pWebSock(pWebSock), m_bBasic(bBasic)
 {
 }
 
@@ -209,7 +209,7 @@ void NoWebAuth::RefusedLogin(const NoString& sReason)
 
 void NoWebAuth::Invalidate()
 {
-    NoAuthBase::Invalidate();
+    NoAuthenticator::Invalidate();
     m_pWebSock = nullptr;
 }
 

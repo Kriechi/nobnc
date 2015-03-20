@@ -25,7 +25,7 @@ class NoImapAuthMod;
 class NoImapSock : public NoModuleSocket
 {
 public:
-    NoImapSock(NoImapAuthMod* pModule, std::shared_ptr<NoAuthBase> Auth) : NoModuleSocket((NoModule*)pModule), m_spAuth(Auth)
+    NoImapSock(NoImapAuthMod* pModule, std::shared_ptr<NoAuthenticator> Auth) : NoModuleSocket((NoModule*)pModule), m_spAuth(Auth)
     {
         m_pIMAPMod = pModule;
         m_bSentReply = false;
@@ -47,7 +47,7 @@ protected:
     NoImapAuthMod* m_pIMAPMod;
     bool m_bSentLogin;
     bool m_bSentReply;
-    std::shared_ptr<NoAuthBase> m_spAuth;
+    std::shared_ptr<NoAuthenticator> m_spAuth;
 };
 
 
@@ -88,7 +88,7 @@ public:
         return true;
     }
 
-    ModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
+    ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         NoUser* pUser = NoApp::Get().FindUser(Auth->GetUsername());
 

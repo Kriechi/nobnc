@@ -69,18 +69,18 @@
         }                                                                     \
     }
 
-class NoClientAuth : public NoAuthBase
+class NoClientAuth : public NoAuthenticator
 {
 public:
     NoClientAuth(NoClient* pClient, const NoString& sUsername, const NoString& sPassword)
-        : NoAuthBase(sUsername, sPassword, pClient), m_pClient(pClient)
+        : NoAuthenticator(sUsername, sPassword, pClient), m_pClient(pClient)
     {
     }
 
     void Invalidate() override
     {
         m_pClient = nullptr;
-        NoAuthBase::Invalidate();
+        NoAuthenticator::Invalidate();
     }
 
     void AcceptedLogin(NoUser& User) override

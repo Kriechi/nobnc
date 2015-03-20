@@ -381,7 +381,7 @@ bool NoModules::OnClientConnect(NoSocket* pClient, const NoString& sHost, ushort
     return false;
 }
 
-bool NoModules::OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) { MODHALTCHK(OnLoginAttempt(Auth)); }
+bool NoModules::OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) { MODHALTCHK(OnLoginAttempt(Auth)); }
 
 bool NoModules::OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP)
 {
