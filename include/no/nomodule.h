@@ -112,32 +112,7 @@ class NoNick;
 class NoChannel;
 class NoModule;
 class NoSocketManager;
-
-#ifdef HAVE_PTHREAD
-/// A NoJob version which can be safely used in modules. The job will be
-/// cancelled when the module is unloaded.
-class NO_EXPORT NoModuleJob : public NoJob
-{
-public:
-    NoModuleJob(NoModule* pModule, const NoString& sName, const NoString& sDesc)
-        : NoJob(), m_pModule(pModule), m_sName(sName), m_sDescription(sDesc)
-    {
-    }
-    virtual ~NoModuleJob();
-
-    NoModuleJob(const NoModuleJob&) = delete;
-    NoModuleJob& operator=(const NoModuleJob&) = delete;
-
-    NoModule* GetModule() const { return m_pModule; }
-    const NoString& GetName() const { return m_sName; }
-    const NoString& GetDescription() const { return m_sDescription; }
-
-private:
-    NoModule* m_pModule;
-    const NoString m_sName;
-    const NoString m_sDescription;
-};
-#endif
+class NoModuleJob;
 
 typedef void* ModHandle;
 

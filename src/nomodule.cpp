@@ -22,6 +22,7 @@
 #include "nowebmodules.h"
 #include "noclient.h"
 #include "noapp.h"
+#include "nomodulejob.h"
 #include <dlfcn.h>
 
 NoModule::NoModule(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, NoModInfo::ModuleType eType)
@@ -404,8 +405,6 @@ void NoModule::ListSockets()
 }
 
 #ifdef HAVE_PTHREAD
-NoModuleJob::~NoModuleJob() { m_pModule->UnlinkJob(this); }
-
 void NoModule::AddJob(NoModuleJob* pJob)
 {
     NoThreadPool::Get().addJob(pJob);
