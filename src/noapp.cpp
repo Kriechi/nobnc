@@ -18,6 +18,7 @@
 #include "nodir.h"
 #include "nofile.h"
 #include "noircconnection.h"
+#include "noauthenticator.h"
 #include "noserver.h"
 #include "nouser.h"
 #include "nonetwork.h"

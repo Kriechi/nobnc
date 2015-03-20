@@ -24,41 +24,8 @@
 class NoUser;
 class NoNetwork;
 class NoIrcConnection;
-class NoClient;
+class NoAuthBase;
 class NoTable;
-
-class NO_EXPORT NoAuthBase
-{
-public:
-    NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock);
-    virtual ~NoAuthBase();
-
-    NoAuthBase(const NoAuthBase&) = delete;
-    NoAuthBase& operator=(const NoAuthBase&) = delete;
-
-    virtual void SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock);
-
-    void AcceptLogin(NoUser& User);
-    void RefuseLogin(const NoString& sReason);
-
-    const NoString& GetUsername() const;
-    const NoString& GetPassword() const;
-    NoSocket* GetSocket() const;
-    NoString GetRemoteIP() const;
-
-    // Invalidate this NoAuthBase instance which means it will no longer use
-    // m_pSock and AcceptLogin() or RefusedLogin() will have no effect.
-    virtual void Invalidate();
-
-protected:
-    virtual void AcceptedLogin(NoUser& User) = 0;
-    virtual void RefusedLogin(const NoString& sReason) = 0;
-
-private:
-    NoString m_sUsername;
-    NoString m_sPassword;
-    NoSocket* m_pSock;
-};
 
 class NO_EXPORT NoClient : public NoIrcSocket
 {

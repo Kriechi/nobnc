@@ -15,6 +15,7 @@
  */
 
 #include "nowebmodules.h"
+#include "noauthenticator.h"
 #include "nofile.h"
 #include "nodir.h"
 #include "noclient.h"

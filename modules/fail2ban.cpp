@@ -17,6 +17,7 @@
 #include <no/nomodule.h>
 #include <no/noapp.h>
 #include <no/noclient.h>
+#include <no/noauthenticator.h>
 
 class NoFailToBanMod : public NoModule
 {

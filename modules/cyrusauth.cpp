@@ -28,6 +28,7 @@
 #include <no/nouser.h>
 #include <no/nodebug.h>
 #include <no/noclient.h>
+#include <no/noauthenticator.h>
 
 #include <sasl/sasl.h>
 

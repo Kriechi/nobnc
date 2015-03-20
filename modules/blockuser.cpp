@@ -19,6 +19,7 @@
 #include <no/nonetwork.h>
 #include <no/noclient.h>
 #include <no/noapp.h>
+#include <no/noauthenticator.h>
 
 #define MESSAGE "Your account has been disabled. Contact your administrator."
 
