@@ -26,32 +26,29 @@ class NoSocket;
 class NO_EXPORT NoAuthenticator
 {
 public:
-    NoAuthenticator(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock);
+    NoAuthenticator(const NoString& username, const NoString& password, NoSocket* socket);
     virtual ~NoAuthenticator();
 
     NoAuthenticator(const NoAuthenticator&) = delete;
     NoAuthenticator& operator=(const NoAuthenticator&) = delete;
 
-    void AcceptLogin(NoUser& User);
-    void RefuseLogin(const NoString& sReason);
+    NoString username() const;
+    NoString password() const;
+    NoSocket* socket() const;
 
-    const NoString& GetUsername() const;
-    const NoString& GetPassword() const;
-    NoSocket* GetSocket() const;
-    NoString GetRemoteIP() const;
+    void acceptLogin(NoUser* user);
+    void refuseLogin(const NoString& reason);
 
-    // Invalidate this NoAuthenticator instance which means it will no longer use
-    // m_pSock and AcceptLogin() or RefusedLogin() will have no effect.
-    virtual void Invalidate();
+    virtual void invalidate();
 
 protected:
-    virtual void AcceptedLogin(NoUser& User) = 0;
-    virtual void RefusedLogin(const NoString& sReason) = 0;
+    virtual void loginAccepted(NoUser* user) = 0;
+    virtual void loginRefused(NoUser* user, const NoString& reason) = 0;
 
 private:
-    NoString m_sUsername;
-    NoString m_sPassword;
-    NoSocket* m_pSock;
+    NoString m_username;
+    NoString m_password;
+    NoSocket* m_socket;
 };
 
 #endif // NOAUTHENTICATOR_H

@@ -105,8 +105,8 @@ public:
 
     ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
-        const NoString sUser = Auth->GetUsername();
-        NoSocket* pSock = Auth->GetSocket();
+        const NoString sUser = Auth->username();
+        NoSocket* pSock = Auth->socket();
         NoUser* pUser = NoApp::Get().FindUser(sUser);
 
         if (pSock == nullptr || pUser == nullptr) return CONTINUE;
@@ -133,7 +133,7 @@ public:
 
         // This client uses a valid pubkey for this user, let them in
         NO_DEBUG("Accepted pubkey auth");
-        Auth->AcceptLogin(*pUser);
+        Auth->acceptLogin(pUser);
 
         return HALT;
     }

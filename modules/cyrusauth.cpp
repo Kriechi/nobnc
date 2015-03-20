@@ -94,8 +94,8 @@ public:
 
     ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
-        const NoString& sUsername = Auth->GetUsername();
-        const NoString& sPassword = Auth->GetPassword();
+        const NoString& sUsername = Auth->username();
+        const NoString& sPassword = Auth->password();
         NoUser* pUser(NoApp::Get().FindUser(sUsername));
         sasl_conn_t* sasl_conn(nullptr);
         bool bSuccess = false;
@@ -153,7 +153,7 @@ public:
             }
 
             if (pUser) {
-                Auth->AcceptLogin(*pUser);
+                Auth->acceptLogin(pUser);
                 return HALT;
             }
         }

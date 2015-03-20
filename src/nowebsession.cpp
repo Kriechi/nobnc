@@ -100,12 +100,13 @@ public:
     NoWebAuth& operator=(const NoWebAuth&) = delete;
 
     void SetWebSock(NoWebSocket* pWebSock) { m_pWebSock = pWebSock; }
-    void AcceptedLogin(NoUser& User) override;
-    void RefusedLogin(const NoString& sReason) override;
-    void Invalidate() override;
+    void invalidate() override;
+
+protected:
+    void loginAccepted(NoUser* user) override;
+    void loginRefused(NoUser* user, const NoString& reason) override;
 
 private:
-protected:
     NoWebSocket* m_pWebSock;
     bool m_bBasic;
 };
@@ -189,12 +190,12 @@ NoWebAuth::NoWebAuth(NoWebSocket* pWebSock, const NoString& sUsername, const NoS
 {
 }
 
-void NoWebAuth::AcceptedLogin(NoUser& User)
+void NoWebAuth::loginAccepted(NoUser* user)
 {
     if (m_pWebSock) {
         std::shared_ptr<NoWebSession> spSession = m_pWebSock->GetSession();
 
-        spSession->SetUser(&User);
+        spSession->SetUser(user);
 
         m_pWebSock->SetLoggedIn(true);
         m_pWebSock->UnPauseRead();
@@ -202,11 +203,11 @@ void NoWebAuth::AcceptedLogin(NoUser& User)
             m_pWebSock->Redirect("/?cookie_check=true");
         }
 
-        NO_DEBUG("Successful login attempt ==> USER [" + User.GetUserName() + "] ==> SESSION [" + spSession->GetId() + "]");
+        NO_DEBUG("Successful login attempt ==> USER [" + user->GetUserName() + "] ==> SESSION [" + spSession->GetId() + "]");
     }
 }
 
-void NoWebAuth::RefusedLogin(const NoString& sReason)
+void NoWebAuth::loginRefused(NoUser* user, const NoString& reason)
 {
     if (m_pWebSock) {
         std::shared_ptr<NoWebSession> spSession = m_pWebSock->GetSession();
@@ -218,13 +219,13 @@ void NoWebAuth::RefusedLogin(const NoString& sReason)
         m_pWebSock->UnPauseRead();
         m_pWebSock->Redirect("/?cookie_check=true");
 
-        NO_DEBUG("UNSUCCESSFUL login attempt ==> REASON [" + sReason + "] ==> SESSION [" + spSession->GetId() + "]");
+        NO_DEBUG("UNSUCCESSFUL login attempt ==> REASON [" + reason + "] ==> SESSION [" + spSession->GetId() + "]");
     }
 }
 
-void NoWebAuth::Invalidate()
+void NoWebAuth::invalidate()
 {
-    NoAuthenticator::Invalidate();
+    NoAuthenticator::invalidate();
     m_pWebSock = nullptr;
 }
 
@@ -238,7 +239,7 @@ NoWebSocket::NoWebSocket(const NoString& sURIPrefix)
 NoWebSocket::~NoWebSocket()
 {
     if (m_spAuth) {
-        m_spAuth->Invalidate();
+        m_spAuth->invalidate();
     }
 
     // we have to account for traffic here because NoSocket does

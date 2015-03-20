@@ -88,14 +88,14 @@ public:
     ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         // e.g. webadmin ends up here
-        const NoString& sRemoteIP = Auth->GetRemoteIP();
+        const NoString& sRemoteIP = Auth->socket()->GetRemoteIP();
 
         if (sRemoteIP.empty()) return CONTINUE;
 
         uint* pCount = m_Cache.GetItem(sRemoteIP);
         if (pCount && *pCount >= m_uiAllowedFailed) {
             // OnFailedLogin() will refresh their ban
-            Auth->RefuseLogin("Please try again later - reconnecting too fast");
+            Auth->refuseLogin("Please try again later - reconnecting too fast");
             return HALT;
         }
 

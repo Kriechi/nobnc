@@ -19,17 +19,8 @@
 #include "nouser.h"
 #include "noapp.h"
 
-NoString NoAuthenticator::GetRemoteIP() const
-{
-    if (m_pSock)
-        return m_pSock->GetRemoteIP();
-    return "";
-}
-
-void NoAuthenticator::Invalidate() { m_pSock = nullptr; }
-
-NoAuthenticator::NoAuthenticator(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
-    : m_sUsername(sUsername), m_sPassword(sPassword), m_pSock(pSock)
+NoAuthenticator::NoAuthenticator(const NoString& username, const NoString& password, NoSocket* socket)
+    : m_username(username), m_password(password), m_socket(socket)
 {
 }
 
@@ -37,36 +28,50 @@ NoAuthenticator::~NoAuthenticator()
 {
 }
 
-void NoAuthenticator::AcceptLogin(NoUser& User)
+NoString NoAuthenticator::username() const
 {
-    if (m_pSock) {
-        AcceptedLogin(User);
-        Invalidate();
+    return m_username;
+}
+
+NoString NoAuthenticator::password() const
+{
+    return m_password;
+}
+
+NoSocket* NoAuthenticator::socket() const
+{
+    return m_socket;
+}
+
+void NoAuthenticator::acceptLogin(NoUser* user)
+{
+    if (m_socket) {
+        loginAccepted(user);
+        invalidate();
     }
 }
 
-void NoAuthenticator::RefuseLogin(const NoString& sReason)
+void NoAuthenticator::refuseLogin(const NoString& reason)
 {
-    if (!m_pSock) return;
+    if (!m_socket)
+        return;
 
-    NoUser* pUser = NoApp::Get().FindUser(GetUsername());
+    NoUser* user = NoApp::Get().FindUser(m_username);
 
     // If the username is valid, notify that user that someone tried to
-    // login. Use sReason because there are other reasons than "wrong
+    // login. Use reason because there are other reasons than "wrong
     // password" for a login to be rejected (e.g. fail2ban).
-    if (pUser) {
-        pUser->PutStatus("A client from [" + GetRemoteIP() + "] attempted "
-                                                             "to login as you, but was rejected [" +
-                         sReason + "].");
+    if (user) {
+        user->PutStatus("A client from [" + m_socket->GetRemoteIP() + "] attempted "
+                        "to login as you, but was rejected [" + reason + "].");
     }
 
-    GLOBALMODULECALL(OnFailedLogin(GetUsername(), GetRemoteIP()), NOTHING);
-    RefusedLogin(sReason);
-    Invalidate();
+    GLOBALMODULECALL(OnFailedLogin(m_username, m_socket->GetRemoteIP()), NOTHING);
+    loginRefused(user, reason);
+    invalidate();
 }
 
-const NoString& NoAuthenticator::GetUsername() const { return m_sUsername; }
-
-const NoString& NoAuthenticator::GetPassword() const { return m_sPassword; }
-
-NoSocket* NoAuthenticator::GetSocket() const { return m_pSock; }
+void NoAuthenticator::invalidate()
+{
+    m_socket = nullptr;
+}

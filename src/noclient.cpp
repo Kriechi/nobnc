@@ -78,22 +78,22 @@ public:
     {
     }
 
-    void Invalidate() override
+    void invalidate() override
     {
         m_pClient = nullptr;
-        NoAuthenticator::Invalidate();
+        NoAuthenticator::invalidate();
     }
 
-    void AcceptedLogin(NoUser& User) override
+    void loginAccepted(NoUser* user) override
     {
         if (m_pClient)
-            m_pClient->AcceptLogin(User);
+            m_pClient->AcceptLogin(*user);
     }
 
-    void RefusedLogin(const NoString& sReason) override
+    void loginRefused(NoUser* user, const NoString& reason) override
     {
         if (m_pClient)
-            m_pClient->RefuseLogin(sReason);
+            m_pClient->RefuseLogin(reason);
     }
 
 private:
@@ -115,7 +115,7 @@ NoClient::~NoClient()
 {
     if (m_spAuth) {
         NoClientAuth* pAuth = (NoClientAuth*)&(*m_spAuth);
-        pAuth->Invalidate();
+        pAuth->invalidate();
     }
     if (m_pUser != nullptr) {
         m_pUser->AddBytesRead(GetBytesRead());

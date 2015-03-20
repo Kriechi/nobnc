@@ -1971,21 +1971,24 @@ void NoApp::AuthUser(std::shared_ptr<NoAuthenticator> AuthClass)
     GLOBALMODULECALL(OnLoginAttempt(AuthClass), &bReturn);
     if (bReturn) return;
 
-    NoUser* pUser = FindUser(AuthClass->GetUsername());
+    NoUser* pUser = FindUser(AuthClass->username());
 
-    if (!pUser || !pUser->CheckPass(AuthClass->GetPassword())) {
-        AuthClass->RefuseLogin("Invalid Password");
+    if (!pUser || !pUser->CheckPass(AuthClass->password())) {
+        AuthClass->refuseLogin("Invalid Password");
         return;
     }
 
-    NoString sHost = AuthClass->GetRemoteIP();
+    NoString sHost;
+    NoSocket* pSock = AuthClass->socket();
+    if (pSock)
+        sHost = pSock->GetRemoteIP();
 
     if (!pUser->IsHostAllowed(sHost)) {
-        AuthClass->RefuseLogin("Your host [" + sHost + "] is not allowed");
+        AuthClass->refuseLogin("Your host [" + sHost + "] is not allowed");
         return;
     }
 
-    AuthClass->AcceptLogin(*pUser);
+    AuthClass->acceptLogin(pUser);
 }
 
 void NoApp::SetConfigState(NoApp::ConfigState e) { m_eConfigState = e; }

@@ -68,8 +68,8 @@ public:
 
     ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
-        if (IsBlocked(Auth->GetUsername())) {
-            Auth->RefuseLogin(MESSAGE);
+        if (IsBlocked(Auth->username())) {
+            Auth->refuseLogin(MESSAGE);
             return HALT;
         }
 

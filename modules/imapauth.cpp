@@ -37,7 +37,7 @@ public:
     virtual ~NoImapSock()
     {
         if (!m_bSentReply) {
-            m_spAuth->RefuseLogin("IMAP server is down, please try again later");
+            m_spAuth->refuseLogin("IMAP server is down, please try again later");
         }
     }
 
@@ -91,16 +91,16 @@ public:
 
     ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
-        NoUser* pUser = NoApp::Get().FindUser(Auth->GetUsername());
+        NoUser* pUser = NoApp::Get().FindUser(Auth->username());
 
         if (!pUser) { // @todo Will want to do some sort of && !m_bAllowCreate in the future
-            Auth->RefuseLogin("Invalid User - Halting IMAP Lookup");
+            Auth->refuseLogin("Invalid User - Halting IMAP Lookup");
             return HALT;
         }
 
-        if (pUser && m_Cache.HasItem(NoUtils::MD5(Auth->GetUsername() + ":" + Auth->GetPassword()))) {
+        if (pUser && m_Cache.HasItem(NoUtils::MD5(Auth->username() + ":" + Auth->password()))) {
             NO_DEBUG("+++ Found in cache");
-            Auth->AcceptLogin(*pUser);
+            Auth->acceptLogin(pUser);
             return HALT;
         }
 
@@ -131,7 +131,7 @@ private:
 void NoImapSock::ReadLineImpl(const NoString& sLine)
 {
     if (!m_bSentLogin) {
-        NoString sUsername = m_spAuth->GetUsername();
+        NoString sUsername = m_spAuth->username();
         m_bSentLogin = true;
 
         const NoString& sFormat = m_pIMAPMod->GetUserFormat();
@@ -144,17 +144,17 @@ void NoImapSock::ReadLineImpl(const NoString& sLine)
             }
         }
 
-        Write("AUTH LOGIN " + sUsername + " " + m_spAuth->GetPassword() + "\r\n");
+        Write("AUTH LOGIN " + sUsername + " " + m_spAuth->password() + "\r\n");
     } else if (sLine.left(5) == "AUTH ") {
-        NoUser* pUser = NoApp::Get().FindUser(m_spAuth->GetUsername());
+        NoUser* pUser = NoApp::Get().FindUser(m_spAuth->username());
 
         if (pUser && sLine.startsWith("AUTH OK")) {
-            m_spAuth->AcceptLogin(*pUser);
+            m_spAuth->acceptLogin(pUser);
             // Use MD5 so passes don't sit in memory in plain text
-            m_pIMAPMod->CacheLogin(NoUtils::MD5(m_spAuth->GetUsername() + ":" + m_spAuth->GetPassword()));
+            m_pIMAPMod->CacheLogin(NoUtils::MD5(m_spAuth->username() + ":" + m_spAuth->password()));
             NO_DEBUG("+++ Successful IMAP lookup");
         } else {
-            m_spAuth->RefuseLogin("Invalid Password");
+            m_spAuth->refuseLogin("Invalid Password");
             NO_DEBUG("--- FAILED IMAP lookup");
         }
 
