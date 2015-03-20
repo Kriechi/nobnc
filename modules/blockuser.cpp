@@ -135,7 +135,7 @@ public:
             PutModule("This user is not blocked");
     }
 
-    bool OnEmbeddedWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/user" && WebSock.GetSession()->IsAdmin()) {
             NoString sAction = Tmpl["WebadminAction"];

@@ -138,7 +138,7 @@ public:
 
     NoString GetWebMenuTitle() override { return "Perform"; }
 
-    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName != "index") {
             // only accept requests to index

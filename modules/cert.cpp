@@ -72,7 +72,7 @@ public:
 
     NoString GetWebMenuTitle() override { return "Certificate"; }
 
-    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             Tmpl["Cert"] = NoString(HasPemFile());

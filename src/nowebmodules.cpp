@@ -31,7 +31,7 @@
 /// @todo Do we want to make this a configure option?
 #define _SKINDIR_ _DATADIR_ "/webskins"
 
-const uint NoWebSock::m_uiMaxSessions = 5;
+const uint NoWebSocket::m_uiMaxSessions = 5;
 
 class NoWebSessionMap : public NoCacheMap<NoString, std::shared_ptr<NoWebSession>>
 {
@@ -63,7 +63,7 @@ static NoWebSessionManager Sessions;
 class NoTagHandler : public NoTemplateTagHandler
 {
 public:
-    NoTagHandler(NoWebSock& WebSock) : NoTemplateTagHandler(), m_WebSock(WebSock) {}
+    NoTagHandler(NoWebSocket& WebSock) : NoTemplateTagHandler(), m_WebSock(WebSock) {}
 
     bool HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override
     {
@@ -76,29 +76,29 @@ public:
     }
 
 private:
-    NoWebSock& m_WebSock;
+    NoWebSocket& m_WebSock;
 };
 
 class NoWebAuth : public NoAuthenticator
 {
 public:
-    NoWebAuth(NoWebSock* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic);
+    NoWebAuth(NoWebSocket* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic);
 
     NoWebAuth(const NoWebAuth&) = delete;
     NoWebAuth& operator=(const NoWebAuth&) = delete;
 
-    void SetWebSock(NoWebSock* pWebSock) { m_pWebSock = pWebSock; }
+    void SetWebSock(NoWebSocket* pWebSock) { m_pWebSock = pWebSock; }
     void AcceptedLogin(NoUser& User) override;
     void RefusedLogin(const NoString& sReason) override;
     void Invalidate() override;
 
 private:
 protected:
-    NoWebSock* m_pWebSock;
+    NoWebSocket* m_pWebSock;
     bool m_bBasic;
 };
 
-void NoWebSock::FinishUserSessions(const NoUser& User) { Sessions.m_mspSessions.FinishUserSessions(User); }
+void NoWebSocket::FinishUserSessions(const NoUser& User) { Sessions.m_mspSessions.FinishUserSessions(User); }
 
 NoWebSession::~NoWebSession()
 {
@@ -127,7 +127,7 @@ void NoWebSession::UpdateLastActive() { time(&m_tmLastActive); }
 
 bool NoWebSession::IsAdmin() const { return IsLoggedIn() && m_pUser->IsAdmin(); }
 
-NoWebAuth::NoWebAuth(NoWebSock* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic)
+NoWebAuth::NoWebAuth(NoWebSocket* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic)
     : NoAuthenticator(sUsername, sPassword, pWebSock), m_pWebSock(pWebSock), m_bBasic(bBasic)
 {
 }
@@ -215,14 +215,14 @@ void NoWebAuth::Invalidate()
     m_pWebSock = nullptr;
 }
 
-NoWebSock::NoWebSock(const NoString& sURIPrefix)
+NoWebSocket::NoWebSocket(const NoString& sURIPrefix)
     : NoHttpSocket(nullptr, sURIPrefix), m_bPathsSet(false), m_Template(), m_spAuth(), m_sModName(""), m_sPath(""),
       m_sPage(""), m_spSession()
 {
     m_Template.AddTagHandler(std::make_shared<NoTagHandler>(*this));
 }
 
-NoWebSock::~NoWebSock()
+NoWebSocket::~NoWebSocket()
 {
     if (m_spAuth) {
         m_spAuth->Invalidate();
@@ -244,7 +244,7 @@ NoWebSock::~NoWebSock()
     ResetBytesRead();
 }
 
-void NoWebSock::GetAvailSkins(NoStringVector& vRet) const
+void NoWebSocket::GetAvailSkins(NoStringVector& vRet) const
 {
     vRet.clear();
 
@@ -276,7 +276,7 @@ void NoWebSock::GetAvailSkins(NoStringVector& vRet) const
     }
 }
 
-NoStringVector NoWebSock::GetDirs(NoModule* pModule, bool bIsTemplate)
+NoStringVector NoWebSocket::GetDirs(NoModule* pModule, bool bIsTemplate)
 {
     NoString sHomeSkinsDir(NoApp::Get().GetZNCPath() + "/webskins/");
     NoString sSkinName(GetSkinName());
@@ -325,7 +325,7 @@ NoStringVector NoWebSock::GetDirs(NoModule* pModule, bool bIsTemplate)
     return vsResult;
 }
 
-NoString NoWebSock::FindTmpl(NoModule* pModule, const NoString& sName)
+NoString NoWebSocket::FindTmpl(NoModule* pModule, const NoString& sName)
 {
     NoStringVector vsDirs = GetDirs(pModule, true);
     NoString sFile = pModule->GetModName() + "_" + sName;
@@ -338,7 +338,7 @@ NoString NoWebSock::FindTmpl(NoModule* pModule, const NoString& sName)
     return sName;
 }
 
-void NoWebSock::SetPaths(NoModule* pModule, bool bIsTemplate)
+void NoWebSocket::SetPaths(NoModule* pModule, bool bIsTemplate)
 {
     m_Template.ClearPaths();
 
@@ -350,7 +350,7 @@ void NoWebSock::SetPaths(NoModule* pModule, bool bIsTemplate)
     m_bPathsSet = true;
 }
 
-void NoWebSock::SetVars()
+void NoWebSocket::SetVars()
 {
     m_Template["SessionUser"] = GetUser();
     m_Template["SessionIP"] = GetRemoteIP();
@@ -399,7 +399,7 @@ void NoWebSock::SetVars()
     }
 }
 
-bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemplate* pTemplate)
+bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemplate* pTemplate)
 {
     if (!pTemplate) {
         pTemplate = &m_Template;
@@ -492,7 +492,7 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
     return false;
 }
 
-NoWebSock::PageRequest NoWebSock::PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule)
+NoWebSocket::PageRequest NoWebSocket::PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule)
 {
     SetPaths(pModule);
     NoString sFile = m_Template.ExpandFile(sPath.trimLeft_n("/"));
@@ -503,7 +503,7 @@ NoWebSock::PageRequest NoWebSock::PrintStaticFile(const NoString& sPath, NoStrin
     return Done;
 }
 
-NoWebSock::PageRequest NoWebSock::PrintTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule)
+NoWebSocket::PageRequest NoWebSocket::PrintTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule)
 {
     SetVars();
 
@@ -534,7 +534,7 @@ NoWebSock::PageRequest NoWebSock::PrintTemplate(const NoString& sPageName, NoStr
     }
 }
 
-NoString NoWebSock::GetSkinPath(const NoString& sSkinName)
+NoString NoWebSocket::GetSkinPath(const NoString& sSkinName)
 {
     NoString sRet = NoApp::Get().GetZNCPath() + "/webskins/" + sSkinName;
 
@@ -549,7 +549,7 @@ NoString NoWebSock::GetSkinPath(const NoString& sSkinName)
     return sRet + "/";
 }
 
-bool NoWebSock::ForceLogin()
+bool NoWebSocket::ForceLogin()
 {
     if (GetSession()->IsLoggedIn()) {
         return true;
@@ -560,7 +560,7 @@ bool NoWebSock::ForceLogin()
     return false;
 }
 
-NoString NoWebSock::GetRequestCookie(const NoString& sKey)
+NoString NoWebSocket::GetRequestCookie(const NoString& sKey)
 {
     const NoString sPrefixedKey = NoString(GetLocalPort()) + "-" + sKey;
     NoString sRet;
@@ -576,7 +576,7 @@ NoString NoWebSock::GetRequestCookie(const NoString& sKey)
     return sRet;
 }
 
-bool NoWebSock::SendCookie(const NoString& sKey, const NoString& sValue)
+bool NoWebSocket::SendCookie(const NoString& sKey, const NoString& sValue)
 {
     const NoString sPrefixedKey = NoString(GetLocalPort()) + "-" + sKey;
 
@@ -587,7 +587,7 @@ bool NoWebSock::SendCookie(const NoString& sKey, const NoString& sValue)
     return NoHttpSocket::SendCookie(sPrefixedKey, sValue);
 }
 
-void NoWebSock::OnPageRequest(const NoString& sURI)
+void NoWebSocket::OnPageRequest(const NoString& sURI)
 {
     NoString sPageRet;
     PageRequest eRet = OnPageRequestInternal(sURI, sPageRet);
@@ -610,7 +610,7 @@ void NoWebSock::OnPageRequest(const NoString& sURI)
     }
 }
 
-NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, NoString& sPageRet)
+NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI, NoString& sPageRet)
 {
     // Check that their session really belongs to their IP address. IP-based
     // authentication is bad, but here it's just an extra layer that makes
@@ -848,7 +848,7 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
     return NotFound;
 }
 
-void NoWebSock::PrintErrorPage(const NoString& sMessage)
+void NoWebSocket::PrintErrorPage(const NoString& sMessage)
 {
     m_Template.SetFile("Error.tmpl");
 
@@ -863,7 +863,7 @@ static inline bool compareLastActive(const std::pair<const NoString, NoWebSessio
     return first.second->GetLastActive() < second.second->GetLastActive();
 }
 
-std::shared_ptr<NoWebSession> NoWebSock::GetSession()
+std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
 {
     if (m_spSession) {
         return m_spSession;
@@ -908,15 +908,15 @@ std::shared_ptr<NoWebSession> NoWebSock::GetSession()
     return spSession;
 }
 
-NoString NoWebSock::GetCSRFCheck()
+NoString NoWebSocket::GetCSRFCheck()
 {
     std::shared_ptr<NoWebSession> pSession = GetSession();
     return NoUtils::MD5(pSession->GetId());
 }
 
-bool NoWebSock::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic)
+bool NoWebSocket::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic)
 {
-    NO_DEBUG("=================== NoWebSock::OnLogin(), basic auth? " << std::boolalpha << bBasic);
+    NO_DEBUG("=================== NoWebSocket::OnLogin(), basic auth? " << std::boolalpha << bBasic);
     m_spAuth = std::make_shared<NoWebAuth>(this, sUser, sPass, bBasic);
 
     // Some authentication module could need some time, block this socket
@@ -928,15 +928,15 @@ bool NoWebSock::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasi
     return IsLoggedIn();
 }
 
-NoSocket* NoWebSock::GetSockObjImpl(const NoString& sHost, ushort uPort)
+NoSocket* NoWebSocket::GetSockObjImpl(const NoString& sHost, ushort uPort)
 {
-    // All listening is done by NoListener, thus NoWebSock should never have
+    // All listening is done by NoListener, thus NoWebSocket should never have
     // to listen, but since GetSockObj() is pure virtual...
-    NO_DEBUG("NoWebSock::GetSockObj() called - this should never happen!");
+    NO_DEBUG("NoWebSocket::GetSockObj() called - this should never happen!");
     return nullptr;
 }
 
-NoString NoWebSock::GetSkinName()
+NoString NoWebSocket::GetSkinName()
 {
     std::shared_ptr<NoWebSession> spSession = GetSession();
 

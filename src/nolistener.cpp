@@ -227,7 +227,7 @@ void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
             return;
         }
 
-        pSock = new NoWebSock(m_sURIPrefix);
+        pSock = new NoWebSocket(m_sURIPrefix);
         NoApp::Get().GetManager().SwapSockByAddr(pSock->GetHandle(), GetHandle());
 
         // And don't forget to give it some sane name / timeout

@@ -104,7 +104,7 @@ public:
     bool WebRequiresAdmin() override { return true; }
     NoString GetWebMenuTitle() override { return "List sockets"; }
 
-    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             if (NoApp::Get().GetManager().GetSockets().empty()) {

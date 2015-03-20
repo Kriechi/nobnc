@@ -163,7 +163,7 @@ bool NoApp::HandleUserDeletion()
             continue;
         }
         m_msUsers.erase(pUser->GetUserName());
-        NoWebSock::FinishUserSessions(*pUser);
+        NoWebSocket::FinishUserSessions(*pUser);
         delete pUser;
     }
 

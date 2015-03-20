@@ -34,7 +34,7 @@ class NoAuthenticator;
 class NoChannel;
 class NoNetwork;
 class NoClient;
-class NoWebSock;
+class NoWebSocket;
 class NoTemplate;
 class NoIrcConnection;
 class NoModule;
@@ -219,7 +219,7 @@ public:
      *  @return true if you handled the page request or false if the name is to be checked
      *          against the list of registered SubPages and their permission settings.
      */
-    virtual bool OnWebPreRequest(NoWebSock& WebSock, const NoString& sPageName);
+    virtual bool OnWebPreRequest(NoWebSocket& WebSock, const NoString& sPageName);
     /** If OnWebPreRequest returned false, and the RequiresAdmin/IsAdmin check has been passed,
      *  this method will be called with the page name. It will also be called for pages that
      *  have NOT been specifically registered with AddSubPage.
@@ -229,7 +229,7 @@ public:
      *  @return You MUST return true if you want the template to be evaluated and sent to the browser.
      *          Return false if you called Redirect() or PrintErrorPage(). If you didn't, a 404 page will be sent.
      */
-    virtual bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl);
+    virtual bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl);
     /** Registers a sub page for the sidebar.
      *  @param spSubPage The SubPage instance.
      */
@@ -250,7 +250,7 @@ public:
      *  @return If you don't need to embed web stuff to the specified place, just return false.
      *          Exact meaning of return value is up to caller, and depends on context.
      */
-    virtual bool OnEmbeddedWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl);
+    virtual bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl);
 
 
     /** Called just before znc.conf is rehashed */

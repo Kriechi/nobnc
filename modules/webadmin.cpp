@@ -169,7 +169,7 @@ public:
         return true;
     }
 
-    NoUser* GetNewUser(NoWebSock& WebSock, NoUser* pUser)
+    NoUser* GetNewUser(NoWebSocket& WebSock, NoUser* pUser)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         NoString sUsername = WebSock.GetParam("newuser");
@@ -414,7 +414,7 @@ public:
         return pNewUser;
     }
 
-    NoString SafeGetUserNameParam(NoWebSock& WebSock)
+    NoString SafeGetUserNameParam(NoWebSocket& WebSock)
     {
         NoString sUserName = WebSock.GetParam("user"); // check for POST param
         if (sUserName.empty() && !WebSock.IsPost()) {
@@ -425,7 +425,7 @@ public:
         return sUserName;
     }
 
-    NoString SafeGetNetworkParam(NoWebSock& WebSock)
+    NoString SafeGetNetworkParam(NoWebSocket& WebSock)
     {
         NoString sNetwork = WebSock.GetParam("network"); // check for POST param
         if (sNetwork.empty() && !WebSock.IsPost()) {
@@ -436,9 +436,9 @@ public:
         return sNetwork;
     }
 
-    NoUser* SafeGetUserFromParam(NoWebSock& WebSock) { return NoApp::Get().FindUser(SafeGetUserNameParam(WebSock)); }
+    NoUser* SafeGetUserFromParam(NoWebSocket& WebSock) { return NoApp::Get().FindUser(SafeGetUserNameParam(WebSock)); }
 
-    NoNetwork* SafeGetNetworkFromParam(NoWebSock& WebSock)
+    NoNetwork* SafeGetNetworkFromParam(NoWebSocket& WebSock)
     {
         NoUser* pUser = NoApp::Get().FindUser(SafeGetUserNameParam(WebSock));
         NoNetwork* pNetwork = nullptr;
@@ -451,7 +451,7 @@ public:
     }
 
     NoString GetWebMenuTitle() override { return "webadmin"; }
-    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
 
@@ -647,7 +647,7 @@ public:
         return false;
     }
 
-    bool ChanPage(NoWebSock& WebSock, NoTemplate& Tmpl, NoNetwork* pNetwork, NoChannel* pChan = nullptr)
+    bool ChanPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoNetwork* pNetwork, NoChannel* pChan = nullptr)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_chan.tmpl");
@@ -793,7 +793,7 @@ public:
         return true;
     }
 
-    bool NetworkPage(NoWebSock& WebSock, NoTemplate& Tmpl, NoUser* pUser, NoNetwork* pNetwork = nullptr)
+    bool NetworkPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* pUser, NoNetwork* pNetwork = nullptr)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_network.tmpl");
@@ -1154,7 +1154,7 @@ public:
         return true;
     }
 
-    bool DelNetwork(NoWebSock& WebSock, NoUser* pUser, NoTemplate& Tmpl)
+    bool DelNetwork(NoWebSocket& WebSock, NoUser* pUser, NoTemplate& Tmpl)
     {
         NoString sNetwork = WebSock.GetParam("name");
         if (sNetwork.empty() && !WebSock.IsPost()) {
@@ -1191,7 +1191,7 @@ public:
         return false;
     }
 
-    bool DelChan(NoWebSock& WebSock, NoNetwork* pNetwork)
+    bool DelChan(NoWebSocket& WebSock, NoNetwork* pNetwork)
     {
         NoString sChan = WebSock.GetParam("name", false);
 
@@ -1213,7 +1213,7 @@ public:
         return false;
     }
 
-    bool UserPage(NoWebSock& WebSock, NoTemplate& Tmpl, NoUser* pUser = nullptr)
+    bool UserPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* pUser = nullptr)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_user.tmpl");
@@ -1561,7 +1561,7 @@ public:
         return false;
     }
 
-    bool ListUsersPage(NoWebSock& WebSock, NoTemplate& Tmpl)
+    bool ListUsersPage(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
@@ -1586,7 +1586,7 @@ public:
         return true;
     }
 
-    bool TrafficPage(NoWebSock& WebSock, NoTemplate& Tmpl)
+    bool TrafficPage(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
         Tmpl["Title"] = "Traffic Info";
         Tmpl["Uptime"] = NoApp::Get().GetUptime();
@@ -1651,7 +1651,7 @@ public:
         return true;
     }
 
-    bool AddListener(NoWebSock& WebSock, NoTemplate& Tmpl)
+    bool AddListener(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
         ushort uPort = WebSock.GetParam("port").toUShort();
         NoString sHost = WebSock.GetParam("host");
@@ -1710,7 +1710,7 @@ public:
         return SettingsPage(WebSock, Tmpl);
     }
 
-    bool DelListener(NoWebSock& WebSock, NoTemplate& Tmpl)
+    bool DelListener(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
         ushort uPort = WebSock.GetParam("port").toUShort();
         NoString sHost = WebSock.GetParam("host");
@@ -1746,7 +1746,7 @@ public:
         return SettingsPage(WebSock, Tmpl);
     }
 
-    bool SettingsPage(NoWebSock& WebSock, NoTemplate& Tmpl)
+    bool SettingsPage(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
         Tmpl.SetFile("settings.tmpl");
         if (!WebSock.GetParam("submitted").toUInt()) {

@@ -515,15 +515,15 @@ NoString NoModule::GetModNick() const { return ((m_pUser) ? m_pUser->GetStatusPr
 const NoString& NoModule::GetModDataDir() const { return m_sDataDir; }
 
 // Webmods
-bool NoModule::OnWebPreRequest(NoWebSock& WebSock, const NoString& sPageName) { return false; }
-bool NoModule::OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
+bool NoModule::OnWebPreRequest(NoWebSocket& WebSock, const NoString& sPageName) { return false; }
+bool NoModule::OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
 
 void NoModule::AddSubPage(TWebSubPage spSubPage) { m_vSubPages.push_back(spSubPage); }
 
 void NoModule::ClearSubPages() { m_vSubPages.clear(); }
 
 VWebSubPages& NoModule::GetSubPages() { return m_vSubPages; }
-bool NoModule::OnEmbeddedWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
+bool NoModule::OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
 // !Webmods
 
 bool NoModule::OnLoad(const NoString& sArgs, NoString& sMessage)

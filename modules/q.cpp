@@ -309,7 +309,7 @@ public:
 
     NoString GetWebMenuTitle() override { return "Q"; }
 
-    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             bool bSubmitted = (WebSock.GetParam("submitted").toInt() != 0);

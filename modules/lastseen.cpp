@@ -90,7 +90,7 @@ public:
     bool WebRequiresAdmin() override { return true; }
     NoString GetWebMenuTitle() override { return "Last Seen"; }
 
-    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             NoModules& GModules = NoApp::Get().GetModules();
@@ -118,7 +118,7 @@ public:
         return false;
     }
 
-    bool OnEmbeddedWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/user" && WebSock.GetSession()->IsAdmin()) {
             NoUser* pUser = NoApp::Get().FindUser(Tmpl["Username"]);

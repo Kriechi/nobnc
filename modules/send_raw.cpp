@@ -80,7 +80,7 @@ public:
     NoString GetWebMenuTitle() override { return "Send Raw"; }
     bool WebRequiresAdmin() override { return true; }
 
-    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             if (WebSock.IsPost()) {

@@ -40,7 +40,7 @@ NoModuleSocket::~NoModuleSocket()
 {
     NoUser* pUser = nullptr;
 
-    // NoWebSock could cause us to have a nullptr pointer here
+    // NoWebSocket could cause us to have a nullptr pointer here
     if (m_pModule) {
         pUser = m_pModule->GetUser();
         m_pModule->UnlinkSocket(this);

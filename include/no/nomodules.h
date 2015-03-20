@@ -24,7 +24,7 @@ class NoAuthenticator;
 class NoChannel;
 class NoNetwork;
 class NoClient;
-class NoWebSock;
+class NoWebSocket;
 class NoTemplate;
 class NoIrcConnection;
 class NoNick;

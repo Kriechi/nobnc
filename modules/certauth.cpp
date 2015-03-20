@@ -244,7 +244,7 @@ public:
 
     NoString GetWebMenuTitle() override { return "certauth"; }
 
-    bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         NoUser* pUser = WebSock.GetSession()->GetUser();
 

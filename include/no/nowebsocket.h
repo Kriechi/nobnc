@@ -24,7 +24,7 @@
 class NoWebSession;
 class NoAuthenticator;
 
-class NO_EXPORT NoWebSock : public NoHttpSocket
+class NO_EXPORT NoWebSocket : public NoHttpSocket
 {
 public:
     enum PageRequest {
@@ -34,8 +34,8 @@ public:
         Done // all stuff has been done
     };
 
-    NoWebSock(const NoString& sURIPrefix);
-    virtual ~NoWebSock();
+    NoWebSocket(const NoString& sURIPrefix);
+    virtual ~NoWebSocket();
 
     bool ForceLogin() override;
     bool OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic) override;
