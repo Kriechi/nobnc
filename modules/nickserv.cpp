@@ -32,7 +32,7 @@ class NoNickServ : public NoModule
 public:
     void SetCommand(const NoString& sLine)
     {
-        SetNV("Password", sLine.Tokens(1));
+        SetNV("Password", sLine.tokens(1));
         PutModule("Password set");
     }
 
@@ -40,7 +40,7 @@ public:
 
     void SetNSNameCommand(const NoString& sLine)
     {
-        SetNV("NickServName", sLine.Tokens(1));
+        SetNV("NickServName", sLine.tokens(1));
         PutModule("NickServ name set");
     }
 
@@ -50,9 +50,9 @@ public:
 
     void SetCommandCommand(const NoString& sLine)
     {
-        NoString sCmd = sLine.Token(1);
-        NoString sNewCmd = sLine.Tokens(2);
-        if (sCmd.Equals("IDENTIFY")) {
+        NoString sCmd = sLine.token(1);
+        NoString sNewCmd = sLine.tokens(2);
+        if (sCmd.equals("IDENTIFY")) {
             SetNV("IdentifyCmd", sNewCmd);
         } else {
             PutModule("No such editable command. See ViewCommands for list.");
@@ -110,7 +110,7 @@ public:
              sMessage.find("This is a registered nickname, please identify") != NoString::npos ||
              NoUtils::StripControls(sMessage).find("type /NickServ IDENTIFY password") != NoString::npos ||
              NoUtils::StripControls(sMessage).find("type /msg NickServ IDENTIFY password") != NoString::npos) &&
-            sMessage.AsUpper().find("IDENTIFY") != NoString::npos && sMessage.find("help") == NoString::npos) {
+            sMessage.toUpper().find("IDENTIFY") != NoString::npos && sMessage.find("help") == NoString::npos) {
             NoStringMap msValues;
             msValues["password"] = GetNV("Password");
             PutIRC(NoUtils::NamedFormat(GetNV("IdentifyCmd"), msValues));

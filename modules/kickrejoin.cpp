@@ -38,7 +38,7 @@ protected:
     void RunJob() override
     {
         NoNetwork* pNetwork = module()->GetNetwork();
-        NoChannel* pChan = pNetwork->FindChan(GetName().Tokens(1));
+        NoChannel* pChan = pNetwork->FindChan(GetName().tokens(1));
 
         if (pChan) {
             pChan->enable();
@@ -74,9 +74,9 @@ public:
             if (sDelay.empty())
                 delay = 10;
             else
-                delay = sDelay.ToUInt();
+                delay = sDelay.toUInt();
         } else {
-            int i = sArgs.ToInt();
+            int i = sArgs.toInt();
             if ((i == 0 && sArgs == "0") || i > 0)
                 delay = i;
             else {
@@ -92,7 +92,7 @@ public:
     void OnSetDelayCommand(const NoString& sCommand)
     {
         int i;
-        i = sCommand.Token(1).ToInt();
+        i = sCommand.token(1).toInt();
 
         if (i < 0) {
             PutModule("Negative delays don't make any sense!");
@@ -118,7 +118,7 @@ public:
 
     void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& pChan, const NoString& sMessage) override
     {
-        if (GetNetwork()->GetCurNick().Equals(sKickedNick)) {
+        if (GetNetwork()->GetCurNick().equals(sKickedNick)) {
             if (!delay) {
                 PutIRC("JOIN " + pChan.getName() + " " + pChan.getKey());
                 pChan.enable();

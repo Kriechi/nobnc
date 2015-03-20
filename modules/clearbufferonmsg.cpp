@@ -133,21 +133,21 @@ public:
               { "quit", RULE_QUIT },
           };
 
-        if (sOpt.Equals("all")) {
+        if (sOpt.equals("all")) {
             SetAllRules(bVal);
         } else {
             for (int i = 0; i < RULE_MAX; i++) {
-                if (sOpt.Equals(Names[i].sName)) m_bRules[Names[i].Index] = bVal;
+                if (sOpt.equals(Names[i].sName)) m_bRules[Names[i].Index] = bVal;
             }
         }
     }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        NoStringVector vsOpts = sArgs.Split(" ", No::SkipEmptyParts);
+        NoStringVector vsOpts = sArgs.split(" ", No::SkipEmptyParts);
 
         for (NoString& sOpt : vsOpts) {
-            if (sOpt.StartsWith("!"))
+            if (sOpt.startsWith("!"))
                 SetRule(sOpt.substr(1), false);
             else if (!sOpt.empty())
                 SetRule(sOpt, true);

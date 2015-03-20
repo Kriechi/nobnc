@@ -35,9 +35,9 @@ public:
 
     bool IsMatch(const NoString& sChan, const NoString& sHost, const NoString& sMessage) const
     {
-        if (!sHost.WildCmp(m_sHostmaskWildcard, No::CaseInsensitive)) return false;
-        if (!sChan.WildCmp(m_sChannelWildcard, No::CaseInsensitive)) return false;
-        if (!sMessage.WildCmp(m_pModule->ExpandString(m_sSearchWildcard), No::CaseInsensitive)) return false;
+        if (!sHost.wildCmp(m_sHostmaskWildcard, No::CaseInsensitive)) return false;
+        if (!sChan.wildCmp(m_sChannelWildcard, No::CaseInsensitive)) return false;
+        if (!sMessage.wildCmp(m_pModule->ExpandString(m_sSearchWildcard), No::CaseInsensitive)) return false;
         return true;
     }
 
@@ -78,19 +78,19 @@ public:
 private:
     void HandleAdd(const NoString& sLine)
     {
-        NoString sMsg = sLine.Tokens(1);
+        NoString sMsg = sLine.tokens(1);
         bool bHelp = false;
-        bool bNegated = sMsg.TrimPrefix("!");
-        NoString sChan = sMsg.Token(0);
-        NoString sSearch = sMsg.Token(1);
-        NoString sHost = sMsg.Token(2);
+        bool bNegated = sMsg.trimPrefix("!");
+        NoString sChan = sMsg.token(0);
+        NoString sSearch = sMsg.token(1);
+        NoString sHost = sMsg.token(2);
 
         if (sChan.empty()) {
             bHelp = true;
         } else if (Add(bNegated, sChan, sSearch, sHost)) {
             PutModule("Added to list");
         } else {
-            PutModule(sLine.Tokens(1) + " is already added");
+            PutModule(sLine.tokens(1) + " is already added");
             bHelp = true;
         }
         if (bHelp) {
@@ -101,11 +101,11 @@ private:
 
     void HandleDel(const NoString& sLine)
     {
-        NoString sMsg = sLine.Tokens(1);
-        bool bNegated = sMsg.TrimPrefix("!");
-        NoString sChan = sMsg.Token(0);
-        NoString sSearch = sMsg.Token(1);
-        NoString sHost = sMsg.Token(2);
+        NoString sMsg = sLine.tokens(1);
+        bool bNegated = sMsg.trimPrefix("!");
+        NoString sChan = sMsg.token(0);
+        NoString sSearch = sMsg.token(1);
+        NoString sHost = sMsg.token(2);
 
         if (Del(bNegated, sChan, sSearch, sHost)) {
             PutModule("Removed " + sChan + " from list");
@@ -152,14 +152,14 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        NoStringVector vsChans = sArgs.Split(" ", No::SkipEmptyParts);
+        NoStringVector vsChans = sArgs.split(" ", No::SkipEmptyParts);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             NoString sAdd = *it;
-            bool bNegated = sAdd.TrimPrefix("!");
-            NoString sChan = sAdd.Token(0);
-            NoString sSearch = sAdd.Token(1);
-            NoString sHost = sAdd.Tokens(2);
+            bool bNegated = sAdd.trimPrefix("!");
+            NoString sChan = sAdd.token(0);
+            NoString sSearch = sAdd.token(1);
+            NoString sHost = sAdd.tokens(2);
 
             if (!Add(bNegated, sChan, sSearch, sHost)) {
                 PutModule("Unable to add [" + *it + "]");
@@ -170,10 +170,10 @@ public:
         NoStringMap::iterator it;
         for (it = BeginNV(); it != EndNV(); ++it) {
             NoString sAdd = it->first;
-            bool bNegated = sAdd.TrimPrefix("!");
-            NoString sChan = sAdd.Token(0);
-            NoString sSearch = sAdd.Token(1);
-            NoString sHost = sAdd.Tokens(2);
+            bool bNegated = sAdd.trimPrefix("!");
+            NoString sChan = sAdd.token(0);
+            NoString sSearch = sAdd.token(1);
+            NoString sHost = sAdd.tokens(2);
 
             Add(bNegated, sChan, sSearch, sHost);
         }

@@ -336,7 +336,7 @@ NoString escape(const NoString& str, No::EscapeFormat from, No::EscapeFormat to)
     }
 
     if (to == No::HexColonFormat)
-        ret.TrimRight(":");
+        ret.trimRight(":");
 
     return ret;
 }

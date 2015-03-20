@@ -46,12 +46,12 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        m_iThresholdMsgs = sArgs.Token(0).ToUInt();
-        m_iThresholdSecs = sArgs.Token(1).ToUInt();
+        m_iThresholdMsgs = sArgs.token(0).toUInt();
+        m_iThresholdSecs = sArgs.token(1).toUInt();
 
         if (m_iThresholdMsgs == 0 || m_iThresholdSecs == 0) {
-            m_iThresholdMsgs = GetNV("msgs").ToUInt();
-            m_iThresholdSecs = GetNV("secs").ToUInt();
+            m_iThresholdMsgs = GetNV("msgs").toUInt();
+            m_iThresholdSecs = GetNV("secs").toUInt();
         }
 
         if (m_iThresholdSecs == 0) m_iThresholdSecs = 2;
@@ -81,7 +81,7 @@ public:
                 // channels which we detached, this means that
                 // we detached because of a flood.
 
-                if (!GetNV("silent").ToBool()) {
+                if (!GetNV("silent").toBool()) {
                     PutModule("Flood in [" + pChan->getName() + "] is over, "
                                                                 "re-attaching...");
                 }
@@ -139,7 +139,7 @@ public:
         it->second.first = now;
 
         Channel.detachUser();
-        if (!GetNV("silent").ToBool()) {
+        if (!GetNV("silent").toBool()) {
             PutModule("Channel [" + Channel.getName() + "] was "
                                                         "flooded, you've been detached");
         }
@@ -179,12 +179,12 @@ public:
 
     void SecsCommand(const NoString& sLine)
     {
-        const NoString sArg = sLine.Tokens(1);
+        const NoString sArg = sLine.tokens(1);
 
         if (sArg.empty()) {
             PutModule("Seconds limit is [" + NoString(m_iThresholdSecs) + "]");
         } else {
-            m_iThresholdSecs = sArg.ToUInt();
+            m_iThresholdSecs = sArg.toUInt();
             if (m_iThresholdSecs == 0) m_iThresholdSecs = 1;
 
             PutModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
@@ -194,12 +194,12 @@ public:
 
     void LinesCommand(const NoString& sLine)
     {
-        const NoString sArg = sLine.Tokens(1);
+        const NoString sArg = sLine.tokens(1);
 
         if (sArg.empty()) {
             PutModule("Lines limit is [" + NoString(m_iThresholdMsgs) + "]");
         } else {
-            m_iThresholdMsgs = sArg.ToUInt();
+            m_iThresholdMsgs = sArg.toUInt();
             if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 2;
 
             PutModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");
@@ -209,13 +209,13 @@ public:
 
     void SilentCommand(const NoString& sLine)
     {
-        const NoString sArg = sLine.Tokens(1);
+        const NoString sArg = sLine.tokens(1);
 
         if (!sArg.empty()) {
-            SetNV("silent", NoString(sArg.ToBool()));
+            SetNV("silent", NoString(sArg.toBool()));
         }
 
-        if (GetNV("silent").ToBool()) {
+        if (GetNV("silent").toBool()) {
             PutModule("Module messages are disabled");
         } else {
             PutModule("Module messages are enabled");

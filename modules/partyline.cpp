@@ -31,7 +31,7 @@
 class NoPartylineChannel
 {
 public:
-    NoPartylineChannel(const NoString& sName) { m_sName = sName.AsLower(); }
+    NoPartylineChannel(const NoString& sName) { m_sName = sName.toLower(); }
 
     const NoString& GetTopic() const { return m_sTopic; }
     const NoString& GetName() const { return m_sName; }
@@ -135,11 +135,11 @@ public:
         }
 
         NoStringVector::const_iterator it;
-        NoStringVector vsChans = sArgs.Split(" ", No::SkipEmptyParts);
+        NoStringVector vsChans = sArgs.split(" ", No::SkipEmptyParts);
 
         for (it = vsChans.begin(); it != vsChans.end(); ++it) {
-            if (it->Left(2) == CHAN_PREFIX) {
-                m_ssDefaultChans.insert(it->Left(32));
+            if (it->left(2) == CHAN_PREFIX) {
+                m_ssDefaultChans.insert(it->left(32));
             }
         }
 
@@ -154,8 +154,8 @@ public:
         NoPartylineChannel* pChannel;
         for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
             if (it->first.find(":") != NoString::npos) {
-                sAction = it->first.Token(0, ":");
-                sKey = it->first.Tokens(1, ":");
+                sAction = it->first.token(0, ":");
+                sKey = it->first.tokens(1, ":");
             } else {
                 // backwards compatibility for older NV data
                 sAction = "fixedchan";
@@ -202,8 +202,8 @@ public:
 
     ModRet OnRaw(NoString& sLine) override
     {
-        if (sLine.Token(1) == "005") {
-            NoString::size_type uPos = sLine.AsUpper().find("CHANTYPES=");
+        if (sLine.token(1) == "005") {
+            NoString::size_type uPos = sLine.toUpper().find("CHANTYPES=");
             if (uPos != NoString::npos) {
                 uPos = sLine.find(" ", uPos);
 
@@ -289,15 +289,15 @@ public:
 
     ModRet OnUserRaw(NoString& sLine) override
     {
-        if (sLine.StartsWith("WHO " CHAN_PREFIX_1)) {
+        if (sLine.startsWith("WHO " CHAN_PREFIX_1)) {
             return HALT;
-        } else if (sLine.StartsWith("MODE " CHAN_PREFIX_1)) {
+        } else if (sLine.startsWith("MODE " CHAN_PREFIX_1)) {
             return HALT;
-        } else if (sLine.StartsWith("TOPIC " CHAN_PREFIX)) {
-            NoString sChannel = sLine.Token(1);
-            NoString sTopic = sLine.Tokens(2);
+        } else if (sLine.startsWith("TOPIC " CHAN_PREFIX)) {
+            NoString sChannel = sLine.token(1);
+            NoString sTopic = sLine.tokens(2);
 
-            sTopic.TrimPrefix(":");
+            sTopic.trimPrefix(":");
 
             NoUser* pUser = GetUser();
             NoClient* pClient = GetClient();
@@ -335,11 +335,11 @@ public:
 
     ModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
     {
-        if (sChannel.Left(1) != CHAN_PREFIX_1) {
+        if (sChannel.left(1) != CHAN_PREFIX_1) {
             return CONTINUE;
         }
 
-        if (sChannel.Left(2) != CHAN_PREFIX) {
+        if (sChannel.left(2) != CHAN_PREFIX) {
             GetClient()->PutClient(":" + GetIRCServer(GetNetwork()) + " 401 " + GetClient()->GetNick() + " " + sChannel + " :No such channel");
             return HALT;
         }
@@ -417,17 +417,17 @@ public:
 
     ModRet OnUserJoin(NoString& sChannel, NoString& sKey) override
     {
-        if (sChannel.Left(1) != CHAN_PREFIX_1) {
+        if (sChannel.left(1) != CHAN_PREFIX_1) {
             return CONTINUE;
         }
 
-        if (sChannel.Left(2) != CHAN_PREFIX) {
+        if (sChannel.left(2) != CHAN_PREFIX) {
             GetClient()->PutClient(":" + GetIRCServer(GetNetwork()) + " 403 " + GetClient()->GetNick() + " " +
                                    sChannel + " :Channels look like " CHAN_PREFIX "znc");
             return HALT;
         }
 
-        sChannel = sChannel.Left(32);
+        sChannel = sChannel.left(32);
         NoPartylineChannel* pChannel = GetChannel(sChannel);
 
         JoinUser(GetUser(), pChannel);
@@ -523,7 +523,7 @@ public:
                     true,
                     false);
         } else {
-            NoString sNick = sTarget.LeftChomp_n(1);
+            NoString sNick = sTarget.leftChomp_n(1);
             NoUser* pTargetUser = NoApp::Get().FindUser(sNick);
 
             if (pTargetUser) {
@@ -676,10 +676,10 @@ public:
 
     NoPartylineChannel* FindChannel(const NoString& sChan)
     {
-        NoString sChannel = sChan.AsLower();
+        NoString sChannel = sChan.toLower();
 
         for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
-            if ((*it)->GetName().AsLower() == sChannel) return *it;
+            if ((*it)->GetName().toLower() == sChannel) return *it;
         }
 
         return nullptr;
@@ -690,7 +690,7 @@ public:
         NoPartylineChannel* pChannel = FindChannel(sChannel);
 
         if (!pChannel) {
-            pChannel = new NoPartylineChannel(sChannel.AsLower());
+            pChannel = new NoPartylineChannel(sChannel.toLower());
             m_ssChannels.insert(pChannel);
         }
 

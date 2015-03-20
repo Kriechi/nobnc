@@ -28,10 +28,10 @@ public:
     bool IsOnlineModNick(const NoString& sNick)
     {
         const NoString& sPrefix = GetUser()->GetStatusPrefix();
-        if (!sNick.StartsWith(sPrefix)) return false;
+        if (!sNick.startsWith(sPrefix)) return false;
 
         NoString sModNick = sNick.substr(sPrefix.length());
-        if (sModNick.Equals("status") || GetNetwork()->GetModules().FindModule(sModNick) ||
+        if (sModNick.equals("status") || GetNetwork()->GetModules().FindModule(sModNick) ||
             GetUser()->GetModules().FindModule(sModNick) || NoApp::Get().GetModules().FindModule(sModNick))
             return true;
         return false;
@@ -40,11 +40,11 @@ public:
     ModRet OnUserRaw(NoString& sLine) override
     {
         // Handle ISON
-        if (sLine.Token(0).Equals("ison")) {
+        if (sLine.token(0).equals("ison")) {
             NoStringVector::const_iterator it;
 
             // Get the list of nicks which are being asked for
-            NoStringVector vsNicks = sLine.Tokens(1).TrimLeft_n(":").Split(" ", No::SkipEmptyParts);
+            NoStringVector vsNicks = sLine.tokens(1).trimLeft_n(":").split(" ", No::SkipEmptyParts);
 
             NoString sBNNoNicks;
             for (it = vsNicks.begin(); it != vsNicks.end(); ++it) {
@@ -53,7 +53,7 @@ public:
                 }
             }
             // Remove the leading space
-            sBNNoNicks.LeftChomp(1);
+            sBNNoNicks.leftChomp(1);
 
             if (!GetNetwork()->GetIRCSock()) {
                 // if we are not connected to any IRC server, send
@@ -67,8 +67,8 @@ public:
         }
 
         // Handle WHOIS
-        if (sLine.Token(0).Equals("whois")) {
-            NoString sNick = sLine.Token(1);
+        if (sLine.token(0).equals("whois")) {
+            NoString sNick = sLine.token(1);
 
             if (IsOnlineModNick(sNick)) {
                 NoNetwork* pNetwork = GetNetwork();
@@ -86,13 +86,13 @@ public:
     ModRet OnRaw(NoString& sLine) override
     {
         // Handle 303 reply if m_Requests is not empty
-        if (sLine.Token(1) == "303" && !m_ISONRequests.empty()) {
+        if (sLine.token(1) == "303" && !m_ISONRequests.empty()) {
             NoStringVector::iterator it = m_ISONRequests.begin();
 
-            sLine.Trim();
+            sLine.trim();
 
             // Only append a space if this isn't an empty reply
-            if (sLine.Right(1) != ":") {
+            if (sLine.right(1) != ":") {
                 sLine += " ";
             }
 

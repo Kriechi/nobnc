@@ -43,7 +43,7 @@ public:
     ModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
     {
         for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
-            if (sChannel.Equals(it->first)) {
+            if (sChannel.equals(it->first)) {
                 NoChannel* pChan = GetNetwork()->FindChan(sChannel);
 
                 if (pChan) {
@@ -72,18 +72,18 @@ public:
 
     void OnStickCommand(const NoString& sCommand)
     {
-        NoString sChannel = sCommand.Token(1).AsLower();
+        NoString sChannel = sCommand.token(1).toLower();
         if (sChannel.empty()) {
             PutModule("Usage: Stick <#channel> [key]");
             return;
         }
-        SetNV(sChannel, sCommand.Token(2), true);
+        SetNV(sChannel, sCommand.token(2), true);
         PutModule("Stuck " + sChannel);
     }
 
     void OnUnstickCommand(const NoString& sCommand)
     {
-        NoString sChannel = sCommand.Token(1);
+        NoString sChannel = sCommand.token(1);
         if (sChannel.empty()) {
             PutModule("Usage: Unstick <#channel>");
             return;
@@ -132,7 +132,7 @@ public:
     bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            bool bSubmitted = (WebSock.GetParam("submitted").ToInt() != 0);
+            bool bSubmitted = (WebSock.GetParam("submitted").toInt() != 0);
 
             const std::vector<NoChannel*>& Channels = GetNetwork()->GetChans();
             for (uint c = 0; c < Channels.size(); c++) {
@@ -140,7 +140,7 @@ public:
                 bool bStick = FindNV(sChan) != EndNV();
 
                 if (bSubmitted) {
-                    bool bNewStick = WebSock.GetParam("stick_" + sChan).ToBool();
+                    bool bNewStick = WebSock.GetParam("stick_" + sChan).toBool();
                     if (bNewStick && !bStick)
                         SetNV(sChan, ""); // no password support for now unless chansaver is active too
                     else if (!bNewStick && bStick) {
@@ -170,10 +170,10 @@ public:
         if (sPageName == "webadmin/channel") {
             NoString sChan = Tmpl["ChanName"];
             bool bStick = FindNV(sChan) != EndNV();
-            if (Tmpl["WebadminAction"].Equals("display")) {
+            if (Tmpl["WebadminAction"].equals("display")) {
                 Tmpl["Sticky"] = NoString(bStick);
-            } else if (WebSock.GetParam("embed_stickychan_presented").ToBool()) {
-                bool bNewStick = WebSock.GetParam("embed_stickychan_sticky").ToBool();
+            } else if (WebSock.GetParam("embed_stickychan_presented").toBool()) {
+                bool bNewStick = WebSock.GetParam("embed_stickychan_sticky").toBool();
                 if (bNewStick && !bStick) {
                     SetNV(sChan, ""); // no password support for now unless chansaver is active too
                     WebSock.GetSession()->AddSuccess("Channel become sticky!");
@@ -193,12 +193,12 @@ static void RunTimer(NoModule* pModule, NoTimer* pTimer) { ((NoStickyChan*)pModu
 
 bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
 {
-    NoStringVector vsChans = sArgs.Split(",", No::SkipEmptyParts);
+    NoStringVector vsChans = sArgs.split(",", No::SkipEmptyParts);
     NoStringVector::iterator it;
 
     for (it = vsChans.begin(); it != vsChans.end(); ++it) {
-        NoString sChan = it->Token(0);
-        NoString sKey = it->Tokens(1);
+        NoString sChan = it->token(0);
+        NoString sKey = it->tokens(1);
         SetNV(sChan, sKey);
     }
 

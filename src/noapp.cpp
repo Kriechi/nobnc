@@ -422,7 +422,7 @@ void NoApp::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
     if (uPos == NoString::npos)
         m_sCurPath = "./";
     else
-        m_sCurPath = NoDir::ChangeDir("./", sArgvPath.Left(uPos), "");
+        m_sCurPath = NoDir::ChangeDir("./", sArgvPath.left(uPos), "");
 
     // Try to set the user's home dir, default to binpath on failure
     NoFile::InitHomePath(m_sCurPath);
@@ -490,9 +490,9 @@ NoString NoApp::ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir)
     if (sConfigFile.empty()) {
         sRetPath = GetConfPath(bAllowMkDir) + "/znc.conf";
     } else {
-        if (sConfigFile.Left(2) == "./" || sConfigFile.Left(3) == "../") {
+        if (sConfigFile.left(2) == "./" || sConfigFile.left(3) == "../") {
             sRetPath = GetCurPath() + "/" + sConfigFile;
-        } else if (sConfigFile.Left(1) != "/") {
+        } else if (sConfigFile.left(1) != "/") {
             sRetPath = GetConfPath(bAllowMkDir) + "/" + sConfigFile;
         } else {
             sRetPath = sConfigFile;
@@ -561,15 +561,15 @@ bool NoApp::WriteConfig()
     config.AddKeyValuePair("ServerThrottle", NoString(m_sConnectThrottle.GetTTL() / 1000));
 
     if (!m_sPidFile.empty()) {
-        config.AddKeyValuePair("PidFile", m_sPidFile.FirstLine());
+        config.AddKeyValuePair("PidFile", m_sPidFile.firstLine());
     }
 
     if (!m_sSkinName.empty()) {
-        config.AddKeyValuePair("Skin", m_sSkinName.FirstLine());
+        config.AddKeyValuePair("Skin", m_sSkinName.firstLine());
     }
 
     if (!m_sStatusPrefix.empty()) {
-        config.AddKeyValuePair("StatusPrefix", m_sStatusPrefix.FirstLine());
+        config.AddKeyValuePair("StatusPrefix", m_sStatusPrefix.firstLine());
     }
 
     if (!m_sSSLCiphers.empty()) {
@@ -581,15 +581,15 @@ bool NoApp::WriteConfig()
     }
 
     for (const NoString& sLine : m_vsMotd) {
-        config.AddKeyValuePair("Motd", sLine.FirstLine());
+        config.AddKeyValuePair("Motd", sLine.firstLine());
     }
 
     for (const NoString& sHost : m_vsBindHosts) {
-        config.AddKeyValuePair("BindHost", sHost.FirstLine());
+        config.AddKeyValuePair("BindHost", sHost.firstLine());
     }
 
     for (const NoString& sProxy : m_vsTrustedProxies) {
-        config.AddKeyValuePair("TrustedProxy", sProxy.FirstLine());
+        config.AddKeyValuePair("TrustedProxy", sProxy.firstLine());
     }
 
     NoModules& Mods = GetModules();
@@ -599,10 +599,10 @@ bool NoApp::WriteConfig()
         NoString sArgs = pMod->GetArgs();
 
         if (!sArgs.empty()) {
-            sArgs = " " + sArgs.FirstLine();
+            sArgs = " " + sArgs.firstLine();
         }
 
-        config.AddKeyValuePair("LoadModule", sName.FirstLine() + sArgs);
+        config.AddKeyValuePair("LoadModule", sName.firstLine() + sArgs);
     }
 
     for (const auto& it : m_msUsers) {
@@ -753,7 +753,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         vsGlobalModNames.push_back(Info.GetName());
         vsLines.push_back("LoadModule = " + Info.GetName());
     }
-    NoUtils::PrintMessage("Enabled global modules [" + NoString(", ").Join(vsGlobalModNames.begin(), vsGlobalModNames.end()) + "]");
+    NoUtils::PrintMessage("Enabled global modules [" + NoString(", ").join(vsGlobalModNames.begin(), vsGlobalModNames.end()) + "]");
 
     // User
     NoUtils::PrintMessage("");
@@ -795,7 +795,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         vsUserModNames.push_back(Info.GetName());
         vsLines.push_back("\tLoadModule = " + Info.GetName());
     }
-    NoUtils::PrintMessage("Enabled user modules [" + NoString(", ").Join(vsUserModNames.begin(), vsUserModNames.end()) + "]");
+    NoUtils::PrintMessage("Enabled user modules [" + NoString(", ").join(vsUserModNames.begin(), vsUserModNames.end()) + "]");
 
     NoUtils::PrintMessage("");
     if (NoUtils::GetBoolInput("Set up a network?", true)) {
@@ -823,7 +823,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         bool bSSL = false;
         uint uServerPort = 0;
 
-        if (sNetwork.Equals("freenode")) {
+        if (sNetwork.equals("freenode")) {
             sHost = "chat.freenode.net";
 #ifdef HAVE_LIBSSL
             bSSL = true;
@@ -846,17 +846,17 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         NoString sChans;
         if (NoUtils::GetInput("Initial channels", sChans)) {
             vsLines.push_back("");
-            sChans.Replace(",", " ");
-            sChans.Replace(";", " ");
-            NoStringVector vsChans = sChans.Split(" ", No::SkipEmptyParts);
+            sChans.replace(",", " ");
+            sChans.replace(";", " ");
+            NoStringVector vsChans = sChans.split(" ", No::SkipEmptyParts);
             for (const NoString& sChan : vsChans) {
-                vsLines.push_back("\t\t<Chan " + sChan.Trim_n() + ">");
+                vsLines.push_back("\t\t<Chan " + sChan.trim_n() + ">");
                 vsLines.push_back("\t\t</Chan>");
             }
         }
 
         NoUtils::PrintMessage("Enabled network modules [" +
-                             NoString(", ").Join(vsNetworkModNames.begin(), vsNetworkModNames.end()) + "]");
+                             NoString(", ").join(vsNetworkModNames.begin(), vsNetworkModNames.end()) + "]");
 
         vsLines.push_back("\t</Network>");
     }
@@ -901,7 +901,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
                                      "",
                                      "or \"stdout\" for displaying the config"))
                 ;
-            if (m_sConfigFile.Equals("stdout"))
+            if (m_sConfigFile.equals("stdout"))
                 bFileOK = true;
             else
                 m_sConfigFile = ExpandConfigPath(m_sConfigFile);
@@ -1062,7 +1062,7 @@ bool NoApp::DoRehash(NoString& sError)
     NoString sSavedVersion;
     config.FindStringEntry("version", sSavedVersion);
     std::tuple<uint, uint> tSavedVersion =
-    std::make_tuple(sSavedVersion.Token(0, ".").ToUInt(), sSavedVersion.Token(1, ".").ToUInt());
+    std::make_tuple(sSavedVersion.token(0, ".").toUInt(), sSavedVersion.token(1, ".").toUInt());
     std::tuple<uint, uint> tCurrentVersion = std::make_tuple(NO_VERSION_MAJOR, NO_VERSION_MINOR);
     if (tSavedVersion < tCurrentVersion) {
         if (sSavedVersion.empty()) {
@@ -1089,8 +1089,8 @@ bool NoApp::DoRehash(NoString& sError)
     NoStringVector vsList;
     config.FindStringVector("loadmodule", vsList);
     for (const NoString& sModLine : vsList) {
-        NoString sModName = sModLine.Token(0);
-        NoString sArgs = sModLine.Tokens(1);
+        NoString sModName = sModLine.token(0);
+        NoString sArgs = sModLine.tokens(1);
 
         if (sModName == "saslauth" && tSavedVersion < std::make_tuple(0, 207)) {
             // XXX compatibility crap, added in 0.207
@@ -1184,34 +1184,34 @@ bool NoApp::DoRehash(NoString& sError)
     if (config.FindStringEntry("sslcertfile", sVal)) m_sSSLCertFile = sVal;
     if (config.FindStringEntry("sslciphers", sVal)) m_sSSLCiphers = sVal;
     if (config.FindStringEntry("skin", sVal)) SetSkinName(sVal);
-    if (config.FindStringEntry("connectdelay", sVal)) SetConnectDelay(sVal.ToUInt());
-    if (config.FindStringEntry("serverthrottle", sVal)) m_sConnectThrottle.SetTTL(sVal.ToUInt() * 1000);
-    if (config.FindStringEntry("anoniplimit", sVal)) m_uiAnonIPLimit = sVal.ToUInt();
-    if (config.FindStringEntry("maxbuffersize", sVal)) m_uiMaxBufferSize = sVal.ToUInt();
-    if (config.FindStringEntry("protectwebsessions", sVal)) m_bProtectWebSessions = sVal.ToBool();
-    if (config.FindStringEntry("hideversion", sVal)) m_bHideVersion = sVal.ToBool();
+    if (config.FindStringEntry("connectdelay", sVal)) SetConnectDelay(sVal.toUInt());
+    if (config.FindStringEntry("serverthrottle", sVal)) m_sConnectThrottle.SetTTL(sVal.toUInt() * 1000);
+    if (config.FindStringEntry("anoniplimit", sVal)) m_uiAnonIPLimit = sVal.toUInt();
+    if (config.FindStringEntry("maxbuffersize", sVal)) m_uiMaxBufferSize = sVal.toUInt();
+    if (config.FindStringEntry("protectwebsessions", sVal)) m_bProtectWebSessions = sVal.toBool();
+    if (config.FindStringEntry("hideversion", sVal)) m_bHideVersion = sVal.toBool();
 
     if (config.FindStringEntry("sslprotocols", m_sSSLProtocols)) {
-        NoStringVector vsProtocols = m_sSSLProtocols.Split(" ", No::SkipEmptyParts);
+        NoStringVector vsProtocols = m_sSSLProtocols.split(" ", No::SkipEmptyParts);
 
         for (NoString& sProtocol : vsProtocols) {
 
             uint uFlag = 0;
-            sProtocol.Trim();
-            bool bEnable = sProtocol.TrimPrefix("+");
-            bool bDisable = sProtocol.TrimPrefix("-");
+            sProtocol.trim();
+            bool bEnable = sProtocol.trimPrefix("+");
+            bool bDisable = sProtocol.trimPrefix("-");
 
-            if (sProtocol.Equals("All")) {
+            if (sProtocol.equals("All")) {
                 uFlag = ~0;
-            } else if (sProtocol.Equals("SSLv2")) {
+            } else if (sProtocol.equals("SSLv2")) {
                 uFlag = Csock::EDP_SSLv2;
-            } else if (sProtocol.Equals("SSLv3")) {
+            } else if (sProtocol.equals("SSLv3")) {
                 uFlag = Csock::EDP_SSLv3;
-            } else if (sProtocol.Equals("TLSv1")) {
+            } else if (sProtocol.equals("TLSv1")) {
                 uFlag = Csock::EDP_TLSv1;
-            } else if (sProtocol.Equals("TLSv1.1")) {
+            } else if (sProtocol.equals("TLSv1.1")) {
                 uFlag = Csock::EDP_TLSv1_1;
-            } else if (sProtocol.Equals("TLSv1.2")) {
+            } else if (sProtocol.equals("TLSv1.2")) {
                 uFlag = Csock::EDP_TLSv1_2;
             } else {
                 NoUtils::PrintError("Invalid SSLProtocols value [" + sProtocol + "]");
@@ -1395,7 +1395,7 @@ bool NoApp::AddBindHost(const NoString& sHost)
     }
 
     for (const NoString& sBindHost : m_vsBindHosts) {
-        if (sBindHost.Equals(sHost)) {
+        if (sBindHost.equals(sHost)) {
             return false;
         }
     }
@@ -1408,7 +1408,7 @@ bool NoApp::RemBindHost(const NoString& sHost)
 {
     NoStringVector::iterator it;
     for (it = m_vsBindHosts.begin(); it != m_vsBindHosts.end(); ++it) {
-        if (sHost.Equals(*it)) {
+        if (sHost.equals(*it)) {
             m_vsBindHosts.erase(it);
             return true;
         }
@@ -1426,7 +1426,7 @@ bool NoApp::AddTrustedProxy(const NoString& sHost)
     }
 
     for (const NoString& sTrustedProxy : m_vsTrustedProxies) {
-        if (sTrustedProxy.Equals(sHost)) {
+        if (sTrustedProxy.equals(sHost)) {
             return false;
         }
     }
@@ -1439,7 +1439,7 @@ bool NoApp::RemTrustedProxy(const NoString& sHost)
 {
     NoStringVector::iterator it;
     for (it = m_vsTrustedProxies.begin(); it != m_vsTrustedProxies.end(); ++it) {
-        if (sHost.Equals(*it)) {
+        if (sHost.equals(*it)) {
             m_vsTrustedProxies.erase(it);
             return true;
         }
@@ -1619,21 +1619,21 @@ NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, No::Ad
 
 bool NoApp::AddListener(const NoString& sLine, NoString& sError)
 {
-    NoString sName = sLine.Token(0);
-    NoString sValue = sLine.Tokens(1);
+    NoString sName = sLine.token(0);
+    NoString sValue = sLine.tokens(1);
 
     No::AddressType eAddr = No::Ipv4AndIpv6Address;
-    if (sName.Equals("Listen4") || sName.Equals("Listen") || sName.Equals("Listener4")) {
+    if (sName.equals("Listen4") || sName.equals("Listen") || sName.equals("Listener4")) {
         eAddr = No::Ipv4Address;
     }
-    if (sName.Equals("Listener6")) {
+    if (sName.equals("Listener6")) {
         eAddr = No::Ipv6Address;
     }
 
     NoListener::AcceptType eAccept = NoListener::AcceptAll;
-    if (sValue.TrimPrefix("irc_only "))
+    if (sValue.trimPrefix("irc_only "))
         eAccept = NoListener::AcceptIrc;
-    else if (sValue.TrimPrefix("web_only "))
+    else if (sValue.trimPrefix("web_only "))
         eAccept = NoListener::AcceptHttp;
 
     bool bSSL = false;
@@ -1641,24 +1641,24 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
     NoString sBindHost;
 
     if (No::Ipv4Address == eAddr) {
-        sValue.Replace(":", " ");
+        sValue.replace(":", " ");
     }
 
     if (sValue.find(" ") != NoString::npos) {
-        sBindHost = sValue.Token(0, " ");
-        sPort = sValue.Tokens(1, " ");
+        sBindHost = sValue.token(0, " ");
+        sPort = sValue.tokens(1, " ");
     } else {
         sPort = sValue;
     }
 
-    if (sPort.Left(1) == "+") {
-        sPort.LeftChomp(1);
+    if (sPort.left(1) == "+") {
+        sPort.leftChomp(1);
         bSSL = true;
     }
 
     // No support for URIPrefix for old-style configs.
     NoString sURIPrefix;
-    ushort uPort = sPort.ToUShort();
+    ushort uPort = sPort.toUShort();
     return AddListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
 }
 
@@ -1733,11 +1733,11 @@ bool NoApp::AddListener(ushort uPort,
     // URIPrefix must start with a slash and end without one.
     NoString sURIPrefix = NoString(sURIPrefixRaw);
     if (!sURIPrefix.empty()) {
-        if (!sURIPrefix.StartsWith("/")) {
+        if (!sURIPrefix.startsWith("/")) {
             sURIPrefix = "/" + sURIPrefix;
         }
-        if (sURIPrefix.EndsWith("/")) {
-            sURIPrefix.TrimRight("/");
+        if (sURIPrefix.endsWith("/")) {
+            sURIPrefix.trimRight("/");
         }
     }
 
@@ -1874,9 +1874,9 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
 
     for (NoSocket* pSock : m_Manager.GetSockets()) {
         NoUser* pUser = nullptr;
-        if (pSock->GetSockName().Left(5) == "IRC::") {
+        if (pSock->GetSockName().left(5) == "IRC::") {
             pUser = ((NoIrcConnection*)pSock)->GetNetwork()->GetUser();
-        } else if (pSock->GetSockName().Left(5) == "USR::") {
+        } else if (pSock->GetSockName().left(5) == "USR::") {
             pUser = ((NoClient*)pSock)->GetUser();
         }
 

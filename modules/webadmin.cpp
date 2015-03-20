@@ -107,15 +107,15 @@ public:
         NoString sListenHost;
         NoString sURIPrefix;
 
-        while (sArgs.Left(1) == "-") {
-            NoString sOpt = sArgs.Token(0);
-            sArgs = sArgs.Tokens(1);
+        while (sArgs.left(1) == "-") {
+            NoString sOpt = sArgs.token(0);
+            sArgs = sArgs.tokens(1);
 
-            if (sOpt.Equals("-IPV6")) {
+            if (sOpt.equals("-IPV6")) {
                 bIPv6 = true;
-            } else if (sOpt.Equals("-IPV4")) {
+            } else if (sOpt.equals("-IPV4")) {
                 bIPv6 = false;
-            } else if (sOpt.Equals("-noircport")) {
+            } else if (sOpt.equals("-noircport")) {
                 bShareIRCPorts = false;
             } else {
                 // Uhm... Unknown option? Let's just ignore all
@@ -129,19 +129,19 @@ public:
         if (sArgs.empty() && bShareIRCPorts) return true;
 
         if (sArgs.find(" ") != NoString::npos) {
-            sListenHost = sArgs.Token(0);
-            sPort = sArgs.Tokens(1);
+            sListenHost = sArgs.token(0);
+            sPort = sArgs.tokens(1);
         } else {
             sPort = sArgs;
         }
 
-        if (sPort.Left(1) == "+") {
-            sPort.TrimLeft("+");
+        if (sPort.left(1) == "+") {
+            sPort.trimLeft("+");
             bSSL = true;
         }
 
         if (!sPort.empty()) {
-            uPort = sPort.ToUShort();
+            uPort = sPort.toUShort();
         }
 
         if (!bShareIRCPorts) {
@@ -201,21 +201,21 @@ public:
             pNewUser->SetPass(sHash, NoUser::HASH_DEFAULT, sSalt);
         }
 
-        NoStringVector vsArgs = WebSock.GetRawParam("allowedips").Split("\n");
+        NoStringVector vsArgs = WebSock.GetRawParam("allowedips").split("\n");
         uint a = 0;
 
         if (vsArgs.size()) {
             for (a = 0; a < vsArgs.size(); a++) {
-                pNewUser->AddAllowedHost(vsArgs[a].Trim_n());
+                pNewUser->AddAllowedHost(vsArgs[a].trim_n());
             }
         } else {
             pNewUser->AddAllowedHost("*");
         }
 
-        vsArgs = WebSock.GetRawParam("ctcpreplies").Split("\n");
+        vsArgs = WebSock.GetRawParam("ctcpreplies").split("\n");
         for (a = 0; a < vsArgs.size(); a++) {
-            NoString sReply = vsArgs[a].TrimRight_n("\r");
-            pNewUser->AddCTCPReply(sReply.Token(0).Trim_n(), sReply.Tokens(1).Trim_n());
+            NoString sReply = vsArgs[a].trimRight_n("\r");
+            pNewUser->AddCTCPReply(sReply.token(0).trim_n(), sReply.tokens(1).trim_n());
         }
 
         sArg = WebSock.GetParam("nick");
@@ -269,10 +269,10 @@ public:
                 bool bFoundDCC = false;
 
                 for (it = vsHosts.begin(); it != vsHosts.end(); ++it) {
-                    if (sArg.Equals(*it)) {
+                    if (sArg.equals(*it)) {
                         bFound = true;
                     }
-                    if (sArg2.Equals(*it)) {
+                    if (sArg2.equals(*it)) {
                         bFoundDCC = true;
                     }
                 }
@@ -290,23 +290,23 @@ public:
         }
 
         sArg = WebSock.GetParam("bufsize");
-        if (!sArg.empty()) pNewUser->SetBufferCount(sArg.ToUInt(), spSession->IsAdmin());
+        if (!sArg.empty()) pNewUser->SetBufferCount(sArg.toUInt(), spSession->IsAdmin());
         if (!sArg.empty()) {
             // First apply the old limit in case the new one is too high
             if (pUser) pNewUser->SetBufferCount(pUser->GetBufferCount(), true);
-            pNewUser->SetBufferCount(sArg.ToUInt(), spSession->IsAdmin());
+            pNewUser->SetBufferCount(sArg.toUInt(), spSession->IsAdmin());
         }
 
         pNewUser->SetSkinName(WebSock.GetParam("skin"));
-        pNewUser->SetAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").ToBool());
-        pNewUser->SetMultiClients(WebSock.GetParam("multiclients").ToBool());
-        pNewUser->SetTimestampAppend(WebSock.GetParam("appendtimestamp").ToBool());
-        pNewUser->SetTimestampPrepend(WebSock.GetParam("prependtimestamp").ToBool());
+        pNewUser->SetAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").toBool());
+        pNewUser->SetMultiClients(WebSock.GetParam("multiclients").toBool());
+        pNewUser->SetTimestampAppend(WebSock.GetParam("appendtimestamp").toBool());
+        pNewUser->SetTimestampPrepend(WebSock.GetParam("prependtimestamp").toBool());
         pNewUser->SetTimezone(WebSock.GetParam("timezone"));
-        pNewUser->SetJoinTries(WebSock.GetParam("jointries").ToUInt());
-        pNewUser->SetMaxJoins(WebSock.GetParam("maxjoins").ToUInt());
-        pNewUser->SetAutoClearQueryBuffer(WebSock.GetParam("autoclearquerybuffer").ToBool());
-        pNewUser->SetMaxQueryBuffers(WebSock.GetParam("maxquerybuffers").ToUInt());
+        pNewUser->SetJoinTries(WebSock.GetParam("jointries").toUInt());
+        pNewUser->SetMaxJoins(WebSock.GetParam("maxjoins").toUInt());
+        pNewUser->SetAutoClearQueryBuffer(WebSock.GetParam("autoclearquerybuffer").toBool());
+        pNewUser->SetMaxQueryBuffers(WebSock.GetParam("maxquerybuffers").toUInt());
 
 #ifdef HAVE_ICU
         NoString sEncodingUtf = WebSock.GetParam("encoding_utf");
@@ -327,10 +327,10 @@ public:
 #endif
 
         if (spSession->IsAdmin()) {
-            pNewUser->SetDenyLoadMod(WebSock.GetParam("denyloadmod").ToBool());
-            pNewUser->SetDenySetBindHost(WebSock.GetParam("denysetbindhost").ToBool());
+            pNewUser->SetDenyLoadMod(WebSock.GetParam("denyloadmod").toBool());
+            pNewUser->SetDenySetBindHost(WebSock.GetParam("denysetbindhost").toBool());
             sArg = WebSock.GetParam("maxnetworks");
-            if (!sArg.empty()) pNewUser->SetMaxNetworks(sArg.ToUInt());
+            if (!sArg.empty()) pNewUser->SetMaxNetworks(sArg.toUInt());
         } else if (pUser) {
             pNewUser->SetDenyLoadMod(pUser->DenyLoadMod());
             pNewUser->SetDenySetBindHost(pUser->DenySetBindHost());
@@ -340,7 +340,7 @@ public:
         // If pUser is not nullptr, we are editing an existing user.
         // Users must not be able to change their own admin flag.
         if (pUser != NoApp::Get().FindUser(WebSock.GetUser())) {
-            pNewUser->SetAdmin(WebSock.GetParam("isadmin").ToBool());
+            pNewUser->SetAdmin(WebSock.GetParam("isadmin").toBool());
         } else if (pUser) {
             pNewUser->SetAdmin(pUser->IsAdmin());
         }
@@ -352,7 +352,7 @@ public:
             if (NoModInfo::UserModule == GetType() && pUser == NoApp::Get().FindUser(WebSock.GetUser())) {
                 bool bLoadedWebadmin = false;
                 for (a = 0; a < vsArgs.size(); ++a) {
-                    NoString sModName = vsArgs[a].TrimRight_n("\r");
+                    NoString sModName = vsArgs[a].trimRight_n("\r");
                     if (sModName == GetModName()) {
                         bLoadedWebadmin = true;
                         break;
@@ -365,7 +365,7 @@ public:
 
             for (a = 0; a < vsArgs.size(); a++) {
                 NoString sModRet;
-                NoString sModName = vsArgs[a].TrimRight_n("\r");
+                NoString sModName = vsArgs[a].trimRight_n("\r");
                 NoString sModLoadError;
 
                 if (!sModName.empty()) {
@@ -656,7 +656,7 @@ public:
             return true;
         }
 
-        if (!WebSock.GetParam("submitted").ToUInt()) {
+        if (!WebSock.GetParam("submitted").toUInt()) {
             Tmpl["User"] = pUser->GetUserName();
             Tmpl["Network"] = pNetwork->GetName();
 
@@ -719,7 +719,7 @@ public:
             return true;
         }
 
-        NoString sChanName = WebSock.GetParam("name").Trim_n();
+        NoString sChanName = WebSock.GetParam("name").trim_n();
 
         if (!pChan) {
             if (sChanName.empty()) {
@@ -742,19 +742,19 @@ public:
             }
         }
 
-        uint uBufferCount = WebSock.GetParam("buffercount").ToUInt();
+        uint uBufferCount = WebSock.GetParam("buffercount").toUInt();
         if (pChan->getBufferCount() != uBufferCount) {
             pChan->setBufferCount(uBufferCount, spSession->IsAdmin());
         }
         pChan->setDefaultModes(WebSock.GetParam("defmodes"));
-        pChan->setInConfig(WebSock.GetParam("save").ToBool());
-        bool bAutoClearChanBuffer = WebSock.GetParam("autoclearchanbuffer").ToBool();
+        pChan->setInConfig(WebSock.GetParam("save").toBool());
+        bool bAutoClearChanBuffer = WebSock.GetParam("autoclearchanbuffer").toBool();
         if (pChan->autoClearChanBuffer() != bAutoClearChanBuffer) {
-            pChan->setAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").ToBool());
+            pChan->setAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").toBool());
         }
         pChan->setKey(WebSock.GetParam("key"));
 
-        bool bDetached = WebSock.GetParam("detached").ToBool();
+        bool bDetached = WebSock.GetParam("detached").toBool();
         if (pChan->isDetached() != bDetached) {
             if (bDetached) {
                 pChan->detachUser();
@@ -763,7 +763,7 @@ public:
             }
         }
 
-        bool bDisabled = WebSock.GetParam("disabled").ToBool();
+        bool bDisabled = WebSock.GetParam("disabled").toBool();
         if (bDisabled)
             pChan->disable();
         else
@@ -796,7 +796,7 @@ public:
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_network.tmpl");
 
-        if (!WebSock.GetParam("submitted").ToUInt()) {
+        if (!WebSock.GetParam("submitted").toUInt()) {
             Tmpl["Username"] = pUser->GetUserName();
 
             std::set<NoModInfo> ssNetworkMods;
@@ -971,7 +971,7 @@ public:
             return true;
         }
 
-        NoString sName = WebSock.GetParam("name").Trim_n();
+        NoString sName = WebSock.GetParam("name").trim_n();
         if (sName.empty()) {
             WebSock.PrintErrorPage("Network name is a required argument");
             return true;
@@ -1008,7 +1008,7 @@ public:
 
         pNetwork->SetQuitMsg(WebSock.GetParam("quitmsg"));
 
-        pNetwork->SetIRCConnectEnabled(WebSock.GetParam("doconnect").ToBool());
+        pNetwork->SetIRCConnectEnabled(WebSock.GetParam("doconnect").toBool());
 
         sArg = WebSock.GetParam("bindhost");
         // To change BindHosts be admin or don't have DenySetBindHost
@@ -1020,7 +1020,7 @@ public:
                 bool bFound = false;
 
                 for (it = vsHosts.begin(); it != vsHosts.end(); ++it) {
-                    if (sHost.Equals(*it)) {
+                    if (sHost.equals(*it)) {
                         bFound = true;
                         break;
                     }
@@ -1033,14 +1033,14 @@ public:
             pNetwork->SetBindHost(sHost);
         }
 
-        if (WebSock.GetParam("floodprotection").ToBool()) {
-            pNetwork->SetFloodRate(WebSock.GetParam("floodrate").ToDouble());
-            pNetwork->SetFloodBurst(WebSock.GetParam("floodburst").ToUShort());
+        if (WebSock.GetParam("floodprotection").toBool()) {
+            pNetwork->SetFloodRate(WebSock.GetParam("floodrate").toDouble());
+            pNetwork->SetFloodBurst(WebSock.GetParam("floodburst").toUShort());
         } else {
             pNetwork->SetFloodRate(-1);
         }
 
-        pNetwork->SetJoinDelay(WebSock.GetParam("joindelay").ToUShort());
+        pNetwork->SetJoinDelay(WebSock.GetParam("joindelay").toUShort());
 
 #ifdef HAVE_ICU
         NoString sEncodingUtf = WebSock.GetParam("encoding_utf");
@@ -1061,12 +1061,12 @@ public:
 #endif
 
         pNetwork->DelServers();
-        NoStringVector vsArgs = WebSock.GetRawParam("servers").Split("\n");
+        NoStringVector vsArgs = WebSock.GetRawParam("servers").split("\n");
         for (uint a = 0; a < vsArgs.size(); a++) {
-            pNetwork->AddServer(vsArgs[a].Trim_n());
+            pNetwork->AddServer(vsArgs[a].trim_n());
         }
 
-        vsArgs = WebSock.GetRawParam("fingerprints").Split("\n");
+        vsArgs = WebSock.GetRawParam("fingerprints").split("\n");
         while (!pNetwork->GetTrustedFingerprints().empty()) {
             pNetwork->DelTrustedFingerprint(*pNetwork->GetTrustedFingerprints().begin());
         }
@@ -1077,9 +1077,9 @@ public:
         WebSock.GetParamValues("channel", vsArgs);
         for (uint a = 0; a < vsArgs.size(); a++) {
             const NoString& sChan = vsArgs[a];
-            NoChannel* pChan = pNetwork->FindChan(sChan.TrimRight_n("\r"));
+            NoChannel* pChan = pNetwork->FindChan(sChan.trimRight_n("\r"));
             if (pChan) {
-                pChan->setInConfig(WebSock.GetParam("save_" + sChan).ToBool());
+                pChan->setInConfig(WebSock.GetParam("save_" + sChan).toBool());
             }
         }
 
@@ -1088,7 +1088,7 @@ public:
         if (spSession->IsAdmin() || !pUser->DenyLoadMod()) {
             for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
                 NoString sModRet;
-                NoString sModName = (*it).TrimRight_n("\r");
+                NoString sModName = (*it).trimRight_n("\r");
                 NoString sModLoadError;
 
                 if (!sModName.empty()) {
@@ -1216,7 +1216,7 @@ public:
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_user.tmpl");
 
-        if (!WebSock.GetParam("submitted").ToUInt()) {
+        if (!WebSock.GetParam("submitted").toUInt()) {
             if (pUser) {
                 Tmpl["Action"] = "edituser";
                 Tmpl["Title"] = "Edit User [" + pUser->GetUserName() + "]";
@@ -1651,15 +1651,15 @@ public:
 
     bool AddListener(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
-        ushort uPort = WebSock.GetParam("port").ToUShort();
+        ushort uPort = WebSock.GetParam("port").toUShort();
         NoString sHost = WebSock.GetParam("host");
         NoString sURIPrefix = WebSock.GetParam("uriprefix");
         if (sHost == "*") sHost = "";
-        bool bSSL = WebSock.GetParam("ssl").ToBool();
-        bool bIPv4 = WebSock.GetParam("ipv4").ToBool();
-        bool bIPv6 = WebSock.GetParam("ipv6").ToBool();
-        bool bIRC = WebSock.GetParam("irc").ToBool();
-        bool bWeb = WebSock.GetParam("web").ToBool();
+        bool bSSL = WebSock.GetParam("ssl").toBool();
+        bool bIPv4 = WebSock.GetParam("ipv4").toBool();
+        bool bIPv6 = WebSock.GetParam("ipv6").toBool();
+        bool bIRC = WebSock.GetParam("irc").toBool();
+        bool bWeb = WebSock.GetParam("web").toBool();
 
         No::AddressType eAddr = No::Ipv4AndIpv6Address;
         if (bIPv4) {
@@ -1710,10 +1710,10 @@ public:
 
     bool DelListener(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
-        ushort uPort = WebSock.GetParam("port").ToUShort();
+        ushort uPort = WebSock.GetParam("port").toUShort();
         NoString sHost = WebSock.GetParam("host");
-        bool bIPv4 = WebSock.GetParam("ipv4").ToBool();
-        bool bIPv6 = WebSock.GetParam("ipv6").ToBool();
+        bool bIPv4 = WebSock.GetParam("ipv4").toBool();
+        bool bIPv6 = WebSock.GetParam("ipv6").toBool();
 
         No::AddressType eAddr = No::Ipv4AndIpv6Address;
         if (bIPv4) {
@@ -1747,7 +1747,7 @@ public:
     bool SettingsPage(NoWebSock& WebSock, NoTemplate& Tmpl)
     {
         Tmpl.SetFile("settings.tmpl");
-        if (!WebSock.GetParam("submitted").ToUInt()) {
+        if (!WebSock.GetParam("submitted").toUInt()) {
             Tmpl["Action"] = "settings";
             Tmpl["Title"] = "Settings";
             Tmpl["StatusPrefix"] = NoApp::Get().GetStatusPrefix();
@@ -1886,31 +1886,31 @@ public:
         sArg = WebSock.GetParam("statusprefix");
         NoApp::Get().SetStatusPrefix(sArg);
         sArg = WebSock.GetParam("maxbufsize");
-        NoApp::Get().SetMaxBufferSize(sArg.ToUInt());
+        NoApp::Get().SetMaxBufferSize(sArg.toUInt());
         sArg = WebSock.GetParam("connectdelay");
-        NoApp::Get().SetConnectDelay(sArg.ToUInt());
+        NoApp::Get().SetConnectDelay(sArg.toUInt());
         sArg = WebSock.GetParam("serverthrottle");
-        NoApp::Get().SetServerThrottle(sArg.ToUInt());
+        NoApp::Get().SetServerThrottle(sArg.toUInt());
         sArg = WebSock.GetParam("anoniplimit");
-        NoApp::Get().SetAnonIPLimit(sArg.ToUInt());
+        NoApp::Get().SetAnonIPLimit(sArg.toUInt());
         sArg = WebSock.GetParam("protectwebsessions");
-        NoApp::Get().SetProtectWebSessions(sArg.ToBool());
+        NoApp::Get().SetProtectWebSessions(sArg.toBool());
         sArg = WebSock.GetParam("hideversion");
-        NoApp::Get().SetHideVersion(sArg.ToBool());
+        NoApp::Get().SetHideVersion(sArg.toBool());
 
-        NoStringVector vsArgs = WebSock.GetRawParam("motd").Split("\n");
+        NoStringVector vsArgs = WebSock.GetRawParam("motd").split("\n");
         NoApp::Get().ClearMotd();
 
         uint a = 0;
         for (a = 0; a < vsArgs.size(); a++) {
-            NoApp::Get().AddMotd(vsArgs[a].TrimRight_n());
+            NoApp::Get().AddMotd(vsArgs[a].trimRight_n());
         }
 
-        vsArgs = WebSock.GetRawParam("bindhosts").Split("\n");
+        vsArgs = WebSock.GetRawParam("bindhosts").split("\n");
         NoApp::Get().ClearBindHosts();
 
         for (a = 0; a < vsArgs.size(); a++) {
-            NoApp::Get().AddBindHost(vsArgs[a].Trim_n());
+            NoApp::Get().AddBindHost(vsArgs[a].trim_n());
         }
 
         NoApp::Get().SetSkinName(WebSock.GetParam("skin"));
@@ -1920,7 +1920,7 @@ public:
 
         for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
             NoString sModRet;
-            NoString sModName = (*it).TrimRight_n("\r");
+            NoString sModName = (*it).trimRight_n("\r");
             NoString sModLoadError;
 
             if (!sModName.empty()) {

@@ -21,7 +21,7 @@ class NoPerform : public NoModule
 {
     void Add(const NoString& sCommand)
     {
-        NoString sPerf = sCommand.Tokens(1);
+        NoString sPerf = sCommand.tokens(1);
 
         if (sPerf.empty()) {
             PutModule("Usage: add <command>");
@@ -35,7 +35,7 @@ class NoPerform : public NoModule
 
     void Del(const NoString& sCommand)
     {
-        u_int iNum = sCommand.Tokens(1).ToUInt();
+        u_int iNum = sCommand.tokens(1).toUInt();
 
         if (iNum > m_vPerform.size() || iNum <= 0) {
             PutModule("Illegal # Requested");
@@ -81,8 +81,8 @@ class NoPerform : public NoModule
 
     void Swap(const NoString& sCommand)
     {
-        u_int iNumA = sCommand.Token(1).ToUInt();
-        u_int iNumB = sCommand.Token(2).ToUInt();
+        u_int iNumA = sCommand.token(1).toUInt();
+        u_int iNumB = sCommand.token(2).toUInt();
 
         if (iNumA > m_vPerform.size() || iNumA <= 0 || iNumB > m_vPerform.size() || iNumB <= 0) {
             PutModule("Illegal # Requested");
@@ -108,14 +108,14 @@ public:
     {
         NoString sPerf = sArg;
 
-        if (sPerf.Left(1) == "/") sPerf.LeftChomp(1);
+        if (sPerf.left(1) == "/") sPerf.leftChomp(1);
 
-        if (sPerf.Token(0).Equals("MSG")) {
-            sPerf = "PRIVMSG " + sPerf.Tokens(1);
+        if (sPerf.token(0).equals("MSG")) {
+            sPerf = "PRIVMSG " + sPerf.tokens(1);
         }
 
-        if ((sPerf.Token(0).Equals("PRIVMSG") || sPerf.Token(0).Equals("NOTICE")) && sPerf.Token(2).Left(1) != ":") {
-            sPerf = sPerf.Token(0) + " " + sPerf.Token(1) + " :" + sPerf.Tokens(2);
+        if ((sPerf.token(0).equals("PRIVMSG") || sPerf.token(0).equals("NOTICE")) && sPerf.token(2).left(1) != ":") {
+            sPerf = sPerf.token(0) + " " + sPerf.token(1) + " :" + sPerf.tokens(2);
         }
 
         return sPerf;
@@ -123,7 +123,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        m_vPerform = GetNV("Perform").Split("\n", No::SkipEmptyParts);
+        m_vPerform = GetNV("Perform").split("\n", No::SkipEmptyParts);
 
         return true;
     }
@@ -145,7 +145,7 @@ public:
         }
 
         if (WebSock.IsPost()) {
-            NoStringVector vsPerf = WebSock.GetRawParam("perform", true).Split("\n", No::SkipEmptyParts);
+            NoStringVector vsPerf = WebSock.GetRawParam("perform", true).split("\n", No::SkipEmptyParts);
             m_vPerform.clear();
 
             for (NoStringVector::const_iterator it = vsPerf.begin(); it != vsPerf.end(); ++it)

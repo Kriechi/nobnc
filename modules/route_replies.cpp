@@ -267,7 +267,7 @@ public:
 
     ModRet OnRaw(NoString& sLine) override
     {
-        NoString sCmd = sLine.Token(1).AsUpper();
+        NoString sCmd = sLine.token(1).toUpper();
         size_t i = 0;
 
         if (!m_pReplies) return CONTINUE;
@@ -275,9 +275,9 @@ public:
         // Is this a "not enough arguments" error?
         if (sCmd == "461") {
             // :server 461 nick WHO :Not enough parameters
-            NoString sOrigCmd = sLine.Token(3);
+            NoString sOrigCmd = sLine.token(3);
 
-            if (m_sLastRequest.Token(0).Equals(sOrigCmd)) {
+            if (m_sLastRequest.token(0).equals(sOrigCmd)) {
                 // This is the reply to the last request
                 if (RouteReply(sLine, true)) return HALTCORE;
                 return CONTINUE;
@@ -300,26 +300,26 @@ public:
 
     ModRet OnUserRaw(NoString& sLine) override
     {
-        NoString sCmd = sLine.Token(0).AsUpper();
+        NoString sCmd = sLine.token(0).toUpper();
 
         if (!GetNetwork()->GetIRCSock()) return CONTINUE;
 
-        if (sCmd.Equals("MODE")) {
+        if (sCmd.equals("MODE")) {
             // Check if this is a mode request that needs to be handled
 
             // If there are arguments to a mode change,
             // we must not route it.
-            if (!sLine.Tokens(3).empty()) return CONTINUE;
+            if (!sLine.tokens(3).empty()) return CONTINUE;
 
             // Grab the mode change parameter
-            NoString sMode = sLine.Token(2);
+            NoString sMode = sLine.token(2);
 
             // If this is a channel mode request, znc core replies to it
             if (sMode.empty()) return CONTINUE;
 
             // Check if this is a mode change or a specific
             // mode request (the later needs to be routed).
-            sMode.TrimPrefix("+");
+            sMode.trimPrefix("+");
             if (sMode.length() != 1) return CONTINUE;
 
             // Now just check if it's one of the supported modes
@@ -353,7 +353,7 @@ public:
     {
         // The timer will be deleted after this by the event loop
 
-        if (!GetNV("silent_timeouts").ToBool()) {
+        if (!GetNV("silent_timeouts").toBool()) {
             PutModule("This module hit a timeout which is possibly a bug.");
             PutModule("To disable this message, do \"/msg " + GetModNick() + " silent yes\"");
             PutModule("Last request: " + m_sLastRequest);
@@ -430,13 +430,13 @@ private:
 
     void SilentCommand(const NoString& sLine)
     {
-        const NoString sValue = sLine.Token(1);
+        const NoString sValue = sLine.token(1);
 
         if (!sValue.empty()) {
             SetNV("silent_timeouts", sValue);
         }
 
-        NoString sPrefix = GetNV("silent_timeouts").ToBool() ? "dis" : "en";
+        NoString sPrefix = GetNV("silent_timeouts").toBool() ? "dis" : "en";
         PutModule("Timeout messages are " + sPrefix + "abled.");
     }
 

@@ -64,9 +64,9 @@ public:
 
     bool HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override
     {
-        if (sName.Equals("URLPARAM")) {
+        if (sName.equals("URLPARAM")) {
             // sOutput = NoApp::Get()
-            sOutput = m_WebSock.GetParam(sArgs.Token(0), false);
+            sOutput = m_WebSock.GetParam(sArgs.token(0), false);
             return true;
         }
         return false;
@@ -247,9 +247,9 @@ void NoWebSock::GetAvailSkins(NoStringVector& vRet) const
 
     NoString sRoot(GetSkinPath("_default_"));
 
-    sRoot.TrimRight("/");
-    sRoot.TrimRight("_default_");
-    sRoot.TrimRight("/");
+    sRoot.trimRight("/");
+    sRoot.trimRight("_default_");
+    sRoot.trimRight("/");
 
     if (!sRoot.empty()) {
         sRoot += "/";
@@ -414,7 +414,7 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
         Row["Title"] = sTitle;
 
         if (m_sModName == Module.GetModName()) {
-            NoString sModuleType = GetPath().Token(1, "/");
+            NoString sModuleType = GetPath().token(1, "/");
             if (sModuleType == "global" && Module.GetType() == NoModInfo::GlobalModule) {
                 bActiveModule = true;
             } else if (sModuleType == "user" && Module.GetType() == NoModInfo::UserModule) {
@@ -422,7 +422,7 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
             } else if (sModuleType == "network" && Module.GetType() == NoModInfo::NetworkModule) {
                 NoNetwork* Network = Module.GetNetwork();
                 if (Network) {
-                    NoString sNetworkName = GetPath().Token(2, "/");
+                    NoString sNetworkName = GetPath().token(2, "/");
                     if (sNetworkName == Network->GetName()) {
                         bActiveModule = true;
                     }
@@ -492,7 +492,7 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
 NoWebSock::PageRequest NoWebSock::PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule)
 {
     SetPaths(pModule);
-    NoString sFile = m_Template.ExpandFile(sPath.TrimLeft_n("/"));
+    NoString sFile = m_Template.ExpandFile(sPath.trimLeft_n("/"));
     NO_DEBUG("About to print [" + sFile + "]");
     // Either PrintFile() fails and sends an error page or it suceeds and
     // sends a result. In both cases we don't have anything more to do.
@@ -646,7 +646,7 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
 
     // Handle the static pages that don't require a login
     if (sURI == "/") {
-        if (!m_bLoggedIn && GetParam("cookie_check", false).ToBool() && GetRequestCookie("SessionId").empty()) {
+        if (!m_bLoggedIn && GetParam("cookie_check", false).toBool() && GetRequestCookie("SessionId").empty()) {
             GetSession()->AddError("Your browser does not have cookies enabled for this site!");
         }
         return PrintTemplate("index", sPageRet);
@@ -662,7 +662,7 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
         // We already sent a reply
         return Done;
     } else if (sURI == "/login") {
-        if (GetParam("submitted").ToBool()) {
+        if (GetParam("submitted").toBool()) {
             m_sUser = GetParam("user");
             m_sPass = GetParam("pass");
             m_bLoggedIn = OnLogin(m_sUser, m_sPass, false);
@@ -673,9 +673,9 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
 
         Redirect("/"); // the login form is here
         return Done;
-    } else if (sURI.Left(5) == "/pub/") {
+    } else if (sURI.left(5) == "/pub/") {
         return PrintStaticFile(sURI, sPageRet);
-    } else if (sURI.Left(11) == "/skinfiles/") {
+    } else if (sURI.left(11) == "/skinfiles/") {
         NoString sSkinName = sURI.substr(11);
         NoString::size_type uPathStart = sSkinName.find("/");
         if (uPathStart != NoString::npos) {
@@ -692,10 +692,10 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
             }
         }
         return NotFound;
-    } else if (sURI.Left(6) == "/mods/" || sURI.Left(10) == "/modfiles/") {
+    } else if (sURI.left(6) == "/mods/" || sURI.left(10) == "/modfiles/") {
         // Make sure modules are treated as directories
-        if (sURI.Right(1) != "/" && sURI.find(".") == NoString::npos &&
-            sURI.TrimLeft_n("/mods/").TrimLeft_n("/").find("/") == NoString::npos) {
+        if (sURI.right(1) != "/" && sURI.find(".") == NoString::npos &&
+            sURI.trimLeft_n("/mods/").trimLeft_n("/").find("/") == NoString::npos) {
             Redirect(sURI + "/");
             return Done;
         }
@@ -703,20 +703,20 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
         // The URI looks like:
         // /mods/[type]/([network]/)?[module][/page][?arg1=val1&arg2=val2...]
 
-        m_sPath = GetPath().TrimLeft_n("/");
+        m_sPath = GetPath().trimLeft_n("/");
 
-        m_sPath.TrimPrefix("mods/");
-        m_sPath.TrimPrefix("modfiles/");
+        m_sPath.trimPrefix("mods/");
+        m_sPath.trimPrefix("modfiles/");
 
-        NoString sType = m_sPath.Token(0, "/");
-        m_sPath = m_sPath.Tokens(1, "/");
+        NoString sType = m_sPath.token(0, "/");
+        m_sPath = m_sPath.tokens(1, "/");
 
         NoModInfo::ModuleType eModType;
-        if (sType.Equals("global")) {
+        if (sType.equals("global")) {
             eModType = NoModInfo::GlobalModule;
-        } else if (sType.Equals("user")) {
+        } else if (sType.equals("user")) {
             eModType = NoModInfo::UserModule;
-        } else if (sType.Equals("network")) {
+        } else if (sType.equals("network")) {
             eModType = NoModInfo::NetworkModule;
         } else {
             PrintErrorPage(403, "Forbidden", "Unknown module type [" + sType + "]");
@@ -730,8 +730,8 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
 
         NoNetwork* pNetwork = nullptr;
         if (eModType == NoModInfo::NetworkModule) {
-            NoString sNetwork = m_sPath.Token(0, "/");
-            m_sPath = m_sPath.Tokens(1, "/");
+            NoString sNetwork = m_sPath.token(0, "/");
+            m_sPath = m_sPath.tokens(1, "/");
 
             pNetwork = GetSession()->GetUser()->FindNetwork(sNetwork);
 
@@ -741,8 +741,8 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
             }
         }
 
-        m_sModName = m_sPath.Token(0, "/");
-        m_sPage = m_sPath.Tokens(1, "/");
+        m_sModName = m_sPath.token(0, "/");
+        m_sPage = m_sPath.tokens(1, "/");
 
         if (m_sPage.empty()) {
             m_sPage = "index";
@@ -799,11 +799,11 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
             AddModLoop("UserModLoop", *pModule);
         }
 
-        if (sURI.Left(10) == "/modfiles/") {
+        if (sURI.left(10) == "/modfiles/") {
             m_Template.AppendPath(GetSkinPath(GetSkinName()) + "/mods/" + m_sModName + "/files/");
             m_Template.AppendPath(pModule->GetModDataDir() + "/files/");
 
-            if (PrintFile(m_Template.ExpandFile(m_sPage.TrimLeft_n("/")))) {
+            if (PrintFile(m_Template.ExpandFile(m_sPage.trimLeft_n("/")))) {
                 return Print;
             } else {
                 return NotFound;
@@ -828,7 +828,7 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
             return Done;
         }
     } else {
-        NoString sPage(sURI.Trim_n("/"));
+        NoString sPage(sURI.trim_n("/"));
         if (sPage.length() < 32) {
             for (uint a = 0; a < sPage.length(); a++) {
                 uchar c = sPage[a];

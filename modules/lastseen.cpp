@@ -21,7 +21,7 @@
 class NoLastSeenMod : public NoModule
 {
 private:
-    time_t GetTime(const NoUser* pUser) { return GetNV(pUser->GetUserName()).ToULong(); }
+    time_t GetTime(const NoUser* pUser) { return GetNV(pUser->GetUserName()).toULong(); }
 
     void SetTime(const NoUser* pUser) { SetNV(pUser->GetUserName(), NoString(time(nullptr))); }
 

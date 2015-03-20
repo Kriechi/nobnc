@@ -23,21 +23,21 @@
 
 static No::EscapeFormat ToEscapeFormat(const NoString& sEsc)
 {
-    if (sEsc.Equals("ASCII")) {
+    if (sEsc.equals("ASCII")) {
         return No::AsciiFormat;
-    } else if (sEsc.Equals("HTML")) {
+    } else if (sEsc.equals("HTML")) {
         return No::HtmlFormat;
-    } else if (sEsc.Equals("URL")) {
+    } else if (sEsc.equals("URL")) {
         return No::UrlFormat;
-    } else if (sEsc.Equals("SQL")) {
+    } else if (sEsc.equals("SQL")) {
         return No::SqlFormat;
-    } else if (sEsc.Equals("NAMEDFMT")) {
+    } else if (sEsc.equals("NAMEDFMT")) {
         return No::NamedFormat;
-    } else if (sEsc.Equals("DEBUG")) {
+    } else if (sEsc.equals("DEBUG")) {
         return No::DebugFormat;
-    } else if (sEsc.Equals("MSGTAG")) {
+    } else if (sEsc.equals("MSGTAG")) {
         return No::MsgTagFormat;
-    } else if (sEsc.Equals("HEXCOLON")) {
+    } else if (sEsc.equals("HEXCOLON")) {
         return No::HexColonFormat;
     }
 
@@ -83,8 +83,8 @@ static uint SafeReplace(NoString& str, const NoString& sReplace, const NoString&
 
 void NoTemplateOptions::Parse(const NoString& sLine)
 {
-    NoString sName = sLine.Token(0, "=").Trim_n().AsUpper();
-    NoString sValue = sLine.Tokens(1, "=").Trim_n();
+    NoString sName = sLine.token(0, "=").trim_n().toUpper();
+    NoString sValue = sLine.tokens(1, "=").trim_n();
 
     if (sName == "ESC") {
         m_eEscapeTo = ToEscapeFormat(sValue);
@@ -117,21 +117,21 @@ NoString NoTemplateLoopContext::GetValue(const NoString& sName, bool bFromIf)
         return "";
     }
 
-    if (sName.Equals("__ID__")) {
+    if (sName.equals("__ID__")) {
         return NoString(GetRowIndex() + 1);
-    } else if (sName.Equals("__COUNT__")) {
+    } else if (sName.equals("__COUNT__")) {
         return NoString(GetRowCount());
-    } else if (sName.Equals("__ODD__")) {
+    } else if (sName.equals("__ODD__")) {
         return ((GetRowIndex() % 2) ? "" : "1");
-    } else if (sName.Equals("__EVEN__")) {
+    } else if (sName.equals("__EVEN__")) {
         return ((GetRowIndex() % 2) ? "1" : "");
-    } else if (sName.Equals("__FIRST__")) {
+    } else if (sName.equals("__FIRST__")) {
         return ((GetRowIndex() == 0) ? "1" : "");
-    } else if (sName.Equals("__LAST__")) {
+    } else if (sName.equals("__LAST__")) {
         return ((GetRowIndex() == m_pvRows->size() - 1) ? "1" : "");
-    } else if (sName.Equals("__OUTER__")) {
+    } else if (sName.equals("__OUTER__")) {
         return ((GetRowIndex() == 0 || GetRowIndex() == m_pvRows->size() - 1) ? "1" : "");
-    } else if (sName.Equals("__INNER__")) {
+    } else if (sName.equals("__INNER__")) {
         return ((GetRowIndex() == 0 || GetRowIndex() == m_pvRows->size() - 1) ? "" : "1");
     }
 
@@ -173,14 +173,14 @@ NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
         return sFilename;
     }*/
 
-    NoString sFile(ResolveLiteral(sFilename).TrimLeft_n("/"));
+    NoString sFile(ResolveLiteral(sFilename).trimLeft_n("/"));
 
     for (auto& it : m_lsbPaths) {
         NoString& sRoot = it.first;
         NoString sFilePath(NoDir::ChangeDir(sRoot, sFile));
 
         // Make sure path ends with a slash because "/foo/pub*" matches "/foo/public_keep_out/" but "/foo/pub/*" doesn't
-        if (!sRoot.empty() && sRoot.Right(1) != "/") {
+        if (!sRoot.empty() && sRoot.right(1) != "/") {
             sRoot += "/";
         }
 
@@ -190,7 +190,7 @@ NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
         }
 
         if (NoFile::Exists(sFilePath)) {
-            if (sRoot.empty() || sFilePath.Left(sRoot.length()) == sRoot) {
+            if (sRoot.empty() || sFilePath.left(sRoot.length()) == sRoot) {
                 NO_DEBUG("    Found  [" + sFilePath + "]");
                 return sFilePath;
             } else {
@@ -215,7 +215,7 @@ NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
 
 void NoTemplate::SetPath(const NoString& sPaths)
 {
-    NoStringVector vsDirs = sPaths.Split(":", No::SkipEmptyParts);
+    NoStringVector vsDirs = sPaths.split(":", No::SkipEmptyParts);
 
     for (const NoString& sDir : vsDirs) {
         AppendPath(sDir, false);
@@ -226,7 +226,7 @@ NoString NoTemplate::MakePath(const NoString& sPath) const
 {
     NoString sRet(NoDir::ChangeDir("./", sPath + "/"));
 
-    if (!sRet.empty() && sRet.Right(1) != "/") {
+    if (!sRet.empty() && sRet.right(1) != "/") {
         sRet += "/";
     }
 
@@ -410,31 +410,31 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
             uCurPos += iPos2 + 4;
 
-            NoString sMid = NoString(sLine.substr(0, iPos2)).Trim_n();
+            NoString sMid = NoString(sLine.substr(0, iPos2)).trim_n();
 
             // Make sure we don't have a nested tag
             if (sMid.find("<?") == NoString::npos) {
                 sLine = sLine.substr(iPos2 + 2);
-                NoString sAction = sMid.Token(0);
-                NoString sArgs = sMid.Tokens(1);
+                NoString sAction = sMid.token(0);
+                NoString sArgs = sMid.tokens(1);
                 bool bNotFound = false;
 
                 // If we're breaking or continuing from within a loop, skip all tags that aren't ENDLOOP
-                if ((bLoopCont || bLoopBreak) && !sAction.Equals("ENDLOOP")) {
+                if ((bLoopCont || bLoopBreak) && !sAction.equals("ENDLOOP")) {
                     continue;
                 }
 
                 if (!uSkip) {
-                    if (sAction.Equals("INC")) {
+                    if (sAction.equals("INC")) {
                         if (!Print(ExpandFile(sArgs, true), oOut)) {
                             NO_DEBUG("Unable to print INC'd file [" + sArgs + "]");
                             return false;
                         }
-                    } else if (sAction.Equals("SETOPTION")) {
+                    } else if (sAction.equals("SETOPTION")) {
                         m_spOptions->Parse(sArgs);
-                    } else if (sAction.Equals("ADDROW")) {
-                        NoString sLoopName = sArgs.Token(0);
-                        NoStringMap msRow = NoUtils::OptionSplit(sArgs.Tokens(1, " "));
+                    } else if (sAction.equals("ADDROW")) {
+                        NoString sLoopName = sArgs.token(0);
+                        NoStringMap msRow = NoUtils::OptionSplit(sArgs.tokens(1, " "));
                         if (!msRow.empty()) {
                             NoTemplate& NewRow = AddRow(sLoopName);
 
@@ -442,21 +442,21 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                                 NewRow[it.first] = it.second;
                             }
                         }
-                    } else if (sAction.Equals("SET")) {
-                        NoString sName = sArgs.Token(0);
-                        NoString sValue = sArgs.Tokens(1);
+                    } else if (sAction.equals("SET")) {
+                        NoString sName = sArgs.token(0);
+                        NoString sValue = sArgs.tokens(1);
 
                         (*this)[sName] = sValue;
-                    } else if (sAction.Equals("JOIN")) {
+                    } else if (sAction.equals("JOIN")) {
                         NoStringVector vsArgs = NoUtils::QuoteSplit(sArgs);
                         if (vsArgs.size() > 1) {
-                            NoString sDelim = vsArgs[0].Trim_n("\"");
+                            NoString sDelim = vsArgs[0].trim_n("\"");
                             bool bFoundOne = false;
                             No::EscapeFormat eEscape = No::AsciiFormat;
 
                             for (const NoString& sArg : vsArgs) {
-                                if (sArg.StartsWith("ESC=")) {
-                                    eEscape = ToEscapeFormat(sArg.LeftChomp_n(4));
+                                if (sArg.startsWith("ESC=")) {
+                                    eEscape = ToEscapeFormat(sArg.leftChomp_n(4));
                                 } else {
                                     NoString sValue = GetValue(sArg);
 
@@ -471,18 +471,18 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                                 }
                             }
                         }
-                    } else if (sAction.Equals("SETBLOCK")) {
+                    } else if (sAction.equals("SETBLOCK")) {
                         sSetBlockVar = sArgs;
                         bInSetBlock = true;
-                    } else if (sAction.Equals("EXPAND")) {
+                    } else if (sAction.equals("EXPAND")) {
                         sOutput += ExpandFile(sArgs, true);
-                    } else if (sAction.Equals("VAR")) {
+                    } else if (sAction.equals("VAR")) {
                         sOutput += GetValue(sArgs);
-                    } else if (sAction.Equals("LT")) {
+                    } else if (sAction.equals("LT")) {
                         sOutput += "<?";
-                    } else if (sAction.Equals("GT")) {
+                    } else if (sAction.equals("GT")) {
                         sOutput += "?>";
-                    } else if (sAction.Equals("CONTINUE")) {
+                    } else if (sAction.equals("CONTINUE")) {
                         NoTemplateLoopContext* pContext = GetCurLoopContext();
 
                         if (pContext) {
@@ -494,7 +494,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                             NO_DEBUG("[" + sFileName + ":" + NoString(uCurPos - iPos2 - 4) +
                                   "] <? CONTINUE ?> must be used inside of a loop!");
                         }
-                    } else if (sAction.Equals("BREAK")) {
+                    } else if (sAction.equals("BREAK")) {
                         // break from loop
                         NoTemplateLoopContext* pContext = GetCurLoopContext();
 
@@ -507,28 +507,28 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                             NO_DEBUG("[" + sFileName + ":" + NoString(uCurPos - iPos2 - 4) +
                                   "] <? BREAK ?> must be used inside of a loop!");
                         }
-                    } else if (sAction.Equals("EXIT")) {
+                    } else if (sAction.equals("EXIT")) {
                         bExit = true;
-                    } else if (sAction.Equals("DEBUG")) {
+                    } else if (sAction.equals("DEBUG")) {
                         NO_DEBUG("NoTemplate DEBUG [" + sFileName + "@" + NoString(uCurPos - iPos2 - 4) + "b] -> [" + sArgs + "]");
-                    } else if (sAction.Equals("LOOP")) {
+                    } else if (sAction.equals("LOOP")) {
                         NoTemplateLoopContext* pContext = GetCurLoopContext();
 
                         if (!pContext || pContext->GetFilePosition() != uCurPos) {
                             // we are at a brand new loop (be it new or a first pass at an inner loop)
 
-                            NoString sLoopName = sArgs.Token(0);
-                            bool bReverse = (sArgs.Token(1).Equals("REVERSE"));
-                            bool bSort = (sArgs.Token(1).Left(4).Equals("SORT"));
+                            NoString sLoopName = sArgs.token(0);
+                            bool bReverse = (sArgs.token(1).equals("REVERSE"));
+                            bool bSort = (sArgs.token(1).left(4).equals("SORT"));
                             std::vector<NoTemplate*>* pvLoop = GetLoop(sLoopName);
 
                             if (bSort && pvLoop != nullptr && pvLoop->size() > 1) {
                                 NoString sKey;
 
-                                if (sArgs.Token(1).TrimPrefix_n("SORT").Left(4).Equals("ASC=")) {
-                                    sKey = sArgs.Token(1).TrimPrefix_n("SORTASC=");
-                                } else if (sArgs.Token(1).TrimPrefix_n("SORT").Left(5).Equals("DESC=")) {
-                                    sKey = sArgs.Token(1).TrimPrefix_n("SORTDESC=");
+                                if (sArgs.token(1).trimPrefix_n("SORT").left(4).equals("ASC=")) {
+                                    sKey = sArgs.token(1).trimPrefix_n("SORTASC=");
+                                } else if (sArgs.token(1).trimPrefix_n("SORT").left(5).equals("DESC=")) {
+                                    sKey = sArgs.token(1).trimPrefix_n("SORTDESC=");
                                     bReverse = true;
                                 }
 
@@ -556,7 +556,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                                 uSkip++;
                             }
                         }
-                    } else if (sAction.Equals("IF")) {
+                    } else if (sAction.equals("IF")) {
                         if (ValidIf(sArgs)) {
                             uNestedIfs++;
                             bValidLastIf = true;
@@ -564,33 +564,33 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                             uSkip++;
                             bValidLastIf = false;
                         }
-                    } else if (sAction.Equals("REM")) {
+                    } else if (sAction.equals("REM")) {
                         uSkip++;
                     } else {
                         bNotFound = true;
                     }
-                } else if (sAction.Equals("REM")) {
+                } else if (sAction.equals("REM")) {
                     uSkip++;
-                } else if (sAction.Equals("IF")) {
+                } else if (sAction.equals("IF")) {
                     uSkip++;
-                } else if (sAction.Equals("LOOP")) {
+                } else if (sAction.equals("LOOP")) {
                     uSkip++;
                 }
 
-                if (sAction.Equals("ENDIF")) {
+                if (sAction.equals("ENDIF")) {
                     if (uSkip) {
                         uSkip--;
                     } else {
                         uNestedIfs--;
                     }
-                } else if (sAction.Equals("ENDREM")) {
+                } else if (sAction.equals("ENDREM")) {
                     if (uSkip) {
                         uSkip--;
                     }
-                } else if (sAction.Equals("ENDSETBLOCK")) {
+                } else if (sAction.equals("ENDSETBLOCK")) {
                     bInSetBlock = false;
                     sSetBlockVar = "";
-                } else if (sAction.Equals("ENDLOOP")) {
+                } else if (sAction.equals("ENDLOOP")) {
                     if (bLoopCont && uSkip == 1) {
                         uSkip--;
                         bLoopCont = false;
@@ -618,13 +618,13 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                                 File.Seek(uCurPos);
                                 bBroke = true;
 
-                                if (!sOutput.Trim_n().empty()) {
+                                if (!sOutput.trim_n().empty()) {
                                     pContext->SetHasData();
                                 }
 
                                 break;
                             } else {
-                                if (sOutput.Trim_n().empty()) {
+                                if (sOutput.trim_n().empty()) {
                                     sOutput.clear();
                                 }
 
@@ -634,11 +634,11 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                             }
                         }
                     }
-                } else if (sAction.Equals("ELSE")) {
+                } else if (sAction.equals("ELSE")) {
                     if (!bValidLastIf && uSkip == 1) {
-                        NoString sArg = sArgs.Token(0);
+                        NoString sArg = sArgs.token(0);
 
-                        if (sArg.empty() || (sArg.Equals("IF") && ValidIf(sArgs.Tokens(1)))) {
+                        if (sArg.empty() || (sArg.equals("IF") && ValidIf(sArgs.tokens(1)))) {
                             uSkip = 0;
                             bValidLastIf = true;
                         }
@@ -684,8 +684,8 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
         if (!bFoundATag || bTmplLoopHasData || sOutput.find_first_not_of(" \t\r\n") != NoString::npos) {
             if (bInSetBlock) {
-                NoString sName = sSetBlockVar.Token(0);
-                // NoString sValue = sSetBlockVar.Tokens(1);
+                NoString sName = sSetBlockVar.token(0);
+                // NoString sValue = sSetBlockVar.tokens(1);
                 (*this)[sName] += sOutput;
             } else {
                 oOut << sOutput;
@@ -740,8 +740,8 @@ bool NoTemplate::ValidIf(const NoString& sArgs)
             bAnd = true;
         }
 
-        NoString sExpr = sArgStr.Token(0, ((bAnd) ? "&&" : "||"));
-        sArgStr = sArgStr.Tokens(1, ((bAnd) ? "&&" : "||"));
+        NoString sExpr = sArgStr.token(0, ((bAnd) ? "&&" : "||"));
+        sArgStr = sArgStr.tokens(1, ((bAnd) ? "&&" : "||"));
 
         if (ValidExpr(sExpr)) {
             if (!bAnd) {
@@ -770,36 +770,36 @@ bool NoTemplate::ValidExpr(const NoString& sExpression)
     NoString sName;
     NoString sValue;
 
-    if (sExpr.Left(1) == "!") {
+    if (sExpr.left(1) == "!") {
         bNegate = true;
-        sExpr.LeftChomp(1);
+        sExpr.leftChomp(1);
     }
 
     if (sExpr.find("!=") != NoString::npos) {
-        sName = sExpr.Token(0, "!=").Trim_n();
-        sValue = Token_helper(sExpr, 1, true, "!=", "\"", "\"").Trim_n().Trim_n("\"");
+        sName = sExpr.token(0, "!=").trim_n();
+        sValue = Token_helper(sExpr, 1, true, "!=", "\"", "\"").trim_n().trim_n("\"");
         bNegate = !bNegate;
     } else if (sExpr.find("==") != NoString::npos) {
-        sName = sExpr.Token(0, "==").Trim_n();
-        sValue = Token_helper(sExpr, 1, true, "==", "\"", "\"").Trim_n().Trim_n("\"");
+        sName = sExpr.token(0, "==").trim_n();
+        sValue = Token_helper(sExpr, 1, true, "==", "\"", "\"").trim_n().trim_n("\"");
     } else if (sExpr.find(">=") != NoString::npos) {
-        sName = sExpr.Token(0, ">=").Trim_n();
-        sValue = Token_helper(sExpr, 1, true, ">=", "\"", "\"").Trim_n().Trim_n("\"");
-        return (GetValue(sName, true).ToLong() >= sValue.ToLong());
+        sName = sExpr.token(0, ">=").trim_n();
+        sValue = Token_helper(sExpr, 1, true, ">=", "\"", "\"").trim_n().trim_n("\"");
+        return (GetValue(sName, true).toLong() >= sValue.toLong());
     } else if (sExpr.find("<=") != NoString::npos) {
-        sName = sExpr.Token(0, "<=").Trim_n();
-        sValue = Token_helper(sExpr, 1, true, "<=", "\"", "\"").Trim_n().Trim_n("\"");
-        return (GetValue(sName, true).ToLong() <= sValue.ToLong());
+        sName = sExpr.token(0, "<=").trim_n();
+        sValue = Token_helper(sExpr, 1, true, "<=", "\"", "\"").trim_n().trim_n("\"");
+        return (GetValue(sName, true).toLong() <= sValue.toLong());
     } else if (sExpr.find(">") != NoString::npos) {
-        sName = sExpr.Token(0, ">").Trim_n();
-        sValue = Token_helper(sExpr, 1, true, ">", "\"", "\"").Trim_n().Trim_n("\"");
-        return (GetValue(sName, true).ToLong() > sValue.ToLong());
+        sName = sExpr.token(0, ">").trim_n();
+        sValue = Token_helper(sExpr, 1, true, ">", "\"", "\"").trim_n().trim_n("\"");
+        return (GetValue(sName, true).toLong() > sValue.toLong());
     } else if (sExpr.find("<") != NoString::npos) {
-        sName = sExpr.Token(0, "<").Trim_n();
-        sValue = Token_helper(sExpr, 1, true, "<", "\"", "\"").Trim_n().Trim_n("\"");
-        return (GetValue(sName, true).ToLong() < sValue.ToLong());
+        sName = sExpr.token(0, "<").trim_n();
+        sValue = Token_helper(sExpr, 1, true, "<", "\"", "\"").trim_n().trim_n("\"");
+        return (GetValue(sName, true).toLong() < sValue.toLong());
     } else {
-        sName = sExpr.Trim_n();
+        sName = sExpr.trim_n();
     }
 
     if (sValue.empty()) {
@@ -808,7 +808,7 @@ bool NoTemplate::ValidExpr(const NoString& sExpression)
 
     sValue = ResolveLiteral(sValue);
 
-    return (bNegate != GetValue(sName, true).Equals(sValue));
+    return (bNegate != GetValue(sName, true).equals(sValue));
 }
 
 bool NoTemplate::IsTrue(const NoString& sName)
@@ -817,7 +817,7 @@ bool NoTemplate::IsTrue(const NoString& sName)
         return true;
     }
 
-    return GetValue(sName, true).ToBool();
+    return GetValue(sName, true).toBool();
 }
 
 bool NoTemplate::HasLoop(const NoString& sName) { return (GetLoop(sName) != nullptr); }
@@ -844,10 +844,10 @@ NoTemplate* NoTemplate::GetCurTemplate()
 
 NoString NoTemplate::ResolveLiteral(const NoString& sString)
 {
-    if (sString.Left(2) == "**") {
+    if (sString.left(2) == "**") {
         // Allow string to start with a literal * by using two in a row
         return sString.substr(1);
-    } else if (sString.Left(1) == "*") {
+    } else if (sString.left(1) == "*") {
         // If it starts with only one * then treat it as a var and do a lookup
         return GetValue(sString.substr(1));
     }
@@ -858,8 +858,8 @@ NoString NoTemplate::ResolveLiteral(const NoString& sString)
 NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
 {
     NoTemplateLoopContext* pContext = GetCurLoopContext();
-    NoString sName = sArgs.Token(0);
-    NoString sRest = sArgs.Tokens(1);
+    NoString sName = sArgs.token(0);
+    NoString sRest = sArgs.tokens(1);
     NoString sRet;
 
     while (SafeReplace(sRest, " =", "=", "\"", "\"")) {
@@ -871,8 +871,8 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
     NoStringMap msArgs;
 
     for (NoString& sArg : vArgs) {
-        sArg.Trim("\"");
-        msArgs[sArg.Token(0, "=").AsUpper()] = sArg.Tokens(1, "=");
+        sArg.trim("\"");
+        msArgs[sArg.token(0, "=").toUpper()] = sArg.tokens(1, "=");
     }
 
     /* We have no NoSettings in ZNC land
@@ -889,8 +889,8 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
             return sRet;
         }
     } else {
-        if (sName.Left(1) == "*") {
-            sName.LeftChomp(1);
+        if (sName.left(1) == "*") {
+            sName.leftChomp(1);
             NoStringMap::iterator it = find(sName);
             sName = (it != end()) ? it->second : "";
         }
@@ -908,10 +908,10 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
             for (const auto& spTagHandler : vspTagHandlers) {
                 NoString sCustomOutput;
 
-                if (!bFromIf && spTagHandler->HandleVar(*pTmpl, sArgs.Token(0), sArgs.Tokens(1), sCustomOutput)) {
+                if (!bFromIf && spTagHandler->HandleVar(*pTmpl, sArgs.token(0), sArgs.tokens(1), sCustomOutput)) {
                     sRet = sCustomOutput;
                     break;
-                } else if (bFromIf && spTagHandler->HandleIf(*pTmpl, sArgs.Token(0), sArgs.Tokens(1), sCustomOutput)) {
+                } else if (bFromIf && spTagHandler->HandleIf(*pTmpl, sArgs.token(0), sArgs.tokens(1), sCustomOutput)) {
                     sRet = sCustomOutput;
                     break;
                 }
@@ -933,7 +933,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
         NoStringMap::iterator it = msArgs.find("ESC");
 
         if (it != msArgs.end()) {
-            NoStringVector vsEscs = it->second.Split(",", No::SkipEmptyParts);
+            NoStringVector vsEscs = it->second.split(",", No::SkipEmptyParts);
 
             for (const NoString& sEsc : vsEscs) {
                 sRet = No::escape(sRet, ToEscapeFormat(sEsc));

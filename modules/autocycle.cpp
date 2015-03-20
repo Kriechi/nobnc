@@ -38,7 +38,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        NoStringVector vsChans = sArgs.Split(" ", No::SkipEmptyParts);
+        NoStringVector vsChans = sArgs.split(" ", No::SkipEmptyParts);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             if (!Add(*it)) {
@@ -60,7 +60,7 @@ public:
 
     void OnAddCommand(const NoString& sLine)
     {
-        NoString sChan = sLine.Token(1);
+        NoString sChan = sLine.token(1);
 
         if (AlreadyAdded(sChan)) {
             PutModule(sChan + " is already added");
@@ -73,7 +73,7 @@ public:
 
     void OnDelCommand(const NoString& sLine)
     {
-        NoString sChan = sLine.Token(1);
+        NoString sChan = sLine.token(1);
 
         if (Del(sChan))
             PutModule("Removed " + sChan + " from list");
@@ -138,7 +138,7 @@ protected:
     {
         std::vector<NoString>::iterator it;
 
-        if (sInput.Left(1) == "!") {
+        if (sInput.left(1) == "!") {
             NoString sChan = sInput.substr(1);
             for (it = m_vsNegChans.begin(); it != m_vsNegChans.end(); ++it) {
                 if (*it == sChan) return true;
@@ -157,7 +157,7 @@ protected:
             return false;
         }
 
-        if (sChan.Left(1) == "!") {
+        if (sChan.left(1) == "!") {
             m_vsNegChans.push_back(sChan.substr(1));
         } else {
             m_vsChans.push_back(sChan);
@@ -175,7 +175,7 @@ protected:
 
         if (sChan.empty() || sChan == "!") return false;
 
-        if (sChan.Left(1) == "!") {
+        if (sChan.left(1) == "!") {
             NoString sTmp = sChan.substr(1);
             it = m_vsNegChans.begin();
             end = m_vsNegChans.end();
@@ -206,13 +206,13 @@ protected:
     bool IsAutoCycle(const NoString& sChan)
     {
         for (uint a = 0; a < m_vsNegChans.size(); a++) {
-            if (sChan.WildCmp(m_vsNegChans[a], No::CaseInsensitive)) {
+            if (sChan.wildCmp(m_vsNegChans[a], No::CaseInsensitive)) {
                 return false;
             }
         }
 
         for (uint b = 0; b < m_vsChans.size(); b++) {
-            if (sChan.WildCmp(m_vsChans[b], No::CaseInsensitive)) {
+            if (sChan.wildCmp(m_vsChans[b], No::CaseInsensitive)) {
                 return true;
             }
         }

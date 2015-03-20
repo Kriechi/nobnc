@@ -455,7 +455,7 @@ bool NoModules::OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::Modul
 NoModule* NoModules::FindModule(const NoString& sModule) const
 {
     for (NoModule* pMod : *this) {
-        if (sModule.Equals(pMod->GetModName())) {
+        if (sModule.equals(pMod->GetModName())) {
             return pMod;
         }
     }
@@ -670,7 +670,7 @@ void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleT
             NoString sName = File.GetShortName();
             NoString sPath = File.GetLongName();
             NoModInfo ModInfo;
-            sName.RightChomp(3);
+            sName.rightChomp(3);
 
             NoString sIgnoreRetMsg;
             if (GetModPathInfo(ModInfo, sName, sPath, sIgnoreRetMsg)) {

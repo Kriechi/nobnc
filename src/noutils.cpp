@@ -125,7 +125,7 @@ NoString NoUtils::GetSaltedHashPass(NoString& sSalt)
 
         NoString pass2 = NoUtils::GetPass("Confirm password");
 
-        if (!pass1.Equals(pass2, No::CaseSensitive)) {
+        if (!pass1.equals(pass2, No::CaseSensitive)) {
             NoUtils::PrintError("The supplied passwords did not match");
         } else {
             // Construct the salted pass
@@ -215,9 +215,9 @@ bool NoUtils::GetBoolInput(const NoString& sPrompt, bool* pbDefault)
     while (true) {
         GetInput(sPrompt, sRet, sDefault, "yes/no");
 
-        if (sRet.Equals("y") || sRet.Equals("yes")) {
+        if (sRet.equals("y") || sRet.equals("yes")) {
             return true;
-        } else if (sRet.Equals("n") || sRet.Equals("no")) {
+        } else if (sRet.equals("n") || sRet.equals("no")) {
             return false;
         }
     }
@@ -244,7 +244,7 @@ bool NoUtils::GetNumInput(const NoString& sPrompt, uint& uRet, uint uMin, uint u
             return false;
         }
 
-        uRet = sNum.ToUInt();
+        uRet = sNum.toUInt();
 
         if ((uRet >= uMin && uRet <= uMax)) {
             break;
@@ -283,8 +283,8 @@ bool NoUtils::GetInput(const NoString& sPrompt, NoString& sRet, const NoString& 
     }
     sInput = szBuf;
 
-    if (sInput.Right(1) == "\n") {
-        sInput.RightChomp(1);
+    if (sInput.right(1) == "\n") {
+        sInput.rightChomp(1);
     }
 
     if (sInput.empty()) {
@@ -384,7 +384,7 @@ namespace
  */
 inline NoString FixGMT(NoString sTZ)
 {
-    if (sTZ.length() >= 4 && sTZ.Left(3) == "GMT") {
+    if (sTZ.length() >= 4 && sTZ.left(3) == "GMT") {
         if (sTZ[3] == '+') {
             sTZ[3] = '-';
         } else if (sTZ[3] == '-') {
@@ -401,7 +401,7 @@ NoString NoUtils::CTime(time_t t, const NoString& sTimezone)
     if (sTimezone.empty()) {
         ctime_r(&t, s);
         // ctime() adds a trailing newline
-        return NoString(s).Trim_n();
+        return NoString(s).trim_n();
     }
     NoString sTZ = FixGMT(sTimezone);
 
@@ -422,7 +422,7 @@ NoString NoUtils::CTime(time_t t, const NoString& sTimezone)
     }
     tzset();
 
-    return NoString(s).Trim_n();
+    return NoString(s).trim_n();
 }
 
 NoString NoUtils::FormatTime(time_t t, const NoString& sFormat, const NoString& sTimezone)
@@ -485,7 +485,7 @@ void FillTimezones(const NoString& sPath, NoStringSet& result, const NoString& s
         NoString sName = pFile->GetShortName();
         NoString sFile = pFile->GetLongName();
         if (sName == "posix" || sName == "right") continue; // these 2 dirs contain the same filenames
-        if (sName.Right(4) == ".tab" || sName == "posixrules" || sName == "localtime") continue;
+        if (sName.right(4) == ".tab" || sName == "posixrules" || sName == "localtime") continue;
         if (pFile->IsDir()) {
             if (sName == "Etc") {
                 FillTimezones(sFile, result, sPrefix);
@@ -532,8 +532,8 @@ NoStringSet NoUtils::GetEncodings()
 
 NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
 {
-    if (sLine.StartsWith("@")) {
-        NoStringVector vsTags = sLine.Token(0).TrimPrefix_n("@").Split(";", No::SkipEmptyParts);
+    if (sLine.startsWith("@")) {
+        NoStringVector vsTags = sLine.token(0).trimPrefix_n("@").split(";", No::SkipEmptyParts);
 
         NoStringMap mssTags;
         for (const NoString& sTag : vsTags) {
@@ -553,8 +553,8 @@ NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
 
 void NoUtils::SetMessageTags(NoString& sLine, const NoStringMap& mssTags)
 {
-    if (sLine.StartsWith("@")) {
-        sLine.LeftChomp(sLine.Token(0).length() + 1);
+    if (sLine.startsWith("@")) {
+        sLine.leftChomp(sLine.token(0).length() + 1);
     }
 
     if (!mssTags.empty()) {
@@ -654,9 +654,9 @@ NoUtils::status_t NoUtils::ReadFromDisk(NoStringMap& values, const NoString& sPa
     NoString sBuffer;
 
     while (cFile.ReadLine(sBuffer)) {
-        sBuffer.Trim();
-        NoString sKey = sBuffer.Token(0);
-        NoString sValue = sBuffer.Token(1);
+        sBuffer.trim();
+        NoString sKey = sBuffer.token(0);
+        NoString sValue = sBuffer.token(1);
         Decode(sKey);
         Decode(sValue);
 
@@ -710,7 +710,7 @@ NoString NoUtils::ToTimeStr(ulong s)
 
     if (sRet.empty()) return "0s";
 
-    return sRet.RightChomp_n(1);
+    return sRet.rightChomp_n(1);
 }
 
 NoString NoUtils::ToPercent(double d)
@@ -865,8 +865,8 @@ NoStringMap NoUtils::OptionSplit(const NoString& str)
     NoStringMap msRet;
 
     while (!sCopy.empty()) {
-        sName = Token_helper(sCopy, 0, false, "=", "\"", "\"").Trim_n();
-        sCopy = Token_helper(sCopy, 1, true, "=", "\"", "\"").TrimLeft_n();
+        sName = Token_helper(sCopy, 0, false, "=", "\"", "\"").trim_n();
+        sCopy = Token_helper(sCopy, 1, true, "=", "\"", "\"").trimLeft_n();
 
         if (sName.empty()) {
             continue;

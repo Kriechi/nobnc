@@ -120,7 +120,7 @@ public:
         ushort uPort =
         NoApp::Get().GetManager().ListenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
 
-        if (GetUser()->GetNick().Equals(sRemoteNick)) {
+        if (GetUser()->GetNick().equals(sRemoteNick)) {
             PutUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
                     NoString(NoUtils::GetLongIP(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
         } else {
@@ -154,8 +154,8 @@ public:
 
     void SendCommand(const NoString& sLine)
     {
-        NoString sToNick = sLine.Token(1);
-        NoString sFile = sLine.Token(2);
+        NoString sToNick = sLine.token(1);
+        NoString sFile = sLine.token(2);
         NoString sAllowedPath = GetSavePath();
         NoString sAbsolutePath;
 
@@ -176,7 +176,7 @@ public:
 
     void GetCommand(const NoString& sLine)
     {
-        NoString sFile = sLine.Token(1);
+        NoString sFile = sLine.token(1);
         NoString sAllowedPath = GetSavePath();
         NoString sAbsolutePath;
 
@@ -235,10 +235,10 @@ public:
 
     void OnModCTCP(const NoString& sMessage) override
     {
-        if (sMessage.StartsWith("DCC RESUME ")) {
-            NoString sFile = sMessage.Token(2);
-            ushort uResumePort = sMessage.Token(3).ToUShort();
-            ulong uResumeSize = sMessage.Token(4).ToULong();
+        if (sMessage.startsWith("DCC RESUME ")) {
+            NoString sFile = sMessage.token(2);
+            ushort uResumePort = sMessage.token(3).toUShort();
+            ulong uResumeSize = sMessage.token(4).toULong();
 
             std::set<NoModuleSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
@@ -256,14 +256,14 @@ public:
                     }
                 }
             }
-        } else if (sMessage.StartsWith("DCC SEND ")) {
-            NoString sLocalFile = NoDir::CheckPathPrefix(GetSavePath(), sMessage.Token(2));
+        } else if (sMessage.startsWith("DCC SEND ")) {
+            NoString sLocalFile = NoDir::CheckPathPrefix(GetSavePath(), sMessage.token(2));
             if (sLocalFile.empty()) {
-                PutModule("Bad DCC file: " + sMessage.Token(2));
+                PutModule("Bad DCC file: " + sMessage.token(2));
             }
-            ulong uLongIP = sMessage.Token(3).ToULong();
-            ushort uPort = sMessage.Token(4).ToUShort();
-            ulong uFileSize = sMessage.Token(5).ToULong();
+            ulong uLongIP = sMessage.token(3).toULong();
+            ushort uPort = sMessage.token(4).toUShort();
+            ulong uFileSize = sMessage.token(5).toULong();
             GetFile(GetClient()->GetNick(), NoUtils::GetIP(uLongIP), uPort, sLocalFile, uFileSize);
         }
     }

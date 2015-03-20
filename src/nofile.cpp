@@ -49,13 +49,13 @@ NoFile::~NoFile() { Close(); }
 
 void NoFile::SetFileName(const NoString& sLongName)
 {
-    if (sLongName.Left(2) == "~/") {
+    if (sLongName.left(2) == "~/") {
         m_sLongName = NoFile::GetHomePath() + sLongName.substr(1);
     } else
         m_sLongName = sLongName;
 
     m_sShortName = sLongName;
-    m_sShortName.TrimRight("/");
+    m_sShortName.trimRight("/");
 
     NoString::size_type uPos = m_sShortName.rfind('/');
     if (uPos != NoString::npos) {
@@ -65,10 +65,10 @@ void NoFile::SetFileName(const NoString& sLongName)
 
 bool NoFile::IsDir(const NoString& sLongName, bool bUseLstat)
 {
-    if (sLongName.Equals("/")) return NoFile::FType(sLongName, Directory, bUseLstat);
+    if (sLongName.equals("/")) return NoFile::FType(sLongName, Directory, bUseLstat);
 
     // Some OS don't like trailing slashes for directories
-    return NoFile::FType(sLongName.TrimRight_n("/"), Directory, bUseLstat);
+    return NoFile::FType(sLongName.trimRight_n("/"), Directory, bUseLstat);
 }
 
 bool NoFile::IsReg(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Regular, bUseLstat); }
@@ -491,8 +491,8 @@ NoString NoFile::GetDir() const
 {
     NoString sDir(m_sLongName);
 
-    while (!sDir.empty() && sDir.Right(1) != "/" && sDir.Right(1) != "\\") {
-        sDir.RightChomp(1);
+    while (!sDir.empty() && sDir.right(1) != "/" && sDir.right(1) != "\\") {
+        sDir.rightChomp(1);
     }
 
     return sDir;

@@ -44,15 +44,15 @@ class NoAdminMod : public NoModule
         VarTable.AddColumn("Variables");
         std::map<const char*, NoStringVector> mvsTypedVariables;
         for (uint i = 0; i != uSize; ++i) {
-            NoString sVar = NoString(vars[i][0]).AsLower();
-            if (sFilter.empty() || sVar.StartsWith(sFilter) || sVar.WildCmp(sFilter)) {
+            NoString sVar = NoString(vars[i][0]).toLower();
+            if (sFilter.empty() || sVar.startsWith(sFilter) || sVar.wildCmp(sFilter)) {
                 mvsTypedVariables[vars[i][1]].emplace_back(vars[i][0]);
             }
         }
         for (const auto& i : mvsTypedVariables) {
             VarTable.AddRow();
             VarTable.SetCell("Type", i.first);
-            VarTable.SetCell("Variables", NoString(", ").Join(i.second.cbegin(), i.second.cend()));
+            VarTable.SetCell("Variables", NoString(", ").join(i.second.cbegin(), i.second.cend()));
         }
         if (!VarTable.empty()) {
             PutModule(sDescription);
@@ -69,10 +69,10 @@ class NoAdminMod : public NoModule
         static const char* integer = "Integer";
         static const char* doublenum = "Double";
 
-        const NoString sCmdFilter = sLine.Token(1);
-        const NoString sVarFilter = sLine.Tokens(2).AsLower();
+        const NoString sCmdFilter = sLine.token(1);
+        const NoString sVarFilter = sLine.tokens(2).toLower();
 
-        if (sCmdFilter.empty() || sCmdFilter.StartsWith("Set") || sCmdFilter.StartsWith("Get")) {
+        if (sCmdFilter.empty() || sCmdFilter.startsWith("Set") || sCmdFilter.startsWith("Get")) {
             static const char* vars[][2] = {
                 { "Nick", str },
                 { "Altnick", str },
@@ -109,7 +109,7 @@ class NoAdminMod : public NoModule
                           "The following variables are available when using the Set/Get commands:");
         }
 
-        if (sCmdFilter.empty() || sCmdFilter.StartsWith("SetNetwork") || sCmdFilter.StartsWith("GetNetwork")) {
+        if (sCmdFilter.empty() || sCmdFilter.startsWith("SetNetwork") || sCmdFilter.startsWith("GetNetwork")) {
             static const char* nvars[][2] = {
                 { "Nick", str },
                 { "Altnick", str },
@@ -130,7 +130,7 @@ class NoAdminMod : public NoModule
                           "The following variables are available when using the SetNetwork/GetNetwork commands:");
         }
 
-        if (sCmdFilter.empty() || sCmdFilter.StartsWith("SetChan") || sCmdFilter.StartsWith("GetChan")) {
+        if (sCmdFilter.empty() || sCmdFilter.startsWith("SetChan") || sCmdFilter.startsWith("GetChan")) {
             static const char* cvars[][2] = { { "DefModes", str },
                                               { "Key", str },
                                               { "Buffer", integer },
@@ -150,7 +150,7 @@ class NoAdminMod : public NoModule
 
     NoUser* FindUser(const NoString& sUsername)
     {
-        if (sUsername.Equals("$me") || sUsername.Equals("$user")) return GetUser();
+        if (sUsername.equals("$me") || sUsername.equals("$user")) return GetUser();
         NoUser* pUser = NoApp::Get().FindUser(sUsername);
         if (!pUser) {
             PutModule("Error: User [" + sUsername + "] not found.");
@@ -165,7 +165,7 @@ class NoAdminMod : public NoModule
 
     NoNetwork* FindNetwork(NoUser* pUser, const NoString& sNetwork)
     {
-        if (sNetwork.Equals("$net") || sNetwork.Equals("$network")) {
+        if (sNetwork.equals("$net") || sNetwork.equals("$network")) {
             if (pUser != GetUser()) {
                 PutModule("Error: You cannot use " + sNetwork + " to modify other users!");
                 return nullptr;
@@ -181,8 +181,8 @@ class NoAdminMod : public NoModule
 
     void Get(const NoString& sLine)
     {
-        const NoString sVar = sLine.Token(1).AsLower();
-        NoString sUsername = sLine.Tokens(2);
+        const NoString sVar = sLine.token(1).toLower();
+        NoString sUsername = sLine.tokens(2);
         NoUser* pUser;
 
         if (sVar.empty()) {
@@ -259,9 +259,9 @@ class NoAdminMod : public NoModule
 
     void Set(const NoString& sLine)
     {
-        const NoString sVar = sLine.Token(1).AsLower();
-        NoString sUserName = sLine.Token(2);
-        NoString sValue = sLine.Tokens(3);
+        const NoString sVar = sLine.token(1).toLower();
+        NoString sUserName = sLine.token(2);
+        NoString sValue = sLine.tokens(3);
 
         if (sValue.empty()) {
             PutModule("Usage: Set <variable> <username> <value>");
@@ -285,7 +285,7 @@ class NoAdminMod : public NoModule
             PutModule("RealName = " + sValue);
         } else if (sVar == "bindhost") {
             if (!pUser->DenySetBindHost() || GetUser()->IsAdmin()) {
-                if (sValue.Equals(GetUser()->GetBindHost())) {
+                if (sValue.equals(GetUser()->GetBindHost())) {
                     PutModule("This bind host is already set!");
                     return;
                 }
@@ -296,7 +296,7 @@ class NoAdminMod : public NoModule
                     bool bFound = false;
 
                     for (it = vsHosts.begin(); it != vsHosts.end(); ++it) {
-                        if (sValue.Equals(*it)) {
+                        if (sValue.equals(*it)) {
                             bFound = true;
                             break;
                         }
@@ -315,12 +315,12 @@ class NoAdminMod : public NoModule
                 PutModule("Access denied!");
             }
         } else if (sVar == "multiclients") {
-            bool b = sValue.ToBool();
+            bool b = sValue.toBool();
             pUser->SetMultiClients(b);
             PutModule("MultiClients = " + NoString(b));
         } else if (sVar == "denyloadmod") {
             if (GetUser()->IsAdmin()) {
-                bool b = sValue.ToBool();
+                bool b = sValue.toBool();
                 pUser->SetDenyLoadMod(b);
                 PutModule("DenyLoadMod = " + NoString(b));
             } else {
@@ -328,7 +328,7 @@ class NoAdminMod : public NoModule
             }
         } else if (sVar == "denysetbindhost") {
             if (GetUser()->IsAdmin()) {
-                bool b = sValue.ToBool();
+                bool b = sValue.toBool();
                 pUser->SetDenySetBindHost(b);
                 PutModule("DenySetBindHost = " + NoString(b));
             } else {
@@ -341,7 +341,7 @@ class NoAdminMod : public NoModule
             pUser->SetQuitMsg(sValue);
             PutModule("QuitMsg = " + sValue);
         } else if (sVar == "buffercount") {
-            uint i = sValue.ToUInt();
+            uint i = sValue.toUInt();
             // Admins don't have to honour the buffer limit
             if (pUser->SetBufferCount(i, GetUser()->IsAdmin())) {
                 PutModule("BufferCount = " + sValue);
@@ -349,15 +349,15 @@ class NoAdminMod : public NoModule
                 PutModule("Setting failed, limit is " + NoString(NoApp::Get().GetMaxBufferSize()));
             }
         } else if (sVar == "keepbuffer") { // XXX compatibility crap, added in 0.207
-            bool b = !sValue.ToBool();
+            bool b = !sValue.toBool();
             pUser->SetAutoClearChanBuffer(b);
             PutModule("AutoClearChanBuffer = " + NoString(b));
         } else if (sVar == "autoclearchanbuffer") {
-            bool b = sValue.ToBool();
+            bool b = sValue.toBool();
             pUser->SetAutoClearChanBuffer(b);
             PutModule("AutoClearChanBuffer = " + NoString(b));
         } else if (sVar == "autoclearquerybuffer") {
-            bool b = sValue.ToBool();
+            bool b = sValue.toBool();
             pUser->SetAutoClearQueryBuffer(b);
             PutModule("AutoClearQueryBuffer = " + NoString(b));
         } else if (sVar == "password") {
@@ -366,23 +366,23 @@ class NoAdminMod : public NoModule
             pUser->SetPass(sHash, NoUser::HASH_DEFAULT, sSalt);
             PutModule("Password has been changed!");
         } else if (sVar == "maxjoins") {
-            uint i = sValue.ToUInt();
+            uint i = sValue.toUInt();
             pUser->SetMaxJoins(i);
             PutModule("MaxJoins = " + NoString(pUser->MaxJoins()));
         } else if (sVar == "maxnetworks") {
             if (GetUser()->IsAdmin()) {
-                uint i = sValue.ToUInt();
+                uint i = sValue.toUInt();
                 pUser->SetMaxNetworks(i);
                 PutModule("MaxNetworks = " + sValue);
             } else {
                 PutModule("Access denied!");
             }
         } else if (sVar == "maxquerybuffers") {
-            uint i = sValue.ToUInt();
+            uint i = sValue.toUInt();
             pUser->SetMaxQueryBuffers(i);
             PutModule("MaxQueryBuffers = " + sValue);
         } else if (sVar == "jointries") {
-            uint i = sValue.ToUInt();
+            uint i = sValue.toUInt();
             pUser->SetJoinTries(i);
             PutModule("JoinTries = " + NoString(pUser->JoinTries()));
         } else if (sVar == "timezone") {
@@ -390,18 +390,18 @@ class NoAdminMod : public NoModule
             PutModule("Timezone = " + pUser->GetTimezone());
         } else if (sVar == "admin") {
             if (GetUser()->IsAdmin() && pUser != GetUser()) {
-                bool b = sValue.ToBool();
+                bool b = sValue.toBool();
                 pUser->SetAdmin(b);
                 PutModule("Admin = " + NoString(pUser->IsAdmin()));
             } else {
                 PutModule("Access denied!");
             }
         } else if (sVar == "prependtimestamp") {
-            bool b = sValue.ToBool();
+            bool b = sValue.toBool();
             pUser->SetTimestampPrepend(b);
             PutModule("PrependTimestamp = " + NoString(b));
         } else if (sVar == "appendtimestamp") {
-            bool b = sValue.ToBool();
+            bool b = sValue.toBool();
             pUser->SetTimestampAppend(b);
             PutModule("AppendTimestamp = " + NoString(b));
         } else if (sVar == "timestampformat") {
@@ -434,9 +434,9 @@ class NoAdminMod : public NoModule
 
     void GetNetwork(const NoString& sLine)
     {
-        const NoString sVar = sLine.Token(1).AsLower();
-        const NoString sUsername = sLine.Token(2);
-        const NoString sNetwork = sLine.Token(3);
+        const NoString sVar = sLine.token(1).toLower();
+        const NoString sUsername = sLine.token(2);
+        const NoString sNetwork = sLine.token(3);
 
         NoNetwork* pNetwork = nullptr;
 
@@ -459,27 +459,27 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (sVar.Equals("nick")) {
+        if (sVar.equals("nick")) {
             PutModule("Nick = " + pNetwork->GetNick());
-        } else if (sVar.Equals("altnick")) {
+        } else if (sVar.equals("altnick")) {
             PutModule("AltNick = " + pNetwork->GetAltNick());
-        } else if (sVar.Equals("ident")) {
+        } else if (sVar.equals("ident")) {
             PutModule("Ident = " + pNetwork->GetIdent());
-        } else if (sVar.Equals("realname")) {
+        } else if (sVar.equals("realname")) {
             PutModule("RealName = " + pNetwork->GetRealName());
-        } else if (sVar.Equals("bindhost")) {
+        } else if (sVar.equals("bindhost")) {
             PutModule("BindHost = " + pNetwork->GetBindHost());
-        } else if (sVar.Equals("floodrate")) {
+        } else if (sVar.equals("floodrate")) {
             PutModule("FloodRate = " + NoString(pNetwork->GetFloodRate()));
-        } else if (sVar.Equals("floodburst")) {
+        } else if (sVar.equals("floodburst")) {
             PutModule("FloodBurst = " + NoString(pNetwork->GetFloodBurst()));
-        } else if (sVar.Equals("joindelay")) {
+        } else if (sVar.equals("joindelay")) {
             PutModule("JoinDelay = " + NoString(pNetwork->GetJoinDelay()));
 #ifdef HAVE_ICU
-        } else if (sVar.Equals("encoding")) {
+        } else if (sVar.equals("encoding")) {
             PutModule("Encoding = " + pNetwork->GetEncoding());
 #endif
-        } else if (sVar.Equals("quitmsg")) {
+        } else if (sVar.equals("quitmsg")) {
             PutModule("QuitMsg = " + pNetwork->GetQuitMsg());
         } else {
             PutModule("Error: Unknown variable");
@@ -488,10 +488,10 @@ class NoAdminMod : public NoModule
 
     void SetNetwork(const NoString& sLine)
     {
-        const NoString sVar = sLine.Token(1).AsLower();
-        const NoString sUsername = sLine.Token(2);
-        const NoString sNetwork = sLine.Token(3);
-        const NoString sValue = sLine.Tokens(4);
+        const NoString sVar = sLine.token(1).toLower();
+        const NoString sUsername = sLine.token(2);
+        const NoString sNetwork = sLine.token(3);
+        const NoString sValue = sLine.tokens(4);
 
         NoUser* pUser = nullptr;
         NoNetwork* pNetwork = nullptr;
@@ -516,21 +516,21 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (sVar.Equals("nick")) {
+        if (sVar.equals("nick")) {
             pNetwork->SetNick(sValue);
             PutModule("Nick = " + pNetwork->GetNick());
-        } else if (sVar.Equals("altnick")) {
+        } else if (sVar.equals("altnick")) {
             pNetwork->SetAltNick(sValue);
             PutModule("AltNick = " + pNetwork->GetAltNick());
-        } else if (sVar.Equals("ident")) {
+        } else if (sVar.equals("ident")) {
             pNetwork->SetIdent(sValue);
             PutModule("Ident = " + pNetwork->GetIdent());
-        } else if (sVar.Equals("realname")) {
+        } else if (sVar.equals("realname")) {
             pNetwork->SetRealName(sValue);
             PutModule("RealName = " + pNetwork->GetRealName());
-        } else if (sVar.Equals("bindhost")) {
+        } else if (sVar.equals("bindhost")) {
             if (!pUser->DenySetBindHost() || GetUser()->IsAdmin()) {
-                if (sValue.Equals(pNetwork->GetBindHost())) {
+                if (sValue.equals(pNetwork->GetBindHost())) {
                     PutModule("This bind host is already set!");
                     return;
                 }
@@ -541,7 +541,7 @@ class NoAdminMod : public NoModule
                     bool bFound = false;
 
                     for (it = vsHosts.begin(); it != vsHosts.end(); ++it) {
-                        if (sValue.Equals(*it)) {
+                        if (sValue.equals(*it)) {
                             bFound = true;
                             break;
                         }
@@ -559,21 +559,21 @@ class NoAdminMod : public NoModule
             } else {
                 PutModule("Access denied!");
             }
-        } else if (sVar.Equals("floodrate")) {
-            pNetwork->SetFloodRate(sValue.ToDouble());
+        } else if (sVar.equals("floodrate")) {
+            pNetwork->SetFloodRate(sValue.toDouble());
             PutModule("FloodRate = " + NoString(pNetwork->GetFloodRate()));
-        } else if (sVar.Equals("floodburst")) {
-            pNetwork->SetFloodBurst(sValue.ToUShort());
+        } else if (sVar.equals("floodburst")) {
+            pNetwork->SetFloodBurst(sValue.toUShort());
             PutModule("FloodBurst = " + NoString(pNetwork->GetFloodBurst()));
-        } else if (sVar.Equals("joindelay")) {
-            pNetwork->SetJoinDelay(sValue.ToUShort());
+        } else if (sVar.equals("joindelay")) {
+            pNetwork->SetJoinDelay(sValue.toUShort());
             PutModule("JoinDelay = " + NoString(pNetwork->GetJoinDelay()));
 #ifdef HAVE_ICU
-        } else if (sVar.Equals("encoding")) {
+        } else if (sVar.equals("encoding")) {
             pNetwork->SetEncoding(sValue);
             PutModule("Encoding = " + pNetwork->GetEncoding());
 #endif
-        } else if (sVar.Equals("quitmsg")) {
+        } else if (sVar.equals("quitmsg")) {
             pNetwork->SetQuitMsg(sValue);
             PutModule("QuitMsg = " + pNetwork->GetQuitMsg());
         } else {
@@ -583,9 +583,9 @@ class NoAdminMod : public NoModule
 
     void AddChan(const NoString& sLine)
     {
-        const NoString sUsername = sLine.Token(1);
-        const NoString sNetwork = sLine.Token(2);
-        const NoString sChan = sLine.Token(3);
+        const NoString sUsername = sLine.token(1);
+        const NoString sNetwork = sLine.token(2);
+        const NoString sChan = sLine.token(3);
 
         if (sChan.empty()) {
             PutModule("Usage: AddChan <username> <network> <channel>");
@@ -614,9 +614,9 @@ class NoAdminMod : public NoModule
 
     void DelChan(const NoString& sLine)
     {
-        const NoString sUsername = sLine.Token(1);
-        const NoString sNetwork = sLine.Token(2);
-        const NoString sChan = sLine.Token(3);
+        const NoString sUsername = sLine.token(1);
+        const NoString sNetwork = sLine.token(2);
+        const NoString sChan = sLine.token(3);
 
         if (sChan.empty()) {
             PutModule("Usage: DelChan <username> <network> <channel>");
@@ -645,16 +645,16 @@ class NoAdminMod : public NoModule
             pNetwork->DelChan(sName);
         }
 
-        PutModule("Channel(s) [" + NoString(",").Join(vsNames.begin(), vsNames.end()) + "] for user [" + sUsername +
+        PutModule("Channel(s) [" + NoString(",").join(vsNames.begin(), vsNames.end()) + "] for user [" + sUsername +
                   "] deleted.");
     }
 
     void GetChan(const NoString& sLine)
     {
-        const NoString sVar = sLine.Token(1).AsLower();
-        NoString sUsername = sLine.Token(2);
-        NoString sNetwork = sLine.Token(3);
-        NoString sChan = sLine.Tokens(4);
+        const NoString sVar = sLine.token(1).toLower();
+        NoString sUsername = sLine.token(2);
+        NoString sNetwork = sLine.token(3);
+        NoString sChan = sLine.tokens(4);
 
         if (sChan.empty()) {
             PutModule("Usage: GetChan <variable> <username> <network> <chan>");
@@ -708,11 +708,11 @@ class NoAdminMod : public NoModule
 
     void SetChan(const NoString& sLine)
     {
-        const NoString sVar = sLine.Token(1).AsLower();
-        NoString sUsername = sLine.Token(2);
-        NoString sNetwork = sLine.Token(3);
-        NoString sChan = sLine.Token(4);
-        NoString sValue = sLine.Tokens(5);
+        const NoString sVar = sLine.token(1).toLower();
+        NoString sUsername = sLine.token(2);
+        NoString sNetwork = sLine.token(3);
+        NoString sChan = sLine.token(4);
+        NoString sValue = sLine.tokens(5);
 
         if (sValue.empty()) {
             PutModule("Usage: SetChan <variable> <username> <network> <chan> <value>");
@@ -738,7 +738,7 @@ class NoAdminMod : public NoModule
                 pChan->setDefaultModes(sValue);
                 PutModule(pChan->getName() + ": DefModes = " + sValue);
             } else if (sVar == "buffer") {
-                uint i = sValue.ToUInt();
+                uint i = sValue.toUInt();
                 // Admins don't have to honour the buffer limit
                 if (pChan->setBufferCount(i, GetUser()->IsAdmin())) {
                     PutModule(pChan->getName() + ": Buffer = " + sValue);
@@ -747,19 +747,19 @@ class NoAdminMod : public NoModule
                     return;
                 }
             } else if (sVar == "inconfig") {
-                bool b = sValue.ToBool();
+                bool b = sValue.toBool();
                 pChan->setInConfig(b);
                 PutModule(pChan->getName() + ": InConfig = " + NoString(b));
             } else if (sVar == "keepbuffer") { // XXX compatibility crap, added in 0.207
-                bool b = !sValue.ToBool();
+                bool b = !sValue.toBool();
                 pChan->setAutoClearChanBuffer(b);
                 PutModule(pChan->getName() + ": AutoClearChanBuffer = " + NoString(b));
             } else if (sVar == "autoclearchanbuffer") {
-                bool b = sValue.ToBool();
+                bool b = sValue.toBool();
                 pChan->setAutoClearChanBuffer(b);
                 PutModule(pChan->getName() + ": AutoClearChanBuffer = " + NoString(b));
             } else if (sVar == "detached") {
-                bool b = sValue.ToBool();
+                bool b = sValue.toBool();
                 if (pChan->isDetached() != b) {
                     if (b)
                         pChan->detachUser();
@@ -815,7 +815,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sUsername = sLine.Token(1), sPassword = sLine.Token(2);
+        const NoString sUsername = sLine.token(1), sPassword = sLine.token(2);
         if (sPassword.empty()) {
             PutModule("Usage: AddUser <username> <password>");
             return;
@@ -848,7 +848,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sUsername = sLine.Tokens(1);
+        const NoString sUsername = sLine.tokens(1);
         if (sUsername.empty()) {
             PutModule("Usage: DelUser <username>");
             return;
@@ -883,7 +883,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sOldUsername = sLine.Token(1), sNewUsername = sLine.Tokens(2);
+        const NoString sOldUsername = sLine.token(1), sNewUsername = sLine.tokens(2);
 
         if (sOldUsername.empty() || sNewUsername.empty()) {
             PutModule("Usage: CloneUser <old username> <new username>");
@@ -917,8 +917,8 @@ class NoAdminMod : public NoModule
 
     void AddNetwork(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sNetwork = sLine.Token(2);
+        NoString sUser = sLine.token(1);
+        NoString sNetwork = sLine.token(2);
         NoUser* pUser = GetUser();
 
         if (sNetwork.empty()) {
@@ -957,8 +957,8 @@ class NoAdminMod : public NoModule
 
     void DelNetwork(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sNetwork = sLine.Token(2);
+        NoString sUser = sLine.token(1);
+        NoString sNetwork = sLine.token(2);
         NoUser* pUser = GetUser();
 
         if (sNetwork.empty()) {
@@ -994,7 +994,7 @@ class NoAdminMod : public NoModule
 
     void ListNetworks(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
+        NoString sUser = sLine.token(1);
         NoUser* pUser = GetUser();
 
         if (!sUser.empty()) {
@@ -1034,9 +1034,9 @@ class NoAdminMod : public NoModule
 
     void AddServer(const NoString& sLine)
     {
-        NoString sUsername = sLine.Token(1);
-        NoString sNetwork = sLine.Token(2);
-        NoString sServer = sLine.Tokens(3);
+        NoString sUsername = sLine.token(1);
+        NoString sNetwork = sLine.token(2);
+        NoString sServer = sLine.tokens(3);
 
         if (sServer.empty()) {
             PutModule("Usage: AddServer <username> <network> <server>");
@@ -1060,11 +1060,11 @@ class NoAdminMod : public NoModule
 
     void DelServer(const NoString& sLine)
     {
-        NoString sUsername = sLine.Token(1);
-        NoString sNetwork = sLine.Token(2);
-        NoString sServer = sLine.Tokens(3);
-        ushort uPort = sLine.Token(4).ToUShort();
-        NoString sPass = sLine.Token(5);
+        NoString sUsername = sLine.token(1);
+        NoString sNetwork = sLine.token(2);
+        NoString sServer = sLine.tokens(3);
+        ushort uPort = sLine.token(4).toUShort();
+        NoString sPass = sLine.token(5);
 
         if (sServer.empty()) {
             PutModule("Usage: DelServer <username> <network> <server>");
@@ -1088,8 +1088,8 @@ class NoAdminMod : public NoModule
 
     void ReconnectUser(const NoString& sLine)
     {
-        NoString sUserName = sLine.Token(1);
-        NoString sNetwork = sLine.Token(2);
+        NoString sUserName = sLine.token(1);
+        NoString sNetwork = sLine.token(2);
 
         if (sNetwork.empty()) {
             PutModule("Usage: Reconnect <username> <network>");
@@ -1125,8 +1125,8 @@ class NoAdminMod : public NoModule
 
     void DisconnectUser(const NoString& sLine)
     {
-        NoString sUserName = sLine.Token(1);
-        NoString sNetwork = sLine.Token(2);
+        NoString sUserName = sLine.token(1);
+        NoString sNetwork = sLine.token(2);
 
         if (sNetwork.empty()) {
             PutModule("Usage: Disconnect <username> <network>");
@@ -1150,7 +1150,7 @@ class NoAdminMod : public NoModule
 
     void ListCTCP(const NoString& sLine)
     {
-        NoString sUserName = sLine.Tokens(1);
+        NoString sUserName = sLine.tokens(1);
 
         if (sUserName.empty()) {
             sUserName = GetUser()->GetUserName();
@@ -1178,13 +1178,13 @@ class NoAdminMod : public NoModule
 
     void AddCTCP(const NoString& sLine)
     {
-        NoString sUserName = sLine.Token(1);
-        NoString sCTCPRequest = sLine.Token(2);
-        NoString sCTCPReply = sLine.Tokens(3);
+        NoString sUserName = sLine.token(1);
+        NoString sCTCPRequest = sLine.token(2);
+        NoString sCTCPReply = sLine.tokens(3);
 
         if (sCTCPRequest.empty()) {
             sCTCPRequest = sUserName;
-            sCTCPReply = sLine.Tokens(2);
+            sCTCPReply = sLine.tokens(2);
             sUserName = GetUser()->GetUserName();
         }
         if (sCTCPRequest.empty()) {
@@ -1205,8 +1205,8 @@ class NoAdminMod : public NoModule
 
     void DelCTCP(const NoString& sLine)
     {
-        NoString sUserName = sLine.Token(1);
-        NoString sCTCPRequest = sLine.Tokens(2);
+        NoString sUserName = sLine.token(1);
+        NoString sCTCPRequest = sLine.tokens(2);
 
         if (sCTCPRequest.empty()) {
             sCTCPRequest = sUserName;
@@ -1254,9 +1254,9 @@ class NoAdminMod : public NoModule
 
     void LoadModuleForUser(const NoString& sLine)
     {
-        NoString sUsername = sLine.Token(1);
-        NoString sModName = sLine.Token(2);
-        NoString sArgs = sLine.Tokens(3);
+        NoString sUsername = sLine.token(1);
+        NoString sModName = sLine.token(2);
+        NoString sArgs = sLine.tokens(3);
 
         if (sModName.empty()) {
             PutModule("Usage: LoadModule <username> <modulename> [args]");
@@ -1271,10 +1271,10 @@ class NoAdminMod : public NoModule
 
     void LoadModuleForNetwork(const NoString& sLine)
     {
-        NoString sUsername = sLine.Token(1);
-        NoString sNetwork = sLine.Token(2);
-        NoString sModName = sLine.Token(3);
-        NoString sArgs = sLine.Tokens(4);
+        NoString sUsername = sLine.token(1);
+        NoString sNetwork = sLine.token(2);
+        NoString sModName = sLine.token(3);
+        NoString sArgs = sLine.tokens(4);
 
         if (sModName.empty()) {
             PutModule("Usage: LoadNetModule <username> <network> <modulename> [args]");
@@ -1314,8 +1314,8 @@ class NoAdminMod : public NoModule
 
     void UnLoadModuleForUser(const NoString& sLine)
     {
-        NoString sUsername = sLine.Token(1);
-        NoString sModName = sLine.Token(2);
+        NoString sUsername = sLine.token(1);
+        NoString sModName = sLine.token(2);
 
         if (sModName.empty()) {
             PutModule("Usage: UnloadModule <username> <modulename>");
@@ -1330,9 +1330,9 @@ class NoAdminMod : public NoModule
 
     void UnLoadModuleForNetwork(const NoString& sLine)
     {
-        NoString sUsername = sLine.Token(1);
-        NoString sNetwork = sLine.Token(2);
-        NoString sModName = sLine.Token(3);
+        NoString sUsername = sLine.token(1);
+        NoString sNetwork = sLine.token(2);
+        NoString sModName = sLine.token(3);
 
         if (sModName.empty()) {
             PutModule("Usage: UnloadNetModule <username> <network> <modulename>");
@@ -1372,7 +1372,7 @@ class NoAdminMod : public NoModule
 
     void ListModulesForUser(const NoString& sLine)
     {
-        NoString sUsername = sLine.Token(1);
+        NoString sUsername = sLine.token(1);
 
         if (sUsername.empty()) {
             PutModule("Usage: ListMods <username>");
@@ -1387,8 +1387,8 @@ class NoAdminMod : public NoModule
 
     void ListModulesForNetwork(const NoString& sLine)
     {
-        NoString sUsername = sLine.Token(1);
-        NoString sNetwork = sLine.Token(2);
+        NoString sUsername = sLine.token(1);
+        NoString sNetwork = sLine.token(2);
 
         if (sNetwork.empty()) {
             PutModule("Usage: ListNetMods <username> <network>");

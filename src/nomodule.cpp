@@ -278,7 +278,7 @@ NoTimer* NoModule::FindTimer(const NoString& sLabel)
     }
 
     for (NoTimer* pTimer : m_sTimers) {
-        if (pTimer->GetName().Equals(sLabel)) {
+        if (pTimer->GetName().equals(sLabel)) {
             return pTimer;
         }
     }
@@ -342,7 +342,7 @@ bool NoModule::RemSocket(NoModuleSocket* pSocket)
 bool NoModule::RemSocket(const NoString& sSockName)
 {
     for (NoModuleSocket* pSocket : m_sSockets) {
-        if (pSocket->GetSockName().Equals(sSockName)) {
+        if (pSocket->GetSockName().equals(sSockName)) {
             m_sSockets.erase(pSocket);
             m_pManager->DelSockByAddr(pSocket);
             return true;
@@ -357,7 +357,7 @@ bool NoModule::UnlinkSocket(NoModuleSocket* pSocket) { return m_sSockets.erase(p
 NoModuleSocket* NoModule::FindSocket(const NoString& sSockName)
 {
     for (NoModuleSocket* pSocket : m_sSockets) {
-        if (pSocket->GetSockName().Equals(sSockName)) {
+        if (pSocket->GetSockName().equals(sSockName)) {
             return pSocket;
         }
     }
@@ -422,7 +422,7 @@ void NoModule::CancelJob(NoModuleJob* pJob)
 bool NoModule::CancelJob(const NoString& sJobName)
 {
     for (NoModuleJob* pJob : m_sJobs) {
-        if (pJob->GetName().Equals(sJobName)) {
+        if (pJob->GetName().equals(sJobName)) {
             CancelJob(pJob);
             return true;
         }
@@ -470,7 +470,7 @@ bool NoModule::RemCommand(const NoString& sCmd) { return m_mCommands.erase(sCmd)
 const NoModCommand* NoModule::FindCommand(const NoString& sCmd) const
 {
     for (const auto& it : m_mCommands) {
-        if (!it.first.Equals(sCmd)) continue;
+        if (!it.first.equals(sCmd)) continue;
         return &it.second;
     }
     return nullptr;
@@ -478,7 +478,7 @@ const NoModCommand* NoModule::FindCommand(const NoString& sCmd) const
 
 bool NoModule::HandleCommand(const NoString& sLine)
 {
-    const NoString& sCmd = sLine.Token(0);
+    const NoString& sCmd = sLine.token(0);
     const NoModCommand* pCmd = FindCommand(sCmd);
 
     if (pCmd) {
@@ -493,13 +493,13 @@ bool NoModule::HandleCommand(const NoString& sLine)
 
 void NoModule::HandleHelpCommand(const NoString& sLine)
 {
-    NoString sFilter = sLine.Token(1).AsLower();
+    NoString sFilter = sLine.token(1).toLower();
     NoTable Table;
 
     NoModCommand::InitHelp(Table);
     for (const auto& it : m_mCommands) {
-        NoString sCmd = it.second.GetCommand().AsLower();
-        if (sFilter.empty() || (sCmd.StartsWith(sFilter, No::CaseSensitive)) || sCmd.WildCmp(sFilter)) {
+        NoString sCmd = it.second.GetCommand().toLower();
+        if (sFilter.empty() || (sCmd.startsWith(sFilter, No::CaseSensitive)) || sCmd.wildCmp(sFilter)) {
             it.second.AddHelp(Table);
         }
     }

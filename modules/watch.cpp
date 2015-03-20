@@ -80,7 +80,7 @@ public:
             for (uint a = 0; a < m_vsSources.size(); a++) {
                 const NoWatchSource& WatchSource = m_vsSources[a];
 
-                if (sSource.WildCmp(WatchSource.GetSource(), No::CaseInsensitive)) {
+                if (sSource.wildCmp(WatchSource.GetSource(), No::CaseInsensitive)) {
                     if (WatchSource.IsNegated()) {
                         return false;
                     } else {
@@ -91,14 +91,14 @@ public:
         }
 
         if (!bGoodSource) return false;
-        if (!Nick.hostMask().WildCmp(m_sHostMask, No::CaseInsensitive)) return false;
-        return (sText.WildCmp(pNetwork->ExpandString(m_sPattern), No::CaseInsensitive));
+        if (!Nick.hostMask().wildCmp(m_sHostMask, No::CaseInsensitive)) return false;
+        return (sText.wildCmp(pNetwork->ExpandString(m_sPattern), No::CaseInsensitive));
     }
 
     bool operator==(const NoWatchEntry& WatchEntry)
     {
-        return (GetHostMask().Equals(WatchEntry.GetHostMask()) && GetTarget().Equals(WatchEntry.GetTarget()) &&
-                GetPattern().Equals(WatchEntry.GetPattern()));
+        return (GetHostMask().equals(WatchEntry.GetHostMask()) && GetTarget().equals(WatchEntry.GetTarget()) &&
+                GetPattern().equals(WatchEntry.GetPattern()));
     }
 
     // Getters
@@ -140,7 +140,7 @@ public:
     void SetDetachedChannelOnly(bool b = true) { m_bDetachedChannelOnly = b; }
     void SetSources(const NoString& sSources)
     {
-        NoStringVector vsSources = sSources.Split(" ", No::SkipEmptyParts);
+        NoStringVector vsSources = sSources.split(" ", No::SkipEmptyParts);
         NoStringVector::iterator it;
 
         m_vsSources.clear();
@@ -275,65 +275,65 @@ public:
 
     void OnModCommand(const NoString& sCommand) override
     {
-        NoString sCmdName = sCommand.Token(0);
-        if (sCmdName.Equals("ADD") || sCmdName.Equals("WATCH")) {
-            Watch(sCommand.Token(1), sCommand.Token(2), sCommand.Tokens(3));
-        } else if (sCmdName.Equals("HELP")) {
+        NoString sCmdName = sCommand.token(0);
+        if (sCmdName.equals("ADD") || sCmdName.equals("WATCH")) {
+            Watch(sCommand.token(1), sCommand.token(2), sCommand.tokens(3));
+        } else if (sCmdName.equals("HELP")) {
             Help();
-        } else if (sCmdName.Equals("LIST")) {
+        } else if (sCmdName.equals("LIST")) {
             List();
-        } else if (sCmdName.Equals("DUMP")) {
+        } else if (sCmdName.equals("DUMP")) {
             Dump();
-        } else if (sCmdName.Equals("ENABLE")) {
-            NoString sTok = sCommand.Token(1);
+        } else if (sCmdName.equals("ENABLE")) {
+            NoString sTok = sCommand.token(1);
 
             if (sTok == "*") {
                 SetDisabled(~0, false);
             } else {
-                SetDisabled(sTok.ToUInt(), false);
+                SetDisabled(sTok.toUInt(), false);
             }
-        } else if (sCmdName.Equals("DISABLE")) {
-            NoString sTok = sCommand.Token(1);
+        } else if (sCmdName.equals("DISABLE")) {
+            NoString sTok = sCommand.token(1);
 
             if (sTok == "*") {
                 SetDisabled(~0, true);
             } else {
-                SetDisabled(sTok.ToUInt(), true);
+                SetDisabled(sTok.toUInt(), true);
             }
-        } else if (sCmdName.Equals("SETDETACHEDCLIENTONLY")) {
-            NoString sTok = sCommand.Token(1);
-            bool bDetachedClientOnly = sCommand.Token(2).ToBool();
+        } else if (sCmdName.equals("SETDETACHEDCLIENTONLY")) {
+            NoString sTok = sCommand.token(1);
+            bool bDetachedClientOnly = sCommand.token(2).toBool();
 
             if (sTok == "*") {
                 SetDetachedClientOnly(~0, bDetachedClientOnly);
             } else {
-                SetDetachedClientOnly(sTok.ToUInt(), bDetachedClientOnly);
+                SetDetachedClientOnly(sTok.toUInt(), bDetachedClientOnly);
             }
-        } else if (sCmdName.Equals("SETDETACHEDCHANNELONLY")) {
-            NoString sTok = sCommand.Token(1);
-            bool bDetachedchannelOnly = sCommand.Token(2).ToBool();
+        } else if (sCmdName.equals("SETDETACHEDCHANNELONLY")) {
+            NoString sTok = sCommand.token(1);
+            bool bDetachedchannelOnly = sCommand.token(2).toBool();
 
             if (sTok == "*") {
                 SetDetachedChannelOnly(~0, bDetachedchannelOnly);
             } else {
-                SetDetachedChannelOnly(sTok.ToUInt(), bDetachedchannelOnly);
+                SetDetachedChannelOnly(sTok.toUInt(), bDetachedchannelOnly);
             }
-        } else if (sCmdName.Equals("SETSOURCES")) {
-            SetSources(sCommand.Token(1).ToUInt(), sCommand.Tokens(2));
-        } else if (sCmdName.Equals("CLEAR")) {
+        } else if (sCmdName.equals("SETSOURCES")) {
+            SetSources(sCommand.token(1).toUInt(), sCommand.tokens(2));
+        } else if (sCmdName.equals("CLEAR")) {
             m_lsWatchers.clear();
             PutModule("All entries cleared.");
             Save();
-        } else if (sCmdName.Equals("BUFFER")) {
-            NoString sCount = sCommand.Token(1);
+        } else if (sCmdName.equals("BUFFER")) {
+            NoString sCount = sCommand.token(1);
 
             if (sCount.size()) {
-                m_Buffer.setLimit(sCount.ToUInt());
+                m_Buffer.setLimit(sCount.toUInt());
             }
 
             PutModule("Buffer count is set to [" + NoString(m_Buffer.getLimit()) + "]");
-        } else if (sCmdName.Equals("DEL")) {
-            Remove(sCommand.Token(1).ToUInt());
+        } else if (sCmdName.equals("DEL")) {
+            Remove(sCommand.token(1).toUInt());
         } else {
             PutModule("Unknown command: [" + sCmdName + "]");
         }
@@ -676,7 +676,7 @@ private:
         bool bWarn = false;
 
         for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
-            NoStringVector vList = it->first.Split("\n");
+            NoStringVector vList = it->first.split("\n");
 
             // Backwards compatibility with the old save format
             if (vList.size() != 5 && vList.size() != 7) {
@@ -685,7 +685,7 @@ private:
             }
 
             NoWatchEntry WatchEntry(vList[0], vList[1], vList[2]);
-            if (vList[3].Equals("disabled"))
+            if (vList[3].equals("disabled"))
                 WatchEntry.SetDisabled(true);
             else
                 WatchEntry.SetDisabled(false);
@@ -694,8 +694,8 @@ private:
             if (vList.size() == 5) {
                 WatchEntry.SetSources(vList[4]);
             } else {
-                WatchEntry.SetDetachedClientOnly(vList[4].ToBool());
-                WatchEntry.SetDetachedChannelOnly(vList[5].ToBool());
+                WatchEntry.SetDetachedClientOnly(vList[4].toBool());
+                WatchEntry.SetDetachedChannelOnly(vList[5].toBool());
                 WatchEntry.SetSources(vList[6]);
             }
             m_lsWatchers.push_back(WatchEntry);

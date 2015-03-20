@@ -64,14 +64,14 @@ public:
 
     ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
-        sTarget.TrimLeft(NickPrefix());
+        sTarget.trimLeft(NickPrefix());
 
-        if (sMessage.Left(2) == "``") {
-            sMessage.LeftChomp(2);
+        if (sMessage.left(2) == "``") {
+            sMessage.leftChomp(2);
             return CONTINUE;
         }
 
-        NoStringMap::iterator it = FindNV(sTarget.AsLower());
+        NoStringMap::iterator it = FindNV(sTarget.toLower());
 
         if (it != EndNV()) {
             NoChannel* pChan = GetNetwork()->FindChan(sTarget);
@@ -86,7 +86,7 @@ public:
 
             NoString sMsg = MakeIvec() + sMessage;
             sMsg = NoUtils::Encrypt(sMsg, it->second);
-            sMsg = sMsg.ToBase64();
+            sMsg = sMsg.toBase64();
             sMsg = "+OK *" + sMsg;
 
             PutIRC("PRIVMSG " + sTarget + " :" + sMsg);
@@ -110,14 +110,14 @@ public:
 
     void FilterIncoming(const NoString& sTarget, NoNick& Nick, NoString& sMessage)
     {
-        if (sMessage.Left(5) == "+OK *") {
-            NoStringMap::iterator it = FindNV(sTarget.AsLower());
+        if (sMessage.left(5) == "+OK *") {
+            NoStringMap::iterator it = FindNV(sTarget.toLower());
 
             if (it != EndNV()) {
-                sMessage.LeftChomp(5);
-                sMessage = NoString::FromBase64(sMessage);
+                sMessage.leftChomp(5);
+                sMessage = NoString::fromBase64(sMessage);
                 sMessage = NoUtils::Decrypt(sMessage, it->second);
-                sMessage.LeftChomp(8);
+                sMessage.leftChomp(8);
                 sMessage = sMessage.c_str();
                 Nick.setNick(NickPrefix() + Nick.nick());
             }
@@ -126,10 +126,10 @@ public:
 
     void OnDelKeyCommand(const NoString& sCommand)
     {
-        NoString sTarget = sCommand.Token(1);
+        NoString sTarget = sCommand.token(1);
 
         if (!sTarget.empty()) {
-            if (DelNV(sTarget.AsLower())) {
+            if (DelNV(sTarget.toLower())) {
                 PutModule("Target [" + sTarget + "] deleted");
             } else {
                 PutModule("Target [" + sTarget + "] not found");
@@ -141,14 +141,14 @@ public:
 
     void OnSetKeyCommand(const NoString& sCommand)
     {
-        NoString sTarget = sCommand.Token(1);
-        NoString sKey = sCommand.Tokens(2);
+        NoString sTarget = sCommand.token(1);
+        NoString sKey = sCommand.tokens(2);
 
         // Strip "cbc:" from beginning of string incase someone pastes directly from mircryption
-        sKey.TrimPrefix("cbc:");
+        sKey.trimPrefix("cbc:");
 
         if (!sKey.empty()) {
-            SetNV(sTarget.AsLower(), sKey);
+            SetNV(sTarget.toLower(), sKey);
             PutModule("Set encryption key for [" + sTarget + "] to [" + sKey + "]");
         } else {
             PutModule("Usage: SetKey <#chan|Nick> <Key>");

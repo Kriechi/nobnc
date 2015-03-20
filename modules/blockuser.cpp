@@ -51,7 +51,7 @@ public:
         }
 
         // Parse arguments, each argument is a user name to block
-        NoStringVector vArgs = sArgs.Split(" ", No::SkipEmptyParts);
+        NoStringVector vArgs = sArgs.split(" ", No::SkipEmptyParts);
 
         for (it = vArgs.begin(); it != vArgs.end(); ++it) {
             if (!Block(*it)) {
@@ -99,14 +99,14 @@ public:
 
     void OnBlockCommand(const NoString& sCommand)
     {
-        NoString sUser = sCommand.Tokens(1);
+        NoString sUser = sCommand.tokens(1);
 
         if (sUser.empty()) {
             PutModule("Usage: Block <user>");
             return;
         }
 
-        if (GetUser()->GetUserName().Equals(sUser)) {
+        if (GetUser()->GetUserName().equals(sUser)) {
             PutModule("You can't block yourself");
             return;
         }
@@ -119,7 +119,7 @@ public:
 
     void OnUnblockCommand(const NoString& sCommand)
     {
-        NoString sUser = sCommand.Tokens(1);
+        NoString sUser = sCommand.tokens(1);
 
         if (sUser.empty()) {
             PutModule("Usage: Unblock <user>");
@@ -138,22 +138,22 @@ public:
             NoString sAction = Tmpl["WebadminAction"];
             if (sAction == "display") {
                 Tmpl["Blocked"] = NoString(IsBlocked(Tmpl["Username"]));
-                Tmpl["Self"] = NoString(Tmpl["Username"].Equals(WebSock.GetSession()->GetUser()->GetUserName()));
+                Tmpl["Self"] = NoString(Tmpl["Username"].equals(WebSock.GetSession()->GetUser()->GetUserName()));
                 return true;
             }
-            if (sAction == "change" && WebSock.GetParam("embed_blockuser_presented").ToBool()) {
-                if (Tmpl["Username"].Equals(WebSock.GetSession()->GetUser()->GetUserName()) &&
-                    WebSock.GetParam("embed_blockuser_block").ToBool()) {
+            if (sAction == "change" && WebSock.GetParam("embed_blockuser_presented").toBool()) {
+                if (Tmpl["Username"].equals(WebSock.GetSession()->GetUser()->GetUserName()) &&
+                    WebSock.GetParam("embed_blockuser_block").toBool()) {
                     WebSock.GetSession()->AddError("You can't block yourself");
-                } else if (WebSock.GetParam("embed_blockuser_block").ToBool()) {
-                    if (!WebSock.GetParam("embed_blockuser_old").ToBool()) {
+                } else if (WebSock.GetParam("embed_blockuser_block").toBool()) {
+                    if (!WebSock.GetParam("embed_blockuser_old").toBool()) {
                         if (Block(Tmpl["Username"])) {
                             WebSock.GetSession()->AddSuccess("Blocked [" + Tmpl["Username"] + "]");
                         } else {
                             WebSock.GetSession()->AddError("Couldn't block [" + Tmpl["Username"] + "]");
                         }
                     }
-                } else if (WebSock.GetParam("embed_blockuser_old").ToBool()) {
+                } else if (WebSock.GetParam("embed_blockuser_old").toBool()) {
                     if (DelNV(Tmpl["Username"])) {
                         WebSock.GetSession()->AddSuccess("Unblocked [" + Tmpl["Username"] + "]");
                     } else {

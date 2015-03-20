@@ -34,7 +34,7 @@ public:
     bool IsEnabled() const { return m_bEnabled; }
     void SetEnabled(bool bEnabled) { m_bEnabled = bEnabled; }
 
-    bool Compare(const NoString& sTarget) const { return sTarget.WildCmp(m_sRule, No::CaseInsensitive); }
+    bool Compare(const NoString& sTarget) const { return sTarget.wildCmp(m_sRule, No::CaseInsensitive); }
 
     bool operator==(const NoLogRule& sOther) const { return m_sRule == sOther.GetRule(); }
 
@@ -115,7 +115,7 @@ private:
 
 void NoLogMod::SetRulesCmd(const NoString& sLine)
 {
-    NoStringVector vsRules = SplitRules(sLine.Tokens(1));
+    NoStringVector vsRules = SplitRules(sLine.tokens(1));
 
     if (vsRules.empty()) {
         PutModule("Usage: SetRules <rules>");
@@ -165,7 +165,7 @@ void NoLogMod::SetRules(const NoStringVector& vsRules)
     m_vRules.clear();
 
     for (NoString sRule : vsRules) {
-        bool bEnabled = !sRule.TrimPrefix("!");
+        bool bEnabled = !sRule.trimPrefix("!");
         m_vRules.push_back(NoLogRule(sRule, bEnabled));
     }
 }
@@ -173,9 +173,9 @@ void NoLogMod::SetRules(const NoStringVector& vsRules)
 NoStringVector NoLogMod::SplitRules(const NoString& sRules) const
 {
     NoString sCopy = sRules;
-    sCopy.Replace(",", " ");
+    sCopy.replace(",", " ");
 
-    NoStringVector vsRules = sCopy.Split(" ", No::SkipEmptyParts);
+    NoStringVector vsRules = sCopy.split(" ", No::SkipEmptyParts);
 
     return vsRules;
 }
@@ -187,7 +187,7 @@ NoString NoLogMod::JoinRules(const NoString& sSeparator) const
         vsRules.push_back(Rule.ToString());
     }
 
-    return sSeparator.Join(vsRules.begin(), vsRules.end());
+    return sSeparator.join(vsRules.begin(), vsRules.end());
 }
 
 bool NoLogMod::TestRules(const NoString& sTarget) const
@@ -220,9 +220,9 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
 
     // TODO: Properly handle IRC case mapping
     // $WINDOW has to be handled last, since it can contain %
-    sPath.Replace("$USER", NoString((GetUser() ? GetUser()->GetUserName() : "UNKNOWN")).AsLower());
-    sPath.Replace("$NETWORK", NoString((GetNetwork() ? GetNetwork()->GetName() : "znc")).AsLower());
-    sPath.Replace("$WINDOW", NoString(sWindow.Replace_n("/", "-").Replace_n("\\", "-")).AsLower());
+    sPath.replace("$USER", NoString((GetUser() ? GetUser()->GetUserName() : "UNKNOWN")).toLower());
+    sPath.replace("$NETWORK", NoString((GetNetwork() ? GetNetwork()->GetName() : "znc")).toLower());
+    sPath.replace("$WINDOW", NoString(sWindow.replace_n("/", "-").replace_n("\\", "-")).toLower());
 
     // Check if it's allowed to write in this specific path
     sPath = NoDir::CheckPathPrefix(GetSavePath(), sPath);
@@ -261,31 +261,31 @@ NoString NoLogMod::GetServer()
 bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)
 {
     size_t uIndex = 0;
-    if (sArgs.Token(0).Equals("-sanitize")) {
+    if (sArgs.token(0).equals("-sanitize")) {
         m_bSanitize = true;
         ++uIndex;
     }
 
     // Use load parameter as save path
-    m_sLogPath = sArgs.Token(uIndex);
+    m_sLogPath = sArgs.token(uIndex);
 
     // Add default filename to path if it's a folder
     if (GetType() == NoModInfo::UserModule) {
-        if (m_sLogPath.Right(1) == "/" || m_sLogPath.find("$WINDOW") == NoString::npos || m_sLogPath.find("$NETWORK") == NoString::npos) {
+        if (m_sLogPath.right(1) == "/" || m_sLogPath.find("$WINDOW") == NoString::npos || m_sLogPath.find("$NETWORK") == NoString::npos) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
             }
             m_sLogPath += "$NETWORK/$WINDOW/%Y-%m-%d.log";
         }
     } else if (GetType() == NoModInfo::NetworkModule) {
-        if (m_sLogPath.Right(1) == "/" || m_sLogPath.find("$WINDOW") == NoString::npos) {
+        if (m_sLogPath.right(1) == "/" || m_sLogPath.find("$WINDOW") == NoString::npos) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
             }
             m_sLogPath += "$WINDOW/%Y-%m-%d.log";
         }
     } else {
-        if (m_sLogPath.Right(1) == "/" || m_sLogPath.find("$USER") == NoString::npos ||
+        if (m_sLogPath.right(1) == "/" || m_sLogPath.find("$USER") == NoString::npos ||
             m_sLogPath.find("$WINDOW") == NoString::npos || m_sLogPath.find("$NETWORK") == NoString::npos) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";

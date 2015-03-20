@@ -69,7 +69,7 @@ public:
      * @param target The object to cast into. If the cast fails, its state is unspecified.
      * @return True if the cast succeeds, and false if it fails.
      */
-    template <typename T> bool Convert(T* target) const
+    template <typename T> bool convert(T* target) const
     {
         std::stringstream ss(*this);
         ss >> *target;
@@ -83,7 +83,7 @@ public:
      * @param i_end An iterator pointing past the end of a group of objects.
      * @return The joined string
      */
-    template <typename Iterator> NoString Join(Iterator i_start, const Iterator& i_end) const
+    template <typename Iterator> NoString join(Iterator i_start, const Iterator& i_end) const
     {
         if (i_start == i_end) return NoString("");
         std::ostringstream output;
@@ -104,7 +104,7 @@ public:
      * @return An integer less than, equal to, or greater than zero if this
      *         string smaller, equal.... to the given string.
      */
-    int Compare(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
+    int compare(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /**
      * Check if this string is equal to some other string.
      * @param s The string to compare to.
@@ -112,7 +112,7 @@ public:
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return True if the strings are equal.
      */
-    bool Equals(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
+    bool equals(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /**
      * Do a wildcard comparison on this string.
      * For example, the following returns true:
@@ -123,20 +123,20 @@ public:
      * @todo Make cs CaseInsensitive by default.
      * @return The result of <code>this->WildCmp(sWild, *this);</code>.
      */
-    bool WildCmp(const NoString& sWild, No::CaseSensitivity cs = No::CaseSensitive) const;
+    bool wildCmp(const NoString& sWild, No::CaseSensitivity cs = No::CaseSensitive) const;
 
     /**
      * Return a copy of this string with all characters turned into
      * upper-case.
      * @return The new string.
      */
-    NoString AsUpper() const;
+    NoString toUpper() const;
     /**
      * Return a copy of this string with all characters turned into
      * lower-case.
      * @return The new string.
      */
-    NoString AsLower() const;
+    NoString toLower() const;
 
     /** Replace all occurrences in the current string.
      * @see NoString::Replace
@@ -145,29 +145,29 @@ public:
      * @return The result of the replacing. The current string is left
      *         unchanged.
      */
-    NoString Replace_n(const NoString& sReplace, const NoString& sWith) const;
+    NoString replace_n(const NoString& sReplace, const NoString& sWith) const;
     /** Replace all occurrences in the current string.
      * @see NoString::Replace
      * @param sReplace The string to look for.
      * @param sWith The replacement to use.
      * @returns The number of replacements done.
      */
-    uint Replace(const NoString& sReplace, const NoString& sWith);
+    uint replace(const NoString& sReplace, const NoString& sWith);
     /** Return the left part of the string.
      * @param uCount The number of characters to keep.
      * @return The resulting string.
      */
-    NoString Left(size_type uCount) const;
+    NoString left(size_type uCount) const;
     /** Return the right part of the string.
      * @param uCount The number of characters to keep.
      * @return The resulting string.
      */
-    NoString Right(size_type uCount) const;
+    NoString right(size_type uCount) const;
 
     /** Get the first line of this string.
      * @return The first line of text.
      */
-    NoString FirstLine() const { return Token(0, "\n"); }
+    NoString firstLine() const { return token(0, "\n"); }
 
     /** Get a token out of this string. For example in the string "a bc d  e",
      *  each of "a", "bc", "d" and "e" are tokens.
@@ -181,7 +181,7 @@ public:
      *         after it.
      * @see Split() if you need a string split into all of its tokens.
      */
-    NoString Token(size_t uPos, const NoString& sSep = " ") const;
+    NoString token(size_t uPos, const NoString& sSep = " ") const;
 
     /** Get a token out of this string. For example in the string "a bc d  e",
      *  each of "a", "bc", "d" and "e" are tokens.
@@ -195,7 +195,7 @@ public:
      *         after it.
      * @see Split() if you need a string split into all of its tokens.
      */
-    NoString Tokens(size_t uPos, const NoString& sSep = " ") const;
+    NoString tokens(size_t uPos, const NoString& sSep = " ") const;
 
     /** Split up this string into tokens.
      * @param separator The separator between tokens.
@@ -203,96 +203,96 @@ public:
                        appear in the result. By default, empty entries are kept.
      * @return A vector of tokens.
      */
-    NoStringVector Split(const NoString& separator, No::SplitBehavior behavior = No::KeepEmptyParts) const;
+    NoStringVector split(const NoString& separator, No::SplitBehavior behavior = No::KeepEmptyParts) const;
 
     /** Decode the give base64-encoded string.
      * @return The decoded string.
      */
-    static NoString FromBase64(const NoString& base64);
+    static NoString fromBase64(const NoString& base64);
     /** Base64-encode the current string
      * @todo uWrap is as broken as Base64Encode()'s uWrap.
      * @return The encoded string.
      */
-    NoString ToBase64(uint uWrap = 0) const;
+    NoString toBase64(uint uWrap = 0) const;
 
     /** @return True if this string is not "false". */
-    bool ToBool() const;
+    bool toBool() const;
     /** @return The numerical value of this string similar to atoi(). */
-    short ToShort() const;
+    short toShort() const;
     /** @return The numerical value of this string similar to atoi(). */
-    ushort ToUShort() const;
+    ushort toUShort() const;
     /** @return The numerical value of this string similar to atoi(). */
-    int ToInt() const;
+    int toInt() const;
     /** @return The numerical value of this string similar to atoi(). */
-    long ToLong() const;
+    long toLong() const;
     /** @return The numerical value of this string similar to atoi(). */
-    uint ToUInt() const;
+    uint toUInt() const;
     /** @return The numerical value of this string similar to atoi(). */
-    ulong ToULong() const;
+    ulong toULong() const;
     /** @return The numerical value of this string similar to atoi(). */
-    ulonglong ToULongLong() const;
+    ulonglong toULongLong() const;
     /** @return The numerical value of this string similar to atoi(). */
-    long long ToLongLong() const;
+    long long toLongLong() const;
     /** @return The numerical value of this string similar to atoi(). */
-    double ToDouble() const;
+    double toDouble() const;
 
     /** Trim this string. All leading/trailing occurences of characters from
      *  s are removed.
      * @param s A list of characters that should be trimmed.
      * @return true if this string was modified.
      */
-    bool Trim(const NoString& s = " \t\r\n");
+    bool trim(const NoString& s = " \t\r\n");
     /** Trim this string. All leading occurences of characters from s are
      *  removed.
      * @param s A list of characters that should be trimmed.
      * @return true if this string was modified.
      */
-    bool TrimLeft(const NoString& s = " \t\r\n");
+    bool trimLeft(const NoString& s = " \t\r\n");
     /** Trim this string. All trailing occurences of characters from s are
      *  removed.
      * @param s A list of characters that should be trimmed.
      * @return true if this string was modified.
      */
-    bool TrimRight(const NoString& s = " \t\r\n");
+    bool trimRight(const NoString& s = " \t\r\n");
     /** Trim this string. All leading/trailing occurences of characters from
      *  s are removed. This NoString instance is not modified.
      * @param s A list of characters that should be trimmed.
      * @return The trimmed string.
      */
-    NoString Trim_n(const NoString& s = " \t\r\n") const;
+    NoString trim_n(const NoString& s = " \t\r\n") const;
     /** Trim this string. All leading occurences of characters from s are
      *  removed. This NoString instance is not modified.
      * @param s A list of characters that should be trimmed.
      * @return The trimmed string.
      */
-    NoString TrimLeft_n(const NoString& s = " \t\r\n") const;
+    NoString trimLeft_n(const NoString& s = " \t\r\n") const;
     /** Trim this string. All trailing occurences of characters from s are
      *  removed. This NoString instance is not modified.
      * @param s A list of characters that should be trimmed.
      * @return The trimmed string.
      */
-    NoString TrimRight_n(const NoString& s = " \t\r\n") const;
+    NoString trimRight_n(const NoString& s = " \t\r\n") const;
 
     /** Trim a given prefix.
      * @param sPrefix The prefix that should be removed.
      * @return True if this string was modified.
      */
-    bool TrimPrefix(const NoString& sPrefix = ":");
+    bool trimPrefix(const NoString& sPrefix = ":");
     /** Trim a given suffix.
      * @param sSuffix The suffix that should be removed.
      * @return True if this string was modified.
      */
-    bool TrimSuffix(const NoString& sSuffix);
+    bool trimSuffix(const NoString& sSuffix);
     /** Trim a given prefix.
      * @param sPrefix The prefix that should be removed.
      * @return A copy of this string without the prefix.
      */
-    NoString TrimPrefix_n(const NoString& sPrefix = ":") const;
+    NoString trimPrefix_n(const NoString& sPrefix = ":") const;
     /** Trim a given suffix.
      * @param sSuffix The suffix that should be removed.
      * @return A copy of this string without the prefix.
      */
-    NoString TrimSuffix_n(const NoString& sSuffix) const;
+    NoString trimSuffix_n(const NoString& sSuffix) const;
 
     /** Find the position of the given substring.
      * @param s The substring to search for.
@@ -300,51 +300,53 @@ public:
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return The position of the substring if found, NoString::npos otherwise.
      */
-    size_t Find(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
+    size_t find(char c, No::CaseSensitivity cs = No::CaseInsensitive) const;
+    size_t find(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
+    size_t find(const NoString& s, size_t pos, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /** Check whether the string starts with a given prefix.
      * @param sPrefix The prefix.
      * @param cs CaseSensitive if you want the comparison to be case
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return True if the string starts with prefix, false otherwise.
      */
-    bool StartsWith(const NoString& sPrefix, No::CaseSensitivity cs = No::CaseInsensitive) const;
+    bool startsWith(const NoString& sPrefix, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /** Check whether the string ends with a given suffix.
      * @param sSuffix The suffix.
      * @param cs CaseSensitive if you want the comparison to be case
      *                       sensitive, CaseInsensitive (default) otherwise.
      * @return True if the string ends with suffix, false otherwise.
      */
-    bool EndsWith(const NoString& sSuffix, No::CaseSensitivity cs = No::CaseInsensitive) const;
+    bool endsWith(const NoString& sSuffix, No::CaseSensitivity cs = No::CaseInsensitive) const;
     /**
      * Check whether the string contains a given string.
      * @param s The string to search.
      * @param bCaseSensitive Whether the search is case sensitive.
      * @return True if this string contains the other string, falser otherwise.
      */
-    bool Contains(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
+    bool contains(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
 
     /** Remove characters from the beginning of this string.
      * @param uLen The number of characters to remove.
      * @return true if this string was modified.
      */
-    bool LeftChomp(size_type uLen);
+    bool leftChomp(size_type uLen);
     /** Remove characters from the end of this string.
      * @param uLen The number of characters to remove.
      * @return true if this string was modified.
      */
-    bool RightChomp(size_type uLen);
+    bool rightChomp(size_type uLen);
     /** Remove characters from the beginning of this string.
      * This string object isn't modified.
      * @param uLen The number of characters to remove.
      * @return The result of the conversion.
      */
-    NoString LeftChomp_n(size_type uLen) const;
+    NoString leftChomp_n(size_type uLen) const;
     /** Remove characters from the end of this string.
      * This string object isn't modified.
      * @param uLen The number of characters to remove.
      * @return The result of the conversion.
      */
-    NoString RightChomp_n(size_type uLen) const;
+    NoString rightChomp_n(size_type uLen) const;
 };
 
 #endif // NOSTRING_H

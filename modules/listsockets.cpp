@@ -35,10 +35,10 @@ public:
             if (other.m_pSock->IsListener()) return true;
         }
         const NoString& sMyName = m_pSock->GetSockName();
-        const NoString& sMyName2 = sMyName.Tokens(1, "::");
+        const NoString& sMyName2 = sMyName.tokens(1, "::");
         bool bMyEmpty = sMyName2.empty();
         const NoString& sHisName = other.GetSock()->GetSockName();
-        const NoString& sHisName2 = sHisName.Tokens(1, "::");
+        const NoString& sHisName2 = sHisName.tokens(1, "::");
         bool bHisEmpty = sHisName2.empty();
 
         // Then sort by first token after "::"
@@ -46,12 +46,12 @@ public:
         if (bHisEmpty && !bMyEmpty) return true;
 
         if (!bMyEmpty && !bHisEmpty) {
-            int c = sMyName2.Compare(sHisName2, No::CaseSensitive);
+            int c = sMyName2.compare(sHisName2, No::CaseSensitive);
             if (c < 0) return false;
             if (c > 0) return true;
         }
         // and finally sort by the whole socket name
-        return sMyName.Compare(sHisName, No::CaseSensitive) > 0;
+        return sMyName.compare(sHisName, No::CaseSensitive) > 0;
     }
     NoSocket* GetSock() const { return m_pSock; }
 
@@ -135,10 +135,10 @@ public:
 
     void OnListCommand(const NoString& sLine)
     {
-        NoString sArg = sLine.Tokens(1);
+        NoString sArg = sLine.tokens(1);
 
         bool bShowHosts = true;
-        if (sArg.Equals("-n")) {
+        if (sArg.equals("-n")) {
             bShowHosts = false;
         }
         ShowSocks(bShowHosts);

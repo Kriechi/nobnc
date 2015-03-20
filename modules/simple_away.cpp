@@ -76,16 +76,16 @@ public:
         NoString sReasonArg;
 
         // Load AwayWait
-        NoString sFirstArg = sArgs.Token(0);
-        if (sFirstArg.Equals("-notimer")) {
+        NoString sFirstArg = sArgs.token(0);
+        if (sFirstArg.equals("-notimer")) {
             SetAwayWait(0);
-            sReasonArg = sArgs.Tokens(1);
-        } else if (sFirstArg.Equals("-timer")) {
-            SetAwayWait(sArgs.Token(1).ToUInt());
-            sReasonArg = sArgs.Tokens(2);
+            sReasonArg = sArgs.tokens(1);
+        } else if (sFirstArg.equals("-timer")) {
+            SetAwayWait(sArgs.token(1).toUInt());
+            sReasonArg = sArgs.tokens(2);
         } else {
             NoString sAwayWait = GetNV("awaywait");
-            if (!sAwayWait.empty()) SetAwayWait(sAwayWait.ToUInt(), false);
+            if (!sAwayWait.empty()) SetAwayWait(sAwayWait.toUInt(), false);
             sReasonArg = sArgs;
         }
 
@@ -121,7 +121,7 @@ public:
 
     void OnReasonCommand(const NoString& sLine)
     {
-        NoString sReason = sLine.Tokens(1);
+        NoString sReason = sLine.tokens(1);
 
         if (!sReason.empty()) {
             SetReason(sReason);
@@ -139,7 +139,7 @@ public:
 
     void OnSetTimerCommand(const NoString& sLine)
     {
-        SetAwayWait(sLine.Token(1).ToUInt());
+        SetAwayWait(sLine.token(1).toUInt());
 
         if (m_iAwayWait == 0)
             PutModule("Timer disabled");
@@ -155,10 +155,10 @@ public:
 
     ModRet OnUserRaw(NoString& sLine) override
     {
-        if (!sLine.Token(0).Equals("AWAY")) return CONTINUE;
+        if (!sLine.token(0).equals("AWAY")) return CONTINUE;
 
         // If a client set us away, we don't touch that away message
-        const NoString sArg = sLine.Tokens(1).Trim_n(" ");
+        const NoString sArg = sLine.tokens(1).trim_n(" ");
         if (sArg.empty() || sArg == ":")
             m_bClientSetAway = false;
         else
@@ -199,7 +199,7 @@ private:
 
         time_t iTime = time(nullptr);
         NoString sTime = NoUtils::CTime(iTime, GetUser()->GetTimezone());
-        sReason.Replace("%s", sTime);
+        sReason.replace("%s", sTime);
 
         return sReason;
     }

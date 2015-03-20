@@ -53,12 +53,12 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        m_iThresholdMsgs = sArgs.Token(0).ToUInt();
-        m_iThresholdSecs = sArgs.Token(1).ToUInt();
+        m_iThresholdMsgs = sArgs.token(0).toUInt();
+        m_iThresholdSecs = sArgs.token(1).toUInt();
 
         if (m_iThresholdMsgs == 0 || m_iThresholdSecs == 0) {
-            m_iThresholdMsgs = GetNV("msgs").ToUInt();
-            m_iThresholdSecs = GetNV("secs").ToUInt();
+            m_iThresholdMsgs = GetNV("msgs").toUInt();
+            m_iThresholdSecs = GetNV("secs").toUInt();
         }
 
         if (m_iThresholdSecs == 0) m_iThresholdSecs = 2;
@@ -72,7 +72,7 @@ public:
     ModRet Message(const NoNick& Nick, const NoString& sMessage)
     {
         // We never block /me, because it doesn't cause a reply
-        if (sMessage.Token(0).Equals("ACTION")) return CONTINUE;
+        if (sMessage.token(0).equals("ACTION")) return CONTINUE;
 
         if (m_tLastCTCP + m_iThresholdSecs < time(nullptr)) {
             m_tLastCTCP = time(nullptr);
@@ -98,14 +98,14 @@ public:
 
     void OnSecsCommand(const NoString& sCommand)
     {
-        const NoString& sArg = sCommand.Tokens(1);
+        const NoString& sArg = sCommand.tokens(1);
 
         if (sArg.empty()) {
             PutModule("Usage: Secs <limit>");
             return;
         }
 
-        m_iThresholdSecs = sArg.ToUInt();
+        m_iThresholdSecs = sArg.toUInt();
         if (m_iThresholdSecs == 0) m_iThresholdSecs = 1;
 
         PutModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
@@ -114,14 +114,14 @@ public:
 
     void OnLinesCommand(const NoString& sCommand)
     {
-        const NoString& sArg = sCommand.Tokens(1);
+        const NoString& sArg = sCommand.tokens(1);
 
         if (sArg.empty()) {
             PutModule("Usage: Lines <limit>");
             return;
         }
 
-        m_iThresholdMsgs = sArg.ToUInt();
+        m_iThresholdMsgs = sArg.toUInt();
         if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 2;
 
         PutModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");

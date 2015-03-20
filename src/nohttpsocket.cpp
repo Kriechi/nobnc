@@ -76,7 +76,7 @@ NoString NoHttpSocket::GetRequestCookie(const NoString& sKey) const
 void NoHttpSocket::CheckPost()
 {
     if (m_sPostData.size() >= m_uPostLen) {
-        ParseParams(m_sPostData.Left(m_uPostLen), m_msvsPOSTParams);
+        ParseParams(m_sPostData.left(m_uPostLen), m_msvsPOSTParams);
         GetPage();
         m_sPostData.clear();
         m_bDone = true;
@@ -90,57 +90,57 @@ void NoHttpSocket::ReadLineImpl(const NoString& sData)
     }
 
     NoString sLine = sData;
-    sLine.TrimRight("\r\n");
+    sLine.trimRight("\r\n");
 
-    NoString sName = sLine.Token(0);
+    NoString sName = sLine.token(0);
 
-    if (sName.Equals("GET")) {
+    if (sName.equals("GET")) {
         m_bPost = false;
-        m_sURI = sLine.Token(1);
-        m_bHTTP10Client = sLine.Token(2).Equals("HTTP/1.0");
+        m_sURI = sLine.token(1);
+        m_bHTTP10Client = sLine.token(2).equals("HTTP/1.0");
         ParseURI();
-    } else if (sName.Equals("POST")) {
+    } else if (sName.equals("POST")) {
         m_bPost = true;
-        m_sURI = sLine.Token(1);
+        m_sURI = sLine.token(1);
         ParseURI();
-    } else if (sName.Equals("Cookie:")) {
-        NoStringVector vsNV = sLine.Tokens(1).Split(";", No::SkipEmptyParts);
+    } else if (sName.equals("Cookie:")) {
+        NoStringVector vsNV = sLine.tokens(1).split(";", No::SkipEmptyParts);
 
         for (NoString& s : vsNV) {
-            s.Trim();
-            m_msRequestCookies[No::escape(s.Token(0, "="), No::UrlFormat, No::AsciiFormat)] =
-            No::escape(s.Tokens(1, "="), No::UrlFormat, No::AsciiFormat);
+            s.trim();
+            m_msRequestCookies[No::escape(s.token(0, "="), No::UrlFormat, No::AsciiFormat)] =
+            No::escape(s.tokens(1, "="), No::UrlFormat, No::AsciiFormat);
         }
-    } else if (sName.Equals("Authorization:")) {
-        NoString sUnhashed = NoString::FromBase64(sLine.Token(2));
-        m_sUser = sUnhashed.Token(0, ":");
-        m_sPass = sUnhashed.Tokens(1, ":");
+    } else if (sName.equals("Authorization:")) {
+        NoString sUnhashed = NoString::fromBase64(sLine.token(2));
+        m_sUser = sUnhashed.token(0, ":");
+        m_sPass = sUnhashed.tokens(1, ":");
         m_bLoggedIn = OnLogin(m_sUser, m_sPass, true);
-    } else if (sName.Equals("Content-Length:")) {
-        m_uPostLen = sLine.Token(1).ToULong();
+    } else if (sName.equals("Content-Length:")) {
+        m_uPostLen = sLine.token(1).toULong();
         if (m_uPostLen > MAX_POST_SIZE)
             PrintErrorPage(413, "Request Entity Too Large", "The request you sent was too large.");
-    } else if (sName.Equals("X-Forwarded-For:")) {
+    } else if (sName.equals("X-Forwarded-For:")) {
         // X-Forwarded-For: client, proxy1, proxy2
         if (m_sForwardedIP.empty()) {
             const NoStringVector& vsTrustedProxies = NoApp::Get().GetTrustedProxies();
             NoString sIP = GetRemoteIP();
 
-            NoStringVector vsIPs = sLine.Tokens(1).Split(",", No::SkipEmptyParts);
+            NoStringVector vsIPs = sLine.tokens(1).split(",", No::SkipEmptyParts);
 
             while (!vsIPs.empty()) {
                 // sIP told us that it got connection from vsIPs.back()
                 // check if sIP is trusted proxy
                 bool bTrusted = false;
                 for (const NoString& sTrustedProxy : vsTrustedProxies) {
-                    if (sIP.WildCmp(sTrustedProxy)) {
+                    if (sIP.wildCmp(sTrustedProxy)) {
                         bTrusted = true;
                         break;
                     }
                 }
                 if (bTrusted) {
                     // sIP is trusted proxy, so use vsIPs.back() as new sIP
-                    sIP = vsIPs.back().Trim_n();
+                    sIP = vsIPs.back().trim_n();
                     vsIPs.pop_back();
                 } else {
                     break;
@@ -151,14 +151,14 @@ void NoHttpSocket::ReadLineImpl(const NoString& sData)
             // in both cases use it as the endpoind
             m_sForwardedIP = sIP;
         }
-    } else if (sName.Equals("If-None-Match:")) {
+    } else if (sName.equals("If-None-Match:")) {
         // this is for proper client cache support (HTTP 304) on static files:
-        m_sIfNoneMatch = sLine.Tokens(1);
-    } else if (sName.Equals("Accept-Encoding:") && !m_bHTTP10Client) {
+        m_sIfNoneMatch = sLine.tokens(1);
+    } else if (sName.equals("Accept-Encoding:") && !m_bHTTP10Client) {
         // trimming whitespace from the tokens is important:
-        NoStringVector vsEncodings = sLine.Tokens(1).Split(",", No::SkipEmptyParts);
+        NoStringVector vsEncodings = sLine.tokens(1).split(",", No::SkipEmptyParts);
         for (NoString& sEncoding : vsEncodings) {
-            if (sEncoding.Trim_n().Equals("gzip"))
+            if (sEncoding.trim_n().equals("gzip"))
                 m_bAcceptGzip = true;
         }
     } else if (sLine.empty()) {
@@ -210,7 +210,7 @@ void NoHttpSocket::GetPage()
     NO_DEBUG("Page Request [" << m_sURI << "] ");
 
     // Check that the requested path starts with the prefix. Strip it if so.
-    if (!m_sURI.TrimPrefix(m_sURIPrefix)) {
+    if (!m_sURI.trimPrefix(m_sURIPrefix)) {
         NO_DEBUG("INVALID path => Does not start with prefix [" + m_sURIPrefix + "]");
         NO_DEBUG("Expected prefix:   " << m_sURIPrefix);
         NO_DEBUG("Requested path:    " << m_sURI);
@@ -286,7 +286,7 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
     NoString sFilePath = sFileName;
 
     if (!m_sDocRoot.empty()) {
-        sFilePath.TrimLeft("/");
+        sFilePath.trimLeft("/");
 
         sFilePath = NoDir::CheckPathPrefix(m_sDocRoot, sFilePath, m_sDocRoot);
 
@@ -306,21 +306,21 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
     }
 
     if (sContentType.empty()) {
-        if (sFileName.Right(5).Equals(".html") || sFileName.Right(4).Equals(".htm")) {
+        if (sFileName.right(5).equals(".html") || sFileName.right(4).equals(".htm")) {
             sContentType = "text/html; charset=utf-8";
-        } else if (sFileName.Right(4).Equals(".css")) {
+        } else if (sFileName.right(4).equals(".css")) {
             sContentType = "text/css; charset=utf-8";
-        } else if (sFileName.Right(3).Equals(".js")) {
+        } else if (sFileName.right(3).equals(".js")) {
             sContentType = "application/x-javascript; charset=utf-8";
-        } else if (sFileName.Right(4).Equals(".jpg")) {
+        } else if (sFileName.right(4).equals(".jpg")) {
             sContentType = "image/jpeg";
-        } else if (sFileName.Right(4).Equals(".gif")) {
+        } else if (sFileName.right(4).equals(".gif")) {
             sContentType = "image/gif";
-        } else if (sFileName.Right(4).Equals(".ico")) {
+        } else if (sFileName.right(4).equals(".ico")) {
             sContentType = "image/x-icon";
-        } else if (sFileName.Right(4).Equals(".png")) {
+        } else if (sFileName.right(4).equals(".png")) {
             sContentType = "image/png";
-        } else if (sFileName.Right(4).Equals(".bmp")) {
+        } else if (sFileName.right(4).equals(".bmp")) {
             sContentType = "image/bmp";
         } else {
             sContentType = "text/plain; charset=utf-8";
@@ -339,8 +339,8 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
         AddHeader("Cache-Control", "public");
 
         if (!m_sIfNoneMatch.empty()) {
-            m_sIfNoneMatch.Trim("\\\"'");
-            bNotModified = (m_sIfNoneMatch.Equals(sETag, No::CaseSensitive));
+            m_sIfNoneMatch.trim("\\\"'");
+            bNotModified = (m_sIfNoneMatch.equals(sETag, No::CaseSensitive));
         }
     }
 
@@ -358,7 +358,7 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
         }
 
 #ifdef HAVE_ZLIB
-        bool bGzip = m_bAcceptGzip && (sContentType.Left(5).Equals("text/") || sFileName.Right(3).Equals(".js"));
+        bool bGzip = m_bAcceptGzip && (sContentType.left(5).equals("text/") || sFileName.right(3).equals(".js"));
 
         if (bGzip) {
             NO_DEBUG("- Sending gzip-compressed.");
@@ -456,11 +456,11 @@ void NoHttpSocket::WriteFileGzipped(NoFile& File)
 
 void NoHttpSocket::ParseURI()
 {
-    ParseParams(m_sURI.Tokens(1, "?"), m_msvsGETParams);
-    m_sURI = m_sURI.Token(0, "?");
+    ParseParams(m_sURI.tokens(1, "?"), m_msvsGETParams);
+    m_sURI = m_sURI.token(0, "?");
 }
 
-NoString NoHttpSocket::GetPath() const { return m_sURI.Token(0, "?"); }
+NoString NoHttpSocket::GetPath() const { return m_sURI.token(0, "?"); }
 
 bool NoHttpSocket::IsLoggedIn() const { return m_bLoggedIn; }
 
@@ -468,11 +468,11 @@ void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStr
 {
     msvsParams.clear();
 
-    NoStringVector vsPairs = sParams.Split("&");
+    NoStringVector vsPairs = sParams.split("&");
 
     for (const NoString& sPair : vsPairs) {
-        NoString sName = No::escape(sPair.Token(0, "="), No::UrlFormat, No::AsciiFormat);
-        NoString sValue = No::escape(sPair.Tokens(1, "="), No::UrlFormat, No::AsciiFormat);
+        NoString sName = No::escape(sPair.token(0, "="), No::UrlFormat, No::AsciiFormat);
+        NoString sValue = No::escape(sPair.tokens(1, "="), No::UrlFormat, No::AsciiFormat);
 
         msvsParams[sName].push_back(sValue);
     }
@@ -481,7 +481,7 @@ void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStr
 void NoHttpSocket::SetDocRoot(const NoString& s)
 {
     m_sDocRoot = s + "/";
-    m_sDocRoot.Replace("//", "/");
+    m_sDocRoot.replace("//", "/");
 }
 
 void NoHttpSocket::SetLoggedIn(bool b) { m_bLoggedIn = b; }
@@ -532,10 +532,10 @@ NoString NoHttpSocket::GetParam(const NoString& sName, bool bPost, const NoStrin
 NoString NoHttpSocket::GetParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
     NoString sRet = GetRawParam(sName, msvsParams);
-    sRet.Trim();
+    sRet.trim();
 
     for (size_t i = 0; i < sFilter.length(); i++) {
-        sRet.Replace(NoString(sFilter.at(i)), "");
+        sRet.replace(NoString(sFilter.at(i)), "");
     }
 
     return sRet;
@@ -555,10 +555,10 @@ size_t NoHttpSocket::GetParamValues(const NoString& sName, std::set<NoString>& s
 
     if (it != msvsParams.end()) {
         for (NoString sParam : it->second) {
-            sParam.Trim();
+            sParam.trim();
 
             for (size_t i = 0; i < sFilter.length(); i++) {
-                sParam.Replace(NoString(sFilter.at(i)), "");
+                sParam.replace(NoString(sFilter.at(i)), "");
             }
             ssRet.insert(sParam);
         }
@@ -581,10 +581,10 @@ size_t NoHttpSocket::GetParamValues(const NoString& sName, NoStringVector& vsRet
 
     if (it != msvsParams.end()) {
         for (NoString sParam : it->second) {
-            sParam.Trim();
+            sParam.trim();
 
             for (size_t i = 0; i < sFilter.length(); i++) {
-                sParam.Replace(NoString(sFilter.at(i)), "");
+                sParam.replace(NoString(sFilter.at(i)), "");
             }
             vsRet.push_back(sParam);
         }
@@ -712,7 +712,7 @@ bool NoHttpSocket::Redirect(const NoString& sURL)
     if (SentHeader()) {
         NO_DEBUG("Redirect() - Header was already sent");
         return false;
-    } else if (!sURL.StartsWith("/")) {
+    } else if (!sURL.startsWith("/")) {
         // HTTP/1.1 only admits absolute URIs for the Location header.
         NO_DEBUG("Redirect to relative URI [" + sURL + "] is not allowed.");
         return false;

@@ -58,10 +58,10 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector::const_iterator it;
-        NoStringVector vsArgs = sArgs.Split(" ", No::SkipEmptyParts);
+        NoStringVector vsArgs = sArgs.split(" ", No::SkipEmptyParts);
 
         for (it = vsArgs.begin(); it != vsArgs.end(); ++it) {
-            if (it->Equals("saslauthd") || it->Equals("auxprop")) {
+            if (it->equals("saslauthd") || it->equals("auxprop")) {
                 m_sMethod += *it + " ";
             } else {
                 NoUtils::PrintError("Ignoring invalid SASL pwcheck method: " + *it);
@@ -69,7 +69,7 @@ public:
             }
         }
 
-        m_sMethod.TrimRight();
+        m_sMethod.trimRight();
 
         if (m_sMethod.empty()) {
             sMessage = "Need a pwcheck method as argument (saslauthd, auxprop)";
@@ -164,7 +164,7 @@ public:
 
     void CreateUserCommand(const NoString& sLine)
     {
-        NoString sCreate = sLine.Token(1);
+        NoString sCreate = sLine.token(1);
 
         if (!sCreate.empty()) {
             SetNV("CreateUser", sCreate);
@@ -179,7 +179,7 @@ public:
 
     void CloneUserCommand(const NoString& sLine)
     {
-        NoString sUsername = sLine.Token(1);
+        NoString sUsername = sLine.token(1);
 
         if (!sUsername.empty()) {
             SetNV("CloneUser", sUsername);
@@ -198,7 +198,7 @@ public:
         PutModule("Clone user disabled");
     }
 
-    bool CreateUser() const { return GetNV("CreateUser").ToBool(); }
+    bool CreateUser() const { return GetNV("CreateUser").toBool(); }
 
     NoString CloneUser() const { return GetNV("CloneUser"); }
 
@@ -212,7 +212,7 @@ protected:
 
     static int getopt(void* context, const char* plugin_name, const char* option, const char** result, unsigned* len)
     {
-        if (NoString(option).Equals("pwcheck_method")) {
+        if (NoString(option).equals("pwcheck_method")) {
             *result = ((NoSaslAuthMod*)context)->GetMethod().c_str();
             return SASL_OK;
         }

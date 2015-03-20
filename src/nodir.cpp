@@ -39,8 +39,8 @@ NoString NoDir::ChangeDir(const NoString& sPath, const NoString& sAdd, const NoS
 
     NoString sAddDir(sAdd);
 
-    if (sAddDir.Left(2) == "~/") {
-        sAddDir.LeftChomp(1);
+    if (sAddDir.left(2) == "~/") {
+        sAddDir.leftChomp(1);
         sAddDir = sHomeDir + sAddDir;
     }
 
@@ -48,8 +48,8 @@ NoString NoDir::ChangeDir(const NoString& sPath, const NoString& sAdd, const NoS
     sAddDir += "/";
     NoString sCurDir;
 
-    if (sRet.Right(1) == "/") {
-        sRet.RightChomp(1);
+    if (sRet.right(1) == "/") {
+        sRet.rightChomp(1);
     }
 
     for (uint a = 0; a < sAddDir.size(); a++) {
@@ -106,12 +106,12 @@ size_t NoDir::FillByWildcard(const NoString& sDir, const NoString& sWildcard)
         if ((strcmp(de->d_name, ".") == 0) || (strcmp(de->d_name, "..") == 0)) {
             continue;
         }
-        if ((!sWildcard.empty()) && (!NoString(de->d_name).WildCmp(sWildcard))) {
+        if ((!sWildcard.empty()) && (!NoString(de->d_name).wildCmp(sWildcard))) {
             continue;
         }
 
         NoFile* file =
-                new NoFile(sDir.TrimSuffix_n("/") + "/" +
+                new NoFile(sDir.trimSuffix_n("/") + "/" +
                            de->d_name /*, this*/); // @todo need to pass pointer to 'this' if we want to do Sort()
         push_back(file);
     }
@@ -164,10 +164,10 @@ bool NoDir::IsDescending() const { return m_bDesc; }
 
 NoString NoDir::CheckPathPrefix(const NoString& sPath, const NoString& sAdd, const NoString& sHomeDir)
 {
-    NoString sPrefix = sPath.Replace_n("//", "/").TrimRight_n("/") + "/";
+    NoString sPrefix = sPath.replace_n("//", "/").trimRight_n("/") + "/";
     NoString sAbsolutePath = ChangeDir(sPrefix, sAdd, sHomeDir);
 
-    if (sAbsolutePath.Left(sPrefix.length()) != sPrefix) return "";
+    if (sAbsolutePath.left(sPrefix.length()) != sPrefix) return "";
     return sAbsolutePath;
 }
 
@@ -183,10 +183,10 @@ bool NoDir::MakeDir(const NoString& sPath, mode_t iMode)
     }
 
     // If this is an absolute path, we need to handle this now!
-    if (sPath.Left(1) == "/") sDir = "/";
+    if (sPath.left(1) == "/") sDir = "/";
 
     // For every single subpath, do...
-    NoStringVector dirs = sPath.Split("/", No::SkipEmptyParts);
+    NoStringVector dirs = sPath.split("/", No::SkipEmptyParts);
     for (it = dirs.begin(); it != dirs.end(); ++it) {
         // Add this to the path we already created
         sDir += *it;

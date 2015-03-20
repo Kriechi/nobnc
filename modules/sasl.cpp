@@ -104,8 +104,8 @@ public:
 
     void Set(const NoString& sLine)
     {
-        SetNV("username", sLine.Token(1));
-        SetNV("password", sLine.Token(2));
+        SetNV("username", sLine.token(1));
+        SetNV("password", sLine.token(2));
 
         PutModule("Username has been set to [" + GetNV("username") + "]");
         PutModule("Password has been set to [" + GetNV("password") + "]");
@@ -113,10 +113,10 @@ public:
 
     void SetMechanismCommand(const NoString& sLine)
     {
-        NoString sMechanisms = sLine.Tokens(1).AsUpper();
+        NoString sMechanisms = sLine.tokens(1).toUpper();
 
         if (!sMechanisms.empty()) {
-            NoStringVector vsMechanisms = sMechanisms.Split(" ");
+            NoStringVector vsMechanisms = sMechanisms.split(" ");
 
             for (NoStringVector::const_iterator it = vsMechanisms.begin(); it != vsMechanisms.end(); ++it) {
                 if (!SupportsMechanism(*it)) {
@@ -133,11 +133,11 @@ public:
 
     void RequireAuthCommand(const NoString& sLine)
     {
-        if (!sLine.Token(1).empty()) {
-            SetNV(NV_REQUIRE_AUTH, sLine.Token(1));
+        if (!sLine.token(1).empty()) {
+            SetNV(NV_REQUIRE_AUTH, sLine.token(1));
         }
 
-        if (GetNV(NV_REQUIRE_AUTH).ToBool()) {
+        if (GetNV(NV_REQUIRE_AUTH).toBool()) {
             PutModule("We require SASL negotiation to connect");
         } else {
             PutModule("We will connect even if SASL fails");
@@ -147,7 +147,7 @@ public:
     bool SupportsMechanism(const NoString& sMechanism) const
     {
         for (size_t i = 0; SupportedMechanisms[i].szName != nullptr; i++) {
-            if (sMechanism.Equals(SupportedMechanisms[i].szName)) {
+            if (sMechanism.equals(SupportedMechanisms[i].szName)) {
                 return true;
             }
         }
@@ -178,7 +178,7 @@ public:
 
     bool CheckRequireAuth()
     {
-        if (!m_bAuthenticated && GetNV(NV_REQUIRE_AUTH).ToBool()) {
+        if (!m_bAuthenticated && GetNV(NV_REQUIRE_AUTH).toBool()) {
             GetNetwork()->SetIRCConnectEnabled(false);
             PutModule("Disabling network, we require authentication.");
             PutModule("Use 'RequireAuth no' to disable.");
@@ -190,9 +190,9 @@ public:
 
     void Authenticate(const NoString& sLine)
     {
-        if (m_Mechanisms.GetCurrent().Equals("PLAIN") && sLine.Equals("+")) {
+        if (m_Mechanisms.GetCurrent().equals("PLAIN") && sLine.equals("+")) {
             NoString sAuthLine = GetNV("username") + '\0' + GetNV("username") + '\0' + GetNV("password");
-            sAuthLine = sAuthLine.ToBase64();
+            sAuthLine = sAuthLine.toBase64();
             PutIRC("AUTHENTICATE " + sAuthLine);
         } else {
             /* Send blank authenticate for other mechanisms (like EXTERNAL). */
@@ -200,13 +200,13 @@ public:
         }
     }
 
-    bool OnServerCapAvailable(const NoString& sCap) override { return sCap.Equals("sasl"); }
+    bool OnServerCapAvailable(const NoString& sCap) override { return sCap.equals("sasl"); }
 
     void OnServerCapResult(const NoString& sCap, bool bSuccess) override
     {
-        if (sCap.Equals("sasl")) {
+        if (sCap.equals("sasl")) {
             if (bSuccess) {
-                m_Mechanisms = GetMechanismsString().Split(" ");
+                m_Mechanisms = GetMechanismsString().split(" ");
 
                 if (m_Mechanisms.empty()) {
                     CheckRequireAuth();
@@ -225,14 +225,14 @@ public:
 
     ModRet OnRaw(NoString& sLine) override
     {
-        if (sLine.Token(0).Equals("AUTHENTICATE")) {
-            Authenticate(sLine.Tokens(1));
-        } else if (sLine.Token(1).Equals("903")) {
+        if (sLine.token(0).equals("AUTHENTICATE")) {
+            Authenticate(sLine.tokens(1));
+        } else if (sLine.token(1).equals("903")) {
             /* SASL success! */
             GetNetwork()->GetIRCSock()->ResumeCap();
             m_bAuthenticated = true;
             NO_DEBUG("sasl: Authenticated with mechanism [" << m_Mechanisms.GetCurrent() << "]");
-        } else if (sLine.Token(1).Equals("904") || sLine.Token(1).Equals("905")) {
+        } else if (sLine.token(1).equals("904") || sLine.token(1).equals("905")) {
             NO_DEBUG("sasl: Mechanism [" << m_Mechanisms.GetCurrent() << "] failed.");
             PutModule(m_Mechanisms.GetCurrent() + " mechanism failed.");
 
@@ -243,11 +243,11 @@ public:
                 CheckRequireAuth();
                 GetNetwork()->GetIRCSock()->ResumeCap();
             }
-        } else if (sLine.Token(1).Equals("906")) {
+        } else if (sLine.token(1).equals("906")) {
             /* CAP wasn't paused? */
             NO_DEBUG("sasl: Reached 906.");
             CheckRequireAuth();
-        } else if (sLine.Token(1).Equals("907")) {
+        } else if (sLine.token(1).equals("907")) {
             m_bAuthenticated = true;
             GetNetwork()->GetIRCSock()->ResumeCap();
             NO_DEBUG("sasl: Received 907 -- We are already registered");

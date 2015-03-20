@@ -142,11 +142,11 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     }
     for (const auto& Option : UIntOptions) {
         NoString sValue;
-        if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.ToUInt());
+        if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.toUInt());
     }
     for (const auto& Option : BoolOptions) {
         NoString sValue;
-        if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.ToBool());
+        if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.toBool());
     }
 
     NoStringVector vsList;
@@ -156,7 +156,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     }
     pConfig->FindStringVector("ctcpreply", vsList);
     for (const NoString& sReply : vsList) {
-        AddCTCPReply(sReply.Token(0), sReply.Tokens(1));
+        AddCTCPReply(sReply.token(0), sReply.tokens(1));
     }
 
     NoString sValue;
@@ -164,7 +164,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     NoString sDCCLookupValue;
     pConfig->FindStringEntry("dcclookupmethod", sDCCLookupValue);
     if (pConfig->FindStringEntry("bouncedccs", sValue)) {
-        if (sValue.ToBool()) {
+        if (sValue.toBool()) {
             NoUtils::PrintAction("Loading Module [bouncedcc]");
             NoString sModRet;
             bool bModRet = GetModules().LoadModule("bouncedcc", "", NoModInfo::UserModule, this, nullptr, sModRet);
@@ -175,21 +175,21 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
                 return false;
             }
 
-            if (sDCCLookupValue.Equals("Client")) {
+            if (sDCCLookupValue.equals("Client")) {
                 GetModules().FindModule("bouncedcc")->SetNV("UseClientIP", "1");
             }
         }
     }
-    if (pConfig->FindStringEntry("buffer", sValue)) SetBufferCount(sValue.ToUInt(), true);
+    if (pConfig->FindStringEntry("buffer", sValue)) SetBufferCount(sValue.toUInt(), true);
     if (pConfig->FindStringEntry("awaysuffix", sValue)) {
         NoUtils::PrintMessage("WARNING: AwaySuffix has been deprecated, instead try -> LoadModule = awaynick %nick%_" + sValue);
     }
     if (pConfig->FindStringEntry("autocycle", sValue)) {
-        if (sValue.Equals("true"))
+        if (sValue.equals("true"))
             NoUtils::PrintError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle");
     }
     if (pConfig->FindStringEntry("keepnick", sValue)) {
-        if (sValue.Equals("true"))
+        if (sValue.equals("true"))
             NoUtils::PrintError("WARNING: KeepNick has been deprecated, instead try -> LoadModule = keepnick");
     }
     if (pConfig->FindStringEntry("statusprefix", sValue)) {
@@ -203,19 +203,19 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         SetTimezone(sValue);
     }
     if (pConfig->FindStringEntry("timezoneoffset", sValue)) {
-        if (fabs(sValue.ToDouble()) > 0.1) {
+        if (fabs(sValue.toDouble()) > 0.1) {
             NoUtils::PrintError("WARNING: TimezoneOffset has been deprecated, now you can set your timezone by name");
         }
     }
     if (pConfig->FindStringEntry("timestamp", sValue)) {
-        if (!sValue.Trim_n().Equals("true")) {
-            if (sValue.Trim_n().Equals("append")) {
+        if (!sValue.trim_n().equals("true")) {
+            if (sValue.trim_n().equals("append")) {
                 SetTimestampAppend(true);
                 SetTimestampPrepend(false);
-            } else if (sValue.Trim_n().Equals("prepend")) {
+            } else if (sValue.trim_n().equals("prepend")) {
                 SetTimestampAppend(false);
                 SetTimestampPrepend(true);
-            } else if (sValue.Trim_n().Equals("false")) {
+            } else if (sValue.trim_n().equals("false")) {
                 SetTimestampAppend(false);
                 SetTimestampPrepend(false);
             } else {
@@ -232,19 +232,19 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     // Pass = <hash name>#<salted hash>#<salt>#
     // 'Salted hash' means hash of 'password' + 'salt'
     // Possible hashes are md5 and sha256
-    if (sValue.Right(1) == "-") {
-        sValue.RightChomp(1);
-        sValue.Trim();
+    if (sValue.right(1) == "-") {
+        sValue.rightChomp(1);
+        sValue.trim();
         SetPass(sValue, NoUser::HASH_MD5);
     } else {
-        NoString sMethod = sValue.Token(0, "#");
-        NoString sPass = sValue.Tokens(1, "#");
+        NoString sMethod = sValue.token(0, "#");
+        NoString sPass = sValue.tokens(1, "#");
         if (sMethod == "md5" || sMethod == "sha256") {
             NoUser::eHashType type = NoUser::HASH_MD5;
             if (sMethod == "sha256") type = NoUser::HASH_SHA256;
 
-            NoString sSalt = sPass.Token(1, "#");
-            sPass = sPass.Token(0, "#");
+            NoString sSalt = sPass.token(1, "#");
+            sPass = sPass.token(0, "#");
             SetPass(sPass, type, sSalt);
         } else if (sMethod == "plain") {
             SetPass(sPass, NoUser::HASH_NONE);
@@ -270,11 +270,11 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         pSubConf->FindStringEntry("hash", sHash);
         pSubConf->FindStringEntry("method", sMethod);
         pSubConf->FindStringEntry("salt", sSalt);
-        if (sMethod.empty() || sMethod.Equals("plain"))
+        if (sMethod.empty() || sMethod.equals("plain"))
             method = NoUser::HASH_NONE;
-        else if (sMethod.Equals("md5"))
+        else if (sMethod.equals("md5"))
             method = NoUser::HASH_MD5;
-        else if (sMethod.Equals("sha256"))
+        else if (sMethod.equals("sha256"))
             method = NoUser::HASH_SHA256;
         else {
             sError = "Invalid hash method";
@@ -334,7 +334,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
 
     pConfig->FindStringVector("loadmodule", vsList);
     for (const NoString& sMod : vsList) {
-        NoString sModName = sMod.Token(0);
+        NoString sModName = sMod.token(0);
         NoString sNotice = "Loading user module [" + sModName + "]";
 
         // XXX Legacy crap, added in ZNC 0.089
@@ -371,11 +371,11 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         if (sModName == "charset") {
             NoUtils::PrintAction("NOTICE: Charset support was moved to core, importing old charset module settings");
             size_t uIndex = 1;
-            if (sMod.Token(uIndex).Equals("-force")) {
+            if (sMod.token(uIndex).equals("-force")) {
                 uIndex++;
             }
-            NoStringVector vsClient = sMod.Token(uIndex).Split(",");
-            NoStringVector vsServer = sMod.Token(uIndex + 1).Split(",");
+            NoStringVector vsClient = sMod.token(uIndex).split(",");
+            NoStringVector vsServer = sMod.token(uIndex + 1).split(",");
             if (vsClient.empty() || vsServer.empty()) {
                 NoUtils::PrintStatus(false, "charset module was loaded with wrong parameters.");
                 continue;
@@ -389,7 +389,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         }
 
         NoString sModRet;
-        NoString sArgs = sMod.Tokens(1);
+        NoString sArgs = sMod.tokens(1);
 
         bool bModRet = LoadModule(sModName, sArgs, sNotice, sModRet);
 
@@ -415,7 +415,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     // Move ircconnectenabled to the networks
     if (pConfig->FindStringEntry("ircconnectenabled", sValue)) {
         for (NoNetwork* pNetwork : m_vIRCNetworks) {
-            pNetwork->SetIRCConnectEnabled(sValue.ToBool());
+            pNetwork->SetIRCConnectEnabled(sValue.toBool());
         }
     }
 
@@ -428,7 +428,7 @@ NoNetwork* NoUser::AddNetwork(const NoString& sNetwork, NoString& sErrorRet)
         sErrorRet = "Invalid network name. It should be alphanumeric. Not to be confused with server name";
         return nullptr;
     } else if (FindNetwork(sNetwork)) {
-        sErrorRet = "Network [" + sNetwork.Token(0) + "] already exists";
+        sErrorRet = "Network [" + sNetwork.token(0) + "] already exists";
         return nullptr;
     }
 
@@ -483,7 +483,7 @@ bool NoUser::DeleteNetwork(const NoString& sNetwork)
 NoNetwork* NoUser::FindNetwork(const NoString& sNetwork) const
 {
     for (NoNetwork* pNetwork : m_vIRCNetworks) {
-        if (pNetwork->GetName().Equals(sNetwork)) {
+        if (pNetwork->GetName().equals(sNetwork)) {
             return pNetwork;
         }
     }
@@ -504,21 +504,21 @@ NoString& NoUser::ExpandString(const NoString& sStr, NoString& sRet) const
     NoString sTime = NoUtils::CTime(time(nullptr), m_sTimezone);
 
     sRet = sStr;
-    sRet.Replace("%user%", GetUserName());
-    sRet.Replace("%defnick%", GetNick());
-    sRet.Replace("%nick%", GetNick());
-    sRet.Replace("%altnick%", GetAltNick());
-    sRet.Replace("%ident%", GetIdent());
-    sRet.Replace("%realname%", GetRealName());
-    sRet.Replace("%vhost%", GetBindHost());
-    sRet.Replace("%bindhost%", GetBindHost());
-    sRet.Replace("%version%", NoApp::GetVersion());
-    sRet.Replace("%time%", sTime);
-    sRet.Replace("%uptime%", NoApp::Get().GetUptime());
+    sRet.replace("%user%", GetUserName());
+    sRet.replace("%defnick%", GetNick());
+    sRet.replace("%nick%", GetNick());
+    sRet.replace("%altnick%", GetAltNick());
+    sRet.replace("%ident%", GetIdent());
+    sRet.replace("%realname%", GetRealName());
+    sRet.replace("%vhost%", GetBindHost());
+    sRet.replace("%bindhost%", GetBindHost());
+    sRet.replace("%version%", NoApp::GetVersion());
+    sRet.replace("%time%", sTime);
+    sRet.replace("%uptime%", NoApp::Get().GetUptime());
     // The following lines do not exist. You must be on DrUgS!
-    sRet.Replace("%znc%", "All your IRC are belong to ZNC");
+    sRet.replace("%znc%", "All your IRC are belong to ZNC");
     // Chosen by fair zocchihedron dice roll by SilverLeo
-    sRet.Replace("%rand%", "42");
+    sRet.replace("%rand%", "42");
 
     return sRet;
 }
@@ -773,7 +773,7 @@ bool NoUser::IsHostAllowed(const NoString& sHostMask) const
     }
 
     for (const NoString& sHost : m_ssAllowedHosts) {
-        if (sHostMask.WildCmp(sHost)) {
+        if (sHostMask.wildCmp(sHost)) {
             return true;
         }
     }
@@ -890,7 +890,7 @@ NoSettings NoUser::ToConfig() const
     // CTCP Replies
     if (!m_mssCTCPReplies.empty()) {
         for (const auto& itb : m_mssCTCPReplies) {
-            config.AddKeyValuePair("CTCPReply", itb.first.AsUpper() + " " + itb.second);
+            config.AddKeyValuePair("CTCPReply", itb.first.toUpper() + " " + itb.second);
         }
     }
 
@@ -921,9 +921,9 @@ bool NoUser::CheckPass(const NoString& sPass) const
 {
     switch (m_eHashType) {
     case HASH_MD5:
-        return m_sPass.Equals(NoUtils::SaltedMD5Hash(sPass, m_sPassSalt));
+        return m_sPass.equals(NoUtils::SaltedMD5Hash(sPass, m_sPassSalt));
     case HASH_SHA256:
-        return m_sPass.Equals(NoUtils::SaltedSHA256Hash(sPass, m_sPassSalt));
+        return m_sPass.equals(NoUtils::SaltedSHA256Hash(sPass, m_sPassSalt));
     case HASH_NONE:
     default:
         return (sPass == m_sPass);
@@ -937,7 +937,7 @@ bool NoUser::CheckPass(const NoString& sPass) const
 
     for (uint a = 0; a < Manager.size(); a++) {
         Csock* pSock = Manager[a];
-        if (pSock->GetSockName().Equals(sSockName)) {
+        if (pSock->GetSockName().equals(sSockName)) {
             if (!pSock->IsClosed()) {
                 return (NoClient*) pSock;
             }
@@ -1055,7 +1055,7 @@ bool NoUser::PutModNotice(const NoString& sModule, const NoString& sLine, NoClie
     return (pClient == nullptr);
 }
 
-NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return sUserName.Token(0, "@").Replace_n(".", ""); }
+NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return sUserName.token(0, "@").replace_n(".", ""); }
 
 NoModules&NoUser::GetModules() { return *m_pModules; }
 
@@ -1196,7 +1196,7 @@ bool NoUser::AddCTCPReply(const NoString& sCTCP, const NoString& sReply)
     if (sCTCP.empty()) {
         return false;
     }
-    m_mssCTCPReplies[sCTCP.AsUpper()] = sReply;
+    m_mssCTCPReplies[sCTCP.toUpper()] = sReply;
     return true;
 }
 
@@ -1260,7 +1260,7 @@ NoString NoUser::GetDefaultChanModes() const { return m_sDefaultChanModes; }
 NoString NoUser::GetClientEncoding() const { return m_sClientEncoding; }
 bool NoUser::HasSpaceForNewNetwork() const { return GetNetworks().size() < MaxNetworks(); }
 
-NoString NoUser::GetQuitMsg() const { return (!m_sQuitMsg.Trim_n().empty()) ? m_sQuitMsg : NoApp::GetTag(false); }
+NoString NoUser::GetQuitMsg() const { return (!m_sQuitMsg.trim_n().empty()) ? m_sQuitMsg : NoApp::GetTag(false); }
 NoStringMap NoUser::GetCTCPReplies() const { return m_mssCTCPReplies; }
 uint NoUser::GetBufferCount() const { return m_uBufferCount; }
 bool NoUser::AutoClearChanBuffer() const { return m_bAutoClearChanBuffer; }

@@ -23,14 +23,14 @@ public:
 
     ModRet OnRaw(NoString& sLine) override
     {
-        const NoString sCmd = sLine.Token(1);
+        const NoString sCmd = sLine.token(1);
 
         if (sCmd == "375" /* begin of MOTD */
             ||
             sCmd == "372" /* MOTD */)
             return HALT;
         if (sCmd == "376" /* End of MOTD */) {
-            sLine = sLine.Token(0) + " 422 " + sLine.Token(2) + " :MOTD blocked by ZNC";
+            sLine = sLine.token(0) + " 422 " + sLine.token(2) + " :MOTD blocked by ZNC";
         }
         return CONTINUE;
     }

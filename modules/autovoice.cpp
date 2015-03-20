@@ -36,7 +36,7 @@ public:
     bool ChannelMatches(const NoString& sChan) const
     {
         for (std::set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
-            if (sChan.AsLower().WildCmp(*it, No::CaseInsensitive)) {
+            if (sChan.toLower().wildCmp(*it, No::CaseInsensitive)) {
                 return true;
             }
         }
@@ -44,7 +44,7 @@ public:
         return false;
     }
 
-    bool HostMatches(const NoString& sHostmask) { return sHostmask.WildCmp(m_sHostmask, No::CaseInsensitive); }
+    bool HostMatches(const NoString& sHostmask) { return sHostmask.wildCmp(m_sHostmask, No::CaseInsensitive); }
 
     NoString GetChannels() const
     {
@@ -63,19 +63,19 @@ public:
 
     void DelChans(const NoString& sChans)
     {
-        NoStringVector vsChans = sChans.Split(" ");
+        NoStringVector vsChans = sChans.split(" ");
 
         for (uint a = 0; a < vsChans.size(); a++) {
-            m_ssChans.erase(vsChans[a].AsLower());
+            m_ssChans.erase(vsChans[a].toLower());
         }
     }
 
     void AddChans(const NoString& sChans)
     {
-        NoStringVector vsChans = sChans.Split(" ");
+        NoStringVector vsChans = sChans.split(" ");
 
         for (uint a = 0; a < vsChans.size(); a++) {
-            m_ssChans.insert(vsChans[a].AsLower());
+            m_ssChans.insert(vsChans[a].toLower());
         }
     }
 
@@ -96,10 +96,10 @@ public:
 
     bool FromString(const NoString& sLine)
     {
-        m_sUsername = sLine.Token(0, "\t");
-        m_sHostmask = sLine.Token(1, "\t");
+        m_sUsername = sLine.token(0, "\t");
+        m_sHostmask = sLine.token(1, "\t");
 
-        NoStringVector vsChans = sLine.Token(2, "\t").Split(" ");
+        NoStringVector vsChans = sLine.token(2, "\t").split(" ");
         m_ssChans = NoStringSet(vsChans.begin(), vsChans.end());
 
         return !m_sHostmask.empty();
@@ -144,7 +144,7 @@ public:
     {
         // Load the chans from the command line
         uint a = 0;
-        NoStringVector vsChans = sArgs.Split(" ", No::SkipEmptyParts);
+        NoStringVector vsChans = sArgs.split(" ", No::SkipEmptyParts);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             NoString sName = "Args";
@@ -157,10 +157,10 @@ public:
             const NoString& sLine = it->second;
             NoAutoVoiceUser* pUser = new NoAutoVoiceUser;
 
-            if (!pUser->FromString(sLine) || FindUser(pUser->GetUsername().AsLower())) {
+            if (!pUser->FromString(sLine) || FindUser(pUser->GetUsername().toLower())) {
                 delete pUser;
             } else {
-                m_msUsers[pUser->GetUsername().AsLower()] = pUser;
+                m_msUsers[pUser->GetUsername().toLower()] = pUser;
             }
         }
 
@@ -192,13 +192,13 @@ public:
 
     void OnAddUserCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sHost = sLine.Token(2);
+        NoString sUser = sLine.token(1);
+        NoString sHost = sLine.token(2);
 
         if (sHost.empty()) {
             PutModule("Usage: AddUser <user> <hostmask> [channels]");
         } else {
-            NoAutoVoiceUser* pUser = AddUser(sUser, sHost, sLine.Tokens(3));
+            NoAutoVoiceUser* pUser = AddUser(sUser, sHost, sLine.tokens(3));
 
             if (pUser) {
                 SetNV(sUser, pUser->ToString());
@@ -208,7 +208,7 @@ public:
 
     void OnDelUserCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
+        NoString sUser = sLine.token(1);
 
         if (sUser.empty()) {
             PutModule("Usage: DelUser <user>");
@@ -243,8 +243,8 @@ public:
 
     void OnAddChansCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sChans = sLine.Tokens(2);
+        NoString sUser = sLine.token(1);
+        NoString sChans = sLine.tokens(2);
 
         if (sChans.empty()) {
             PutModule("Usage: AddChans <user> <channel> [channel] ...");
@@ -266,8 +266,8 @@ public:
 
     void OnDelChansCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sChans = sLine.Tokens(2);
+        NoString sUser = sLine.token(1);
+        NoString sChans = sLine.tokens(2);
 
         if (sChans.empty()) {
             PutModule("Usage: DelChans <user> <channel> [channel] ...");
@@ -289,7 +289,7 @@ public:
 
     NoAutoVoiceUser* FindUser(const NoString& sUser)
     {
-        std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.toLower());
 
         return (it != m_msUsers.end()) ? it->second : nullptr;
     }
@@ -309,7 +309,7 @@ public:
 
     void DelUser(const NoString& sUser)
     {
-        std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.toLower());
 
         if (it == m_msUsers.end()) {
             PutModule("That user does not exist");
@@ -329,7 +329,7 @@ public:
         }
 
         NoAutoVoiceUser* pUser = new NoAutoVoiceUser(sUser, sHost, sChans);
-        m_msUsers[sUser.AsLower()] = pUser;
+        m_msUsers[sUser.toLower()] = pUser;
         PutModule("User [" + sUser + "] added with hostmask [" + sHost + "]");
         return pUser;
     }

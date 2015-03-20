@@ -182,7 +182,7 @@ public:
 
     ModRet OnInvite(const NoNick& Nick, const NoString& sChan) override
     {
-        if (sChan.Equals("#test")) {
+        if (sChan.equals("#test")) {
             PutModule(Nick.nick() + " invited us to " + sChan + ", ignoring invites to " + sChan);
             return HALT;
         }
@@ -303,14 +303,14 @@ public:
 
     void OnModCommand(const NoString& sCommand) override
     {
-        if (sCommand.Equals("TIMERS")) {
+        if (sCommand.equals("TIMERS")) {
             ListTimers();
         }
     }
 
     ModRet OnStatusCommand(NoString& sCommand) override
     {
-        if (sCommand.Equals("SAMPLE")) {
+        if (sCommand.equals("SAMPLE")) {
             PutModule("Hi, I'm your friendly sample module.");
             return HALT;
         }

@@ -32,19 +32,19 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (!sArgs.empty()) {
-            SetUsername(sArgs.Token(0));
-            SetPassword(sArgs.Token(1));
+            SetUsername(sArgs.token(0));
+            SetPassword(sArgs.token(1));
         } else {
             m_sUsername = GetNV("Username");
             m_sPassword = GetNV("Password");
         }
 
         NoString sTmp;
-        m_bUseCloakedHost = (sTmp = GetNV("UseCloakedHost")).empty() ? true : sTmp.ToBool();
-        m_bUseChallenge = (sTmp = GetNV("UseChallenge")).empty() ? true : sTmp.ToBool();
-        m_bRequestPerms = GetNV("RequestPerms").ToBool();
-        m_bJoinOnInvite = (sTmp = GetNV("JoinOnInvite")).empty() ? true : sTmp.ToBool();
-        m_bJoinAfterCloaked = (sTmp = GetNV("JoinAfterCloaked")).empty() ? true : sTmp.ToBool();
+        m_bUseCloakedHost = (sTmp = GetNV("UseCloakedHost")).empty() ? true : sTmp.toBool();
+        m_bUseChallenge = (sTmp = GetNV("UseChallenge")).empty() ? true : sTmp.toBool();
+        m_bRequestPerms = GetNV("RequestPerms").toBool();
+        m_bJoinOnInvite = (sTmp = GetNV("JoinOnInvite")).empty() ? true : sTmp.toBool();
+        m_bJoinAfterCloaked = (sTmp = GetNV("JoinAfterCloaked")).empty() ? true : sTmp.toBool();
 
         // Make sure NVs are stored in config. Note: SetUseCloakedHost() is called further down.
         SetUseChallenge(m_bUseChallenge);
@@ -98,7 +98,7 @@ public:
 
     void OnModCommand(const NoString& sLine) override
     {
-        NoString sCommand = sLine.Token(0).AsLower();
+        NoString sCommand = sLine.token(0).toLower();
 
         if (sCommand == "help") {
             PutModule("The following commands are available:");
@@ -165,8 +165,8 @@ public:
             PutModule("Module settings are stored between restarts.");
 
         } else if (sCommand == "set") {
-            NoString sSetting = sLine.Token(1).AsLower();
-            NoString sValue = sLine.Token(2);
+            NoString sSetting = sLine.token(1).toLower();
+            NoString sValue = sLine.token(2);
             if (sSetting.empty() || sValue.empty()) {
                 PutModule("Syntax: Set <setting> <value>");
             } else if (sSetting == "username") {
@@ -176,19 +176,19 @@ public:
                 SetPassword(sValue);
                 PutModule("Password set");
             } else if (sSetting == "usecloakedhost") {
-                SetUseCloakedHost(sValue.ToBool());
+                SetUseCloakedHost(sValue.toBool());
                 PutModule("UseCloakedHost set");
             } else if (sSetting == "usechallenge") {
-                SetUseChallenge(sValue.ToBool());
+                SetUseChallenge(sValue.toBool());
                 PutModule("UseChallenge set");
             } else if (sSetting == "requestperms") {
-                SetRequestPerms(sValue.ToBool());
+                SetRequestPerms(sValue.toBool());
                 PutModule("RequestPerms set");
             } else if (sSetting == "joinoninvite") {
-                SetJoinOnInvite(sValue.ToBool());
+                SetJoinOnInvite(sValue.toBool());
                 PutModule("JoinOnInvite set");
             } else if (sSetting == "joinaftercloaked") {
-                SetJoinAfterCloaked(sValue.ToBool());
+                SetJoinAfterCloaked(sValue.toBool());
                 PutModule("JoinAfterCloaked set");
             } else
                 PutModule("Unknown setting: " + sSetting);
@@ -240,7 +240,7 @@ public:
 
             } else if (sCommand == "auth") {
                 if (!m_bAuthed)
-                    Auth(sLine.Token(1), sLine.Token(2));
+                    Auth(sLine.token(1), sLine.token(2));
                 else
                     PutModule("Error: You are already authed!");
 
@@ -257,7 +257,7 @@ public:
     ModRet OnRaw(NoString& sLine) override
     {
         // use OnRaw because OnUserMode is not defined (yet?)
-        if (sLine.Token(1) == "396" && sLine.Token(3).find("users.quakenet.org") != NoString::npos) {
+        if (sLine.token(1) == "396" && sLine.token(3).find("users.quakenet.org") != NoString::npos) {
             m_bCloaked = true;
             PutModule("Cloak successful: Your hostname is now cloaked.");
 
@@ -300,7 +300,7 @@ public:
 
     ModRet OnInvite(const NoNick& Nick, const NoString& sChan) override
     {
-        if (!Nick.equals("Q") || !Nick.host().Equals("CServe.quakenet.org")) return CONTINUE;
+        if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org")) return CONTINUE;
         if (m_bJoinOnInvite) GetNetwork()->AddChan(sChan, false);
         return CONTINUE;
     }
@@ -310,7 +310,7 @@ public:
     bool OnWebRequest(NoWebSock& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            bool bSubmitted = (WebSock.GetParam("submitted").ToInt() != 0);
+            bool bSubmitted = (WebSock.GetParam("submitted").toInt() != 0);
 
             if (bSubmitted) {
                 NoString FormUsername = WebSock.GetParam("user");
@@ -319,11 +319,11 @@ public:
                 NoString FormPassword = WebSock.GetParam("password");
                 if (!FormPassword.empty()) SetPassword(FormPassword);
 
-                SetUseCloakedHost(WebSock.GetParam("usecloakedhost").ToBool());
-                SetUseChallenge(WebSock.GetParam("usechallenge").ToBool());
-                SetRequestPerms(WebSock.GetParam("requestperms").ToBool());
-                SetJoinOnInvite(WebSock.GetParam("joinoninvite").ToBool());
-                SetJoinAfterCloaked(WebSock.GetParam("joinaftercloaked").ToBool());
+                SetUseCloakedHost(WebSock.GetParam("usecloakedhost").toBool());
+                SetUseChallenge(WebSock.GetParam("usechallenge").toBool());
+                SetRequestPerms(WebSock.GetParam("requestperms").toBool());
+                SetJoinOnInvite(WebSock.GetParam("joinoninvite").toBool());
+                SetJoinAfterCloaked(WebSock.GetParam("joinaftercloaked").toBool());
             }
 
             Tmpl["Username"] = m_sUsername;
@@ -424,8 +424,8 @@ private:
     {
         if (m_bAuthed) return;
 
-        NoString sUsername = m_sUsername.AsLower().Replace_n("[", "{").Replace_n("]", "}").Replace_n("\\", "|");
-        NoString sPasswordHash = NoUtils::SHA256(m_sPassword.Left(10));
+        NoString sUsername = m_sUsername.toLower().replace_n("[", "{").replace_n("]", "}").replace_n("\\", "|");
+        NoString sPasswordHash = NoUtils::SHA256(m_sPassword.left(10));
         NoString sKey = NoUtils::SHA256(sUsername + ":" + sPasswordHash);
         NoString sResponse = HMAC_SHA256(sKey, sChallenge);
 
@@ -435,9 +435,9 @@ private:
 
     ModRet HandleMessage(const NoNick& Nick, NoString sMessage)
     {
-        if (!Nick.equals("Q") || !Nick.host().Equals("CServe.quakenet.org")) return CONTINUE;
+        if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org")) return CONTINUE;
 
-        sMessage.Trim();
+        sMessage.trim();
 
 #if Q_DEBUG_COMMUNICATION
         PutModule("[ZNC <-- Q] " + sMessage);
@@ -453,33 +453,33 @@ private:
             m_msChanModes.clear();
             m_bCatchResponse = m_bRequestedWhoami;
             m_bRequestedWhoami = true;
-        } else if (m_bRequestedWhoami && sMessage.WildCmp("#*")) {
-            NoString sChannel = sMessage.Token(0);
-            NoString sFlags = sMessage.Tokens(1).Trim_n().TrimLeft_n("+");
+        } else if (m_bRequestedWhoami && sMessage.wildCmp("#*")) {
+            NoString sChannel = sMessage.token(0);
+            NoString sFlags = sMessage.tokens(1).trim_n().trimLeft_n("+");
             m_msChanModes[sChannel] = sFlags;
         } else if (m_bRequestedWhoami && m_bCatchResponse &&
-                   (sMessage.Equals("End of list.") || sMessage.Equals("account, or HELLO to create an account."))) {
+                   (sMessage.equals("End of list.") || sMessage.equals("account, or HELLO to create an account."))) {
             m_bRequestedWhoami = m_bCatchResponse = false;
             return HALT;
         }
 
         // AUTH
-        else if (sMessage.Equals("Username or password incorrect.")) {
+        else if (sMessage.equals("Username or password incorrect.")) {
             m_bAuthed = false;
             PutModule("Auth failed: " + sMessage);
             return HALT;
-        } else if (sMessage.WildCmp("You are now logged in as *.")) {
+        } else if (sMessage.wildCmp("You are now logged in as *.")) {
             m_bAuthed = true;
             PutModule("Auth successful: " + sMessage);
             WhoAmI();
             return HALT;
-        } else if (m_bRequestedChallenge && sMessage.Token(0).Equals("CHALLENGE")) {
+        } else if (m_bRequestedChallenge && sMessage.token(0).equals("CHALLENGE")) {
             m_bRequestedChallenge = false;
             if (sMessage.find("not available once you have authed") != NoString::npos) {
                 m_bAuthed = true;
             } else {
                 if (sMessage.find("HMAC-SHA-256") != NoString::npos) {
-                    ChallengeAuth(sMessage.Token(1));
+                    ChallengeAuth(sMessage.token(1));
                 } else {
                     PutModule(
                     "Auth failed: Q does not support HMAC-SHA-256 for CHALLENGEAUTH, falling back to standard AUTH.");

@@ -92,7 +92,7 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                     const NoMessage& message = buffer.getMessage(uIdx);
 
                     if (!useClient->HasSelfMessage()) {
-                        NoNick sender(message.GetFormat().Token(0));
+                        NoNick sender(message.GetFormat().token(0));
                         if (sender.equals(useClient->GetNick())) {
                             continue;
                         }

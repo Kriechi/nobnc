@@ -116,7 +116,7 @@ Csock* NoSocket::GetHandle() const
 int NoCsock::ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const
 {
     int ret = Csock::ConvertAddress(pAddr, iAddrLen, sIP, piPort);
-    if (ret == 0) sIP.TrimPrefix("::ffff:");
+    if (ret == 0) sIP.trimPrefix("::ffff:");
     return ret;
 }
 
@@ -158,7 +158,7 @@ void NoCsock::SSLHandShakeFinished()
     }
     NO_DEBUG(GetSockName() + ": Bad cert");
     NoString sErrorMsg = "Invalid SSL certificate: ";
-    sErrorMsg += NoString(", ").Join(begin(m_ssCertVerificationErrors), end(m_ssCertVerificationErrors));
+    sErrorMsg += NoString(", ").join(begin(m_ssCertVerificationErrors), end(m_ssCertVerificationErrors));
     CallSockError(errnoBadSSLCert, sErrorMsg);
     Close();
 }

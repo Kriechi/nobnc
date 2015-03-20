@@ -134,11 +134,11 @@ public:
 
     ModRet OnUserRaw(NoString& sLine) override
     {
-        if (sLine.StartsWith("schat ")) {
+        if (sLine.startsWith("schat ")) {
             OnModCommand("chat " + sLine.substr(6));
             return (HALT);
 
-        } else if (sLine.Equals("schat")) {
+        } else if (sLine.equals("schat")) {
             PutModule("SChat User Area ...");
             OnModCommand("help");
             return (HALT);
@@ -149,16 +149,16 @@ public:
 
     void OnModCommand(const NoString& sCommand) override
     {
-        NoString sCom = sCommand.Token(0);
-        NoString sArgs = sCommand.Tokens(1);
+        NoString sCom = sCommand.token(0);
+        NoString sArgs = sCommand.tokens(1);
 
-        if (sCom.Equals("chat") && !sArgs.empty()) {
+        if (sCom.equals("chat") && !sArgs.empty()) {
             NoString sNick = "(s)" + sArgs;
             std::set<NoModuleSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 NoSChatSock* pSock = (NoSChatSock*)*it;
 
-                if (pSock->GetChatNick().Equals(sNick)) {
+                if (pSock->GetChatNick().equals(sNick)) {
                     PutModule("Already Connected to [" + sArgs + "]");
                     return;
                 }
@@ -184,7 +184,7 @@ public:
 
             PutIRC(s.str());
 
-        } else if (sCom.Equals("list")) {
+        } else if (sCom.equals("list")) {
             NoTable Table;
             Table.AddColumn("Nick");
             Table.AddColumn("Created");
@@ -204,7 +204,7 @@ public:
                 char* pTime = ctime(&iTime);
                 if (pTime) {
                     NoString sTime = pTime;
-                    sTime.Trim();
+                    sTime.trim();
                     Table.SetCell("Created", sTime);
                 }
 
@@ -226,20 +226,20 @@ public:
             } else
                 PutModule("No SDCCs currently in session");
 
-        } else if (sCom.Equals("close")) {
-            if (!sArgs.StartsWith("(s)")) sArgs = "(s)" + sArgs;
+        } else if (sCom.equals("close")) {
+            if (!sArgs.startsWith("(s)")) sArgs = "(s)" + sArgs;
 
             std::set<NoModuleSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
                 NoSChatSock* pSock = (NoSChatSock*)*it;
 
-                if (sArgs.Equals(pSock->GetChatNick())) {
+                if (sArgs.equals(pSock->GetChatNick())) {
                     pSock->Close();
                     return;
                 }
             }
             PutModule("No Such Chat [" + sArgs + "]");
-        } else if (sCom.Equals("showsocks") && GetUser()->IsAdmin()) {
+        } else if (sCom.equals("showsocks") && GetUser()->IsAdmin()) {
             NoTable Table;
             Table.AddColumn("SockName");
             Table.AddColumn("Created");
@@ -258,7 +258,7 @@ public:
                 char* pTime = ctime(&iTime);
                 if (pTime) {
                     NoString sTime = pTime;
-                    sTime.Trim();
+                    sTime.trim();
                     Table.SetCell("Created", sTime);
                 }
 
@@ -286,7 +286,7 @@ public:
             else
                 PutModule("Error Finding Sockets");
 
-        } else if (sCom.Equals("help")) {
+        } else if (sCom.equals("help")) {
             PutModule("Commands are:");
             PutModule("    help           - This text.");
             PutModule("    chat <nick>    - Chat a nick.");
@@ -296,7 +296,7 @@ public:
             if (GetUser()->IsAdmin()) {
                 PutModule("    showsocks      - Shows all socket connections.");
             }
-        } else if (sCom.Equals("timers"))
+        } else if (sCom.equals("timers"))
             ListTimers();
         else
             PutModule("Unknown command [" + sCom + "] [" + sArgs + "]");
@@ -304,10 +304,10 @@ public:
 
     ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
-        if (sMessage.StartsWith("DCC SCHAT ")) {
+        if (sMessage.startsWith("DCC SCHAT ")) {
             // chat ip port
-            ulong iIP = sMessage.Token(3).ToULong();
-            ushort iPort = sMessage.Token(4).ToUShort();
+            ulong iIP = sMessage.token(3).toULong();
+            ushort iPort = sMessage.token(4).toUShort();
 
             if (iIP > 0 && iPort > 0) {
                 std::pair<u_long, u_short> pTmp;
@@ -339,15 +339,15 @@ public:
 
     ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
-        if (sTarget.Left(3) == "(s)") {
-            NoString sSockName = GetModName().AsUpper() + "::" + sTarget;
+        if (sTarget.left(3) == "(s)") {
+            NoString sSockName = GetModName().toUpper() + "::" + sTarget;
             NoSChatSock* p = (NoSChatSock*)FindSocket(sSockName);
             if (!p) {
                 std::map<NoString, std::pair<u_long, u_short>>::iterator it;
                 it = m_siiWaitingChats.find(sTarget);
 
                 if (it != m_siiWaitingChats.end()) {
-                    if (!sMessage.Equals("yes"))
+                    if (!sMessage.equals("yes"))
                         SendToUser(sTarget + "!" + sTarget + "@" + NoUtils::GetIP(it->second.first),
                                    "Refusing to accept DCC SCHAT!");
                     else
@@ -392,7 +392,7 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoModuleSoc
 {
     m_pModule = pMod;
     m_sChatNick = sChatNick;
-    SetSockName(pMod->GetModName().AsUpper() + "::" + m_sChatNick);
+    SetSockName(pMod->GetModName().toUpper() + "::" + m_sChatNick);
 }
 
 NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout)
@@ -401,7 +401,7 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoStrin
     m_pModule = pMod;
     EnableReadLine();
     m_sChatNick = sChatNick;
-    SetSockName(pMod->GetModName().AsUpper() + "::" + m_sChatNick);
+    SetSockName(pMod->GetModName().toUpper() + "::" + m_sChatNick);
 }
 
 void NoSChatSock::PutQuery(const NoString& sText)
@@ -414,7 +414,7 @@ void NoSChatSock::ReadLineImpl(const NoString& sLine)
     if (m_pModule) {
         NoString sText = sLine;
 
-        sText.TrimRight("\r\n");
+        sText.trimRight("\r\n");
 
         if (m_pModule->IsAttached())
             PutQuery(sText);

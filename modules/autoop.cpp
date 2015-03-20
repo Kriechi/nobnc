@@ -58,7 +58,7 @@ public:
     bool ChannelMatches(const NoString& sChan) const
     {
         for (std::set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
-            if (sChan.AsLower().WildCmp(*it, No::CaseInsensitive)) {
+            if (sChan.toLower().wildCmp(*it, No::CaseInsensitive)) {
                 return true;
             }
         }
@@ -69,20 +69,20 @@ public:
     bool HostMatches(const NoString& sHostmask)
     {
         for (std::set<NoString>::const_iterator it = m_ssHostmasks.begin(); it != m_ssHostmasks.end(); ++it) {
-            if (sHostmask.WildCmp(*it, No::CaseInsensitive)) {
+            if (sHostmask.wildCmp(*it, No::CaseInsensitive)) {
                 return true;
             }
         }
         return false;
     }
 
-    NoString GetHostmasks() const { return NoString(",").Join(m_ssHostmasks.begin(), m_ssHostmasks.end()); }
+    NoString GetHostmasks() const { return NoString(",").join(m_ssHostmasks.begin(), m_ssHostmasks.end()); }
 
-    NoString GetChannels() const { return NoString(" ").Join(m_ssChans.begin(), m_ssChans.end()); }
+    NoString GetChannels() const { return NoString(" ").join(m_ssChans.begin(), m_ssChans.end()); }
 
     bool DelHostmasks(const NoString& sHostmasks)
     {
-        NoStringVector vsHostmasks = sHostmasks.Split(",");
+        NoStringVector vsHostmasks = sHostmasks.split(",");
 
         for (uint a = 0; a < vsHostmasks.size(); a++) {
             m_ssHostmasks.erase(vsHostmasks[a]);
@@ -93,7 +93,7 @@ public:
 
     void AddHostmasks(const NoString& sHostmasks)
     {
-        NoStringVector vsHostmasks = sHostmasks.Split(",");
+        NoStringVector vsHostmasks = sHostmasks.split(",");
 
         for (uint a = 0; a < vsHostmasks.size(); a++) {
             m_ssHostmasks.insert(vsHostmasks[a]);
@@ -102,19 +102,19 @@ public:
 
     void DelChans(const NoString& sChans)
     {
-        NoStringVector vsChans = sChans.Split(" ");
+        NoStringVector vsChans = sChans.split(" ");
 
         for (uint a = 0; a < vsChans.size(); a++) {
-            m_ssChans.erase(vsChans[a].AsLower());
+            m_ssChans.erase(vsChans[a].toLower());
         }
     }
 
     void AddChans(const NoString& sChans)
     {
-        NoStringVector vsChans = sChans.Split(" ");
+        NoStringVector vsChans = sChans.split(" ");
 
         for (uint a = 0; a < vsChans.size(); a++) {
-            m_ssChans.insert(vsChans[a].AsLower());
+            m_ssChans.insert(vsChans[a].toLower());
         }
     }
 
@@ -122,13 +122,13 @@ public:
 
     bool FromString(const NoString& sLine)
     {
-        m_sUsername = sLine.Token(0, "\t");
-        m_sUserKey = sLine.Token(2, "\t");
+        m_sUsername = sLine.token(0, "\t");
+        m_sUserKey = sLine.token(2, "\t");
 
-        NoStringVector vsHostMasks = sLine.Token(1, "\t").Split(",");
+        NoStringVector vsHostMasks = sLine.token(1, "\t").split(",");
         m_ssHostmasks = NoStringSet(vsHostMasks.begin(), vsHostMasks.end());
 
-        NoStringVector vsChans = sLine.Token(3, "\t").Split(" ");
+        NoStringVector vsChans = sLine.token(3, "\t").split(" ");
         m_ssChans = NoStringSet(vsChans.begin(), vsChans.end());
 
         return !m_sUserKey.empty();
@@ -187,10 +187,10 @@ public:
             const NoString& sLine = it->second;
             NoAutoOpUser* pUser = new NoAutoOpUser;
 
-            if (!pUser->FromString(sLine) || FindUser(pUser->GetUsername().AsLower())) {
+            if (!pUser->FromString(sLine) || FindUser(pUser->GetUsername().toLower())) {
                 delete pUser;
             } else {
-                m_msUsers[pUser->GetUsername().AsLower()] = pUser;
+                m_msUsers[pUser->GetUsername().toLower()] = pUser;
             }
         }
 
@@ -215,7 +215,7 @@ public:
 
     void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
-        NoStringMap::iterator it = m_msQueue.find(Nick.nick().AsLower());
+        NoStringMap::iterator it = m_msQueue.find(Nick.nick().toLower());
 
         if (it != m_msQueue.end()) {
             m_msQueue.erase(it);
@@ -225,26 +225,26 @@ public:
     void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         // Update the queue with nick changes
-        NoStringMap::iterator it = m_msQueue.find(OldNick.nick().AsLower());
+        NoStringMap::iterator it = m_msQueue.find(OldNick.nick().toLower());
 
         if (it != m_msQueue.end()) {
-            m_msQueue[sNewNick.AsLower()] = it->second;
+            m_msQueue[sNewNick.toLower()] = it->second;
             m_msQueue.erase(it);
         }
     }
 
     ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
-        if (!sMessage.Token(0).Equals("!ZNCAO")) {
+        if (!sMessage.token(0).equals("!ZNCAO")) {
             return CONTINUE;
         }
 
-        NoString sCommand = sMessage.Token(1);
+        NoString sCommand = sMessage.token(1);
 
-        if (sCommand.Equals("CHALLENGE")) {
-            ChallengeRespond(Nick, sMessage.Token(2));
-        } else if (sCommand.Equals("RESPONSE")) {
-            VerifyResponse(Nick, sMessage.Token(2));
+        if (sCommand.equals("CHALLENGE")) {
+            ChallengeRespond(Nick, sMessage.token(2));
+        } else if (sCommand.equals("RESPONSE")) {
+            VerifyResponse(Nick, sMessage.token(2));
         }
 
         return HALTCORE;
@@ -265,8 +265,8 @@ public:
 
     void OnModCommand(const NoString& sLine) override
     {
-        NoString sCommand = sLine.Token(0).AsUpper();
-        if (sCommand.Equals("TIMERS")) {
+        NoString sCommand = sLine.token(0).toUpper();
+        if (sCommand.equals("TIMERS")) {
             // for testing purposes - hidden from help
             ListTimers();
         } else {
@@ -276,14 +276,14 @@ public:
 
     void OnAddUserCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sHost = sLine.Token(2);
-        NoString sKey = sLine.Token(3);
+        NoString sUser = sLine.token(1);
+        NoString sHost = sLine.token(2);
+        NoString sKey = sLine.token(3);
 
         if (sHost.empty()) {
             PutModule("Usage: AddUser <user> <hostmask>[,<hostmasks>...] <key> [channels]");
         } else {
-            NoAutoOpUser* pUser = AddUser(sUser, sKey, sHost, sLine.Tokens(4));
+            NoAutoOpUser* pUser = AddUser(sUser, sKey, sHost, sLine.tokens(4));
 
             if (pUser) {
                 SetNV(sUser, pUser->ToString());
@@ -293,7 +293,7 @@ public:
 
     void OnDelUserCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
+        NoString sUser = sLine.token(1);
 
         if (sUser.empty()) {
             PutModule("Usage: DelUser <user>");
@@ -318,7 +318,7 @@ public:
         Table.AddColumn("Channels");
 
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
-            NoStringVector vsHostmasks = it->second->GetHostmasks().Split(",");
+            NoStringVector vsHostmasks = it->second->GetHostmasks().split(",");
             for (uint a = 0; a < vsHostmasks.size(); a++) {
                 Table.AddRow();
                 if (a == 0) {
@@ -339,8 +339,8 @@ public:
 
     void OnAddChansCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sChans = sLine.Tokens(2);
+        NoString sUser = sLine.token(1);
+        NoString sChans = sLine.tokens(2);
 
         if (sChans.empty()) {
             PutModule("Usage: AddChans <user> <channel> [channel] ...");
@@ -361,8 +361,8 @@ public:
 
     void OnDelChansCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sChans = sLine.Tokens(2);
+        NoString sUser = sLine.token(1);
+        NoString sChans = sLine.tokens(2);
 
         if (sChans.empty()) {
             PutModule("Usage: DelChans <user> <channel> [channel] ...");
@@ -383,8 +383,8 @@ public:
 
     void OnAddMasksCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sHostmasks = sLine.Tokens(2);
+        NoString sUser = sLine.token(1);
+        NoString sHostmasks = sLine.tokens(2);
 
         if (sHostmasks.empty()) {
             PutModule("Usage: AddMasks <user> <mask>,[mask] ...");
@@ -405,8 +405,8 @@ public:
 
     void OnDelMasksCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.Token(1);
-        NoString sHostmasks = sLine.Tokens(2);
+        NoString sUser = sLine.token(1);
+        NoString sHostmasks = sLine.tokens(2);
 
         if (sHostmasks.empty()) {
             PutModule("Usage: DelMasks <user> <mask>,[mask] ...");
@@ -433,7 +433,7 @@ public:
 
     NoAutoOpUser* FindUser(const NoString& sUser)
     {
-        std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.toLower());
 
         return (it != m_msUsers.end()) ? it->second : nullptr;
     }
@@ -459,11 +459,11 @@ public:
             return false;
         }
 
-        if (pUser->GetUserKey().Equals("__NOKEY__")) {
+        if (pUser->GetUserKey().equals("__NOKEY__")) {
             PutIRC("MODE " + Channel.getName() + " +o " + Nick.nick());
         } else {
             // then insert this nick into the queue, the timer does the rest
-            NoString sNick = Nick.nick().AsLower();
+            NoString sNick = Nick.nick().toLower();
             if (m_msQueue.find(sNick) == m_msQueue.end()) {
                 m_msQueue[sNick] = "";
             }
@@ -474,7 +474,7 @@ public:
 
     void DelUser(const NoString& sUser)
     {
-        std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.AsLower());
+        std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.toLower());
 
         if (it == m_msUsers.end()) {
             PutModule("That user does not exist");
@@ -494,7 +494,7 @@ public:
         }
 
         NoAutoOpUser* pUser = new NoAutoOpUser(sUser, sKey, sHosts, sChans);
-        m_msUsers[sUser.AsLower()] = pUser;
+        m_msUsers[sUser.toLower()] = pUser;
         PutModule("User [" + sUser + "] added with hostmask(s) [" + sHosts + "]");
         return pUser;
     }
@@ -557,7 +557,7 @@ public:
 
     bool VerifyResponse(const NoNick& Nick, const NoString& sResponse)
     {
-        NoStringMap::iterator itQueue = m_msQueue.find(Nick.nick().AsLower());
+        NoStringMap::iterator itQueue = m_msQueue.find(Nick.nick().toLower());
 
         if (itQueue == m_msQueue.end()) {
             PutModule("[" + Nick.hostMask() + "] sent an unchallenged response.  This could be due to lag.");

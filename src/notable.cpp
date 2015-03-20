@@ -26,7 +26,7 @@ NoTable::NoTable(ulong uPreferredWidth)
 bool NoTable::AddColumn(const NoString& sName, bool bWrappable)
 {
     for (const NoString& sHeader : m_vsHeaders) {
-        if (sHeader.Equals(sName)) {
+        if (sHeader.equals(sName)) {
             return false;
         }
     }
@@ -73,7 +73,7 @@ bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, size_type
     }
 
     if (m_vbWrappable[uColIdx]) {
-        NoStringVector vsWords = sValue.Split(" ");
+        NoStringVector vsWords = sValue.split(" ");
         size_type uMaxWord = 0;
         for (const NoString& sWord : vsWords) {
             if (sWord.length() > uMaxWord) {
@@ -158,7 +158,7 @@ NoStringVector NoTable::Render() const
         sHorizontal = ssLine.str();
     }
     NoStringVector vsOutput;
-    vsOutput.emplace_back(sHorizontal.Replace_n("-", "="));
+    vsOutput.emplace_back(sHorizontal.replace_n("-", "="));
     {
         std::ostringstream ssLine;
         ssLine << "|";
@@ -206,7 +206,7 @@ NoStringVector NoTable::Render() const
 
 NoStringVector NoTable::WrapWords(const NoString& s, size_type uWidth)
 {
-    NoStringVector vsWords = s.Split(" ");
+    NoStringVector vsWords = s.split(" ");
     NoStringVector vsResult;
     vsResult.emplace_back("");
     for (const NoString& sWord : vsWords) {

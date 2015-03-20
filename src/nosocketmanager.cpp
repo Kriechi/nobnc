@@ -242,7 +242,7 @@ uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
     for (Csock* pSock : *m_instance) {
         // Logged in NoClients have "USR::<username>" as their sockname
         if (pSock->GetType() == Csock::INBOUND && pSock->GetRemoteIP() == sIP &&
-            pSock->GetSockName().Left(5) != "USR::") {
+            pSock->GetSockName().left(5) != "USR::") {
             ret++;
         }
     }

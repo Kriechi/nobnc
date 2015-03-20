@@ -142,7 +142,7 @@ NoString::NoString(float i, int precision) : std::string()
     *this = s.str();
 }
 
-int NoString::Compare(const NoString& s, No::CaseSensitivity cs) const
+int NoString::compare(const NoString& s, No::CaseSensitivity cs) const
 {
     if (cs == No::CaseSensitive)
         return strcmp(c_str(), s.c_str());
@@ -150,18 +150,18 @@ int NoString::Compare(const NoString& s, No::CaseSensitivity cs) const
         return strcasecmp(c_str(), s.c_str());
 }
 
-bool NoString::Equals(const NoString& s, No::CaseSensitivity cs) const
+bool NoString::equals(const NoString& s, No::CaseSensitivity cs) const
 {
-    return Compare(s, cs) == 0;
+    return compare(s, cs) == 0;
 }
 
-bool NoString::WildCmp(const NoString& sWild, No::CaseSensitivity cs) const
+bool NoString::wildCmp(const NoString& sWild, No::CaseSensitivity cs) const
 {
     // avoid a copy when cs == No::CaseSensitive (C++ deliberately specifies that binding
     // a temporary object to a reference to const on the stack lengthens the lifetime
     // of the temporary to the lifetime of the reference itself)
-    const NoString& sWld = (cs == No::CaseSensitive ? sWild : sWild.AsLower());
-    const NoString& sStr = (cs == No::CaseSensitive ? *this : AsLower());
+    const NoString& sWld = (cs == No::CaseSensitive ? sWild : sWild.toLower());
+    const NoString& sStr = (cs == No::CaseSensitive ? *this : toLower());
 
     // Written by Jack Handy - jakkhandy@hotmail.com
     const char* wild = sWld.c_str(), *NoString = sStr.c_str();
@@ -200,7 +200,7 @@ bool NoString::WildCmp(const NoString& sWild, No::CaseSensitivity cs) const
     return (*wild == 0);
 }
 
-NoString NoString::AsUpper() const
+NoString NoString::toUpper() const
 {
     NoString sRet = *this;
     for (char& c : sRet) {
@@ -210,7 +210,7 @@ NoString NoString::AsUpper() const
     return sRet;
 }
 
-NoString NoString::AsLower() const
+NoString NoString::toLower() const
 {
     NoString sRet = *this;
     for (char& c : sRet) {
@@ -220,14 +220,14 @@ NoString NoString::AsLower() const
     return sRet;
 }
 
-NoString NoString::Replace_n(const NoString& sReplace, const NoString& sWith) const
+NoString NoString::replace_n(const NoString& sReplace, const NoString& sWith) const
 {
     NoString sRet = *this;
-    sRet.Replace(sReplace, sWith);
+    sRet.replace(sReplace, sWith);
     return sRet;
 }
 
-uint NoString::Replace(const NoString& sReplace, const NoString& sWith)
+uint NoString::replace(const NoString& sReplace, const NoString& sWith)
 {
     uint uRet = 0;
     NoString sCopy = *this;
@@ -324,23 +324,23 @@ NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoStri
     return Token_impl(str, uPos, bRest, sSep);
 }
 
-NoString NoString::Token(size_t uPos, const NoString& sSep) const
+NoString NoString::token(size_t uPos, const NoString& sSep) const
 {
     return Token_impl(*this, uPos, false, sSep);
 }
 
-NoString NoString::Tokens(size_t uPos, const NoString& sSep) const
+NoString NoString::tokens(size_t uPos, const NoString& sSep) const
 {
     return Token_impl(*this, uPos, true, sSep);
 }
 
-NoString NoString::Left(size_type uCount) const
+NoString NoString::left(size_type uCount) const
 {
     uCount = (uCount > length()) ? length() : uCount;
     return substr(0, uCount);
 }
 
-NoString NoString::Right(size_type uCount) const
+NoString NoString::right(size_type uCount) const
 {
     uCount = (uCount > length()) ? length() : uCount;
     return substr(length() - uCount, uCount);
@@ -415,12 +415,12 @@ NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::Spl
     return vsRet;
 }
 
-NoStringVector NoString::Split(const NoString& separator, No::SplitBehavior behavior) const
+NoStringVector NoString::split(const NoString& separator, No::SplitBehavior behavior) const
 {
     return Split_helper(*this, separator, behavior, "", "", true);
 }
 
-NoString NoString::ToBase64(uint uWrap) const
+NoString NoString::toBase64(uint uWrap) const
 {
     const char b64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     NoString sRet;
@@ -481,12 +481,12 @@ NoString NoString::ToBase64(uint uWrap) const
     return sRet;
 }
 
-NoString NoString::FromBase64(const NoString& base64)
+NoString NoString::fromBase64(const NoString& base64)
 {
     NoString sTmp(base64);
     // remove new lines
-    sTmp.Replace("\r", "");
-    sTmp.Replace("\n", "");
+    sTmp.replace("\r", "");
+    sTmp.replace("\n", "");
 
     const char* in = sTmp.c_str();
     char c, c1, *p;
@@ -524,65 +524,65 @@ NoString NoString::FromBase64(const NoString& base64)
     return sRet;
 }
 
-bool NoString::ToBool() const
+bool NoString::toBool() const
 {
-    NoString sTrimmed = Trim_n();
-    return (!sTrimmed.Trim_n("0").empty() && !sTrimmed.Equals("false") && !sTrimmed.Equals("off") &&
-            !sTrimmed.Equals("no") && !sTrimmed.Equals("n"));
+    NoString sTrimmed = trim_n();
+    return (!sTrimmed.trim_n("0").empty() && !sTrimmed.equals("false") && !sTrimmed.equals("off") &&
+            !sTrimmed.equals("no") && !sTrimmed.equals("n"));
 }
 
-short NoString::ToShort() const
+short NoString::toShort() const
 {
     return (short int)strtol(this->c_str(), (char**)nullptr, 10);
 }
 
-ushort NoString::ToUShort() const
+ushort NoString::toUShort() const
 {
     return (ushort)strtoul(this->c_str(), (char**)nullptr, 10);
 }
 
-uint NoString::ToUInt() const
+uint NoString::toUInt() const
 {
     return (uint)strtoul(this->c_str(), (char**)nullptr, 10);
 }
 
-int NoString::ToInt() const
+int NoString::toInt() const
 {
     return (int)strtol(this->c_str(), (char**)nullptr, 10);
 }
 
-long NoString::ToLong() const
+long NoString::toLong() const
 {
     return strtol(this->c_str(), (char**)nullptr, 10);
 }
 
-ulong NoString::ToULong() const
+ulong NoString::toULong() const
 {
     return strtoul(c_str(), nullptr, 10);
 }
 
-ulonglong NoString::ToULongLong() const
+ulonglong NoString::toULongLong() const
 {
     return strtoull(c_str(), nullptr, 10);
 }
 
-long long NoString::ToLongLong() const
+long long NoString::toLongLong() const
 {
     return strtoll(c_str(), nullptr, 10);
 }
 
-double NoString::ToDouble() const
+double NoString::toDouble() const
 {
     return strtod(c_str(), nullptr);
 }
 
-bool NoString::Trim(const NoString& s)
+bool NoString::trim(const NoString& s)
 {
-    bool bLeft = TrimLeft(s);
-    return (TrimRight(s) || bLeft);
+    bool bLeft = trimLeft(s);
+    return (trimRight(s) || bLeft);
 }
 
-bool NoString::TrimLeft(const NoString& s)
+bool NoString::trimLeft(const NoString& s)
 {
     size_type i = find_first_not_of(s);
 
@@ -596,7 +596,7 @@ bool NoString::TrimLeft(const NoString& s)
     return true;
 }
 
-bool NoString::TrimRight(const NoString& s)
+bool NoString::trimRight(const NoString& s)
 {
     size_type i = find_last_not_of(s);
 
@@ -610,100 +610,110 @@ bool NoString::TrimRight(const NoString& s)
     return true;
 }
 
-NoString NoString::Trim_n(const NoString& s) const
+NoString NoString::trim_n(const NoString& s) const
 {
     NoString sRet = *this;
-    sRet.Trim(s);
+    sRet.trim(s);
     return sRet;
 }
 
-NoString NoString::TrimLeft_n(const NoString& s) const
+NoString NoString::trimLeft_n(const NoString& s) const
 {
     NoString sRet = *this;
-    sRet.TrimLeft(s);
+    sRet.trimLeft(s);
     return sRet;
 }
 
-NoString NoString::TrimRight_n(const NoString& s) const
+NoString NoString::trimRight_n(const NoString& s) const
 {
     NoString sRet = *this;
-    sRet.TrimRight(s);
+    sRet.trimRight(s);
     return sRet;
 }
 
-bool NoString::TrimPrefix(const NoString& sPrefix)
+bool NoString::trimPrefix(const NoString& sPrefix)
 {
-    if (StartsWith(sPrefix)) {
-        LeftChomp(sPrefix.length());
+    if (startsWith(sPrefix)) {
+        leftChomp(sPrefix.length());
         return true;
     } else {
         return false;
     }
 }
 
-bool NoString::TrimSuffix(const NoString& sSuffix)
+bool NoString::trimSuffix(const NoString& sSuffix)
 {
-    if (Right(sSuffix.length()).Equals(sSuffix)) {
-        RightChomp(sSuffix.length());
+    if (right(sSuffix.length()).equals(sSuffix)) {
+        rightChomp(sSuffix.length());
         return true;
     } else {
         return false;
     }
 }
 
-size_t NoString::Find(const NoString& s, No::CaseSensitivity cs) const
+size_t NoString::find(char c, No::CaseSensitivity cs) const
+{
+    return find(NoString(c), cs);
+}
+
+size_t NoString::find(const NoString& s, No::CaseSensitivity cs) const
+{
+    return find(s, 0, cs);
+}
+
+size_t NoString::find(const NoString& s, size_t pos, No::CaseSensitivity cs) const
 {
     if (cs == No::CaseSensitive) {
-        return find(s);
+        return std::string::find(s, pos);
     } else {
-        return AsLower().find(s.AsLower());
+        return toLower().std::string::find(s.toLower(), pos);
     }
 }
 
-bool NoString::StartsWith(const NoString& sPrefix, No::CaseSensitivity cs) const
+bool NoString::startsWith(const NoString& sPrefix, No::CaseSensitivity cs) const
 {
-    return Left(sPrefix.length()).Equals(sPrefix, cs);
+    return left(sPrefix.length()).equals(sPrefix, cs);
 }
 
-bool NoString::EndsWith(const NoString& sSuffix, No::CaseSensitivity cs) const
+bool NoString::endsWith(const NoString& sSuffix, No::CaseSensitivity cs) const
 {
-    return Right(sSuffix.length()).Equals(sSuffix, cs);
+    return right(sSuffix.length()).equals(sSuffix, cs);
 }
 
-bool NoString::Contains(const NoString& s, No::CaseSensitivity cs) const
+bool NoString::contains(const NoString& s, No::CaseSensitivity cs) const
 {
-    return Find(s, cs) != npos;
+    return find(s, cs) != npos;
 }
 
-NoString NoString::TrimPrefix_n(const NoString& sPrefix) const
+NoString NoString::trimPrefix_n(const NoString& sPrefix) const
 {
     NoString sRet = *this;
-    sRet.TrimPrefix(sPrefix);
+    sRet.trimPrefix(sPrefix);
     return sRet;
 }
 
-NoString NoString::TrimSuffix_n(const NoString& sSuffix) const
+NoString NoString::trimSuffix_n(const NoString& sSuffix) const
 {
     NoString sRet = *this;
-    sRet.TrimSuffix(sSuffix);
+    sRet.trimSuffix(sSuffix);
     return sRet;
 }
 
-NoString NoString::LeftChomp_n(size_type uLen) const
+NoString NoString::leftChomp_n(size_type uLen) const
 {
     NoString sRet = *this;
-    sRet.LeftChomp(uLen);
+    sRet.leftChomp(uLen);
     return sRet;
 }
 
-NoString NoString::RightChomp_n(size_type uLen) const
+NoString NoString::rightChomp_n(size_type uLen) const
 {
     NoString sRet = *this;
-    sRet.RightChomp(uLen);
+    sRet.rightChomp(uLen);
     return sRet;
 }
 
-bool NoString::LeftChomp(size_type uLen)
+bool NoString::leftChomp(size_type uLen)
 {
     bool bRet = false;
 
@@ -715,7 +725,7 @@ bool NoString::LeftChomp(size_type uLen)
     return bRet;
 }
 
-bool NoString::RightChomp(size_type uLen)
+bool NoString::rightChomp(size_type uLen)
 {
     bool bRet = false;
 

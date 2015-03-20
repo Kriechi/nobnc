@@ -27,7 +27,7 @@ bool NoNick::equals(const NoString& nick) const
 {
     // TODO add proper IRC case mapping here
     // https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.1
-    return m_nick.Equals(nick);
+    return m_nick.equals(nick);
 }
 
 NoString NoNick::nick() const
@@ -151,7 +151,7 @@ void NoNick::parse(const NoString& mask)
         return;
 
     m_nick = mask;
-    m_nick.TrimLeft(":");
+    m_nick.trimLeft(":");
 
     ulong pos = mask.find('!');
     if (pos != NoString::npos) {

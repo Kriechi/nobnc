@@ -84,9 +84,9 @@ public:
 
     void OnModCommand(const NoString& sLine) override
     {
-        NoString sCommand = sLine.Token(0);
-        if (sCommand.Equals("cd")) {
-            NoString sArg = sLine.Tokens(1);
+        NoString sCommand = sLine.token(0);
+        if (sCommand.equals("cd")) {
+            NoString sArg = sLine.tokens(1);
             NoString sPath =
             NoDir::ChangeDir(m_sPath, (sArg.empty() ? NoString(NoApp::Get().GetHomePath()) : sArg), NoApp::Get().GetHomePath());
             NoFile Dir(sPath);
@@ -107,7 +107,7 @@ public:
 
     void PutShell(const NoString& sMsg)
     {
-        NoString sPath = m_sPath.Replace_n(" ", "_");
+        NoString sPath = m_sPath.replace_n(" ", "_");
         NoString sSource = ":" + GetModNick() + "!shell@" + sPath;
         NoString sLine = sSource + " PRIVMSG " + GetClient()->GetNick() + " :" + sMsg;
         GetClient()->PutClient(sLine);
@@ -128,8 +128,8 @@ void NoShellSock::ReadLineImpl(const NoString& sData)
 {
     NoString sLine = sData;
 
-    sLine.TrimRight("\r\n");
-    sLine.Replace("\t", "    ");
+    sLine.trimRight("\r\n");
+    sLine.replace("\t", "    ");
 
     m_pParent->SetClient(m_pClient);
     m_pParent->PutShell(sLine);

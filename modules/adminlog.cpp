@@ -49,11 +49,11 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoString sTarget = GetNV("target");
-        if (sTarget.Equals("syslog"))
+        if (sTarget.equals("syslog"))
             m_eLogMode = LOG_TO_SYSLOG;
-        else if (sTarget.Equals("both"))
+        else if (sTarget.equals("both"))
             m_eLogMode = LOG_TO_BOTH;
-        else if (sTarget.Equals("file"))
+        else if (sTarget.equals("file"))
             m_eLogMode = LOG_TO_FILE;
         else
             m_eLogMode = LOG_TO_FILE;
@@ -77,11 +77,11 @@ public:
 
     ModRet OnRaw(NoString& sLine) override
     {
-        if (sLine.StartsWith("ERROR ")) {
+        if (sLine.startsWith("ERROR ")) {
             // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
             // ERROR :Closing Link: nick[24.24.24.24] Killer (Local kill by Killer (reason))
             NoString sError(sLine.substr(6));
-            if (sError.Left(1) == ":") sError.LeftChomp(1);
+            if (sError.left(1) == ":") sError.leftChomp(1);
             Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC: " +
                 GetNetwork()->GetCurrentServer()->GetName() + " [" + sError + "]",
                 LOG_NOTICE);
@@ -137,20 +137,20 @@ public:
 
     void OnTargetCommand(const NoString& sCommand)
     {
-        NoString sArg = sCommand.Tokens(1);
+        NoString sArg = sCommand.tokens(1);
         NoString sTarget;
         NoString sMessage;
         LogMode mode;
 
-        if (sArg.Equals("file")) {
+        if (sArg.equals("file")) {
             sTarget = "file";
             sMessage = "Now only logging to file";
             mode = LOG_TO_FILE;
-        } else if (sArg.Equals("syslog")) {
+        } else if (sArg.equals("syslog")) {
             sTarget = "syslog";
             sMessage = "Now only logging to syslog";
             mode = LOG_TO_SYSLOG;
-        } else if (sArg.Equals("both")) {
+        } else if (sArg.equals("both")) {
             sTarget = "both";
             sMessage = "Now logging to file and syslog";
             mode = LOG_TO_BOTH;

@@ -65,20 +65,20 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        if (sArgs.Trim_n().empty()) {
+        if (sArgs.trim_n().empty()) {
             return true; // use defaults
         }
 
-        m_sServer = sArgs.Token(0);
-        NoString sPort = sArgs.Token(1);
-        m_sUserFormat = sArgs.Token(2);
+        m_sServer = sArgs.token(0);
+        NoString sPort = sArgs.token(1);
+        m_sUserFormat = sArgs.token(2);
 
-        if (sPort.Left(1) == "+") {
+        if (sPort.left(1) == "+") {
             m_bSSL = true;
-            sPort.LeftChomp(1);
+            sPort.leftChomp(1);
         }
 
-        ushort uPort = sPort.ToUShort();
+        ushort uPort = sPort.toUShort();
 
         if (uPort) {
             m_uPort = uPort;
@@ -136,17 +136,17 @@ void NoImapSock::ReadLineImpl(const NoString& sLine)
 
         if (!sFormat.empty()) {
             if (sFormat.find('%') != NoString::npos) {
-                sUsername = sFormat.Replace_n("%", sUsername);
+                sUsername = sFormat.replace_n("%", sUsername);
             } else {
                 sUsername += sFormat;
             }
         }
 
         Write("AUTH LOGIN " + sUsername + " " + m_spAuth->GetPassword() + "\r\n");
-    } else if (sLine.Left(5) == "AUTH ") {
+    } else if (sLine.left(5) == "AUTH ") {
         NoUser* pUser = NoApp::Get().FindUser(m_spAuth->GetUsername());
 
-        if (pUser && sLine.StartsWith("AUTH OK")) {
+        if (pUser && sLine.startsWith("AUTH OK")) {
             m_spAuth->AcceptLogin(*pUser);
             // Use MD5 so passes don't sit in memory in plain text
             m_pIMAPMod->CacheLogin(NoUtils::MD5(m_spAuth->GetUsername() + ":" + m_spAuth->GetPassword()));

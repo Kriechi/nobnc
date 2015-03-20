@@ -152,13 +152,13 @@ public:
 
     void UseClientIPCommand(const NoString& sLine)
     {
-        NoString sValue = sLine.Tokens(1);
+        NoString sValue = sLine.tokens(1);
 
         if (!sValue.empty()) {
             SetNV("UseClientIP", sValue);
         }
 
-        PutModule("UseClientIP: " + NoString(GetNV("UseClientIP").ToBool()));
+        PutModule("UseClientIP: " + NoString(GetNV("UseClientIP").toBool()));
     }
 
     MODCONSTRUCTOR(NoBounceDccMod)
@@ -175,40 +175,40 @@ public:
 
     NoString GetLocalDCCIP() { return GetUser()->GetLocalDCCIP(); }
 
-    bool UseClientIP() { return GetNV("UseClientIP").ToBool(); }
+    bool UseClientIP() { return GetNV("UseClientIP").toBool(); }
 
     ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
     {
-        if (sMessage.StartsWith("DCC ")) {
+        if (sMessage.startsWith("DCC ")) {
             NoStringVector tokens = NoUtils::QuoteSplit(sMessage);
             tokens.resize(6);
-            NoString sType = tokens.at(1).Trim_n("\"");
+            NoString sType = tokens.at(1).trim_n("\"");
             NoString sFile = tokens.at(2);
-            ulong uLongIP = tokens.at(3).Trim_n("\"").ToULong();
-            ushort uPort = tokens.at(4).Trim_n("\"").ToUShort();
-            ulong uFileSize = tokens.at(5).Trim_n("\"").ToULong();
+            ulong uLongIP = tokens.at(3).trim_n("\"").toULong();
+            ushort uPort = tokens.at(4).trim_n("\"").toUShort();
+            ulong uFileSize = tokens.at(5).trim_n("\"").toULong();
             NoString sIP = GetLocalDCCIP();
 
             if (!UseClientIP()) {
                 uLongIP = NoUtils::GetLongIP(GetClient()->GetRemoteIP());
             }
 
-            if (sType.Equals("CHAT")) {
+            if (sType.equals("CHAT")) {
                 ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, "", true, this, "");
                 if (uBNCPort) {
                     PutIRC("PRIVMSG " + sTarget + " :\001DCC CHAT chat " + NoString(NoUtils::GetLongIP(sIP)) + " " +
                            NoString(uBNCPort) + "\001");
                 }
-            } else if (sType.Equals("SEND")) {
+            } else if (sType.equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
                 ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, sFile, false, this, "");
                 if (uBNCPort) {
                     PutIRC("PRIVMSG " + sTarget + " :\001DCC SEND " + sFile + " " + NoString(NoUtils::GetLongIP(sIP)) +
                            " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
-            } else if (sType.Equals("RESUME")) {
+            } else if (sType.equals("RESUME")) {
                 // PRIVMSG user :DCC RESUME "znc.o" 58810 151552
-                ushort uResumePort = sMessage.Token(3).ToUShort();
+                ushort uResumePort = sMessage.token(3).toUShort();
 
                 std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
@@ -216,18 +216,18 @@ public:
 
                     if (pSock->GetLocalPort() == uResumePort) {
                         PutIRC("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
-                               NoString(pSock->GetUserPort()) + " " + sMessage.Token(4) + "\001");
+                               NoString(pSock->GetUserPort()) + " " + sMessage.token(4) + "\001");
                     }
                 }
-            } else if (sType.Equals("ACCEPT")) {
+            } else if (sType.equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
 
                 std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
-                    if (pSock->GetUserPort() == sMessage.Token(3).ToUShort()) {
+                    if (pSock->GetUserPort() == sMessage.token(3).toUShort()) {
                         PutIRC("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
-                               NoString(pSock->GetLocalPort()) + " " + sMessage.Token(4) + "\001");
+                               NoString(pSock->GetLocalPort()) + " " + sMessage.token(4) + "\001");
                     }
                 }
             }
@@ -241,17 +241,17 @@ public:
     ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
         NoNetwork* pNetwork = GetNetwork();
-        if (sMessage.StartsWith("DCC ") && pNetwork->IsUserAttached()) {
+        if (sMessage.startsWith("DCC ") && pNetwork->IsUserAttached()) {
             // DCC CHAT chat 2453612361 44592
             NoStringVector tokens = NoUtils::QuoteSplit(sMessage);
             tokens.resize(6);
-            NoString sType = tokens.at(1).Trim_n("\"");
+            NoString sType = tokens.at(1).trim_n("\"");
             NoString sFile = tokens.at(2);
-            ulong uLongIP = tokens.at(3).Trim_n("\"").ToULong();
-            ushort uPort = tokens.at(4).Trim_n("\"").ToUShort();
-            ulong uFileSize = tokens.at(5).Trim_n("\"").ToULong();
+            ulong uLongIP = tokens.at(3).trim_n("\"").toULong();
+            ushort uPort = tokens.at(4).trim_n("\"").toUShort();
+            ulong uFileSize = tokens.at(5).trim_n("\"").toULong();
 
-            if (sType.Equals("CHAT")) {
+            if (sType.equals("CHAT")) {
                 NoNick FromNick(Nick.nickMask());
                 ushort uBNCPort =
                 NoDccBounce::DCCRequest(FromNick.nick(), uLongIP, uPort, "", true, this, NoUtils::GetIP(uLongIP));
@@ -260,7 +260,7 @@ public:
                     PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC CHAT chat " +
                             NoString(NoUtils::GetLongIP(sIP)) + " " + NoString(uBNCPort) + "\001");
                 }
-            } else if (sType.Equals("SEND")) {
+            } else if (sType.equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
                 ushort uBNCPort =
                 NoDccBounce::DCCRequest(Nick.nick(), uLongIP, uPort, sFile, false, this, NoUtils::GetIP(uLongIP));
@@ -269,9 +269,9 @@ public:
                     PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC SEND " + sFile + " " +
                             NoString(NoUtils::GetLongIP(sIP)) + " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
-            } else if (sType.Equals("RESUME")) {
+            } else if (sType.equals("RESUME")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
-                ushort uResumePort = sMessage.Token(3).ToUShort();
+                ushort uResumePort = sMessage.token(3).toUShort();
 
                 std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
@@ -279,18 +279,18 @@ public:
 
                     if (pSock->GetLocalPort() == uResumePort) {
                         PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
-                                " " + sFile + " " + NoString(pSock->GetUserPort()) + " " + sMessage.Token(4) + "\001");
+                                " " + sFile + " " + NoString(pSock->GetUserPort()) + " " + sMessage.token(4) + "\001");
                     }
                 }
-            } else if (sType.Equals("ACCEPT")) {
+            } else if (sType.equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
                 std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 
-                    if (pSock->GetUserPort() == sMessage.Token(3).ToUShort()) {
+                    if (pSock->GetUserPort() == sMessage.token(3).toUShort()) {
                         PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
-                                " " + sFile + " " + NoString(pSock->GetLocalPort()) + " " + sMessage.Token(4) + "\001");
+                                " " + sFile + " " + NoString(pSock->GetLocalPort()) + " " + sMessage.token(4) + "\001");
                     }
                 }
             }
@@ -366,7 +366,7 @@ NoDccBounce::~NoDccBounce()
 
 void NoDccBounce::ReadLineImpl(const NoString& sData)
 {
-    NoString sLine = sData.TrimRight_n("\r\n");
+    NoString sLine = sData.trimRight_n("\r\n");
 
     NO_DEBUG(GetSockName() << " <- [" << sLine << "]");
 

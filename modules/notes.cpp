@@ -26,8 +26,8 @@ class NoNotesMod : public NoModule
 
     void AddNoteCommand(const NoString& sLine)
     {
-        NoString sKey(sLine.Token(1));
-        NoString sValue(sLine.Tokens(2));
+        NoString sKey(sLine.token(1));
+        NoString sValue(sLine.tokens(2));
 
         if (!GetNV(sKey).empty()) {
             PutModule("That note already exists.  Use MOD <key> <note> to overwrite.");
@@ -40,8 +40,8 @@ class NoNotesMod : public NoModule
 
     void ModCommand(const NoString& sLine)
     {
-        NoString sKey(sLine.Token(1));
-        NoString sValue(sLine.Tokens(2));
+        NoString sKey(sLine.token(1));
+        NoString sValue(sLine.tokens(2));
 
         if (AddNote(sKey, sValue)) {
             PutModule("Set note for [" + sKey + "]");
@@ -52,7 +52,7 @@ class NoNotesMod : public NoModule
 
     void GetCommand(const NoString& sLine)
     {
-        NoString sNote = GetNV(sLine.Tokens(1));
+        NoString sNote = GetNV(sLine.tokens(1));
 
         if (sNote.empty()) {
             PutModule("This note doesn't exist.");
@@ -63,7 +63,7 @@ class NoNotesMod : public NoModule
 
     void DelCommand(const NoString& sLine)
     {
-        NoString sKey(sLine.Token(1));
+        NoString sKey(sLine.token(1));
 
         if (DelNote(sKey)) {
             PutModule("Deleted note [" + sKey + "]");
@@ -86,7 +86,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        bShowNotesOnLogin = !sArgs.Equals("-disableNotesOnLogin");
+        bShowNotesOnLogin = !sArgs.equals("-disableNotesOnLogin");
         return true;
     }
 
@@ -101,7 +101,7 @@ public:
 
     ModRet OnUserRaw(NoString& sLine) override
     {
-        if (sLine.Left(1) != "#") {
+        if (sLine.left(1) != "#") {
             return CONTINUE;
         }
 
@@ -111,22 +111,22 @@ public:
         if (sLine == "#?") {
             ListNotes(true);
             return HALT;
-        } else if (sLine.Left(2) == "#-") {
-            sKey = sLine.Token(0).LeftChomp_n(2);
+        } else if (sLine.left(2) == "#-") {
+            sKey = sLine.token(0).leftChomp_n(2);
             if (DelNote(sKey)) {
                 PutModNotice("Deleted note [" + sKey + "]");
             } else {
                 PutModNotice("Unable to delete note [" + sKey + "]");
             }
             return HALT;
-        } else if (sLine.Left(2) == "#+") {
-            sKey = sLine.Token(0).LeftChomp_n(2);
+        } else if (sLine.left(2) == "#+") {
+            sKey = sLine.token(0).leftChomp_n(2);
             bOverwrite = true;
-        } else if (sLine.Left(1) == "#") {
-            sKey = sLine.Token(0).LeftChomp_n(1);
+        } else if (sLine.left(1) == "#") {
+            sKey = sLine.token(0).leftChomp_n(1);
         }
 
-        NoString sValue(sLine.Tokens(1));
+        NoString sValue(sLine.tokens(1));
 
         if (!sKey.empty()) {
             if (!bOverwrite && FindNV(sKey) != EndNV()) {

@@ -25,19 +25,19 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        NoString sTimeout = sArgs.Token(0);
-        NoString sAttempts = sArgs.Token(1);
-        uint timeout = sTimeout.ToUInt();
+        NoString sTimeout = sArgs.token(0);
+        NoString sAttempts = sArgs.token(1);
+        uint timeout = sTimeout.toUInt();
 
         if (sAttempts.empty())
             m_uiAllowedFailed = 2;
         else
-            m_uiAllowedFailed = sAttempts.ToUInt();
+            m_uiAllowedFailed = sAttempts.toUInt();
         ;
 
         if (sArgs.empty()) {
             timeout = 1;
-        } else if (timeout == 0 || m_uiAllowedFailed == 0 || !sArgs.Tokens(2).empty()) {
+        } else if (timeout == 0 || m_uiAllowedFailed == 0 || !sArgs.tokens(2).empty()) {
             sMessage = "Invalid argument, must be the number of minutes "
                        "IPs are blocked after a failed login and can be "
                        "followed by number of allowed failed login attempts";

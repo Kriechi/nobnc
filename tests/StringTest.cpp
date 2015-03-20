@@ -59,8 +59,8 @@ TEST_F(EscapeTest, Test)
 
 TEST(StringTest, Bool)
 {
-    EXPECT_EQ(true, NoString(true).ToBool());
-    EXPECT_EQ(false, NoString(false).ToBool());
+    EXPECT_EQ(true, NoString(true).toBool());
+    EXPECT_EQ(false, NoString(false).toBool());
 }
 
 #define NS(s) (NoString((s), sizeof(s) - 1))
@@ -72,147 +72,147 @@ TEST(StringTest, Cmp)
     EXPECT_EQ(NoString("Bbb"), s);
     EXPECT_LT(NoString("Aaa"), s);
     EXPECT_GT(NoString("Ccc"), s);
-    EXPECT_EQ(0, s.Compare("Bbb", No::CaseSensitive));
-    EXPECT_GT(0, s.Compare("bbb", No::CaseSensitive));
-    EXPECT_LT(0, s.Compare("Aaa", No::CaseSensitive));
-    EXPECT_GT(0, s.Compare("Ccc", No::CaseSensitive));
-    EXPECT_EQ(0, s.Compare("Bbb", No::CaseInsensitive));
-    EXPECT_EQ(0, s.Compare("bbb", No::CaseInsensitive));
-    EXPECT_LT(0, s.Compare("Aaa", No::CaseInsensitive));
-    EXPECT_GT(0, s.Compare("Ccc", No::CaseInsensitive));
+    EXPECT_EQ(0, s.compare("Bbb", No::CaseSensitive));
+    EXPECT_GT(0, s.compare("bbb", No::CaseSensitive));
+    EXPECT_LT(0, s.compare("Aaa", No::CaseSensitive));
+    EXPECT_GT(0, s.compare("Ccc", No::CaseSensitive));
+    EXPECT_EQ(0, s.compare("Bbb", No::CaseInsensitive));
+    EXPECT_EQ(0, s.compare("bbb", No::CaseInsensitive));
+    EXPECT_LT(0, s.compare("Aaa", No::CaseInsensitive));
+    EXPECT_GT(0, s.compare("Ccc", No::CaseInsensitive));
 
-    EXPECT_TRUE(s.Equals("bbb"));
-    EXPECT_FALSE(s.Equals("bbb", No::CaseSensitive));
-    EXPECT_FALSE(s.Equals("bb"));
+    EXPECT_TRUE(s.equals("bbb"));
+    EXPECT_FALSE(s.equals("bbb", No::CaseSensitive));
+    EXPECT_FALSE(s.equals("bb"));
 }
 
 TEST(StringTest, Wild)
 {
-    EXPECT_TRUE(NoString("").WildCmp("", No::CaseSensitive));
-    EXPECT_TRUE(NoString("").WildCmp("", No::CaseInsensitive));
+    EXPECT_TRUE(NoString("").wildCmp("", No::CaseSensitive));
+    EXPECT_TRUE(NoString("").wildCmp("", No::CaseInsensitive));
 
-    EXPECT_FALSE(NoString("xy").WildCmp("*a*b*c*", No::CaseSensitive));
-    EXPECT_FALSE(NoString("xy").WildCmp("*a*b*c*", No::CaseInsensitive));
+    EXPECT_FALSE(NoString("xy").wildCmp("*a*b*c*", No::CaseSensitive));
+    EXPECT_FALSE(NoString("xy").wildCmp("*a*b*c*", No::CaseInsensitive));
 
-    EXPECT_TRUE(NoString("I_am!~bar@foo").WildCmp("*!?bar@foo", No::CaseSensitive));
-    EXPECT_TRUE(NoString("I_am!~bar@foo").WildCmp("*!?bar@foo", No::CaseInsensitive));
+    EXPECT_TRUE(NoString("I_am!~bar@foo").wildCmp("*!?bar@foo", No::CaseSensitive));
+    EXPECT_TRUE(NoString("I_am!~bar@foo").wildCmp("*!?bar@foo", No::CaseInsensitive));
 
-    EXPECT_FALSE(NoString("I_am!~bar@foo").WildCmp("*!?BAR@foo", No::CaseSensitive));
-    EXPECT_TRUE(NoString("I_am!~bar@foo").WildCmp("*!?BAR@foo", No::CaseInsensitive));
+    EXPECT_FALSE(NoString("I_am!~bar@foo").wildCmp("*!?BAR@foo", No::CaseSensitive));
+    EXPECT_TRUE(NoString("I_am!~bar@foo").wildCmp("*!?BAR@foo", No::CaseInsensitive));
 
-    EXPECT_TRUE(NoString("abc").WildCmp("*a*b*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("abc").WildCmp("*a*b*c*", No::CaseInsensitive));
+    EXPECT_TRUE(NoString("abc").wildCmp("*a*b*c*", No::CaseSensitive));
+    EXPECT_TRUE(NoString("abc").wildCmp("*a*b*c*", No::CaseInsensitive));
 
-    EXPECT_FALSE(NoString("abc").WildCmp("*A*b*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("abc").WildCmp("*A*b*c*", No::CaseInsensitive));
+    EXPECT_FALSE(NoString("abc").wildCmp("*A*b*c*", No::CaseSensitive));
+    EXPECT_TRUE(NoString("abc").wildCmp("*A*b*c*", No::CaseInsensitive));
 
-    EXPECT_FALSE(NoString("Abc").WildCmp("*a*b*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("Abc").WildCmp("*a*b*c*", No::CaseInsensitive));
+    EXPECT_FALSE(NoString("Abc").wildCmp("*a*b*c*", No::CaseSensitive));
+    EXPECT_TRUE(NoString("Abc").wildCmp("*a*b*c*", No::CaseInsensitive));
 
-    EXPECT_TRUE(NoString("axbyc").WildCmp("*a*b*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("axbyc").WildCmp("*a*b*c*", No::CaseInsensitive));
+    EXPECT_TRUE(NoString("axbyc").wildCmp("*a*b*c*", No::CaseSensitive));
+    EXPECT_TRUE(NoString("axbyc").wildCmp("*a*b*c*", No::CaseInsensitive));
 
-    EXPECT_FALSE(NoString("AxByC").WildCmp("*a*B*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("AxByC").WildCmp("*a*B*c*", No::CaseInsensitive));
+    EXPECT_FALSE(NoString("AxByC").wildCmp("*a*B*c*", No::CaseSensitive));
+    EXPECT_TRUE(NoString("AxByC").wildCmp("*a*B*c*", No::CaseInsensitive));
 }
 
 TEST(StringTest, Case)
 {
     NoString x = NS("xx");
     NoString X = NS("XX");
-    EXPECT_EQ(X, x.AsUpper());
-    EXPECT_EQ(x, X.AsLower());
+    EXPECT_EQ(X, x.toUpper());
+    EXPECT_EQ(x, X.toLower());
 }
 
 TEST(StringTest, Replace)
 {
-    EXPECT_EQ("(b()b)", NoString("(a()a)").Replace_n("a", "b"));
+    EXPECT_EQ("(b()b)", NoString("(a()a)").replace_n("a", "b"));
 //    EXPECT_EQ("(a()b)", NoString("(a()a)").Replace_n("a", "b", "(", ")"));
 //    EXPECT_EQ("a(b)", NoString("(a()a)").Replace_n("a", "b", "(", ")", true));
 }
 
 TEST(StringTest, LeftRight)
 {
-    EXPECT_EQ("Xy", NS("Xyz").Left(2));
-    EXPECT_EQ("Xyz", NS("Xyz").Left(20));
+    EXPECT_EQ("Xy", NS("Xyz").left(2));
+    EXPECT_EQ("Xyz", NS("Xyz").left(20));
 
-    EXPECT_EQ("yz", NS("Xyz").Right(2));
-    EXPECT_EQ("Xyz", NS("Xyz").Right(20));
+    EXPECT_EQ("yz", NS("Xyz").right(2));
+    EXPECT_EQ("Xyz", NS("Xyz").right(20));
 }
 
 TEST(StringTest, Split)
 {
-    EXPECT_EQ("a", NS("a b c").Token(0));
-    EXPECT_EQ("b", NS("a b c").Token(1));
-    EXPECT_EQ("", NS("a b c").Token(100));
-    EXPECT_EQ("b c", NS("a b c").Tokens(1));
-    EXPECT_EQ("c", NS("a  c").Token(1));
-    EXPECT_EQ("c", NS("a  c").Token(1, " "));
-    EXPECT_EQ("c", NS("a  c").Token(1, "  "));
-    EXPECT_EQ(" c", NS("a   c").Token(1, "  "));
-    EXPECT_EQ("c", NS("a    c").Token(1, "  "));
-//    EXPECT_EQ("(b c)", CS("a (b c) d").Token(1, " ", "(", ")"));
-//    EXPECT_EQ("d", CS("a (b c) d").Token(2, " ", "(", ")"));
+    EXPECT_EQ("a", NS("a b c").token(0));
+    EXPECT_EQ("b", NS("a b c").token(1));
+    EXPECT_EQ("", NS("a b c").token(100));
+    EXPECT_EQ("b c", NS("a b c").tokens(1));
+    EXPECT_EQ("c", NS("a  c").token(1));
+    EXPECT_EQ("c", NS("a  c").token(1, " "));
+    EXPECT_EQ("c", NS("a  c").token(1, "  "));
+    EXPECT_EQ(" c", NS("a   c").token(1, "  "));
+    EXPECT_EQ("c", NS("a    c").token(1, "  "));
+//    EXPECT_EQ("(b c)", CS("a (b c) d").token(1, " ", "(", ")"));
+//    EXPECT_EQ("d", CS("a (b c) d").token(2, " ", "(", ")"));
 
     NoStringVector vexpected;
     vexpected.push_back("a");
     vexpected.push_back("b");
     vexpected.push_back("c");
-    NoStringVector vresult = NS("a b c").Split(" ");
+    NoStringVector vresult = NS("a b c").split(" ");
     EXPECT_EQ(vexpected, vresult);
 }
 
 TEST(StringTest, Equals)
 {
-    EXPECT_TRUE(NS("ABC").Equals("abc"));
-    EXPECT_TRUE(NS("ABC").Equals("abc", No::CaseInsensitive));
-    EXPECT_FALSE(NS("ABC").Equals("abc", No::CaseSensitive));
+    EXPECT_TRUE(NS("ABC").equals("abc"));
+    EXPECT_TRUE(NS("ABC").equals("abc", No::CaseInsensitive));
+    EXPECT_FALSE(NS("ABC").equals("abc", No::CaseSensitive));
 }
 
 TEST(StringTest, Find)
 {
-    EXPECT_EQ(NoString("Hello, I'm Bob").Find("Hello"), 0u);
-    EXPECT_EQ(NoString("Hello, I'm Bob").Find("Hello", No::CaseInsensitive), 0u);
-    EXPECT_EQ(NoString("Hello, I'm Bob").Find("Hello", No::CaseSensitive), 0u);
+    EXPECT_EQ(NoString("Hello, I'm Bob").find("Hello"), 0u);
+    EXPECT_EQ(NoString("Hello, I'm Bob").find("Hello", No::CaseInsensitive), 0u);
+    EXPECT_EQ(NoString("Hello, I'm Bob").find("Hello", No::CaseSensitive), 0u);
 
-    EXPECT_EQ(NoString("Hello, I'm Bob").Find("i'm"), 7u);
-    EXPECT_EQ(NoString("Hello, I'm Bob").Find("i'm", No::CaseInsensitive), 7u);
-    EXPECT_EQ(NoString("Hello, I'm Bob").Find("i'm", No::CaseSensitive), NoString::npos);
+    EXPECT_EQ(NoString("Hello, I'm Bob").find("i'm"), 7u);
+    EXPECT_EQ(NoString("Hello, I'm Bob").find("i'm", No::CaseInsensitive), 7u);
+    EXPECT_EQ(NoString("Hello, I'm Bob").find("i'm", No::CaseSensitive), NoString::npos);
 }
 
 TEST(StringTest, StartsWith)
 {
-    EXPECT_TRUE(NoString("Hello, I'm Bob").StartsWith("Hello"));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").StartsWith("Hello", No::CaseInsensitive));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").StartsWith("Hello", No::CaseSensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").startsWith("Hello"));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").startsWith("Hello", No::CaseInsensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").startsWith("Hello", No::CaseSensitive));
 
-    EXPECT_TRUE(NoString("Hello, I'm Bob").StartsWith("hello"));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").StartsWith("hello", No::CaseInsensitive));
-    EXPECT_FALSE(NoString("Hello, I'm Bob").StartsWith("hello", No::CaseSensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").startsWith("hello"));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").startsWith("hello", No::CaseInsensitive));
+    EXPECT_FALSE(NoString("Hello, I'm Bob").startsWith("hello", No::CaseSensitive));
 }
 
 TEST(StringTest, EndsWith)
 {
-    EXPECT_TRUE(NoString("Hello, I'm Bob").EndsWith("Bob"));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").EndsWith("Bob", No::CaseInsensitive));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").EndsWith("Bob", No::CaseSensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").endsWith("Bob"));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").endsWith("Bob", No::CaseInsensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").endsWith("Bob", No::CaseSensitive));
 
-    EXPECT_TRUE(NoString("Hello, I'm Bob").EndsWith("bob"));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").EndsWith("bob", No::CaseInsensitive));
-    EXPECT_FALSE(NoString("Hello, I'm Bob").EndsWith("bob", No::CaseSensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").endsWith("bob"));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").endsWith("bob", No::CaseInsensitive));
+    EXPECT_FALSE(NoString("Hello, I'm Bob").endsWith("bob", No::CaseSensitive));
 }
 
 TEST(StringTest, Contains)
 {
-    EXPECT_TRUE(NoString("Hello, I'm Bob").Contains("Hello"));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").Contains("Hello", No::CaseInsensitive));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").Contains("Hello", No::CaseSensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").contains("Hello"));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").contains("Hello", No::CaseInsensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").contains("Hello", No::CaseSensitive));
 
-    EXPECT_TRUE(NoString("Hello, I'm Bob").Contains("i'm"));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").Contains("i'm", No::CaseInsensitive));
-    EXPECT_FALSE(NoString("Hello, I'm Bob").Contains("i'm", No::CaseSensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").contains("i'm"));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").contains("i'm", No::CaseInsensitive));
+    EXPECT_FALSE(NoString("Hello, I'm Bob").contains("i'm", No::CaseSensitive));
 
-    EXPECT_TRUE(NoString("Hello, I'm Bob").Contains("i'm bob"));
-    EXPECT_TRUE(NoString("Hello, I'm Bob").Contains("i'm bob", No::CaseInsensitive));
-    EXPECT_FALSE(NoString("Hello, I'm Bob").Contains("i'm bob", No::CaseSensitive));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").contains("i'm bob"));
+    EXPECT_TRUE(NoString("Hello, I'm Bob").contains("i'm bob", No::CaseInsensitive));
+    EXPECT_FALSE(NoString("Hello, I'm Bob").contains("i'm bob", No::CaseSensitive));
 }

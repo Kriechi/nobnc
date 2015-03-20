@@ -194,7 +194,7 @@ void NoIncomingConnection::ReachedMaxBufferImpl()
 
 void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
 {
-    bool bIsHTTP = (sLine.WildCmp("GET * HTTP/1.?\r\n") || sLine.WildCmp("POST * HTTP/1.?\r\n"));
+    bool bIsHTTP = (sLine.wildCmp("GET * HTTP/1.?\r\n") || sLine.wildCmp("POST * HTTP/1.?\r\n"));
     bool bAcceptHTTP = (m_eAcceptType == NoListener::AcceptAll) || (m_eAcceptType == NoListener::AcceptHttp);
     bool bAcceptIRC = (m_eAcceptType == NoListener::AcceptAll) || (m_eAcceptType == NoListener::AcceptIrc);
     NoSocket* pSock = nullptr;

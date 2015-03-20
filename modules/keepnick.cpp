@@ -72,7 +72,7 @@ public:
         if (!pIRCSock) return;
 
         // Do we already have the nick we want?
-        if (pIRCSock->GetNick().Equals(GetNick())) return;
+        if (pIRCSock->GetNick().equals(GetNick())) return;
 
         PutIRC("NICK " + GetNick());
     }
@@ -82,7 +82,7 @@ public:
         NoString sConfNick = GetNetwork()->GetNick();
         NoIrcConnection* pIRCSock = GetNetwork()->GetIRCSock();
 
-        if (pIRCSock) sConfNick = sConfNick.Left(pIRCSock->GetMaxNickLen());
+        if (pIRCSock) sConfNick = sConfNick.left(pIRCSock->GetMaxNickLen());
 
         return sConfNick;
     }
@@ -96,7 +96,7 @@ public:
                 // Let's assume the user wants this and disable
                 // this module (to avoid fighting nickserv).
                 Disable();
-            } else if (sNewNick.Equals(GetNick())) {
+            } else if (sNewNick.equals(GetNick())) {
                 // We are changing our nick to the conf setting,
                 // so we don't need that timer anymore.
                 Disable();
@@ -126,7 +126,7 @@ public:
 
     void OnIRCConnected() override
     {
-        if (!GetNetwork()->GetIRCSock()->GetNick().Equals(GetNick())) {
+        if (!GetNetwork()->GetIRCSock()->GetNick().equals(GetNick())) {
             // We don't have the nick we want, try to get it
             Enable();
         }
@@ -155,15 +155,15 @@ public:
         if (!GetNetwork()->IsIRCConnected()) return CONTINUE;
 
         // We are trying to get the config nick and this is a /nick?
-        if (!m_pTimer || !sLine.Token(0).Equals("NICK")) return CONTINUE;
+        if (!m_pTimer || !sLine.token(0).equals("NICK")) return CONTINUE;
 
         // Is the nick change for the nick we are trying to get?
-        NoString sNick = sLine.Token(1);
+        NoString sNick = sLine.token(1);
 
         // Don't even think of using spaces in your nick!
-        if (sNick.Left(1) == ":") sNick.LeftChomp(1);
+        if (sNick.left(1) == ":") sNick.leftChomp(1);
 
-        if (!sNick.Equals(GetNick())) return CONTINUE;
+        if (!sNick.equals(GetNick())) return CONTINUE;
 
         // Indeed trying to change to this nick, generate a 433 for it.
         // This way we can *always* block incoming 433s from the server.
@@ -176,7 +176,7 @@ public:
     {
         // Are we trying to get our primary nick and we caused this error?
         // :irc.server.net 433 mynick badnick :Nickname is already in use.
-        if (m_pTimer && sLine.Token(1) == "433" && sLine.Token(3).Equals(GetNick())) return HALT;
+        if (m_pTimer && sLine.token(1) == "433" && sLine.token(3).equals(GetNick())) return HALT;
 
         return CONTINUE;
     }

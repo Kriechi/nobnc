@@ -60,11 +60,11 @@ class NoAway : public NoModule
         time_t curtime;
         time(&curtime);
 
-        if (sCommand.Token(1) != "-quiet") {
-            sReason = NoUtils::FormatTime(curtime, sCommand.Tokens(1), GetUser()->GetTimezone());
+        if (sCommand.token(1) != "-quiet") {
+            sReason = NoUtils::FormatTime(curtime, sCommand.tokens(1), GetUser()->GetTimezone());
             PutModNotice("You have been marked as away");
         } else {
-            sReason = NoUtils::FormatTime(curtime, sCommand.Tokens(2), GetUser()->GetTimezone());
+            sReason = NoUtils::FormatTime(curtime, sCommand.tokens(2), GetUser()->GetTimezone());
         }
 
         Away(false, sReason);
@@ -72,7 +72,7 @@ class NoAway : public NoModule
 
     void BackCommand(const NoString& sCommand)
     {
-        if ((m_vMessages.empty()) && (sCommand.Token(1) != "-quiet")) PutModNotice("Welcome Back!");
+        if ((m_vMessages.empty()) && (sCommand.token(1) != "-quiet")) PutModNotice("Welcome Back!");
         Ping();
         Back();
     }
@@ -86,15 +86,15 @@ class NoAway : public NoModule
     {
         NoString nick = GetClient()->GetNick();
         for (u_int a = 0; a < m_vMessages.size(); a++) {
-            NoString sWhom = m_vMessages[a].Token(1, ":");
-            NoString sMessage = m_vMessages[a].Tokens(2, ":");
+            NoString sWhom = m_vMessages[a].token(1, ":");
+            NoString sMessage = m_vMessages[a].tokens(2, ":");
             PutUser(":" + sWhom + " PRIVMSG " + nick + " :" + sMessage);
         }
     }
 
     void DeleteCommand(const NoString& sCommand)
     {
-        NoString sWhich = sCommand.Token(1);
+        NoString sWhich = sCommand.token(1);
         if (sWhich == "all") {
             PutModNotice("Deleted " + NoString(m_vMessages.size()) + " Messages.");
             for (u_int a = 0; a < m_vMessages.size(); a++) m_vMessages.erase(m_vMessages.begin() + a--);
@@ -102,7 +102,7 @@ class NoAway : public NoModule
             PutModNotice("USAGE: delete <num|all>");
             return;
         } else {
-            u_int iNum = sWhich.ToUInt();
+            u_int iNum = sWhich.toUInt();
             if (iNum >= m_vMessages.size()) {
                 PutModNotice("Illegal Message # Requested");
                 return;
@@ -132,7 +132,7 @@ class NoAway : public NoModule
 
     void PassCommand(const NoString& sCommand)
     {
-        m_sPassword = sCommand.Token(1);
+        m_sPassword = sCommand.token(1);
         PutModNotice("Password Updated to [" + m_sPassword + "]");
     }
 
@@ -140,9 +140,9 @@ class NoAway : public NoModule
     {
         std::map<NoString, std::vector<NoString>> msvOutput;
         for (u_int a = 0; a < m_vMessages.size(); a++) {
-            NoString sTime = m_vMessages[a].Token(0);
-            NoString sWhom = m_vMessages[a].Token(1);
-            NoString sMessage = m_vMessages[a].Tokens(2);
+            NoString sTime = m_vMessages[a].token(0);
+            NoString sWhom = m_vMessages[a].token(1);
+            NoString sMessage = m_vMessages[a].tokens(2);
 
             if ((sTime.empty()) || (sWhom.empty()) || (sMessage.empty())) {
                 // illegal format
@@ -151,7 +151,7 @@ class NoAway : public NoModule
                 continue;
             }
 
-            time_t iTime = sTime.ToULong();
+            time_t iTime = sTime.toULong();
             char szFormat[64];
             struct tm t;
             localtime_r(&iTime, &t);
@@ -192,7 +192,7 @@ class NoAway : public NoModule
 
     void SetTimerCommand(const NoString& sCommand)
     {
-        int iSetting = sCommand.Token(1).ToInt();
+        int iSetting = sCommand.token(1).toInt();
 
         SetAwayTime(iSetting);
 
@@ -242,16 +242,16 @@ public:
     {
         NoString sMyArgs = sArgs;
         size_t uIndex = 0;
-        if (sMyArgs.Token(0) == "-nostore") {
+        if (sMyArgs.token(0) == "-nostore") {
             uIndex++;
             m_saveMessages = false;
         }
-        if (sMyArgs.Token(uIndex) == "-notimer") {
+        if (sMyArgs.token(uIndex) == "-notimer") {
             SetAwayTime(0);
-            sMyArgs = sMyArgs.Tokens(uIndex + 1);
-        } else if (sMyArgs.Token(uIndex) == "-timer") {
-            SetAwayTime(sMyArgs.Token(uIndex + 1).ToInt());
-            sMyArgs = sMyArgs.Tokens(uIndex + 2);
+            sMyArgs = sMyArgs.tokens(uIndex + 1);
+        } else if (sMyArgs.token(uIndex) == "-timer") {
+            SetAwayTime(sMyArgs.token(uIndex + 1).toInt());
+            sMyArgs = sMyArgs.tokens(uIndex + 2);
         }
         if (m_saveMessages) {
             if (!sMyArgs.empty()) {
@@ -286,11 +286,11 @@ public:
         if (DecryptMessages(sFile)) {
             NoStringVector::iterator it;
 
-            NoStringVector vsLines = sFile.Split("\n");
+            NoStringVector vsLines = sFile.split("\n");
 
             for (it = vsLines.begin(); it != vsLines.end(); ++it) {
                 NoString sLine(*it);
-                sLine.Trim();
+                sLine.trim();
                 AddMessage(sLine);
             }
         } else {
@@ -347,7 +347,7 @@ public:
             NoString sTime;
             if (pTime) {
                 sTime = pTime;
-                sTime.Trim();
+                sTime.trim();
             }
             if (m_sReason.empty()) m_sReason = "Auto Away at " + sTime;
             PutIRC("AWAY :" + m_sReason);
@@ -438,7 +438,7 @@ private:
             NoBlowfish c(m_sPassword, BF_DECRYPT);
             sBuffer = c.Crypt(sFile);
 
-            if (sBuffer.Left(strlen(CRYPT_VERIFICATION_TOKEN)) != CRYPT_VERIFICATION_TOKEN) {
+            if (sBuffer.left(strlen(CRYPT_VERIFICATION_TOKEN)) != CRYPT_VERIFICATION_TOKEN) {
                 // failed to decode :(
                 PutModule("Unable to decode Encrypted messages");
                 return (false);

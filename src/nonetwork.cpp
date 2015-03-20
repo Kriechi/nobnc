@@ -178,7 +178,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
 
     m_uServerIdx = 0;
     for (size_t a = 0; a < m_vServers.size(); a++) {
-        if (sServer.Equals(m_vServers[a]->GetName())) {
+        if (sServer.equals(m_vServers[a]->GetName())) {
             m_uServerIdx = a + 1;
             break;
         }
@@ -346,7 +346,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
 
         for (const auto& Option : BoolOptions) {
             NoString sValue;
-            if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.ToBool());
+            if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.toBool());
         }
 
         for (const auto& Option : DoubleOptions) {
@@ -361,7 +361,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
 
         pConfig->FindStringVector("loadmodule", vsList);
         for (const NoString& sValue : vsList) {
-            NoString sModName = sValue.Token(0);
+            NoString sModName = sValue.token(0);
             NoString sNotice = "Loading network module [" + sModName + "]";
 
             // XXX Legacy crap, added in ZNC 0.203, modified in 0.207
@@ -384,7 +384,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
             }
 
             NoString sModRet;
-            NoString sArgs = sValue.Tokens(1);
+            NoString sArgs = sValue.tokens(1);
 
             bool bModRet = LoadModule(sModName, sArgs, sNotice, sModRet);
 
@@ -658,7 +658,7 @@ std::vector<NoClient*> NoNetwork::FindClients(const NoString& sIdentifier) const
 {
     std::vector<NoClient*> vClients;
     for (NoClient* pClient : m_vClients) {
-        if (pClient->GetIdentifier().Equals(sIdentifier)) {
+        if (pClient->GetIdentifier().equals(sIdentifier)) {
             vClients.push_back(pClient);
         }
     }
@@ -751,11 +751,11 @@ NoChannel* NoNetwork::FindChan(NoString sName) const
 {
     if (GetIRCSock()) {
         // See https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.16
-        sName.TrimLeft(GetIRCSock()->GetISupport("STATUSMSG", ""));
+        sName.trimLeft(GetIRCSock()->GetISupport("STATUSMSG", ""));
     }
 
     for (NoChannel* pChan : m_vChans) {
-        if (sName.Equals(pChan->getName())) {
+        if (sName.equals(pChan->getName())) {
             return pChan;
         }
     }
@@ -767,9 +767,9 @@ std::vector<NoChannel*> NoNetwork::FindChans(const NoString& sWild) const
 {
     std::vector<NoChannel*> vChans;
     vChans.reserve(m_vChans.size());
-    const NoString sLower = sWild.AsLower();
+    const NoString sLower = sWild.toLower();
     for (NoChannel* pChan : m_vChans) {
-        if (pChan->getName().AsLower().WildCmp(sLower)) vChans.push_back(pChan);
+        if (pChan->getName().toLower().wildCmp(sLower)) vChans.push_back(pChan);
     }
     return vChans;
 }
@@ -781,7 +781,7 @@ bool NoNetwork::AddChan(NoChannel* pChan)
     }
 
     for (NoChannel* pEachChan : m_vChans) {
-        if (pEachChan->getName().Equals(pChan->getName())) {
+        if (pEachChan->getName().equals(pChan->getName())) {
             delete pChan;
             return false;
         }
@@ -805,7 +805,7 @@ bool NoNetwork::AddChan(const NoString& sName, bool bInConfig)
 bool NoNetwork::DelChan(const NoString& sName)
 {
     for (std::vector<NoChannel*>::iterator a = m_vChans.begin(); a != m_vChans.end(); ++a) {
-        if (sName.Equals((*a)->getName())) {
+        if (sName.equals((*a)->getName())) {
             delete *a;
             m_vChans.erase(a);
             return true;
@@ -918,7 +918,7 @@ std::vector<NoQuery*> NoNetwork::GetQueries() const { return m_vQueries; }
 NoQuery* NoNetwork::FindQuery(const NoString& sName) const
 {
     for (NoQuery* pQuery : m_vQueries) {
-        if (sName.Equals(pQuery->getName())) {
+        if (sName.equals(pQuery->getName())) {
             return pQuery;
         }
     }
@@ -930,9 +930,9 @@ std::vector<NoQuery*> NoNetwork::FindQueries(const NoString& sWild) const
 {
     std::vector<NoQuery*> vQueries;
     vQueries.reserve(m_vQueries.size());
-    const NoString sLower = sWild.AsLower();
+    const NoString sLower = sWild.toLower();
     for (NoQuery* pQuery : m_vQueries) {
-        if (pQuery->getName().AsLower().WildCmp(sLower)) vQueries.push_back(pQuery);
+        if (pQuery->getName().toLower().wildCmp(sLower)) vQueries.push_back(pQuery);
     }
     return vQueries;
 }
@@ -962,7 +962,7 @@ NoQuery* NoNetwork::AddQuery(const NoString& sName)
 bool NoNetwork::DelQuery(const NoString& sName)
 {
     for (std::vector<NoQuery*>::iterator a = m_vQueries.begin(); a != m_vQueries.end(); ++a) {
-        if (sName.Equals((*a)->getName())) {
+        if (sName.equals((*a)->getName())) {
             delete *a;
             m_vQueries.erase(a);
             return true;
@@ -981,7 +981,7 @@ bool NoNetwork::HasServers() const { return !m_vServers.empty(); }
 NoServer* NoNetwork::FindServer(const NoString& sName) const
 {
     for (NoServer* pServer : m_vServers) {
-        if (sName.Equals(pServer->GetName())) {
+        if (sName.equals(pServer->GetName())) {
             return pServer;
         }
     }
@@ -1004,7 +1004,7 @@ bool NoNetwork::DelServer(const NoString& sName, ushort uPort, const NoString& s
 
         if (pServer == pCurServer) bSawCurrentServer = true;
 
-        if (!pServer->GetName().Equals(sName)) continue;
+        if (!pServer->GetName().equals(sName)) continue;
 
         if (uPort != 0 && pServer->GetPort() != uPort) continue;
 
@@ -1047,18 +1047,18 @@ bool NoNetwork::AddServer(const NoString& sName)
 
     bool bSSL = false;
     NoString sLine = sName;
-    sLine.Trim();
+    sLine.trim();
 
-    NoString sHost = sLine.Token(0);
-    NoString sPort = sLine.Token(1);
+    NoString sHost = sLine.token(0);
+    NoString sPort = sLine.token(1);
 
-    if (sPort.Left(1) == "+") {
+    if (sPort.left(1) == "+") {
         bSSL = true;
-        sPort.LeftChomp(1);
+        sPort.leftChomp(1);
     }
 
-    ushort uPort = sPort.ToUShort();
-    NoString sPass = sLine.Tokens(2);
+    ushort uPort = sPort.toUShort();
+    NoString sPass = sLine.tokens(2);
 
     return AddServer(sHost, uPort, sPass, bSSL);
 }
@@ -1081,7 +1081,7 @@ bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& s
 
     // Check if server is already added
     for (NoServer* pServer : m_vServers) {
-        if (!sName.Equals(pServer->GetName())) continue;
+        if (!sName.equals(pServer->GetName())) continue;
 
         if (uPort != pServer->GetPort()) continue;
 
@@ -1377,7 +1377,7 @@ NoString NoNetwork::GetQuitMsg() const
 
 void NoNetwork::SetNick(const NoString& s)
 {
-    if (m_pUser->GetNick().Equals(s)) {
+    if (m_pUser->GetNick().equals(s)) {
         m_sNick = "";
     } else {
         m_sNick = s;
@@ -1386,7 +1386,7 @@ void NoNetwork::SetNick(const NoString& s)
 
 void NoNetwork::SetAltNick(const NoString& s)
 {
-    if (m_pUser->GetAltNick().Equals(s)) {
+    if (m_pUser->GetAltNick().equals(s)) {
         m_sAltNick = "";
     } else {
         m_sAltNick = s;
@@ -1395,7 +1395,7 @@ void NoNetwork::SetAltNick(const NoString& s)
 
 void NoNetwork::SetIdent(const NoString& s)
 {
-    if (m_pUser->GetIdent().Equals(s)) {
+    if (m_pUser->GetIdent().equals(s)) {
         m_sIdent = "";
     } else {
         m_sIdent = s;
@@ -1404,7 +1404,7 @@ void NoNetwork::SetIdent(const NoString& s)
 
 void NoNetwork::SetRealName(const NoString& s)
 {
-    if (m_pUser->GetRealName().Equals(s)) {
+    if (m_pUser->GetRealName().equals(s)) {
         m_sRealName = "";
     } else {
         m_sRealName = s;
@@ -1413,7 +1413,7 @@ void NoNetwork::SetRealName(const NoString& s)
 
 void NoNetwork::SetBindHost(const NoString& s)
 {
-    if (m_pUser->GetBindHost().Equals(s)) {
+    if (m_pUser->GetBindHost().equals(s)) {
         m_sBindHost = "";
     } else {
         m_sBindHost = s;
@@ -1424,7 +1424,7 @@ void NoNetwork::SetEncoding(const NoString& s) { m_sEncoding = s; }
 
 void NoNetwork::SetQuitMsg(const NoString& s)
 {
-    if (m_pUser->GetQuitMsg().Equals(s)) {
+    if (m_pUser->GetQuitMsg().equals(s)) {
         m_sQuitMsg = "";
     } else {
         m_sQuitMsg = s;
@@ -1448,12 +1448,12 @@ NoString NoNetwork::ExpandString(const NoString& sStr) const
 NoString& NoNetwork::ExpandString(const NoString& sStr, NoString& sRet) const
 {
     sRet = sStr;
-    sRet.Replace("%defnick%", GetNick());
-    sRet.Replace("%nick%", GetCurNick());
-    sRet.Replace("%altnick%", GetAltNick());
-    sRet.Replace("%ident%", GetIdent());
-    sRet.Replace("%realname%", GetRealName());
-    sRet.Replace("%bindhost%", GetBindHost());
+    sRet.replace("%defnick%", GetNick());
+    sRet.replace("%nick%", GetCurNick());
+    sRet.replace("%altnick%", GetAltNick());
+    sRet.replace("%ident%", GetIdent());
+    sRet.replace("%realname%", GetRealName());
+    sRet.replace("%bindhost%", GetBindHost());
 
     return m_pUser->ExpandString(sRet, sRet);
 }

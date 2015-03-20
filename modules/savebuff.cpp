@@ -140,22 +140,22 @@ public:
 
         NoStringVector::iterator it;
 
-        NoStringVector vsLines = sContent.Split("\n");
+        NoStringVector vsLines = sContent.split("\n");
 
         for (it = vsLines.begin(); it != vsLines.end(); ++it) {
             NoString sLine(*it);
-            sLine.Trim();
+            sLine.trim();
             if (sLine[0] == '@' && it + 1 != vsLines.end()) {
-                NoString sTimestamp = sLine.Token(0);
-                sTimestamp.TrimLeft("@");
+                NoString sTimestamp = sLine.token(0);
+                sTimestamp.trimLeft("@");
                 timeval ts;
-                ts.tv_sec = sTimestamp.Token(0, ",").ToLongLong();
-                ts.tv_usec = sTimestamp.Token(1, ",").ToLong();
+                ts.tv_sec = sTimestamp.token(0, ",").toLongLong();
+                ts.tv_usec = sTimestamp.token(1, ",").toLong();
 
-                NoString sFormat = sLine.Tokens(1);
+                NoString sFormat = sLine.tokens(1);
 
                 NoString sText(*++it);
-                sText.Trim();
+                sText.trim();
 
                 pTarget->addBuffer(sFormat, sText, &ts);
             } else {
@@ -222,7 +222,7 @@ public:
 
     void OnSetPassCommand(const NoString& sCmdLine)
     {
-        NoString sArgs = sCmdLine.Tokens(1);
+        NoString sArgs = sCmdLine.tokens(1);
 
         if (sArgs.empty()) sArgs = CRYPT_LAME_PASS;
 
@@ -232,20 +232,20 @@ public:
 
     void OnModCommand(const NoString& sCmdLine) override
     {
-        NoString sCommand = sCmdLine.Token(0);
-        NoString sArgs = sCmdLine.Tokens(1);
+        NoString sCommand = sCmdLine.token(0);
+        NoString sArgs = sCmdLine.tokens(1);
 
-        if (sCommand.Equals("dumpbuff")) {
+        if (sCommand.equals("dumpbuff")) {
             // for testing purposes - hidden from help
             NoString sFile;
             NoString sName;
             if (DecryptBuffer(GetPath(sArgs), sFile, sName)) {
-                NoStringVector vsLines = sFile.Split("\n");
+                NoStringVector vsLines = sFile.split("\n");
                 NoStringVector::iterator it;
 
                 for (it = vsLines.begin(); it != vsLines.end(); ++it) {
                     NoString sLine(*it);
-                    sLine.Trim();
+                    sLine.trim();
                     PutModule("[" + sLine + "]");
                 }
             }
@@ -257,7 +257,7 @@ public:
 
     void OnReplayCommand(const NoString& sCmdLine)
     {
-        NoString sArgs = sCmdLine.Tokens(1);
+        NoString sArgs = sCmdLine.tokens(1);
 
         Replay(sArgs);
         PutModule("Replayed " + sArgs);
@@ -275,12 +275,12 @@ public:
         NoString sName;
         PutUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Buffer Playback...");
         if (DecryptBuffer(GetPath(sBuffer), sFile, sName)) {
-            NoStringVector vsLines = sFile.Split("\n");
+            NoStringVector vsLines = sFile.split("\n");
             NoStringVector::iterator it;
 
             for (it = vsLines.begin(); it != vsLines.end(); ++it) {
                 NoString sLine(*it);
-                sLine.Trim();
+                sLine.trim();
                 PutUser(sLine);
             }
         }
@@ -289,7 +289,7 @@ public:
 
     NoString GetPath(const NoString& sTarget) const
     {
-        NoString sBuffer = GetUser()->GetUserName() + sTarget.AsLower();
+        NoString sBuffer = GetUser()->GetUserName() + sTarget.toLower();
         NoString sRet = GetSavePath();
         sRet += "/" + NoBlowfish::MD5(sBuffer, true);
         return (sRet);
@@ -300,7 +300,7 @@ public:
         const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
         for (NoChannel* pChan : vChans) {
             const NoString& sName = pChan->getName();
-            if (GetPath(sName).Equals(sPath)) {
+            if (GetPath(sName).equals(sPath)) {
                 return sName;
             }
         }
@@ -379,15 +379,15 @@ private:
             NoBlowfish c(m_sPassword, BF_DECRYPT);
             sBuffer = c.Crypt(sContent);
 
-            if (sBuffer.TrimPrefix(LEGACY_VERIFICATION_TOKEN)) {
+            if (sBuffer.trimPrefix(LEGACY_VERIFICATION_TOKEN)) {
                 sName = FindLegacyBufferName(sPath);
                 return ChanBuffer;
-            } else if (sBuffer.TrimPrefix(CHAN_VERIFICATION_TOKEN)) {
-                sName = sBuffer.FirstLine();
-                if (sBuffer.TrimLeft(sName + "\n")) return ChanBuffer;
-            } else if (sBuffer.TrimPrefix(QUERY_VERIFICATION_TOKEN)) {
-                sName = sBuffer.FirstLine();
-                if (sBuffer.TrimLeft(sName + "\n")) return QueryBuffer;
+            } else if (sBuffer.trimPrefix(CHAN_VERIFICATION_TOKEN)) {
+                sName = sBuffer.firstLine();
+                if (sBuffer.trimLeft(sName + "\n")) return ChanBuffer;
+            } else if (sBuffer.trimPrefix(QUERY_VERIFICATION_TOKEN)) {
+                sName = sBuffer.firstLine();
+                if (sBuffer.trimLeft(sName + "\n")) return QueryBuffer;
             }
 
             PutModule("Unable to decode Encrypted file [" + sPath + "]");

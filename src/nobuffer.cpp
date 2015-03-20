@@ -44,7 +44,7 @@ uint NoBuffer::addMessage(const NoString& format, const NoString& text, const ti
 uint NoBuffer::updateMessage(const NoString& match, const NoString& format, const NoString& text)
 {
     for (NoMessage& line : m_lines) {
-        if (line.GetFormat().compare(0, match.length(), match) == 0) {
+        if (line.GetFormat().startsWith(match, No::CaseSensitive) == 0) {
             line.SetFormat(format);
             line.SetText(text);
             line.UpdateTime();

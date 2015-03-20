@@ -110,7 +110,7 @@ bool NoSettings::FindBoolEntry(const NoString& sName, bool& bRes, bool bDefault)
 {
     NoString s;
     if (FindStringEntry(sName, s)) {
-        bRes = s.ToBool();
+        bRes = s.toBool();
         return true;
     }
     bRes = bDefault;
@@ -121,7 +121,7 @@ bool NoSettings::FindUIntEntry(const NoString& sName, uint& uRes, uint uDefault)
 {
     NoString s;
     if (FindStringEntry(sName, s)) {
-        uRes = s.ToUInt();
+        uRes = s.toUInt();
         return true;
     }
     uRes = uDefault;
@@ -132,7 +132,7 @@ bool NoSettings::FindUShortEntry(const NoString& sName, ushort& uRes, ushort uDe
 {
     NoString s;
     if (FindStringEntry(sName, s)) {
-        uRes = s.ToUShort();
+        uRes = s.toUShort();
         return true;
     }
     uRes = uDefault;
@@ -143,7 +143,7 @@ bool NoSettings::FindDoubleEntry(const NoString& sName, double& fRes, double fDe
 {
     NoString s;
     if (FindStringEntry(sName, s)) {
-        fRes = s.ToDouble();
+        fRes = s.toDouble();
         return true;
     }
     fRes = fDefault;
@@ -195,32 +195,32 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
     } while (0)
 
         // Remove all leading spaces and trailing line endings
-        sLine.TrimLeft();
-        sLine.TrimRight("\r\n");
+        sLine.trimLeft();
+        sLine.trimRight("\r\n");
 
-        if (bCommented || sLine.Left(2) == "/*") {
+        if (bCommented || sLine.left(2) == "/*") {
             /* Does this comment end on the same line again? */
-            bCommented = (sLine.Right(2) != "*/");
+            bCommented = (sLine.right(2) != "*/");
 
             continue;
         }
 
-        if ((sLine.empty()) || (sLine[0] == '#') || (sLine.Left(2) == "//")) {
+        if ((sLine.empty()) || (sLine[0] == '#') || (sLine.left(2) == "//")) {
             continue;
         }
 
-        if ((sLine.Left(1) == "<") && (sLine.Right(1) == ">")) {
-            sLine.LeftChomp(1);
-            sLine.RightChomp(1);
-            sLine.Trim();
+        if ((sLine.left(1) == "<") && (sLine.right(1) == ">")) {
+            sLine.leftChomp(1);
+            sLine.rightChomp(1);
+            sLine.trim();
 
-            NoString sTag = sLine.Token(0);
-            NoString sValue = sLine.Tokens(1);
+            NoString sTag = sLine.token(0);
+            NoString sValue = sLine.tokens(1);
 
-            sTag.Trim();
-            sValue.Trim();
+            sTag.trim();
+            sValue.trim();
 
-            if (sTag.Left(1) == "/") {
+            if (sTag.left(1) == "/") {
                 sTag = sTag.substr(1);
 
                 if (!sValue.empty()) ERROR("Malformated closing tag. Expected \"</" << sTag << ">\".");
@@ -230,7 +230,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
                 NoSettings myConfig(entry.Config);
                 NoString sName(entry.sName);
 
-                if (!sTag.Equals(entry.sTag)) ERROR("Closing tag \"" << sTag << "\" which is not open.");
+                if (!sTag.equals(entry.sTag)) ERROR("Closing tag \"" << sTag << "\" which is not open.");
 
                 // This breaks entry
                 ConfigStack.pop();
@@ -240,7 +240,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
                 else
                     pActiveConfig = &ConfigStack.top().Config;
 
-                SubConfig& conf = pActiveConfig->m_SubConfigs[sTag.AsLower()];
+                SubConfig& conf = pActiveConfig->m_SubConfigs[sTag.toLower()];
                 SubConfig::const_iterator it = conf.find(sName);
 
                 if (it != conf.end()) ERROR("Duplicate entry for tag \"" << sTag << "\" name \"" << sName << "\".");
@@ -248,7 +248,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
                 conf[sName] = NoSettingsEntry(myConfig);
             } else {
                 if (sValue.empty()) ERROR("Empty block name at begin of block.");
-                ConfigStack.push(ConfigStackEntry(sTag.AsLower(), sValue));
+                ConfigStack.push(ConfigStackEntry(sTag.toLower(), sValue));
                 pActiveConfig = &ConfigStack.top().Config;
             }
 
@@ -256,20 +256,20 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
         }
 
         // If we have a regular line, figure out where it goes
-        NoString sName = sLine.Token(0, "=");
-        NoString sValue = sLine.Tokens(1, "=");
+        NoString sName = sLine.token(0, "=");
+        NoString sValue = sLine.tokens(1, "=");
 
         // Only remove the first space, people might want
         // leading spaces (e.g. in the MOTD).
-        if (sValue.Left(1) == " ") sValue.LeftChomp(1);
+        if (sValue.left(1) == " ") sValue.leftChomp(1);
 
         // We don't have any names with spaces, trim all
         // leading/trailing spaces.
-        sName.Trim();
+        sName.trim();
 
         if (sName.empty() || sValue.empty()) ERROR("Malformed line");
 
-        NoString sNameLower = sName.AsLower();
+        NoString sNameLower = sName.toLower();
         pActiveConfig->m_ConfigEntries[sNameLower].push_back(sValue);
     }
 
