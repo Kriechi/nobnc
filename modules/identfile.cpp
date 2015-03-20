@@ -131,7 +131,7 @@ public:
             sData.Replace("%", GetUser()->GetIdent());
         }
 
-        DEBUG("Writing [" + sData + "] to ident spoof file [" + m_pISpoofLockFile->GetLongName() +
+        NO_DEBUG("Writing [" + sData + "] to ident spoof file [" + m_pISpoofLockFile->GetLongName() +
               "] for user/network [" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "]");
 
         m_pISpoofLockFile->Write(sData + "\n");
@@ -141,7 +141,7 @@ public:
 
     void ReleaseISpoof()
     {
-        DEBUG("Releasing ident spoof for user/network [" +
+        NO_DEBUG("Releasing ident spoof for user/network [" +
               (m_pIRCSock ? m_pIRCSock->GetNetwork()->GetUser()->GetUserName() + "/" + m_pIRCSock->GetNetwork()->GetName() : "<no user/network>") +
               "]");
 
@@ -176,14 +176,14 @@ public:
     ModRet OnIRCConnecting(NoIrcConnection* pIRCSock) override
     {
         if (m_pISpoofLockFile != nullptr) {
-            DEBUG("Aborting connection, ident spoof lock file exists");
+            NO_DEBUG("Aborting connection, ident spoof lock file exists");
             PutModule(
             "Aborting connection, another user or network is currently connecting and using the ident spoof file");
             return HALTCORE;
         }
 
         if (!WriteISpoof()) {
-            DEBUG("identfile [" + GetNV("File") + "] could not be written");
+            NO_DEBUG("identfile [" + GetNV("File") + "] could not be written");
             PutModule("[" + GetNV("File") + "] could not be written, retrying...");
             return HALTCORE;
         }

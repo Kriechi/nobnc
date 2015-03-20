@@ -27,12 +27,12 @@
  *
  *  You can use all the features of C++ streams:
  *  @code
- *  DEBUG("I had " << errors << " errors");
+ *  NO_DEBUG("I had " << errors << " errors");
  *  @endcode
  *
  *  @param f The expression you want to display.
  */
-#define DEBUG(f)                 \
+#define NO_DEBUG(f)                 \
     do {                         \
         if (NoDebug::Debug()) {   \
             NoDebugStream sDebug; \

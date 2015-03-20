@@ -138,7 +138,7 @@ NoRealListener::~NoRealListener()
 bool NoRealListener::ConnectionFromImpl(const NoString& sHost, ushort uPort)
 {
     bool bHostAllowed = NoApp::Get().IsHostAllowed(sHost);
-    DEBUG(GetSockName() << " == ConnectionFrom(" << sHost << ", " << uPort << ") ["
+    NO_DEBUG(GetSockName() << " == ConnectionFrom(" << sHost << ", " << uPort << ") ["
                         << (bHostAllowed ? "Allowed" : "Not allowed") << "]");
     return bHostAllowed;
 }
@@ -158,7 +158,7 @@ NoSocket* NoRealListener::GetSockObjImpl(const NoString& sHost, ushort uPort)
 
 void NoRealListener::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
-    DEBUG(GetSockName() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
+    NO_DEBUG(GetSockName() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
     if (iErrno == EMFILE) {
         // We have too many open fds, let's close this listening port to be able to continue
         // to work, next rehash will (try to) reopen it.
@@ -206,7 +206,7 @@ void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
             Write("ERROR :We don't take kindly to your types around here!\r\n");
             Close(CLT_AFTERWRITE);
 
-            DEBUG("Refused IRC connection to non IRC port");
+            NO_DEBUG("Refused IRC connection to non IRC port");
             return;
         }
 
@@ -222,7 +222,7 @@ void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
             Write("HTTP/1.0 403 Access Denied\r\n\r\nWeb Access is not enabled.\r\n");
             Close(CLT_AFTERWRITE);
 
-            DEBUG("Refused HTTP connection to non HTTP port");
+            NO_DEBUG("Refused HTTP connection to non HTTP port");
             return;
         }
 

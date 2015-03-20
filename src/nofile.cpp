@@ -245,7 +245,7 @@ bool NoFile::Copy(const NoString& sOldFileName, const NoString& sNewFileName, bo
 
     while ((len = OldFile.Read(szBuf, 8192))) {
         if (len < 0) {
-            DEBUG("NoFile::Copy() failed: " << strerror(errno));
+            NO_DEBUG("NoFile::Copy() failed: " << strerror(errno));
             OldFile.Close();
 
             // That file is only a partial copy, get rid of it
@@ -449,7 +449,7 @@ void NoFile::Close()
     if (m_iFD >= 0) {
         if (close(m_iFD) < 0) {
             m_bHadError = true;
-            DEBUG("NoFile::Close(): close() failed with [" << strerror(errno) << "]");
+            NO_DEBUG("NoFile::Close(): close() failed with [" << strerror(errno) << "]");
         }
     }
     m_iFD = -1;

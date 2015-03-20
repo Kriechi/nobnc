@@ -52,7 +52,7 @@ public:
 
         for (NoStringMap::const_iterator it1 = BeginNV(); it1 != EndNV(); ++it1) {
             if (NoApp::Get().FindUser(it1->first) == nullptr) {
-                DEBUG("Unknown user in saved data [" + it1->first + "]");
+                NO_DEBUG("Unknown user in saved data [" + it1->first + "]");
                 continue;
             }
 
@@ -109,27 +109,27 @@ public:
         if (pSock == nullptr || pUser == nullptr) return CONTINUE;
 
         const NoString sPubKey = GetKey(pSock);
-        DEBUG("User: " << sUser << " Key: " << sPubKey);
+        NO_DEBUG("User: " << sUser << " Key: " << sPubKey);
 
         if (sPubKey.empty()) {
-            DEBUG("Peer got no public key, ignoring");
+            NO_DEBUG("Peer got no public key, ignoring");
             return CONTINUE;
         }
 
         MNoStringSet::const_iterator it = m_PubKeys.find(sUser);
         if (it == m_PubKeys.end()) {
-            DEBUG("No saved pubkeys for this client");
+            NO_DEBUG("No saved pubkeys for this client");
             return CONTINUE;
         }
 
         NoStringSet::const_iterator it2 = it->second.find(sPubKey);
         if (it2 == it->second.end()) {
-            DEBUG("Invalid pubkey");
+            NO_DEBUG("Invalid pubkey");
             return CONTINUE;
         }
 
         // This client uses a valid pubkey for this user, let them in
-        DEBUG("Accepted pubkey auth");
+        NO_DEBUG("Accepted pubkey auth");
         Auth->AcceptLogin(*pUser);
 
         return HALT;
@@ -225,7 +225,7 @@ public:
         NoString sRes;
         long int res = pSock->GetPeerFingerprint(sRes);
 
-        DEBUG("GetKey() returned status " << res << " with key " << sRes);
+        NO_DEBUG("GetKey() returned status " << res << " with key " << sRes);
 
         // This is 'inspired' by charybdis' libratbox
         switch (res) {

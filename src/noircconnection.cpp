@@ -130,7 +130,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
 
     sLine.TrimRight("\n\r");
 
-    DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") IRC -> ZNC [" << sLine << "]");
+    NO_DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") IRC -> ZNC [" << sLine << "]");
 
     bool bReturn = false;
     IRCSOCKMODULECALL(OnRaw(sLine), &bReturn);
@@ -920,7 +920,7 @@ bool NoIrcConnection::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
         m_lastCTCP = now;
         // If we are over the limit, don't reply to this CTCP
         if (m_uNumCTCP >= m_uCTCPFloodCount) {
-            DEBUG("CTCP flood detected - not replying to query");
+            NO_DEBUG("CTCP flood detected - not replying to query");
             return true;
         }
         m_uNumCTCP++;
@@ -1025,7 +1025,7 @@ void NoIrcConnection::PutIRC(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (m_bFloodProtection && m_iSendsAllowed <= 0) {
-        DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") ZNC -> IRC [" << sLine << "] (queued)");
+        NO_DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") ZNC -> IRC [" << sLine << "] (queued)");
     }
     m_vsSendQueue.push_back(sLine);
     TrySend();
@@ -1035,7 +1035,7 @@ void NoIrcConnection::PutIRCQuick(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (m_bFloodProtection && m_iSendsAllowed <= 0) {
-        DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") ZNC -> IRC [" << sLine
+        NO_DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") ZNC -> IRC [" << sLine
                   << "] (queued to front)");
     }
     m_vsSendQueue.push_front(sLine);
@@ -1052,7 +1052,7 @@ void NoIrcConnection::TrySend()
         IRCSOCKMODULECALL(OnSendToIRC(sLine), &bSkip);
         if (!bSkip) {
             ;
-            DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") ZNC -> IRC [" << sLine << "]");
+            NO_DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") ZNC -> IRC [" << sLine << "]");
             Write(sLine + "\r\n");
         }
         m_vsSendQueue.pop_front();
@@ -1067,7 +1067,7 @@ void NoIrcConnection::SetNick(const NoString& sNick)
 
 void NoIrcConnection::ConnectedImpl()
 {
-    DEBUG(GetSockName() << " == Connected()");
+    NO_DEBUG(GetSockName() << " == Connected()");
 
     NoString sPass = m_sPass;
     NoString sNick = m_pNetwork->GetNick();
@@ -1095,7 +1095,7 @@ void NoIrcConnection::DisconnectedImpl()
 {
     IRCSOCKMODULECALL(OnIRCDisconnected(), NOTHING);
 
-    DEBUG(GetSockName() << " == Disconnected()");
+    NO_DEBUG(GetSockName() << " == Disconnected()");
     if (!m_pNetwork->GetUser()->IsBeingDeleted() && m_pNetwork->GetIRCConnectEnabled() && m_pNetwork->GetServers().size() != 0) {
         m_pNetwork->PutStatus("Disconnected from IRC. Reconnecting...");
     }
@@ -1124,7 +1124,7 @@ void NoIrcConnection::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
     NoString sError = sDescription;
 
-    DEBUG(GetSockName() << " == SockError(" << iErrno << " " << sError << ")");
+    NO_DEBUG(GetSockName() << " == SockError(" << iErrno << " " << sError << ")");
     if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
         if (IsConOK()) {
             m_pNetwork->PutStatus("Cannot connect to IRC (" + sError + "). Retrying...");
@@ -1168,7 +1168,7 @@ void NoIrcConnection::SockErrorImpl(int iErrno, const NoString& sDescription)
 
 void NoIrcConnection::TimeoutImpl()
 {
-    DEBUG(GetSockName() << " == Timeout()");
+    NO_DEBUG(GetSockName() << " == Timeout()");
     if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
         m_pNetwork->PutStatus("IRC connection timed out.  Reconnecting...");
     }
@@ -1181,7 +1181,7 @@ void NoIrcConnection::TimeoutImpl()
 
 void NoIrcConnection::ConnectionRefusedImpl()
 {
-    DEBUG(GetSockName() << " == ConnectionRefused()");
+    NO_DEBUG(GetSockName() << " == ConnectionRefused()");
     if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
         m_pNetwork->PutStatus("Connection Refused.  Reconnecting...");
     }
@@ -1191,7 +1191,7 @@ void NoIrcConnection::ConnectionRefusedImpl()
 
 void NoIrcConnection::ReachedMaxBufferImpl()
 {
-    DEBUG(GetSockName() << " == ReachedMaxBuffer()");
+    NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
     m_pNetwork->PutStatus("Received a too long line from the IRC server!");
     Quit();
 }

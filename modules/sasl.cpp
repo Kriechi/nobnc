@@ -231,9 +231,9 @@ public:
             /* SASL success! */
             GetNetwork()->GetIRCSock()->ResumeCap();
             m_bAuthenticated = true;
-            DEBUG("sasl: Authenticated with mechanism [" << m_Mechanisms.GetCurrent() << "]");
+            NO_DEBUG("sasl: Authenticated with mechanism [" << m_Mechanisms.GetCurrent() << "]");
         } else if (sLine.Token(1).Equals("904") || sLine.Token(1).Equals("905")) {
-            DEBUG("sasl: Mechanism [" << m_Mechanisms.GetCurrent() << "] failed.");
+            NO_DEBUG("sasl: Mechanism [" << m_Mechanisms.GetCurrent() << "] failed.");
             PutModule(m_Mechanisms.GetCurrent() + " mechanism failed.");
 
             if (m_Mechanisms.HasNext()) {
@@ -245,12 +245,12 @@ public:
             }
         } else if (sLine.Token(1).Equals("906")) {
             /* CAP wasn't paused? */
-            DEBUG("sasl: Reached 906.");
+            NO_DEBUG("sasl: Reached 906.");
             CheckRequireAuth();
         } else if (sLine.Token(1).Equals("907")) {
             m_bAuthenticated = true;
             GetNetwork()->GetIRCSock()->ResumeCap();
-            DEBUG("sasl: Received 907 -- We are already registered");
+            NO_DEBUG("sasl: Received 907 -- We are already registered");
         } else {
             return CONTINUE;
         }

@@ -316,7 +316,7 @@ NoDccSock::~NoDccSock()
 void NoDccSock::ReadDataImpl(const char* data, size_t len)
 {
     if (!m_pFile) {
-        DEBUG("File not open! closing get.");
+        NO_DEBUG("File not open! closing get.");
         m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                              "] - File not open!");
         Close();
@@ -354,27 +354,27 @@ void NoDccSock::ReadDataImpl(const char* data, size_t len)
 
 void NoDccSock::ConnectionRefusedImpl()
 {
-    DEBUG(GetSockName() << " == ConnectionRefused()");
+    NO_DEBUG(GetSockName() << " == ConnectionRefused()");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Connection Refused.");
 }
 
 void NoDccSock::TimeoutImpl()
 {
-    DEBUG(GetSockName() << " == Timeout()");
+    NO_DEBUG(GetSockName() << " == Timeout()");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - Timed Out.");
 }
 
 void NoDccSock::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
-    DEBUG(GetSockName() << " == SockError(" << iErrno << ", " << sDescription << ")");
+    NO_DEBUG(GetSockName() << " == SockError(" << iErrno << ", " << sDescription << ")");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Socket Error [" + sDescription + "]");
 }
 
 void NoDccSock::ConnectedImpl()
 {
-    DEBUG(GetSockName() << " == Connected(" << GetRemoteIP() << ")");
+    NO_DEBUG(GetSockName() << " == Connected(" << GetRemoteIP() << ")");
     m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Transfer Started.");
 
@@ -389,7 +389,7 @@ void NoDccSock::DisconnectedImpl()
 {
     const NoString sStart = ((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - ";
 
-    DEBUG(GetSockName() << " == Disconnected()");
+    NO_DEBUG(GetSockName() << " == Disconnected()");
 
     if (m_uBytesSoFar > m_uFileSize) {
         m_pModule->PutModule(sStart + "TooMuchData!");
@@ -418,7 +418,7 @@ void NoDccSock::SendPacket()
     if (GetInternalWriteBuffer().size() > 1024 * 1024) {
         // There is still enough data to be written, don't add more
         // stuff to that buffer.
-        DEBUG("SendPacket(): Skipping send, buffer still full enough [" << GetInternalWriteBuffer().size() << "]["
+        NO_DEBUG("SendPacket(): Skipping send, buffer still full enough [" << GetInternalWriteBuffer().size() << "]["
                                                                         << m_sRemoteNick << "][" << m_sFileName << "]");
         return;
     }

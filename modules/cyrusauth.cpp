@@ -106,12 +106,12 @@ public:
         const NoString sCacheKey(NoUtils::MD5(sUsername + ":" + sPassword));
         if (m_Cache.HasItem(sCacheKey)) {
             bSuccess = true;
-            DEBUG("saslauth: Found [" + sUsername + "] in cache");
+            NO_DEBUG("saslauth: Found [" + sUsername + "] in cache");
         } else if (sasl_server_new("znc", nullptr, nullptr, nullptr, nullptr, m_cbs, 0, &sasl_conn) == SASL_OK &&
                    sasl_checkpass(sasl_conn, sUsername.c_str(), sUsername.size(), sPassword.c_str(), sPassword.size()) == SASL_OK) {
             m_Cache.AddItem(sCacheKey);
 
-            DEBUG("saslauth: Successful SASL authentication [" + sUsername + "]");
+            NO_DEBUG("saslauth: Successful SASL authentication [" + sUsername + "]");
 
             bSuccess = true;
         }
@@ -127,13 +127,13 @@ public:
                     NoUser* pBaseUser = NoApp::Get().FindUser(CloneUser());
 
                     if (!pBaseUser) {
-                        DEBUG("saslauth: Clone User [" << CloneUser() << "] User not found");
+                        NO_DEBUG("saslauth: Clone User [" << CloneUser() << "] User not found");
                         delete pUser;
                         pUser = nullptr;
                     }
 
                     if (pUser && !pUser->Clone(*pBaseUser, sErr)) {
-                        DEBUG("saslauth: Clone User [" << CloneUser() << "] failed: " << sErr);
+                        NO_DEBUG("saslauth: Clone User [" << CloneUser() << "] failed: " << sErr);
                         delete pUser;
                         pUser = nullptr;
                     }
@@ -145,7 +145,7 @@ public:
                 }
 
                 if (pUser && !NoApp::Get().AddUser(pUser, sErr)) {
-                    DEBUG("saslauth: Add user [" << sUsername << "] failed: " << sErr);
+                    NO_DEBUG("saslauth: Add user [" << sUsername << "] failed: " << sErr);
                     delete pUser;
                     pUser = nullptr;
                 }

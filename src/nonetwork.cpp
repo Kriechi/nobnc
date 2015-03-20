@@ -1207,12 +1207,12 @@ bool NoNetwork::Connect()
     pIRCSock->SetPass(pServer->GetPass());
     pIRCSock->SetSSLTrustedPeerFingerprints(m_ssTrustedFingerprints);
 
-    DEBUG("Connecting user/network [" << m_pUser->GetUserName() << "/" << m_sName << "]");
+    NO_DEBUG("Connecting user/network [" << m_pUser->GetUserName() << "/" << m_sName << "]");
 
     bool bAbort = false;
     NETWORKMODULECALL(OnIRCConnecting(pIRCSock), m_pUser, this, nullptr, &bAbort);
     if (bAbort) {
-        DEBUG("Some module aborted the connection attempt");
+        NO_DEBUG("Some module aborted the connection attempt");
         PutStatus("Some module aborted the connection attempt");
         delete pIRCSock;
         NoApp::Get().AddNetworkToQueue(this);

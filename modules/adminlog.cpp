@@ -122,7 +122,7 @@ public:
             if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT))
                 LogFile.Write(buf + sLine + "\n");
             else
-                DEBUG("Failed to write to [" << m_sLogFile << "]: " << strerror(errno));
+                NO_DEBUG("Failed to write to [" << m_sLogFile << "]: " << strerror(errno));
         }
     }
 

@@ -113,7 +113,7 @@ NoString NoTemplateLoopContext::GetValue(const NoString& sName, bool bFromIf)
     NoTemplate* pTemplate = GetCurRow();
 
     if (!pTemplate) {
-        DEBUG("Loop [" + GetName() + "] has no row index [" + NoString(GetRowIndex()) + "]");
+        NO_DEBUG("Loop [" + GetName() + "] has no row index [" + NoString(GetRowIndex()) + "]");
         return "";
     }
 
@@ -185,29 +185,29 @@ NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
         }
 
         if (it.second && !bFromInc) {
-            DEBUG("\t\tSkipping path (not from INC)  [" + sFilePath + "]");
+            NO_DEBUG("\t\tSkipping path (not from INC)  [" + sFilePath + "]");
             continue;
         }
 
         if (NoFile::Exists(sFilePath)) {
             if (sRoot.empty() || sFilePath.Left(sRoot.length()) == sRoot) {
-                DEBUG("    Found  [" + sFilePath + "]");
+                NO_DEBUG("    Found  [" + sFilePath + "]");
                 return sFilePath;
             } else {
-                DEBUG("\t\tOutside of root [" + sFilePath + "] !~ [" + sRoot + "]");
+                NO_DEBUG("\t\tOutside of root [" + sFilePath + "] !~ [" + sRoot + "]");
             }
         }
     }
 
     switch (m_lsbPaths.size()) {
     case 0:
-        DEBUG("Unable to find [" + sFile + "] using the current directory");
+        NO_DEBUG("Unable to find [" + sFile + "] using the current directory");
         break;
     case 1:
-        DEBUG("Unable to find [" + sFile + "] in the defined path [" + m_lsbPaths.begin()->first + "]");
+        NO_DEBUG("Unable to find [" + sFile + "] in the defined path [" + m_lsbPaths.begin()->first + "]");
         break;
     default:
-        DEBUG("Unable to find [" + sFile + "] in any of the " + NoString(m_lsbPaths.size()) + " defined paths");
+        NO_DEBUG("Unable to find [" + sFile + "] in any of the " + NoString(m_lsbPaths.size()) + " defined paths");
     }
 
     return "";
@@ -235,19 +235,19 @@ NoString NoTemplate::MakePath(const NoString& sPath) const
 
 void NoTemplate::PrependPath(const NoString& sPath, bool bIncludesOnly)
 {
-    DEBUG("NoTemplate::PrependPath(" + sPath + ") == [" + MakePath(sPath) + "]");
+    NO_DEBUG("NoTemplate::PrependPath(" + sPath + ") == [" + MakePath(sPath) + "]");
     m_lsbPaths.push_front(make_pair(MakePath(sPath), bIncludesOnly));
 }
 
 void NoTemplate::AppendPath(const NoString& sPath, bool bIncludesOnly)
 {
-    DEBUG("NoTemplate::AppendPath(" + sPath + ") == [" + MakePath(sPath) + "]");
+    NO_DEBUG("NoTemplate::AppendPath(" + sPath + ") == [" + MakePath(sPath) + "]");
     m_lsbPaths.push_back(make_pair(MakePath(sPath), bIncludesOnly));
 }
 
 void NoTemplate::RemovePath(const NoString& sPath)
 {
-    DEBUG("NoTemplate::RemovePath(" + sPath + ") == [" + NoDir::ChangeDir("./", sPath + "/") + "]");
+    NO_DEBUG("NoTemplate::RemovePath(" + sPath + ") == [" + NoDir::ChangeDir("./", sPath + "/") + "]");
 
     for (const auto& it : m_lsbPaths) {
         if (it.first == sPath) {
@@ -266,16 +266,16 @@ bool NoTemplate::SetFile(const NoString& sFileName)
     PrependPath(sFileName + "/..");
 
     if (sFileName.empty()) {
-        DEBUG("NoTemplate::SetFile() - Filename is empty");
+        NO_DEBUG("NoTemplate::SetFile() - Filename is empty");
         return false;
     }
 
     if (m_sFileName.empty()) {
-        DEBUG("NoTemplate::SetFile() - [" + sFileName + "] does not exist");
+        NO_DEBUG("NoTemplate::SetFile() - [" + sFileName + "] does not exist");
         return false;
     }
 
-    DEBUG("Set template file to [" + m_sFileName + "]");
+    NO_DEBUG("Set template file to [" + m_sFileName + "]");
 
     return true;
 }
@@ -350,14 +350,14 @@ bool NoTemplate::Print(std::ostream& oOut) { return Print(m_sFileName, oOut); }
 bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 {
     if (sFileName.empty()) {
-        DEBUG("Empty filename in NoTemplate::Print()");
+        NO_DEBUG("Empty filename in NoTemplate::Print()");
         return false;
     }
 
     NoFile File(sFileName);
 
     if (!File.Open()) {
-        DEBUG("Unable to open file [" + sFileName + "] in NoTemplate::Print()");
+        NO_DEBUG("Unable to open file [" + sFileName + "] in NoTemplate::Print()");
         return false;
     }
 
@@ -404,7 +404,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
             // Make sure our tmpl tag is ended properly
             if (iPos2 == NoString::npos) {
-                DEBUG("Template tag not ended properly in file [" + sFileName + "] [<?" + sLine + "]");
+                NO_DEBUG("Template tag not ended properly in file [" + sFileName + "] [<?" + sLine + "]");
                 return false;
             }
 
@@ -427,7 +427,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                 if (!uSkip) {
                     if (sAction.Equals("INC")) {
                         if (!Print(ExpandFile(sArgs, true), oOut)) {
-                            DEBUG("Unable to print INC'd file [" + sArgs + "]");
+                            NO_DEBUG("Unable to print INC'd file [" + sArgs + "]");
                             return false;
                         }
                     } else if (sAction.Equals("SETOPTION")) {
@@ -491,7 +491,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
                             break;
                         } else {
-                            DEBUG("[" + sFileName + ":" + NoString(uCurPos - iPos2 - 4) +
+                            NO_DEBUG("[" + sFileName + ":" + NoString(uCurPos - iPos2 - 4) +
                                   "] <? CONTINUE ?> must be used inside of a loop!");
                         }
                     } else if (sAction.Equals("BREAK")) {
@@ -504,13 +504,13 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
                             break;
                         } else {
-                            DEBUG("[" + sFileName + ":" + NoString(uCurPos - iPos2 - 4) +
+                            NO_DEBUG("[" + sFileName + ":" + NoString(uCurPos - iPos2 - 4) +
                                   "] <? BREAK ?> must be used inside of a loop!");
                         }
                     } else if (sAction.Equals("EXIT")) {
                         bExit = true;
                     } else if (sAction.Equals("DEBUG")) {
-                        DEBUG("NoTemplate DEBUG [" + sFileName + "@" + NoString(uCurPos - iPos2 - 4) + "b] -> [" + sArgs + "]");
+                        NO_DEBUG("NoTemplate DEBUG [" + sFileName + "@" + NoString(uCurPos - iPos2 - 4) + "b] -> [" + sArgs + "]");
                     } else if (sAction.Equals("LOOP")) {
                         NoTemplateLoopContext* pContext = GetCurLoopContext();
 
@@ -662,7 +662,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         }
 
                         if (bNotFound) {
-                            DEBUG("Unknown/Unhandled tag [" + sAction + "]");
+                            NO_DEBUG("Unknown/Unhandled tag [" + sAction + "]");
                         }
                     }
                 }
@@ -670,8 +670,8 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                 continue;
             }
 
-            DEBUG("Malformed tag on line " + NoString(uLineNum) + " of [" << File.GetLongName() + "]");
-            DEBUG("--------------- [" + sLine + "]");
+            NO_DEBUG("Malformed tag on line " + NoString(uLineNum) + " of [" << File.GetLongName() + "]");
+            NO_DEBUG("--------------- [" + sLine + "]");
         }
 
         if (!bBroke) {

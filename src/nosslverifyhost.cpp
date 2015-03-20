@@ -315,7 +315,7 @@ static HostnameValidationResult matches_common_name(const char* hostname, const 
         return MalformedCertificate;
     }
 
-    DEBUG("SSLVerifyHost: Found CN " << common_name_str);
+    NO_DEBUG("SSLVerifyHost: Found CN " << common_name_str);
     // Compare expected hostname with the CN
     if (ZNC_Curl::Curl_cert_hostcheck(common_name_str, hostname)) {
         return MatchFound;
@@ -361,7 +361,7 @@ static HostnameValidationResult matches_subject_alternative_name(const char* hos
                 result = MalformedCertificate;
                 break;
             } else { // Compare expected hostname with the DNS name
-                DEBUG("SSLVerifyHost: Found SAN " << dns_name);
+                NO_DEBUG("SSLVerifyHost: Found SAN " << dns_name);
                 if (ZNC_Curl::Curl_cert_hostcheck(dns_name, hostname)) {
                     result = MatchFound;
                     break;
@@ -410,22 +410,22 @@ static HostnameValidationResult validate_hostname(const char* hostname, const X5
 
 bool ZNC_SSLVerifyHost(const NoString& sHost, const X509* pCert, NoString& sError)
 {
-    DEBUG("SSLVerifyHost: checking " << sHost);
+    NO_DEBUG("SSLVerifyHost: checking " << sHost);
     ZNC_iSECPartners::HostnameValidationResult eResult = ZNC_iSECPartners::validate_hostname(sHost.c_str(), pCert);
     switch (eResult) {
     case ZNC_iSECPartners::MatchFound:
-        DEBUG("SSLVerifyHost: verified");
+        NO_DEBUG("SSLVerifyHost: verified");
         return true;
     case ZNC_iSECPartners::MatchNotFound:
-        DEBUG("SSLVerifyHost: host doesn't match");
+        NO_DEBUG("SSLVerifyHost: host doesn't match");
         sError = "hostname doesn't match";
         return false;
     case ZNC_iSECPartners::MalformedCertificate:
-        DEBUG("SSLVerifyHost: malformed cert");
+        NO_DEBUG("SSLVerifyHost: malformed cert");
         sError = "malformed hostname in certificate";
         return false;
     default:
-        DEBUG("SSLVerifyHost: error");
+        NO_DEBUG("SSLVerifyHost: error");
         sError = "hostname verification error";
         return false;
     }

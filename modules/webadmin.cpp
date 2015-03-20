@@ -380,7 +380,7 @@ public:
                     }
 
                     if (!sModLoadError.empty()) {
-                        DEBUG(sModLoadError);
+                        NO_DEBUG(sModLoadError);
                         spSession->AddError(sModLoadError);
                     }
                 }
@@ -403,7 +403,7 @@ public:
                 }
 
                 if (!sModLoadError.empty()) {
-                    DEBUG(sModLoadError);
+                    NO_DEBUG(sModLoadError);
                     spSession->AddError(sModLoadError);
                 }
             }
@@ -1107,7 +1107,7 @@ public:
                     }
 
                     if (!sModLoadError.empty()) {
-                        DEBUG(sModLoadError);
+                        NO_DEBUG(sModLoadError);
                         WebSock.GetSession()->AddError(sModLoadError);
                     }
                 }
@@ -1938,7 +1938,7 @@ public:
                 }
 
                 if (!sModLoadError.empty()) {
-                    DEBUG(sModLoadError);
+                    NO_DEBUG(sModLoadError);
                     WebSock.GetSession()->AddError(sModLoadError);
                 }
             }

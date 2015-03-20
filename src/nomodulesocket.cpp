@@ -57,14 +57,14 @@ NoModuleSocket::~NoModuleSocket()
 
 void NoModuleSocket::ReachedMaxBufferImpl()
 {
-    DEBUG(GetSockName() << " == ReachedMaxBuffer()");
+    NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
     if (m_pModule) m_pModule->PutModule("Some socket reached its max buffer limit and was closed!");
     Close();
 }
 
 void NoModuleSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
-    DEBUG(GetSockName() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
+    NO_DEBUG(GetSockName() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
     if (iErrno == EMFILE) {
         // We have too many open fds, this can cause a busy loop.
         Close();
@@ -79,7 +79,7 @@ bool NoModuleSocket::ConnectionFromImpl(const NoString& sHost, ushort uPort)
 bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL, uint uTimeout)
 {
     if (!m_pModule) {
-        DEBUG("ERROR: NoSocket::Connect called on instance without m_pModule handle!");
+        NO_DEBUG("ERROR: NoSocket::Connect called on instance without m_pModule handle!");
         return false;
     }
 
@@ -109,7 +109,7 @@ bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL,
 bool NoModuleSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
 {
     if (!m_pModule) {
-        DEBUG("ERROR: NoSocket::Listen called on instance without m_pModule handle!");
+        NO_DEBUG("ERROR: NoSocket::Listen called on instance without m_pModule handle!");
         return false;
     }
 

@@ -368,14 +368,14 @@ void NoDccBounce::ReadLineImpl(const NoString& sData)
 {
     NoString sLine = sData.TrimRight_n("\r\n");
 
-    DEBUG(GetSockName() << " <- [" << sLine << "]");
+    NO_DEBUG(GetSockName() << " <- [" << sLine << "]");
 
     PutPeer(sLine);
 }
 
 void NoDccBounce::ReachedMaxBufferImpl()
 {
-    DEBUG(GetSockName() << " == ReachedMaxBuffer()");
+    NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
 
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
@@ -391,7 +391,7 @@ void NoDccBounce::ReadDataImpl(const char* data, size_t len)
         size_t BufLen = m_pPeer->GetInternalWriteBuffer().length();
 
         if (BufLen >= m_uiMaxDCCBuffer) {
-            DEBUG(GetSockName() << " The send buffer is over the "
+            NO_DEBUG(GetSockName() << " The send buffer is over the "
                                    "limit (" << BufLen << "), throttling");
             PauseRead();
         }
@@ -405,7 +405,7 @@ void NoDccBounce::ReadPausedImpl()
 
 void NoDccBounce::TimeoutImpl()
 {
-    DEBUG(GetSockName() << " == Timeout()");
+    NO_DEBUG(GetSockName() << " == Timeout()");
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
     if (IsRemote()) {
@@ -426,7 +426,7 @@ void NoDccBounce::TimeoutImpl()
 
 void NoDccBounce::ConnectionRefusedImpl()
 {
-    DEBUG(GetSockName() << " == ConnectionRefused()");
+    NO_DEBUG(GetSockName() << " == ConnectionRefused()");
 
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
     NoString sHost = NoSocket::GetHostName();
@@ -441,7 +441,7 @@ void NoDccBounce::ConnectionRefusedImpl()
 
 void NoDccBounce::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
-    DEBUG(GetSockName() << " == SockError(" << iErrno << ")");
+    NO_DEBUG(GetSockName() << " == SockError(" << iErrno << ")");
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
     if (IsRemote()) {
@@ -460,15 +460,15 @@ void NoDccBounce::SockErrorImpl(int iErrno, const NoString& sDescription)
 void NoDccBounce::ConnectedImpl()
 {
     SetTimeout(0);
-    DEBUG(GetSockName() << " == Connected()");
+    NO_DEBUG(GetSockName() << " == Connected()");
 }
 
-void NoDccBounce::DisconnectedImpl() { DEBUG(GetSockName() << " == Disconnected()"); }
+void NoDccBounce::DisconnectedImpl() { NO_DEBUG(GetSockName() << " == Disconnected()"); }
 
 void NoDccBounce::Shutdown()
 {
     m_pPeer = nullptr;
-    DEBUG(GetSockName() << " == Close(); because my peer told me to");
+    NO_DEBUG(GetSockName() << " == Close(); because my peer told me to");
     Close();
 }
 
@@ -501,7 +501,7 @@ NoSocket* NoDccBounce::GetSockObjImpl(const NoString& sHost, ushort uPort)
 
 void NoDccBounce::PutServ(const NoString& sLine)
 {
-    DEBUG(GetSockName() << " -> [" << sLine << "]");
+    NO_DEBUG(GetSockName() << " -> [" << sLine << "]");
     Write(sLine + "\r\n");
 }
 

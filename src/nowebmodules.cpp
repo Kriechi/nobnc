@@ -186,7 +186,7 @@ void NoWebAuth::AcceptedLogin(NoUser& User)
             m_pWebSock->Redirect("/?cookie_check=true");
         }
 
-        DEBUG("Successful login attempt ==> USER [" + User.GetUserName() + "] ==> SESSION [" + spSession->GetId() + "]");
+        NO_DEBUG("Successful login attempt ==> USER [" + User.GetUserName() + "] ==> SESSION [" + spSession->GetId() + "]");
     }
 }
 
@@ -202,7 +202,7 @@ void NoWebAuth::RefusedLogin(const NoString& sReason)
         m_pWebSock->UnPauseRead();
         m_pWebSock->Redirect("/?cookie_check=true");
 
-        DEBUG("UNSUCCESSFUL login attempt ==> REASON [" + sReason + "] ==> SESSION [" + spSession->GetId() + "]");
+        NO_DEBUG("UNSUCCESSFUL login attempt ==> REASON [" + sReason + "] ==> SESSION [" + spSession->GetId() + "]");
     }
 }
 
@@ -493,7 +493,7 @@ NoWebSock::PageRequest NoWebSock::PrintStaticFile(const NoString& sPath, NoStrin
 {
     SetPaths(pModule);
     NoString sFile = m_Template.ExpandFile(sPath.TrimLeft_n("/"));
-    DEBUG("About to print [" + sFile + "]");
+    NO_DEBUG("About to print [" + sFile + "]");
     // Either PrintFile() fails and sends an error page or it suceeds and
     // sends a result. In both cases we don't have anything more to do.
     PrintFile(sFile);
@@ -616,8 +616,8 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
     // When their IP is wrong, we give them an invalid cookie. This makes
     // sure that they will get a new cookie on their next request.
     if (NoApp::Get().GetProtectWebSessions() && GetSession()->GetIP() != GetRemoteIP()) {
-        DEBUG("Expected IP: " << GetSession()->GetIP());
-        DEBUG("Remote IP:   " << GetRemoteIP());
+        NO_DEBUG("Expected IP: " << GetSession()->GetIP());
+        NO_DEBUG("Remote IP:   " << GetRemoteIP());
         SendCookie("SessionId", "WRONG_IP_FOR_SESSION");
         PrintErrorPage(403, "Access denied", "This session does not belong to your IP.");
         return Done;
@@ -628,8 +628,8 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
     // CSRF against the login form makes no sense and the login form does a
     // cookies-enabled check which would break otherwise.
     if (IsPost() && GetParam("_CSRF_Check") != GetCSRFCheck() && sURI != "/login") {
-        DEBUG("Expected _CSRF_Check: " << GetCSRFCheck());
-        DEBUG("Actual _CSRF_Check:   " << GetParam("_CSRF_Check"));
+        NO_DEBUG("Expected _CSRF_Check: " << GetCSRFCheck());
+        NO_DEBUG("Actual _CSRF_Check:   " << GetParam("_CSRF_Check"));
         PrintErrorPage(403,
                        "Access denied",
                        "POST requests need to send "
@@ -748,7 +748,7 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
             m_sPage = "index";
         }
 
-        DEBUG("Path [" + m_sPath + "], Module [" + m_sModName + "], Page [" + m_sPage + "]");
+        NO_DEBUG("Path [" + m_sPath + "], Module [" + m_sModName + "], Page [" + m_sPage + "]");
 
         NoModule* pModule = nullptr;
 
@@ -874,7 +874,7 @@ std::shared_ptr<NoWebSession> NoWebSock::GetSession()
         Sessions.m_mspSessions.AddItem((*pSession)->GetId(), *pSession);
         (*pSession)->UpdateLastActive();
         m_spSession = *pSession;
-        DEBUG("Found existing session from cookie: [" + sCookieSessionId + "] IsLoggedIn(" +
+        NO_DEBUG("Found existing session from cookie: [" + sCookieSessionId + "] IsLoggedIn(" +
               NoString((*pSession)->IsLoggedIn() ? "true, " + ((*pSession)->GetUser()->GetUserName()) : "false") + ")");
         return *pSession;
     }
@@ -882,7 +882,7 @@ std::shared_ptr<NoWebSession> NoWebSock::GetSession()
     if (Sessions.m_mIPSessions.count(GetRemoteIP()) > m_uiMaxSessions) {
         std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(GetRemoteIP());
         mIPSessionsIterator it = std::min_element(p.first, p.second, compareLastActive);
-        DEBUG("Remote IP:   " << GetRemoteIP() << "; discarding session [" << it->second->GetId() << "]");
+        NO_DEBUG("Remote IP:   " << GetRemoteIP() << "; discarding session [" << it->second->GetId() << "]");
         Sessions.m_mspSessions.RemItem(it->second->GetId());
     }
 
@@ -894,7 +894,7 @@ std::shared_ptr<NoWebSession> NoWebSock::GetSession()
         sSessionID += ":" + NoString(time(nullptr));
         sSessionID = NoUtils::SHA256(sSessionID);
 
-        DEBUG("Auto generated session: [" + sSessionID + "]");
+        NO_DEBUG("Auto generated session: [" + sSessionID + "]");
     } while (Sessions.m_mspSessions.HasItem(sSessionID));
 
     std::shared_ptr<NoWebSession> spSession(new NoWebSession(sSessionID, GetRemoteIP()));
@@ -913,7 +913,7 @@ NoString NoWebSock::GetCSRFCheck()
 
 bool NoWebSock::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic)
 {
-    DEBUG("=================== NoWebSock::OnLogin(), basic auth? " << std::boolalpha << bBasic);
+    NO_DEBUG("=================== NoWebSock::OnLogin(), basic auth? " << std::boolalpha << bBasic);
     m_spAuth = std::make_shared<NoWebAuth>(this, sUser, sPass, bBasic);
 
     // Some authentication module could need some time, block this socket
@@ -929,7 +929,7 @@ NoSocket* NoWebSock::GetSockObjImpl(const NoString& sHost, ushort uPort)
 {
     // All listening is done by NoListener, thus NoWebSock should never have
     // to listen, but since GetSockObj() is pure virtual...
-    DEBUG("NoWebSock::GetSockObj() called - this should never happen!");
+    NO_DEBUG("NoWebSock::GetSockObj() called - this should never happen!");
     return nullptr;
 }
 

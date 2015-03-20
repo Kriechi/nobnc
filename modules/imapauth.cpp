@@ -97,7 +97,7 @@ public:
         }
 
         if (pUser && m_Cache.HasItem(NoUtils::MD5(Auth->GetUsername() + ":" + Auth->GetPassword()))) {
-            DEBUG("+++ Found in cache");
+            NO_DEBUG("+++ Found in cache");
             Auth->AcceptLogin(*pUser);
             return HALT;
         }
@@ -150,10 +150,10 @@ void NoImapSock::ReadLineImpl(const NoString& sLine)
             m_spAuth->AcceptLogin(*pUser);
             // Use MD5 so passes don't sit in memory in plain text
             m_pIMAPMod->CacheLogin(NoUtils::MD5(m_spAuth->GetUsername() + ":" + m_spAuth->GetPassword()));
-            DEBUG("+++ Successful IMAP lookup");
+            NO_DEBUG("+++ Successful IMAP lookup");
         } else {
             m_spAuth->RefuseLogin("Invalid Password");
-            DEBUG("--- FAILED IMAP lookup");
+            NO_DEBUG("--- FAILED IMAP lookup");
         }
 
         m_bSentReply = true;

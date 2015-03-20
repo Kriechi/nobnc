@@ -207,13 +207,13 @@ NoString NoHttpSocket::GetDate(time_t stamp)
 
 void NoHttpSocket::GetPage()
 {
-    DEBUG("Page Request [" << m_sURI << "] ");
+    NO_DEBUG("Page Request [" << m_sURI << "] ");
 
     // Check that the requested path starts with the prefix. Strip it if so.
     if (!m_sURI.TrimPrefix(m_sURIPrefix)) {
-        DEBUG("INVALID path => Does not start with prefix [" + m_sURIPrefix + "]");
-        DEBUG("Expected prefix:   " << m_sURIPrefix);
-        DEBUG("Requested path:    " << m_sURI);
+        NO_DEBUG("INVALID path => Does not start with prefix [" + m_sURIPrefix + "]");
+        NO_DEBUG("Expected prefix:   " << m_sURIPrefix);
+        NO_DEBUG("Requested path:    " << m_sURI);
         Redirect("/");
     } else {
         OnPageRequest(m_sURI);
@@ -244,7 +244,7 @@ void NoHttpSocket::PrintPage(const NoString& sPage)
         int zStatus, zFlush = Z_NO_FLUSH;
 
         if (InitZlibStream(&zStrm, sPage.c_str())) {
-            DEBUG("- Sending gzip-compressed.");
+            NO_DEBUG("- Sending gzip-compressed.");
             AddHeader("Content-Encoding", "gzip");
             PrintHeader(0); // we do not know the compressed data's length
 
@@ -274,7 +274,7 @@ void NoHttpSocket::PrintPage(const NoString& sPage)
     if (!SentHeader()) {
         PrintHeader(sPage.length());
     } else {
-        DEBUG("PrintPage(): Header was already sent");
+        NO_DEBUG("PrintPage(): Header was already sent");
     }
 
     Write(sPage);
@@ -292,8 +292,8 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
 
         if (sFilePath.empty()) {
             PrintErrorPage(403, "Forbidden", "You don't have permission to access that file on this server.");
-            DEBUG("THIS FILE:     [" << sFilePath << "] does not live in ...");
-            DEBUG("DOCUMENT ROOT: [" << m_sDocRoot << "]");
+            NO_DEBUG("THIS FILE:     [" << sFilePath << "] does not live in ...");
+            NO_DEBUG("DOCUMENT ROOT: [" << m_sDocRoot << "]");
             return false;
         }
     }
@@ -352,7 +352,7 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
         // Don't try to send files over 16 MiB, because it might block
         // the whole process and use huge amounts of memory.
         if (iSize > 16 * 1024 * 1024) {
-            DEBUG("- Abort: File is over 16 MiB big: " << iSize);
+            NO_DEBUG("- Abort: File is over 16 MiB big: " << iSize);
             PrintErrorPage(500, "Internal Server Error", "File too big");
             return true;
         }
@@ -361,7 +361,7 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
         bool bGzip = m_bAcceptGzip && (sContentType.Left(5).Equals("text/") || sFileName.Right(3).Equals(".js"));
 
         if (bGzip) {
-            DEBUG("- Sending gzip-compressed.");
+            NO_DEBUG("- Sending gzip-compressed.");
             AddHeader("Content-Encoding", "gzip");
             PrintHeader(0, sContentType); // we do not know the compressed data's length
             WriteFileGzipped(File);
@@ -373,7 +373,7 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
         }
     }
 
-    DEBUG("- ETag: [" << sETag << "] / If-None-Match [" << m_sIfNoneMatch << "]");
+    NO_DEBUG("- ETag: [" << sETag << "] / If-None-Match [" << m_sIfNoneMatch << "]");
 
     Close(NoSocket::CLT_AFTERWRITE);
 
@@ -394,7 +394,7 @@ void NoHttpSocket::WriteFileUncompressed(NoFile& File)
     }
 
     if (i < 0) {
-        DEBUG("- Error while reading file: " << strerror(errno));
+        NO_DEBUG("- Error while reading file: " << strerror(errno));
     }
 }
 
@@ -409,7 +409,7 @@ void NoHttpSocket::WriteFileGzipped(NoFile& File)
     int zStatus;
 
     if (!InitZlibStream(&zStrm, szBufIn)) {
-        DEBUG("- Error initializing zlib!");
+        NO_DEBUG("- Error initializing zlib!");
         return;
     }
 
@@ -609,7 +609,7 @@ bool NoHttpSocket::PrintNotFound()
 bool NoHttpSocket::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage)
 {
     if (SentHeader()) {
-        DEBUG("PrintErrorPage(): Header was already sent");
+        NO_DEBUG("PrintErrorPage(): Header was already sent");
         return false;
     }
 
@@ -647,7 +647,7 @@ bool NoHttpSocket::ForceLogin()
     }
 
     if (SentHeader()) {
-        DEBUG("ForceLogin(): Header was already sent!");
+        NO_DEBUG("ForceLogin(): Header was already sent!");
         return false;
     }
 
@@ -664,7 +664,7 @@ bool NoHttpSocket::SentHeader() const { return m_bSentHeader; }
 bool NoHttpSocket::PrintHeader(off_t uContentLength, const NoString& sContentType, uint uStatusId, const NoString& sStatusMsg)
 {
     if (SentHeader()) {
-        DEBUG("PrintHeader(): Header was already sent!");
+        NO_DEBUG("PrintHeader(): Header was already sent!");
         return false;
     }
 
@@ -676,7 +676,7 @@ bool NoHttpSocket::PrintHeader(off_t uContentLength, const NoString& sContentTyp
         m_sContentType = "text/html; charset=utf-8";
     }
 
-    DEBUG("- " << uStatusId << " (" << sStatusMsg << ") [" << m_sContentType << "]");
+    NO_DEBUG("- " << uStatusId << " (" << sStatusMsg << ") [" << m_sContentType << "]");
 
     Write("HTTP/" + NoString(m_bHTTP10Client ? "1.0 " : "1.1 ") + NoString(uStatusId) + " " + sStatusMsg + "\r\n");
     Write("Date: " + GetDate() + "\r\n");
@@ -710,16 +710,16 @@ void NoHttpSocket::AddHeader(const NoString& sName, const NoString& sValue) { m_
 bool NoHttpSocket::Redirect(const NoString& sURL)
 {
     if (SentHeader()) {
-        DEBUG("Redirect() - Header was already sent");
+        NO_DEBUG("Redirect() - Header was already sent");
         return false;
     } else if (!sURL.StartsWith("/")) {
         // HTTP/1.1 only admits absolute URIs for the Location header.
-        DEBUG("Redirect to relative URI [" + sURL + "] is not allowed.");
+        NO_DEBUG("Redirect to relative URI [" + sURL + "] is not allowed.");
         return false;
     } else {
         NoString location = m_sURIPrefix + sURL;
 
-        DEBUG("- Redirect to [" << location << "] with prefix [" + m_sURIPrefix + "]");
+        NO_DEBUG("- Redirect to [" << location << "] with prefix [" + m_sURIPrefix + "]");
         AddHeader("Location", location);
         PrintErrorPage(302,
                        "Found",

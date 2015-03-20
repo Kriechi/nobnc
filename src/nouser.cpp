@@ -650,7 +650,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     // user names can only specified for the constructor, changing it later
     // on breaks too much stuff (e.g. lots of paths depend on the user name)
     if (GetUserName() != User.GetUserName()) {
-        DEBUG("Ignoring username in NoUser::Clone(), old username [" << GetUserName() << "]; New username ["
+        NO_DEBUG("Ignoring username in NoUser::Clone(), old username [" << GetUserName() << "]; New username ["
                                                                     << User.GetUserName() << "]");
     }
 

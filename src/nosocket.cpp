@@ -137,7 +137,7 @@ void NoCsock::SSLHandShakeFinished()
 
     X509* pCert = GetX509();
     if (!pCert) {
-        DEBUG(GetSockName() + ": No cert");
+        NO_DEBUG(GetSockName() + ": No cert");
         CallSockError(errnoBadSSLCert, "Anonymous SSL cert is not allowed");
         Close();
         return;
@@ -148,15 +148,15 @@ void NoCsock::SSLHandShakeFinished()
     }
     X509_free(pCert);
     if (m_ssCertVerificationErrors.empty()) {
-        DEBUG(GetSockName() + ": Good cert");
+        NO_DEBUG(GetSockName() + ": Good cert");
         return;
     }
     NoString sFP = q_ptr->GetSSLPeerFingerprint();
     if (q_ptr->GetSSLTrustedPeerFingerprints().count(sFP) != 0) {
-        DEBUG(GetSockName() + ": Cert explicitly trusted by user: " << sFP);
+        NO_DEBUG(GetSockName() + ": Cert explicitly trusted by user: " << sFP);
         return;
     }
-    DEBUG(GetSockName() + ": Bad cert");
+    NO_DEBUG(GetSockName() + ": Bad cert");
     NoString sErrorMsg = "Invalid SSL certificate: ";
     sErrorMsg += NoString(", ").Join(begin(m_ssCertVerificationErrors), end(m_ssCertVerificationErrors));
     CallSockError(errnoBadSSLCert, sErrorMsg);
@@ -182,7 +182,7 @@ NoString NoSocket::GetSSLPeerFingerprint() const
     const EVP_MD* evp = EVP_sha256();
     X509* pCert = GetX509();
     if (!pCert) {
-        DEBUG(GetSockName() + ": GetSSLPeerFingerprint: Anonymous cert");
+        NO_DEBUG(GetSockName() + ": GetSSLPeerFingerprint: Anonymous cert");
         return "";
     }
     uchar buf[256 / 8];
@@ -190,7 +190,7 @@ NoString NoSocket::GetSSLPeerFingerprint() const
     int iSuccess = X509_digest(pCert, evp, buf, &_32);
     X509_free(pCert);
     if (!iSuccess) {
-        DEBUG(GetSockName() + ": GetSSLPeerFingerprint: Couldn't find digest");
+        NO_DEBUG(GetSockName() + ": GetSSLPeerFingerprint: Couldn't find digest");
         return "";
     }
     return No::Escape_n(NoString(reinterpret_cast<const char*>(buf), sizeof buf), No::AsciiFormat, No::HexColonFormat);

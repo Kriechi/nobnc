@@ -199,7 +199,7 @@ void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const No
         pcSock->SetHostToVerifySSL(sHostname);
     }
 #ifdef HAVE_THREADED_DNS
-    DEBUG("TDNS: initiating resolving of [" << sHostname << "] and bindhost [" << sBindHost << "]");
+    NO_DEBUG("TDNS: initiating resolving of [" << sHostname << "] and bindhost [" << sBindHost << "]");
     NoDnsTask* task = new NoDnsTask;
     task->sHostname = sHostname;
     task->iPort = iPort;
@@ -247,7 +247,7 @@ uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
         }
     }
 
-    DEBUG("There are [" << ret << "] clients from [" << sIP << "]");
+    NO_DEBUG("There are [" << ret << "] clients from [" << sIP << "]");
 
     return ret;
 }
@@ -325,9 +325,9 @@ void NoDnsJob::runThread()
 void NoDnsJob::runMain()
 {
     if (0 != this->iRes) {
-        DEBUG("Error in threaded DNS: " << gai_strerror(this->iRes));
+        NO_DEBUG("Error in threaded DNS: " << gai_strerror(this->iRes));
         if (this->aiResult) {
-            DEBUG("And aiResult is not nullptr...");
+            NO_DEBUG("And aiResult is not nullptr...");
         }
         this->aiResult = nullptr; // just for case. Maybe to call freeaddrinfo()?
     }
@@ -461,10 +461,10 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
             sBindhost = RandomFromSet(ssBinds, gen);
         }
 
-        DEBUG("TDNS: " << task->sSockName << ", connecting to [" << sTargetHost << "] using bindhost [" << sBindhost << "]");
+        NO_DEBUG("TDNS: " << task->sSockName << ", connecting to [" << sTargetHost << "] using bindhost [" << sBindhost << "]");
         FinishConnect(manager, sTargetHost, task->iPort, task->sSockName, task->iTimeout, task->bSSL, sBindhost, task->pcSock);
     } catch (const char* s) {
-        DEBUG(task->sSockName << ", dns resolving error: " << s);
+        NO_DEBUG(task->sSockName << ", dns resolving error: " << s);
         task->pcSock->SetSockName(task->sSockName);
         task->pcSock->SockErrorImpl(-1, s);
         delete task->pcSock;

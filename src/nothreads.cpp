@@ -41,7 +41,7 @@ NoThreadPool::NoThreadPool()
       m_iJobPipe{ 0, 0 }, m_jobs()
 {
     if (pipe(m_iJobPipe)) {
-        DEBUG("Ouch, can't open pipe for thread pool: " << strerror(errno));
+        NO_DEBUG("Ouch, can't open pipe for thread pool: " << strerror(errno));
         exit(1);
     }
 }
@@ -64,7 +64,7 @@ void NoThreadPool::jobDone(NoJob* job)
     // (Yes, this really wants to write a pointer(!) to the pipe.
     size_t w = write(m_iJobPipe[1], &job, sizeof(job));
     if (w != sizeof(job)) {
-        DEBUG("Something bad happened during write() to a pipe for thread pool, wrote " << w << " bytes: " << strerror(errno));
+        NO_DEBUG("Something bad happened during write() to a pipe for thread pool, wrote " << w << " bytes: " << strerror(errno));
         exit(1);
     }
 }
@@ -77,7 +77,7 @@ NoJob* NoThreadPool::getJobFromPipe() const
     ssize_t need = sizeof(a);
     ssize_t r = read(m_iJobPipe[0], &a, need);
     if (r != need) {
-        DEBUG("Something bad happened during read() from a pipe for thread pool: " << strerror(errno));
+        NO_DEBUG("Something bad happened during read() from a pipe for thread pool: " << strerror(errno));
         exit(1);
     }
     return a;

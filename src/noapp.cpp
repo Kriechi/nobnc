@@ -505,7 +505,7 @@ NoString NoApp::ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir)
 bool NoApp::WriteConfig()
 {
     if (GetConfigFile().empty()) {
-        DEBUG("Config file name is empty?!");
+        NO_DEBUG("Config file name is empty?!");
         return false;
     }
 
@@ -513,7 +513,7 @@ bool NoApp::WriteConfig()
     NoFile* pFile = new NoFile(GetConfigFile() + "~");
 
     if (!pFile->Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
-        DEBUG("Could not write config to " + GetConfigFile() + "~: " + NoString(strerror(errno)));
+        NO_DEBUG("Could not write config to " + GetConfigFile() + "~: " + NoString(strerror(errno)));
         delete pFile;
         return false;
     }
@@ -522,7 +522,7 @@ bool NoApp::WriteConfig()
     // The old file (= inode) is going away and thus a lock on it would be
     // useless. These lock should always succeed (races, anyone?).
     if (!pFile->TryExLock()) {
-        DEBUG("Error while locking the new config file, errno says: " + NoString(strerror(errno)));
+        NO_DEBUG("Error while locking the new config file, errno says: " + NoString(strerror(errno)));
         pFile->Delete();
         delete pFile;
         return false;
@@ -609,7 +609,7 @@ bool NoApp::WriteConfig()
         NoString sErr;
 
         if (!it.second->IsValid(sErr)) {
-            DEBUG("** Error writing config for user [" << it.first << "] [" << sErr << "]");
+            NO_DEBUG("** Error writing config for user [" << it.first << "] [" << sErr << "]");
             continue;
         }
 
@@ -622,7 +622,7 @@ bool NoApp::WriteConfig()
     pFile->Sync();
 
     if (pFile->HadError()) {
-        DEBUG("Error while writing the config, errno says: " + NoString(strerror(errno)));
+        NO_DEBUG("Error while writing the config, errno says: " + NoString(strerror(errno)));
         pFile->Delete();
         delete pFile;
         return false;
@@ -630,7 +630,7 @@ bool NoApp::WriteConfig()
 
     // We wrote to a temporary name, move it to the right place
     if (!pFile->Move(GetConfigFile(), true)) {
-        DEBUG("Error while replacing the config file with a new version, errno says " << strerror(errno));
+        NO_DEBUG("Error while replacing the config file with a new version, errno says " << strerror(errno));
         pFile->Delete();
         delete pFile;
         return false;
@@ -1301,7 +1301,7 @@ bool NoApp::DoRehash(NoString& sError)
         if (pRealUser) {
             if (!pRealUser->Clone(*pUser, sErr) || !AddUser(pRealUser, sErr)) {
                 sError = "Invalid user [" + pUser->GetUserName() + "] " + sErr;
-                DEBUG("NoUser::Clone() failed in rehash");
+                NO_DEBUG("NoUser::Clone() failed in rehash");
             }
             pUser->SetBeingDeleted(true);
             delete pUser;
@@ -1531,7 +1531,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
     // Reload the global module
     if (bGlobal) {
         if (!GetModules().LoadModule(sModule, sGlobalArgs, NoModInfo::GlobalModule, nullptr, nullptr, sErr)) {
-            DEBUG("Failed to reload [" << sModule << "] globally [" << sErr << "]");
+            NO_DEBUG("Failed to reload [" << sModule << "] globally [" << sErr << "]");
             bError = true;
         }
     }
@@ -1542,7 +1542,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
         const NoString& sArgs = it.second;
 
         if (!pUser->GetModules().LoadModule(sModule, sArgs, NoModInfo::UserModule, pUser, nullptr, sErr)) {
-            DEBUG("Failed to reload [" << sModule << "] for [" << pUser->GetUserName() << "] [" << sErr << "]");
+            NO_DEBUG("Failed to reload [" << sModule << "] for [" << pUser->GetUserName() << "] [" << sErr << "]");
             bError = true;
         }
     }
@@ -1553,7 +1553,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
         const NoString& sArgs = it.second;
 
         if (!pNetwork->GetModules().LoadModule(sModule, sArgs, NoModInfo::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
-            DEBUG("Failed to reload [" << sModule << "] for [" << pNetwork->GetUser()->GetUserName() << "/"
+            NO_DEBUG("Failed to reload [" << sModule << "] for [" << pNetwork->GetUser()->GetUserName() << "/"
                                        << pNetwork->GetName() << "] [" << sErr << "]");
             bError = true;
         }
@@ -1589,17 +1589,17 @@ bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
 {
     if (FindUser(pUser->GetUserName()) != nullptr) {
         sErrorRet = "User already exists";
-        DEBUG("User [" << pUser->GetUserName() << "] - already exists");
+        NO_DEBUG("User [" << pUser->GetUserName() << "] - already exists");
         return false;
     }
     if (!pUser->IsValid(sErrorRet)) {
-        DEBUG("Invalid user [" << pUser->GetUserName() << "] - [" << sErrorRet << "]");
+        NO_DEBUG("Invalid user [" << pUser->GetUserName() << "] - [" << sErrorRet << "]");
         return false;
     }
     bool bFailed = false;
     GLOBALMODULECALL(OnAddUser(*pUser, sErrorRet), &bFailed);
     if (bFailed) {
-        DEBUG("AddUser [" << pUser->GetUserName() << "] aborted by a module [" << sErrorRet << "]");
+        NO_DEBUG("AddUser [" << pUser->GetUserName() << "] aborted by a module [" << sErrorRet << "]");
         return false;
     }
     m_msUsers[pUser->GetUserName()] = pUser;
@@ -1976,7 +1976,7 @@ protected:
         RealConnectionQueue.splice(RealConnectionQueue.begin(), ConnectionQueue);
 
         if (RealConnectionQueue.empty()) {
-            DEBUG("ConnectQueueTimer done");
+            NO_DEBUG("ConnectQueueTimer done");
             NoApp::Get().DisableConnectQueue();
         }
     }
@@ -2013,7 +2013,7 @@ void NoApp::DisableConnectQueue()
 
 void NoApp::PauseConnectQueue()
 {
-    DEBUG("Connection queue paused");
+    NO_DEBUG("Connection queue paused");
     m_uiConnectPaused++;
 
     if (m_pConnectQueueTimer) {
@@ -2023,7 +2023,7 @@ void NoApp::PauseConnectQueue()
 
 void NoApp::ResumeConnectQueue()
 {
-    DEBUG("Connection queue resumed");
+    NO_DEBUG("Connection queue resumed");
     m_uiConnectPaused--;
 
     EnableConnectQueue();

@@ -108,7 +108,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
 
     sLine.TrimRight("\n\r");
 
-    DEBUG("(" << GetFullName() << ") CLI -> ZNC [" << sLine << "]");
+    NO_DEBUG("(" << GetFullName() << ") CLI -> ZNC [" << sLine << "]");
 
     if (sLine.Left(1) == "@") {
         // TODO support message-tags properly
@@ -744,13 +744,13 @@ void NoClient::AcceptLogin(NoUser& User)
 
 void NoClient::TimeoutImpl() { PutClient("ERROR :Closing link [Timeout]"); }
 
-void NoClient::ConnectedImpl() { DEBUG(GetSockName() << " == Connected();"); }
+void NoClient::ConnectedImpl() { NO_DEBUG(GetSockName() << " == Connected();"); }
 
-void NoClient::ConnectionRefusedImpl() { DEBUG(GetSockName() << " == ConnectionRefused()"); }
+void NoClient::ConnectionRefusedImpl() { NO_DEBUG(GetSockName() << " == ConnectionRefused()"); }
 
 void NoClient::DisconnectedImpl()
 {
-    DEBUG(GetSockName() << " == Disconnected()");
+    NO_DEBUG(GetSockName() << " == Disconnected()");
     NoNetwork* pNetwork = m_pNetwork;
     SetNetwork(nullptr, true, false);
 
@@ -761,7 +761,7 @@ void NoClient::DisconnectedImpl()
 
 void NoClient::ReachedMaxBufferImpl()
 {
-    DEBUG(GetSockName() << " == ReachedMaxBuffer()");
+    NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
     if (IsAttached()) {
         PutClient("ERROR :Closing link [Too long raw line]");
     }
@@ -801,7 +801,7 @@ void NoClient::PutClient(const NoString& sLine)
     NoString sCopy = sLine;
     NETWORKMODULECALL(OnSendToClient(sCopy, *this), m_pUser, m_pNetwork, this, &bReturn);
     if (bReturn) return;
-    DEBUG("(" << GetFullName() << ") ZNC -> CLI [" << sCopy << "]");
+    NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [" << sCopy << "]");
     Write(sCopy + "\r\n");
 }
 
@@ -823,7 +823,7 @@ void NoClient::PutModNotice(const NoString& sModule, const NoString& sLine)
         return;
     }
 
-    DEBUG("(" << GetFullName() << ") ZNC -> CLI [:" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE "
+    NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [:" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE "
               << GetNick() << " :" << sLine << "]");
     Write(":" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE " +
           GetNick() + " :" + sLine + "\r\n");
@@ -835,7 +835,7 @@ void NoClient::PutModule(const NoString& sModule, const NoString& sLine)
         return;
     }
 
-    DEBUG("(" << GetFullName() << ") ZNC -> CLI [:" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG "
+    NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [:" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG "
               << GetNick() << " :" << sLine << "]");
 
     NoStringVector vsLines = sLine.Split("\n");

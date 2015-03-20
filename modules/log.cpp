@@ -214,7 +214,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
     // Generate file name
     sPath = NoUtils::FormatTime(curtime, m_sLogPath, GetUser()->GetTimezone());
     if (sPath.empty()) {
-        DEBUG("Could not format log path [" << sPath << "]");
+        NO_DEBUG("Could not format log path [" << sPath << "]");
         return;
     }
 
@@ -227,7 +227,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
     // Check if it's allowed to write in this specific path
     sPath = NoDir::CheckPathPrefix(GetSavePath(), sPath);
     if (sPath.empty()) {
-        DEBUG("Invalid log path [" << m_sLogPath << "].");
+        NO_DEBUG("Invalid log path [" << m_sLogPath << "].");
         return;
     }
 
@@ -240,7 +240,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
         LogFile.Write(NoUtils::FormatTime(curtime, "[%H:%M:%S] ", GetUser()->GetTimezone()) +
                       (m_bSanitize ? NoUtils::StripControls(sLine) : sLine) + "\n");
     } else
-        DEBUG("Could not open log file [" << sPath << "]: " << strerror(errno));
+        NO_DEBUG("Could not open log file [" << sPath << "]: " << strerror(errno));
 }
 
 void NoLogMod::PutLog(const NoString& sLine, const NoChannel& Channel) { PutLog(sLine, Channel.getName()); }

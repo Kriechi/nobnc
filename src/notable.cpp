@@ -232,7 +232,7 @@ uint NoTable::GetColumnIndex(const NoString& sName) const
         if (m_vsHeaders[i] == sName) return i;
     }
 
-    DEBUG("NoTable::GetColumnIndex(" + sName + ") failed");
+    NO_DEBUG("NoTable::GetColumnIndex(" + sName + ") failed");
 
     return (uint)-1;
 }
