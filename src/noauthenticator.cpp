@@ -37,13 +37,6 @@ NoAuthenticator::~NoAuthenticator()
 {
 }
 
-void NoAuthenticator::SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
-{
-    m_sUsername = sUsername;
-    m_sPassword = sPassword;
-    m_pSock = pSock;
-}
-
 void NoAuthenticator::AcceptLogin(NoUser& User)
 {
     if (m_pSock) {

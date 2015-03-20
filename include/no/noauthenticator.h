@@ -32,8 +32,6 @@ public:
     NoAuthenticator(const NoAuthenticator&) = delete;
     NoAuthenticator& operator=(const NoAuthenticator&) = delete;
 
-    virtual void SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock);
-
     void AcceptLogin(NoUser& User);
     void RefuseLogin(const NoString& sReason);
 
