@@ -19,7 +19,6 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <no/nosocketmanager.h>
 
 class NoSocket;
 
@@ -28,14 +27,14 @@ class NO_EXPORT NoListener
 public:
     enum AcceptType { AcceptIrc = 1, AcceptHttp = 2, AcceptAll = AcceptIrc | AcceptHttp };
 
-    NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, AddressType eAddr, AcceptType eAccept);
+    NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, No::AddressType eAddr, AcceptType eAccept);
     ~NoListener();
 
     NoListener(const NoListener&) = delete;
     NoListener& operator=(const NoListener&) = delete;
 
     bool IsSSL() const;
-    AddressType GetAddrType() const;
+    No::AddressType GetAddrType() const;
     ushort GetPort() const;
     const NoString& GetBindHost() const;
     NoSocket* GetSocket() const;
@@ -51,7 +50,7 @@ public:
 
 private:
     bool m_bSSL;
-    AddressType m_eAddr;
+    No::AddressType m_eAddr;
     ushort m_uPort;
     NoString m_sBindHost;
     NoString m_sURIPrefix;

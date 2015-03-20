@@ -1550,8 +1550,8 @@ void NoClient::UserPortCommand(NoString& sLine)
             Table.SetCell("BindHost", (pListener->GetBindHost().empty() ? NoString("*") : pListener->GetBindHost()));
             Table.SetCell("SSL", NoString(pListener->IsSSL()));
 
-            AddressType eAddr = pListener->GetAddrType();
-            Table.SetCell("Proto", (eAddr == Ipv4AndIpv6Address ? "All" : (eAddr == Ipv4Address ? "IPv4" : "IPv6")));
+            No::AddressType eAddr = pListener->GetAddrType();
+            Table.SetCell("Proto", (eAddr == No::Ipv4AndIpv6Address ? "All" : (eAddr == No::Ipv4Address ? "IPv4" : "IPv6")));
 
             NoListener::AcceptType eAccept = pListener->GetAcceptType();
             Table.SetCell("IRC/Web",
@@ -1567,14 +1567,14 @@ void NoClient::UserPortCommand(NoString& sLine)
 
     NoString sPort = sLine.Token(1);
     NoString sAddr = sLine.Token(2);
-    AddressType eAddr = Ipv4AndIpv6Address;
+    No::AddressType eAddr = No::Ipv4AndIpv6Address;
 
     if (sAddr.Equals("IPV4")) {
-        eAddr = Ipv4Address;
+        eAddr = No::Ipv4Address;
     } else if (sAddr.Equals("IPV6")) {
-        eAddr = Ipv6Address;
+        eAddr = No::Ipv6Address;
     } else if (sAddr.Equals("ALL")) {
-        eAddr = Ipv4AndIpv6Address;
+        eAddr = No::Ipv4AndIpv6Address;
     } else {
         sAddr.clear();
     }

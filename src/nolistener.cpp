@@ -45,7 +45,7 @@ private:
     const NoString m_sURIPrefix;
 };
 
-NoListener::NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, AddressType eAddr, AcceptType eAccept)
+NoListener::NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, No::AddressType eAddr, AcceptType eAccept)
     : m_bSSL(bSSL), m_eAddr(eAddr), m_uPort(uPort), m_sBindHost(sBindHost), m_sURIPrefix(sURIPrefix),
       m_pSocket(nullptr), m_eAcceptType(eAccept)
 {
@@ -62,7 +62,7 @@ bool NoListener::IsSSL() const
     return m_bSSL;
 }
 
-AddressType NoListener::GetAddrType() const
+No::AddressType NoListener::GetAddrType() const
 {
     return m_eAddr;
 }

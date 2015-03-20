@@ -23,6 +23,7 @@ namespace No
 {
     enum CaseSensitivity { CaseInsensitive, CaseSensitive };
     enum SplitBehavior { KeepEmptyParts, SkipEmptyParts };
+    enum AddressType { Ipv4Address = 1, Ipv6Address = 2, Ipv4AndIpv6Address = Ipv4Address | Ipv6Address };
 }
 
 #endif // NONAMESPACE_H

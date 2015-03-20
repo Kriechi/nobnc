@@ -546,8 +546,8 @@ bool NoApp::WriteConfig()
         listenerConfig.AddKeyValuePair("URIPrefix", pListener->GetURIPrefix() + "/");
         listenerConfig.AddKeyValuePair("Port", NoString(pListener->GetPort()));
 
-        listenerConfig.AddKeyValuePair("IPv4", NoString(pListener->GetAddrType() != Ipv6Address));
-        listenerConfig.AddKeyValuePair("IPv6", NoString(pListener->GetAddrType() != Ipv4Address));
+        listenerConfig.AddKeyValuePair("IPv4", NoString(pListener->GetAddrType() != No::Ipv6Address));
+        listenerConfig.AddKeyValuePair("IPv6", NoString(pListener->GetAddrType() != No::Ipv4Address));
 
         listenerConfig.AddKeyValuePair("SSL", NoString(pListener->IsSSL()));
 
@@ -718,7 +718,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
         NoUtils::PrintAction("Verifying the listener");
         NoListener* pListener =
-        new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? Ipv4AndIpv6Address : Ipv4Address, NoListener::AcceptAll);
+        new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address, NoListener::AcceptAll);
         if (!pListener->Listen()) {
             NoUtils::PrintStatus(false, FormatBindError());
             bSuccess = false;
@@ -1606,7 +1606,7 @@ bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
     return true;
 }
 
-NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, AddressType eAddr)
+NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, No::AddressType eAddr)
 {
     for (NoListener* pListener : m_vpListeners) {
         if (pListener->GetPort() != uPort) continue;
@@ -1622,12 +1622,12 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
     NoString sName = sLine.Token(0);
     NoString sValue = sLine.Tokens(1);
 
-    AddressType eAddr = Ipv4AndIpv6Address;
+    No::AddressType eAddr = No::Ipv4AndIpv6Address;
     if (sName.Equals("Listen4") || sName.Equals("Listen") || sName.Equals("Listener4")) {
-        eAddr = Ipv4Address;
+        eAddr = No::Ipv4Address;
     }
     if (sName.Equals("Listener6")) {
-        eAddr = Ipv6Address;
+        eAddr = No::Ipv6Address;
     }
 
     NoListener::AcceptType eAccept = NoListener::AcceptAll;
@@ -1640,7 +1640,7 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
     NoString sPort;
     NoString sBindHost;
 
-    if (Ipv4Address == eAddr) {
+    if (No::Ipv4Address == eAddr) {
         sValue.Replace(":", " ");
     }
 
@@ -1666,7 +1666,7 @@ bool NoApp::AddListener(ushort uPort,
                        const NoString& sBindHost,
                        const NoString& sURIPrefixRaw,
                        bool bSSL,
-                       AddressType eAddr,
+                       No::AddressType eAddr,
                        NoListener::AcceptType eAccept,
                        NoString& sError)
 {
@@ -1679,13 +1679,13 @@ bool NoApp::AddListener(ushort uPort,
     NoString sIPV6Comment;
 
     switch (eAddr) {
-    case Ipv4AndIpv6Address:
+    case No::Ipv4AndIpv6Address:
         sIPV6Comment = "";
         break;
-    case Ipv4Address:
+    case No::Ipv4Address:
         sIPV6Comment = " using ipv4";
         break;
-    case Ipv6Address:
+    case No::Ipv6Address:
         sIPV6Comment = " using ipv6";
     }
 
@@ -1783,13 +1783,13 @@ bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
     pConfig->FindBoolEntry("allowweb", bWeb, true);
     pConfig->FindStringEntry("uriprefix", sURIPrefix);
 
-    AddressType eAddr;
+    No::AddressType eAddr;
     if (b4 && b6) {
-        eAddr = Ipv4AndIpv6Address;
+        eAddr = No::Ipv4AndIpv6Address;
     } else if (b4 && !b6) {
-        eAddr = Ipv4Address;
+        eAddr = No::Ipv4Address;
     } else if (!b4 && b6) {
-        eAddr = Ipv6Address;
+        eAddr = No::Ipv6Address;
     } else {
         sError = "No address family given";
         NoUtils::PrintError(sError);

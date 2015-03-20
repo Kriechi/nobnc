@@ -155,7 +155,7 @@ public:
 
         // Now turn that into a listener instance
         NoListener* pListener =
-        new NoListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? Ipv4Address : Ipv4AndIpv6Address), NoListener::AcceptHttp);
+        new NoListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address), NoListener::AcceptHttp);
 
         if (!pListener->Listen()) {
             sMessage = "Failed to add backwards-compatible listener";
@@ -1661,16 +1661,16 @@ public:
         bool bIRC = WebSock.GetParam("irc").ToBool();
         bool bWeb = WebSock.GetParam("web").ToBool();
 
-        AddressType eAddr = Ipv4AndIpv6Address;
+        No::AddressType eAddr = No::Ipv4AndIpv6Address;
         if (bIPv4) {
             if (bIPv6) {
-                eAddr = Ipv4AndIpv6Address;
+                eAddr = No::Ipv4AndIpv6Address;
             } else {
-                eAddr = Ipv4Address;
+                eAddr = No::Ipv4Address;
             }
         } else {
             if (bIPv6) {
-                eAddr = Ipv6Address;
+                eAddr = No::Ipv6Address;
             } else {
                 WebSock.GetSession()->AddError("Choose either IPv4 or IPv6 or both.");
                 return SettingsPage(WebSock, Tmpl);
@@ -1715,16 +1715,16 @@ public:
         bool bIPv4 = WebSock.GetParam("ipv4").ToBool();
         bool bIPv6 = WebSock.GetParam("ipv6").ToBool();
 
-        AddressType eAddr = Ipv4AndIpv6Address;
+        No::AddressType eAddr = No::Ipv4AndIpv6Address;
         if (bIPv4) {
             if (bIPv6) {
-                eAddr = Ipv4AndIpv6Address;
+                eAddr = No::Ipv4AndIpv6Address;
             } else {
-                eAddr = Ipv4Address;
+                eAddr = No::Ipv4Address;
             }
         } else {
             if (bIPv6) {
-                eAddr = Ipv6Address;
+                eAddr = No::Ipv6Address;
             } else {
                 WebSock.GetSession()->AddError("Invalid request.");
                 return SettingsPage(WebSock, Tmpl);
@@ -1796,13 +1796,13 @@ public:
 
 #ifdef HAVE_IPV6
                 switch (pListener->GetAddrType()) {
-                case Ipv4Address:
+                case No::Ipv4Address:
                     l["IsIPV4"] = "true";
                     break;
-                case Ipv6Address:
+                case No::Ipv6Address:
                     l["IsIPV6"] = "true";
                     break;
-                case Ipv4AndIpv6Address:
+                case No::Ipv4AndIpv6Address:
                     l["IsIPV4"] = "true";
                     l["IsIPV6"] = "true";
                     break;

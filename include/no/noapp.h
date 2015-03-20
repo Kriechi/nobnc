@@ -146,13 +146,13 @@ public:
     bool AddUser(NoUser* pUser, NoString& sErrorRet);
     const std::map<NoString, NoUser*>& GetUserMap() const { return (m_msUsers); }
 
-    NoListener* FindListener(u_short uPort, const NoString& BindHost, AddressType eAddr);
+    NoListener* FindListener(u_short uPort, const NoString& BindHost, No::AddressType eAddr);
     bool AddListener(NoListener*);
     bool AddListener(ushort uPort,
                      const NoString& sBindHost,
                      const NoString& sURIPrefix,
                      bool bSSL,
-                     AddressType eAddr,
+                     No::AddressType eAddr,
                      NoListener::AcceptType eAccept,
                      NoString& sError);
     bool DelListener(NoListener*);
