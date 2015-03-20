@@ -68,6 +68,36 @@
         }                                                                     \
     }
 
+class NoClientAuth : public NoAuthBase
+{
+public:
+    NoClientAuth(NoClient* pClient, const NoString& sUsername, const NoString& sPassword)
+        : NoAuthBase(sUsername, sPassword, pClient), m_pClient(pClient)
+    {
+    }
+
+    void Invalidate() override
+    {
+        m_pClient = nullptr;
+        NoAuthBase::Invalidate();
+    }
+
+    void AcceptedLogin(NoUser& User) override
+    {
+        if (m_pClient)
+            m_pClient->AcceptLogin(User);
+    }
+
+    void RefusedLogin(const NoString& sReason) override
+    {
+        if (m_pClient)
+            m_pClient->RefuseLogin(sReason);
+    }
+
+private:
+    NoClient* m_pClient;
+};
+
 NoClient::NoClient() : NoIrcSocket(), m_bGotPass(false), m_bGotNick(false), m_bGotUser(false), m_bInCap(false), m_bNamesx(false),
       m_bUHNames(false), m_bAway(false), m_bServerTime(false), m_bBatch(false), m_bSelfMessage(false),
       m_bPlaybackActive(false), m_pUser(nullptr), m_pNetwork(nullptr), m_sNick("unknown-nick"), m_sPass(""),
@@ -635,24 +665,6 @@ void NoClient::AuthUser()
     NoApp::Get().AuthUser(m_spAuth);
 }
 
-NoClientAuth::NoClientAuth(NoClient* pClient, const NoString& sUsername, const NoString& sPassword)
-    : NoAuthBase(sUsername, sPassword, pClient), m_pClient(pClient)
-{
-}
-
-void NoClientAuth::Invalidate()
-{
-    m_pClient = nullptr;
-    NoAuthBase::Invalidate();
-}
-
-void NoClientAuth::RefusedLogin(const NoString& sReason)
-{
-    if (m_pClient) {
-        m_pClient->RefuseLogin(sReason);
-    }
-}
-
 NoString NoAuthBase::GetRemoteIP() const
 {
     if (m_pSock) return m_pSock->GetRemoteIP();
@@ -714,13 +726,6 @@ void NoClient::RefuseLogin(const NoString& sReason)
     PutStatus("Bad username and/or password.");
     PutClient(":irc.znc.in 464 " + GetNick() + " :" + sReason);
     Close(NoSocket::CLT_AFTERWRITE);
-}
-
-void NoClientAuth::AcceptedLogin(NoUser& User)
-{
-    if (m_pClient) {
-        m_pClient->AcceptLogin(User);
-    }
 }
 
 void NoClient::AcceptLogin(NoUser& User)

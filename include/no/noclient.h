@@ -60,23 +60,6 @@ private:
     NoSocket* m_pSock;
 };
 
-
-class NO_EXPORT NoClientAuth : public NoAuthBase
-{
-public:
-    NoClientAuth(NoClient* pClient, const NoString& sUsername, const NoString& sPassword);
-
-    NoClientAuth(const NoClientAuth&) = delete;
-    NoClientAuth& operator=(const NoClientAuth&) = delete;
-
-    void Invalidate() override;
-    void AcceptedLogin(NoUser& User) override;
-    void RefusedLogin(const NoString& sReason) override;
-
-private:
-    NoClient* m_pClient;
-};
-
 class NO_EXPORT NoClient : public NoIrcSocket
 {
 public:
