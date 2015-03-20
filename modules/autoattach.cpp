@@ -269,7 +269,7 @@ private:
     VAttachMatch m_vMatches;
 };
 
-template <> void TModInfo<NoChannelAttach>(NoModInfo& Info)
+template <> void no_moduleInfo<NoChannelAttach>(NoModInfo& Info)
 {
     Info.AddType(No::UserModule);
     Info.SetWikiPage("autoattach");

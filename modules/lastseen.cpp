@@ -129,6 +129,6 @@ public:
     }
 };
 
-template <> void TModInfo<NoLastSeenMod>(NoModInfo& Info) { Info.SetWikiPage("lastseen"); }
+template <> void no_moduleInfo<NoLastSeenMod>(NoModInfo& Info) { Info.SetWikiPage("lastseen"); }
 
 GLOBALMODULEDEFS(NoLastSeenMod, "Collects data about when a user last logged in.")

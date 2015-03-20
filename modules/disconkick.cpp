@@ -36,7 +36,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoKickClientOnIrcDisconnect>(NoModInfo& Info) { Info.SetWikiPage("disconkick"); }
+template <> void no_moduleInfo<NoKickClientOnIrcDisconnect>(NoModInfo& Info) { Info.SetWikiPage("disconkick"); }
 
 USERMODULEDEFS(NoKickClientOnIrcDisconnect,
                "Kicks the client from all channels when the connection to the IRC server is lost")

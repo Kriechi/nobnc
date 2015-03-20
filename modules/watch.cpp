@@ -708,6 +708,6 @@ private:
     NoBuffer m_Buffer;
 };
 
-template <> void TModInfo<NoWatcherMod>(NoModInfo& Info) { Info.SetWikiPage("watch"); }
+template <> void no_moduleInfo<NoWatcherMod>(NoModInfo& Info) { Info.SetWikiPage("watch"); }
 
 NETWORKMODULEDEFS(NoWatcherMod, "Copy activity from a specific user into a separate window")

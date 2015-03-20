@@ -160,7 +160,7 @@ private:
     bool m_bRules[RULE_MAX];
 };
 
-template <> void TModInfo<NoClearBufferOnMsgMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoClearBufferOnMsgMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("clearbufferonmsg");
     Info.SetHasArgs(true);

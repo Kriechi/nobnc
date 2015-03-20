@@ -143,7 +143,7 @@ private:
     uint m_iThresholdMsgs;
 };
 
-template <> void TModInfo<NoCtcpFloodMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoCtcpFloodMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("ctcpflood");
     Info.SetHasArgs(true);

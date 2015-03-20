@@ -633,6 +633,6 @@ private:
 
 void NoAutoOpTimer::RunJob() { m_pParent->ProcessQueue(); }
 
-template <> void TModInfo<NoAutoOpMod>(NoModInfo& Info) { Info.SetWikiPage("autoop"); }
+template <> void no_moduleInfo<NoAutoOpMod>(NoModInfo& Info) { Info.SetWikiPage("autoop"); }
 
 NETWORKMODULEDEFS(NoAutoOpMod, "Auto op the good people")

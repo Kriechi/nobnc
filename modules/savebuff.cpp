@@ -404,7 +404,7 @@ void NoSaveBuffJob::RunJob()
     p->SaveBuffersToDisk();
 }
 
-template <> void TModInfo<NoSaveBuff>(NoModInfo& Info)
+template <> void no_moduleInfo<NoSaveBuff>(NoModInfo& Info)
 {
     Info.SetWikiPage("savebuff");
     Info.SetHasArgs(true);

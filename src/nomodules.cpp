@@ -780,15 +780,15 @@ ModHandle NoModules::OpenModule(const NoString& sModule, const NoString& sModPat
     }
 
     typedef bool (*InfoFP)(double, NoModInfo&);
-    InfoFP ZNNoModInfo = (InfoFP)dlsym(p, "ZNNoModInfo");
+    InfoFP no_moduleInfo = (InfoFP)dlsym(p, "no_moduleInfo");
 
-    if (!ZNNoModInfo) {
+    if (!no_moduleInfo) {
         dlclose(p);
-        sRetMsg = "Could not find ZNNoModInfo() in module [" + sModule + "]";
+        sRetMsg = "Could not find no_moduleInfo() in module [" + sModule + "]";
         return nullptr;
     }
 
-    if (ZNNoModInfo(NoModule::GetCoreVersion(), Info)) {
+    if (no_moduleInfo(NoModule::GetCoreVersion(), Info)) {
         sRetMsg = "";
         bVersionMismatch = false;
     } else {

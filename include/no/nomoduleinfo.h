@@ -73,12 +73,15 @@ private:
     ModLoader m_fLoader;
 };
 
-template <class M> void TModInfo(NoModInfo& Info) {}
-
-template <class M>
-NoModule* TModLoad(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType)
+template <class T>
+void no_moduleInfo(NoModInfo& info)
 {
-    return new M(p, pUser, pNetwork, sModName, sModPath, eType);
+}
+
+template <class T>
+NoModule* no_loadModule(ModHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& path, No::ModuleType type)
+{
+    return new T(handle, user, network, name, path, type);
 }
 
 #endif // NOMODULEINFO_H

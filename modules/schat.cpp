@@ -452,7 +452,7 @@ void NoRemMarkerJob::RunJob()
     // store buffer
 }
 
-template <> void TModInfo<NoSChat>(NoModInfo& Info)
+template <> void no_moduleInfo<NoSChat>(NoModInfo& Info)
 {
     Info.SetWikiPage("schat");
     Info.SetHasArgs(true);

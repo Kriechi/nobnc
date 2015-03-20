@@ -453,6 +453,6 @@ void NoRouteTimeout::RunJob()
     pMod->Timeout();
 }
 
-template <> void TModInfo<NoRouteRepliesMod>(NoModInfo& Info) { Info.SetWikiPage("route_replies"); }
+template <> void no_moduleInfo<NoRouteRepliesMod>(NoModInfo& Info) { Info.SetWikiPage("route_replies"); }
 
 NETWORKMODULEDEFS(NoRouteRepliesMod, "Send replies (e.g. to /who) to the right client only")

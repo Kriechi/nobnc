@@ -76,7 +76,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoBuffExtras>(NoModInfo& Info)
+template <> void no_moduleInfo<NoBuffExtras>(NoModInfo& Info)
 {
     Info.SetWikiPage("buffextras");
     Info.AddType(No::NetworkModule);

@@ -482,7 +482,7 @@ void NoAwayJob::RunJob()
     }
 }
 
-template <> void TModInfo<NoAway>(NoModInfo& Info)
+template <> void no_moduleInfo<NoAway>(NoModInfo& Info)
 {
     Info.SetWikiPage("awaystore");
     Info.SetHasArgs(true);

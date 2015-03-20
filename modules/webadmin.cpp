@@ -1970,7 +1970,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoWebAdminMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoWebAdminMod>(NoModInfo& Info)
 {
     Info.AddType(No::UserModule);
     Info.SetWikiPage("webadmin");

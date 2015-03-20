@@ -59,7 +59,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoStripControlsMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoStripControlsMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("stripcontrols");
     Info.AddType(No::UserModule);

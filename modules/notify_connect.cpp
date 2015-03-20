@@ -38,6 +38,6 @@ private:
     void SendAdmins(const NoString& msg) { NoApp::Get().Broadcast(msg, true, nullptr, GetClient()); }
 };
 
-template <> void TModInfo<NoNotifyConnectMod>(NoModInfo& Info) { Info.SetWikiPage("notify_connect"); }
+template <> void no_moduleInfo<NoNotifyConnectMod>(NoModInfo& Info) { Info.SetWikiPage("notify_connect"); }
 
 GLOBALMODULEDEFS(NoNotifyConnectMod, "Notifies all admin users when a client connects or disconnects.")

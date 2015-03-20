@@ -222,7 +222,7 @@ protected:
     }
 };
 
-template <> void TModInfo<NoSaslAuthMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoSaslAuthMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("cyrusauth");
     Info.SetHasArgs(true);

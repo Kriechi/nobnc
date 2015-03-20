@@ -194,6 +194,6 @@ public:
     }
 };
 
-template <> void TModInfo<NoCryptMod>(NoModInfo& Info) { Info.SetWikiPage("crypt"); }
+template <> void no_moduleInfo<NoCryptMod>(NoModInfo& Info) { Info.SetWikiPage("crypt"); }
 
 NETWORKMODULEDEFS(NoCryptMod, "Encryption for channel/private messages")

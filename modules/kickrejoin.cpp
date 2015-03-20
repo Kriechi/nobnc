@@ -129,7 +129,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoRejoinMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoRejoinMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("kickrejoin");
     Info.SetHasArgs(true);

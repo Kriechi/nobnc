@@ -95,7 +95,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoCertMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoCertMod>(NoModInfo& Info)
 {
     Info.AddType(No::UserModule);
     Info.SetWikiPage("cert");

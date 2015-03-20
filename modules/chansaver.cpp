@@ -84,7 +84,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoChannelSaverMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoChannelSaverMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("chansaver");
     Info.AddType(No::NetworkModule);

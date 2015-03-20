@@ -204,7 +204,7 @@ private:
     }
 };
 
-template <> void TModInfo<NoBlockUser>(NoModInfo& Info)
+template <> void no_moduleInfo<NoBlockUser>(NoModInfo& Info)
 {
     Info.SetWikiPage("blockuser");
     Info.SetHasArgs(true);

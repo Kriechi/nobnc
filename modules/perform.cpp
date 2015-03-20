@@ -176,7 +176,7 @@ private:
     NoStringVector m_vPerform;
 };
 
-template <> void TModInfo<NoPerform>(NoModInfo& Info)
+template <> void no_moduleInfo<NoPerform>(NoModInfo& Info)
 {
     Info.AddType(No::UserModule);
     Info.SetWikiPage("perform");

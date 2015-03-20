@@ -56,19 +56,19 @@ class NoModInfo;
 #define MODULE_EXPORT
 #endif
 
-#define MODCOMMONDEFS(CLASS, DESCRIPTION, TYPE)                         \
-    extern "C" {                                                        \
-    MODULE_EXPORT bool ZNNoModInfo(double dCoreVersion, NoModInfo& Info); \
-    bool ZNNoModInfo(double dCoreVersion, NoModInfo& Info)                \
-    {                                                                   \
-        if (dCoreVersion != NO_VERSION) return false;                      \
-        Info.SetDescription(DESCRIPTION);                               \
-        Info.SetDefaultType(TYPE);                                      \
-        Info.AddType(TYPE);                                             \
-        Info.SetLoader(TModLoad<CLASS>);                                \
-        TModInfo<CLASS>(Info);                                          \
-        return true;                                                    \
-    }                                                                   \
+#define MODCOMMONDEFS(CLASS, DESCRIPTION, TYPE)                             \
+    extern "C" {                                                            \
+        MODULE_EXPORT bool no_moduleInfo(double version, NoModInfo& info)   \
+        {                                                                   \
+            if (version != NO_VERSION)                                      \
+                return false;                                               \
+            info.SetDescription(DESCRIPTION);                               \
+            info.SetDefaultType(TYPE);                                      \
+            info.AddType(TYPE);                                             \
+            info.SetLoader(no_loadModule<CLASS>);                           \
+            no_moduleInfo<CLASS>(info);                                     \
+            return true;                                                    \
+        }                                                                   \
     }
 
 /** Instead of writing a constructor, you should call this macro. It accepts all

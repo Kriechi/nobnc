@@ -36,7 +36,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoBlockMotd>(NoModInfo& Info)
+template <> void no_moduleInfo<NoBlockMotd>(NoModInfo& Info)
 {
     Info.AddType(No::NetworkModule);
     Info.AddType(No::GlobalModule);

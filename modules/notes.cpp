@@ -216,7 +216,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoNotesMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoNotesMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("notes");
     Info.SetHasArgs(true);

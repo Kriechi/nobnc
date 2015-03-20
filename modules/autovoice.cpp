@@ -338,7 +338,7 @@ private:
     std::map<NoString, NoAutoVoiceUser*> m_msUsers;
 };
 
-template <> void TModInfo<NoAutoVoiceMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoAutoVoiceMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("autovoice");
     Info.SetHasArgs(true);

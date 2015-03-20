@@ -107,7 +107,7 @@ private:
     uint m_uiAllowedFailed;
 };
 
-template <> void TModInfo<NoFailToBanMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoFailToBanMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("fail2ban");
     Info.SetHasArgs(true);

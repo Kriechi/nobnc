@@ -130,7 +130,7 @@ public:
     }
 };
 
-template <> void TModInfo<NoNickServ>(NoModInfo& Info)
+template <> void no_moduleInfo<NoNickServ>(NoModInfo& Info)
 {
     Info.SetWikiPage("nickserv");
     Info.SetHasArgs(true);

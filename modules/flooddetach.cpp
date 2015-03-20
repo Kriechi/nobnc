@@ -229,7 +229,7 @@ private:
     uint m_iThresholdMsgs;
 };
 
-template <> void TModInfo<NoFloodDetachMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoFloodDetachMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("flooddetach");
     Info.SetHasArgs(true);

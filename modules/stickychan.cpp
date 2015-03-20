@@ -209,7 +209,7 @@ bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
     return (true);
 }
 
-template <> void TModInfo<NoStickyChan>(NoModInfo& Info)
+template <> void no_moduleInfo<NoStickyChan>(NoModInfo& Info)
 {
     Info.SetWikiPage("stickychan");
     Info.SetHasArgs(true);
