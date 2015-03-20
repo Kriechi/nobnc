@@ -28,27 +28,20 @@ typedef std::vector<TWebPage> VWebPages;
 class NO_EXPORT NoWebPage
 {
 public:
-    NoWebPage(const NoString& sName, const NoString& sTitle = "", uint uFlags = 0)
-        : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams()
-    {
-    }
-
-    NoWebPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags = 0)
-        : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams(vParams)
-    {
-    }
+    NoWebPage(const NoString& sName, const NoString& sTitle = "", uint uFlags = 0);
+    NoWebPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags = 0);
 
     enum { Admin = 1 };
 
-    void SetName(const NoString& s) { m_sName = s; }
-    void SetTitle(const NoString& s) { m_sTitle = s; }
-    void AddParam(const NoString& sName, const NoString& sValue) { m_vParams.push_back(make_pair(sName, sValue)); }
+    void SetName(const NoString& s);
+    void SetTitle(const NoString& s);
+    void AddParam(const NoString& sName, const NoString& sValue);
 
-    bool RequiresAdmin() const { return m_uFlags & Admin; }
+    bool RequiresAdmin() const;
 
-    const NoString& GetName() const { return m_sName; }
-    const NoString& GetTitle() const { return m_sTitle; }
-    const NoStringPairVector& GetParams() const { return m_vParams; }
+    const NoString& GetName() const;
+    const NoString& GetTitle() const;
+    const NoStringPairVector& GetParams() const;
 
 private:
     uint m_uFlags;

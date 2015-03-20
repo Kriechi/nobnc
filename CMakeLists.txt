@@ -123,6 +123,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nouser.cpp
                        src/noutils.cpp
                        src/nowebmodules.cpp
+                       src/nowebpage.cpp
                        third_party/md5/md5.cpp
                        third_party/sha2/sha2.c
                        third_party/Csocket/Csocket.cc
