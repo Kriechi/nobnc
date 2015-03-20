@@ -63,7 +63,7 @@ TEST(StringTest, Bool)
     EXPECT_EQ(false, NoString(false).ToBool());
 }
 
-#define CS(s) (NoString((s), sizeof(s) - 1))
+#define NS(s) (NoString((s), sizeof(s) - 1))
 
 TEST(StringTest, Cmp)
 {
@@ -118,8 +118,8 @@ TEST(StringTest, Wild)
 
 TEST(StringTest, Case)
 {
-    NoString x = CS("xx");
-    NoString X = CS("XX");
+    NoString x = NS("xx");
+    NoString X = NS("XX");
     EXPECT_EQ(X, x.AsUpper());
     EXPECT_EQ(x, X.AsLower());
 }
@@ -133,24 +133,24 @@ TEST(StringTest, Replace)
 
 TEST(StringTest, LeftRight)
 {
-    EXPECT_EQ("Xy", CS("Xyz").Left(2));
-    EXPECT_EQ("Xyz", CS("Xyz").Left(20));
+    EXPECT_EQ("Xy", NS("Xyz").Left(2));
+    EXPECT_EQ("Xyz", NS("Xyz").Left(20));
 
-    EXPECT_EQ("yz", CS("Xyz").Right(2));
-    EXPECT_EQ("Xyz", CS("Xyz").Right(20));
+    EXPECT_EQ("yz", NS("Xyz").Right(2));
+    EXPECT_EQ("Xyz", NS("Xyz").Right(20));
 }
 
 TEST(StringTest, Split)
 {
-    EXPECT_EQ("a", CS("a b c").Token(0));
-    EXPECT_EQ("b", CS("a b c").Token(1));
-    EXPECT_EQ("", CS("a b c").Token(100));
-    EXPECT_EQ("b c", CS("a b c").Tokens(1));
-    EXPECT_EQ("c", CS("a  c").Token(1));
-    EXPECT_EQ("c", CS("a  c").Token(1, " "));
-    EXPECT_EQ("c", CS("a  c").Token(1, "  "));
-    EXPECT_EQ(" c", CS("a   c").Token(1, "  "));
-    EXPECT_EQ("c", CS("a    c").Token(1, "  "));
+    EXPECT_EQ("a", NS("a b c").Token(0));
+    EXPECT_EQ("b", NS("a b c").Token(1));
+    EXPECT_EQ("", NS("a b c").Token(100));
+    EXPECT_EQ("b c", NS("a b c").Tokens(1));
+    EXPECT_EQ("c", NS("a  c").Token(1));
+    EXPECT_EQ("c", NS("a  c").Token(1, " "));
+    EXPECT_EQ("c", NS("a  c").Token(1, "  "));
+    EXPECT_EQ(" c", NS("a   c").Token(1, "  "));
+    EXPECT_EQ("c", NS("a    c").Token(1, "  "));
 //    EXPECT_EQ("(b c)", CS("a (b c) d").Token(1, " ", "(", ")"));
 //    EXPECT_EQ("d", CS("a (b c) d").Token(2, " ", "(", ")"));
 
@@ -158,15 +158,15 @@ TEST(StringTest, Split)
     vexpected.push_back("a");
     vexpected.push_back("b");
     vexpected.push_back("c");
-    NoStringVector vresult = CS("a b c").Split(" ");
+    NoStringVector vresult = NS("a b c").Split(" ");
     EXPECT_EQ(vexpected, vresult);
 }
 
 TEST(StringTest, Equals)
 {
-    EXPECT_TRUE(CS("ABC").Equals("abc"));
-    EXPECT_TRUE(CS("ABC").Equals("abc", No::CaseInsensitive));
-    EXPECT_FALSE(CS("ABC").Equals("abc", No::CaseSensitive));
+    EXPECT_TRUE(NS("ABC").Equals("abc"));
+    EXPECT_TRUE(NS("ABC").Equals("abc", No::CaseInsensitive));
+    EXPECT_FALSE(NS("ABC").Equals("abc", No::CaseSensitive));
 }
 
 TEST(StringTest, Find)
