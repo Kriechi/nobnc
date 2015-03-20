@@ -20,47 +20,46 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 
-class NO_EXPORT NoUtils
+namespace NoUtils
 {
-public:
-    static NoString formatIp(ulong addr);
-    static ulong formatLongIp(const NoString& sIP);
+    NO_EXPORT NoString formatIp(ulong addr);
+    NO_EXPORT ulong formatLongIp(const NoString& sIP);
 
-    static void printError(const NoString& sMessage);
-    static void printMessage(const NoString& sMessage, bool bStrong = false);
-    static void printPrompt(const NoString& sMessage);
-    static void printAction(const NoString& sMessage);
-    static void printStatus(bool bSuccess, const NoString& sMessage = "");
+    NO_EXPORT void printError(const NoString& sMessage);
+    NO_EXPORT void printMessage(const NoString& sMessage, bool bStrong = false);
+    NO_EXPORT void printPrompt(const NoString& sMessage);
+    NO_EXPORT void printAction(const NoString& sMessage);
+    NO_EXPORT void printStatus(bool bSuccess, const NoString& sMessage = "");
 
 #ifdef HAVE_LIBSSL
-    static NoString encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
-    static NoString decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
+    NO_EXPORT NoString encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
+    NO_EXPORT NoString decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
 #endif
 
-    static NoString salt();
-    static NoString defaultHash();
-    static NoString md5(const NoString& sStr);
-    static NoString sha256(const NoString& sStr);
-    static NoString saltedMd5(const NoString& sPass, const NoString& sSalt);
-    static NoString saltedSha256(const NoString& sPass, const NoString& sSalt);
+    NO_EXPORT NoString salt();
+    NO_EXPORT NoString defaultHash();
+    NO_EXPORT NoString md5(const NoString& sStr);
+    NO_EXPORT NoString sha256(const NoString& sStr);
+    NO_EXPORT NoString saltedMd5(const NoString& sPass, const NoString& sSalt);
+    NO_EXPORT NoString saltedSha256(const NoString& sPass, const NoString& sSalt);
 
-    static NoString getPass(const NoString& sPrompt);
-    static NoString getSaltedHashPass(NoString& sSalt);
-    static bool getInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefault = "", const NoString& sHint = "");
-    static bool getBoolInput(const NoString& sPrompt, bool bDefault);
-    static bool getBoolInput(const NoString& sPrompt, bool* pbDefault = nullptr);
-    static bool getNumInput(const NoString& sPrompt, uint& uRet, uint uMin = 0, uint uMax = ~0, uint uDefault = ~0);
+    NO_EXPORT NoString getPass(const NoString& sPrompt);
+    NO_EXPORT NoString getSaltedHashPass(NoString& sSalt);
+    NO_EXPORT bool getInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefault = "", const NoString& sHint = "");
+    NO_EXPORT bool getBoolInput(const NoString& sPrompt, bool bDefault);
+    NO_EXPORT bool getBoolInput(const NoString& sPrompt, bool* pbDefault = nullptr);
+    NO_EXPORT bool getNumInput(const NoString& sPrompt, uint& uRet, uint uMin = 0, uint uMax = ~0, uint uDefault = ~0);
 
-    static ulonglong millTime();
+    NO_EXPORT ulonglong millTime();
 
-    static NoString cTime(time_t t, const NoString& sTZ);
-    static NoString formatTime(time_t t, const NoString& sFormat, const NoString& sTZ);
-    static NoString formatServerTime(const timeval& tv);
-    static NoStringSet timezones();
-    static NoStringSet encodings();
+    NO_EXPORT NoString cTime(time_t t, const NoString& sTZ);
+    NO_EXPORT NoString formatTime(time_t t, const NoString& sFormat, const NoString& sTZ);
+    NO_EXPORT NoString formatServerTime(const timeval& tv);
+    NO_EXPORT NoStringSet timezones();
+    NO_EXPORT NoStringSet encodings();
 
-    static NoStringMap messageTags(const NoString& sLine);
-    static void setMessageTags(NoString& sLine, const NoStringMap& mssTags);
+    NO_EXPORT NoStringMap messageTags(const NoString& sLine);
+    NO_EXPORT void setMessageTags(NoString& sLine, const NoStringMap& mssTags);
 
     /** Status codes that can be returned by WriteToDisk() and
      * ReadFromDisk(). */
@@ -79,42 +78,42 @@ public:
      * @return The result of the operation.
      * @see WriteFilter.
      */
-    static status_t writeToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode = 0644);
+    NO_EXPORT status_t writeToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode = 0644);
     /** Read a map from a file.
      * @param sPath The file name to read from.
      * @return The result of the operation.
      * @see ReadFilter.
      */
-    static status_t readFromDisk(NoStringMap& values, const NoString& sPath);
+    NO_EXPORT status_t readFromDisk(NoStringMap& values, const NoString& sPath);
 
     /** Pretty-print a number of bytes.
      * @param d The number of bytes.
      * @return A string describing the number of bytes.
      */
-    static NoString toByteStr(ulonglong d);
+    NO_EXPORT NoString toByteStr(ulonglong d);
     /** Pretty-print a time span.
      * @param s Number of seconds to print.
      * @return A string like "4w 6d 4h 3m 58s".
      */
-    static NoString toTimeStr(ulong s);
+    NO_EXPORT NoString toTimeStr(ulong s);
     /** Pretty-print a percent value.
      * @param d The percent value. This should be in range 0-100.
      * @return The "pretty" string.
      */
-    static NoString toPercent(double d);
+    NO_EXPORT NoString toPercent(double d);
 
     /** Remove controls characters from the string.
      * Controls characters are color codes, and those in C0 set
      * See https://en.wikipedia.org/wiki/C0_and_C1_control_codes
      * @return A string without control codes.
      */
-    static NoString stripControls(const NoString& str);
+    NO_EXPORT NoString stripControls(const NoString& str);
 
     /** Produces a random string.
      * @param uLength The length of the resulting string.
      * @return A random string.
      */
-    static NoString randomString(uint uLength);
+    NO_EXPORT NoString randomString(uint uLength);
 
     /** Build a string from a format string, replacing values from a map.
      * The format specification can contain simple named parameters that match
@@ -124,7 +123,7 @@ public:
      * @param msValues A map of named parameters to their values.
      * @return The string with named parameters replaced.
      */
-    static NoString namedFormat(const NoString& sFormat, const NoStringMap& msValues);
+    NO_EXPORT NoString namedFormat(const NoString& sFormat, const NoStringMap& msValues);
 
     /** Ellipsize the current string.
      * For example, ellipsizing "Hello, I'm Bob" to the length 9 would
@@ -132,10 +131,10 @@ public:
      * @param uLen The length to ellipsize to.
      * @return The ellipsized string.
      */
-    static NoString ellipsize(const NoString& str, uint uLen);
+    NO_EXPORT NoString ellipsize(const NoString& str, uint uLen);
 
-    static NoStringMap optionSplit(const NoString& str);
-    static NoStringVector quoteSplit(const NoString& str);
-};
+    NO_EXPORT NoStringMap optionSplit(const NoString& str);
+    NO_EXPORT NoStringVector quoteSplit(const NoString& str);
+}
 
 #endif // NOUTILS_H
