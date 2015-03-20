@@ -231,19 +231,19 @@ public:
         Process(OldNick, "* " + OldNick.nick() + " is now known as " + sNewNick, "");
     }
 
-    EModRet OnCTCPReply(NoNick& Nick, NoString& sMessage) override
+    ModRet OnCTCPReply(NoNick& Nick, NoString& sMessage) override
     {
         Process(Nick, "* CTCP: " + Nick.nick() + " reply [" + sMessage + "]", "priv");
         return CONTINUE;
     }
 
-    EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
         Process(Nick, "* CTCP: " + Nick.nick() + " [" + sMessage + "]", "priv");
         return CONTINUE;
     }
 
-    EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Process(Nick,
                 "* CTCP: " + Nick.nick() + " [" + sMessage + "] to "
@@ -253,25 +253,25 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         Process(Nick, "-" + Nick.nick() + "- " + sMessage, "priv");
         return CONTINUE;
     }
 
-    EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Process(Nick, "-" + Nick.nick() + ":" + Channel.getName() + "- " + sMessage, Channel.getName());
         return CONTINUE;
     }
 
-    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         Process(Nick, "<" + Nick.nick() + "> " + sMessage, "priv");
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Process(Nick, "<" + Nick.nick() + ":" + Channel.getName() + "> " + sMessage, Channel.getName());
         return CONTINUE;

@@ -101,7 +101,7 @@ public:
         }
     }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         if (sLine.Left(1) != "#") {
             return CONTINUE;

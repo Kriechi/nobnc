@@ -148,11 +148,11 @@ static void signalHandler(int sig)
     switch (sig) {
     case SIGHUP:
         NoUtils::PrintMessage("Caught SIGHUP");
-        NoApp::Get().SetConfigState(NoApp::ECONFIG_NEED_REHASH);
+        NoApp::Get().SetConfigState(NoApp::ConfigNeedRehash);
         break;
     case SIGUSR1:
         NoUtils::PrintMessage("Caught SIGUSR1");
-        NoApp::Get().SetConfigState(NoApp::ECONFIG_NEED_VERBOSE_WRITE);
+        NoApp::Get().SetConfigState(NoApp::ConfigNeedVerboseWrite);
         break;
     default:
         NoUtils::PrintMessage("WTF? Signal handler called for a signal it doesn't know?");

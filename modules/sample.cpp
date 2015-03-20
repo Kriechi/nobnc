@@ -94,13 +94,13 @@ public:
 
     void OnIRCDisconnected() override { PutModule("You got disconnected BoyOh."); }
 
-    EModRet OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName) override
+    ModRet OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName) override
     {
         sRealName += " - ZNC";
         return CONTINUE;
     }
 
-    EModRet OnBroadcast(NoString& sMessage) override
+    ModRet OnBroadcast(NoString& sMessage) override
     {
         PutModule("------ [" + sMessage + "]");
         sMessage = "======== [" + sMessage + "] ========";
@@ -142,13 +142,13 @@ public:
         PutModule("* " + OpNick.nick() + " sets mode: " + sModes + " " + sArgs + " (" + Channel.getName() + ")");
     }
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         // PutModule("OnRaw() [" + sLine + "]");
         return CONTINUE;
     }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         // PutModule("UserRaw() [" + sLine + "]");
         return CONTINUE;
@@ -165,7 +165,7 @@ public:
         PutModule("* Quits: " + Nick.nick() + " (" + Nick.ident() + "!" + Nick.host() + ") (" + sMessage + ")");
     }
 
-    EModRet OnTimerAutoJoin(NoChannel& Channel) override
+    ModRet OnTimerAutoJoin(NoChannel& Channel) override
     {
         PutModule("Attempting to join " + Channel.getName());
         return CONTINUE;
@@ -181,7 +181,7 @@ public:
         PutModule("* Parts: " + Nick.nick() + " (" + Nick.ident() + "!" + Nick.host() + ")");
     }
 
-    EModRet OnInvite(const NoNick& Nick, const NoString& sChan) override
+    ModRet OnInvite(const NoNick& Nick, const NoString& sChan) override
     {
         if (sChan.Equals("#test")) {
             PutModule(Nick.nick() + " invited us to " + sChan + ", ignoring invites to " + sChan);
@@ -197,7 +197,7 @@ public:
         PutModule("* " + OldNick.nick() + " is now known as " + sNewNick);
     }
 
-    EModRet OnUserCTCPReply(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserCTCPReply(NoString& sTarget, NoString& sMessage) override
     {
         PutModule("[" + sTarget + "] userctcpreply [" + sMessage + "]");
         sMessage = "\037" + sMessage + "\037";
@@ -205,21 +205,21 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnCTCPReply(NoNick& Nick, NoString& sMessage) override
+    ModRet OnCTCPReply(NoNick& Nick, NoString& sMessage) override
     {
         PutModule("[" + Nick.nick() + "] ctcpreply [" + sMessage + "]");
 
         return CONTINUE;
     }
 
-    EModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
     {
         PutModule("[" + sTarget + "] userctcp [" + sMessage + "]");
 
         return CONTINUE;
     }
 
-    EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
         PutModule("[" + Nick.nick() + "] privctcp [" + sMessage + "]");
         sMessage = "\002" + sMessage + "\002";
@@ -227,7 +227,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         PutModule("[" + Nick.nick() + "] chanctcp [" + sMessage + "] to [" + Channel.getName() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
@@ -235,7 +235,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
     {
         PutModule("[" + sTarget + "] usernotice [" + sMessage + "]");
         sMessage = "\037" + sMessage + "\037";
@@ -243,7 +243,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         PutModule("[" + Nick.nick() + "] privnotice [" + sMessage + "]");
         sMessage = "\002" + sMessage + "\002";
@@ -251,7 +251,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         PutModule("[" + Nick.nick() + "] channotice [" + sMessage + "] to [" + Channel.getName() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
@@ -259,21 +259,21 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
+    ModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
         PutModule("* " + Nick.nick() + " changes topic on " + Channel.getName() + " to '" + sTopic + "'");
 
         return CONTINUE;
     }
 
-    EModRet OnUserTopic(NoString& sTarget, NoString& sTopic) override
+    ModRet OnUserTopic(NoString& sTarget, NoString& sTopic) override
     {
         PutModule("* " + GetClient()->GetNick() + " changed topic on " + sTarget + " to '" + sTopic + "'");
 
         return CONTINUE;
     }
 
-    EModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         PutModule("[" + sTarget + "] usermsg [" + sMessage + "]");
         sMessage = "Sample: \0034" + sMessage + "\003";
@@ -281,7 +281,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         PutModule("[" + Nick.nick() + "] privmsg [" + sMessage + "]");
         sMessage = "\002" + sMessage + "\002";
@@ -289,7 +289,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         if (sMessage == "!ping") {
             PutIRC("PRIVMSG " + Channel.getName() + " :PONG?");
@@ -309,7 +309,7 @@ public:
         }
     }
 
-    EModRet OnStatusCommand(NoString& sCommand) override
+    ModRet OnStatusCommand(NoString& sCommand) override
     {
         if (sCommand.Equals("SAMPLE")) {
             PutModule("Hi, I'm your friendly sample module.");

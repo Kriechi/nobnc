@@ -173,7 +173,7 @@ public:
         return true;
     }
 
-    EModRet OnIRCConnecting(NoIrcConnection* pIRCSock) override
+    ModRet OnIRCConnecting(NoIrcConnection* pIRCSock) override
     {
         if (m_pISpoofLockFile != nullptr) {
             DEBUG("Aborting connection, ident spoof lock file exists");

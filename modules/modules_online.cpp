@@ -38,7 +38,7 @@ public:
         return false;
     }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         // Handle ISON
         if (sLine.Token(0).Equals("ison")) {
@@ -84,7 +84,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         // Handle 303 reply if m_Requests is not empty
         if (sLine.Token(1) == "303" && !m_ISONRequests.empty()) {

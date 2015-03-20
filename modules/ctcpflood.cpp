@@ -71,7 +71,7 @@ public:
         return true;
     }
 
-    EModRet Message(const NoNick& Nick, const NoString& sMessage)
+    ModRet Message(const NoNick& Nick, const NoString& sMessage)
     {
         // We never block /me, because it doesn't cause a reply
         if (sMessage.Token(0).Equals("ACTION")) return CONTINUE;
@@ -94,9 +94,9 @@ public:
         return HALT;
     }
 
-    EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override { return Message(Nick, sMessage); }
+    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override { return Message(Nick, sMessage); }
 
-    EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override { return Message(Nick, sMessage); }
+    ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override { return Message(Nick, sMessage); }
 
     void OnSecsCommand(const NoString& sCommand)
     {

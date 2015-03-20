@@ -206,19 +206,19 @@ public:
         }
     }
 
-    EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         TryAttach(Nick, Channel, sMessage);
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         TryAttach(Nick, Channel, sMessage);
         return CONTINUE;
     }
 
-    EModRet OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         TryAttach(Nick, Channel, sMessage);
         return CONTINUE;

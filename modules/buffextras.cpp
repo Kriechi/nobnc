@@ -70,7 +70,7 @@ public:
         }
     }
 
-    EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
+    ModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
         AddBuffer(Channel, Nick.nickMask() + " changed the topic to: " + sTopic);
 

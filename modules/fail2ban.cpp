@@ -85,7 +85,7 @@ public:
             Add(sRemoteIP, 1);
     }
 
-    EModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
+    ModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
     {
         // e.g. webadmin ends up here
         const NoString& sRemoteIP = Auth->GetRemoteIP();

@@ -669,7 +669,7 @@ void NoChannel::setKey(const NoString& s)
     if (m_key != s) {
         m_key = s;
         if (m_inConfig) {
-            NoApp::Get().SetConfigState(NoApp::ECONFIG_NEED_WRITE);
+            NoApp::Get().SetConfigState(NoApp::ConfigNeedWrite);
         }
     }
 }
@@ -697,7 +697,7 @@ void NoChannel::setInConfig(bool b)
     if (m_inConfig != b) {
         m_inConfig = b;
         if (m_inConfig) {
-            NoApp::Get().SetConfigState(NoApp::ECONFIG_NEED_WRITE);
+            NoApp::Get().SetConfigState(NoApp::ConfigNeedWrite);
         }
     }
 }

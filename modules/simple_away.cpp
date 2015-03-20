@@ -157,7 +157,7 @@ public:
         PutModule("Timer disabled");
     }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         if (!sLine.Token(0).Equals("AWAY")) return CONTINUE;
 

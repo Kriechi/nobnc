@@ -179,7 +179,7 @@ public:
 
     bool UseClientIP() { return GetNV("UseClientIP").ToBool(); }
 
-    EModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
     {
         if (sMessage.StartsWith("DCC ")) {
             NoStringVector tokens = NoUtils::QuoteSplit(sMessage);
@@ -240,7 +240,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
         NoNetwork* pNetwork = GetNetwork();
         if (sMessage.StartsWith("DCC ") && pNetwork->IsUserAttached()) {

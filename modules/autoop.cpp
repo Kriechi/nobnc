@@ -237,7 +237,7 @@ public:
         }
     }
 
-    EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         if (!sMessage.Token(0).Equals("!ZNCAO")) {
             return CONTINUE;

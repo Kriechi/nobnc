@@ -24,7 +24,7 @@
 #include "noapp.h"
 #include <dlfcn.h>
 
-NoModule::NoModule(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, NoModInfo::EModuleType eType)
+NoModule::NoModule(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, NoModInfo::ModuleType eType)
     : m_eType(eType), m_sDescription(""), m_sTimers(), m_sSockets(),
 #ifdef HAVE_PTHREAD
       m_sJobs(),
@@ -87,7 +87,7 @@ NoString& NoModule::ExpandString(const NoString& sStr, NoString& sRet) const
     return sRet;
 }
 
-void NoModule::SetType(NoModInfo::EModuleType eType) { m_eType = eType; }
+void NoModule::SetType(NoModInfo::ModuleType eType) { m_eType = eType; }
 
 void NoModule::SetDescription(const NoString& s) { m_sDescription = s; }
 
@@ -95,7 +95,7 @@ void NoModule::SetModPath(const NoString& s) { m_sModPath = s; }
 
 void NoModule::SetArgs(const NoString& s) { m_sArgs = s; }
 
-NoModInfo::EModuleType NoModule::GetType() const { return m_eType; }
+NoModInfo::ModuleType NoModule::GetType() const { return m_eType; }
 
 const NoString& NoModule::GetDescription() const { return m_sDescription; }
 
@@ -542,13 +542,13 @@ void NoModule::OnPreRehash() {}
 void NoModule::OnPostRehash() {}
 void NoModule::OnIRCDisconnected() {}
 void NoModule::OnIRCConnected() {}
-NoModule::EModRet NoModule::OnIRCConnecting(NoIrcConnection* IRCSock) { return CONTINUE; }
+NoModule::ModRet NoModule::OnIRCConnecting(NoIrcConnection* IRCSock) { return CONTINUE; }
 void NoModule::OnIRCConnectionError(NoIrcConnection* IRCSock) {}
-NoModule::EModRet NoModule::OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName)
+NoModule::ModRet NoModule::OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName)
 {
     return CONTINUE;
 }
-NoModule::EModRet NoModule::OnBroadcast(NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnBroadcast(NoString& sMessage) { return CONTINUE; }
 
 void NoModule::OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange)
 {
@@ -591,9 +591,9 @@ void NoModule::OnMode(const NoNick& pOpNick, NoChannel& Channel, char uMode, con
 {
 }
 
-NoModule::EModRet NoModule::OnRaw(NoString& sLine) { return CONTINUE; }
+NoModule::ModRet NoModule::OnRaw(NoString& sLine) { return CONTINUE; }
 
-NoModule::EModRet NoModule::OnStatusCommand(NoString& sCommand) { return CONTINUE; }
+NoModule::ModRet NoModule::OnStatusCommand(NoString& sCommand) { return CONTINUE; }
 void NoModule::OnModNotice(const NoString& sMessage) {}
 void NoModule::OnModCTCP(const NoString& sMessage) {}
 
@@ -612,55 +612,55 @@ void NoModule::OnUnknownModCommand(const NoString& sLine)
 void NoModule::OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) {}
 void NoModule::OnNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) {}
 void NoModule::OnKick(const NoNick& Nick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) {}
-NoModule::EModRet NoModule::OnJoining(NoChannel& Channel) { return CONTINUE; }
+NoModule::ModRet NoModule::OnJoining(NoChannel& Channel) { return CONTINUE; }
 void NoModule::OnJoin(const NoNick& Nick, NoChannel& Channel) {}
 void NoModule::OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) {}
-NoModule::EModRet NoModule::OnInvite(const NoNick& Nick, const NoString& sChan) { return CONTINUE; }
+NoModule::ModRet NoModule::OnInvite(const NoNick& Nick, const NoString& sChan) { return CONTINUE; }
 
-NoModule::EModRet NoModule::OnChanBufferStarting(NoChannel& Chan, NoClient& Client) { return CONTINUE; }
-NoModule::EModRet NoModule::OnChanBufferEnding(NoChannel& Chan, NoClient& Client) { return CONTINUE; }
-NoModule::EModRet NoModule::OnChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine) { return CONTINUE; }
-NoModule::EModRet NoModule::OnPrivBufferPlayLine(NoClient& Client, NoString& sLine) { return CONTINUE; }
+NoModule::ModRet NoModule::OnChanBufferStarting(NoChannel& Chan, NoClient& Client) { return CONTINUE; }
+NoModule::ModRet NoModule::OnChanBufferEnding(NoChannel& Chan, NoClient& Client) { return CONTINUE; }
+NoModule::ModRet NoModule::OnChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine) { return CONTINUE; }
+NoModule::ModRet NoModule::OnPrivBufferPlayLine(NoClient& Client, NoString& sLine) { return CONTINUE; }
 
-NoModule::EModRet NoModule::OnChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv)
+NoModule::ModRet NoModule::OnChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv)
 {
     return OnChanBufferPlayLine(Chan, Client, sLine);
 }
-NoModule::EModRet NoModule::OnPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv)
+NoModule::ModRet NoModule::OnPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv)
 {
     return OnPrivBufferPlayLine(Client, sLine);
 }
 
 void NoModule::OnClientLogin() {}
 void NoModule::OnClientDisconnect() {}
-NoModule::EModRet NoModule::OnUserRaw(NoString& sLine) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserCTCPReply(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserCTCP(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserAction(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserMsg(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserNotice(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserJoin(NoString& sChannel, NoString& sKey) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserPart(NoString& sChannel, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserTopic(NoString& sChannel, NoString& sTopic) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserTopicRequest(NoString& sChannel) { return CONTINUE; }
-NoModule::EModRet NoModule::OnUserQuit(NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserRaw(NoString& sLine) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserCTCPReply(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserCTCP(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserAction(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserMsg(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserNotice(NoString& sTarget, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserJoin(NoString& sChannel, NoString& sKey) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserPart(NoString& sChannel, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserTopic(NoString& sChannel, NoString& sTopic) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserTopicRequest(NoString& sChannel) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUserQuit(NoString& sMessage) { return CONTINUE; }
 
-NoModule::EModRet NoModule::OnCTCPReply(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnPrivCTCP(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnPrivAction(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnPrivMsg(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnPrivNotice(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) { return CONTINUE; }
-NoModule::EModRet NoModule::OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) { return CONTINUE; }
-NoModule::EModRet NoModule::OnTimerAutoJoin(NoChannel& Channel) { return CONTINUE; }
-NoModule::EModRet NoModule::OnAddNetwork(NoNetwork& Network, NoString& sErrorRet) { return CONTINUE; }
-NoModule::EModRet NoModule::OnDeleteNetwork(NoNetwork& Network) { return CONTINUE; }
+NoModule::ModRet NoModule::OnCTCPReply(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnPrivCTCP(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnPrivAction(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnPrivMsg(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnPrivNotice(NoNick& Nick, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) { return CONTINUE; }
+NoModule::ModRet NoModule::OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) { return CONTINUE; }
+NoModule::ModRet NoModule::OnTimerAutoJoin(NoChannel& Channel) { return CONTINUE; }
+NoModule::ModRet NoModule::OnAddNetwork(NoNetwork& Network, NoString& sErrorRet) { return CONTINUE; }
+NoModule::ModRet NoModule::OnDeleteNetwork(NoNetwork& Network) { return CONTINUE; }
 
-NoModule::EModRet NoModule::OnSendToClient(NoString& sLine, NoClient& Client) { return CONTINUE; }
-NoModule::EModRet NoModule::OnSendToIRC(NoString& sLine) { return CONTINUE; }
+NoModule::ModRet NoModule::OnSendToClient(NoString& sLine, NoClient& Client) { return CONTINUE; }
+NoModule::ModRet NoModule::OnSendToIRC(NoString& sLine) { return CONTINUE; }
 
 ModHandle NoModule::GetDLL() { return m_pDLL; }
 
@@ -715,26 +715,26 @@ const NoString& NoModule::GetModName() const { return m_sModName; }
 ///////////////////
 // Global Module //
 ///////////////////
-NoModule::EModRet NoModule::OnAddUser(NoUser& User, NoString& sErrorRet) { return CONTINUE; }
-NoModule::EModRet NoModule::OnDeleteUser(NoUser& User) { return CONTINUE; }
+NoModule::ModRet NoModule::OnAddUser(NoUser& User, NoString& sErrorRet) { return CONTINUE; }
+NoModule::ModRet NoModule::OnDeleteUser(NoUser& User) { return CONTINUE; }
 void NoModule::OnClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort) {}
-NoModule::EModRet NoModule::OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) { return CONTINUE; }
+NoModule::ModRet NoModule::OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) { return CONTINUE; }
 void NoModule::OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) {}
-NoModule::EModRet NoModule::OnUnknownUserRaw(NoClient* pClient, NoString& sLine) { return CONTINUE; }
+NoModule::ModRet NoModule::OnUnknownUserRaw(NoClient* pClient, NoString& sLine) { return CONTINUE; }
 void NoModule::OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps) {}
 bool NoModule::IsClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState) { return false; }
 void NoModule::OnClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState) {}
-NoModule::EModRet
-NoModule::OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::EModuleType eType, bool& bSuccess, NoString& sRetMsg)
+NoModule::ModRet
+NoModule::OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::ModuleType eType, bool& bSuccess, NoString& sRetMsg)
 {
     return CONTINUE;
 }
-NoModule::EModRet NoModule::OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg) { return CONTINUE; }
-NoModule::EModRet NoModule::OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg)
+NoModule::ModRet NoModule::OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg) { return CONTINUE; }
+NoModule::ModRet NoModule::OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg)
 {
     return CONTINUE;
 }
-void NoModule::OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType) {}
+void NoModule::OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType) {}
 
 NoModCommand::NoModCommand() : m_sCmd(), m_pFunc(nullptr), m_sArgs(), m_sDesc() {}
 

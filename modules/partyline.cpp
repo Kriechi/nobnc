@@ -187,7 +187,7 @@ public:
             DelNV("topic:" + pChannel->GetName());
     }
 
-    EModRet OnDeleteUser(NoUser& User) override
+    ModRet OnDeleteUser(NoUser& User) override
     {
         // Loop through each chan
         for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end();) {
@@ -201,7 +201,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         if (sLine.Token(1) == "005") {
             NoString::size_type uPos = sLine.AsUpper().find("CHANTYPES=");
@@ -288,7 +288,7 @@ public:
         }
     }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         if (sLine.StartsWith("WHO " CHAN_PREFIX_1)) {
             return HALT;
@@ -334,7 +334,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
+    ModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
     {
         if (sChannel.Left(1) != CHAN_PREFIX_1) {
             return CONTINUE;
@@ -416,7 +416,7 @@ public:
         }
     }
 
-    EModRet OnUserJoin(NoString& sChannel, NoString& sKey) override
+    ModRet OnUserJoin(NoString& sChannel, NoString& sKey) override
     {
         if (sChannel.Left(1) != CHAN_PREFIX_1) {
             return CONTINUE;
@@ -490,7 +490,7 @@ public:
         }
     }
 
-    EModRet HandleMessage(const NoString& sCmd, const NoString& sTarget, const NoString& sMessage)
+    ModRet HandleMessage(const NoString& sCmd, const NoString& sTarget, const NoString& sMessage)
     {
         if (sTarget.empty()) {
             return CONTINUE;
@@ -551,27 +551,27 @@ public:
         return HALT;
     }
 
-    EModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("PRIVMSG", sTarget, sMessage);
     }
 
-    EModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("NOTICE", sTarget, sMessage);
     }
 
-    EModRet OnUserAction(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserAction(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("PRIVMSG", sTarget, "\001ACTION " + sMessage + "\001");
     }
 
-    EModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("PRIVMSG", sTarget, "\001" + sMessage + "\001");
     }
 
-    EModRet OnUserCTCPReply(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserCTCPReply(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("NOTICE", sTarget, "\001" + sMessage + "\001");
     }

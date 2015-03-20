@@ -27,7 +27,7 @@ class CSConnection;
 class CSocketManager;
 class NoSocket;
 
-enum EAddrType { ADDR_IPV4ONLY, ADDR_IPV6ONLY, ADDR_ALL };
+enum AddressType { Ipv4Address = 1, Ipv6Address = 2, Ipv4AndIpv6Address = Ipv4Address | Ipv6Address };
 
 class NO_EXPORT NoSocketManager
 {
@@ -42,7 +42,7 @@ public:
                     int iMaxConns = SOMAXCONN,
                     NoSocket* pcSock = nullptr,
                     u_int iTimeout = 0,
-                    EAddrType eAddr = ADDR_ALL);
+                    AddressType eAddr = Ipv4AndIpv6Address);
 
     bool ListenAll(ushort iPort,
                    const NoString& sSockName,
@@ -50,7 +50,7 @@ public:
                    int iMaxConns = SOMAXCONN,
                    NoSocket* pcSock = nullptr,
                    u_int iTimeout = 0,
-                   EAddrType eAddr = ADDR_ALL);
+                   AddressType eAddr = Ipv4AndIpv6Address);
 
     u_short ListenRand(const NoString& sSockName,
                        const NoString& sBindHost,
@@ -58,14 +58,14 @@ public:
                        int iMaxConns = SOMAXCONN,
                        NoSocket* pcSock = nullptr,
                        u_int iTimeout = 0,
-                       EAddrType eAddr = ADDR_ALL);
+                       AddressType eAddr = Ipv4AndIpv6Address);
 
     u_short ListenAllRand(const NoString& sSockName,
                           bool bSSL = false,
                           int iMaxConns = SOMAXCONN,
                           NoSocket* pcSock = nullptr,
                           u_int iTimeout = 0,
-                          EAddrType eAddr = ADDR_ALL);
+                          AddressType eAddr = Ipv4AndIpv6Address);
 
     void Connect(const NoString& sHostname,
                  ushort iPort,

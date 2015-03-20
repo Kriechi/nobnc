@@ -23,7 +23,7 @@ public:
 
     virtual ~NoBlockMotd() {}
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         const NoString sCmd = sLine.Token(1);
 

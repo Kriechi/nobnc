@@ -295,8 +295,8 @@ Csock* NoCsock::GetSockObj(const NoString& sHost, ushort uPort)
 }
 NoSocket* NoSocket::GetSockObjImpl(const NoString& sHost, ushort uPort) { return nullptr; }
 
-NoSocket::ECloseType NoSocket::GetCloseType() const { return static_cast<ECloseType>(m_csock->GetCloseType()); }
-void NoSocket::Close(ECloseType type) { m_csock->Close(static_cast<Csock::ECloseType>(type)); }
+NoSocket::CloseType NoSocket::GetCloseType() const { return static_cast<CloseType>(m_csock->GetCloseType()); }
+void NoSocket::Close(CloseType type) { m_csock->Close(static_cast<Csock::ECloseType>(type)); }
 NoString & NoSocket::GetInternalReadBuffer() { return m_csock->GetInternalReadBuffer(); }
 NoString & NoSocket::GetInternalWriteBuffer() { return m_csock->GetInternalWriteBuffer(); }
 

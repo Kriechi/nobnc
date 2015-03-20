@@ -135,7 +135,7 @@ public:
         }
     }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         if (sLine.StartsWith("schat ")) {
             OnModCommand("chat " + sLine.substr(6));
@@ -305,7 +305,7 @@ public:
             PutModule("Unknown command [" + sCom + "] [" + sArgs + "]");
     }
 
-    EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
         if (sMessage.StartsWith("DCC SCHAT ")) {
             // chat ip port
@@ -340,7 +340,7 @@ public:
         RemTimer("Remove " + sNick); // delete any associated timer to this nick
     }
 
-    EModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         if (sTarget.Left(3) == "(s)") {
             NoString sSockName = GetModName().AsUpper() + "::" + sTarget;

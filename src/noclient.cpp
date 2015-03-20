@@ -32,7 +32,7 @@
                 pModule->SetClient(CLIENT);                                   \
                 pModule->FUNC;                                                \
                 pModule->SetClient(nullptr);                                  \
-            } catch (const NoModule::EModException& e) {                       \
+            } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
                     (NETWORK)->GetModules().UnloadModule(MOD);                \
                 }                                                             \
@@ -44,7 +44,7 @@
                 pModule->FUNC;                                                \
                 pModule->SetClient(nullptr);                                  \
                 pModule->SetNetwork(nullptr);                                 \
-            } catch (const NoModule::EModException& e) {                       \
+            } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
                     (USER)->GetModules().UnloadModule(MOD);                   \
                 }                                                             \
@@ -58,7 +58,7 @@
                 pModule->SetClient(nullptr);                                  \
                 pModule->SetNetwork(nullptr);                                 \
                 pModule->SetUser(nullptr);                                    \
-            } catch (const NoModule::EModException& e) {                       \
+            } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
                     NoApp::Get().GetModules().UnloadModule(MOD);               \
                 }                                                             \

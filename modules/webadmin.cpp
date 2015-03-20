@@ -84,10 +84,10 @@ public:
     {
         NoStringPairVector vParams;
         vParams.push_back(std::make_pair("user", ""));
-        AddSubPage(std::make_shared<NoWebSubPage>("settings", "Global Settings", NoWebSubPage::F_ADMIN));
+        AddSubPage(std::make_shared<NoWebSubPage>("settings", "Global Settings", NoWebSubPage::Admin));
         AddSubPage(std::make_shared<NoWebSubPage>("edituser", "Your Settings", vParams));
-        AddSubPage(std::make_shared<NoWebSubPage>("traffic", "Traffic Info", NoWebSubPage::F_ADMIN));
-        AddSubPage(std::make_shared<NoWebSubPage>("listusers", "Manage Users", NoWebSubPage::F_ADMIN));
+        AddSubPage(std::make_shared<NoWebSubPage>("traffic", "Traffic Info", NoWebSubPage::Admin));
+        AddSubPage(std::make_shared<NoWebSubPage>("listusers", "Manage Users", NoWebSubPage::Admin));
     }
 
     virtual ~NoWebAdminMod() {}
@@ -151,13 +151,13 @@ public:
             const std::vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
             std::vector<NoListener*>::const_iterator it;
             for (it = vListeners.begin(); it != vListeners.end(); ++it) {
-                (*it)->SetAcceptType(NoListener::ACCEPT_IRC);
+                (*it)->SetAcceptType(NoListener::AcceptIrc);
             }
         }
 
         // Now turn that into a listener instance
         NoListener* pListener =
-        new NoListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? ADDR_IPV4ONLY : ADDR_ALL), NoListener::ACCEPT_HTTP);
+        new NoListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? Ipv4Address : Ipv4AndIpv6Address), NoListener::AcceptHttp);
 
         if (!pListener->Listen()) {
             sMessage = "Failed to add backwards-compatible listener";
@@ -1663,32 +1663,32 @@ public:
         bool bIRC = WebSock.GetParam("irc").ToBool();
         bool bWeb = WebSock.GetParam("web").ToBool();
 
-        EAddrType eAddr = ADDR_ALL;
+        AddressType eAddr = Ipv4AndIpv6Address;
         if (bIPv4) {
             if (bIPv6) {
-                eAddr = ADDR_ALL;
+                eAddr = Ipv4AndIpv6Address;
             } else {
-                eAddr = ADDR_IPV4ONLY;
+                eAddr = Ipv4Address;
             }
         } else {
             if (bIPv6) {
-                eAddr = ADDR_IPV6ONLY;
+                eAddr = Ipv6Address;
             } else {
                 WebSock.GetSession()->AddError("Choose either IPv4 or IPv6 or both.");
                 return SettingsPage(WebSock, Tmpl);
             }
         }
 
-        NoListener::EAcceptType eAccept;
+        NoListener::AcceptType eAccept;
         if (bIRC) {
             if (bWeb) {
-                eAccept = NoListener::ACCEPT_ALL;
+                eAccept = NoListener::AcceptAll;
             } else {
-                eAccept = NoListener::ACCEPT_IRC;
+                eAccept = NoListener::AcceptIrc;
             }
         } else {
             if (bWeb) {
-                eAccept = NoListener::ACCEPT_HTTP;
+                eAccept = NoListener::AcceptHttp;
             } else {
                 WebSock.GetSession()->AddError("Choose either IRC or Web or both.");
                 return SettingsPage(WebSock, Tmpl);
@@ -1717,16 +1717,16 @@ public:
         bool bIPv4 = WebSock.GetParam("ipv4").ToBool();
         bool bIPv6 = WebSock.GetParam("ipv6").ToBool();
 
-        EAddrType eAddr = ADDR_ALL;
+        AddressType eAddr = Ipv4AndIpv6Address;
         if (bIPv4) {
             if (bIPv6) {
-                eAddr = ADDR_ALL;
+                eAddr = Ipv4AndIpv6Address;
             } else {
-                eAddr = ADDR_IPV4ONLY;
+                eAddr = Ipv4Address;
             }
         } else {
             if (bIPv6) {
-                eAddr = ADDR_IPV6ONLY;
+                eAddr = Ipv6Address;
             } else {
                 WebSock.GetSession()->AddError("Invalid request.");
                 return SettingsPage(WebSock, Tmpl);
@@ -1780,8 +1780,8 @@ public:
                 l["Port"] = NoString(pListener->GetPort());
                 l["BindHost"] = pListener->GetBindHost();
 
-                l["IsWeb"] = NoString(pListener->GetAcceptType() != NoListener::ACCEPT_IRC);
-                l["IsIRC"] = NoString(pListener->GetAcceptType() != NoListener::ACCEPT_HTTP);
+                l["IsWeb"] = NoString(pListener->GetAcceptType() != NoListener::AcceptIrc);
+                l["IsIRC"] = NoString(pListener->GetAcceptType() != NoListener::AcceptHttp);
 
                 l["URIPrefix"] = pListener->GetURIPrefix() + "/";
 
@@ -1798,13 +1798,13 @@ public:
 
 #ifdef HAVE_IPV6
                 switch (pListener->GetAddrType()) {
-                case ADDR_IPV4ONLY:
+                case Ipv4Address:
                     l["IsIPV4"] = "true";
                     break;
-                case ADDR_IPV6ONLY:
+                case Ipv6Address:
                     l["IsIPV6"] = "true";
                     break;
-                case ADDR_ALL:
+                case Ipv4AndIpv6Address:
                     l["IsIPV4"] = "true";
                     l["IsIPV6"] = "true";
                     break;

@@ -37,7 +37,7 @@ public:
     NoIrcConnection(const NoIrcConnection&) = delete;
     NoIrcConnection& operator=(const NoIrcConnection&) = delete;
 
-    enum EChanModeArgs {
+    enum ChanModeArgs {
         // These values must line up with their position in the CHANMODE argument to raw 005
         ListArg = 0,
         HasArg = 1,
@@ -81,9 +81,9 @@ public:
     void SetPass(const NoString& s);
 
     uint GetMaxNickLen() const;
-    EChanModeArgs GetModeType(uchar uMode) const;
+    ChanModeArgs GetModeType(uchar uMode) const;
     uchar GetPermFromMode(uchar uMode) const;
-    const std::map<uchar, EChanModeArgs>& GetChanModes() const;
+    const std::map<uchar, ChanModeArgs>& GetChanModes() const;
     bool IsPermChar(const char c) const;
     bool IsPermMode(const char c) const;
     const NoString& GetPerms() const;
@@ -122,7 +122,7 @@ private:
     NoString m_sPerms;
     NoString m_sPermModes;
     std::set<uchar> m_scUserModes;
-    std::map<uchar, EChanModeArgs> m_mueChanModes;
+    std::map<uchar, ChanModeArgs> m_mueChanModes;
     NoNetwork* m_pNetwork;
     NoNick m_Nick;
     NoString m_sPass;

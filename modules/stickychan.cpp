@@ -41,7 +41,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override;
 
-    EModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
+    ModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
     {
         for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
             if (sChannel.Equals(it->first)) {

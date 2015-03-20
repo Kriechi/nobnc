@@ -36,17 +36,17 @@ private:
 class NoIncomingConnection : public NoSocket
 {
 public:
-    NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix);
+    NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::AcceptType eAcceptType, const NoString& sURIPrefix);
     virtual ~NoIncomingConnection() {}
     void ReadLineImpl(const NoString& sData) override;
     void ReachedMaxBufferImpl() override;
 
 private:
-    NoListener::EAcceptType m_eAcceptType;
+    NoListener::AcceptType m_eAcceptType;
     const NoString m_sURIPrefix;
 };
 
-NoListener::NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept)
+NoListener::NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, AddressType eAddr, AcceptType eAccept)
     : m_bSSL(bSSL), m_eAddr(eAddr), m_uPort(uPort), m_sBindHost(sBindHost), m_sURIPrefix(sURIPrefix),
       m_pSocket(nullptr), m_eAcceptType(eAccept)
 {
@@ -63,7 +63,7 @@ bool NoListener::IsSSL() const
     return m_bSSL;
 }
 
-EAddrType NoListener::GetAddrType() const
+AddressType NoListener::GetAddrType() const
 {
     return m_eAddr;
 }
@@ -88,12 +88,12 @@ const NoString& NoListener::GetURIPrefix() const
     return m_sURIPrefix;
 }
 
-NoListener::EAcceptType NoListener::GetAcceptType() const
+NoListener::AcceptType NoListener::GetAcceptType() const
 {
     return m_eAcceptType;
 }
 
-void NoListener::SetAcceptType(EAcceptType eType)
+void NoListener::SetAcceptType(AcceptType eType)
 {
     m_eAcceptType = eType;
 }
@@ -170,7 +170,7 @@ void NoRealListener::SockErrorImpl(int iErrno, const NoString& sDescription)
     }
 }
 
-NoIncomingConnection::NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::EAcceptType eAcceptType, const NoString& sURIPrefix)
+NoIncomingConnection::NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::AcceptType eAcceptType, const NoString& sURIPrefix)
     : NoSocket(sHostname, uPort), m_eAcceptType(eAcceptType), m_sURIPrefix(sURIPrefix)
 {
     // The socket will time out in 120 secs, no matter what.
@@ -196,8 +196,8 @@ void NoIncomingConnection::ReachedMaxBufferImpl()
 void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
 {
     bool bIsHTTP = (sLine.WildCmp("GET * HTTP/1.?\r\n") || sLine.WildCmp("POST * HTTP/1.?\r\n"));
-    bool bAcceptHTTP = (m_eAcceptType == NoListener::ACCEPT_ALL) || (m_eAcceptType == NoListener::ACCEPT_HTTP);
-    bool bAcceptIRC = (m_eAcceptType == NoListener::ACCEPT_ALL) || (m_eAcceptType == NoListener::ACCEPT_IRC);
+    bool bAcceptHTTP = (m_eAcceptType == NoListener::AcceptAll) || (m_eAcceptType == NoListener::AcceptHttp);
+    bool bAcceptIRC = (m_eAcceptType == NoListener::AcceptAll) || (m_eAcceptType == NoListener::AcceptIrc);
     NoSocket* pSock = nullptr;
 
     if (!bIsHTTP) {

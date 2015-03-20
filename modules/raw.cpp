@@ -22,7 +22,7 @@ public:
     MODCONSTRUCTOR(NoRawMod) {}
     virtual ~NoRawMod() {}
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         PutModule("IRC -> [" + sLine + "]");
         return CONTINUE;
@@ -30,7 +30,7 @@ public:
 
     void OnModCommand(const NoString& sCommand) override { PutIRC(sCommand); }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         PutModule("YOU -> [" + sLine + "]");
         return CONTINUE;

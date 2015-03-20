@@ -490,7 +490,7 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
     return false;
 }
 
-NoWebSock::EPageReqResult NoWebSock::PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule)
+NoWebSock::PageRequest NoWebSock::PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule)
 {
     SetPaths(pModule);
     NoString sFile = m_Template.ExpandFile(sPath.TrimLeft_n("/"));
@@ -498,10 +498,10 @@ NoWebSock::EPageReqResult NoWebSock::PrintStaticFile(const NoString& sPath, NoSt
     // Either PrintFile() fails and sends an error page or it suceeds and
     // sends a result. In both cases we don't have anything more to do.
     PrintFile(sFile);
-    return PAGE_DONE;
+    return Done;
 }
 
-NoWebSock::EPageReqResult NoWebSock::PrintTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule)
+NoWebSock::PageRequest NoWebSock::PrintTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule)
 {
     SetVars();
 
@@ -522,13 +522,13 @@ NoWebSock::EPageReqResult NoWebSock::PrintTemplate(const NoString& sPageName, No
     }
 
     if (m_Template.GetFileName().empty() && !m_Template.SetFile(sPageName + ".tmpl")) {
-        return PAGE_NOTFOUND;
+        return NotFound;
     }
 
     if (m_Template.PrintString(sPageRet)) {
-        return PAGE_PRINT;
+        return Print;
     } else {
-        return PAGE_NOTFOUND;
+        return NotFound;
     }
 }
 
@@ -588,27 +588,27 @@ bool NoWebSock::SendCookie(const NoString& sKey, const NoString& sValue)
 void NoWebSock::OnPageRequest(const NoString& sURI)
 {
     NoString sPageRet;
-    EPageReqResult eRet = OnPageRequestInternal(sURI, sPageRet);
+    PageRequest eRet = OnPageRequestInternal(sURI, sPageRet);
     switch (eRet) {
-    case PAGE_PRINT:
+    case Print:
         PrintPage(sPageRet);
         break;
-    case PAGE_DEFERRED:
+    case Deferred:
         // Something else will later call Close()
         break;
-    case PAGE_DONE:
+    case Done:
         // Redirect or something like that, it's done, just make sure
         // the connection will be closed
         Close(CLT_AFTERWRITE);
         break;
-    case PAGE_NOTFOUND:
+    case NotFound:
     default:
         PrintNotFound();
         break;
     }
 }
 
-NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI, NoString& sPageRet)
+NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, NoString& sPageRet)
 {
     // Check that their session really belongs to their IP address. IP-based
     // authentication is bad, but here it's just an extra layer that makes
@@ -621,7 +621,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
         DEBUG("Remote IP:   " << GetRemoteIP());
         SendCookie("SessionId", "WRONG_IP_FOR_SESSION");
         PrintErrorPage(403, "Access denied", "This session does not belong to your IP.");
-        return PAGE_DONE;
+        return Done;
     }
 
     // Check that they really POSTed from one our forms by checking if they
@@ -635,7 +635,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
                        "Access denied",
                        "POST requests need to send "
                        "a secret token to prevent cross-site request forgery attacks.");
-        return PAGE_DONE;
+        return Done;
     }
 
     SendCookie("SessionId", GetSession()->GetId());
@@ -661,7 +661,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
         Redirect("/");
 
         // We already sent a reply
-        return PAGE_DONE;
+        return Done;
     } else if (sURI == "/login") {
         if (GetParam("submitted").ToBool()) {
             m_sUser = GetParam("user");
@@ -669,11 +669,11 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
             m_bLoggedIn = OnLogin(m_sUser, m_sPass, false);
 
             // AcceptedLogin()/RefusedLogin() will call Redirect()
-            return PAGE_DEFERRED;
+            return Deferred;
         }
 
         Redirect("/"); // the login form is here
-        return PAGE_DONE;
+        return Done;
     } else if (sURI.Left(5) == "/pub/") {
         return PrintStaticFile(sURI, sPageRet);
     } else if (sURI.Left(11) == "/skinfiles/") {
@@ -687,18 +687,18 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
             m_Template.AppendPath(GetSkinPath(sSkinName) + "pub");
 
             if (PrintFile(m_Template.ExpandFile(sFilePath))) {
-                return PAGE_DONE;
+                return Done;
             } else {
-                return PAGE_NOTFOUND;
+                return NotFound;
             }
         }
-        return PAGE_NOTFOUND;
+        return NotFound;
     } else if (sURI.Left(6) == "/mods/" || sURI.Left(10) == "/modfiles/") {
         // Make sure modules are treated as directories
         if (sURI.Right(1) != "/" && sURI.find(".") == NoString::npos &&
             sURI.TrimLeft_n("/mods/").TrimLeft_n("/").find("/") == NoString::npos) {
             Redirect(sURI + "/");
-            return PAGE_DONE;
+            return Done;
         }
 
         // The URI looks like:
@@ -712,7 +712,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
         NoString sType = m_sPath.Token(0, "/");
         m_sPath = m_sPath.Tokens(1, "/");
 
-        NoModInfo::EModuleType eModType;
+        NoModInfo::ModuleType eModType;
         if (sType.Equals("global")) {
             eModType = NoModInfo::GlobalModule;
         } else if (sType.Equals("user")) {
@@ -721,12 +721,12 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
             eModType = NoModInfo::NetworkModule;
         } else {
             PrintErrorPage(403, "Forbidden", "Unknown module type [" + sType + "]");
-            return PAGE_DONE;
+            return Done;
         }
 
         if ((eModType != NoModInfo::GlobalModule) && !ForceLogin()) {
             // Make sure we have a valid user
-            return PAGE_DONE;
+            return Done;
         }
 
         NoNetwork* pNetwork = nullptr;
@@ -738,7 +738,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
 
             if (!pNetwork) {
                 PrintErrorPage(404, "Not Found", "Network [" + sNetwork + "] not found.");
-                return PAGE_DONE;
+                return Done;
             }
         }
 
@@ -765,23 +765,23 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
             break;
         }
 
-        if (!pModule) return PAGE_NOTFOUND;
+        if (!pModule) return NotFound;
 
         m_Template["ModPath"] = pModule->GetWebPath();
         m_Template["ModFilesPath"] = pModule->GetWebFilesPath();
 
         if (pModule->WebRequiresLogin() && !ForceLogin()) {
-            return PAGE_PRINT;
+            return Print;
         } else if (pModule->WebRequiresAdmin() && !GetSession()->IsAdmin()) {
             PrintErrorPage(403, "Forbidden", "You need to be an admin to access this module");
-            return PAGE_DONE;
+            return Done;
         } else if (pModule->GetType() != NoModInfo::GlobalModule && pModule->GetUser() != GetSession()->GetUser()) {
             PrintErrorPage(403,
                            "Forbidden",
                            "You must login as " + pModule->GetUser()->GetUserName() + " in order to view this page");
-            return PAGE_DONE;
+            return Done;
         } else if (pModule->OnWebPreRequest(*this, m_sPage)) {
-            return PAGE_DEFERRED;
+            return Deferred;
         }
 
         VWebSubPages& vSubPages = pModule->GetSubPages();
@@ -791,7 +791,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
 
             if (bActive && SubPage->RequiresAdmin() && !GetSession()->IsAdmin()) {
                 PrintErrorPage(403, "Forbidden", "You need to be an admin to access this page");
-                return PAGE_DONE;
+                return Done;
             }
         }
 
@@ -805,9 +805,9 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
             m_Template.AppendPath(pModule->GetModDataDir() + "/files/");
 
             if (PrintFile(m_Template.ExpandFile(m_sPage.TrimLeft_n("/")))) {
-                return PAGE_PRINT;
+                return Print;
             } else {
-                return PAGE_NOTFOUND;
+                return NotFound;
             }
         } else {
             SetPaths(pModule, true);
@@ -818,7 +818,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
                 // If they already sent a reply, let's assume
                 // they did what they wanted to do.
                 if (SentHeader()) {
-                    return PAGE_DONE;
+                    return Done;
                 }
                 return PrintTemplate(m_sPage, sPageRet, pModule);
             }
@@ -826,7 +826,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
             if (!SentHeader()) {
                 PrintErrorPage(404, "Not Implemented", "The requested module does not acknowledge web requests");
             }
-            return PAGE_DONE;
+            return Done;
         }
     } else {
         NoString sPage(sURI.Trim_n("/"));
@@ -835,7 +835,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
                 uchar c = sPage[a];
 
                 if ((c < '0' || c > '9') && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && c != '_') {
-                    return PAGE_NOTFOUND;
+                    return NotFound;
                 }
             }
 
@@ -843,7 +843,7 @@ NoWebSock::EPageReqResult NoWebSock::OnPageRequestInternal(const NoString& sURI,
         }
     }
 
-    return PAGE_NOTFOUND;
+    return NotFound;
 }
 
 void NoWebSock::PrintErrorPage(const NoString& sMessage)

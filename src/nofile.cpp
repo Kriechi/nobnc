@@ -65,18 +65,18 @@ void NoFile::SetFileName(const NoString& sLongName)
 
 bool NoFile::IsDir(const NoString& sLongName, bool bUseLstat)
 {
-    if (sLongName.Equals("/")) return NoFile::FType(sLongName, FT_DIRECTORY, bUseLstat);
+    if (sLongName.Equals("/")) return NoFile::FType(sLongName, Directory, bUseLstat);
 
     // Some OS don't like trailing slashes for directories
-    return NoFile::FType(sLongName.TrimRight_n("/"), FT_DIRECTORY, bUseLstat);
+    return NoFile::FType(sLongName.TrimRight_n("/"), Directory, bUseLstat);
 }
 
-bool NoFile::IsReg(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, FT_REGULAR, bUseLstat); }
-bool NoFile::IsChr(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, FT_CHARACTER, bUseLstat); }
-bool NoFile::IsBlk(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, FT_BLOCK, bUseLstat); }
-bool NoFile::IsFifo(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, FT_FIFO, bUseLstat); }
-bool NoFile::IsLnk(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, FT_LINK, bUseLstat); }
-bool NoFile::IsSock(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, FT_SOCK, bUseLstat); }
+bool NoFile::IsReg(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Regular, bUseLstat); }
+bool NoFile::IsChr(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Character, bUseLstat); }
+bool NoFile::IsBlk(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Block, bUseLstat); }
+bool NoFile::IsFifo(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Fifo, bUseLstat); }
+bool NoFile::IsLnk(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Link, bUseLstat); }
+bool NoFile::IsSock(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Socket, bUseLstat); }
 
 bool NoFile::IsReg(bool bUseLstat) const { return NoFile::IsReg(m_sLongName, bUseLstat); }
 bool NoFile::IsDir(bool bUseLstat) const { return NoFile::IsDir(m_sLongName, bUseLstat); }
@@ -87,7 +87,7 @@ bool NoFile::IsLnk(bool bUseLstat) const { return NoFile::IsLnk(m_sLongName, bUs
 bool NoFile::IsSock(bool bUseLstat) const { return NoFile::IsSock(m_sLongName, bUseLstat); }
 
 // for gettin file types, using fstat instead
-bool NoFile::FType(const NoString& sFileName, EFileTypes eType, bool bUseLstat)
+bool NoFile::FType(const NoString& sFileName, FileType eType, bool bUseLstat)
 {
     struct stat st;
 
@@ -102,19 +102,19 @@ bool NoFile::FType(const NoString& sFileName, EFileTypes eType, bool bUseLstat)
     }
 
     switch (eType) {
-    case FT_REGULAR:
+    case Regular:
         return S_ISREG(st.st_mode);
-    case FT_DIRECTORY:
+    case Directory:
         return S_ISDIR(st.st_mode);
-    case FT_CHARACTER:
+    case Character:
         return S_ISCHR(st.st_mode);
-    case FT_BLOCK:
+    case Block:
         return S_ISBLK(st.st_mode);
-    case FT_FIFO:
+    case Fifo:
         return S_ISFIFO(st.st_mode);
-    case FT_LINK:
+    case Link:
         return S_ISLNK(st.st_mode);
-    case FT_SOCK:
+    case Socket:
         return S_ISSOCK(st.st_mode);
     default:
         break;

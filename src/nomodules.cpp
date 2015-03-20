@@ -45,7 +45,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             if (m_pUser) pMod->SetUser(pOldUser);       \
             if (m_pNetwork) pMod->SetNetwork(pNetwork); \
             pMod->SetClient(pOldClient);                \
-        } catch (const NoModule::EModException& e) {     \
+        } catch (const NoModule::ModException& e) {     \
             if (e == NoModule::UNLOAD) {                 \
                 UnloadModule(pMod->GetModName());       \
             }                                           \
@@ -57,7 +57,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
     bool bHaltCore = false;                             \
     for (NoModule * pMod : *this) {                      \
         try {                                           \
-            NoModule::EModRet e = NoModule::CONTINUE;     \
+            NoModule::ModRet e = NoModule::CONTINUE;     \
             NoClient* pOldClient = pMod->GetClient();    \
             pMod->SetClient(m_pClient);                 \
             NoUser* pOldUser = nullptr;                  \
@@ -82,7 +82,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
                 bHaltCore = true;                       \
                 break;                                  \
             }                                           \
-        } catch (const NoModule::EModException& e) {     \
+        } catch (const NoModule::ModException& e) {     \
             if (e == NoModule::UNLOAD) {                 \
                 UnloadModule(pMod->GetModName());       \
             }                                           \
@@ -110,7 +110,7 @@ bool NoModules::OnBoot()
             if (!pMod->OnBoot()) {
                 return true;
             }
-        } catch (const NoModule::EModException& e) {
+        } catch (const NoModule::ModException& e) {
             if (e == NoModule::UNLOAD) {
                 UnloadModule(pMod->GetModName());
             }
@@ -335,7 +335,7 @@ bool NoModules::OnModCTCP(const NoString& sMessage)
     return false;
 }
 
-// Why MODHALTCHK works only with functions returning EModRet ? :(
+// Why MODHALTCHK works only with functions returning ModRet ? :(
 bool NoModules::OnServerCapAvailable(const NoString& sCap)
 {
     bool bResult = false;
@@ -353,7 +353,7 @@ bool NoModules::OnServerCapAvailable(const NoString& sCap)
                 bResult |= pMod->OnServerCapAvailable(sCap);
             }
             pMod->SetClient(pOldClient);
-        } catch (const NoModule::EModException& e) {
+        } catch (const NoModule::ModException& e) {
             if (NoModule::UNLOAD == e) {
                 UnloadModule(pMod->GetModName());
             }
@@ -415,7 +415,7 @@ bool NoModules::IsClientCapSupported(NoClient* pClient, const NoString& sCap, bo
                 bResult |= pMod->IsClientCapSupported(pClient, sCap, bState);
             }
             pMod->SetClient(pOldClient);
-        } catch (const NoModule::EModException& e) {
+        } catch (const NoModule::ModException& e) {
             if (NoModule::UNLOAD == e) {
                 UnloadModule(pMod->GetModName());
             }
@@ -430,7 +430,7 @@ bool NoModules::OnClientCapRequest(NoClient* pClient, const NoString& sCap, bool
     return false;
 }
 
-bool NoModules::OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::EModuleType eType, bool& bSuccess, NoString& sRetMsg)
+bool NoModules::OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::ModuleType eType, bool& bSuccess, NoString& sRetMsg)
 {
     MODHALTCHK(OnModuleLoading(sModName, sArgs, eType, bSuccess, sRetMsg));
 }
@@ -445,7 +445,7 @@ bool NoModules::OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& 
     MODHALTCHK(OnGetModInfo(ModInfo, sModule, bSuccess, sRetMsg));
 }
 
-bool NoModules::OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
+bool NoModules::OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType)
 {
     MODUNLOADCHK(OnGetAvailableMods(ssMods, eType));
     return false;
@@ -463,7 +463,7 @@ NoModule* NoModules::FindModule(const NoString& sModule) const
     return nullptr;
 }
 
-bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, NoModInfo::EModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
+bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, NoModInfo::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
 {
     sRetMsg = "";
 
@@ -524,7 +524,7 @@ bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, NoMod
     bool bLoaded;
     try {
         bLoaded = pModule->OnLoad(sArgs, sRetMsg);
-    } catch (const NoModule::EModException&) {
+    } catch (const NoModule::ModException&) {
         bLoaded = false;
         sRetMsg = "Caught an exception";
     }
@@ -599,7 +599,7 @@ bool NoModules::ReloadModule(const NoString& sModule, const NoString& sArgs, NoU
         return false;
     }
 
-    NoModInfo::EModuleType eType = pModule->GetType();
+    NoModInfo::ModuleType eType = pModule->GetType();
     pModule = nullptr;
 
     sRetMsg = "";
@@ -652,7 +652,7 @@ bool NoModules::GetModPathInfo(NoModInfo& ModInfo, const NoString& sModule, cons
     return true;
 }
 
-void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
+void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType)
 {
     ssMods.clear();
 
@@ -684,12 +684,12 @@ void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModule
     GLOBALMODULECALL(OnGetAvailableMods(ssMods, eType), NOTHING);
 }
 
-void NoModules::GetDefaultMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType)
+void NoModules::GetDefaultMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType)
 {
 
     GetAvailableMods(ssMods, eType);
 
-    const std::map<NoString, NoModInfo::EModuleType> ns = { { "chansaver", NoModInfo::UserModule },
+    const std::map<NoString, NoModInfo::ModuleType> ns = { { "chansaver", NoModInfo::UserModule },
                                                      { "controlpanel", NoModInfo::UserModule },
                                                      { "simple_away", NoModInfo::NetworkModule },
                                                      { "webadmin", NoModInfo::GlobalModule } };

@@ -223,7 +223,7 @@ public:
         }
     }
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         if (sLine.Token(0).Equals("AUTHENTICATE")) {
             Authenticate(sLine.Tokens(1));

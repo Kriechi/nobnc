@@ -266,7 +266,7 @@ public:
         SendRequest();
     }
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         NoString sCmd = sLine.Token(1).AsUpper();
         size_t i = 0;
@@ -299,7 +299,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         NoString sCmd = sLine.Token(0).AsUpper();
 

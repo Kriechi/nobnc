@@ -255,7 +255,7 @@ public:
         }
     }
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         // use OnRaw because OnUserMode is not defined (yet?)
         if (sLine.Token(1) == "396" && sLine.Token(3).find("users.quakenet.org") != NoString::npos) {
@@ -271,11 +271,11 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
+    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
 
-    EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
+    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
 
-    EModRet OnJoining(NoChannel& Channel) override
+    ModRet OnJoining(NoChannel& Channel) override
     {
         // Halt if are not already cloaked, but the user requres that we delay
         // channel join till after we are cloaked.
@@ -299,7 +299,7 @@ public:
         if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick))) HandleNeed(Channel, "v");
     }
 
-    EModRet OnInvite(const NoNick& Nick, const NoString& sChan) override
+    ModRet OnInvite(const NoNick& Nick, const NoString& sChan) override
     {
         if (!Nick.equals("Q") || !Nick.host().Equals("CServe.quakenet.org")) return CONTINUE;
         if (m_bJoinOnInvite) GetNetwork()->AddChan(sChan, false);
@@ -434,7 +434,7 @@ private:
         PutQ("CHALLENGEAUTH " + m_sUsername + " " + sResponse + " HMAC-SHA-256");
     }
 
-    EModRet HandleMessage(const NoNick& Nick, NoString sMessage)
+    ModRet HandleMessage(const NoNick& Nick, NoString sMessage)
     {
         if (!Nick.equals("Q") || !Nick.host().Equals("CServe.quakenet.org")) return CONTINUE;
 

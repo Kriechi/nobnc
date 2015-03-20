@@ -78,7 +78,7 @@ public:
 
     void OnClientDisconnect() override { SetTime(GetUser()); }
 
-    EModRet OnDeleteUser(NoUser& User) override
+    ModRet OnDeleteUser(NoUser& User) override
     {
         DelNV(User.GetUserName());
         return CONTINUE;

@@ -89,7 +89,7 @@ public:
         return true;
     }
 
-    EModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
+    ModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth) override
     {
         NoUser* pUser = NoApp::Get().FindUser(Auth->GetUsername());
 

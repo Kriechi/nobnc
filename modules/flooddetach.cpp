@@ -147,26 +147,26 @@ public:
         }
     }
 
-    EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
     // This also catches OnChanAction()
-    EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
+    ModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
         Message(Channel);
         return CONTINUE;

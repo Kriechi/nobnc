@@ -130,15 +130,15 @@ public:
     bool OnServerCapResult(const NoString& sCap, bool bSuccess);
 
     NoModule* FindModule(const NoString& sModule) const;
-    bool LoadModule(const NoString& sModule, const NoString& sArgs, NoModInfo::EModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
+    bool LoadModule(const NoString& sModule, const NoString& sArgs, NoModInfo::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
     bool UnloadModule(const NoString& sModule);
     bool UnloadModule(const NoString& sModule, NoString& sRetMsg);
     bool ReloadModule(const NoString& sModule, const NoString& sArgs, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
 
     static bool GetModInfo(NoModInfo& ModInfo, const NoString& sModule, NoString& sRetMsg);
     static bool GetModPathInfo(NoModInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg);
-    static void GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType = NoModInfo::UserModule);
-    static void GetDefaultMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType = NoModInfo::UserModule);
+    static void GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType = NoModInfo::UserModule);
+    static void GetDefaultMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType = NoModInfo::UserModule);
 
     // This returns the path to the .so and to the data dir
     // which is where static data (webadmin skins) are saved
@@ -157,10 +157,10 @@ public:
     bool OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps);
     bool IsClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState);
     bool OnClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState);
-    bool OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::EModuleType eType, bool& bSuccess, NoString& sRetMsg);
+    bool OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::ModuleType eType, bool& bSuccess, NoString& sRetMsg);
     bool OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg);
     bool OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
-    bool OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType);
+    bool OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType);
 
 private:
     static ModHandle

@@ -26,37 +26,37 @@ class NoSocket;
 class NO_EXPORT NoListener
 {
 public:
-    enum EAcceptType { ACCEPT_IRC, ACCEPT_HTTP, ACCEPT_ALL };
+    enum AcceptType { AcceptIrc = 1, AcceptHttp = 2, AcceptAll = AcceptIrc | AcceptHttp };
 
-    NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, EAddrType eAddr, EAcceptType eAccept);
+    NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, AddressType eAddr, AcceptType eAccept);
     ~NoListener();
 
     NoListener(const NoListener&) = delete;
     NoListener& operator=(const NoListener&) = delete;
 
     bool IsSSL() const;
-    EAddrType GetAddrType() const;
+    AddressType GetAddrType() const;
     ushort GetPort() const;
     const NoString& GetBindHost() const;
     NoSocket* GetSocket() const;
     const NoString& GetURIPrefix() const;
-    EAcceptType GetAcceptType() const;
+    AcceptType GetAcceptType() const;
 
     // It doesn't make sense to change any of the settings after Listen()
     // except this one, so don't add other setters!
-    void SetAcceptType(EAcceptType eType);
+    void SetAcceptType(AcceptType eType);
 
     bool Listen();
     void ResetSocket();
 
 private:
     bool m_bSSL;
-    EAddrType m_eAddr;
+    AddressType m_eAddr;
     ushort m_uPort;
     NoString m_sBindHost;
     NoString m_sURIPrefix;
     NoSocket* m_pSocket;
-    EAcceptType m_eAcceptType;
+    AcceptType m_eAcceptType;
 };
 
 #endif // NOLISTENER_H

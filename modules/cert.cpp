@@ -61,7 +61,7 @@ public:
 
     bool HasPemFile() const { return (NoFile::Exists(PemFile())); }
 
-    EModRet OnIRCConnecting(NoIrcConnection* pIRCSock) override
+    ModRet OnIRCConnecting(NoIrcConnection* pIRCSock) override
     {
         if (HasPemFile()) {
             pIRCSock->SetPemLocation(PemFile());

@@ -86,7 +86,7 @@ class NoModInfo;
  *  @param CLASS The name of your module's class.
  */
 #define MODCONSTRUCTOR(CLASS)                                                                                                                 \
-    CLASS(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, NoModInfo::EModuleType eType) \
+    CLASS(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, NoModInfo::ModuleType eType) \
         : NoModule(pDLL, pUser, pNetwork, sModName, sModPath, eType)
 
 /** This works exactly like MODULEDEFS, but for user modules. */
@@ -144,12 +144,12 @@ typedef void* ModHandle;
 class NO_EXPORT NoModInfo
 {
 public:
-    enum EModuleType { GlobalModule, UserModule, NetworkModule };
+    enum ModuleType { GlobalModule, UserModule, NetworkModule };
 
-    typedef NoModule* (*ModLoader)(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, EModuleType eType);
+    typedef NoModule* (*ModLoader)(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, ModuleType eType);
 
     NoModInfo() : NoModInfo("", "", NetworkModule) {}
-    NoModInfo(const NoString& sName, const NoString& sPath, EModuleType eType)
+    NoModInfo(const NoString& sName, const NoString& sPath, ModuleType eType)
         : m_seType(), m_eDefaultType(eType), m_sName(sName), m_sPath(sPath), m_sDescription(""), m_sWikiPage(""),
           m_sArgsHelpText(""), m_bHasArgs(false), m_fLoader(nullptr)
     {
@@ -158,11 +158,11 @@ public:
 
     bool operator<(const NoModInfo& Info) const { return (GetName() < Info.GetName()); }
 
-    bool SupportsType(EModuleType eType) const { return m_seType.find(eType) != m_seType.end(); }
+    bool SupportsType(ModuleType eType) const { return m_seType.find(eType) != m_seType.end(); }
 
-    void AddType(EModuleType eType) { m_seType.insert(eType); }
+    void AddType(ModuleType eType) { m_seType.insert(eType); }
 
-    static NoString ModuleTypeToString(EModuleType eType)
+    static NoString ModuleTypeToString(ModuleType eType)
     {
         switch (eType) {
         case GlobalModule:
@@ -183,7 +183,7 @@ public:
     const NoString& GetArgsHelpText() const { return m_sArgsHelpText; }
     bool GetHasArgs() const { return m_bHasArgs; }
     ModLoader GetLoader() const { return m_fLoader; }
-    EModuleType GetDefaultType() const { return m_eDefaultType; }
+    ModuleType GetDefaultType() const { return m_eDefaultType; }
 
     void SetName(const NoString& s) { m_sName = s; }
     void SetPath(const NoString& s) { m_sPath = s; }
@@ -192,11 +192,11 @@ public:
     void SetArgsHelpText(const NoString& s) { m_sArgsHelpText = s; }
     void SetHasArgs(bool b = false) { m_bHasArgs = b; }
     void SetLoader(ModLoader fLoader) { m_fLoader = fLoader; }
-    void SetDefaultType(EModuleType eType) { m_eDefaultType = eType; }
+    void SetDefaultType(ModuleType eType) { m_eDefaultType = eType; }
 
 private:
-    std::set<EModuleType> m_seType;
-    EModuleType m_eDefaultType;
+    std::set<ModuleType> m_seType;
+    ModuleType m_eDefaultType;
     NoString m_sName;
     NoString m_sPath;
     NoString m_sDescription;
@@ -210,7 +210,7 @@ template <class M> void TModInfo(NoModInfo& Info) {}
 
 template <class M>
 NoModule*
-TModLoad(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, NoModInfo::EModuleType eType)
+TModLoad(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, NoModInfo::ModuleType eType)
 {
     return new M(p, pUser, pNetwork, sModName, sModPath, eType);
 }
@@ -291,7 +291,7 @@ public:
             NoNetwork* pNetwork,
             const NoString& sModName,
             const NoString& sDataDir,
-            NoModInfo::EModuleType eType = NoModInfo::NetworkModule); // TODO: remove default value in ZNC 2.x
+            NoModInfo::ModuleType eType = NoModInfo::NetworkModule); // TODO: remove default value in ZNC 2.x
     virtual ~NoModule();
 
     NoModule(const NoModule&) = delete;
@@ -301,7 +301,7 @@ public:
      *  return, ZNC then decides what to do with the event which caused the
      *  module hook.
      */
-    enum EModRet {
+    enum ModRet {
         /** ZNC will continue event processing normally. This is what
          *  you should return normally.
          */
@@ -321,7 +321,7 @@ public:
         HALTCORE = 4
     };
 
-    enum EModException {
+    enum ModException {
         /** Your module can throw this enum at any given time. When this
          * is thrown, the module will be unloaded.
          */
@@ -417,9 +417,9 @@ public:
     /** This module hook is called just before ZNC tries to establish a
      *  connection to an IRC server.
      *  @param pIRCSock The socket that will be used for the connection.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnIRCConnecting(NoIrcConnection* pIRCSock);
+    virtual ModRet OnIRCConnecting(NoIrcConnection* pIRCSock);
     /** This module hook is called when a NoIrcSock fails to connect or
      *  a module returned HALTCORE from OnIRCConnecting.
      *  @param pIRCSock The socket that failed to connect.
@@ -433,14 +433,14 @@ public:
      *  @param sIdent The protocol identity that will be used. This is not
      *                the ident string that is transfered via e.g. oidentd!
      *  @param sRealName The real name that will be used.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName);
+    virtual ModRet OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName);
     /** This module hook is called when a message is broadcasted to all users.
      *  @param sMessage The message that is broadcasted.
-     *  @return see NoModule::EModRet
+     *  @return see NoModule::ModRet
      */
-    virtual EModRet OnBroadcast(NoString& sMessage);
+    virtual ModRet OnBroadcast(NoString& sMessage);
 
     /** This module hook is called when a user mode on a channel changes.
      *  @param pOpNick The nick who sent the mode change, or nullptr if set by server.
@@ -490,15 +490,15 @@ public:
 
     /** Called on any raw IRC line received from the <em>IRC server</em>.
      *  @param sLine The line read from the server.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnRaw(NoString& sLine);
+    virtual ModRet OnRaw(NoString& sLine);
 
     /** Called when a command to *status is sent.
      *  @param sCommand The command sent.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnStatusCommand(NoString& sCommand);
+    virtual ModRet OnStatusCommand(NoString& sCommand);
     /** Called when a command to your module is sent, e.g. query to *modname.
      *  @param sCommand The command that was sent.
      */
@@ -542,9 +542,9 @@ public:
     virtual void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage);
     /** This module hook is called just before ZNC tries to join an IRC channel.
      *  @param Chan The channel which is about to get joined.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnJoining(NoChannel& Channel);
+    virtual ModRet OnJoining(NoChannel& Channel);
     /** Called when a nick joins a channel.
      *  @param Nick The nick who joined.
      *  @param Channel The channel which was joined.
@@ -559,40 +559,40 @@ public:
     /** Called when user is invited into a channel
      *  @param Nick The nick who invited you.
      *  @param sChan The channel the user got invited into
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnInvite(const NoNick& Nick, const NoString& sChan);
+    virtual ModRet OnInvite(const NoNick& Nick, const NoString& sChan);
 
     /** Called before a channel buffer is played back to a client.
      *  @param Chan The channel which will be played back.
      *  @param Client The client the buffer will be played back to.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnChanBufferStarting(NoChannel& Chan, NoClient& Client);
+    virtual ModRet OnChanBufferStarting(NoChannel& Chan, NoClient& Client);
     /** Called after a channel buffer was played back to a client.
      *  @param Chan The channel which was played back.
      *  @param Client The client the buffer was played back to.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnChanBufferEnding(NoChannel& Chan, NoClient& Client);
+    virtual ModRet OnChanBufferEnding(NoChannel& Chan, NoClient& Client);
     /** Called when for each line during a channel's buffer play back.
      *  @param Chan The channel this playback is from.
      *  @param Client The client the buffer is played back to.
      *  @param sLine The current line of buffer playback. This is a raw IRC
      *               traffic line!
      *  @param tv The timestamp of the message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv);
-    virtual EModRet OnChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine);
+    virtual ModRet OnChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv);
+    virtual ModRet OnChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine);
     /** Called when a line from the query buffer is played back.
      *  @param Client The client this line will go to.
      *  @param sLine The raw IRC traffic line from the buffer.
      *  @param tv The timestamp of the message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv);
-    virtual EModRet OnPrivBufferPlayLine(NoClient& Client, NoString& sLine);
+    virtual ModRet OnPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv);
+    virtual ModRet OnPrivBufferPlayLine(NoClient& Client, NoString& sLine);
 
     /** Called when a client successfully logged in to ZNC. */
     virtual void OnClientLogin();
@@ -600,143 +600,143 @@ public:
     virtual void OnClientDisconnect();
     /** This module hook is called when a client sends a raw traffic line to ZNC.
      *  @param sLine The raw traffic line sent.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnUserRaw(NoString& sLine);
+    virtual ModRet OnUserRaw(NoString& sLine);
     /** This module hook is called when a client sends a CTCP reply.
      *  @param sTarget The target for the CTCP reply. Could be a channel
      *                 name or a nick name.
      *  @param sMessage The CTCP reply message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnUserCTCPReply(NoString& sTarget, NoString& sMessage);
+    virtual ModRet OnUserCTCPReply(NoString& sTarget, NoString& sMessage);
     /** This module hook is called when a client sends a CTCP request.
      *  @param sTarget The target for the CTCP request. Could be a channel
      *                 name or a nick name.
      *  @param sMessage The CTCP request message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      *  @note This is not called for CTCP ACTION messages, use
      *        NoModule::OnUserAction() instead.
      */
-    virtual EModRet OnUserCTCP(NoString& sTarget, NoString& sMessage);
+    virtual ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage);
     /** Called when a client sends a CTCP ACTION request ("/me").
      *  @param sTarget The target for the CTCP ACTION. Could be a channel
      *                 name or a nick name.
      *  @param sMessage The action message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      *  @note NoModule::OnUserCTCP() will not be called for this message.
      */
-    virtual EModRet OnUserAction(NoString& sTarget, NoString& sMessage);
+    virtual ModRet OnUserAction(NoString& sTarget, NoString& sMessage);
     /** This module hook is called when a user sends a normal IRC message.
      *  @param sTarget The target of the message. Could be a channel name or
      *                 a nick name.
      *  @param sMessage The message which was sent.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnUserMsg(NoString& sTarget, NoString& sMessage);
+    virtual ModRet OnUserMsg(NoString& sTarget, NoString& sMessage);
     /** This module hook is called when a user sends a notice message.
      *  @param sTarget The target of the message. Could be a channel name or
      *                 a nick name.
      *  @param sMessage The message which was sent.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnUserNotice(NoString& sTarget, NoString& sMessage);
+    virtual ModRet OnUserNotice(NoString& sTarget, NoString& sMessage);
     /** This hooks is called when a user sends a JOIN message.
      *  @param sChannel The channel name the join is for.
      *  @param sKey The key for the channel.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnUserJoin(NoString& sChannel, NoString& sKey);
+    virtual ModRet OnUserJoin(NoString& sChannel, NoString& sKey);
     /** This hooks is called when a user sends a PART message.
      *  @param sChannel The channel name the part is for.
      *  @param sMessage The part message the client sent.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnUserPart(NoString& sChannel, NoString& sMessage);
+    virtual ModRet OnUserPart(NoString& sChannel, NoString& sMessage);
     /** This module hook is called when a user wants to change a channel topic.
      *  @param sChannel The channel.
      *  @param sTopic The new topic which the user sent.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnUserTopic(NoString& sChannel, NoString& sTopic);
+    virtual ModRet OnUserTopic(NoString& sChannel, NoString& sTopic);
     /** This hook is called when a user requests a channel's topic.
      *  @param sChannel The channel for which the request is.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnUserTopicRequest(NoString& sChannel);
+    virtual ModRet OnUserTopicRequest(NoString& sChannel);
     /** This module hook is called when a user requests to quit from network.
      *  @param sMessage The quit message the client sent.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnUserQuit(NoString& sMessage);
+    virtual ModRet OnUserQuit(NoString& sMessage);
 
     /** Called when we receive a CTCP reply <em>from IRC</em>.
      *  @param Nick The nick the CTCP reply is from.
      *  @param sMessage The CTCP reply message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnCTCPReply(NoNick& Nick, NoString& sMessage);
+    virtual ModRet OnCTCPReply(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a private CTCP request <em>from IRC</em>.
      *  @param Nick The nick the CTCP request is from.
      *  @param sMessage The CTCP request message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage);
+    virtual ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a channel CTCP request <em>from IRC</em>.
      *  @param Nick The nick the CTCP request is from.
      *  @param Channel The channel to which the request was sent.
      *  @param sMessage The CTCP request message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    virtual ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
     /** Called when we receive a private CTCP ACTION ("/me" in query) <em>from IRC</em>.
      *  This is called after NoModule::OnPrivCTCP().
      *  @param Nick The nick the action came from.
      *  @param sMessage The action message
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnPrivAction(NoNick& Nick, NoString& sMessage);
+    virtual ModRet OnPrivAction(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a channel CTCP ACTION ("/me" in a channel) <em>from IRC</em>.
      *  This is called after NoModule::OnChanCTCP().
      *  @param Nick The nick the action came from.
      *  @param Channel The channel the action was sent to.
      *  @param sMessage The action message
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    virtual ModRet OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
     /** Called when we receive a private message <em>from IRC</em>.
      *  @param Nick The nick which sent the message.
      *  @param sMessage The message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage);
+    virtual ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a channel message <em>from IRC</em>.
      *  @param Nick The nick which sent the message.
      *  @param Channel The channel to which the message was sent.
      *  @param sMessage The message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    virtual ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
     /** Called when we receive a private notice.
      *  @param Nick The nick which sent the notice.
      *  @param sMessage The notice message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage);
+    virtual ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a channel notice.
      *  @param Nick The nick which sent the notice.
      *  @param Channel The channel to which the notice was sent.
      *  @param sMessage The notice message.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    virtual ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
     /** Called when we receive a channel topic change <em>from IRC</em>.
      *  @param Nick The nick which changed the topic.
      *  @param Channel The channel whose topic was changed.
      *  @param sTopic The new topic.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic);
+    virtual ModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic);
 
     /** Called for every CAP received via CAP LS from server.
      *  @param sCap capability supported by server.
@@ -754,36 +754,36 @@ public:
     /** This module hook is called just before ZNC tries to join a channel
      *  by itself because it's in the config but wasn't joined yet.
      *  @param Channel The channel which will be joined.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnTimerAutoJoin(NoChannel& Channel);
+    virtual ModRet OnTimerAutoJoin(NoChannel& Channel);
 
     /** This module hook is called when a network is being added.
      *  @param Network The new IRC network.
      *  @param sErrorRet A message that may be displayed to the user if
      *                  the module stops adding the network.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnAddNetwork(NoNetwork& Network, NoString& sErrorRet);
+    virtual ModRet OnAddNetwork(NoNetwork& Network, NoString& sErrorRet);
     /** This module hook is called when a network is deleted.
      *  @param Network The IRC network which is going to be deleted.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnDeleteNetwork(NoNetwork& Network);
+    virtual ModRet OnDeleteNetwork(NoNetwork& Network);
 
     /** Called when ZNC sends a raw traffic line to a client.
      *  @param sLine The raw traffic line sent.
      *  @param Client The client this line is sent to.
      *  @warning Calling PutUser() from within this hook leads to infinite recursion.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnSendToClient(NoString& sLine, NoClient& Client);
+    virtual ModRet OnSendToClient(NoString& sLine, NoClient& Client);
     /** Called when ZNC sends a raw traffic line to the IRC server.
      *  @param sLine The raw traffic line sent.
      *  @warning Calling PutIRC() from within this hook leads to infinite recursion.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnSendToIRC(NoString& sLine);
+    virtual ModRet OnSendToIRC(NoString& sLine);
 
     ModHandle GetDLL();
     static double GetCoreVersion();
@@ -912,12 +912,12 @@ public:
     NoString ExpandString(const NoString& sStr) const;
     NoString& ExpandString(const NoString& sStr, NoString& sRet) const;
 
-    void SetType(NoModInfo::EModuleType eType);
+    void SetType(NoModInfo::ModuleType eType);
     void SetDescription(const NoString& s);
     void SetModPath(const NoString& s);
     void SetArgs(const NoString& s);
 
-    NoModInfo::EModuleType GetType() const;
+    NoModInfo::ModuleType GetType() const;
     const NoString& GetDescription() const;
     const NoString& GetArgs() const;
     const NoString& GetModPath() const;
@@ -939,14 +939,14 @@ public:
      * @param User The user which will be added.
      * @param sErrorRet A message that may be displayed to the user if
      *                  the module stops adding the user.
-     * @return See NoModule::EModRet.
+     * @return See NoModule::ModRet.
      */
-    virtual EModRet OnAddUser(NoUser& User, NoString& sErrorRet);
+    virtual ModRet OnAddUser(NoUser& User, NoString& sErrorRet);
     /** This module hook is called when a user is deleted.
      *  @param User The user which will be deleted.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnDeleteUser(NoUser& User);
+    virtual ModRet OnDeleteUser(NoUser& User);
     /** This module hook is called when there is an incoming connection on
      *  any of ZNC's listening sockets.
      *  @param pSock The incoming client socket.
@@ -956,11 +956,11 @@ public:
     virtual void OnClientConnect(NoSocket* pSock, const NoString& sHost, ushort uPort);
     /** This module hook is called when a client tries to login. If your
      *  module wants to handle the login attempt, it must return
-     *  NoModule::EModRet::HALT;
+     *  NoModule::ModRet::HALT;
      *  @param Auth The necessary authentication info for this login attempt.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth);
+    virtual ModRet OnLoginAttempt(std::shared_ptr<NoAuthBase> Auth);
     /** Called after a client login was rejected.
      *  @param sUsername The username that tried to log in.
      *  @param sRemoteIP The IP address from which the client tried to login.
@@ -972,7 +972,7 @@ public:
      *  @param pClient The client which send this line.
      *  @param sLine The raw traffic line which the client sent.
      */
-    virtual EModRet OnUnknownUserRaw(NoClient* pClient, NoString& sLine);
+    virtual ModRet OnUnknownUserRaw(NoClient* pClient, NoString& sLine);
 
     /** Called when a client told us CAP LS. Use ssCaps.insert("cap-name")
      *  for announcing capabilities which your module supports.
@@ -1001,34 +1001,34 @@ public:
      *  @param[out] bSuccess the module was loaded successfully
      *                       as result of this module hook?
      *  @param[out] sRetMsg text about loading of the module.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet
-    OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::EModuleType eType, bool& bSuccess, NoString& sRetMsg);
+    virtual ModRet
+    OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::ModuleType eType, bool& bSuccess, NoString& sRetMsg);
     /** Called when a module is going to be unloaded.
      *  @param pModule the module.
      *  @param[out] bSuccess the module was unloaded successfully
      *                       as result of this module hook?
      *  @param[out] sRetMsg text about unloading of the module.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg);
+    virtual ModRet OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg);
     /** Called when info about a module is needed.
      *  @param[out] ModInfo put result here, if your module knows it.
      *  @param sModule name of the module.
      *  @param bSuccess this module provided info about the module.
      *  @param sRetMsg text describing possible issues.
-     *  @return See NoModule::EModRet.
+     *  @return See NoModule::ModRet.
      */
-    virtual EModRet OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
+    virtual ModRet OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
     /** Called when list of available mods is requested.
      *  @param ssMods put new modules here.
      *  @param bGlobal true if global modules are needed.
      */
-    virtual void OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::EModuleType eType);
+    virtual void OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType);
 
 private:
-    NoModInfo::EModuleType m_eType;
+    NoModInfo::ModuleType m_eType;
     NoString m_sDescription;
     std::set<NoTimer*> m_sTimers;
     std::set<NoModuleSocket*> m_sSockets;

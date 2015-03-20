@@ -315,7 +315,7 @@ public:
                    "Reports the actions performed by an alias.");
     }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         NoAlias current_alias;
 

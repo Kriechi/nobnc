@@ -75,7 +75,7 @@ public:
         PutIRC("NOTICE " + sNick + " :" + GetReply());
     }
 
-    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         Handle(Nick.nick());
         return CONTINUE;

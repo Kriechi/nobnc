@@ -30,9 +30,9 @@ class NoSettings;
 class NO_EXPORT NoChannel
 {
 public:
-    enum EUserPerms { Voice = '+', HalfOp = '%', Op = '@', Admin = '!', Owner = '*' };
+    enum UserPerms { Voice = '+', HalfOp = '%', Op = '@', Admin = '!', Owner = '*' };
 
-    enum EModes {
+    enum Modes {
         M_Private = 'p',
         M_Secret = 's',
         M_Moderated = 'm',

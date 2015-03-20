@@ -114,9 +114,9 @@ public:
     enum { TMO_READ = 1, TMO_WRITE = 2, TMO_ACCEPT = 4, TMO_ALL = TMO_READ|TMO_WRITE|TMO_ACCEPT };
     void SetTimeout( int iTimeout, uint32_t iTimeoutType = TMO_ALL );
     virtual NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort);
-    enum ECloseType { CLT_DONT, CLT_NOW, CLT_AFTERWRITE, CLT_DEREFERENCE };
-    ECloseType GetCloseType() const;
-    void Close(ECloseType type = CLT_NOW);
+    enum CloseType { CLT_DONT, CLT_NOW, CLT_AFTERWRITE, CLT_DEREFERENCE };
+    CloseType GetCloseType() const;
+    void Close(CloseType type = CLT_NOW);
     NoString & GetInternalReadBuffer();
     NoString & GetInternalWriteBuffer();
     virtual void ReadLineImpl( const NoString & sLine);

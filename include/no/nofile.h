@@ -30,7 +30,7 @@ public:
     NoFile(const NoString& sLongName);
     ~NoFile();
 
-    enum EFileTypes { FT_REGULAR, FT_DIRECTORY, FT_CHARACTER, FT_BLOCK, FT_FIFO, FT_LINK, FT_SOCK };
+    enum FileType { Regular, Directory, Character, Block, Fifo, Link, Socket };
 
     void SetFileName(const NoString& sLongName);
     static bool IsReg(const NoString& sLongName, bool bUseLstat = false);
@@ -50,9 +50,9 @@ public:
     bool IsSock(bool bUseLstat = false) const;
 
     // for gettin file types, using fstat instead
-    static bool FType(const NoString& sFileName, EFileTypes eType, bool bUseLstat = false);
+    static bool FType(const NoString& sFileName, FileType eType, bool bUseLstat = false);
 
-    enum EFileAttr { FA_Name, FA_Size, FA_ATime, FA_MTime, FA_CTime, FA_UID };
+    enum Attribute { Name, Size, AccessTime, ModificationTime, CreationTime, Uid };
 
     bool Exists() const;
     off_t GetSize() const;

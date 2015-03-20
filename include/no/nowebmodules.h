@@ -85,13 +85,13 @@ public:
 
     virtual ~NoWebSubPage() {}
 
-    enum { F_ADMIN = 1 };
+    enum { Admin = 1 };
 
     void SetName(const NoString& s) { m_sName = s; }
     void SetTitle(const NoString& s) { m_sTitle = s; }
     void AddParam(const NoString& sName, const NoString& sValue) { m_vParams.push_back(make_pair(sName, sValue)); }
 
-    bool RequiresAdmin() const { return m_uFlags & F_ADMIN; }
+    bool RequiresAdmin() const { return m_uFlags & Admin; }
 
     const NoString& GetName() const { return m_sName; }
     const NoString& GetTitle() const { return m_sTitle; }
@@ -107,11 +107,11 @@ private:
 class NO_EXPORT NoWebSock : public NoHttpSocket
 {
 public:
-    enum EPageReqResult {
-        PAGE_NOTFOUND, // print 404 and Close()
-        PAGE_PRINT, // print page contents and Close()
-        PAGE_DEFERRED, // async processing, Close() will be called from a different place
-        PAGE_DONE // all stuff has been done
+    enum PageRequest {
+        NotFound, // print 404 and Close()
+        Print, // print page contents and Close()
+        Deferred, // async processing, Close() will be called from a different place
+        Done // all stuff has been done
     };
 
     NoWebSock(const NoString& sURIPrefix);
@@ -121,8 +121,8 @@ public:
     bool OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic) override;
     void OnPageRequest(const NoString& sURI) override;
 
-    EPageReqResult PrintTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule = nullptr);
-    EPageReqResult PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule = nullptr);
+    PageRequest PrintTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule = nullptr);
+    PageRequest PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule = nullptr);
 
     NoString FindTmpl(NoModule* pModule, const NoString& sName);
 
@@ -150,7 +150,7 @@ protected:
     NoString GetCSRFCheck();
 
 private:
-    EPageReqResult OnPageRequestInternal(const NoString& sURI, NoString& sPageRet);
+    PageRequest OnPageRequestInternal(const NoString& sURI, NoString& sPageRet);
 
     bool m_bPathsSet;
     NoTemplate m_Template;

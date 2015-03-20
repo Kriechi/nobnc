@@ -373,13 +373,13 @@ public:
         m_sReason = "";
     }
 
-    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         if (m_bIsAway) AddMessage(time(nullptr), Nick, sMessage);
         return (CONTINUE);
     }
 
-    EModRet OnPrivAction(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivAction(NoNick& Nick, NoString& sMessage) override
     {
         if (m_bIsAway) {
             AddMessage(time(nullptr), Nick, "* " + sMessage);
@@ -387,7 +387,7 @@ public:
         return (CONTINUE);
     }
 
-    EModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
     {
         Ping();
         if (m_bIsAway) Back();
@@ -395,7 +395,7 @@ public:
         return (CONTINUE);
     }
 
-    EModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         Ping();
         if (m_bIsAway) Back();
@@ -403,7 +403,7 @@ public:
         return (CONTINUE);
     }
 
-    EModRet OnUserAction(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserAction(NoString& sTarget, NoString& sMessage) override
     {
         Ping();
         if (m_bIsAway) Back();

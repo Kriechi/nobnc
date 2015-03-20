@@ -152,7 +152,7 @@ public:
         m_pTimer = nullptr;
     }
 
-    EModRet OnUserRaw(NoString& sLine) override
+    ModRet OnUserRaw(NoString& sLine) override
     {
         // We dont care if we are not connected to IRC
         if (!GetNetwork()->IsIRCConnected()) return CONTINUE;
@@ -175,7 +175,7 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         // Are we trying to get our primary nick and we caused this error?
         // :irc.server.net 433 mynick badnick :Nickname is already in use.

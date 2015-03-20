@@ -40,7 +40,7 @@ public:
     NoApp(const NoApp&) = delete;
     NoApp& operator=(const NoApp&) = delete;
 
-    enum ConfigState { ECONFIG_NOTHING, ECONFIG_NEED_REHASH, ECONFIG_NEED_WRITE, ECONFIG_NEED_VERBOSE_WRITE };
+    enum ConfigState { ConfigNothing, ConfigNeedRehash, ConfigNeedWrite, ConfigNeedVerboseWrite };
 
     void DeleteUsers();
     void Loop();
@@ -85,7 +85,7 @@ public:
     // The result is passed back via callbacks to NoAuthBase.
     void AuthUser(std::shared_ptr<NoAuthBase> AuthClass);
 
-    void SetConfigState(enum ConfigState e) { m_eConfigState = e; }
+    void SetConfigState(ConfigState e) { m_eConfigState = e; }
     void SetSkinName(const NoString& s) { m_sSkinName = s; }
     void SetStatusPrefix(const NoString& s) { m_sStatusPrefix = (s.empty()) ? "*" : s; }
     void SetMaxBufferSize(uint i) { m_uiMaxBufferSize = i; }
@@ -95,7 +95,7 @@ public:
     void SetHideVersion(bool b) { m_bHideVersion = b; }
     void SetConnectDelay(uint i);
 
-    enum ConfigState GetConfigState() const { return m_eConfigState; }
+    ConfigState GetConfigState() const { return m_eConfigState; }
     NoSocketManager& GetManager() { return m_Manager; }
     const NoSocketManager& GetManager() const { return m_Manager; }
     NoModules& GetModules() { return *m_pModules; }
@@ -146,14 +146,14 @@ public:
     bool AddUser(NoUser* pUser, NoString& sErrorRet);
     const std::map<NoString, NoUser*>& GetUserMap() const { return (m_msUsers); }
 
-    NoListener* FindListener(u_short uPort, const NoString& BindHost, EAddrType eAddr);
+    NoListener* FindListener(u_short uPort, const NoString& BindHost, AddressType eAddr);
     bool AddListener(NoListener*);
     bool AddListener(ushort uPort,
                      const NoString& sBindHost,
                      const NoString& sURIPrefix,
                      bool bSSL,
-                     EAddrType eAddr,
-                     NoListener::EAcceptType eAccept,
+                     AddressType eAddr,
+                     NoListener::AcceptType eAccept,
                      NoString& sError);
     bool DelListener(NoListener*);
 
@@ -203,7 +203,7 @@ private:
 
     time_t m_TimeStarted;
 
-    enum ConfigState m_eConfigState;
+    ConfigState m_eConfigState;
     std::vector<NoListener*> m_vpListeners;
     std::map<NoString, NoUser*> m_msUsers;
     std::map<NoString, NoUser*> m_msDelUsers;

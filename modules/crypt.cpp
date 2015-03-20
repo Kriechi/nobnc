@@ -64,7 +64,7 @@ public:
 
     virtual ~NoCryptMod() {}
 
-    EModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         sTarget.TrimLeft(NickPrefix());
 
@@ -98,13 +98,13 @@ public:
         return CONTINUE;
     }
 
-    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         FilterIncoming(Nick.nick(), Nick, sMessage);
         return CONTINUE;
     }
 
-    EModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         FilterIncoming(Channel.getName(), Nick, sMessage);
         return CONTINUE;

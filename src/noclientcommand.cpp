@@ -987,7 +987,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
         return;
     } else if (sCommand.Equals("LOADMOD") || sCommand.Equals("LOADMODULE")) {
-        NoModInfo::EModuleType eType;
+        NoModInfo::ModuleType eType;
         NoString sType = sLine.Token(1);
         NoString sMod = sLine.Token(2);
         NoString sArgs = sLine.Tokens(3);
@@ -1060,7 +1060,7 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(sModRet);
         return;
     } else if (sCommand.Equals("UNLOADMOD") || sCommand.Equals("UNLOADMODULE")) {
-        NoModInfo::EModuleType eType = NoModInfo::UserModule;
+        NoModInfo::ModuleType eType = NoModInfo::UserModule;
         NoString sType = sLine.Token(1);
         NoString sMod = sLine.Token(2);
 
@@ -1126,7 +1126,7 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(sModRet);
         return;
     } else if (sCommand.Equals("RELOADMOD") || sCommand.Equals("RELOADMODULE")) {
-        NoModInfo::EModuleType eType;
+        NoModInfo::ModuleType eType;
         NoString sType = sLine.Token(1);
         NoString sMod = sLine.Token(2);
         NoString sArgs = sLine.Tokens(3);
@@ -1550,13 +1550,13 @@ void NoClient::UserPortCommand(NoString& sLine)
             Table.SetCell("BindHost", (pListener->GetBindHost().empty() ? NoString("*") : pListener->GetBindHost()));
             Table.SetCell("SSL", NoString(pListener->IsSSL()));
 
-            EAddrType eAddr = pListener->GetAddrType();
-            Table.SetCell("Proto", (eAddr == ADDR_ALL ? "All" : (eAddr == ADDR_IPV4ONLY ? "IPv4" : "IPv6")));
+            AddressType eAddr = pListener->GetAddrType();
+            Table.SetCell("Proto", (eAddr == Ipv4AndIpv6Address ? "All" : (eAddr == Ipv4Address ? "IPv4" : "IPv6")));
 
-            NoListener::EAcceptType eAccept = pListener->GetAcceptType();
+            NoListener::AcceptType eAccept = pListener->GetAcceptType();
             Table.SetCell("IRC/Web",
-                          (eAccept == NoListener::ACCEPT_ALL ? "All" :
-                                                              (eAccept == NoListener::ACCEPT_IRC ? "IRC" : "Web")));
+                          (eAccept == NoListener::AcceptAll ? "All" :
+                                                              (eAccept == NoListener::AcceptIrc ? "IRC" : "Web")));
             Table.SetCell("URIPrefix", pListener->GetURIPrefix() + "/");
         }
 
@@ -1567,14 +1567,14 @@ void NoClient::UserPortCommand(NoString& sLine)
 
     NoString sPort = sLine.Token(1);
     NoString sAddr = sLine.Token(2);
-    EAddrType eAddr = ADDR_ALL;
+    AddressType eAddr = Ipv4AndIpv6Address;
 
     if (sAddr.Equals("IPV4")) {
-        eAddr = ADDR_IPV4ONLY;
+        eAddr = Ipv4Address;
     } else if (sAddr.Equals("IPV6")) {
-        eAddr = ADDR_IPV6ONLY;
+        eAddr = Ipv6Address;
     } else if (sAddr.Equals("ALL")) {
-        eAddr = ADDR_ALL;
+        eAddr = Ipv4AndIpv6Address;
     } else {
         sAddr.clear();
     }
@@ -1582,15 +1582,15 @@ void NoClient::UserPortCommand(NoString& sLine)
     ushort uPort = sPort.ToUShort();
 
     if (sCommand.Equals("ADDPORT")) {
-        NoListener::EAcceptType eAccept = NoListener::ACCEPT_ALL;
+        NoListener::AcceptType eAccept = NoListener::AcceptAll;
         NoString sAccept = sLine.Token(3);
 
         if (sAccept.Equals("WEB")) {
-            eAccept = NoListener::ACCEPT_HTTP;
+            eAccept = NoListener::AcceptHttp;
         } else if (sAccept.Equals("IRC")) {
-            eAccept = NoListener::ACCEPT_IRC;
+            eAccept = NoListener::AcceptIrc;
         } else if (sAccept.Equals("ALL")) {
-            eAccept = NoListener::ACCEPT_ALL;
+            eAccept = NoListener::AcceptAll;
         } else {
             sAccept.clear();
         }

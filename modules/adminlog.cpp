@@ -75,7 +75,7 @@ public:
         Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC");
     }
 
-    EModRet OnRaw(NoString& sLine) override
+    ModRet OnRaw(NoString& sLine) override
     {
         if (sLine.StartsWith("ERROR ")) {
             // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)

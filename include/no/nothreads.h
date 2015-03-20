@@ -231,9 +231,9 @@ class NO_EXPORT NoJob
 public:
     friend class NoThreadPool;
 
-    enum EJobState { READY, RUNNING, DONE, CANCELLED };
+    enum JobState { Ready, Running, Done, Cancelled };
 
-    NoJob() : m_eState(READY) {}
+    NoJob() : m_eState(Ready) {}
 
     /// Destructor, always called from the main thread.
     virtual ~NoJob() {}
@@ -256,7 +256,7 @@ private:
     NoJob& operator=(const NoJob&);
 
     // Synchronized via the thread pool's mutex! Do not access without that mutex!
-    EJobState m_eState;
+    JobState m_eState;
 };
 
 class NO_EXPORT NoThreadPool

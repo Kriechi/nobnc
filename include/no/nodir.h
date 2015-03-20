@@ -41,7 +41,7 @@ public:
 
     uint Delete();
 
-    NoFile::EFileAttr GetSortAttr() const;
+    NoFile::Attribute GetSortAttr() const;
     bool IsDescending() const;
 
     // Check if sPath + "/" + sAdd (~/ is handled) is an absolute path which
@@ -53,7 +53,7 @@ public:
     static NoString GetCWD();
 
 private:
-    NoFile::EFileAttr m_eSortAttr;
+    NoFile::Attribute m_eSortAttr;
     bool m_bDesc;
 };
 

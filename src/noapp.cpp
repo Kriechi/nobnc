@@ -38,7 +38,7 @@ static inline NoString FormatBindError()
 }
 
 NoApp::NoApp()
-    : m_TimeStarted(time(nullptr)), m_eConfigState(ECONFIG_NOTHING), m_vpListeners(), m_msUsers(), m_msDelUsers(),
+    : m_TimeStarted(time(nullptr)), m_eConfigState(ConfigNothing), m_vpListeners(), m_msUsers(), m_msDelUsers(),
       m_Manager(), m_sCurPath(""), m_sZNCPath(""), m_sConfigFile(""), m_sSkinName(""), m_sStatusPrefix(""),
       m_sPidFile(""), m_sSSLCertFile(""), m_sSSLCiphers(""), m_sSSLProtocols(""), m_vsBindHosts(), m_vsTrustedProxies(),
       m_vsMotd(), m_pLockFile(nullptr), m_uiConnectDelay(5), m_uiAnonIPLimit(10), m_uiMaxBufferSize(500),
@@ -177,8 +177,8 @@ void NoApp::Loop()
 
         ConfigState eState = GetConfigState();
         switch (eState) {
-        case ECONFIG_NEED_REHASH:
-            SetConfigState(ECONFIG_NOTHING);
+        case ConfigNeedRehash:
+            SetConfigState(ConfigNothing);
 
             if (RehashConfig(sError)) {
                 Broadcast("Rehashing succeeded", true);
@@ -187,17 +187,17 @@ void NoApp::Loop()
                 Broadcast("ZNC is in some possibly inconsistent state!", true);
             }
             break;
-        case ECONFIG_NEED_WRITE:
-        case ECONFIG_NEED_VERBOSE_WRITE:
-            SetConfigState(ECONFIG_NOTHING);
+        case ConfigNeedWrite:
+        case ConfigNeedVerboseWrite:
+            SetConfigState(ConfigNothing);
 
             if (!WriteConfig()) {
                 Broadcast("Writing the config file failed", true);
-            } else if (eState == ECONFIG_NEED_VERBOSE_WRITE) {
+            } else if (eState == ConfigNeedVerboseWrite) {
                 Broadcast("Writing the config succeeded", true);
             }
             break;
-        case ECONFIG_NOTHING:
+        case ConfigNothing:
             break;
         }
 
@@ -546,13 +546,13 @@ bool NoApp::WriteConfig()
         listenerConfig.AddKeyValuePair("URIPrefix", pListener->GetURIPrefix() + "/");
         listenerConfig.AddKeyValuePair("Port", NoString(pListener->GetPort()));
 
-        listenerConfig.AddKeyValuePair("IPv4", NoString(pListener->GetAddrType() != ADDR_IPV6ONLY));
-        listenerConfig.AddKeyValuePair("IPv6", NoString(pListener->GetAddrType() != ADDR_IPV4ONLY));
+        listenerConfig.AddKeyValuePair("IPv4", NoString(pListener->GetAddrType() != Ipv6Address));
+        listenerConfig.AddKeyValuePair("IPv6", NoString(pListener->GetAddrType() != Ipv4Address));
 
         listenerConfig.AddKeyValuePair("SSL", NoString(pListener->IsSSL()));
 
-        listenerConfig.AddKeyValuePair("AllowIRC", NoString(pListener->GetAcceptType() != NoListener::ACCEPT_HTTP));
-        listenerConfig.AddKeyValuePair("AllowWeb", NoString(pListener->GetAcceptType() != NoListener::ACCEPT_IRC));
+        listenerConfig.AddKeyValuePair("AllowIRC", NoString(pListener->GetAcceptType() != NoListener::AcceptHttp));
+        listenerConfig.AddKeyValuePair("AllowWeb", NoString(pListener->GetAcceptType() != NoListener::AcceptIrc));
 
         config.AddSubConfig("Listener", "listener" + NoString(l++), listenerConfig);
     }
@@ -718,7 +718,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
         NoUtils::PrintAction("Verifying the listener");
         NoListener* pListener =
-        new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? ADDR_ALL : ADDR_IPV4ONLY, NoListener::ACCEPT_ALL);
+        new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? Ipv4AndIpv6Address : Ipv4Address, NoListener::AcceptAll);
         if (!pListener->Listen()) {
             NoUtils::PrintStatus(false, FormatBindError());
             bSuccess = false;
@@ -1606,7 +1606,7 @@ bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
     return true;
 }
 
-NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, EAddrType eAddr)
+NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, AddressType eAddr)
 {
     for (NoListener* pListener : m_vpListeners) {
         if (pListener->GetPort() != uPort) continue;
@@ -1622,25 +1622,25 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
     NoString sName = sLine.Token(0);
     NoString sValue = sLine.Tokens(1);
 
-    EAddrType eAddr = ADDR_ALL;
+    AddressType eAddr = Ipv4AndIpv6Address;
     if (sName.Equals("Listen4") || sName.Equals("Listen") || sName.Equals("Listener4")) {
-        eAddr = ADDR_IPV4ONLY;
+        eAddr = Ipv4Address;
     }
     if (sName.Equals("Listener6")) {
-        eAddr = ADDR_IPV6ONLY;
+        eAddr = Ipv6Address;
     }
 
-    NoListener::EAcceptType eAccept = NoListener::ACCEPT_ALL;
+    NoListener::AcceptType eAccept = NoListener::AcceptAll;
     if (sValue.TrimPrefix("irc_only "))
-        eAccept = NoListener::ACCEPT_IRC;
+        eAccept = NoListener::AcceptIrc;
     else if (sValue.TrimPrefix("web_only "))
-        eAccept = NoListener::ACCEPT_HTTP;
+        eAccept = NoListener::AcceptHttp;
 
     bool bSSL = false;
     NoString sPort;
     NoString sBindHost;
 
-    if (ADDR_IPV4ONLY == eAddr) {
+    if (Ipv4Address == eAddr) {
         sValue.Replace(":", " ");
     }
 
@@ -1666,8 +1666,8 @@ bool NoApp::AddListener(ushort uPort,
                        const NoString& sBindHost,
                        const NoString& sURIPrefixRaw,
                        bool bSSL,
-                       EAddrType eAddr,
-                       NoListener::EAcceptType eAccept,
+                       AddressType eAddr,
+                       NoListener::AcceptType eAccept,
                        NoString& sError)
 {
     NoString sHostComment;
@@ -1679,13 +1679,13 @@ bool NoApp::AddListener(ushort uPort,
     NoString sIPV6Comment;
 
     switch (eAddr) {
-    case ADDR_ALL:
+    case Ipv4AndIpv6Address:
         sIPV6Comment = "";
         break;
-    case ADDR_IPV4ONLY:
+    case Ipv4Address:
         sIPV6Comment = " using ipv4";
         break;
-    case ADDR_IPV6ONLY:
+    case Ipv6Address:
         sIPV6Comment = " using ipv6";
     }
 
@@ -1783,26 +1783,26 @@ bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
     pConfig->FindBoolEntry("allowweb", bWeb, true);
     pConfig->FindStringEntry("uriprefix", sURIPrefix);
 
-    EAddrType eAddr;
+    AddressType eAddr;
     if (b4 && b6) {
-        eAddr = ADDR_ALL;
+        eAddr = Ipv4AndIpv6Address;
     } else if (b4 && !b6) {
-        eAddr = ADDR_IPV4ONLY;
+        eAddr = Ipv4Address;
     } else if (!b4 && b6) {
-        eAddr = ADDR_IPV6ONLY;
+        eAddr = Ipv6Address;
     } else {
         sError = "No address family given";
         NoUtils::PrintError(sError);
         return false;
     }
 
-    NoListener::EAcceptType eAccept;
+    NoListener::AcceptType eAccept;
     if (bIRC && bWeb) {
-        eAccept = NoListener::ACCEPT_ALL;
+        eAccept = NoListener::AcceptAll;
     } else if (bIRC && !bWeb) {
-        eAccept = NoListener::ACCEPT_IRC;
+        eAccept = NoListener::AcceptIrc;
     } else if (!bIRC && bWeb) {
-        eAccept = NoListener::ACCEPT_HTTP;
+        eAccept = NoListener::AcceptHttp;
     } else {
         sError = "Either Web or IRC or both should be selected";
         NoUtils::PrintError(sError);

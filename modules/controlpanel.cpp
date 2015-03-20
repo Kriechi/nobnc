@@ -1226,7 +1226,7 @@ class NoAdminMod : public NoModule
             PutModule("Error: [" + sCTCPRequest + "] not found for user [" + pUser->GetUserName() + "]!");
     }
 
-    void LoadModuleFor(NoModules& Modules, const NoString& sModName, const NoString& sArgs, NoModInfo::EModuleType eType, NoUser* pUser, NoNetwork* pNetwork)
+    void LoadModuleFor(NoModules& Modules, const NoString& sModName, const NoString& sArgs, NoModInfo::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork)
     {
         if (pUser->DenyLoadMod() && !GetUser()->IsAdmin()) {
             PutModule("Loading modules has been disabled.");

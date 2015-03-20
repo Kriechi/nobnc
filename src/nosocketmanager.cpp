@@ -111,7 +111,7 @@ bool NoSocketManager::ListenHost(u_short iPort,
                 int iMaxConns,
                 NoSocket* pcSock,
                 u_int iTimeout,
-                EAddrType eAddr)
+                AddressType eAddr)
 {
     CSListener L(iPort, sBindHost);
 
@@ -122,13 +122,13 @@ bool NoSocketManager::ListenHost(u_short iPort,
 
 #ifdef HAVE_IPV6
     switch (eAddr) {
-    case ADDR_IPV4ONLY:
+    case Ipv4Address:
         L.SetAFRequire(CSSockAddr::RAF_INET);
         break;
-    case ADDR_IPV6ONLY:
+    case Ipv6Address:
         L.SetAFRequire(CSSockAddr::RAF_INET6);
         break;
-    case ADDR_ALL:
+    case Ipv4AndIpv6Address:
         L.SetAFRequire(CSSockAddr::RAF_ANY);
         break;
     }
@@ -143,7 +143,7 @@ bool NoSocketManager::ListenAll(u_short iPort,
                int iMaxConns,
                NoSocket* pcSock,
                u_int iTimeout,
-               EAddrType eAddr)
+               AddressType eAddr)
 {
     return ListenHost(iPort, sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
 }
@@ -154,7 +154,7 @@ u_short NoSocketManager::ListenRand(const NoString& sSockName,
                    int iMaxConns,
                    NoSocket* pcSock,
                    u_int iTimeout,
-                   EAddrType eAddr)
+                   AddressType eAddr)
 {
     ushort uPort = 0;
     CSListener L(0, sBindHost);
@@ -166,13 +166,13 @@ u_short NoSocketManager::ListenRand(const NoString& sSockName,
 
 #ifdef HAVE_IPV6
     switch (eAddr) {
-    case ADDR_IPV4ONLY:
+    case Ipv4Address:
         L.SetAFRequire(CSSockAddr::RAF_INET);
         break;
-    case ADDR_IPV6ONLY:
+    case Ipv6Address:
         L.SetAFRequire(CSSockAddr::RAF_INET6);
         break;
-    case ADDR_ALL:
+    case Ipv4AndIpv6Address:
         L.SetAFRequire(CSSockAddr::RAF_ANY);
         break;
     }
@@ -188,7 +188,7 @@ u_short NoSocketManager::ListenAllRand(const NoString& sSockName,
                       int iMaxConns,
                       NoSocket* pcSock,
                       u_int iTimeout,
-                      EAddrType eAddr)
+                      AddressType eAddr)
 {
     return ListenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
 }

@@ -72,7 +72,7 @@ NoString NoDir::ChangeDir(const NoString& sPath, const NoString& sAdd, const NoS
     return (sRet.empty()) ? "/" : sRet;
 }
 
-NoDir::NoDir(const NoString& sDir) : m_eSortAttr(NoFile::FA_Name), m_bDesc(false)
+NoDir::NoDir(const NoString& sDir) : m_eSortAttr(NoFile::Name), m_bDesc(false)
 {
     if (!sDir.empty())
         Fill(sDir);
@@ -158,7 +158,7 @@ uint NoDir::Delete()
     return uRet;
 }
 
-NoFile::EFileAttr NoDir::GetSortAttr() const { return m_eSortAttr; }
+NoFile::Attribute NoDir::GetSortAttr() const { return m_eSortAttr; }
 
 bool NoDir::IsDescending() const { return m_bDesc; }
 

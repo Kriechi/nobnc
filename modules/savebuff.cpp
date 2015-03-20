@@ -109,7 +109,7 @@ public:
             NoString sName;
             NoString sBuffer;
 
-            EBufferType eType = DecryptBuffer(pFile->GetLongName(), sBuffer, sName);
+            BufferType eType = DecryptBuffer(pFile->GetLongName(), sBuffer, sName);
             switch (eType) {
             case InvalidBuffer:
                 m_sPassword = "";
@@ -364,9 +364,9 @@ private:
     bool m_bBootError;
     NoString m_sPassword;
 
-    enum EBufferType { InvalidBuffer = 0, EmptyBuffer, ChanBuffer, QueryBuffer };
+    enum BufferType { InvalidBuffer = 0, EmptyBuffer, ChanBuffer, QueryBuffer };
 
-    EBufferType DecryptBuffer(const NoString& sPath, NoString& sBuffer, NoString& sName)
+    BufferType DecryptBuffer(const NoString& sPath, NoString& sBuffer, NoString& sName)
     {
         NoString sContent;
         sBuffer = "";

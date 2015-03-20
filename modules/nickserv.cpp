@@ -119,13 +119,13 @@ public:
         }
     }
 
-    EModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         HandleMessage(Nick, sMessage);
         return CONTINUE;
     }
 
-    EModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         HandleMessage(Nick, sMessage);
         return CONTINUE;

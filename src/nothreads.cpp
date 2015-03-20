@@ -50,10 +50,10 @@ void NoThreadPool::jobDone(NoJob* job)
 {
     // This must be called with the mutex locked!
 
-    enum NoJob::EJobState oldState = job->m_eState;
-    job->m_eState = NoJob::DONE;
+    enum NoJob::JobState oldState = job->m_eState;
+    job->m_eState = NoJob::Done;
 
-    if (oldState == NoJob::CANCELLED) {
+    if (oldState == NoJob::Cancelled) {
         // Signal the main thread that cancellation is done
         m_cancellationCond.signal();
         return;
@@ -125,7 +125,7 @@ void NoThreadPool::threadFunc()
 
         // Now do the actual job
         m_num_idle--;
-        job->m_eState = NoJob::RUNNING;
+        job->m_eState = NoJob::Running;
         guard.unlock();
 
         job->runThread();
@@ -195,8 +195,8 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
     // Start cancelling all jobs
     for (it = jobs.begin(); it != jobs.end(); ++it) {
         switch ((*it)->m_eState) {
-        case NoJob::READY: {
-            (*it)->m_eState = NoJob::CANCELLED;
+        case NoJob::Ready: {
+            (*it)->m_eState = NoJob::Cancelled;
 
             // Job wasn't started yet, must be in the queue
             std::list<NoJob*>::iterator it2 = std::find(m_jobs.begin(), m_jobs.end(), *it);
@@ -206,17 +206,17 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
             continue;
         }
 
-        case NoJob::RUNNING:
-            (*it)->m_eState = NoJob::CANCELLED;
+        case NoJob::Running:
+            (*it)->m_eState = NoJob::Cancelled;
             wait.insert(*it);
             continue;
 
-        case NoJob::DONE:
-            (*it)->m_eState = NoJob::CANCELLED;
+        case NoJob::Done:
+            (*it)->m_eState = NoJob::Cancelled;
             finished.insert(*it);
             continue;
 
-        case NoJob::CANCELLED:
+        case NoJob::Cancelled:
         default:
             assert(0);
         }
@@ -229,10 +229,10 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
     while (!wait.empty()) {
         it = wait.begin();
         while (it != wait.end()) {
-            if ((*it)->m_eState != NoJob::CANCELLED) {
-                assert((*it)->m_eState == NoJob::DONE);
+            if ((*it)->m_eState != NoJob::Cancelled) {
+                assert((*it)->m_eState == NoJob::Done);
                 // Re-set state for the destructor
-                (*it)->m_eState = NoJob::CANCELLED;
+                (*it)->m_eState = NoJob::Cancelled;
                 ;
                 deleteLater.insert(*it);
                 wait.erase(it++);
@@ -253,7 +253,7 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
     while (!finished.empty()) {
         NoJob* job = getJobFromPipe();
         if (finished.erase(job) > 0) {
-            assert(job->m_eState == NoJob::CANCELLED);
+            assert(job->m_eState == NoJob::Cancelled);
             delete job;
         } else
             finishJob(job);
@@ -269,7 +269,7 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
 bool NoJob::wasCancelled() const
 {
     NoMutexLocker guard(NoThreadPool::Get().m_mutex);
-    return m_eState == CANCELLED;
+    return m_eState == Cancelled;
 }
 
 #endif // HAVE_PTHREAD

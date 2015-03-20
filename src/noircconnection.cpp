@@ -1235,7 +1235,7 @@ void NoIrcConnection::ParseISupport(const NoString& sLine)
                     NoString sModes = sValue.Token(a, ",");
 
                     for (uint b = 0; b < sModes.size(); b++) {
-                        m_mueChanModes[sModes[b]] = (EChanModeArgs)a;
+                        m_mueChanModes[sModes[b]] = (ChanModeArgs)a;
                     }
                 }
             }
@@ -1373,7 +1373,7 @@ uchar NoIrcConnection::GetPermFromMode(uchar uMode) const
     return 0;
 }
 
-const std::map<uchar, NoIrcConnection::EChanModeArgs>&NoIrcConnection::GetChanModes() const { return m_mueChanModes; }
+const std::map<uchar, NoIrcConnection::ChanModeArgs>&NoIrcConnection::GetChanModes() const { return m_mueChanModes; }
 
 bool NoIrcConnection::IsPermChar(const char c) const { return (c != '\0' && GetPerms().find(c) != NoString::npos); }
 
@@ -1403,9 +1403,9 @@ bool NoIrcConnection::IsCapAccepted(const NoString& sCap) { return 1 == m_ssAcce
 
 const NoStringMap&NoIrcConnection::GetISupport() const { return m_mISupport; }
 
-NoIrcConnection::EChanModeArgs NoIrcConnection::GetModeType(uchar uMode) const
+NoIrcConnection::ChanModeArgs NoIrcConnection::GetModeType(uchar uMode) const
 {
-    std::map<uchar, EChanModeArgs>::const_iterator it = m_mueChanModes.find(uMode);
+    std::map<uchar, ChanModeArgs>::const_iterator it = m_mueChanModes.find(uMode);
 
     if (it == m_mueChanModes.end()) {
         return NoArg;
