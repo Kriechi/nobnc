@@ -21,7 +21,7 @@
  * @brief SASL authentication module for znc.
  */
 
-#define REQUIRECYRUS
+#define REQUIRESASL
 
 #include <no/nomodule.h>
 #include <no/noapp.h>
