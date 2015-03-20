@@ -467,9 +467,9 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
 
                 if (!ssNV.first.empty()) {
                     if (!ssNV.second.empty()) {
-                        sParams += No::Escape_n(ssNV.first, No::UrlFormat);
+                        sParams += No::escape(ssNV.first, No::UrlFormat);
                         sParams += "=";
-                        sParams += No::Escape_n(ssNV.second, No::UrlFormat);
+                        sParams += No::escape(ssNV.second, No::UrlFormat);
                     }
 
                     if (bActive && GetParam(ssNV.first, false) != ssNV.second) {

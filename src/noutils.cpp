@@ -541,7 +541,7 @@ NoStringMap NoUtils::GetMessageTags(const NoString& sLine)
             if (eq != NoString::npos) {
                 NoString sKey = sTag.substr(0, eq);
                 NoString sValue = sTag.substr(eq + 1);
-                mssTags[sKey] = No::Escape_n(sValue, No::MsgTagFormat, No::AsciiFormat);
+                mssTags[sKey] = No::escape(sValue, No::MsgTagFormat, No::AsciiFormat);
             } else {
                 mssTags[sTag] = "";
             }
@@ -564,7 +564,7 @@ void NoUtils::SetMessageTags(NoString& sLine, const NoStringMap& mssTags)
                 sTags += ";";
             }
             sTags += it.first;
-            if (!it.second.empty()) sTags += "=" + No::Escape_n(it.second, No::MsgTagFormat);
+            if (!it.second.empty()) sTags += "=" + No::escape(it.second, No::MsgTagFormat);
         }
         sLine = "@" + sTags + " " + sLine;
     }

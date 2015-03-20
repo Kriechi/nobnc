@@ -193,7 +193,7 @@ NoString NoSocket::GetSSLPeerFingerprint() const
         NO_DEBUG(GetSockName() + ": GetSSLPeerFingerprint: Couldn't find digest");
         return "";
     }
-    return No::Escape_n(NoString(reinterpret_cast<const char*>(buf), sizeof buf), No::AsciiFormat, No::HexColonFormat);
+    return No::escape(NoString(reinterpret_cast<const char*>(buf), sizeof buf), No::AsciiFormat, No::HexColonFormat);
 #else
     return "";
 #endif

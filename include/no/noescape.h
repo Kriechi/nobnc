@@ -20,7 +20,7 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 
-#define _NAMEDFMT(s) No::Escape_n(s, No::NamedFormat)
+#define _NAMEDFMT(str) No::escape(str, No::NamedFormat)
 
 namespace No
 {
@@ -35,8 +35,8 @@ namespace No
         HexColonFormat
     };
 
-    NO_EXPORT NoString Escape_n(const NoString& str, No::EscapeFormat eTo);
-    NO_EXPORT NoString Escape_n(const NoString& str, No::EscapeFormat eFrom, No::EscapeFormat eTo);
+    NO_EXPORT NoString escape(const NoString& str, No::EscapeFormat to);
+    NO_EXPORT NoString escape(const NoString& str, No::EscapeFormat from, No::EscapeFormat to);
 }
 
 #endif // NOESCAPE_H

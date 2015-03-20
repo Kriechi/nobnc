@@ -18,363 +18,327 @@
 
 namespace No {
 
-static uchar* strnchr(const uchar* src, uchar c, uint iMaxBytes, uchar* pFill, uint* piCount)
+static uchar* strnchr(const uchar* src, uchar c, uint max, uchar* fill, uint* count)
 {
-    for (uint a = 0; a < iMaxBytes && *src; a++, src++) {
-        if (pFill) {
-            pFill[a] = *src;
-        }
+    for (uint a = 0; a < max && *src; a++, src++) {
+        if (fill)
+            fill[a] = *src;
 
         if (*src == c) {
-            if (pFill) {
-                pFill[a + 1] = 0;
-            }
-
-            if (piCount) {
-                *piCount = a;
-            }
-
+            if (fill)
+                fill[a + 1] = 0;
+            if (count)
+                *count = a;
             return (uchar*)src;
         }
     }
 
-    if (pFill) {
-        *pFill = 0;
-    }
-
-    if (piCount) {
-        *piCount = 0;
-    }
-
+    if (fill)
+        *fill = 0;
+    if (count)
+        *count = 0;
     return nullptr;
 }
 
-NoString Escape_n(const NoString& str, No::EscapeFormat eTo)
+NoString escape(const NoString& str, No::EscapeFormat to)
 {
-    return Escape_n(str, No::AsciiFormat, eTo);
+    return escape(str, No::AsciiFormat, to);
 }
 
-NoString Escape_n(const NoString& str, No::EscapeFormat eFrom, No::EscapeFormat eTo)
+NoString escape(const NoString& str, No::EscapeFormat from, No::EscapeFormat to)
 {
-    NoString sRet;
-    const char szHex[] = "0123456789ABCDEF";
-    const uchar* pStart = (const uchar*)str.data();
+    NoString ret;
+    const char hex[] = "0123456789ABCDEF";
+    const uchar* start = (const uchar*)str.data();
     const uchar* p = (const uchar*)str.data();
-    NoString::size_type iLength = str.length();
-    sRet.reserve(iLength * 3);
-    uchar pTmp[21];
-    uint iCounted = 0;
+    ulong len = str.length();
+    ret.reserve(len * 3);
+    uchar tmp[21];
+    uint counted = 0;
 
-    for (uint a = 0; a < iLength; a++, p = pStart + a) {
+    for (uint a = 0; a < len; a++, p = start + a) {
         uchar ch = 0;
 
-        switch (eFrom) {
+        switch (from) {
         case No::HtmlFormat:
-            if ((*p == '&') && (strnchr((uchar*)p, ';', sizeof(pTmp) - 1, pTmp, &iCounted))) {
+            if ((*p == '&') && (strnchr((uchar*)p, ';', sizeof(tmp) - 1, tmp, &counted))) {
                 // please note that we do not have any Unicode or UTF-8 support here at all.
 
-                if ((iCounted >= 3) && (pTmp[1] == '#')) { // do XML and HTML &#97; &#x3c
+                if ((counted >= 3) && (tmp[1] == '#')) { // do XML and HTML &#97; &#x3c
                     int base = 10;
 
-                    if ((pTmp[2] & 0xDF) == 'X') {
+                    if ((tmp[2] & 0xDF) == 'X')
                         base = 16;
-                    }
 
                     char* endptr = nullptr;
-                    ulong b = strtol((const char*)(pTmp + 2 + (base == 16)), &endptr, base);
+                    ulong b = strtol((const char*)(tmp + 2 + (base == 16)), &endptr, base);
 
                     if ((*endptr == ';') && (b <= 255)) { // incase they do something like &#7777777777;
                         ch = (uchar)b;
-                        a += iCounted;
+                        a += counted;
                         break;
                     }
                 }
 
                 if (ch == 0) {
-                    if (!strncasecmp((const char*)&pTmp, "&lt;", 2))
+                    if (!strncasecmp((const char*)&tmp, "&lt;", 2))
                         ch = '<';
-                    else if (!strncasecmp((const char*)&pTmp, "&gt;", 2))
+                    else if (!strncasecmp((const char*)&tmp, "&gt;", 2))
                         ch = '>';
-                    else if (!strncasecmp((const char*)&pTmp, "&quot;", 4))
+                    else if (!strncasecmp((const char*)&tmp, "&quot;", 4))
                         ch = '"';
-                    else if (!strncasecmp((const char*)&pTmp, "&amp;", 3))
+                    else if (!strncasecmp((const char*)&tmp, "&amp;", 3))
                         ch = '&';
                 }
 
-                if (ch > 0) {
-                    a += iCounted;
-                } else {
+                if (ch > 0)
+                    a += counted;
+                else
                     ch = *p; // Not a valid escape, just record the &
-                }
             } else {
                 ch = *p;
             }
             break;
+
         case No::AsciiFormat:
             ch = *p;
             break;
+
         case No::UrlFormat:
-            if (*p == '%' && (a + 2) < iLength && isxdigit(*(p + 1)) && isxdigit(*(p + 2))) {
+            if (*p == '%' && (a + 2) < len && isxdigit(*(p + 1)) && isxdigit(*(p + 2))) {
                 p++;
-                if (isdigit(*p)) {
+                if (isdigit(*p))
                     ch = (uchar)((*p - '0') << 4);
-                } else {
+                else
                     ch = (uchar)((tolower(*p) - 'a' + 10) << 4);
-                }
 
                 p++;
-                if (isdigit(*p)) {
+                if (isdigit(*p))
                     ch |= (uchar)(*p - '0');
-                } else {
+                else
                     ch |= (uchar)(tolower(*p) - 'a' + 10);
-                }
 
                 a += 2;
-            } else if (pStart[a] == '+') {
+            } else if (start[a] == '+') {
                 ch = ' ';
             } else {
                 ch = *p;
             }
-
             break;
+
         case No::SqlFormat:
-            if (*p != '\\' || iLength < (a + 1)) {
+            if (*p != '\\' || len < (a + 1)) {
                 ch = *p;
             } else {
                 a++;
                 p++;
 
-                if (*p == 'n') {
+                if (*p == 'n')
                     ch = '\n';
-                } else if (*p == 'r') {
+                else if (*p == 'r')
                     ch = '\r';
-                } else if (*p == '0') {
+                else if (*p == '0')
                     ch = '\0';
-                } else if (*p == 't') {
+                else if (*p == 't')
                     ch = '\t';
-                } else if (*p == 'b') {
+                else if (*p == 'b')
                     ch = '\b';
-                } else {
+                else
                     ch = *p;
-                }
             }
-
             break;
+
         case No::NamedFormat:
-            if (*p != '\\' || iLength < (a + 1)) {
+            if (*p != '\\' || len < (a + 1)) {
                 ch = *p;
             } else {
                 a++;
                 p++;
                 ch = *p;
             }
-
             break;
+
         case No::DebugFormat:
-            if (*p == '\\' && (a + 3) < iLength && *(p + 1) == 'x' && isxdigit(*(p + 2)) && isxdigit(*(p + 3))) {
+            if (*p == '\\' && (a + 3) < len && *(p + 1) == 'x' && isxdigit(*(p + 2)) && isxdigit(*(p + 3))) {
                 p += 2;
-                if (isdigit(*p)) {
+                if (isdigit(*p))
                     ch = (uchar)((*p - '0') << 4);
-                } else {
+                else
                     ch = (uchar)((tolower(*p) - 'a' + 10) << 4);
-                }
 
                 p++;
-                if (isdigit(*p)) {
+                if (isdigit(*p))
                     ch |= (uchar)(*p - '0');
-                } else {
+                else
                     ch |= (uchar)(tolower(*p) - 'a' + 10);
-                }
 
                 a += 3;
-            } else if (*p == '\\' && a + 1 < iLength && *(p + 1) == '.') {
+            } else if (*p == '\\' && a + 1 < len && *(p + 1) == '.') {
                 a++;
                 p++;
                 ch = '\\';
             } else {
                 ch = *p;
             }
-
             break;
+
         case No::MsgTagFormat:
-            if (*p != '\\' || iLength < (a + 1)) {
+            if (*p != '\\' || len < (a + 1)) {
                 ch = *p;
             } else {
                 a++;
                 p++;
 
-                if (*p == ':') {
+                if (*p == ':')
                     ch = ';';
-                } else if (*p == 's') {
+                else if (*p == 's')
                     ch = ' ';
-                } else if (*p == '0') {
+                else if (*p == '0')
                     ch = '\0';
-                } else if (*p == '\\') {
+                else if (*p == '\\')
                     ch = '\\';
-                } else if (*p == 'r') {
+                else if (*p == 'r')
                     ch = '\r';
-                } else if (*p == 'n') {
+                else if (*p == 'n')
                     ch = '\n';
-                } else {
+                else
                     ch = *p;
-                }
             }
-
             break;
-        case No::HexColonFormat: {
-            while (!isxdigit(*p) && a < iLength) {
+
+        case No::HexColonFormat:
+            while (!isxdigit(*p) && a < len) {
                 a++;
                 p++;
             }
-            if (a == iLength) {
+            if (a == len)
                 continue;
-            }
-            if (isdigit(*p)) {
+
+            if (isdigit(*p))
                 ch = (uchar)((*p - '0') << 4);
-            } else {
+            else
                 ch = (uchar)((tolower(*p) - 'a' + 10) << 4);
-            }
+
             a++;
             p++;
-            while (!isxdigit(*p) && a < iLength) {
+            while (!isxdigit(*p) && a < len) {
                 a++;
                 p++;
             }
-            if (a == iLength) {
+            if (a == len)
                 continue;
-            }
-            if (isdigit(*p)) {
+
+            if (isdigit(*p))
                 ch |= (uchar)(*p - '0');
-            } else {
+            else
                 ch |= (uchar)(tolower(*p) - 'a' + 10);
-            }
-        } break;
+            break;
         }
 
-        switch (eTo) {
+        switch (to) {
         case No::HtmlFormat:
             if (ch == '<')
-                sRet += "&lt;";
+                ret += "&lt;";
             else if (ch == '>')
-                sRet += "&gt;";
+                ret += "&gt;";
             else if (ch == '"')
-                sRet += "&quot;";
+                ret += "&quot;";
             else if (ch == '&')
-                sRet += "&amp;";
+                ret += "&amp;";
             else {
-                sRet += ch;
+                ret += ch;
             }
+            break;
 
-            break;
         case No::AsciiFormat:
-            sRet += ch;
+            ret += ch;
             break;
+
         case No::UrlFormat:
             if (isalnum(ch) || ch == '_' || ch == '.' || ch == '-') {
-                sRet += ch;
+                ret += ch;
             } else if (ch == ' ') {
-                sRet += '+';
+                ret += '+';
             } else {
-                sRet += '%';
-                sRet += szHex[ch >> 4];
-                sRet += szHex[ch & 0xf];
+                ret += '%';
+                ret += hex[ch >> 4];
+                ret += hex[ch & 0xf];
             }
-
             break;
+
         case No::SqlFormat:
-            if (ch == '\0') {
-                sRet += '\\';
-                sRet += '0';
-            } else if (ch == '\n') {
-                sRet += '\\';
-                sRet += 'n';
-            } else if (ch == '\t') {
-                sRet += '\\';
-                sRet += 't';
-            } else if (ch == '\r') {
-                sRet += '\\';
-                sRet += 'r';
-            } else if (ch == '\b') {
-                sRet += '\\';
-                sRet += 'b';
-            } else if (ch == '\"') {
-                sRet += '\\';
-                sRet += '\"';
-            } else if (ch == '\'') {
-                sRet += '\\';
-                sRet += '\'';
-            } else if (ch == '\\') {
-                sRet += '\\';
-                sRet += '\\';
-            } else {
-                sRet += ch;
-            }
-
+            if (ch == '\0')
+                ret += "\\0";
+            else if (ch == '\n')
+                ret += "\\n";
+            else if (ch == '\t')
+                ret += "\\t";
+            else if (ch == '\r')
+                ret += "\\r";
+            else if (ch == '\b')
+                ret += "\\b";
+            else if (ch == '\"')
+                ret += "\\\"";
+            else if (ch == '\'')
+                ret += "\\\'";
+            else if (ch == '\\')
+                ret += "\\\\";
+            else
+                ret += ch;
             break;
+
         case No::NamedFormat:
-            if (ch == '\\') {
-                sRet += '\\';
-                sRet += '\\';
-            } else if (ch == '{') {
-                sRet += '\\';
-                sRet += '{';
-            } else if (ch == '}') {
-                sRet += '\\';
-                sRet += '}';
-            } else {
-                sRet += ch;
-            }
-
+            if (ch == '\\')
+                ret += "\\\\";
+            else if (ch == '{')
+                ret += "\\{";
+            else if (ch == '}')
+                ret += "\\}";
+            else
+                ret += ch;
             break;
+
         case No::DebugFormat:
             if (ch < 0x20 || ch == 0x7F) {
-                sRet += "\\x";
-                sRet += szHex[ch >> 4];
-                sRet += szHex[ch & 0xf];
+                ret += "\\x";
+                ret += hex[ch >> 4];
+                ret += hex[ch & 0xf];
             } else if (ch == '\\') {
-                sRet += "\\.";
+                ret += "\\.";
             } else {
-                sRet += ch;
+                ret += ch;
             }
-
             break;
+
         case No::MsgTagFormat:
-            if (ch == ';') {
-                sRet += '\\';
-                sRet += ':';
-            } else if (ch == ' ') {
-                sRet += '\\';
-                sRet += 's';
-            } else if (ch == '\0') {
-                sRet += '\\';
-                sRet += '0';
-            } else if (ch == '\\') {
-                sRet += '\\';
-                sRet += '\\';
-            } else if (ch == '\r') {
-                sRet += '\\';
-                sRet += 'r';
-            } else if (ch == '\n') {
-                sRet += '\\';
-                sRet += 'n';
-            } else {
-                sRet += ch;
-            }
-
+            if (ch == ';')
+                ret += "\\:";
+            else if (ch == ' ')
+                ret += "\\s";
+            else if (ch == '\0')
+                ret += "\\0";
+            else if (ch == '\\')
+                ret += "\\\\";
+            else if (ch == '\r')
+                ret += "\\r";
+            else if (ch == '\n')
+                ret += "\\n";
+            else
+                ret += ch;
             break;
-        case No::HexColonFormat: {
-            sRet += tolower(szHex[ch >> 4]);
-            sRet += tolower(szHex[ch & 0xf]);
-            sRet += ":";
-        } break;
+
+        case No::HexColonFormat:
+            ret += tolower(hex[ch >> 4]);
+            ret += tolower(hex[ch & 0xf]);
+            ret += ":";
+            break;
         }
     }
 
-    if (eTo == No::HexColonFormat) {
-        sRet.TrimRight(":");
-    }
+    if (to == No::HexColonFormat)
+        ret.TrimRight(":");
 
-    return sRet;
+    return ret;
 }
 
 }

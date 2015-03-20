@@ -1147,11 +1147,11 @@ void NoIrcConnection::SockErrorImpl(int iErrno, const NoString& sDescription)
                 NoStringVector vsCert = sCert.Split("\n");
                 for (const NoString& s : vsCert) {
                     // It shouldn't contain any bad characters, but let's be safe...
-                    m_pNetwork->PutStatus("|" + No::Escape_n(s, No::DebugFormat));
+                    m_pNetwork->PutStatus("|" + No::escape(s, No::DebugFormat));
                 }
                 NoString sSHA1;
                 if (GetPeerFingerprint(sSHA1))
-                    m_pNetwork->PutStatus("SHA1: " + No::Escape_n(sSHA1, No::HexColonFormat, No::HexColonFormat));
+                    m_pNetwork->PutStatus("SHA1: " + No::escape(sSHA1, No::HexColonFormat, No::HexColonFormat));
                 NoString sSHA256 = GetSSLPeerFingerprint();
                 m_pNetwork->PutStatus("SHA-256: " + sSHA256);
                 m_pNetwork->PutStatus("If you trust this certificate, do /znc AddTrustedServerFingerprint " + sSHA256);

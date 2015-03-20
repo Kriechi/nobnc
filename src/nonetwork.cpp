@@ -1144,7 +1144,7 @@ bool NoNetwork::IsLastServer() const { return (m_uServerIdx >= m_vServers.size()
 NoStringSet NoNetwork::GetTrustedFingerprints() const { return m_ssTrustedFingerprints; }
 void NoNetwork::AddTrustedFingerprint(const NoString& sFP)
 {
-    m_ssTrustedFingerprints.insert(No::Escape_n(sFP, No::HexColonFormat, No::HexColonFormat));
+    m_ssTrustedFingerprints.insert(No::escape(sFP, No::HexColonFormat, No::HexColonFormat));
 }
 void NoNetwork::DelTrustedFingerprint(const NoString& sFP) { m_ssTrustedFingerprints.erase(sFP); }
 
