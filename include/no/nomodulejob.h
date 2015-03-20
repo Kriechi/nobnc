@@ -19,7 +19,7 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <no/nothreads.h>
+#include <no/nojob.h>
 
 #ifdef HAVE_PTHREAD
 

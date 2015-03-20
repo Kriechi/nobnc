@@ -23,6 +23,7 @@
 #include "noclient.h"
 #include "noapp.h"
 #include "nomodulejob.h"
+#include "nothreadpool.h"
 #include <dlfcn.h>
 
 NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)

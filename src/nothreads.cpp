@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-#include "nothreads.h"
+#include "nothread.h"
+#include "nothreadpool.h"
+#include "nomutex.h"
+#include "nomutexlocker.h"
+#include "noconditionvariable.h"
+#include "nojob.h"
 
 #ifdef HAVE_PTHREAD
 

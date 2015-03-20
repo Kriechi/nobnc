@@ -35,6 +35,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nocachemap.h
                        include/no/nochannel.h
                        include/no/noclient.h
+                       include/no/noconditionvariable.h
                        include/no/nodebug.h
                        include/no/nodir.h
                        include/no/noescape.h
@@ -43,6 +44,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nohttpsocket.h
                        include/no/noircconnection.h
                        include/no/noircsocket.h
+                       include/no/nojob.h
                        include/no/nolistener.h
                        include/no/nonamespace.h
                        include/no/nomessage.h
@@ -53,6 +55,8 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nomodulejob.h
                        include/no/nomodules.h
                        include/no/nomodulesocket.h
+                       include/no/nomutex.h
+                       include/no/nomutexlocker.h
                        include/no/nonetwork.h
                        include/no/nonick.h
                        include/no/noprocess.h
@@ -65,7 +69,8 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nostring.h
                        include/no/notable.h
                        include/no/notemplate.h
-                       include/no/nothreads.h
+                       include/no/nothread.h
+                       include/no/nothreadpool.h
                        include/no/notimer.h
                        include/no/nouser.h
                        include/no/noutils.h

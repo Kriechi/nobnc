@@ -24,7 +24,7 @@
 #include <sys/types.h>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)
-#include "nothreads.h"
+#include "nomutex.h"
 #include <openssl/crypto.h>
 #include <memory>
 
