@@ -428,7 +428,7 @@ NoModule::ModRet NoLogMod::OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString&
     return CONTINUE;
 }
 
-template <> void no_moduleInfo<NoLogMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoLogMod>(NoModuleInfo& Info)
 {
     Info.AddType(No::NetworkModule);
     Info.AddType(No::GlobalModule);

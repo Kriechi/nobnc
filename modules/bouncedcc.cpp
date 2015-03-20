@@ -529,6 +529,6 @@ ushort NoDccBounce::DCCRequest(const NoString& sNick,
     return uListenPort;
 }
 
-template <> void no_moduleInfo<NoBounceDccMod>(NoModInfo& Info) { Info.SetWikiPage("bouncedcc"); }
+template <> void no_moduleInfo<NoBounceDccMod>(NoModuleInfo& Info) { Info.SetWikiPage("bouncedcc"); }
 
 USERMODULEDEFS(NoBounceDccMod, "Bounces DCC transfers through ZNC instead of sending them directly to the user. ")

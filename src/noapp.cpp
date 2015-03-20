@@ -776,10 +776,10 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     vsLines.push_back("</Listener>");
     // !Listen
 
-    std::set<NoModInfo> ssGlobalMods;
+    std::set<NoModuleInfo> ssGlobalMods;
     GetModules().GetDefaultMods(ssGlobalMods, No::GlobalModule);
     std::vector<NoString> vsGlobalModNames;
-    for (const NoModInfo& Info : ssGlobalMods) {
+    for (const NoModuleInfo& Info : ssGlobalMods) {
         vsGlobalModNames.push_back(Info.GetName());
         vsLines.push_back("LoadModule = " + Info.GetName());
     }
@@ -818,10 +818,10 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         vsLines.push_back("\tBindHost   = " + sAnswer);
     }
 
-    std::set<NoModInfo> ssUserMods;
+    std::set<NoModuleInfo> ssUserMods;
     GetModules().GetDefaultMods(ssUserMods, No::UserModule);
     std::vector<NoString> vsUserModNames;
-    for (const NoModInfo& Info : ssUserMods) {
+    for (const NoModuleInfo& Info : ssUserMods) {
         vsUserModNames.push_back(Info.GetName());
         vsLines.push_back("\tLoadModule = " + Info.GetName());
     }
@@ -841,10 +841,10 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
         vsLines.push_back("\t<Network " + sNetwork + ">");
 
-        std::set<NoModInfo> ssNetworkMods;
+        std::set<NoModuleInfo> ssNetworkMods;
         GetModules().GetDefaultMods(ssNetworkMods, No::NetworkModule);
         std::vector<NoString> vsNetworkModNames;
-        for (const NoModInfo& Info : ssNetworkMods) {
+        for (const NoModuleInfo& Info : ssNetworkMods) {
             vsNetworkModNames.push_back(Info.GetName());
             vsLines.push_back("\t\tLoadModule = " + Info.GetName());
         }

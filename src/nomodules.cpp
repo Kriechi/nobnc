@@ -440,12 +440,12 @@ bool NoModules::OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& s
     MODHALTCHK(OnModuleUnloading(pModule, bSuccess, sRetMsg));
 }
 
-bool NoModules::OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg)
+bool NoModules::OnGetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg)
 {
     MODHALTCHK(OnGetModInfo(ModInfo, sModule, bSuccess, sRetMsg));
 }
 
-bool NoModules::OnGetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType)
+bool NoModules::OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType)
 {
     MODUNLOADCHK(OnGetAvailableMods(ssMods, eType));
     return false;
@@ -479,7 +479,7 @@ bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, No::M
 
     NoString sModPath, sDataPath;
     bool bVersionMismatch;
-    NoModInfo Info;
+    NoModuleInfo Info;
 
     if (!FindModPath(sModule, sModPath, sDataPath)) {
         sRetMsg = "Unable to find module [" + sModule + "]";
@@ -499,7 +499,7 @@ bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, No::M
     if (!Info.SupportsType(eType)) {
         dlclose(p);
         sRetMsg =
-        "Module [" + sModule + "] does not support module type [" + NoModInfo::ModuleTypeToString(eType) + "].";
+        "Module [" + sModule + "] does not support module type [" + NoModuleInfo::ModuleTypeToString(eType) + "].";
         return false;
     }
 
@@ -615,7 +615,7 @@ bool NoModules::ReloadModule(const NoString& sModule, const NoString& sArgs, NoU
     return true;
 }
 
-bool NoModules::GetModInfo(NoModInfo& ModInfo, const NoString& sModule, NoString& sRetMsg)
+bool NoModules::GetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, NoString& sRetMsg)
 {
     NoString sModPath, sTmp;
 
@@ -632,7 +632,7 @@ bool NoModules::GetModInfo(NoModInfo& ModInfo, const NoString& sModule, NoString
     return GetModPathInfo(ModInfo, sModule, sModPath, sRetMsg);
 }
 
-bool NoModules::GetModPathInfo(NoModInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg)
+bool NoModules::GetModPathInfo(NoModuleInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg)
 {
     bool bVersionMismatch;
 
@@ -652,7 +652,7 @@ bool NoModules::GetModPathInfo(NoModInfo& ModInfo, const NoString& sModule, cons
     return true;
 }
 
-void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType)
+void NoModules::GetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType)
 {
     ssMods.clear();
 
@@ -669,7 +669,7 @@ void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eTy
             NoFile& File = *Dir[a];
             NoString sName = File.GetShortName();
             NoString sPath = File.GetLongName();
-            NoModInfo ModInfo;
+            NoModuleInfo ModInfo;
             sName.rightChomp(3);
 
             NoString sIgnoreRetMsg;
@@ -684,7 +684,7 @@ void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eTy
     GLOBALMODULECALL(OnGetAvailableMods(ssMods, eType), NOTHING);
 }
 
-void NoModules::GetDefaultMods(std::set<NoModInfo>& ssMods, No::ModuleType eType)
+void NoModules::GetDefaultMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType)
 {
 
     GetAvailableMods(ssMods, eType);
@@ -742,7 +742,7 @@ NoModules::ModDirList NoModules::GetModDirs()
     return ret;
 }
 
-ModHandle NoModules::OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModInfo& Info, NoString& sRetMsg)
+ModHandle NoModules::OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg)
 {
     // Some sane defaults in case anything errors out below
     bVersionMismatch = false;
@@ -779,7 +779,7 @@ ModHandle NoModules::OpenModule(const NoString& sModule, const NoString& sModPat
         return nullptr;
     }
 
-    typedef bool (*InfoFP)(double, NoModInfo&);
+    typedef bool (*InfoFP)(double, NoModuleInfo&);
     InfoFP no_moduleInfo = (InfoFP)dlsym(p, "no_moduleInfo");
 
     if (!no_moduleInfo) {

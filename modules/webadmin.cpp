@@ -799,10 +799,10 @@ public:
         if (!WebSock.GetParam("submitted").toUInt()) {
             Tmpl["Username"] = pUser->GetUserName();
 
-            std::set<NoModInfo> ssNetworkMods;
+            std::set<NoModuleInfo> ssNetworkMods;
             NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, No::NetworkModule);
-            for (std::set<NoModInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
-                const NoModInfo& Info = *it;
+            for (std::set<NoModuleInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
+                const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
                 l["Name"] = Info.GetName();
@@ -1370,11 +1370,11 @@ public:
                 }
             }
 
-            std::set<NoModInfo> ssUserMods;
+            std::set<NoModuleInfo> ssUserMods;
             NoApp::Get().GetModules().GetAvailableMods(ssUserMods);
 
-            for (std::set<NoModInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
-                const NoModInfo& Info = *it;
+            for (std::set<NoModuleInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
+                const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
                 l["Name"] = Info.GetName();
@@ -1825,11 +1825,11 @@ public:
                 }
             }
 
-            std::set<NoModInfo> ssGlobalMods;
+            std::set<NoModuleInfo> ssGlobalMods;
             NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
 
-            for (std::set<NoModInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
-                const NoModInfo& Info = *it;
+            for (std::set<NoModuleInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
+                const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
                 NoModule* pModule = NoApp::Get().GetModules().FindModule(Info.GetName());
@@ -1970,7 +1970,7 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoWebAdminMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoWebAdminMod>(NoModuleInfo& Info)
 {
     Info.AddType(No::UserModule);
     Info.SetWikiPage("webadmin");

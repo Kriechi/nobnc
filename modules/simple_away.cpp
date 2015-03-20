@@ -220,7 +220,7 @@ private:
 
 void NoSimpleAwayJob::RunJob() { ((NoSimpleAway*)module())->SetAway(false); }
 
-template <> void no_moduleInfo<NoSimpleAway>(NoModInfo& Info)
+template <> void no_moduleInfo<NoSimpleAway>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("simple_away");
     Info.SetHasArgs(true);

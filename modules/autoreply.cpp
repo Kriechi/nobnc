@@ -94,7 +94,7 @@ private:
     NoCacheMap<NoString> m_Messaged;
 };
 
-template <> void no_moduleInfo<NoAutoReplyMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoAutoReplyMod>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("autoreply");
     Info.AddType(No::NetworkModule);

@@ -16,21 +16,21 @@
 
 #include "nomoduleinfo.h"
 
-NoModInfo::NoModInfo() : NoModInfo("", "", No::NetworkModule) {}
+NoModuleInfo::NoModuleInfo() : NoModuleInfo("", "", No::NetworkModule) {}
 
-NoModInfo::NoModInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType)
+NoModuleInfo::NoModuleInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType)
     : m_seType(), m_eDefaultType(eType), m_sName(sName), m_sPath(sPath), m_sDescription(""), m_sWikiPage(""),
       m_sArgsHelpText(""), m_bHasArgs(false), m_fLoader(nullptr)
 {
 }
 
-bool NoModInfo::operator<(const NoModInfo& Info) const { return (GetName() < Info.GetName()); }
+bool NoModuleInfo::operator<(const NoModuleInfo& Info) const { return (GetName() < Info.GetName()); }
 
-bool NoModInfo::SupportsType(No::ModuleType eType) const { return m_seType.find(eType) != m_seType.end(); }
+bool NoModuleInfo::SupportsType(No::ModuleType eType) const { return m_seType.find(eType) != m_seType.end(); }
 
-void NoModInfo::AddType(No::ModuleType eType) { m_seType.insert(eType); }
+void NoModuleInfo::AddType(No::ModuleType eType) { m_seType.insert(eType); }
 
-NoString NoModInfo::ModuleTypeToString(No::ModuleType eType)
+NoString NoModuleInfo::ModuleTypeToString(No::ModuleType eType)
 {
     switch (eType) {
     case No::GlobalModule:
@@ -44,34 +44,34 @@ NoString NoModInfo::ModuleTypeToString(No::ModuleType eType)
     }
 }
 
-const NoString& NoModInfo::GetName() const { return m_sName; }
+const NoString& NoModuleInfo::GetName() const { return m_sName; }
 
-const NoString& NoModInfo::GetPath() const { return m_sPath; }
+const NoString& NoModuleInfo::GetPath() const { return m_sPath; }
 
-const NoString& NoModInfo::GetDescription() const { return m_sDescription; }
+const NoString& NoModuleInfo::GetDescription() const { return m_sDescription; }
 
-const NoString& NoModInfo::GetWikiPage() const { return m_sWikiPage; }
+const NoString& NoModuleInfo::GetWikiPage() const { return m_sWikiPage; }
 
-const NoString& NoModInfo::GetArgsHelpText() const { return m_sArgsHelpText; }
+const NoString& NoModuleInfo::GetArgsHelpText() const { return m_sArgsHelpText; }
 
-bool NoModInfo::GetHasArgs() const { return m_bHasArgs; }
+bool NoModuleInfo::GetHasArgs() const { return m_bHasArgs; }
 
-NoModInfo::ModLoader NoModInfo::GetLoader() const { return m_fLoader; }
+NoModuleInfo::ModLoader NoModuleInfo::GetLoader() const { return m_fLoader; }
 
-No::ModuleType NoModInfo::GetDefaultType() const { return m_eDefaultType; }
+No::ModuleType NoModuleInfo::GetDefaultType() const { return m_eDefaultType; }
 
-void NoModInfo::SetName(const NoString& s) { m_sName = s; }
+void NoModuleInfo::SetName(const NoString& s) { m_sName = s; }
 
-void NoModInfo::SetPath(const NoString& s) { m_sPath = s; }
+void NoModuleInfo::SetPath(const NoString& s) { m_sPath = s; }
 
-void NoModInfo::SetDescription(const NoString& s) { m_sDescription = s; }
+void NoModuleInfo::SetDescription(const NoString& s) { m_sDescription = s; }
 
-void NoModInfo::SetWikiPage(const NoString& s) { m_sWikiPage = s; }
+void NoModuleInfo::SetWikiPage(const NoString& s) { m_sWikiPage = s; }
 
-void NoModInfo::SetArgsHelpText(const NoString& s) { m_sArgsHelpText = s; }
+void NoModuleInfo::SetArgsHelpText(const NoString& s) { m_sArgsHelpText = s; }
 
-void NoModInfo::SetHasArgs(bool b) { m_bHasArgs = b; }
+void NoModuleInfo::SetHasArgs(bool b) { m_bHasArgs = b; }
 
-void NoModInfo::SetLoader(NoModInfo::ModLoader fLoader) { m_fLoader = fLoader; }
+void NoModuleInfo::SetLoader(NoModuleInfo::ModLoader fLoader) { m_fLoader = fLoader; }
 
-void NoModInfo::SetDefaultType(No::ModuleType eType) { m_eDefaultType = eType; }
+void NoModuleInfo::SetDefaultType(No::ModuleType eType) { m_eDefaultType = eType; }

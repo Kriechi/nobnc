@@ -108,6 +108,6 @@ private:
     NoStringVector m_ISONRequests;
 };
 
-template <> void no_moduleInfo<NoFakeOnlineModule>(NoModInfo& Info) { Info.SetWikiPage("modules_online"); }
+template <> void no_moduleInfo<NoFakeOnlineModule>(NoModuleInfo& Info) { Info.SetWikiPage("modules_online"); }
 
 NETWORKMODULEDEFS(NoFakeOnlineModule, "Make ZNC's *modules to be \"online\".")

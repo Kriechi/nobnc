@@ -36,7 +36,7 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoRawMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoRawMod>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("raw");
     Info.AddType(No::UserModule);

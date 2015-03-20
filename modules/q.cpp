@@ -629,7 +629,7 @@ private:
     }
 };
 
-template <> void no_moduleInfo<NoQModule>(NoModInfo& Info)
+template <> void no_moduleInfo<NoQModule>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("Q");
     Info.SetHasArgs(true);

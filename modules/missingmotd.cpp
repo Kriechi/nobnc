@@ -24,7 +24,7 @@ public:
     void OnClientLogin() override { PutUser(":irc.znc.in 422 :MOTD File is missing"); }
 };
 
-template <> void no_moduleInfo<NoMissingMotd>(NoModInfo& Info)
+template <> void no_moduleInfo<NoMissingMotd>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("missingmotd");
     Info.SetHasArgs(false);

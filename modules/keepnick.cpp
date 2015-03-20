@@ -214,6 +214,6 @@ NoKeepNickTimer::NoKeepNickTimer(NoKeepNickMod* pMod)
 
 void NoKeepNickTimer::RunJob() { m_pMod->KeepNick(); }
 
-template <> void no_moduleInfo<NoKeepNickMod>(NoModInfo& Info) { Info.SetWikiPage("keepnick"); }
+template <> void no_moduleInfo<NoKeepNickMod>(NoModuleInfo& Info) { Info.SetWikiPage("keepnick"); }
 
 NETWORKMODULEDEFS(NoKeepNickMod, "Keep trying for your primary nick")

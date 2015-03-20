@@ -293,9 +293,9 @@ int main(int argc, char** argv)
     }
 
     {
-        std::set<NoModInfo> ssGlobalMods;
-        std::set<NoModInfo> ssUserMods;
-        std::set<NoModInfo> ssNetworkMods;
+        std::set<NoModuleInfo> ssGlobalMods;
+        std::set<NoModuleInfo> ssUserMods;
+        std::set<NoModuleInfo> ssNetworkMods;
         NoUtils::PrintAction("Checking for list of available modules");
         pZNC->GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
         pZNC->GetModules().GetAvailableMods(ssUserMods, No::UserModule);

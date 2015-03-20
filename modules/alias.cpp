@@ -349,7 +349,7 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoAliasMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoAliasMod>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("alias");
     Info.AddType(No::NetworkModule);

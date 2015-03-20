@@ -27,15 +27,15 @@ class NoNetwork;
 
 typedef void* ModHandle;
 
-class NO_EXPORT NoModInfo
+class NO_EXPORT NoModuleInfo
 {
 public:
     typedef NoModule* (*ModLoader)(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType);
 
-    NoModInfo();
-    NoModInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType);
+    NoModuleInfo();
+    NoModuleInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType);
 
-    bool operator<(const NoModInfo& Info) const;
+    bool operator<(const NoModuleInfo& Info) const;
 
     bool SupportsType(No::ModuleType eType) const;
 
@@ -74,7 +74,7 @@ private:
 };
 
 template <class T>
-void no_moduleInfo(NoModInfo& info)
+void no_moduleInfo(NoModuleInfo& info)
 {
 }
 

@@ -285,6 +285,6 @@ private:
     MNoStringSet m_PubKeys;
 };
 
-template <> void no_moduleInfo<NoSslClientCertMod>(NoModInfo& Info) { Info.SetWikiPage("certauth"); }
+template <> void no_moduleInfo<NoSslClientCertMod>(NoModuleInfo& Info) { Info.SetWikiPage("certauth"); }
 
 GLOBALMODULEDEFS(NoSslClientCertMod, "Allow users to authenticate via SSL client certificates.")

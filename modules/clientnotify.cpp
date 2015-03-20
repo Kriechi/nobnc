@@ -153,6 +153,6 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoClientNotifyMod>(NoModInfo& Info) { Info.SetWikiPage("clientnotify"); }
+template <> void no_moduleInfo<NoClientNotifyMod>(NoModuleInfo& Info) { Info.SetWikiPage("clientnotify"); }
 
 USERMODULEDEFS(NoClientNotifyMod, "Notifies you when another IRC client logs into or out of your account. Configurable.")

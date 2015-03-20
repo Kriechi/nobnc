@@ -320,7 +320,7 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoSampleMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoSampleMod>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("sample");
     Info.SetHasArgs(true);

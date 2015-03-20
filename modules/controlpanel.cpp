@@ -1509,6 +1509,6 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoAdminMod>(NoModInfo& Info) { Info.SetWikiPage("controlpanel"); }
+template <> void no_moduleInfo<NoAdminMod>(NoModuleInfo& Info) { Info.SetWikiPage("controlpanel"); }
 
 USERMODULEDEFS(NoAdminMod, "Dynamic configuration through IRC. Allows editing only yourself if you're not ZNC admin.")

@@ -1081,7 +1081,7 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
     bool bModRet = true;
     NoString sModRet;
 
-    NoModInfo ModInfo;
+    NoModuleInfo ModInfo;
     if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sModName, sModRet)) {
         sError = "Unable to find modinfo [" + sModName + "] [" + sModRet + "]";
         return false;

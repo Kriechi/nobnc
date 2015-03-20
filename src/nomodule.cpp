@@ -729,11 +729,11 @@ NoModule::OnModuleLoading(const NoString& sModName, const NoString& sArgs, No::M
     return CONTINUE;
 }
 NoModule::ModRet NoModule::OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg) { return CONTINUE; }
-NoModule::ModRet NoModule::OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg)
+NoModule::ModRet NoModule::OnGetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg)
 {
     return CONTINUE;
 }
-void NoModule::OnGetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType) {}
+void NoModule::OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType) {}
 
 NoModCommand::NoModCommand() : m_sCmd(), m_pFunc(nullptr), m_sArgs(), m_sDesc() {}
 

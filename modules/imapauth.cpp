@@ -162,7 +162,7 @@ void NoImapSock::ReadLineImpl(const NoString& sLine)
     }
 }
 
-template <> void no_moduleInfo<NoImapAuthMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoImapAuthMod>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("imapauth");
     Info.SetHasArgs(true);

@@ -28,6 +28,6 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoAwayNickMod>(NoModInfo& Info) { Info.SetWikiPage("awaynick"); }
+template <> void no_moduleInfo<NoAwayNickMod>(NoModuleInfo& Info) { Info.SetWikiPage("awaynick"); }
 
 NETWORKMODULEDEFS(NoAwayNickMod, "retired module - see http://wiki.znc.in/awaynick")

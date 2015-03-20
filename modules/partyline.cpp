@@ -703,7 +703,7 @@ private:
     std::set<NoString> m_ssDefaultChans;
 };
 
-template <> void no_moduleInfo<NoPartylineMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoPartylineMod>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("partyline");
     Info.SetHasArgs(true);

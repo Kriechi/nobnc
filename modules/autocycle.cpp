@@ -226,7 +226,7 @@ private:
     NoCacheMap<NoString> m_recentlyCycled;
 };
 
-template <> void no_moduleInfo<NoAutoCycleMod>(NoModInfo& Info)
+template <> void no_moduleInfo<NoAutoCycleMod>(NoModuleInfo& Info)
 {
     Info.SetWikiPage("autocycle");
     Info.SetHasArgs(true);

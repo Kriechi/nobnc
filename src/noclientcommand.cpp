@@ -925,7 +925,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (m_pUser->IsAdmin()) {
-            std::set<NoModInfo> ssGlobalMods;
+            std::set<NoModuleInfo> ssGlobalMods;
             NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
 
             if (ssGlobalMods.empty()) {
@@ -936,7 +936,7 @@ void NoClient::UserCommand(NoString& sLine)
                 GTable.AddColumn("Name");
                 GTable.AddColumn("Description");
 
-                for (const NoModInfo& Info : ssGlobalMods) {
+                for (const NoModuleInfo& Info : ssGlobalMods) {
                     GTable.AddRow();
                     GTable.SetCell("Name", (NoApp::Get().GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
                     GTable.SetCell("Description", NoUtils::Ellipsize(Info.GetDescription(), 128));
@@ -946,7 +946,7 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        std::set<NoModInfo> ssUserMods;
+        std::set<NoModuleInfo> ssUserMods;
         NoApp::Get().GetModules().GetAvailableMods(ssUserMods);
 
         if (ssUserMods.empty()) {
@@ -957,7 +957,7 @@ void NoClient::UserCommand(NoString& sLine)
             Table.AddColumn("Name");
             Table.AddColumn("Description");
 
-            for (const NoModInfo& Info : ssUserMods) {
+            for (const NoModuleInfo& Info : ssUserMods) {
                 Table.AddRow();
                 Table.SetCell("Name", (m_pUser->GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
                 Table.SetCell("Description", NoUtils::Ellipsize(Info.GetDescription(), 128));
@@ -966,7 +966,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus(Table);
         }
 
-        std::set<NoModInfo> ssNetworkMods;
+        std::set<NoModuleInfo> ssNetworkMods;
         NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, No::NetworkModule);
 
         if (ssNetworkMods.empty()) {
@@ -977,7 +977,7 @@ void NoClient::UserCommand(NoString& sLine)
             Table.AddColumn("Name");
             Table.AddColumn("Description");
 
-            for (const NoModInfo& Info : ssNetworkMods) {
+            for (const NoModuleInfo& Info : ssNetworkMods) {
                 Table.AddRow();
                 Table.SetCell("Name", ((m_pNetwork && m_pNetwork->GetModules().FindModule(Info.GetName())) ? "*" : " ") + Info.GetName());
                 Table.SetCell("Description", NoUtils::Ellipsize(Info.GetDescription(), 128));
@@ -1017,7 +1017,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoModInfo ModInfo;
+        NoModuleInfo ModInfo;
         NoString sRetMsg;
         if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
             PutStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
@@ -1087,7 +1087,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (sType.equals("default")) {
-            NoModInfo ModInfo;
+            NoModuleInfo ModInfo;
             NoString sRetMsg;
             if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
                 PutStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
@@ -1157,7 +1157,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (sType.equals("default")) {
-            NoModInfo ModInfo;
+            NoModuleInfo ModInfo;
             NoString sRetMsg;
             if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
                 PutStatus("Unable to find modinfo for [" + sMod + "] [" + sRetMsg + "]");

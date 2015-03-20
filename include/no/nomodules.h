@@ -135,10 +135,10 @@ public:
     bool UnloadModule(const NoString& sModule, NoString& sRetMsg);
     bool ReloadModule(const NoString& sModule, const NoString& sArgs, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
 
-    static bool GetModInfo(NoModInfo& ModInfo, const NoString& sModule, NoString& sRetMsg);
-    static bool GetModPathInfo(NoModInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg);
-    static void GetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType = No::UserModule);
-    static void GetDefaultMods(std::set<NoModInfo>& ssMods, No::ModuleType eType = No::UserModule);
+    static bool GetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, NoString& sRetMsg);
+    static bool GetModPathInfo(NoModuleInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg);
+    static void GetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType = No::UserModule);
+    static void GetDefaultMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType = No::UserModule);
 
     // This returns the path to the .so and to the data dir
     // which is where static data (webadmin skins) are saved
@@ -159,12 +159,12 @@ public:
     bool OnClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState);
     bool OnModuleLoading(const NoString& sModName, const NoString& sArgs, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg);
     bool OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg);
-    bool OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
-    bool OnGetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType);
+    bool OnGetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
+    bool OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType);
 
 private:
     static ModHandle
-    OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModInfo& Info, NoString& sRetMsg);
+    OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg);
 
     NoUser* m_pUser;
     NoNetwork* m_pNetwork;

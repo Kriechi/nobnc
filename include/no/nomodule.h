@@ -38,7 +38,7 @@ class NoWebSock;
 class NoTemplate;
 class NoIrcConnection;
 class NoModule;
-class NoModInfo;
+class NoModuleInfo;
 
 #ifdef REQUIRESSL
 #ifndef HAVE_LIBSSL
@@ -56,19 +56,19 @@ class NoModInfo;
 #define MODULE_EXPORT
 #endif
 
-#define MODCOMMONDEFS(CLASS, DESCRIPTION, TYPE)                             \
-    extern "C" {                                                            \
-        MODULE_EXPORT bool no_moduleInfo(double version, NoModInfo& info)   \
-        {                                                                   \
-            if (version != NO_VERSION)                                      \
-                return false;                                               \
-            info.SetDescription(DESCRIPTION);                               \
-            info.SetDefaultType(TYPE);                                      \
-            info.AddType(TYPE);                                             \
-            info.SetLoader(no_loadModule<CLASS>);                           \
-            no_moduleInfo<CLASS>(info);                                     \
-            return true;                                                    \
-        }                                                                   \
+#define MODCOMMONDEFS(CLASS, DESCRIPTION, TYPE)                              \
+    extern "C" {                                                             \
+        MODULE_EXPORT bool no_moduleInfo(double version, NoModuleInfo& info) \
+        {                                                                    \
+            if (version != NO_VERSION)                                       \
+                return false;                                                \
+            info.SetDescription(DESCRIPTION);                                \
+            info.SetDefaultType(TYPE);                                       \
+            info.AddType(TYPE);                                              \
+            info.SetLoader(no_loadModule<CLASS>);                            \
+            no_moduleInfo<CLASS>(info);                                      \
+            return true;                                                     \
+        }                                                                    \
     }
 
 /** Instead of writing a constructor, you should call this macro. It accepts all
@@ -920,12 +920,12 @@ public:
      *  @param sRetMsg text describing possible issues.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
+    virtual ModRet OnGetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
     /** Called when list of available mods is requested.
      *  @param ssMods put new modules here.
      *  @param bGlobal true if global modules are needed.
      */
-    virtual void OnGetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType);
+    virtual void OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType);
 
 private:
     No::ModuleType m_eType;
