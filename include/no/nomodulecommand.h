@@ -20,6 +20,7 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/nomoduleinfo.h>
+#include <functional>
 
 class NoTable;
 
