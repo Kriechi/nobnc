@@ -25,6 +25,7 @@
 #include "noexception.h"
 #include "nomodulecall.h"
 #include "noapp.h"
+#include "nolistener.h"
 
 void NoClient::UserCommand(NoString& sLine)
 {
@@ -1553,10 +1554,10 @@ void NoClient::UserPortCommand(NoString& sLine)
             No::AddressType eAddr = pListener->GetAddrType();
             Table.SetCell("Proto", (eAddr == No::Ipv4AndIpv6Address ? "All" : (eAddr == No::Ipv4Address ? "IPv4" : "IPv6")));
 
-            NoListener::AcceptType eAccept = pListener->GetAcceptType();
+            No::AcceptType eAccept = pListener->GetAcceptType();
             Table.SetCell("IRC/Web",
-                          (eAccept == NoListener::AcceptAll ? "All" :
-                                                              (eAccept == NoListener::AcceptIrc ? "IRC" : "Web")));
+                          (eAccept == No::AcceptAll ? "All" :
+                                                              (eAccept == No::AcceptIrc ? "IRC" : "Web")));
             Table.SetCell("URIPrefix", pListener->GetURIPrefix() + "/");
         }
 
@@ -1582,15 +1583,15 @@ void NoClient::UserPortCommand(NoString& sLine)
     ushort uPort = sPort.toUShort();
 
     if (sCommand.equals("ADDPORT")) {
-        NoListener::AcceptType eAccept = NoListener::AcceptAll;
+        No::AcceptType eAccept = No::AcceptAll;
         NoString sAccept = No::token(sLine, 3);
 
         if (sAccept.equals("WEB")) {
-            eAccept = NoListener::AcceptHttp;
+            eAccept = No::AcceptHttp;
         } else if (sAccept.equals("IRC")) {
-            eAccept = NoListener::AcceptIrc;
+            eAccept = No::AcceptIrc;
         } else if (sAccept.equals("ALL")) {
-            eAccept = NoListener::AcceptAll;
+            eAccept = No::AcceptAll;
         } else {
             sAccept.clear();
         }

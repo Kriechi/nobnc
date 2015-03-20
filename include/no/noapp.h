@@ -21,7 +21,6 @@
 #include <no/nostring.h>
 #include <no/nosocketmanager.h>
 #include <no/nomodules.h>
-#include <no/nolistener.h>
 #include <no/nocachemap.h>
 #include <list>
 
@@ -32,6 +31,7 @@ class NoNetwork;
 class NoConnectQueueTimer;
 class NoSettings;
 class NoFile;
+class NoListener;
 
 class NO_EXPORT NoApp
 {
@@ -152,7 +152,7 @@ public:
                      const NoString& sURIPrefix,
                      bool bSSL,
                      No::AddressType eAddr,
-                     NoListener::AcceptType eAccept,
+                     No::AcceptType eAccept,
                      NoString& sError);
     bool DelListener(NoListener*);
 

@@ -25,6 +25,7 @@ namespace No
     enum SplitBehavior { KeepEmptyParts, SkipEmptyParts };
     enum AddressType { Ipv4Address = 1, Ipv6Address = 2, Ipv4AndIpv6Address = Ipv4Address | Ipv6Address };
     enum ModuleType { GlobalModule, UserModule, NetworkModule };
+    enum AcceptType { AcceptIrc = 1, AcceptHttp = 2, AcceptAll = AcceptIrc | AcceptHttp };
 }
 
 #endif // NONAMESPACE_H

@@ -26,6 +26,7 @@
 #include <no/nowebsocket.h>
 #include <no/nowebsession.h>
 #include <no/noescape.h>
+#include <no/nolistener.h>
 
 /* Stuff to be able to write this:
    // i will be name of local variable, see below
@@ -152,13 +153,13 @@ public:
             const std::vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
             std::vector<NoListener*>::const_iterator it;
             for (it = vListeners.begin(); it != vListeners.end(); ++it) {
-                (*it)->SetAcceptType(NoListener::AcceptIrc);
+                (*it)->SetAcceptType(No::AcceptIrc);
             }
         }
 
         // Now turn that into a listener instance
         NoListener* pListener =
-        new NoListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address), NoListener::AcceptHttp);
+        new NoListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address), No::AcceptHttp);
 
         if (!pListener->Listen()) {
             sMessage = "Failed to add backwards-compatible listener";
@@ -1680,16 +1681,16 @@ public:
             }
         }
 
-        NoListener::AcceptType eAccept;
+        No::AcceptType eAccept;
         if (bIRC) {
             if (bWeb) {
-                eAccept = NoListener::AcceptAll;
+                eAccept = No::AcceptAll;
             } else {
-                eAccept = NoListener::AcceptIrc;
+                eAccept = No::AcceptIrc;
             }
         } else {
             if (bWeb) {
-                eAccept = NoListener::AcceptHttp;
+                eAccept = No::AcceptHttp;
             } else {
                 WebSock.GetSession()->AddError("Choose either IRC or Web or both.");
                 return SettingsPage(WebSock, Tmpl);
@@ -1781,8 +1782,8 @@ public:
                 l["Port"] = NoString(pListener->GetPort());
                 l["BindHost"] = pListener->GetBindHost();
 
-                l["IsWeb"] = NoString(pListener->GetAcceptType() != NoListener::AcceptIrc);
-                l["IsIRC"] = NoString(pListener->GetAcceptType() != NoListener::AcceptHttp);
+                l["IsWeb"] = NoString(pListener->GetAcceptType() != No::AcceptIrc);
+                l["IsIRC"] = NoString(pListener->GetAcceptType() != No::AcceptHttp);
 
                 l["URIPrefix"] = pListener->GetURIPrefix() + "/";
 

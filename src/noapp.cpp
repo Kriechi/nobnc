@@ -25,6 +25,7 @@
 #include "nosettings.h"
 #include "noclient.h"
 #include "nowebsocket.h"
+#include "nolistener.h"
 #include <tuple>
 #include <algorithm>
 #include "Csocket/Csocket.h"
@@ -582,8 +583,8 @@ bool NoApp::WriteConfig()
 
         listenerConfig.AddKeyValuePair("SSL", NoString(pListener->IsSSL()));
 
-        listenerConfig.AddKeyValuePair("AllowIRC", NoString(pListener->GetAcceptType() != NoListener::AcceptHttp));
-        listenerConfig.AddKeyValuePair("AllowWeb", NoString(pListener->GetAcceptType() != NoListener::AcceptIrc));
+        listenerConfig.AddKeyValuePair("AllowIRC", NoString(pListener->GetAcceptType() != No::AcceptHttp));
+        listenerConfig.AddKeyValuePair("AllowWeb", NoString(pListener->GetAcceptType() != No::AcceptIrc));
 
         config.AddSubConfig("Listener", "listener" + NoString(l++), listenerConfig);
     }
@@ -749,7 +750,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
         No::printAction("Verifying the listener");
         NoListener* pListener =
-        new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address, NoListener::AcceptAll);
+        new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address, No::AcceptAll);
         if (!pListener->Listen()) {
             No::printStatus(false, FormatBindError());
             bSuccess = false;
@@ -1671,11 +1672,11 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
         eAddr = No::Ipv6Address;
     }
 
-    NoListener::AcceptType eAccept = NoListener::AcceptAll;
+    No::AcceptType eAccept = No::AcceptAll;
     if (sValue.trimPrefix("irc_only "))
-        eAccept = NoListener::AcceptIrc;
+        eAccept = No::AcceptIrc;
     else if (sValue.trimPrefix("web_only "))
-        eAccept = NoListener::AcceptHttp;
+        eAccept = No::AcceptHttp;
 
     bool bSSL = false;
     NoString sPort;
@@ -1708,7 +1709,7 @@ bool NoApp::AddListener(ushort uPort,
                        const NoString& sURIPrefixRaw,
                        bool bSSL,
                        No::AddressType eAddr,
-                       NoListener::AcceptType eAccept,
+                       No::AcceptType eAccept,
                        NoString& sError)
 {
     NoString sHostComment;
@@ -1837,13 +1838,13 @@ bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
         return false;
     }
 
-    NoListener::AcceptType eAccept;
+    No::AcceptType eAccept;
     if (bIRC && bWeb) {
-        eAccept = NoListener::AcceptAll;
+        eAccept = No::AcceptAll;
     } else if (bIRC && !bWeb) {
-        eAccept = NoListener::AcceptIrc;
+        eAccept = No::AcceptIrc;
     } else if (!bIRC && bWeb) {
-        eAccept = NoListener::AcceptHttp;
+        eAccept = No::AcceptHttp;
     } else {
         sError = "Either Web or IRC or both should be selected";
         No::printError(sError);

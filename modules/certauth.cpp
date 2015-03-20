@@ -24,6 +24,7 @@
 #include <no/noauthenticator.h>
 #include <no/nowebsocket.h>
 #include <no/nowebsession.h>
+#include <no/nolistener.h>
 
 class NoSslClientCertMod : public NoModule
 {
