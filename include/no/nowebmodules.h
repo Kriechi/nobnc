@@ -83,8 +83,6 @@ public:
     {
     }
 
-    virtual ~NoWebSubPage() {}
-
     enum { Admin = 1 };
 
     void SetName(const NoString& s) { m_sName = s; }
