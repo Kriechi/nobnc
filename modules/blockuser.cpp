@@ -39,8 +39,6 @@ public:
                    "Unblock a user");
     }
 
-    virtual ~NoBlockUser() {}
-
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector::iterator it;

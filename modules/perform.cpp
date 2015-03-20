@@ -104,8 +104,6 @@ public:
         AddCommand("Swap", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::Swap), "<nr> <nr>");
     }
 
-    virtual ~NoPerform() {}
-
     NoString ParsePerform(const NoString& sArg) const
     {
         NoString sPerf = sArg;

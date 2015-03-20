@@ -32,8 +32,6 @@ public:
     {
     }
 
-    virtual ~NoSimpleAwayJob() {}
-
 protected:
     void RunJob() override;
 };
@@ -72,8 +70,6 @@ public:
                    "",
                    "Disables the wait time before setting you away");
     }
-
-    virtual ~NoSimpleAway() {}
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {

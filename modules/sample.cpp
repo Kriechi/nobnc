@@ -58,7 +58,6 @@ public:
         : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }
-    virtual ~NoSampleTimer() {}
 
 private:
 protected:

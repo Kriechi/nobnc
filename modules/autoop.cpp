@@ -31,8 +31,6 @@ public:
         m_pParent = pModule;
     }
 
-    virtual ~NoAutoOpTimer() {}
-
 private:
 protected:
     void RunJob() override;
@@ -53,8 +51,6 @@ public:
         AddHostmasks(sHostmasks);
         AddChans(sChannels);
     }
-
-    virtual ~NoAutoOpUser() {}
 
     const NoString& GetUsername() const { return m_sUsername; }
     const NoString& GetUserKey() const { return m_sUserKey; }

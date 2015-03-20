@@ -1507,8 +1507,6 @@ public:
                    "[username]",
                    "List all networks for a user");
     }
-
-    virtual ~NoAdminMod() {}
 };
 
 template <> void TModInfo<NoAdminMod>(NoModInfo& Info) { Info.SetWikiPage("controlpanel"); }

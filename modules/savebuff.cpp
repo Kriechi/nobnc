@@ -51,8 +51,6 @@ public:
     {
     }
 
-    virtual ~NoSaveBuffJob() {}
-
 protected:
     void RunJob() override;
 };

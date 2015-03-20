@@ -28,7 +28,6 @@ class NoQModule : public NoModule
 {
 public:
     MODCONSTRUCTOR(NoQModule) {}
-    virtual ~NoQModule() {}
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {

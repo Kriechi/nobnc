@@ -25,8 +25,6 @@ class NoChannelSaverMod : public NoModule
 public:
     MODCONSTRUCTOR(NoChannelSaverMod) {}
 
-    virtual ~NoChannelSaverMod() {}
-
     bool OnLoad(const NoString& sArgsi, NoString& sMessage) override
     {
         switch (GetType()) {

@@ -26,7 +26,6 @@ public:
         m_sSource = sSource;
         m_bNegated = bNegated;
     }
-    virtual ~NoWatchSource() {}
 
     // Getters
     const NoString& GetSource() const { return m_sSource; }
@@ -66,7 +65,6 @@ public:
             m_sTarget += Nick.nick();
         }
     }
-    virtual ~NoWatchEntry() {}
 
     bool IsMatch(const NoNick& Nick, const NoString& sText, const NoString& sSource, const NoNetwork* pNetwork)
     {
@@ -175,8 +173,6 @@ public:
         m_Buffer.setLimit(500);
         Load();
     }
-
-    virtual ~NoWatcherMod() {}
 
     void OnRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
     {

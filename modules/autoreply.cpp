@@ -36,8 +36,6 @@ public:
         m_Messaged.SetTTL(1000 * 120);
     }
 
-    virtual ~NoAutoReplyMod() {}
-
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (!sArgs.empty()) {

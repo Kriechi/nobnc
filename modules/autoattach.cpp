@@ -150,8 +150,6 @@ public:
         AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoChannelAttach::HandleList), "", "List all entries");
     }
 
-    virtual ~NoChannelAttach() {}
-
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector vsChans = sArgs.Split(" ", No::SkipEmptyParts);

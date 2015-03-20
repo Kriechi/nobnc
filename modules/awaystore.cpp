@@ -48,8 +48,6 @@ public:
     {
     }
 
-    virtual ~NoAwayJob() {}
-
 protected:
     void RunJob() override;
 };

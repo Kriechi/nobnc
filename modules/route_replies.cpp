@@ -190,7 +190,6 @@ public:
         : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
     {
     }
-    virtual ~NoRouteTimeout() {}
 
 protected:
     void RunJob() override;

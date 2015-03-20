@@ -30,8 +30,6 @@ public:
         AddChans(sChannels);
     }
 
-    virtual ~NoAutoVoiceUser() {}
-
     const NoString& GetUsername() const { return m_sUsername; }
     const NoString& GetHostmask() const { return m_sHostmask; }
 

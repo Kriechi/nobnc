@@ -22,7 +22,6 @@ class NoFailToBanMod : public NoModule
 {
 public:
     MODCONSTRUCTOR(NoFailToBanMod) {}
-    virtual ~NoFailToBanMod() {}
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {

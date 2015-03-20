@@ -84,8 +84,6 @@ public:
         AddCommand("SetCommand", static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::SetCommandCommand), "cmd new-pattern", "Set pattern for commands");
     }
 
-    virtual ~NoNickServ() {}
-
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (!sArgs.empty() && sArgs != "<hidden>") {

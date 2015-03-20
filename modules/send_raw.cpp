@@ -65,8 +65,6 @@ class NoSendRawMod : public NoModule
     }
 
 public:
-    virtual ~NoSendRawMod() {}
-
     bool OnLoad(const NoString& sArgs, NoString& sErrorMsg) override
     {
         if (!GetUser()->IsAdmin()) {

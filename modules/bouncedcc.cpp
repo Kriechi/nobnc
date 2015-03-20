@@ -173,8 +173,6 @@ public:
                    "<true|false>");
     }
 
-    virtual ~NoBounceDccMod() {}
-
     NoString GetLocalDCCIP() { return GetUser()->GetLocalDCCIP(); }
 
     bool UseClientIP() { return GetNV("UseClientIP").ToBool(); }

@@ -34,8 +34,6 @@ public:
     {
     }
 
-    virtual ~NoRejoinJob() {}
-
 protected:
     void RunJob() override
     {
@@ -67,7 +65,6 @@ public:
                    "",
                    "Show the rejoin delay");
     }
-    virtual ~NoRejoinMod() {}
 
     bool OnLoad(const NoString& sArgs, NoString& sErrorMsg) override
     {

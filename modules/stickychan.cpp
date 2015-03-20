@@ -37,7 +37,6 @@ public:
                    "",
                    "Lists sticky channels");
     }
-    virtual ~NoStickyChan() {}
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override;
 

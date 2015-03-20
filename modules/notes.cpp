@@ -84,8 +84,6 @@ public:
         AddCommand("Get", "<key>", "", [this](const NoString& sLine) { GetCommand(sLine); });
     }
 
-    virtual ~NoNotesMod() {}
-
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         bShowNotesOnLogin = !sArgs.Equals("-disableNotesOnLogin");

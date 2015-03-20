@@ -33,8 +33,6 @@ public:
         AddCommand("Silent", static_cast<NoModCommand::ModCmdFunc>(&NoFloodDetachMod::SilentCommand), "[yes|no]");
     }
 
-    ~NoFloodDetachMod() {}
-
     void Save()
     {
         // We save the settings twice because the module arguments can

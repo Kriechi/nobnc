@@ -61,8 +61,6 @@ public:
         m_bSSL = false;
     }
 
-    virtual ~NoImapAuthMod() {}
-
     bool OnBoot() override { return true; }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override

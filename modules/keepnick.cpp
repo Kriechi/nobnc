@@ -24,7 +24,6 @@ class NoKeepNickTimer : public NoTimer
 {
 public:
     NoKeepNickTimer(NoKeepNickMod* pMod);
-    ~NoKeepNickTimer() {}
 
     void RunJob() override;
 
@@ -51,8 +50,6 @@ public:
                    "",
                    "Show the current state");
     }
-
-    ~NoKeepNickMod() {}
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {

@@ -92,8 +92,6 @@ public:
         AddCommand("ListTransfers", static_cast<NoModCommand::ModCmdFunc>(&NoDccMod::ListTransfersCommand));
     }
 
-    virtual ~NoDccMod() {}
-
 #ifndef MOD_DCC_ALLOW_EVERYONE
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {

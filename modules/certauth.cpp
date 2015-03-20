@@ -40,8 +40,6 @@ public:
                    "Print your current key");
     }
 
-    virtual ~NoSslClientCertMod() {}
-
     bool OnBoot() override
     {
         const std::vector<NoListener*>& vListeners = NoApp::Get().GetListeners();

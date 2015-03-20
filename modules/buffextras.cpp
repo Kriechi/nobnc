@@ -23,8 +23,6 @@ class NoBuffExtras : public NoModule
 public:
     MODCONSTRUCTOR(NoBuffExtras) {}
 
-    virtual ~NoBuffExtras() {}
-
     void AddBuffer(NoChannel& Channel, const NoString& sMessage)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected

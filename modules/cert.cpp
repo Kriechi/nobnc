@@ -55,8 +55,6 @@ public:
         AddCommand("info", static_cast<NoModCommand::ModCmdFunc>(&NoCertMod::Info));
     }
 
-    virtual ~NoCertMod() {}
-
     NoString PemFile() const { return GetSavePath() + "/user.pem"; }
 
     bool HasPemFile() const { return (NoFile::Exists(PemFile())); }

@@ -40,8 +40,6 @@ public:
                    "Show the current limits");
     }
 
-    ~NoCtcpFloodMod() {}
-
     void Save()
     {
         // We save the settings twice because the module arguments can

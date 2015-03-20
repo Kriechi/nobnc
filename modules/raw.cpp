@@ -20,7 +20,6 @@ class NoRawMod : public NoModule
 {
 public:
     MODCONSTRUCTOR(NoRawMod) {}
-    virtual ~NoRawMod() {}
 
     ModRet OnRaw(NoString& sLine) override
     {

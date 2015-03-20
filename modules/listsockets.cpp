@@ -253,8 +253,6 @@ public:
         PutModule(Table);
         return;
     }
-
-    virtual ~NoListSockets() {}
 };
 
 template <> void TModInfo<NoListSockets>(NoModInfo& Info) { Info.SetWikiPage("listsockets"); }

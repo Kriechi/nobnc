@@ -24,7 +24,6 @@ class NoFakeOnlineModule : public NoModule
 {
 public:
     MODCONSTRUCTOR(NoFakeOnlineModule) {}
-    virtual ~NoFakeOnlineModule() {}
 
     bool IsOnlineModNick(const NoString& sNick)
     {

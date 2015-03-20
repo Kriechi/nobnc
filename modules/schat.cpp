@@ -37,7 +37,6 @@ public:
     {
     }
 
-    virtual ~NoRemMarkerJob() {}
     void SetNick(const NoString& sNick) { m_sNick = sNick; }
 
 protected:
@@ -50,7 +49,6 @@ class NoSChatSock : public NoModuleSocket
 public:
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick);
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout = 60);
-    ~NoSChatSock() {}
 
     NoSocket* GetSockObjImpl(const NoString& sHostname, u_short iPort) override
     {
@@ -105,7 +103,6 @@ class NoSChat : public NoModule
 {
 public:
     MODCONSTRUCTOR(NoSChat) {}
-    virtual ~NoSChat() {}
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {

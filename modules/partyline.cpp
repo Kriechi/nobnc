@@ -32,7 +32,6 @@ class NoPartylineChannel
 {
 public:
     NoPartylineChannel(const NoString& sName) { m_sName = sName.AsLower(); }
-    ~NoPartylineChannel() {}
 
     const NoString& GetTopic() const { return m_sTopic; }
     const NoString& GetName() const { return m_sName; }

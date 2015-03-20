@@ -90,8 +90,6 @@ public:
         AddSubPage(std::make_shared<NoWebSubPage>("listusers", "Manage Users", NoWebSubPage::Admin));
     }
 
-    virtual ~NoWebAdminMod() {}
-
     bool OnLoad(const NoString& sArgStr, NoString& sMessage) override
     {
         if (sArgStr.empty() || NoModInfo::GlobalModule != GetType()) return true;

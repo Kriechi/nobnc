@@ -62,8 +62,6 @@ public:
                    "List all keys");
     }
 
-    virtual ~NoCryptMod() {}
-
     ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         sTarget.TrimLeft(NickPrefix());

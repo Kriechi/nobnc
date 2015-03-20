@@ -21,8 +21,6 @@ class NoBlockMotd : public NoModule
 public:
     MODCONSTRUCTOR(NoBlockMotd) {}
 
-    virtual ~NoBlockMotd() {}
-
     ModRet OnRaw(NoString& sLine) override
     {
         const NoString sCmd = sLine.Token(1);

@@ -70,8 +70,6 @@ public:
         AddCommand("Show", static_cast<NoModCommand::ModCmdFunc>(&NoLastSeenMod::ShowCommand));
     }
 
-    virtual ~NoLastSeenMod() {}
-
     // Event stuff:
 
     void OnClientLogin() override { SetTime(GetUser()); }

@@ -36,8 +36,6 @@ public:
         m_recentlyCycled.SetTTL(15 * 1000);
     }
 
-    virtual ~NoAutoCycleMod() {}
-
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector vsChans = sArgs.Split(" ", No::SkipEmptyParts);
