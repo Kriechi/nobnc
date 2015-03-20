@@ -227,7 +227,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
         NoModule* pCurMod = vCurMods.FindModule(pNewMod->GetModName());
 
         if (!pCurMod) {
-            vCurMods.LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), NoModInfo::NetworkModule, m_pUser, this, sModRet);
+            vCurMods.LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::NetworkModule, m_pUser, this, sModRet);
         } else if (pNewMod->GetArgs() != pCurMod->GetArgs()) {
             vCurMods.ReloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), m_pUser, this, sModRet);
         }
@@ -1463,7 +1463,7 @@ bool NoNetwork::LoadModule(const NoString& sModName, const NoString& sArgs, cons
     NoUtils::PrintAction(sNotice);
     NoString sModRet;
 
-    bool bModRet = GetModules().LoadModule(sModName, sArgs, NoModInfo::NetworkModule, GetUser(), this, sModRet);
+    bool bModRet = GetModules().LoadModule(sModName, sArgs, No::NetworkModule, GetUser(), this, sModRet);
 
     NoUtils::PrintStatus(bModRet, sModRet);
     if (!bModRet) {

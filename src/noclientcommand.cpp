@@ -926,7 +926,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         if (m_pUser->IsAdmin()) {
             std::set<NoModInfo> ssGlobalMods;
-            NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, NoModInfo::GlobalModule);
+            NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
 
             if (ssGlobalMods.empty()) {
                 PutStatus("No global modules available.");
@@ -967,7 +967,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         std::set<NoModInfo> ssNetworkMods;
-        NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, NoModInfo::NetworkModule);
+        NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, No::NetworkModule);
 
         if (ssNetworkMods.empty()) {
             PutStatus("No network modules available.");
@@ -987,24 +987,24 @@ void NoClient::UserCommand(NoString& sLine)
         }
         return;
     } else if (sCommand.equals("LOADMOD") || sCommand.equals("LOADMODULE")) {
-        NoModInfo::ModuleType eType;
+        No::ModuleType eType;
         NoString sType = sLine.token(1);
         NoString sMod = sLine.token(2);
         NoString sArgs = sLine.tokens(3);
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
-            eType = NoModInfo::GlobalModule;
+            eType = No::GlobalModule;
         } else if (sType.equals("--type=user")) {
-            eType = NoModInfo::UserModule;
+            eType = No::UserModule;
         } else if (sType.equals("--type=network")) {
-            eType = NoModInfo::NetworkModule;
+            eType = No::NetworkModule;
         } else {
             sMod = sType;
             sArgs = sLine.tokens(2);
             sType = "default";
             // Will be set correctly later
-            eType = NoModInfo::UserModule;
+            eType = No::UserModule;
         }
 
         if (m_pUser->DenyLoadMod()) {
@@ -1028,12 +1028,12 @@ void NoClient::UserCommand(NoString& sLine)
             eType = ModInfo.GetDefaultType();
         }
 
-        if (eType == NoModInfo::GlobalModule && !m_pUser->IsAdmin()) {
+        if (eType == No::GlobalModule && !m_pUser->IsAdmin()) {
             PutStatus("Unable to load global module [" + sMod + "]: Access Denied.");
             return;
         }
 
-        if (eType == NoModInfo::NetworkModule && !m_pNetwork) {
+        if (eType == No::NetworkModule && !m_pNetwork) {
             PutStatus("Unable to load network module [" + sMod + "] Not connected with a network.");
             return;
         }
@@ -1042,13 +1042,13 @@ void NoClient::UserCommand(NoString& sLine)
         bool b = false;
 
         switch (eType) {
-        case NoModInfo::GlobalModule:
+        case No::GlobalModule:
             b = NoApp::Get().GetModules().LoadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
             break;
-        case NoModInfo::UserModule:
+        case No::UserModule:
             b = m_pUser->GetModules().LoadModule(sMod, sArgs, eType, m_pUser, nullptr, sModRet);
             break;
-        case NoModInfo::NetworkModule:
+        case No::NetworkModule:
             b = m_pNetwork->GetModules().LoadModule(sMod, sArgs, eType, m_pUser, m_pNetwork, sModRet);
             break;
         default:
@@ -1060,17 +1060,17 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(sModRet);
         return;
     } else if (sCommand.equals("UNLOADMOD") || sCommand.equals("UNLOADMODULE")) {
-        NoModInfo::ModuleType eType = NoModInfo::UserModule;
+        No::ModuleType eType = No::UserModule;
         NoString sType = sLine.token(1);
         NoString sMod = sLine.token(2);
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
-            eType = NoModInfo::GlobalModule;
+            eType = No::GlobalModule;
         } else if (sType.equals("--type=user")) {
-            eType = NoModInfo::UserModule;
+            eType = No::UserModule;
         } else if (sType.equals("--type=network")) {
-            eType = NoModInfo::NetworkModule;
+            eType = No::NetworkModule;
         } else {
             sMod = sType;
             sType = "default";
@@ -1097,12 +1097,12 @@ void NoClient::UserCommand(NoString& sLine)
             eType = ModInfo.GetDefaultType();
         }
 
-        if (eType == NoModInfo::GlobalModule && !m_pUser->IsAdmin()) {
+        if (eType == No::GlobalModule && !m_pUser->IsAdmin()) {
             PutStatus("Unable to unload global module [" + sMod + "]: Access Denied.");
             return;
         }
 
-        if (eType == NoModInfo::NetworkModule && !m_pNetwork) {
+        if (eType == No::NetworkModule && !m_pNetwork) {
             PutStatus("Unable to unload network module [" + sMod + "] Not connected with a network.");
             return;
         }
@@ -1110,13 +1110,13 @@ void NoClient::UserCommand(NoString& sLine)
         NoString sModRet;
 
         switch (eType) {
-        case NoModInfo::GlobalModule:
+        case No::GlobalModule:
             NoApp::Get().GetModules().UnloadModule(sMod, sModRet);
             break;
-        case NoModInfo::UserModule:
+        case No::UserModule:
             m_pUser->GetModules().UnloadModule(sMod, sModRet);
             break;
-        case NoModInfo::NetworkModule:
+        case No::NetworkModule:
             m_pNetwork->GetModules().UnloadModule(sMod, sModRet);
             break;
         default:
@@ -1126,7 +1126,7 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(sModRet);
         return;
     } else if (sCommand.equals("RELOADMOD") || sCommand.equals("RELOADMODULE")) {
-        NoModInfo::ModuleType eType;
+        No::ModuleType eType;
         NoString sType = sLine.token(1);
         NoString sMod = sLine.token(2);
         NoString sArgs = sLine.tokens(3);
@@ -1138,17 +1138,17 @@ void NoClient::UserCommand(NoString& sLine)
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
-            eType = NoModInfo::GlobalModule;
+            eType = No::GlobalModule;
         } else if (sType.equals("--type=user")) {
-            eType = NoModInfo::UserModule;
+            eType = No::UserModule;
         } else if (sType.equals("--type=network")) {
-            eType = NoModInfo::NetworkModule;
+            eType = No::NetworkModule;
         } else {
             sMod = sType;
             sArgs = sLine.tokens(2);
             sType = "default";
             // Will be set correctly later
-            eType = NoModInfo::UserModule;
+            eType = No::UserModule;
         }
 
         if (sMod.empty()) {
@@ -1167,12 +1167,12 @@ void NoClient::UserCommand(NoString& sLine)
             eType = ModInfo.GetDefaultType();
         }
 
-        if (eType == NoModInfo::GlobalModule && !m_pUser->IsAdmin()) {
+        if (eType == No::GlobalModule && !m_pUser->IsAdmin()) {
             PutStatus("Unable to reload global module [" + sMod + "]: Access Denied.");
             return;
         }
 
-        if (eType == NoModInfo::NetworkModule && !m_pNetwork) {
+        if (eType == No::NetworkModule && !m_pNetwork) {
             PutStatus("Unable to load network module [" + sMod + "] Not connected with a network.");
             return;
         }
@@ -1180,13 +1180,13 @@ void NoClient::UserCommand(NoString& sLine)
         NoString sModRet;
 
         switch (eType) {
-        case NoModInfo::GlobalModule:
+        case No::GlobalModule:
             NoApp::Get().GetModules().ReloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
             break;
-        case NoModInfo::UserModule:
+        case No::UserModule:
             m_pUser->GetModules().ReloadModule(sMod, sArgs, m_pUser, nullptr, sModRet);
             break;
-        case NoModInfo::NetworkModule:
+        case No::NetworkModule:
             m_pNetwork->GetModules().ReloadModule(sMod, sArgs, m_pUser, m_pNetwork, sModRet);
             break;
         default:

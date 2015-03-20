@@ -79,7 +79,7 @@ public:
 template <> void TModInfo<NoBuffExtras>(NoModInfo& Info)
 {
     Info.SetWikiPage("buffextras");
-    Info.AddType(NoModInfo::NetworkModule);
+    Info.AddType(No::NetworkModule);
 }
 
 USERMODULEDEFS(NoBuffExtras, "Add joins, parts etc. to the playback buffer")

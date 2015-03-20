@@ -28,13 +28,13 @@ public:
     bool OnLoad(const NoString& sArgsi, NoString& sMessage) override
     {
         switch (GetType()) {
-        case NoModInfo::GlobalModule:
+        case No::GlobalModule:
             LoadUsers();
             break;
-        case NoModInfo::UserModule:
+        case No::UserModule:
             LoadUser(GetUser());
             break;
-        case NoModInfo::NetworkModule:
+        case No::NetworkModule:
             LoadNetwork(GetNetwork());
             break;
         }
@@ -87,8 +87,8 @@ public:
 template <> void TModInfo<NoChannelSaverMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("chansaver");
-    Info.AddType(NoModInfo::NetworkModule);
-    Info.AddType(NoModInfo::GlobalModule);
+    Info.AddType(No::NetworkModule);
+    Info.AddType(No::GlobalModule);
 }
 
 USERMODULEDEFS(NoChannelSaverMod, "Keep config up-to-date when user joins/parts.")

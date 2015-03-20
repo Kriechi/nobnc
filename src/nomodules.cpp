@@ -430,7 +430,7 @@ bool NoModules::OnClientCapRequest(NoClient* pClient, const NoString& sCap, bool
     return false;
 }
 
-bool NoModules::OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::ModuleType eType, bool& bSuccess, NoString& sRetMsg)
+bool NoModules::OnModuleLoading(const NoString& sModName, const NoString& sArgs, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg)
 {
     MODHALTCHK(OnModuleLoading(sModName, sArgs, eType, bSuccess, sRetMsg));
 }
@@ -445,7 +445,7 @@ bool NoModules::OnGetModInfo(NoModInfo& ModInfo, const NoString& sModule, bool& 
     MODHALTCHK(OnGetModInfo(ModInfo, sModule, bSuccess, sRetMsg));
 }
 
-bool NoModules::OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType)
+bool NoModules::OnGetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType)
 {
     MODUNLOADCHK(OnGetAvailableMods(ssMods, eType));
     return false;
@@ -463,7 +463,7 @@ NoModule* NoModules::FindModule(const NoString& sModule) const
     return nullptr;
 }
 
-bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, NoModInfo::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
+bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, No::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
 {
     sRetMsg = "";
 
@@ -503,13 +503,13 @@ bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, NoMod
         return false;
     }
 
-    if (!pUser && eType == NoModInfo::UserModule) {
+    if (!pUser && eType == No::UserModule) {
         dlclose(p);
         sRetMsg = "Module [" + sModule + "] requires a user.";
         return false;
     }
 
-    if (!pNetwork && eType == NoModInfo::NetworkModule) {
+    if (!pNetwork && eType == No::NetworkModule) {
         dlclose(p);
         sRetMsg = "Module [" + sModule + "] requires a network.";
         return false;
@@ -599,7 +599,7 @@ bool NoModules::ReloadModule(const NoString& sModule, const NoString& sArgs, NoU
         return false;
     }
 
-    NoModInfo::ModuleType eType = pModule->GetType();
+    No::ModuleType eType = pModule->GetType();
     pModule = nullptr;
 
     sRetMsg = "";
@@ -652,7 +652,7 @@ bool NoModules::GetModPathInfo(NoModInfo& ModInfo, const NoString& sModule, cons
     return true;
 }
 
-void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType)
+void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType)
 {
     ssMods.clear();
 
@@ -684,15 +684,15 @@ void NoModules::GetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleT
     GLOBALMODULECALL(OnGetAvailableMods(ssMods, eType), NOTHING);
 }
 
-void NoModules::GetDefaultMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType)
+void NoModules::GetDefaultMods(std::set<NoModInfo>& ssMods, No::ModuleType eType)
 {
 
     GetAvailableMods(ssMods, eType);
 
-    const std::map<NoString, NoModInfo::ModuleType> ns = { { "chansaver", NoModInfo::UserModule },
-                                                     { "controlpanel", NoModInfo::UserModule },
-                                                     { "simple_away", NoModInfo::NetworkModule },
-                                                     { "webadmin", NoModInfo::GlobalModule } };
+    const std::map<NoString, No::ModuleType> ns = { { "chansaver", No::UserModule },
+                                                     { "controlpanel", No::UserModule },
+                                                     { "simple_away", No::NetworkModule },
+                                                     { "webadmin", No::GlobalModule } };
 
     auto it = ssMods.begin();
     while (it != ssMods.end()) {

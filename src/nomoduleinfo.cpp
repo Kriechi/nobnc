@@ -16,9 +16,9 @@
 
 #include "nomoduleinfo.h"
 
-NoModInfo::NoModInfo() : NoModInfo("", "", NetworkModule) {}
+NoModInfo::NoModInfo() : NoModInfo("", "", No::NetworkModule) {}
 
-NoModInfo::NoModInfo(const NoString& sName, const NoString& sPath, NoModInfo::ModuleType eType)
+NoModInfo::NoModInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType)
     : m_seType(), m_eDefaultType(eType), m_sName(sName), m_sPath(sPath), m_sDescription(""), m_sWikiPage(""),
       m_sArgsHelpText(""), m_bHasArgs(false), m_fLoader(nullptr)
 {
@@ -26,18 +26,18 @@ NoModInfo::NoModInfo(const NoString& sName, const NoString& sPath, NoModInfo::Mo
 
 bool NoModInfo::operator<(const NoModInfo& Info) const { return (GetName() < Info.GetName()); }
 
-bool NoModInfo::SupportsType(NoModInfo::ModuleType eType) const { return m_seType.find(eType) != m_seType.end(); }
+bool NoModInfo::SupportsType(No::ModuleType eType) const { return m_seType.find(eType) != m_seType.end(); }
 
-void NoModInfo::AddType(NoModInfo::ModuleType eType) { m_seType.insert(eType); }
+void NoModInfo::AddType(No::ModuleType eType) { m_seType.insert(eType); }
 
-NoString NoModInfo::ModuleTypeToString(NoModInfo::ModuleType eType)
+NoString NoModInfo::ModuleTypeToString(No::ModuleType eType)
 {
     switch (eType) {
-    case GlobalModule:
+    case No::GlobalModule:
         return "Global";
-    case UserModule:
+    case No::UserModule:
         return "User";
-    case NetworkModule:
+    case No::NetworkModule:
         return "Network";
     default:
         return "UNKNOWN";
@@ -58,7 +58,7 @@ bool NoModInfo::GetHasArgs() const { return m_bHasArgs; }
 
 NoModInfo::ModLoader NoModInfo::GetLoader() const { return m_fLoader; }
 
-NoModInfo::ModuleType NoModInfo::GetDefaultType() const { return m_eDefaultType; }
+No::ModuleType NoModInfo::GetDefaultType() const { return m_eDefaultType; }
 
 void NoModInfo::SetName(const NoString& s) { m_sName = s; }
 
@@ -74,4 +74,4 @@ void NoModInfo::SetHasArgs(bool b) { m_bHasArgs = b; }
 
 void NoModInfo::SetLoader(NoModInfo::ModLoader fLoader) { m_fLoader = fLoader; }
 
-void NoModInfo::SetDefaultType(NoModInfo::ModuleType eType) { m_eDefaultType = eType; }
+void NoModInfo::SetDefaultType(No::ModuleType eType) { m_eDefaultType = eType; }

@@ -270,14 +270,14 @@ bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)
     m_sLogPath = sArgs.token(uIndex);
 
     // Add default filename to path if it's a folder
-    if (GetType() == NoModInfo::UserModule) {
+    if (GetType() == No::UserModule) {
         if (m_sLogPath.right(1) == "/" || m_sLogPath.find("$WINDOW") == NoString::npos || m_sLogPath.find("$NETWORK") == NoString::npos) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
             }
             m_sLogPath += "$NETWORK/$WINDOW/%Y-%m-%d.log";
         }
-    } else if (GetType() == NoModInfo::NetworkModule) {
+    } else if (GetType() == No::NetworkModule) {
         if (m_sLogPath.right(1) == "/" || m_sLogPath.find("$WINDOW") == NoString::npos) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
@@ -430,8 +430,8 @@ NoModule::ModRet NoLogMod::OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString&
 
 template <> void TModInfo<NoLogMod>(NoModInfo& Info)
 {
-    Info.AddType(NoModInfo::NetworkModule);
-    Info.AddType(NoModInfo::GlobalModule);
+    Info.AddType(No::NetworkModule);
+    Info.AddType(No::GlobalModule);
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("[-sanitize] Optional path where to store logs.");
     Info.SetWikiPage("log");

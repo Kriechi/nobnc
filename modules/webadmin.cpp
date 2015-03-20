@@ -92,7 +92,7 @@ public:
 
     bool OnLoad(const NoString& sArgStr, NoString& sMessage) override
     {
-        if (sArgStr.empty() || NoModInfo::GlobalModule != GetType()) return true;
+        if (sArgStr.empty() || No::GlobalModule != GetType()) return true;
 
         // We don't accept any arguments, but for backwards
         // compatibility we have to do some magic here.
@@ -349,7 +349,7 @@ public:
             WebSock.GetParamValues("loadmod", vsArgs);
 
             // disallow unload webadmin from itself
-            if (NoModInfo::UserModule == GetType() && pUser == NoApp::Get().FindUser(WebSock.GetUser())) {
+            if (No::UserModule == GetType() && pUser == NoApp::Get().FindUser(WebSock.GetUser())) {
                 bool bLoadedWebadmin = false;
                 for (a = 0; a < vsArgs.size(); ++a) {
                     NoString sModName = vsArgs[a].trimRight_n("\r");
@@ -372,7 +372,7 @@ public:
                     NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
                     try {
-                        if (!pNewUser->GetModules().LoadModule(sModName, sArgs, NoModInfo::UserModule, pNewUser, nullptr, sModRet)) {
+                        if (!pNewUser->GetModules().LoadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } catch (...) {
@@ -395,7 +395,7 @@ public:
                 NoString sModLoadError;
 
                 try {
-                    if (!pNewUser->GetModules().LoadModule(sModName, sArgs, NoModInfo::UserModule, pNewUser, nullptr, sModRet)) {
+                    if (!pNewUser->GetModules().LoadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } catch (...) {
@@ -800,7 +800,7 @@ public:
             Tmpl["Username"] = pUser->GetUserName();
 
             std::set<NoModInfo> ssNetworkMods;
-            NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, NoModInfo::NetworkModule);
+            NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, No::NetworkModule);
             for (std::set<NoModInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
                 const NoModInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
@@ -820,11 +820,11 @@ public:
                 }
 
                 // Check if module is loaded globally
-                l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(NoModInfo::GlobalModule));
+                l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(No::GlobalModule));
                 l["LoadedGlobally"] = NoString(NoApp::Get().GetModules().FindModule(Info.GetName()) != nullptr);
 
                 // Check if module is loaded by user
-                l["CanBeLoadedByUser"] = NoString(Info.SupportsType(NoModInfo::UserModule));
+                l["CanBeLoadedByUser"] = NoString(Info.SupportsType(No::UserModule));
                 l["LoadedByUser"] = NoString(pUser->GetModules().FindModule(Info.GetName()) != nullptr);
 
                 if (!spSession->IsAdmin() && pUser->DenyLoadMod()) {
@@ -1097,7 +1097,7 @@ public:
                     NoModule* pMod = pNetwork->GetModules().FindModule(sModName);
 
                     if (!pMod) {
-                        if (!pNetwork->GetModules().LoadModule(sModName, sArgs, NoModInfo::NetworkModule, pUser, pNetwork, sModRet)) {
+                        if (!pNetwork->GetModules().LoadModule(sModName, sArgs, No::NetworkModule, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } else if (pMod->GetArgs() != sArgs) {
@@ -1396,18 +1396,18 @@ public:
                             networksWithRenderedModuleCount++;
                         }
                     }
-                    l["CanBeLoadedByNetwork"] = NoString(Info.SupportsType(NoModInfo::NetworkModule));
+                    l["CanBeLoadedByNetwork"] = NoString(Info.SupportsType(No::NetworkModule));
                     l["LoadedByAllNetworks"] = NoString(networksWithRenderedModuleCount == userNetworks.size());
                     l["LoadedBySomeNetworks"] = NoString(networksWithRenderedModuleCount != 0);
                 }
                 if (pModule) {
                     l["Checked"] = "true";
                     l["Args"] = pModule->GetArgs();
-                    if (NoModInfo::UserModule == GetType() && Info.GetName() == GetModName()) {
+                    if (No::UserModule == GetType() && Info.GetName() == GetModName()) {
                         l["Disabled"] = "true";
                     }
                 }
-                l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(NoModInfo::GlobalModule));
+                l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(No::GlobalModule));
                 // Check if module is loaded globally
                 l["LoadedGlobally"] = NoString(NoApp::Get().GetModules().FindModule(Info.GetName()) != nullptr);
 
@@ -1826,7 +1826,7 @@ public:
             }
 
             std::set<NoModInfo> ssGlobalMods;
-            NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, NoModInfo::GlobalModule);
+            NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
 
             for (std::set<NoModInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
                 const NoModInfo& Info = *it;
@@ -1836,7 +1836,7 @@ public:
                 if (pModule) {
                     l["Checked"] = "true";
                     l["Args"] = pModule->GetArgs();
-                    if (NoModInfo::GlobalModule == GetType() && Info.GetName() == GetModName()) {
+                    if (No::GlobalModule == GetType() && Info.GetName() == GetModName()) {
                         l["Disabled"] = "true";
                     }
                 }
@@ -1870,11 +1870,11 @@ public:
                         }
                     }
                 }
-                l["CanBeLoadedByNetwork"] = NoString(Info.SupportsType(NoModInfo::NetworkModule));
+                l["CanBeLoadedByNetwork"] = NoString(Info.SupportsType(No::NetworkModule));
                 l["LoadedByAllNetworks"] = NoString(networksWithRenderedModuleCount == networksCount);
                 l["LoadedBySomeNetworks"] = NoString(networksWithRenderedModuleCount != 0);
 
-                l["CanBeLoadedByUser"] = NoString(Info.SupportsType(NoModInfo::UserModule));
+                l["CanBeLoadedByUser"] = NoString(Info.SupportsType(No::UserModule));
                 l["LoadedByAllUsers"] = NoString(usersWithRenderedModuleCount == allUsers.size());
                 l["LoadedBySomeUsers"] = NoString(usersWithRenderedModuleCount != 0);
             }
@@ -1928,7 +1928,7 @@ public:
 
                 NoModule* pMod = NoApp::Get().GetModules().FindModule(sModName);
                 if (!pMod) {
-                    if (!NoApp::Get().GetModules().LoadModule(sModName, sArgs, NoModInfo::GlobalModule, nullptr, nullptr, sModRet)) {
+                    if (!NoApp::Get().GetModules().LoadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } else if (pMod->GetArgs() != sArgs) {
@@ -1951,7 +1951,7 @@ public:
             NoModule* pCurMod = vCurMods[a];
 
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() &&
-                (NoModInfo::GlobalModule != GetType() || pCurMod->GetModName() != GetModName())) {
+                (No::GlobalModule != GetType() || pCurMod->GetModName() != GetModName())) {
                 ssUnloadMods.insert(pCurMod->GetModName());
             }
         }
@@ -1972,7 +1972,7 @@ public:
 
 template <> void TModInfo<NoWebAdminMod>(NoModInfo& Info)
 {
-    Info.AddType(NoModInfo::UserModule);
+    Info.AddType(No::UserModule);
     Info.SetWikiPage("webadmin");
 }
 

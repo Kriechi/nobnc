@@ -97,7 +97,7 @@ private:
 template <> void TModInfo<NoAutoReplyMod>(NoModInfo& Info)
 {
     Info.SetWikiPage("autoreply");
-    Info.AddType(NoModInfo::NetworkModule);
+    Info.AddType(No::NetworkModule);
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("You might specify a reply text. It is used when automatically answering queries, if you are "
                          "not connected to ZNC.");

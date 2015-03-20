@@ -38,8 +38,8 @@ public:
 
 template <> void TModInfo<NoBlockMotd>(NoModInfo& Info)
 {
-    Info.AddType(NoModInfo::NetworkModule);
-    Info.AddType(NoModInfo::GlobalModule);
+    Info.AddType(No::NetworkModule);
+    Info.AddType(No::GlobalModule);
     Info.SetWikiPage("block_motd");
 }
 

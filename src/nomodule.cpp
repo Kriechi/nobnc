@@ -25,7 +25,7 @@
 #include "nomodulejob.h"
 #include <dlfcn.h>
 
-NoModule::NoModule(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, NoModInfo::ModuleType eType)
+NoModule::NoModule(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
     : m_eType(eType), m_sDescription(""), m_sTimers(), m_sSockets(),
 #ifdef HAVE_PTHREAD
       m_sJobs(),
@@ -88,7 +88,7 @@ NoString& NoModule::ExpandString(const NoString& sStr, NoString& sRet) const
     return sRet;
 }
 
-void NoModule::SetType(NoModInfo::ModuleType eType) { m_eType = eType; }
+void NoModule::SetType(No::ModuleType eType) { m_eType = eType; }
 
 void NoModule::SetDescription(const NoString& s) { m_sDescription = s; }
 
@@ -96,7 +96,7 @@ void NoModule::SetModPath(const NoString& s) { m_sModPath = s; }
 
 void NoModule::SetArgs(const NoString& s) { m_sArgs = s; }
 
-NoModInfo::ModuleType NoModule::GetType() const { return m_eType; }
+No::ModuleType NoModule::GetType() const { return m_eType; }
 
 const NoString& NoModule::GetDescription() const { return m_sDescription; }
 
@@ -123,11 +123,11 @@ const NoString& NoModule::GetSavePath() const
 NoString NoModule::GetWebPath()
 {
     switch (m_eType) {
-    case NoModInfo::GlobalModule:
+    case No::GlobalModule:
         return "/mods/global/" + GetModName() + "/";
-    case NoModInfo::UserModule:
+    case No::UserModule:
         return "/mods/user/" + GetModName() + "/";
-    case NoModInfo::NetworkModule:
+    case No::NetworkModule:
         return "/mods/network/" + m_pNetwork->GetName() + "/" + GetModName() + "/";
     default:
         return "/";
@@ -137,11 +137,11 @@ NoString NoModule::GetWebPath()
 NoString NoModule::GetWebFilesPath()
 {
     switch (m_eType) {
-    case NoModInfo::GlobalModule:
+    case No::GlobalModule:
         return "/modfiles/global/" + GetModName() + "/";
-    case NoModInfo::UserModule:
+    case No::UserModule:
         return "/modfiles/user/" + GetModName() + "/";
-    case NoModInfo::NetworkModule:
+    case No::NetworkModule:
         return "/modfiles/network/" + m_pNetwork->GetName() + "/" + GetModName() + "/";
     default:
         return "/";
@@ -724,7 +724,7 @@ void NoModule::OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps) {}
 bool NoModule::IsClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState) { return false; }
 void NoModule::OnClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState) {}
 NoModule::ModRet
-NoModule::OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::ModuleType eType, bool& bSuccess, NoString& sRetMsg)
+NoModule::OnModuleLoading(const NoString& sModName, const NoString& sArgs, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg)
 {
     return CONTINUE;
 }
@@ -733,7 +733,7 @@ NoModule::ModRet NoModule::OnGetModInfo(NoModInfo& ModInfo, const NoString& sMod
 {
     return CONTINUE;
 }
-void NoModule::OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType) {}
+void NoModule::OnGetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType) {}
 
 NoModCommand::NoModCommand() : m_sCmd(), m_pFunc(nullptr), m_sArgs(), m_sDesc() {}
 

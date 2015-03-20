@@ -416,11 +416,11 @@ bool NoWebSock::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTempla
 
         if (m_sModName == Module.GetModName()) {
             NoString sModuleType = GetPath().token(1, "/");
-            if (sModuleType == "global" && Module.GetType() == NoModInfo::GlobalModule) {
+            if (sModuleType == "global" && Module.GetType() == No::GlobalModule) {
                 bActiveModule = true;
-            } else if (sModuleType == "user" && Module.GetType() == NoModInfo::UserModule) {
+            } else if (sModuleType == "user" && Module.GetType() == No::UserModule) {
                 bActiveModule = true;
-            } else if (sModuleType == "network" && Module.GetType() == NoModInfo::NetworkModule) {
+            } else if (sModuleType == "network" && Module.GetType() == No::NetworkModule) {
                 NoNetwork* Network = Module.GetNetwork();
                 if (Network) {
                     NoString sNetworkName = GetPath().token(2, "/");
@@ -712,25 +712,25 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
         NoString sType = m_sPath.token(0, "/");
         m_sPath = m_sPath.tokens(1, "/");
 
-        NoModInfo::ModuleType eModType;
+        No::ModuleType eModType;
         if (sType.equals("global")) {
-            eModType = NoModInfo::GlobalModule;
+            eModType = No::GlobalModule;
         } else if (sType.equals("user")) {
-            eModType = NoModInfo::UserModule;
+            eModType = No::UserModule;
         } else if (sType.equals("network")) {
-            eModType = NoModInfo::NetworkModule;
+            eModType = No::NetworkModule;
         } else {
             PrintErrorPage(403, "Forbidden", "Unknown module type [" + sType + "]");
             return Done;
         }
 
-        if ((eModType != NoModInfo::GlobalModule) && !ForceLogin()) {
+        if ((eModType != No::GlobalModule) && !ForceLogin()) {
             // Make sure we have a valid user
             return Done;
         }
 
         NoNetwork* pNetwork = nullptr;
-        if (eModType == NoModInfo::NetworkModule) {
+        if (eModType == No::NetworkModule) {
             NoString sNetwork = m_sPath.token(0, "/");
             m_sPath = m_sPath.tokens(1, "/");
 
@@ -754,13 +754,13 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
         NoModule* pModule = nullptr;
 
         switch (eModType) {
-        case NoModInfo::GlobalModule:
+        case No::GlobalModule:
             pModule = NoApp::Get().GetModules().FindModule(m_sModName);
             break;
-        case NoModInfo::UserModule:
+        case No::UserModule:
             pModule = GetSession()->GetUser()->GetModules().FindModule(m_sModName);
             break;
-        case NoModInfo::NetworkModule:
+        case No::NetworkModule:
             pModule = pNetwork->GetModules().FindModule(m_sModName);
             break;
         }
@@ -775,7 +775,7 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
         } else if (pModule->WebRequiresAdmin() && !GetSession()->IsAdmin()) {
             PrintErrorPage(403, "Forbidden", "You need to be an admin to access this module");
             return Done;
-        } else if (pModule->GetType() != NoModInfo::GlobalModule && pModule->GetUser() != GetSession()->GetUser()) {
+        } else if (pModule->GetType() != No::GlobalModule && pModule->GetUser() != GetSession()->GetUser()) {
             PrintErrorPage(403,
                            "Forbidden",
                            "You must login as " + pModule->GetUser()->GetUserName() + " in order to view this page");
@@ -795,7 +795,7 @@ NoWebSock::PageRequest NoWebSock::OnPageRequestInternal(const NoString& sURI, No
             }
         }
 
-        if (pModule && pModule->GetType() != NoModInfo::GlobalModule &&
+        if (pModule && pModule->GetType() != No::GlobalModule &&
             (!IsLoggedIn() || pModule->GetUser() != GetSession()->GetUser())) {
             AddModLoop("UserModLoop", *pModule);
         }

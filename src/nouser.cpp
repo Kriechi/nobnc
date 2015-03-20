@@ -167,7 +167,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         if (sValue.toBool()) {
             NoUtils::PrintAction("Loading Module [bouncedcc]");
             NoString sModRet;
-            bool bModRet = GetModules().LoadModule("bouncedcc", "", NoModInfo::UserModule, this, nullptr, sModRet);
+            bool bModRet = GetModules().LoadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
 
             NoUtils::PrintStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -729,7 +729,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
         NoModule* pCurMod = vCurMods.FindModule(pNewMod->GetModName());
 
         if (!pCurMod) {
-            vCurMods.LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), NoModInfo::UserModule, this, nullptr, sModRet);
+            vCurMods.LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::UserModule, this, nullptr, sModRet);
         } else if (pNewMod->GetArgs() != pCurMod->GetArgs()) {
             vCurMods.ReloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), this, nullptr, sModRet);
         }
@@ -1089,7 +1089,7 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
 
     NoUtils::PrintAction(sNotice);
 
-    if (!ModInfo.SupportsType(NoModInfo::UserModule) && ModInfo.SupportsType(NoModInfo::NetworkModule)) {
+    if (!ModInfo.SupportsType(No::UserModule) && ModInfo.SupportsType(No::NetworkModule)) {
         NoUtils::PrintMessage("NOTICE: Module [" + sModName +
                              "] is a network module, loading module for all networks in user.");
 
@@ -1106,13 +1106,13 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
                 fNVFile.Copy(sNetworkModPath + "/.registry");
             }
 
-            bModRet = pNetwork->GetModules().LoadModule(sModName, sArgs, NoModInfo::NetworkModule, this, pNetwork, sModRet);
+            bModRet = pNetwork->GetModules().LoadModule(sModName, sArgs, No::NetworkModule, this, pNetwork, sModRet);
             if (!bModRet) {
                 break;
             }
         }
     } else {
-        bModRet = GetModules().LoadModule(sModName, sArgs, NoModInfo::UserModule, this, nullptr, sModRet);
+        bModRet = GetModules().LoadModule(sModName, sArgs, No::UserModule, this, nullptr, sModRet);
     }
 
     if (!bModRet) {

@@ -19,6 +19,7 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
+#include <no/nonamespace.h>
 
 class NoUser;
 class NoModule;
@@ -29,20 +30,18 @@ typedef void* ModHandle;
 class NO_EXPORT NoModInfo
 {
 public:
-    enum ModuleType { GlobalModule, UserModule, NetworkModule };
-
-    typedef NoModule* (*ModLoader)(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, ModuleType eType);
+    typedef NoModule* (*ModLoader)(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType);
 
     NoModInfo();
-    NoModInfo(const NoString& sName, const NoString& sPath, ModuleType eType);
+    NoModInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType);
 
     bool operator<(const NoModInfo& Info) const;
 
-    bool SupportsType(ModuleType eType) const;
+    bool SupportsType(No::ModuleType eType) const;
 
-    void AddType(ModuleType eType);
+    void AddType(No::ModuleType eType);
 
-    static NoString ModuleTypeToString(ModuleType eType);
+    static NoString ModuleTypeToString(No::ModuleType eType);
 
     const NoString& GetName() const;
     const NoString& GetPath() const;
@@ -51,7 +50,7 @@ public:
     const NoString& GetArgsHelpText() const;
     bool GetHasArgs() const;
     ModLoader GetLoader() const;
-    ModuleType GetDefaultType() const;
+    No::ModuleType GetDefaultType() const;
 
     void SetName(const NoString& s);
     void SetPath(const NoString& s);
@@ -60,11 +59,11 @@ public:
     void SetArgsHelpText(const NoString& s);
     void SetHasArgs(bool b = false);
     void SetLoader(ModLoader fLoader);
-    void SetDefaultType(ModuleType eType);
+    void SetDefaultType(No::ModuleType eType);
 
 private:
-    std::set<ModuleType> m_seType;
-    ModuleType m_eDefaultType;
+    std::set<No::ModuleType> m_seType;
+    No::ModuleType m_eDefaultType;
     NoString m_sName;
     NoString m_sPath;
     NoString m_sDescription;
@@ -77,7 +76,7 @@ private:
 template <class M> void TModInfo(NoModInfo& Info) {}
 
 template <class M>
-NoModule* TModLoad(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, NoModInfo::ModuleType eType)
+NoModule* TModLoad(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType)
 {
     return new M(p, pUser, pNetwork, sModName, sModPath, eType);
 }

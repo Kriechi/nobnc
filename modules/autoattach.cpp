@@ -271,7 +271,7 @@ private:
 
 template <> void TModInfo<NoChannelAttach>(NoModInfo& Info)
 {
-    Info.AddType(NoModInfo::UserModule);
+    Info.AddType(No::UserModule);
     Info.SetWikiPage("autoattach");
     Info.SetHasArgs(true);
     Info.SetArgsHelpText("List of channel masks and channel masks with ! before them.");

@@ -87,17 +87,17 @@ class NoModInfo;
  *  @param CLASS The name of your module's class.
  */
 #define MODCONSTRUCTOR(CLASS)                                                                                                                 \
-    CLASS(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, NoModInfo::ModuleType eType) \
+    CLASS(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType) \
         : NoModule(pDLL, pUser, pNetwork, sModName, sModPath, eType)
 
 /** This works exactly like MODULEDEFS, but for user modules. */
-#define USERMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, NoModInfo::UserModule)
+#define USERMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, No::UserModule)
 
 /** This works exactly like MODULEDEFS, but for global modules. */
-#define GLOBALMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, NoModInfo::GlobalModule)
+#define GLOBALMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, No::GlobalModule)
 
 /** This works exactly like MODULEDEFS, but for network modules. */
-#define NETWORKMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, NoModInfo::NetworkModule)
+#define NETWORKMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, No::NetworkModule)
 
 /** At the end of your source file, you must call this macro in global context.
  *  It defines some static functions which ZNC needs to load this module.
@@ -191,7 +191,7 @@ public:
             NoNetwork* pNetwork,
             const NoString& sModName,
             const NoString& sDataDir,
-            NoModInfo::ModuleType eType = NoModInfo::NetworkModule); // TODO: remove default value in ZNC 2.x
+            No::ModuleType eType = No::NetworkModule); // TODO: remove default value in ZNC 2.x
     virtual ~NoModule();
 
     NoModule(const NoModule&) = delete;
@@ -812,12 +812,12 @@ public:
     NoString ExpandString(const NoString& sStr) const;
     NoString& ExpandString(const NoString& sStr, NoString& sRet) const;
 
-    void SetType(NoModInfo::ModuleType eType);
+    void SetType(No::ModuleType eType);
     void SetDescription(const NoString& s);
     void SetModPath(const NoString& s);
     void SetArgs(const NoString& s);
 
-    NoModInfo::ModuleType GetType() const;
+    No::ModuleType GetType() const;
     const NoString& GetDescription() const;
     const NoString& GetArgs() const;
     const NoString& GetModPath() const;
@@ -904,7 +904,7 @@ public:
      *  @return See NoModule::ModRet.
      */
     virtual ModRet
-    OnModuleLoading(const NoString& sModName, const NoString& sArgs, NoModInfo::ModuleType eType, bool& bSuccess, NoString& sRetMsg);
+    OnModuleLoading(const NoString& sModName, const NoString& sArgs, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg);
     /** Called when a module is going to be unloaded.
      *  @param pModule the module.
      *  @param[out] bSuccess the module was unloaded successfully
@@ -925,10 +925,10 @@ public:
      *  @param ssMods put new modules here.
      *  @param bGlobal true if global modules are needed.
      */
-    virtual void OnGetAvailableMods(std::set<NoModInfo>& ssMods, NoModInfo::ModuleType eType);
+    virtual void OnGetAvailableMods(std::set<NoModInfo>& ssMods, No::ModuleType eType);
 
 private:
-    NoModInfo::ModuleType m_eType;
+    No::ModuleType m_eType;
     NoString m_sDescription;
     std::set<NoTimer*> m_sTimers;
     std::set<NoModuleSocket*> m_sSockets;

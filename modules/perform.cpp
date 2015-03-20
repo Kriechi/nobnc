@@ -178,7 +178,7 @@ private:
 
 template <> void TModInfo<NoPerform>(NoModInfo& Info)
 {
-    Info.AddType(NoModInfo::UserModule);
+    Info.AddType(No::UserModule);
     Info.SetWikiPage("perform");
 }
 

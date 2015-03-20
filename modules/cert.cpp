@@ -97,7 +97,7 @@ public:
 
 template <> void TModInfo<NoCertMod>(NoModInfo& Info)
 {
-    Info.AddType(NoModInfo::UserModule);
+    Info.AddType(No::UserModule);
     Info.SetWikiPage("cert");
 }
 
