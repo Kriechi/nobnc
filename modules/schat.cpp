@@ -150,8 +150,8 @@ public:
 
     void OnModCommand(const NoString& sCommand) override
     {
-        NoString sCom = sCommand.token(0);
-        NoString sArgs = sCommand.tokens(1);
+        NoString sCom = No::token(sCommand, 0);
+        NoString sArgs = No::tokens(sCommand, 1);
 
         if (sCom.equals("chat") && !sArgs.empty()) {
             NoString sNick = "(s)" + sArgs;
@@ -307,8 +307,8 @@ public:
     {
         if (sMessage.startsWith("DCC SCHAT ")) {
             // chat ip port
-            ulong iIP = sMessage.token(3).toULong();
-            ushort iPort = sMessage.token(4).toUShort();
+            ulong iIP = No::token(sMessage, 3).toULong();
+            ushort iPort = No::token(sMessage, 4).toUShort();
 
             if (iIP > 0 && iPort > 0) {
                 std::pair<u_long, u_short> pTmp;

@@ -25,7 +25,7 @@
 NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig, NoSettings* pConfig)
     : m_detached(false), m_isOn(false), m_autoClearChanBuffer(pNetwork->GetUser()->AutoClearChanBuffer()),
       m_inConfig(bInConfig), m_disabled(false), m_hasBufferCountSet(false), m_hasAutoClearChanBufferSet(false),
-      m_name(sName.token(0)), m_key(sName.token(1)), m_topic(""), m_topicOwner(""), m_topicDate(0),
+      m_name(No::token(sName, 0)), m_key(No::token(sName, 1)), m_topic(""), m_topicOwner(""), m_topicDate(0),
       m_creationDate(0), m_network(pNetwork), m_nick(), m_joinTries(0), m_defaultModes(""), m_nicks(),
       m_buffer(), m_modeKnown(false), m_modes()
 {
@@ -256,8 +256,8 @@ void NoChannel::onWho(const NoString& sNick, const NoString& sIdent, const NoStr
 
 void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
 {
-    NoString sModeArg = sModes.token(0);
-    NoString sArgs = sModes.tokens(1);
+    NoString sModeArg = No::token(sModes, 0);
+    NoString sArgs = No::tokens(sModes, 1);
     bool bAdd = true;
 
     /* Try to find a NoNick* from this channel so that pOpNick->HasPerm()
@@ -457,11 +457,11 @@ bool NoChannel::addNick(const NoString& sNick)
     sTmp = p;
 
     // The UHNames extension gets us nick!ident@host instead of just plain nick
-    sIdent = sTmp.tokens(1, "!");
-    sHost = sIdent.tokens(1, "@");
-    sIdent = sIdent.token(0, "@");
+    sIdent = No::tokens(sTmp, 1, "!");
+    sHost = No::tokens(sIdent, 1, "@");
+    sIdent = No::token(sIdent, 0, "@");
     // Get the nick
-    sTmp = sTmp.token(0, "!");
+    sTmp = No::token(sTmp, 0, "!");
 
     NoNick tmpNick(sTmp);
     NoNick* pNick = findNick(sTmp);

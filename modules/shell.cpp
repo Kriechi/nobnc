@@ -84,9 +84,9 @@ public:
 
     void OnModCommand(const NoString& sLine) override
     {
-        NoString sCommand = sLine.token(0);
+        NoString sCommand = No::token(sLine, 0);
         if (sCommand.equals("cd")) {
-            NoString sArg = sLine.tokens(1);
+            NoString sArg = No::tokens(sLine, 1);
             NoString sPath =
             NoDir::ChangeDir(m_sPath, (sArg.empty() ? NoString(NoApp::Get().GetHomePath()) : sArg), NoApp::Get().GetHomePath());
             NoFile Dir(sPath);

@@ -48,13 +48,13 @@ public:
 
     void SetFile(const NoString& sLine)
     {
-        SetNV("File", sLine.tokens(1));
+        SetNV("File", No::tokens(sLine, 1));
         PutModule("File has been set to: " + GetNV("File"));
     }
 
     void SetFormat(const NoString& sLine)
     {
-        SetNV("Format", sLine.tokens(1));
+        SetNV("Format", No::tokens(sLine, 1));
         PutModule("Format has been set to: " + GetNV("Format"));
         PutModule("Format would be expanded to: " + ExpandString(GetNV("Format")));
     }

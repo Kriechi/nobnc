@@ -112,18 +112,6 @@ TEST(StringTest, LeftRight)
 
 TEST(StringTest, Split)
 {
-    EXPECT_EQ("a", NS("a b c").token(0));
-    EXPECT_EQ("b", NS("a b c").token(1));
-    EXPECT_EQ("", NS("a b c").token(100));
-    EXPECT_EQ("b c", NS("a b c").tokens(1));
-    EXPECT_EQ("c", NS("a  c").token(1));
-    EXPECT_EQ("c", NS("a  c").token(1, " "));
-    EXPECT_EQ("c", NS("a  c").token(1, "  "));
-    EXPECT_EQ(" c", NS("a   c").token(1, "  "));
-    EXPECT_EQ("c", NS("a    c").token(1, "  "));
-//    EXPECT_EQ("(b c)", CS("a (b c) d").token(1, " ", "(", ")"));
-//    EXPECT_EQ("d", CS("a (b c) d").token(2, " ", "(", ")"));
-
     NoStringVector vexpected;
     vexpected.push_back("a");
     vexpected.push_back("b");

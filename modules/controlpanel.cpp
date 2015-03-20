@@ -69,8 +69,8 @@ class NoAdminMod : public NoModule
         static const char* integer = "Integer";
         static const char* doublenum = "Double";
 
-        const NoString sCmdFilter = sLine.token(1);
-        const NoString sVarFilter = sLine.tokens(2).toLower();
+        const NoString sCmdFilter = No::token(sLine, 1);
+        const NoString sVarFilter = No::tokens(sLine, 2).toLower();
 
         if (sCmdFilter.empty() || sCmdFilter.startsWith("Set") || sCmdFilter.startsWith("Get")) {
             static const char* vars[][2] = {
@@ -181,8 +181,8 @@ class NoAdminMod : public NoModule
 
     void Get(const NoString& sLine)
     {
-        const NoString sVar = sLine.token(1).toLower();
-        NoString sUsername = sLine.tokens(2);
+        const NoString sVar = No::token(sLine, 1).toLower();
+        NoString sUsername = No::tokens(sLine, 2);
         NoUser* pUser;
 
         if (sVar.empty()) {
@@ -259,9 +259,9 @@ class NoAdminMod : public NoModule
 
     void Set(const NoString& sLine)
     {
-        const NoString sVar = sLine.token(1).toLower();
-        NoString sUserName = sLine.token(2);
-        NoString sValue = sLine.tokens(3);
+        const NoString sVar = No::token(sLine, 1).toLower();
+        NoString sUserName = No::token(sLine, 2);
+        NoString sValue = No::tokens(sLine, 3);
 
         if (sValue.empty()) {
             PutModule("Usage: Set <variable> <username> <value>");
@@ -434,9 +434,9 @@ class NoAdminMod : public NoModule
 
     void GetNetwork(const NoString& sLine)
     {
-        const NoString sVar = sLine.token(1).toLower();
-        const NoString sUsername = sLine.token(2);
-        const NoString sNetwork = sLine.token(3);
+        const NoString sVar = No::token(sLine, 1).toLower();
+        const NoString sUsername = No::token(sLine, 2);
+        const NoString sNetwork = No::token(sLine, 3);
 
         NoNetwork* pNetwork = nullptr;
 
@@ -488,10 +488,10 @@ class NoAdminMod : public NoModule
 
     void SetNetwork(const NoString& sLine)
     {
-        const NoString sVar = sLine.token(1).toLower();
-        const NoString sUsername = sLine.token(2);
-        const NoString sNetwork = sLine.token(3);
-        const NoString sValue = sLine.tokens(4);
+        const NoString sVar = No::token(sLine, 1).toLower();
+        const NoString sUsername = No::token(sLine, 2);
+        const NoString sNetwork = No::token(sLine, 3);
+        const NoString sValue = No::tokens(sLine, 4);
 
         NoUser* pUser = nullptr;
         NoNetwork* pNetwork = nullptr;
@@ -583,9 +583,9 @@ class NoAdminMod : public NoModule
 
     void AddChan(const NoString& sLine)
     {
-        const NoString sUsername = sLine.token(1);
-        const NoString sNetwork = sLine.token(2);
-        const NoString sChan = sLine.token(3);
+        const NoString sUsername = No::token(sLine, 1);
+        const NoString sNetwork = No::token(sLine, 2);
+        const NoString sChan = No::token(sLine, 3);
 
         if (sChan.empty()) {
             PutModule("Usage: AddChan <username> <network> <channel>");
@@ -614,9 +614,9 @@ class NoAdminMod : public NoModule
 
     void DelChan(const NoString& sLine)
     {
-        const NoString sUsername = sLine.token(1);
-        const NoString sNetwork = sLine.token(2);
-        const NoString sChan = sLine.token(3);
+        const NoString sUsername = No::token(sLine, 1);
+        const NoString sNetwork = No::token(sLine, 2);
+        const NoString sChan = No::token(sLine, 3);
 
         if (sChan.empty()) {
             PutModule("Usage: DelChan <username> <network> <channel>");
@@ -651,10 +651,10 @@ class NoAdminMod : public NoModule
 
     void GetChan(const NoString& sLine)
     {
-        const NoString sVar = sLine.token(1).toLower();
-        NoString sUsername = sLine.token(2);
-        NoString sNetwork = sLine.token(3);
-        NoString sChan = sLine.tokens(4);
+        const NoString sVar = No::token(sLine, 1).toLower();
+        NoString sUsername = No::token(sLine, 2);
+        NoString sNetwork = No::token(sLine, 3);
+        NoString sChan = No::tokens(sLine, 4);
 
         if (sChan.empty()) {
             PutModule("Usage: GetChan <variable> <username> <network> <chan>");
@@ -708,11 +708,11 @@ class NoAdminMod : public NoModule
 
     void SetChan(const NoString& sLine)
     {
-        const NoString sVar = sLine.token(1).toLower();
-        NoString sUsername = sLine.token(2);
-        NoString sNetwork = sLine.token(3);
-        NoString sChan = sLine.token(4);
-        NoString sValue = sLine.tokens(5);
+        const NoString sVar = No::token(sLine, 1).toLower();
+        NoString sUsername = No::token(sLine, 2);
+        NoString sNetwork = No::token(sLine, 3);
+        NoString sChan = No::token(sLine, 4);
+        NoString sValue = No::tokens(sLine, 5);
 
         if (sValue.empty()) {
             PutModule("Usage: SetChan <variable> <username> <network> <chan> <value>");
@@ -815,7 +815,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sUsername = sLine.token(1), sPassword = sLine.token(2);
+        const NoString sUsername = No::token(sLine, 1), sPassword = No::token(sLine, 2);
         if (sPassword.empty()) {
             PutModule("Usage: AddUser <username> <password>");
             return;
@@ -848,7 +848,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sUsername = sLine.tokens(1);
+        const NoString sUsername = No::tokens(sLine, 1);
         if (sUsername.empty()) {
             PutModule("Usage: DelUser <username>");
             return;
@@ -883,7 +883,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sOldUsername = sLine.token(1), sNewUsername = sLine.tokens(2);
+        const NoString sOldUsername = No::token(sLine, 1), sNewUsername = No::tokens(sLine, 2);
 
         if (sOldUsername.empty() || sNewUsername.empty()) {
             PutModule("Usage: CloneUser <old username> <new username>");
@@ -917,8 +917,8 @@ class NoAdminMod : public NoModule
 
     void AddNetwork(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sNetwork = sLine.token(2);
+        NoString sUser = No::token(sLine, 1);
+        NoString sNetwork = No::token(sLine, 2);
         NoUser* pUser = GetUser();
 
         if (sNetwork.empty()) {
@@ -957,8 +957,8 @@ class NoAdminMod : public NoModule
 
     void DelNetwork(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sNetwork = sLine.token(2);
+        NoString sUser = No::token(sLine, 1);
+        NoString sNetwork = No::token(sLine, 2);
         NoUser* pUser = GetUser();
 
         if (sNetwork.empty()) {
@@ -994,7 +994,7 @@ class NoAdminMod : public NoModule
 
     void ListNetworks(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
+        NoString sUser = No::token(sLine, 1);
         NoUser* pUser = GetUser();
 
         if (!sUser.empty()) {
@@ -1034,9 +1034,9 @@ class NoAdminMod : public NoModule
 
     void AddServer(const NoString& sLine)
     {
-        NoString sUsername = sLine.token(1);
-        NoString sNetwork = sLine.token(2);
-        NoString sServer = sLine.tokens(3);
+        NoString sUsername = No::token(sLine, 1);
+        NoString sNetwork = No::token(sLine, 2);
+        NoString sServer = No::tokens(sLine, 3);
 
         if (sServer.empty()) {
             PutModule("Usage: AddServer <username> <network> <server>");
@@ -1060,11 +1060,11 @@ class NoAdminMod : public NoModule
 
     void DelServer(const NoString& sLine)
     {
-        NoString sUsername = sLine.token(1);
-        NoString sNetwork = sLine.token(2);
-        NoString sServer = sLine.tokens(3);
-        ushort uPort = sLine.token(4).toUShort();
-        NoString sPass = sLine.token(5);
+        NoString sUsername = No::token(sLine, 1);
+        NoString sNetwork = No::token(sLine, 2);
+        NoString sServer = No::tokens(sLine, 3);
+        ushort uPort = No::token(sLine, 4).toUShort();
+        NoString sPass = No::token(sLine, 5);
 
         if (sServer.empty()) {
             PutModule("Usage: DelServer <username> <network> <server>");
@@ -1088,8 +1088,8 @@ class NoAdminMod : public NoModule
 
     void ReconnectUser(const NoString& sLine)
     {
-        NoString sUserName = sLine.token(1);
-        NoString sNetwork = sLine.token(2);
+        NoString sUserName = No::token(sLine, 1);
+        NoString sNetwork = No::token(sLine, 2);
 
         if (sNetwork.empty()) {
             PutModule("Usage: Reconnect <username> <network>");
@@ -1125,8 +1125,8 @@ class NoAdminMod : public NoModule
 
     void DisconnectUser(const NoString& sLine)
     {
-        NoString sUserName = sLine.token(1);
-        NoString sNetwork = sLine.token(2);
+        NoString sUserName = No::token(sLine, 1);
+        NoString sNetwork = No::token(sLine, 2);
 
         if (sNetwork.empty()) {
             PutModule("Usage: Disconnect <username> <network>");
@@ -1150,7 +1150,7 @@ class NoAdminMod : public NoModule
 
     void ListCTCP(const NoString& sLine)
     {
-        NoString sUserName = sLine.tokens(1);
+        NoString sUserName = No::tokens(sLine, 1);
 
         if (sUserName.empty()) {
             sUserName = GetUser()->GetUserName();
@@ -1178,13 +1178,13 @@ class NoAdminMod : public NoModule
 
     void AddCTCP(const NoString& sLine)
     {
-        NoString sUserName = sLine.token(1);
-        NoString sCTCPRequest = sLine.token(2);
-        NoString sCTCPReply = sLine.tokens(3);
+        NoString sUserName = No::token(sLine, 1);
+        NoString sCTCPRequest = No::token(sLine, 2);
+        NoString sCTCPReply = No::tokens(sLine, 3);
 
         if (sCTCPRequest.empty()) {
             sCTCPRequest = sUserName;
-            sCTCPReply = sLine.tokens(2);
+            sCTCPReply = No::tokens(sLine, 2);
             sUserName = GetUser()->GetUserName();
         }
         if (sCTCPRequest.empty()) {
@@ -1205,8 +1205,8 @@ class NoAdminMod : public NoModule
 
     void DelCTCP(const NoString& sLine)
     {
-        NoString sUserName = sLine.token(1);
-        NoString sCTCPRequest = sLine.tokens(2);
+        NoString sUserName = No::token(sLine, 1);
+        NoString sCTCPRequest = No::tokens(sLine, 2);
 
         if (sCTCPRequest.empty()) {
             sCTCPRequest = sUserName;
@@ -1254,9 +1254,9 @@ class NoAdminMod : public NoModule
 
     void LoadModuleForUser(const NoString& sLine)
     {
-        NoString sUsername = sLine.token(1);
-        NoString sModName = sLine.token(2);
-        NoString sArgs = sLine.tokens(3);
+        NoString sUsername = No::token(sLine, 1);
+        NoString sModName = No::token(sLine, 2);
+        NoString sArgs = No::tokens(sLine, 3);
 
         if (sModName.empty()) {
             PutModule("Usage: LoadModule <username> <modulename> [args]");
@@ -1271,10 +1271,10 @@ class NoAdminMod : public NoModule
 
     void LoadModuleForNetwork(const NoString& sLine)
     {
-        NoString sUsername = sLine.token(1);
-        NoString sNetwork = sLine.token(2);
-        NoString sModName = sLine.token(3);
-        NoString sArgs = sLine.tokens(4);
+        NoString sUsername = No::token(sLine, 1);
+        NoString sNetwork = No::token(sLine, 2);
+        NoString sModName = No::token(sLine, 3);
+        NoString sArgs = No::tokens(sLine, 4);
 
         if (sModName.empty()) {
             PutModule("Usage: LoadNetModule <username> <network> <modulename> [args]");
@@ -1314,8 +1314,8 @@ class NoAdminMod : public NoModule
 
     void UnLoadModuleForUser(const NoString& sLine)
     {
-        NoString sUsername = sLine.token(1);
-        NoString sModName = sLine.token(2);
+        NoString sUsername = No::token(sLine, 1);
+        NoString sModName = No::token(sLine, 2);
 
         if (sModName.empty()) {
             PutModule("Usage: UnloadModule <username> <modulename>");
@@ -1330,9 +1330,9 @@ class NoAdminMod : public NoModule
 
     void UnLoadModuleForNetwork(const NoString& sLine)
     {
-        NoString sUsername = sLine.token(1);
-        NoString sNetwork = sLine.token(2);
-        NoString sModName = sLine.token(3);
+        NoString sUsername = No::token(sLine, 1);
+        NoString sNetwork = No::token(sLine, 2);
+        NoString sModName = No::token(sLine, 3);
 
         if (sModName.empty()) {
             PutModule("Usage: UnloadNetModule <username> <network> <modulename>");
@@ -1372,7 +1372,7 @@ class NoAdminMod : public NoModule
 
     void ListModulesForUser(const NoString& sLine)
     {
-        NoString sUsername = sLine.token(1);
+        NoString sUsername = No::token(sLine, 1);
 
         if (sUsername.empty()) {
             PutModule("Usage: ListMods <username>");
@@ -1387,8 +1387,8 @@ class NoAdminMod : public NoModule
 
     void ListModulesForNetwork(const NoString& sLine)
     {
-        NoString sUsername = sLine.token(1);
-        NoString sNetwork = sLine.token(2);
+        NoString sUsername = No::token(sLine, 1);
+        NoString sNetwork = No::token(sLine, 2);
 
         if (sNetwork.empty()) {
             PutModule("Usage: ListNetMods <username> <network>");

@@ -127,7 +127,7 @@ public:
 
     void OnDelKeyCommand(const NoString& sCommand)
     {
-        NoString sTarget = sCommand.token(1);
+        NoString sTarget = No::token(sCommand, 1);
 
         if (!sTarget.empty()) {
             if (DelNV(sTarget.toLower())) {
@@ -142,8 +142,8 @@ public:
 
     void OnSetKeyCommand(const NoString& sCommand)
     {
-        NoString sTarget = sCommand.token(1);
-        NoString sKey = sCommand.tokens(2);
+        NoString sTarget = No::token(sCommand, 1);
+        NoString sKey = No::tokens(sCommand, 2);
 
         // Strip "cbc:" from beginning of string incase someone pastes directly from mircryption
         sKey.trimPrefix("cbc:");

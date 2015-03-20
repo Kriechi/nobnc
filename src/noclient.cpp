@@ -144,7 +144,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
 
     if (sLine.left(1) == "@") {
         // TODO support message-tags properly
-        sLine = sLine.tokens(1);
+        sLine = No::tokens(sLine, 1);
     }
 
     bool bReturn = false;
@@ -155,25 +155,25 @@ void NoClient::ReadLineImpl(const NoString& sData)
     }
     if (bReturn) return;
 
-    NoString sCommand = sLine.token(0);
+    NoString sCommand = No::token(sLine, 0);
     if (sCommand.left(1) == ":") {
         // Evil client! Sending a nickmask prefix on client's command
         // is bad, bad, bad, bad, bad, bad, bad, bad, BAD, B A D!
-        sLine = sLine.tokens(1);
-        sCommand = sLine.token(0);
+        sLine = No::tokens(sLine, 1);
+        sCommand = No::token(sLine, 0);
     }
 
     if (!IsAttached()) { // The following commands happen before authentication with ZNC
         if (sCommand.equals("PASS")) {
             m_bGotPass = true;
 
-            NoString sAuthLine = sLine.tokens(1).trimPrefix_n();
+            NoString sAuthLine = No::tokens(sLine, 1).trimPrefix_n();
             ParsePass(sAuthLine);
 
             AuthUser();
             return; // Don't forward this msg.  ZNC has already registered us.
         } else if (sCommand.equals("NICK")) {
-            NoString sNick = sLine.token(1).trimPrefix_n();
+            NoString sNick = No::token(sLine, 1).trimPrefix_n();
 
             m_sNick = sNick;
             m_bGotNick = true;
@@ -181,7 +181,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
             AuthUser();
             return; // Don't forward this msg.  ZNC will handle nick changes until auth is complete
         } else if (sCommand.equals("USER")) {
-            NoString sAuthLine = sLine.token(1);
+            NoString sAuthLine = No::token(sLine, 1);
 
             if (m_sUser.empty() && !sAuthLine.empty()) {
                 ParseUser(sAuthLine);
@@ -212,14 +212,14 @@ void NoClient::ReadLineImpl(const NoString& sData)
     }
 
     if (sCommand.equals("ZNC")) {
-        NoString sTarget = sLine.token(1);
+        NoString sTarget = No::token(sLine, 1);
         NoString sModCommand;
 
         if (sTarget.trimPrefix(m_pUser->GetStatusPrefix())) {
-            sModCommand = sLine.tokens(2);
+            sModCommand = No::tokens(sLine, 2);
         } else {
             sTarget = "status";
-            sModCommand = sLine.tokens(1);
+            sModCommand = No::tokens(sLine, 1);
         }
 
         if (sTarget.equals("status")) {
@@ -245,13 +245,13 @@ void NoClient::ReadLineImpl(const NoString& sData)
         // Block PONGs, we already responded to the pings
         return;
     } else if (sCommand.equals("QUIT")) {
-        NoString sMsg = sLine.tokens(1).trimPrefix_n();
+        NoString sMsg = No::tokens(sLine, 1).trimPrefix_n();
         NETWORKMODULECALL(OnUserQuit(sMsg), m_pUser, m_pNetwork, this, &bReturn);
         if (bReturn) return;
         Close(NoSocket::CLT_AFTERWRITE); // Treat a client quit as a detach
         return; // Don't forward this msg.  We don't want the client getting us disconnected.
     } else if (sCommand.equals("PROTOCTL")) {
-        NoStringVector vsTokens = sLine.tokens(1).split(" ", No::SkipEmptyParts);
+        NoStringVector vsTokens = No::tokens(sLine, 1).split(" ", No::SkipEmptyParts);
 
         for (const NoString& sToken : vsTokens) {
             if (sToken == "NAMESX") {
@@ -262,8 +262,8 @@ void NoClient::ReadLineImpl(const NoString& sData)
         }
         return; // If the server understands it, we already enabled namesx / uhnames
     } else if (sCommand.equals("NOTICE")) {
-        NoString sTargets = sLine.token(1).trimPrefix_n();
-        NoString sMsg = sLine.tokens(2).trimPrefix_n();
+        NoString sTargets = No::token(sLine, 1).trimPrefix_n();
+        NoString sMsg = No::tokens(sLine, 2).trimPrefix_n();
         NoStringVector vTargets = sTargets.split(",", No::SkipEmptyParts);
 
         for (NoString& sTarget : vTargets) {
@@ -280,7 +280,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
                 sCTCP.leftChomp(1);
                 sCTCP.rightChomp(1);
 
-                if (sCTCP.token(0) == "VERSION") {
+                if (No::token(sCTCP, 0) == "VERSION") {
                     sCTCP += " via " + NoApp::GetTag(false);
                 }
 
@@ -323,8 +323,8 @@ void NoClient::ReadLineImpl(const NoString& sData)
 
         return;
     } else if (sCommand.equals("PRIVMSG")) {
-        NoString sTargets = sLine.token(1);
-        NoString sMsg = sLine.tokens(2).trimPrefix_n();
+        NoString sTargets = No::token(sLine, 1);
+        NoString sMsg = No::tokens(sLine, 2).trimPrefix_n();
         NoStringVector vTargets = sTargets.split(",", No::SkipEmptyParts);
 
         for (NoString& sTarget : vTargets) {
@@ -344,8 +344,8 @@ void NoClient::ReadLineImpl(const NoString& sData)
                 }
 
                 if (m_pNetwork) {
-                    if (sCTCP.token(0).equals("ACTION")) {
-                        NoString sMessage = sCTCP.tokens(1);
+                    if (No::token(sCTCP, 0).equals("ACTION")) {
+                        NoString sMessage = No::tokens(sCTCP, 1);
                         NETWORKMODULECALL(OnUserAction(sTarget, sMessage), m_pUser, m_pNetwork, this, &bContinue);
                         if (bContinue) continue;
                         sCTCP = "ACTION " + sMessage;
@@ -446,7 +446,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
     }
 
     if (sCommand.equals("DETACH")) {
-        NoString sPatterns = sLine.tokens(1);
+        NoString sPatterns = No::tokens(sLine, 1);
 
         if (sPatterns.empty()) {
             PutStatusNotice("Usage: /detach <#chans>");
@@ -474,8 +474,8 @@ void NoClient::ReadLineImpl(const NoString& sData)
 
         return;
     } else if (sCommand.equals("JOIN")) {
-        NoString sChans = sLine.token(1).trimPrefix_n();
-        NoString sKey = sLine.token(2);
+        NoString sChans = No::token(sLine, 1).trimPrefix_n();
+        NoString sKey = No::token(sLine, 2);
 
         NoStringVector vsChans = sChans.split(",", No::SkipEmptyParts);
         sChans.clear();
@@ -509,8 +509,8 @@ void NoClient::ReadLineImpl(const NoString& sData)
             sLine += " " + sKey;
         }
     } else if (sCommand.equals("PART")) {
-        NoString sChans = sLine.token(1).trimPrefix_n();
-        NoString sMessage = sLine.tokens(2).trimPrefix_n();
+        NoString sChans = No::token(sLine, 1).trimPrefix_n();
+        NoString sMessage = No::tokens(sLine, 2).trimPrefix_n();
 
         NoStringVector vsChans = sChans.split(",", No::SkipEmptyParts);
         sChans.clear();
@@ -540,8 +540,8 @@ void NoClient::ReadLineImpl(const NoString& sData)
             sLine += " :" + sMessage;
         }
     } else if (sCommand.equals("TOPIC")) {
-        NoString sChan = sLine.token(1);
-        NoString sTopic = sLine.tokens(2).trimPrefix_n();
+        NoString sChan = No::token(sLine, 1);
+        NoString sTopic = No::tokens(sLine, 2).trimPrefix_n();
 
         if (!sTopic.empty()) {
             NETWORKMODULECALL(OnUserTopic(sChan, sTopic), m_pUser, m_pNetwork, this, &bReturn);
@@ -552,8 +552,8 @@ void NoClient::ReadLineImpl(const NoString& sData)
             if (bReturn) return;
         }
     } else if (sCommand.equals("MODE")) {
-        NoString sTarget = sLine.token(1);
-        NoString sModes = sLine.tokens(2);
+        NoString sTarget = No::token(sLine, 1);
+        NoString sModes = No::tokens(sLine, 2);
 
         if (m_pNetwork->IsChan(sTarget) && sModes.empty()) {
             // If we are on that channel and already received a
@@ -630,10 +630,10 @@ NoIrcConnection* NoClient::GetIRCSock() const
 
 void NoClient::StatusCTCP(const NoString& sLine)
 {
-    NoString sCommand = sLine.token(0);
+    NoString sCommand = No::token(sLine, 0);
 
     if (sCommand.equals("PING")) {
-        PutStatusNotice("\001PING " + sLine.tokens(1) + "\001");
+        PutStatusNotice("\001PING " + No::tokens(sLine, 1) + "\001");
     } else if (sCommand.equals("VERSION")) {
         PutStatusNotice("\001VERSION " + NoApp::GetTag() + "\001");
     }
@@ -883,7 +883,7 @@ void NoClient::RespondCap(const NoString& sResponse) { PutClient(":irc.znc.in CA
 void NoClient::HandleCap(const NoString& sLine)
 {
     // TODO support ~ and = modifiers
-    NoString sSubCmd = sLine.token(1);
+    NoString sSubCmd = No::token(sLine, 1);
 
     if (sSubCmd.equals("LS")) {
         NoStringSet ssOfferCaps;
@@ -906,7 +906,7 @@ void NoClient::HandleCap(const NoString& sLine)
             }
         }
     } else if (sSubCmd.equals("REQ")) {
-        NoStringVector vsTokens = sLine.tokens(2).trimPrefix_n(":").split(" ", No::SkipEmptyParts);
+        NoStringVector vsTokens = No::tokens(sLine, 2).trimPrefix_n(":").split(" ", No::SkipEmptyParts);
 
         for (const NoString& sToken : vsTokens) {
             bool bVal = true;
@@ -919,7 +919,7 @@ void NoClient::HandleCap(const NoString& sLine)
 
             if (!bAccepted) {
                 // Some unsupported capability is requested
-                RespondCap("NAK :" + sLine.tokens(2).trimPrefix_n(":"));
+                RespondCap("NAK :" + No::tokens(sLine, 2).trimPrefix_n(":"));
                 return;
             }
         }
@@ -950,7 +950,7 @@ void NoClient::HandleCap(const NoString& sLine)
             }
         }
 
-        RespondCap("ACK :" + sLine.tokens(2).trimPrefix_n(":"));
+        RespondCap("ACK :" + No::tokens(sLine, 2).trimPrefix_n(":"));
     } else if (sSubCmd.equals("LIST")) {
         NoString sList = NoString(" ").join(m_ssAcceptedCaps.begin(), m_ssAcceptedCaps.end());
         RespondCap("LIST :" + sList);

@@ -96,10 +96,10 @@ public:
 
     bool FromString(const NoString& sLine)
     {
-        m_sUsername = sLine.token(0, "\t");
-        m_sHostmask = sLine.token(1, "\t");
+        m_sUsername = No::token(sLine, 0, "\t");
+        m_sHostmask = No::token(sLine, 1, "\t");
 
-        NoStringVector vsChans = sLine.token(2, "\t").split(" ");
+        NoStringVector vsChans = No::token(sLine, 2, "\t").split(" ");
         m_ssChans = NoStringSet(vsChans.begin(), vsChans.end());
 
         return !m_sHostmask.empty();
@@ -192,13 +192,13 @@ public:
 
     void OnAddUserCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sHost = sLine.token(2);
+        NoString sUser = No::token(sLine, 1);
+        NoString sHost = No::token(sLine, 2);
 
         if (sHost.empty()) {
             PutModule("Usage: AddUser <user> <hostmask> [channels]");
         } else {
-            NoAutoVoiceUser* pUser = AddUser(sUser, sHost, sLine.tokens(3));
+            NoAutoVoiceUser* pUser = AddUser(sUser, sHost, No::tokens(sLine, 3));
 
             if (pUser) {
                 SetNV(sUser, pUser->ToString());
@@ -208,7 +208,7 @@ public:
 
     void OnDelUserCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
+        NoString sUser = No::token(sLine, 1);
 
         if (sUser.empty()) {
             PutModule("Usage: DelUser <user>");
@@ -243,8 +243,8 @@ public:
 
     void OnAddChansCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sChans = sLine.tokens(2);
+        NoString sUser = No::token(sLine, 1);
+        NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
             PutModule("Usage: AddChans <user> <channel> [channel] ...");
@@ -266,8 +266,8 @@ public:
 
     void OnDelChansCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sChans = sLine.tokens(2);
+        NoString sUser = No::token(sLine, 1);
+        NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
             PutModule("Usage: DelChans <user> <channel> [channel] ...");

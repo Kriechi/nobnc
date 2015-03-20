@@ -16,6 +16,7 @@
 
 #include "nosettings.h"
 #include "nofile.h"
+#include "noutils.h"
 #include <stack>
 #include <sstream>
 
@@ -214,8 +215,8 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
             sLine.rightChomp(1);
             sLine.trim();
 
-            NoString sTag = sLine.token(0);
-            NoString sValue = sLine.tokens(1);
+            NoString sTag = No::token(sLine, 0);
+            NoString sValue = No::tokens(sLine, 1);
 
             sTag.trim();
             sValue.trim();
@@ -256,8 +257,8 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
         }
 
         // If we have a regular line, figure out where it goes
-        NoString sName = sLine.token(0, "=");
-        NoString sValue = sLine.tokens(1, "=");
+        NoString sName = No::token(sLine, 0, "=");
+        NoString sValue = No::tokens(sLine, 1, "=");
 
         // Only remove the first space, people might want
         // leading spaces (e.g. in the MOTD).

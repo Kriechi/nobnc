@@ -46,8 +46,8 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        m_iThresholdMsgs = sArgs.token(0).toUInt();
-        m_iThresholdSecs = sArgs.token(1).toUInt();
+        m_iThresholdMsgs = No::token(sArgs, 0).toUInt();
+        m_iThresholdSecs = No::token(sArgs, 1).toUInt();
 
         if (m_iThresholdMsgs == 0 || m_iThresholdSecs == 0) {
             m_iThresholdMsgs = GetNV("msgs").toUInt();
@@ -179,7 +179,7 @@ public:
 
     void SecsCommand(const NoString& sLine)
     {
-        const NoString sArg = sLine.tokens(1);
+        const NoString sArg = No::tokens(sLine, 1);
 
         if (sArg.empty()) {
             PutModule("Seconds limit is [" + NoString(m_iThresholdSecs) + "]");
@@ -194,7 +194,7 @@ public:
 
     void LinesCommand(const NoString& sLine)
     {
-        const NoString sArg = sLine.tokens(1);
+        const NoString sArg = No::tokens(sLine, 1);
 
         if (sArg.empty()) {
             PutModule("Lines limit is [" + NoString(m_iThresholdMsgs) + "]");
@@ -209,7 +209,7 @@ public:
 
     void SilentCommand(const NoString& sLine)
     {
-        const NoString sArg = sLine.tokens(1);
+        const NoString sArg = No::tokens(sLine, 1);
 
         if (!sArg.empty()) {
             SetNV("silent", NoString(sArg.toBool()));

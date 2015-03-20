@@ -36,10 +36,10 @@ public:
             if (other.m_pSock->IsListener()) return true;
         }
         const NoString& sMyName = m_pSock->GetSockName();
-        const NoString& sMyName2 = sMyName.tokens(1, "::");
+        const NoString& sMyName2 = No::tokens(sMyName, 1, "::");
         bool bMyEmpty = sMyName2.empty();
         const NoString& sHisName = other.GetSock()->GetSockName();
-        const NoString& sHisName2 = sHisName.tokens(1, "::");
+        const NoString& sHisName2 = No::tokens(sHisName, 1, "::");
         bool bHisEmpty = sHisName2.empty();
 
         // Then sort by first token after "::"
@@ -136,7 +136,7 @@ public:
 
     void OnListCommand(const NoString& sLine)
     {
-        NoString sArg = sLine.tokens(1);
+        NoString sArg = No::tokens(sLine, 1);
 
         bool bShowHosts = true;
         if (sArg.equals("-n")) {

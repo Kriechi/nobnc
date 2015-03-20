@@ -156,7 +156,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     }
     pConfig->FindStringVector("ctcpreply", vsList);
     for (const NoString& sReply : vsList) {
-        AddCTCPReply(sReply.token(0), sReply.tokens(1));
+        AddCTCPReply(No::token(sReply, 0), No::tokens(sReply, 1));
     }
 
     NoString sValue;
@@ -237,14 +237,14 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         sValue.trim();
         SetPass(sValue, NoUser::HASH_MD5);
     } else {
-        NoString sMethod = sValue.token(0, "#");
-        NoString sPass = sValue.tokens(1, "#");
+        NoString sMethod = No::token(sValue, 0, "#");
+        NoString sPass = No::tokens(sValue, 1, "#");
         if (sMethod == "md5" || sMethod == "sha256") {
             NoUser::eHashType type = NoUser::HASH_MD5;
             if (sMethod == "sha256") type = NoUser::HASH_SHA256;
 
-            NoString sSalt = sPass.token(1, "#");
-            sPass = sPass.token(0, "#");
+            NoString sSalt = No::token(sPass, 1, "#");
+            sPass = No::token(sPass, 0, "#");
             SetPass(sPass, type, sSalt);
         } else if (sMethod == "plain") {
             SetPass(sPass, NoUser::HASH_NONE);
@@ -334,7 +334,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
 
     pConfig->FindStringVector("loadmodule", vsList);
     for (const NoString& sMod : vsList) {
-        NoString sModName = sMod.token(0);
+        NoString sModName = No::token(sMod, 0);
         NoString sNotice = "Loading user module [" + sModName + "]";
 
         // XXX Legacy crap, added in ZNC 0.089
@@ -371,11 +371,11 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         if (sModName == "charset") {
             No::printAction("NOTICE: Charset support was moved to core, importing old charset module settings");
             size_t uIndex = 1;
-            if (sMod.token(uIndex).equals("-force")) {
+            if (No::token(sMod, uIndex).equals("-force")) {
                 uIndex++;
             }
-            NoStringVector vsClient = sMod.token(uIndex).split(",");
-            NoStringVector vsServer = sMod.token(uIndex + 1).split(",");
+            NoStringVector vsClient = No::token(sMod, uIndex).split(",");
+            NoStringVector vsServer = No::token(sMod, uIndex + 1).split(",");
             if (vsClient.empty() || vsServer.empty()) {
                 No::printStatus(false, "charset module was loaded with wrong parameters.");
                 continue;
@@ -389,7 +389,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         }
 
         NoString sModRet;
-        NoString sArgs = sMod.tokens(1);
+        NoString sArgs = No::tokens(sMod, 1);
 
         bool bModRet = LoadModule(sModName, sArgs, sNotice, sModRet);
 
@@ -428,7 +428,7 @@ NoNetwork* NoUser::AddNetwork(const NoString& sNetwork, NoString& sErrorRet)
         sErrorRet = "Invalid network name. It should be alphanumeric. Not to be confused with server name";
         return nullptr;
     } else if (FindNetwork(sNetwork)) {
-        sErrorRet = "Network [" + sNetwork.token(0) + "] already exists";
+        sErrorRet = "Network [" + No::token(sNetwork, 0) + "] already exists";
         return nullptr;
     }
 
@@ -1055,7 +1055,7 @@ bool NoUser::PutModNotice(const NoString& sModule, const NoString& sLine, NoClie
     return (pClient == nullptr);
 }
 
-NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return sUserName.token(0, "@").replace_n(".", ""); }
+NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return No::token(sUserName, 0, "@").replace_n(".", ""); }
 
 NoModules&NoUser::GetModules() { return *m_pModules; }
 

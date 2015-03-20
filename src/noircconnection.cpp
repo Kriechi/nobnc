@@ -142,7 +142,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         // we don't want any PING forwarded
         PutIRCQuick("PONG " + sLine.substr(5));
         return;
-    } else if (sLine.token(1).equals("PONG")) {
+    } else if (No::token(sLine, 1).equals("PONG")) {
         // Block PONGs, we already responded to the pings
         return;
     } else if (sLine.startsWith("ERROR ")) {
@@ -153,13 +153,13 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         return;
     }
 
-    NoString sCmd = sLine.token(1);
+    NoString sCmd = No::token(sLine, 1);
 
     if ((sCmd.length() == 3) && (isdigit(sCmd[0])) && (isdigit(sCmd[1])) && (isdigit(sCmd[2]))) {
-        NoString sServer = sLine.token(0).leftChomp_n(1);
+        NoString sServer = No::token(sLine, 0).leftChomp_n(1);
         uint uRaw = sCmd.toUInt();
-        NoString sNick = sLine.token(2);
-        NoString sRest = sLine.tokens(3);
+        NoString sNick = No::token(sLine, 2);
+        NoString sRest = No::tokens(sLine, 3);
         NoString sTmp;
 
         switch (uRaw) {
@@ -208,9 +208,9 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             m_pNetwork->UpdateExactRawBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
             break;
         case 10: { // :irc.server.com 010 nick <hostname> <port> :<info>
-            NoString sHost = sRest.token(0);
-            NoString sPort = sRest.token(1);
-            NoString sInfo = sRest.tokens(2).trimPrefix_n();
+            NoString sHost = No::token(sRest, 0);
+            NoString sPort = No::token(sRest, 1);
+            NoString sInfo = No::tokens(sRest, 2).trimPrefix_n();
             m_pNetwork->PutStatus("Server [" + m_pNetwork->GetCurrentServer()->GetString(false) +
                                   "] redirects us to [" + sHost + ":" + sPort + "] with reason [" + sInfo + "]");
             m_pNetwork->PutStatus("Perhaps you want to add it as a new server.");
@@ -238,10 +238,10 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             break;
         case 324: { // MODE
             sRest.trim();
-            NoChannel* pChan = m_pNetwork->FindChan(sRest.token(0));
+            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 0));
 
             if (pChan) {
-                pChan->setModes(sRest.tokens(1));
+                pChan->setModes(No::tokens(sRest, 1));
 
                 // We don't SetModeKnown(true) here,
                 // because a 329 will follow
@@ -258,10 +258,10 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         } break;
         case 329: {
             sRest.trim();
-            NoChannel* pChan = m_pNetwork->FindChan(sRest.token(0));
+            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 0));
 
             if (pChan) {
-                ulong ulDate = sLine.token(4).toULong();
+                ulong ulDate = No::token(sLine, 4).toULong();
                 pChan->setCreationDate(ulDate);
 
                 if (!pChan->isModeKnown()) {
@@ -278,7 +278,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         } break;
         case 331: {
             // :irc.server.com 331 yournick #chan :No topic is set.
-            NoChannel* pChan = m_pNetwork->FindChan(sLine.token(3));
+            NoChannel* pChan = m_pNetwork->FindChan(No::token(sLine, 3));
 
             if (pChan) {
                 pChan->setTopic("");
@@ -291,10 +291,10 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         }
         case 332: {
             // :irc.server.com 332 yournick #chan :This is a topic
-            NoChannel* pChan = m_pNetwork->FindChan(sLine.token(3));
+            NoChannel* pChan = m_pNetwork->FindChan(No::token(sLine, 3));
 
             if (pChan) {
-                NoString sTopic = sLine.tokens(4);
+                NoString sTopic = No::tokens(sLine, 4);
                 sTopic.leftChomp(1);
                 pChan->setTopic(sTopic);
                 if (pChan->isDetached()) {
@@ -306,11 +306,11 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         }
         case 333: {
             // :irc.server.com 333 yournick #chan setternick 1112320796
-            NoChannel* pChan = m_pNetwork->FindChan(sLine.token(3));
+            NoChannel* pChan = m_pNetwork->FindChan(No::token(sLine, 3));
 
             if (pChan) {
-                sNick = sLine.token(4);
-                ulong ulDate = sLine.token(5).toULong();
+                sNick = No::token(sLine, 4);
+                ulong ulDate = No::token(sLine, 5).toULong();
 
                 pChan->setTopicOwner(sNick);
                 pChan->setTopicDate(ulDate);
@@ -324,11 +324,11 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         }
         case 352: { // WHO
             // :irc.yourserver.com 352 yournick #chan ident theirhost.com irc.theirserver.com theirnick H :0 Real Name
-            sServer = sLine.token(0);
-            sNick = sLine.token(7);
-            NoString sChan = sLine.token(3);
-            NoString sIdent = sLine.token(4);
-            NoString sHost = sLine.token(5);
+            sServer = No::token(sLine, 0);
+            sNick = No::token(sLine, 7);
+            NoString sChan = No::token(sLine, 3);
+            NoString sIdent = No::token(sLine, 4);
+            NoString sHost = No::token(sLine, 5);
 
             sServer.leftChomp(1);
 
@@ -362,8 +362,8 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
                         if (pos >= 2 && pos != NoString::npos) {
                             sNewNick = sNick[0] + sNick.substr(pos);
                         }
-                        NoString sNewLine = sServer + " 352 " + sLine.token(2) + " " + sChan + " " + sIdent + " " +
-                                           sHost + " " + sLine.token(6) + " " + sNewNick + " " + sLine.tokens(8);
+                        NoString sNewLine = sServer + " 352 " + No::token(sLine, 2) + " " + sChan + " " + sIdent + " " +
+                                           sHost + " " + No::token(sLine, 6) + " " + sNewNick + " " + No::tokens(sLine, 8);
                         m_pNetwork->PutUser(sNewLine, pClient);
                     }
                 }
@@ -381,11 +381,11 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         case 353: { // NAMES
             sRest.trim();
             // Todo: allow for non @+= server msgs
-            NoChannel* pChan = m_pNetwork->FindChan(sRest.token(1));
+            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 1));
             // If we don't know that channel, some client might have
             // requested a /names for it and we really should forward this.
             if (pChan) {
-                NoString sNicks = sRest.tokens(2).trimPrefix_n();
+                NoString sNicks = No::tokens(sRest, 2).trimPrefix_n();
                 pChan->addNicks(sNicks);
                 if (pChan->isDetached()) {
                     return;
@@ -399,7 +399,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         }
         case 366: { // end of names list
             // :irc.server.com 366 nick #chan :End of /NAMES list.
-            NoChannel* pChan = m_pNetwork->FindChan(sRest.token(0));
+            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 0));
 
             if (pChan) {
                 if (pChan->isOn()) {
@@ -439,10 +439,10 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             // :irc.server.net 437 * badnick :Nick/channel is temporarily unavailable
             // :irc.server.net 437 mynick badnick :Nick/channel is temporarily unavailable
             // :irc.server.net 437 mynick badnick :Cannot change nickname while banned on channel
-            if (m_pNetwork->IsChan(sRest.token(0)) || sNick != "*") break;
+            if (m_pNetwork->IsChan(No::token(sRest, 0)) || sNick != "*") break;
         case 432: // :irc.server.com 432 * nick :Erroneous Nickname: Illegal characters
         case 433: {
-            NoString sBadNick = sRest.token(0);
+            NoString sBadNick = No::token(sRest, 0);
 
             if (!m_bAuthed) {
                 SendAltNick(sBadNick);
@@ -460,10 +460,10 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             // :mccaffrey.freenode.net 470 mynick #electronics ##electronics :Forwarding to another channel
 
             // freenode style numeric
-            NoChannel* pChan = m_pNetwork->FindChan(sRest.token(0));
+            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 0));
             if (!pChan) {
                 // unreal style numeric
-                pChan = m_pNetwork->FindChan(sRest.token(1));
+                pChan = m_pNetwork->FindChan(No::token(sRest, 1));
             }
             if (pChan) {
                 pChan->disable();
@@ -484,9 +484,9 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             return;
         }
     } else {
-        NoNick Nick(sLine.token(0).trimPrefix_n());
-        sCmd = sLine.token(1);
-        NoString sRest = sLine.tokens(2);
+        NoNick Nick(No::token(sLine, 0).trimPrefix_n());
+        sCmd = No::token(sLine, 1);
+        NoString sRest = No::tokens(sLine, 2);
 
         if (sCmd.equals("NICK")) {
             NoString sNewNick = sRest.trimPrefix_n();
@@ -550,7 +550,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
                 return;
             }
         } else if (sCmd.equals("JOIN")) {
-            NoString sChan = sRest.token(0).trimPrefix_n();
+            NoString sChan = No::token(sRest, 0).trimPrefix_n();
             NoChannel* pChan;
 
             if (Nick.equals(GetNick())) {
@@ -574,8 +574,8 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
                 }
             }
         } else if (sCmd.equals("PART")) {
-            NoString sChan = sRest.token(0).trimPrefix_n();
-            NoString sMsg = sRest.tokens(1).trimPrefix_n();
+            NoString sChan = No::token(sRest, 0).trimPrefix_n();
+            NoString sMsg = No::tokens(sRest, 1).trimPrefix_n();
 
             NoChannel* pChan = m_pNetwork->FindChan(sChan);
             bool bDetached = false;
@@ -600,8 +600,8 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
                 return;
             }
         } else if (sCmd.equals("MODE")) {
-            NoString sTarget = sRest.token(0);
-            NoString sModes = sRest.tokens(1);
+            NoString sTarget = No::token(sRest, 0);
+            NoString sModes = No::tokens(sRest, 1);
             if (sModes.left(1) == ":") sModes = sModes.substr(1);
 
             NoChannel* pChan = m_pNetwork->FindChan(sTarget);
@@ -612,7 +612,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
                     return;
                 }
             } else if (sTarget == m_Nick.nick()) {
-                NoString sModeArg = sModes.token(0);
+                NoString sModeArg = No::token(sModes, 0);
                 bool bAdd = true;
                 /* no module call defined (yet?)
                                 MODULECALL(OnRawUserMode(*pOpNick, *this, sModeArg, sArgs), m_pNetwork->GetUser(),
@@ -636,9 +636,9 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             }
         } else if (sCmd.equals("KICK")) {
             // :opnick!ident@host.com KICK #chan nick :msg
-            NoString sChan = sRest.token(0);
-            NoString sKickedNick = sRest.token(1);
-            NoString sMsg = sRest.tokens(2);
+            NoString sChan = No::token(sRest, 0);
+            NoString sKickedNick = No::token(sRest, 1);
+            NoString sMsg = No::tokens(sRest, 2);
             sMsg.leftChomp(1);
 
             NoChannel* pChan = m_pNetwork->FindChan(sChan);
@@ -662,8 +662,8 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             }
         } else if (sCmd.equals("NOTICE")) {
             // :nick!ident@host.com NOTICE #chan :Message
-            NoString sTarget = sRest.token(0);
-            NoString sMsg = sRest.tokens(1);
+            NoString sTarget = No::token(sRest, 0);
+            NoString sMsg = No::tokens(sRest, 1);
             sMsg.leftChomp(1);
 
             if (No::wildCmp(sMsg, "\001*\001")) {
@@ -699,10 +699,10 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             return;
         } else if (sCmd.equals("TOPIC")) {
             // :nick!ident@host.com TOPIC #chan :This is a topic
-            NoChannel* pChan = m_pNetwork->FindChan(sLine.token(2));
+            NoChannel* pChan = m_pNetwork->FindChan(No::token(sLine, 2));
 
             if (pChan) {
-                NoString sTopic = sLine.tokens(3);
+                NoString sTopic = No::tokens(sLine, 3);
                 sTopic.leftChomp(1);
 
                 IRCSOCKMODULECALL(OnTopic(Nick, *pChan, sTopic), &bReturn);
@@ -720,8 +720,8 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             }
         } else if (sCmd.equals("PRIVMSG")) {
             // :nick!ident@host.com PRIVMSG #chan :Message
-            NoString sTarget = sRest.token(0);
-            NoString sMsg = sRest.tokens(1).trimPrefix_n();
+            NoString sTarget = No::token(sRest, 0);
+            NoString sMsg = No::tokens(sRest, 1).trimPrefix_n();
 
             if (No::wildCmp(sMsg, "\001*\001")) {
                 sMsg.leftChomp(1);
@@ -755,7 +755,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             }
         } else if (sCmd.equals("WALLOPS")) {
             // :blub!dummy@rox-8DBEFE92 WALLOPS :this is a test
-            NoString sMsg = sRest.tokens(0).trimPrefix_n();
+            NoString sMsg = No::tokens(sRest, 0).trimPrefix_n();
 
             if (!m_pNetwork->IsUserOnline()) {
                 m_pNetwork->AddNoticeBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " WALLOPS :{text}", sMsg);
@@ -763,10 +763,10 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
         } else if (sCmd.equals("CAP")) {
             // CAPs are supported only before authorization.
             if (!m_bAuthed) {
-                // sRest.token(0) is most likely "*". No idea why, the
+                // No::token(sRest, 0) is most likely "*". No idea why, the
                 // CAP spec don't mention this, but all implementations
                 // I've seen add this extra asterisk
-                NoString sSubCmd = sRest.token(1);
+                NoString sSubCmd = No::token(sRest, 1);
 
                 // If the caplist of a reply is too long, it's split
                 // into multiple replies. A "*" is prepended to show
@@ -780,10 +780,10 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
                 // to recognize past request of NAK by 100 chars
                 // of this reply.
                 NoString sArgs;
-                if (sRest.token(2) == "*") {
-                    sArgs = sRest.tokens(3).trimPrefix_n();
+                if (No::token(sRest, 2) == "*") {
+                    sArgs = No::tokens(sRest, 3).trimPrefix_n();
                 } else {
-                    sArgs = sRest.tokens(2).trimPrefix_n();
+                    sArgs = No::tokens(sRest, 2).trimPrefix_n();
                 }
 
                 if (sSubCmd == "LS") {
@@ -815,7 +815,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             // Don't forward any CAP stuff to the client
             return;
         } else if (sCmd.equals("INVITE")) {
-            IRCSOCKMODULECALL(OnInvite(Nick, sLine.token(3).trimPrefix_n(":")), &bReturn);
+            IRCSOCKMODULECALL(OnInvite(Nick, No::token(sLine, 3).trimPrefix_n(":")), &bReturn);
             if (bReturn) return;
         }
     }
@@ -892,7 +892,7 @@ bool NoIrcConnection::OnPrivCTCP(NoNick& Nick, NoString& sMessage)
 bool NoIrcConnection::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
 {
     const NoStringMap& mssCTCPReplies = m_pNetwork->GetUser()->GetCTCPReplies();
-    NoString sQuery = sMessage.token(0).toUpper();
+    NoString sQuery = No::token(sMessage, 0).toUpper();
     NoStringMap::const_iterator it = mssCTCPReplies.find(sQuery);
     bool bHaveReply = false;
     NoString sReply;
@@ -910,7 +910,7 @@ bool NoIrcConnection::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
         if (sQuery == "VERSION") {
             sReply = NoApp::GetTag(false);
         } else if (sQuery == "PING") {
-            sReply = sMessage.tokens(1);
+            sReply = No::tokens(sMessage, 1);
         }
     }
 
@@ -1202,8 +1202,8 @@ void NoIrcConnection::ParseISupport(const NoString& sLine)
     NoStringVector vsTokens = sLine.split(" ", No::SkipEmptyParts);
 
     for (const NoString& sToken : vsTokens) {
-        NoString sName = sToken.token(0, "=");
-        NoString sValue = sToken.tokens(1, "=");
+        NoString sName = No::token(sToken, 0, "=");
+        NoString sValue = No::tokens(sToken, 1, "=");
 
         if (0 < sName.length() && ':' == sName[0]) {
             break;
@@ -1212,8 +1212,8 @@ void NoIrcConnection::ParseISupport(const NoString& sLine)
         m_mISupport[sName] = sValue;
 
         if (sName.equals("PREFIX")) {
-            NoString sPrefixes = sValue.token(1, ")");
-            NoString sPermModes = sValue.token(0, ")");
+            NoString sPrefixes = No::token(sValue, 1, ")");
+            NoString sPermModes = No::token(sValue, 0, ")");
             sPermModes.trimLeft("(");
 
             if (!sPrefixes.empty() && sPermModes.size() == sPrefixes.size()) {
@@ -1233,7 +1233,7 @@ void NoIrcConnection::ParseISupport(const NoString& sLine)
                 m_mueChanModes.clear();
 
                 for (uint a = 0; a < 4; a++) {
-                    NoString sModes = sValue.token(a, ",");
+                    NoString sModes = No::token(sValue, a, ",");
 
                     for (uint b = 0; b < sModes.size(); b++) {
                         m_mueChanModes[sModes[b]] = (ChanModeArgs)a;
@@ -1273,14 +1273,14 @@ void NoIrcConnection::ForwardRaw353(const NoString& sLine) const
 
 void NoIrcConnection::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
 {
-    NoString sNicks = sLine.tokens(5).trimPrefix_n();
+    NoString sNicks = No::tokens(sLine, 5).trimPrefix_n();
 
     if ((!m_bNamesx || pClient->HasNamesx()) && (!m_bUHNames || pClient->HasUHNames())) {
         // Client and server have both the same UHNames and Namesx stuff enabled
         m_pNetwork->PutUser(sLine, pClient);
     } else {
         // Get everything except the actual user list
-        NoString sTmp = sLine.token(0, " :") + " :";
+        NoString sTmp = No::token(sLine, 0, " :") + " :";
 
         // This loop runs once for every nick on the channel
         NoStringVector vsNicks = sNicks.split(" ", No::SkipEmptyParts);
@@ -1298,7 +1298,7 @@ void NoIrcConnection::ForwardRaw353(const NoString& sLine, NoClient* pClient) co
             if (m_bUHNames && !pClient->HasUHNames()) {
                 // Server has, client hasnt UHNAMES,
                 // so we strip away ident and host.
-                sNick = sNick.token(0, "!");
+                sNick = No::token(sNick, 0, "!");
             }
 
             sTmp += sNick + " ";

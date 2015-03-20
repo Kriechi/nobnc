@@ -38,7 +38,7 @@ protected:
     void RunJob() override
     {
         NoNetwork* pNetwork = module()->GetNetwork();
-        NoChannel* pChan = pNetwork->FindChan(GetName().tokens(1));
+        NoChannel* pChan = pNetwork->FindChan(No::tokens(GetName(), 1));
 
         if (pChan) {
             pChan->enable();
@@ -92,7 +92,7 @@ public:
     void OnSetDelayCommand(const NoString& sCommand)
     {
         int i;
-        i = sCommand.token(1).toInt();
+        i = No::token(sCommand, 1).toInt();
 
         if (i < 0) {
             PutModule("Negative delays don't make any sense!");

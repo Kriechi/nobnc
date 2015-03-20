@@ -534,7 +534,7 @@ NoStringSet No::encodings()
 NoStringMap No::messageTags(const NoString& sLine)
 {
     if (sLine.startsWith("@")) {
-        NoStringVector vsTags = sLine.token(0).trimPrefix_n("@").split(";", No::SkipEmptyParts);
+        NoStringVector vsTags = No::token(sLine, 0).trimPrefix_n("@").split(";", No::SkipEmptyParts);
 
         NoStringMap mssTags;
         for (const NoString& sTag : vsTags) {
@@ -555,7 +555,7 @@ NoStringMap No::messageTags(const NoString& sLine)
 void No::setMessageTags(NoString& sLine, const NoStringMap& mssTags)
 {
     if (sLine.startsWith("@")) {
-        sLine.leftChomp(sLine.token(0).length() + 1);
+        sLine.leftChomp(No::token(sLine, 0).length() + 1);
     }
 
     if (!mssTags.empty()) {
@@ -656,8 +656,8 @@ No::status_t No::readFromDisk(NoStringMap& values, const NoString& sPath)
 
     while (cFile.ReadLine(sBuffer)) {
         sBuffer.trim();
-        NoString sKey = sBuffer.token(0);
-        NoString sValue = sBuffer.token(1);
+        NoString sKey = No::token(sBuffer, 0);
+        NoString sValue = No::token(sBuffer, 1);
         Decode(sKey);
         Decode(sValue);
 
@@ -856,8 +856,80 @@ NoString No::ellipsize(const NoString& str, uint uLen)
 }
 
 // TODO: cleanup
-extern NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight);
 extern NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
+
+static NoString Token_impl(const NoString& s, size_t uPos, bool bRest, const NoString& sSep)
+{
+    const char* sep_str = sSep.c_str();
+    size_t sep_len = sSep.length();
+    const char* str = s.c_str();
+    size_t str_len = s.length();
+    size_t start_pos = 0;
+    size_t end_pos;
+
+    while (strncmp(&str[start_pos], sep_str, sep_len) == 0) {
+        start_pos += sep_len;
+    }
+
+    // First, find the start of our token
+    while (uPos != 0 && start_pos < str_len) {
+        bool bFoundSep = false;
+
+        while (strncmp(&str[start_pos], sep_str, sep_len) == 0) {
+            start_pos += sep_len;
+            bFoundSep = true;
+        }
+
+        if (bFoundSep) {
+            uPos--;
+        } else {
+            start_pos++;
+        }
+    }
+
+    // String is over?
+    if (start_pos >= str_len) return "";
+
+    // If they want everything from here on, give it to them
+    if (bRest) {
+        return s.substr(start_pos);
+    }
+
+    // Now look for the end of the token they want
+    end_pos = start_pos;
+    while (end_pos < str_len) {
+        if (strncmp(&str[end_pos], sep_str, sep_len) == 0) return s.substr(start_pos, end_pos - start_pos);
+
+        end_pos++;
+    }
+
+    // They want the last token in the string, not something in between
+    return s.substr(start_pos);
+}
+
+NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight)
+{
+    NoStringVector vsTokens = Split_helper(str, sSep, No::SkipEmptyParts, sLeft, sRight, false);
+    if (vsTokens.size() > uPos) {
+        NoString sRet;
+
+        for (size_t a = uPos; a < vsTokens.size(); a++) {
+            if (a > uPos) {
+                sRet += sSep;
+            }
+
+            sRet += vsTokens[a];
+
+            if (!bRest) {
+                break;
+            }
+        }
+
+        return sRet;
+    }
+
+    return Token_impl(str, uPos, bRest, sSep);
+}
 
 NoStringMap No::optionSplit(const NoString& str)
 {
@@ -938,4 +1010,19 @@ bool No::wildCmp(const NoString& sString, const NoString& sWild, No::CaseSensiti
     }
 
     return (*wild == 0);
+}
+
+NoString No::token(const NoString& str, size_t uPos, const NoString& sSep)
+{
+    return Token_impl(str, uPos, false, sSep);
+}
+
+NoString No::tokens(const NoString& str, size_t uPos, const NoString& sSep)
+{
+    return Token_impl(str, uPos, true, sSep);
+}
+
+NoString No::firstLine(const NoString& str)
+{
+    return token(str, 0, "\n");
 }

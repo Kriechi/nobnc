@@ -147,13 +147,13 @@ public:
             NoString sLine(*it);
             sLine.trim();
             if (sLine[0] == '@' && it + 1 != vsLines.end()) {
-                NoString sTimestamp = sLine.token(0);
+                NoString sTimestamp = No::token(sLine, 0);
                 sTimestamp.trimLeft("@");
                 timeval ts;
-                ts.tv_sec = sTimestamp.token(0, ",").toLongLong();
-                ts.tv_usec = sTimestamp.token(1, ",").toLong();
+                ts.tv_sec = No::token(sTimestamp, 0, ",").toLongLong();
+                ts.tv_usec = No::token(sTimestamp, 1, ",").toLong();
 
-                NoString sFormat = sLine.tokens(1);
+                NoString sFormat = No::tokens(sLine, 1);
 
                 NoString sText(*++it);
                 sText.trim();
@@ -223,7 +223,7 @@ public:
 
     void OnSetPassCommand(const NoString& sCmdLine)
     {
-        NoString sArgs = sCmdLine.tokens(1);
+        NoString sArgs = No::tokens(sCmdLine, 1);
 
         if (sArgs.empty()) sArgs = CRYPT_LAME_PASS;
 
@@ -233,8 +233,8 @@ public:
 
     void OnModCommand(const NoString& sCmdLine) override
     {
-        NoString sCommand = sCmdLine.token(0);
-        NoString sArgs = sCmdLine.tokens(1);
+        NoString sCommand = No::token(sCmdLine, 0);
+        NoString sArgs = No::tokens(sCmdLine, 1);
 
         if (sCommand.equals("dumpbuff")) {
             // for testing purposes - hidden from help
@@ -258,7 +258,7 @@ public:
 
     void OnReplayCommand(const NoString& sCmdLine)
     {
-        NoString sArgs = sCmdLine.tokens(1);
+        NoString sArgs = No::tokens(sCmdLine, 1);
 
         Replay(sArgs);
         PutModule("Replayed " + sArgs);
@@ -384,10 +384,10 @@ private:
                 sName = FindLegacyBufferName(sPath);
                 return ChanBuffer;
             } else if (sBuffer.trimPrefix(CHAN_VERIFICATION_TOKEN)) {
-                sName = sBuffer.firstLine();
+                sName = No::firstLine(sBuffer);
                 if (sBuffer.trimLeft(sName + "\n")) return ChanBuffer;
             } else if (sBuffer.trimPrefix(QUERY_VERIFICATION_TOKEN)) {
-                sName = sBuffer.firstLine();
+                sName = No::firstLine(sBuffer);
                 if (sBuffer.trimLeft(sName + "\n")) return QueryBuffer;
             }
 

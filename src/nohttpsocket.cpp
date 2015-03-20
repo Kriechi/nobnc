@@ -93,32 +93,32 @@ void NoHttpSocket::ReadLineImpl(const NoString& sData)
     NoString sLine = sData;
     sLine.trimRight("\r\n");
 
-    NoString sName = sLine.token(0);
+    NoString sName = No::token(sLine, 0);
 
     if (sName.equals("GET")) {
         m_bPost = false;
-        m_sURI = sLine.token(1);
-        m_bHTTP10Client = sLine.token(2).equals("HTTP/1.0");
+        m_sURI = No::token(sLine, 1);
+        m_bHTTP10Client = No::token(sLine, 2).equals("HTTP/1.0");
         ParseURI();
     } else if (sName.equals("POST")) {
         m_bPost = true;
-        m_sURI = sLine.token(1);
+        m_sURI = No::token(sLine, 1);
         ParseURI();
     } else if (sName.equals("Cookie:")) {
-        NoStringVector vsNV = sLine.tokens(1).split(";", No::SkipEmptyParts);
+        NoStringVector vsNV = No::tokens(sLine, 1).split(";", No::SkipEmptyParts);
 
         for (NoString& s : vsNV) {
             s.trim();
-            m_msRequestCookies[No::escape(s.token(0, "="), No::UrlFormat, No::AsciiFormat)] =
-            No::escape(s.tokens(1, "="), No::UrlFormat, No::AsciiFormat);
+            m_msRequestCookies[No::escape(No::token(s, 0, "="), No::UrlFormat, No::AsciiFormat)] =
+            No::escape(No::tokens(s, 1, "="), No::UrlFormat, No::AsciiFormat);
         }
     } else if (sName.equals("Authorization:")) {
-        NoString sUnhashed = NoString::fromBase64(sLine.token(2));
-        m_sUser = sUnhashed.token(0, ":");
-        m_sPass = sUnhashed.tokens(1, ":");
+        NoString sUnhashed = NoString::fromBase64(No::token(sLine, 2));
+        m_sUser = No::token(sUnhashed, 0, ":");
+        m_sPass = No::tokens(sUnhashed, 1, ":");
         m_bLoggedIn = OnLogin(m_sUser, m_sPass, true);
     } else if (sName.equals("Content-Length:")) {
-        m_uPostLen = sLine.token(1).toULong();
+        m_uPostLen = No::token(sLine, 1).toULong();
         if (m_uPostLen > MAX_POST_SIZE)
             PrintErrorPage(413, "Request Entity Too Large", "The request you sent was too large.");
     } else if (sName.equals("X-Forwarded-For:")) {
@@ -127,7 +127,7 @@ void NoHttpSocket::ReadLineImpl(const NoString& sData)
             const NoStringVector& vsTrustedProxies = NoApp::Get().GetTrustedProxies();
             NoString sIP = GetRemoteIP();
 
-            NoStringVector vsIPs = sLine.tokens(1).split(",", No::SkipEmptyParts);
+            NoStringVector vsIPs = No::tokens(sLine, 1).split(",", No::SkipEmptyParts);
 
             while (!vsIPs.empty()) {
                 // sIP told us that it got connection from vsIPs.back()
@@ -154,10 +154,10 @@ void NoHttpSocket::ReadLineImpl(const NoString& sData)
         }
     } else if (sName.equals("If-None-Match:")) {
         // this is for proper client cache support (HTTP 304) on static files:
-        m_sIfNoneMatch = sLine.tokens(1);
+        m_sIfNoneMatch = No::tokens(sLine, 1);
     } else if (sName.equals("Accept-Encoding:") && !m_bHTTP10Client) {
         // trimming whitespace from the tokens is important:
-        NoStringVector vsEncodings = sLine.tokens(1).split(",", No::SkipEmptyParts);
+        NoStringVector vsEncodings = No::tokens(sLine, 1).split(",", No::SkipEmptyParts);
         for (NoString& sEncoding : vsEncodings) {
             if (sEncoding.trim_n().equals("gzip"))
                 m_bAcceptGzip = true;
@@ -457,11 +457,11 @@ void NoHttpSocket::WriteFileGzipped(NoFile& File)
 
 void NoHttpSocket::ParseURI()
 {
-    ParseParams(m_sURI.tokens(1, "?"), m_msvsGETParams);
-    m_sURI = m_sURI.token(0, "?");
+    ParseParams(No::tokens(m_sURI, 1, "?"), m_msvsGETParams);
+    m_sURI = No::token(m_sURI, 0, "?");
 }
 
-NoString NoHttpSocket::GetPath() const { return m_sURI.token(0, "?"); }
+NoString NoHttpSocket::GetPath() const { return No::token(m_sURI, 0, "?"); }
 
 bool NoHttpSocket::IsLoggedIn() const { return m_bLoggedIn; }
 
@@ -472,8 +472,8 @@ void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStr
     NoStringVector vsPairs = sParams.split("&");
 
     for (const NoString& sPair : vsPairs) {
-        NoString sName = No::escape(sPair.token(0, "="), No::UrlFormat, No::AsciiFormat);
-        NoString sValue = No::escape(sPair.tokens(1, "="), No::UrlFormat, No::AsciiFormat);
+        NoString sName = No::escape(No::token(sPair, 0, "="), No::UrlFormat, No::AsciiFormat);
+        NoString sValue = No::escape(No::tokens(sPair, 1, "="), No::UrlFormat, No::AsciiFormat);
 
         msvsParams[sName].push_back(sValue);
     }

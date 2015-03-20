@@ -104,8 +104,8 @@ public:
 
     void Set(const NoString& sLine)
     {
-        SetNV("username", sLine.token(1));
-        SetNV("password", sLine.token(2));
+        SetNV("username", No::token(sLine, 1));
+        SetNV("password", No::token(sLine, 2));
 
         PutModule("Username has been set to [" + GetNV("username") + "]");
         PutModule("Password has been set to [" + GetNV("password") + "]");
@@ -113,7 +113,7 @@ public:
 
     void SetMechanismCommand(const NoString& sLine)
     {
-        NoString sMechanisms = sLine.tokens(1).toUpper();
+        NoString sMechanisms = No::tokens(sLine, 1).toUpper();
 
         if (!sMechanisms.empty()) {
             NoStringVector vsMechanisms = sMechanisms.split(" ");
@@ -133,8 +133,8 @@ public:
 
     void RequireAuthCommand(const NoString& sLine)
     {
-        if (!sLine.token(1).empty()) {
-            SetNV(NV_REQUIRE_AUTH, sLine.token(1));
+        if (!No::token(sLine, 1).empty()) {
+            SetNV(NV_REQUIRE_AUTH, No::token(sLine, 1));
         }
 
         if (GetNV(NV_REQUIRE_AUTH).toBool()) {
@@ -225,14 +225,14 @@ public:
 
     ModRet OnRaw(NoString& sLine) override
     {
-        if (sLine.token(0).equals("AUTHENTICATE")) {
-            Authenticate(sLine.tokens(1));
-        } else if (sLine.token(1).equals("903")) {
+        if (No::token(sLine, 0).equals("AUTHENTICATE")) {
+            Authenticate(No::tokens(sLine, 1));
+        } else if (No::token(sLine, 1).equals("903")) {
             /* SASL success! */
             GetNetwork()->GetIRCSock()->ResumeCap();
             m_bAuthenticated = true;
             NO_DEBUG("sasl: Authenticated with mechanism [" << m_Mechanisms.GetCurrent() << "]");
-        } else if (sLine.token(1).equals("904") || sLine.token(1).equals("905")) {
+        } else if (No::token(sLine, 1).equals("904") || No::token(sLine, 1).equals("905")) {
             NO_DEBUG("sasl: Mechanism [" << m_Mechanisms.GetCurrent() << "] failed.");
             PutModule(m_Mechanisms.GetCurrent() + " mechanism failed.");
 
@@ -243,11 +243,11 @@ public:
                 CheckRequireAuth();
                 GetNetwork()->GetIRCSock()->ResumeCap();
             }
-        } else if (sLine.token(1).equals("906")) {
+        } else if (No::token(sLine, 1).equals("906")) {
             /* CAP wasn't paused? */
             NO_DEBUG("sasl: Reached 906.");
             CheckRequireAuth();
-        } else if (sLine.token(1).equals("907")) {
+        } else if (No::token(sLine, 1).equals("907")) {
             m_bAuthenticated = true;
             GetNetwork()->GetIRCSock()->ResumeCap();
             NO_DEBUG("sasl: Received 907 -- We are already registered");

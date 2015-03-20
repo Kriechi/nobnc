@@ -22,7 +22,7 @@ class NoPerform : public NoModule
 {
     void Add(const NoString& sCommand)
     {
-        NoString sPerf = sCommand.tokens(1);
+        NoString sPerf = No::tokens(sCommand, 1);
 
         if (sPerf.empty()) {
             PutModule("Usage: add <command>");
@@ -36,7 +36,7 @@ class NoPerform : public NoModule
 
     void Del(const NoString& sCommand)
     {
-        u_int iNum = sCommand.tokens(1).toUInt();
+        u_int iNum = No::tokens(sCommand, 1).toUInt();
 
         if (iNum > m_vPerform.size() || iNum <= 0) {
             PutModule("Illegal # Requested");
@@ -82,8 +82,8 @@ class NoPerform : public NoModule
 
     void Swap(const NoString& sCommand)
     {
-        u_int iNumA = sCommand.token(1).toUInt();
-        u_int iNumB = sCommand.token(2).toUInt();
+        u_int iNumA = No::token(sCommand, 1).toUInt();
+        u_int iNumB = No::token(sCommand, 2).toUInt();
 
         if (iNumA > m_vPerform.size() || iNumA <= 0 || iNumB > m_vPerform.size() || iNumB <= 0) {
             PutModule("Illegal # Requested");
@@ -111,12 +111,12 @@ public:
 
         if (sPerf.left(1) == "/") sPerf.leftChomp(1);
 
-        if (sPerf.token(0).equals("MSG")) {
-            sPerf = "PRIVMSG " + sPerf.tokens(1);
+        if (No::token(sPerf, 0).equals("MSG")) {
+            sPerf = "PRIVMSG " + No::tokens(sPerf, 1);
         }
 
-        if ((sPerf.token(0).equals("PRIVMSG") || sPerf.token(0).equals("NOTICE")) && sPerf.token(2).left(1) != ":") {
-            sPerf = sPerf.token(0) + " " + sPerf.token(1) + " :" + sPerf.tokens(2);
+        if ((No::token(sPerf, 0).equals("PRIVMSG") || No::token(sPerf, 0).equals("NOTICE")) && No::token(sPerf, 2).left(1) != ":") {
+            sPerf = No::token(sPerf, 0) + " " + No::token(sPerf, 1) + " :" + No::tokens(sPerf, 2);
         }
 
         return sPerf;

@@ -155,10 +155,10 @@ public:
         if (!GetNetwork()->IsIRCConnected()) return CONTINUE;
 
         // We are trying to get the config nick and this is a /nick?
-        if (!m_pTimer || !sLine.token(0).equals("NICK")) return CONTINUE;
+        if (!m_pTimer || !No::token(sLine, 0).equals("NICK")) return CONTINUE;
 
         // Is the nick change for the nick we are trying to get?
-        NoString sNick = sLine.token(1);
+        NoString sNick = No::token(sLine, 1);
 
         // Don't even think of using spaces in your nick!
         if (sNick.left(1) == ":") sNick.leftChomp(1);
@@ -176,7 +176,7 @@ public:
     {
         // Are we trying to get our primary nick and we caused this error?
         // :irc.server.net 433 mynick badnick :Nickname is already in use.
-        if (m_pTimer && sLine.token(1) == "433" && sLine.token(3).equals(GetNick())) return HALT;
+        if (m_pTimer && No::token(sLine, 1) == "433" && No::token(sLine, 3).equals(GetNick())) return HALT;
 
         return CONTINUE;
     }

@@ -102,7 +102,7 @@ public:
 
     void OnBlockCommand(const NoString& sCommand)
     {
-        NoString sUser = sCommand.tokens(1);
+        NoString sUser = No::tokens(sCommand, 1);
 
         if (sUser.empty()) {
             PutModule("Usage: Block <user>");
@@ -122,7 +122,7 @@ public:
 
     void OnUnblockCommand(const NoString& sCommand)
     {
-        NoString sUser = sCommand.tokens(1);
+        NoString sUser = No::tokens(sCommand, 1);
 
         if (sUser.empty()) {
             PutModule("Usage: Unblock <user>");

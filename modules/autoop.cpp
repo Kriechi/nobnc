@@ -122,13 +122,13 @@ public:
 
     bool FromString(const NoString& sLine)
     {
-        m_sUsername = sLine.token(0, "\t");
-        m_sUserKey = sLine.token(2, "\t");
+        m_sUsername = No::token(sLine, 0, "\t");
+        m_sUserKey = No::token(sLine, 2, "\t");
 
-        NoStringVector vsHostMasks = sLine.token(1, "\t").split(",");
+        NoStringVector vsHostMasks = No::token(sLine, 1, "\t").split(",");
         m_ssHostmasks = NoStringSet(vsHostMasks.begin(), vsHostMasks.end());
 
-        NoStringVector vsChans = sLine.token(3, "\t").split(" ");
+        NoStringVector vsChans = No::token(sLine, 3, "\t").split(" ");
         m_ssChans = NoStringSet(vsChans.begin(), vsChans.end());
 
         return !m_sUserKey.empty();
@@ -235,16 +235,16 @@ public:
 
     ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
-        if (!sMessage.token(0).equals("!ZNCAO")) {
+        if (!No::token(sMessage, 0).equals("!ZNCAO")) {
             return CONTINUE;
         }
 
-        NoString sCommand = sMessage.token(1);
+        NoString sCommand = No::token(sMessage, 1);
 
         if (sCommand.equals("CHALLENGE")) {
-            ChallengeRespond(Nick, sMessage.token(2));
+            ChallengeRespond(Nick, No::token(sMessage, 2));
         } else if (sCommand.equals("RESPONSE")) {
-            VerifyResponse(Nick, sMessage.token(2));
+            VerifyResponse(Nick, No::token(sMessage, 2));
         }
 
         return HALTCORE;
@@ -265,7 +265,7 @@ public:
 
     void OnModCommand(const NoString& sLine) override
     {
-        NoString sCommand = sLine.token(0).toUpper();
+        NoString sCommand = No::token(sLine, 0).toUpper();
         if (sCommand.equals("TIMERS")) {
             // for testing purposes - hidden from help
             ListTimers();
@@ -276,14 +276,14 @@ public:
 
     void OnAddUserCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sHost = sLine.token(2);
-        NoString sKey = sLine.token(3);
+        NoString sUser = No::token(sLine, 1);
+        NoString sHost = No::token(sLine, 2);
+        NoString sKey = No::token(sLine, 3);
 
         if (sHost.empty()) {
             PutModule("Usage: AddUser <user> <hostmask>[,<hostmasks>...] <key> [channels]");
         } else {
-            NoAutoOpUser* pUser = AddUser(sUser, sKey, sHost, sLine.tokens(4));
+            NoAutoOpUser* pUser = AddUser(sUser, sKey, sHost, No::tokens(sLine, 4));
 
             if (pUser) {
                 SetNV(sUser, pUser->ToString());
@@ -293,7 +293,7 @@ public:
 
     void OnDelUserCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
+        NoString sUser = No::token(sLine, 1);
 
         if (sUser.empty()) {
             PutModule("Usage: DelUser <user>");
@@ -339,8 +339,8 @@ public:
 
     void OnAddChansCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sChans = sLine.tokens(2);
+        NoString sUser = No::token(sLine, 1);
+        NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
             PutModule("Usage: AddChans <user> <channel> [channel] ...");
@@ -361,8 +361,8 @@ public:
 
     void OnDelChansCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sChans = sLine.tokens(2);
+        NoString sUser = No::token(sLine, 1);
+        NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
             PutModule("Usage: DelChans <user> <channel> [channel] ...");
@@ -383,8 +383,8 @@ public:
 
     void OnAddMasksCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sHostmasks = sLine.tokens(2);
+        NoString sUser = No::token(sLine, 1);
+        NoString sHostmasks = No::tokens(sLine, 2);
 
         if (sHostmasks.empty()) {
             PutModule("Usage: AddMasks <user> <mask>,[mask] ...");
@@ -405,8 +405,8 @@ public:
 
     void OnDelMasksCommand(const NoString& sLine)
     {
-        NoString sUser = sLine.token(1);
-        NoString sHostmasks = sLine.tokens(2);
+        NoString sUser = No::token(sLine, 1);
+        NoString sHostmasks = No::tokens(sLine, 2);
 
         if (sHostmasks.empty()) {
             PutModule("Usage: DelMasks <user> <mask>,[mask] ...");

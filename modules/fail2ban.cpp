@@ -26,8 +26,8 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        NoString sTimeout = sArgs.token(0);
-        NoString sAttempts = sArgs.token(1);
+        NoString sTimeout = No::token(sArgs, 0);
+        NoString sAttempts = No::token(sArgs, 1);
         uint timeout = sTimeout.toUInt();
 
         if (sAttempts.empty())
@@ -38,7 +38,7 @@ public:
 
         if (sArgs.empty()) {
             timeout = 1;
-        } else if (timeout == 0 || m_uiAllowedFailed == 0 || !sArgs.tokens(2).empty()) {
+        } else if (timeout == 0 || m_uiAllowedFailed == 0 || !No::tokens(sArgs, 2).empty()) {
             sMessage = "Invalid argument, must be the number of minutes "
                        "IPs are blocked after a failed login and can be "
                        "followed by number of allowed failed login attempts";

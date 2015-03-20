@@ -151,7 +151,7 @@ public:
 
     void HandleAddCommand(const NoString& sLine)
     {
-        NoString sPubKey = sLine.token(1);
+        NoString sPubKey = No::token(sLine, 1);
 
         if (sPubKey.empty()) {
             sPubKey = GetKey(GetClient());
@@ -197,7 +197,7 @@ public:
 
     void HandleDelCommand(const NoString& sLine)
     {
-        uint id = sLine.tokens(1).toUInt();
+        uint id = No::tokens(sLine, 1).toUInt();
         MNoStringSet::iterator it = m_PubKeys.find(GetUser()->GetUserName());
 
         if (it == m_PubKeys.end()) {

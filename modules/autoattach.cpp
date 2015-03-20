@@ -78,19 +78,19 @@ public:
 private:
     void HandleAdd(const NoString& sLine)
     {
-        NoString sMsg = sLine.tokens(1);
+        NoString sMsg = No::tokens(sLine, 1);
         bool bHelp = false;
         bool bNegated = sMsg.trimPrefix("!");
-        NoString sChan = sMsg.token(0);
-        NoString sSearch = sMsg.token(1);
-        NoString sHost = sMsg.token(2);
+        NoString sChan = No::token(sMsg, 0);
+        NoString sSearch = No::token(sMsg, 1);
+        NoString sHost = No::token(sMsg, 2);
 
         if (sChan.empty()) {
             bHelp = true;
         } else if (Add(bNegated, sChan, sSearch, sHost)) {
             PutModule("Added to list");
         } else {
-            PutModule(sLine.tokens(1) + " is already added");
+            PutModule(No::tokens(sLine, 1) + " is already added");
             bHelp = true;
         }
         if (bHelp) {
@@ -101,11 +101,11 @@ private:
 
     void HandleDel(const NoString& sLine)
     {
-        NoString sMsg = sLine.tokens(1);
+        NoString sMsg = No::tokens(sLine, 1);
         bool bNegated = sMsg.trimPrefix("!");
-        NoString sChan = sMsg.token(0);
-        NoString sSearch = sMsg.token(1);
-        NoString sHost = sMsg.token(2);
+        NoString sChan = No::token(sMsg, 0);
+        NoString sSearch = No::token(sMsg, 1);
+        NoString sHost = No::token(sMsg, 2);
 
         if (Del(bNegated, sChan, sSearch, sHost)) {
             PutModule("Removed " + sChan + " from list");
@@ -157,9 +157,9 @@ public:
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             NoString sAdd = *it;
             bool bNegated = sAdd.trimPrefix("!");
-            NoString sChan = sAdd.token(0);
-            NoString sSearch = sAdd.token(1);
-            NoString sHost = sAdd.tokens(2);
+            NoString sChan = No::token(sAdd, 0);
+            NoString sSearch = No::token(sAdd, 1);
+            NoString sHost = No::tokens(sAdd, 2);
 
             if (!Add(bNegated, sChan, sSearch, sHost)) {
                 PutModule("Unable to add [" + *it + "]");
@@ -171,9 +171,9 @@ public:
         for (it = BeginNV(); it != EndNV(); ++it) {
             NoString sAdd = it->first;
             bool bNegated = sAdd.trimPrefix("!");
-            NoString sChan = sAdd.token(0);
-            NoString sSearch = sAdd.token(1);
-            NoString sHost = sAdd.tokens(2);
+            NoString sChan = No::token(sAdd, 0);
+            NoString sSearch = No::token(sAdd, 1);
+            NoString sHost = No::tokens(sAdd, 2);
 
             Add(bNegated, sChan, sSearch, sHost);
         }

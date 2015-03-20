@@ -34,8 +34,8 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (!sArgs.empty()) {
-            SetUsername(sArgs.token(0));
-            SetPassword(sArgs.token(1));
+            SetUsername(No::token(sArgs, 0));
+            SetPassword(No::token(sArgs, 1));
         } else {
             m_sUsername = GetNV("Username");
             m_sPassword = GetNV("Password");
@@ -100,7 +100,7 @@ public:
 
     void OnModCommand(const NoString& sLine) override
     {
-        NoString sCommand = sLine.token(0).toLower();
+        NoString sCommand = No::token(sLine, 0).toLower();
 
         if (sCommand == "help") {
             PutModule("The following commands are available:");
@@ -167,8 +167,8 @@ public:
             PutModule("Module settings are stored between restarts.");
 
         } else if (sCommand == "set") {
-            NoString sSetting = sLine.token(1).toLower();
-            NoString sValue = sLine.token(2);
+            NoString sSetting = No::token(sLine, 1).toLower();
+            NoString sValue = No::token(sLine, 2);
             if (sSetting.empty() || sValue.empty()) {
                 PutModule("Syntax: Set <setting> <value>");
             } else if (sSetting == "username") {
@@ -242,7 +242,7 @@ public:
 
             } else if (sCommand == "auth") {
                 if (!m_bAuthed)
-                    Auth(sLine.token(1), sLine.token(2));
+                    Auth(No::token(sLine, 1), No::token(sLine, 2));
                 else
                     PutModule("Error: You are already authed!");
 
@@ -259,7 +259,7 @@ public:
     ModRet OnRaw(NoString& sLine) override
     {
         // use OnRaw because OnUserMode is not defined (yet?)
-        if (sLine.token(1) == "396" && sLine.token(3).find("users.quakenet.org") != NoString::npos) {
+        if (No::token(sLine, 1) == "396" && No::token(sLine, 3).find("users.quakenet.org") != NoString::npos) {
             m_bCloaked = true;
             PutModule("Cloak successful: Your hostname is now cloaked.");
 
@@ -456,8 +456,8 @@ private:
             m_bCatchResponse = m_bRequestedWhoami;
             m_bRequestedWhoami = true;
         } else if (m_bRequestedWhoami && No::wildCmp(sMessage, "#*")) {
-            NoString sChannel = sMessage.token(0);
-            NoString sFlags = sMessage.tokens(1).trim_n().trimLeft_n("+");
+            NoString sChannel = No::token(sMessage, 0);
+            NoString sFlags = No::tokens(sMessage, 1).trim_n().trimLeft_n("+");
             m_msChanModes[sChannel] = sFlags;
         } else if (m_bRequestedWhoami && m_bCatchResponse &&
                    (sMessage.equals("End of list.") || sMessage.equals("account, or HELLO to create an account."))) {
@@ -475,13 +475,13 @@ private:
             PutModule("Auth successful: " + sMessage);
             WhoAmI();
             return HALT;
-        } else if (m_bRequestedChallenge && sMessage.token(0).equals("CHALLENGE")) {
+        } else if (m_bRequestedChallenge && No::token(sMessage, 0).equals("CHALLENGE")) {
             m_bRequestedChallenge = false;
             if (sMessage.find("not available once you have authed") != NoString::npos) {
                 m_bAuthed = true;
             } else {
                 if (sMessage.find("HMAC-SHA-256") != NoString::npos) {
-                    ChallengeAuth(sMessage.token(1));
+                    ChallengeAuth(No::token(sMessage, 1));
                 } else {
                     PutModule(
                     "Auth failed: Q does not support HMAC-SHA-256 for CHALLENGEAUTH, falling back to standard AUTH.");

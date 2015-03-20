@@ -53,8 +53,8 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        m_iThresholdMsgs = sArgs.token(0).toUInt();
-        m_iThresholdSecs = sArgs.token(1).toUInt();
+        m_iThresholdMsgs = No::token(sArgs, 0).toUInt();
+        m_iThresholdSecs = No::token(sArgs, 1).toUInt();
 
         if (m_iThresholdMsgs == 0 || m_iThresholdSecs == 0) {
             m_iThresholdMsgs = GetNV("msgs").toUInt();
@@ -72,7 +72,7 @@ public:
     ModRet Message(const NoNick& Nick, const NoString& sMessage)
     {
         // We never block /me, because it doesn't cause a reply
-        if (sMessage.token(0).equals("ACTION")) return CONTINUE;
+        if (No::token(sMessage, 0).equals("ACTION")) return CONTINUE;
 
         if (m_tLastCTCP + m_iThresholdSecs < time(nullptr)) {
             m_tLastCTCP = time(nullptr);
@@ -98,7 +98,7 @@ public:
 
     void OnSecsCommand(const NoString& sCommand)
     {
-        const NoString& sArg = sCommand.tokens(1);
+        const NoString& sArg = No::tokens(sCommand, 1);
 
         if (sArg.empty()) {
             PutModule("Usage: Secs <limit>");
@@ -114,7 +114,7 @@ public:
 
     void OnLinesCommand(const NoString& sCommand)
     {
-        const NoString& sArg = sCommand.tokens(1);
+        const NoString& sArg = No::tokens(sCommand, 1);
 
         if (sArg.empty()) {
             PutModule("Usage: Lines <limit>");

@@ -61,7 +61,7 @@ public:
 
     void OnAddCommand(const NoString& sLine)
     {
-        NoString sChan = sLine.token(1);
+        NoString sChan = No::token(sLine, 1);
 
         if (AlreadyAdded(sChan)) {
             PutModule(sChan + " is already added");
@@ -74,7 +74,7 @@ public:
 
     void OnDelCommand(const NoString& sLine)
     {
-        NoString sChan = sLine.token(1);
+        NoString sChan = No::token(sLine, 1);
 
         if (Del(sChan))
             PutModule("Removed " + sChan + " from list");

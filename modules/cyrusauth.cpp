@@ -165,7 +165,7 @@ public:
 
     void CreateUserCommand(const NoString& sLine)
     {
-        NoString sCreate = sLine.token(1);
+        NoString sCreate = No::token(sLine, 1);
 
         if (!sCreate.empty()) {
             SetNV("CreateUser", sCreate);
@@ -180,7 +180,7 @@ public:
 
     void CloneUserCommand(const NoString& sLine)
     {
-        NoString sUsername = sLine.token(1);
+        NoString sUsername = No::token(sLine, 1);
 
         if (!sUsername.empty()) {
             SetNV("CloneUser", sUsername);

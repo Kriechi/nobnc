@@ -137,7 +137,7 @@ public:
 
     void OnTargetCommand(const NoString& sCommand)
     {
-        NoString sArg = sCommand.tokens(1);
+        NoString sArg = No::tokens(sCommand, 1);
         NoString sTarget;
         NoString sMessage;
         LogMode mode;

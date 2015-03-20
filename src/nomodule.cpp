@@ -478,7 +478,7 @@ const NoModuleCommand* NoModule::FindCommand(const NoString& sCmd) const
 
 bool NoModule::HandleCommand(const NoString& sLine)
 {
-    const NoString& sCmd = sLine.token(0);
+    const NoString& sCmd = No::token(sLine, 0);
     const NoModuleCommand* pCmd = FindCommand(sCmd);
 
     if (pCmd) {
@@ -493,7 +493,7 @@ bool NoModule::HandleCommand(const NoString& sLine)
 
 void NoModule::HandleHelpCommand(const NoString& sLine)
 {
-    NoString sFilter = sLine.token(1).toLower();
+    NoString sFilter = No::token(sLine, 1).toLower();
     NoTable Table;
 
     NoModuleCommand::InitHelp(Table);

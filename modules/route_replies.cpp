@@ -267,7 +267,7 @@ public:
 
     ModRet OnRaw(NoString& sLine) override
     {
-        NoString sCmd = sLine.token(1).toUpper();
+        NoString sCmd = No::token(sLine, 1).toUpper();
         size_t i = 0;
 
         if (!m_pReplies) return CONTINUE;
@@ -275,9 +275,9 @@ public:
         // Is this a "not enough arguments" error?
         if (sCmd == "461") {
             // :server 461 nick WHO :Not enough parameters
-            NoString sOrigCmd = sLine.token(3);
+            NoString sOrigCmd = No::token(sLine, 3);
 
-            if (m_sLastRequest.token(0).equals(sOrigCmd)) {
+            if (No::token(m_sLastRequest, 0).equals(sOrigCmd)) {
                 // This is the reply to the last request
                 if (RouteReply(sLine, true)) return HALTCORE;
                 return CONTINUE;
@@ -300,7 +300,7 @@ public:
 
     ModRet OnUserRaw(NoString& sLine) override
     {
-        NoString sCmd = sLine.token(0).toUpper();
+        NoString sCmd = No::token(sLine, 0).toUpper();
 
         if (!GetNetwork()->GetIRCSock()) return CONTINUE;
 
@@ -309,10 +309,10 @@ public:
 
             // If there are arguments to a mode change,
             // we must not route it.
-            if (!sLine.tokens(3).empty()) return CONTINUE;
+            if (!No::tokens(sLine, 3).empty()) return CONTINUE;
 
             // Grab the mode change parameter
-            NoString sMode = sLine.token(2);
+            NoString sMode = No::token(sLine, 2);
 
             // If this is a channel mode request, znc core replies to it
             if (sMode.empty()) return CONTINUE;
@@ -430,7 +430,7 @@ private:
 
     void SilentCommand(const NoString& sLine)
     {
-        const NoString sValue = sLine.token(1);
+        const NoString sValue = No::token(sLine, 1);
 
         if (!sValue.empty()) {
             SetNV("silent_timeouts", sValue);

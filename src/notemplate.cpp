@@ -149,8 +149,8 @@ static uint SafeReplace(NoString& str, const NoString& sReplace, const NoString&
 
 void NoTemplateOptions::Parse(const NoString& sLine)
 {
-    NoString sName = sLine.token(0, "=").trim_n().toUpper();
-    NoString sValue = sLine.tokens(1, "=").trim_n();
+    NoString sName = No::token(sLine, 0, "=").trim_n().toUpper();
+    NoString sValue = No::tokens(sLine, 1, "=").trim_n();
 
     if (sName == "ESC") {
         m_eEscapeTo = ToEscapeFormat(sValue);
@@ -506,8 +506,8 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
             // Make sure we don't have a nested tag
             if (sMid.find("<?") == NoString::npos) {
                 sLine = sLine.substr(iPos2 + 2);
-                NoString sAction = sMid.token(0);
-                NoString sArgs = sMid.tokens(1);
+                NoString sAction = No::token(sMid, 0);
+                NoString sArgs = No::tokens(sMid, 1);
                 bool bNotFound = false;
 
                 // If we're breaking or continuing from within a loop, skip all tags that aren't ENDLOOP
@@ -524,8 +524,8 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                     } else if (sAction.equals("SETOPTION")) {
                         m_spOptions->Parse(sArgs);
                     } else if (sAction.equals("ADDROW")) {
-                        NoString sLoopName = sArgs.token(0);
-                        NoStringMap msRow = No::optionSplit(sArgs.tokens(1, " "));
+                        NoString sLoopName = No::token(sArgs, 0);
+                        NoStringMap msRow = No::optionSplit(No::tokens(sArgs, 1, " "));
                         if (!msRow.empty()) {
                             NoTemplate& NewRow = AddRow(sLoopName);
 
@@ -534,8 +534,8 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                             }
                         }
                     } else if (sAction.equals("SET")) {
-                        NoString sName = sArgs.token(0);
-                        NoString sValue = sArgs.tokens(1);
+                        NoString sName = No::token(sArgs, 0);
+                        NoString sValue = No::tokens(sArgs, 1);
 
                         (*this)[sName] = sValue;
                     } else if (sAction.equals("JOIN")) {
@@ -608,18 +608,18 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         if (!pContext || pContext->GetFilePosition() != uCurPos) {
                             // we are at a brand new loop (be it new or a first pass at an inner loop)
 
-                            NoString sLoopName = sArgs.token(0);
-                            bool bReverse = (sArgs.token(1).equals("REVERSE"));
-                            bool bSort = (sArgs.token(1).left(4).equals("SORT"));
+                            NoString sLoopName = No::token(sArgs, 0);
+                            bool bReverse = (No::token(sArgs, 1).equals("REVERSE"));
+                            bool bSort = (No::token(sArgs, 1).left(4).equals("SORT"));
                             std::vector<NoTemplate*>* pvLoop = GetLoop(sLoopName);
 
                             if (bSort && pvLoop != nullptr && pvLoop->size() > 1) {
                                 NoString sKey;
 
-                                if (sArgs.token(1).trimPrefix_n("SORT").left(4).equals("ASC=")) {
-                                    sKey = sArgs.token(1).trimPrefix_n("SORTASC=");
-                                } else if (sArgs.token(1).trimPrefix_n("SORT").left(5).equals("DESC=")) {
-                                    sKey = sArgs.token(1).trimPrefix_n("SORTDESC=");
+                                if (No::token(sArgs, 1).trimPrefix_n("SORT").left(4).equals("ASC=")) {
+                                    sKey = No::token(sArgs, 1).trimPrefix_n("SORTASC=");
+                                } else if (No::token(sArgs, 1).trimPrefix_n("SORT").left(5).equals("DESC=")) {
+                                    sKey = No::token(sArgs, 1).trimPrefix_n("SORTDESC=");
                                     bReverse = true;
                                 }
 
@@ -727,9 +727,9 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                     }
                 } else if (sAction.equals("ELSE")) {
                     if (!bValidLastIf && uSkip == 1) {
-                        NoString sArg = sArgs.token(0);
+                        NoString sArg = No::token(sArgs, 0);
 
-                        if (sArg.empty() || (sArg.equals("IF") && ValidIf(sArgs.tokens(1)))) {
+                        if (sArg.empty() || (sArg.equals("IF") && ValidIf(No::tokens(sArgs, 1)))) {
                             uSkip = 0;
                             bValidLastIf = true;
                         }
@@ -775,8 +775,8 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
         if (!bFoundATag || bTmplLoopHasData || sOutput.find_first_not_of(" \t\r\n") != NoString::npos) {
             if (bInSetBlock) {
-                NoString sName = sSetBlockVar.token(0);
-                // NoString sValue = sSetBlockVar.tokens(1);
+                NoString sName = No::token(sSetBlockVar, 0);
+                // NoString sValue = No::tokens(sSetBlockVar, 1);
                 (*this)[sName] += sOutput;
             } else {
                 oOut << sOutput;
@@ -831,8 +831,8 @@ bool NoTemplate::ValidIf(const NoString& sArgs)
             bAnd = true;
         }
 
-        NoString sExpr = sArgStr.token(0, ((bAnd) ? "&&" : "||"));
-        sArgStr = sArgStr.tokens(1, ((bAnd) ? "&&" : "||"));
+        NoString sExpr = No::token(sArgStr, 0, ((bAnd) ? "&&" : "||"));
+        sArgStr = No::tokens(sArgStr, 1, ((bAnd) ? "&&" : "||"));
 
         if (ValidExpr(sExpr)) {
             if (!bAnd) {
@@ -867,26 +867,26 @@ bool NoTemplate::ValidExpr(const NoString& sExpression)
     }
 
     if (sExpr.find("!=") != NoString::npos) {
-        sName = sExpr.token(0, "!=").trim_n();
+        sName = No::token(sExpr, 0, "!=").trim_n();
         sValue = Token_helper(sExpr, 1, true, "!=", "\"", "\"").trim_n().trim_n("\"");
         bNegate = !bNegate;
     } else if (sExpr.find("==") != NoString::npos) {
-        sName = sExpr.token(0, "==").trim_n();
+        sName = No::token(sExpr, 0, "==").trim_n();
         sValue = Token_helper(sExpr, 1, true, "==", "\"", "\"").trim_n().trim_n("\"");
     } else if (sExpr.find(">=") != NoString::npos) {
-        sName = sExpr.token(0, ">=").trim_n();
+        sName = No::token(sExpr, 0, ">=").trim_n();
         sValue = Token_helper(sExpr, 1, true, ">=", "\"", "\"").trim_n().trim_n("\"");
         return (GetValue(sName, true).toLong() >= sValue.toLong());
     } else if (sExpr.find("<=") != NoString::npos) {
-        sName = sExpr.token(0, "<=").trim_n();
+        sName = No::token(sExpr, 0, "<=").trim_n();
         sValue = Token_helper(sExpr, 1, true, "<=", "\"", "\"").trim_n().trim_n("\"");
         return (GetValue(sName, true).toLong() <= sValue.toLong());
     } else if (sExpr.find(">") != NoString::npos) {
-        sName = sExpr.token(0, ">").trim_n();
+        sName = No::token(sExpr, 0, ">").trim_n();
         sValue = Token_helper(sExpr, 1, true, ">", "\"", "\"").trim_n().trim_n("\"");
         return (GetValue(sName, true).toLong() > sValue.toLong());
     } else if (sExpr.find("<") != NoString::npos) {
-        sName = sExpr.token(0, "<").trim_n();
+        sName = No::token(sExpr, 0, "<").trim_n();
         sValue = Token_helper(sExpr, 1, true, "<", "\"", "\"").trim_n().trim_n("\"");
         return (GetValue(sName, true).toLong() < sValue.toLong());
     } else {
@@ -951,8 +951,8 @@ NoString NoTemplate::ResolveLiteral(const NoString& sString)
 NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
 {
     NoTemplateLoopContext* pContext = GetCurLoopContext();
-    NoString sName = sArgs.token(0);
-    NoString sRest = sArgs.tokens(1);
+    NoString sName = No::token(sArgs, 0);
+    NoString sRest = No::tokens(sArgs, 1);
     NoString sRet;
 
     while (SafeReplace(sRest, " =", "=", "\"", "\"")) {
@@ -965,7 +965,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
 
     for (NoString& sArg : vArgs) {
         sArg.trim("\"");
-        msArgs[sArg.token(0, "=").toUpper()] = sArg.tokens(1, "=");
+        msArgs[No::token(sArg, 0, "=").toUpper()] = No::tokens(sArg, 1, "=");
     }
 
     /* We have no NoSettings in ZNC land
@@ -1001,10 +1001,10 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
             for (const auto& spTagHandler : vspTagHandlers) {
                 NoString sCustomOutput;
 
-                if (!bFromIf && spTagHandler->HandleVar(*pTmpl, sArgs.token(0), sArgs.tokens(1), sCustomOutput)) {
+                if (!bFromIf && spTagHandler->HandleVar(*pTmpl, No::token(sArgs, 0), No::tokens(sArgs, 1), sCustomOutput)) {
                     sRet = sCustomOutput;
                     break;
-                } else if (bFromIf && spTagHandler->HandleIf(*pTmpl, sArgs.token(0), sArgs.tokens(1), sCustomOutput)) {
+                } else if (bFromIf && spTagHandler->HandleIf(*pTmpl, No::token(sArgs, 0), No::tokens(sArgs, 1), sCustomOutput)) {
                     sRet = sCustomOutput;
                     break;
                 }

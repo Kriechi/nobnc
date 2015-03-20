@@ -87,7 +87,7 @@ public:
 
     void OnSetCommand(const NoString& sCommand)
     {
-        SetReply(sCommand.tokens(1));
+        SetReply(No::tokens(sCommand, 1));
         PutModule("New reply set");
     }
 

@@ -155,8 +155,8 @@ public:
 
     void SendCommand(const NoString& sLine)
     {
-        NoString sToNick = sLine.token(1);
-        NoString sFile = sLine.token(2);
+        NoString sToNick = No::token(sLine, 1);
+        NoString sFile = No::token(sLine, 2);
         NoString sAllowedPath = GetSavePath();
         NoString sAbsolutePath;
 
@@ -177,7 +177,7 @@ public:
 
     void GetCommand(const NoString& sLine)
     {
-        NoString sFile = sLine.token(1);
+        NoString sFile = No::token(sLine, 1);
         NoString sAllowedPath = GetSavePath();
         NoString sAbsolutePath;
 
@@ -237,9 +237,9 @@ public:
     void OnModCTCP(const NoString& sMessage) override
     {
         if (sMessage.startsWith("DCC RESUME ")) {
-            NoString sFile = sMessage.token(2);
-            ushort uResumePort = sMessage.token(3).toUShort();
-            ulong uResumeSize = sMessage.token(4).toULong();
+            NoString sFile = No::token(sMessage, 2);
+            ushort uResumePort = No::token(sMessage, 3).toUShort();
+            ulong uResumeSize = No::token(sMessage, 4).toULong();
 
             std::set<NoModuleSocket*>::const_iterator it;
             for (it = BeginSockets(); it != EndSockets(); ++it) {
@@ -258,13 +258,13 @@ public:
                 }
             }
         } else if (sMessage.startsWith("DCC SEND ")) {
-            NoString sLocalFile = NoDir::CheckPathPrefix(GetSavePath(), sMessage.token(2));
+            NoString sLocalFile = NoDir::CheckPathPrefix(GetSavePath(), No::token(sMessage, 2));
             if (sLocalFile.empty()) {
-                PutModule("Bad DCC file: " + sMessage.token(2));
+                PutModule("Bad DCC file: " + No::token(sMessage, 2));
             }
-            ulong uLongIP = sMessage.token(3).toULong();
-            ushort uPort = sMessage.token(4).toUShort();
-            ulong uFileSize = sMessage.token(5).toULong();
+            ulong uLongIP = No::token(sMessage, 3).toULong();
+            ushort uPort = No::token(sMessage, 4).toUShort();
+            ulong uFileSize = No::token(sMessage, 5).toULong();
             GetFile(GetClient()->GetNick(), No::formatIp(uLongIP), uPort, sLocalFile, uFileSize);
         }
     }

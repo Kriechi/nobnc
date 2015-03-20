@@ -32,7 +32,7 @@ class NoNickServ : public NoModule
 public:
     void SetCommand(const NoString& sLine)
     {
-        SetNV("Password", sLine.tokens(1));
+        SetNV("Password", No::tokens(sLine, 1));
         PutModule("Password set");
     }
 
@@ -40,7 +40,7 @@ public:
 
     void SetNSNameCommand(const NoString& sLine)
     {
-        SetNV("NickServName", sLine.tokens(1));
+        SetNV("NickServName", No::tokens(sLine, 1));
         PutModule("NickServ name set");
     }
 
@@ -50,8 +50,8 @@ public:
 
     void SetCommandCommand(const NoString& sLine)
     {
-        NoString sCmd = sLine.token(1);
-        NoString sNewCmd = sLine.tokens(2);
+        NoString sCmd = No::token(sLine, 1);
+        NoString sNewCmd = No::tokens(sLine, 2);
         if (sCmd.equals("IDENTIFY")) {
             SetNV("IdentifyCmd", sNewCmd);
         } else {

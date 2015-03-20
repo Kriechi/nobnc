@@ -111,8 +111,8 @@ public:
         NoString sURIPrefix;
 
         while (sArgs.left(1) == "-") {
-            NoString sOpt = sArgs.token(0);
-            sArgs = sArgs.tokens(1);
+            NoString sOpt = No::token(sArgs, 0);
+            sArgs = No::tokens(sArgs, 1);
 
             if (sOpt.equals("-IPV6")) {
                 bIPv6 = true;
@@ -132,8 +132,8 @@ public:
         if (sArgs.empty() && bShareIRCPorts) return true;
 
         if (sArgs.find(" ") != NoString::npos) {
-            sListenHost = sArgs.token(0);
-            sPort = sArgs.tokens(1);
+            sListenHost = No::token(sArgs, 0);
+            sPort = No::tokens(sArgs, 1);
         } else {
             sPort = sArgs;
         }
@@ -218,7 +218,7 @@ public:
         vsArgs = WebSock.GetRawParam("ctcpreplies").split("\n");
         for (a = 0; a < vsArgs.size(); a++) {
             NoString sReply = vsArgs[a].trimRight_n("\r");
-            pNewUser->AddCTCPReply(sReply.token(0).trim_n(), sReply.tokens(1).trim_n());
+            pNewUser->AddCTCPReply(No::token(sReply, 0).trim_n(), No::tokens(sReply, 1).trim_n());
         }
 
         sArg = WebSock.GetParam("nick");

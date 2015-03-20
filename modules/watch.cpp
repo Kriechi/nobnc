@@ -277,9 +277,9 @@ public:
 
     void OnModCommand(const NoString& sCommand) override
     {
-        NoString sCmdName = sCommand.token(0);
+        NoString sCmdName = No::token(sCommand, 0);
         if (sCmdName.equals("ADD") || sCmdName.equals("WATCH")) {
-            Watch(sCommand.token(1), sCommand.token(2), sCommand.tokens(3));
+            Watch(No::token(sCommand, 1), No::token(sCommand, 2), No::tokens(sCommand, 3));
         } else if (sCmdName.equals("HELP")) {
             Help();
         } else if (sCmdName.equals("LIST")) {
@@ -287,7 +287,7 @@ public:
         } else if (sCmdName.equals("DUMP")) {
             Dump();
         } else if (sCmdName.equals("ENABLE")) {
-            NoString sTok = sCommand.token(1);
+            NoString sTok = No::token(sCommand, 1);
 
             if (sTok == "*") {
                 SetDisabled(~0, false);
@@ -295,7 +295,7 @@ public:
                 SetDisabled(sTok.toUInt(), false);
             }
         } else if (sCmdName.equals("DISABLE")) {
-            NoString sTok = sCommand.token(1);
+            NoString sTok = No::token(sCommand, 1);
 
             if (sTok == "*") {
                 SetDisabled(~0, true);
@@ -303,8 +303,8 @@ public:
                 SetDisabled(sTok.toUInt(), true);
             }
         } else if (sCmdName.equals("SETDETACHEDCLIENTONLY")) {
-            NoString sTok = sCommand.token(1);
-            bool bDetachedClientOnly = sCommand.token(2).toBool();
+            NoString sTok = No::token(sCommand, 1);
+            bool bDetachedClientOnly = No::token(sCommand, 2).toBool();
 
             if (sTok == "*") {
                 SetDetachedClientOnly(~0, bDetachedClientOnly);
@@ -312,8 +312,8 @@ public:
                 SetDetachedClientOnly(sTok.toUInt(), bDetachedClientOnly);
             }
         } else if (sCmdName.equals("SETDETACHEDCHANNELONLY")) {
-            NoString sTok = sCommand.token(1);
-            bool bDetachedchannelOnly = sCommand.token(2).toBool();
+            NoString sTok = No::token(sCommand, 1);
+            bool bDetachedchannelOnly = No::token(sCommand, 2).toBool();
 
             if (sTok == "*") {
                 SetDetachedChannelOnly(~0, bDetachedchannelOnly);
@@ -321,13 +321,13 @@ public:
                 SetDetachedChannelOnly(sTok.toUInt(), bDetachedchannelOnly);
             }
         } else if (sCmdName.equals("SETSOURCES")) {
-            SetSources(sCommand.token(1).toUInt(), sCommand.tokens(2));
+            SetSources(No::token(sCommand, 1).toUInt(), No::tokens(sCommand, 2));
         } else if (sCmdName.equals("CLEAR")) {
             m_lsWatchers.clear();
             PutModule("All entries cleared.");
             Save();
         } else if (sCmdName.equals("BUFFER")) {
-            NoString sCount = sCommand.token(1);
+            NoString sCount = No::token(sCommand, 1);
 
             if (sCount.size()) {
                 m_Buffer.setLimit(sCount.toUInt());
@@ -335,7 +335,7 @@ public:
 
             PutModule("Buffer count is set to [" + NoString(m_Buffer.getLimit()) + "]");
         } else if (sCmdName.equals("DEL")) {
-            Remove(sCommand.token(1).toUInt());
+            Remove(No::token(sCommand, 1).toUInt());
         } else {
             PutModule("Unknown command: [" + sCmdName + "]");
         }

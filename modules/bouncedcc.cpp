@@ -153,7 +153,7 @@ public:
 
     void UseClientIPCommand(const NoString& sLine)
     {
-        NoString sValue = sLine.tokens(1);
+        NoString sValue = No::tokens(sLine, 1);
 
         if (!sValue.empty()) {
             SetNV("UseClientIP", sValue);
@@ -209,7 +209,7 @@ public:
                 }
             } else if (sType.equals("RESUME")) {
                 // PRIVMSG user :DCC RESUME "znc.o" 58810 151552
-                ushort uResumePort = sMessage.token(3).toUShort();
+                ushort uResumePort = No::token(sMessage, 3).toUShort();
 
                 std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
@@ -217,7 +217,7 @@ public:
 
                     if (pSock->GetLocalPort() == uResumePort) {
                         PutIRC("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
-                               NoString(pSock->GetUserPort()) + " " + sMessage.token(4) + "\001");
+                               NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
             } else if (sType.equals("ACCEPT")) {
@@ -226,9 +226,9 @@ public:
                 std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
-                    if (pSock->GetUserPort() == sMessage.token(3).toUShort()) {
+                    if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
                         PutIRC("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
-                               NoString(pSock->GetLocalPort()) + " " + sMessage.token(4) + "\001");
+                               NoString(pSock->GetLocalPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
             }
@@ -272,7 +272,7 @@ public:
                 }
             } else if (sType.equals("RESUME")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
-                ushort uResumePort = sMessage.token(3).toUShort();
+                ushort uResumePort = No::token(sMessage, 3).toUShort();
 
                 std::set<NoModuleSocket*>::const_iterator it;
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
@@ -280,7 +280,7 @@ public:
 
                     if (pSock->GetLocalPort() == uResumePort) {
                         PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
-                                " " + sFile + " " + NoString(pSock->GetUserPort()) + " " + sMessage.token(4) + "\001");
+                                " " + sFile + " " + NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
             } else if (sType.equals("ACCEPT")) {
@@ -289,9 +289,9 @@ public:
                 for (it = BeginSockets(); it != EndSockets(); ++it) {
                     NoDccBounce* pSock = (NoDccBounce*)*it;
 
-                    if (pSock->GetUserPort() == sMessage.token(3).toUShort()) {
+                    if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
                         PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
-                                " " + sFile + " " + NoString(pSock->GetLocalPort()) + " " + sMessage.token(4) + "\001");
+                                " " + sFile + " " + NoString(pSock->GetLocalPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
             }

@@ -592,15 +592,15 @@ bool NoApp::WriteConfig()
     config.AddKeyValuePair("ServerThrottle", NoString(m_sConnectThrottle.GetTTL() / 1000));
 
     if (!m_sPidFile.empty()) {
-        config.AddKeyValuePair("PidFile", m_sPidFile.firstLine());
+        config.AddKeyValuePair("PidFile", No::firstLine(m_sPidFile));
     }
 
     if (!m_sSkinName.empty()) {
-        config.AddKeyValuePair("Skin", m_sSkinName.firstLine());
+        config.AddKeyValuePair("Skin", No::firstLine(m_sSkinName));
     }
 
     if (!m_sStatusPrefix.empty()) {
-        config.AddKeyValuePair("StatusPrefix", m_sStatusPrefix.firstLine());
+        config.AddKeyValuePair("StatusPrefix", No::firstLine(m_sStatusPrefix));
     }
 
     if (!m_sSSLCiphers.empty()) {
@@ -612,15 +612,15 @@ bool NoApp::WriteConfig()
     }
 
     for (const NoString& sLine : m_vsMotd) {
-        config.AddKeyValuePair("Motd", sLine.firstLine());
+        config.AddKeyValuePair("Motd", No::firstLine(sLine));
     }
 
     for (const NoString& sHost : m_vsBindHosts) {
-        config.AddKeyValuePair("BindHost", sHost.firstLine());
+        config.AddKeyValuePair("BindHost", No::firstLine(sHost));
     }
 
     for (const NoString& sProxy : m_vsTrustedProxies) {
-        config.AddKeyValuePair("TrustedProxy", sProxy.firstLine());
+        config.AddKeyValuePair("TrustedProxy", No::firstLine(sProxy));
     }
 
     NoModules& Mods = GetModules();
@@ -630,10 +630,10 @@ bool NoApp::WriteConfig()
         NoString sArgs = pMod->GetArgs();
 
         if (!sArgs.empty()) {
-            sArgs = " " + sArgs.firstLine();
+            sArgs = " " + No::firstLine(sArgs);
         }
 
-        config.AddKeyValuePair("LoadModule", sName.firstLine() + sArgs);
+        config.AddKeyValuePair("LoadModule", No::firstLine(sName) + sArgs);
     }
 
     for (const auto& it : m_msUsers) {
@@ -1093,7 +1093,7 @@ bool NoApp::DoRehash(NoString& sError)
     NoString sSavedVersion;
     config.FindStringEntry("version", sSavedVersion);
     std::tuple<uint, uint> tSavedVersion =
-    std::make_tuple(sSavedVersion.token(0, ".").toUInt(), sSavedVersion.token(1, ".").toUInt());
+    std::make_tuple(No::token(sSavedVersion, 0, ".").toUInt(), No::token(sSavedVersion, 1, ".").toUInt());
     std::tuple<uint, uint> tCurrentVersion = std::make_tuple(NO_VERSION_MAJOR, NO_VERSION_MINOR);
     if (tSavedVersion < tCurrentVersion) {
         if (sSavedVersion.empty()) {
@@ -1120,8 +1120,8 @@ bool NoApp::DoRehash(NoString& sError)
     NoStringVector vsList;
     config.FindStringVector("loadmodule", vsList);
     for (const NoString& sModLine : vsList) {
-        NoString sModName = sModLine.token(0);
-        NoString sArgs = sModLine.tokens(1);
+        NoString sModName = No::token(sModLine, 0);
+        NoString sArgs = No::tokens(sModLine, 1);
 
         if (sModName == "saslauth" && tSavedVersion < std::make_tuple(0, 207)) {
             // XXX compatibility crap, added in 0.207
@@ -1660,8 +1660,8 @@ NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, No::Ad
 
 bool NoApp::AddListener(const NoString& sLine, NoString& sError)
 {
-    NoString sName = sLine.token(0);
-    NoString sValue = sLine.tokens(1);
+    NoString sName = No::token(sLine, 0);
+    NoString sValue = No::tokens(sLine, 1);
 
     No::AddressType eAddr = No::Ipv4AndIpv6Address;
     if (sName.equals("Listen4") || sName.equals("Listen") || sName.equals("Listener4")) {
@@ -1686,8 +1686,8 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
     }
 
     if (sValue.find(" ") != NoString::npos) {
-        sBindHost = sValue.token(0, " ");
-        sPort = sValue.tokens(1, " ");
+        sBindHost = No::token(sValue, 0, " ");
+        sPort = No::tokens(sValue, 1, " ");
     } else {
         sPort = sValue;
     }

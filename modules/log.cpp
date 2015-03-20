@@ -115,7 +115,7 @@ private:
 
 void NoLogMod::SetRulesCmd(const NoString& sLine)
 {
-    NoStringVector vsRules = SplitRules(sLine.tokens(1));
+    NoStringVector vsRules = SplitRules(No::tokens(sLine, 1));
 
     if (vsRules.empty()) {
         PutModule("Usage: SetRules <rules>");
@@ -261,13 +261,13 @@ NoString NoLogMod::GetServer()
 bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)
 {
     size_t uIndex = 0;
-    if (sArgs.token(0).equals("-sanitize")) {
+    if (No::token(sArgs, 0).equals("-sanitize")) {
         m_bSanitize = true;
         ++uIndex;
     }
 
     // Use load parameter as save path
-    m_sLogPath = sArgs.token(uIndex);
+    m_sLogPath = No::token(sArgs, uIndex);
 
     // Add default filename to path if it's a folder
     if (GetType() == No::UserModule) {

@@ -153,39 +153,6 @@ public:
      */
     NoString right(size_type uCount) const;
 
-    /** Get the first line of this string.
-     * @return The first line of text.
-     */
-    NoString firstLine() const { return token(0, "\n"); }
-
-    /** Get a token out of this string. For example in the string "a bc d  e",
-     *  each of "a", "bc", "d" and "e" are tokens.
-     * @param uPos The number of the token you are interested. The first
-     *             token has a position of 0.
-     * @param sSep Seperator between tokens.
-     * @param bAllowEmpty If this is true, empty tokens are allowed. In the
-     *                    example from above this means that there is a
-     *                    token "" before the "e" token.
-     * @return The token you asked for and, if bRest is true, everything
-     *         after it.
-     * @see Split() if you need a string split into all of its tokens.
-     */
-    NoString token(size_t uPos, const NoString& sSep = " ") const;
-
-    /** Get a token out of this string. For example in the string "a bc d  e",
-     *  each of "a", "bc", "d" and "e" are tokens.
-     * @param uPos The number of the token you are interested. The first
-     *             token has a position of 0.
-     * @param sSep Seperator between tokens.
-     * @param bAllowEmpty If this is true, empty tokens are allowed. In the
-     *                    example from above this means that there is a
-     *                    token "" before the "e" token.
-     * @return The token you asked for and, if bRest is true, everything
-     *         after it.
-     * @see Split() if you need a string split into all of its tokens.
-     */
-    NoString tokens(size_t uPos, const NoString& sSep = " ") const;
-
     /** Split up this string into tokens.
      * @param separator The separator between tokens.
      * @param behavior If behavior is No::SkipEmptyParts, empty entries don't

@@ -81,7 +81,7 @@ public:
     {
         if (sName.equals("URLPARAM")) {
             // sOutput = NoApp::Get()
-            sOutput = m_WebSock.GetParam(sArgs.token(0), false);
+            sOutput = m_WebSock.GetParam(No::token(sArgs, 0), false);
             return true;
         }
         return false;
@@ -433,7 +433,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
         Row["Title"] = sTitle;
 
         if (m_sModName == Module.GetModName()) {
-            NoString sModuleType = GetPath().token(1, "/");
+            NoString sModuleType = No::token(GetPath(), 1, "/");
             if (sModuleType == "global" && Module.GetType() == No::GlobalModule) {
                 bActiveModule = true;
             } else if (sModuleType == "user" && Module.GetType() == No::UserModule) {
@@ -441,7 +441,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
             } else if (sModuleType == "network" && Module.GetType() == No::NetworkModule) {
                 NoNetwork* Network = Module.GetNetwork();
                 if (Network) {
-                    NoString sNetworkName = GetPath().token(2, "/");
+                    NoString sNetworkName = No::token(GetPath(), 2, "/");
                     if (sNetworkName == Network->GetName()) {
                         bActiveModule = true;
                     }
@@ -727,8 +727,8 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
         m_sPath.trimPrefix("mods/");
         m_sPath.trimPrefix("modfiles/");
 
-        NoString sType = m_sPath.token(0, "/");
-        m_sPath = m_sPath.tokens(1, "/");
+        NoString sType = No::token(m_sPath, 0, "/");
+        m_sPath = No::tokens(m_sPath, 1, "/");
 
         No::ModuleType eModType;
         if (sType.equals("global")) {
@@ -749,8 +749,8 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
         NoNetwork* pNetwork = nullptr;
         if (eModType == No::NetworkModule) {
-            NoString sNetwork = m_sPath.token(0, "/");
-            m_sPath = m_sPath.tokens(1, "/");
+            NoString sNetwork = No::token(m_sPath, 0, "/");
+            m_sPath = No::tokens(m_sPath, 1, "/");
 
             pNetwork = GetSession()->GetUser()->FindNetwork(sNetwork);
 
@@ -760,8 +760,8 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             }
         }
 
-        m_sModName = m_sPath.token(0, "/");
-        m_sPage = m_sPath.tokens(1, "/");
+        m_sModName = No::token(m_sPath, 0, "/");
+        m_sPage = No::tokens(m_sPath, 1, "/");
 
         if (m_sPage.empty()) {
             m_sPage = "index";

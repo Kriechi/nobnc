@@ -40,17 +40,17 @@ void NoClient::UserCommand(NoString& sLine)
     NETWORKMODULECALL(OnStatusCommand(sLine), m_pUser, m_pNetwork, this, &bReturn);
     if (bReturn) return;
 
-    const NoString sCommand = sLine.token(0);
+    const NoString sCommand = No::token(sLine, 0);
 
     if (sCommand.equals("HELP")) {
-        HelpUser(sLine.token(1));
+        HelpUser(No::token(sLine, 1));
     } else if (sCommand.equals("LISTNICKS")) {
         if (!m_pNetwork) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sChan = sLine.token(1);
+        NoString sChan = No::token(sLine, 1);
 
         if (sChan.empty()) {
             PutStatus("Usage: ListNicks <#chan>");
@@ -113,7 +113,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sPatterns = sLine.tokens(1);
+        NoString sPatterns = No::tokens(sLine, 1);
 
         if (sPatterns.empty()) {
             PutStatus("Usage: Detach <#chans>");
@@ -161,7 +161,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
     } else if (sCommand.equals("LISTCLIENTS")) {
         NoUser* pUser = m_pUser;
-        NoString sNick = sLine.token(1);
+        NoString sNick = No::token(sLine, 1);
 
         if (!sNick.empty()) {
             if (!m_pUser->IsAdmin()) {
@@ -255,7 +255,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (m_pUser->IsAdmin() && sCommand.equals("SetMOTD")) {
-        NoString sMessage = sLine.tokens(1);
+        NoString sMessage = No::tokens(sLine, 1);
 
         if (sMessage.empty()) {
             PutStatus("Usage: SetMOTD <message>");
@@ -264,7 +264,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("MOTD set to [" + sMessage + "]");
         }
     } else if (m_pUser->IsAdmin() && sCommand.equals("AddMOTD")) {
-        NoString sMessage = sLine.tokens(1);
+        NoString sMessage = No::tokens(sLine, 1);
 
         if (sMessage.empty()) {
             PutStatus("Usage: AddMOTD <message>");
@@ -276,15 +276,15 @@ void NoClient::UserCommand(NoString& sLine)
         NoApp::Get().ClearMotd();
         PutStatus("Cleared MOTD");
     } else if (m_pUser->IsAdmin() && sCommand.equals("BROADCAST")) {
-        NoApp::Get().Broadcast(sLine.tokens(1));
+        NoApp::Get().Broadcast(No::tokens(sLine, 1));
     } else if (m_pUser->IsAdmin() && (sCommand.equals("SHUTDOWN") || sCommand.equals("RESTART"))) {
         bool bRestart = sCommand.equals("RESTART");
-        NoString sMessage = sLine.tokens(1);
+        NoString sMessage = No::tokens(sLine, 1);
         bool bForce = false;
 
-        if (sMessage.token(0).equals("FORCE")) {
+        if (No::token(sMessage, 0).equals("FORCE")) {
             bForce = true;
-            sMessage = sMessage.tokens(1);
+            sMessage = No::tokens(sMessage, 1);
         }
 
         if (sMessage.empty()) {
@@ -309,7 +309,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sArgs = sLine.tokens(1);
+        NoString sArgs = No::tokens(sLine, 1);
         sArgs.trim();
         NoServer* pServer = nullptr;
 
@@ -351,7 +351,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (GetIRCSock()) {
-            NoString sQuitMsg = sLine.tokens(1);
+            NoString sQuitMsg = No::tokens(sLine, 1);
             GetIRCSock()->Quit(sQuitMsg);
         }
 
@@ -364,7 +364,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sPatterns = sLine.tokens(1);
+        NoString sPatterns = No::tokens(sLine, 1);
 
         if (sPatterns.empty()) {
             PutStatus("Usage: EnableChan <#chans>");
@@ -394,7 +394,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sPatterns = sLine.tokens(1);
+        NoString sPatterns = No::tokens(sLine, 1);
 
         if (sPatterns.empty()) {
             PutStatus("Usage: DisableChan <#chans>");
@@ -424,7 +424,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sChan = sLine.tokens(1);
+        NoString sChan = No::tokens(sLine, 1);
         if (sChan.empty()) {
             PutStatus("Usage: ShowChan <#chan>");
             return;
@@ -492,8 +492,8 @@ void NoClient::UserCommand(NoString& sLine)
 
         NoNetwork* pNetwork = m_pNetwork;
 
-        const NoString sNick = sLine.token(1);
-        const NoString sNetwork = sLine.token(2);
+        const NoString sNick = No::token(sLine, 1);
+        const NoString sNetwork = No::token(sLine, 2);
 
         if (!sNick.empty()) {
             if (!m_pUser->IsAdmin()) {
@@ -550,7 +550,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sNetwork = sLine.token(1);
+        NoString sNetwork = No::token(sLine, 1);
 
         if (sNetwork.empty()) {
             PutStatus("Usage: AddNetwork <name>");
@@ -571,7 +571,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus(sNetworkAddError);
         }
     } else if (sCommand.equals("DELNETWORK")) {
-        NoString sNetwork = sLine.token(1);
+        NoString sNetwork = No::token(sLine, 1);
 
         if (sNetwork.empty()) {
             PutStatus("Usage: DelNetwork <name>");
@@ -591,11 +591,11 @@ void NoClient::UserCommand(NoString& sLine)
     } else if (sCommand.equals("LISTNETWORKS")) {
         NoUser* pUser = m_pUser;
 
-        if (m_pUser->IsAdmin() && !sLine.token(1).empty()) {
-            pUser = NoApp::Get().FindUser(sLine.token(1));
+        if (m_pUser->IsAdmin() && !No::token(sLine, 1).empty()) {
+            pUser = NoApp::Get().FindUser(No::token(sLine, 1));
 
             if (!pUser) {
-                PutStatus("User not found " + sLine.token(1));
+                PutStatus("User not found " + No::token(sLine, 1));
                 return;
             }
         }
@@ -631,10 +631,10 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sOldUser = sLine.token(1);
-        NoString sOldNetwork = sLine.token(2);
-        NoString sNewUser = sLine.token(3);
-        NoString sNewNetwork = sLine.token(4);
+        NoString sOldUser = No::token(sLine, 1);
+        NoString sOldNetwork = No::token(sLine, 2);
+        NoString sNewUser = No::token(sLine, 3);
+        NoString sNewNetwork = No::token(sLine, 4);
 
         if (sOldUser.empty() || sOldNetwork.empty() || sNewUser.empty()) {
             PutStatus("Usage: MoveNetwork <old user> <old network> <new user> [new network]");
@@ -708,7 +708,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Copied the network to new user, but failed to delete old network");
         }
     } else if (sCommand.equals("JUMPNETWORK")) {
-        NoString sNetwork = sLine.token(1);
+        NoString sNetwork = No::token(sLine, 1);
 
         if (sNetwork.empty()) {
             PutStatus("No network supplied.");
@@ -728,7 +728,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("You don't have a network named " + sNetwork);
         }
     } else if (sCommand.equals("ADDSERVER")) {
-        NoString sServer = sLine.token(1);
+        NoString sServer = No::token(sLine, 1);
 
         if (!m_pNetwork) {
             PutStatus("You must be connected with a network to use this command");
@@ -740,7 +740,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (m_pNetwork->AddServer(sLine.tokens(1))) {
+        if (m_pNetwork->AddServer(No::tokens(sLine, 1))) {
             PutStatus("Server added");
         } else {
             PutStatus("Unable to add that server");
@@ -752,9 +752,9 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sServer = sLine.token(1);
-        ushort uPort = sLine.token(2).toUShort();
-        NoString sPass = sLine.token(3);
+        NoString sServer = No::token(sLine, 1);
+        ushort uPort = No::token(sLine, 2).toUShort();
+        NoString sPass = No::token(sLine, 3);
 
         if (sServer.empty()) {
             PutStatus("Usage: DelServer <host> [port] [pass]");
@@ -803,7 +803,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("You must be connected with a network to use this command");
             return;
         }
-        NoString sFP = sLine.token(1);
+        NoString sFP = No::token(sLine, 1);
         if (sFP.empty()) {
             PutStatus("Usage: AddTrustedServerFingerprint <fi:ng:er>");
             return;
@@ -815,7 +815,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("You must be connected with a network to use this command");
             return;
         }
-        NoString sFP = sLine.token(1);
+        NoString sFP = No::token(sLine, 1);
         if (sFP.empty()) {
             PutStatus("Usage: DelTrustedServerFingerprint <fi:ng:er>");
             return;
@@ -988,9 +988,9 @@ void NoClient::UserCommand(NoString& sLine)
         return;
     } else if (sCommand.equals("LOADMOD") || sCommand.equals("LOADMODULE")) {
         No::ModuleType eType;
-        NoString sType = sLine.token(1);
-        NoString sMod = sLine.token(2);
-        NoString sArgs = sLine.tokens(3);
+        NoString sType = No::token(sLine, 1);
+        NoString sMod = No::token(sLine, 2);
+        NoString sArgs = No::tokens(sLine, 3);
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
@@ -1001,7 +1001,7 @@ void NoClient::UserCommand(NoString& sLine)
             eType = No::NetworkModule;
         } else {
             sMod = sType;
-            sArgs = sLine.tokens(2);
+            sArgs = No::tokens(sLine, 2);
             sType = "default";
             // Will be set correctly later
             eType = No::UserModule;
@@ -1061,8 +1061,8 @@ void NoClient::UserCommand(NoString& sLine)
         return;
     } else if (sCommand.equals("UNLOADMOD") || sCommand.equals("UNLOADMODULE")) {
         No::ModuleType eType = No::UserModule;
-        NoString sType = sLine.token(1);
-        NoString sMod = sLine.token(2);
+        NoString sType = No::token(sLine, 1);
+        NoString sMod = No::token(sLine, 2);
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
@@ -1127,9 +1127,9 @@ void NoClient::UserCommand(NoString& sLine)
         return;
     } else if (sCommand.equals("RELOADMOD") || sCommand.equals("RELOADMODULE")) {
         No::ModuleType eType;
-        NoString sType = sLine.token(1);
-        NoString sMod = sLine.token(2);
-        NoString sArgs = sLine.tokens(3);
+        NoString sType = No::token(sLine, 1);
+        NoString sMod = No::token(sLine, 2);
+        NoString sArgs = No::tokens(sLine, 3);
 
         if (m_pUser->DenyLoadMod()) {
             PutStatus("Unable to reload modules. Access Denied.");
@@ -1145,7 +1145,7 @@ void NoClient::UserCommand(NoString& sLine)
             eType = No::NetworkModule;
         } else {
             sMod = sType;
-            sArgs = sLine.tokens(2);
+            sArgs = No::tokens(sLine, 2);
             sType = "default";
             // Will be set correctly later
             eType = No::UserModule;
@@ -1196,7 +1196,7 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(sModRet);
         return;
     } else if ((sCommand.equals("UPDATEMOD") || sCommand.equals("UPDATEMODULE")) && m_pUser->IsAdmin()) {
-        NoString sMod = sLine.token(1);
+        NoString sMod = No::token(sLine, 1);
 
         if (sMod.empty()) {
             PutStatus("Usage: UpdateMod <module>");
@@ -1210,7 +1210,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Done, but there were errors, [" + sMod + "] could not be loaded everywhere.");
         }
     } else if ((sCommand.equals("ADDBINDHOST") || sCommand.equals("ADDVHOST")) && m_pUser->IsAdmin()) {
-        NoString sHost = sLine.token(1);
+        NoString sHost = No::token(sLine, 1);
 
         if (sHost.empty()) {
             PutStatus("Usage: AddBindHost <host>");
@@ -1225,7 +1225,7 @@ void NoClient::UserCommand(NoString& sLine)
     } else if ((sCommand.equals("REMBINDHOST") || sCommand.equals("DELBINDHOST") || sCommand.equals("REMVHOST") ||
                 sCommand.equals("DELVHOST")) &&
                m_pUser->IsAdmin()) {
-        NoString sHost = sLine.token(1);
+        NoString sHost = No::token(sLine, 1);
 
         if (sHost.empty()) {
             PutStatus("Usage: DelBindHost <host>");
@@ -1260,7 +1260,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("You must be connected with a network to use this command. Try SetUserBindHost instead");
             return;
         }
-        NoString sArg = sLine.token(1);
+        NoString sArg = No::token(sLine, 1);
 
         if (sArg.empty()) {
             PutStatus("Usage: SetBindHost <host>");
@@ -1292,7 +1292,7 @@ void NoClient::UserCommand(NoString& sLine)
         m_pNetwork->SetBindHost(sArg);
         PutStatus("Set bind host for network [" + m_pNetwork->GetName() + "] to [" + m_pNetwork->GetBindHost() + "]");
     } else if (sCommand.equals("SETUSERBINDHOST") && (m_pUser->IsAdmin() || !m_pUser->DenySetBindHost())) {
-        NoString sArg = sLine.token(1);
+        NoString sArg = No::token(sLine, 1);
 
         if (sArg.empty()) {
             PutStatus("Usage: SetUserBindHost <host>");
@@ -1347,7 +1347,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sBuffer = sLine.token(1);
+        NoString sBuffer = No::token(sLine, 1);
 
         if (sBuffer.empty()) {
             PutStatus("Usage: PlayBuffer <#chan|query>");
@@ -1394,7 +1394,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sBuffer = sLine.token(1);
+        NoString sBuffer = No::token(sLine, 1);
 
         if (sBuffer.empty()) {
             PutStatus("Usage: ClearBuffer <#chan|query>");
@@ -1452,14 +1452,14 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoString sBuffer = sLine.token(1);
+        NoString sBuffer = No::token(sLine, 1);
 
         if (sBuffer.empty()) {
             PutStatus("Usage: SetBuffer <#chan|query> [linecount]");
             return;
         }
 
-        uint uLineCount = sLine.token(2).toUInt();
+        uint uLineCount = No::token(sLine, 2).toUInt();
         uint uMatches = 0, uFail = 0;
         std::vector<NoChannel*> vChans = m_pNetwork->FindChans(sBuffer);
         for (NoChannel* pChan : vChans) {
@@ -1530,7 +1530,7 @@ void NoClient::UserCommand(NoString& sLine)
 
 void NoClient::UserPortCommand(NoString& sLine)
 {
-    const NoString sCommand = sLine.token(0);
+    const NoString sCommand = No::token(sLine, 0);
 
     if (sCommand.equals("LISTPORTS")) {
         NoTable Table;
@@ -1565,8 +1565,8 @@ void NoClient::UserPortCommand(NoString& sLine)
         return;
     }
 
-    NoString sPort = sLine.token(1);
-    NoString sAddr = sLine.token(2);
+    NoString sPort = No::token(sLine, 1);
+    NoString sAddr = No::token(sLine, 2);
     No::AddressType eAddr = No::Ipv4AndIpv6Address;
 
     if (sAddr.equals("IPV4")) {
@@ -1583,7 +1583,7 @@ void NoClient::UserPortCommand(NoString& sLine)
 
     if (sCommand.equals("ADDPORT")) {
         NoListener::AcceptType eAccept = NoListener::AcceptAll;
-        NoString sAccept = sLine.token(3);
+        NoString sAccept = No::token(sLine, 3);
 
         if (sAccept.equals("WEB")) {
             eAccept = NoListener::AcceptHttp;
@@ -1599,8 +1599,8 @@ void NoClient::UserPortCommand(NoString& sLine)
             PutStatus("Usage: AddPort <[+]port> <ipv4|ipv6|all> <web|irc|all> [bindhost [uriprefix]]");
         } else {
             bool bSSL = (sPort.left(1).equals("+"));
-            const NoString sBindHost = sLine.token(4);
-            const NoString sURIPrefix = sLine.token(5);
+            const NoString sBindHost = No::token(sLine, 4);
+            const NoString sURIPrefix = No::token(sLine, 5);
 
             NoListener* pListener = new NoListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept);
 
@@ -1618,7 +1618,7 @@ void NoClient::UserPortCommand(NoString& sLine)
         if (sPort.empty() || sAddr.empty()) {
             PutStatus("Usage: DelPort <port> <ipv4|ipv6|all> [bindhost]");
         } else {
-            const NoString sBindHost = sLine.token(3);
+            const NoString sBindHost = No::token(sLine, 3);
 
             NoListener* pListener = NoApp::Get().FindListener(uPort, sBindHost, eAddr);
 

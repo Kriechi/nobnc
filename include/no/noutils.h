@@ -147,6 +147,39 @@ namespace No
      * @return The result of <code>this->WildCmp(sWild, *this);</code>.
      */
     NO_EXPORT bool wildCmp(const NoString& sStr, const NoString& sWild, No::CaseSensitivity cs = No::CaseSensitive);
+
+    /** Get a token out of this string. For example in the string "a bc d  e",
+     *  each of "a", "bc", "d" and "e" are tokens.
+     * @param uPos The number of the token you are interested. The first
+     *             token has a position of 0.
+     * @param sSep Seperator between tokens.
+     * @param bAllowEmpty If this is true, empty tokens are allowed. In the
+     *                    example from above this means that there is a
+     *                    token "" before the "e" token.
+     * @return The token you asked for and, if bRest is true, everything
+     *         after it.
+     * @see Split() if you need a string split into all of its tokens.
+     */
+    NO_EXPORT NoString token(const NoString& str, size_t uPos, const NoString& sSep = " ");
+
+    /** Get a token out of this string. For example in the string "a bc d  e",
+     *  each of "a", "bc", "d" and "e" are tokens.
+     * @param uPos The number of the token you are interested. The first
+     *             token has a position of 0.
+     * @param sSep Seperator between tokens.
+     * @param bAllowEmpty If this is true, empty tokens are allowed. In the
+     *                    example from above this means that there is a
+     *                    token "" before the "e" token.
+     * @return The token you asked for and, if bRest is true, everything
+     *         after it.
+     * @see Split() if you need a string split into all of its tokens.
+     */
+    NO_EXPORT NoString tokens(const NoString& str, size_t uPos, const NoString& sSep = " ");
+
+    /** Get the first line of this string.
+     * @return The first line of text.
+     */
+    NO_EXPORT NoString firstLine(const NoString& str);
 }
 
 #endif // NOUTILS_H

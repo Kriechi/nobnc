@@ -171,3 +171,18 @@ TEST(UtilsTest, WildCmp)
     EXPECT_FALSE(No::wildCmp("AxByC", "*a*B*c*", No::CaseSensitive));
     EXPECT_TRUE(No::wildCmp("AxByC", "*a*B*c*", No::CaseInsensitive));
 }
+
+TEST(UtilsTest, Token)
+{
+    EXPECT_EQ("a", No::token("a b c", 0));
+    EXPECT_EQ("b", No::token("a b c", 1));
+    EXPECT_EQ("", No::token("a b c", 100));
+    EXPECT_EQ("b c", No::tokens("a b c", 1));
+    EXPECT_EQ("c", No::token("a  c", 1));
+    EXPECT_EQ("c", No::token("a  c", 1, " "));
+    EXPECT_EQ("c", No::token("a  c", 1, "  "));
+    EXPECT_EQ(" c", No::token("a   c", 1, "  "));
+    EXPECT_EQ("c", No::token("a    c", 1, "  "));
+//    EXPECT_EQ("(b c)", No::token("a (b c) d", 1, " ", "(", ")"));
+//    EXPECT_EQ("d", No::token("a (b c) d", 2, " ", "(", ")"));
+}

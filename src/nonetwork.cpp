@@ -361,7 +361,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
 
         pConfig->FindStringVector("loadmodule", vsList);
         for (const NoString& sValue : vsList) {
-            NoString sModName = sValue.token(0);
+            NoString sModName = No::token(sValue, 0);
             NoString sNotice = "Loading network module [" + sModName + "]";
 
             // XXX Legacy crap, added in ZNC 0.203, modified in 0.207
@@ -384,7 +384,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
             }
 
             NoString sModRet;
-            NoString sArgs = sValue.tokens(1);
+            NoString sArgs = No::tokens(sValue, 1);
 
             bool bModRet = LoadModule(sModName, sArgs, sNotice, sModRet);
 
@@ -1049,8 +1049,8 @@ bool NoNetwork::AddServer(const NoString& sName)
     NoString sLine = sName;
     sLine.trim();
 
-    NoString sHost = sLine.token(0);
-    NoString sPort = sLine.token(1);
+    NoString sHost = No::token(sLine, 0);
+    NoString sPort = No::token(sLine, 1);
 
     if (sPort.left(1) == "+") {
         bSSL = true;
@@ -1058,7 +1058,7 @@ bool NoNetwork::AddServer(const NoString& sName)
     }
 
     ushort uPort = sPort.toUShort();
-    NoString sPass = sLine.tokens(2);
+    NoString sPass = No::tokens(sLine, 2);
 
     return AddServer(sHost, uPort, sPass, bSSL);
 }

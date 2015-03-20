@@ -40,11 +40,11 @@ public:
     ModRet OnUserRaw(NoString& sLine) override
     {
         // Handle ISON
-        if (sLine.token(0).equals("ison")) {
+        if (No::token(sLine, 0).equals("ison")) {
             NoStringVector::const_iterator it;
 
             // Get the list of nicks which are being asked for
-            NoStringVector vsNicks = sLine.tokens(1).trimLeft_n(":").split(" ", No::SkipEmptyParts);
+            NoStringVector vsNicks = No::tokens(sLine, 1).trimLeft_n(":").split(" ", No::SkipEmptyParts);
 
             NoString sBNNoNicks;
             for (it = vsNicks.begin(); it != vsNicks.end(); ++it) {
@@ -67,8 +67,8 @@ public:
         }
 
         // Handle WHOIS
-        if (sLine.token(0).equals("whois")) {
-            NoString sNick = sLine.token(1);
+        if (No::token(sLine, 0).equals("whois")) {
+            NoString sNick = No::token(sLine, 1);
 
             if (IsOnlineModNick(sNick)) {
                 NoNetwork* pNetwork = GetNetwork();
@@ -86,7 +86,7 @@ public:
     ModRet OnRaw(NoString& sLine) override
     {
         // Handle 303 reply if m_Requests is not empty
-        if (sLine.token(1) == "303" && !m_ISONRequests.empty()) {
+        if (No::token(sLine, 1) == "303" && !m_ISONRequests.empty()) {
             NoStringVector::iterator it = m_ISONRequests.begin();
 
             sLine.trim();

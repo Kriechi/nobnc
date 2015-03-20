@@ -28,8 +28,8 @@ class NoNotesMod : public NoModule
 
     void AddNoteCommand(const NoString& sLine)
     {
-        NoString sKey(sLine.token(1));
-        NoString sValue(sLine.tokens(2));
+        NoString sKey(No::token(sLine, 1));
+        NoString sValue(No::tokens(sLine, 2));
 
         if (!GetNV(sKey).empty()) {
             PutModule("That note already exists.  Use MOD <key> <note> to overwrite.");
@@ -42,8 +42,8 @@ class NoNotesMod : public NoModule
 
     void ModCommand(const NoString& sLine)
     {
-        NoString sKey(sLine.token(1));
-        NoString sValue(sLine.tokens(2));
+        NoString sKey(No::token(sLine, 1));
+        NoString sValue(No::tokens(sLine, 2));
 
         if (AddNote(sKey, sValue)) {
             PutModule("Set note for [" + sKey + "]");
@@ -54,7 +54,7 @@ class NoNotesMod : public NoModule
 
     void GetCommand(const NoString& sLine)
     {
-        NoString sNote = GetNV(sLine.tokens(1));
+        NoString sNote = GetNV(No::tokens(sLine, 1));
 
         if (sNote.empty()) {
             PutModule("This note doesn't exist.");
@@ -65,7 +65,7 @@ class NoNotesMod : public NoModule
 
     void DelCommand(const NoString& sLine)
     {
-        NoString sKey(sLine.token(1));
+        NoString sKey(No::token(sLine, 1));
 
         if (DelNote(sKey)) {
             PutModule("Deleted note [" + sKey + "]");
@@ -114,7 +114,7 @@ public:
             ListNotes(true);
             return HALT;
         } else if (sLine.left(2) == "#-") {
-            sKey = sLine.token(0).leftChomp_n(2);
+            sKey = No::token(sLine, 0).leftChomp_n(2);
             if (DelNote(sKey)) {
                 PutModNotice("Deleted note [" + sKey + "]");
             } else {
@@ -122,13 +122,13 @@ public:
             }
             return HALT;
         } else if (sLine.left(2) == "#+") {
-            sKey = sLine.token(0).leftChomp_n(2);
+            sKey = No::token(sLine, 0).leftChomp_n(2);
             bOverwrite = true;
         } else if (sLine.left(1) == "#") {
-            sKey = sLine.token(0).leftChomp_n(1);
+            sKey = No::token(sLine, 0).leftChomp_n(1);
         }
 
-        NoString sValue(sLine.tokens(1));
+        NoString sValue(No::tokens(sLine, 1));
 
         if (!sKey.empty()) {
             if (!bOverwrite && FindNV(sKey) != EndNV()) {

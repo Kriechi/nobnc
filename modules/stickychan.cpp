@@ -74,18 +74,18 @@ public:
 
     void OnStickCommand(const NoString& sCommand)
     {
-        NoString sChannel = sCommand.token(1).toLower();
+        NoString sChannel = No::token(sCommand, 1).toLower();
         if (sChannel.empty()) {
             PutModule("Usage: Stick <#channel> [key]");
             return;
         }
-        SetNV(sChannel, sCommand.token(2), true);
+        SetNV(sChannel, No::token(sCommand, 2), true);
         PutModule("Stuck " + sChannel);
     }
 
     void OnUnstickCommand(const NoString& sCommand)
     {
-        NoString sChannel = sCommand.token(1);
+        NoString sChannel = No::token(sCommand, 1);
         if (sChannel.empty()) {
             PutModule("Usage: Unstick <#channel>");
             return;
@@ -199,8 +199,8 @@ bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
     NoStringVector::iterator it;
 
     for (it = vsChans.begin(); it != vsChans.end(); ++it) {
-        NoString sChan = it->token(0);
-        NoString sKey = it->tokens(1);
+        NoString sChan = No::token(*it, 0);
+        NoString sKey = No::tokens(*it, 1);
         SetNV(sChan, sKey);
     }
 

@@ -71,9 +71,9 @@ public:
             return true; // use defaults
         }
 
-        m_sServer = sArgs.token(0);
-        NoString sPort = sArgs.token(1);
-        m_sUserFormat = sArgs.token(2);
+        m_sServer = No::token(sArgs, 0);
+        NoString sPort = No::token(sArgs, 1);
+        m_sUserFormat = No::token(sArgs, 2);
 
         if (sPort.left(1) == "+") {
             m_bSSL = true;

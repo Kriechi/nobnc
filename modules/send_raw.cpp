@@ -26,43 +26,43 @@ class NoSendRawMod : public NoModule
 {
     void SendClient(const NoString& sLine)
     {
-        NoUser* pUser = NoApp::Get().FindUser(sLine.token(1));
+        NoUser* pUser = NoApp::Get().FindUser(No::token(sLine, 1));
 
         if (pUser) {
-            NoNetwork* pNetwork = pUser->FindNetwork(sLine.token(2));
+            NoNetwork* pNetwork = pUser->FindNetwork(No::token(sLine, 2));
 
             if (pNetwork) {
-                pNetwork->PutUser(sLine.tokens(3));
-                PutModule("Sent [" + sLine.tokens(3) + "] to " + pUser->GetUserName() + "/" + pNetwork->GetName());
+                pNetwork->PutUser(No::tokens(sLine, 3));
+                PutModule("Sent [" + No::tokens(sLine, 3) + "] to " + pUser->GetUserName() + "/" + pNetwork->GetName());
             } else {
-                PutModule("Network [" + sLine.token(2) + "] not found for user [" + sLine.token(1) + "]");
+                PutModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
             }
         } else {
-            PutModule("User [" + sLine.token(1) + "] not found");
+            PutModule("User [" + No::token(sLine, 1) + "] not found");
         }
     }
 
     void SendServer(const NoString& sLine)
     {
-        NoUser* pUser = NoApp::Get().FindUser(sLine.token(1));
+        NoUser* pUser = NoApp::Get().FindUser(No::token(sLine, 1));
 
         if (pUser) {
-            NoNetwork* pNetwork = pUser->FindNetwork(sLine.token(2));
+            NoNetwork* pNetwork = pUser->FindNetwork(No::token(sLine, 2));
 
             if (pNetwork) {
-                pNetwork->PutIRC(sLine.tokens(3));
-                PutModule("Sent [" + sLine.tokens(3) + "] to IRC Server of " + pUser->GetUserName() + "/" + pNetwork->GetName());
+                pNetwork->PutIRC(No::tokens(sLine, 3));
+                PutModule("Sent [" + No::tokens(sLine, 3) + "] to IRC Server of " + pUser->GetUserName() + "/" + pNetwork->GetName());
             } else {
-                PutModule("Network [" + sLine.token(2) + "] not found for user [" + sLine.token(1) + "]");
+                PutModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
             }
         } else {
-            PutModule("User [" + sLine.token(1) + "] not found");
+            PutModule("User [" + No::token(sLine, 1) + "] not found");
         }
     }
 
     void CurrentClient(const NoString& sLine)
     {
-        NoString sData = sLine.tokens(1);
+        NoString sData = No::tokens(sLine, 1);
         GetClient()->PutClient(sData);
     }
 
@@ -84,13 +84,13 @@ public:
     {
         if (sPageName == "index") {
             if (WebSock.IsPost()) {
-                NoUser* pUser = NoApp::Get().FindUser(WebSock.GetParam("network").token(0, "/"));
+                NoUser* pUser = NoApp::Get().FindUser(No::token(WebSock.GetParam("network"), 0, "/"));
                 if (!pUser) {
                     WebSock.GetSession()->AddError("User not found");
                     return true;
                 }
 
-                NoNetwork* pNetwork = pUser->FindNetwork(WebSock.GetParam("network").token(1, "/"));
+                NoNetwork* pNetwork = pUser->FindNetwork(No::token(WebSock.GetParam("network"), 1, "/"));
                 if (!pNetwork) {
                     WebSock.GetSession()->AddError("Network not found");
                     return true;

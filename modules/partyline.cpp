@@ -154,8 +154,8 @@ public:
         NoPartylineChannel* pChannel;
         for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
             if (it->first.find(":") != NoString::npos) {
-                sAction = it->first.token(0, ":");
-                sKey = it->first.tokens(1, ":");
+                sAction = No::token(it->first, 0, ":");
+                sKey = No::tokens(it->first, 1, ":");
             } else {
                 // backwards compatibility for older NV data
                 sAction = "fixedchan";
@@ -202,7 +202,7 @@ public:
 
     ModRet OnRaw(NoString& sLine) override
     {
-        if (sLine.token(1) == "005") {
+        if (No::token(sLine, 1) == "005") {
             NoString::size_type uPos = sLine.toUpper().find("CHANTYPES=");
             if (uPos != NoString::npos) {
                 uPos = sLine.find(" ", uPos);
@@ -294,8 +294,8 @@ public:
         } else if (sLine.startsWith("MODE " CHAN_PREFIX_1)) {
             return HALT;
         } else if (sLine.startsWith("TOPIC " CHAN_PREFIX)) {
-            NoString sChannel = sLine.token(1);
-            NoString sTopic = sLine.tokens(2);
+            NoString sChannel = No::token(sLine, 1);
+            NoString sTopic = No::tokens(sLine, 2);
 
             sTopic.trimPrefix(":");
 
