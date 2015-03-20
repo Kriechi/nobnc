@@ -49,7 +49,7 @@ NoApp::NoApp()
       m_bProtectWebSessions(true), m_bHideVersion(false)
 {
     if (!InitCsocket()) {
-        NoUtils::printError("Could not initialize Csocket!");
+        No::printError("Could not initialize Csocket!");
         exit(-1);
     }
     m_sConnectThrottle.SetTTL(30000);
@@ -138,7 +138,7 @@ NoString NoApp::GetCompileOptionsString()
 NoString NoApp::GetUptime() const
 {
     time_t now = time(nullptr);
-    return NoUtils::toTimeStr(now - TimeStarted());
+    return No::toTimeStr(now - TimeStarted());
 }
 
 bool NoApp::OnBoot()
@@ -237,7 +237,7 @@ bool NoApp::WritePidFile(int iPid)
     NoFile* File = InitPidFile();
     if (File == nullptr) return false;
 
-    NoUtils::printAction("Writing pid file [" + File->GetLongName() + "]");
+    No::printAction("Writing pid file [" + File->GetLongName() + "]");
 
     bool bRet = false;
     if (File->Open(O_WRONLY | O_TRUNC | O_CREAT)) {
@@ -247,7 +247,7 @@ bool NoApp::WritePidFile(int iPid)
     }
 
     delete File;
-    NoUtils::printStatus(bRet);
+    No::printStatus(bRet);
     return bRet;
 }
 
@@ -256,12 +256,12 @@ bool NoApp::DeletePidFile()
     NoFile* File = InitPidFile();
     if (File == nullptr) return false;
 
-    NoUtils::printAction("Deleting pid file [" + File->GetLongName() + "]");
+    No::printAction("Deleting pid file [" + File->GetLongName() + "]");
 
     bool bRet = File->Delete();
 
     delete File;
-    NoUtils::printStatus(bRet);
+    No::printStatus(bRet);
     return bRet;
 }
 
@@ -357,16 +357,16 @@ static void GenerateCert(FILE* pOut, const NoString& sHost)
 bool NoApp::WritePemFile()
 {
 #ifndef HAVE_LIBSSL
-    NoUtils::PrintError("ZNC was not compiled with ssl support.");
+    No::PrintError("ZNC was not compiled with ssl support.");
     return false;
 #else
     NoString sPemFile = GetPemLocation();
 
-    NoUtils::printAction("Writing Pem file [" + sPemFile + "]");
+    No::printAction("Writing Pem file [" + sPemFile + "]");
 #ifndef _WIN32
     int fd = creat(sPemFile.c_str(), 0600);
     if (fd == -1) {
-        NoUtils::printStatus(false, "Unable to open");
+        No::printStatus(false, "Unable to open");
         return false;
     }
     FILE* f = fdopen(fd, "w");
@@ -375,7 +375,7 @@ bool NoApp::WritePemFile()
 #endif
 
     if (!f) {
-        NoUtils::printStatus(false, "Unable to open");
+        No::printStatus(false, "Unable to open");
         return false;
     }
 
@@ -384,7 +384,7 @@ bool NoApp::WritePemFile()
 #endif
     fclose(f);
 
-    NoUtils::printStatus(true);
+    No::printStatus(true);
     return true;
 #endif
 }
@@ -701,12 +701,12 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     m_sConfigFile = ExpandConfigPath(sConfigFile);
 
     if (NoFile::Exists(m_sConfigFile)) {
-        NoUtils::printStatus(false, "WARNING: config [" + m_sConfigFile + "] already exists.");
+        No::printStatus(false, "WARNING: config [" + m_sConfigFile + "] already exists.");
     }
 
-    NoUtils::printMessage("");
-    NoUtils::printMessage("-- Global settings --");
-    NoUtils::printMessage("");
+    No::printMessage("");
+    No::printMessage("-- Global settings --");
+    No::printMessage("");
 
 // Listen
 #ifdef HAVE_IPV6
@@ -723,13 +723,13 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     do {
         bSuccess = true;
         while (true) {
-            if (!NoUtils::getNumInput("Listen on port", uListenPort, 1025, 65534)) {
+            if (!No::getNumInput("Listen on port", uListenPort, 1025, 65534)) {
                 continue;
             }
             if (uListenPort == 6667) {
-                NoUtils::printStatus(false, "WARNING: Some web browsers reject port 6667. If you intend to");
-                NoUtils::printStatus(false, "use ZNC's web interface, you might want to use another port.");
-                if (!NoUtils::getBoolInput("Proceed with port 6667 anyway?", true)) {
+                No::printStatus(false, "WARNING: Some web browsers reject port 6667. If you intend to");
+                No::printStatus(false, "use ZNC's web interface, you might want to use another port.");
+                if (!No::getBoolInput("Proceed with port 6667 anyway?", true)) {
                     continue;
                 }
             }
@@ -738,30 +738,30 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
 
 #ifdef HAVE_LIBSSL
-        bListenSSL = NoUtils::getBoolInput("Listen using SSL", bListenSSL);
+        bListenSSL = No::getBoolInput("Listen using SSL", bListenSSL);
 #endif
 
 #ifdef HAVE_IPV6
-        b6 = NoUtils::getBoolInput("Listen using both IPv4 and IPv6", b6);
+        b6 = No::getBoolInput("Listen using both IPv4 and IPv6", b6);
 #endif
 
         // Don't ask for listen host, it may be configured later if needed.
 
-        NoUtils::printAction("Verifying the listener");
+        No::printAction("Verifying the listener");
         NoListener* pListener =
         new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address, NoListener::AcceptAll);
         if (!pListener->Listen()) {
-            NoUtils::printStatus(false, FormatBindError());
+            No::printStatus(false, FormatBindError());
             bSuccess = false;
         } else
-            NoUtils::printStatus(true);
+            No::printStatus(true);
         delete pListener;
     } while (!bSuccess);
 
 #ifdef HAVE_LIBSSL
     NoString sPemFile = GetPemLocation();
     if (!NoFile::Exists(sPemFile)) {
-        NoUtils::printMessage("Unable to locate pem file: [" + sPemFile + "], creating it");
+        No::printMessage("Unable to locate pem file: [" + sPemFile + "], creating it");
         WritePemFile();
     }
 #endif
@@ -784,37 +784,37 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         vsGlobalModNames.push_back(Info.GetName());
         vsLines.push_back("LoadModule = " + Info.GetName());
     }
-    NoUtils::printMessage("Enabled global modules [" + NoString(", ").join(vsGlobalModNames.begin(), vsGlobalModNames.end()) + "]");
+    No::printMessage("Enabled global modules [" + NoString(", ").join(vsGlobalModNames.begin(), vsGlobalModNames.end()) + "]");
 
     // User
-    NoUtils::printMessage("");
-    NoUtils::printMessage("-- Admin user settings --");
-    NoUtils::printMessage("");
+    No::printMessage("");
+    No::printMessage("-- Admin user settings --");
+    No::printMessage("");
 
     vsLines.push_back("");
     NoString sNick;
     do {
-        NoUtils::getInput("Username", sUser, "", "alphanumeric");
+        No::getInput("Username", sUser, "", "alphanumeric");
     } while (!NoUser::IsValidUserName(sUser));
 
     vsLines.push_back("<User " + sUser + ">");
     NoString sSalt;
-    sAnswer = NoUtils::getSaltedHashPass(sSalt);
-    vsLines.push_back("\tPass       = " + NoUtils::defaultHash() + "#" + sAnswer + "#" + sSalt + "#");
+    sAnswer = No::getSaltedHashPass(sSalt);
+    vsLines.push_back("\tPass       = " + No::defaultHash() + "#" + sAnswer + "#" + sSalt + "#");
 
     vsLines.push_back("\tAdmin      = true");
 
-    NoUtils::getInput("Nick", sNick, NoUser::MakeCleanUserName(sUser));
+    No::getInput("Nick", sNick, NoUser::MakeCleanUserName(sUser));
     vsLines.push_back("\tNick       = " + sNick);
-    NoUtils::getInput("Alternate nick", sAnswer, sNick + "_");
+    No::getInput("Alternate nick", sAnswer, sNick + "_");
     if (!sAnswer.empty()) {
         vsLines.push_back("\tAltNick    = " + sAnswer);
     }
-    NoUtils::getInput("Ident", sAnswer, sUser);
+    No::getInput("Ident", sAnswer, sUser);
     vsLines.push_back("\tIdent      = " + sAnswer);
-    NoUtils::getInput("Real name", sAnswer, "Got ZNC?");
+    No::getInput("Real name", sAnswer, "Got ZNC?");
     vsLines.push_back("\tRealName   = " + sAnswer);
-    NoUtils::getInput("Bind host", sAnswer, "", "optional");
+    No::getInput("Bind host", sAnswer, "", "optional");
     if (!sAnswer.empty()) {
         vsLines.push_back("\tBindHost   = " + sAnswer);
     }
@@ -826,18 +826,18 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         vsUserModNames.push_back(Info.GetName());
         vsLines.push_back("\tLoadModule = " + Info.GetName());
     }
-    NoUtils::printMessage("Enabled user modules [" + NoString(", ").join(vsUserModNames.begin(), vsUserModNames.end()) + "]");
+    No::printMessage("Enabled user modules [" + NoString(", ").join(vsUserModNames.begin(), vsUserModNames.end()) + "]");
 
-    NoUtils::printMessage("");
-    if (NoUtils::getBoolInput("Set up a network?", true)) {
+    No::printMessage("");
+    if (No::getBoolInput("Set up a network?", true)) {
         vsLines.push_back("");
 
-        NoUtils::printMessage("");
-        NoUtils::printMessage("-- Network settings --");
-        NoUtils::printMessage("");
+        No::printMessage("");
+        No::printMessage("-- Network settings --");
+        No::printMessage("");
 
         do {
-            NoUtils::getInput("Name", sNetwork, "freenode");
+            No::getInput("Name", sNetwork, "freenode");
         } while (!NoNetwork::IsValidNetwork(sNetwork));
 
         vsLines.push_back("\t<Network " + sNetwork + ">");
@@ -863,19 +863,19 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
             sHint = "host only";
         }
 
-        while (!NoUtils::getInput("Server host", sHost, sHost, sHint) || !NoServer::IsValidHostName(sHost))
+        while (!No::getInput("Server host", sHost, sHost, sHint) || !NoServer::IsValidHostName(sHost))
             ;
 #ifdef HAVE_LIBSSL
-        bSSL = NoUtils::getBoolInput("Server uses SSL?", bSSL);
+        bSSL = No::getBoolInput("Server uses SSL?", bSSL);
 #endif
-        while (!NoUtils::getNumInput("Server port", uServerPort, 1, 65535, bSSL ? 6697 : 6667))
+        while (!No::getNumInput("Server port", uServerPort, 1, 65535, bSSL ? 6697 : 6667))
             ;
-        NoUtils::getInput("Server password (probably empty)", sPass);
+        No::getInput("Server password (probably empty)", sPass);
 
         vsLines.push_back("\t\tServer     = " + sHost + ((bSSL) ? " +" : " ") + NoString(uServerPort) + " " + sPass);
 
         NoString sChans;
-        if (NoUtils::getInput("Initial channels", sChans)) {
+        if (No::getInput("Initial channels", sChans)) {
             vsLines.push_back("");
             sChans.replace(",", " ");
             sChans.replace(";", " ");
@@ -886,7 +886,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
             }
         }
 
-        NoUtils::printMessage("Enabled network modules [" +
+        No::printMessage("Enabled network modules [" +
                              NoString(", ").join(vsNetworkModNames.begin(), vsNetworkModNames.end()) + "]");
 
         vsLines.push_back("\t</Network>");
@@ -894,24 +894,24 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
     vsLines.push_back("</User>");
 
-    NoUtils::printMessage("");
+    No::printMessage("");
     // !User
 
     NoFile File;
     bool bFileOK, bFileOpen = false;
     do {
-        NoUtils::printAction("Writing config [" + m_sConfigFile + "]");
+        No::printAction("Writing config [" + m_sConfigFile + "]");
 
         bFileOK = true;
         if (NoFile::Exists(m_sConfigFile)) {
             if (!File.TryExLock(m_sConfigFile)) {
-                NoUtils::printStatus(false, "ZNC is currently running on this config.");
+                No::printStatus(false, "ZNC is currently running on this config.");
                 bFileOK = false;
             } else {
                 File.Close();
-                NoUtils::printStatus(false, "This config already exists.");
-                if (NoUtils::getBoolInput("Are you sure you want to overwrite it?", false))
-                    NoUtils::printAction("Overwriting config [" + m_sConfigFile + "]");
+                No::printStatus(false, "This config already exists.");
+                if (No::getBoolInput("Are you sure you want to overwrite it?", false))
+                    No::printAction("Overwriting config [" + m_sConfigFile + "]");
                 else
                     bFileOK = false;
             }
@@ -922,12 +922,12 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
             if (File.Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
                 bFileOpen = true;
             } else {
-                NoUtils::printStatus(false, "Unable to open file");
+                No::printStatus(false, "Unable to open file");
                 bFileOK = false;
             }
         }
         if (!bFileOK) {
-            while (!NoUtils::getInput("Please specify an alternate location",
+            while (!No::getInput("Please specify an alternate location",
                                      m_sConfigFile,
                                      "",
                                      "or \"stdout\" for displaying the config"))
@@ -940,9 +940,9 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     } while (!bFileOK);
 
     if (!bFileOpen) {
-        NoUtils::printMessage("");
-        NoUtils::printMessage("Printing the new config to stdout:");
-        NoUtils::printMessage("");
+        No::printMessage("");
+        No::printMessage("Printing the new config to stdout:");
+        No::printMessage("");
         std::cout << std::endl << "----------------------------------------------------------------------------" << std::endl << std::endl;
     }
 
@@ -957,16 +957,16 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     if (bFileOpen) {
         File.Close();
         if (File.HadError())
-            NoUtils::printStatus(false, "There was an error while writing the config");
+            No::printStatus(false, "There was an error while writing the config");
         else
-            NoUtils::printStatus(true);
+            No::printStatus(true);
     } else {
         std::cout << std::endl << "----------------------------------------------------------------------------" << std::endl << std::endl;
     }
 
     if (File.HadError()) {
         bFileOpen = false;
-        NoUtils::printMessage("Printing the new config to stdout instead:");
+        No::printMessage("Printing the new config to stdout instead:");
         std::cout << std::endl << "----------------------------------------------------------------------------" << std::endl << std::endl;
         for (const NoString& sLine : vsLines) {
             std::cout << sLine << std::endl;
@@ -976,20 +976,20 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
     const NoString sProtocol(bListenSSL ? "https" : "http");
     const NoString sSSL(bListenSSL ? "+" : "");
-    NoUtils::printMessage("");
-    NoUtils::printMessage("To connect to this ZNC you need to connect to it as your IRC server", true);
-    NoUtils::printMessage("using the port that you supplied.  You have to supply your login info", true);
-    NoUtils::printMessage("as the IRC server password like this: user/network:pass.", true);
-    NoUtils::printMessage("");
-    NoUtils::printMessage("Try something like this in your IRC client...", true);
-    NoUtils::printMessage("/server <znc_server_ip> " + sSSL + NoString(uListenPort) + " " + sUser + ":<pass>", true);
-    NoUtils::printMessage("");
-    NoUtils::printMessage("To manage settings, users and networks, point your web browser to", true);
-    NoUtils::printMessage(sProtocol + "://<znc_server_ip>:" + NoString(uListenPort) + "/", true);
-    NoUtils::printMessage("");
+    No::printMessage("");
+    No::printMessage("To connect to this ZNC you need to connect to it as your IRC server", true);
+    No::printMessage("using the port that you supplied.  You have to supply your login info", true);
+    No::printMessage("as the IRC server password like this: user/network:pass.", true);
+    No::printMessage("");
+    No::printMessage("Try something like this in your IRC client...", true);
+    No::printMessage("/server <znc_server_ip> " + sSSL + NoString(uListenPort) + " " + sUser + ":<pass>", true);
+    No::printMessage("");
+    No::printMessage("To manage settings, users and networks, point your web browser to", true);
+    No::printMessage(sProtocol + "://<znc_server_ip>:" + NoString(uListenPort) + "/", true);
+    No::printMessage("");
 
     File.UnLock();
-    return bFileOpen && NoUtils::getBoolInput("Launch ZNC now?", true);
+    return bFileOpen && No::getBoolInput("Launch ZNC now?", true);
 }
 
 void NoApp::BackupConfigOnce(const NoString& sSuffix)
@@ -998,13 +998,13 @@ void NoApp::BackupConfigOnce(const NoString& sSuffix)
     if (didBackup) return;
     didBackup = true;
 
-    NoUtils::printAction("Creating a config backup");
+    No::printAction("Creating a config backup");
 
     NoString sBackup = NoDir::ChangeDir(m_sConfigFile, "../znc.conf." + sSuffix);
     if (NoFile::Copy(m_sConfigFile, sBackup))
-        NoUtils::printStatus(true, sBackup);
+        No::printStatus(true, sBackup);
     else
-        NoUtils::printStatus(false, strerror(errno));
+        No::printStatus(false, strerror(errno));
 }
 
 bool NoApp::ParseConfig(const NoString& sConfig, NoString& sError)
@@ -1045,18 +1045,18 @@ bool NoApp::DoRehash(NoString& sError)
 {
     sError.clear();
 
-    NoUtils::printAction("Opening config [" + m_sConfigFile + "]");
+    No::printAction("Opening config [" + m_sConfigFile + "]");
 
     if (!NoFile::Exists(m_sConfigFile)) {
         sError = "No such file";
-        NoUtils::printStatus(false, sError);
-        NoUtils::printMessage("Restart ZNC with the --makeconf option if you wish to create this config.");
+        No::printStatus(false, sError);
+        No::printMessage("Restart ZNC with the --makeconf option if you wish to create this config.");
         return false;
     }
 
     if (!NoFile::IsReg(m_sConfigFile)) {
         sError = "Not a file";
-        NoUtils::printStatus(false, sError);
+        No::printStatus(false, sError);
         return false;
     }
 
@@ -1066,14 +1066,14 @@ bool NoApp::DoRehash(NoString& sError)
     // exclusive locking to work properly!
     if (!pFile->Open(m_sConfigFile, O_RDWR)) {
         sError = "Can not open config file";
-        NoUtils::printStatus(false, sError);
+        No::printStatus(false, sError);
         delete pFile;
         return false;
     }
 
     if (!pFile->TryExLock()) {
         sError = "ZNC is already running on this config.";
-        NoUtils::printStatus(false, sError);
+        No::printStatus(false, sError);
         delete pFile;
         return false;
     }
@@ -1085,10 +1085,10 @@ bool NoApp::DoRehash(NoString& sError)
 
     NoSettings config;
     if (!config.Parse(File, sError)) {
-        NoUtils::printStatus(false, sError);
+        No::printStatus(false, sError);
         return false;
     }
-    NoUtils::printStatus(true);
+    No::printStatus(true);
 
     NoString sSavedVersion;
     config.FindStringEntry("version", sSavedVersion);
@@ -1099,10 +1099,10 @@ bool NoApp::DoRehash(NoString& sError)
         if (sSavedVersion.empty()) {
             sSavedVersion = "< 0.203";
         }
-        NoUtils::printMessage("Found old config from ZNC " + sSavedVersion + ". Saving a backup of it.");
+        No::printMessage("Found old config from ZNC " + sSavedVersion + ". Saving a backup of it.");
         BackupConfigOnce("pre-" + NoString(NO_VERSION_STR));
     } else if (tSavedVersion > tCurrentVersion) {
-        NoUtils::printError("Config was saved from ZNC " + sSavedVersion + ". It may or may not work with current ZNC " + GetVersion());
+        No::printError("Config was saved from ZNC " + sSavedVersion + ". It may or may not work with current ZNC " + GetVersion());
     }
 
     m_vsBindHosts.clear();
@@ -1125,13 +1125,13 @@ bool NoApp::DoRehash(NoString& sError)
 
         if (sModName == "saslauth" && tSavedVersion < std::make_tuple(0, 207)) {
             // XXX compatibility crap, added in 0.207
-            NoUtils::printMessage("saslauth module was renamed to cyrusauth. Loading cyrusauth instead.");
+            No::printMessage("saslauth module was renamed to cyrusauth. Loading cyrusauth instead.");
             sModName = "cyrusauth";
         }
 
         if (msModules.find(sModName) != msModules.end()) {
             sError = "Module [" + sModName + "] already loaded";
-            NoUtils::printError(sError);
+            No::printError(sError);
             return false;
         }
         NoString sModRet;
@@ -1139,27 +1139,27 @@ bool NoApp::DoRehash(NoString& sError)
 
         pOldMod = GetModules().FindModule(sModName);
         if (!pOldMod) {
-            NoUtils::printAction("Loading global module [" + sModName + "]");
+            No::printAction("Loading global module [" + sModName + "]");
 
             bool bModRet = GetModules().LoadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet);
 
-            NoUtils::printStatus(bModRet, sModRet);
+            No::printStatus(bModRet, sModRet);
             if (!bModRet) {
                 sError = sModRet;
                 return false;
             }
         } else if (pOldMod->GetArgs() != sArgs) {
-            NoUtils::printAction("Reloading global module [" + sModName + "]");
+            No::printAction("Reloading global module [" + sModName + "]");
 
             bool bModRet = GetModules().ReloadModule(sModName, sArgs, nullptr, nullptr, sModRet);
 
-            NoUtils::printStatus(bModRet, sModRet);
+            No::printStatus(bModRet, sModRet);
             if (!bModRet) {
                 sError = sModRet;
                 return false;
             }
         } else
-            NoUtils::printMessage("Module [" + sModName + "] already loaded.");
+            No::printMessage("Module [" + sModName + "] already loaded.");
 
         msModules[sModName] = sArgs;
     }
@@ -1170,12 +1170,12 @@ bool NoApp::DoRehash(NoString& sError)
     if (!sISpoofFormat.empty() || !sISpoofFile.empty()) {
         NoModule* pIdentFileMod = GetModules().FindModule("identfile");
         if (!pIdentFileMod) {
-            NoUtils::printAction("Loading global Module [identfile]");
+            No::printAction("Loading global Module [identfile]");
 
             NoString sModRet;
             bool bModRet = GetModules().LoadModule("identfile", "", No::GlobalModule, nullptr, nullptr, sModRet);
 
-            NoUtils::printStatus(bModRet, sModRet);
+            No::printStatus(bModRet, sModRet);
             if (!bModRet) {
                 sError = sModRet;
                 return false;
@@ -1245,9 +1245,9 @@ bool NoApp::DoRehash(NoString& sError)
             } else if (sProtocol.equals("TLSv1.2")) {
                 uFlag = Csock::EDP_TLSv1_2;
             } else {
-                NoUtils::printError("Invalid SSLProtocols value [" + sProtocol + "]");
-                NoUtils::printError("The syntax is [SSLProtocols = [+|-]<protocol> ...]");
-                NoUtils::printError("Available protocols are [SSLv2, SSLv3, TLSv1, TLSv1.1, TLSv1.2]");
+                No::printError("Invalid SSLProtocols value [" + sProtocol + "]");
+                No::printError("The syntax is [SSLProtocols = [+|-]<protocol> ...]");
+                No::printError("Available protocols are [SSLv2, SSLv3, TLSv1, TLSv1.1, TLSv1.2]");
                 return false;
             }
 
@@ -1280,7 +1280,7 @@ bool NoApp::DoRehash(NoString& sError)
         if (!AddListener(pSubConf, sError)) return false;
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in Listener config!";
-            NoUtils::printError(sError);
+            No::printError(sError);
 
             NoApp::DumpConfig(pSubConf);
             return false;
@@ -1293,7 +1293,7 @@ bool NoApp::DoRehash(NoString& sError)
         NoSettings* pSubConf = subIt->second.m_pSubConfig;
         NoUser* pRealUser = nullptr;
 
-        NoUtils::printMessage("Loading user [" + sUserName + "]");
+        No::printMessage("Loading user [" + sUserName + "]");
 
         // Either create a NoUser* or use an existing one
         std::map<NoString, NoUser*>::iterator it = m_msDelUsers.find(sUserName);
@@ -1308,13 +1308,13 @@ bool NoApp::DoRehash(NoString& sError)
         if (!m_sStatusPrefix.empty()) {
             if (!pUser->SetStatusPrefix(m_sStatusPrefix)) {
                 sError = "Invalid StatusPrefix [" + m_sStatusPrefix + "] Must be 1-5 chars, no spaces.";
-                NoUtils::printError(sError);
+                No::printError(sError);
                 return false;
             }
         }
 
         if (!pUser->ParseConfig(pSubConf, sError)) {
-            NoUtils::printError(sError);
+            No::printError(sError);
             delete pUser;
             pUser = nullptr;
             return false;
@@ -1322,7 +1322,7 @@ bool NoApp::DoRehash(NoString& sError)
 
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in config for User [" + sUserName + "]!";
-            NoUtils::printError(sError);
+            No::printError(sError);
 
             DumpConfig(pSubConf);
             return false;
@@ -1342,7 +1342,7 @@ bool NoApp::DoRehash(NoString& sError)
         }
 
         if (!sError.empty()) {
-            NoUtils::printError(sError);
+            No::printError(sError);
             if (pUser) {
                 pUser->SetBeingDeleted(true);
                 delete pUser;
@@ -1357,7 +1357,7 @@ bool NoApp::DoRehash(NoString& sError)
 
     if (!config.empty()) {
         sError = "Unhandled lines in config!";
-        NoUtils::printError(sError);
+        No::printError(sError);
 
         DumpConfig(&config);
         return false;
@@ -1372,20 +1372,20 @@ bool NoApp::DoRehash(NoString& sError)
 
     for (const NoString& sMod : ssUnload) {
         if (GetModules().UnloadModule(sMod))
-            NoUtils::printMessage("Unloaded global module [" + sMod + "]");
+            No::printMessage("Unloaded global module [" + sMod + "]");
         else
-            NoUtils::printMessage("Could not unload [" + sMod + "]");
+            No::printMessage("Could not unload [" + sMod + "]");
     }
 
     if (m_msUsers.empty()) {
         sError = "You must define at least one user in your config.";
-        NoUtils::printError(sError);
+        No::printError(sError);
         return false;
     }
 
     if (m_vpListeners.empty()) {
         sError = "You must supply at least one Listen port in your config.";
-        NoUtils::printError(sError);
+        No::printError(sError);
         return false;
     }
 
@@ -1400,7 +1400,7 @@ void NoApp::DumpConfig(const NoSettings* pConfig)
         const NoStringVector& vsList = eit->second;
         NoStringVector::const_iterator it = vsList.begin();
         for (; it != vsList.end(); ++it) {
-            NoUtils::printError(sKey + " = " + *it);
+            No::printError(sKey + " = " + *it);
         }
     }
 
@@ -1411,7 +1411,7 @@ void NoApp::DumpConfig(const NoSettings* pConfig)
         NoSettings::SubConfig::const_iterator it = sSub.begin();
 
         for (; it != sSub.end(); ++it) {
-            NoUtils::printError("SubConfig [" + sKey + " " + it->first + "]:");
+            No::printError("SubConfig [" + sKey + " " + it->first + "]:");
             DumpConfig(it->second.m_pSubConfig);
         }
     }
@@ -1730,12 +1730,12 @@ bool NoApp::AddListener(ushort uPort,
         sIPV6Comment = " using ipv6";
     }
 
-    NoUtils::printAction("Binding to port [" + NoString((bSSL) ? "+" : "") + NoString(uPort) + "]" + sHostComment + sIPV6Comment);
+    No::printAction("Binding to port [" + NoString((bSSL) ? "+" : "") + NoString(uPort) + "]" + sHostComment + sIPV6Comment);
 
 #ifndef HAVE_IPV6
     if (ADDR_IPV6ONLY == eAddr) {
         sError = "IPV6 is not enabled";
-        NoUtils::PrintStatus(false, sError);
+        No::PrintStatus(false, sError);
         return false;
     }
 #endif
@@ -1743,7 +1743,7 @@ bool NoApp::AddListener(ushort uPort,
 #ifndef HAVE_LIBSSL
     if (bSSL) {
         sError = "SSL is not enabled";
-        NoUtils::PrintStatus(false, sError);
+        No::PrintStatus(false, sError);
         return false;
     }
 #else
@@ -1751,23 +1751,23 @@ bool NoApp::AddListener(ushort uPort,
 
     if (bSSL && !NoFile::Exists(sPemFile)) {
         sError = "Unable to locate pem file: [" + sPemFile + "]";
-        NoUtils::printStatus(false, sError);
+        No::printStatus(false, sError);
 
         // If stdin is e.g. /dev/null and we call GetBoolInput(),
         // we are stuck in an endless loop!
-        if (isatty(0) && NoUtils::getBoolInput("Would you like to create a new pem file?", true)) {
+        if (isatty(0) && No::getBoolInput("Would you like to create a new pem file?", true)) {
             sError.clear();
             WritePemFile();
         } else {
             return false;
         }
 
-        NoUtils::printAction("Binding to port [+" + NoString(uPort) + "]" + sHostComment + sIPV6Comment);
+        No::printAction("Binding to port [+" + NoString(uPort) + "]" + sHostComment + sIPV6Comment);
     }
 #endif
     if (!uPort) {
         sError = "Invalid port";
-        NoUtils::printStatus(false, sError);
+        No::printStatus(false, sError);
         return false;
     }
 
@@ -1786,13 +1786,13 @@ bool NoApp::AddListener(ushort uPort,
 
     if (!pListener->Listen()) {
         sError = FormatBindError();
-        NoUtils::printStatus(false, sError);
+        No::printStatus(false, sError);
         delete pListener;
         return false;
     }
 
     m_vpListeners.push_back(pListener);
-    NoUtils::printStatus(true);
+    No::printStatus(true);
 
     return true;
 }
@@ -1813,7 +1813,7 @@ bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
     ushort uPort;
     if (!pConfig->FindUShortEntry("port", uPort)) {
         sError = "No port given";
-        NoUtils::printError(sError);
+        No::printError(sError);
         return false;
     }
     pConfig->FindStringEntry("host", sBindHost);
@@ -1833,7 +1833,7 @@ bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
         eAddr = No::Ipv6Address;
     } else {
         sError = "No address family given";
-        NoUtils::printError(sError);
+        No::printError(sError);
         return false;
     }
 
@@ -1846,7 +1846,7 @@ bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
         eAccept = NoListener::AcceptHttp;
     } else {
         sError = "Either Web or IRC or both should be selected";
-        NoUtils::printError(sError);
+        No::printError(sError);
         return false;
     }
 

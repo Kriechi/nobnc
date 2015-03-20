@@ -47,11 +47,11 @@ public:
     };
 
     // If you change the default hash here and in HASH_DEFAULT,
-    // don't forget NoUtils::sDefaultHash!
+    // don't forget No::sDefaultHash!
     // TODO refactor this
     static NoString SaltedHash(const NoString& sPass, const NoString& sSalt)
     {
-        return NoUtils::saltedSha256(sPass, sSalt);
+        return No::saltedSha256(sPass, sSalt);
     }
 
     NoSettings ToConfig() const;

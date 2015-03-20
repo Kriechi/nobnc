@@ -61,10 +61,10 @@ class NoAway : public NoModule
         time(&curtime);
 
         if (sCommand.token(1) != "-quiet") {
-            sReason = NoUtils::formatTime(curtime, sCommand.tokens(1), GetUser()->GetTimezone());
+            sReason = No::formatTime(curtime, sCommand.tokens(1), GetUser()->GetTimezone());
             PutModNotice("You have been marked as away");
         } else {
-            sReason = NoUtils::formatTime(curtime, sCommand.tokens(2), GetUser()->GetTimezone());
+            sReason = No::formatTime(curtime, sCommand.tokens(2), GetUser()->GetTimezone());
         }
 
         Away(false, sReason);
@@ -295,7 +295,7 @@ public:
             }
         } else {
             m_sPassword = "";
-            NoUtils::printError("[" + GetModName() + ".so] Failed to Decrypt Messages");
+            No::printError("[" + GetModName() + ".so] Failed to Decrypt Messages");
             return (false);
         }
 

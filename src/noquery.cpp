@@ -81,7 +81,7 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                 useClient->SetPlaybackActive(true);
 
                 bool batch = useClient->HasBatch();
-                NoString batchName = NoUtils::md5(m_name);
+                NoString batchName = No::md5(m_name);
 
                 if (batch) {
                     m_network->PutUser(":znc.in BATCH +" + batchName + " znc.in/playback " + m_name, useClient);
@@ -100,9 +100,9 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
 
                     NoString line = message.GetLine(*useClient, params);
                     if (batch) {
-                        NoStringMap tags = NoUtils::messageTags(line);
+                        NoStringMap tags = No::messageTags(line);
                         tags["batch"] = batchName;
-                        NoUtils::setMessageTags(line, tags);
+                        No::setMessageTags(line, tags);
                     }
                     bool skip = false;
                     NETWORKMODULECALL(OnPrivBufferPlayLine2(*useClient, line, message.GetTime()),

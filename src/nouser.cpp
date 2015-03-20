@@ -165,11 +165,11 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     pConfig->FindStringEntry("dcclookupmethod", sDCCLookupValue);
     if (pConfig->FindStringEntry("bouncedccs", sValue)) {
         if (sValue.toBool()) {
-            NoUtils::printAction("Loading Module [bouncedcc]");
+            No::printAction("Loading Module [bouncedcc]");
             NoString sModRet;
             bool bModRet = GetModules().LoadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
 
-            NoUtils::printStatus(bModRet, sModRet);
+            No::printStatus(bModRet, sModRet);
             if (!bModRet) {
                 sError = sModRet;
                 return false;
@@ -182,20 +182,20 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     }
     if (pConfig->FindStringEntry("buffer", sValue)) SetBufferCount(sValue.toUInt(), true);
     if (pConfig->FindStringEntry("awaysuffix", sValue)) {
-        NoUtils::printMessage("WARNING: AwaySuffix has been deprecated, instead try -> LoadModule = awaynick %nick%_" + sValue);
+        No::printMessage("WARNING: AwaySuffix has been deprecated, instead try -> LoadModule = awaynick %nick%_" + sValue);
     }
     if (pConfig->FindStringEntry("autocycle", sValue)) {
         if (sValue.equals("true"))
-            NoUtils::printError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle");
+            No::printError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle");
     }
     if (pConfig->FindStringEntry("keepnick", sValue)) {
         if (sValue.equals("true"))
-            NoUtils::printError("WARNING: KeepNick has been deprecated, instead try -> LoadModule = keepnick");
+            No::printError("WARNING: KeepNick has been deprecated, instead try -> LoadModule = keepnick");
     }
     if (pConfig->FindStringEntry("statusprefix", sValue)) {
         if (!SetStatusPrefix(sValue)) {
             sError = "Invalid StatusPrefix [" + sValue + "] Must be 1-5 chars, no spaces.";
-            NoUtils::printError(sError);
+            No::printError(sError);
             return false;
         }
     }
@@ -204,7 +204,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     }
     if (pConfig->FindStringEntry("timezoneoffset", sValue)) {
         if (fabs(sValue.toDouble()) > 0.1) {
-            NoUtils::printError("WARNING: TimezoneOffset has been deprecated, now you can set your timezone by name");
+            No::printError("WARNING: TimezoneOffset has been deprecated, now you can set your timezone by name");
         }
     }
     if (pConfig->FindStringEntry("timestamp", sValue)) {
@@ -257,7 +257,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     pConfig->FindSubConfig("pass", subConf);
     if (!sValue.empty() && !subConf.empty()) {
         sError = "Password defined more than once";
-        NoUtils::printError(sError);
+        No::printError(sError);
         return false;
     }
     subIt = subConf.begin();
@@ -278,14 +278,14 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             method = NoUser::HASH_SHA256;
         else {
             sError = "Invalid hash method";
-            NoUtils::printError(sError);
+            No::printError(sError);
             return false;
         }
 
         SetPass(sHash, method, sSalt);
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in config!";
-            NoUtils::printError(sError);
+            No::printError(sError);
 
             NoApp::DumpConfig(pSubConf);
             return false;
@@ -294,7 +294,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     }
     if (subIt != subConf.end()) {
         sError = "Password defined more than once";
-        NoUtils::printError(sError);
+        No::printError(sError);
         return false;
     }
 
@@ -302,7 +302,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
         const NoString& sNetworkName = subIt->first;
 
-        NoUtils::printMessage("Loading network [" + sNetworkName + "]");
+        No::printMessage("Loading network [" + sNetworkName + "]");
 
         NoNetwork* pNetwork = FindNetwork(sNetworkName);
 
@@ -324,7 +324,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         }
 
         if (pNetwork) {
-            NoUtils::printMessage("NOTICE: Found deprecated config, upgrading to a network");
+            No::printMessage("NOTICE: Found deprecated config, upgrading to a network");
 
             if (!pNetwork->ParseConfig(pConfig, sError, true)) {
                 return false;
@@ -369,7 +369,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
 
         // XXX Legacy crap, added in 1.3
         if (sModName == "charset") {
-            NoUtils::printAction("NOTICE: Charset support was moved to core, importing old charset module settings");
+            No::printAction("NOTICE: Charset support was moved to core, importing old charset module settings");
             size_t uIndex = 1;
             if (sMod.token(uIndex).equals("-force")) {
                 uIndex++;
@@ -377,14 +377,14 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             NoStringVector vsClient = sMod.token(uIndex).split(",");
             NoStringVector vsServer = sMod.token(uIndex + 1).split(",");
             if (vsClient.empty() || vsServer.empty()) {
-                NoUtils::printStatus(false, "charset module was loaded with wrong parameters.");
+                No::printStatus(false, "charset module was loaded with wrong parameters.");
                 continue;
             }
             SetClientEncoding(vsClient[0]);
             for (NoNetwork* pNetwork : m_vIRCNetworks) {
                 pNetwork->SetEncoding(vsServer[0]);
             }
-            NoUtils::printStatus(true, "Using [" + vsClient[0] + "] for clients, and [" + vsServer[0] + "] for servers");
+            No::printStatus(true, "Using [" + vsClient[0] + "] for clients, and [" + vsServer[0] + "] for servers");
             continue;
         }
 
@@ -393,7 +393,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
 
         bool bModRet = LoadModule(sModName, sArgs, sNotice, sModRet);
 
-        NoUtils::printStatus(bModRet, sModRet);
+        No::printStatus(bModRet, sModRet);
         if (!bModRet) {
             // XXX The awaynick module was retired in 1.6 (still available as external module)
             if (sModName == "awaynick") {
@@ -501,7 +501,7 @@ NoString NoUser::ExpandString(const NoString& sStr) const
 
 NoString& NoUser::ExpandString(const NoString& sStr, NoString& sRet) const
 {
-    NoString sTime = NoUtils::cTime(time(nullptr), m_sTimezone);
+    NoString sTime = No::cTime(time(nullptr), m_sTimezone);
 
     sRet = sStr;
     sRet.replace("%user%", GetUserName());
@@ -534,7 +534,7 @@ NoString NoUser::AddTimestamp(time_t tm, const NoString& sStr) const
     NoString sRet = sStr;
 
     if (!GetTimestampFormat().empty() && (m_bAppendTimestamp || m_bPrependTimestamp)) {
-        NoString sTimestamp = NoUtils::formatTime(tm, GetTimestampFormat(), m_sTimezone);
+        NoString sTimestamp = No::formatTime(tm, GetTimestampFormat(), m_sTimezone);
         if (sTimestamp.empty()) {
             return sRet;
         }
@@ -921,9 +921,9 @@ bool NoUser::CheckPass(const NoString& sPass) const
 {
     switch (m_eHashType) {
     case HASH_MD5:
-        return m_sPass.equals(NoUtils::saltedMd5(sPass, m_sPassSalt));
+        return m_sPass.equals(No::saltedMd5(sPass, m_sPassSalt));
     case HASH_SHA256:
-        return m_sPass.equals(NoUtils::saltedSha256(sPass, m_sPassSalt));
+        return m_sPass.equals(No::saltedSha256(sPass, m_sPassSalt));
     case HASH_NONE:
     default:
         return (sPass == m_sPass);
@@ -1087,10 +1087,10 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
         return false;
     }
 
-    NoUtils::printAction(sNotice);
+    No::printAction(sNotice);
 
     if (!ModInfo.SupportsType(No::UserModule) && ModInfo.SupportsType(No::NetworkModule)) {
-        NoUtils::printMessage("NOTICE: Module [" + sModName +
+        No::printMessage("NOTICE: Module [" + sModName +
                              "] is a network module, loading module for all networks in user.");
 
         // Do they have old NV?

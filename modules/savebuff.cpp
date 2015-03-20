@@ -112,7 +112,7 @@ public:
             switch (eType) {
             case InvalidBuffer:
                 m_sPassword = "";
-                NoUtils::printError("[" + GetModName() + ".so] Failed to Decrypt [" + pFile->GetLongName() + "]");
+                No::printError("[" + GetModName() + ".so] Failed to Decrypt [" + pFile->GetLongName() + "]");
                 if (!sName.empty()) {
                     PutUser(":***!znc@znc.in PRIVMSG " + sName +
                             " :Failed to decrypt this buffer, did you change the encryption pass?");

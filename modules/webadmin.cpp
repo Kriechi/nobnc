@@ -199,7 +199,7 @@ public:
         NoUser* pNewUser = new NoUser(sUsername);
 
         if (!sArg.empty()) {
-            NoString sSalt = NoUtils::salt();
+            NoString sSalt = No::salt();
             NoString sHash = NoUser::SaltedHash(sArg, sSalt);
             pNewUser->SetPass(sHash, NoUser::HASH_DEFAULT, sSalt);
         }
@@ -949,7 +949,7 @@ public:
             }
 
 #ifdef HAVE_ICU
-            for (const NoString& sEncoding : NoUtils::encodings()) {
+            for (const NoString& sEncoding : No::encodings()) {
                 NoTemplate& l = Tmpl.AddRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
@@ -1284,14 +1284,14 @@ public:
                 Tmpl["StatusPrefix"] = "*";
             }
 
-            NoStringSet ssTimezones = NoUtils::timezones();
+            NoStringSet ssTimezones = No::timezones();
             for (NoStringSet::iterator i = ssTimezones.begin(); i != ssTimezones.end(); ++i) {
                 NoTemplate& l = Tmpl.AddRow("TZLoop");
                 l["TZ"] = *i;
             }
 
 #ifdef HAVE_ICU
-            for (const NoString& sEncoding : NoUtils::encodings()) {
+            for (const NoString& sEncoding : No::encodings()) {
                 NoTemplate& l = Tmpl.AddRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
@@ -1632,22 +1632,22 @@ public:
             NoTemplate& l = Tmpl.AddRow("TrafficLoop");
 
             l["Username"] = it->first;
-            l["In"] = NoUtils::toByteStr(it->second.first);
-            l["Out"] = NoUtils::toByteStr(it->second.second);
-            l["Total"] = NoUtils::toByteStr(it->second.first + it->second.second);
+            l["In"] = No::toByteStr(it->second.first);
+            l["Out"] = No::toByteStr(it->second.second);
+            l["Total"] = No::toByteStr(it->second.first + it->second.second);
         }
 
-        Tmpl["UserIn"] = NoUtils::toByteStr(Users.first);
-        Tmpl["UserOut"] = NoUtils::toByteStr(Users.second);
-        Tmpl["UserTotal"] = NoUtils::toByteStr(Users.first + Users.second);
+        Tmpl["UserIn"] = No::toByteStr(Users.first);
+        Tmpl["UserOut"] = No::toByteStr(Users.second);
+        Tmpl["UserTotal"] = No::toByteStr(Users.first + Users.second);
 
-        Tmpl["ZNCIn"] = NoUtils::toByteStr(ZNC.first);
-        Tmpl["ZNCOut"] = NoUtils::toByteStr(ZNC.second);
-        Tmpl["ZNCTotal"] = NoUtils::toByteStr(ZNC.first + ZNC.second);
+        Tmpl["ZNCIn"] = No::toByteStr(ZNC.first);
+        Tmpl["ZNCOut"] = No::toByteStr(ZNC.second);
+        Tmpl["ZNCTotal"] = No::toByteStr(ZNC.first + ZNC.second);
 
-        Tmpl["AllIn"] = NoUtils::toByteStr(Total.first);
-        Tmpl["AllOut"] = NoUtils::toByteStr(Total.second);
-        Tmpl["AllTotal"] = NoUtils::toByteStr(Total.first + Total.second);
+        Tmpl["AllIn"] = No::toByteStr(Total.first);
+        Tmpl["AllOut"] = No::toByteStr(Total.second);
+        Tmpl["AllTotal"] = No::toByteStr(Total.first + Total.second);
 
         return true;
     }

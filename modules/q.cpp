@@ -427,8 +427,8 @@ private:
         if (m_bAuthed) return;
 
         NoString sUsername = m_sUsername.toLower().replace_n("[", "{").replace_n("]", "}").replace_n("\\", "|");
-        NoString sPasswordHash = NoUtils::sha256(m_sPassword.left(10));
-        NoString sKey = NoUtils::sha256(sUsername + ":" + sPasswordHash);
+        NoString sPasswordHash = No::sha256(m_sPassword.left(10));
+        NoString sKey = No::sha256(sUsername + ":" + sPasswordHash);
         NoString sResponse = HMAC_SHA256(sKey, sChallenge);
 
         PutModule("Auth: Received challenge, sending CHALLENGEAUTH request...");
@@ -560,7 +560,7 @@ private:
     {
         NoString sRealKey;
         if (sKey.length() > 64)
-            PackHex(NoUtils::sha256(sKey), sRealKey);
+            PackHex(No::sha256(sKey), sRealKey);
         else
             sRealKey = sKey;
 
@@ -573,8 +573,8 @@ private:
         }
 
         NoString sInnerHash;
-        PackHex(NoUtils::sha256(sInnerKey + sData), sInnerHash);
-        return NoUtils::sha256(sOuterKey + sInnerHash);
+        PackHex(No::sha256(sInnerKey + sData), sInnerHash);
+        return No::sha256(sOuterKey + sInnerHash);
     }
 
     /* Settings */

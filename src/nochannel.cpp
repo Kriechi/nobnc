@@ -47,7 +47,7 @@ NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig,
             if (sValue.toBool()) disable();
         if (pConfig->FindStringEntry("autocycle", sValue))
             if (sValue.equals("true"))
-                NoUtils::printError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle " + sName);
+                No::printError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle " + sName);
         if (pConfig->FindStringEntry("key", sValue)) setKey(sValue);
         if (pConfig->FindStringEntry("modes", sValue)) setDefaultModes(sValue);
     }
@@ -606,7 +606,7 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                 }
 
                 bool bBatch = pUseClient->HasBatch();
-                NoString sBatchName = NoUtils::md5(getName());
+                NoString sBatchName = No::md5(getName());
 
                 if (bBatch) {
                     m_network->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + getName(), pUseClient);
@@ -617,9 +617,9 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                     const NoMessage& BufLine = Buffer.getMessage(uIdx);
                     NoString sLine = BufLine.GetLine(*pUseClient, NoStringMap());
                     if (bBatch) {
-                        NoStringMap msBatchTags = NoUtils::messageTags(sLine);
+                        NoStringMap msBatchTags = No::messageTags(sLine);
                         msBatchTags["batch"] = sBatchName;
-                        NoUtils::setMessageTags(sLine, msBatchTags);
+                        No::setMessageTags(sLine, msBatchTags);
                     }
                     bool bNotShowThisLine = false;
                     NETWORKMODULECALL(OnChanBufferPlayLine2(*this, *pUseClient, sLine, BufLine.GetTime()),

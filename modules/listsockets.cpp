@@ -124,8 +124,8 @@ public:
                 Row["SSL"] = pSocket->GetSSL() ? "Yes" : "No";
                 Row["Local"] = GetLocalHost(pSocket, true);
                 Row["Remote"] = GetRemoteHost(pSocket, true);
-                Row["In"] = NoUtils::toByteStr(pSocket->GetBytesRead());
-                Row["Out"] = NoUtils::toByteStr(pSocket->GetBytesWritten());
+                Row["In"] = No::toByteStr(pSocket->GetBytesRead());
+                Row["Out"] = No::toByteStr(pSocket->GetBytesWritten());
             }
 
             return true;
@@ -165,7 +165,7 @@ public:
     {
         ulonglong iStartTime = pSocket->GetStartTime();
         time_t iTime = iStartTime / 1000;
-        return NoUtils::formatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->GetTimezone());
+        return No::formatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->GetTimezone());
     }
 
     NoString GetLocalHost(NoSocket* pSocket, bool bShowHosts)
@@ -247,8 +247,8 @@ public:
 
             Table.SetCell("Local", GetLocalHost(pSocket, bShowHosts));
             Table.SetCell("Remote", GetRemoteHost(pSocket, bShowHosts));
-            Table.SetCell("In", NoUtils::toByteStr(pSocket->GetBytesRead()));
-            Table.SetCell("Out", NoUtils::toByteStr(pSocket->GetBytesWritten()));
+            Table.SetCell("In", No::toByteStr(pSocket->GetBytesRead()));
+            Table.SetCell("Out", No::toByteStr(pSocket->GetBytesWritten()));
         }
 
         PutModule(Table);

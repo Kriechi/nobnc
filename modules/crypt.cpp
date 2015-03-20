@@ -86,7 +86,7 @@ public:
             }
 
             NoString sMsg = MakeIvec() + sMessage;
-            sMsg = NoUtils::encrypt(sMsg, it->second);
+            sMsg = No::encrypt(sMsg, it->second);
             sMsg = sMsg.toBase64();
             sMsg = "+OK *" + sMsg;
 
@@ -117,7 +117,7 @@ public:
             if (it != EndNV()) {
                 sMessage.leftChomp(5);
                 sMessage = NoString::fromBase64(sMessage);
-                sMessage = NoUtils::decrypt(sMessage, it->second);
+                sMessage = No::decrypt(sMessage, it->second);
                 sMessage.leftChomp(8);
                 sMessage = sMessage.c_str();
                 Nick.setNick(NickPrefix() + Nick.nick());

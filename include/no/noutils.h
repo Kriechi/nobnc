@@ -20,7 +20,7 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 
-namespace NoUtils
+namespace No
 {
     NO_EXPORT NoString formatIp(ulong addr);
     NO_EXPORT ulong formatLongIp(const NoString& sIP);

@@ -212,7 +212,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
 
     time(&curtime);
     // Generate file name
-    sPath = NoUtils::formatTime(curtime, m_sLogPath, GetUser()->GetTimezone());
+    sPath = No::formatTime(curtime, m_sLogPath, GetUser()->GetTimezone());
     if (sPath.empty()) {
         NO_DEBUG("Could not format log path [" << sPath << "]");
         return;
@@ -237,8 +237,8 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
     NoFile::GetInfo(GetSavePath(), ModDirInfo);
     if (!NoFile::Exists(sLogDir)) NoDir::MakeDir(sLogDir, ModDirInfo.st_mode);
     if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT)) {
-        LogFile.Write(NoUtils::formatTime(curtime, "[%H:%M:%S] ", GetUser()->GetTimezone()) +
-                      (m_bSanitize ? NoUtils::stripControls(sLine) : sLine) + "\n");
+        LogFile.Write(No::formatTime(curtime, "[%H:%M:%S] ", GetUser()->GetTimezone()) +
+                      (m_bSanitize ? No::stripControls(sLine) : sLine) + "\n");
     } else
         NO_DEBUG("Could not open log file [" << sPath << "]: " << strerror(errno));
 }

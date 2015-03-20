@@ -49,7 +49,7 @@ public:
         i |= pthread_sigmask(SIG_SETMASK, &old_sigmask, nullptr);
         i |= pthread_detach(thr);
         if (i) {
-            NoUtils::printError("Can't start new thread: " + NoString(strerror(errno)));
+            No::printError("Can't start new thread: " + NoString(strerror(errno)));
             exit(1);
         }
     }

@@ -44,7 +44,7 @@ public:
     {
         int i = pthread_mutex_init(&m_mutex, nullptr);
         if (i) {
-            NoUtils::printError("Can't initialize mutex: " + NoString(strerror(errno)));
+            No::printError("Can't initialize mutex: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -53,7 +53,7 @@ public:
     {
         int i = pthread_mutex_destroy(&m_mutex);
         if (i) {
-            NoUtils::printError("Can't destroy mutex: " + NoString(strerror(errno)));
+            No::printError("Can't destroy mutex: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -62,7 +62,7 @@ public:
     {
         int i = pthread_mutex_lock(&m_mutex);
         if (i) {
-            NoUtils::printError("Can't lock mutex: " + NoString(strerror(errno)));
+            No::printError("Can't lock mutex: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -71,7 +71,7 @@ public:
     {
         int i = pthread_mutex_unlock(&m_mutex);
         if (i) {
-            NoUtils::printError("Can't unlock mutex: " + NoString(strerror(errno)));
+            No::printError("Can't unlock mutex: " + NoString(strerror(errno)));
             exit(1);
         }
     }

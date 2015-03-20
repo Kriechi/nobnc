@@ -152,13 +152,13 @@ NoString NoModule::GetWebFilesPath()
 bool NoModule::LoadRegistry()
 {
     // NoString sPrefix = (m_pUser) ? m_pUser->GetUserName() : ".global";
-    return NoUtils::readFromDisk(m_mssRegistry, GetSavePath() + "/.registry") == NoUtils::MCS_SUCCESS;
+    return No::readFromDisk(m_mssRegistry, GetSavePath() + "/.registry") == No::MCS_SUCCESS;
 }
 
 bool NoModule::SaveRegistry() const
 {
     // NoString sPrefix = (m_pUser) ? m_pUser->GetUserName() : ".global";
-    return NoUtils::writeToDisk(m_mssRegistry, GetSavePath() + "/.registry", 0600) == NoUtils::MCS_SUCCESS;
+    return No::writeToDisk(m_mssRegistry, GetSavePath() + "/.registry", 0600) == No::MCS_SUCCESS;
 }
 
 bool NoModule::MoveRegistry(const NoString& sPath)

@@ -34,7 +34,7 @@
 #include <cstring>
 #include <cstdlib>
 
-NoString NoUtils::formatIp(ulong addr)
+NoString No::formatIp(ulong addr)
 {
     char szBuf[16];
     memset((char*)szBuf, 0, 16);
@@ -51,7 +51,7 @@ NoString NoUtils::formatIp(ulong addr)
     return szBuf;
 }
 
-ulong NoUtils::formatLongIp(const NoString& sIP)
+ulong No::formatLongIp(const NoString& sIP)
 {
     ulong ret;
     char ip[4][4];
@@ -98,31 +98,31 @@ static NoString Crypt(const NoString& sStr, const NoString& sPass, bool bEncrypt
     return ret;
 }
 
-NoString NoUtils::encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec)
+NoString No::encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec)
 {
     return Crypt(sStr, sPass, true, sIvec);
 }
 
-NoString NoUtils::decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec)
+NoString No::decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec)
 {
     return Crypt(sStr, sPass, false, sIvec);
 }
 #endif // HAVE_LIBSSL
 
-NoString NoUtils::getSaltedHashPass(NoString& sSalt)
+NoString No::getSaltedHashPass(NoString& sSalt)
 {
     sSalt = salt();
 
     while (true) {
         NoString pass1;
         do {
-            pass1 = NoUtils::getPass("Enter password");
+            pass1 = No::getPass("Enter password");
         } while (pass1.empty());
 
-        NoString pass2 = NoUtils::getPass("Confirm password");
+        NoString pass2 = No::getPass("Confirm password");
 
         if (!pass1.equals(pass2, No::CaseSensitive)) {
-            NoUtils::printError("The supplied passwords did not match");
+            No::printError("The supplied passwords did not match");
         } else {
             // Construct the salted pass
             return saltedSha256(pass1, sSalt);
@@ -130,16 +130,16 @@ NoString NoUtils::getSaltedHashPass(NoString& sSalt)
     }
 }
 
-NoString NoUtils::salt() { return randomString(20); }
+NoString No::salt() { return randomString(20); }
 
 // If you change this here and in GetSaltedHashPass(),
 // don't forget NoUser::HASH_DEFAULT!
 // TODO refactor this
-NoString NoUtils::defaultHash() { return "sha256"; }
+NoString No::defaultHash() { return "sha256"; }
 
-NoString NoUtils::md5(const NoString& sStr) { return MD5::md5(sStr); }
+NoString No::md5(const NoString& sStr) { return MD5::md5(sStr); }
 
-NoString NoUtils::sha256(const NoString& sStr)
+NoString No::sha256(const NoString& sStr)
 {
     uchar digest[SHA256_DIGEST_SIZE];
     char digest_hex[SHA256_DIGEST_SIZE * 2 + 1];
@@ -189,11 +189,11 @@ NoString NoUtils::sha256(const NoString& sStr)
     return digest_hex;
 }
 
-NoString NoUtils::saltedMd5(const NoString& sPass, const NoString& sSalt) { return md5(sPass + sSalt); }
+NoString No::saltedMd5(const NoString& sPass, const NoString& sSalt) { return md5(sPass + sSalt); }
 
-NoString NoUtils::saltedSha256(const NoString& sPass, const NoString& sSalt) { return sha256(sPass + sSalt); }
+NoString No::saltedSha256(const NoString& sPass, const NoString& sSalt) { return sha256(sPass + sSalt); }
 
-NoString NoUtils::getPass(const NoString& sPrompt)
+NoString No::getPass(const NoString& sPrompt)
 {
     printPrompt(sPrompt);
 #ifdef HAVE_GETPASSPHRASE
@@ -203,9 +203,9 @@ NoString NoUtils::getPass(const NoString& sPrompt)
 #endif
 }
 
-bool NoUtils::getBoolInput(const NoString& sPrompt, bool bDefault) { return NoUtils::getBoolInput(sPrompt, &bDefault); }
+bool No::getBoolInput(const NoString& sPrompt, bool bDefault) { return No::getBoolInput(sPrompt, &bDefault); }
 
-bool NoUtils::getBoolInput(const NoString& sPrompt, bool* pbDefault)
+bool No::getBoolInput(const NoString& sPrompt, bool* pbDefault)
 {
     NoString sRet, sDefault;
 
@@ -224,7 +224,7 @@ bool NoUtils::getBoolInput(const NoString& sPrompt, bool* pbDefault)
     }
 }
 
-bool NoUtils::getNumInput(const NoString& sPrompt, uint& uRet, uint uMin, uint uMax, uint uDefault)
+bool No::getNumInput(const NoString& sPrompt, uint& uRet, uint uMin, uint uMax, uint uDefault)
 {
     if (uMin > uMax) {
         return false;
@@ -251,13 +251,13 @@ bool NoUtils::getNumInput(const NoString& sPrompt, uint& uRet, uint uMin, uint u
             break;
         }
 
-        NoUtils::printError("Number must be " + sHint);
+        No::printError("Number must be " + sHint);
     }
 
     return true;
 }
 
-ulonglong NoUtils::millTime()
+ulonglong No::millTime()
 {
     struct timeval tv;
     ulonglong iTime = 0;
@@ -267,7 +267,7 @@ ulonglong NoUtils::millTime()
     return iTime;
 }
 
-bool NoUtils::getInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefault, const NoString& sHint)
+bool No::getInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefault, const NoString& sHint)
 {
     NoString sExtra;
     NoString sInput;
@@ -306,7 +306,7 @@ bool NoUtils::getInput(const NoString& sPrompt, NoString& sRet, const NoString& 
 #define BLU "\033[34m"
 #define DFL "\033[39m"
 
-void NoUtils::printError(const NoString& sMessage)
+void No::printError(const NoString& sMessage)
 {
     if (NoDebug::StdoutIsTTY())
         fprintf(stdout, BOLD BLU "[" RED " ** " BLU "]" DFL NORM " %s\n", sMessage.c_str());
@@ -315,7 +315,7 @@ void NoUtils::printError(const NoString& sMessage)
     fflush(stdout);
 }
 
-void NoUtils::printPrompt(const NoString& sMessage)
+void No::printPrompt(const NoString& sMessage)
 {
     if (NoDebug::StdoutIsTTY())
         fprintf(stdout, BOLD BLU "[" YEL " ?? " BLU "]" DFL NORM " %s: ", sMessage.c_str());
@@ -324,7 +324,7 @@ void NoUtils::printPrompt(const NoString& sMessage)
     fflush(stdout);
 }
 
-void NoUtils::printMessage(const NoString& sMessage, bool bStrong)
+void No::printMessage(const NoString& sMessage, bool bStrong)
 {
     if (NoDebug::StdoutIsTTY()) {
         if (bStrong)
@@ -337,7 +337,7 @@ void NoUtils::printMessage(const NoString& sMessage, bool bStrong)
     fflush(stdout);
 }
 
-void NoUtils::printAction(const NoString& sMessage)
+void No::printAction(const NoString& sMessage)
 {
     if (NoDebug::StdoutIsTTY())
         fprintf(stdout, BOLD BLU "[ .. " BLU "]" DFL NORM " %s...\n", sMessage.c_str());
@@ -346,7 +346,7 @@ void NoUtils::printAction(const NoString& sMessage)
     fflush(stdout);
 }
 
-void NoUtils::printStatus(bool bSuccess, const NoString& sMessage)
+void No::printStatus(bool bSuccess, const NoString& sMessage)
 {
     if (NoDebug::StdoutIsTTY()) {
         if (bSuccess) {
@@ -396,7 +396,7 @@ inline NoString FixGMT(NoString sTZ)
 }
 }
 
-NoString NoUtils::cTime(time_t t, const NoString& sTimezone)
+NoString No::cTime(time_t t, const NoString& sTimezone)
 {
     char s[30] = {}; // should have at least 26 bytes
     if (sTimezone.empty()) {
@@ -426,7 +426,7 @@ NoString NoUtils::cTime(time_t t, const NoString& sTimezone)
     return NoString(s).trim_n();
 }
 
-NoString NoUtils::formatTime(time_t t, const NoString& sFormat, const NoString& sTimezone)
+NoString No::formatTime(time_t t, const NoString& sFormat, const NoString& sTimezone)
 {
     char s[1024] = {};
     tm m;
@@ -458,7 +458,7 @@ NoString NoUtils::formatTime(time_t t, const NoString& sFormat, const NoString& 
     return s;
 }
 
-NoString NoUtils::formatServerTime(const timeval& tv)
+NoString No::formatServerTime(const timeval& tv)
 {
     NoString s_msec(tv.tv_usec / 1000);
     while (s_msec.length() < 3) {
@@ -500,7 +500,7 @@ void FillTimezones(const NoString& sPath, NoStringSet& result, const NoString& s
 }
 }
 
-NoStringSet NoUtils::timezones()
+NoStringSet No::timezones()
 {
     static NoStringSet result;
     if (result.empty()) {
@@ -509,7 +509,7 @@ NoStringSet NoUtils::timezones()
     return result;
 }
 
-NoStringSet NoUtils::encodings()
+NoStringSet No::encodings()
 {
     static NoStringSet ssResult;
 #ifdef HAVE_ICU
@@ -531,7 +531,7 @@ NoStringSet NoUtils::encodings()
     return ssResult;
 }
 
-NoStringMap NoUtils::messageTags(const NoString& sLine)
+NoStringMap No::messageTags(const NoString& sLine)
 {
     if (sLine.startsWith("@")) {
         NoStringVector vsTags = sLine.token(0).trimPrefix_n("@").split(";", No::SkipEmptyParts);
@@ -552,7 +552,7 @@ NoStringMap NoUtils::messageTags(const NoString& sLine)
     return NoStringMap();
 }
 
-void NoUtils::setMessageTags(NoString& sLine, const NoStringMap& mssTags)
+void No::setMessageTags(NoString& sLine, const NoStringMap& mssTags)
 {
     if (sLine.startsWith("@")) {
         sLine.leftChomp(sLine.token(0).length() + 1);
@@ -592,7 +592,7 @@ static NoString& Encode(NoString& sValue)
     return sValue;
 }
 
-NoUtils::status_t NoUtils::writeToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode)
+No::status_t No::writeToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode)
 {
     NoFile cFile(sPath);
 
@@ -646,7 +646,7 @@ static NoString& Decode(NoString& sValue)
     return sValue;
 }
 
-NoUtils::status_t NoUtils::readFromDisk(NoStringMap& values, const NoString& sPath)
+No::status_t No::readFromDisk(NoStringMap& values, const NoString& sPath)
 {
     NoFile cFile(sPath);
     if (!cFile.Open(O_RDONLY))
@@ -668,7 +668,7 @@ NoUtils::status_t NoUtils::readFromDisk(NoStringMap& values, const NoString& sPa
     return MCS_SUCCESS;
 }
 
-NoString NoUtils::toByteStr(ulonglong d)
+NoString No::toByteStr(ulonglong d)
 {
     const ulonglong KiB = 1024;
     const ulonglong MiB = KiB * 1024;
@@ -688,7 +688,7 @@ NoString NoUtils::toByteStr(ulonglong d)
     return NoString(d) + " B";
 }
 
-NoString NoUtils::toTimeStr(ulong s)
+NoString No::toTimeStr(ulong s)
 {
     const ulong m = 60;
     const ulong h = m * 60;
@@ -714,14 +714,14 @@ NoString NoUtils::toTimeStr(ulong s)
     return sRet.rightChomp_n(1);
 }
 
-NoString NoUtils::toPercent(double d)
+NoString No::toPercent(double d)
 {
     char szRet[32];
     snprintf(szRet, 32, "%.02f%%", d);
     return szRet;
 }
 
-NoString NoUtils::stripControls(const NoString& str)
+NoString No::stripControls(const NoString& str)
 {
     NoString sRet;
     const uchar* pStart = (const uchar*)str.data();
@@ -769,7 +769,7 @@ NoString NoUtils::stripControls(const NoString& str)
     return sRet;
 }
 
-NoString NoUtils::randomString(uint uLength)
+NoString No::randomString(uint uLength)
 {
     const char chars[] = "abcdefghijklmnopqrstuvwxyz"
                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -787,7 +787,7 @@ NoString NoUtils::randomString(uint uLength)
     return sRet;
 }
 
-NoString NoUtils::namedFormat(const NoString& sFormat, const NoStringMap& msValues)
+NoString No::namedFormat(const NoString& sFormat, const NoStringMap& msValues)
 {
     NoString sRet;
 
@@ -833,7 +833,7 @@ NoString NoUtils::namedFormat(const NoString& sFormat, const NoStringMap& msValu
     return sRet;
 }
 
-NoString NoUtils::ellipsize(const NoString& str, uint uLen)
+NoString No::ellipsize(const NoString& str, uint uLen)
 {
     if (uLen >= str.size()) {
         return str;
@@ -859,7 +859,7 @@ NoString NoUtils::ellipsize(const NoString& str, uint uLen)
 extern NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight);
 extern NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
 
-NoStringMap NoUtils::optionSplit(const NoString& str)
+NoStringMap No::optionSplit(const NoString& str)
 {
     NoString sName;
     NoString sCopy(str);
@@ -890,7 +890,7 @@ NoStringMap NoUtils::optionSplit(const NoString& str)
     return msRet;
 }
 
-NoStringVector NoUtils::quoteSplit(const NoString& str)
+NoStringVector No::quoteSplit(const NoString& str)
 {
     return Split_helper(str, " ", No::SkipEmptyParts, "\"", "\"", false);
 }

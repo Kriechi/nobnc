@@ -65,7 +65,7 @@ public:
             if (it->equals("saslauthd") || it->equals("auxprop")) {
                 m_sMethod += *it + " ";
             } else {
-                NoUtils::printError("Ignoring invalid SASL pwcheck method: " + *it);
+                No::printError("Ignoring invalid SASL pwcheck method: " + *it);
                 sMessage = "Ignored invalid SASL pwcheck method";
             }
         }
@@ -104,7 +104,7 @@ public:
             return CONTINUE;
         }
 
-        const NoString sCacheKey(NoUtils::md5(sUsername + ":" + sPassword));
+        const NoString sCacheKey(No::md5(sUsername + ":" + sPassword));
         if (m_Cache.HasItem(sCacheKey)) {
             bSuccess = true;
             NO_DEBUG("saslauth: Found [" + sUsername + "] in cache");

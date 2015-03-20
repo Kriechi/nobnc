@@ -66,7 +66,7 @@ public:
             return;
         }
 
-        m_mItems[Item] = value(NoUtils::millTime() + uTTL, Val);
+        m_mItems[Item] = value(No::millTime() + uTTL, Val);
     }
 
     /**
@@ -108,7 +108,7 @@ public:
         iterator it = m_mItems.begin();
 
         while (it != m_mItems.end()) {
-            if (NoUtils::millTime() > (it->second.first)) {
+            if (No::millTime() > (it->second.first)) {
                 m_mItems.erase(it++);
             } else {
                 ++it;

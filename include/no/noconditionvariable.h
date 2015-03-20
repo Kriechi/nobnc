@@ -42,7 +42,7 @@ public:
     {
         int i = pthread_cond_init(&m_cond, nullptr);
         if (i) {
-            NoUtils::printError("Can't initialize condition variable: " + NoString(strerror(errno)));
+            No::printError("Can't initialize condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -51,7 +51,7 @@ public:
     {
         int i = pthread_cond_destroy(&m_cond);
         if (i) {
-            NoUtils::printError("Can't destroy condition variable: " + NoString(strerror(errno)));
+            No::printError("Can't destroy condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -60,7 +60,7 @@ public:
     {
         int i = pthread_cond_wait(&m_cond, &mutex.m_mutex);
         if (i) {
-            NoUtils::printError("Can't wait on condition variable: " + NoString(strerror(errno)));
+            No::printError("Can't wait on condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -69,7 +69,7 @@ public:
     {
         int i = pthread_cond_signal(&m_cond);
         if (i) {
-            NoUtils::printError("Can't signal condition variable: " + NoString(strerror(errno)));
+            No::printError("Can't signal condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
@@ -78,7 +78,7 @@ public:
     {
         int i = pthread_cond_broadcast(&m_cond);
         if (i) {
-            NoUtils::printError("Can't broadcast condition variable: " + NoString(strerror(errno)));
+            No::printError("Can't broadcast condition variable: " + NoString(strerror(errno)));
             exit(1);
         }
     }
