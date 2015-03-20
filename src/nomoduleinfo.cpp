@@ -56,7 +56,7 @@ const NoString& NoModuleInfo::GetArgsHelpText() const { return m_sArgsHelpText; 
 
 bool NoModuleInfo::GetHasArgs() const { return m_bHasArgs; }
 
-NoModuleInfo::ModLoader NoModuleInfo::GetLoader() const { return m_fLoader; }
+NoModuleInfo::NoModuleLoader NoModuleInfo::GetLoader() const { return m_fLoader; }
 
 No::ModuleType NoModuleInfo::GetDefaultType() const { return m_eDefaultType; }
 
@@ -72,6 +72,6 @@ void NoModuleInfo::SetArgsHelpText(const NoString& s) { m_sArgsHelpText = s; }
 
 void NoModuleInfo::SetHasArgs(bool b) { m_bHasArgs = b; }
 
-void NoModuleInfo::SetLoader(NoModuleInfo::ModLoader fLoader) { m_fLoader = fLoader; }
+void NoModuleInfo::SetLoader(NoModuleInfo::NoModuleLoader fLoader) { m_fLoader = fLoader; }
 
 void NoModuleInfo::SetDefaultType(No::ModuleType eType) { m_eDefaultType = eType; }

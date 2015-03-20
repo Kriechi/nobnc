@@ -486,7 +486,7 @@ bool NoModules::LoadModule(const NoString& sModule, const NoString& sArgs, No::M
         return false;
     }
 
-    ModHandle p = OpenModule(sModule, sModPath, bVersionMismatch, Info, sRetMsg);
+    NoModuleHandle p = OpenModule(sModule, sModPath, bVersionMismatch, Info, sRetMsg);
 
     if (!p) return false;
 
@@ -567,7 +567,7 @@ bool NoModules::UnloadModule(const NoString& sModule, NoString& sRetMsg)
     _GLOBALMODULECALL(OnModuleUnloading(pModule, bSuccess, sRetMsg), pModule->GetUser(), pModule->GetNetwork(), nullptr, &bHandled);
     if (bHandled) return bSuccess;
 
-    ModHandle p = pModule->GetDLL();
+    NoModuleHandle p = pModule->GetDLL();
 
     if (p) {
         delete pModule;
@@ -636,7 +636,7 @@ bool NoModules::GetModPathInfo(NoModuleInfo& ModInfo, const NoString& sModule, c
 {
     bool bVersionMismatch;
 
-    ModHandle p = OpenModule(sModule, sModPath, bVersionMismatch, ModInfo, sRetMsg);
+    NoModuleHandle p = OpenModule(sModule, sModPath, bVersionMismatch, ModInfo, sRetMsg);
 
     if (!p) return false;
 
@@ -742,7 +742,7 @@ NoModules::ModDirList NoModules::GetModDirs()
     return ret;
 }
 
-ModHandle NoModules::OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg)
+NoModuleHandle NoModules::OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg)
 {
     // Some sane defaults in case anything errors out below
     bVersionMismatch = false;
@@ -768,7 +768,7 @@ ModHandle NoModules::OpenModule(const NoString& sModule, const NoString& sModPat
     // loads own modules (which it apparently does with RTLD_LAZY), we will die in a
     // name lookup since one of perl's symbols isn't found. That's worse
     // than any theoretical issue with RTLD_GLOBAL.
-    ModHandle p = dlopen((sModPath).c_str(), RTLD_NOW | RTLD_GLOBAL);
+    NoModuleHandle p = dlopen((sModPath).c_str(), RTLD_NOW | RTLD_GLOBAL);
 
     if (!p) {
         // dlerror() returns pointer to static buffer, which may be overwritten very soon with another dl call

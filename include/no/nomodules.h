@@ -163,7 +163,7 @@ public:
     bool OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType);
 
 private:
-    static ModHandle
+    static NoModuleHandle
     OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg);
 
     NoUser* m_pUser;

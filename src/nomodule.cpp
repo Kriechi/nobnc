@@ -25,7 +25,7 @@
 #include "nomodulejob.h"
 #include <dlfcn.h>
 
-NoModule::NoModule(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
+NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
     : m_eType(eType), m_sDescription(""), m_sTimers(), m_sSockets(),
 #ifdef HAVE_PTHREAD
       m_sJobs(),
@@ -661,7 +661,7 @@ NoModule::ModRet NoModule::OnDeleteNetwork(NoNetwork& Network) { return CONTINUE
 NoModule::ModRet NoModule::OnSendToClient(NoString& sLine, NoClient& Client) { return CONTINUE; }
 NoModule::ModRet NoModule::OnSendToIRC(NoString& sLine) { return CONTINUE; }
 
-ModHandle NoModule::GetDLL() { return m_pDLL; }
+NoModuleHandle NoModule::GetDLL() { return m_pDLL; }
 
 double NoModule::GetCoreVersion() { return NO_VERSION; }
 

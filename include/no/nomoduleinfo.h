@@ -25,12 +25,12 @@ class NoUser;
 class NoModule;
 class NoNetwork;
 
-typedef void* ModHandle;
+typedef void* NoModuleHandle;
 
 class NO_EXPORT NoModuleInfo
 {
 public:
-    typedef NoModule* (*ModLoader)(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType);
+    typedef NoModule* (*NoModuleLoader)(NoModuleHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType);
 
     NoModuleInfo();
     NoModuleInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType);
@@ -49,7 +49,7 @@ public:
     const NoString& GetWikiPage() const;
     const NoString& GetArgsHelpText() const;
     bool GetHasArgs() const;
-    ModLoader GetLoader() const;
+    NoModuleLoader GetLoader() const;
     No::ModuleType GetDefaultType() const;
 
     void SetName(const NoString& s);
@@ -58,7 +58,7 @@ public:
     void SetWikiPage(const NoString& s);
     void SetArgsHelpText(const NoString& s);
     void SetHasArgs(bool b = false);
-    void SetLoader(ModLoader fLoader);
+    void SetLoader(NoModuleLoader fLoader);
     void SetDefaultType(No::ModuleType eType);
 
 private:
@@ -70,7 +70,7 @@ private:
     NoString m_sWikiPage;
     NoString m_sArgsHelpText;
     bool m_bHasArgs;
-    ModLoader m_fLoader;
+    NoModuleLoader m_fLoader;
 };
 
 template <class T>
@@ -79,7 +79,7 @@ void no_moduleInfo(NoModuleInfo& info)
 }
 
 template <class T>
-NoModule* no_loadModule(ModHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& path, No::ModuleType type)
+NoModule* no_loadModule(NoModuleHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& path, No::ModuleType type)
 {
     return new T(handle, user, network, name, path, type);
 }

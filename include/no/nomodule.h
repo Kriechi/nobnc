@@ -87,7 +87,7 @@ class NoModuleInfo;
  *  @param CLASS The name of your module's class.
  */
 #define MODCONSTRUCTOR(CLASS)                                                                                                                 \
-    CLASS(ModHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType) \
+    CLASS(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType) \
         : NoModule(pDLL, pUser, pNetwork, sModName, sModPath, eType)
 
 /** This works exactly like MODULEDEFS, but for user modules. */
@@ -186,7 +186,7 @@ private:
 class NO_EXPORT NoModule
 {
 public:
-    NoModule(ModHandle pDLL,
+    NoModule(NoModuleHandle pDLL,
             NoUser* pUser,
             NoNetwork* pNetwork,
             const NoString& sModName,
@@ -685,7 +685,7 @@ public:
      */
     virtual ModRet OnSendToIRC(NoString& sLine);
 
-    ModHandle GetDLL();
+    NoModuleHandle GetDLL();
     static double GetCoreVersion();
 
     /** This function sends a given raw IRC line to the IRC server, if we
@@ -935,7 +935,7 @@ private:
 #ifdef HAVE_PTHREAD
     std::set<NoModuleJob*> m_sJobs;
 #endif
-    ModHandle m_pDLL;
+    NoModuleHandle m_pDLL;
     NoSocketManager* m_pManager;
     NoUser* m_pUser;
     NoNetwork* m_pNetwork;
