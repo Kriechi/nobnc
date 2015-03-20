@@ -119,7 +119,7 @@ target_link_libraries(nobnc ${NO_LIBRARIES})
 
 add_subdirectory(modules)
 add_subdirectory(share)
-add_subdirectory(test)
+add_subdirectory(tests)
 
 ### INSTALLS
 

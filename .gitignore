@@ -25,12 +25,10 @@
 /src/Csocket.cpp
 /include/no/Csocket.h
 
-# test
-/test/unittest
-/test/gtest.zip
-/test/gtest-1.7.0
-/test/ConfigTest
-/test/EscapeTest
+# tests
+/tests/unittest
+/tests/gtest.zip
+/tests/gtest-1.7.0
 
 # CMake
 build
