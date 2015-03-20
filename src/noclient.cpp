@@ -640,6 +640,12 @@ NoClientAuth::NoClientAuth(NoClient* pClient, const NoString& sUsername, const N
 {
 }
 
+void NoClientAuth::Invalidate()
+{
+    m_pClient = nullptr;
+    NoAuthBase::Invalidate();
+}
+
 void NoClientAuth::RefusedLogin(const NoString& sReason)
 {
     if (m_pClient) {
@@ -654,6 +660,20 @@ NoString NoAuthBase::GetRemoteIP() const
 }
 
 void NoAuthBase::Invalidate() { m_pSock = nullptr; }
+
+NoAuthBase::NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
+    : m_sUsername(sUsername), m_sPassword(sPassword), m_pSock(pSock)
+{
+}
+
+NoAuthBase::~NoAuthBase() {}
+
+void NoAuthBase::SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
+{
+    m_sUsername = sUsername;
+    m_sPassword = sPassword;
+    m_pSock = pSock;
+}
 
 void NoAuthBase::AcceptLogin(NoUser& User)
 {
@@ -682,6 +702,12 @@ void NoAuthBase::RefuseLogin(const NoString& sReason)
     RefusedLogin(sReason);
     Invalidate();
 }
+
+const NoString& NoAuthBase::GetUsername() const { return m_sUsername; }
+
+const NoString& NoAuthBase::GetPassword() const { return m_sPassword; }
+
+NoSocket* NoAuthBase::GetSocket() const { return m_pSock; }
 
 void NoClient::RefuseLogin(const NoString& sReason)
 {

@@ -30,29 +30,20 @@ class NoTable;
 class NO_EXPORT NoAuthBase
 {
 public:
-    NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
-        : m_sUsername(sUsername), m_sPassword(sPassword), m_pSock(pSock)
-    {
-    }
-
-    virtual ~NoAuthBase() {}
+    NoAuthBase(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock);
+    virtual ~NoAuthBase();
 
     NoAuthBase(const NoAuthBase&) = delete;
     NoAuthBase& operator=(const NoAuthBase&) = delete;
 
-    virtual void SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock)
-    {
-        m_sUsername = sUsername;
-        m_sPassword = sPassword;
-        m_pSock = pSock;
-    }
+    virtual void SetLoginInfo(const NoString& sUsername, const NoString& sPassword, NoSocket* pSock);
 
     void AcceptLogin(NoUser& User);
     void RefuseLogin(const NoString& sReason);
 
-    const NoString& GetUsername() const { return m_sUsername; }
-    const NoString& GetPassword() const { return m_sPassword; }
-    NoSocket* GetSocket() const { return m_pSock; }
+    const NoString& GetUsername() const;
+    const NoString& GetPassword() const;
+    NoSocket* GetSocket() const;
     NoString GetRemoteIP() const;
 
     // Invalidate this NoAuthBase instance which means it will no longer use
@@ -74,16 +65,11 @@ class NO_EXPORT NoClientAuth : public NoAuthBase
 {
 public:
     NoClientAuth(NoClient* pClient, const NoString& sUsername, const NoString& sPassword);
-    virtual ~NoClientAuth() {}
 
     NoClientAuth(const NoClientAuth&) = delete;
     NoClientAuth& operator=(const NoClientAuth&) = delete;
 
-    void Invalidate() override
-    {
-        m_pClient = nullptr;
-        NoAuthBase::Invalidate();
-    }
+    void Invalidate() override;
     void AcceptedLogin(NoUser& User) override;
     void RefusedLogin(const NoString& sReason) override;
 
