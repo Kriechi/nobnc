@@ -212,7 +212,7 @@ public:
         m_pReplies = nullptr;
 
         AddHelpCommand();
-        AddCommand("Silent", static_cast<NoModCommand::ModCmdFunc>(&NoRouteRepliesMod::SilentCommand), "[yes|no]");
+        AddCommand("Silent", static_cast<NoModuleCommand::ModCmdFunc>(&NoRouteRepliesMod::SilentCommand), "[yes|no]");
     }
 
     virtual ~NoRouteRepliesMod()

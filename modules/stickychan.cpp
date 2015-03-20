@@ -25,15 +25,15 @@ public:
     {
         AddHelpCommand();
         AddCommand("Stick",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoStickyChan::OnStickCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnStickCommand),
                    "<#channel> [key]",
                    "Sticks a channel");
         AddCommand("Unstick",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoStickyChan::OnUnstickCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnUnstickCommand),
                    "<#channel>",
                    "Unsticks a channel");
         AddCommand("List",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoStickyChan::OnListCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnListCommand),
                    "",
                    "Lists sticky channels");
     }

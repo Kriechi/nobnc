@@ -79,7 +79,7 @@ public:
     {
         AddHelpCommand();
         AddCommand("List",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoPartylineMod::ListChannelsCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoPartylineMod::ListChannelsCommand),
                    "",
                    "List all open channels");
     }

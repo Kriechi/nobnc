@@ -440,7 +440,7 @@ void NoModule::CancelJobs(const std::set<NoModuleJob*>& sJobs)
 bool NoModule::UnlinkJob(NoModuleJob* pJob) { return 0 != m_sJobs.erase(pJob); }
 #endif
 
-bool NoModule::AddCommand(const NoModCommand& Command)
+bool NoModule::AddCommand(const NoModuleCommand& Command)
 {
     if (Command.GetFunction() == nullptr) return false;
     if (Command.GetCommand().find(' ') != NoString::npos) return false;
@@ -450,15 +450,15 @@ bool NoModule::AddCommand(const NoModCommand& Command)
     return true;
 }
 
-bool NoModule::AddCommand(const NoString& sCmd, NoModCommand::ModCmdFunc func, const NoString& sArgs, const NoString& sDesc)
+bool NoModule::AddCommand(const NoString& sCmd, NoModuleCommand::ModCmdFunc func, const NoString& sArgs, const NoString& sDesc)
 {
-    NoModCommand cmd(sCmd, this, func, sArgs, sDesc);
+    NoModuleCommand cmd(sCmd, this, func, sArgs, sDesc);
     return AddCommand(cmd);
 }
 
 bool NoModule::AddCommand(const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, std::function<void(const NoString& sLine)> func)
 {
-    NoModCommand cmd(sCmd, std::move(func), sArgs, sDesc);
+    NoModuleCommand cmd(sCmd, std::move(func), sArgs, sDesc);
     return AddCommand(std::move(cmd));
 }
 
@@ -466,7 +466,7 @@ void NoModule::AddHelpCommand() { AddCommand("Help", &NoModule::HandleHelpComman
 
 bool NoModule::RemCommand(const NoString& sCmd) { return m_mCommands.erase(sCmd) > 0; }
 
-const NoModCommand* NoModule::FindCommand(const NoString& sCmd) const
+const NoModuleCommand* NoModule::FindCommand(const NoString& sCmd) const
 {
     for (const auto& it : m_mCommands) {
         if (!it.first.equals(sCmd)) continue;
@@ -478,7 +478,7 @@ const NoModCommand* NoModule::FindCommand(const NoString& sCmd) const
 bool NoModule::HandleCommand(const NoString& sLine)
 {
     const NoString& sCmd = sLine.token(0);
-    const NoModCommand* pCmd = FindCommand(sCmd);
+    const NoModuleCommand* pCmd = FindCommand(sCmd);
 
     if (pCmd) {
         pCmd->Call(sLine);
@@ -495,7 +495,7 @@ void NoModule::HandleHelpCommand(const NoString& sLine)
     NoString sFilter = sLine.token(1).toLower();
     NoTable Table;
 
-    NoModCommand::InitHelp(Table);
+    NoModuleCommand::InitHelp(Table);
     for (const auto& it : m_mCommands) {
         NoString sCmd = it.second.GetCommand().toLower();
         if (sFilter.empty() || (sCmd.startsWith(sFilter, No::CaseSensitive)) || sCmd.wildCmp(sFilter)) {
@@ -602,7 +602,7 @@ void NoModule::OnUnknownModCommand(const NoString& sLine)
     if (m_mCommands.empty())
         // This function is only called if OnModCommand wasn't
         // overriden, so no false warnings for modules which don't use
-        // NoModCommand for command handling.
+        // NoModuleCommand for command handling.
         PutModule("This module doesn't implement any commands.");
     else
         PutModule("Unknown command!");

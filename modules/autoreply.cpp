@@ -26,11 +26,11 @@ public:
     {
         AddHelpCommand();
         AddCommand("Set",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoReplyMod::OnSetCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoReplyMod::OnSetCommand),
                    "<reply>",
                    "Sets a new reply");
         AddCommand("Show",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoReplyMod::OnShowCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoReplyMod::OnShowCommand),
                    "",
                    "Displays the current query reply");
         m_Messaged.SetTTL(1000 * 120);

@@ -720,17 +720,17 @@ public:
     /// Register the "Help" command.
     void AddHelpCommand();
     /// @return True if the command was successfully added.
-    bool AddCommand(const NoModCommand& Command);
+    bool AddCommand(const NoModuleCommand& Command);
     /// @return True if the command was successfully added.
-    bool AddCommand(const NoString& sCmd, NoModCommand::ModCmdFunc func, const NoString& sArgs = "", const NoString& sDesc = "");
+    bool AddCommand(const NoString& sCmd, NoModuleCommand::ModCmdFunc func, const NoString& sArgs = "", const NoString& sDesc = "");
     /// @return True if the command was successfully added.
     bool AddCommand(const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, std::function<void(const NoString& sLine)> func);
     /// @return True if the command was successfully removed.
     bool RemCommand(const NoString& sCmd);
-    /// @return The NoModCommand instance or nullptr if none was found.
-    const NoModCommand* FindCommand(const NoString& sCmd) const;
+    /// @return The NoModuleCommand instance or nullptr if none was found.
+    const NoModuleCommand* FindCommand(const NoString& sCmd) const;
     /** This function tries to dispatch the given command via the correct
-     * instance of NoModCommand. Before this can be called, commands have to
+     * instance of NoModuleCommand. Before this can be called, commands have to
      * be added via AddCommand(). If no matching commands are found then
      * OnUnknownModCommand will be called.
      * @param sLine The command line to handle.
@@ -895,7 +895,7 @@ private:
 private:
     NoStringMap m_mssRegistry; //!< way to save name/value pairs. Note there is no encryption involved in this
     VWebSubPages m_vSubPages;
-    std::map<NoString, NoModCommand> m_mCommands;
+    std::map<NoString, NoModuleCommand> m_mCommands;
 };
 
 #endif // NOMODULE_H

@@ -87,9 +87,9 @@ public:
     MODCONSTRUCTOR(NoDccMod)
     {
         AddHelpCommand();
-        AddCommand("Send", static_cast<NoModCommand::ModCmdFunc>(&NoDccMod::SendCommand), "<nick> <file>");
-        AddCommand("Get", static_cast<NoModCommand::ModCmdFunc>(&NoDccMod::GetCommand), "<file>");
-        AddCommand("ListTransfers", static_cast<NoModCommand::ModCmdFunc>(&NoDccMod::ListTransfersCommand));
+        AddCommand("Send", static_cast<NoModuleCommand::ModCmdFunc>(&NoDccMod::SendCommand), "<nick> <file>");
+        AddCommand("Get", static_cast<NoModuleCommand::ModCmdFunc>(&NoDccMod::GetCommand), "<file>");
+        AddCommand("ListTransfers", static_cast<NoModuleCommand::ModCmdFunc>(&NoDccMod::ListTransfersCommand));
     }
 
 #ifndef MOD_DCC_ALLOW_EVERYONE

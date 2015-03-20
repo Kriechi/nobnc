@@ -25,14 +25,14 @@ public:
     {
         AddHelpCommand();
         AddCommand("Add",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoCycleMod::OnAddCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnAddCommand),
                    "[!]<#chan>",
                    "Add an entry, use !#chan to negate and * for wildcards");
         AddCommand("Del",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoCycleMod::OnDelCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnDelCommand),
                    "[!]<#chan>",
                    "Remove an entry, needs to be an exact match");
-        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoAutoCycleMod::OnListCommand), "", "List all entries");
+        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnListCommand), "", "List all entries");
         m_recentlyCycled.SetTTL(15 * 1000);
     }
 

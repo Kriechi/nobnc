@@ -282,35 +282,35 @@ public:
     {
         AddHelpCommand();
         AddCommand("Create",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAliasMod::CreateCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::CreateCommand),
                    "<name>",
                    "Creates a new, blank alias called name.");
         AddCommand("Delete",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAliasMod::DeleteCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::DeleteCommand),
                    "<name>",
                    "Deletes an existing alias.");
         AddCommand("Add",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAliasMod::AddCmd),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::AddCmd),
                    "<name> <action ...>",
                    "Adds a line to an existing alias.");
         AddCommand("Insert",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAliasMod::InsertCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::InsertCommand),
                    "<name> <pos> <action ...>",
                    "Inserts a line into an existing alias.");
         AddCommand("Remove",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAliasMod::RemoveCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::RemoveCommand),
                    "<name> <linenum>",
                    "Removes a line from an existing alias.");
         AddCommand("Clear",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAliasMod::ClearCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::ClearCommand),
                    "<name>",
                    "Removes all line from an existing alias.");
         AddCommand("List",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAliasMod::ListCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::ListCommand),
                    "",
                    "Lists all aliases by name.");
         AddCommand("Info",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAliasMod::InfoCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::InfoCommand),
                    "<name>",
                    "Reports the actions performed by an alias.");
     }

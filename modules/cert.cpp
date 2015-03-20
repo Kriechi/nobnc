@@ -49,10 +49,10 @@ public:
     {
         AddHelpCommand();
         AddCommand("delete",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoCertMod::Delete),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoCertMod::Delete),
                    "",
                    "Delete the current certificate");
-        AddCommand("info", static_cast<NoModCommand::ModCmdFunc>(&NoCertMod::Info));
+        AddCommand("info", static_cast<NoModuleCommand::ModCmdFunc>(&NoCertMod::Info));
     }
 
     NoString PemFile() const { return GetSavePath() + "/user.pem"; }

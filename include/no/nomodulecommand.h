@@ -24,7 +24,7 @@
 class NoTable;
 
 /** A helper class for handling commands in modules. */
-class NO_EXPORT NoModCommand
+class NO_EXPORT NoModuleCommand
 {
 public:
     /// Type for the callback function that handles the actual command.
@@ -32,26 +32,26 @@ public:
     typedef std::function<void(const NoString& sLine)> CmdFunc;
 
     /// Default constructor, needed so that this can be saved in a std::map.
-    NoModCommand();
+    NoModuleCommand();
 
-    /** Construct a new NoModCommand.
+    /** Construct a new NoModuleCommand.
      * @param sCmd The name of the command.
      * @param func The command's callback function.
      * @param sArgs Help text describing the arguments to this command.
      * @param sDesc Help text describing what this command does.
      */
-    NoModCommand(const NoString& sCmd, NoModule* pMod, ModCmdFunc func, const NoString& sArgs, const NoString& sDesc);
-    NoModCommand(const NoString& sCmd, CmdFunc func, const NoString& sArgs, const NoString& sDesc);
+    NoModuleCommand(const NoString& sCmd, NoModule* pMod, ModCmdFunc func, const NoString& sArgs, const NoString& sDesc);
+    NoModuleCommand(const NoString& sCmd, CmdFunc func, const NoString& sArgs, const NoString& sDesc);
 
     /** Copy constructor, needed so that this can be saved in a std::map.
      * @param other Object to copy from.
      */
-    NoModCommand(const NoModCommand& other);
+    NoModuleCommand(const NoModuleCommand& other);
 
     /** Assignment operator, needed so that this can be saved in a std::map.
      * @param other Object to copy from.
      */
-    NoModCommand& operator=(const NoModCommand& other);
+    NoModuleCommand& operator=(const NoModuleCommand& other);
 
     /** Initialize a NoTable so that it can be used with AddHelp().
      * @param Table The instance of NoTable to initialize.

@@ -57,11 +57,11 @@ public:
     {
         AddHelpCommand();
         AddCommand("SetDelay",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoRejoinMod::OnSetDelayCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoRejoinMod::OnSetDelayCommand),
                    "<secs>",
                    "Set the rejoin delay");
         AddCommand("ShowDelay",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoRejoinMod::OnShowDelayCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoRejoinMod::OnShowDelayCommand),
                    "",
                    "Show the rejoin delay");
     }

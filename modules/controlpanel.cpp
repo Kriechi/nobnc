@@ -1410,100 +1410,100 @@ public:
     MODCONSTRUCTOR(NoAdminMod)
     {
         AddCommand("Help",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::PrintHelp),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::PrintHelp),
                    "[command] [variable]",
                    "Prints help for matching commands and variables");
         AddCommand("Get",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::Get),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::Get),
                    "<variable> [username]",
                    "Prints the variable's value for the given or current user");
         AddCommand("Set",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::Set),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::Set),
                    "<variable> <username> <value>",
                    "Sets the variable's value for the given user");
         AddCommand("GetNetwork",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::GetNetwork),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::GetNetwork),
                    "<variable> [username] [network]",
                    "Prints the variable's value for the given network");
         AddCommand("SetNetwork",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::SetNetwork),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::SetNetwork),
                    "<variable> <username> <network> <value>",
                    "Sets the variable's value for the given network");
         AddCommand("GetChan",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::GetChan),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::GetChan),
                    "<variable> [username] <network> <chan>",
                    "Prints the variable's value for the given channel");
         AddCommand("SetChan",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::SetChan),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::SetChan),
                    "<variable> <username> <network> <chan> <value>",
                    "Sets the variable's value for the given channel");
-        AddCommand("AddChan", static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::AddChan), "<username> <network> <chan>", "Adds a new channel");
-        AddCommand("DelChan", static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::DelChan), "<username> <network> <chan>", "Deletes a channel");
-        AddCommand("ListUsers", static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::ListUsers), "", "Lists users");
+        AddCommand("AddChan", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddChan), "<username> <network> <chan>", "Adds a new channel");
+        AddCommand("DelChan", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DelChan), "<username> <network> <chan>", "Deletes a channel");
+        AddCommand("ListUsers", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListUsers), "", "Lists users");
         AddCommand("AddUser",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::AddUser),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddUser),
                    "<username> <password>",
                    "Adds a new user");
         AddCommand("DelUser",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::DelUser),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DelUser),
                    "<username>",
                    "Deletes a user");
         AddCommand("CloneUser",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::CloneUser),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::CloneUser),
                    "<old username> <new username>",
                    "Clones a user");
         AddCommand("AddServer",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::AddServer),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddServer),
                    "<username> <network> <server>",
                    "Adds a new IRC server for the given or current user");
         AddCommand("DelServer",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::DelServer),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DelServer),
                    "<username> <network> <server>",
                    "Deletes an IRC server from the given or current user");
-        AddCommand("Reconnect", static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::ReconnectUser), "<username> <network>", "Cycles the user's IRC server connection");
+        AddCommand("Reconnect", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ReconnectUser), "<username> <network>", "Cycles the user's IRC server connection");
         AddCommand("Disconnect",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::DisconnectUser),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DisconnectUser),
                    "<username> <network>",
                    "Disconnects the user from their IRC server");
         AddCommand("LoadModule",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::LoadModuleForUser),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::LoadModuleForUser),
                    "<username> <modulename> [args]",
                    "Loads a Module for a user");
         AddCommand("UnLoadModule",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::UnLoadModuleForUser),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::UnLoadModuleForUser),
                    "<username> <modulename>",
                    "Removes a Module of a user");
         AddCommand("ListMods",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::ListModulesForUser),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListModulesForUser),
                    "<username>",
                    "Get the list of modules for a user");
         AddCommand("LoadNetModule",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::LoadModuleForNetwork),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::LoadModuleForNetwork),
                    "<username> <network> <modulename> [args]",
                    "Loads a Module for a network");
         AddCommand("UnLoadNetModule",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::UnLoadModuleForNetwork),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::UnLoadModuleForNetwork),
                    "<username> <network> <modulename>",
                    "Removes a Module of a network");
         AddCommand("ListNetMods",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::ListModulesForNetwork),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListModulesForNetwork),
                    "<username> <network>",
                    "Get the list of modules for a network");
         AddCommand("ListCTCPs",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::ListCTCP),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListCTCP),
                    "<username>",
                    "List the configured CTCP replies");
-        AddCommand("AddCTCP", static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::AddCTCP), "<username> <ctcp> [reply]", "Configure a new CTCP reply");
+        AddCommand("AddCTCP", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddCTCP), "<username> <ctcp> [reply]", "Configure a new CTCP reply");
         AddCommand("DelCTCP",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::DelCTCP),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DelCTCP),
                    "<username> <ctcp>",
                    "Remove a CTCP reply");
 
         // Network commands
-        AddCommand("AddNetwork", static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::AddNetwork), "[username] <network>", "Add a network for a user");
-        AddCommand("DelNetwork", static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::DelNetwork), "[username] <network>", "Delete a network for a user");
+        AddCommand("AddNetwork", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddNetwork), "[username] <network>", "Add a network for a user");
+        AddCommand("DelNetwork", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DelNetwork), "[username] <network>", "Delete a network for a user");
         AddCommand("ListNetworks",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAdminMod::ListNetworks),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListNetworks),
                    "[username]",
                    "List all networks for a user");
     }

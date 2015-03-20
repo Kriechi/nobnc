@@ -17,24 +17,24 @@
 #include "nomodulecommand.h"
 #include "notable.h"
 
-NoModCommand::NoModCommand() : m_sCmd(), m_pFunc(nullptr), m_sArgs(), m_sDesc() {}
+NoModuleCommand::NoModuleCommand() : m_sCmd(), m_pFunc(nullptr), m_sArgs(), m_sDesc() {}
 
-NoModCommand::NoModCommand(const NoString& sCmd, NoModule* pMod, ModCmdFunc func, const NoString& sArgs, const NoString& sDesc)
+NoModuleCommand::NoModuleCommand(const NoString& sCmd, NoModule* pMod, ModCmdFunc func, const NoString& sArgs, const NoString& sDesc)
     : m_sCmd(sCmd), m_pFunc([pMod, func](const NoString& sLine) { (pMod->*func)(sLine); }), m_sArgs(sArgs), m_sDesc(sDesc)
 {
 }
 
-NoModCommand::NoModCommand(const NoString& sCmd, CmdFunc func, const NoString& sArgs, const NoString& sDesc)
+NoModuleCommand::NoModuleCommand(const NoString& sCmd, CmdFunc func, const NoString& sArgs, const NoString& sDesc)
     : m_sCmd(sCmd), m_pFunc(std::move(func)), m_sArgs(sArgs), m_sDesc(sDesc)
 {
 }
 
-NoModCommand::NoModCommand(const NoModCommand& other)
+NoModuleCommand::NoModuleCommand(const NoModuleCommand& other)
     : m_sCmd(other.m_sCmd), m_pFunc(other.m_pFunc), m_sArgs(other.m_sArgs), m_sDesc(other.m_sDesc)
 {
 }
 
-NoModCommand& NoModCommand::operator=(const NoModCommand& other)
+NoModuleCommand& NoModuleCommand::operator=(const NoModuleCommand& other)
 {
     m_sCmd = other.m_sCmd;
     m_pFunc = other.m_pFunc;
@@ -43,14 +43,14 @@ NoModCommand& NoModCommand::operator=(const NoModCommand& other)
     return *this;
 }
 
-void NoModCommand::InitHelp(NoTable& Table)
+void NoModuleCommand::InitHelp(NoTable& Table)
 {
     Table.AddColumn("Command");
     Table.AddColumn("Arguments");
     Table.AddColumn("Description");
 }
 
-void NoModCommand::AddHelp(NoTable& Table) const
+void NoModuleCommand::AddHelp(NoTable& Table) const
 {
     Table.AddRow();
     Table.SetCell("Command", GetCommand());
@@ -58,12 +58,12 @@ void NoModCommand::AddHelp(NoTable& Table) const
     Table.SetCell("Description", GetDescription());
 }
 
-void NoModCommand::Call(const NoString& sLine) const { m_pFunc(sLine); }
+void NoModuleCommand::Call(const NoString& sLine) const { m_pFunc(sLine); }
 
-const NoString& NoModCommand::GetDescription() const { return m_sDesc; }
+const NoString& NoModuleCommand::GetDescription() const { return m_sDesc; }
 
-const NoString& NoModCommand::GetArgs() const { return m_sArgs; }
+const NoString& NoModuleCommand::GetArgs() const { return m_sArgs; }
 
-NoModCommand::CmdFunc NoModCommand::GetFunction() const { return m_pFunc; }
+NoModuleCommand::CmdFunc NoModuleCommand::GetFunction() const { return m_pFunc; }
 
-const NoString& NoModCommand::GetCommand() const { return m_sCmd; }
+const NoString& NoModuleCommand::GetCommand() const { return m_sCmd; }

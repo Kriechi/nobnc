@@ -52,12 +52,12 @@ public:
     {
         AddHelpCommand();
         AddCommand("DelKey",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoCryptMod::OnDelKeyCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnDelKeyCommand),
                    "<#chan|Nick>",
                    "Remove a key for nick or channel");
-        AddCommand("SetKey", static_cast<NoModCommand::ModCmdFunc>(&NoCryptMod::OnSetKeyCommand), "<#chan|Nick> <Key>", "Set a key for nick or channel");
+        AddCommand("SetKey", static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnSetKeyCommand), "<#chan|Nick> <Key>", "Set a key for nick or channel");
         AddCommand("ListKeys",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoCryptMod::OnListKeysCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnListKeysCommand),
                    "",
                    "List all keys");
     }

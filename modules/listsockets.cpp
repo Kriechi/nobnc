@@ -66,7 +66,7 @@ public:
     {
         AddHelpCommand();
         AddCommand("List",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoListSockets::OnListCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoListSockets::OnListCommand),
                    "[-n]",
                    "Show the list of active sockets. Pass -n to show IP addresses");
     }

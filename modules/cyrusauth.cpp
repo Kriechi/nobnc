@@ -40,9 +40,9 @@ public:
         m_Cache.SetTTL(60000 /*ms*/);
 
         AddHelpCommand();
-        AddCommand("CreateUser", static_cast<NoModCommand::ModCmdFunc>(&NoSaslAuthMod::CreateUserCommand), "[yes|no]");
-        AddCommand("CloneUser", static_cast<NoModCommand::ModCmdFunc>(&NoSaslAuthMod::CloneUserCommand), "[username]");
-        AddCommand("DisableCloneUser", static_cast<NoModCommand::ModCmdFunc>(&NoSaslAuthMod::DisableCloneUserCommand));
+        AddCommand("CreateUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CreateUserCommand), "[yes|no]");
+        AddCommand("CloneUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CloneUserCommand), "[username]");
+        AddCommand("DisableCloneUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::DisableCloneUserCommand));
     }
 
     virtual ~NoSaslAuthMod() { sasl_done(); }

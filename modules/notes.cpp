@@ -77,9 +77,9 @@ public:
     {
         using std::placeholders::_1;
         AddHelpCommand();
-        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoNotesMod::ListCommand));
-        AddCommand("Add", static_cast<NoModCommand::ModCmdFunc>(&NoNotesMod::AddNoteCommand), "<key> <note>");
-        AddCommand("Del", static_cast<NoModCommand::ModCmdFunc>(&NoNotesMod::DelCommand), "<key>", "Delete a note");
+        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::ListCommand));
+        AddCommand("Add", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::AddNoteCommand), "<key> <note>");
+        AddCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::DelCommand), "<key>", "Delete a note");
         AddCommand("Mod", "<key> <note>", "Modify a note", std::bind(&NoNotesMod::ModCommand, this, _1));
         AddCommand("Get", "<key>", "", [this](const NoString& sLine) { GetCommand(sLine); });
     }

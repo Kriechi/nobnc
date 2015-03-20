@@ -29,13 +29,13 @@ public:
     MODCONSTRUCTOR(NoBlockUser)
     {
         AddHelpCommand();
-        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoBlockUser::OnListCommand), "", "List blocked users");
+        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnListCommand), "", "List blocked users");
         AddCommand("Block",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoBlockUser::OnBlockCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnBlockCommand),
                    "<user>",
                    "Block a user");
         AddCommand("Unblock",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoBlockUser::OnUnblockCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnUnblockCommand),
                    "<user>",
                    "Unblock a user");
     }

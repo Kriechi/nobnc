@@ -64,14 +64,14 @@ public:
 
         AddHelpCommand();
         AddCommand("SetPass",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoSaveBuff::OnSetPassCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnSetPassCommand),
                    "<password>",
                    "Sets the password");
         AddCommand("Replay",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoSaveBuff::OnReplayCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnReplayCommand),
                    "<buffer>",
                    "Replays the buffer");
-        AddCommand("Save", static_cast<NoModCommand::ModCmdFunc>(&NoSaveBuff::OnSaveCommand), "", "Saves all buffers");
+        AddCommand("Save", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnSaveCommand), "", "Saves all buffers");
     }
     virtual ~NoSaveBuff()
     {

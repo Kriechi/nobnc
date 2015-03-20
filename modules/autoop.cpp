@@ -149,31 +149,31 @@ public:
     {
         AddHelpCommand();
         AddCommand("ListUsers",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnListUsersCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnListUsersCommand),
                    "",
                    "List all users");
         AddCommand("AddChans",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnAddChansCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnAddChansCommand),
                    "<user> <channel> [channel] ...",
                    "Adds channels to a user");
         AddCommand("DelChans",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnDelChansCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnDelChansCommand),
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");
         AddCommand("AddMasks",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnAddMasksCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnAddMasksCommand),
                    "<user> <mask>,[mask] ...",
                    "Adds masks to a user");
         AddCommand("DelMasks",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnDelMasksCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnDelMasksCommand),
                    "<user> <mask>,[mask] ...",
                    "Removes masks from a user");
         AddCommand("AddUser",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnAddUserCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnAddUserCommand),
                    "<user> <hostmask>[,<hostmasks>...] <key> [channels]",
                    "Adds a user");
         AddCommand("DelUser",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoAutoOpMod::OnDelUserCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnDelUserCommand),
                    "<user>",
                    "Removes a user");
     }

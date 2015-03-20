@@ -54,19 +54,19 @@ public:
 
         AddHelpCommand();
         AddCommand("Reason",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoSimpleAway::OnReasonCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSimpleAway::OnReasonCommand),
                    "[<text>]",
                    "Prints or sets the away reason (%s is replaced with the time you were set away)");
         AddCommand("Timer",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoSimpleAway::OnTimerCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSimpleAway::OnTimerCommand),
                    "",
                    "Prints the current time to wait before setting you away");
         AddCommand("SetTimer",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoSimpleAway::OnSetTimerCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSimpleAway::OnSetTimerCommand),
                    "<seconds>",
                    "Sets the time to wait before setting you away");
         AddCommand("DisableTimer",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoSimpleAway::OnDisableTimerCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSimpleAway::OnDisableTimerCommand),
                    "",
                    "Disables the wait time before setting you away");
     }

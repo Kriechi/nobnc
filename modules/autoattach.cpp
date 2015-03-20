@@ -143,11 +143,11 @@ public:
     {
         AddHelpCommand();
         AddCommand("Add",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoChannelAttach::HandleAdd),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleAdd),
                    "[!]<#chan> <search> <host>",
                    "Add an entry, use !#chan to negate and * for wildcards");
-        AddCommand("Del", static_cast<NoModCommand::ModCmdFunc>(&NoChannelAttach::HandleDel), "[!]<#chan> <search> <host>", "Remove an entry, needs to be an exact match");
-        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoChannelAttach::HandleList), "", "List all entries");
+        AddCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleDel), "[!]<#chan> <search> <host>", "Remove an entry, needs to be an exact match");
+        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleList), "", "List all entries");
     }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override

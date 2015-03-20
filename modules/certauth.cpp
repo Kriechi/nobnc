@@ -30,13 +30,13 @@ public:
     {
         AddHelpCommand();
         AddCommand("Add",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoSslClientCertMod::HandleAddCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleAddCommand),
                    "[pubkey]",
                    "If pubkey is not provided will use the current key");
-        AddCommand("Del", static_cast<NoModCommand::ModCmdFunc>(&NoSslClientCertMod::HandleDelCommand), "id");
-        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoSslClientCertMod::HandleListCommand));
+        AddCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleDelCommand), "id");
+        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleListCommand));
         AddCommand("Show",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoSslClientCertMod::HandleShowCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleShowCommand),
                    "",
                    "Print your current key");
     }

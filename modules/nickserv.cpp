@@ -64,24 +64,24 @@ public:
     MODCONSTRUCTOR(NoNickServ)
     {
         AddHelpCommand();
-        AddCommand("Set", static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::SetCommand), "password");
+        AddCommand("Set", static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetCommand), "password");
         AddCommand("Clear",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::ClearCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::ClearCommand),
                    "",
                    "Clear your nickserv password");
         AddCommand("SetNSName",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::SetNSNameCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetNSNameCommand),
                    "nickname",
                    "Set NickServ name (Useful on networks like EpiKnet, where NickServ is named Themis)");
         AddCommand("ClearNSName",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::ClearNSNameCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::ClearNSNameCommand),
                    "",
                    "Reset NickServ name to default (NickServ)");
         AddCommand("ViewCommands",
-                   static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::ViewCommandsCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::ViewCommandsCommand),
                    "",
                    "Show patterns for lines, which are being sent to NickServ");
-        AddCommand("SetCommand", static_cast<NoModCommand::ModCmdFunc>(&NoNickServ::SetCommandCommand), "cmd new-pattern", "Set pattern for commands");
+        AddCommand("SetCommand", static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetCommandCommand), "cmd new-pattern", "Set pattern for commands");
     }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override

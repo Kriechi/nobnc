@@ -218,19 +218,19 @@ public:
         AddTimer(new NoAwayJob(this, 60, 0, "AwayJob", "Checks for idle and saves messages every 1 minute"));
 
         AddHelpCommand();
-        AddCommand("Away", static_cast<NoModCommand::ModCmdFunc>(&NoAway::AwayCommand), "[-quiet]");
-        AddCommand("Back", static_cast<NoModCommand::ModCmdFunc>(&NoAway::BackCommand), "[-quiet]");
-        AddCommand("Messages", static_cast<NoModCommand::ModCmdFunc>(&NoAway::BackCommand));
-        AddCommand("Delete", static_cast<NoModCommand::ModCmdFunc>(&NoAway::DeleteCommand), "delete <num|all>");
-        AddCommand("Save", static_cast<NoModCommand::ModCmdFunc>(&NoAway::SaveCommand));
-        AddCommand("Ping", static_cast<NoModCommand::ModCmdFunc>(&NoAway::PingCommand));
-        AddCommand("Pass", static_cast<NoModCommand::ModCmdFunc>(&NoAway::PassCommand));
-        AddCommand("Show", static_cast<NoModCommand::ModCmdFunc>(&NoAway::ShowCommand));
-        AddCommand("Replay", static_cast<NoModCommand::ModCmdFunc>(&NoAway::ReplayCommand));
-        AddCommand("EnableTimer", static_cast<NoModCommand::ModCmdFunc>(&NoAway::EnableTimerCommand));
-        AddCommand("DisableTimer", static_cast<NoModCommand::ModCmdFunc>(&NoAway::DisableTimerCommand));
-        AddCommand("SetTimer", static_cast<NoModCommand::ModCmdFunc>(&NoAway::SetTimerCommand), "<secs>");
-        AddCommand("Timer", static_cast<NoModCommand::ModCmdFunc>(&NoAway::TimerCommand));
+        AddCommand("Away", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::AwayCommand), "[-quiet]");
+        AddCommand("Back", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::BackCommand), "[-quiet]");
+        AddCommand("Messages", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::BackCommand));
+        AddCommand("Delete", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::DeleteCommand), "delete <num|all>");
+        AddCommand("Save", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::SaveCommand));
+        AddCommand("Ping", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::PingCommand));
+        AddCommand("Pass", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::PassCommand));
+        AddCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::ShowCommand));
+        AddCommand("Replay", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::ReplayCommand));
+        AddCommand("EnableTimer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::EnableTimerCommand));
+        AddCommand("DisableTimer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::DisableTimerCommand));
+        AddCommand("SetTimer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::SetTimerCommand), "<secs>");
+        AddCommand("Timer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::TimerCommand));
     }
 
     virtual ~NoAway()

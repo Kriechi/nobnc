@@ -97,11 +97,11 @@ public:
     MODCONSTRUCTOR(NoPerform)
     {
         AddHelpCommand();
-        AddCommand("Add", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::Add), "<command>");
-        AddCommand("Del", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::Del), "<nr>");
-        AddCommand("List", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::List));
-        AddCommand("Execute", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::Execute));
-        AddCommand("Swap", static_cast<NoModCommand::ModCmdFunc>(&NoPerform::Swap), "<nr> <nr>");
+        AddCommand("Add", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Add), "<command>");
+        AddCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Del), "<nr>");
+        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::List));
+        AddCommand("Execute", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Execute));
+        AddCommand("Swap", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Swap), "<nr> <nr>");
     }
 
     NoString ParsePerform(const NoString& sArg) const
