@@ -939,7 +939,7 @@ void NoClient::UserCommand(NoString& sLine)
                 for (const NoModuleInfo& Info : ssGlobalMods) {
                     GTable.AddRow();
                     GTable.SetCell("Name", (NoApp::Get().GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
-                    GTable.SetCell("Description", NoUtils::Ellipsize(Info.GetDescription(), 128));
+                    GTable.SetCell("Description", NoUtils::ellipsize(Info.GetDescription(), 128));
                 }
 
                 PutStatus(GTable);
@@ -960,7 +960,7 @@ void NoClient::UserCommand(NoString& sLine)
             for (const NoModuleInfo& Info : ssUserMods) {
                 Table.AddRow();
                 Table.SetCell("Name", (m_pUser->GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
-                Table.SetCell("Description", NoUtils::Ellipsize(Info.GetDescription(), 128));
+                Table.SetCell("Description", NoUtils::ellipsize(Info.GetDescription(), 128));
             }
 
             PutStatus(Table);
@@ -980,7 +980,7 @@ void NoClient::UserCommand(NoString& sLine)
             for (const NoModuleInfo& Info : ssNetworkMods) {
                 Table.AddRow();
                 Table.SetCell("Name", ((m_pNetwork && m_pNetwork->GetModules().FindModule(Info.GetName())) ? "*" : " ") + Info.GetName());
-                Table.SetCell("Description", NoUtils::Ellipsize(Info.GetDescription(), 128));
+                Table.SetCell("Description", NoUtils::ellipsize(Info.GetDescription(), 128));
             }
 
             PutStatus(Table);
@@ -1494,28 +1494,28 @@ void NoClient::UserCommand(NoString& sLine)
         for (const auto& it : traffic) {
             Table.AddRow();
             Table.SetCell("Username", it.first);
-            Table.SetCell("In", NoUtils::ToByteStr(it.second.first));
-            Table.SetCell("Out", NoUtils::ToByteStr(it.second.second));
-            Table.SetCell("Total", NoUtils::ToByteStr(it.second.first + it.second.second));
+            Table.SetCell("In", NoUtils::toByteStr(it.second.first));
+            Table.SetCell("Out", NoUtils::toByteStr(it.second.second));
+            Table.SetCell("Total", NoUtils::toByteStr(it.second.first + it.second.second));
         }
 
         Table.AddRow();
         Table.SetCell("Username", "<Users>");
-        Table.SetCell("In", NoUtils::ToByteStr(Users.first));
-        Table.SetCell("Out", NoUtils::ToByteStr(Users.second));
-        Table.SetCell("Total", NoUtils::ToByteStr(Users.first + Users.second));
+        Table.SetCell("In", NoUtils::toByteStr(Users.first));
+        Table.SetCell("Out", NoUtils::toByteStr(Users.second));
+        Table.SetCell("Total", NoUtils::toByteStr(Users.first + Users.second));
 
         Table.AddRow();
         Table.SetCell("Username", "<ZNC>");
-        Table.SetCell("In", NoUtils::ToByteStr(ZNC.first));
-        Table.SetCell("Out", NoUtils::ToByteStr(ZNC.second));
-        Table.SetCell("Total", NoUtils::ToByteStr(ZNC.first + ZNC.second));
+        Table.SetCell("In", NoUtils::toByteStr(ZNC.first));
+        Table.SetCell("Out", NoUtils::toByteStr(ZNC.second));
+        Table.SetCell("Total", NoUtils::toByteStr(ZNC.first + ZNC.second));
 
         Table.AddRow();
         Table.SetCell("Username", "<Total>");
-        Table.SetCell("In", NoUtils::ToByteStr(Total.first));
-        Table.SetCell("Out", NoUtils::ToByteStr(Total.second));
-        Table.SetCell("Total", NoUtils::ToByteStr(Total.first + Total.second));
+        Table.SetCell("In", NoUtils::toByteStr(Total.first));
+        Table.SetCell("Out", NoUtils::toByteStr(Total.second));
+        Table.SetCell("Total", NoUtils::toByteStr(Total.first + Total.second));
 
         PutStatus(Table);
     } else if (sCommand.equals("UPTIME")) {

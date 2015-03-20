@@ -24,37 +24,37 @@ public:
 
     ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
     {
-        sMessage = NoUtils::StripControls(sMessage);
+        sMessage = NoUtils::stripControls(sMessage);
         return CONTINUE;
     }
 
     ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        sMessage = NoUtils::StripControls(sMessage);
+        sMessage = NoUtils::stripControls(sMessage);
         return CONTINUE;
     }
 
     ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
-        sMessage = NoUtils::StripControls(sMessage);
+        sMessage = NoUtils::stripControls(sMessage);
         return CONTINUE;
     }
 
     ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        sMessage = NoUtils::StripControls(sMessage);
+        sMessage = NoUtils::stripControls(sMessage);
         return CONTINUE;
     }
 
     ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
-        sMessage = NoUtils::StripControls(sMessage);
+        sMessage = NoUtils::stripControls(sMessage);
         return CONTINUE;
     }
 
     ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        sMessage = NoUtils::StripControls(sMessage);
+        sMessage = NoUtils::stripControls(sMessage);
         return CONTINUE;
     }
 };

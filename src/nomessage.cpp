@@ -47,11 +47,11 @@ NoString NoMessage::GetLine(const NoClient& client, const NoStringMap& params) c
 
     if (client.HasServerTime()) {
         copy["text"] = m_text;
-        NoString str = NoUtils::NamedFormat(m_format, copy);
-        return "@time=" + NoUtils::FormatServerTime(m_time) + " " + str;
+        NoString str = NoUtils::namedFormat(m_format, copy);
+        return "@time=" + NoUtils::formatServerTime(m_time) + " " + str;
     } else {
         copy["text"] = client.GetUser()->AddTimestamp(m_time.tv_sec, m_text);
-        return NoUtils::NamedFormat(m_format, copy);
+        return NoUtils::namedFormat(m_format, copy);
     }
 }
 

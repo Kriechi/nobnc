@@ -123,10 +123,10 @@ public:
 
         if (GetUser()->GetNick().equals(sRemoteNick)) {
             PutUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
-                    NoString(NoUtils::GetLongIP(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
+                    NoString(NoUtils::formatLongIp(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
         } else {
             PutIRC("PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
-                   NoString(NoUtils::GetLongIP(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
+                   NoString(NoUtils::formatLongIp(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
         }
 
         PutModule("DCC -> [" + sRemoteNick + "][" + pFile->GetShortName() + "] - Attempting Send.");
@@ -224,7 +224,7 @@ public:
             if (pSock->IsListener()) {
                 Table.SetCell("State", "Waiting");
             } else {
-                Table.SetCell("State", NoUtils::ToPercent(pSock->GetProgress()));
+                Table.SetCell("State", NoUtils::toPercent(pSock->GetProgress()));
                 Table.SetCell("Speed", NoString((int)(pSock->GetAvgRead() / 1024.0)) + " KiB/s");
             }
         }
@@ -265,7 +265,7 @@ public:
             ulong uLongIP = sMessage.token(3).toULong();
             ushort uPort = sMessage.token(4).toUShort();
             ulong uFileSize = sMessage.token(5).toULong();
-            GetFile(GetClient()->GetNick(), NoUtils::GetIP(uLongIP), uPort, sLocalFile, uFileSize);
+            GetFile(GetClient()->GetNick(), NoUtils::formatIp(uLongIP), uPort, sLocalFile, uFileSize);
         }
     }
 };

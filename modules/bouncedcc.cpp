@@ -181,7 +181,7 @@ public:
     ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
     {
         if (sMessage.startsWith("DCC ")) {
-            NoStringVector tokens = NoUtils::QuoteSplit(sMessage);
+            NoStringVector tokens = NoUtils::quoteSplit(sMessage);
             tokens.resize(6);
             NoString sType = tokens.at(1).trim_n("\"");
             NoString sFile = tokens.at(2);
@@ -191,20 +191,20 @@ public:
             NoString sIP = GetLocalDCCIP();
 
             if (!UseClientIP()) {
-                uLongIP = NoUtils::GetLongIP(GetClient()->GetRemoteIP());
+                uLongIP = NoUtils::formatLongIp(GetClient()->GetRemoteIP());
             }
 
             if (sType.equals("CHAT")) {
                 ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, "", true, this, "");
                 if (uBNCPort) {
-                    PutIRC("PRIVMSG " + sTarget + " :\001DCC CHAT chat " + NoString(NoUtils::GetLongIP(sIP)) + " " +
+                    PutIRC("PRIVMSG " + sTarget + " :\001DCC CHAT chat " + NoString(NoUtils::formatLongIp(sIP)) + " " +
                            NoString(uBNCPort) + "\001");
                 }
             } else if (sType.equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
                 ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, sFile, false, this, "");
                 if (uBNCPort) {
-                    PutIRC("PRIVMSG " + sTarget + " :\001DCC SEND " + sFile + " " + NoString(NoUtils::GetLongIP(sIP)) +
+                    PutIRC("PRIVMSG " + sTarget + " :\001DCC SEND " + sFile + " " + NoString(NoUtils::formatLongIp(sIP)) +
                            " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.equals("RESUME")) {
@@ -244,7 +244,7 @@ public:
         NoNetwork* pNetwork = GetNetwork();
         if (sMessage.startsWith("DCC ") && pNetwork->IsUserAttached()) {
             // DCC CHAT chat 2453612361 44592
-            NoStringVector tokens = NoUtils::QuoteSplit(sMessage);
+            NoStringVector tokens = NoUtils::quoteSplit(sMessage);
             tokens.resize(6);
             NoString sType = tokens.at(1).trim_n("\"");
             NoString sFile = tokens.at(2);
@@ -255,20 +255,20 @@ public:
             if (sType.equals("CHAT")) {
                 NoNick FromNick(Nick.nickMask());
                 ushort uBNCPort =
-                NoDccBounce::DCCRequest(FromNick.nick(), uLongIP, uPort, "", true, this, NoUtils::GetIP(uLongIP));
+                NoDccBounce::DCCRequest(FromNick.nick(), uLongIP, uPort, "", true, this, NoUtils::formatIp(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
                     PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC CHAT chat " +
-                            NoString(NoUtils::GetLongIP(sIP)) + " " + NoString(uBNCPort) + "\001");
+                            NoString(NoUtils::formatLongIp(sIP)) + " " + NoString(uBNCPort) + "\001");
                 }
             } else if (sType.equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
                 ushort uBNCPort =
-                NoDccBounce::DCCRequest(Nick.nick(), uLongIP, uPort, sFile, false, this, NoUtils::GetIP(uLongIP));
+                NoDccBounce::DCCRequest(Nick.nick(), uLongIP, uPort, sFile, false, this, NoUtils::formatIp(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
                     PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC SEND " + sFile + " " +
-                            NoString(NoUtils::GetLongIP(sIP)) + " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
+                            NoString(NoUtils::formatLongIp(sIP)) + " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.equals("RESUME")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
@@ -313,7 +313,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
     : NoModuleSocket(pMod)
 {
     m_uRemotePort = uPort;
-    m_sConnectIP = NoUtils::GetIP(uLongIP);
+    m_sConnectIP = NoUtils::formatIp(uLongIP);
     m_sRemoteIP = sRemoteIP;
     m_sFileName = sFileName;
     m_sRemoteNick = sRemoteNick;

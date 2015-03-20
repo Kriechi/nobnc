@@ -23,46 +23,46 @@
 class NO_EXPORT NoUtils
 {
 public:
-    static NoString GetIP(ulong addr);
-    static ulong GetLongIP(const NoString& sIP);
+    static NoString formatIp(ulong addr);
+    static ulong formatLongIp(const NoString& sIP);
 
-    static void PrintError(const NoString& sMessage);
-    static void PrintMessage(const NoString& sMessage, bool bStrong = false);
-    static void PrintPrompt(const NoString& sMessage);
-    static void PrintAction(const NoString& sMessage);
-    static void PrintStatus(bool bSuccess, const NoString& sMessage = "");
+    static void printError(const NoString& sMessage);
+    static void printMessage(const NoString& sMessage, bool bStrong = false);
+    static void printPrompt(const NoString& sMessage);
+    static void printAction(const NoString& sMessage);
+    static void printStatus(bool bSuccess, const NoString& sMessage = "");
 
 #ifdef HAVE_LIBSSL
-    static NoString Encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
-    static NoString Decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
+    static NoString encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
+    static NoString decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
 #endif
 
     // TODO refactor this
     static const NoString sDefaultHash;
 
-    static NoString GetSaltedHashPass(NoString& sSalt);
-    static NoString GetSalt();
-    static NoString MD5(const NoString& sStr);
-    static NoString SHA256(const NoString& sStr);
-    static NoString SaltedMD5Hash(const NoString& sPass, const NoString& sSalt);
-    static NoString SaltedSHA256Hash(const NoString& sPass, const NoString& sSalt);
-    static NoString GetPass(const NoString& sPrompt);
-    static bool GetInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefault = "", const NoString& sHint = "");
-    static bool GetBoolInput(const NoString& sPrompt, bool bDefault);
-    static bool GetBoolInput(const NoString& sPrompt, bool* pbDefault = nullptr);
-    static bool
-    GetNumInput(const NoString& sPrompt, uint& uRet, uint uMin = 0, uint uMax = ~0, uint uDefault = ~0);
+    static NoString salt();
+    static NoString md5(const NoString& sStr);
+    static NoString sha256(const NoString& sStr);
+    static NoString saltedMd5(const NoString& sPass, const NoString& sSalt);
+    static NoString saltedSha256(const NoString& sPass, const NoString& sSalt);
 
-    static ulonglong GetMillTime();
+    static NoString getPass(const NoString& sPrompt);
+    static NoString getSaltedHashPass(NoString& sSalt);
+    static bool getInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefault = "", const NoString& sHint = "");
+    static bool getBoolInput(const NoString& sPrompt, bool bDefault);
+    static bool getBoolInput(const NoString& sPrompt, bool* pbDefault = nullptr);
+    static bool getNumInput(const NoString& sPrompt, uint& uRet, uint uMin = 0, uint uMax = ~0, uint uDefault = ~0);
 
-    static NoString CTime(time_t t, const NoString& sTZ);
-    static NoString FormatTime(time_t t, const NoString& sFormat, const NoString& sTZ);
-    static NoString FormatServerTime(const timeval& tv);
-    static NoStringSet GetTimezones();
-    static NoStringSet GetEncodings();
+    static ulonglong millTime();
 
-    static NoStringMap GetMessageTags(const NoString& sLine);
-    static void SetMessageTags(NoString& sLine, const NoStringMap& mssTags);
+    static NoString cTime(time_t t, const NoString& sTZ);
+    static NoString formatTime(time_t t, const NoString& sFormat, const NoString& sTZ);
+    static NoString formatServerTime(const timeval& tv);
+    static NoStringSet timezones();
+    static NoStringSet encodings();
+
+    static NoStringMap messageTags(const NoString& sLine);
+    static void setMessageTags(NoString& sLine, const NoStringMap& mssTags);
 
     /** Status codes that can be returned by WriteToDisk() and
      * ReadFromDisk(). */
@@ -81,42 +81,42 @@ public:
      * @return The result of the operation.
      * @see WriteFilter.
      */
-    static status_t WriteToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode = 0644);
+    static status_t writeToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode = 0644);
     /** Read a map from a file.
      * @param sPath The file name to read from.
      * @return The result of the operation.
      * @see ReadFilter.
      */
-    static status_t ReadFromDisk(NoStringMap& values, const NoString& sPath);
+    static status_t readFromDisk(NoStringMap& values, const NoString& sPath);
 
     /** Pretty-print a number of bytes.
      * @param d The number of bytes.
      * @return A string describing the number of bytes.
      */
-    static NoString ToByteStr(ulonglong d);
+    static NoString toByteStr(ulonglong d);
     /** Pretty-print a time span.
      * @param s Number of seconds to print.
      * @return A string like "4w 6d 4h 3m 58s".
      */
-    static NoString ToTimeStr(ulong s);
+    static NoString toTimeStr(ulong s);
     /** Pretty-print a percent value.
      * @param d The percent value. This should be in range 0-100.
      * @return The "pretty" string.
      */
-    static NoString ToPercent(double d);
+    static NoString toPercent(double d);
 
     /** Remove controls characters from the string.
      * Controls characters are color codes, and those in C0 set
      * See https://en.wikipedia.org/wiki/C0_and_C1_control_codes
      * @return A string without control codes.
      */
-    static NoString StripControls(const NoString& str);
+    static NoString stripControls(const NoString& str);
 
     /** Produces a random string.
      * @param uLength The length of the resulting string.
      * @return A random string.
      */
-    static NoString RandomString(uint uLength);
+    static NoString randomString(uint uLength);
 
     /** Build a string from a format string, replacing values from a map.
      * The format specification can contain simple named parameters that match
@@ -126,7 +126,7 @@ public:
      * @param msValues A map of named parameters to their values.
      * @return The string with named parameters replaced.
      */
-    static NoString NamedFormat(const NoString& sFormat, const NoStringMap& msValues);
+    static NoString namedFormat(const NoString& sFormat, const NoStringMap& msValues);
 
     /** Ellipsize the current string.
      * For example, ellipsizing "Hello, I'm Bob" to the length 9 would
@@ -134,10 +134,10 @@ public:
      * @param uLen The length to ellipsize to.
      * @return The ellipsized string.
      */
-    static NoString Ellipsize(const NoString& str, uint uLen);
+    static NoString ellipsize(const NoString& str, uint uLen);
 
-    static NoStringMap OptionSplit(const NoString& str);
-    static NoStringVector QuoteSplit(const NoString& str);
+    static NoStringMap optionSplit(const NoString& str);
+    static NoStringVector quoteSplit(const NoString& str);
 };
 
 #endif // NOUTILS_H

@@ -51,7 +51,7 @@ public:
     // TODO refactor this
     static NoString SaltedHash(const NoString& sPass, const NoString& sSalt)
     {
-        return NoUtils::SaltedSHA256Hash(sPass, sSalt);
+        return NoUtils::saltedSha256(sPass, sSalt);
     }
 
     NoSettings ToConfig() const;

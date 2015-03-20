@@ -118,27 +118,27 @@ static const struct option g_LongOpts[] = { { "help", no_argument, nullptr, 'h' 
 
 static void GenerateHelp(const char* appname)
 {
-    NoUtils::PrintMessage("USAGE: " + NoString(appname) + " [options]");
-    NoUtils::PrintMessage("Options are:");
-    NoUtils::PrintMessage("\t-h, --help         List available command line options (this page)");
-    NoUtils::PrintMessage("\t-v, --version      Output version information and exit");
-    NoUtils::PrintMessage("\t-f, --foreground   Don't fork into the background");
-    NoUtils::PrintMessage("\t-D, --debug        Output debugging information (Implies -f)");
-    NoUtils::PrintMessage("\t-n, --no-color     Don't use escape sequences in the output");
-    NoUtils::PrintMessage("\t-r, --allow-root   Don't complain if ZNC is run as root");
-    NoUtils::PrintMessage("\t-c, --makeconf     Interactively create a new config");
-    NoUtils::PrintMessage("\t-s, --makepass     Generates a password for use in config");
+    NoUtils::printMessage("USAGE: " + NoString(appname) + " [options]");
+    NoUtils::printMessage("Options are:");
+    NoUtils::printMessage("\t-h, --help         List available command line options (this page)");
+    NoUtils::printMessage("\t-v, --version      Output version information and exit");
+    NoUtils::printMessage("\t-f, --foreground   Don't fork into the background");
+    NoUtils::printMessage("\t-D, --debug        Output debugging information (Implies -f)");
+    NoUtils::printMessage("\t-n, --no-color     Don't use escape sequences in the output");
+    NoUtils::printMessage("\t-r, --allow-root   Don't complain if ZNC is run as root");
+    NoUtils::printMessage("\t-c, --makeconf     Interactively create a new config");
+    NoUtils::printMessage("\t-s, --makepass     Generates a password for use in config");
 #ifdef HAVE_LIBSSL
-    NoUtils::PrintMessage("\t-p, --makepem      Generates a pemfile for use with SSL");
+    NoUtils::printMessage("\t-p, --makepem      Generates a pemfile for use with SSL");
 #endif /* HAVE_LIBSSL */
-    NoUtils::PrintMessage("\t-d, --datadir      Set a different ZNC repository (default is ~/.znc)");
+    NoUtils::printMessage("\t-d, --datadir      Set a different ZNC repository (default is ~/.znc)");
 }
 
 static void die(int sig)
 {
     signal(SIGPIPE, SIG_DFL);
 
-    NoUtils::PrintMessage("Exiting on SIG [" + NoString(sig) + "]");
+    NoUtils::printMessage("Exiting on SIG [" + NoString(sig) + "]");
 
     NoApp::DestroyInstance();
     exit(sig);
@@ -148,15 +148,15 @@ static void signalHandler(int sig)
 {
     switch (sig) {
     case SIGHUP:
-        NoUtils::PrintMessage("Caught SIGHUP");
+        NoUtils::printMessage("Caught SIGHUP");
         NoApp::Get().SetConfigState(NoApp::ConfigNeedRehash);
         break;
     case SIGUSR1:
-        NoUtils::PrintMessage("Caught SIGUSR1");
+        NoUtils::printMessage("Caught SIGUSR1");
         NoApp::Get().SetConfigState(NoApp::ConfigNeedVerboseWrite);
         break;
     default:
-        NoUtils::PrintMessage("WTF? Signal handler called for a signal it doesn't know?");
+        NoUtils::printMessage("WTF? Signal handler called for a signal it doesn't know?");
     }
 }
 
@@ -258,8 +258,8 @@ int main(int argc, char** argv)
     }
 
     if (optind < argc) {
-        NoUtils::PrintError("Specifying a config file as an argument isn't supported anymore.");
-        NoUtils::PrintError("Use --datadir instead.");
+        NoUtils::printError("Specifying a config file as an argument isn't supported anymore.");
+        NoUtils::printError("Use --datadir instead.");
         return 1;
     }
 
@@ -277,17 +277,17 @@ int main(int argc, char** argv)
 
     if (bMakePass) {
         NoString sSalt;
-        NoUtils::PrintMessage("Type your new password.");
-        NoString sHash = NoUtils::GetSaltedHashPass(sSalt);
-        NoUtils::PrintMessage("Kill ZNC process, if it's running.");
-        NoUtils::PrintMessage("Then replace password in the <User> section of your config with this:");
+        NoUtils::printMessage("Type your new password.");
+        NoString sHash = NoUtils::getSaltedHashPass(sSalt);
+        NoUtils::printMessage("Kill ZNC process, if it's running.");
+        NoUtils::printMessage("Then replace password in the <User> section of your config with this:");
         // Not PrintMessage(), to remove [**] from the beginning, to ease copypasting
         std::cout << "<Pass password>" << std::endl;
         std::cout << "\tMethod = " << NoUtils::sDefaultHash << std::endl;
         std::cout << "\tHash = " << sHash << std::endl;
         std::cout << "\tSalt = " << sSalt << std::endl;
         std::cout << "</Pass>" << std::endl;
-        NoUtils::PrintMessage("After that start ZNC again, and you should be able to login with the new password.");
+        NoUtils::printMessage("After that start ZNC again, and you should be able to login with the new password.");
 
         NoApp::DestroyInstance();
         return 0;
@@ -297,32 +297,32 @@ int main(int argc, char** argv)
         std::set<NoModuleInfo> ssGlobalMods;
         std::set<NoModuleInfo> ssUserMods;
         std::set<NoModuleInfo> ssNetworkMods;
-        NoUtils::PrintAction("Checking for list of available modules");
+        NoUtils::printAction("Checking for list of available modules");
         pZNC->GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
         pZNC->GetModules().GetAvailableMods(ssUserMods, No::UserModule);
         pZNC->GetModules().GetAvailableMods(ssNetworkMods, No::NetworkModule);
         if (ssGlobalMods.empty() && ssUserMods.empty() && ssNetworkMods.empty()) {
-            NoUtils::PrintStatus(false, "");
-            NoUtils::PrintError("No modules found. Perhaps you didn't install ZNC properly?");
-            NoUtils::PrintError("Read http://wiki.znc.in/Installation for instructions.");
-            if (!NoUtils::GetBoolInput("Do you really want to run ZNC without any modules?", false)) {
+            NoUtils::printStatus(false, "");
+            NoUtils::printError("No modules found. Perhaps you didn't install ZNC properly?");
+            NoUtils::printError("Read http://wiki.znc.in/Installation for instructions.");
+            if (!NoUtils::getBoolInput("Do you really want to run ZNC without any modules?", false)) {
                 NoApp::DestroyInstance();
                 return 1;
             }
         }
-        NoUtils::PrintStatus(true, "");
+        NoUtils::printStatus(true, "");
     }
 
     if (isRoot()) {
-        NoUtils::PrintError("You are running ZNC as root! Don't do that! There are not many valid");
-        NoUtils::PrintError("reasons for this and it can, in theory, cause great damage!");
+        NoUtils::printError("You are running ZNC as root! Don't do that! There are not many valid");
+        NoUtils::printError("reasons for this and it can, in theory, cause great damage!");
         if (!bAllowRoot) {
             NoApp::DestroyInstance();
             return 1;
         }
-        NoUtils::PrintError("You have been warned.");
-        NoUtils::PrintError("Hit CTRL+C now if you don't want to run ZNC as root.");
-        NoUtils::PrintError("ZNC will start in 30 seconds.");
+        NoUtils::printError("You have been warned.");
+        NoUtils::printError("Hit CTRL+C now if you don't want to run ZNC as root.");
+        NoUtils::printError("ZNC will start in 30 seconds.");
         sleep(30);
     }
 
@@ -336,40 +336,40 @@ int main(int argc, char** argv)
 
     NoString sConfigError;
     if (!pZNC->ParseConfig(sConfig, sConfigError)) {
-        NoUtils::PrintError("Unrecoverable config error.");
+        NoUtils::printError("Unrecoverable config error.");
         NoApp::DestroyInstance();
         return 1;
     }
 
     if (!pZNC->OnBoot()) {
-        NoUtils::PrintError("Exiting due to module boot errors.");
+        NoUtils::printError("Exiting due to module boot errors.");
         NoApp::DestroyInstance();
         return 1;
     }
 
     if (bForeground) {
         int iPid = getpid();
-        NoUtils::PrintMessage("Staying open for debugging [pid: " + NoString(iPid) + "]");
+        NoUtils::printMessage("Staying open for debugging [pid: " + NoString(iPid) + "]");
 
         pZNC->WritePidFile(iPid);
-        NoUtils::PrintMessage(NoApp::GetTag());
+        NoUtils::printMessage(NoApp::GetTag());
     } else {
-        NoUtils::PrintAction("Forking into the background");
+        NoUtils::printAction("Forking into the background");
 
         int iPid = fork();
 
         if (iPid == -1) {
-            NoUtils::PrintStatus(false, strerror(errno));
+            NoUtils::printStatus(false, strerror(errno));
             NoApp::DestroyInstance();
             return 1;
         }
 
         if (iPid > 0) {
             // We are the parent. We are done and will go to bed.
-            NoUtils::PrintStatus(true, "[pid: " + NoString(iPid) + "]");
+            NoUtils::printStatus(true, "[pid: " + NoString(iPid) + "]");
 
             pZNC->WritePidFile(iPid);
-            NoUtils::PrintMessage(NoApp::GetTag());
+            NoUtils::printMessage(NoApp::GetTag());
             /* Don't destroy pZNC here or it will delete the pid file. */
             return 0;
         }
@@ -379,7 +379,7 @@ int main(int argc, char** argv)
          *   call to avoid race condition with parent exiting.
          */
         if (!pZNC->WaitForChildLock()) {
-            NoUtils::PrintError("Child was unable to obtain lock on config file.");
+            NoUtils::printError("Child was unable to obtain lock on config file.");
             NoApp::DestroyInstance();
             return 1;
         }
@@ -445,7 +445,7 @@ int main(int argc, char** argv)
 
             NoApp::DestroyInstance();
             execvp(args[0], args);
-            NoUtils::PrintError("Unable to restart ZNC [" + NoString(strerror(errno)) + "]");
+            NoUtils::printError("Unable to restart ZNC [" + NoString(strerror(errno)) + "]");
         } /* Fall through */
         default:
             iRet = 1;

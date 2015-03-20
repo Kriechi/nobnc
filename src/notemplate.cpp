@@ -525,7 +525,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         m_spOptions->Parse(sArgs);
                     } else if (sAction.equals("ADDROW")) {
                         NoString sLoopName = sArgs.token(0);
-                        NoStringMap msRow = NoUtils::OptionSplit(sArgs.tokens(1, " "));
+                        NoStringMap msRow = NoUtils::optionSplit(sArgs.tokens(1, " "));
                         if (!msRow.empty()) {
                             NoTemplate& NewRow = AddRow(sLoopName);
 
@@ -539,7 +539,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
                         (*this)[sName] = sValue;
                     } else if (sAction.equals("JOIN")) {
-                        NoStringVector vsArgs = NoUtils::QuoteSplit(sArgs);
+                        NoStringVector vsArgs = NoUtils::quoteSplit(sArgs);
                         if (vsArgs.size() > 1) {
                             NoString sDelim = vsArgs[0].trim_n("\"");
                             bool bFoundOne = false;
@@ -960,7 +960,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
     while (SafeReplace(sRest, "= ", "=", "\"", "\"")) {
     }
 
-    NoStringVector vArgs = NoUtils::QuoteSplit(sRest);
+    NoStringVector vArgs = NoUtils::quoteSplit(sRest);
     NoStringMap msArgs;
 
     for (NoString& sArg : vArgs) {

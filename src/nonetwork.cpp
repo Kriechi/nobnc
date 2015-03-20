@@ -408,8 +408,8 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
 
     pConfig->FindStringVector("server", vsList);
     for (const NoString& sServer : vsList) {
-        NoUtils::PrintAction("Adding server [" + sServer + "]");
-        NoUtils::PrintStatus(AddServer(sServer));
+        NoUtils::printAction("Adding server [" + sServer + "]");
+        NoUtils::printStatus(AddServer(sServer));
     }
 
     pConfig->FindStringVector("trustedserverfingerprint", vsList);
@@ -434,7 +434,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in config for User [" + m_pUser->GetUserName() + "], Network [" + GetName() +
                      "], Channel [" + sChanName + "]!";
-            NoUtils::PrintError(sError);
+            NoUtils::printError(sError);
 
             NoApp::DumpConfig(pSubConf);
             return false;
@@ -445,7 +445,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
         sError = pChan->getName();
         if (!AddChan(pChan)) {
             sError = "Channel [" + sError + "] defined more than once";
-            NoUtils::PrintError(sError);
+            NoUtils::printError(sError);
             return false;
         }
         sError.clear();
@@ -1460,12 +1460,12 @@ NoString& NoNetwork::ExpandString(const NoString& sStr, NoString& sRet) const
 
 bool NoNetwork::LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError)
 {
-    NoUtils::PrintAction(sNotice);
+    NoUtils::printAction(sNotice);
     NoString sModRet;
 
     bool bModRet = GetModules().LoadModule(sModName, sArgs, No::NetworkModule, GetUser(), this, sModRet);
 
-    NoUtils::PrintStatus(bModRet, sModRet);
+    NoUtils::printStatus(bModRet, sModRet);
     if (!bModRet) {
         sError = sModRet;
     }

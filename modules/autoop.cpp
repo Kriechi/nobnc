@@ -551,7 +551,7 @@ public:
         }
 
         NoString sResponse = pUser->GetUserKey() + "::" + sChallenge;
-        PutIRC("NOTICE " + Nick.nick() + " :!ZNCAO RESPONSE " + NoUtils::MD5(sResponse));
+        PutIRC("NOTICE " + Nick.nick() + " :!ZNCAO RESPONSE " + NoUtils::md5(sResponse));
         return false;
     }
 
@@ -569,7 +569,7 @@ public:
 
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             if (it->second->HostMatches(Nick.hostMask())) {
-                if (sResponse == NoUtils::MD5(it->second->GetUserKey() + "::" + sChallenge)) {
+                if (sResponse == NoUtils::md5(it->second->GetUserKey() + "::" + sChallenge)) {
                     OpUser(Nick, *it->second);
                     return true;
                 } else {
@@ -604,7 +604,7 @@ public:
 
         // Now issue challenges for the new users in the queue
         for (NoStringMap::iterator it = m_msQueue.begin(); it != m_msQueue.end(); ++it) {
-            it->second = NoUtils::RandomString(AUTOOP_CHALLENGE_LENGTH);
+            it->second = NoUtils::randomString(AUTOOP_CHALLENGE_LENGTH);
             PutIRC("NOTICE " + it->first + " :!ZNCAO CHALLENGE " + it->second);
         }
     }

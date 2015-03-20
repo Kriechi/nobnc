@@ -361,7 +361,7 @@ class NoAdminMod : public NoModule
             pUser->SetAutoClearQueryBuffer(b);
             PutModule("AutoClearQueryBuffer = " + NoString(b));
         } else if (sVar == "password") {
-            const NoString sSalt = NoUtils::GetSalt();
+            const NoString sSalt = NoUtils::salt();
             const NoString sHash = NoUser::SaltedHash(sValue, sSalt);
             pUser->SetPass(sHash, NoUser::HASH_DEFAULT, sSalt);
             PutModule("Password has been changed!");
@@ -827,7 +827,7 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pNewUser = new NoUser(sUsername);
-        NoString sSalt = NoUtils::GetSalt();
+        NoString sSalt = NoUtils::salt();
         pNewUser->SetPass(NoUser::SaltedHash(sPassword, sSalt), NoUser::HASH_DEFAULT, sSalt);
 
         NoString sErr;

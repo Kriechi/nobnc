@@ -907,11 +907,11 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
 
     NoString sSessionID;
     do {
-        sSessionID = NoUtils::RandomString(32);
+        sSessionID = NoUtils::randomString(32);
         sSessionID += ":" + GetRemoteIP() + ":" + NoString(GetRemotePort());
         sSessionID += ":" + GetLocalIP() + ":" + NoString(GetLocalPort());
         sSessionID += ":" + NoString(time(nullptr));
-        sSessionID = NoUtils::SHA256(sSessionID);
+        sSessionID = NoUtils::sha256(sSessionID);
 
         NO_DEBUG("Auto generated session: [" + sSessionID + "]");
     } while (Sessions.m_mspSessions.HasItem(sSessionID));
@@ -927,7 +927,7 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
 NoString NoWebSocket::GetCSRFCheck()
 {
     std::shared_ptr<NoWebSession> pSession = GetSession();
-    return NoUtils::MD5(pSession->GetId());
+    return NoUtils::md5(pSession->GetId());
 }
 
 bool NoWebSocket::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic)

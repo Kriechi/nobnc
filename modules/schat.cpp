@@ -180,7 +180,7 @@ public:
             std::stringstream s;
             s << "PRIVMSG " << sArgs << " :\001";
             s << "DCC SCHAT chat ";
-            s << NoUtils::GetLongIP(GetUser()->GetLocalDCCIP());
+            s << NoUtils::formatLongIp(GetUser()->GetLocalDCCIP());
             s << " " << iPort << "\001";
 
             PutIRC(s.str());
@@ -316,7 +316,7 @@ public:
 
                 pTmp.first = iIP;
                 pTmp.second = iPort;
-                sMask = "(s)" + Nick.nick() + "!" + "(s)" + Nick.nick() + "@" + NoUtils::GetIP(iIP);
+                sMask = "(s)" + Nick.nick() + "!" + "(s)" + Nick.nick() + "@" + NoUtils::formatIp(iIP);
 
                 m_siiWaitingChats["(s)" + Nick.nick()] = pTmp;
                 SendToUser(sMask, "*** Incoming DCC SCHAT, Accept ? (yes/no)");
@@ -333,8 +333,8 @@ public:
 
     void AcceptSDCC(const NoString& sNick, u_long iIP, u_short iPort)
     {
-        NoSChatSock* p = new NoSChatSock(this, sNick, NoUtils::GetIP(iIP), iPort, 60);
-        GetManager()->Connect(NoUtils::GetIP(iIP), iPort, p->GetSockName(), 60, true, GetUser()->GetLocalDCCIP(), p);
+        NoSChatSock* p = new NoSChatSock(this, sNick, NoUtils::formatIp(iIP), iPort, 60);
+        GetManager()->Connect(NoUtils::formatIp(iIP), iPort, p->GetSockName(), 60, true, GetUser()->GetLocalDCCIP(), p);
         RemTimer("Remove " + sNick); // delete any associated timer to this nick
     }
 
@@ -349,7 +349,7 @@ public:
 
                 if (it != m_siiWaitingChats.end()) {
                     if (!sMessage.equals("yes"))
-                        SendToUser(sTarget + "!" + sTarget + "@" + NoUtils::GetIP(it->second.first),
+                        SendToUser(sTarget + "!" + sTarget + "@" + NoUtils::formatIp(it->second.first),
                                    "Refusing to accept DCC SCHAT!");
                     else
                         AcceptSDCC(sTarget, it->second.first, it->second.second);
