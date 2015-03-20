@@ -69,10 +69,10 @@ public:
     bool AddTrustedProxy(const NoString& sHost);
     bool RemTrustedProxy(const NoString& sHost);
     void Broadcast(const NoString& sMessage, bool bAdminOnly = false, NoUser* pSkipUser = nullptr, NoClient* pSkipClient = nullptr);
-    void AddBytesRead(ulonglong u) { m_uBytesRead += u; }
-    void AddBytesWritten(ulonglong u) { m_uBytesWritten += u; }
-    ulonglong BytesRead() const { return m_uBytesRead; }
-    ulonglong BytesWritten() const { return m_uBytesWritten; }
+    void AddBytesRead(ulonglong u);
+    void AddBytesWritten(ulonglong u);
+    ulonglong BytesRead() const;
+    ulonglong BytesWritten() const;
 
     typedef std::pair<ulonglong, ulonglong> TrafficStatsPair;
     typedef std::map<NoString, TrafficStatsPair> TrafficStatsMap;
@@ -85,22 +85,22 @@ public:
     // The result is passed back via callbacks to NoAuthBase.
     void AuthUser(std::shared_ptr<NoAuthBase> AuthClass);
 
-    void SetConfigState(ConfigState e) { m_eConfigState = e; }
-    void SetSkinName(const NoString& s) { m_sSkinName = s; }
-    void SetStatusPrefix(const NoString& s) { m_sStatusPrefix = (s.empty()) ? "*" : s; }
-    void SetMaxBufferSize(uint i) { m_uiMaxBufferSize = i; }
-    void SetAnonIPLimit(uint i) { m_uiAnonIPLimit = i; }
-    void SetServerThrottle(uint i) { m_sConnectThrottle.SetTTL(i * 1000); }
-    void SetProtectWebSessions(bool b) { m_bProtectWebSessions = b; }
-    void SetHideVersion(bool b) { m_bHideVersion = b; }
+    void SetConfigState(ConfigState e);
+    void SetSkinName(const NoString& s);
+    void SetStatusPrefix(const NoString& s);
+    void SetMaxBufferSize(uint i);
+    void SetAnonIPLimit(uint i);
+    void SetServerThrottle(uint i);
+    void SetProtectWebSessions(bool b);
+    void SetHideVersion(bool b);
     void SetConnectDelay(uint i);
 
-    ConfigState GetConfigState() const { return m_eConfigState; }
-    NoSocketManager& GetManager() { return m_Manager; }
-    const NoSocketManager& GetManager() const { return m_Manager; }
-    NoModules& GetModules() { return *m_pModules; }
-    NoString GetSkinName() const { return m_sSkinName; }
-    const NoString& GetStatusPrefix() const { return m_sStatusPrefix; }
+    ConfigState GetConfigState() const;
+    NoSocketManager& GetManager();
+    const NoSocketManager& GetManager() const;
+    NoModules& GetModules();
+    NoString GetSkinName() const;
+    const NoString& GetStatusPrefix() const;
     const NoString& GetCurPath() const;
     const NoString& GetHomePath() const;
     const NoString& GetZNCPath() const;
@@ -108,23 +108,20 @@ public:
     NoString GetUserPath() const;
     NoString GetModPath() const;
     NoString GetPemLocation() const;
-    const NoString& GetConfigFile() const { return m_sConfigFile; }
+    const NoString& GetConfigFile() const;
     bool WritePemFile();
-    const NoStringVector& GetBindHosts() const { return m_vsBindHosts; }
-    const NoStringVector& GetTrustedProxies() const { return m_vsTrustedProxies; }
-    const std::vector<NoListener*>& GetListeners() const { return m_vpListeners; }
-    time_t TimeStarted() const { return m_TimeStarted; }
-    uint GetMaxBufferSize() const { return m_uiMaxBufferSize; }
-    uint GetAnonIPLimit() const { return m_uiAnonIPLimit; }
-    uint GetServerThrottle() const { return m_sConnectThrottle.GetTTL() / 1000; }
-    uint GetConnectDelay() const { return m_uiConnectDelay; }
-    bool GetProtectWebSessions() const { return m_bProtectWebSessions; }
-    bool GetHideVersion() const { return m_bHideVersion; }
-    NoString GetSSLCiphers() const { return m_sSSLCiphers; }
-    uint GetDisabledSSLProtocols() const
-    {
-        return m_uDisabledSSLProtocols;
-    }
+    const NoStringVector& GetBindHosts() const;
+    const NoStringVector& GetTrustedProxies() const;
+    const std::vector<NoListener*>& GetListeners() const;
+    time_t TimeStarted() const;
+    uint GetMaxBufferSize() const;
+    uint GetAnonIPLimit() const;
+    uint GetServerThrottle() const;
+    uint GetConnectDelay() const;
+    bool GetProtectWebSessions() const;
+    bool GetHideVersion() const;
+    NoString GetSSLCiphers() const;
+    uint GetDisabledSSLProtocols() const;
 
     static void CreateInstance();
     static NoApp& Get();
@@ -144,7 +141,7 @@ public:
 
     bool DeleteUser(const NoString& sUsername);
     bool AddUser(NoUser* pUser, NoString& sErrorRet);
-    const std::map<NoString, NoUser*>& GetUserMap() const { return (m_msUsers); }
+    const std::map<NoString, NoUser*>& GetUserMap() const;
 
     NoListener* FindListener(u_short uPort, const NoString& BindHost, No::AddressType eAddr);
     bool AddListener(NoListener*);
@@ -157,29 +154,16 @@ public:
                      NoString& sError);
     bool DelListener(NoListener*);
 
-    void SetMotd(const NoString& sMessage)
-    {
-        ClearMotd();
-        AddMotd(sMessage);
-    }
-    void AddMotd(const NoString& sMessage)
-    {
-        if (!sMessage.empty()) {
-            m_vsMotd.push_back(sMessage);
-        }
-    }
-    void ClearMotd() { m_vsMotd.clear(); }
-    const NoStringVector& GetMotd() const { return m_vsMotd; }
+    void SetMotd(const NoString& sMessage);
+    void AddMotd(const NoString& sMessage);
+    void ClearMotd();
+    const NoStringVector& GetMotd() const;
 
-    void AddServerThrottle(NoString sName) { m_sConnectThrottle.AddItem(sName, true); }
-    bool GetServerThrottle(NoString sName)
-    {
-        bool* b = m_sConnectThrottle.GetItem(sName);
-        return (b && *b);
-    }
+    void AddServerThrottle(NoString sName);
+    bool GetServerThrottle(NoString sName);
 
     void AddNetworkToQueue(NoNetwork* pNetwork);
-    std::list<NoNetwork*>& GetConnectionQueue() { return m_lpConnectQueue; }
+    std::list<NoNetwork*>& GetConnectionQueue();
 
     void EnableConnectQueue();
     void DisableConnectQueue();

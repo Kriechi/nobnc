@@ -387,6 +387,33 @@ bool NoApp::WritePemFile()
 #endif
 }
 
+const NoStringVector&NoApp::GetBindHosts() const { return m_vsBindHosts; }
+
+const NoStringVector&NoApp::GetTrustedProxies() const { return m_vsTrustedProxies; }
+
+const std::vector<NoListener*>&NoApp::GetListeners() const { return m_vpListeners; }
+
+time_t NoApp::TimeStarted() const { return m_TimeStarted; }
+
+uint NoApp::GetMaxBufferSize() const { return m_uiMaxBufferSize; }
+
+uint NoApp::GetAnonIPLimit() const { return m_uiAnonIPLimit; }
+
+uint NoApp::GetServerThrottle() const { return m_sConnectThrottle.GetTTL() / 1000; }
+
+uint NoApp::GetConnectDelay() const { return m_uiConnectDelay; }
+
+bool NoApp::GetProtectWebSessions() const { return m_bProtectWebSessions; }
+
+bool NoApp::GetHideVersion() const { return m_bHideVersion; }
+
+NoString NoApp::GetSSLCiphers() const { return m_sSSLCiphers; }
+
+uint NoApp::GetDisabledSSLProtocols() const
+{
+    return m_uDisabledSSLProtocols;
+}
+
 void NoApp::DeleteUsers()
 {
     for (const auto& it : m_msUsers) {
@@ -482,6 +509,8 @@ const NoString& NoApp::GetZNCPath() const
 }
 
 NoString NoApp::GetPemLocation() const { return NoDir::ChangeDir("", m_sSSLCertFile); }
+
+const NoString&NoApp::GetConfigFile() const { return m_sConfigFile; }
 
 NoString NoApp::ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir)
 {
@@ -1465,6 +1494,14 @@ void NoApp::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUs
     }
 }
 
+void NoApp::AddBytesRead(ulonglong u) { m_uBytesRead += u; }
+
+void NoApp::AddBytesWritten(ulonglong u) { m_uBytesWritten += u; }
+
+ulonglong NoApp::BytesRead() const { return m_uBytesRead; }
+
+ulonglong NoApp::BytesWritten() const { return m_uBytesWritten; }
+
 NoModule* NoApp::FindModule(const NoString& sModName, const NoString& sUsername)
 {
     if (sUsername.empty()) {
@@ -1605,6 +1642,8 @@ bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
     m_msUsers[pUser->GetUserName()] = pUser;
     return true;
 }
+
+const std::map<NoString, NoUser*>&NoApp::GetUserMap() const { return (m_msUsers); }
 
 NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, No::AddressType eAddr)
 {
@@ -1839,6 +1878,31 @@ bool NoApp::DelListener(NoListener* pListener)
     return false;
 }
 
+void NoApp::SetMotd(const NoString& sMessage)
+{
+    ClearMotd();
+    AddMotd(sMessage);
+}
+
+void NoApp::AddMotd(const NoString& sMessage)
+{
+    if (!sMessage.empty()) {
+        m_vsMotd.push_back(sMessage);
+    }
+}
+
+void NoApp::ClearMotd() { m_vsMotd.clear(); }
+
+const NoStringVector&NoApp::GetMotd() const { return m_vsMotd; }
+
+void NoApp::AddServerThrottle(NoString sName) { m_sConnectThrottle.AddItem(sName, true); }
+
+bool NoApp::GetServerThrottle(NoString sName)
+{
+    bool* b = m_sConnectThrottle.GetItem(sName);
+    return (b && *b);
+}
+
 static NoApp* s_pZNC = nullptr;
 
 void NoApp::CreateInstance()
@@ -1922,6 +1986,22 @@ void NoApp::AuthUser(std::shared_ptr<NoAuthBase> AuthClass)
     AuthClass->AcceptLogin(*pUser);
 }
 
+void NoApp::SetConfigState(NoApp::ConfigState e) { m_eConfigState = e; }
+
+void NoApp::SetSkinName(const NoString& s) { m_sSkinName = s; }
+
+void NoApp::SetStatusPrefix(const NoString& s) { m_sStatusPrefix = (s.empty()) ? "*" : s; }
+
+void NoApp::SetMaxBufferSize(uint i) { m_uiMaxBufferSize = i; }
+
+void NoApp::SetAnonIPLimit(uint i) { m_uiAnonIPLimit = i; }
+
+void NoApp::SetServerThrottle(uint i) { m_sConnectThrottle.SetTTL(i * 1000); }
+
+void NoApp::SetProtectWebSessions(bool b) { m_bProtectWebSessions = b; }
+
+void NoApp::SetHideVersion(bool b) { m_bHideVersion = b; }
+
 class NoConnectQueueTimer : public CCron
 {
 public:
@@ -1994,6 +2074,18 @@ void NoApp::SetConnectDelay(uint i)
     m_uiConnectDelay = i;
 }
 
+NoApp::ConfigState NoApp::GetConfigState() const { return m_eConfigState; }
+
+NoSocketManager&NoApp::GetManager() { return m_Manager; }
+
+const NoSocketManager&NoApp::GetManager() const { return m_Manager; }
+
+NoModules&NoApp::GetModules() { return *m_pModules; }
+
+NoString NoApp::GetSkinName() const { return m_sSkinName; }
+
+const NoString&NoApp::GetStatusPrefix() const { return m_sStatusPrefix; }
+
 void NoApp::EnableConnectQueue()
 {
     if (!m_pConnectQueueTimer && !m_uiConnectPaused && !m_lpConnectQueue.empty()) {
@@ -2042,6 +2134,8 @@ void NoApp::AddNetworkToQueue(NoNetwork* pNetwork)
     m_lpConnectQueue.push_back(pNetwork);
     EnableConnectQueue();
 }
+
+std::list<NoNetwork*>&NoApp::GetConnectionQueue() { return m_lpConnectQueue; }
 
 void NoApp::LeakConnectQueueTimer(NoConnectQueueTimer* pTimer)
 {
