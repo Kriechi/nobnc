@@ -19,7 +19,73 @@
 #include "nodir.h"
 #include "nodebug.h"
 #include "noutils.h"
+#include "noescape.h"
 #include <algorithm>
+
+class NoTemplateOptions
+{
+public:
+    NoTemplateOptions() : m_eEscapeFrom(No::AsciiFormat), m_eEscapeTo(No::AsciiFormat) {}
+
+    virtual ~NoTemplateOptions() {}
+
+    void Parse(const NoString& sLine);
+
+    No::EscapeFormat GetEscapeFrom() const { return m_eEscapeFrom; }
+    No::EscapeFormat GetEscapeTo() const { return m_eEscapeTo; }
+
+private:
+    No::EscapeFormat m_eEscapeFrom;
+    No::EscapeFormat m_eEscapeTo;
+};
+
+class NoTemplateLoopContext
+{
+public:
+    NoTemplateLoopContext(ulong uFilePos, const NoString& sLoopName, bool bReverse, std::vector<NoTemplate*>* pRows)
+        : m_bReverse(bReverse), m_bHasData(false), m_sName(sLoopName), m_uRowIndex(0), m_uFilePosition(uFilePos),
+          m_pvRows(pRows)
+    {
+    }
+
+    virtual ~NoTemplateLoopContext() {}
+
+    NoTemplateLoopContext(const NoTemplateLoopContext&) = default;
+    NoTemplateLoopContext& operator=(const NoTemplateLoopContext&) = default;
+
+    void SetHasData(bool b = true) { m_bHasData = b; }
+    void SetName(const NoString& s) { m_sName = s; }
+    void SetRowIndex(uint u) { m_uRowIndex = u; }
+    uint IncRowIndex() { return ++m_uRowIndex; }
+    uint DecRowIndex()
+    {
+        if (m_uRowIndex == 0) {
+            return 0;
+        }
+        return --m_uRowIndex;
+    }
+    void SetFilePosition(uint u) { m_uFilePosition = u; }
+
+    bool HasData() const { return m_bHasData; }
+    const NoString& GetName() const { return m_sName; }
+    ulong GetFilePosition() const { return m_uFilePosition; }
+    uint GetRowIndex() const { return m_uRowIndex; }
+    size_t GetRowCount() { return m_pvRows->size(); }
+    std::vector<NoTemplate*>* GetRows() { return m_pvRows; }
+    NoTemplate* GetNextRow() { return GetRow(IncRowIndex()); }
+    NoTemplate* GetCurRow() { return GetRow(m_uRowIndex); }
+
+    NoTemplate* GetRow(uint uIndex);
+    NoString GetValue(const NoString& sName, bool bFromIf = false);
+
+private:
+    bool m_bReverse; //!< Iterate through this loop in reverse order
+    bool m_bHasData; //!< Tells whether this loop has real data or not
+    NoString m_sName; //!< The name portion of the <?LOOP name?> tag
+    uint m_uRowIndex; //!< The index of the current row we're on
+    ulong m_uFilePosition; //!< The file position of the opening <?LOOP?> tag
+    std::vector<NoTemplate*>* m_pvRows; //!< This holds pointers to the templates associated with this loop
+};
 
 static No::EscapeFormat ToEscapeFormat(const NoString& sEsc)
 {
@@ -138,6 +204,20 @@ NoString NoTemplateLoopContext::GetValue(const NoString& sName, bool bFromIf)
     return pTemplate->GetValue(sName, bFromIf);
 }
 
+NoTemplate::NoTemplate() : NoTemplate("") {}
+
+NoTemplate::NoTemplate(const NoString& sFileName)
+    : NoStringMap(), m_pParent(nullptr), m_sFileName(sFileName), m_lsbPaths(), m_mvLoops(), m_vLoopContexts(),
+      m_spOptions(new NoTemplateOptions), m_vspTagHandlers()
+{
+}
+
+NoTemplate::NoTemplate(const std::shared_ptr<NoTemplateOptions>& Options, NoTemplate* pParent)
+    : NoStringMap(), m_pParent(pParent), m_sFileName(""), m_lsbPaths(), m_mvLoops(), m_vLoopContexts(),
+      m_spOptions(Options), m_vspTagHandlers()
+{
+}
+
 NoTemplate::~NoTemplate()
 {
     for (const auto& it : m_mvLoops) {
@@ -150,6 +230,17 @@ NoTemplate::~NoTemplate()
     for (NoTemplateLoopContext* pContext : m_vLoopContexts) {
         delete pContext;
     }
+}
+
+void NoTemplate::AddTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler) { m_vspTagHandlers.push_back(spTagHandler); }
+
+std::vector<std::shared_ptr<NoTemplateTagHandler> >&NoTemplate::GetTagHandlers()
+{
+    if (m_pParent) {
+        return m_pParent->GetTagHandlers();
+    }
+
+    return m_vspTagHandlers;
 }
 
 void NoTemplate::Init()
@@ -841,6 +932,8 @@ NoTemplate* NoTemplate::GetCurTemplate()
 
     return pContext->GetCurRow();
 }
+
+const NoString& NoTemplate::GetFileName() const { return m_sFileName; }
 
 NoString NoTemplate::ResolveLiteral(const NoString& sString)
 {

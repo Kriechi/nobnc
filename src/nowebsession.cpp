@@ -26,6 +26,7 @@
 #include "nonetwork.h"
 #include "nodebug.h"
 #include "noapp.h"
+#include "noescape.h"
 #include <algorithm>
 
 /// @todo Do we want to make this a configure option?
