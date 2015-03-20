@@ -25,6 +25,7 @@
 #include <no/notimer.h>
 #include <no/nomodulecall.h>
 #include <no/nomoduleinfo.h>
+#include <no/nomodulecommand.h>
 #include <functional>
 #include <set>
 #include <queue>
@@ -114,61 +115,6 @@ class NoChannel;
 class NoModule;
 class NoSocketManager;
 class NoModuleJob;
-
-/** A helper class for handling commands in modules. */
-class NO_EXPORT NoModCommand
-{
-public:
-    /// Type for the callback function that handles the actual command.
-    typedef void (NoModule::*ModCmdFunc)(const NoString& sLine);
-    typedef std::function<void(const NoString& sLine)> CmdFunc;
-
-    /// Default constructor, needed so that this can be saved in a std::map.
-    NoModCommand();
-
-    /** Construct a new NoModCommand.
-     * @param sCmd The name of the command.
-     * @param func The command's callback function.
-     * @param sArgs Help text describing the arguments to this command.
-     * @param sDesc Help text describing what this command does.
-     */
-    NoModCommand(const NoString& sCmd, NoModule* pMod, ModCmdFunc func, const NoString& sArgs, const NoString& sDesc);
-    NoModCommand(const NoString& sCmd, CmdFunc func, const NoString& sArgs, const NoString& sDesc);
-
-    /** Copy constructor, needed so that this can be saved in a std::map.
-     * @param other Object to copy from.
-     */
-    NoModCommand(const NoModCommand& other);
-
-    /** Assignment operator, needed so that this can be saved in a std::map.
-     * @param other Object to copy from.
-     */
-    NoModCommand& operator=(const NoModCommand& other);
-
-    /** Initialize a NoTable so that it can be used with AddHelp().
-     * @param Table The instance of NoTable to initialize.
-     */
-    static void InitHelp(NoTable& Table);
-
-    /** Add this command to the NoTable instance.
-     * @param Table Instance of NoTable to which this should be added.
-     * @warning The Table should be initialized via InitHelp().
-     */
-    void AddHelp(NoTable& Table) const;
-
-    const NoString& GetCommand() const { return m_sCmd; }
-    CmdFunc GetFunction() const { return m_pFunc; }
-    const NoString& GetArgs() const { return m_sArgs; }
-    const NoString& GetDescription() const { return m_sDesc; }
-
-    void Call(const NoString& sLine) const { m_pFunc(sLine); }
-
-private:
-    NoString m_sCmd;
-    CmdFunc m_pFunc;
-    NoString m_sArgs;
-    NoString m_sDesc;
-};
 
 /** The base class for your own ZNC modules.
  *
