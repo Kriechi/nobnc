@@ -36,7 +36,6 @@ public:
         SetName("NoUserTimer::" + m_pUser->GetUserName());
         Start(NoNetwork::PING_SLACK);
     }
-    virtual ~NoUserTimer() {}
 
     NoUserTimer(const NoUserTimer&) = delete;
     NoUserTimer& operator=(const NoUserTimer&) = delete;

@@ -38,8 +38,6 @@ public:
         Start(NoNetwork::PING_SLACK);
     }
 
-    virtual ~NoNetworkPingTimer() {}
-
     NoNetworkPingTimer(const NoNetworkPingTimer&) = delete;
     NoNetworkPingTimer& operator=(const NoNetworkPingTimer&) = delete;
 
@@ -72,8 +70,6 @@ public:
         SetName("NoNetworkJoinTimer::" + m_pNetwork->GetUser()->GetUserName() + "::" + m_pNetwork->GetName());
         Start(NoNetwork::JOIN_FREQUENCY);
     }
-
-    virtual ~NoNetworkJoinTimer() {}
 
     NoNetworkJoinTimer(const NoNetworkJoinTimer&) = delete;
     NoNetworkJoinTimer& operator=(const NoNetworkJoinTimer&) = delete;

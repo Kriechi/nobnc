@@ -37,7 +37,6 @@ class NoIncomingConnection : public NoSocket
 {
 public:
     NoIncomingConnection(const NoString& sHostname, ushort uPort, NoListener::AcceptType eAcceptType, const NoString& sURIPrefix);
-    virtual ~NoIncomingConnection() {}
     void ReadLineImpl(const NoString& sData) override;
     void ReachedMaxBufferImpl() override;
 

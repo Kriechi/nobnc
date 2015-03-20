@@ -80,7 +80,6 @@ class NoWebAuth : public NoAuthBase
 {
 public:
     NoWebAuth(NoWebSock* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic);
-    virtual ~NoWebAuth() {}
 
     NoWebAuth(const NoWebAuth&) = delete;
     NoWebAuth& operator=(const NoWebAuth&) = delete;
