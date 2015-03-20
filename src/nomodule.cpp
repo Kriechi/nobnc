@@ -518,11 +518,11 @@ const NoString& NoModule::GetModDataDir() const { return m_sDataDir; }
 bool NoModule::OnWebPreRequest(NoWebSocket& WebSock, const NoString& sPageName) { return false; }
 bool NoModule::OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
 
-void NoModule::AddSubPage(TWebSubPage spSubPage) { m_vSubPages.push_back(spSubPage); }
+void NoModule::AddSubPage(TWebPage spSubPage) { m_vSubPages.push_back(spSubPage); }
 
 void NoModule::ClearSubPages() { m_vSubPages.clear(); }
 
-VWebSubPages& NoModule::GetSubPages() { return m_vSubPages; }
+VWebPages& NoModule::GetSubPages() { return m_vSubPages; }
 bool NoModule::OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
 // !Webmods
 

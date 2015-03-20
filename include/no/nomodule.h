@@ -233,14 +233,14 @@ public:
     /** Registers a sub page for the sidebar.
      *  @param spSubPage The SubPage instance.
      */
-    virtual void AddSubPage(TWebSubPage spSubPage);
+    virtual void AddSubPage(TWebPage spSubPage);
     /** Removes all registered (AddSubPage'd) SubPages.
      */
     virtual void ClearSubPages();
     /** Returns a list of all registered SubPages. Don't mess with it too much.
      *  @return The List.
      */
-    virtual VWebSubPages& GetSubPages();
+    virtual VWebPages& GetSubPages();
     /** Using this hook, module can embed web stuff directly to different places.
      *  This method is called whenever embededded modules I/O happens.
      *  Name of used .tmpl file (if any) is up to caller.
@@ -895,7 +895,7 @@ private:
 
 private:
     NoStringMap m_mssRegistry; //!< way to save name/value pairs. Note there is no encryption involved in this
-    VWebSubPages m_vSubPages;
+    VWebPages m_vSubPages;
     std::map<NoString, NoModuleCommand> m_mCommands;
 };
 

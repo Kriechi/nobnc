@@ -443,9 +443,9 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
             Row["Username"] = Module.GetUser()->GetUserName();
         }
 
-        VWebSubPages& vSubPages = Module.GetSubPages();
+        VWebPages& vSubPages = Module.GetSubPages();
 
-        for (TWebSubPage& SubPage : vSubPages) {
+        for (TWebPage& SubPage : vSubPages) {
             // bActive is whether or not the current url matches this subpage (params will be checked below)
             bool bActive = (m_sModName == Module.GetModName() && m_sPage == SubPage->GetName() && bActiveModule);
 
@@ -786,9 +786,9 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             return Deferred;
         }
 
-        VWebSubPages& vSubPages = pModule->GetSubPages();
+        VWebPages& vSubPages = pModule->GetSubPages();
 
-        for (TWebSubPage& SubPage : vSubPages) {
+        for (TWebPage& SubPage : vSubPages) {
             bool bActive = (m_sModName == pModule->GetModName() && m_sPage == SubPage->GetName());
 
             if (bActive && SubPage->RequiresAdmin() && !GetSession()->IsAdmin()) {

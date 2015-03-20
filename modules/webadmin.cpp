@@ -86,10 +86,10 @@ public:
     {
         NoStringPairVector vParams;
         vParams.push_back(std::make_pair("user", ""));
-        AddSubPage(std::make_shared<NoWebSubPage>("settings", "Global Settings", NoWebSubPage::Admin));
-        AddSubPage(std::make_shared<NoWebSubPage>("edituser", "Your Settings", vParams));
-        AddSubPage(std::make_shared<NoWebSubPage>("traffic", "Traffic Info", NoWebSubPage::Admin));
-        AddSubPage(std::make_shared<NoWebSubPage>("listusers", "Manage Users", NoWebSubPage::Admin));
+        AddSubPage(std::make_shared<NoWebPage>("settings", "Global Settings", NoWebPage::Admin));
+        AddSubPage(std::make_shared<NoWebPage>("edituser", "Your Settings", vParams));
+        AddSubPage(std::make_shared<NoWebPage>("traffic", "Traffic Info", NoWebPage::Admin));
+        AddSubPage(std::make_shared<NoWebPage>("listusers", "Manage Users", NoWebPage::Admin));
     }
 
     bool OnLoad(const NoString& sArgStr, NoString& sMessage) override

@@ -21,19 +21,19 @@
 #include <no/nostring.h>
 #include <memory>
 
-class NoWebSubPage;
-typedef std::shared_ptr<NoWebSubPage> TWebSubPage;
-typedef std::vector<TWebSubPage> VWebSubPages;
+class NoWebPage;
+typedef std::shared_ptr<NoWebPage> TWebPage;
+typedef std::vector<TWebPage> VWebPages;
 
-class NO_EXPORT NoWebSubPage
+class NO_EXPORT NoWebPage
 {
 public:
-    NoWebSubPage(const NoString& sName, const NoString& sTitle = "", uint uFlags = 0)
+    NoWebPage(const NoString& sName, const NoString& sTitle = "", uint uFlags = 0)
         : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams()
     {
     }
 
-    NoWebSubPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags = 0)
+    NoWebPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags = 0)
         : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams(vParams)
     {
     }
