@@ -17,6 +17,8 @@
 #include <no/nomodule.h>
 #include <no/noapp.h>
 #include <no/noclient.h>
+#include <no/notemplate.h>
+#include <no/nowebsocket.h>
 
 class NoNotesMod : public NoModule
 {

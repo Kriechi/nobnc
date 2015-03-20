@@ -16,6 +16,7 @@
 
 #include <no/nomodule.h>
 #include <no/nonetwork.h>
+#include <no/nowebsocket.h>
 
 class NoPerform : public NoModule
 {

@@ -14,93 +14,15 @@
  * limitations under the License.
  */
 
-#ifndef NOWEBMODULES_H
-#define NOWEBMODULES_H
+#ifndef NOWEBSOCKET_H
+#define NOWEBSOCKET_H
 
 #include <no/noglobal.h>
-#include <no/notemplate.h>
 #include <no/nohttpsocket.h>
-#include <no/noutils.h>
-#include <no/nocachemap.h>
+#include <no/notemplate.h>
 
+class NoWebSession;
 class NoAuthenticator;
-class NoUser;
-class NoWebSock;
-class NoModule;
-class NoWebSubPage;
-
-typedef std::shared_ptr<NoWebSubPage> TWebSubPage;
-typedef std::vector<TWebSubPage> VWebSubPages;
-
-class NO_EXPORT NoWebSession
-{
-public:
-    NoWebSession(const NoString& sId, const NoString& sIP);
-    ~NoWebSession();
-
-    NoWebSession(const NoWebSession&) = delete;
-    NoWebSession& operator=(const NoWebSession&) = delete;
-
-    const NoString& GetId() const { return m_sId; }
-    const NoString& GetIP() const { return m_sIP; }
-    NoUser* GetUser() const { return m_pUser; }
-    time_t GetLastActive() const { return m_tmLastActive; }
-    bool IsLoggedIn() const { return m_pUser != nullptr; }
-    bool IsAdmin() const;
-    void UpdateLastActive();
-
-    NoUser* SetUser(NoUser* p)
-    {
-        m_pUser = p;
-        return m_pUser;
-    }
-
-    void ClearMessageLoops();
-    void FillMessageLoops(NoTemplate& Tmpl);
-    size_t AddError(const NoString& sMessage);
-    size_t AddSuccess(const NoString& sMessage);
-
-private:
-    NoString m_sId;
-    NoString m_sIP;
-    NoUser* m_pUser;
-    NoStringVector m_vsErrorMsgs;
-    NoStringVector m_vsSuccessMsgs;
-    time_t m_tmLastActive;
-};
-
-
-class NO_EXPORT NoWebSubPage
-{
-public:
-    NoWebSubPage(const NoString& sName, const NoString& sTitle = "", uint uFlags = 0)
-        : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams()
-    {
-    }
-
-    NoWebSubPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags = 0)
-        : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams(vParams)
-    {
-    }
-
-    enum { Admin = 1 };
-
-    void SetName(const NoString& s) { m_sName = s; }
-    void SetTitle(const NoString& s) { m_sTitle = s; }
-    void AddParam(const NoString& sName, const NoString& sValue) { m_vParams.push_back(make_pair(sName, sValue)); }
-
-    bool RequiresAdmin() const { return m_uFlags & Admin; }
-
-    const NoString& GetName() const { return m_sName; }
-    const NoString& GetTitle() const { return m_sTitle; }
-    const NoStringPairVector& GetParams() const { return m_vParams; }
-
-private:
-    uint m_uFlags;
-    NoString m_sName;
-    NoString m_sTitle;
-    NoStringPairVector m_vParams;
-};
 
 class NO_EXPORT NoWebSock : public NoHttpSocket
 {
@@ -161,4 +83,4 @@ private:
     static const uint m_uiMaxSessions;
 };
 
-#endif // NOWEBMODULES_H
+#endif // NOWEBSOCKET_H

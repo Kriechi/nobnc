@@ -18,6 +18,7 @@
 #include <no/nouser.h>
 #include <no/noapp.h>
 #include <no/nosocket.h>
+#include <no/notemplate.h>
 
 class NoSocketSorter
 {

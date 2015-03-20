@@ -18,7 +18,7 @@
 #define NOMODULE_H
 
 #include <no/noglobal.h>
-#include <no/nowebmodules.h>
+#include <no/nowebpage.h>
 #include <no/noutils.h>
 #include <no/notable.h>
 #include <no/notimer.h>
@@ -39,6 +39,8 @@ class NoTemplate;
 class NoIrcConnection;
 class NoModule;
 class NoModuleInfo;
+class NoModuleSocket;
+class NoSocket;
 
 #ifdef REQUIRESSL
 #ifndef HAVE_LIBSSL

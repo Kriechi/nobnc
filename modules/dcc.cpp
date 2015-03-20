@@ -21,6 +21,7 @@
 #include <no/nodir.h>
 #include <no/nodebug.h>
 #include <no/noclient.h>
+#include <no/nomodulesocket.h>
 
 #include <netinet/in.h>
 #include <arpa/inet.h>

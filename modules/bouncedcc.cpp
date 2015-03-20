@@ -20,6 +20,7 @@
 #include <no/nodebug.h>
 #include <no/noclient.h>
 #include <no/noapp.h>
+#include <no/nomodulesocket.h>
 
 class NoBounceDccMod;
 

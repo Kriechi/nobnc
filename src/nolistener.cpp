@@ -18,6 +18,7 @@
 #include "noclient.h"
 #include "nodebug.h"
 #include "noapp.h"
+#include "nowebsocket.h"
 
 class NoRealListener : public NoSocket
 {

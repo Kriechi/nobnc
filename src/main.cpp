@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <iostream>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)
 #include "nomutex.h"

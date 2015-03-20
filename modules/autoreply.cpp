@@ -18,6 +18,7 @@
 #include <no/nomodule.h>
 #include <no/nonetwork.h>
 #include <no/noircconnection.h>
+#include <no/nocachemap.h>
 
 class NoAutoReplyMod : public NoModule
 {

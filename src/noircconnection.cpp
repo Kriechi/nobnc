@@ -23,6 +23,7 @@
 #include "noclient.h"
 #include "noapp.h"
 #include "noquery.h"
+#include "noescape.h"
 #include "Csocket/Csocket.h"
 
 #define IRCSOCKMODULECALL(macFUNC, macEXITER) \

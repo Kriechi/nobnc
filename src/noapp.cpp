@@ -24,6 +24,7 @@
 #include "nonetwork.h"
 #include "nosettings.h"
 #include "noclient.h"
+#include "nowebsocket.h"
 #include <tuple>
 #include <algorithm>
 #include "Csocket/Csocket.h"

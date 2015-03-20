@@ -17,6 +17,7 @@
 #include "nosocket.h"
 #include "nosslverifyhost.h"
 #include "noapp.h"
+#include "noescape.h"
 #include "Csocket/Csocket.h"
 #include <signal.h>
 

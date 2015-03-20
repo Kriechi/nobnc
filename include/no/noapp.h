@@ -22,6 +22,8 @@
 #include <no/nosocketmanager.h>
 #include <no/nomodules.h>
 #include <no/nolistener.h>
+#include <no/nocachemap.h>
+#include <list>
 
 class NoClient;
 class NoAuthenticator;

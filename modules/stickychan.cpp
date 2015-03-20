@@ -17,6 +17,8 @@
 #include <no/nomodule.h>
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
+#include <no/nowebsocket.h>
+#include <no/nowebsession.h>
 
 class NoStickyChan : public NoModule
 {

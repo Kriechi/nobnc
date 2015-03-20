@@ -19,6 +19,8 @@
 #include <no/nonetwork.h>
 #include <no/noapp.h>
 #include <no/noclient.h>
+#include <no/nowebsocket.h>
+#include <no/nowebsession.h>
 
 class NoSendRawMod : public NoModule
 {

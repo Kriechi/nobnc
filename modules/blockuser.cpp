@@ -20,6 +20,8 @@
 #include <no/noclient.h>
 #include <no/noapp.h>
 #include <no/noauthenticator.h>
+#include <no/nowebsocket.h>
+#include <no/nowebsession.h>
 
 #define MESSAGE "Your account has been disabled. Contact your administrator."
 

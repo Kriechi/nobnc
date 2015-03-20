@@ -17,6 +17,7 @@
 #include <no/nomodule.h>
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
+#include <no/nocachemap.h>
 
 class NoAutoCycleMod : public NoModule
 {

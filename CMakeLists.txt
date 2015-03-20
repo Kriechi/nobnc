@@ -74,7 +74,9 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/notimer.h
                        include/no/nouser.h
                        include/no/noutils.h
-                       include/no/nowebmodules.h
+                       include/no/nowebpage.h
+                       include/no/nowebsession.h
+                       include/no/nowebsocket.h
                        third_party/md5/md5.h
                        third_party/sha2/sha2.h
                        third_party/Csocket/Csocket.h

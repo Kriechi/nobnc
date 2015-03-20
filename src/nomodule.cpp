@@ -19,11 +19,11 @@
 #include "notemplate.h"
 #include "nouser.h"
 #include "nonetwork.h"
-#include "nowebmodules.h"
 #include "noclient.h"
 #include "noapp.h"
 #include "nomodulejob.h"
 #include "nothreadpool.h"
+#include "nomodulesocket.h"
 #include <dlfcn.h>
 
 NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)

@@ -17,6 +17,9 @@
 #include <no/nomodule.h>
 #include <no/nouser.h>
 #include <no/noapp.h>
+#include <no/notemplate.h>
+#include <no/nowebsocket.h>
+#include <no/nowebsession.h>
 
 class NoLastSeenMod : public NoModule
 {

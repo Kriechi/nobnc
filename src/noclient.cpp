@@ -24,6 +24,7 @@
 #include "noquery.h"
 #include "nomodulecall.h"
 #include "noapp.h"
+#include "noescape.h"
 
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                             \
     {                                                                         \

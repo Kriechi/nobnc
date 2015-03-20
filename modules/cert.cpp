@@ -20,6 +20,8 @@
 #include <no/nofile.h>
 #include <no/nouser.h>
 #include <no/noircconnection.h>
+#include <no/notemplate.h>
+#include <no/nowebsocket.h>
 
 class NoCertMod : public NoModule
 {

@@ -26,6 +26,7 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/noapp.h>
+#include <no/nomodulesocket.h>
 
 class NoSChat;
 

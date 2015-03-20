@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-#include "nowebmodules.h"
+#include "nowebpage.h"
+#include "nowebsession.h"
+#include "nowebsocket.h"
 #include "noauthenticator.h"
 #include "nofile.h"
 #include "nodir.h"

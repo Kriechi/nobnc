@@ -19,6 +19,8 @@
 #include <no/nonetwork.h>
 #include <no/noircconnection.h>
 #include <no/nochannel.h>
+#include <no/nowebsocket.h>
+#include <no/nowebsession.h>
 
 #ifndef Q_DEBUG_COMMUNICATION
 #define Q_DEBUG_COMMUNICATION 0

@@ -17,6 +17,8 @@
 #include <no/nomodule.h>
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
+#include <no/noescape.h>
+#include <list>
 
 class NoWatchSource
 {

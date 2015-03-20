@@ -23,6 +23,8 @@
 #include <no/noircconnection.h>
 #include <no/nodebug.h>
 #include <no/noapp.h>
+#include <no/nowebsocket.h>
+#include <no/nowebsession.h>
 
 /* Stuff to be able to write this:
    // i will be name of local variable, see below
