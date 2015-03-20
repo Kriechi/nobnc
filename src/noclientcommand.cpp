@@ -1634,7 +1634,7 @@ void NoClient::UserPortCommand(NoString& sLine)
 
 static void AddCommandHelp(NoTable& Table, const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, const NoString& sFilter = "")
 {
-    if (sFilter.empty() || sCmd.startsWith(sFilter) || sCmd.toLower().wildCmp(sFilter.toLower())) {
+    if (sFilter.empty() || sCmd.startsWith(sFilter) || wildCmp(sCmd, sFilter, No::CaseInsensitive)) {
         Table.AddRow();
         Table.SetCell("Command", sCmd);
         Table.SetCell("Arguments", sArgs);

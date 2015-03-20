@@ -141,3 +141,33 @@ TEST(UtilsTest, QuoteSplit)
     expected = NoStringVector{ "\"\"" };
     EXPECT_EQ(expected, No::quoteSplit("\"\""));
 }
+
+TEST(UtilsTest, WildCmp)
+{
+    EXPECT_TRUE(No::wildCmp("", "", No::CaseSensitive));
+    EXPECT_TRUE(No::wildCmp("", "", No::CaseInsensitive));
+
+    EXPECT_FALSE(No::wildCmp("xy", "*a*b*c*", No::CaseSensitive));
+    EXPECT_FALSE(No::wildCmp("xy", "*a*b*c*", No::CaseInsensitive));
+
+    EXPECT_TRUE(No::wildCmp("I_am!~bar@foo", "*!?bar@foo", No::CaseSensitive));
+    EXPECT_TRUE(No::wildCmp("I_am!~bar@foo", "*!?bar@foo", No::CaseInsensitive));
+
+    EXPECT_FALSE(No::wildCmp("I_am!~bar@foo", "*!?BAR@foo", No::CaseSensitive));
+    EXPECT_TRUE(No::wildCmp("I_am!~bar@foo", "*!?BAR@foo", No::CaseInsensitive));
+
+    EXPECT_TRUE(No::wildCmp("abc", "*a*b*c*", No::CaseSensitive));
+    EXPECT_TRUE(No::wildCmp("abc", "*a*b*c*", No::CaseInsensitive));
+
+    EXPECT_FALSE(No::wildCmp("abc", "*A*b*c*", No::CaseSensitive));
+    EXPECT_TRUE(No::wildCmp("abc", "*A*b*c*", No::CaseInsensitive));
+
+    EXPECT_FALSE(No::wildCmp("Abc", "*a*b*c*", No::CaseSensitive));
+    EXPECT_TRUE(No::wildCmp("Abc", "*a*b*c*", No::CaseInsensitive));
+
+    EXPECT_TRUE(No::wildCmp("axbyc", "*a*b*c*", No::CaseSensitive));
+    EXPECT_TRUE(No::wildCmp("axbyc", "*a*b*c*", No::CaseInsensitive));
+
+    EXPECT_FALSE(No::wildCmp("AxByC", "*a*B*c*", No::CaseSensitive));
+    EXPECT_TRUE(No::wildCmp("AxByC", "*a*B*c*", No::CaseInsensitive));
+}

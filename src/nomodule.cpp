@@ -499,7 +499,7 @@ void NoModule::HandleHelpCommand(const NoString& sLine)
     NoModuleCommand::InitHelp(Table);
     for (const auto& it : m_mCommands) {
         NoString sCmd = it.second.GetCommand().toLower();
-        if (sFilter.empty() || (sCmd.startsWith(sFilter, No::CaseSensitive)) || sCmd.wildCmp(sFilter)) {
+        if (sFilter.empty() || (sCmd.startsWith(sFilter, No::CaseSensitive)) || No::wildCmp(sCmd, sFilter)) {
             it.second.AddHelp(Table);
         }
     }

@@ -15,6 +15,7 @@
  */
 
 #include "nodir.h"
+#include "noutils.h"
 #include <fcntl.h>
 #include <pwd.h>
 #include <sys/stat.h>
@@ -106,7 +107,7 @@ size_t NoDir::FillByWildcard(const NoString& sDir, const NoString& sWildcard)
         if ((strcmp(de->d_name, ".") == 0) || (strcmp(de->d_name, "..") == 0)) {
             continue;
         }
-        if ((!sWildcard.empty()) && (!NoString(de->d_name).wildCmp(sWildcard))) {
+        if ((!sWildcard.empty()) && (!No::wildCmp(NoString(de->d_name), sWildcard))) {
             continue;
         }
 

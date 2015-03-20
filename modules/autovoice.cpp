@@ -36,7 +36,7 @@ public:
     bool ChannelMatches(const NoString& sChan) const
     {
         for (std::set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
-            if (sChan.toLower().wildCmp(*it, No::CaseInsensitive)) {
+            if (No::wildCmp(sChan, *it, No::CaseInsensitive)) {
                 return true;
             }
         }
@@ -44,7 +44,7 @@ public:
         return false;
     }
 
-    bool HostMatches(const NoString& sHostmask) { return sHostmask.wildCmp(m_sHostmask, No::CaseInsensitive); }
+    bool HostMatches(const NoString& sHostmask) { return No::wildCmp(sHostmask, m_sHostmask, No::CaseInsensitive); }
 
     NoString GetChannels() const
     {

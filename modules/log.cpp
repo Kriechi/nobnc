@@ -34,7 +34,7 @@ public:
     bool IsEnabled() const { return m_bEnabled; }
     void SetEnabled(bool bEnabled) { m_bEnabled = bEnabled; }
 
-    bool Compare(const NoString& sTarget) const { return sTarget.wildCmp(m_sRule, No::CaseInsensitive); }
+    bool Compare(const NoString& sTarget) const { return No::wildCmp(sTarget, m_sRule, No::CaseInsensitive); }
 
     bool operator==(const NoLogRule& sOther) const { return m_sRule == sOther.GetRule(); }
 

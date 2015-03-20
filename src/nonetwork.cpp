@@ -767,9 +767,9 @@ std::vector<NoChannel*> NoNetwork::FindChans(const NoString& sWild) const
 {
     std::vector<NoChannel*> vChans;
     vChans.reserve(m_vChans.size());
-    const NoString sLower = sWild.toLower();
     for (NoChannel* pChan : m_vChans) {
-        if (pChan->getName().toLower().wildCmp(sLower)) vChans.push_back(pChan);
+        if (No::wildCmp(pChan->getName(), sWild, No::CaseInsensitive))
+            vChans.push_back(pChan);
     }
     return vChans;
 }
@@ -930,9 +930,9 @@ std::vector<NoQuery*> NoNetwork::FindQueries(const NoString& sWild) const
 {
     std::vector<NoQuery*> vQueries;
     vQueries.reserve(m_vQueries.size());
-    const NoString sLower = sWild.toLower();
     for (NoQuery* pQuery : m_vQueries) {
-        if (pQuery->getName().toLower().wildCmp(sLower)) vQueries.push_back(pQuery);
+        if (No::wildCmp(pQuery->getName(), sWild, No::CaseInsensitive))
+            vQueries.push_back(pQuery);
     }
     return vQueries;
 }

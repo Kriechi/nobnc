@@ -894,3 +894,48 @@ NoStringVector No::quoteSplit(const NoString& str)
 {
     return Split_helper(str, " ", No::SkipEmptyParts, "\"", "\"", false);
 }
+
+bool No::wildCmp(const NoString& sString, const NoString& sWild, No::CaseSensitivity cs)
+{
+    // avoid a copy when cs == No::CaseSensitive (C++ deliberately specifies that binding
+    // a temporary object to a reference to const on the stack lengthens the lifetime
+    // of the temporary to the lifetime of the reference itself)
+    const NoString& sWld = (cs == No::CaseSensitive ? sWild : sWild.toLower());
+    const NoString& sStr = (cs == No::CaseSensitive ? sString : sString.toLower());
+
+    // Written by Jack Handy - jakkhandy@hotmail.com
+    const char* wild = sWld.c_str(), *NoString = sStr.c_str();
+    const char* cp = nullptr, *mp = nullptr;
+
+    while ((*NoString) && (*wild != '*')) {
+        if ((*wild != *NoString) && (*wild != '?')) {
+            return false;
+        }
+
+        wild++;
+        NoString++;
+    }
+
+    while (*NoString) {
+        if (*wild == '*') {
+            if (!*++wild) {
+                return true;
+            }
+
+            mp = wild;
+            cp = NoString + 1;
+        } else if ((*wild == *NoString) || (*wild == '?')) {
+            wild++;
+            NoString++;
+        } else {
+            wild = mp;
+            NoString = cp++;
+        }
+    }
+
+    while (*wild == '*') {
+        wild++;
+    }
+
+    return (*wild == 0);
+}

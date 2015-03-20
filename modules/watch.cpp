@@ -82,7 +82,7 @@ public:
             for (uint a = 0; a < m_vsSources.size(); a++) {
                 const NoWatchSource& WatchSource = m_vsSources[a];
 
-                if (sSource.wildCmp(WatchSource.GetSource(), No::CaseInsensitive)) {
+                if (No::wildCmp(sSource, WatchSource.GetSource(), No::CaseInsensitive)) {
                     if (WatchSource.IsNegated()) {
                         return false;
                     } else {
@@ -93,8 +93,8 @@ public:
         }
 
         if (!bGoodSource) return false;
-        if (!Nick.hostMask().wildCmp(m_sHostMask, No::CaseInsensitive)) return false;
-        return (sText.wildCmp(pNetwork->ExpandString(m_sPattern), No::CaseInsensitive));
+        if (!No::wildCmp(Nick.hostMask(), m_sHostMask, No::CaseInsensitive)) return false;
+        return (No::wildCmp(sText, pNetwork->ExpandString(m_sPattern), No::CaseInsensitive));
     }
 
     bool operator==(const NoWatchEntry& WatchEntry)

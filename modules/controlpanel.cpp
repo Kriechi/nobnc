@@ -45,7 +45,7 @@ class NoAdminMod : public NoModule
         std::map<const char*, NoStringVector> mvsTypedVariables;
         for (uint i = 0; i != uSize; ++i) {
             NoString sVar = NoString(vars[i][0]).toLower();
-            if (sFilter.empty() || sVar.startsWith(sFilter) || sVar.wildCmp(sFilter)) {
+            if (sFilter.empty() || sVar.startsWith(sFilter) || No::wildCmp(sVar, sFilter)) {
                 mvsTypedVariables[vars[i][1]].emplace_back(vars[i][0]);
             }
         }

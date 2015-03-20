@@ -207,13 +207,13 @@ protected:
     bool IsAutoCycle(const NoString& sChan)
     {
         for (uint a = 0; a < m_vsNegChans.size(); a++) {
-            if (sChan.wildCmp(m_vsNegChans[a], No::CaseInsensitive)) {
+            if (No::wildCmp(sChan, m_vsNegChans[a], No::CaseInsensitive)) {
                 return false;
             }
         }
 
         for (uint b = 0; b < m_vsChans.size(); b++) {
-            if (sChan.wildCmp(m_vsChans[b], No::CaseInsensitive)) {
+            if (No::wildCmp(sChan, m_vsChans[b], No::CaseInsensitive)) {
                 return true;
             }
         }

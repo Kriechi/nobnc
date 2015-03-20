@@ -455,7 +455,7 @@ private:
             m_msChanModes.clear();
             m_bCatchResponse = m_bRequestedWhoami;
             m_bRequestedWhoami = true;
-        } else if (m_bRequestedWhoami && sMessage.wildCmp("#*")) {
+        } else if (m_bRequestedWhoami && No::wildCmp(sMessage, "#*")) {
             NoString sChannel = sMessage.token(0);
             NoString sFlags = sMessage.tokens(1).trim_n().trimLeft_n("+");
             m_msChanModes[sChannel] = sFlags;
@@ -470,7 +470,7 @@ private:
             m_bAuthed = false;
             PutModule("Auth failed: " + sMessage);
             return HALT;
-        } else if (sMessage.wildCmp("You are now logged in as *.")) {
+        } else if (No::wildCmp(sMessage, "You are now logged in as *.")) {
             m_bAuthed = true;
             PutModule("Auth successful: " + sMessage);
             WhoAmI();

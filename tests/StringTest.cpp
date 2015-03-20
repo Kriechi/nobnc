@@ -86,36 +86,6 @@ TEST(StringTest, Cmp)
     EXPECT_FALSE(s.equals("bb"));
 }
 
-TEST(StringTest, Wild)
-{
-    EXPECT_TRUE(NoString("").wildCmp("", No::CaseSensitive));
-    EXPECT_TRUE(NoString("").wildCmp("", No::CaseInsensitive));
-
-    EXPECT_FALSE(NoString("xy").wildCmp("*a*b*c*", No::CaseSensitive));
-    EXPECT_FALSE(NoString("xy").wildCmp("*a*b*c*", No::CaseInsensitive));
-
-    EXPECT_TRUE(NoString("I_am!~bar@foo").wildCmp("*!?bar@foo", No::CaseSensitive));
-    EXPECT_TRUE(NoString("I_am!~bar@foo").wildCmp("*!?bar@foo", No::CaseInsensitive));
-
-    EXPECT_FALSE(NoString("I_am!~bar@foo").wildCmp("*!?BAR@foo", No::CaseSensitive));
-    EXPECT_TRUE(NoString("I_am!~bar@foo").wildCmp("*!?BAR@foo", No::CaseInsensitive));
-
-    EXPECT_TRUE(NoString("abc").wildCmp("*a*b*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("abc").wildCmp("*a*b*c*", No::CaseInsensitive));
-
-    EXPECT_FALSE(NoString("abc").wildCmp("*A*b*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("abc").wildCmp("*A*b*c*", No::CaseInsensitive));
-
-    EXPECT_FALSE(NoString("Abc").wildCmp("*a*b*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("Abc").wildCmp("*a*b*c*", No::CaseInsensitive));
-
-    EXPECT_TRUE(NoString("axbyc").wildCmp("*a*b*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("axbyc").wildCmp("*a*b*c*", No::CaseInsensitive));
-
-    EXPECT_FALSE(NoString("AxByC").wildCmp("*a*B*c*", No::CaseSensitive));
-    EXPECT_TRUE(NoString("AxByC").wildCmp("*a*B*c*", No::CaseInsensitive));
-}
-
 TEST(StringTest, Case)
 {
     NoString x = NS("xx");

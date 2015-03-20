@@ -275,7 +275,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
             }
 
             bool bContinue = false;
-            if (sMsg.wildCmp("\001*\001")) {
+            if (No::wildCmp(sMsg, "\001*\001")) {
                 NoString sCTCP = sMsg;
                 sCTCP.leftChomp(1);
                 sCTCP.rightChomp(1);
@@ -329,7 +329,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
 
         for (NoString& sTarget : vTargets) {
             bool bContinue = false;
-            if (sMsg.wildCmp("\001*\001")) {
+            if (No::wildCmp(sMsg, "\001*\001")) {
                 NoString sCTCP = sMsg;
                 sCTCP.leftChomp(1);
                 sCTCP.rightChomp(1);

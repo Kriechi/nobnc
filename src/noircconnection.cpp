@@ -666,7 +666,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             NoString sMsg = sRest.tokens(1);
             sMsg.leftChomp(1);
 
-            if (sMsg.wildCmp("\001*\001")) {
+            if (No::wildCmp(sMsg, "\001*\001")) {
                 sMsg.leftChomp(1);
                 sMsg.rightChomp(1);
 
@@ -723,7 +723,7 @@ void NoIrcConnection::ReadLineImpl(const NoString& sData)
             NoString sTarget = sRest.token(0);
             NoString sMsg = sRest.tokens(1).trimPrefix_n();
 
-            if (sMsg.wildCmp("\001*\001")) {
+            if (No::wildCmp(sMsg, "\001*\001")) {
                 sMsg.leftChomp(1);
                 sMsg.rightChomp(1);
 

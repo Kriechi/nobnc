@@ -773,7 +773,7 @@ bool NoUser::IsHostAllowed(const NoString& sHostMask) const
     }
 
     for (const NoString& sHost : m_ssAllowedHosts) {
-        if (sHostMask.wildCmp(sHost)) {
+        if (No::wildCmp(sHostMask, sHost)) {
             return true;
         }
     }

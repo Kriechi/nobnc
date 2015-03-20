@@ -134,7 +134,7 @@ void NoHttpSocket::ReadLineImpl(const NoString& sData)
                 // check if sIP is trusted proxy
                 bool bTrusted = false;
                 for (const NoString& sTrustedProxy : vsTrustedProxies) {
-                    if (sIP.wildCmp(sTrustedProxy)) {
+                    if (No::wildCmp(sIP, sTrustedProxy)) {
                         bTrusted = true;
                         break;
                     }

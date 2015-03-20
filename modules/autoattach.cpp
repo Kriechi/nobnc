@@ -35,9 +35,9 @@ public:
 
     bool IsMatch(const NoString& sChan, const NoString& sHost, const NoString& sMessage) const
     {
-        if (!sHost.wildCmp(m_sHostmaskWildcard, No::CaseInsensitive)) return false;
-        if (!sChan.wildCmp(m_sChannelWildcard, No::CaseInsensitive)) return false;
-        if (!sMessage.wildCmp(m_pModule->ExpandString(m_sSearchWildcard), No::CaseInsensitive)) return false;
+        if (!No::wildCmp(sHost, m_sHostmaskWildcard, No::CaseInsensitive)) return false;
+        if (!No::wildCmp(sChan, m_sChannelWildcard, No::CaseInsensitive)) return false;
+        if (!No::wildCmp(sMessage, m_pModule->ExpandString(m_sSearchWildcard), No::CaseInsensitive)) return false;
         return true;
     }
 

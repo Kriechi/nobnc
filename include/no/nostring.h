@@ -113,17 +113,6 @@ public:
      * @return True if the strings are equal.
      */
     bool equals(const NoString& s, No::CaseSensitivity cs = No::CaseInsensitive) const;
-    /**
-     * Do a wildcard comparison on this string.
-     * For example, the following returns true:
-     * <code>WildCmp("*!?bar@foo", "I_am!~bar@foo");</code>
-     * @param sWild The wildcards used to for the comparison.
-     * @param cs CaseSensitive (default) if you want the comparison
-     *           to be case sensitive, CaseInsensitive otherwise.
-     * @todo Make cs CaseInsensitive by default.
-     * @return The result of <code>this->WildCmp(sWild, *this);</code>.
-     */
-    bool wildCmp(const NoString& sWild, No::CaseSensitivity cs = No::CaseSensitive) const;
 
     /**
      * Return a copy of this string with all characters turned into
