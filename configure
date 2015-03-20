@@ -180,7 +180,7 @@ else
 fi
 
 if $devel; then
-	append_args "-DDEVELOPER_BUILD=ON"
+	append_args "-DDEVELOPER=ON"
 fi
 
 cat > ./config.status << EOF

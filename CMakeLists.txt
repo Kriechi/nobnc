@@ -123,7 +123,7 @@ add_subdirectory(tests)
 
 ### INSTALLS
 
-if(NOT DEVELOPER_BUILD)
+if(NOT DEVELOPER)
     install(TARGETS nobnc RUNTIME DESTINATION ${INSTALL_BINDIR})
     install(TARGETS libno LIBRARY DESTINATION ${INSTALL_LIBDIR}
                           RUNTIME DESTINATION ${INSTALL_BINDIR}
@@ -140,7 +140,7 @@ configure_file("${PROJECT_SOURCE_DIR}/include/no/noconfig.h.in"
 configure_file("${PROJECT_SOURCE_DIR}/src/noglobal.cpp.in"
                "${PROJECT_BINARY_DIR}/src/noglobal.cpp")
 
-if(NOT DEVELOPER_BUILD)
+if(NOT DEVELOPER)
     install(FILES "${PROJECT_BINARY_DIR}/include/no/noconfig.h"
             DESTINATION ${INSTALL_INCLUDEDIR}/no)
     install(FILES "${PROJECT_BINARY_DIR}/include/no/noglobal.h"
@@ -151,7 +151,7 @@ process_definitions("${NO_DEFINITIONS}" NO_DEFINITION_FLAGS)
 process_includedirs("${NO_INCLUDEDIRS}" NO_INCLUDE_FLAGS)
 process_link_libraries("${NO_LIBRARIES}" NO_LIBRARY_FLAGS)
 
-if(NOT DEVELOPER_BUILD)
+if(NOT DEVELOPER)
     set(NO_INCLUDE_FLAGS "-I${INSTALL_INCLUDEDIR} ${NO_INCLUDE_FLAGS}")
     set(NO_LIBRARY_FLAGS "-L${INSTALL_LIBDIR} ${NO_LIBRARY_FLAGS}")
 else()
@@ -168,14 +168,14 @@ configure_file("${PROJECT_SOURCE_DIR}/nobnc-buildmod.in"
 configure_file("${PROJECT_SOURCE_DIR}/nobnc.pc.in"
                "${PROJECT_BINARY_DIR}/nobnc.pc" @ONLY)
 
-if(NOT DEVELOPER_BUILD)
+if(NOT DEVELOPER)
     install(FILES "${PROJECT_BINARY_DIR}/nobnc.pc" DESTINATION ${INSTALL_LIBDIR}/pkgconfig)
     install(PROGRAMS "${PROJECT_BINARY_DIR}/nobnc-buildmod" DESTINATION ${INSTALL_BINDIR})
 endif()
 
 ### PACKAGE
 
-if(NOT DEVELOPER_BUILD)
+if(NOT DEVELOPER)
     if(NOT CPACK_SOURCE_PACKAGE_FILE_NAME)
         set(CPACK_SOURCE_PACKAGE_FILE_NAME "nobnc-${NO_VERSION}")
     endif()
@@ -205,14 +205,14 @@ endif()
 ### SUMMARY
 
 set(BUILD_TYPE ${CMAKE_BUILD_TYPE})
-if(DEVELOPER_BUILD)
+if(DEVELOPER)
     set(BUILD_TYPE "${BUILD_TYPE} (developer)")
 endif()
 
 message(STATUS "")
 message(STATUS "${PROJECT_NAME} ${NO_VERSION} configuration:")
 message(STATUS "")
-if(NOT DEVELOPER_BUILD)
+if(NOT DEVELOPER)
     message(STATUS "Prefix ............... ${INSTALL_PREFIX}")
 endif()
 message(STATUS "Build ................ ${BUILD_TYPE}")

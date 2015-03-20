@@ -6,7 +6,7 @@ if(GZIP_FOUND)
         get_filename_component(MAN_NAME ${MAN_PAGE} NAME_WE)
         add_custom_command(TARGET man DEPENDS ${MAN_PAGE}
                            COMMAND ${GZIP_EXECUTABLE} -9 -c ${MAN_PAGE} > ${CMAKE_CURRENT_BINARY_DIR}/${MAN_NAME}.1.gz)
-        if(NOT DEVELOPER_BUILD)
+        if(NOT DEVELOPER)
             install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${MAN_NAME}.1.gz DESTINATION ${INSTALL_MANDIR})
         endif()
     endforeach()

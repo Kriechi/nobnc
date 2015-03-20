@@ -8,7 +8,7 @@ foreach(NO_MODULE ${NO_MODULES})
         target_link_libraries(${NO_MOD} ${NO_LIBRARIES} $ENV{${NO_MOD}_LDFLAGS})
         set_target_properties(${NO_MOD} PROPERTIES PREFIX "" SUFFIX .so
                                         COMPILE_FLAGS "$ENV{${NO_MOD}_CXXFLAGS}")
-        if(NOT DEVELOPER_BUILD)
+        if(NOT DEVELOPER)
             install(TARGETS ${NO_MOD} LIBRARY DESTINATION ${INSTALL_MODDIR})
         endif()
     endif()
