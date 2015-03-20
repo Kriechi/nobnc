@@ -855,8 +855,74 @@ NoString No::ellipsize(const NoString& str, uint uLen)
     return sRet;
 }
 
-// TODO: cleanup
-extern NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
+NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes)
+{
+    NoStringVector vsRet;
+
+    if (str.empty()) {
+        return vsRet;
+    }
+
+    NoString sTmp;
+    bool bInside = false;
+    NoString::size_type uDelimLen = sDelim.length();
+    NoString::size_type uLeftLen = sLeft.length();
+    NoString::size_type uRightLen = sRight.length();
+    const char* p = str.c_str();
+
+    if (behavior == No::SkipEmptyParts) {
+        while (strncasecmp(p, sDelim.c_str(), uDelimLen) == 0) {
+            p += uDelimLen;
+        }
+    }
+
+    while (*p) {
+        if (uLeftLen && uRightLen && !bInside && strncasecmp(p, sLeft.c_str(), uLeftLen) == 0) {
+            if (!bTrimQuotes) {
+                sTmp += sLeft;
+            }
+
+            p += uLeftLen;
+            bInside = true;
+            continue;
+        }
+
+        if (uLeftLen && uRightLen && bInside && strncasecmp(p, sRight.c_str(), uRightLen) == 0) {
+            if (!bTrimQuotes) {
+                sTmp += sRight;
+            }
+
+            p += uRightLen;
+            bInside = false;
+            continue;
+        }
+
+        if (uDelimLen && !bInside && strncasecmp(p, sDelim.c_str(), uDelimLen) == 0) {
+            vsRet.push_back(sTmp);
+            sTmp.clear();
+            p += uDelimLen;
+
+            if (behavior == No::SkipEmptyParts) {
+                while (strncasecmp(p, sDelim.c_str(), uDelimLen) == 0) {
+                    p += uDelimLen;
+                }
+            }
+
+            bInside = false;
+            continue;
+        } else {
+            sTmp += *p;
+        }
+
+        p++;
+    }
+
+    if (!sTmp.empty()) {
+        vsRet.push_back(sTmp);
+    }
+
+    return vsRet;
+}
 
 static NoString Token_impl(const NoString& s, size_t uPos, bool bRest, const NoString& sSep)
 {
