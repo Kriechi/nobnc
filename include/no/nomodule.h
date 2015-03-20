@@ -24,6 +24,7 @@
 #include <no/nothreads.h>
 #include <no/notimer.h>
 #include <no/nomodulecall.h>
+#include <no/nomoduleinfo.h>
 #include <functional>
 #include <set>
 #include <queue>
@@ -113,82 +114,6 @@ class NoChannel;
 class NoModule;
 class NoSocketManager;
 class NoModuleJob;
-
-typedef void* ModHandle;
-
-class NO_EXPORT NoModInfo
-{
-public:
-    enum ModuleType { GlobalModule, UserModule, NetworkModule };
-
-    typedef NoModule* (*ModLoader)(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, ModuleType eType);
-
-    NoModInfo() : NoModInfo("", "", NetworkModule) {}
-    NoModInfo(const NoString& sName, const NoString& sPath, ModuleType eType)
-        : m_seType(), m_eDefaultType(eType), m_sName(sName), m_sPath(sPath), m_sDescription(""), m_sWikiPage(""),
-          m_sArgsHelpText(""), m_bHasArgs(false), m_fLoader(nullptr)
-    {
-    }
-    ~NoModInfo() {}
-
-    bool operator<(const NoModInfo& Info) const { return (GetName() < Info.GetName()); }
-
-    bool SupportsType(ModuleType eType) const { return m_seType.find(eType) != m_seType.end(); }
-
-    void AddType(ModuleType eType) { m_seType.insert(eType); }
-
-    static NoString ModuleTypeToString(ModuleType eType)
-    {
-        switch (eType) {
-        case GlobalModule:
-            return "Global";
-        case UserModule:
-            return "User";
-        case NetworkModule:
-            return "Network";
-        default:
-            return "UNKNOWN";
-        }
-    }
-
-    const NoString& GetName() const { return m_sName; }
-    const NoString& GetPath() const { return m_sPath; }
-    const NoString& GetDescription() const { return m_sDescription; }
-    const NoString& GetWikiPage() const { return m_sWikiPage; }
-    const NoString& GetArgsHelpText() const { return m_sArgsHelpText; }
-    bool GetHasArgs() const { return m_bHasArgs; }
-    ModLoader GetLoader() const { return m_fLoader; }
-    ModuleType GetDefaultType() const { return m_eDefaultType; }
-
-    void SetName(const NoString& s) { m_sName = s; }
-    void SetPath(const NoString& s) { m_sPath = s; }
-    void SetDescription(const NoString& s) { m_sDescription = s; }
-    void SetWikiPage(const NoString& s) { m_sWikiPage = s; }
-    void SetArgsHelpText(const NoString& s) { m_sArgsHelpText = s; }
-    void SetHasArgs(bool b = false) { m_bHasArgs = b; }
-    void SetLoader(ModLoader fLoader) { m_fLoader = fLoader; }
-    void SetDefaultType(ModuleType eType) { m_eDefaultType = eType; }
-
-private:
-    std::set<ModuleType> m_seType;
-    ModuleType m_eDefaultType;
-    NoString m_sName;
-    NoString m_sPath;
-    NoString m_sDescription;
-    NoString m_sWikiPage;
-    NoString m_sArgsHelpText;
-    bool m_bHasArgs;
-    ModLoader m_fLoader;
-};
-
-template <class M> void TModInfo(NoModInfo& Info) {}
-
-template <class M>
-NoModule*
-TModLoad(ModHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, NoModInfo::ModuleType eType)
-{
-    return new M(p, pUser, pNetwork, sModName, sModPath, eType);
-}
 
 /** A helper class for handling commands in modules. */
 class NO_EXPORT NoModCommand

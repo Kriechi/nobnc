@@ -48,6 +48,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nomessage.h
                        include/no/nomodule.h
                        include/no/nomodulecall.h
+                       include/no/nomoduleinfo.h
                        include/no/nomodulejob.h
                        include/no/nomodules.h
                        include/no/nomodulesocket.h
@@ -92,6 +93,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nolistener.cpp
                        src/nomessage.cpp
                        src/nomodule.cpp
+                       src/nomoduleinfo.cpp
                        src/nomodulejob.cpp
                        src/nomodules.cpp
                        src/nomodulesocket.cpp
