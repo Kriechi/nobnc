@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-#include "nowebpage.h"
 #include "nowebsession.h"
 #include "nowebsocket.h"
+#include "nocachemap.h"
+#include "notemplate.h"
 #include "noauthenticator.h"
 #include "nofile.h"
 #include "nodir.h"
@@ -26,7 +27,6 @@
 #include "nodebug.h"
 #include "noapp.h"
 #include <algorithm>
-#include <sstream>
 
 /// @todo Do we want to make this a configure option?
 #define _SKINDIR_ _DATADIR_ "/webskins"
@@ -37,7 +37,18 @@ class NoWebSessionMap : public NoCacheMap<NoString, std::shared_ptr<NoWebSession
 {
 public:
     NoWebSessionMap(uint uTTL = 5000) : NoCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
-    void FinishUserSessions(const NoUser& User);
+    void FinishUserSessions(const NoUser& User)
+    {
+        iterator it = m_mItems.begin();
+
+        while (it != m_mItems.end()) {
+            if (it->second.second->GetUser() == &User) {
+                m_mItems.erase(it++);
+            } else {
+                ++it;
+            }
+        }
+    }
 };
 
 // We need this class to make sure the contained maps and their content is
@@ -98,8 +109,6 @@ protected:
     bool m_bBasic;
 };
 
-void NoWebSocket::FinishUserSessions(const NoUser& User) { Sessions.m_mspSessions.FinishUserSessions(User); }
-
 NoWebSession::~NoWebSession()
 {
     // Find our entry in mIPSessions
@@ -116,6 +125,16 @@ NoWebSession::~NoWebSession()
     }
 }
 
+const NoString& NoWebSession::GetId() const { return m_sId; }
+
+const NoString& NoWebSession::GetIP() const { return m_sIP; }
+
+NoUser* NoWebSession::GetUser() const { return m_pUser; }
+
+time_t NoWebSession::GetLastActive() const { return m_tmLastActive; }
+
+bool NoWebSession::IsLoggedIn() const { return m_pUser != nullptr; }
+
 NoWebSession::NoWebSession(const NoString& sId, const NoString& sIP)
     : m_sId(sId), m_sIP(sIP), m_pUser(nullptr), m_vsErrorMsgs(), m_vsSuccessMsgs(), m_tmLastActive()
 {
@@ -125,12 +144,13 @@ NoWebSession::NoWebSession(const NoString& sId, const NoString& sIP)
 
 void NoWebSession::UpdateLastActive() { time(&m_tmLastActive); }
 
-bool NoWebSession::IsAdmin() const { return IsLoggedIn() && m_pUser->IsAdmin(); }
-
-NoWebAuth::NoWebAuth(NoWebSocket* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic)
-    : NoAuthenticator(sUsername, sPassword, pWebSock), m_pWebSock(pWebSock), m_bBasic(bBasic)
+NoUser*NoWebSession::SetUser(NoUser* p)
 {
+    m_pUser = p;
+    return m_pUser;
 }
+
+bool NoWebSession::IsAdmin() const { return IsLoggedIn() && m_pUser->IsAdmin(); }
 
 void NoWebSession::ClearMessageLoops()
 {
@@ -163,17 +183,9 @@ size_t NoWebSession::AddSuccess(const NoString& sMessage)
     return m_vsSuccessMsgs.size();
 }
 
-void NoWebSessionMap::FinishUserSessions(const NoUser& User)
+NoWebAuth::NoWebAuth(NoWebSocket* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic)
+    : NoAuthenticator(sUsername, sPassword, pWebSock), m_pWebSock(pWebSock), m_bBasic(bBasic)
 {
-    iterator it = m_mItems.begin();
-
-    while (it != m_mItems.end()) {
-        if (it->second.second->GetUser() == &User) {
-            m_mItems.erase(it++);
-        } else {
-            ++it;
-        }
-    }
 }
 
 void NoWebAuth::AcceptedLogin(NoUser& User)
@@ -243,6 +255,8 @@ NoWebSocket::~NoWebSocket()
     ResetBytesWritten();
     ResetBytesRead();
 }
+
+void NoWebSocket::FinishUserSessions(const NoUser& User) { Sessions.m_mspSessions.FinishUserSessions(User); }
 
 void NoWebSocket::GetAvailSkins(NoStringVector& vRet) const
 {

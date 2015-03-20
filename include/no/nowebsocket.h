@@ -21,6 +21,7 @@
 #include <no/nohttpsocket.h>
 #include <no/notemplate.h>
 
+class NoUser;
 class NoWebSession;
 class NoAuthenticator;
 

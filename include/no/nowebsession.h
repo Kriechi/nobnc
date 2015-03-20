@@ -32,19 +32,15 @@ public:
     NoWebSession(const NoWebSession&) = delete;
     NoWebSession& operator=(const NoWebSession&) = delete;
 
-    const NoString& GetId() const { return m_sId; }
-    const NoString& GetIP() const { return m_sIP; }
-    NoUser* GetUser() const { return m_pUser; }
-    time_t GetLastActive() const { return m_tmLastActive; }
-    bool IsLoggedIn() const { return m_pUser != nullptr; }
+    const NoString& GetId() const;
+    const NoString& GetIP() const;
+    NoUser* GetUser() const;
+    time_t GetLastActive() const;
+    bool IsLoggedIn() const;
     bool IsAdmin() const;
     void UpdateLastActive();
 
-    NoUser* SetUser(NoUser* p)
-    {
-        m_pUser = p;
-        return m_pUser;
-    }
+    NoUser* SetUser(NoUser* p);
 
     void ClearMessageLoops();
     void FillMessageLoops(NoTemplate& Tmpl);
