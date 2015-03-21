@@ -30,6 +30,8 @@ public:
     NoTimer(NoModule* module);
     virtual ~NoTimer();
 
+    NoModule* module() const;
+
     void start(uint interval = 0);
     void stop();
 
@@ -37,9 +39,6 @@ public:
     void resume();
 
     bool isActive() const;
-
-    NoModule* module() const;
-    void setModule(NoModule* module);
 
     NoString name() const;
     void setName(const NoString& name);

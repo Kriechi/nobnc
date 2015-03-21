@@ -59,6 +59,11 @@ NoTimer::~NoTimer()
     }
 }
 
+NoModule* NoTimer::module() const
+{
+    return d->module;
+}
+
 void NoTimer::start(uint interval)
 {
     if (interval > 0)
@@ -84,16 +89,6 @@ void NoTimer::resume()
 bool NoTimer::isActive() const
 {
     return d->isValid();
-}
-
-NoModule* NoTimer::module() const
-{
-    return d->module;
-}
-
-void NoTimer::setModule(NoModule* module)
-{
-    d->module = module;
 }
 
 NoString NoTimer::name() const
