@@ -38,6 +38,7 @@ typedef int no_sock_t;
 class Csock;
 class CCron;
 class NoModule;
+class NoSocketPrivate;
 
 // All existing errno codes seem to be in range 1-300
 enum {
@@ -137,9 +138,10 @@ public:
     virtual bool ConnectionFromImpl(const NoString& sHost, ushort uPort);
 
 private:
-    Csock* m_csock;
-    NoString m_HostToVerifySSL;
-    NoStringSet m_ssTrustedFingerprints;
+    NoSocket(const NoSocket&) = delete;
+    NoSocket& operator=(const NoSocket&) = delete;
+    std::unique_ptr<NoSocketPrivate> d;
+    friend class NoSocketPrivate;
 };
 
 #endif // NOSOCKET_H
