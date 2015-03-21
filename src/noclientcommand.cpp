@@ -1547,18 +1547,18 @@ void NoClient::UserPortCommand(NoString& sLine)
 
         for (const NoListener* pListener : vpListeners) {
             Table.AddRow();
-            Table.SetCell("Port", NoString(pListener->GetPort()));
-            Table.SetCell("BindHost", (pListener->GetBindHost().empty() ? NoString("*") : pListener->GetBindHost()));
-            Table.SetCell("SSL", NoString(pListener->IsSSL()));
+            Table.SetCell("Port", NoString(pListener->port()));
+            Table.SetCell("BindHost", (pListener->bindHost().empty() ? NoString("*") : pListener->bindHost()));
+            Table.SetCell("SSL", NoString(pListener->isSsl()));
 
-            No::AddressType eAddr = pListener->GetAddrType();
+            No::AddressType eAddr = pListener->addressType();
             Table.SetCell("Proto", (eAddr == No::Ipv4AndIpv6Address ? "All" : (eAddr == No::Ipv4Address ? "IPv4" : "IPv6")));
 
-            No::AcceptType eAccept = pListener->GetAcceptType();
+            No::AcceptType eAccept = pListener->acceptType();
             Table.SetCell("IRC/Web",
                           (eAccept == No::AcceptAll ? "All" :
                                                               (eAccept == No::AcceptIrc ? "IRC" : "Web")));
-            Table.SetCell("URIPrefix", pListener->GetURIPrefix() + "/");
+            Table.SetCell("URIPrefix", pListener->uriPrefix() + "/");
         }
 
         PutStatus(Table);
@@ -1605,7 +1605,7 @@ void NoClient::UserPortCommand(NoString& sLine)
 
             NoListener* pListener = new NoListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept);
 
-            if (!pListener->Listen()) {
+            if (!pListener->listen()) {
                 delete pListener;
                 PutStatus("Unable to bind [" + NoString(strerror(errno)) + "]");
             } else {

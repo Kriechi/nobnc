@@ -23,95 +23,95 @@
 class NoRealListener : public NoSocket
 {
 public:
-    NoRealListener(NoListener& listener);
+    NoRealListener(NoListener* listener);
     virtual ~NoRealListener();
 
-    bool ConnectionFromImpl(const NoString& sHost, ushort uPort) override;
-    NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
-    void SockErrorImpl(int iErrno, const NoString& sDescription) override;
+    bool ConnectionFromImpl(const NoString& host, ushort port) override;
+    NoSocket* GetSockObjImpl(const NoString& host, ushort port) override;
+    void SockErrorImpl(int iErrno, const NoString& description) override;
 
 private:
-    NoListener& m_Listener;
+    NoListener* m_listener;
 };
 
 class NoIncomingConnection : public NoSocket
 {
 public:
-    NoIncomingConnection(const NoString& sHostname, ushort uPort, No::AcceptType eAcceptType, const NoString& sURIPrefix);
-    void ReadLineImpl(const NoString& sData) override;
+    NoIncomingConnection(const NoString& hostname, ushort port, No::AcceptType accept, const NoString& uriPrefix);
+    void ReadLineImpl(const NoString& data) override;
     void ReachedMaxBufferImpl() override;
 
 private:
-    No::AcceptType m_eAcceptType;
-    const NoString m_sURIPrefix;
+    No::AcceptType m_acceptType;
+    const NoString m_uriPrefix;
 };
 
-NoListener::NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, No::AddressType eAddr, No::AcceptType eAccept)
-    : m_bSSL(bSSL), m_eAddr(eAddr), m_uPort(uPort), m_sBindHost(sBindHost), m_sURIPrefix(sURIPrefix),
-      m_pSocket(nullptr), m_eAcceptType(eAccept)
+NoListener::NoListener(ushort port, const NoString& bindHost, const NoString& uriPrefix, bool ssl, No::AddressType address, No::AcceptType accept)
+    : m_ssl(ssl), m_addressType(address), m_port(port), m_bindHost(bindHost), m_uriPrefix(uriPrefix),
+      m_socket(nullptr), m_acceptType(accept)
 {
 }
 
 NoListener::~NoListener()
 {
-    if (m_pSocket)
-        NoApp::Get().GetManager().DelSockByAddr(m_pSocket);
+    if (m_socket)
+        NoApp::Get().GetManager().DelSockByAddr(m_socket);
 }
 
-bool NoListener::IsSSL() const
+bool NoListener::isSsl() const
 {
-    return m_bSSL;
+    return m_ssl;
 }
 
-No::AddressType NoListener::GetAddrType() const
+No::AddressType NoListener::addressType() const
 {
-    return m_eAddr;
+    return m_addressType;
 }
 
-ushort NoListener::GetPort() const
+ushort NoListener::port() const
 {
-    return m_uPort;
+    return m_port;
 }
 
-const NoString& NoListener::GetBindHost() const
+const NoString& NoListener::bindHost() const
 {
-    return m_sBindHost;
+    return m_bindHost;
 }
 
-NoSocket* NoListener::GetSocket() const
+NoSocket* NoListener::socket() const
 {
-    return m_pSocket;
+    return m_socket;
 }
 
-const NoString& NoListener::GetURIPrefix() const
+const NoString& NoListener::uriPrefix() const
 {
-    return m_sURIPrefix;
+    return m_uriPrefix;
 }
 
-No::AcceptType NoListener::GetAcceptType() const
+No::AcceptType NoListener::acceptType() const
 {
-    return m_eAcceptType;
+    return m_acceptType;
 }
 
-void NoListener::SetAcceptType(No::AcceptType eType)
+void NoListener::setAcceptType(No::AcceptType type)
 {
-    m_eAcceptType = eType;
+    m_acceptType = type;
 }
 
-bool NoListener::Listen()
+bool NoListener::listen()
 {
-    if (!m_uPort || m_pSocket) {
+    if (!m_port || m_socket) {
         errno = EINVAL;
         return false;
     }
 
-    m_pSocket = new NoRealListener(*this);
+    m_socket = new NoRealListener(this);
 
-    bool bSSL = false;
+    bool ssl = false;
 #ifdef HAVE_LIBSSL
-    if (IsSSL()) {
-        bSSL = true;
-        m_pSocket->SetPemLocation(NoApp::Get().GetPemLocation());
+    if (isSsl()) {
+        ssl = true;
+        m_socket->SetPemLocation(NoApp::Get().GetPemLocation());
     }
 #endif
 
@@ -119,47 +119,47 @@ bool NoListener::Listen()
     // Make sure there is a consistent error message, not something random
     // which might even be "Error: Success".
     errno = EINVAL;
-    return NoApp::Get().GetManager().ListenHost(m_uPort, "_LISTENER", m_sBindHost, bSSL, SOMAXCONN, m_pSocket, 0, m_eAddr);
+    return NoApp::Get().GetManager().ListenHost(m_port, "_LISTENER", m_bindHost, ssl, SOMAXCONN, m_socket, 0, m_addressType);
 }
 
-void NoListener::ResetSocket()
+void NoListener::resetSocket()
 {
-    m_pSocket = nullptr;
+    m_socket = nullptr;
 }
 
-NoRealListener::NoRealListener(NoListener& listener) : NoSocket(), m_Listener(listener)
+NoRealListener::NoRealListener(NoListener* listener) : NoSocket(), m_listener(listener)
 {
 }
 
 NoRealListener::~NoRealListener()
 {
-    m_Listener.ResetSocket();
+    m_listener->resetSocket();
 }
 
-bool NoRealListener::ConnectionFromImpl(const NoString& sHost, ushort uPort)
+bool NoRealListener::ConnectionFromImpl(const NoString& host, ushort port)
 {
-    bool bHostAllowed = NoApp::Get().IsHostAllowed(sHost);
-    NO_DEBUG(GetSockName() << " == ConnectionFrom(" << sHost << ", " << uPort << ") ["
-                        << (bHostAllowed ? "Allowed" : "Not allowed") << "]");
-    return bHostAllowed;
+    bool allowed = NoApp::Get().IsHostAllowed(host);
+    NO_DEBUG(GetSockName() << " == ConnectionFrom(" << host << ", " << port << ") ["
+                        << (allowed ? "Allowed" : "Not allowed") << "]");
+    return allowed;
 }
 
-NoSocket* NoRealListener::GetSockObjImpl(const NoString& sHost, ushort uPort)
+NoSocket* NoRealListener::GetSockObjImpl(const NoString& host, ushort port)
 {
-    NoIncomingConnection* pClient = new NoIncomingConnection(sHost, uPort, m_Listener.GetAcceptType(), m_Listener.GetURIPrefix());
-    if (NoApp::Get().AllowConnectionFrom(sHost)) {
-        GLOBALMODULECALL(OnClientConnect(pClient, sHost, uPort), NOTHING);
+    NoIncomingConnection* client = new NoIncomingConnection(host, port, m_listener->acceptType(), m_listener->uriPrefix());
+    if (NoApp::Get().AllowConnectionFrom(host)) {
+        GLOBALMODULECALL(OnClientConnect(client, host, port), NOTHING);
     } else {
-        pClient->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
-        pClient->Close(NoSocket::CLT_AFTERWRITE);
-        GLOBALMODULECALL(OnFailedLogin("", sHost), NOTHING);
+        client->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
+        client->Close(NoSocket::CLT_AFTERWRITE);
+        GLOBALMODULECALL(OnFailedLogin("", host), NOTHING);
     }
-    return pClient;
+    return client;
 }
 
-void NoRealListener::SockErrorImpl(int iErrno, const NoString& sDescription)
+void NoRealListener::SockErrorImpl(int iErrno, const NoString& description)
 {
-    NO_DEBUG(GetSockName() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
+    NO_DEBUG(GetSockName() << " == SockError(" << description << ", " << strerror(iErrno) << ")");
     if (iErrno == EMFILE) {
         // We have too many open fds, let's close this listening port to be able to continue
         // to work, next rehash will (try to) reopen it.
@@ -170,8 +170,8 @@ void NoRealListener::SockErrorImpl(int iErrno, const NoString& sDescription)
     }
 }
 
-NoIncomingConnection::NoIncomingConnection(const NoString& sHostname, ushort uPort, No::AcceptType eAcceptType, const NoString& sURIPrefix)
-    : NoSocket(sHostname, uPort), m_eAcceptType(eAcceptType), m_sURIPrefix(sURIPrefix)
+NoIncomingConnection::NoIncomingConnection(const NoString& hostname, ushort port, No::AcceptType acceptType, const NoString& uriPrefix)
+    : NoSocket(hostname, port), m_acceptType(acceptType), m_uriPrefix(uriPrefix)
 {
     // The socket will time out in 120 secs, no matter what.
     // This has to be fixed up later, if desired.
@@ -193,17 +193,15 @@ void NoIncomingConnection::ReachedMaxBufferImpl()
     Close();
 }
 
-void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
+void NoIncomingConnection::ReadLineImpl(const NoString& line)
 {
-    bool bIsHTTP = (No::wildCmp(sLine, "GET * HTTP/1.?\r\n") || No::wildCmp(sLine, "POST * HTTP/1.?\r\n"));
-    bool bAcceptHTTP = (m_eAcceptType == No::AcceptAll) || (m_eAcceptType == No::AcceptHttp);
-    bool bAcceptIRC = (m_eAcceptType == No::AcceptAll) || (m_eAcceptType == No::AcceptIrc);
-    NoSocket* pSock = nullptr;
+    bool isHttp = (No::wildCmp(line, "GET * HTTP/1.?\r\n") || No::wildCmp(line, "POST * HTTP/1.?\r\n"));
+    NoSocket* socket = nullptr;
 
-    if (!bIsHTTP) {
+    if (!isHttp) {
         // Let's assume it's an IRC connection
 
-        if (!bAcceptIRC) {
+        if (!(m_acceptType & No::AcceptIrc)) {
             Write("ERROR :We don't take kindly to your types around here!\r\n");
             Close(CLT_AFTERWRITE);
 
@@ -211,15 +209,15 @@ void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
             return;
         }
 
-        pSock = new NoClient();
-        NoApp::Get().GetManager().SwapSockByAddr(pSock->GetHandle(), GetHandle());
+        socket = new NoClient();
+        NoApp::Get().GetManager().SwapSockByAddr(socket->GetHandle(), GetHandle());
 
         // And don't forget to give it some sane name / timeout
-        pSock->SetSockName("USR::???");
+        socket->SetSockName("USR::???");
     } else {
         // This is a HTTP request, let the webmods handle it
 
-        if (!bAcceptHTTP) {
+        if (!(m_acceptType & No::AcceptHttp)) {
             Write("HTTP/1.0 403 Access Denied\r\n\r\nWeb Access is not enabled.\r\n");
             Close(CLT_AFTERWRITE);
 
@@ -227,14 +225,14 @@ void NoIncomingConnection::ReadLineImpl(const NoString& sLine)
             return;
         }
 
-        pSock = new NoWebSocket(m_sURIPrefix);
-        NoApp::Get().GetManager().SwapSockByAddr(pSock->GetHandle(), GetHandle());
+        socket = new NoWebSocket(m_uriPrefix);
+        NoApp::Get().GetManager().SwapSockByAddr(socket->GetHandle(), GetHandle());
 
         // And don't forget to give it some sane name / timeout
-        pSock->SetSockName("WebMod::Client");
+        socket->SetSockName("WebMod::Client");
     }
 
     // TODO can we somehow get rid of this?
-    pSock->ReadLineImpl(sLine);
-    pSock->PushBuffImpl("", 0, true);
+    socket->ReadLineImpl(line);
+    socket->PushBuffImpl("", 0, true);
 }

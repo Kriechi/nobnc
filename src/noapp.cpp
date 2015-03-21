@@ -574,17 +574,17 @@ bool NoApp::WriteConfig()
     for (NoListener* pListener : m_vpListeners) {
         NoSettings listenerConfig;
 
-        listenerConfig.AddKeyValuePair("Host", pListener->GetBindHost());
-        listenerConfig.AddKeyValuePair("URIPrefix", pListener->GetURIPrefix() + "/");
-        listenerConfig.AddKeyValuePair("Port", NoString(pListener->GetPort()));
+        listenerConfig.AddKeyValuePair("Host", pListener->bindHost());
+        listenerConfig.AddKeyValuePair("URIPrefix", pListener->uriPrefix() + "/");
+        listenerConfig.AddKeyValuePair("Port", NoString(pListener->port()));
 
-        listenerConfig.AddKeyValuePair("IPv4", NoString(pListener->GetAddrType() != No::Ipv6Address));
-        listenerConfig.AddKeyValuePair("IPv6", NoString(pListener->GetAddrType() != No::Ipv4Address));
+        listenerConfig.AddKeyValuePair("IPv4", NoString(pListener->addressType() != No::Ipv6Address));
+        listenerConfig.AddKeyValuePair("IPv6", NoString(pListener->addressType() != No::Ipv4Address));
 
-        listenerConfig.AddKeyValuePair("SSL", NoString(pListener->IsSSL()));
+        listenerConfig.AddKeyValuePair("SSL", NoString(pListener->isSsl()));
 
-        listenerConfig.AddKeyValuePair("AllowIRC", NoString(pListener->GetAcceptType() != No::AcceptHttp));
-        listenerConfig.AddKeyValuePair("AllowWeb", NoString(pListener->GetAcceptType() != No::AcceptIrc));
+        listenerConfig.AddKeyValuePair("AllowIRC", NoString(pListener->acceptType() != No::AcceptHttp));
+        listenerConfig.AddKeyValuePair("AllowWeb", NoString(pListener->acceptType() != No::AcceptIrc));
 
         config.AddSubConfig("Listener", "listener" + NoString(l++), listenerConfig);
     }
@@ -751,7 +751,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         No::printAction("Verifying the listener");
         NoListener* pListener =
         new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address, No::AcceptAll);
-        if (!pListener->Listen()) {
+        if (!pListener->listen()) {
             No::printStatus(false, FormatBindError());
             bSuccess = false;
         } else
@@ -1651,9 +1651,9 @@ const std::map<NoString, NoUser*>&NoApp::GetUserMap() const { return (m_msUsers)
 NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, No::AddressType eAddr)
 {
     for (NoListener* pListener : m_vpListeners) {
-        if (pListener->GetPort() != uPort) continue;
-        if (pListener->GetBindHost() != sBindHost) continue;
-        if (pListener->GetAddrType() != eAddr) continue;
+        if (pListener->port() != uPort) continue;
+        if (pListener->bindHost() != sBindHost) continue;
+        if (pListener->addressType() != eAddr) continue;
         return pListener;
     }
     return nullptr;
@@ -1785,7 +1785,7 @@ bool NoApp::AddListener(ushort uPort,
 
     NoListener* pListener = new NoListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept);
 
-    if (!pListener->Listen()) {
+    if (!pListener->listen()) {
         sError = FormatBindError();
         No::printStatus(false, sError);
         delete pListener;
@@ -1856,7 +1856,7 @@ bool NoApp::AddListener(NoSettings* pConfig, NoString& sError)
 
 bool NoApp::AddListener(NoListener* pListener)
 {
-    if (!pListener->GetSocket()) {
+    if (!pListener->socket()) {
         // Listener doesnt actually listen
         delete pListener;
         return false;

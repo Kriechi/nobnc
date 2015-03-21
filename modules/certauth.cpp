@@ -52,7 +52,7 @@ public:
         // We need the SSL_VERIFY_PEER flag on all listeners, or else
         // the client doesn't send a ssl cert
         for (it = vListeners.begin(); it != vListeners.end(); ++it)
-            (*it)->GetSocket()->SetRequireClientCertFlags(SSL_VERIFY_PEER);
+            (*it)->socket()->SetRequireClientCertFlags(SSL_VERIFY_PEER);
 
         for (NoStringMap::const_iterator it1 = BeginNV(); it1 != EndNV(); ++it1) {
             if (NoApp::Get().FindUser(it1->first) == nullptr) {

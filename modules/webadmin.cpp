@@ -153,7 +153,7 @@ public:
             const std::vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
             std::vector<NoListener*>::const_iterator it;
             for (it = vListeners.begin(); it != vListeners.end(); ++it) {
-                (*it)->SetAcceptType(No::AcceptIrc);
+                (*it)->setAcceptType(No::AcceptIrc);
             }
         }
 
@@ -161,7 +161,7 @@ public:
         NoListener* pListener =
         new NoListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address), No::AcceptHttp);
 
-        if (!pListener->Listen()) {
+        if (!pListener->listen()) {
             sMessage = "Failed to add backwards-compatible listener";
             return false;
         }
@@ -1779,27 +1779,27 @@ public:
                 NoListener* pListener = vpListeners[c];
                 NoTemplate& l = Tmpl.AddRow("ListenLoop");
 
-                l["Port"] = NoString(pListener->GetPort());
-                l["BindHost"] = pListener->GetBindHost();
+                l["Port"] = NoString(pListener->port());
+                l["BindHost"] = pListener->bindHost();
 
-                l["IsWeb"] = NoString(pListener->GetAcceptType() != No::AcceptIrc);
-                l["IsIRC"] = NoString(pListener->GetAcceptType() != No::AcceptHttp);
+                l["IsWeb"] = NoString(pListener->acceptType() != No::AcceptIrc);
+                l["IsIRC"] = NoString(pListener->acceptType() != No::AcceptHttp);
 
-                l["URIPrefix"] = pListener->GetURIPrefix() + "/";
+                l["URIPrefix"] = pListener->uriPrefix() + "/";
 
                 // simple protection for user from shooting his own foot
                 // TODO check also for hosts/families
                 // such check is only here, user still can forge HTTP request to delete web port
-                l["SuggestDeletion"] = NoString(pListener->GetPort() != WebSock.GetLocalPort());
+                l["SuggestDeletion"] = NoString(pListener->port() != WebSock.GetLocalPort());
 
 #ifdef HAVE_LIBSSL
-                if (pListener->IsSSL()) {
+                if (pListener->isSsl()) {
                     l["IsSSL"] = "true";
                 }
 #endif
 
 #ifdef HAVE_IPV6
-                switch (pListener->GetAddrType()) {
+                switch (pListener->addressType()) {
                 case No::Ipv4Address:
                     l["IsIPV4"] = "true";
                     break;

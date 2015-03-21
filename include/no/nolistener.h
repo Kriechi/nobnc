@@ -25,35 +25,36 @@ class NoSocket;
 class NO_EXPORT NoListener
 {
 public:
-    NoListener(ushort uPort, const NoString& sBindHost, const NoString& sURIPrefix, bool bSSL, No::AddressType eAddr, No::AcceptType eAccept);
+    NoListener(ushort port, const NoString& bindHost, const NoString& uriPrefix, bool ssl, No::AddressType address, No::AcceptType accept);
     ~NoListener();
 
     NoListener(const NoListener&) = delete;
     NoListener& operator=(const NoListener&) = delete;
 
-    bool IsSSL() const;
-    No::AddressType GetAddrType() const;
-    ushort GetPort() const;
-    const NoString& GetBindHost() const;
-    NoSocket* GetSocket() const;
-    const NoString& GetURIPrefix() const;
-    No::AcceptType GetAcceptType() const;
+    bool isSsl() const;
+    No::AddressType addressType() const;
+    ushort port() const;
+    const NoString& bindHost() const;
+    NoSocket* socket() const;
+    const NoString& uriPrefix() const;
 
-    // It doesn't make sense to change any of the settings after Listen()
-    // except this one, so don't add other setters!
-    void SetAcceptType(No::AcceptType eType);
+    No::AcceptType acceptType() const;
+    void setAcceptType(No::AcceptType type);
 
-    bool Listen();
-    void ResetSocket();
+    bool listen();
 
 private:
-    bool m_bSSL;
-    No::AddressType m_eAddr;
-    ushort m_uPort;
-    NoString m_sBindHost;
-    NoString m_sURIPrefix;
-    NoSocket* m_pSocket;
-    No::AcceptType m_eAcceptType;
+    void resetSocket();
+
+    bool m_ssl;
+    No::AddressType m_addressType;
+    ushort m_port;
+    NoString m_bindHost;
+    NoString m_uriPrefix;
+    NoSocket* m_socket;
+    No::AcceptType m_acceptType;
+
+    friend class NoRealListener;
 };
 
 #endif // NOLISTENER_H
