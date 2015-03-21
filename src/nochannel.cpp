@@ -15,7 +15,7 @@
  */
 
 #include "nochannel.h"
-#include "noircconnection.h"
+#include "noircsocket.h"
 #include "nomessage.h"
 #include "nouser.h"
 #include "nonetwork.h"
@@ -328,16 +328,16 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
             NoString sArg;
 
             switch (m_network->GetIRCSock()->GetModeType(uMode)) {
-            case NoIrcConnection::ListArg:
+            case NoIrcSocket::ListArg:
                 bList = true;
                 sArg = getModeArg(sArgs);
                 break;
-            case NoIrcConnection::HasArg:
+            case NoIrcSocket::HasArg:
                 sArg = getModeArg(sArgs);
                 break;
-            case NoIrcConnection::NoArg:
+            case NoIrcSocket::NoArg:
                 break;
-            case NoIrcConnection::ArgWhenSet:
+            case NoIrcSocket::ArgWhenSet:
                 if (bAdd) {
                     sArg = getModeArg(sArgs);
                 }

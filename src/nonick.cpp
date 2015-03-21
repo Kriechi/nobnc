@@ -15,7 +15,7 @@
  */
 
 #include "nonick.h"
-#include "noircconnection.h"
+#include "noircsocket.h"
 #include "nonetwork.h"
 
 class NoNickPrivate
@@ -144,7 +144,7 @@ static NoString availablePerms(NoNetwork* network)
 {
     NoString perms = "@+";
     if (network) {
-        NoIrcConnection* socket = network->GetIRCSock();
+        NoIrcSocket* socket = network->GetIRCSock();
         if (socket)
             perms = socket->GetPerms();
     }

@@ -135,8 +135,8 @@ bool NoModules::OnIRCConnected()
     MODUNLOADCHK(OnIRCConnected());
     return false;
 }
-bool NoModules::OnIRCConnecting(NoIrcConnection* pIRCSock) { MODHALTCHK(OnIRCConnecting(pIRCSock)); }
-bool NoModules::OnIRCConnectionError(NoIrcConnection* pIRCSock)
+bool NoModules::OnIRCConnecting(NoIrcSocket* pIRCSock) { MODHALTCHK(OnIRCConnecting(pIRCSock)); }
+bool NoModules::OnIRCConnectionError(NoIrcSocket* pIRCSock)
 {
     MODUNLOADCHK(OnIRCConnectionError(pIRCSock));
     return false;

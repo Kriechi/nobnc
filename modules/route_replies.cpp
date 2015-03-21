@@ -16,7 +16,7 @@
 
 #include <no/nomodule.h>
 #include <no/nonetwork.h>
-#include <no/noircconnection.h>
+#include <no/noircsocket.h>
 #include <no/noclient.h>
 #include <no/noregistry.h>
 

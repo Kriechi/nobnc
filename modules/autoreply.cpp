@@ -17,7 +17,7 @@
 
 #include <no/nomodule.h>
 #include <no/nonetwork.h>
-#include <no/noircconnection.h>
+#include <no/noircsocket.h>
 #include <no/nocachemap.h>
 #include <no/noregistry.h>
 
@@ -62,7 +62,7 @@ public:
 
     void Handle(const NoString& sNick)
     {
-        NoIrcConnection* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcSocket* pIRCSock = GetNetwork()->GetIRCSock();
         if (!pIRCSock)
             // WTF?
             return;

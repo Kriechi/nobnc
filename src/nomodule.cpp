@@ -361,8 +361,8 @@ void NoModule::OnPreRehash() {}
 void NoModule::OnPostRehash() {}
 void NoModule::OnIRCDisconnected() {}
 void NoModule::OnIRCConnected() {}
-NoModule::ModRet NoModule::OnIRCConnecting(NoIrcConnection* IRCSock) { return CONTINUE; }
-void NoModule::OnIRCConnectionError(NoIrcConnection* IRCSock) {}
+NoModule::ModRet NoModule::OnIRCConnecting(NoIrcSocket* IRCSock) { return CONTINUE; }
+void NoModule::OnIRCConnectionError(NoIrcSocket* IRCSock) {}
 NoModule::ModRet NoModule::OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName)
 {
     return CONTINUE;

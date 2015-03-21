@@ -28,14 +28,14 @@ class NoUser;
 class NoNetwork;
 class NoClient;
 
-class NO_EXPORT NoIrcConnection : public NoSocket
+class NO_EXPORT NoIrcSocket : public NoSocket
 {
 public:
-    NoIrcConnection(NoNetwork* pNetwork);
-    virtual ~NoIrcConnection();
+    NoIrcSocket(NoNetwork* pNetwork);
+    virtual ~NoIrcSocket();
 
-    NoIrcConnection(const NoIrcConnection&) = delete;
-    NoIrcConnection& operator=(const NoIrcConnection&) = delete;
+    NoIrcSocket(const NoIrcSocket&) = delete;
+    NoIrcSocket& operator=(const NoIrcSocket&) = delete;
 
     enum ChanModeArgs {
         // These values must line up with their position in the CHANMODE argument to raw 005

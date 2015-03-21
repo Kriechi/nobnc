@@ -16,7 +16,7 @@
 
 #include <no/nomodule.h>
 #include <no/nonetwork.h>
-#include <no/noircconnection.h>
+#include <no/noircsocket.h>
 
 class NoKeepNickTimer : public NoTimer
 {
@@ -62,7 +62,7 @@ public:
             // No timer means we are turned off
             return;
 
-        NoIrcConnection* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcSocket* pIRCSock = GetNetwork()->GetIRCSock();
 
         if (!pIRCSock) return;
 
@@ -75,7 +75,7 @@ public:
     NoString GetNick()
     {
         NoString sConfNick = GetNetwork()->GetNick();
-        NoIrcConnection* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcSocket* pIRCSock = GetNetwork()->GetIRCSock();
 
         if (pIRCSock) sConfNick = sConfNick.left(pIRCSock->GetMaxNickLen());
 

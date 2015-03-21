@@ -21,7 +21,7 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/nochannel.h>
-#include <no/noircconnection.h>
+#include <no/noircsocket.h>
 #include <no/noapp.h>
 
 template <std::size_t N> struct array_size_helper
@@ -1107,7 +1107,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoIrcConnection* pIRCSock = pNetwork->GetIRCSock();
+        NoIrcSocket* pIRCSock = pNetwork->GetIRCSock();
         // cancel connection attempt:
         if (pIRCSock && !pIRCSock->IsConnected()) {
             pIRCSock->Close();

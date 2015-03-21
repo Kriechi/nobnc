@@ -26,7 +26,7 @@ class NoNetwork;
 class NoClient;
 class NoWebSocket;
 class NoTemplate;
-class NoIrcConnection;
+class NoIrcSocket;
 class NoNick;
 
 class NO_EXPORT NoModules : public std::vector<NoModule*>
@@ -52,8 +52,8 @@ public:
     bool OnPostRehash();
     bool OnIRCDisconnected();
     bool OnIRCConnected();
-    bool OnIRCConnecting(NoIrcConnection* pIRCSock);
-    bool OnIRCConnectionError(NoIrcConnection* pIRCSock);
+    bool OnIRCConnecting(NoIrcSocket* pIRCSock);
+    bool OnIRCConnectionError(NoIrcSocket* pIRCSock);
     bool OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName);
     bool OnBroadcast(NoString& sMessage);
 

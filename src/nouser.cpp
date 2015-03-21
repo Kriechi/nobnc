@@ -19,7 +19,7 @@
 #include "nofile.h"
 #include "nodir.h"
 #include "nonetwork.h"
-#include "noircconnection.h"
+#include "noircsocket.h"
 #include "nochannel.h"
 #include "noclient.h"
 #include "nomodulecall.h"
@@ -957,7 +957,7 @@ NoString NoUser::GetLocalDCCIP() const
     if (!GetDCCBindHost().empty()) return GetDCCBindHost();
 
     for (NoNetwork* pNetwork : m_vIRCNetworks) {
-        NoIrcConnection* pIRCSock = pNetwork->GetIRCSock();
+        NoIrcSocket* pIRCSock = pNetwork->GetIRCSock();
         if (pIRCSock) {
             return pIRCSock->GetLocalIP();
         }

@@ -17,7 +17,7 @@
 #include "noapp.h"
 #include "nodir.h"
 #include "nofile.h"
-#include "noircconnection.h"
+#include "noircsocket.h"
 #include "noauthenticator.h"
 #include "noserver.h"
 #include "nouser.h"
@@ -1950,7 +1950,7 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
     for (NoSocket* pSock : m_Manager.GetSockets()) {
         NoUser* pUser = nullptr;
         if (pSock->GetSockName().left(5) == "IRC::") {
-            pUser = ((NoIrcConnection*)pSock)->GetNetwork()->GetUser();
+            pUser = ((NoIrcSocket*)pSock)->GetNetwork()->GetUser();
         } else if (pSock->GetSockName().left(5) == "USR::") {
             pUser = ((NoClient*)pSock)->GetUser();
         }

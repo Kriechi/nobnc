@@ -20,7 +20,7 @@
 #include <no/noserver.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
-#include <no/noircconnection.h>
+#include <no/noircsocket.h>
 #include <no/nodebug.h>
 #include <no/noapp.h>
 #include <no/nowebsocket.h>
@@ -886,7 +886,7 @@ public:
 
                 Tmpl["QuitMsg"] = pNetwork->GetQuitMsg();
 
-                Tmpl["FloodProtection"] = NoString(NoIrcConnection::IsFloodProtected(pNetwork->GetFloodRate()));
+                Tmpl["FloodProtection"] = NoString(NoIrcSocket::IsFloodProtected(pNetwork->GetFloodRate()));
                 Tmpl["FloodRate"] = NoString(pNetwork->GetFloodRate());
                 Tmpl["FloodBurst"] = NoString(pNetwork->GetFloodBurst());
 

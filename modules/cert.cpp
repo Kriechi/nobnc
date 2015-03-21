@@ -19,7 +19,7 @@
 #include <no/nomodule.h>
 #include <no/nofile.h>
 #include <no/nouser.h>
-#include <no/noircconnection.h>
+#include <no/noircsocket.h>
 #include <no/notemplate.h>
 #include <no/nowebsocket.h>
 
@@ -61,7 +61,7 @@ public:
 
     bool HasPemFile() const { return (NoFile::Exists(PemFile())); }
 
-    ModRet OnIRCConnecting(NoIrcConnection* pIRCSock) override
+    ModRet OnIRCConnecting(NoIrcSocket* pIRCSock) override
     {
         if (HasPemFile()) {
             pIRCSock->SetPemLocation(PemFile());
