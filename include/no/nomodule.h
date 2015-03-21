@@ -29,6 +29,7 @@
 #include <set>
 #include <queue>
 #include <sys/time.h>
+#include <memory>
 
 class NoAuthenticator;
 class NoChannel;
@@ -41,6 +42,7 @@ class NoModule;
 class NoModuleInfo;
 class NoModuleSocket;
 class NoSocket;
+class NoModulePrivate;
 
 #ifdef REQUIRESSL
 #ifndef HAVE_LIBSSL
@@ -862,26 +864,8 @@ public:
     virtual void OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType);
 
 private:
-    No::ModuleType m_eType;
-    NoString m_sDescription;
-    std::set<NoTimer*> m_sTimers;
-    std::set<NoModuleSocket*> m_sSockets;
-#ifdef HAVE_PTHREAD
-    std::set<NoModuleJob*> m_sJobs;
-#endif
-    NoModuleHandle m_pDLL;
-    NoSocketManager* m_pManager;
-    NoUser* m_pUser;
-    NoNetwork* m_pNetwork;
-    NoClient* m_pClient;
-    NoString m_sModName;
-    NoString m_sDataDir;
-    NoString m_sSavePath;
-    NoString m_sArgs;
-    NoString m_sModPath;
-
-    VWebPages m_vSubPages;
-    std::map<NoString, NoModuleCommand> m_mCommands;
+    friend class NoModulePrivate;
+    std::unique_ptr<NoModulePrivate> d;
 };
 
 #endif // NOMODULE_H

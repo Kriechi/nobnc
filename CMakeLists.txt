@@ -49,6 +49,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nonamespace.h
                        include/no/nomessage.h
                        include/no/nomodule.h
+                       include/no/nomodule_p.h
                        include/no/nomodulecall.h
                        include/no/nomodulecommand.h
                        include/no/nomoduleinfo.h
