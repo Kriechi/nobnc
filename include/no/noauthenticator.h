@@ -19,18 +19,17 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
+#include <memory>
 
 class NoUser;
 class NoSocket;
+class NoAuthenticatorPrivate;
 
 class NO_EXPORT NoAuthenticator
 {
 public:
     NoAuthenticator(const NoString& username, const NoString& password, NoSocket* socket);
     virtual ~NoAuthenticator();
-
-    NoAuthenticator(const NoAuthenticator&) = delete;
-    NoAuthenticator& operator=(const NoAuthenticator&) = delete;
 
     NoString username() const;
     NoString password() const;
@@ -46,9 +45,10 @@ protected:
     virtual void loginRefused(NoUser* user, const NoString& reason) = 0;
 
 private:
-    NoString m_username;
-    NoString m_password;
-    NoSocket* m_socket;
+    NoAuthenticator(const NoAuthenticator&) = delete;
+    NoAuthenticator& operator=(const NoAuthenticator&) = delete;
+
+    std::unique_ptr<NoAuthenticatorPrivate> d;
 };
 
 #endif // NOAUTHENTICATOR_H

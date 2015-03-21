@@ -19,9 +19,20 @@
 #include "nouser.h"
 #include "noapp.h"
 
-NoAuthenticator::NoAuthenticator(const NoString& username, const NoString& password, NoSocket* socket)
-    : m_username(username), m_password(password), m_socket(socket)
+class NoAuthenticatorPrivate
 {
+public:
+    NoString username = "";
+    NoString password = "";
+    NoSocket* socket = nullptr;
+};
+
+NoAuthenticator::NoAuthenticator(const NoString& username, const NoString& password, NoSocket* socket)
+    : d(new NoAuthenticatorPrivate)
+{
+    d->username = username;
+    d->password = password;
+    d->socket = socket;
 }
 
 NoAuthenticator::~NoAuthenticator()
@@ -30,22 +41,22 @@ NoAuthenticator::~NoAuthenticator()
 
 NoString NoAuthenticator::username() const
 {
-    return m_username;
+    return d->username;
 }
 
 NoString NoAuthenticator::password() const
 {
-    return m_password;
+    return d->password;
 }
 
 NoSocket* NoAuthenticator::socket() const
 {
-    return m_socket;
+    return d->socket;
 }
 
 void NoAuthenticator::acceptLogin(NoUser* user)
 {
-    if (m_socket) {
+    if (d->socket) {
         loginAccepted(user);
         invalidate();
     }
@@ -53,25 +64,25 @@ void NoAuthenticator::acceptLogin(NoUser* user)
 
 void NoAuthenticator::refuseLogin(const NoString& reason)
 {
-    if (!m_socket)
+    if (!d->socket)
         return;
 
-    NoUser* user = NoApp::Get().FindUser(m_username);
+    NoUser* user = NoApp::Get().FindUser(d->username);
 
     // If the username is valid, notify that user that someone tried to
     // login. Use reason because there are other reasons than "wrong
     // password" for a login to be rejected (e.g. fail2ban).
     if (user) {
-        user->PutStatus("A client from [" + m_socket->GetRemoteIP() + "] attempted "
+        user->PutStatus("A client from [" + d->socket->GetRemoteIP() + "] attempted "
                         "to login as you, but was rejected [" + reason + "].");
     }
 
-    GLOBALMODULECALL(OnFailedLogin(m_username, m_socket->GetRemoteIP()), NOTHING);
+    GLOBALMODULECALL(OnFailedLogin(d->username, d->socket->GetRemoteIP()), NOTHING);
     loginRefused(user, reason);
     invalidate();
 }
 
 void NoAuthenticator::invalidate()
 {
-    m_socket = nullptr;
+    d->socket = nullptr;
 }
