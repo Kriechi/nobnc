@@ -119,9 +119,7 @@ public:
         Table.AddColumn("IP");
         Table.AddColumn("File");
 
-        std::set<NoModuleSocket*>::const_iterator it;
-        for (it = BeginSockets(); it != EndSockets(); ++it) {
-            NoDccBounce* pSock = (NoDccBounce*)*it;
+        for (NoDccBounce* pSock : m_sockets) {
             NoString sSockName = pSock->GetSockName();
 
             if (!(pSock->IsRemote())) {
@@ -213,10 +211,7 @@ public:
                 // PRIVMSG user :DCC RESUME "znc.o" 58810 151552
                 ushort uResumePort = No::token(sMessage, 3).toUShort();
 
-                std::set<NoModuleSocket*>::const_iterator it;
-                for (it = BeginSockets(); it != EndSockets(); ++it) {
-                    NoDccBounce* pSock = (NoDccBounce*)*it;
-
+                for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetLocalPort() == uResumePort) {
                         PutIRC("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
                                NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
@@ -225,9 +220,7 @@ public:
             } else if (sType.equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
 
-                std::set<NoModuleSocket*>::const_iterator it;
-                for (it = BeginSockets(); it != EndSockets(); ++it) {
-                    NoDccBounce* pSock = (NoDccBounce*)*it;
+                for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
                         PutIRC("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
                                NoString(pSock->GetLocalPort()) + " " + No::token(sMessage, 4) + "\001");
@@ -276,10 +269,7 @@ public:
                 // Need to lookup the connection by port, filter the port, and forward to the user
                 ushort uResumePort = No::token(sMessage, 3).toUShort();
 
-                std::set<NoModuleSocket*>::const_iterator it;
-                for (it = BeginSockets(); it != EndSockets(); ++it) {
-                    NoDccBounce* pSock = (NoDccBounce*)*it;
-
+                for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetLocalPort() == uResumePort) {
                         PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
                                 " " + sFile + " " + NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
@@ -287,10 +277,7 @@ public:
                 }
             } else if (sType.equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
-                std::set<NoModuleSocket*>::const_iterator it;
-                for (it = BeginSockets(); it != EndSockets(); ++it) {
-                    NoDccBounce* pSock = (NoDccBounce*)*it;
-
+                for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
                         PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
                                 " " + sFile + " " + NoString(pSock->GetLocalPort()) + " " + No::token(sMessage, 4) + "\001");
@@ -303,6 +290,10 @@ public:
 
         return CONTINUE;
     }
+    void AddSocket(NoDccBounce* socket) { m_sockets.insert(socket); }
+    void RemoveSocket(NoDccBounce* socket) { m_sockets.erase(socket); }
+private:
+    std::set<NoDccBounce*> m_sockets;
 };
 
 NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
@@ -330,6 +321,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
     } else {
         DisableReadLine();
     }
+    pMod->AddSocket(this);
 }
 
 NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
@@ -357,6 +349,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
     } else {
         DisableReadLine();
     }
+    pMod->AddSocket(this);
 }
 
 NoDccBounce::~NoDccBounce()
@@ -365,6 +358,7 @@ NoDccBounce::~NoDccBounce()
         m_pPeer->Shutdown();
         m_pPeer = nullptr;
     }
+    m_pModule->RemoveSocket(this);
 }
 
 void NoDccBounce::ReadLineImpl(const NoString& sData)

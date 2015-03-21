@@ -16,6 +16,7 @@
 
 #include "nomodulesocket.h"
 #include "nomodule.h"
+#include "nomodule_p.h"
 #include "nonetwork.h"
 #include "nouser.h"
 #include "noapp.h"
@@ -23,7 +24,8 @@
 
 NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_pModule(pModule)
 {
-    if (m_pModule) m_pModule->AddSocket(this);
+    if (pModule)
+        NoModulePrivate::get(pModule)->addSocket(this);
     EnableReadLine();
     SetMaxBufferThreshold(10240);
 }
@@ -31,7 +33,8 @@ NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_pModule(pModul
 NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort, int iTimeout)
     : NoSocket(sHostname, uPort, iTimeout), m_pModule(pModule)
 {
-    if (m_pModule) m_pModule->AddSocket(this);
+    if (pModule)
+        NoModulePrivate::get(pModule)->addSocket(this);
     EnableReadLine();
     SetMaxBufferThreshold(10240);
 }
@@ -43,10 +46,11 @@ NoModuleSocket::~NoModuleSocket()
     // NoWebSocket could cause us to have a nullptr pointer here
     if (m_pModule) {
         pUser = m_pModule->GetUser();
-        m_pModule->UnlinkSocket(this);
+        NoModulePrivate::get(m_pModule)->removeSocket(this);
+        m_pModule->GetManager()->DelSockByAddr(this);
     }
 
-    if (pUser && m_pModule && (m_pModule->GetType() != No::GlobalModule)) {
+    if (pUser && m_pModule && m_pModule->GetType() != No::GlobalModule) {
         pUser->AddBytesWritten(GetBytesWritten());
         pUser->AddBytesRead(GetBytesRead());
     } else {

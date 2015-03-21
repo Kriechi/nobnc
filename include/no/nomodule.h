@@ -696,13 +696,7 @@ public:
     NoTimer* FindTimer(const NoString& sLabel) const;
     virtual void ListTimers();
 
-    bool AddSocket(NoModuleSocket* pSocket);
-    bool RemSocket(NoModuleSocket* pSocket);
-    bool RemSocket(const NoString& sSockName);
-    bool UnlinkSocket(NoModuleSocket* pSocket);
-    NoModuleSocket* FindSocket(const NoString& sSockName);
-    std::set<NoModuleSocket*>::const_iterator BeginSockets() const;
-    std::set<NoModuleSocket*>::const_iterator EndSockets() const;
+    NoModuleSocket* FindSocket(const NoString& sName) const;
     virtual void ListSockets();
 
 #ifdef HAVE_PTHREAD

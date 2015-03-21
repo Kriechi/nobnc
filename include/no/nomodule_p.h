@@ -31,6 +31,8 @@ public:
 
     void addTimer(NoTimer* timer) { sTimers.insert(timer); }
     void removeTimer(NoTimer* timer) { sTimers.erase(timer); }
+    void addSocket(NoModuleSocket* socket) { sSockets.insert(socket); }
+    void removeSocket(NoModuleSocket* socket) { sSockets.erase(socket); }
 
     No::ModuleType eType;
     NoString sDescription;

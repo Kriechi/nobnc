@@ -206,10 +206,7 @@ public:
         Table.AddColumn("IP");
         Table.AddColumn("File");
 
-        std::set<NoModuleSocket*>::const_iterator it;
-        for (it = BeginSockets(); it != EndSockets(); ++it) {
-            NoDccSock* pSock = (NoDccSock*)*it;
-
+        for (NoDccSock* pSock : m_sockets) {
             Table.AddRow();
             Table.SetCell("Nick", pSock->GetRemoteNick());
             Table.SetCell("IP", pSock->GetRemoteIP());
@@ -241,10 +238,7 @@ public:
             ushort uResumePort = No::token(sMessage, 3).toUShort();
             ulong uResumeSize = No::token(sMessage, 4).toULong();
 
-            std::set<NoModuleSocket*>::const_iterator it;
-            for (it = BeginSockets(); it != EndSockets(); ++it) {
-                NoDccSock* pSock = (NoDccSock*)*it;
-
+            for (NoDccSock* pSock : m_sockets) {
                 if (pSock->GetLocalPort() == uResumePort) {
                     if (pSock->Seek(uResumeSize)) {
                         PutModule("DCC -> [" + pSock->GetRemoteNick() + "][" + pSock->GetFileName() +
@@ -268,6 +262,10 @@ public:
             GetFile(GetClient()->GetNick(), No::formatIp(uLongIP), uPort, sLocalFile, uFileSize);
         }
     }
+    void AddSocket(NoDccSock* socket) { m_sockets.insert(socket); }
+    void RemoveSocket(NoDccSock* socket) { m_sockets.erase(socket); }
+private:
+    std::set<NoDccSock*> m_sockets;
 };
 
 NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize, NoFile* pFile)
@@ -283,6 +281,7 @@ NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString
     m_bSend = true;
     m_bNoDelFile = false;
     SetMaxBufferThreshold(0);
+    pMod->AddSocket(this);
 }
 
 NoDccSock::NoDccSock(NoDccMod* pMod,
@@ -304,6 +303,7 @@ NoDccSock::NoDccSock(NoDccMod* pMod,
     m_bSend = false;
     m_bNoDelFile = false;
     SetMaxBufferThreshold(0);
+    pMod->AddSocket(this);
 }
 
 NoDccSock::~NoDccSock()
@@ -312,6 +312,7 @@ NoDccSock::~NoDccSock()
         m_pFile->Close();
         delete m_pFile;
     }
+    m_pModule->RemoveSocket(this);
 }
 
 void NoDccSock::ReadDataImpl(const char* data, size_t len)

@@ -45,9 +45,9 @@ NoModule::~NoModule()
         delete timer;
     d->sTimers.clear();
 
-    while (!d->sSockets.empty()) {
-        RemSocket(*d->sSockets.begin());
-    }
+    for (NoModuleSocket* socket : d->sSockets)
+        delete socket;
+    d->sSockets.clear();
 
 #ifdef HAVE_PTHREAD
     CancelJobs(d->sJobs);
@@ -179,55 +179,16 @@ void NoModule::ListTimers()
     PutModule(Table);
 }
 
-bool NoModule::AddSocket(NoModuleSocket* pSocket)
-{
-    if (!pSocket) {
-        return false;
-    }
-
-    d->sSockets.insert(pSocket);
-    return true;
-}
-
-bool NoModule::RemSocket(NoModuleSocket* pSocket)
-{
-    if (d->sSockets.erase(pSocket)) {
-        d->pManager->DelSockByAddr(pSocket);
-        return true;
-    }
-
-    return false;
-}
-
-bool NoModule::RemSocket(const NoString& sSockName)
+NoModuleSocket* NoModule::FindSocket(const NoString& sName) const
 {
     for (NoModuleSocket* pSocket : d->sSockets) {
-        if (pSocket->GetSockName().equals(sSockName)) {
-            d->sSockets.erase(pSocket);
-            d->pManager->DelSockByAddr(pSocket);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool NoModule::UnlinkSocket(NoModuleSocket* pSocket) { return d->sSockets.erase(pSocket); }
-
-NoModuleSocket* NoModule::FindSocket(const NoString& sSockName)
-{
-    for (NoModuleSocket* pSocket : d->sSockets) {
-        if (pSocket->GetSockName().equals(sSockName)) {
+        if (pSocket->GetSockName().equals(sName)) {
             return pSocket;
         }
     }
 
     return nullptr;
 }
-
-std::set<NoModuleSocket*>::const_iterator NoModule::BeginSockets() const { return d->sSockets.begin(); }
-
-std::set<NoModuleSocket*>::const_iterator NoModule::EndSockets() const { return d->sSockets.end(); }
 
 void NoModule::ListSockets()
 {

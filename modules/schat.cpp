@@ -49,6 +49,7 @@ class NoSChatSock : public NoModuleSocket
 public:
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick);
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout = 60);
+    ~NoSChatSock();
 
     NoSocket* GetSockObjImpl(const NoString& sHostname, u_short iPort) override
     {
@@ -122,13 +123,9 @@ public:
 
     void OnClientLogin() override
     {
-        std::set<NoModuleSocket*>::const_iterator it;
-        for (it = BeginSockets(); it != EndSockets(); ++it) {
-            NoSChatSock* p = (NoSChatSock*)*it;
-
-            if (p->IsListener()) continue;
-
-            p->DumpBuffer();
+        for (NoSChatSock* p : m_sockets) {
+            if (!p->IsListener())
+                p->DumpBuffer();
         }
     }
 
@@ -154,10 +151,7 @@ public:
 
         if (sCom.equals("chat") && !sArgs.empty()) {
             NoString sNick = "(s)" + sArgs;
-            std::set<NoModuleSocket*>::const_iterator it;
-            for (it = BeginSockets(); it != EndSockets(); ++it) {
-                NoSChatSock* pSock = (NoSChatSock*)*it;
-
+            for (NoSChatSock* pSock : m_sockets) {
                 if (pSock->GetChatNick().equals(sNick)) {
                     PutModule("Already Connected to [" + sArgs + "]");
                     return;
@@ -193,11 +187,8 @@ public:
             Table.AddColumn("Status");
             Table.AddColumn("Cipher");
 
-            std::set<NoModuleSocket*>::const_iterator it;
-            for (it = BeginSockets(); it != EndSockets(); ++it) {
+            for (NoSChatSock* pSock : m_sockets) {
                 Table.AddRow();
-
-                NoSChatSock* pSock = (NoSChatSock*)*it;
                 Table.SetCell("Nick", pSock->GetChatNick());
                 ulonglong iStartTime = pSock->GetStartTime();
                 time_t iTime = iStartTime / 1000;
@@ -229,10 +220,7 @@ public:
         } else if (sCom.equals("close")) {
             if (!sArgs.startsWith("(s)")) sArgs = "(s)" + sArgs;
 
-            std::set<NoModuleSocket*>::const_iterator it;
-            for (it = BeginSockets(); it != EndSockets(); ++it) {
-                NoSChatSock* pSock = (NoSChatSock*)*it;
-
+            for (NoSChatSock* pSock : m_sockets) {
                 if (sArgs.equals(pSock->GetChatNick())) {
                     pSock->Close();
                     return;
@@ -248,10 +236,8 @@ public:
             Table.AddColumn("Type");
             Table.AddColumn("Cipher");
 
-            std::set<NoModuleSocket*>::const_iterator it;
-            for (it = BeginSockets(); it != EndSockets(); ++it) {
+            for (NoSChatSock* pSock : m_sockets) {
                 Table.AddRow();
-                NoModuleSocket* pSock = *it;
                 Table.SetCell("SockName", pSock->GetSockName());
                 ulonglong iStartTime = pSock->GetStartTime();
                 time_t iTime = iStartTime / 1000;
@@ -379,9 +365,13 @@ public:
 
     bool IsAttached() { return (GetNetwork()->IsUserAttached()); }
 
+    void AddSocket(NoSChatSock* socket) { m_sockets.insert(socket); }
+    void RemoveSocket(NoSChatSock* socket) { m_sockets.erase(socket); }
+
 private:
     std::map<NoString, std::pair<u_long, u_short>> m_siiWaitingChats;
     NoString m_sPemFile;
+    std::set<NoSChatSock*> m_sockets;
 };
 
 
@@ -392,6 +382,7 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoModuleSoc
     m_pModule = pMod;
     m_sChatNick = sChatNick;
     SetSockName(pMod->GetModName().toUpper() + "::" + m_sChatNick);
+    pMod->AddSocket(this);
 }
 
 NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout)
@@ -401,6 +392,12 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoStrin
     EnableReadLine();
     m_sChatNick = sChatNick;
     SetSockName(pMod->GetModName().toUpper() + "::" + m_sChatNick);
+    pMod->AddSocket(this);
+}
+
+NoSChatSock::~NoSChatSock()
+{
+    m_pModule->RemoveSocket(this);
 }
 
 void NoSChatSock::PutQuery(const NoString& sText)
