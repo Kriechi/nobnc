@@ -54,8 +54,6 @@ public:
     bool listen();
 
 private:
-    void resetSocket();
-
     bool m_ssl;
     ushort m_port;
     NoString m_bindHost;
@@ -64,7 +62,7 @@ private:
     No::AddressType m_addressType;
     NoSocket* m_socket;
 
-    friend class NoRealListener;
+    friend class NoListenerSocket;
 };
 
 #endif // NOLISTENER_H

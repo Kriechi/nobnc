@@ -20,11 +20,11 @@
 #include "noapp.h"
 #include "nowebsocket.h"
 
-class NoRealListener : public NoSocket
+class NoListenerSocket : public NoSocket
 {
 public:
-    NoRealListener(NoListener* listener);
-    virtual ~NoRealListener();
+    NoListenerSocket(NoListener* listener) : m_listener(listener) { }
+    ~NoListenerSocket() { m_listener->m_socket = nullptr; }
 
     bool ConnectionFromImpl(const NoString& host, ushort port) override;
     NoSocket* GetSockObjImpl(const NoString& host, ushort port) override;
@@ -34,10 +34,11 @@ private:
     NoListener* m_listener;
 };
 
-class NoIncomingConnection : public NoSocket
+class NoClientSocket : public NoSocket
 {
 public:
-    NoIncomingConnection(const NoString& hostname, ushort port, No::AcceptType accept, const NoString& uriPrefix);
+    NoClientSocket(const NoString& hostname, ushort port, NoListener* listener);
+
     void ReadLineImpl(const NoString& data) override;
     void ReachedMaxBufferImpl() override;
 
@@ -45,6 +46,107 @@ private:
     No::AcceptType m_acceptType;
     const NoString m_uriPrefix;
 };
+
+bool NoListenerSocket::ConnectionFromImpl(const NoString& host, ushort port)
+{
+    bool allowed = NoApp::Get().IsHostAllowed(host);
+    NO_DEBUG(GetSockName() << " == ConnectionFrom(" << host << ", " << port << ") ["
+                        << (allowed ? "Allowed" : "Not allowed") << "]");
+    return allowed;
+}
+
+NoSocket* NoListenerSocket::GetSockObjImpl(const NoString& host, ushort port)
+{
+    NoClientSocket* client = new NoClientSocket(host, port, m_listener);
+    if (NoApp::Get().AllowConnectionFrom(host)) {
+        GLOBALMODULECALL(OnClientConnect(client, host, port), NOTHING);
+    } else {
+        client->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
+        client->Close(NoSocket::CLT_AFTERWRITE);
+        GLOBALMODULECALL(OnFailedLogin("", host), NOTHING);
+    }
+    return client;
+}
+
+void NoListenerSocket::SockErrorImpl(int error, const NoString& description)
+{
+    NO_DEBUG(GetSockName() << " == SockError(" << description << ", " << strerror(error) << ")");
+    if (error == EMFILE) {
+        // We have too many open fds, let's close this listening port to be able to continue
+        // to work, next rehash will (try to) reopen it.
+        NoApp::Get().Broadcast("We hit the FD limit, closing listening socket on [" + GetLocalIP() + " : " +
+                              NoString(GetLocalPort()) + "]");
+        NoApp::Get().Broadcast("An admin has to rehash to reopen the listening port");
+        Close();
+    }
+}
+
+NoClientSocket::NoClientSocket(const NoString& hostname, ushort port, NoListener* listener)
+    : NoSocket(hostname, port), m_acceptType(listener->acceptType()), m_uriPrefix(listener->uriPrefix())
+{
+    // The socket will time out in 120 secs, no matter what.
+    // This has to be fixed up later, if desired.
+    SetTimeout(120, 0);
+
+    SetEncoding("UTF-8");
+    EnableReadLine();
+}
+
+void NoClientSocket::ReachedMaxBufferImpl()
+{
+    if (GetCloseType() != CLT_DONT) return; // Already closing
+
+    // We don't actually SetMaxBufferThreshold() because that would be
+    // inherited by sockets after SwapSockByAddr().
+    if (GetInternalReadBuffer().length() <= 4096) return;
+
+    // We should never get here with legitimate requests :/
+    Close();
+}
+
+void NoClientSocket::ReadLineImpl(const NoString& line)
+{
+    bool isHttp = (No::wildCmp(line, "GET * HTTP/1.?\r\n") || No::wildCmp(line, "POST * HTTP/1.?\r\n"));
+    NoSocket* socket = nullptr;
+
+    if (!isHttp) {
+        // Let's assume it's an IRC connection
+
+        if (!(m_acceptType & No::AcceptIrc)) {
+            Write("ERROR :We don't take kindly to your types around here!\r\n");
+            Close(CLT_AFTERWRITE);
+
+            NO_DEBUG("Refused IRC connection to non IRC port");
+            return;
+        }
+
+        socket = new NoClient();
+        NoApp::Get().GetManager().SwapSockByAddr(socket->GetHandle(), GetHandle());
+
+        // And don't forget to give it some sane name / timeout
+        socket->SetSockName("USR::???");
+    } else {
+        // This is a HTTP request, let the webmods handle it
+
+        if (!(m_acceptType & No::AcceptHttp)) {
+            Write("HTTP/1.0 403 Access Denied\r\n\r\nWeb Access is not enabled.\r\n");
+            Close(CLT_AFTERWRITE);
+
+            NO_DEBUG("Refused HTTP connection to non HTTP port");
+            return;
+        }
+
+        socket = new NoWebSocket(m_uriPrefix);
+        NoApp::Get().GetManager().SwapSockByAddr(socket->GetHandle(), GetHandle());
+
+        // And don't forget to give it some sane name / timeout
+        socket->SetSockName("WebMod::Client");
+    }
+
+    // TODO can we somehow get rid of this?
+    socket->ReadLineImpl(line);
+    socket->PushBuffImpl("", 0, true);
+}
 
 NoListener::NoListener(ushort port, const NoString& bindHost)
     : m_ssl(false), m_port(port), m_bindHost(bindHost), m_uriPrefix(""),
@@ -135,7 +237,7 @@ bool NoListener::listen()
         return false;
     }
 
-    m_socket = new NoRealListener(this);
+    m_socket = new NoListenerSocket(this);
 
     bool ssl = false;
 #ifdef HAVE_LIBSSL
@@ -150,119 +252,4 @@ bool NoListener::listen()
     // which might even be "Error: Success".
     errno = EINVAL;
     return NoApp::Get().GetManager().ListenHost(m_port, "_LISTENER", m_bindHost, ssl, SOMAXCONN, m_socket, 0, m_addressType);
-}
-
-void NoListener::resetSocket()
-{
-    m_socket = nullptr;
-}
-
-NoRealListener::NoRealListener(NoListener* listener) : NoSocket(), m_listener(listener)
-{
-}
-
-NoRealListener::~NoRealListener()
-{
-    m_listener->resetSocket();
-}
-
-bool NoRealListener::ConnectionFromImpl(const NoString& host, ushort port)
-{
-    bool allowed = NoApp::Get().IsHostAllowed(host);
-    NO_DEBUG(GetSockName() << " == ConnectionFrom(" << host << ", " << port << ") ["
-                        << (allowed ? "Allowed" : "Not allowed") << "]");
-    return allowed;
-}
-
-NoSocket* NoRealListener::GetSockObjImpl(const NoString& host, ushort port)
-{
-    NoIncomingConnection* client = new NoIncomingConnection(host, port, m_listener->acceptType(), m_listener->uriPrefix());
-    if (NoApp::Get().AllowConnectionFrom(host)) {
-        GLOBALMODULECALL(OnClientConnect(client, host, port), NOTHING);
-    } else {
-        client->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
-        client->Close(NoSocket::CLT_AFTERWRITE);
-        GLOBALMODULECALL(OnFailedLogin("", host), NOTHING);
-    }
-    return client;
-}
-
-void NoRealListener::SockErrorImpl(int iErrno, const NoString& description)
-{
-    NO_DEBUG(GetSockName() << " == SockError(" << description << ", " << strerror(iErrno) << ")");
-    if (iErrno == EMFILE) {
-        // We have too many open fds, let's close this listening port to be able to continue
-        // to work, next rehash will (try to) reopen it.
-        NoApp::Get().Broadcast("We hit the FD limit, closing listening socket on [" + GetLocalIP() + " : " +
-                              NoString(GetLocalPort()) + "]");
-        NoApp::Get().Broadcast("An admin has to rehash to reopen the listening port");
-        Close();
-    }
-}
-
-NoIncomingConnection::NoIncomingConnection(const NoString& hostname, ushort port, No::AcceptType acceptType, const NoString& uriPrefix)
-    : NoSocket(hostname, port), m_acceptType(acceptType), m_uriPrefix(uriPrefix)
-{
-    // The socket will time out in 120 secs, no matter what.
-    // This has to be fixed up later, if desired.
-    SetTimeout(120, 0);
-
-    SetEncoding("UTF-8");
-    EnableReadLine();
-}
-
-void NoIncomingConnection::ReachedMaxBufferImpl()
-{
-    if (GetCloseType() != CLT_DONT) return; // Already closing
-
-    // We don't actually SetMaxBufferThreshold() because that would be
-    // inherited by sockets after SwapSockByAddr().
-    if (GetInternalReadBuffer().length() <= 4096) return;
-
-    // We should never get here with legitimate requests :/
-    Close();
-}
-
-void NoIncomingConnection::ReadLineImpl(const NoString& line)
-{
-    bool isHttp = (No::wildCmp(line, "GET * HTTP/1.?\r\n") || No::wildCmp(line, "POST * HTTP/1.?\r\n"));
-    NoSocket* socket = nullptr;
-
-    if (!isHttp) {
-        // Let's assume it's an IRC connection
-
-        if (!(m_acceptType & No::AcceptIrc)) {
-            Write("ERROR :We don't take kindly to your types around here!\r\n");
-            Close(CLT_AFTERWRITE);
-
-            NO_DEBUG("Refused IRC connection to non IRC port");
-            return;
-        }
-
-        socket = new NoClient();
-        NoApp::Get().GetManager().SwapSockByAddr(socket->GetHandle(), GetHandle());
-
-        // And don't forget to give it some sane name / timeout
-        socket->SetSockName("USR::???");
-    } else {
-        // This is a HTTP request, let the webmods handle it
-
-        if (!(m_acceptType & No::AcceptHttp)) {
-            Write("HTTP/1.0 403 Access Denied\r\n\r\nWeb Access is not enabled.\r\n");
-            Close(CLT_AFTERWRITE);
-
-            NO_DEBUG("Refused HTTP connection to non HTTP port");
-            return;
-        }
-
-        socket = new NoWebSocket(m_uriPrefix);
-        NoApp::Get().GetManager().SwapSockByAddr(socket->GetHandle(), GetHandle());
-
-        // And don't forget to give it some sane name / timeout
-        socket->SetSockName("WebMod::Client");
-    }
-
-    // TODO can we somehow get rid of this?
-    socket->ReadLineImpl(line);
-    socket->PushBuffImpl("", 0, true);
 }
