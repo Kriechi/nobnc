@@ -32,7 +32,6 @@ typedef int no_sock_t;
 #endif
 
 class Csock;
-class CCron;
 class NoModule;
 class NoSocketPrivate;
 
@@ -114,7 +113,6 @@ public:
     virtual void ReadLineImpl( const NoString & sLine);
     virtual void ReadDataImpl(const char* data, size_t len);
     virtual void PushBuffImpl( const char *data, size_t len, bool bStartAtZero = false );
-    void AddCron( CCron * pcCron );
     bool StartTLS();
     bool IsConOK() const;
 

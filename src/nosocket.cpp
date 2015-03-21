@@ -285,7 +285,6 @@ void NoSocket::ReadDataImpl(const char* data, size_t len) { return d->csock->Cso
 void NoSocketPrivate::PushBuff(const char *data, size_t len, bool bStartAtZero) { q->PushBuffImpl(data, len, bStartAtZero); }
 void NoSocket::PushBuffImpl( const char *data, size_t len, bool bStartAtZero ) { d->csock->Csock::PushBuff(data, len, bStartAtZero); }
 
-void NoSocket::AddCron( CCron * pcCron ) { d->csock->AddCron(pcCron); }
 bool NoSocket::StartTLS() { return d->csock->StartTLS(); }
 bool NoSocket::IsConOK() const { return d->csock->GetConState() == Csock::CST_OK; }
 

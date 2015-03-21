@@ -86,7 +86,7 @@ NoIrcSocket::NoIrcSocket(NoNetwork* pNetwork)
     // RFC says a line can have 512 chars max, but we don't care ;)
     SetMaxBufferThreshold(1024);
     if (m_bFloodProtection) {
-        AddCron(new NoIrcFloodTimer(this));
+        NoSocketPrivate::get(this)->AddCron(new NoIrcFloodTimer(this));
     }
 }
 
