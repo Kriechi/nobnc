@@ -21,7 +21,6 @@
 #include <no/nostring.h>
 #include <sys/socket.h>
 
-class Csock;
 class NoModule;
 class NoSocketPrivate;
 
@@ -43,8 +42,6 @@ class NO_EXPORT NoSocket
 public:
     NoSocket(const NoString& sHost = "", u_short port = 0, int timeout = 60);
     virtual ~NoSocket();
-
-    Csock* GetHandle() const;
 
     NoString GetHostToVerifySSL() const;
     void SetHostToVerifySSL(const NoString& sHost);

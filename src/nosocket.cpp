@@ -62,11 +62,6 @@ NoSocket::~NoSocket()
 {
 }
 
-Csock* NoSocket::GetHandle() const
-{
-    return d->csock;
-}
-
 int NoSocketPrivate::ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const
 {
     int ret = Csock::ConvertAddress(pAddr, iAddrLen, sIP, piPort);
@@ -265,7 +260,7 @@ Csock* NoSocketPrivate::GetSockObj(const NoString& sHost, ushort uPort)
 {
     NoSocket* sockObj = q->GetSockObjImpl(sHost, uPort);
     if (sockObj)
-        return sockObj->GetHandle();
+        return NoSocketPrivate::get(sockObj);
     return Csock::GetSockObj(sHost, uPort);
 }
 NoSocket* NoSocket::GetSockObjImpl(const NoString& sHost, ushort uPort) { return nullptr; }

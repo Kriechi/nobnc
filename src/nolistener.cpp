@@ -19,6 +19,7 @@
 #include "nodebug.h"
 #include "noapp.h"
 #include "nowebsocket.h"
+#include "nosocket_p.h"
 
 class NoListenerPrivate
 {
@@ -133,7 +134,7 @@ void NoClientSocket::ReadLineImpl(const NoString& line)
             NO_DEBUG("Refused IRC connection to non IRC port");
         } else {
             socket = new NoClient();
-            NoApp::Get().GetManager().SwapSockByAddr(socket->GetHandle(), GetHandle());
+            NoApp::Get().GetManager().SwapSockByAddr(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout
             socket->SetSockName("USR::???");
@@ -145,7 +146,7 @@ void NoClientSocket::ReadLineImpl(const NoString& line)
             NO_DEBUG("Refused HTTP connection to non HTTP port");
         } else {
             socket = new NoWebSocket(m_listener->uriPrefix);
-            NoApp::Get().GetManager().SwapSockByAddr(socket->GetHandle(), GetHandle());
+            NoApp::Get().GetManager().SwapSockByAddr(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout
             socket->SetSockName("WebMod::Client");

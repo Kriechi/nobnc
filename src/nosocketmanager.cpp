@@ -16,6 +16,7 @@
 
 #include "nosocketmanager.h"
 #include "nosocket.h"
+#include "nosocket_p.h"
 #include "nothreadpool.h"
 #include "nojob.h"
 #include "noapp.h"
@@ -134,7 +135,7 @@ bool NoSocketManager::ListenHost(u_short iPort,
     }
 #endif
 
-    return m_instance->Listen(L, pcSock->GetHandle());
+    return m_instance->Listen(L, NoSocketPrivate::get(pcSock));
 }
 
 bool NoSocketManager::ListenAll(u_short iPort,
@@ -178,7 +179,7 @@ u_short NoSocketManager::ListenRand(const NoString& sSockName,
     }
 #endif
 
-    m_instance->Listen(L, pcSock->GetHandle(), &uPort);
+    m_instance->Listen(L, NoSocketPrivate::get(pcSock), &uPort);
 
     return uPort;
 }
@@ -265,7 +266,7 @@ void NoSocketManager::DynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBo
 void NoSocketManager::AddSock(NoSocket* pcSock, const NoString& sSockName)
 {
     m_sockets.push_back(pcSock);
-    m_instance->AddSock(pcSock->GetHandle(), sSockName);
+    m_instance->AddSock(NoSocketPrivate::get(pcSock), sSockName);
 }
 
 void NoSocketManager::DelSockByAddr(NoSocket* socket)
@@ -273,7 +274,7 @@ void NoSocketManager::DelSockByAddr(NoSocket* socket)
     auto it = std::find(m_sockets.begin(), m_sockets.end(), socket);
     if (it != m_sockets.end())
         m_sockets.erase(it);
-    m_instance->DelSockByAddr(socket->GetHandle());
+    m_instance->DelSockByAddr(NoSocketPrivate::get(socket));
     delete socket;
 }
 
@@ -495,5 +496,5 @@ void FinishConnect(NoSocketManager* manager, const NoString& sHostname,
     C.SetCipher(sCipher);
 #endif
 
-    manager->DoConnect(C, pcSock->GetHandle());
+    manager->DoConnect(C, NoSocketPrivate::get(pcSock));
 }
