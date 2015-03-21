@@ -1137,7 +1137,7 @@ void NoIrcSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
 #ifdef HAVE_LIBSSL
         if (iErrno == errnoBadSSLCert) {
             // Stringify bad cert
-            X509* pCert = GetX509();
+            X509* pCert = NoSocketPrivate::get(this)->GetX509();
             if (pCert) {
                 BIO* mem = BIO_new(BIO_s_mem());
                 X509_print(mem, pCert);

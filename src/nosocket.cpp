@@ -134,7 +134,7 @@ NoString NoSocket::GetSSLPeerFingerprint() const
     // Csocket's version returns insecure SHA-1
     // This one is SHA-256
     const EVP_MD* evp = EVP_sha256();
-    X509* pCert = GetX509();
+    X509* pCert = d->GetX509();
     if (!pCert) {
         NO_DEBUG(GetSockName() + ": GetSSLPeerFingerprint: Anonymous cert");
         return "";
@@ -235,7 +235,6 @@ void NoSocket::SetCipher( const NoString & sCipher ) { d->csock->SetCipher(sCiph
 long NoSocket::GetPeerFingerprint( NoString & sFP ) const { return d->csock->GetPeerFingerprint(sFP); }
 void NoSocket::SetRequireClientCertFlags( uint32_t iRequireClientCertFlags ) { d->csock->SetRequireClientCertFlags(iRequireClientCertFlags); }
 SSL_SESSION * NoSocket::GetSSLSession() const { return d->csock->GetSSLSession(); }
-X509 *NoSocket::GetX509() const { return d->csock->GetX509(); }
 #endif
 uint64_t NoSocket::GetBytesRead() const { return d->csock->GetBytesRead(); }
 void NoSocket::ResetBytesRead() { d->csock->ResetBytesRead(); }

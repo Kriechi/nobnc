@@ -83,7 +83,6 @@ public:
     long GetPeerFingerprint( NoString & sFP ) const;
     void SetRequireClientCertFlags( uint32_t iRequireClientCertFlags );
     SSL_SESSION * GetSSLSession() const;
-    X509 *GetX509() const;
 #endif
     uint64_t GetBytesRead() const;
     void ResetBytesRead();
