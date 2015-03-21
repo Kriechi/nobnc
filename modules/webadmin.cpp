@@ -158,8 +158,11 @@ public:
         }
 
         // Now turn that into a listener instance
-        NoListener* pListener =
-        new NoListener(uPort, sListenHost, sURIPrefix, bSSL, (!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address), No::AcceptHttp);
+        NoListener* pListener = new NoListener(uPort, sListenHost);
+        pListener->setUriPrefix(sURIPrefix);
+        pListener->setSsl(bSSL);
+        pListener->setAddressType(!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address);
+        pListener->setAcceptType(No::AcceptHttp);
 
         if (!pListener->listen()) {
             sMessage = "Failed to add backwards-compatible listener";

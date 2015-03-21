@@ -1603,7 +1603,11 @@ void NoClient::UserPortCommand(NoString& sLine)
             const NoString sBindHost = No::token(sLine, 4);
             const NoString sURIPrefix = No::token(sLine, 5);
 
-            NoListener* pListener = new NoListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept);
+            NoListener* pListener = new NoListener(uPort, sBindHost);
+            pListener->setUriPrefix(sURIPrefix);
+            pListener->setSsl(bSSL);
+            pListener->setAddressType(eAddr);
+            pListener->setAcceptType(eAccept);
 
             if (!pListener->listen()) {
                 delete pListener;

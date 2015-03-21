@@ -46,9 +46,9 @@ private:
     const NoString m_uriPrefix;
 };
 
-NoListener::NoListener(ushort port, const NoString& bindHost, const NoString& uriPrefix, bool ssl, No::AddressType address, No::AcceptType accept)
-    : m_ssl(ssl), m_addressType(address), m_port(port), m_bindHost(bindHost), m_uriPrefix(uriPrefix),
-      m_socket(nullptr), m_acceptType(accept)
+NoListener::NoListener(ushort port, const NoString& bindHost)
+    : m_ssl(false), m_port(port), m_bindHost(bindHost), m_uriPrefix(""),
+      m_addressType(No::Ipv4AndIpv6Address), m_acceptType(No::AcceptAll), m_socket(nullptr)
 {
 }
 
@@ -63,9 +63,10 @@ bool NoListener::isSsl() const
     return m_ssl;
 }
 
-No::AddressType NoListener::addressType() const
+void NoListener::setSsl(bool ssl)
 {
-    return m_addressType;
+    // TODO: warning if (m_socket)
+    m_ssl = ssl;
 }
 
 ushort NoListener::port() const
@@ -73,19 +74,43 @@ ushort NoListener::port() const
     return m_port;
 }
 
-const NoString& NoListener::bindHost() const
+void NoListener::setPort(ushort port)
+{
+    // TODO: warning if (m_socket)
+    m_port = port;
+}
+
+NoString NoListener::bindHost() const
 {
     return m_bindHost;
 }
 
-NoSocket* NoListener::socket() const
+void NoListener::setBindHost(const NoString& host)
 {
-    return m_socket;
+    // TODO: warning if (m_socket)
+    m_bindHost = host;
 }
 
-const NoString& NoListener::uriPrefix() const
+NoString NoListener::uriPrefix() const
 {
     return m_uriPrefix;
+}
+
+void NoListener::setUriPrefix(const NoString& prefix)
+{
+    // TODO: warning if (m_socket)
+    m_uriPrefix = prefix;
+}
+
+No::AddressType NoListener::addressType() const
+{
+    return m_addressType;
+}
+
+void NoListener::setAddressType(No::AddressType type)
+{
+    // TODO: warning if (m_socket)
+    m_addressType = type;
 }
 
 No::AcceptType NoListener::acceptType() const
@@ -96,6 +121,11 @@ No::AcceptType NoListener::acceptType() const
 void NoListener::setAcceptType(No::AcceptType type)
 {
     m_acceptType = type;
+}
+
+NoSocket* NoListener::socket() const
+{
+    return m_socket;
 }
 
 bool NoListener::listen()

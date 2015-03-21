@@ -25,21 +25,31 @@ class NoSocket;
 class NO_EXPORT NoListener
 {
 public:
-    NoListener(ushort port, const NoString& bindHost, const NoString& uriPrefix, bool ssl, No::AddressType address, No::AcceptType accept);
+    NoListener(ushort port, const NoString& bindHost);
     ~NoListener();
 
     NoListener(const NoListener&) = delete;
     NoListener& operator=(const NoListener&) = delete;
 
     bool isSsl() const;
-    No::AddressType addressType() const;
+    void setSsl(bool ssl);
+
     ushort port() const;
-    const NoString& bindHost() const;
-    NoSocket* socket() const;
-    const NoString& uriPrefix() const;
+    void setPort(ushort port);
+
+    NoString bindHost() const;
+    void setBindHost(const NoString& host);
+
+    NoString uriPrefix() const;
+    void setUriPrefix(const NoString& prefix);
+
+    No::AddressType addressType() const;
+    void setAddressType(No::AddressType type);
 
     No::AcceptType acceptType() const;
     void setAcceptType(No::AcceptType type);
+
+    NoSocket* socket() const;
 
     bool listen();
 
@@ -47,12 +57,12 @@ private:
     void resetSocket();
 
     bool m_ssl;
-    No::AddressType m_addressType;
     ushort m_port;
     NoString m_bindHost;
     NoString m_uriPrefix;
-    NoSocket* m_socket;
     No::AcceptType m_acceptType;
+    No::AddressType m_addressType;
+    NoSocket* m_socket;
 
     friend class NoRealListener;
 };

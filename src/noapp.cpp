@@ -749,8 +749,10 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         // Don't ask for listen host, it may be configured later if needed.
 
         No::printAction("Verifying the listener");
-        NoListener* pListener =
-        new NoListener((ushort)uListenPort, sListenHost, sURIPrefix, bListenSSL, b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address, No::AcceptAll);
+        NoListener* pListener = new NoListener((ushort)uListenPort, sListenHost);
+        pListener->setUriPrefix(sURIPrefix);
+        pListener->setSsl(bListenSSL);
+        pListener->setAddressType(b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address);
         if (!pListener->listen()) {
             No::printStatus(false, FormatBindError());
             bSuccess = false;
@@ -1783,7 +1785,11 @@ bool NoApp::AddListener(ushort uPort,
         }
     }
 
-    NoListener* pListener = new NoListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept);
+    NoListener* pListener = new NoListener(uPort, sBindHost);
+    pListener->setUriPrefix(sURIPrefix);
+    pListener->setSsl(bSSL);
+    pListener->setAddressType(eAddr);
+    pListener->setAcceptType(eAccept);
 
     if (!pListener->listen()) {
         sError = FormatBindError();
