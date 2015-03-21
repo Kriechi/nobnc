@@ -18,95 +18,126 @@
 #include "noircconnection.h"
 #include "nonetwork.h"
 
-NoNick::NoNick(const NoString& mask) : m_perms(""), m_network(nullptr), m_nick(""), m_ident(""), m_host("")
+class NoNickPrivate
 {
-    parse(mask);
+public:
+    void parse(const NoString& mask)
+    {
+        if (mask.empty())
+            return;
+
+        nick = mask;
+        nick.trimLeft(":");
+
+        ulong pos = mask.find('!');
+        if (pos != NoString::npos) {
+            nick.resize(pos);
+            host = mask.substr(pos + 1);
+
+            pos = host.find('@');
+            if (pos != NoString::npos) {
+                ident = host.substr(0, pos);
+                host = host.substr(pos + 1);
+            }
+        }
+    }
+
+    NoString nick = "";
+    NoString ident = "";
+    NoString host = "";
+    NoString perms = "";
+    NoNetwork* network = nullptr;
+};
+
+NoNick::NoNick(const NoString& mask) : d(new NoNickPrivate)
+{
+    d->parse(mask);
 }
 
 bool NoNick::equals(const NoString& nick) const
 {
     // TODO add proper IRC case mapping here
     // https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.1
-    return m_nick.equals(nick);
+    return d->nick.equals(nick);
 }
 
 NoString NoNick::nick() const
 {
-    return m_nick;
+    return d->nick;
 }
 
 void NoNick::setNick(const NoString& nick)
 {
-    m_nick = nick;
+    d->nick = nick;
 }
 
 NoString NoNick::ident() const
 {
-    return m_ident;
+    return d->ident;
 }
 
 void NoNick::setIdent(const NoString& ident)
 {
-    m_ident = ident;
+    d->ident = ident;
 }
 
 NoString NoNick::host() const
 {
-    return m_host;
+    return d->host;
 }
 
 void NoNick::setHost(const NoString& host)
 {
-    m_host = host;
+    d->host = host;
 }
 
 NoString NoNick::nickMask() const
 {
-    NoString mask = m_nick;
-    if (!m_host.empty()) {
-        if (!m_ident.empty())
-            mask += "!" + m_ident;
-        mask += "@" + m_host;
+    NoString mask = d->nick;
+    if (!d->host.empty()) {
+        if (!d->ident.empty())
+            mask += "!" + d->ident;
+        mask += "@" + d->host;
     }
     return mask;
 }
 
 NoString NoNick::hostMask() const
 {
-    NoString mask = m_nick;
-    if (!m_ident.empty())
-        mask += "!" + m_ident;
-    if (!m_host.empty())
-        mask += "@" + m_host;
+    NoString mask = d->nick;
+    if (!d->ident.empty())
+        mask += "!" + d->ident;
+    if (!d->host.empty())
+        mask += "@" + d->host;
     return mask;
 }
 
 NoNetwork* NoNick::network() const
 {
-    return m_network;
+    return d->network;
 }
 
 void NoNick::setNetwork(NoNetwork* network)
 {
-    m_network = network;
+    d->network = network;
 }
 
 bool NoNick::hasPerm(uchar perm) const
 {
-    return perm && m_perms.find(perm) != NoString::npos;
+    return perm && d->perms.find(perm) != NoString::npos;
 }
 
 void NoNick::addPerm(uchar perm)
 {
     if (perm && !hasPerm(perm))
-        m_perms.append(1, perm);
+        d->perms.append(1, perm);
 }
 
 void NoNick::removePerm(uchar perm)
 {
-    ulong pos = m_perms.find(perm);
+    ulong pos = d->perms.find(perm);
     if (pos != NoString::npos)
-        m_perms.erase(pos, 1);
+        d->perms.erase(pos, 1);
 }
 
 static NoString availablePerms(NoNetwork* network)
@@ -122,7 +153,7 @@ static NoString availablePerms(NoNetwork* network)
 
 uchar NoNick::perm() const
 {
-    for (const uchar& perm : availablePerms(m_network)) {
+    for (const uchar& perm : availablePerms(d->network)) {
         if (hasPerm(perm))
             return perm;
     }
@@ -132,7 +163,7 @@ uchar NoNick::perm() const
 NoString NoNick::perms() const
 {
     NoString perms;
-    for (const uchar& perm : availablePerms(m_network)) {
+    for (const uchar& perm : availablePerms(d->network)) {
         if (hasPerm(perm))
             perms += perm;
     }
@@ -141,27 +172,6 @@ NoString NoNick::perms() const
 
 void NoNick::reset()
 {
-    m_perms.clear();
-    m_network = nullptr;
-}
-
-void NoNick::parse(const NoString& mask)
-{
-    if (mask.empty())
-        return;
-
-    m_nick = mask;
-    m_nick.trimLeft(":");
-
-    ulong pos = mask.find('!');
-    if (pos != NoString::npos) {
-        m_nick.resize(pos);
-        m_host = mask.substr(pos + 1);
-
-        pos = m_host.find('@');
-        if (pos != NoString::npos) {
-            m_ident = m_host.substr(0, pos);
-            m_host = m_host.substr(pos + 1);
-        }
-    }
+    d->perms.clear();
+    d->network = nullptr;
 }

@@ -19,8 +19,10 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
+#include <memory>
 
 class NoNetwork;
+class NoNickPrivate;
 
 class NO_EXPORT NoNick
 {
@@ -53,16 +55,10 @@ public:
     void addPerm(uchar perm);
     void removePerm(uchar perm);
 
-    void reset(); // TODO
+    void reset(); // TODO: still used from NoChannel...
 
 private:
-    void parse(const NoString& mask);
-
-    NoString m_perms;
-    NoNetwork* m_network;
-    NoString m_nick;
-    NoString m_ident;
-    NoString m_host;
+    std::shared_ptr<NoNickPrivate> d;
 };
 
 #endif // NONICK_H
