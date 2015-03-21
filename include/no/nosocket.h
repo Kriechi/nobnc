@@ -20,6 +20,7 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 #include <sys/socket.h>
+#include <memory>
 
 class NoModule;
 class NoSocketPrivate;
