@@ -158,7 +158,7 @@ public:
         }
 
         // Now turn that into a listener instance
-        NoListener* pListener = new NoListener(uPort, sListenHost);
+        NoListener* pListener = new NoListener(sListenHost, uPort);
         pListener->setUriPrefix(sURIPrefix);
         pListener->setSsl(bSSL);
         pListener->setAddressType(!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address);
@@ -1783,7 +1783,7 @@ public:
                 NoTemplate& l = Tmpl.AddRow("ListenLoop");
 
                 l["Port"] = NoString(pListener->port());
-                l["BindHost"] = pListener->bindHost();
+                l["BindHost"] = pListener->host();
 
                 l["IsWeb"] = NoString(pListener->acceptType() != No::AcceptIrc);
                 l["IsIRC"] = NoString(pListener->acceptType() != No::AcceptHttp);

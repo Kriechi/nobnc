@@ -145,7 +145,7 @@ public:
     bool AddUser(NoUser* pUser, NoString& sErrorRet);
     const std::map<NoString, NoUser*>& GetUserMap() const;
 
-    NoListener* FindListener(u_short uPort, const NoString& BindHost, No::AddressType eAddr);
+    NoListener* FindListener(u_short uPort, const NoString& sHost, No::AddressType eAddr);
     bool AddListener(NoListener*);
     bool AddListener(ushort uPort,
                      const NoString& sBindHost,

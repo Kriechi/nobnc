@@ -23,11 +23,11 @@
 class NoListenerPrivate
 {
 public:
-    NoListenerPrivate(ushort port, const NoString& bindHost) : port(port), bindHost(bindHost) { }
+    NoListenerPrivate(const NoString& host, ushort port) : port(port), host(host) { }
 
     bool ssl = false;
     ushort port = 0;
-    NoString bindHost = "";
+    NoString host = "";
     NoString uriPrefix = "";
     No::AcceptType acceptType = No::AcceptAll;
     No::AddressType addressType = No::Ipv4AndIpv6Address;
@@ -51,7 +51,7 @@ private:
 class NoClientSocket : public NoSocket
 {
 public:
-    NoClientSocket(const NoString& hostname, ushort port, NoListenerPrivate* listener);
+    NoClientSocket(const NoString& host, ushort port, NoListenerPrivate* listener);
 
     void ReadLineImpl(const NoString& data) override;
     void ReachedMaxBufferImpl() override;
@@ -96,8 +96,8 @@ void NoListenerSocket::SockErrorImpl(int error, const NoString& description)
     }
 }
 
-NoClientSocket::NoClientSocket(const NoString& hostname, ushort port, NoListenerPrivate* listener)
-    : NoSocket(hostname, port), m_listener(listener)
+NoClientSocket::NoClientSocket(const NoString& host, ushort port, NoListenerPrivate* listener)
+    : NoSocket(host, port), m_listener(listener)
 {
     // The socket will time out in 120 secs, no matter what.
     // This has to be fixed up later, if desired.
@@ -157,7 +157,7 @@ void NoClientSocket::ReadLineImpl(const NoString& line)
     socket->PushBuffImpl("", 0, true);
 }
 
-NoListener::NoListener(ushort port, const NoString& bindHost) : d(new NoListenerPrivate(port, bindHost))
+NoListener::NoListener(const NoString& host, ushort port) : d(new NoListenerPrivate(host, port))
 {
 }
 
@@ -189,15 +189,15 @@ void NoListener::setPort(ushort port)
     d->port = port;
 }
 
-NoString NoListener::bindHost() const
+NoString NoListener::host() const
 {
-    return d->bindHost;
+    return d->host;
 }
 
-void NoListener::setBindHost(const NoString& host)
+void NoListener::setHost(const NoString& host)
 {
     // TODO: warning if (d->socket)
-    d->bindHost = host;
+    d->host = host;
 }
 
 NoString NoListener::uriPrefix() const
@@ -258,5 +258,5 @@ bool NoListener::listen()
     // Make sure there is a consistent error message, not something random
     // which might even be "Error: Success".
     errno = EINVAL;
-    return NoApp::Get().GetManager().ListenHost(d->port, "_LISTENER", d->bindHost, ssl, SOMAXCONN, d->socket, 0, d->addressType);
+    return NoApp::Get().GetManager().ListenHost(d->port, "_LISTENER", d->host, ssl, SOMAXCONN, d->socket, 0, d->addressType);
 }

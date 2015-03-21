@@ -1548,7 +1548,7 @@ void NoClient::UserPortCommand(NoString& sLine)
         for (const NoListener* pListener : vpListeners) {
             Table.AddRow();
             Table.SetCell("Port", NoString(pListener->port()));
-            Table.SetCell("BindHost", (pListener->bindHost().empty() ? NoString("*") : pListener->bindHost()));
+            Table.SetCell("BindHost", (pListener->host().empty() ? NoString("*") : pListener->host()));
             Table.SetCell("SSL", NoString(pListener->isSsl()));
 
             No::AddressType eAddr = pListener->addressType();
@@ -1600,10 +1600,10 @@ void NoClient::UserPortCommand(NoString& sLine)
             PutStatus("Usage: AddPort <[+]port> <ipv4|ipv6|all> <web|irc|all> [bindhost [uriprefix]]");
         } else {
             bool bSSL = (sPort.left(1).equals("+"));
-            const NoString sBindHost = No::token(sLine, 4);
+            const NoString sHost = No::token(sLine, 4);
             const NoString sURIPrefix = No::token(sLine, 5);
 
-            NoListener* pListener = new NoListener(uPort, sBindHost);
+            NoListener* pListener = new NoListener(sHost, uPort);
             pListener->setUriPrefix(sURIPrefix);
             pListener->setSsl(bSSL);
             pListener->setAddressType(eAddr);

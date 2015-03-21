@@ -574,7 +574,7 @@ bool NoApp::WriteConfig()
     for (NoListener* pListener : m_vpListeners) {
         NoSettings listenerConfig;
 
-        listenerConfig.AddKeyValuePair("Host", pListener->bindHost());
+        listenerConfig.AddKeyValuePair("Host", pListener->host());
         listenerConfig.AddKeyValuePair("URIPrefix", pListener->uriPrefix() + "/");
         listenerConfig.AddKeyValuePair("Port", NoString(pListener->port()));
 
@@ -749,7 +749,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         // Don't ask for listen host, it may be configured later if needed.
 
         No::printAction("Verifying the listener");
-        NoListener* pListener = new NoListener((ushort)uListenPort, sListenHost);
+        NoListener* pListener = new NoListener(sListenHost, (ushort)uListenPort);
         pListener->setUriPrefix(sURIPrefix);
         pListener->setSsl(bListenSSL);
         pListener->setAddressType(b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address);
@@ -1650,11 +1650,11 @@ bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
 
 const std::map<NoString, NoUser*>&NoApp::GetUserMap() const { return (m_msUsers); }
 
-NoListener* NoApp::FindListener(u_short uPort, const NoString& sBindHost, No::AddressType eAddr)
+NoListener* NoApp::FindListener(u_short uPort, const NoString& sHost, No::AddressType eAddr)
 {
     for (NoListener* pListener : m_vpListeners) {
         if (pListener->port() != uPort) continue;
-        if (pListener->bindHost() != sBindHost) continue;
+        if (pListener->host() != sHost) continue;
         if (pListener->addressType() != eAddr) continue;
         return pListener;
     }
@@ -1785,7 +1785,7 @@ bool NoApp::AddListener(ushort uPort,
         }
     }
 
-    NoListener* pListener = new NoListener(uPort, sBindHost);
+    NoListener* pListener = new NoListener(sBindHost, uPort);
     pListener->setUriPrefix(sURIPrefix);
     pListener->setSsl(bSSL);
     pListener->setAddressType(eAddr);

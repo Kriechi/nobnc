@@ -27,7 +27,7 @@ class NoListenerPrivate;
 class NO_EXPORT NoListener
 {
 public:
-    NoListener(ushort port, const NoString& bindHost);
+    NoListener(const NoString& host = "", ushort port = 0);
     ~NoListener();
 
     bool isSsl() const;
@@ -36,8 +36,8 @@ public:
     ushort port() const;
     void setPort(ushort port);
 
-    NoString bindHost() const;
-    void setBindHost(const NoString& host);
+    NoString host() const;
+    void setHost(const NoString& host);
 
     NoString uriPrefix() const;
     void setUriPrefix(const NoString& prefix);
