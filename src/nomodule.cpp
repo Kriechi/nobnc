@@ -249,14 +249,6 @@ bool NoModule::AddTimer(NoTimer* pTimer)
     return true;
 }
 
-bool NoModule::AddTimer(NoTimer::Callback pFBCallback, const NoString& sLabel, u_int uInterval, u_int uCycles, const NoString& sDescription)
-{
-    NoTimer* pTimer = new NoTimer(this, uInterval, uCycles, sLabel, sDescription);
-    pTimer->setCallback(pFBCallback);
-
-    return AddTimer(pTimer);
-}
-
 bool NoModule::RemTimer(NoTimer* pTimer)
 {
     if (m_sTimers.erase(pTimer) == 0) return false;

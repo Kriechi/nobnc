@@ -45,12 +45,8 @@ public:
     NoString description() const;
     void setDescription(const NoString& description);
 
-    typedef void (*Callback)(NoModule*, NoTimer*);
-    Callback callback() const;
-    void setCallback(Callback callback);
-
 protected:
-    virtual void RunJob();
+    virtual void RunJob() = 0;
 
 private:
     NoTimer(const NoTimer&) = delete;

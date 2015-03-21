@@ -692,7 +692,6 @@ public:
     const NoString& GetModDataDir() const;
 
     bool AddTimer(NoTimer* pTimer);
-    bool AddTimer(NoTimer::Callback pFBCallback, const NoString& sLabel, u_int uInterval, u_int uCycles = 0, const NoString& sDescription = "");
     bool RemTimer(NoTimer* pTimer);
     bool RemTimer(const NoString& sLabel);
     bool UnlinkTimer(NoTimer* pTimer);

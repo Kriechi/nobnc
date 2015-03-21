@@ -29,7 +29,6 @@ public:
     CCron* cron;
     NoModule* module;
     NoString description;
-    NoTimer::Callback callback;
 };
 
 NoTimer::NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description)
@@ -94,20 +93,4 @@ NoString NoTimer::description() const
 void NoTimer::setDescription(const NoString& description)
 {
     d->description = description;
-}
-
-NoTimer::Callback NoTimer::callback() const
-{
-    return d->callback;
-}
-
-void NoTimer::setCallback(Callback callback)
-{
-    d->callback = callback;
-}
-
-void NoTimer::RunJob()
-{
-    if (d->callback)
-        d->callback(d->module, this);
 }
