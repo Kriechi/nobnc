@@ -132,7 +132,7 @@ public:
         if (m_pTimer) return;
 
         m_pTimer = new NoKeepNickTimer(this);
-        AddTimer(m_pTimer);
+        m_pTimer->start(30);
     }
 
     void Disable()
@@ -140,7 +140,7 @@ public:
         if (!m_pTimer) return;
 
         m_pTimer->stop();
-        RemTimer(m_pTimer);
+        delete m_pTimer;
         m_pTimer = nullptr;
     }
 
@@ -205,8 +205,6 @@ NoKeepNickTimer::NoKeepNickTimer(NoModule* pMod) : NoTimer(pMod)
 {
     setName("KeepNickTimer");
     setDescription("Tries to acquire this user's primary nick");
-
-    start(30);
 }
 
 void NoKeepNickTimer::run()

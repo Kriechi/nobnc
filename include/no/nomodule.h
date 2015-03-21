@@ -693,13 +693,7 @@ public:
      */
     const NoString& GetModDataDir() const;
 
-    bool AddTimer(NoTimer* pTimer);
-    bool RemTimer(NoTimer* pTimer);
-    bool RemTimer(const NoString& sLabel);
-    bool UnlinkTimer(NoTimer* pTimer);
     NoTimer* FindTimer(const NoString& sLabel);
-    std::set<NoTimer*>::const_iterator BeginTimers() const;
-    std::set<NoTimer*>::const_iterator EndTimers() const;
     virtual void ListTimers();
 
     bool AddSocket(NoModuleSocket* pSocket);

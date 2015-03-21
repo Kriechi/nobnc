@@ -48,13 +48,10 @@ class NoSaveBuff;
 class NoSaveBuffJob : public NoTimer
 {
 public:
-    NoSaveBuffJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule)
+    NoSaveBuffJob(NoModule* pModule) : NoTimer(pModule)
     {
-        setName(sLabel);
-        setDescription(sDescription);
-
-        start(uInterval);
+        setName("SaveBuff");
+        setDescription("Saves the current buffer to disk every 1 minute");
     }
 
 protected:
@@ -101,7 +98,8 @@ public:
         else
             m_sPassword = NoBlowfish::MD5(sArgs);
 
-        AddTimer(new NoSaveBuffJob(this, 60, "SaveBuff", "Saves the current buffer to disk every 1 minute"));
+        NoSaveBuffJob* timer = new NoSaveBuffJob(this);
+        timer->start(60);
 
         return (!m_bBootError);
     }

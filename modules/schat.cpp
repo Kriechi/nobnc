@@ -33,17 +33,11 @@ class NoSChat;
 class NoRemMarkerJob : public NoTimer
 {
 public:
-    NoRemMarkerJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule)
+    NoRemMarkerJob(NoModule* pModule, const NoString& sNick) : NoTimer(pModule), m_sNick(sNick)
     {
-        setName(sLabel);
-        setDescription(sDescription);
-
-        setSingleShot(true);
-        start(uInterval);
+        setName("Remove (s)" + sNick);
+        setDescription("Removes this nicks entry for waiting DCC.");
     }
-
-    void SetNick(const NoString& sNick) { m_sNick = sNick; }
 
 protected:
     void run() override;
@@ -325,9 +319,9 @@ public:
 
                 m_siiWaitingChats["(s)" + Nick.nick()] = pTmp;
                 SendToUser(sMask, "*** Incoming DCC SCHAT, Accept ? (yes/no)");
-                NoRemMarkerJob* p = new NoRemMarkerJob(this, 60, "Remove (s)" + Nick.nick(), "Removes this nicks entry for waiting DCC.");
-                p->SetNick("(s)" + Nick.nick());
-                AddTimer(p);
+                NoRemMarkerJob* p = new NoRemMarkerJob(this, Nick.nick());
+                p->setSingleShot(true);
+                p->start(60);
                 return (HALT);
             }
         }
@@ -339,7 +333,7 @@ public:
     {
         NoSChatSock* p = new NoSChatSock(this, sNick, No::formatIp(iIP), iPort, 60);
         GetManager()->Connect(No::formatIp(iIP), iPort, p->GetSockName(), 60, true, GetUser()->GetLocalDCCIP(), p);
-        RemTimer("Remove " + sNick); // delete any associated timer to this nick
+        delete FindTimer("Remove " + sNick); // delete any associated timer to this nick
     }
 
     ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override

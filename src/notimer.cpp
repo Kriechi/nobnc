@@ -15,7 +15,9 @@
  */
 
 #include "notimer.h"
-#include "nomodules.h"
+#include "nomodule.h"
+#include "nomodule_p.h"
+#include "nosocketmanager.h"
 #include "Csocket/Csocket.h"
 
 class NoTimerPrivate : public CCron
@@ -43,11 +45,18 @@ public:
 NoTimer::NoTimer(NoModule* module)
     : d(new NoTimerPrivate(module, this))
 {
+    if (module) {
+        NoModulePrivate::get(module)->addTimer(this);
+        module->GetManager()->AddCron(d.get());
+    }
 }
 
 NoTimer::~NoTimer()
 {
-    d->module->UnlinkTimer(this);
+    if (d->module) {
+        NoModulePrivate::get(d->module)->removeTimer(this);
+        d->module->GetManager()->DelCronByAddr(d.get());
+    }
 }
 
 void NoTimer::start(uint interval)

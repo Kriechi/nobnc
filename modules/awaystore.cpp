@@ -43,13 +43,10 @@ class NoAway;
 class NoAwayJob : public NoTimer
 {
 public:
-    NoAwayJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule)
+    NoAwayJob(NoModule* pModule) : NoTimer(pModule)
     {
-        setName(sLabel);
-        setDescription(sDescription);
-
-        start(uInterval);
+        setName("AwayJob");
+        setDescription("Checks for idle and saves messages every 1 minute");
     }
 
 protected:
@@ -219,7 +216,8 @@ public:
         m_bBootError = false;
         m_saveMessages = true;
         SetAwayTime(300);
-        AddTimer(new NoAwayJob(this, 60, "AwayJob", "Checks for idle and saves messages every 1 minute"));
+        NoAwayJob* timer = new NoAwayJob(this);
+        timer->start(60);
 
         AddHelpCommand();
         AddCommand("Away", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::AwayCommand), "[-quiet]");

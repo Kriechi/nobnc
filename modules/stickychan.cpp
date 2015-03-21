@@ -182,8 +182,6 @@ public:
     NoStickyTimer(NoModule* module) : NoTimer(module)
     {
         setName("StickyChanTimer");
-
-        start(15);
     }
 
 protected:
@@ -233,7 +231,8 @@ bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
     // Since we now have these channels added, clear the argument list
     SetArgs("");
 
-    AddTimer(new NoStickyTimer(this));
+    NoStickyTimer* timer = new NoStickyTimer(this);
+    timer->start(15);
     return (true);
 }
 

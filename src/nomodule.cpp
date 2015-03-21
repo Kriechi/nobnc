@@ -41,9 +41,9 @@ NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, cons
 
 NoModule::~NoModule()
 {
-    while (!d->sTimers.empty()) {
-        RemTimer(*d->sTimers.begin());
-    }
+    for (NoTimer* timer : d->sTimers)
+        delete timer;
+    d->sTimers.clear();
 
     while (!d->sSockets.empty()) {
         RemSocket(*d->sSockets.begin());
@@ -141,37 +141,6 @@ NoString NoModule::GetWebFilesPath()
     }
 }
 
-bool NoModule::AddTimer(NoTimer* pTimer)
-{
-    if ((!pTimer) || (!pTimer->name().empty() && FindTimer(pTimer->name()))) {
-        delete pTimer;
-        return false;
-    }
-
-    if (!d->sTimers.insert(pTimer).second)
-        // Was already added
-        return true;
-
-    d->pManager->AddCron(static_cast<CCron*>(pTimer->handle()));
-    return true;
-}
-
-bool NoModule::RemTimer(NoTimer* pTimer)
-{
-    if (d->sTimers.erase(pTimer) == 0) return false;
-    d->pManager->DelCronByAddr(static_cast<CCron*>(pTimer->handle()));
-    return true;
-}
-
-bool NoModule::RemTimer(const NoString& sLabel)
-{
-    NoTimer* pTimer = FindTimer(sLabel);
-    if (!pTimer) return false;
-    return RemTimer(pTimer);
-}
-
-bool NoModule::UnlinkTimer(NoTimer* pTimer) { return d->sTimers.erase(pTimer); }
-
 NoTimer* NoModule::FindTimer(const NoString& sLabel)
 {
     if (sLabel.empty()) {
@@ -186,10 +155,6 @@ NoTimer* NoModule::FindTimer(const NoString& sLabel)
 
     return nullptr;
 }
-
-std::set<NoTimer*>::const_iterator NoModule::BeginTimers() const { return d->sTimers.begin(); }
-
-std::set<NoTimer*>::const_iterator NoModule::EndTimers() const { return d->sTimers.end(); }
 
 void NoModule::ListTimers()
 {

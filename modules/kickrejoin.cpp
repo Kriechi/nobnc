@@ -30,14 +30,10 @@
 class NoRejoinJob : public NoTimer
 {
 public:
-    NoRejoinJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule)
+    NoRejoinJob(NoModule* pModule, const NoString& sChan) : NoTimer(pModule)
     {
-        setName(sLabel);
-        setDescription(sDescription);
-
-        setSingleShot(true);
-        start(uInterval);
+        setName("Rejoin " + sChan);
+        setDescription("Rejoin channel after a delay");
     }
 
 protected:
@@ -132,7 +128,9 @@ public:
                 pChan.enable();
                 return;
             }
-            AddTimer(new NoRejoinJob(this, delay, "Rejoin " + pChan.getName(), "Rejoin channel after a delay"));
+            NoRejoinJob* timer = new NoRejoinJob(this, pChan.getName());
+            timer->setSingleShot(true);
+            timer->start(delay);
         }
     }
 };

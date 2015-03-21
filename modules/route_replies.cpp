@@ -187,14 +187,10 @@ static const struct
 class NoRouteTimeout : public NoTimer
 {
 public:
-    NoRouteTimeout(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule)
+    NoRouteTimeout(NoModule* pModule) : NoTimer(pModule)
     {
-        setName(sLabel);
-        setDescription(sDescription);
-
-        setSingleShot(true);
-        start(uInterval);
+        setName("RouteTimeout");
+        setDescription("Recover from missing / wrong server replies");
     }
 
 protected:
@@ -244,7 +240,7 @@ public:
         m_vsPending.clear();
 
         // No way we get a reply, so stop the timer (If it's running)
-        RemTimer("RouteTimeout");
+        delete FindTimer("RouteTimeout");
     }
 
     void OnIRCDisconnected() override
@@ -259,7 +255,7 @@ public:
         if (GetClient() == m_pDoing) {
             // The replies which aren't received yet will be
             // broadcasted to everyone, but at least nothing breaks
-            RemTimer("RouteTimeout");
+            delete FindTimer("RouteTimeout");
             m_pDoing = nullptr;
             m_pReplies = nullptr;
         }
@@ -392,7 +388,7 @@ private:
 
         if (bFinished) {
             // Stop the timeout
-            RemTimer("RouteTimeout");
+            delete FindTimer("RouteTimeout");
 
             m_pDoing = nullptr;
             m_pReplies = nullptr;
@@ -421,12 +417,11 @@ private:
         // When we are called from the timer, we need to remove it.
         // We can't delete it (segfault on return), thus we
         // just stop it. The main loop will delete it.
-        NoTimer* pTimer = FindTimer("RouteTimeout");
-        if (pTimer) {
-            pTimer->stop();
-            UnlinkTimer(pTimer);
-        }
-        AddTimer(new NoRouteTimeout(this, 60, "RouteTimeout", "Recover from missing / wrong server replies"));
+        delete FindTimer("RouteTimeout");
+
+        NoRouteTimeout* timer = new NoRouteTimeout(this);
+        timer->setSingleShot(true);
+        timer->start(60);
 
         m_pDoing = it->first;
         m_pReplies = it->second[0].reply;

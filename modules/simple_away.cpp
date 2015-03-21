@@ -28,14 +28,10 @@ class NoSimpleAway;
 class NoSimpleAwayJob : public NoTimer
 {
 public:
-    NoSimpleAwayJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule)
+    NoSimpleAwayJob(NoModule* pModule) : NoTimer(pModule)
     {
-        setName(sLabel);
-        setDescription(sDescription);
-
-        setSingleShot(true);
-        start(uInterval);
+        setName("simple_away");
+        setDescription("Sets you away after detach");
     }
 
 protected:
@@ -178,8 +174,10 @@ public:
     void SetAway(bool bTimer = true)
     {
         if (bTimer) {
-            RemTimer("simple_away");
-            AddTimer(new NoSimpleAwayJob(this, m_iAwayWait, "simple_away", "Sets you away after detach"));
+            delete FindTimer("simple_away");
+            NoSimpleAwayJob* timer = new NoSimpleAwayJob(this);
+            timer->setSingleShot(true);
+            timer->start(m_iAwayWait);
         } else {
             if (!m_bClientSetAway) {
                 PutIRC("AWAY :" + ExpandReason());
@@ -190,7 +188,7 @@ public:
 
     void SetBack()
     {
-        RemTimer("simple_away");
+        delete FindTimer("simple_away");
         if (m_bWeSetAway) {
             PutIRC("AWAY");
             m_bWeSetAway = false;

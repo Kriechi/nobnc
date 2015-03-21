@@ -30,8 +30,6 @@ public:
     {
         setName("AutoOpChecker");
         setDescription("Check channels for auto op candidates");
-
-        start(20);
     }
 
 protected:
@@ -180,7 +178,8 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        AddTimer(new NoAutoOpTimer(this));
+        NoAutoOpTimer* timer = new NoAutoOpTimer(this);
+        timer->start(20);
 
         // Load the users
         NoRegistry registry(this);

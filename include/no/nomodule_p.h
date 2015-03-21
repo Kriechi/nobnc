@@ -29,6 +29,9 @@ public:
 
     static NoModulePrivate* get(NoModule* module) { return module->d.get(); }
 
+    void addTimer(NoTimer* timer) { sTimers.insert(timer); }
+    void removeTimer(NoTimer* timer) { sTimers.erase(timer); }
+
     No::ModuleType eType;
     NoString sDescription;
     std::set<NoTimer*> sTimers;
