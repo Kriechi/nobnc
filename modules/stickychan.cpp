@@ -106,29 +106,6 @@ public:
         PutModule(" -- End of List");
     }
 
-    void RunJob()
-    {
-        NoNetwork* pNetwork = GetNetwork();
-        if (!pNetwork->GetIRCSock()) return;
-
-        for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
-            NoChannel* pChan = pNetwork->FindChan(it->first);
-            if (!pChan) {
-                pChan = new NoChannel(it->first, pNetwork, true);
-                if (!it->second.empty()) pChan->setKey(it->second);
-                if (!pNetwork->AddChan(pChan)) {
-                    /* AddChan() deleted that channel */
-                    PutModule("Could not join [" + it->first + "] (# prefix missing?)");
-                    continue;
-                }
-            }
-            if (!pChan->isOn() && pNetwork->IsIRCConnected()) {
-                PutModule("Joining [" + pChan->getName() + "]");
-                PutIRC("JOIN " + pChan->getName() + (pChan->getKey().empty() ? "" : " " + pChan->getKey()));
-            }
-        }
-    }
-
     NoString GetWebMenuTitle() override { return "Sticky Chans"; }
 
     bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
@@ -190,8 +167,40 @@ public:
     }
 };
 
+class NoStickyTimer : public NoTimer
+{
+public:
+    NoStickyTimer(NoModule* module) : NoTimer(module, 15, 0, "StickyChanTimer", "") { }
 
-static void RunTimer(NoModule* pModule, NoTimer* pTimer) { ((NoStickyChan*)pModule)->RunJob(); }
+protected:
+    void RunJob() override
+    {
+        NoModule* mod = module();
+        if (!mod)
+            return;
+
+        NoNetwork* pNetwork = mod->GetNetwork();
+        if (!pNetwork->GetIRCSock())
+            return;
+
+        for (NoStringMap::iterator it = mod->BeginNV(); it != mod->EndNV(); ++it) {
+            NoChannel* pChan = pNetwork->FindChan(it->first);
+            if (!pChan) {
+                pChan = new NoChannel(it->first, pNetwork, true);
+                if (!it->second.empty()) pChan->setKey(it->second);
+                if (!pNetwork->AddChan(pChan)) {
+                    /* AddChan() deleted that channel */
+                    mod->PutModule("Could not join [" + it->first + "] (# prefix missing?)");
+                    continue;
+                }
+            }
+            if (!pChan->isOn() && pNetwork->IsIRCConnected()) {
+                mod->PutModule("Joining [" + pChan->getName() + "]");
+                mod->PutIRC("JOIN " + pChan->getName() + (pChan->getKey().empty() ? "" : " " + pChan->getKey()));
+            }
+        }
+    }
+};
 
 bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
 {
@@ -207,7 +216,7 @@ bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
     // Since we now have these channels added, clear the argument list
     SetArgs("");
 
-    AddTimer(RunTimer, "StickyChanTimer", 15);
+    AddTimer(new NoStickyTimer(this));
     return (true);
 }
 
