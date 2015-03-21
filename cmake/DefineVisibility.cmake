@@ -34,12 +34,20 @@ if(NOT GCC_TOO_OLD AND NOT _INTEL_TOO_OLD AND NOT WIN32 AND NOT CYGWIN
    AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES XL
    AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES PGI
    AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES Watcom)
-    check_cxx_compiler_flag(-fvisibility=default COMPILER_HAS_VISIBILITY)
+    check_cxx_compiler_flag(-fvisibility=default COMPILER_HAS_VISIBILITY_DEFAULT)
+    check_cxx_compiler_flag(-fvisibility=hidden COMPILER_HAS_VISIBILITY_HIDDEN)
+    check_cxx_compiler_flag(-fvisibility=inlines-hidden COMPILER_HAS_VISIBILITY_INLINES_HIDDEN)
+    if(COMPILER_HAS_VISIBILITY_HIDDEN)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+    endif()
+    if(COMPILER_HAS_VISIBILITY_INLINES_HIDDEN)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility-inlines-hidden")
+    endif()
     option(FEATURE_VISIBILITY "Enable visibility support" ON)
     mark_as_advanced(FEATURE_VISIBILITY)
 endif()
 
-if(FEATURE_VISIBILITY AND COMPILER_HAS_VISIBILITY)
+if(FEATURE_VISIBILITY AND COMPILER_HAS_VISIBILITY_DEFAULT)
     set(HAVE_VISIBILITY 1)
 else()
     set(HAVE_VISIBILITY 0)
