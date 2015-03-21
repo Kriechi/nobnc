@@ -18,6 +18,7 @@
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
 #include <no/noescape.h>
+#include <no/noregistry.h>
 #include <list>
 
 class NoWatchSource
@@ -648,7 +649,8 @@ private:
 
     void Save()
     {
-        ClearNV(false);
+        NoRegistry registry(this);
+        registry.clear();
         for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
             NoWatchEntry& WatchEntry = *it;
             NoString sSave;
@@ -664,10 +666,8 @@ private:
             // returns an empty string
             sSave += " ";
 
-            SetNV(sSave, "", false);
+            registry.setValue(sSave, "");
         }
-
-        SaveRegistry();
     }
 
     void Load()
@@ -677,8 +677,9 @@ private:
 
         bool bWarn = false;
 
-        for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
-            NoStringVector vList = it->first.split("\n");
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
+            NoStringVector vList = key.split("\n");
 
             // Backwards compatibility with the old save format
             if (vList.size() != 5 && vList.size() != 7) {

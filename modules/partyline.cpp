@@ -19,6 +19,7 @@
 #include <no/nonetwork.h>
 #include <no/noapp.h>
 #include <no/noclient.h>
+#include <no/noregistry.h>
 
 // If you change these and it breaks, you get to keep the pieces
 #define CHAN_PREFIX_1 "~"
@@ -152,14 +153,15 @@ public:
     {
         NoString sAction, sKey;
         NoPartylineChannel* pChannel;
-        for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
-            if (it->first.find(":") != NoString::npos) {
-                sAction = No::token(it->first, 0, ":");
-                sKey = No::tokens(it->first, 1, ":");
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
+            if (key.contains(":")) {
+                sAction = No::token(key, 0, ":");
+                sKey = No::tokens(key, 1, ":");
             } else {
                 // backwards compatibility for older NV data
                 sAction = "fixedchan";
-                sKey = it->first;
+                sKey = key;
             }
 
             if (sAction == "fixedchan") {
@@ -168,9 +170,10 @@ public:
 
             if (sAction == "topic") {
                 pChannel = FindChannel(sKey);
-                if (pChannel && !(it->second).empty()) {
-                    PutChan(pChannel->GetNicks(), ":irc.znc.in TOPIC " + pChannel->GetName() + " :" + it->second);
-                    pChannel->SetTopic(it->second);
+                NoString value = registry.value(key);
+                if (pChannel && !value.empty()) {
+                    PutChan(pChannel->GetNicks(), ":irc.znc.in TOPIC " + pChannel->GetName() + " :" + value);
+                    pChannel->SetTopic(value);
                 }
             }
         }
@@ -180,10 +183,11 @@ public:
 
     void SaveTopic(NoPartylineChannel* pChannel)
     {
+        NoRegistry registry(this);
         if (!pChannel->GetTopic().empty())
-            SetNV("topic:" + pChannel->GetName(), pChannel->GetTopic());
+            registry.setValue("topic:" + pChannel->GetName(), pChannel->GetTopic());
         else
-            DelNV("topic:" + pChannel->GetName());
+            registry.remove("topic:" + pChannel->GetName());
     }
 
     ModRet OnDeleteUser(NoUser& User) override

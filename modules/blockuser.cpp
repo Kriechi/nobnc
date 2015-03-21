@@ -22,6 +22,7 @@
 #include <no/noauthenticator.h>
 #include <no/nowebsocket.h>
 #include <no/nowebsession.h>
+#include <no/noregistry.h>
 
 #define MESSAGE "Your account has been disabled. Contact your administrator."
 
@@ -45,12 +46,12 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector::iterator it;
-        NoStringMap::iterator it2;
 
         // Load saved settings
-        for (it2 = BeginNV(); it2 != EndNV(); ++it2) {
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
             // Ignore errors
-            Block(it2->first);
+            Block(key);
         }
 
         // Parse arguments, each argument is a user name to block
@@ -92,9 +93,10 @@ public:
 
         Table.AddColumn("Blocked user");
 
-        for (it = BeginNV(); it != EndNV(); ++it) {
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
             Table.AddRow();
-            Table.SetCell("Blocked user", it->first);
+            Table.SetCell("Blocked user", key);
         }
 
         if (PutModule(Table) == 0) PutModule("No users blocked");
@@ -129,10 +131,13 @@ public:
             return;
         }
 
-        if (DelNV(sUser))
+        NoRegistry registry(this);
+        if (registry.contains(sUser)) {
+            registry.remove(sUser);
             PutModule("Unblocked [" + sUser + "]");
-        else
+        } else {
             PutModule("This user is not blocked");
+        }
     }
 
     bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
@@ -157,7 +162,9 @@ public:
                         }
                     }
                 } else if (WebSock.GetParam("embed_blockuser_old").toBool()) {
-                    if (DelNV(Tmpl["Username"])) {
+                    NoRegistry registry(this);
+                    if (registry.contains(Tmpl["Username"])) {
+                        registry.remove(Tmpl["Username"]);
                         WebSock.GetSession()->AddSuccess("Unblocked [" + Tmpl["Username"] + "]");
                     } else {
                         WebSock.GetSession()->AddError("User [" + Tmpl["Username"] + "is not blocked");
@@ -172,13 +179,7 @@ public:
 private:
     bool IsBlocked(const NoString& sUser)
     {
-        NoStringMap::iterator it;
-        for (it = BeginNV(); it != EndNV(); ++it) {
-            if (sUser == it->first) {
-                return true;
-            }
-        }
-        return false;
+        return NoRegistry(this).contains(sUser);
     }
 
     bool Block(const NoString& sUser)
@@ -201,7 +202,8 @@ private:
             (*it2)->SetIRCConnectEnabled(false);
         }
 
-        SetNV(pUser->GetUserName(), "");
+        NoRegistry registry(this);
+        registry.setValue(pUser->GetUserName(), "");
         return true;
     }
 };

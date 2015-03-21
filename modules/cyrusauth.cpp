@@ -29,6 +29,7 @@
 #include <no/nodebug.h>
 #include <no/noclient.h>
 #include <no/noauthenticator.h>
+#include <no/noregistry.h>
 
 #include <sasl/sasl.h>
 
@@ -168,7 +169,8 @@ public:
         NoString sCreate = No::token(sLine, 1);
 
         if (!sCreate.empty()) {
-            SetNV("CreateUser", sCreate);
+            NoRegistry registry(this);
+            registry.setValue("CreateUser", sCreate);
         }
 
         if (CreateUser()) {
@@ -183,7 +185,8 @@ public:
         NoString sUsername = No::token(sLine, 1);
 
         if (!sUsername.empty()) {
-            SetNV("CloneUser", sUsername);
+            NoRegistry registry(this);
+            registry.setValue("CloneUser", sUsername);
         }
 
         if (ShouldCloneUser()) {
@@ -195,15 +198,16 @@ public:
 
     void DisableCloneUserCommand(const NoString& sLine)
     {
-        DelNV("CloneUser");
+        NoRegistry registry(this);
+        registry.remove("CloneUser");
         PutModule("Clone user disabled");
     }
 
-    bool CreateUser() const { return GetNV("CreateUser").toBool(); }
+    bool CreateUser() const { return NoRegistry(this).value("CreateUser").toBool(); }
 
-    NoString CloneUser() const { return GetNV("CloneUser"); }
+    NoString CloneUser() const { return NoRegistry(this).value("CloneUser"); }
 
-    bool ShouldCloneUser() { return !GetNV("CloneUser").empty(); }
+    bool ShouldCloneUser() { return !NoRegistry(this).value("CloneUser").empty(); }
 
 protected:
     NoCacheMap<NoString> m_Cache;

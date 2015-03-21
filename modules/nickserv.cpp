@@ -18,6 +18,7 @@
 #include <no/noutils.h>
 #include <no/nouser.h>
 #include <no/nonick.h>
+#include <no/noregistry.h>
 
 class NoNickServ : public NoModule
 {
@@ -25,35 +26,39 @@ class NoNickServ : public NoModule
     {
         NoStringMap msValues;
         msValues["nickname"] = sNick;
-        msValues["password"] = GetNV("Password");
-        PutIRC(No::namedFormat(GetNV(sCmd), msValues));
+        NoRegistry registry(this);
+        msValues["password"] = registry.value("Password");
+        PutIRC(No::namedFormat(registry.value(sCmd), msValues));
     }
 
 public:
     void SetCommand(const NoString& sLine)
     {
-        SetNV("Password", No::tokens(sLine, 1));
+        NoRegistry registry(this);
+        registry.setValue("Password", No::tokens(sLine, 1));
         PutModule("Password set");
     }
 
-    void ClearCommand(const NoString& sLine) { DelNV("Password"); }
+    void ClearCommand(const NoString& sLine) { NoRegistry(this).remove("Password"); }
 
     void SetNSNameCommand(const NoString& sLine)
     {
-        SetNV("NickServName", No::tokens(sLine, 1));
+        NoRegistry registry(this);
+        registry.setValue("NickServName", No::tokens(sLine, 1));
         PutModule("NickServ name set");
     }
 
-    void ClearNSNameCommand(const NoString& sLine) { DelNV("NickServName"); }
+    void ClearNSNameCommand(const NoString& sLine) { NoRegistry(this).remove("NickServName"); }
 
-    void ViewCommandsCommand(const NoString& sLine) { PutModule("IDENTIFY " + GetNV("IdentifyCmd")); }
+    void ViewCommandsCommand(const NoString& sLine) { PutModule("IDENTIFY " + NoRegistry(this).value("IdentifyCmd")); }
 
     void SetCommandCommand(const NoString& sLine)
     {
         NoString sCmd = No::token(sLine, 1);
         NoString sNewCmd = No::tokens(sLine, 2);
         if (sCmd.equals("IDENTIFY")) {
-            SetNV("IdentifyCmd", sNewCmd);
+            NoRegistry registry(this);
+            registry.setValue("IdentifyCmd", sNewCmd);
         } else {
             PutModule("No such editable command. See ViewCommands for list.");
             return;
@@ -86,13 +91,14 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
+        NoRegistry registry(this);
         if (!sArgs.empty() && sArgs != "<hidden>") {
-            SetNV("Password", sArgs);
+            registry.setValue("Password", sArgs);
             SetArgs("<hidden>");
         }
 
-        if (GetNV("IdentifyCmd").empty()) {
-            SetNV("IdentifyCmd", "NICKSERV IDENTIFY {password}");
+        if (registry.value("IdentifyCmd").empty()) {
+            registry.setValue("IdentifyCmd", "NICKSERV IDENTIFY {password}");
         }
 
         return true;
@@ -100,8 +106,9 @@ public:
 
     void HandleMessage(NoNick& Nick, const NoString& sMessage)
     {
-        NoString sNickServName = (!GetNV("NickServName").empty()) ? GetNV("NickServName") : "NickServ";
-        if (!GetNV("Password").empty() && Nick.equals(sNickServName) &&
+        NoRegistry registry(this);
+        NoString sNickServName = (!registry.value("NickServName").empty()) ? registry.value("NickServName") : "NickServ";
+        if (!registry.value("Password").empty() && Nick.equals(sNickServName) &&
             (sMessage.find("msg") != NoString::npos || sMessage.find("authenticate") != NoString::npos ||
              sMessage.find("choose a different nickname") != NoString::npos ||
              sMessage.find("please choose a different nick") != NoString::npos ||
@@ -112,8 +119,8 @@ public:
              No::stripControls(sMessage).find("type /msg NickServ IDENTIFY password") != NoString::npos) &&
             sMessage.toUpper().find("IDENTIFY") != NoString::npos && sMessage.find("help") == NoString::npos) {
             NoStringMap msValues;
-            msValues["password"] = GetNV("Password");
-            PutIRC(No::namedFormat(GetNV("IdentifyCmd"), msValues));
+            msValues["password"] = registry.value("Password");
+            PutIRC(No::namedFormat(registry.value("IdentifyCmd"), msValues));
         }
     }
 

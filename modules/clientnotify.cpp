@@ -18,6 +18,7 @@
 #include <no/noapp.h>
 #include <no/nouser.h>
 #include <no/noclient.h>
+#include <no/noregistry.h>
 
 class NoClientNotifyMod : public NoModule
 {
@@ -30,9 +31,10 @@ protected:
 
     void SaveSettings()
     {
-        SetNV("method", m_sMethod);
-        SetNV("newonly", m_bNewOnly ? "1" : "0");
-        SetNV("ondisconnect", m_bOnDisconnect ? "1" : "0");
+        NoRegistry registry(this);
+        registry.setValue("method", m_sMethod);
+        registry.setValue("newonly", m_bNewOnly ? "1" : "0");
+        registry.setValue("ondisconnect", m_bOnDisconnect ? "1" : "0");
     }
 
     void SendNotification(const NoString& sMessage)
@@ -68,7 +70,8 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        m_sMethod = GetNV("method");
+        NoRegistry registry(this);
+        m_sMethod = registry.value("method");
 
         if (m_sMethod != "notice" && m_sMethod != "message" && m_sMethod != "off") {
             m_sMethod = "message";
@@ -76,8 +79,8 @@ public:
 
         // default = off for these:
 
-        m_bNewOnly = (GetNV("newonly") == "1");
-        m_bOnDisconnect = (GetNV("ondisconnect") == "1");
+        m_bNewOnly = (registry.value("newonly") == "1");
+        m_bOnDisconnect = (registry.value("ondisconnect") == "1");
 
         return true;
     }

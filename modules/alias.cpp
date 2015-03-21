@@ -18,6 +18,7 @@
 #include <no/noclient.h>
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
+#include <no/noregistry.h>
 
 #include <sstream>
 #include <stdexcept>
@@ -46,18 +47,19 @@ public:
     static bool AliasExists(NoModule* module, NoString alias_name)
     {
         alias_name = No::token(alias_name, 0, " ").toUpper();
-        return (module->FindNV(alias_name) != module->EndNV());
+        return NoRegistry(module).contains(alias_name);
     }
 
     // populate alias from stored settings in registry, or return false if none exists
     static bool AliasGet(NoAlias& alias, NoModule* module, NoString line)
     {
         line = No::token(line, 0, " ").toUpper();
-        NoStringMap::iterator i = module->FindNV(line);
-        if (i == module->EndNV()) return false;
+        NoRegistry registry(module);
+        if (!registry.contains(line))
+            return false;
         alias.parent = module;
         alias.name = line;
-        alias.alias_cmds = i->second.split("\n", No::SkipEmptyParts);
+        alias.alias_cmds = registry.value(line).split("\n", No::SkipEmptyParts);
         return true;
     }
 
@@ -72,14 +74,16 @@ public:
     void Commit() const
     {
         if (!parent) return;
-        parent->SetNV(name, GetCommands());
+        NoRegistry registry(parent);
+        registry.setValue(name, GetCommands());
     }
 
     // delete this alias from regisrty
     void Delete() const
     {
         if (!parent) return;
-        parent->DelNV(name);
+        NoRegistry registry(parent);
+        registry.remove(name);
     }
 
 private:
@@ -253,12 +257,12 @@ public:
     void ListCommand(const NoString& sLine)
     {
         NoString output = "The following aliases exist:";
-        NoStringMap::iterator i = BeginNV();
-        if (i == EndNV()) output += " [none]";
-        for (; i != EndNV(); ++i) {
-            output.append(" ");
-            output.append(i->first);
-        }
+        NoRegistry registry(this);
+        NoStringVector aliases = registry.keys();
+        if (!aliases.empty())
+            output += NoString(" ").join(aliases.begin(), aliases.end());
+        else
+            output += " [none]";
         PutModule(output);
     }
 
@@ -325,7 +329,8 @@ public:
             if (sLine.equals("ZNC-CLEAR-ALL-ALIASES!")) {
                 ListCommand("");
                 PutModule("Clearing all of them!");
-                ClearNV();
+                NoRegistry registry(this);
+                registry.clear();
                 return HALT;
             } else if (NoAlias::AliasGet(current_alias, this, sLine)) {
                 NoStringVector rawLines = current_alias.Imprint(sLine).split("\n", No::SkipEmptyParts);

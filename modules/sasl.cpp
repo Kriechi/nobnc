@@ -18,6 +18,7 @@
 #include <no/nonetwork.h>
 #include <no/noircconnection.h>
 #include <no/nodebug.h>
+#include <no/noregistry.h>
 
 static const struct
 {
@@ -104,11 +105,12 @@ public:
 
     void Set(const NoString& sLine)
     {
-        SetNV("username", No::token(sLine, 1));
-        SetNV("password", No::token(sLine, 2));
+        NoRegistry registry(this);
+        registry.setValue("username", No::token(sLine, 1));
+        registry.setValue("password", No::token(sLine, 2));
 
-        PutModule("Username has been set to [" + GetNV("username") + "]");
-        PutModule("Password has been set to [" + GetNV("password") + "]");
+        PutModule("Username has been set to [" + registry.value("username") + "]");
+        PutModule("Password has been set to [" + registry.value("password") + "]");
     }
 
     void SetMechanismCommand(const NoString& sLine)
@@ -125,7 +127,8 @@ public:
                 }
             }
 
-            SetNV(NV_MECHANISMS, sMechanisms);
+            NoRegistry registry(this);
+            registry.setValue(NV_MECHANISMS, sMechanisms);
         }
 
         PutModule("Current mechanisms set: " + GetMechanismsString());
@@ -133,11 +136,12 @@ public:
 
     void RequireAuthCommand(const NoString& sLine)
     {
+        NoRegistry registry(this);
         if (!No::token(sLine, 1).empty()) {
-            SetNV(NV_REQUIRE_AUTH, No::token(sLine, 1));
+            registry.setValue(NV_REQUIRE_AUTH, No::token(sLine, 1));
         }
 
-        if (GetNV(NV_REQUIRE_AUTH).toBool()) {
+        if (registry.value(NV_REQUIRE_AUTH).toBool()) {
             PutModule("We require SASL negotiation to connect");
         } else {
             PutModule("We will connect even if SASL fails");
@@ -157,7 +161,8 @@ public:
 
     NoString GetMechanismsString() const
     {
-        if (GetNV(NV_MECHANISMS).empty()) {
+        NoRegistry registry(this);
+        if (!registry.contains(NV_MECHANISMS)) {
             NoString sDefaults = "";
 
             for (size_t i = 0; SupportedMechanisms[i].szName != nullptr; i++) {
@@ -173,12 +178,13 @@ public:
             return sDefaults;
         }
 
-        return GetNV(NV_MECHANISMS);
+        return registry.value(NV_MECHANISMS);
     }
 
     bool CheckRequireAuth()
     {
-        if (!m_bAuthenticated && GetNV(NV_REQUIRE_AUTH).toBool()) {
+        NoRegistry registry(this);
+        if (!m_bAuthenticated && registry.value(NV_REQUIRE_AUTH).toBool()) {
             GetNetwork()->SetIRCConnectEnabled(false);
             PutModule("Disabling network, we require authentication.");
             PutModule("Use 'RequireAuth no' to disable.");
@@ -191,7 +197,8 @@ public:
     void Authenticate(const NoString& sLine)
     {
         if (m_Mechanisms.GetCurrent().equals("PLAIN") && sLine.equals("+")) {
-            NoString sAuthLine = GetNV("username") + '\0' + GetNV("username") + '\0' + GetNV("password");
+            NoRegistry registry(this);
+            NoString sAuthLine = registry.value("username") + '\0' + registry.value("username") + '\0' + registry.value("password");
             sAuthLine = sAuthLine.toBase64();
             PutIRC("AUTHENTICATE " + sAuthLine);
         } else {

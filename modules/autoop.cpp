@@ -17,6 +17,7 @@
 #include <no/nomodule.h>
 #include <no/nonetwork.h>
 #include <no/nochannel.h>
+#include <no/noregistry.h>
 
 class NoAutoOpMod;
 
@@ -182,8 +183,9 @@ public:
         AddTimer(new NoAutoOpTimer(this));
 
         // Load the users
-        for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
-            const NoString& sLine = it->second;
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
+            const NoString& sLine = registry.value(key);
             NoAutoOpUser* pUser = new NoAutoOpUser;
 
             if (!pUser->FromString(sLine) || FindUser(pUser->GetUsername().toLower())) {
@@ -285,7 +287,8 @@ public:
             NoAutoOpUser* pUser = AddUser(sUser, sKey, sHost, No::tokens(sLine, 4));
 
             if (pUser) {
-                SetNV(sUser, pUser->ToString());
+                NoRegistry registry(this);
+                registry.setValue(sUser, pUser->ToString());
             }
         }
     }
@@ -298,7 +301,8 @@ public:
             PutModule("Usage: DelUser <user>");
         } else {
             DelUser(sUser);
-            DelNV(sUser);
+            NoRegistry registry(this);
+            registry.remove(sUser);
         }
     }
 
@@ -355,7 +359,9 @@ public:
 
         pUser->AddChans(sChans);
         PutModule("Channel(s) added to user [" + pUser->GetUsername() + "]");
-        SetNV(pUser->GetUsername(), pUser->ToString());
+
+        NoRegistry registry(this);
+        registry.setValue(pUser->GetUsername(), pUser->ToString());
     }
 
     void OnDelChansCommand(const NoString& sLine)
@@ -377,7 +383,9 @@ public:
 
         pUser->DelChans(sChans);
         PutModule("Channel(s) Removed from user [" + pUser->GetUsername() + "]");
-        SetNV(pUser->GetUsername(), pUser->ToString());
+
+        NoRegistry registry(this);
+        registry.setValue(pUser->GetUsername(), pUser->ToString());
     }
 
     void OnAddMasksCommand(const NoString& sLine)
@@ -399,7 +407,9 @@ public:
 
         pUser->AddHostmasks(sHostmasks);
         PutModule("Hostmasks(s) added to user [" + pUser->GetUsername() + "]");
-        SetNV(pUser->GetUsername(), pUser->ToString());
+
+        NoRegistry registry(this);
+        registry.setValue(pUser->GetUsername(), pUser->ToString());
     }
 
     void OnDelMasksCommand(const NoString& sLine)
@@ -423,10 +433,12 @@ public:
             PutModule("Removed user [" + pUser->GetUsername() + "] with key [" + pUser->GetUserKey() +
                       "] and channels [" + pUser->GetChannels() + "]");
             DelUser(sUser);
-            DelNV(sUser);
+            NoRegistry registry(this);
+            registry.remove(sUser);
         } else {
             PutModule("Hostmasks(s) Removed from user [" + pUser->GetUsername() + "]");
-            SetNV(pUser->GetUsername(), pUser->ToString());
+            NoRegistry registry(this);
+            registry.setValue(pUser->GetUsername(), pUser->ToString());
         }
     }
 

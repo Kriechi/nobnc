@@ -16,6 +16,7 @@
 
 #include <no/nomodule.h>
 #include <no/nochannel.h>
+#include <no/noregistry.h>
 
 class NoAttachMatch
 {
@@ -167,13 +168,13 @@ public:
         }
 
         // Load our saved settings, ignore errors
-        NoStringMap::iterator it;
-        for (it = BeginNV(); it != EndNV(); ++it) {
-            NoString sAdd = it->first;
-            bool bNegated = sAdd.trimPrefix("!");
-            NoString sChan = No::token(sAdd, 0);
-            NoString sSearch = No::token(sAdd, 1);
-            NoString sHost = No::tokens(sAdd, 2);
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
+            NoString str = key;
+            bool bNegated = str.trimPrefix("!");
+            NoString sChan = No::token(str, 0);
+            NoString sSearch = No::token(str, 1);
+            NoString sHost = No::tokens(str, 2);
 
             Add(bNegated, sChan, sSearch, sHost);
         }
@@ -249,7 +250,8 @@ public:
         m_vMatches.push_back(attach);
 
         // Also save it for next module load
-        SetNV(attach.ToString(), "");
+        NoRegistry registry(this);
+        registry.setValue(attach.ToString(), "");
 
         return true;
     }
@@ -259,7 +261,8 @@ public:
         VAttachIter it = FindEntry(sChan, sSearch, sHost);
         if (it == m_vMatches.end() || it->IsNegated() != bNegated) return false;
 
-        DelNV(it->ToString());
+        NoRegistry registry(this);
+        registry.remove(it->ToString());
         m_vMatches.erase(it);
 
         return true;

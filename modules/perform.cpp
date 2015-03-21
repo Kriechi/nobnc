@@ -17,6 +17,7 @@
 #include <no/nomodule.h>
 #include <no/nonetwork.h>
 #include <no/nowebsocket.h>
+#include <no/noregistry.h>
 
 class NoPerform : public NoModule
 {
@@ -124,7 +125,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        m_vPerform = GetNV("Perform").split("\n", No::SkipEmptyParts);
+        m_vPerform = NoRegistry(this).value("Perform").split("\n", No::SkipEmptyParts);
 
         return true;
     }
@@ -171,7 +172,8 @@ private:
         for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
             sBuffer += *it + "\n";
         }
-        SetNV("Perform", sBuffer);
+        NoRegistry registry(this);
+        registry.setValue("Perform", sBuffer);
     }
 
     NoStringVector m_vPerform;

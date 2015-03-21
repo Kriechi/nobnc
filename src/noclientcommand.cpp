@@ -26,6 +26,7 @@
 #include "nomodulecall.h"
 #include "noapp.h"
 #include "nolistener.h"
+#include "noregistry.h"
 
 void NoClient::UserCommand(NoString& sLine)
 {
@@ -686,7 +687,8 @@ void NoClient::UserCommand(NoString& sLine)
                 }
             }
 
-            pMod->MoveRegistry(sNewModPath);
+            NoRegistry registry(pMod);
+            registry.copy(sNewModPath);
         }
 
         NoString sNetworkAddError;

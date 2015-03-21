@@ -26,6 +26,7 @@
 #include "noclient.h"
 #include "nowebsocket.h"
 #include "nolistener.h"
+#include "noregistry.h"
 #include <tuple>
 #include <algorithm>
 #include "Csocket/Csocket.h"
@@ -1188,8 +1189,9 @@ bool NoApp::DoRehash(NoString& sError)
             msModules["identfile"] = "";
         }
 
-        pIdentFileMod->SetNV("File", sISpoofFile);
-        pIdentFileMod->SetNV("Format", sISpoofFormat);
+        NoRegistry registry(pIdentFileMod);
+        registry.setValue("File", sISpoofFile);
+        registry.setValue("Format", sISpoofFormat);
     }
 
     config.FindStringVector("motd", vsList);

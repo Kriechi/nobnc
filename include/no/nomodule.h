@@ -742,18 +742,6 @@ public:
      */
     void HandleHelpCommand(const NoString& sLine = "");
 
-    bool LoadRegistry();
-    bool SaveRegistry() const;
-    bool MoveRegistry(const NoString& sPath);
-    bool SetNV(const NoString& sName, const NoString& sValue, bool bWriteToDisk = true);
-    NoString GetNV(const NoString& sName) const;
-    bool DelNV(const NoString& sName, bool bWriteToDisk = true);
-    NoStringMap::iterator FindNV(const NoString& sName);
-    NoStringMap::iterator EndNV();
-    NoStringMap::iterator BeginNV();
-    void DelNV(NoStringMap::iterator it);
-    bool ClearNV(bool bWriteToDisk = true);
-
     const NoString& GetSavePath() const;
     NoString ExpandString(const NoString& sStr) const;
     NoString& ExpandString(const NoString& sStr, NoString& sRet) const;

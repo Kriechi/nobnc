@@ -25,6 +25,7 @@
 #include <no/nomodule.h>
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
+#include <no/noregistry.h>
 
 class NoRejoinJob : public NoTimer
 {
@@ -74,7 +75,8 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sErrorMsg) override
     {
         if (sArgs.empty()) {
-            NoString sDelay = GetNV("delay");
+            NoRegistry registry(this);
+            NoString sDelay = registry.value("delay");
 
             if (sDelay.empty())
                 delay = 10;
@@ -105,7 +107,8 @@ public:
         }
 
         delay = i;
-        SetNV("delay", NoString(delay));
+        NoRegistry registry(this);
+        registry.setValue("delay", NoString(delay));
 
         if (delay)
             PutModule("Rejoin delay set to " + NoString(delay) + " seconds");

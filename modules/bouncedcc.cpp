@@ -21,6 +21,7 @@
 #include <no/noclient.h>
 #include <no/noapp.h>
 #include <no/nomodulesocket.h>
+#include <no/noregistry.h>
 
 class NoBounceDccMod;
 
@@ -155,11 +156,12 @@ public:
     {
         NoString sValue = No::tokens(sLine, 1);
 
+        NoRegistry registry(this);
         if (!sValue.empty()) {
-            SetNV("UseClientIP", sValue);
+            registry.setValue("UseClientIP", sValue);
         }
 
-        PutModule("UseClientIP: " + NoString(GetNV("UseClientIP").toBool()));
+        PutModule("UseClientIP: " + NoString(registry.value("UseClientIP").toBool()));
     }
 
     MODCONSTRUCTOR(NoBounceDccMod)
@@ -176,7 +178,7 @@ public:
 
     NoString GetLocalDCCIP() { return GetUser()->GetLocalDCCIP(); }
 
-    bool UseClientIP() { return GetNV("UseClientIP").toBool(); }
+    bool UseClientIP() { return NoRegistry(this).value("UseClientIP").toBool(); }
 
     ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
     {

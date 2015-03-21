@@ -21,6 +21,7 @@
 #include <no/nouser.h>
 #include <no/nodebug.h>
 #include <no/noclient.h>
+#include <no/noregistry.h>
 
 #include <syslog.h>
 #include <unistd.h>
@@ -48,7 +49,8 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        NoString sTarget = GetNV("target");
+        NoRegistry registry(this);
+        NoString sTarget = registry.value("target");
         if (sTarget.equals("syslog"))
             m_eLogMode = LOG_TO_SYSLOG;
         else if (sTarget.equals("both"))
@@ -164,7 +166,8 @@ public:
         }
 
         Log(sMessage);
-        SetNV("target", sTarget);
+        NoRegistry registry(this);
+        registry.setValue("target", sTarget);
         m_eLogMode = mode;
         PutModule(sMessage);
     }

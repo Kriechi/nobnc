@@ -21,6 +21,7 @@
 #include <no/nonetwork.h>
 #include <no/nodebug.h>
 #include <no/noapp.h>
+#include <no/noregistry.h>
 
 class NoIdentFileModule : public NoModule
 {
@@ -44,25 +45,28 @@ public:
 
     virtual ~NoIdentFileModule() { ReleaseISpoof(); }
 
-    void GetFile(const NoString& sLine) { PutModule("File is set to: " + GetNV("File")); }
+    void GetFile(const NoString& sLine) { PutModule("File is set to: " + NoRegistry(this).value("File")); }
 
     void SetFile(const NoString& sLine)
     {
-        SetNV("File", No::tokens(sLine, 1));
-        PutModule("File has been set to: " + GetNV("File"));
+        NoRegistry registry(this);
+        registry.setValue("File", No::tokens(sLine, 1));
+        PutModule("File has been set to: " + registry.value("File"));
     }
 
     void SetFormat(const NoString& sLine)
     {
-        SetNV("Format", No::tokens(sLine, 1));
-        PutModule("Format has been set to: " + GetNV("Format"));
-        PutModule("Format would be expanded to: " + ExpandString(GetNV("Format")));
+        NoRegistry registry(this);
+        registry.setValue("Format", No::tokens(sLine, 1));
+        PutModule("Format has been set to: " + registry.value("Format"));
+        PutModule("Format would be expanded to: " + ExpandString(registry.value("Format")));
     }
 
     void GetFormat(const NoString& sLine)
     {
-        PutModule("Format is set to: " + GetNV("Format"));
-        PutModule("Format would be expanded to: " + ExpandString(GetNV("Format")));
+        NoRegistry registry(this);
+        PutModule("Format is set to: " + registry.value("Format"));
+        PutModule("Format would be expanded to: " + ExpandString(registry.value("Format")));
     }
 
     void Show(const NoString& sLine)
@@ -105,8 +109,10 @@ public:
             return false;
         }
 
+        NoRegistry registry(this);
+
         m_pISpoofLockFile = new NoFile;
-        if (!m_pISpoofLockFile->TryExLock(GetNV("File"), O_RDWR | O_CREAT)) {
+        if (!m_pISpoofLockFile->TryExLock(registry.value("File"), O_RDWR | O_CREAT)) {
             delete m_pISpoofLockFile;
             m_pISpoofLockFile = nullptr;
             return false;
@@ -123,11 +129,11 @@ public:
             return false;
         }
 
-        NoString sData = ExpandString(GetNV("Format"));
+        NoString sData = ExpandString(registry.value("Format"));
 
         // If the format doesn't contain anything expandable, we'll
         // assume this is an "old"-style format string.
-        if (sData == GetNV("Format")) {
+        if (sData == registry.value("Format")) {
             sData.replace("%", GetUser()->GetIdent());
         }
 
@@ -162,12 +168,13 @@ public:
         m_pISpoofLockFile = nullptr;
         m_pIRCSock = nullptr;
 
-        if (GetNV("Format").empty()) {
-            SetNV("Format", "global { reply \"%ident%\" }");
+        NoRegistry registry(this);
+        if (registry.value("Format").empty()) {
+            registry.setValue("Format", "global { reply \"%ident%\" }");
         }
 
-        if (GetNV("File").empty()) {
-            SetNV("File", "~/.oidentd.conf");
+        if (registry.value("File").empty()) {
+            registry.setValue("File", "~/.oidentd.conf");
         }
 
         return true;
@@ -183,8 +190,9 @@ public:
         }
 
         if (!WriteISpoof()) {
-            NO_DEBUG("identfile [" + GetNV("File") + "] could not be written");
-            PutModule("[" + GetNV("File") + "] could not be written, retrying...");
+            NoRegistry registry(this);
+            NO_DEBUG("identfile [" + registry.value("File") + "] could not be written");
+            PutModule("[" + registry.value("File") + "] could not be written, retrying...");
             return HALTCORE;
         }
 

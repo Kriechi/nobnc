@@ -21,6 +21,7 @@
 #include <no/nochannel.h>
 #include <no/nowebsocket.h>
 #include <no/nowebsession.h>
+#include <no/noregistry.h>
 
 #ifndef Q_DEBUG_COMMUNICATION
 #define Q_DEBUG_COMMUNICATION 0
@@ -33,20 +34,21 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
+        NoRegistry registry(this);
         if (!sArgs.empty()) {
             SetUsername(No::token(sArgs, 0));
             SetPassword(No::token(sArgs, 1));
         } else {
-            m_sUsername = GetNV("Username");
-            m_sPassword = GetNV("Password");
+            m_sUsername = registry.value("Username");
+            m_sPassword = registry.value("Password");
         }
 
         NoString sTmp;
-        m_bUseCloakedHost = (sTmp = GetNV("UseCloakedHost")).empty() ? true : sTmp.toBool();
-        m_bUseChallenge = (sTmp = GetNV("UseChallenge")).empty() ? true : sTmp.toBool();
-        m_bRequestPerms = GetNV("RequestPerms").toBool();
-        m_bJoinOnInvite = (sTmp = GetNV("JoinOnInvite")).empty() ? true : sTmp.toBool();
-        m_bJoinAfterCloaked = (sTmp = GetNV("JoinAfterCloaked")).empty() ? true : sTmp.toBool();
+        m_bUseCloakedHost = (sTmp = registry.value("UseCloakedHost")).empty() ? true : sTmp.toBool();
+        m_bUseChallenge = (sTmp = registry.value("UseChallenge")).empty() ? true : sTmp.toBool();
+        m_bRequestPerms = registry.value("RequestPerms").toBool();
+        m_bJoinOnInvite = (sTmp = registry.value("JoinOnInvite")).empty() ? true : sTmp.toBool();
+        m_bJoinAfterCloaked = (sTmp = registry.value("JoinAfterCloaked")).empty() ? true : sTmp.toBool();
 
         // Make sure NVs are stored in config. Note: SetUseCloakedHost() is called further down.
         SetUseChallenge(m_bUseChallenge);
@@ -63,7 +65,7 @@ public:
 
             // This will only happen once, and only if the user loads the module after connecting to IRC.
             // Also don't notify the user in case he already had mode +x set.
-            if (GetNV("UseCloakedHost").empty()) {
+            if (registry.value("UseCloakedHost").empty()) {
                 if (!m_bCloaked)
                     PutModule("Notice: Your host will be cloaked the next time you reconnect to IRC. "
                               "If you want to cloak your host now, /msg *q Cloak. You can set your preference "
@@ -588,46 +590,53 @@ private:
 
     void SetUsername(const NoString& sUsername)
     {
+        NoRegistry registry(this);
+        registry.setValue("Username", sUsername);
         m_sUsername = sUsername;
-        SetNV("Username", sUsername);
     }
 
     void SetPassword(const NoString& sPassword)
     {
+        NoRegistry registry(this);
+        registry.setValue("Password", sPassword);
         m_sPassword = sPassword;
-        SetNV("Password", sPassword);
     }
 
     void SetUseCloakedHost(const bool bUseCloakedHost)
     {
+        NoRegistry registry(this);
+        registry.setValue("UseCloakedHost", NoString(bUseCloakedHost));
         m_bUseCloakedHost = bUseCloakedHost;
-        SetNV("UseCloakedHost", NoString(bUseCloakedHost));
 
         if (!m_bCloaked && m_bUseCloakedHost && IsIRCConnected()) Cloak();
     }
 
     void SetUseChallenge(const bool bUseChallenge)
     {
+        NoRegistry registry(this);
+        registry.setValue("UseChallenge", NoString(bUseChallenge));
         m_bUseChallenge = bUseChallenge;
-        SetNV("UseChallenge", NoString(bUseChallenge));
     }
 
     void SetRequestPerms(const bool bRequestPerms)
     {
+        NoRegistry registry(this);
+        registry.setValue("RequestPerms", NoString(bRequestPerms));
         m_bRequestPerms = bRequestPerms;
-        SetNV("RequestPerms", NoString(bRequestPerms));
     }
 
     void SetJoinOnInvite(const bool bJoinOnInvite)
     {
+        NoRegistry registry(this);
+        registry.setValue("JoinOnInvite", NoString(bJoinOnInvite));
         m_bJoinOnInvite = bJoinOnInvite;
-        SetNV("JoinOnInvite", NoString(bJoinOnInvite));
     }
 
     void SetJoinAfterCloaked(const bool bJoinAfterCloaked)
     {
+        NoRegistry registry(this);
+        registry.setValue("JoinAfterCloaked", NoString(bJoinAfterCloaked));
         m_bJoinAfterCloaked = bJoinAfterCloaked;
-        SetNV("JoinAfterCloaked", NoString(bJoinAfterCloaked));
     }
 };
 

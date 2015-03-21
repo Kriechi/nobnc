@@ -23,6 +23,7 @@
 #include <no/nochannel.h>
 #include <no/noserver.h>
 #include <no/nodebug.h>
+#include <no/noregistry.h>
 #include <algorithm>
 
 class NoLogRule
@@ -122,7 +123,8 @@ void NoLogMod::SetRulesCmd(const NoString& sLine)
         PutModule("Wildcards are allowed");
     } else {
         SetRules(vsRules);
-        SetNV("rules", JoinRules(","));
+        NoRegistry registry(this);
+        registry.setValue("rules", JoinRules(","));
         ListRulesCmd();
     }
 }
@@ -136,7 +138,8 @@ void NoLogMod::ClearRulesCmd(const NoString& sLine)
     } else {
         NoString sRules = JoinRules(" ");
         SetRules(NoStringVector());
-        DelNV("rules");
+        NoRegistry registry(this);
+        registry.remove("rules");
         PutModule(NoString(uCount) + " rule(s) removed: " + sRules);
     }
 }
@@ -294,7 +297,8 @@ bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)
         }
     }
 
-    NoString sRules = GetNV("rules");
+    NoRegistry registry(this);
+    NoString sRules = registry.value("rules");
     NoStringVector vsRules = SplitRules(sRules);
     SetRules(vsRules);
 

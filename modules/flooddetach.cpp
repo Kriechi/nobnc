@@ -17,6 +17,7 @@
 #include <no/nomodule.h>
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
+#include <no/noregistry.h>
 
 class NoFloodDetachMod : public NoModule
 {
@@ -36,10 +37,11 @@ public:
     void Save()
     {
         // We save the settings twice because the module arguments can
-        // be more easily edited via webadmin, while the SetNV() stuff
+        // be more easily edited via webadmin, while the registry.setValue() stuff
         // survives e.g. /msg *status reloadmod ctcpflood.
-        SetNV("secs", NoString(m_iThresholdSecs));
-        SetNV("msgs", NoString(m_iThresholdMsgs));
+        NoRegistry registry(this);
+        registry.setValue("secs", NoString(m_iThresholdSecs));
+        registry.setValue("msgs", NoString(m_iThresholdMsgs));
 
         SetArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
@@ -50,8 +52,9 @@ public:
         m_iThresholdSecs = No::token(sArgs, 1).toUInt();
 
         if (m_iThresholdMsgs == 0 || m_iThresholdSecs == 0) {
-            m_iThresholdMsgs = GetNV("msgs").toUInt();
-            m_iThresholdSecs = GetNV("secs").toUInt();
+            NoRegistry registry(this);
+            m_iThresholdMsgs = registry.value("msgs").toUInt();
+            m_iThresholdSecs = registry.value("secs").toUInt();
         }
 
         if (m_iThresholdSecs == 0) m_iThresholdSecs = 2;
@@ -81,7 +84,8 @@ public:
                 // channels which we detached, this means that
                 // we detached because of a flood.
 
-                if (!GetNV("silent").toBool()) {
+                NoRegistry registry(this);
+                if (!registry.value("silent").toBool()) {
                     PutModule("Flood in [" + pChan->getName() + "] is over, "
                                                                 "re-attaching...");
                 }
@@ -139,7 +143,9 @@ public:
         it->second.first = now;
 
         Channel.detachUser();
-        if (!GetNV("silent").toBool()) {
+
+        NoRegistry registry(this);
+        if (!registry.value("silent").toBool()) {
             PutModule("Channel [" + Channel.getName() + "] was "
                                                         "flooded, you've been detached");
         }
@@ -211,11 +217,12 @@ public:
     {
         const NoString sArg = No::tokens(sLine, 1);
 
+        NoRegistry registry(this);
         if (!sArg.empty()) {
-            SetNV("silent", NoString(sArg.toBool()));
+            registry.setValue("silent", NoString(sArg.toBool()));
         }
 
-        if (GetNV("silent").toBool()) {
+        if (registry.value("silent").toBool()) {
             PutModule("Module messages are disabled");
         } else {
             PutModule("Module messages are enabled");

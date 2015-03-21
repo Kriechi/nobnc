@@ -18,6 +18,7 @@
 #include <no/nonetwork.h>
 #include <no/noircconnection.h>
 #include <no/noclient.h>
+#include <no/noregistry.h>
 
 struct reply
 {
@@ -358,7 +359,8 @@ public:
     {
         // The timer will be deleted after this by the event loop
 
-        if (!GetNV("silent_timeouts").toBool()) {
+        NoRegistry registry(this);
+        if (!registry.value("silent_timeouts").toBool()) {
             PutModule("This module hit a timeout which is possibly a bug.");
             PutModule("To disable this message, do \"/msg " + GetModNick() + " silent yes\"");
             PutModule("Last request: " + m_sLastRequest);
@@ -437,11 +439,12 @@ private:
     {
         const NoString sValue = No::token(sLine, 1);
 
+        NoRegistry registry(this);
         if (!sValue.empty()) {
-            SetNV("silent_timeouts", sValue);
+            registry.setValue("silent_timeouts", sValue);
         }
 
-        NoString sPrefix = GetNV("silent_timeouts").toBool() ? "dis" : "en";
+        NoString sPrefix = registry.value("silent_timeouts").toBool() ? "dis" : "en";
         PutModule("Timeout messages are " + sPrefix + "abled.");
     }
 

@@ -42,7 +42,6 @@ NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, cons
     } else {
         m_sSavePath = NoApp::Get().GetZNCPath() + "/moddata/" + m_sModName;
     }
-    LoadRegistry();
 }
 
 NoModule::~NoModule()
@@ -54,8 +53,6 @@ NoModule::~NoModule()
     while (!m_sSockets.empty()) {
         RemSocket(*m_sSockets.begin());
     }
-
-    SaveRegistry();
 
 #ifdef HAVE_PTHREAD
     CancelJobs(m_sJobs);
@@ -147,91 +144,6 @@ NoString NoModule::GetWebFilesPath()
     default:
         return "/";
     }
-}
-
-bool NoModule::LoadRegistry()
-{
-    // NoString sPrefix = (m_pUser) ? m_pUser->GetUserName() : ".global";
-    return No::readFromDisk(m_mssRegistry, GetSavePath() + "/.registry") == No::MCS_SUCCESS;
-}
-
-bool NoModule::SaveRegistry() const
-{
-    // NoString sPrefix = (m_pUser) ? m_pUser->GetUserName() : ".global";
-    return No::writeToDisk(m_mssRegistry, GetSavePath() + "/.registry", 0600) == No::MCS_SUCCESS;
-}
-
-bool NoModule::MoveRegistry(const NoString& sPath)
-{
-    if (m_sSavePath != sPath) {
-        NoFile fOldNVFile = NoFile(m_sSavePath + "/.registry");
-        if (!fOldNVFile.Exists()) {
-            return false;
-        }
-        if (!NoFile::Exists(sPath) && !NoDir::MakeDir(sPath)) {
-            return false;
-        }
-        fOldNVFile.Copy(sPath + "/.registry");
-        m_sSavePath = sPath;
-        return true;
-    }
-    return false;
-}
-
-bool NoModule::SetNV(const NoString& sName, const NoString& sValue, bool bWriteToDisk)
-{
-    m_mssRegistry[sName] = sValue;
-    if (bWriteToDisk) {
-        return SaveRegistry();
-    }
-
-    return true;
-}
-
-NoString NoModule::GetNV(const NoString& sName) const
-{
-    NoStringMap::const_iterator it = m_mssRegistry.find(sName);
-
-    if (it != m_mssRegistry.end()) {
-        return it->second;
-    }
-
-    return "";
-}
-
-bool NoModule::DelNV(const NoString& sName, bool bWriteToDisk)
-{
-    NoStringMap::iterator it = m_mssRegistry.find(sName);
-
-    if (it != m_mssRegistry.end()) {
-        m_mssRegistry.erase(it);
-    } else {
-        return false;
-    }
-
-    if (bWriteToDisk) {
-        return SaveRegistry();
-    }
-
-    return true;
-}
-
-NoStringMap::iterator NoModule::FindNV(const NoString& sName) { return m_mssRegistry.find(sName); }
-
-NoStringMap::iterator NoModule::EndNV() { return m_mssRegistry.end(); }
-
-NoStringMap::iterator NoModule::BeginNV() { return m_mssRegistry.begin(); }
-
-void NoModule::DelNV(NoStringMap::iterator it) { m_mssRegistry.erase(it); }
-
-bool NoModule::ClearNV(bool bWriteToDisk)
-{
-    m_mssRegistry.clear();
-
-    if (bWriteToDisk) {
-        return SaveRegistry();
-    }
-    return true;
 }
 
 bool NoModule::AddTimer(NoTimer* pTimer)

@@ -61,6 +61,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nonick.h
                        include/no/noprocess.h
                        include/no/noquery.h
+                       include/no/noregistry.h
                        include/no/noserver.h
                        include/no/nosettings.h
                        include/no/nosocket.h
@@ -110,6 +111,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nonick.cpp
                        src/noprocess.cpp
                        src/noquery.cpp
+                       src/noregistry.cpp
                        src/noserver.cpp
                        src/nosettings.cpp
                        src/nosocket.cpp

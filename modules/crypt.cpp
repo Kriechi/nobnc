@@ -36,6 +36,7 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/noescape.h>
+#include <no/noregistry.h>
 
 #define REQUIRESSL 1
 #define NICK_PREFIX_KEY "[nick-prefix]"
@@ -44,8 +45,10 @@ class NoCryptMod : public NoModule
 {
     NoString NickPrefix()
     {
-        NoStringMap::iterator it = FindNV(NICK_PREFIX_KEY);
-        return it != EndNV() ? it->second : "*";
+        NoRegistry registry(this);
+        if (!registry.contains(NICK_PREFIX_KEY))
+            return "*";
+        return registry.value(NICK_PREFIX_KEY);
     }
 
 public:
@@ -72,9 +75,8 @@ public:
             return CONTINUE;
         }
 
-        NoStringMap::iterator it = FindNV(sTarget.toLower());
-
-        if (it != EndNV()) {
+        NoRegistry registry(this);
+        if (registry.contains(sTarget.toLower())) {
             NoChannel* pChan = GetNetwork()->FindChan(sTarget);
             NoString sNickMask = GetNetwork()->GetIRCNick().nickMask();
             if (pChan) {
@@ -86,7 +88,7 @@ public:
             }
 
             NoString sMsg = MakeIvec() + sMessage;
-            sMsg = No::encrypt(sMsg, it->second);
+            sMsg = No::encrypt(sMsg, registry.value(sTarget.toLower()));
             sMsg = sMsg.toBase64();
             sMsg = "+OK *" + sMsg;
 
@@ -112,12 +114,11 @@ public:
     void FilterIncoming(const NoString& sTarget, NoNick& Nick, NoString& sMessage)
     {
         if (sMessage.left(5) == "+OK *") {
-            NoStringMap::iterator it = FindNV(sTarget.toLower());
-
-            if (it != EndNV()) {
+            NoRegistry registry(this);
+            if (registry.contains(sTarget.toLower())) {
                 sMessage.leftChomp(5);
                 sMessage = NoString::fromBase64(sMessage);
-                sMessage = No::decrypt(sMessage, it->second);
+                sMessage = No::decrypt(sMessage, registry.value(sTarget.toLower()));
                 sMessage.leftChomp(8);
                 sMessage = sMessage.c_str();
                 Nick.setNick(NickPrefix() + Nick.nick());
@@ -130,7 +131,9 @@ public:
         NoString sTarget = No::token(sCommand, 1);
 
         if (!sTarget.empty()) {
-            if (DelNV(sTarget.toLower())) {
+            NoRegistry registry(this);
+            if (registry.contains(sTarget.toLower())) {
+                registry.remove(sTarget.toLower());
                 PutModule("Target [" + sTarget + "] deleted");
             } else {
                 PutModule("Target [" + sTarget + "] not found");
@@ -149,7 +152,8 @@ public:
         sKey.trimPrefix("cbc:");
 
         if (!sKey.empty()) {
-            SetNV(sTarget.toLower(), sKey);
+            NoRegistry registry(this);
+            registry.setValue(sTarget.toLower(), sKey);
             PutModule("Set encryption key for [" + sTarget + "] to [" + sKey + "]");
         } else {
             PutModule("Usage: SetKey <#chan|Nick> <Key>");
@@ -158,21 +162,22 @@ public:
 
     void OnListKeysCommand(const NoString& sCommand)
     {
-        if (BeginNV() == EndNV()) {
+        NoRegistry registry(this);
+        if (registry.isEmpty()) {
             PutModule("You have no encryption keys set.");
         } else {
             NoTable Table;
             Table.AddColumn("Target");
             Table.AddColumn("Key");
 
-            for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
+            NoRegistry registry(this);
+            for (const NoString& key : registry.keys()) {
                 Table.AddRow();
-                Table.SetCell("Target", it->first);
-                Table.SetCell("Key", it->second);
+                Table.SetCell("Target", key);
+                Table.SetCell("Key", registry.value(key));
             }
 
-            NoStringMap::iterator it = FindNV(NICK_PREFIX_KEY);
-            if (it == EndNV()) {
+            if (!registry.contains(NICK_PREFIX_KEY)) {
                 Table.AddRow();
                 Table.SetCell("Target", NICK_PREFIX_KEY);
                 Table.SetCell("Key", NickPrefix());

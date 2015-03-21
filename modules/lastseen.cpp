@@ -20,13 +20,14 @@
 #include <no/notemplate.h>
 #include <no/nowebsocket.h>
 #include <no/nowebsession.h>
+#include <no/noregistry.h>
 
 class NoLastSeenMod : public NoModule
 {
 private:
-    time_t GetTime(const NoUser* pUser) { return GetNV(pUser->GetUserName()).toULong(); }
+    time_t GetTime(const NoUser* pUser) { return NoRegistry(this).value(pUser->GetUserName()).toULong(); }
 
-    void SetTime(const NoUser* pUser) { SetNV(pUser->GetUserName(), NoString(time(nullptr))); }
+    void SetTime(const NoUser* pUser) { NoRegistry(this).setValue(pUser->GetUserName(), NoString(time(nullptr))); }
 
     const NoString FormatLastSeen(const NoUser* pUser, const char* sDefault = "")
     {
@@ -81,7 +82,8 @@ public:
 
     ModRet OnDeleteUser(NoUser& User) override
     {
-        DelNV(User.GetUserName());
+        NoRegistry registry(this);
+        registry.remove(User.GetUserName());
         return CONTINUE;
     }
 

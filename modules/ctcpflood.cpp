@@ -16,6 +16,7 @@
 
 #include <no/nomodule.h>
 #include <no/nochannel.h>
+#include <no/noregistry.h>
 
 class NoCtcpFloodMod : public NoModule
 {
@@ -43,10 +44,11 @@ public:
     void Save()
     {
         // We save the settings twice because the module arguments can
-        // be more easily edited via webadmin, while the SetNV() stuff
+        // be more easily edited via webadmin, while the registry.setValue() stuff
         // survives e.g. /msg *status reloadmod ctcpflood.
-        SetNV("secs", NoString(m_iThresholdSecs));
-        SetNV("msgs", NoString(m_iThresholdMsgs));
+        NoRegistry registry(this);
+        registry.setValue("secs", NoString(m_iThresholdSecs));
+        registry.setValue("msgs", NoString(m_iThresholdMsgs));
 
         SetArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
@@ -57,8 +59,9 @@ public:
         m_iThresholdSecs = No::token(sArgs, 1).toUInt();
 
         if (m_iThresholdMsgs == 0 || m_iThresholdSecs == 0) {
-            m_iThresholdMsgs = GetNV("msgs").toUInt();
-            m_iThresholdSecs = GetNV("secs").toUInt();
+            NoRegistry registry(this);
+            m_iThresholdMsgs = registry.value("msgs").toUInt();
+            m_iThresholdSecs = registry.value("secs").toUInt();
         }
 
         if (m_iThresholdSecs == 0) m_iThresholdSecs = 2;

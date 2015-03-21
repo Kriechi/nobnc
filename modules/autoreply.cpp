@@ -19,6 +19,7 @@
 #include <no/nonetwork.h>
 #include <no/noircconnection.h>
 #include <no/nocachemap.h>
+#include <no/noregistry.h>
 
 class NoAutoReplyMod : public NoModule
 {
@@ -46,11 +47,11 @@ public:
         return true;
     }
 
-    void SetReply(const NoString& sReply) { SetNV("Reply", sReply); }
+    void SetReply(const NoString& sReply) { NoRegistry(this).setValue("Reply", sReply); }
 
     NoString GetReply()
     {
-        NoString sReply = GetNV("Reply");
+        NoString sReply = NoRegistry(this).value("Reply");
         if (sReply.empty()) {
             sReply = "%nick% is currently away, try again later";
             SetReply(sReply);
@@ -82,7 +83,7 @@ public:
 
     void OnShowCommand(const NoString& sCommand)
     {
-        PutModule("Current reply is: " + GetNV("Reply") + " (" + GetReply() + ")");
+        PutModule("Current reply is: " + NoRegistry(this).value("Reply") + " (" + GetReply() + ")");
     }
 
     void OnSetCommand(const NoString& sCommand)

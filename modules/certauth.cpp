@@ -25,6 +25,7 @@
 #include <no/nowebsocket.h>
 #include <no/nowebsession.h>
 #include <no/nolistener.h>
+#include <no/noregistry.h>
 
 class NoSslClientCertMod : public NoModule
 {
@@ -54,15 +55,16 @@ public:
         for (it = vListeners.begin(); it != vListeners.end(); ++it)
             (*it)->socket()->SetRequireClientCertFlags(SSL_VERIFY_PEER);
 
-        for (NoStringMap::const_iterator it1 = BeginNV(); it1 != EndNV(); ++it1) {
-            if (NoApp::Get().FindUser(it1->first) == nullptr) {
-                NO_DEBUG("Unknown user in saved data [" + it1->first + "]");
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
+            if (NoApp::Get().FindUser(key) == nullptr) {
+                NO_DEBUG("Unknown user in saved data [" + key + "]");
                 continue;
             }
 
-            NoStringVector vsKeys = it1->second.split(" ", No::SkipEmptyParts);
+            NoStringVector vsKeys = registry.value(key).split(" ", No::SkipEmptyParts);
             for (NoStringVector::const_iterator it2 = vsKeys.begin(); it2 != vsKeys.end(); ++it2) {
-                m_PubKeys[it1->first].insert(it2->toLower());
+                m_PubKeys[key].insert(it2->toLower());
             }
         }
 
@@ -80,17 +82,18 @@ public:
 
     bool Save()
     {
-        ClearNV(false);
+        NoRegistry registry(this);
+        registry.clear();
         for (MNoStringSet::const_iterator it = m_PubKeys.begin(); it != m_PubKeys.end(); ++it) {
             NoString sVal;
             for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
                 sVal += *it2 + " ";
             }
 
-            if (!sVal.empty()) SetNV(it->first, sVal, false);
+            if (!sVal.empty()) registry.setValue(it->first, sVal);
         }
 
-        return SaveRegistry();
+        return registry.save();
     }
 
     bool AddKey(NoUser* pUser, const NoString& sKey)

@@ -16,6 +16,7 @@
 
 #include <no/nomodule.h>
 #include <no/nochannel.h>
+#include <no/noregistry.h>
 
 class NoAutoVoiceUser
 {
@@ -153,8 +154,9 @@ public:
         }
 
         // Load the saved users
-        for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
-            const NoString& sLine = it->second;
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
+            const NoString& sLine = registry.value(key);
             NoAutoVoiceUser* pUser = new NoAutoVoiceUser;
 
             if (!pUser->FromString(sLine) || FindUser(pUser->GetUsername().toLower())) {
@@ -201,7 +203,8 @@ public:
             NoAutoVoiceUser* pUser = AddUser(sUser, sHost, No::tokens(sLine, 3));
 
             if (pUser) {
-                SetNV(sUser, pUser->ToString());
+                NoRegistry registry(this);
+                registry.setValue(sUser, pUser->ToString());
             }
         }
     }
@@ -214,7 +217,8 @@ public:
             PutModule("Usage: DelUser <user>");
         } else {
             DelUser(sUser);
-            DelNV(sUser);
+            NoRegistry registry(this);
+            registry.remove(sUser);
         }
     }
 
@@ -261,7 +265,8 @@ public:
         pUser->AddChans(sChans);
         PutModule("Channel(s) added to user [" + pUser->GetUsername() + "]");
 
-        SetNV(pUser->GetUsername(), pUser->ToString());
+        NoRegistry registry(this);
+        registry.setValue(pUser->GetUsername(), pUser->ToString());
     }
 
     void OnDelChansCommand(const NoString& sLine)
@@ -284,7 +289,8 @@ public:
         pUser->DelChans(sChans);
         PutModule("Channel(s) Removed from user [" + pUser->GetUsername() + "]");
 
-        SetNV(pUser->GetUsername(), pUser->ToString());
+        NoRegistry registry(this);
+        registry.setValue(pUser->GetUsername(), pUser->ToString());
     }
 
     NoAutoVoiceUser* FindUser(const NoString& sUser)

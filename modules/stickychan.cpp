@@ -19,6 +19,7 @@
 #include <no/nonetwork.h>
 #include <no/nowebsocket.h>
 #include <no/nowebsession.h>
+#include <no/noregistry.h>
 
 class NoStickyChan : public NoModule
 {
@@ -44,8 +45,9 @@ public:
 
     ModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
     {
-        for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
-            if (sChannel.equals(it->first)) {
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
+            if (sChannel.equals(key)) {
                 NoChannel* pChan = GetNetwork()->FindChan(sChannel);
 
                 if (pChan) {
@@ -64,10 +66,12 @@ public:
             if (bAdded) {
                 // We ignore channel key "*" because of some broken nets.
                 if (sArg != "*") {
-                    SetNV(Channel.getName(), sArg, true);
+                    NoRegistry registry(this);
+                    registry.setValue(Channel.getName(), sArg);
                 }
             } else {
-                SetNV(Channel.getName(), "", true);
+                NoRegistry registry(this);
+                registry.setValue(Channel.getName(), "");
             }
         }
     }
@@ -79,7 +83,8 @@ public:
             PutModule("Usage: Stick <#channel> [key]");
             return;
         }
-        SetNV(sChannel, No::token(sCommand, 2), true);
+        NoRegistry registry(this);
+        registry.setValue(sChannel, No::token(sCommand, 2));
         PutModule("Stuck " + sChannel);
     }
 
@@ -90,18 +95,21 @@ public:
             PutModule("Usage: Unstick <#channel>");
             return;
         }
-        DelNV(sChannel, true);
+        NoRegistry registry(this);
+        registry.remove(sChannel);
         PutModule("Unstuck " + sChannel);
     }
 
     void OnListCommand(const NoString& sCommand)
     {
         int i = 1;
-        for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it, i++) {
-            if (it->second.empty())
-                PutModule(NoString(i) + ": " + it->first);
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys()) {
+            NoString value = registry.value(key);
+            if (value.empty())
+                PutModule(NoString(i) + ": " + key);
             else
-                PutModule(NoString(i) + ": " + it->first + " (" + it->second + ")");
+                PutModule(NoString(i) + ": " + key + " (" + value + ")");
         }
         PutModule(" -- End of List");
     }
@@ -113,18 +121,18 @@ public:
         if (sPageName == "index") {
             bool bSubmitted = (WebSock.GetParam("submitted").toInt() != 0);
 
+            NoRegistry registry(this);
             const std::vector<NoChannel*>& Channels = GetNetwork()->GetChans();
             for (uint c = 0; c < Channels.size(); c++) {
                 const NoString sChan = Channels[c]->getName();
-                bool bStick = FindNV(sChan) != EndNV();
+                bool bStick = registry.contains(sChan);
 
                 if (bSubmitted) {
                     bool bNewStick = WebSock.GetParam("stick_" + sChan).toBool();
                     if (bNewStick && !bStick)
-                        SetNV(sChan, ""); // no password support for now unless chansaver is active too
+                        registry.setValue(sChan, ""); // no password support for now unless chansaver is active too
                     else if (!bNewStick && bStick) {
-                        NoStringMap::iterator it = FindNV(sChan);
-                        if (it != EndNV()) DelNV(it);
+                        registry.remove(sChan);
                     }
                     bStick = bNewStick;
                 }
@@ -148,16 +156,17 @@ public:
     {
         if (sPageName == "webadmin/channel") {
             NoString sChan = Tmpl["ChanName"];
-            bool bStick = FindNV(sChan) != EndNV();
+            NoRegistry registry(this);
+            bool bStick = registry.contains(sChan);
             if (Tmpl["WebadminAction"].equals("display")) {
                 Tmpl["Sticky"] = NoString(bStick);
             } else if (WebSock.GetParam("embed_stickychan_presented").toBool()) {
                 bool bNewStick = WebSock.GetParam("embed_stickychan_sticky").toBool();
                 if (bNewStick && !bStick) {
-                    SetNV(sChan, ""); // no password support for now unless chansaver is active too
+                    registry.setValue(sChan, ""); // no password support for now unless chansaver is active too
                     WebSock.GetSession()->AddSuccess("Channel become sticky!");
                 } else if (!bNewStick && bStick) {
-                    DelNV(sChan);
+                    registry.remove(sChan);
                     WebSock.GetSession()->AddSuccess("Channel stopped being sticky!");
                 }
             }
@@ -188,14 +197,16 @@ protected:
         if (!pNetwork->GetIRCSock())
             return;
 
-        for (NoStringMap::iterator it = mod->BeginNV(); it != mod->EndNV(); ++it) {
-            NoChannel* pChan = pNetwork->FindChan(it->first);
+        NoRegistry registry(module());
+        for (const NoString& key : registry.keys()) {
+            NoChannel* pChan = pNetwork->FindChan(key);
             if (!pChan) {
-                pChan = new NoChannel(it->first, pNetwork, true);
-                if (!it->second.empty()) pChan->setKey(it->second);
+                pChan = new NoChannel(key, pNetwork, true);
+                if (!registry.value(key).empty())
+                    pChan->setKey(registry.value(key));
                 if (!pNetwork->AddChan(pChan)) {
                     /* AddChan() deleted that channel */
-                    mod->PutModule("Could not join [" + it->first + "] (# prefix missing?)");
+                    mod->PutModule("Could not join [" + key + "] (# prefix missing?)");
                     continue;
                 }
             }
@@ -215,7 +226,8 @@ bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
     for (it = vsChans.begin(); it != vsChans.end(); ++it) {
         NoString sChan = No::token(*it, 0);
         NoString sKey = No::tokens(*it, 1);
-        SetNV(sChan, sKey);
+        NoRegistry registry(this);
+        registry.setValue(sChan, sKey);
     }
 
     // Since we now have these channels added, clear the argument list

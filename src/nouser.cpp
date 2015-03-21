@@ -24,6 +24,7 @@
 #include "noclient.h"
 #include "nomodulecall.h"
 #include "noapp.h"
+#include "noregistry.h"
 #include "Csocket/Csocket.h"
 #include <math.h>
 #include <algorithm>
@@ -176,7 +177,11 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             }
 
             if (sDCCLookupValue.equals("Client")) {
-                GetModules().FindModule("bouncedcc")->SetNV("UseClientIP", "1");
+                NoModule* pMod = GetModules().FindModule("bouncedcc");
+                if (pMod) {
+                    NoRegistry registry(pMod);
+                    registry.setValue("UseClientIP", "1");
+                }
             }
         }
     }

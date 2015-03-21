@@ -17,6 +17,7 @@
 #include <no/nomodule.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
+#include <no/noregistry.h>
 
 #define SIMPLE_AWAY_DEFAULT_REASON "Auto away at %s"
 #define SIMPLE_AWAY_DEFAULT_TIME 60
@@ -89,7 +90,7 @@ public:
             SetAwayWait(No::token(sArgs, 1).toUInt());
             sReasonArg = No::tokens(sArgs, 2);
         } else {
-            NoString sAwayWait = GetNV("awaywait");
+            NoString sAwayWait = NoRegistry(this).value("awaywait");
             if (!sAwayWait.empty()) SetAwayWait(sAwayWait.toUInt(), false);
             sReasonArg = sArgs;
         }
@@ -98,7 +99,7 @@ public:
         if (!sReasonArg.empty()) {
             SetReason(sReasonArg);
         } else {
-            NoString sSavedReason = GetNV("reason");
+            NoString sSavedReason = NoRegistry(this).value("reason");
             if (!sSavedReason.empty()) SetReason(sSavedReason, false);
         }
 
@@ -212,13 +213,19 @@ private:
     /* Settings */
     void SetReason(NoString& sReason, bool bSave = true)
     {
-        if (bSave) SetNV("reason", sReason);
+        if (bSave) {
+            NoRegistry registry(this);
+            registry.setValue("reason", sReason);
+        }
         m_sReason = sReason;
     }
 
     void SetAwayWait(uint iAwayWait, bool bSave = true)
     {
-        if (bSave) SetNV("awaywait", NoString(iAwayWait));
+        if (bSave) {
+            NoRegistry registry(this);
+            registry.setValue("awaywait", NoString(iAwayWait));
+        }
         m_iAwayWait = iAwayWait;
     }
 };

@@ -27,6 +27,7 @@
 #include <no/nowebsession.h>
 #include <no/noescape.h>
 #include <no/nolistener.h>
+#include <no/noregistry.h>
 
 /* Stuff to be able to write this:
    // i will be name of local variable, see below
@@ -999,7 +1000,8 @@ public:
             if (pOldNetwork) {
                 for (NoModule* pModule : pOldNetwork->GetModules()) {
                     NoString sPath = pUser->GetUserPath() + "/networks/" + sName + "/moddata/" + pModule->GetModName();
-                    pModule->MoveRegistry(sPath);
+                    NoRegistry registry(pModule);
+                    registry.copy(sPath);
                 }
                 pNetwork->Clone(*pOldNetwork, false);
                 pUser->DeleteNetwork(pOldNetwork->GetName());

@@ -19,6 +19,7 @@
 #include <no/noclient.h>
 #include <no/notemplate.h>
 #include <no/nowebsocket.h>
+#include <no/noregistry.h>
 
 class NoNotesMod : public NoModule
 {
@@ -31,7 +32,8 @@ class NoNotesMod : public NoModule
         NoString sKey(No::token(sLine, 1));
         NoString sValue(No::tokens(sLine, 2));
 
-        if (!GetNV(sKey).empty()) {
+        NoRegistry registry(this);
+        if (!registry.value(sKey).empty()) {
             PutModule("That note already exists.  Use MOD <key> <note> to overwrite.");
         } else if (AddNote(sKey, sValue)) {
             PutModule("Added note [" + sKey + "]");
@@ -54,7 +56,8 @@ class NoNotesMod : public NoModule
 
     void GetCommand(const NoString& sLine)
     {
-        NoString sNote = GetNV(No::tokens(sLine, 1));
+        NoRegistry registry(this);
+        NoString sNote = registry.value(No::tokens(sLine, 1));
 
         if (sNote.empty()) {
             PutModule("This note doesn't exist.");
@@ -131,7 +134,7 @@ public:
         NoString sValue(No::tokens(sLine, 1));
 
         if (!sKey.empty()) {
-            if (!bOverwrite && FindNV(sKey) != EndNV()) {
+            if (!bOverwrite && NoRegistry(this).contains(sKey)) {
                 PutModNotice("That note already exists.  Use /#+<key> <note> to overwrite.");
             } else if (AddNote(sKey, sValue)) {
                 if (!bOverwrite) {
@@ -147,7 +150,15 @@ public:
         return HALT;
     }
 
-    bool DelNote(const NoString& sKey) { return DelNV(sKey); }
+    bool DelNote(const NoString& sKey)
+    {
+        NoRegistry registry(this);
+        if (registry.contains(sKey)) {
+            registry.remove(sKey);
+            return true;
+        }
+        return false;
+    }
 
     bool AddNote(const NoString& sKey, const NoString& sNote)
     {
@@ -155,7 +166,9 @@ public:
             return false;
         }
 
-        return SetNV(sKey, sNote);
+        NoRegistry registry(this);
+        registry.setValue(sKey, sNote);
+        return true;
     }
 
     void ListNotes(bool bNotice = false)
@@ -167,10 +180,11 @@ public:
             Table.AddColumn("Key");
             Table.AddColumn("Note");
 
-            for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
+            NoRegistry registry(this);
+            for (const NoString& key : registry.keys()) {
                 Table.AddRow();
-                Table.SetCell("Key", it->first);
-                Table.SetCell("Note", it->second);
+                Table.SetCell("Key", key);
+                Table.SetCell("Note", registry.value(key));
             }
 
             if (Table.size()) {
@@ -196,11 +210,12 @@ public:
     bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            for (NoStringMap::iterator it = BeginNV(); it != EndNV(); ++it) {
+            NoRegistry registry(this);
+            for (const NoString& key : registry.keys()) {
                 NoTemplate& Row = Tmpl.AddRow("NotesLoop");
 
-                Row["Key"] = it->first;
-                Row["Note"] = it->second;
+                Row["Key"] = key;
+                Row["Note"] = registry.value(key);
             }
 
             return true;

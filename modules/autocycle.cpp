@@ -18,6 +18,7 @@
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
 #include <no/nocachemap.h>
+#include <no/noregistry.h>
 
 class NoAutoCycleMod : public NoModule
 {
@@ -48,10 +49,9 @@ public:
         }
 
         // Load our saved settings, ignore errors
-        NoStringMap::iterator it;
-        for (it = BeginNV(); it != EndNV(); ++it) {
-            Add(it->first);
-        }
+        NoRegistry registry(this);
+        for (const NoString& key : registry.keys())
+            Add(key);
 
         // Default is auto cycle for all channels
         if (m_vsChans.empty()) Add("*");
@@ -165,7 +165,8 @@ protected:
         }
 
         // Also save it for next module load
-        SetNV(sChan, "");
+        NoRegistry registry(this);
+        registry.setValue(sChan, "");
 
         return true;
     }
@@ -199,7 +200,8 @@ protected:
             m_vsChans.erase(it);
         }
 
-        DelNV(sChan);
+        NoRegistry registry(this);
+        registry.remove(sChan);
 
         return true;
     }
