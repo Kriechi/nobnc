@@ -138,8 +138,3 @@ void NoTimer::setSingleShot(bool single)
             d->restart();
     }
 }
-
-void* NoTimer::handle() const
-{
-    return d.get();
-}

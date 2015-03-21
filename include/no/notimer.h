@@ -52,8 +52,6 @@ public:
     bool isSingleShot() const;
     void setSingleShot(bool single);
 
-    void* handle() const; // TODO: cleanup
-
 protected:
     virtual void run() = 0;
 
