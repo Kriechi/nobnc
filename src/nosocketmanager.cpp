@@ -90,7 +90,6 @@ public:
 
 static void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind);
 static void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind, addrinfo* aiResult);
-static void* TDNSThread(void* argument);
 static void FinishConnect(NoSocketManager* manager, const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoSocket* pcSock);
 #endif
 
