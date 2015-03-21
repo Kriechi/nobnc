@@ -65,7 +65,6 @@ public:
     bool ConnectionFrom(const NoString& sHost, ushort uPort) override { return q->ConnectionFromImpl(sHost, uPort); }
 
     NoSocket* q;
-    Csock* csock;
     NoString hostToVerifySSL;
     NoStringSet ssTrustedFingerprints;
     NoStringSet ssCertVerificationErrors;
