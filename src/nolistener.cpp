@@ -20,30 +20,44 @@
 #include "noapp.h"
 #include "nowebsocket.h"
 
+class NoListenerPrivate
+{
+public:
+    NoListenerPrivate(ushort port, const NoString& bindHost) : port(port), bindHost(bindHost) { }
+
+    bool ssl = false;
+    ushort port = 0;
+    NoString bindHost = "";
+    NoString uriPrefix = "";
+    No::AcceptType acceptType = No::AcceptAll;
+    No::AddressType addressType = No::Ipv4AndIpv6Address;
+    NoSocket* socket = nullptr;
+};
+
 class NoListenerSocket : public NoSocket
 {
 public:
-    NoListenerSocket(NoListener* listener) : m_listener(listener) { }
-    ~NoListenerSocket() { m_listener->m_socket = nullptr; }
+    NoListenerSocket(NoListenerPrivate* listener) : m_listener(listener) { }
+    ~NoListenerSocket() { m_listener->socket = nullptr; }
 
     bool ConnectionFromImpl(const NoString& host, ushort port) override;
     NoSocket* GetSockObjImpl(const NoString& host, ushort port) override;
     void SockErrorImpl(int iErrno, const NoString& description) override;
 
 private:
-    NoListener* m_listener;
+    NoListenerPrivate* m_listener;
 };
 
 class NoClientSocket : public NoSocket
 {
 public:
-    NoClientSocket(const NoString& hostname, ushort port, NoListener* listener);
+    NoClientSocket(const NoString& hostname, ushort port, NoListenerPrivate* listener);
 
     void ReadLineImpl(const NoString& data) override;
     void ReachedMaxBufferImpl() override;
 
 private:
-    NoListener* m_listener;
+    NoListenerPrivate* m_listener;
 };
 
 bool NoListenerSocket::ConnectionFromImpl(const NoString& host, ushort port)
@@ -82,7 +96,7 @@ void NoListenerSocket::SockErrorImpl(int error, const NoString& description)
     }
 }
 
-NoClientSocket::NoClientSocket(const NoString& hostname, ushort port, NoListener* listener)
+NoClientSocket::NoClientSocket(const NoString& hostname, ushort port, NoListenerPrivate* listener)
     : NoSocket(hostname, port), m_listener(listener)
 {
     // The socket will time out in 120 secs, no matter what.
@@ -113,7 +127,7 @@ void NoClientSocket::ReadLineImpl(const NoString& line)
     bool isHttp = No::wildCmp(line, "GET * HTTP/1.?\r\n") || No::wildCmp(line, "POST * HTTP/1.?\r\n");
 
     if (!isHttp) {
-        if (!(m_listener->acceptType() & No::AcceptIrc)) {
+        if (!(m_listener->acceptType & No::AcceptIrc)) {
             Write("ERROR :Access Denied. IRC access is not enabled.\r\n");
             Close(CLT_AFTERWRITE);
             NO_DEBUG("Refused IRC connection to non IRC port");
@@ -125,12 +139,12 @@ void NoClientSocket::ReadLineImpl(const NoString& line)
             socket->SetSockName("USR::???");
         }
     } else {
-        if (!(m_listener->acceptType() & No::AcceptHttp)) {
+        if (!(m_listener->acceptType & No::AcceptHttp)) {
             Write("HTTP/1.0 403 Access Denied\r\n\r\nWeb access is not enabled.\r\n");
             Close(CLT_AFTERWRITE);
             NO_DEBUG("Refused HTTP connection to non HTTP port");
         } else {
-            socket = new NoWebSocket(m_listener->uriPrefix());
+            socket = new NoWebSocket(m_listener->uriPrefix);
             NoApp::Get().GetManager().SwapSockByAddr(socket->GetHandle(), GetHandle());
 
             // And don't forget to give it some sane name / timeout
@@ -143,102 +157,100 @@ void NoClientSocket::ReadLineImpl(const NoString& line)
     socket->PushBuffImpl("", 0, true);
 }
 
-NoListener::NoListener(ushort port, const NoString& bindHost)
-    : m_ssl(false), m_port(port), m_bindHost(bindHost), m_uriPrefix(""),
-      m_addressType(No::Ipv4AndIpv6Address), m_acceptType(No::AcceptAll), m_socket(nullptr)
+NoListener::NoListener(ushort port, const NoString& bindHost) : d(new NoListenerPrivate(port, bindHost))
 {
 }
 
 NoListener::~NoListener()
 {
-    if (m_socket)
-        NoApp::Get().GetManager().DelSockByAddr(m_socket);
+    if (d->socket)
+        NoApp::Get().GetManager().DelSockByAddr(d->socket);
 }
 
 bool NoListener::isSsl() const
 {
-    return m_ssl;
+    return d->ssl;
 }
 
 void NoListener::setSsl(bool ssl)
 {
-    // TODO: warning if (m_socket)
-    m_ssl = ssl;
+    // TODO: warning if (d->socket)
+    d->ssl = ssl;
 }
 
 ushort NoListener::port() const
 {
-    return m_port;
+    return d->port;
 }
 
 void NoListener::setPort(ushort port)
 {
-    // TODO: warning if (m_socket)
-    m_port = port;
+    // TODO: warning if (d->socket)
+    d->port = port;
 }
 
 NoString NoListener::bindHost() const
 {
-    return m_bindHost;
+    return d->bindHost;
 }
 
 void NoListener::setBindHost(const NoString& host)
 {
-    // TODO: warning if (m_socket)
-    m_bindHost = host;
+    // TODO: warning if (d->socket)
+    d->bindHost = host;
 }
 
 NoString NoListener::uriPrefix() const
 {
-    return m_uriPrefix;
+    return d->uriPrefix;
 }
 
 void NoListener::setUriPrefix(const NoString& prefix)
 {
-    // TODO: warning if (m_socket)
-    m_uriPrefix = prefix;
+    // TODO: warning if (d->socket)
+    d->uriPrefix = prefix;
 }
 
 No::AddressType NoListener::addressType() const
 {
-    return m_addressType;
+    return d->addressType;
 }
 
 void NoListener::setAddressType(No::AddressType type)
 {
-    // TODO: warning if (m_socket)
-    m_addressType = type;
+    // TODO: warning if (d->socket)
+    d->addressType = type;
 }
 
 No::AcceptType NoListener::acceptType() const
 {
-    return m_acceptType;
+    return d->acceptType;
 }
 
 void NoListener::setAcceptType(No::AcceptType type)
 {
-    m_acceptType = type;
+    d->acceptType = type;
 }
 
 NoSocket* NoListener::socket() const
 {
-    return m_socket;
+    return d->socket;
 }
 
 bool NoListener::listen()
 {
-    if (!m_port || m_socket) {
+    if (!d->port || d->socket) {
         errno = EINVAL;
         return false;
     }
 
-    m_socket = new NoListenerSocket(this);
+    d->socket = new NoListenerSocket(d.get());
 
     bool ssl = false;
 #ifdef HAVE_LIBSSL
     if (isSsl()) {
         ssl = true;
-        m_socket->SetPemLocation(NoApp::Get().GetPemLocation());
+        d->socket->SetPemLocation(NoApp::Get().GetPemLocation());
     }
 #endif
 
@@ -246,5 +258,5 @@ bool NoListener::listen()
     // Make sure there is a consistent error message, not something random
     // which might even be "Error: Success".
     errno = EINVAL;
-    return NoApp::Get().GetManager().ListenHost(m_port, "_LISTENER", m_bindHost, ssl, SOMAXCONN, m_socket, 0, m_addressType);
+    return NoApp::Get().GetManager().ListenHost(d->port, "_LISTENER", d->bindHost, ssl, SOMAXCONN, d->socket, 0, d->addressType);
 }

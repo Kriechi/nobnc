@@ -19,17 +19,16 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
+#include <memory>
 
 class NoSocket;
+class NoListenerPrivate;
 
 class NO_EXPORT NoListener
 {
 public:
     NoListener(ushort port, const NoString& bindHost);
     ~NoListener();
-
-    NoListener(const NoListener&) = delete;
-    NoListener& operator=(const NoListener&) = delete;
 
     bool isSsl() const;
     void setSsl(bool ssl);
@@ -49,20 +48,14 @@ public:
     No::AcceptType acceptType() const;
     void setAcceptType(No::AcceptType type);
 
+    bool listen();
     NoSocket* socket() const;
 
-    bool listen();
-
 private:
-    bool m_ssl;
-    ushort m_port;
-    NoString m_bindHost;
-    NoString m_uriPrefix;
-    No::AcceptType m_acceptType;
-    No::AddressType m_addressType;
-    NoSocket* m_socket;
+    NoListener(const NoListener&) = delete;
+    NoListener& operator=(const NoListener&) = delete;
 
-    friend class NoListenerSocket;
+    std::unique_ptr<NoListenerPrivate> d;
 };
 
 #endif // NOLISTENER_H
