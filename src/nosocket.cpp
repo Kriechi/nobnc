@@ -40,7 +40,7 @@ const char* ZNC_DefaultCipher =
 #endif
 
 NoSocketPrivate::NoSocketPrivate(NoSocket *q, const NoString& host, u_short port, int timeout)
-    : Csock(host, port, timeout), q(q)
+    : Csock(host, port, timeout), q(q), allowControlCodes(false)
 {
 #ifdef HAVE_LIBSSL
     DisableSSLCompression();
@@ -176,19 +176,41 @@ void NoSocket::SetEncoding(const NoString& sEncoding)
 #ifdef HAVE_ICU
 void NoSocketPrivate::IcuExtToUCallback(UConverterToUnicodeArgs* toArgs, const char* codeUnits, int32_t length, UConverterCallbackReason reason, UErrorCode* err )
 {
-    q->IcuExtToUCallbackImpl(toArgs, codeUnits, length, reason, err);
-}
-void NoSocket::IcuExtToUCallbackImpl(UConverterToUnicodeArgs* toArgs, const char* codeUnits, int32_t length, UConverterCallbackReason reason, UErrorCode* err )
-{
-    d->csock->Csock::IcuExtToUCallback(toArgs, codeUnits, length, reason, err);
+    // From http://www.mirc.com/colors.html
+    // The Control+O key combination in mIRC inserts ascii character 15,
+    // which turns off all previous attributes, including color, bold, underline, and italics.
+    //
+    // \x02 bold
+    // \x03 mIRC-compatible color
+    // \x04 RRGGBB color
+    // \x0F normal/reset (turn off bold, colors, etc.)
+    // \x12 reverse (weechat)
+    // \x16 reverse (mirc, kvirc)
+    // \x1D italic
+    // \x1F underline
+    // Also see http://www.visualirc.net/tech-attrs.php
+    //
+    // Keep in sync with NoUser::AddTimestamp and NoSocketPrivate::IcuExtFromUCallback
+    static const std::set<char> scAllowedChars = { '\x02', '\x03', '\x04', '\x0F', '\x12', '\x16', '\x1D', '\x1F' };
+    if (reason == UCNV_ILLEGAL && length == 1 && scAllowedChars.count(*codeUnits)) {
+        *err = U_ZERO_ERROR;
+        UChar c = *codeUnits;
+        ucnv_cbToUWriteUChars(toArgs, &c, 1, 0, err);
+        return;
+    }
+    Csock::IcuExtToUCallback(toArgs, codeUnits, length, reason, err);
 }
 void NoSocketPrivate::IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs, const UChar* codeUnits, int32_t length, UChar32 codePoint, UConverterCallbackReason reason, UErrorCode* err )
 {
-    q->IcuExtFromUCallbackImpl(fromArgs, codeUnits, length, codePoint, reason, err);
-}
-void NoSocket::IcuExtFromUCallbackImpl(UConverterFromUnicodeArgs* fromArgs, const UChar* codeUnits, int32_t length, UChar32 codePoint, UConverterCallbackReason reason, UErrorCode* err )
-{
-    d->csock->Csock::IcuExtFromUCallback(fromArgs, codeUnits, length, codePoint, reason, err);
+    // See comment in NoSocketPrivate::IcuExtToUCallback
+    static const std::set<UChar32> scAllowedChars = { 0x02, 0x03, 0x04, 0x0F, 0x12, 0x16, 0x1D, 0x1F };
+    if (reason == UCNV_ILLEGAL && scAllowedChars.count(codePoint)) {
+        *err = U_ZERO_ERROR;
+        char c = codePoint;
+        ucnv_cbFromUWriteBytes(fromArgs, &c, 1, 0, err);
+        return;
+    }
+    Csock::IcuExtFromUCallback(fromArgs, codeUnits, length, codePoint, reason, err);
 }
 #endif
 NoString NoSocket::GetRemoteIP() const { return d->csock->GetRemoteIP(); }

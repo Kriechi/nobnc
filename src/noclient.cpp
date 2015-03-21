@@ -15,6 +15,7 @@
  */
 
 #include "noclient.h"
+#include "nosocket_p.h"
 #include "nochannel.h"
 #include "noircconnection.h"
 #include "noauthenticator.h"
@@ -100,11 +101,12 @@ private:
     NoClient* m_pClient;
 };
 
-NoClient::NoClient() : NoIrcSocket(), m_bGotPass(false), m_bGotNick(false), m_bGotUser(false), m_bInCap(false), m_bNamesx(false),
+NoClient::NoClient() : m_bGotPass(false), m_bGotNick(false), m_bGotUser(false), m_bInCap(false), m_bNamesx(false),
       m_bUHNames(false), m_bAway(false), m_bServerTime(false), m_bBatch(false), m_bSelfMessage(false),
       m_bPlaybackActive(false), m_pUser(nullptr), m_pNetwork(nullptr), m_sNick("unknown-nick"), m_sPass(""),
       m_sUser(""), m_sNetwork(""), m_sIdentifier(""), m_spAuth(), m_ssAcceptedCaps()
 {
+    NoSocketPrivate::get(this)->allowControlCodes = true;
     EnableReadLine();
     // RFC says a line can have 512 chars max, but we are
     // a little more gentle ;)

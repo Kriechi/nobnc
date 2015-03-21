@@ -15,6 +15,7 @@
  */
 
 #include "noircconnection.h"
+#include "nosocket_p.h"
 #include "nochannel.h"
 #include "nouser.h"
 #include "nonetwork.h"
@@ -57,12 +58,13 @@ public:
 bool NoIrcConnection::IsFloodProtected(double fRate) { return fRate > FLOOD_MINIMAL_RATE; }
 
 NoIrcConnection::NoIrcConnection(NoNetwork* pNetwork)
-    : NoIrcSocket(), m_bAuthed(false), m_bNamesx(false), m_bUHNames(false), m_sPerms("*!@%+"), m_sPermModes("qaohv"),
+    : m_bAuthed(false), m_bNamesx(false), m_bUHNames(false), m_sPerms("*!@%+"), m_sPermModes("qaohv"),
       m_scUserModes(), m_mueChanModes(), m_pNetwork(pNetwork), m_Nick(), m_sPass(""), m_msChans(), m_uMaxNickLen(9),
       m_uCapPaused(0), m_ssAcceptedCaps(), m_ssPendingCaps(), m_lastCTCP(0), m_uNumCTCP(0), m_mISupport(),
       m_vsSendQueue(), m_iSendsAllowed(pNetwork->GetFloodBurst()), m_uFloodBurst(pNetwork->GetFloodBurst()),
       m_fFloodRate(pNetwork->GetFloodRate()), m_bFloodProtection(IsFloodProtected(pNetwork->GetFloodRate()))
 {
+    NoSocketPrivate::get(this)->allowControlCodes = true;
     EnableReadLine();
     m_Nick.setIdent(m_pNetwork->GetIdent());
     m_Nick.setHost(m_pNetwork->GetBindHost());

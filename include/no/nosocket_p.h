@@ -65,6 +65,7 @@ public:
     NoString hostToVerifySSL;
     NoStringSet ssTrustedFingerprints;
     NoStringSet ssCertVerificationErrors;
+    bool allowControlCodes;
 };
 
 #endif // NOSOCKET_P_H

@@ -563,7 +563,7 @@ NoString NoUser::AddTimestamp(time_t tm, const NoString& sStr) const
             // \x1F underline
             // Also see http://www.visualirc.net/tech-attrs.php
             //
-            // Keep in sync with NoIrcSocket::IcuExt__UCallback
+            // Keep in sync with NoSocketPrivate::IcuExt__UCallback
             if (NoString::npos != sRet.find_first_of("\x02\x03\x04\x0F\x12\x16\x1D\x1F")) {
                 sRet += "\x0F";
             }

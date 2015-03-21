@@ -18,7 +18,7 @@
 #define NOIRCCONNECTION_H
 
 #include <no/noglobal.h>
-#include <no/noircsocket.h>
+#include <no/nosocket.h>
 #include <no/nonick.h>
 
 #include <deque>
@@ -28,7 +28,7 @@ class NoUser;
 class NoNetwork;
 class NoClient;
 
-class NO_EXPORT NoIrcConnection : public NoIrcSocket
+class NO_EXPORT NoIrcConnection : public NoSocket
 {
 public:
     NoIrcConnection(NoNetwork* pNetwork);

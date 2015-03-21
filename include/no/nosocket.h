@@ -21,10 +21,6 @@
 #include <no/nostring.h>
 #include <sys/socket.h>
 
-#ifdef HAVE_ICU
-# include <unicode/ucnv.h>
-#endif
-
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>
 #endif
@@ -63,10 +59,6 @@ public:
     void SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs);
 
     void SetEncoding(const NoString& sEncoding);
-#ifdef HAVE_ICU
-    virtual void IcuExtToUCallbackImpl(UConverterToUnicodeArgs* toArgs, const char* codeUnits, int32_t length, UConverterCallbackReason reason, UErrorCode* err );
-    virtual void IcuExtFromUCallbackImpl(UConverterFromUnicodeArgs* fromArgs, const UChar* codeUnits, int32_t length, UChar32 codePoint, UConverterCallbackReason reason, UErrorCode* err );
-#endif
     virtual NoString GetRemoteIP() const;
 
     void SetPemLocation( const NoString & sPemFile );

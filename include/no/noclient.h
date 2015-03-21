@@ -18,7 +18,7 @@
 #define NOCLIENT_H
 
 #include <no/noglobal.h>
-#include <no/noircsocket.h>
+#include <no/nosocket.h>
 #include <memory>
 
 class NoUser;
@@ -27,7 +27,7 @@ class NoIrcConnection;
 class NoAuthenticator;
 class NoTable;
 
-class NO_EXPORT NoClient : public NoIrcSocket
+class NO_EXPORT NoClient : public NoSocket
 {
 public:
     NoClient();
