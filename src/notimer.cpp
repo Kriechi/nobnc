@@ -18,89 +18,96 @@
 #include "nomodules.h"
 #include "Csocket/Csocket.h"
 
-class NoCCron : public CCron
+class NoTimerPrivate : public CCron
 {
 public:
-    NoCCron(NoTimer* q) : q_ptr(q) { }
-protected:
-    void RunJob() override { q_ptr->RunJob(); }
-private:
-    NoTimer* q_ptr;
+    NoTimerPrivate(NoTimer* q) : q(q) { }
+
+    void RunJob() override { q->RunJob(); }
+
+    NoTimer* q;
+    CCron* cron;
+    NoModule* module;
+    NoString description;
+    NoTimer::Callback callback;
 };
 
 NoTimer::NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description)
-    : m_cron(new NoCCron(this)), m_module(module), m_description(description)
+    : d(new NoTimerPrivate(this))
 {
-    m_cron->SetName(label);
+    d->module = module;
+    d->description = description;
+    d->SetName(label);
 
+    // TODO: it's not a great idea to start the timer in its constructor...
     if (cycles)
-        m_cron->StartMaxCycles(interval, cycles);
+        d->cron->StartMaxCycles(interval, cycles);
     else
-        m_cron->Start(interval);
+        d->cron->Start(interval);
 }
 
 NoTimer::~NoTimer()
 {
-    m_module->UnlinkTimer(this);
+    d->module->UnlinkTimer(this);
 }
 
 CCron* NoTimer::GetHandle() const
 {
-    return m_cron;
+    return d->cron;
 }
 
 NoString NoTimer::GetName() const
 {
-    return m_cron->GetName();
+    return d->cron->GetName();
 }
 
 uint NoTimer::GetCyclesLeft() const
 {
-    return m_cron->GetCyclesLeft();
+    return d->cron->GetCyclesLeft();
 }
 
 timeval NoTimer::GetInterval() const
 {
-    return m_cron->GetInterval();
+    return d->cron->GetInterval();
 }
 
 void NoTimer::Stop()
 {
-    m_cron->Stop();
+    d->cron->Stop();
 }
 
 NoModule* NoTimer::module() const
 {
-    return m_module;
+    return d->module;
 }
 
 void NoTimer::setModule(NoModule* module)
 {
-    m_module = module;
+    d->module = module;
 }
 
 NoString NoTimer::description() const
 {
-    return m_description;
+    return d->description;
 }
 
 void NoTimer::setDescription(const NoString& description)
 {
-    m_description = description;
+    d->description = description;
 }
 
 NoTimer::Callback NoTimer::callback() const
 {
-    return m_callback;
+    return d->callback;
 }
 
 void NoTimer::setCallback(Callback callback)
 {
-    m_callback = callback;
+    d->callback = callback;
 }
 
 void NoTimer::RunJob()
 {
-    if (m_callback)
-        m_callback(m_module, this);
+    if (d->callback)
+        d->callback(d->module, this);
 }

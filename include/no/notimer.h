@@ -19,9 +19,11 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
+#include <memory>
 
-class CCron;
 class NoModule;
+class NoTimerPrivate;
+class CCron; // TODO: cleanup
 
 class NO_EXPORT NoTimer
 {
@@ -29,10 +31,9 @@ public:
     NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description);
     virtual ~NoTimer();
 
-    NoTimer(const NoTimer&) = delete;
-    NoTimer& operator=(const NoTimer&) = delete;
+    CCron* GetHandle() const; // TODO: cleanup
 
-    CCron* GetHandle() const;
+    // TODO: revise the API
     NoString GetName() const;
     uint GetCyclesLeft() const;
     timeval GetInterval() const;
@@ -52,12 +53,10 @@ protected:
     virtual void RunJob();
 
 private:
-    CCron* m_cron;
-    NoModule* m_module;
-    NoString m_description;
-    Callback m_callback;
-
-    friend class NoCCron;
+    NoTimer(const NoTimer&) = delete;
+    NoTimer& operator=(const NoTimer&) = delete;
+    std::unique_ptr<NoTimerPrivate> d;
+    friend class NoTimerPrivate;
 };
 
 #endif // NOTIMER_H
