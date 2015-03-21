@@ -18,17 +18,12 @@
 #include <no/nonetwork.h>
 #include <no/noircconnection.h>
 
-class NoKeepNickMod;
-
 class NoKeepNickTimer : public NoTimer
 {
 public:
-    NoKeepNickTimer(NoKeepNickMod* pMod);
+    NoKeepNickTimer(NoModule* pMod);
 
-    void RunJob() override;
-
-private:
-    NoKeepNickMod* m_pMod;
+    void run() override;
 };
 
 class NoKeepNickMod : public NoModule
@@ -144,7 +139,7 @@ public:
     {
         if (!m_pTimer) return;
 
-        m_pTimer->Stop();
+        m_pTimer->stop();
         RemTimer(m_pTimer);
         m_pTimer = nullptr;
     }
@@ -206,13 +201,18 @@ private:
     NoKeepNickTimer* m_pTimer;
 };
 
-NoKeepNickTimer::NoKeepNickTimer(NoKeepNickMod* pMod)
-    : NoTimer(pMod, 30, 0, "KeepNickTimer", "Tries to acquire this user's primary nick")
+NoKeepNickTimer::NoKeepNickTimer(NoModule* pMod) : NoTimer(pMod)
 {
-    m_pMod = pMod;
+    setName("KeepNickTimer");
+    setDescription("Tries to acquire this user's primary nick");
+
+    start(30);
 }
 
-void NoKeepNickTimer::RunJob() { m_pMod->KeepNick(); }
+void NoKeepNickTimer::run()
+{
+    static_cast<NoKeepNickMod*>(module())->KeepNick();
+}
 
 template <> void no_moduleInfo<NoKeepNickMod>(NoModuleInfo& Info) { Info.SetWikiPage("keepnick"); }
 

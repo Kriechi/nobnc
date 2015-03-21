@@ -236,7 +236,7 @@ bool NoModule::ClearNV(bool bWriteToDisk)
 
 bool NoModule::AddTimer(NoTimer* pTimer)
 {
-    if ((!pTimer) || (!pTimer->GetName().empty() && FindTimer(pTimer->GetName()))) {
+    if ((!pTimer) || (!pTimer->name().empty() && FindTimer(pTimer->name()))) {
         delete pTimer;
         return false;
     }
@@ -245,14 +245,14 @@ bool NoModule::AddTimer(NoTimer* pTimer)
         // Was already added
         return true;
 
-    m_pManager->AddCron(pTimer->GetHandle());
+    m_pManager->AddCron(static_cast<CCron*>(pTimer->handle()));
     return true;
 }
 
 bool NoModule::RemTimer(NoTimer* pTimer)
 {
     if (m_sTimers.erase(pTimer) == 0) return false;
-    m_pManager->DelCronByAddr(pTimer->GetHandle());
+    m_pManager->DelCronByAddr(static_cast<CCron*>(pTimer->handle()));
     return true;
 }
 
@@ -272,7 +272,7 @@ NoTimer* NoModule::FindTimer(const NoString& sLabel)
     }
 
     for (NoTimer* pTimer : m_sTimers) {
-        if (pTimer->GetName().equals(sLabel)) {
+        if (pTimer->name().equals(sLabel)) {
             return pTimer;
         }
     }
@@ -298,15 +298,9 @@ void NoModule::ListTimers()
     Table.AddColumn("Description");
 
     for (const NoTimer* pTimer : m_sTimers) {
-        uint uCycles = pTimer->GetCyclesLeft();
-        timeval Interval = pTimer->GetInterval();
-
         Table.AddRow();
-        Table.SetCell("Name", pTimer->GetName());
-        Table.SetCell("Secs",
-                      NoString(Interval.tv_sec) + "seconds" +
-                      (Interval.tv_usec ? " " + NoString(Interval.tv_usec) + " microseconds" : ""));
-        Table.SetCell("Cycles", ((uCycles) ? NoString(uCycles) : "INF"));
+        Table.SetCell("Name", pTimer->name());
+        Table.SetCell("Interval", NoString(pTimer->interval()) + " seconds");
         Table.SetCell("Description", pTimer->description());
     }
 

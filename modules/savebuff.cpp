@@ -48,13 +48,17 @@ class NoSaveBuff;
 class NoSaveBuffJob : public NoTimer
 {
 public:
-    NoSaveBuffJob(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoSaveBuffJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule)
     {
+        setName(sLabel);
+        setDescription(sDescription);
+
+        start(uInterval);
     }
 
 protected:
-    void RunJob() override;
+    void run() override;
 };
 
 class NoSaveBuff : public NoModule
@@ -97,7 +101,7 @@ public:
         else
             m_sPassword = NoBlowfish::MD5(sArgs);
 
-        AddTimer(new NoSaveBuffJob(this, 60, 0, "SaveBuff", "Saves the current buffer to disk every 1 minute"));
+        AddTimer(new NoSaveBuffJob(this, 60, "SaveBuff", "Saves the current buffer to disk every 1 minute"));
 
         return (!m_bBootError);
     }
@@ -400,10 +404,9 @@ private:
 };
 
 
-void NoSaveBuffJob::RunJob()
+void NoSaveBuffJob::run()
 {
-    NoSaveBuff* p = (NoSaveBuff*)module();
-    p->SaveBuffersToDisk();
+    static_cast<NoSaveBuff*>(module())->SaveBuffersToDisk();
 }
 
 template <> void no_moduleInfo<NoSaveBuff>(NoModuleInfo& Info)

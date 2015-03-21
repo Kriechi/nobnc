@@ -55,14 +55,17 @@ public:
 class NoSampleTimer : public NoTimer
 {
 public:
-    NoSampleTimer(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoSampleTimer(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule)
     {
+        setName(sLabel);
+        setDescription(sDescription);
+
+        start(uInterval);
     }
 
-private:
 protected:
-    void RunJob() override { module()->PutModule("TEST!!!!"); }
+    void run() override { module()->PutModule("TEST!!!!"); }
 };
 
 class NoSampleMod : public NoModule

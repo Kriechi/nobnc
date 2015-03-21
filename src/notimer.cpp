@@ -21,28 +21,28 @@
 class NoTimerPrivate : public CCron
 {
 public:
-    NoTimerPrivate(NoTimer* q) : q(q) { }
+    NoTimerPrivate(NoModule* mod, NoTimer* q) : q(q), module(mod) { }
 
-    void RunJob() override { q->RunJob(); }
+    void restart()
+    {
+        if (singleShot)
+            StartMaxCycles(interval, 1);
+        else
+            Start(interval);
+    }
+
+    void RunJob() override { q->run(); }
 
     NoTimer* q;
-    CCron* cron;
     NoModule* module;
-    NoString description;
+    NoString description = "";
+    bool singleShot = false;
+    uint interval = 60;
 };
 
-NoTimer::NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description)
-    : d(new NoTimerPrivate(this))
+NoTimer::NoTimer(NoModule* module)
+    : d(new NoTimerPrivate(module, this))
 {
-    d->module = module;
-    d->description = description;
-    d->SetName(label);
-
-    // TODO: it's not a great idea to start the timer in its constructor...
-    if (cycles)
-        d->cron->StartMaxCycles(interval, cycles);
-    else
-        d->cron->Start(interval);
 }
 
 NoTimer::~NoTimer()
@@ -50,29 +50,31 @@ NoTimer::~NoTimer()
     d->module->UnlinkTimer(this);
 }
 
-CCron* NoTimer::GetHandle() const
+void NoTimer::start(uint interval)
 {
-    return d->cron;
+    if (interval > 0)
+        d->interval = interval;
+    d->restart();
 }
 
-NoString NoTimer::GetName() const
+void NoTimer::stop()
 {
-    return d->cron->GetName();
+    d->Stop();
 }
 
-uint NoTimer::GetCyclesLeft() const
+void NoTimer::pause()
 {
-    return d->cron->GetCyclesLeft();
+    d->Pause();
 }
 
-timeval NoTimer::GetInterval() const
+void NoTimer::resume()
 {
-    return d->cron->GetInterval();
+    d->UnPause();
 }
 
-void NoTimer::Stop()
+bool NoTimer::isActive() const
 {
-    d->cron->Stop();
+    return d->isValid();
 }
 
 NoModule* NoTimer::module() const
@@ -85,6 +87,16 @@ void NoTimer::setModule(NoModule* module)
     d->module = module;
 }
 
+NoString NoTimer::name() const
+{
+    return d->GetName();
+}
+
+void NoTimer::setName(const NoString& name)
+{
+    d->SetName(name);
+}
+
 NoString NoTimer::description() const
 {
     return d->description;
@@ -93,4 +105,37 @@ NoString NoTimer::description() const
 void NoTimer::setDescription(const NoString& description)
 {
     d->description = description;
+}
+
+uint NoTimer::interval() const
+{
+    return d->GetInterval().tv_sec;
+}
+
+void NoTimer::setInterval(uint secs)
+{
+    if (d->interval != secs) {
+        d->interval = secs;
+        if (d->isValid())
+            d->restart();
+    }
+}
+
+bool NoTimer::isSingleShot() const
+{
+    return d->singleShot;
+}
+
+void NoTimer::setSingleShot(bool single)
+{
+    if (d->singleShot != single) {
+        d->singleShot = single;
+        if (d->isValid())
+            d->restart();
+    }
+}
+
+void* NoTimer::handle() const
+{
+    return d.get();
 }

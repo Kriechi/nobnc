@@ -25,17 +25,16 @@ class NoAutoOpMod;
 class NoAutoOpTimer : public NoTimer
 {
 public:
-    NoAutoOpTimer(NoAutoOpMod* pModule)
-        : NoTimer((NoModule*)pModule, 20, 0, "AutoOpChecker", "Check channels for auto op candidates")
+    NoAutoOpTimer(NoModule* pModule) : NoTimer(pModule)
     {
-        m_pParent = pModule;
+        setName("AutoOpChecker");
+        setDescription("Check channels for auto op candidates");
+
+        start(20);
     }
 
-private:
 protected:
-    void RunJob() override;
-
-    NoAutoOpMod* m_pParent;
+    void run() override;
 };
 
 class NoAutoOpUser
@@ -631,7 +630,10 @@ private:
     NoStringMap m_msQueue;
 };
 
-void NoAutoOpTimer::RunJob() { m_pParent->ProcessQueue(); }
+void NoAutoOpTimer::run()
+{
+    static_cast<NoAutoOpMod*>(module())->ProcessQueue();
+}
 
 template <> void no_moduleInfo<NoAutoOpMod>(NoModuleInfo& Info) { Info.SetWikiPage("autoop"); }
 

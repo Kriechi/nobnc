@@ -33,15 +33,20 @@ class NoSChat;
 class NoRemMarkerJob : public NoTimer
 {
 public:
-    NoRemMarkerJob(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoRemMarkerJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule)
     {
+        setName(sLabel);
+        setDescription(sDescription);
+
+        setSingleShot(true);
+        start(uInterval);
     }
 
     void SetNick(const NoString& sNick) { m_sNick = sNick; }
 
 protected:
-    void RunJob() override;
+    void run() override;
     NoString m_sNick;
 };
 
@@ -320,8 +325,7 @@ public:
 
                 m_siiWaitingChats["(s)" + Nick.nick()] = pTmp;
                 SendToUser(sMask, "*** Incoming DCC SCHAT, Accept ? (yes/no)");
-                NoRemMarkerJob* p = new NoRemMarkerJob(
-                this, 60, 1, "Remove (s)" + Nick.nick(), "Removes this nicks entry for waiting DCC.");
+                NoRemMarkerJob* p = new NoRemMarkerJob(this, 60, "Remove (s)" + Nick.nick(), "Removes this nicks entry for waiting DCC.");
                 p->SetNick("(s)" + Nick.nick());
                 AddTimer(p);
                 return (HALT);
@@ -445,10 +449,9 @@ void NoSChatSock::TimeoutImpl()
     }
 }
 
-void NoRemMarkerJob::RunJob()
+void NoRemMarkerJob::run()
 {
-    NoSChat* p = (NoSChat*)module();
-    p->RemoveMarker(m_sNick);
+    static_cast<NoSChat*>(module())->RemoveMarker(m_sNick);
 
     // store buffer
 }

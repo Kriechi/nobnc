@@ -186,13 +186,18 @@ static const struct
 class NoRouteTimeout : public NoTimer
 {
 public:
-    NoRouteTimeout(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoRouteTimeout(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule)
     {
+        setName(sLabel);
+        setDescription(sDescription);
+
+        setSingleShot(true);
+        start(uInterval);
     }
 
 protected:
-    void RunJob() override;
+    void run() override;
 };
 
 struct queued_req
@@ -416,10 +421,10 @@ private:
         // just stop it. The main loop will delete it.
         NoTimer* pTimer = FindTimer("RouteTimeout");
         if (pTimer) {
-            pTimer->Stop();
+            pTimer->stop();
             UnlinkTimer(pTimer);
         }
-        AddTimer(new NoRouteTimeout(this, 60, 1, "RouteTimeout", "Recover from missing / wrong server replies"));
+        AddTimer(new NoRouteTimeout(this, 60, "RouteTimeout", "Recover from missing / wrong server replies"));
 
         m_pDoing = it->first;
         m_pReplies = it->second[0].reply;
@@ -447,10 +452,9 @@ private:
     NoString m_sLastRequest;
 };
 
-void NoRouteTimeout::RunJob()
+void NoRouteTimeout::run()
 {
-    NoRouteRepliesMod* pMod = (NoRouteRepliesMod*)module();
-    pMod->Timeout();
+    static_cast<NoRouteRepliesMod*>(module())->Timeout();
 }
 
 template <> void no_moduleInfo<NoRouteRepliesMod>(NoModuleInfo& Info) { Info.SetWikiPage("route_replies"); }

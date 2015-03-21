@@ -43,13 +43,17 @@ class NoAway;
 class NoAwayJob : public NoTimer
 {
 public:
-    NoAwayJob(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoAwayJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule)
     {
+        setName(sLabel);
+        setDescription(sDescription);
+
+        start(uInterval);
     }
 
 protected:
-    void RunJob() override;
+    void run() override;
 };
 
 class NoAway : public NoModule
@@ -215,7 +219,7 @@ public:
         m_bBootError = false;
         m_saveMessages = true;
         SetAwayTime(300);
-        AddTimer(new NoAwayJob(this, 60, 0, "AwayJob", "Checks for idle and saves messages every 1 minute"));
+        AddTimer(new NoAwayJob(this, 60, "AwayJob", "Checks for idle and saves messages every 1 minute"));
 
         AddHelpCommand();
         AddCommand("Away", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::AwayCommand), "[-quiet]");
@@ -470,7 +474,7 @@ private:
 };
 
 
-void NoAwayJob::RunJob()
+void NoAwayJob::run()
 {
     NoAway* p = (NoAway*)module();
     p->SaveBufferToDisk();

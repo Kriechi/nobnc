@@ -170,10 +170,15 @@ public:
 class NoStickyTimer : public NoTimer
 {
 public:
-    NoStickyTimer(NoModule* module) : NoTimer(module, 15, 0, "StickyChanTimer", "") { }
+    NoStickyTimer(NoModule* module) : NoTimer(module)
+    {
+        setName("StickyChanTimer");
+
+        start(15);
+    }
 
 protected:
-    void RunJob() override
+    void run() override
     {
         NoModule* mod = module();
         if (!mod)

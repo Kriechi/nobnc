@@ -29,16 +29,21 @@
 class NoRejoinJob : public NoTimer
 {
 public:
-    NoRejoinJob(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoRejoinJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule)
     {
+        setName(sLabel);
+        setDescription(sDescription);
+
+        setSingleShot(true);
+        start(uInterval);
     }
 
 protected:
-    void RunJob() override
+    void run() override
     {
         NoNetwork* pNetwork = module()->GetNetwork();
-        NoChannel* pChan = pNetwork->FindChan(No::tokens(GetName(), 1));
+        NoChannel* pChan = pNetwork->FindChan(No::tokens(name(), 1));
 
         if (pChan) {
             pChan->enable();
@@ -124,7 +129,7 @@ public:
                 pChan.enable();
                 return;
             }
-            AddTimer(new NoRejoinJob(this, delay, 1, "Rejoin " + pChan.getName(), "Rejoin channel after a delay"));
+            AddTimer(new NoRejoinJob(this, delay, "Rejoin " + pChan.getName(), "Rejoin channel after a delay"));
         }
     }
 };

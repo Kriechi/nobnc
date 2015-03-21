@@ -23,30 +23,40 @@
 
 class NoModule;
 class NoTimerPrivate;
-class CCron; // TODO: cleanup
 
 class NO_EXPORT NoTimer
 {
 public:
-    NoTimer(NoModule* module, uint interval, uint cycles, const NoString& label, const NoString& description);
+    NoTimer(NoModule* module);
     virtual ~NoTimer();
 
-    CCron* GetHandle() const; // TODO: cleanup
+    void start(uint interval = 0);
+    void stop();
 
-    // TODO: revise the API
-    NoString GetName() const;
-    uint GetCyclesLeft() const;
-    timeval GetInterval() const;
-    void Stop();
+    void pause();
+    void resume();
+
+    bool isActive() const;
 
     NoModule* module() const;
     void setModule(NoModule* module);
 
+    NoString name() const;
+    void setName(const NoString& name);
+
     NoString description() const;
     void setDescription(const NoString& description);
 
+    uint interval() const;
+    void setInterval(uint secs);
+
+    bool isSingleShot() const;
+    void setSingleShot(bool single);
+
+    void* handle() const; // TODO: cleanup
+
 protected:
-    virtual void RunJob() = 0;
+    virtual void run() = 0;
 
 private:
     NoTimer(const NoTimer&) = delete;

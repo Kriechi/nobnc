@@ -27,13 +27,18 @@ class NoSimpleAway;
 class NoSimpleAwayJob : public NoTimer
 {
 public:
-    NoSimpleAwayJob(NoModule* pModule, uint uInterval, uint uCycles, const NoString& sLabel, const NoString& sDescription)
-        : NoTimer(pModule, uInterval, uCycles, sLabel, sDescription)
+    NoSimpleAwayJob(NoModule* pModule, uint uInterval, const NoString& sLabel, const NoString& sDescription)
+        : NoTimer(pModule)
     {
+        setName(sLabel);
+        setDescription(sDescription);
+
+        setSingleShot(true);
+        start(uInterval);
     }
 
 protected:
-    void RunJob() override;
+    void run() override;
 };
 
 class NoSimpleAway : public NoModule
@@ -173,7 +178,7 @@ public:
     {
         if (bTimer) {
             RemTimer("simple_away");
-            AddTimer(new NoSimpleAwayJob(this, m_iAwayWait, 1, "simple_away", "Sets you away after detach"));
+            AddTimer(new NoSimpleAwayJob(this, m_iAwayWait, "simple_away", "Sets you away after detach"));
         } else {
             if (!m_bClientSetAway) {
                 PutIRC("AWAY :" + ExpandReason());
@@ -218,7 +223,7 @@ private:
     }
 };
 
-void NoSimpleAwayJob::RunJob() { ((NoSimpleAway*)module())->SetAway(false); }
+void NoSimpleAwayJob::run() { ((NoSimpleAway*)module())->SetAway(false); }
 
 template <> void no_moduleInfo<NoSimpleAway>(NoModuleInfo& Info)
 {
