@@ -693,7 +693,7 @@ public:
      */
     const NoString& GetModDataDir() const;
 
-    NoTimer* FindTimer(const NoString& sLabel);
+    NoTimer* FindTimer(const NoString& sLabel) const;
     virtual void ListTimers();
 
     bool AddSocket(NoModuleSocket* pSocket);

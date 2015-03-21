@@ -141,7 +141,7 @@ NoString NoModule::GetWebFilesPath()
     }
 }
 
-NoTimer* NoModule::FindTimer(const NoString& sLabel)
+NoTimer* NoModule::FindTimer(const NoString& sLabel) const
 {
     if (sLabel.empty()) {
         return nullptr;
