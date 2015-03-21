@@ -20,6 +20,10 @@
 #include "nosocket.h"
 #include "Csocket/Csocket.h"
 
+#ifdef HAVE_LIBSSL
+#include <openssl/ssl.h>
+#endif
+
 #ifdef HAVE_ICU
 #include <unicode/ucnv.h>
 #include <unicode/ucnv_cb.h>

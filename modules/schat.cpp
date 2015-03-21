@@ -28,6 +28,10 @@
 #include <no/noapp.h>
 #include <no/nomodulesocket.h>
 
+#ifdef HAVE_LIBSSL
+#include <openssl/ssl.h>
+#endif
+
 class NoSChat;
 
 class NoRemMarkerJob : public NoTimer

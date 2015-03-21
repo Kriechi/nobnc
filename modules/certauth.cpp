@@ -27,6 +27,10 @@
 #include <no/nolistener.h>
 #include <no/noregistry.h>
 
+#ifdef HAVE_LIBSSL
+#include <openssl/ssl.h>
+#endif
+
 class NoSslClientCertMod : public NoModule
 {
 public:

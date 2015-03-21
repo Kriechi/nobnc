@@ -21,9 +21,9 @@
 #include <no/nostring.h>
 #include <sys/socket.h>
 
-#ifdef HAVE_LIBSSL
-#include <openssl/ssl.h>
-#endif
+class Csock;
+class NoModule;
+class NoSocketPrivate;
 
 #ifdef _WIN32
 typedef SOCKET no_sock_t;
@@ -31,9 +31,7 @@ typedef SOCKET no_sock_t;
 typedef int no_sock_t;
 #endif
 
-class Csock;
-class NoModule;
-class NoSocketPrivate;
+typedef struct ssl_session_st SSL_SESSION;
 
 // All existing errno codes seem to be in range 1-300
 enum {
@@ -78,12 +76,12 @@ public:
     void PauseRead();
     void UnPauseRead();
     NoString GetLocalIP() const;
-#ifdef HAVE_LIBSSL
+
     void SetCipher( const NoString & sCipher );
     long GetPeerFingerprint( NoString & sFP ) const;
     void SetRequireClientCertFlags( uint32_t iRequireClientCertFlags );
     SSL_SESSION * GetSSLSession() const;
-#endif
+
     uint64_t GetBytesRead() const;
     void ResetBytesRead();
     uint64_t GetBytesWritten() const;
