@@ -54,10 +54,6 @@ NoSocketPrivate::NoSocketPrivate(NoSocket *q, const NoString& host, u_short port
 #endif
 }
 
-NoSocket::NoSocket(int timeout) : d(new NoSocketPrivate(this, "", 0, timeout))
-{
-}
-
 NoSocket::NoSocket(const NoString& host, u_short port, int timeout) : d(new NoSocketPrivate(this, host, port, timeout))
 {
 }
