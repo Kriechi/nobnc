@@ -191,7 +191,7 @@ public:
             NoString sIP = GetLocalDCCIP();
 
             if (!UseClientIP()) {
-                uLongIP = No::formatLongIp(GetClient()->GetRemoteIP());
+                uLongIP = No::formatLongIp(GetClient()->GetSocket()->GetRemoteIP());
             }
 
             if (sType.equals("CHAT")) {

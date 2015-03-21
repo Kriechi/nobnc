@@ -53,7 +53,7 @@ protected:
 
         const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
         for (NoClient* pClient : vClients) {
-            if (pClient->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
+            if (pClient->GetSocket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
                 pClient->PutClient("PING :ZNC");
             }
         }
@@ -259,7 +259,7 @@ NoNetwork::~NoNetwork()
 
     // Delete clients
     while (!m_vClients.empty()) {
-        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]);
+        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]->GetSocket());
     }
     m_vClients.clear();
 

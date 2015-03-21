@@ -19,6 +19,7 @@
 #include <no/nouser.h>
 #include <no/noclient.h>
 #include <no/noregistry.h>
+#include <no/nosocket.h>
 
 class NoClientNotifyMod : public NoModule
 {
@@ -87,7 +88,7 @@ public:
 
     void OnClientLogin() override
     {
-        NoString sRemoteIP = GetClient()->GetRemoteIP();
+        NoString sRemoteIP = GetClient()->GetSocket()->GetRemoteIP();
         if (!m_bNewOnly || m_sClientsSeen.find(sRemoteIP) == m_sClientsSeen.end()) {
             SendNotification("Another client authenticated as your user. "
                              "Use the 'ListClients' command to see all " +

@@ -22,6 +22,7 @@
 #include <no/nodebug.h>
 #include <no/noclient.h>
 #include <no/noregistry.h>
+#include <no/nosocket.h>
 
 #include <syslog.h>
 #include <unistd.h>
@@ -93,12 +94,12 @@ public:
 
     void OnClientLogin() override
     {
-        Log("[" + GetUser()->GetUserName() + "] connected to ZNC from " + GetClient()->GetRemoteIP());
+        Log("[" + GetUser()->GetUserName() + "] connected to ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
     }
 
     void OnClientDisconnect() override
     {
-        Log("[" + GetUser()->GetUserName() + "] disconnected from ZNC from " + GetClient()->GetRemoteIP());
+        Log("[" + GetUser()->GetUserName() + "] disconnected from ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
     }
 
     void OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override

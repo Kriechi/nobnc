@@ -337,7 +337,7 @@ public:
                 sending_lines = true;
 
                 for (size_t i = 0; i < rawLines.size(); ++i) {
-                    GetClient()->ReadLineImpl(rawLines[i]);
+                    GetClient()->ReadLine(rawLines[i]);
                 }
 
                 sending_lines = false;

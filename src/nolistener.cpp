@@ -49,10 +49,10 @@ private:
     NoListenerPrivate* m_listener;
 };
 
-class NoClientSocket : public NoSocket
+class NoPeerSocket : public NoSocket
 {
 public:
-    NoClientSocket(const NoString& host, ushort port, NoListenerPrivate* listener);
+    NoPeerSocket(const NoString& host, ushort port, NoListenerPrivate* listener);
 
     void ReadLineImpl(const NoString& data) override;
     void ReachedMaxBufferImpl() override;
@@ -73,15 +73,15 @@ bool NoListenerSocket::ConnectionFromImpl(const NoString& host, ushort port)
 
 NoSocket* NoListenerSocket::GetSockObjImpl(const NoString& host, ushort port)
 {
-    NoClientSocket* client = new NoClientSocket(host, port, m_listener);
+    NoPeerSocket* socket = new NoPeerSocket(host, port, m_listener);
     if (NoApp::Get().AllowConnectionFrom(host)) {
-        GLOBALMODULECALL(OnClientConnect(client, host, port), NOTHING);
+        GLOBALMODULECALL(OnClientConnect(socket, host, port), NOTHING);
     } else {
-        client->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
-        client->Close(NoSocket::CLT_AFTERWRITE);
+        socket->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
+        socket->Close(NoSocket::CLT_AFTERWRITE);
         GLOBALMODULECALL(OnFailedLogin("", host), NOTHING);
     }
-    return client;
+    return socket;
 }
 
 void NoListenerSocket::SockErrorImpl(int error, const NoString& description)
@@ -97,7 +97,7 @@ void NoListenerSocket::SockErrorImpl(int error, const NoString& description)
     }
 }
 
-NoClientSocket::NoClientSocket(const NoString& host, ushort port, NoListenerPrivate* listener)
+NoPeerSocket::NoPeerSocket(const NoString& host, ushort port, NoListenerPrivate* listener)
     : NoSocket(host, port), m_listener(listener)
 {
     // The socket will time out in 120 secs, no matter what.
@@ -108,7 +108,7 @@ NoClientSocket::NoClientSocket(const NoString& host, ushort port, NoListenerPriv
     EnableReadLine();
 }
 
-void NoClientSocket::ReachedMaxBufferImpl()
+void NoPeerSocket::ReachedMaxBufferImpl()
 {
     if (GetCloseType() != CLT_DONT)
         return; // Already closing
@@ -122,7 +122,7 @@ void NoClientSocket::ReachedMaxBufferImpl()
     Close();
 }
 
-void NoClientSocket::ReadLineImpl(const NoString& line)
+void NoPeerSocket::ReadLineImpl(const NoString& line)
 {
     NoSocket* socket = nullptr;
     bool isHttp = No::wildCmp(line, "GET * HTTP/1.?\r\n") || No::wildCmp(line, "POST * HTTP/1.?\r\n");
@@ -133,7 +133,8 @@ void NoClientSocket::ReadLineImpl(const NoString& line)
             Close(CLT_AFTERWRITE);
             NO_DEBUG("Refused IRC connection to non IRC port");
         } else {
-            socket = new NoClient();
+            NoClient* client = new NoClient;
+            socket = client->GetSocket();
             NoApp::Get().GetManager().SwapSockByAddr(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout

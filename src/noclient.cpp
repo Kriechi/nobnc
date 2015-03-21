@@ -15,6 +15,7 @@
  */
 
 #include "noclient.h"
+#include "nosocket.h"
 #include "nosocket_p.h"
 #include "nochannel.h"
 #include "noircsocket.h"
@@ -71,11 +72,53 @@
         }                                                                     \
     }
 
+class NoClientSocket : public NoSocket
+{
+public:
+    NoClientSocket(NoClient* pClient) : m_pClient(pClient)
+    {
+        NoSocketPrivate::get(this)->allowControlCodes = true;
+
+        EnableReadLine();
+        // RFC says a line can have 512 chars max, but we are
+        // a little more gentle ;)
+        SetMaxBufferThreshold(1024);
+    }
+
+    void ReadLineImpl(const NoString& sData) override { m_pClient->ReadLine(sData); }
+    void TimeoutImpl() override { m_pClient->PutClient("ERROR :Closing link [Timeout]"); }
+    void ConnectedImpl() override { NO_DEBUG(GetSockName() << " == Connected();"); }
+    void ConnectionRefusedImpl() override { NO_DEBUG(GetSockName() << " == ConnectionRefused()"); }
+
+    void DisconnectedImpl() override
+    {
+        NO_DEBUG(GetSockName() << " == Disconnected()");
+        NoNetwork* pNetwork = m_pClient->GetNetwork();
+        m_pClient->SetNetwork(nullptr, true, false);
+
+        NoUser* pUser = m_pClient->GetUser();
+        if (pUser)
+            NETWORKMODULECALL(OnClientDisconnect(), pUser, pNetwork, m_pClient, NOTHING);
+    }
+
+    void ReachedMaxBufferImpl() override
+    {
+        NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
+        if (m_pClient->IsAttached()) {
+            m_pClient->PutClient("ERROR :Closing link [Too long raw line]");
+        }
+        Close();
+    }
+
+private:
+    NoClient* m_pClient;
+};
+
 class NoClientAuth : public NoAuthenticator
 {
 public:
     NoClientAuth(NoClient* pClient, const NoString& sUsername, const NoString& sPassword)
-        : NoAuthenticator(sUsername, sPassword, pClient), m_pClient(pClient)
+        : NoAuthenticator(sUsername, sPassword, pClient->GetSocket()), m_pClient(pClient)
     {
     }
 
@@ -103,14 +146,9 @@ private:
 
 NoClient::NoClient() : m_bGotPass(false), m_bGotNick(false), m_bGotUser(false), m_bInCap(false), m_bNamesx(false),
       m_bUHNames(false), m_bAway(false), m_bServerTime(false), m_bBatch(false), m_bSelfMessage(false),
-      m_bPlaybackActive(false), m_pUser(nullptr), m_pNetwork(nullptr), m_sNick("unknown-nick"), m_sPass(""),
+      m_bPlaybackActive(false), m_pSocket(new NoClientSocket(this)), m_pUser(nullptr), m_pNetwork(nullptr), m_sNick("unknown-nick"), m_sPass(""),
       m_sUser(""), m_sNetwork(""), m_sIdentifier(""), m_spAuth(), m_ssAcceptedCaps()
 {
-    NoSocketPrivate::get(this)->allowControlCodes = true;
-    EnableReadLine();
-    // RFC says a line can have 512 chars max, but we are
-    // a little more gentle ;)
-    SetMaxBufferThreshold(1024);
 }
 
 NoClient::~NoClient()
@@ -120,10 +158,13 @@ NoClient::~NoClient()
         pAuth->invalidate();
     }
     if (m_pUser != nullptr) {
-        m_pUser->AddBytesRead(GetBytesRead());
-        m_pUser->AddBytesWritten(GetBytesWritten());
+        m_pUser->AddBytesRead(m_pSocket->GetBytesRead());
+        m_pUser->AddBytesWritten(m_pSocket->GetBytesWritten());
     }
+    delete m_pSocket;
 }
+
+NoSocket*NoClient::GetSocket() const { return m_pSocket; }
 
 void NoClient::SendRequiredPasswordNotice()
 {
@@ -136,7 +177,7 @@ void NoClient::SendRequiredPasswordNotice()
               "or /quote PASS <username>/<network>:<password> to connect to a specific network.");
 }
 
-void NoClient::ReadLineImpl(const NoString& sData)
+void NoClient::ReadLine(const NoString& sData)
 {
     NoString sLine = sData;
 
@@ -250,7 +291,7 @@ void NoClient::ReadLineImpl(const NoString& sData)
         NoString sMsg = No::tokens(sLine, 1).trimPrefix_n();
         NETWORKMODULECALL(OnUserQuit(sMsg), m_pUser, m_pNetwork, this, &bReturn);
         if (bReturn) return;
-        Close(NoSocket::CLT_AFTERWRITE); // Treat a client quit as a detach
+        m_pSocket->Close(NoSocket::CLT_AFTERWRITE); // Treat a client quit as a detach
         return; // Don't forward this msg.  We don't want the client getting us disconnected.
     } else if (sCommand.equals("PROTOCTL")) {
         NoStringVector vsTokens = No::tokens(sLine, 1).split(" ", No::SkipEmptyParts);
@@ -673,7 +714,7 @@ void NoClient::RefuseLogin(const NoString& sReason)
 {
     PutStatus("Bad username and/or password.");
     PutClient(":irc.znc.in 464 " + GetNick() + " :" + sReason);
-    Close(NoSocket::CLT_AFTERWRITE);
+    m_pSocket->Close(NoSocket::CLT_AFTERWRITE);
 }
 
 void NoClient::AcceptLogin(NoUser& User)
@@ -683,10 +724,10 @@ void NoClient::AcceptLogin(NoUser& User)
 
     // Set our proper timeout and set back our proper timeout mode
     // (constructor set a different timeout and mode)
-    SetTimeout(NoNetwork::NO_TRAFFIC_TIMEOUT, TMO_READ);
+    m_pSocket->SetTimeout(NoNetwork::NO_TRAFFIC_TIMEOUT, NoSocket::TMO_READ);
 
-    SetSockName("USR::" + m_pUser->GetUserName());
-    SetEncoding(m_pUser->GetClientEncoding());
+    m_pSocket->SetSockName("USR::" + m_pUser->GetUserName());
+    m_pSocket->SetEncoding(m_pUser->GetClientEncoding());
 
     if (!m_sNetwork.empty()) {
         m_pNetwork = m_pUser->FindNetwork(m_sNetwork);
@@ -721,36 +762,10 @@ void NoClient::AcceptLogin(NoUser& User)
     NETWORKMODULECALL(OnClientLogin(), m_pUser, m_pNetwork, this, NOTHING);
 }
 
-void NoClient::TimeoutImpl() { PutClient("ERROR :Closing link [Timeout]"); }
-
-void NoClient::ConnectedImpl() { NO_DEBUG(GetSockName() << " == Connected();"); }
-
-void NoClient::ConnectionRefusedImpl() { NO_DEBUG(GetSockName() << " == ConnectionRefused()"); }
-
-void NoClient::DisconnectedImpl()
-{
-    NO_DEBUG(GetSockName() << " == Disconnected()");
-    NoNetwork* pNetwork = m_pNetwork;
-    SetNetwork(nullptr, true, false);
-
-    if (m_pUser) {
-        NETWORKMODULECALL(OnClientDisconnect(), m_pUser, pNetwork, this, NOTHING);
-    }
-}
-
-void NoClient::ReachedMaxBufferImpl()
-{
-    NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
-    if (IsAttached()) {
-        PutClient("ERROR :Closing link [Too long raw line]");
-    }
-    Close();
-}
-
 void NoClient::BouncedOff()
 {
     PutStatusNotice("You are being disconnected because another user just authenticated as you.");
-    Close(NoSocket::CLT_AFTERWRITE);
+    m_pSocket->Close(NoSocket::CLT_AFTERWRITE);
 }
 
 bool NoClient::IsAttached() const { return m_pUser != nullptr; }
@@ -767,7 +782,7 @@ void NoClient::PutIRC(const NoString& sLine)
 
 NoString NoClient::GetFullName() const
 {
-    if (!m_pUser) return GetRemoteIP();
+    if (!m_pUser) return m_pSocket->GetRemoteIP();
     NoString sFullName = m_pUser->GetUserName();
     if (!m_sIdentifier.empty()) sFullName += "@" + m_sIdentifier;
     if (m_pNetwork) sFullName += "/" + m_pNetwork->GetName();
@@ -781,7 +796,7 @@ void NoClient::PutClient(const NoString& sLine)
     NETWORKMODULECALL(OnSendToClient(sCopy, *this), m_pUser, m_pNetwork, this, &bReturn);
     if (bReturn) return;
     NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [" << sCopy << "]");
-    Write(sCopy + "\r\n");
+    m_pSocket->Write(sCopy + "\r\n");
 }
 
 void NoClient::PutStatusNotice(const NoString& sLine) { PutModNotice("status", sLine); }
@@ -804,7 +819,7 @@ void NoClient::PutModNotice(const NoString& sModule, const NoString& sLine)
 
     NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [:" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE "
               << GetNick() << " :" << sLine << "]");
-    Write(":" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE " +
+    m_pSocket->Write(":" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE " +
           GetNick() + " :" + sLine + "\r\n");
 }
 
@@ -819,7 +834,7 @@ void NoClient::PutModule(const NoString& sModule, const NoString& sLine)
 
     NoStringVector vsLines = sLine.split("\n");
     for (const NoString& s : vsLines) {
-        Write(":" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG " +
+        m_pSocket->Write(":" + m_pUser->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG " +
               GetNick() + " :" + s + "\r\n");
     }
 }

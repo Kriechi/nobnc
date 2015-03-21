@@ -193,7 +193,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         for (const NoClient* pClient : vClients) {
             Table.AddRow();
-            Table.SetCell("Host", pClient->GetRemoteIP());
+            Table.SetCell("Host", pClient->GetSocket()->GetRemoteIP());
             if (pClient->GetNetwork()) {
                 Table.SetCell("Network", pClient->GetNetwork()->GetName());
             }

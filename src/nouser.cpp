@@ -48,7 +48,7 @@ protected:
         const std::vector<NoClient*>& vUserClients = m_pUser->GetUserClients();
 
         for (NoClient* pUserClient : vUserClients) {
-            if (pUserClient->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
+            if (pUserClient->GetSocket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
                 pUserClient->PutClient("PING :ZNC");
             }
         }
@@ -81,7 +81,7 @@ NoUser::~NoUser()
 
     // Delete clients
     while (!m_vClients.empty()) {
-        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]);
+        NoApp::Get().GetManager().DelSockByAddr(m_vClients[0]->GetSocket());
     }
     m_vClients.clear();
 
@@ -687,9 +687,10 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
         AddAllowedHost(sHost);
     }
 
-    for (NoClient* pSock : m_vClients) {
+    for (NoClient* pClient : m_vClients) {
+        NoSocket* pSock = pClient->GetSocket();
         if (!IsHostAllowed(pSock->GetRemoteIP())) {
-            pSock->PutStatusNotice(
+            pClient->PutStatusNotice(
             "You are being disconnected because your IP is no longer allowed to connect to this user");
             pSock->Close();
         }
@@ -964,7 +965,7 @@ NoString NoUser::GetLocalDCCIP() const
     }
 
     if (!GetAllClients().empty()) {
-        return GetAllClients()[0]->GetLocalIP();
+        return GetAllClients()[0]->GetSocket()->GetLocalIP();
     }
 
     return "";

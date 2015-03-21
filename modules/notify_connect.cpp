@@ -18,6 +18,7 @@
 #include <no/noapp.h>
 #include <no/nouser.h>
 #include <no/noclient.h>
+#include <no/nosocket.h>
 
 class NoNotifyConnectMod : public NoModule
 {
@@ -26,12 +27,12 @@ public:
 
     void OnClientLogin() override
     {
-        SendAdmins(GetUser()->GetUserName() + " attached (from " + GetClient()->GetRemoteIP() + ")");
+        SendAdmins(GetUser()->GetUserName() + " attached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
     }
 
     void OnClientDisconnect() override
     {
-        SendAdmins(GetUser()->GetUserName() + " detached (from " + GetClient()->GetRemoteIP() + ")");
+        SendAdmins(GetUser()->GetUserName() + " detached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
     }
 
 private:

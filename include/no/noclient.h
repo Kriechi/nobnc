@@ -18,16 +18,17 @@
 #define NOCLIENT_H
 
 #include <no/noglobal.h>
-#include <no/nosocket.h>
+#include <no/nostring.h>
 #include <memory>
 
 class NoUser;
+class NoSocket;
 class NoNetwork;
 class NoIrcSocket;
 class NoAuthenticator;
 class NoTable;
 
-class NO_EXPORT NoClient : public NoSocket
+class NO_EXPORT NoClient
 {
 public:
     NoClient();
@@ -35,6 +36,8 @@ public:
 
     NoClient(const NoClient&) = delete;
     NoClient& operator=(const NoClient&) = delete;
+
+    NoSocket* GetSocket() const;
 
     void SendRequiredPasswordNotice();
     void AcceptLogin(NoUser& User);
@@ -71,15 +74,9 @@ public:
 
     bool IsCapEnabled(const NoString& sCap) const;
 
-    void ReadLineImpl(const NoString& sData) override;
     bool SendMotd();
     void HelpUser(const NoString& sFilter = "");
     void AuthUser();
-    void ConnectedImpl() override;
-    void TimeoutImpl() override;
-    void DisconnectedImpl() override;
-    void ConnectionRefusedImpl() override;
-    void ReachedMaxBufferImpl() override;
 
     void SetNick(const NoString& s);
     void SetAway(bool bAway);
@@ -89,6 +86,8 @@ public:
     std::vector<NoClient*> GetClients() const;
     NoIrcSocket* GetIRCSock() const;
     NoString GetFullName() const;
+
+    void ReadLine(const NoString& sData);
 
 private:
     void HandleCap(const NoString& sLine);
@@ -109,6 +108,7 @@ private:
     bool m_bBatch;
     bool m_bSelfMessage;
     bool m_bPlaybackActive;
+    NoSocket* m_pSocket;
     NoUser* m_pUser;
     NoNetwork* m_pNetwork;
     NoString m_sNick;
@@ -120,6 +120,7 @@ private:
     NoStringSet m_ssAcceptedCaps;
 
     friend class ClientTest;
+    friend class NoClientSocket;
 };
 
 #endif // NOCLIENT_H
