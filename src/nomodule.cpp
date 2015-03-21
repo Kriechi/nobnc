@@ -32,7 +32,7 @@ NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, cons
       m_sJobs(),
 #endif
       m_pDLL(pDLL), m_pManager(&(NoApp::Get().GetManager())), m_pUser(pUser), m_pNetwork(pNetwork), m_pClient(nullptr),
-      m_sModName(sModName), m_sDataDir(sDataDir), m_sSavePath(""), m_sArgs(""), m_sModPath(""), m_mssRegistry(),
+      m_sModName(sModName), m_sDataDir(sDataDir), m_sSavePath(""), m_sArgs(""), m_sModPath(""),
       m_vSubPages(), m_mCommands()
 {
     if (m_pNetwork) {

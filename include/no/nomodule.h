@@ -880,8 +880,6 @@ private:
     NoString m_sArgs;
     NoString m_sModPath;
 
-private:
-    NoStringMap m_mssRegistry; //!< way to save name/value pairs. Note there is no encryption involved in this
     VWebPages m_vSubPages;
     std::map<NoString, NoModuleCommand> m_mCommands;
 };
