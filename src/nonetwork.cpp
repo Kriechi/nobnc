@@ -19,6 +19,7 @@
 #include "nodir.h"
 #include "nosettings.h"
 #include "noircconnection.h"
+#include "nomessage.h"
 #include "noserver.h"
 #include "nochannel.h"
 #include "noquery.h"

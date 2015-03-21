@@ -33,6 +33,7 @@
 #include <no/noquery.h>
 #include <no/noblowfish.h>
 #include <no/noescape.h>
+#include <no/nomessage.h>
 
 #define LEGACY_VERIFICATION_TOKEN "::__:SAVEBUFF:__::"
 #define CHAN_VERIFICATION_TOKEN "::__:CHANBUFF:__::"

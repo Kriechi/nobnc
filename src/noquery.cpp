@@ -19,6 +19,7 @@
 #include "nonetwork.h"
 #include "noclient.h"
 #include "nomodulecall.h"
+#include "nomessage.h"
 #include "noapp.h"
 
 NoQuery::NoQuery(const NoString& name, NoNetwork* network) : m_name(name), m_network(network), m_buffer()

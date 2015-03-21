@@ -19,11 +19,12 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <no/nomessage.h>
 #include <sys/time.h>
-#include <deque>
+#include <memory>
 
-class NoClient;
+class NoClient; // TODO: get rid of this dep
+class NoMessage;
+class NoBufferPrivate;
 
 class NO_EXPORT NoBuffer
 {
@@ -46,8 +47,10 @@ public:
     bool setLimit(uint limit, bool force = false);
 
 private:
-    uint m_limit;
-    std::deque<NoMessage> m_lines;
+    NoBuffer(const NoBuffer&) = delete;
+    NoBuffer& operator=(const NoBuffer&) = delete;
+
+    std::unique_ptr<NoBufferPrivate> d;
 };
 
 #endif // NOBUFFER_H

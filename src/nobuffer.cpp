@@ -15,12 +15,22 @@
  */
 
 #include "nobuffer.h"
+#include "nomessage.h"
 #include "noclient.h"
 #include "nouser.h"
 #include "noapp.h"
+#include <deque>
 
-NoBuffer::NoBuffer(uint limit) : m_limit(limit)
+class NoBufferPrivate
 {
+public:
+    uint limit = 100;
+    std::deque<NoMessage> lines;
+};
+
+NoBuffer::NoBuffer(uint limit) : d(new NoBufferPrivate)
+{
+    d->limit = limit;
 }
 
 NoBuffer::~NoBuffer()
@@ -29,26 +39,24 @@ NoBuffer::~NoBuffer()
 
 uint NoBuffer::addMessage(const NoString& format, const NoString& text, const timeval* ts)
 {
-    if (!m_limit) {
+    if (!d->limit)
         return 0;
-    }
 
-    while (m_lines.size() >= m_limit) {
-        m_lines.erase(m_lines.begin());
-    }
+    while (d->lines.size() >= d->limit)
+        d->lines.erase(d->lines.begin());
 
-    m_lines.push_back(NoMessage(format, text, ts));
-    return m_lines.size();
+    d->lines.push_back(NoMessage(format, text, ts));
+    return d->lines.size();
 }
 
 uint NoBuffer::updateMessage(const NoString& match, const NoString& format, const NoString& text)
 {
-    for (NoMessage& line : m_lines) {
+    for (NoMessage& line : d->lines) {
         if (line.GetFormat().startsWith(match, No::CaseSensitive) == 0) {
             line.SetFormat(format);
             line.SetText(text);
             line.UpdateTime();
-            return m_lines.size();
+            return d->lines.size();
         }
     }
 
@@ -57,10 +65,9 @@ uint NoBuffer::updateMessage(const NoString& match, const NoString& format, cons
 
 uint NoBuffer::updateExactMessage(const NoString& format, const NoString& text)
 {
-    for (const NoMessage& line : m_lines) {
-        if (line.GetFormat() == format && line.GetText() == text) {
-            return m_lines.size();
-        }
+    for (const NoMessage& line : d->lines) {
+        if (line.GetFormat() == format && line.GetText() == text)
+            return d->lines.size();
     }
 
     return addMessage(format, text);
@@ -68,45 +75,44 @@ uint NoBuffer::updateExactMessage(const NoString& format, const NoString& text)
 
 const NoMessage& NoBuffer::getMessage(uint idx) const
 {
-    return m_lines[idx];
+    return d->lines[idx];
 }
 
 NoString NoBuffer::getMessage(uint idx, const NoClient& client, const NoStringMap& params) const
 {
-    return m_lines[idx].GetLine(client, params);
+    return d->lines[idx].GetLine(client, params);
 }
 
 uint NoBuffer::size() const
 {
-    return m_lines.size();
+    return d->lines.size();
 }
 
 bool NoBuffer::isEmpty() const
 {
-    return m_lines.empty();
+    return d->lines.empty();
 }
 
 void NoBuffer::clear()
 {
-    m_lines.clear();
+    d->lines.clear();
 }
 
 uint NoBuffer::getLimit() const
 {
-    return m_limit;
+    return d->limit;
 }
 
 bool NoBuffer::setLimit(uint limit, bool force)
 {
-    if (!force && limit > NoApp::Get().GetMaxBufferSize()) {
+    if (!force && limit > NoApp::Get().GetMaxBufferSize())
         return false;
-    }
 
-    m_limit = limit;
+    d->limit = limit;
 
     // We may need to shrink the buffer if the allowed size got smaller
-    while (m_lines.size() > m_limit) {
-        m_lines.erase(m_lines.begin());
+    while (d->lines.size() > d->limit) {
+        d->lines.erase(d->lines.begin());
     }
 
     return true;

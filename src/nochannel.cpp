@@ -16,6 +16,7 @@
 
 #include "nochannel.h"
 #include "noircconnection.h"
+#include "nomessage.h"
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nosettings.h"
