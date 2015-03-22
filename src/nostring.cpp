@@ -36,19 +36,19 @@ NoString::NoString() : std::string()
 {
 }
 
-NoString::NoString(const char* c) : std::string(c)
+NoString::NoString(const char* str) : std::string(str)
 {
 }
 
-NoString::NoString(const char* c, size_t l) : std::string(c, l)
+NoString::NoString(const char* str, uint size) : std::string(str, size)
 {
 }
 
-NoString::NoString(const std::string& s) : std::string(s)
+NoString::NoString(const std::string& str) : std::string(str)
 {
 }
 
-NoString::NoString(size_t n, char c) : std::string(n, c)
+NoString::NoString(uint size, char ch) : std::string(size, ch)
 {
 }
 
@@ -206,13 +206,13 @@ uint NoString::replace(const NoString& sReplace, const NoString& sWith)
     return uRet;
 }
 
-NoString NoString::left(size_type uCount) const
+NoString NoString::left(uint uCount) const
 {
     uCount = (uCount > length()) ? length() : uCount;
     return substr(0, uCount);
 }
 
-NoString NoString::right(size_type uCount) const
+NoString NoString::right(uint uCount) const
 {
     uCount = (uCount > length()) ? length() : uCount;
     return substr(length() - uCount, uCount);
@@ -456,17 +456,17 @@ bool NoString::trimSuffix(const NoString& sSuffix)
     }
 }
 
-size_t NoString::find(char c, No::CaseSensitivity cs) const
+ulong NoString::find(char c, No::CaseSensitivity cs) const
 {
-    return find(NoString(c), cs);
+    return find(NoString(c), 0, cs);
 }
 
-size_t NoString::find(const NoString& s, No::CaseSensitivity cs) const
+ulong NoString::find(const NoString& s, No::CaseSensitivity cs) const
 {
     return find(s, 0, cs);
 }
 
-size_t NoString::find(const NoString& s, size_t pos, No::CaseSensitivity cs) const
+ulong NoString::find(const NoString& s, uint pos, No::CaseSensitivity cs) const
 {
     if (cs == No::CaseSensitive) {
         return std::string::find(s, pos);
@@ -483,6 +483,11 @@ bool NoString::startsWith(const NoString& sPrefix, No::CaseSensitivity cs) const
 bool NoString::endsWith(const NoString& sSuffix, No::CaseSensitivity cs) const
 {
     return right(sSuffix.length()).equals(sSuffix, cs);
+}
+
+bool NoString::contains(char ch, No::CaseSensitivity cs) const
+{
+    return find(NoString(ch), cs) != npos;
 }
 
 bool NoString::contains(const NoString& s, No::CaseSensitivity cs) const
@@ -504,21 +509,21 @@ NoString NoString::trimSuffix_n(const NoString& sSuffix) const
     return sRet;
 }
 
-NoString NoString::leftChomp_n(size_type uLen) const
+NoString NoString::leftChomp_n(uint uLen) const
 {
     NoString sRet = *this;
     sRet.leftChomp(uLen);
     return sRet;
 }
 
-NoString NoString::rightChomp_n(size_type uLen) const
+NoString NoString::rightChomp_n(uint uLen) const
 {
     NoString sRet = *this;
     sRet.rightChomp(uLen);
     return sRet;
 }
 
-bool NoString::leftChomp(size_type uLen)
+bool NoString::leftChomp(uint uLen)
 {
     bool bRet = false;
 
@@ -530,7 +535,7 @@ bool NoString::leftChomp(size_type uLen)
     return bRet;
 }
 
-bool NoString::rightChomp(size_type uLen)
+bool NoString::rightChomp(uint uLen)
 {
     bool bRet = false;
 
