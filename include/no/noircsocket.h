@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef NOIRCCONNECTION_H
-#define NOIRCCONNECTION_H
+#ifndef NOIRCSOCKET_H
+#define NOIRCSOCKET_H
 
 #include <no/noglobal.h>
 #include <no/nosocket.h>
@@ -120,4 +120,4 @@ private:
     std::unique_ptr<NoIrcSocketPrivate> d;
 };
 
-#endif // NOIRCCONNECTION_H
+#endif // NOIRCSOCKET_H
