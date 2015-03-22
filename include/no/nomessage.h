@@ -20,13 +20,17 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 #include <sys/time.h>
+#include <memory>
 
 class NoClient;
+class NoMessagePrivate;
 
 class NO_EXPORT NoMessage
 {
 public:
     NoMessage(const NoString& format = "", const NoString& text = "", const timeval* ts = nullptr);
+    NoMessage(const NoMessage& other);
+    NoMessage& operator=(const NoMessage& other);
     ~NoMessage();
 
     NoString GetLine(const NoClient& client, const NoStringMap& params) const;
@@ -43,9 +47,7 @@ public:
     void UpdateTime();
 
 private:
-    NoString m_format;
-    NoString m_text;
-    timeval m_time;
+    std::shared_ptr<NoMessagePrivate> d;
 };
 
 #endif // NOMESSAGE_H
