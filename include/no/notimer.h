@@ -59,7 +59,7 @@ private:
     NoTimer(const NoTimer&) = delete;
     NoTimer& operator=(const NoTimer&) = delete;
     std::unique_ptr<NoTimerPrivate> d;
-    friend class NoTimerPrivate;
+    friend class NoTimerImpl;
 };
 
 #endif // NOTIMER_H

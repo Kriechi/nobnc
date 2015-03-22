@@ -20,34 +20,46 @@
 #include "nosocketmanager.h"
 #include "Csocket/Csocket.h"
 
-class NoTimerPrivate : public CCron
+class NoTimerImpl : public CCron
 {
 public:
-    NoTimerPrivate(NoModule* mod, NoTimer* q) : q(q), module(mod) { }
+    NoTimerImpl(NoTimer* q) : q(q) { }
+
+protected:
+    void RunJob() override { q->run(); }
+
+private:
+    NoTimer* q;
+};
+
+class NoTimerPrivate
+{
+public:
+    NoTimerPrivate(NoModule* mod) : module(mod) { }
 
     void restart()
     {
         if (singleShot)
-            StartMaxCycles(interval, 1);
+            impl->StartMaxCycles(interval, 1);
         else
-            Start(interval);
+            impl->Start(interval);
     }
 
-    void RunJob() override { q->run(); }
-
-    NoTimer* q;
     NoModule* module;
+    NoTimerImpl* impl;
     NoString description = "";
     bool singleShot = false;
     uint interval = 60;
 };
 
 NoTimer::NoTimer(NoModule* module)
-    : d(new NoTimerPrivate(module, this))
+    : d(new NoTimerPrivate(module))
 {
+    d->impl = new NoTimerImpl(this);
+
     if (module) {
         NoModulePrivate::get(module)->addTimer(this);
-        module->GetManager()->AddCron(d.get());
+        module->GetManager()->AddCron(d->impl);
     }
 }
 
@@ -55,7 +67,7 @@ NoTimer::~NoTimer()
 {
     if (d->module) {
         NoModulePrivate::get(d->module)->removeTimer(this);
-        d->module->GetManager()->DelCronByAddr(d.get());
+        d->module->GetManager()->DelCronByAddr(d->impl);
     }
 }
 
@@ -73,32 +85,32 @@ void NoTimer::start(uint interval)
 
 void NoTimer::stop()
 {
-    d->Stop();
+    d->impl->Stop();
 }
 
 void NoTimer::pause()
 {
-    d->Pause();
+    d->impl->Pause();
 }
 
 void NoTimer::resume()
 {
-    d->UnPause();
+    d->impl->UnPause();
 }
 
 bool NoTimer::isActive() const
 {
-    return d->isValid();
+    return d->impl->isValid();
 }
 
 NoString NoTimer::name() const
 {
-    return d->GetName();
+    return d->impl->GetName();
 }
 
 void NoTimer::setName(const NoString& name)
 {
-    d->SetName(name);
+    d->impl->SetName(name);
 }
 
 NoString NoTimer::description() const
@@ -113,14 +125,14 @@ void NoTimer::setDescription(const NoString& description)
 
 uint NoTimer::interval() const
 {
-    return d->GetInterval().tv_sec;
+    return d->interval;
 }
 
 void NoTimer::setInterval(uint secs)
 {
     if (d->interval != secs) {
         d->interval = secs;
-        if (d->isValid())
+        if (isActive())
             d->restart();
     }
 }
@@ -134,7 +146,7 @@ void NoTimer::setSingleShot(bool single)
 {
     if (d->singleShot != single) {
         d->singleShot = single;
-        if (d->isValid())
+        if (isActive())
             d->restart();
     }
 }
