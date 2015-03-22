@@ -16,8 +16,38 @@
 
 #include "noserver.h"
 
-NoServer::NoServer(const NoString& host, ushort port) : m_host(host), m_port(port)
+class NoServerPrivate
 {
+public:
+    bool ssl = false;
+    ushort port = 6667;
+    NoString host = "";
+    NoString password = "";
+};
+
+NoServer::NoServer(const NoString& host, ushort port) : d(new NoServerPrivate)
+{
+    d->host = host;
+    d->port = port;
+}
+
+NoServer::NoServer(const NoServer& other) : d(new NoServerPrivate)
+{
+    d->ssl = other.isSsl();
+    d->port = other.port();
+    d->host = other.host();
+    d->password = other.password();
+}
+
+NoServer& NoServer::operator=(const NoServer& other)
+{
+    if (this != &other) {
+        d->ssl = other.isSsl();
+        d->port = other.port();
+        d->host = other.host();
+        d->password = other.password();
+    }
+    return *this;
 }
 
 NoServer::~NoServer()
@@ -26,61 +56,61 @@ NoServer::~NoServer()
 
 bool NoServer::isValid() const
 {
-    return !m_host.empty() && !m_host.contains(" ");
+    return !d->host.empty() && !d->host.contains(" ");
 }
 
 NoString NoServer::host() const
 {
-    return m_host;
+    return d->host;
 }
 
 void NoServer::setHost(const NoString &host)
 {
-    m_host = host;
+    d->host = host;
 }
 
 ushort NoServer::port() const
 {
-    return m_port;
+    return d->port;
 }
 
 void NoServer::setPort(ushort port)
 {
-    m_port = port;
+    d->port = port;
 }
 
 NoString NoServer::password() const
 {
-    return m_password;
+    return d->password;
 }
 
 void NoServer::setPassword(const NoString& password)
 {
-    m_password = password;
+    d->password = password;
 }
 
 bool NoServer::isSsl() const
 {
-    return m_ssl;
+    return d->ssl;
 }
 
 void NoServer::setSsl(bool ssl)
 {
-    m_ssl = ssl;
+    d->ssl = ssl;
 }
 
 NoString NoServer::toString() const
 {
     NoStringVector parts;
-    parts.push_back(m_host);
+    parts.push_back(d->host);
 
-    NoString port(m_port);
-    if (m_ssl)
+    NoString port(d->port);
+    if (d->ssl)
         port = "+" + port;
     parts.push_back(port);
 
-    if (!m_password.empty())
-        parts.push_back(m_password);
+    if (!d->password.empty())
+        parts.push_back(d->password);
 
     return NoString(" ").join(parts.begin(), parts.end());
 }

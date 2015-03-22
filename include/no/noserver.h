@@ -19,11 +19,16 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
+#include <memory>
+
+class NoServerPrivate;
 
 class NO_EXPORT NoServer
 {
 public:
     NoServer(const NoString& host = "", ushort port = 6667);
+    NoServer(const NoServer& other);
+    NoServer& operator=(const NoServer& other);
     ~NoServer();
 
     bool isValid() const;
@@ -43,10 +48,7 @@ public:
     NoString toString() const;
 
 private:
-    bool m_ssl;
-    ushort m_port;
-    NoString m_host;
-    NoString m_password;
+    std::shared_ptr<NoServerPrivate> d;
 };
 
 #endif // NOSERVER_H
