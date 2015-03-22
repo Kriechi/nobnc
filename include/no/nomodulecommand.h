@@ -73,10 +73,10 @@ public:
     void Call(const NoString& sLine) const;
 
 private:
-    NoString m_sCmd;
-    CmdFunc m_pFunc;
-    NoString m_sArgs;
-    NoString m_sDesc;
+    NoString m_cmd;
+    CmdFunc m_func;
+    NoString m_args;
+    NoString m_desc;
 };
 
 #endif // NOMODULECOMMAND_H

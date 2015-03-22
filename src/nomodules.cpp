@@ -30,20 +30,20 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
     for (NoModule * pMod : *this) {                      \
         try {                                           \
             NoClient* pOldClient = pMod->GetClient();    \
-            pMod->SetClient(m_pClient);                 \
+            pMod->SetClient(m_client);                 \
             NoUser* pOldUser = nullptr;                  \
-            if (m_pUser) {                              \
+            if (m_user) {                              \
                 pOldUser = pMod->GetUser();             \
-                pMod->SetUser(m_pUser);                 \
+                pMod->SetUser(m_user);                 \
             }                                           \
             NoNetwork* pNetwork = nullptr;            \
-            if (m_pNetwork) {                           \
+            if (m_network) {                           \
                 pNetwork = pMod->GetNetwork();          \
-                pMod->SetNetwork(m_pNetwork);           \
+                pMod->SetNetwork(m_network);           \
             }                                           \
             pMod->func;                                 \
-            if (m_pUser) pMod->SetUser(pOldUser);       \
-            if (m_pNetwork) pMod->SetNetwork(pNetwork); \
+            if (m_user) pMod->SetUser(pOldUser);       \
+            if (m_network) pMod->SetNetwork(pNetwork); \
             pMod->SetClient(pOldClient);                \
         } catch (const NoModule::ModException& e) {     \
             if (e == NoModule::UNLOAD) {                 \
@@ -59,20 +59,20 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
         try {                                           \
             NoModule::ModRet e = NoModule::CONTINUE;     \
             NoClient* pOldClient = pMod->GetClient();    \
-            pMod->SetClient(m_pClient);                 \
+            pMod->SetClient(m_client);                 \
             NoUser* pOldUser = nullptr;                  \
-            if (m_pUser) {                              \
+            if (m_user) {                              \
                 pOldUser = pMod->GetUser();             \
-                pMod->SetUser(m_pUser);                 \
+                pMod->SetUser(m_user);                 \
             }                                           \
             NoNetwork* pNetwork = nullptr;            \
-            if (m_pNetwork) {                           \
+            if (m_network) {                           \
                 pNetwork = pMod->GetNetwork();          \
-                pMod->SetNetwork(m_pNetwork);           \
+                pMod->SetNetwork(m_network);           \
             }                                           \
             e = pMod->func;                             \
-            if (m_pUser) pMod->SetUser(pOldUser);       \
-            if (m_pNetwork) pMod->SetNetwork(pNetwork); \
+            if (m_user) pMod->SetUser(pOldUser);       \
+            if (m_network) pMod->SetNetwork(pNetwork); \
             pMod->SetClient(pOldClient);                \
             if (e == NoModule::HALTMODS) {               \
                 break;                                  \
@@ -90,7 +90,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
     }                                                   \
     return bHaltCore;
 
-NoModules::NoModules() : m_pUser(nullptr), m_pNetwork(nullptr), m_pClient(nullptr) {}
+NoModules::NoModules() : m_user(nullptr), m_network(nullptr), m_client(nullptr) {}
 
 NoModules::~NoModules() { UnloadAll(); }
 
@@ -342,10 +342,10 @@ bool NoModules::OnServerCapAvailable(const NoString& sCap)
     for (NoModule* pMod : *this) {
         try {
             NoClient* pOldClient = pMod->GetClient();
-            pMod->SetClient(m_pClient);
-            if (m_pUser) {
+            pMod->SetClient(m_client);
+            if (m_user) {
                 NoUser* pOldUser = pMod->GetUser();
-                pMod->SetUser(m_pUser);
+                pMod->SetUser(m_user);
                 bResult |= pMod->OnServerCapAvailable(sCap);
                 pMod->SetUser(pOldUser);
             } else {
@@ -404,10 +404,10 @@ bool NoModules::IsClientCapSupported(NoClient* pClient, const NoString& sCap, bo
     for (NoModule* pMod : *this) {
         try {
             NoClient* pOldClient = pMod->GetClient();
-            pMod->SetClient(m_pClient);
-            if (m_pUser) {
+            pMod->SetClient(m_client);
+            if (m_user) {
                 NoUser* pOldUser = pMod->GetUser();
-                pMod->SetUser(m_pUser);
+                pMod->SetUser(m_user);
                 bResult |= pMod->IsClientCapSupported(pClient, sCap, bState);
                 pMod->SetUser(pOldUser);
             } else {

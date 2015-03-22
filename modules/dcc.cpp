@@ -79,7 +79,7 @@ protected:
     bool m_bSend;
     bool m_bNoDelFile;
     NoFile* m_pFile;
-    NoDccMod* m_pModule;
+    NoDccMod* m_module;
 };
 
 class NoDccMod : public NoModule
@@ -275,7 +275,7 @@ NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString
     m_uFileSize = uFileSize;
     m_uRemotePort = 0;
     m_uBytesSoFar = 0;
-    m_pModule = pMod;
+    m_module = pMod;
     m_pFile = pFile;
     m_sLocalFile = sLocalFile;
     m_bSend = true;
@@ -297,7 +297,7 @@ NoDccSock::NoDccSock(NoDccMod* pMod,
     m_uRemotePort = uRemotePort;
     m_uFileSize = uFileSize;
     m_uBytesSoFar = 0;
-    m_pModule = pMod;
+    m_module = pMod;
     m_pFile = nullptr;
     m_sLocalFile = sLocalFile;
     m_bSend = false;
@@ -312,14 +312,14 @@ NoDccSock::~NoDccSock()
         m_pFile->Close();
         delete m_pFile;
     }
-    m_pModule->RemoveSocket(this);
+    m_module->RemoveSocket(this);
 }
 
 void NoDccSock::ReadDataImpl(const char* data, size_t len)
 {
     if (!m_pFile) {
         NO_DEBUG("File not open! closing get.");
-        m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+        m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                              "] - File not open!");
         Close();
     }
@@ -357,27 +357,27 @@ void NoDccSock::ReadDataImpl(const char* data, size_t len)
 void NoDccSock::ConnectionRefusedImpl()
 {
     NO_DEBUG(GetSockName() << " == ConnectionRefused()");
-    m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+    m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Connection Refused.");
 }
 
 void NoDccSock::TimeoutImpl()
 {
     NO_DEBUG(GetSockName() << " == Timeout()");
-    m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - Timed Out.");
+    m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - Timed Out.");
 }
 
 void NoDccSock::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
     NO_DEBUG(GetSockName() << " == SockError(" << iErrno << ", " << sDescription << ")");
-    m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+    m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Socket Error [" + sDescription + "]");
 }
 
 void NoDccSock::ConnectedImpl()
 {
     NO_DEBUG(GetSockName() << " == Connected(" << GetRemoteIP() << ")");
-    m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+    m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Transfer Started.");
 
     if (m_bSend) {
@@ -394,24 +394,24 @@ void NoDccSock::DisconnectedImpl()
     NO_DEBUG(GetSockName() << " == Disconnected()");
 
     if (m_uBytesSoFar > m_uFileSize) {
-        m_pModule->PutModule(sStart + "TooMuchData!");
+        m_module->PutModule(sStart + "TooMuchData!");
     } else if (m_uBytesSoFar == m_uFileSize) {
         if (m_bSend) {
-            m_pModule->PutModule(sStart + "Completed! - Sent [" + m_sLocalFile + "] at [" +
+            m_module->PutModule(sStart + "Completed! - Sent [" + m_sLocalFile + "] at [" +
                                  NoString((int)(GetAvgWrite() / 1024.0)) + " KiB/s ]");
         } else {
-            m_pModule->PutModule(sStart + "Completed! - Saved to [" + m_sLocalFile + "] at [" +
+            m_module->PutModule(sStart + "Completed! - Saved to [" + m_sLocalFile + "] at [" +
                                  NoString((int)(GetAvgRead() / 1024.0)) + " KiB/s ]");
         }
     } else {
-        m_pModule->PutModule(sStart + "Incomplete!");
+        m_module->PutModule(sStart + "Incomplete!");
     }
 }
 
 void NoDccSock::SendPacket()
 {
     if (!m_pFile) {
-        m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+        m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                              "] - File closed prematurely.");
         Close();
         return;
@@ -429,7 +429,7 @@ void NoDccSock::SendPacket()
     ssize_t iLen = m_pFile->Read(szBuf, 4096);
 
     if (iLen < 0) {
-        m_pModule->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+        m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                              "] - Error reading from file.");
         Close();
         return;
@@ -445,7 +445,7 @@ NoSocket* NoDccSock::GetSockObjImpl(const NoString& sHost, ushort uPort)
 {
     Close();
 
-    NoDccSock* pSock = new NoDccSock(m_pModule, m_sRemoteNick, m_sLocalFile, m_uFileSize, m_pFile);
+    NoDccSock* pSock = new NoDccSock(m_module, m_sRemoteNick, m_sLocalFile, m_uFileSize, m_pFile);
     pSock->SetSockName("DCC::SEND::" + m_sRemoteNick);
     pSock->SetTimeout(120);
     pSock->SetFileName(m_sFileName);
@@ -458,7 +458,7 @@ NoSocket* NoDccSock::GetSockObjImpl(const NoString& sHost, ushort uPort)
 NoFile* NoDccSock::OpenFile(bool bWrite)
 {
     if ((m_pFile) || (m_sLocalFile.empty())) {
-        m_pModule->PutModule(((bWrite) ? "DCC <- [" : "DCC -> [") + m_sRemoteNick + "][" + m_sLocalFile +
+        m_module->PutModule(((bWrite) ? "DCC <- [" : "DCC -> [") + m_sRemoteNick + "][" + m_sLocalFile +
                              "] - Unable to open file.");
         return nullptr;
     }
@@ -469,28 +469,28 @@ NoFile* NoDccSock::OpenFile(bool bWrite)
         if (m_pFile->Exists()) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_pModule->PutModule("DCC <- [" + m_sRemoteNick + "] - File already exists [" + m_sLocalFile + "]");
+            m_module->PutModule("DCC <- [" + m_sRemoteNick + "] - File already exists [" + m_sLocalFile + "]");
             return nullptr;
         }
 
         if (!m_pFile->Open(O_WRONLY | O_TRUNC | O_CREAT)) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_pModule->PutModule("DCC <- [" + m_sRemoteNick + "] - Could not open file [" + m_sLocalFile + "]");
+            m_module->PutModule("DCC <- [" + m_sRemoteNick + "] - Could not open file [" + m_sLocalFile + "]");
             return nullptr;
         }
     } else {
         if (!m_pFile->IsReg()) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_pModule->PutModule("DCC -> [" + m_sRemoteNick + "] - Not a file [" + m_sLocalFile + "]");
+            m_module->PutModule("DCC -> [" + m_sRemoteNick + "] - Not a file [" + m_sLocalFile + "]");
             return nullptr;
         }
 
         if (!m_pFile->Open()) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_pModule->PutModule("DCC -> [" + m_sRemoteNick + "] - Could not open file [" + m_sLocalFile + "]");
+            m_module->PutModule("DCC -> [" + m_sRemoteNick + "] - Could not open file [" + m_sLocalFile + "]");
             return nullptr;
         }
 
@@ -500,7 +500,7 @@ NoFile* NoDccSock::OpenFile(bool bWrite)
         if (uFileSize > (ulonglong)0xffffffffULL) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_pModule->PutModule("DCC -> [" + m_sRemoteNick + "] - File too large (>4 GiB) [" + m_sLocalFile + "]");
+            m_module->PutModule("DCC -> [" + m_sRemoteNick + "] - File too large (>4 GiB) [" + m_sLocalFile + "]");
             return nullptr;
         }
 

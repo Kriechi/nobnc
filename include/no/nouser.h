@@ -178,53 +178,53 @@ private:
     void SetKeepBuffer(bool b); // XXX compatibility crap, added in 0.207
     bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 
-    const NoString m_sUserName;
-    const NoString m_sCleanUserName;
-    NoString m_sNick;
-    NoString m_sAltNick;
-    NoString m_sIdent;
-    NoString m_sRealName;
-    NoString m_sBindHost;
-    NoString m_sDCCBindHost;
-    NoString m_sPass;
-    NoString m_sPassSalt;
-    NoString m_sStatusPrefix;
-    NoString m_sDefaultChanModes;
-    NoString m_sClientEncoding;
+    const NoString m_userName;
+    const NoString m_cleanUserName;
+    NoString m_nickName;
+    NoString m_altNick;
+    NoString m_ident;
+    NoString m_realName;
+    NoString m_bindHost;
+    NoString m_dccBindHost;
+    NoString m_password;
+    NoString m_passwordSalt;
+    NoString m_statusPrefix;
+    NoString m_defaultChanModes;
+    NoString m_clientEncoding;
 
-    NoString m_sQuitMsg;
-    NoStringMap m_mssCTCPReplies;
-    NoString m_sTimestampFormat;
-    NoString m_sTimezone;
-    eHashType m_eHashType;
+    NoString m_quitMsg;
+    NoStringMap m_ctcpReplies;
+    NoString m_timestampFormat;
+    NoString m_timezone;
+    eHashType m_hashType;
 
-    NoString m_sUserPath;
+    NoString m_userPath;
 
-    bool m_bMultiClients;
-    bool m_bDenyLoadMod;
-    bool m_bAdmin;
-    bool m_bDenySetBindHost;
-    bool m_bAutoClearChanBuffer;
-    bool m_bAutoClearQueryBuffer;
-    bool m_bBeingDeleted;
-    bool m_bAppendTimestamp;
-    bool m_bPrependTimestamp;
+    bool m_multiClients;
+    bool m_denyLoadMod;
+    bool m_admin;
+    bool m_denySetBindHost;
+    bool m_autoClearChanBuffer;
+    bool m_autoClearQueryBuffer;
+    bool m_beingDeleted;
+    bool m_appendTimestamp;
+    bool m_prependTimestamp;
 
-    NoUserTimer* m_pUserTimer;
+    NoUserTimer* m_userTimer;
 
-    std::vector<NoNetwork*> m_vIRCNetworks;
-    std::vector<NoClient*> m_vClients;
-    std::set<NoString> m_ssAllowedHosts;
-    uint m_uBufferCount;
-    ulonglong m_uBytesRead;
-    ulonglong m_uBytesWritten;
-    uint m_uMaxJoinTries;
-    uint m_uMaxNetworks;
-    uint m_uMaxQueryBuffers;
-    uint m_uMaxJoins;
-    NoString m_sSkinName;
+    std::vector<NoNetwork*> m_networks;
+    std::vector<NoClient*> m_clients;
+    std::set<NoString> m_allowedHosts;
+    uint m_bufferCount;
+    ulonglong m_bytesRead;
+    ulonglong m_bytesWritten;
+    uint m_maxJoinTries;
+    uint m_maxNetworks;
+    uint m_maxQueryBuffers;
+    uint m_maxJoins;
+    NoString m_skinName;
 
-    NoModules* m_pModules;
+    NoModules* m_modules;
 };
 
 #endif // NOUSER_H

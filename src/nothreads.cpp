@@ -42,10 +42,10 @@ NoThreadPool& NoThreadPool::Get()
 }
 
 NoThreadPool::NoThreadPool()
-    : m_mutex(), m_cond(), m_cancellationCond(), m_exit_cond(), m_done(false), m_num_threads(0), m_num_idle(0),
-      m_iJobPipe{ 0, 0 }, m_jobs()
+    : m_mutex(), m_cond(), m_cancellationCond(), m_exitCond(), m_done(false), m_numThreads(0), m_numIdle(0),
+      m_jobPipe{ 0, 0 }, m_jobs()
 {
-    if (pipe(m_iJobPipe)) {
+    if (pipe(m_jobPipe)) {
         NO_DEBUG("Ouch, can't open pipe for thread pool: " << strerror(errno));
         exit(1);
     }
@@ -55,8 +55,8 @@ void NoThreadPool::jobDone(NoJob* job)
 {
     // This must be called with the mutex locked!
 
-    enum NoJob::JobState oldState = job->m_eState;
-    job->m_eState = NoJob::Done;
+    enum NoJob::JobState oldState = job->m_state;
+    job->m_state = NoJob::Done;
 
     if (oldState == NoJob::Cancelled) {
         // Signal the main thread that cancellation is done
@@ -67,7 +67,7 @@ void NoThreadPool::jobDone(NoJob* job)
     // This write() must succeed because POSIX guarantees that writes of
     // less than PIPE_BUF are atomic (and PIPE_BUF is at least 512).
     // (Yes, this really wants to write a pointer(!) to the pipe.
-    size_t w = write(m_iJobPipe[1], &job, sizeof(job));
+    size_t w = write(m_jobPipe[1], &job, sizeof(job));
     if (w != sizeof(job)) {
         NO_DEBUG("Something bad happened during write() to a pipe for thread pool, wrote " << w << " bytes: " << strerror(errno));
         exit(1);
@@ -80,7 +80,7 @@ NoJob* NoThreadPool::getJobFromPipe() const
 {
     NoJob* a = nullptr;
     ssize_t need = sizeof(a);
-    ssize_t r = read(m_iJobPipe[0], &a, need);
+    ssize_t r = read(m_jobPipe[0], &a, need);
     if (r != need) {
         NO_DEBUG("Something bad happened during read() from a pipe for thread pool: " << strerror(errno));
         exit(1);
@@ -99,15 +99,15 @@ NoThreadPool::~NoThreadPool()
     NoMutexLocker guard(m_mutex);
     m_done = true;
 
-    while (m_num_threads > 0) {
+    while (m_numThreads > 0) {
         m_cond.broadcast();
-        m_exit_cond.wait(m_mutex);
+        m_exitCond.wait(m_mutex);
     }
 }
 
 bool NoThreadPool::threadNeeded() const
 {
-    if (m_num_idle > MAX_IDLE_THREADS) return false;
+    if (m_numIdle > MAX_IDLE_THREADS) return false;
     return !m_done;
 }
 
@@ -115,7 +115,7 @@ void NoThreadPool::threadFunc()
 {
     NoMutexLocker guard(m_mutex);
     // m_num_threads was already increased
-    m_num_idle++;
+    m_numIdle++;
 
     while (true) {
         while (m_jobs.empty()) {
@@ -129,21 +129,21 @@ void NoThreadPool::threadFunc()
         m_jobs.pop_front();
 
         // Now do the actual job
-        m_num_idle--;
-        job->m_eState = NoJob::Running;
+        m_numIdle--;
+        job->m_state = NoJob::Running;
         guard.unlock();
 
         job->runThread();
 
         guard.lock();
         jobDone(job);
-        m_num_idle++;
+        m_numIdle++;
     }
-    assert(m_num_threads > 0 && m_num_idle > 0);
-    m_num_threads--;
-    m_num_idle--;
+    assert(m_numThreads > 0 && m_numIdle > 0);
+    m_numThreads--;
+    m_numIdle--;
 
-    if (m_num_threads == 0 && m_done) m_exit_cond.signal();
+    if (m_numThreads == 0 && m_done) m_exitCond.signal();
 }
 
 void NoThreadPool::addJob(NoJob* job)
@@ -152,18 +152,18 @@ void NoThreadPool::addJob(NoJob* job)
     m_jobs.push_back(job);
 
     // Do we already have a thread which can handle this job?
-    if (m_num_idle > 0) {
+    if (m_numIdle > 0) {
         m_cond.signal();
         return;
     }
 
-    if (m_num_threads >= MAX_TOTAL_THREADS)
+    if (m_numThreads >= MAX_TOTAL_THREADS)
         // We can't start a new thread. The job will be handled once
         // some thread finishes its current job.
         return;
 
     // Start a new thread for our pool
-    m_num_threads++;
+    m_numThreads++;
     NoThread::startThread(threadPoolFunc, this);
 }
 
@@ -199,9 +199,9 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
 
     // Start cancelling all jobs
     for (it = jobs.begin(); it != jobs.end(); ++it) {
-        switch ((*it)->m_eState) {
+        switch ((*it)->m_state) {
         case NoJob::Ready: {
-            (*it)->m_eState = NoJob::Cancelled;
+            (*it)->m_state = NoJob::Cancelled;
 
             // Job wasn't started yet, must be in the queue
             std::list<NoJob*>::iterator it2 = std::find(m_jobs.begin(), m_jobs.end(), *it);
@@ -212,12 +212,12 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
         }
 
         case NoJob::Running:
-            (*it)->m_eState = NoJob::Cancelled;
+            (*it)->m_state = NoJob::Cancelled;
             wait.insert(*it);
             continue;
 
         case NoJob::Done:
-            (*it)->m_eState = NoJob::Cancelled;
+            (*it)->m_state = NoJob::Cancelled;
             finished.insert(*it);
             continue;
 
@@ -234,10 +234,10 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
     while (!wait.empty()) {
         it = wait.begin();
         while (it != wait.end()) {
-            if ((*it)->m_eState != NoJob::Cancelled) {
-                assert((*it)->m_eState == NoJob::Done);
+            if ((*it)->m_state != NoJob::Cancelled) {
+                assert((*it)->m_state == NoJob::Done);
                 // Re-set state for the destructor
-                (*it)->m_eState = NoJob::Cancelled;
+                (*it)->m_state = NoJob::Cancelled;
                 ;
                 deleteLater.insert(*it);
                 wait.erase(it++);
@@ -258,7 +258,7 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
     while (!finished.empty()) {
         NoJob* job = getJobFromPipe();
         if (finished.erase(job) > 0) {
-            assert(job->m_eState == NoJob::Cancelled);
+            assert(job->m_state == NoJob::Cancelled);
             delete job;
         } else
             finishJob(job);
@@ -274,7 +274,7 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
 bool NoJob::wasCancelled() const
 {
     NoMutexLocker guard(NoThreadPool::Get().m_mutex);
-    return m_eState == Cancelled;
+    return m_state == Cancelled;
 }
 
 #endif // HAVE_PTHREAD

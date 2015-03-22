@@ -24,27 +24,27 @@ class NoAuthenticator;
 class NoClientPrivate
 {
 public:
-    bool bGotPass = false;
-    bool bGotNick = false;
-    bool bGotUser = false;
-    bool bInCap = false;
-    bool bNamesx = false;
-    bool bUHNames = false;
-    bool bAway = false;
-    bool bServerTime = false;
-    bool bBatch = false;
-    bool bSelfMessage = false;
-    bool bPlaybackActive = false;
-    NoSocket* pSocket = nullptr;
-    NoUser* pUser = nullptr;
-    NoNetwork* pNetwork = nullptr;
-    NoString sNick = "";
-    NoString sPass = "";
-    NoString sUser = "";
+    bool receivedPass = false;
+    bool receivedNick = false;
+    bool receivedUser = false;
+    bool inCapLs = false;
+    bool inPlayback = false;
+    bool away = false;
+    bool hasNamesX = false;
+    bool hasUhNames = false;
+    bool hasServerTime = false;
+    bool hasBatch = false;
+    bool hasSelfMessage = false;
+    NoUser* user = nullptr;
+    NoSocket* socket = nullptr;
+    NoNetwork* network = nullptr;
+    NoString nickname = "";
+    NoString password = "";
+    NoString username = "";
     NoString sNetwork = "";
-    NoString sIdentifier = "";
-    std::shared_ptr<NoAuthenticator> spAuth;
-    NoStringSet ssAcceptedCaps;
+    NoString identifier = "";
+    std::shared_ptr<NoAuthenticator> authenticator;
+    NoStringSet acceptedCaps;
 };
 
 #endif // NOCLIENT_P_H

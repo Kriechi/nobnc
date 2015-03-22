@@ -99,13 +99,13 @@ public:
     const NoString& GetFileName() const;
 
 private:
-    NoTemplate* m_pParent;
-    NoString m_sFileName;
-    std::list<std::pair<NoString, bool>> m_lsbPaths;
-    std::map<NoString, std::vector<NoTemplate*>> m_mvLoops;
-    std::vector<NoTemplateLoopContext*> m_vLoopContexts;
-    std::shared_ptr<NoTemplateOptions> m_spOptions;
-    std::vector<std::shared_ptr<NoTemplateTagHandler>> m_vspTagHandlers;
+    NoTemplate* m_parent;
+    NoString m_fileName;
+    std::list<std::pair<NoString, bool>> m_paths;
+    std::map<NoString, std::vector<NoTemplate*>> m_loops;
+    std::vector<NoTemplateLoopContext*> m_loopContexts;
+    std::shared_ptr<NoTemplateOptions> m_options;
+    std::vector<std::shared_ptr<NoTemplateTagHandler>> m_tagHandlers;
 };
 
 #endif // NOTEMPLATE_H

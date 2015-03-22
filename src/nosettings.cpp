@@ -29,36 +29,36 @@ struct ConfigStackEntry
     ConfigStackEntry(const NoString& Tag, const NoString Name) : sTag(Tag), sName(Name), Config() {}
 };
 
-NoSettingsEntry::NoSettingsEntry() : m_pSubConfig(nullptr) {}
+NoSettingsEntry::NoSettingsEntry() : m_subConfig(nullptr) {}
 
-NoSettingsEntry::NoSettingsEntry(const NoSettings& Config) : m_pSubConfig(new NoSettings(Config)) {}
+NoSettingsEntry::NoSettingsEntry(const NoSettings& Config) : m_subConfig(new NoSettings(Config)) {}
 
-NoSettingsEntry::NoSettingsEntry(const NoSettingsEntry& other) : m_pSubConfig(nullptr)
+NoSettingsEntry::NoSettingsEntry(const NoSettingsEntry& other) : m_subConfig(nullptr)
 {
-    if (other.m_pSubConfig) m_pSubConfig = new NoSettings(*other.m_pSubConfig);
+    if (other.m_subConfig) m_subConfig = new NoSettings(*other.m_subConfig);
 }
 
-NoSettingsEntry::~NoSettingsEntry() { delete m_pSubConfig; }
+NoSettingsEntry::~NoSettingsEntry() { delete m_subConfig; }
 
 NoSettingsEntry& NoSettingsEntry::operator=(const NoSettingsEntry& other)
 {
-    delete m_pSubConfig;
-    if (other.m_pSubConfig)
-        m_pSubConfig = new NoSettings(*other.m_pSubConfig);
+    delete m_subConfig;
+    if (other.m_subConfig)
+        m_subConfig = new NoSettings(*other.m_subConfig);
     else
-        m_pSubConfig = nullptr;
+        m_subConfig = nullptr;
     return *this;
 }
 
-NoSettings::NoSettings() : m_ConfigEntries(), m_SubConfigs() {}
+NoSettings::NoSettings() : m_entries(), m_subConfigs() {}
 
-NoSettings::EntryMapIterator NoSettings::BeginEntries() const { return m_ConfigEntries.begin(); }
+NoSettings::EntryMapIterator NoSettings::BeginEntries() const { return m_entries.begin(); }
 
-NoSettings::EntryMapIterator NoSettings::EndEntries() const { return m_ConfigEntries.end(); }
+NoSettings::EntryMapIterator NoSettings::EndEntries() const { return m_entries.end(); }
 
-NoSettings::SubConfigMapIterator NoSettings::BeginSubConfigs() const { return m_SubConfigs.begin(); }
+NoSettings::SubConfigMapIterator NoSettings::BeginSubConfigs() const { return m_subConfigs.begin(); }
 
-NoSettings::SubConfigMapIterator NoSettings::EndSubConfigs() const { return m_SubConfigs.end(); }
+NoSettings::SubConfigMapIterator NoSettings::EndSubConfigs() const { return m_subConfigs.end(); }
 
 void NoSettings::AddKeyValuePair(const NoString& sName, const NoString& sValue)
 {
@@ -66,12 +66,12 @@ void NoSettings::AddKeyValuePair(const NoString& sName, const NoString& sValue)
         return;
     }
 
-    m_ConfigEntries[sName].push_back(sValue);
+    m_entries[sName].push_back(sValue);
 }
 
 bool NoSettings::AddSubConfig(const NoString& sTag, const NoString& sName, NoSettings Config)
 {
-    SubConfig& conf = m_SubConfigs[sTag];
+    SubConfig& conf = m_subConfigs[sTag];
     SubConfig::const_iterator it = conf.find(sName);
 
     if (it != conf.end()) {
@@ -84,13 +84,13 @@ bool NoSettings::AddSubConfig(const NoString& sTag, const NoString& sName, NoSet
 
 bool NoSettings::FindStringVector(const NoString& sName, NoStringVector& vsList, bool bErase)
 {
-    EntryMap::iterator it = m_ConfigEntries.find(sName);
+    EntryMap::iterator it = m_entries.find(sName);
     vsList.clear();
-    if (it == m_ConfigEntries.end()) return false;
+    if (it == m_entries.end()) return false;
     vsList = it->second;
 
     if (bErase) {
-        m_ConfigEntries.erase(it);
+        m_entries.erase(it);
     }
 
     return true;
@@ -98,12 +98,12 @@ bool NoSettings::FindStringVector(const NoString& sName, NoStringVector& vsList,
 
 bool NoSettings::FindStringEntry(const NoString& sName, NoString& sRes, const NoString& sDefault)
 {
-    EntryMap::iterator it = m_ConfigEntries.find(sName);
+    EntryMap::iterator it = m_entries.find(sName);
     sRes = sDefault;
-    if (it == m_ConfigEntries.end() || it->second.empty()) return false;
+    if (it == m_entries.end() || it->second.empty()) return false;
     sRes = it->second.front();
     it->second.erase(it->second.begin());
-    if (it->second.empty()) m_ConfigEntries.erase(it);
+    if (it->second.empty()) m_entries.erase(it);
     return true;
 }
 
@@ -153,21 +153,21 @@ bool NoSettings::FindDoubleEntry(const NoString& sName, double& fRes, double fDe
 
 bool NoSettings::FindSubConfig(const NoString& sName, NoSettings::SubConfig& Config, bool bErase)
 {
-    SubConfigMap::iterator it = m_SubConfigs.find(sName);
-    if (it == m_SubConfigs.end()) {
+    SubConfigMap::iterator it = m_subConfigs.find(sName);
+    if (it == m_subConfigs.end()) {
         Config.clear();
         return false;
     }
     Config = it->second;
 
     if (bErase) {
-        m_SubConfigs.erase(it);
+        m_subConfigs.erase(it);
     }
 
     return true;
 }
 
-bool NoSettings::empty() const { return m_ConfigEntries.empty() && m_SubConfigs.empty(); }
+bool NoSettings::empty() const { return m_entries.empty() && m_subConfigs.empty(); }
 
 bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 {
@@ -190,8 +190,8 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
         std::stringstream stream;                              \
         stream << "Error on line " << uLineNum << ": " << arg; \
         sErrorMsg = stream.str();                              \
-        m_SubConfigs.clear();                                  \
-        m_ConfigEntries.clear();                               \
+        m_subConfigs.clear();                                  \
+        m_entries.clear();                               \
         return false;                                          \
     } while (0)
 
@@ -241,7 +241,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
                 else
                     pActiveConfig = &ConfigStack.top().Config;
 
-                SubConfig& conf = pActiveConfig->m_SubConfigs[sTag.toLower()];
+                SubConfig& conf = pActiveConfig->m_subConfigs[sTag.toLower()];
                 SubConfig::const_iterator it = conf.find(sName);
 
                 if (it != conf.end()) ERROR("Duplicate entry for tag \"" << sTag << "\" name \"" << sName << "\".");
@@ -271,7 +271,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
         if (sName.empty() || sValue.empty()) ERROR("Malformed line");
 
         NoString sNameLower = sName.toLower();
-        pActiveConfig->m_ConfigEntries[sNameLower].push_back(sValue);
+        pActiveConfig->m_entries[sNameLower].push_back(sValue);
     }
 
     if (bCommented) ERROR("Comment not closed at end of file.");
@@ -288,18 +288,18 @@ void NoSettings::Write(NoFile& File, uint iIndentation)
 {
     NoString sIndentation = NoString(iIndentation, '\t');
 
-    for (const auto& it : m_ConfigEntries) {
+    for (const auto& it : m_entries) {
         for (const NoString& sValue : it.second) {
             File.Write(sIndentation + it.first + " = " + sValue + "\n");
         }
     }
 
-    for (const auto& it : m_SubConfigs) {
+    for (const auto& it : m_subConfigs) {
         for (const auto& it2 : it.second) {
             File.Write("\n");
 
             File.Write(sIndentation + "<" + it.first + " " + it2.first + ">\n");
-            it2.second.m_pSubConfig->Write(File, iIndentation + 1);
+            it2.second.m_subConfig->Write(File, iIndentation + 1);
             File.Write(sIndentation + "</" + it.first + ">\n");
         }
     }

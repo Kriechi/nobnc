@@ -28,10 +28,10 @@
 #include "Csocket/Csocket.h"
 
 #define IRCSOCKMODULECALL(macFUNC, macEXITER) \
-    NETWORKMODULECALL(macFUNC, m_pNetwork->GetUser(), m_pNetwork, nullptr, macEXITER)
+    NETWORKMODULECALL(macFUNC, m_network->GetUser(), m_network, nullptr, macEXITER)
 // These are used in OnGeneralCTCP()
-const time_t NoIrcSocket::m_uCTCPFloodTime = 5;
-const uint NoIrcSocket::m_uCTCPFloodCount = 5;
+const time_t NoIrcSocket::m_ctcpFloodTime = 5;
+const uint NoIrcSocket::m_ctcpFloodCount = 5;
 
 // It will be bad if user sets it to 0.00000000000001
 // If you want no flood protection, set network's flood rate to -1
@@ -43,13 +43,13 @@ class NoIrcFloodTimer : public CCron
     NoIrcSocket* m_pSock;
 
 public:
-    NoIrcFloodTimer(NoIrcSocket* pSock) : m_pSock(pSock) { StartMaxCycles(m_pSock->m_fFloodRate, 0); }
+    NoIrcFloodTimer(NoIrcSocket* pSock) : m_pSock(pSock) { StartMaxCycles(m_pSock->m_floodRate, 0); }
     NoIrcFloodTimer(const NoIrcFloodTimer&) = delete;
     NoIrcFloodTimer& operator=(const NoIrcFloodTimer&) = delete;
     void RunJob() override
     {
-        if (m_pSock->m_iSendsAllowed < m_pSock->m_uFloodBurst) {
-            m_pSock->m_iSendsAllowed++;
+        if (m_pSock->m_sendsAllowed < m_pSock->m_floodBurst) {
+            m_pSock->m_sendsAllowed++;
         }
         m_pSock->TrySend();
     }
@@ -58,71 +58,71 @@ public:
 bool NoIrcSocket::IsFloodProtected(double fRate) { return fRate > FLOOD_MINIMAL_RATE; }
 
 NoIrcSocket::NoIrcSocket(NoNetwork* pNetwork)
-    : m_bAuthed(false), m_bNamesx(false), m_bUHNames(false), m_sPerms("*!@%+"), m_sPermModes("qaohv"),
-      m_scUserModes(), m_mueChanModes(), m_pNetwork(pNetwork), m_Nick(), m_sPass(""), m_msChans(), m_uMaxNickLen(9),
-      m_uCapPaused(0), m_ssAcceptedCaps(), m_ssPendingCaps(), m_lastCTCP(0), m_uNumCTCP(0), m_mISupport(),
-      m_vsSendQueue(), m_iSendsAllowed(pNetwork->GetFloodBurst()), m_uFloodBurst(pNetwork->GetFloodBurst()),
-      m_fFloodRate(pNetwork->GetFloodRate()), m_bFloodProtection(IsFloodProtected(pNetwork->GetFloodRate()))
+    : m_authed(false), m_hasNamesX(false), m_hasUhNames(false), m_perms("*!@%+"), m_permModes("qaohv"),
+      m_userModes(), m_chanModes(), m_network(pNetwork), m_nick(), m_password(""), m_chans(), m_maxNickLen(9),
+      m_capPaused(0), m_acceptedCaps(), m_pendingCaps(), m_lastCtcp(0), m_numCtcp(0), m_iSupport(),
+      m_sendQueue(), m_sendsAllowed(pNetwork->GetFloodBurst()), m_floodBurst(pNetwork->GetFloodBurst()),
+      m_floodRate(pNetwork->GetFloodRate()), m_floodProtection(IsFloodProtected(pNetwork->GetFloodRate()))
 {
     NoSocketPrivate::get(this)->allowControlCodes = true;
     EnableReadLine();
-    m_Nick.setIdent(m_pNetwork->GetIdent());
-    m_Nick.setHost(m_pNetwork->GetBindHost());
-    SetEncoding(m_pNetwork->GetEncoding());
+    m_nick.setIdent(m_network->GetIdent());
+    m_nick.setHost(m_network->GetBindHost());
+    SetEncoding(m_network->GetEncoding());
 
-    m_mueChanModes['b'] = ListArg;
-    m_mueChanModes['e'] = ListArg;
-    m_mueChanModes['I'] = ListArg;
-    m_mueChanModes['k'] = HasArg;
-    m_mueChanModes['l'] = ArgWhenSet;
-    m_mueChanModes['p'] = NoArg;
-    m_mueChanModes['s'] = NoArg;
-    m_mueChanModes['t'] = NoArg;
-    m_mueChanModes['i'] = NoArg;
-    m_mueChanModes['n'] = NoArg;
+    m_chanModes['b'] = ListArg;
+    m_chanModes['e'] = ListArg;
+    m_chanModes['I'] = ListArg;
+    m_chanModes['k'] = HasArg;
+    m_chanModes['l'] = ArgWhenSet;
+    m_chanModes['p'] = NoArg;
+    m_chanModes['s'] = NoArg;
+    m_chanModes['t'] = NoArg;
+    m_chanModes['i'] = NoArg;
+    m_chanModes['n'] = NoArg;
 
     pNetwork->SetIRCSocket(this);
 
     // RFC says a line can have 512 chars max, but we don't care ;)
     SetMaxBufferThreshold(1024);
-    if (m_bFloodProtection) {
+    if (m_floodProtection) {
         NoSocketPrivate::get(this)->AddCron(new NoIrcFloodTimer(this));
     }
 }
 
 NoIrcSocket::~NoIrcSocket()
 {
-    if (!m_bAuthed) {
+    if (!m_authed) {
         IRCSOCKMODULECALL(OnIRCConnectionError(this), NOTHING);
     }
 
-    const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+    const std::vector<NoChannel*>& vChans = m_network->GetChans();
     for (NoChannel* pChan : vChans) {
         pChan->reset();
     }
 
-    m_pNetwork->IRCDisconnected();
+    m_network->IRCDisconnected();
 
-    for (const auto& it : m_msChans) {
+    for (const auto& it : m_chans) {
         delete it.second;
     }
 
     Quit();
-    m_msChans.clear();
-    m_pNetwork->GetUser()->AddBytesRead(GetBytesRead());
-    m_pNetwork->GetUser()->AddBytesWritten(GetBytesWritten());
+    m_chans.clear();
+    m_network->GetUser()->AddBytesRead(GetBytesRead());
+    m_network->GetUser()->AddBytesWritten(GetBytesWritten());
 }
 
 void NoIrcSocket::Quit(const NoString& sQuitMsg)
 {
-    if (!m_bAuthed) {
+    if (!m_authed) {
         Close(CLT_NOW);
         return;
     }
     if (!sQuitMsg.empty()) {
         PutIRC("QUIT :" + sQuitMsg);
     } else {
-        PutIRC("QUIT :" + m_pNetwork->ExpandString(m_pNetwork->GetQuitMsg()));
+        PutIRC("QUIT :" + m_network->ExpandString(m_network->GetQuitMsg()));
     }
     Close(CLT_AFTERWRITE);
 }
@@ -133,7 +133,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
 
     sLine.trimRight("\n\r");
 
-    NO_DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") IRC -> ZNC [" << sLine << "]");
+    NO_DEBUG("(" << m_network->GetUser()->GetUserName() << "/" << m_network->GetName() << ") IRC -> ZNC [" << sLine << "]");
 
     bool bReturn = false;
     IRCSOCKMODULECALL(OnRaw(sLine), &bReturn);
@@ -151,7 +151,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
         NoString sError(sLine.substr(6));
         sError.trimPrefix();
-        m_pNetwork->PutStatus("Error from Server [" + sError + "]");
+        m_network->PutStatus("Error from Server [" + sError + "]");
         return;
     }
 
@@ -166,22 +166,22 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
 
         switch (uRaw) {
         case 1: { // :irc.server.com 001 nick :Welcome to the Internet Relay Network nick
-            if (m_bAuthed && sServer == "irc.znc.in") {
+            if (m_authed && sServer == "irc.znc.in") {
                 // m_bAuthed == true => we already received another 001 => we might be in a traffic loop
-                m_pNetwork->PutStatus("ZNC seems to be connected to itself, disconnecting...");
+                m_network->PutStatus("ZNC seems to be connected to itself, disconnecting...");
                 Quit();
                 return;
             }
 
-            m_pNetwork->SetIRCServer(sServer);
+            m_network->SetIRCServer(sServer);
             SetTimeout(NoNetwork::NO_TRAFFIC_TIMEOUT,
                        TMO_READ); // Now that we are connected, let nature take its course
             PutIRC("WHO " + sNick);
 
-            m_bAuthed = true;
-            m_pNetwork->PutStatus("Connected!");
+            m_authed = true;
+            m_network->PutStatus("Connected!");
 
-            const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
+            const std::vector<NoClient*>& vClients = m_network->GetClients();
 
             for (NoClient* pClient : vClients) {
                 NoString sClientNick = pClient->GetNick(false);
@@ -189,7 +189,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 if (!sClientNick.equals(sNick)) {
                     // If they connected with a nick that doesn't match the one we got on irc, then we need to update
                     // them
-                    pClient->PutClient(":" + sClientNick + "!" + m_Nick.ident() + "@" + m_Nick.host() +
+                    pClient->PutClient(":" + sClientNick + "!" + m_nick.ident() + "@" + m_nick.host() +
                                        " NICK :" + sNick);
                 }
             }
@@ -198,26 +198,26 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
 
             IRCSOCKMODULECALL(OnIRCConnected(), NOTHING);
 
-            m_pNetwork->ClearRawBuffer();
-            m_pNetwork->AddRawBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
+            m_network->ClearRawBuffer();
+            m_network->AddRawBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
 
-            m_pNetwork->IRCConnected();
+            m_network->IRCConnected();
 
             break;
         }
         case 5:
             ParseISupport(sRest);
-            m_pNetwork->UpdateExactRawBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
+            m_network->UpdateExactRawBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
             break;
         case 10: { // :irc.server.com 010 nick <hostname> <port> :<info>
             NoString sHost = No::token(sRest, 0);
             NoString sPort = No::token(sRest, 1);
             NoString sInfo = No::tokens(sRest, 2).trimPrefix_n();
-            NoServerInfo server = NoServerInfo(*m_pNetwork->GetCurrentServer()); // TODO: store NoServerInfo by value
+            NoServerInfo server = NoServerInfo(*m_network->GetCurrentServer()); // TODO: store NoServerInfo by value
             server.setPassword("");
-            m_pNetwork->PutStatus("Server [" + server.toString() +
+            m_network->PutStatus("Server [" + server.toString() +
                                   "] redirects us to [" + sHost + ":" + sPort + "] with reason [" + sInfo + "]");
-            m_pNetwork->PutStatus("Perhaps you want to add it as a new server.");
+            m_network->PutStatus("Perhaps you want to add it as a new server.");
             // Don't send server redirects to the client
             return;
         }
@@ -232,17 +232,17 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         case 265: // local users
         case 266: // global users
             sTmp = ":" + _NAMEDFMT(sServer) + " " + sCmd;
-            m_pNetwork->UpdateRawBuffer(sTmp, sTmp + " {target} " + _NAMEDFMT(sRest));
+            m_network->UpdateRawBuffer(sTmp, sTmp + " {target} " + _NAMEDFMT(sRest));
             break;
         case 305:
-            m_pNetwork->SetIRCAway(false);
+            m_network->SetIRCAway(false);
             break;
         case 306:
-            m_pNetwork->SetIRCAway(true);
+            m_network->SetIRCAway(true);
             break;
         case 324: { // MODE
             sRest.trim();
-            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 0));
+            NoChannel* pChan = m_network->FindChan(No::token(sRest, 0));
 
             if (pChan) {
                 pChan->setModes(No::tokens(sRest, 1));
@@ -262,7 +262,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         } break;
         case 329: {
             sRest.trim();
-            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 0));
+            NoChannel* pChan = m_network->FindChan(No::token(sRest, 0));
 
             if (pChan) {
                 ulong ulDate = No::token(sLine, 4).toULong();
@@ -282,7 +282,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         } break;
         case 331: {
             // :irc.server.com 331 yournick #chan :No topic is set.
-            NoChannel* pChan = m_pNetwork->FindChan(No::token(sLine, 3));
+            NoChannel* pChan = m_network->FindChan(No::token(sLine, 3));
 
             if (pChan) {
                 pChan->setTopic("");
@@ -295,7 +295,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         }
         case 332: {
             // :irc.server.com 332 yournick #chan :This is a topic
-            NoChannel* pChan = m_pNetwork->FindChan(No::token(sLine, 3));
+            NoChannel* pChan = m_network->FindChan(No::token(sLine, 3));
 
             if (pChan) {
                 NoString sTopic = No::tokens(sLine, 4);
@@ -310,7 +310,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         }
         case 333: {
             // :irc.server.com 333 yournick #chan setternick 1112320796
-            NoChannel* pChan = m_pNetwork->FindChan(No::token(sLine, 3));
+            NoChannel* pChan = m_network->FindChan(No::token(sLine, 3));
 
             if (pChan) {
                 sNick = No::token(sLine, 4);
@@ -337,26 +337,26 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             sServer.leftChomp(1);
 
             if (sNick.equals(GetNick())) {
-                m_Nick.setIdent(sIdent);
-                m_Nick.setHost(sHost);
+                m_nick.setIdent(sIdent);
+                m_nick.setHost(sHost);
             }
 
-            m_pNetwork->SetIRCNick(m_Nick);
-            m_pNetwork->SetIRCServer(sServer);
+            m_network->SetIRCNick(m_nick);
+            m_network->SetIRCServer(sServer);
 
-            const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+            const std::vector<NoChannel*>& vChans = m_network->GetChans();
 
             for (NoChannel* pChan : vChans) {
                 pChan->onWho(sNick, sIdent, sHost);
             }
 
-            if (m_bNamesx && (sNick.size() > 1) && IsPermChar(sNick[1])) {
+            if (m_hasNamesX && (sNick.size() > 1) && IsPermChar(sNick[1])) {
                 // sLine uses multi-prefix
 
-                const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
+                const std::vector<NoClient*>& vClients = m_network->GetClients();
                 for (NoClient* pClient : vClients) {
                     if (pClient->HasNamesx()) {
-                        m_pNetwork->PutUser(sLine, pClient);
+                        m_network->PutUser(sLine, pClient);
                     } else {
                         // The client doesn't support multi-prefix so we need to remove
                         // the other prefixes.
@@ -368,14 +368,14 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                         }
                         NoString sNewLine = sServer + " 352 " + No::token(sLine, 2) + " " + sChan + " " + sIdent + " " +
                                            sHost + " " + No::token(sLine, 6) + " " + sNewNick + " " + No::tokens(sLine, 8);
-                        m_pNetwork->PutUser(sNewLine, pClient);
+                        m_network->PutUser(sNewLine, pClient);
                     }
                 }
 
                 return;
             }
 
-            NoChannel* pChan = m_pNetwork->FindChan(sChan);
+            NoChannel* pChan = m_network->FindChan(sChan);
             if (pChan && pChan->isDetached()) {
                 return;
             }
@@ -385,7 +385,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         case 353: { // NAMES
             sRest.trim();
             // Todo: allow for non @+= server msgs
-            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 1));
+            NoChannel* pChan = m_network->FindChan(No::token(sRest, 1));
             // If we don't know that channel, some client might have
             // requested a /names for it and we really should forward this.
             if (pChan) {
@@ -403,7 +403,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         }
         case 366: { // end of names list
             // :irc.server.com 366 nick #chan :End of /NAMES list.
-            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 0));
+            NoChannel* pChan = m_network->FindChan(No::token(sRest, 0));
 
             if (pChan) {
                 if (pChan->isOn()) {
@@ -412,7 +412,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                         NoString sModes = pChan->getDefaultModes();
 
                         if (sModes.empty()) {
-                            sModes = m_pNetwork->GetUser()->GetDefaultChanModes();
+                            sModes = m_network->GetUser()->GetDefaultChanModes();
                         }
 
                         if (!sModes.empty()) {
@@ -430,25 +430,25 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         }
         case 375: // begin motd
         case 422: // MOTD File is missing
-            if (m_pNetwork->GetIRCServer().equals(sServer)) {
-                m_pNetwork->ClearMotdBuffer();
+            if (m_network->GetIRCServer().equals(sServer)) {
+                m_network->ClearMotdBuffer();
             }
         case 372: // motd
         case 376: // end motd
-            if (m_pNetwork->GetIRCServer().equals(sServer)) {
-                m_pNetwork->AddMotdBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
+            if (m_network->GetIRCServer().equals(sServer)) {
+                m_network->AddMotdBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
             }
             break;
         case 437:
             // :irc.server.net 437 * badnick :Nick/channel is temporarily unavailable
             // :irc.server.net 437 mynick badnick :Nick/channel is temporarily unavailable
             // :irc.server.net 437 mynick badnick :Cannot change nickname while banned on channel
-            if (m_pNetwork->IsChan(No::token(sRest, 0)) || sNick != "*") break;
+            if (m_network->IsChan(No::token(sRest, 0)) || sNick != "*") break;
         case 432: // :irc.server.com 432 * nick :Erroneous Nickname: Illegal characters
         case 433: {
             NoString sBadNick = No::token(sRest, 0);
 
-            if (!m_bAuthed) {
+            if (!m_authed) {
                 SendAltNick(sBadNick);
                 return;
             }
@@ -464,14 +464,14 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             // :mccaffrey.freenode.net 470 mynick #electronics ##electronics :Forwarding to another channel
 
             // freenode style numeric
-            NoChannel* pChan = m_pNetwork->FindChan(No::token(sRest, 0));
+            NoChannel* pChan = m_network->FindChan(No::token(sRest, 0));
             if (!pChan) {
                 // unreal style numeric
-                pChan = m_pNetwork->FindChan(No::token(sRest, 1));
+                pChan = m_network->FindChan(No::token(sRest, 1));
             }
             if (pChan) {
                 pChan->disable();
-                m_pNetwork->PutStatus("Channel [" + pChan->getName() + "] is linked to "
+                m_network->PutStatus("Channel [" + pChan->getName() + "] is linked to "
                                                                        "another channel and was thus disabled.");
             }
             break;
@@ -482,7 +482,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
 
             if (!GetSSL()) {
                 StartTLS();
-                m_pNetwork->PutStatus("Switched to SSL (STARTTLS)");
+                m_network->PutStatus("Switched to SSL (STARTTLS)");
             }
 
             return;
@@ -497,7 +497,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             bool bIsVisible = false;
 
             std::vector<NoChannel*> vFoundChans;
-            const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+            const std::vector<NoChannel*>& vChans = m_network->GetChans();
 
             for (NoChannel* pChan : vChans) {
                 if (pChan->changeNick(Nick.nick(), sNewNick)) {
@@ -513,7 +513,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 // We are changing our own nick, the clients always must see this!
                 bIsVisible = false;
                 SetNick(sNewNick);
-                m_pNetwork->PutUser(sLine);
+                m_network->PutUser(sLine);
             }
 
             IRCSOCKMODULECALL(OnNick(Nick, sNewNick, vFoundChans), NOTHING);
@@ -528,7 +528,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             // :nick!ident@host.com QUIT :message
 
             if (Nick.equals(GetNick())) {
-                m_pNetwork->PutStatus("You quit [" + sMessage + "]");
+                m_network->PutStatus("You quit [" + sMessage + "]");
                 // We don't call module hooks and we don't
                 // forward this quit to clients (Some clients
                 // disconnect if they receive such a QUIT)
@@ -536,7 +536,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             }
 
             std::vector<NoChannel*> vFoundChans;
-            const std::vector<NoChannel*>& vChans = m_pNetwork->GetChans();
+            const std::vector<NoChannel*>& vChans = m_network->GetChans();
 
             for (NoChannel* pChan : vChans) {
                 if (pChan->remNick(Nick.nick())) {
@@ -558,15 +558,15 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             NoChannel* pChan;
 
             if (Nick.equals(GetNick())) {
-                m_pNetwork->AddChan(sChan, false);
-                pChan = m_pNetwork->FindChan(sChan);
+                m_network->AddChan(sChan, false);
+                pChan = m_network->FindChan(sChan);
                 if (pChan) {
                     pChan->enable();
                     pChan->setIsOn(true);
                     PutIRC("MODE " + sChan);
                 }
             } else {
-                pChan = m_pNetwork->FindChan(sChan);
+                pChan = m_network->FindChan(sChan);
             }
 
             if (pChan) {
@@ -581,7 +581,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             NoString sChan = No::token(sRest, 0).trimPrefix_n();
             NoString sMsg = No::tokens(sRest, 1).trimPrefix_n();
 
-            NoChannel* pChan = m_pNetwork->FindChan(sChan);
+            NoChannel* pChan = m_network->FindChan(sChan);
             bool bDetached = false;
             if (pChan) {
                 pChan->remNick(Nick.nick());
@@ -591,7 +591,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             }
 
             if (Nick.equals(GetNick())) {
-                m_pNetwork->DelChan(sChan);
+                m_network->DelChan(sChan);
             }
 
             /*
@@ -608,14 +608,14 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             NoString sModes = No::tokens(sRest, 1);
             if (sModes.left(1) == ":") sModes = sModes.substr(1);
 
-            NoChannel* pChan = m_pNetwork->FindChan(sTarget);
+            NoChannel* pChan = m_network->FindChan(sTarget);
             if (pChan) {
                 pChan->modeChange(sModes, &Nick);
 
                 if (pChan->isDetached()) {
                     return;
                 }
-            } else if (sTarget == m_Nick.nick()) {
+            } else if (sTarget == m_nick.nick()) {
                 NoString sModeArg = No::token(sModes, 0);
                 bool bAdd = true;
                 /* no module call defined (yet?)
@@ -631,9 +631,9 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                         bAdd = false;
                     } else {
                         if (bAdd) {
-                            m_scUserModes.insert(uMode);
+                            m_userModes.insert(uMode);
                         } else {
-                            m_scUserModes.erase(uMode);
+                            m_userModes.erase(uMode);
                         }
                     }
                 }
@@ -645,7 +645,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             NoString sMsg = No::tokens(sRest, 2);
             sMsg.leftChomp(1);
 
-            NoChannel* pChan = m_pNetwork->FindChan(sChan);
+            NoChannel* pChan = m_network->FindChan(sChan);
 
             if (pChan) {
                 IRCSOCKMODULECALL(OnKick(Nick, sKickedNick, *pChan, sMsg), NOTHING);
@@ -680,7 +680,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                     }
                 }
 
-                m_pNetwork->PutUser(":" + Nick.nickMask() + " NOTICE " + sTarget + " :\001" + sMsg + "\001");
+                m_network->PutUser(":" + Nick.nickMask() + " NOTICE " + sTarget + " :\001" + sMsg + "\001");
                 return;
             } else {
                 if (sTarget.equals(GetNick())) {
@@ -694,16 +694,16 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 }
             }
 
-            if (Nick.equals(m_pNetwork->GetIRCServer())) {
-                m_pNetwork->PutUser(":" + Nick.nick() + " NOTICE " + sTarget + " :" + sMsg);
+            if (Nick.equals(m_network->GetIRCServer())) {
+                m_network->PutUser(":" + Nick.nick() + " NOTICE " + sTarget + " :" + sMsg);
             } else {
-                m_pNetwork->PutUser(":" + Nick.nickMask() + " NOTICE " + sTarget + " :" + sMsg);
+                m_network->PutUser(":" + Nick.nickMask() + " NOTICE " + sTarget + " :" + sMsg);
             }
 
             return;
         } else if (sCmd.equals("TOPIC")) {
             // :nick!ident@host.com TOPIC #chan :This is a topic
-            NoChannel* pChan = m_pNetwork->FindChan(No::token(sLine, 2));
+            NoChannel* pChan = m_network->FindChan(No::token(sLine, 2));
 
             if (pChan) {
                 NoString sTopic = No::tokens(sLine, 3);
@@ -741,7 +741,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                     }
                 }
 
-                m_pNetwork->PutUser(":" + Nick.nickMask() + " PRIVMSG " + sTarget + " :\001" + sMsg + "\001");
+                m_network->PutUser(":" + Nick.nickMask() + " PRIVMSG " + sTarget + " :\001" + sMsg + "\001");
                 return;
             } else {
                 if (sTarget.equals(GetNick())) {
@@ -754,19 +754,19 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                     }
                 }
 
-                m_pNetwork->PutUser(":" + Nick.nickMask() + " PRIVMSG " + sTarget + " :" + sMsg);
+                m_network->PutUser(":" + Nick.nickMask() + " PRIVMSG " + sTarget + " :" + sMsg);
                 return;
             }
         } else if (sCmd.equals("WALLOPS")) {
             // :blub!dummy@rox-8DBEFE92 WALLOPS :this is a test
             NoString sMsg = No::tokens(sRest, 0).trimPrefix_n();
 
-            if (!m_pNetwork->IsUserOnline()) {
-                m_pNetwork->AddNoticeBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " WALLOPS :{text}", sMsg);
+            if (!m_network->IsUserOnline()) {
+                m_network->AddNoticeBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " WALLOPS :{text}", sMsg);
             }
         } else if (sCmd.equals("CAP")) {
             // CAPs are supported only before authorization.
-            if (!m_bAuthed) {
+            if (!m_authed) {
                 // No::token(sRest, 0) is most likely "*". No idea why, the
                 // CAP spec don't mention this, but all implementations
                 // I've seen add this extra asterisk
@@ -795,18 +795,18 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
 
                     for (const NoString& sCap : vsTokens) {
                         if (OnServerCapAvailable(sCap) || sCap == "multi-prefix" || sCap == "userhost-in-names") {
-                            m_ssPendingCaps.insert(sCap);
+                            m_pendingCaps.insert(sCap);
                         }
                     }
                 } else if (sSubCmd == "ACK") {
                     sArgs.trim();
                     IRCSOCKMODULECALL(OnServerCapResult(sArgs, true), NOTHING);
                     if ("multi-prefix" == sArgs) {
-                        m_bNamesx = true;
+                        m_hasNamesX = true;
                     } else if ("userhost-in-names" == sArgs) {
-                        m_bUHNames = true;
+                        m_hasUhNames = true;
                     }
-                    m_ssAcceptedCaps.insert(sArgs);
+                    m_acceptedCaps.insert(sArgs);
                 } else if (sSubCmd == "NAK") {
                     // This should work because there's no [known]
                     // capability with length of name more than 100 characters.
@@ -824,34 +824,34 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
         }
     }
 
-    m_pNetwork->PutUser(sLine);
+    m_network->PutUser(sLine);
 }
 
 void NoIrcSocket::SendNextCap()
 {
-    if (!m_uCapPaused) {
-        if (m_ssPendingCaps.empty()) {
+    if (!m_capPaused) {
+        if (m_pendingCaps.empty()) {
             // We already got all needed ACK/NAK replies.
             PutIRC("CAP END");
         } else {
-            NoString sCap = *m_ssPendingCaps.begin();
-            m_ssPendingCaps.erase(m_ssPendingCaps.begin());
+            NoString sCap = *m_pendingCaps.begin();
+            m_pendingCaps.erase(m_pendingCaps.begin());
             PutIRC("CAP REQ :" + sCap);
         }
     }
 }
 
-void NoIrcSocket::PauseCap() { ++m_uCapPaused; }
+void NoIrcSocket::PauseCap() { ++m_capPaused; }
 
 void NoIrcSocket::ResumeCap()
 {
-    --m_uCapPaused;
+    --m_capPaused;
     SendNextCap();
 }
 
-void NoIrcSocket::SetPass(const NoString& s) { m_sPass = s; }
+void NoIrcSocket::SetPass(const NoString& s) { m_password = s; }
 
-uint NoIrcSocket::GetMaxNickLen() const { return m_uMaxNickLen; }
+uint NoIrcSocket::GetMaxNickLen() const { return m_maxNickLen; }
 
 bool NoIrcSocket::OnServerCapAvailable(const NoString& sCap)
 {
@@ -879,8 +879,8 @@ bool NoIrcSocket::OnPrivCTCP(NoNick& Nick, NoString& sMessage)
         IRCSOCKMODULECALL(OnPrivAction(Nick, sMessage), &bResult);
         if (bResult) return true;
 
-        if (!m_pNetwork->IsUserOnline() || !m_pNetwork->GetUser()->AutoClearQueryBuffer()) {
-            NoQuery* pQuery = m_pNetwork->AddQuery(Nick.nick());
+        if (!m_network->IsUserOnline() || !m_network->GetUser()->AutoClearQueryBuffer()) {
+            NoQuery* pQuery = m_network->AddQuery(Nick.nick());
             if (pQuery) {
                 pQuery->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG {target} :\001ACTION {text}\001", sMessage);
             }
@@ -895,14 +895,14 @@ bool NoIrcSocket::OnPrivCTCP(NoNick& Nick, NoString& sMessage)
 
 bool NoIrcSocket::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
 {
-    const NoStringMap& mssCTCPReplies = m_pNetwork->GetUser()->GetCTCPReplies();
+    const NoStringMap& mssCTCPReplies = m_network->GetUser()->GetCTCPReplies();
     NoString sQuery = No::token(sMessage, 0).toUpper();
     NoStringMap::const_iterator it = mssCTCPReplies.find(sQuery);
     bool bHaveReply = false;
     NoString sReply;
 
     if (it != mssCTCPReplies.end()) {
-        sReply = m_pNetwork->ExpandString(it->second);
+        sReply = m_network->ExpandString(it->second);
         bHaveReply = true;
 
         if (sReply.empty()) {
@@ -910,7 +910,7 @@ bool NoIrcSocket::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
         }
     }
 
-    if (!bHaveReply && !m_pNetwork->IsUserAttached()) {
+    if (!bHaveReply && !m_network->IsUserAttached()) {
         if (sQuery == "VERSION") {
             sReply = NoApp::GetTag(false);
         } else if (sQuery == "PING") {
@@ -921,14 +921,14 @@ bool NoIrcSocket::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
     if (!sReply.empty()) {
         time_t now = time(nullptr);
         // If the last CTCP is older than m_uCTCPFloodTime, reset the counter
-        if (m_lastCTCP + m_uCTCPFloodTime < now) m_uNumCTCP = 0;
-        m_lastCTCP = now;
+        if (m_lastCtcp + m_ctcpFloodTime < now) m_numCtcp = 0;
+        m_lastCtcp = now;
         // If we are over the limit, don't reply to this CTCP
-        if (m_uNumCTCP >= m_uCTCPFloodCount) {
+        if (m_numCtcp >= m_ctcpFloodCount) {
             NO_DEBUG("CTCP flood detected - not replying to query");
             return true;
         }
-        m_uNumCTCP++;
+        m_numCtcp++;
 
         PutIRC("NOTICE " + Nick.nick() + " :\001" + sQuery + " " + sReply + "\001");
         return true;
@@ -943,9 +943,9 @@ bool NoIrcSocket::OnPrivNotice(NoNick& Nick, NoString& sMessage)
     IRCSOCKMODULECALL(OnPrivNotice(Nick, sMessage), &bResult);
     if (bResult) return true;
 
-    if (!m_pNetwork->IsUserOnline()) {
+    if (!m_network->IsUserOnline()) {
         // If the user is detached, add to the buffer
-        m_pNetwork->AddNoticeBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " NOTICE {target} :{text}", sMessage);
+        m_network->AddNoticeBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " NOTICE {target} :{text}", sMessage);
     }
 
     return false;
@@ -957,8 +957,8 @@ bool NoIrcSocket::OnPrivMsg(NoNick& Nick, NoString& sMessage)
     IRCSOCKMODULECALL(OnPrivMsg(Nick, sMessage), &bResult);
     if (bResult) return true;
 
-    if (!m_pNetwork->IsUserOnline() || !m_pNetwork->GetUser()->AutoClearQueryBuffer()) {
-        NoQuery* pQuery = m_pNetwork->AddQuery(Nick.nick());
+    if (!m_network->IsUserOnline() || !m_network->GetUser()->AutoClearQueryBuffer()) {
+        NoQuery* pQuery = m_network->AddQuery(Nick.nick());
         if (pQuery) {
             pQuery->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG {target} :{text}", sMessage);
         }
@@ -969,7 +969,7 @@ bool NoIrcSocket::OnPrivMsg(NoNick& Nick, NoString& sMessage)
 
 bool NoIrcSocket::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
-    NoChannel* pChan = m_pNetwork->FindChan(sChan);
+    NoChannel* pChan = m_network->FindChan(sChan);
     if (pChan) {
         bool bResult = false;
         IRCSOCKMODULECALL(OnChanCTCP(Nick, *pChan, sMessage), &bResult);
@@ -980,7 +980,7 @@ bool NoIrcSocket::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMes
             bResult = false;
             IRCSOCKMODULECALL(OnChanAction(Nick, *pChan, sMessage), &bResult);
             if (bResult) return true;
-            if (!pChan->autoClearChanBuffer() || !m_pNetwork->IsUserOnline() || pChan->isDetached()) {
+            if (!pChan->autoClearChanBuffer() || !m_network->IsUserOnline() || pChan->isDetached()) {
                 pChan->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) +
                                  " :\001ACTION {text}\001",
                                  sMessage);
@@ -996,13 +996,13 @@ bool NoIrcSocket::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMes
 
 bool NoIrcSocket::OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
-    NoChannel* pChan = m_pNetwork->FindChan(sChan);
+    NoChannel* pChan = m_network->FindChan(sChan);
     if (pChan) {
         bool bResult = false;
         IRCSOCKMODULECALL(OnChanNotice(Nick, *pChan, sMessage), &bResult);
         if (bResult) return true;
 
-        if (!pChan->autoClearChanBuffer() || !m_pNetwork->IsUserOnline() || pChan->isDetached()) {
+        if (!pChan->autoClearChanBuffer() || !m_network->IsUserOnline() || pChan->isDetached()) {
             pChan->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " NOTICE " + _NAMEDFMT(sChan) + " :{text}", sMessage);
         }
     }
@@ -1012,13 +1012,13 @@ bool NoIrcSocket::OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sM
 
 bool NoIrcSocket::OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
-    NoChannel* pChan = m_pNetwork->FindChan(sChan);
+    NoChannel* pChan = m_network->FindChan(sChan);
     if (pChan) {
         bool bResult = false;
         IRCSOCKMODULECALL(OnChanMsg(Nick, *pChan, sMessage), &bResult);
         if (bResult) return true;
 
-        if (!pChan->autoClearChanBuffer() || !m_pNetwork->IsUserOnline() || pChan->isDetached()) {
+        if (!pChan->autoClearChanBuffer() || !m_network->IsUserOnline() || pChan->isDetached()) {
             pChan->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) + " :{text}", sMessage);
         }
     }
@@ -1029,55 +1029,55 @@ bool NoIrcSocket::OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMess
 void NoIrcSocket::PutIRC(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
-    if (m_bFloodProtection && m_iSendsAllowed <= 0) {
-        NO_DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") ZNC -> IRC [" << sLine << "] (queued)");
+    if (m_floodProtection && m_sendsAllowed <= 0) {
+        NO_DEBUG("(" << m_network->GetUser()->GetUserName() << "/" << m_network->GetName() << ") ZNC -> IRC [" << sLine << "] (queued)");
     }
-    m_vsSendQueue.push_back(sLine);
+    m_sendQueue.push_back(sLine);
     TrySend();
 }
 
 void NoIrcSocket::PutIRCQuick(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
-    if (m_bFloodProtection && m_iSendsAllowed <= 0) {
-        NO_DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") ZNC -> IRC [" << sLine
+    if (m_floodProtection && m_sendsAllowed <= 0) {
+        NO_DEBUG("(" << m_network->GetUser()->GetUserName() << "/" << m_network->GetName() << ") ZNC -> IRC [" << sLine
                   << "] (queued to front)");
     }
-    m_vsSendQueue.push_front(sLine);
+    m_sendQueue.push_front(sLine);
     TrySend();
 }
 
 void NoIrcSocket::TrySend()
 {
     // This condition must be the same as in PutIRC() and PutIRCQuick()!
-    while (!m_vsSendQueue.empty() && (!m_bFloodProtection || m_iSendsAllowed > 0)) {
-        m_iSendsAllowed--;
+    while (!m_sendQueue.empty() && (!m_floodProtection || m_sendsAllowed > 0)) {
+        m_sendsAllowed--;
         bool bSkip = false;
-        NoString& sLine = m_vsSendQueue.front();
+        NoString& sLine = m_sendQueue.front();
         IRCSOCKMODULECALL(OnSendToIRC(sLine), &bSkip);
         if (!bSkip) {
             ;
-            NO_DEBUG("(" << m_pNetwork->GetUser()->GetUserName() << "/" << m_pNetwork->GetName() << ") ZNC -> IRC [" << sLine << "]");
+            NO_DEBUG("(" << m_network->GetUser()->GetUserName() << "/" << m_network->GetName() << ") ZNC -> IRC [" << sLine << "]");
             Write(sLine + "\r\n");
         }
-        m_vsSendQueue.pop_front();
+        m_sendQueue.pop_front();
     }
 }
 
 void NoIrcSocket::SetNick(const NoString& sNick)
 {
-    m_Nick.setNick(sNick);
-    m_pNetwork->SetIRCNick(m_Nick);
+    m_nick.setNick(sNick);
+    m_network->SetIRCNick(m_nick);
 }
 
 void NoIrcSocket::ConnectedImpl()
 {
     NO_DEBUG(GetSockName() << " == Connected()");
 
-    NoString sPass = m_sPass;
-    NoString sNick = m_pNetwork->GetNick();
-    NoString sIdent = m_pNetwork->GetIdent();
-    NoString sRealName = m_pNetwork->GetRealName();
+    NoString sPass = m_password;
+    NoString sNick = m_network->GetNick();
+    NoString sIdent = m_network->GetIdent();
+    NoString sRealName = m_network->GetRealName();
 
     bool bReturn = false;
     IRCSOCKMODULECALL(OnIRCRegistration(sPass, sNick, sIdent, sRealName), &bReturn);
@@ -1093,7 +1093,7 @@ void NoIrcSocket::ConnectedImpl()
     PutIRC("USER " + sIdent + " \"" + sIdent + "\" \"" + sIdent + "\" :" + sRealName);
 
     // SendAltNick() needs this
-    m_Nick.setNick(sNick);
+    m_nick.setNick(sNick);
 }
 
 void NoIrcSocket::DisconnectedImpl()
@@ -1101,11 +1101,11 @@ void NoIrcSocket::DisconnectedImpl()
     IRCSOCKMODULECALL(OnIRCDisconnected(), NOTHING);
 
     NO_DEBUG(GetSockName() << " == Disconnected()");
-    if (!m_pNetwork->GetUser()->IsBeingDeleted() && m_pNetwork->GetIRCConnectEnabled() && m_pNetwork->GetServers().size() != 0) {
-        m_pNetwork->PutStatus("Disconnected from IRC. Reconnecting...");
+    if (!m_network->GetUser()->IsBeingDeleted() && m_network->GetIRCConnectEnabled() && m_network->GetServers().size() != 0) {
+        m_network->PutStatus("Disconnected from IRC. Reconnecting...");
     }
-    m_pNetwork->ClearRawBuffer();
-    m_pNetwork->ClearMotdBuffer();
+    m_network->ClearRawBuffer();
+    m_network->ClearMotdBuffer();
 
     ResetChans();
 
@@ -1113,16 +1113,16 @@ void NoIrcSocket::DisconnectedImpl()
     // otherwise, on reconnect, it might think it still
     // had user modes that it actually doesn't have.
     NoString sUserMode;
-    for (uchar cMode : m_scUserModes) {
+    for (uchar cMode : m_userModes) {
         sUserMode += cMode;
     }
     if (!sUserMode.empty()) {
-        m_pNetwork->PutUser(":" + m_pNetwork->GetIRCNick().nickMask() + " MODE " +
-                            m_pNetwork->GetIRCNick().nick() + " :-" + sUserMode);
+        m_network->PutUser(":" + m_network->GetIRCNick().nickMask() + " MODE " +
+                            m_network->GetIRCNick().nick() + " :-" + sUserMode);
     }
 
     // also clear the user modes in our space:
-    m_scUserModes.clear();
+    m_userModes.clear();
 }
 
 void NoIrcSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
@@ -1130,11 +1130,11 @@ void NoIrcSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
     NoString sError = sDescription;
 
     NO_DEBUG(GetSockName() << " == SockError(" << iErrno << " " << sError << ")");
-    if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
+    if (!m_network->GetUser()->IsBeingDeleted()) {
         if (IsConOK()) {
-            m_pNetwork->PutStatus("Cannot connect to IRC (" + sError + "). Retrying...");
+            m_network->PutStatus("Cannot connect to IRC (" + sError + "). Retrying...");
         } else {
-            m_pNetwork->PutStatus("Disconnected from IRC (" + sError + "). Reconnecting...");
+            m_network->PutStatus("Disconnected from IRC (" + sError + "). Reconnecting...");
         }
 #ifdef HAVE_LIBSSL
         if (iErrno == errnoBadSSLCert) {
@@ -1152,52 +1152,52 @@ void NoIrcSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
                 NoStringVector vsCert = sCert.split("\n");
                 for (const NoString& s : vsCert) {
                     // It shouldn't contain any bad characters, but let's be safe...
-                    m_pNetwork->PutStatus("|" + No::escape(s, No::DebugFormat));
+                    m_network->PutStatus("|" + No::escape(s, No::DebugFormat));
                 }
                 NoString sSHA1;
                 if (GetPeerFingerprint(sSHA1))
-                    m_pNetwork->PutStatus("SHA1: " + No::escape(sSHA1, No::HexColonFormat, No::HexColonFormat));
+                    m_network->PutStatus("SHA1: " + No::escape(sSHA1, No::HexColonFormat, No::HexColonFormat));
                 NoString sSHA256 = GetSSLPeerFingerprint();
-                m_pNetwork->PutStatus("SHA-256: " + sSHA256);
-                m_pNetwork->PutStatus("If you trust this certificate, do /znc AddTrustedServerFingerprint " + sSHA256);
+                m_network->PutStatus("SHA-256: " + sSHA256);
+                m_network->PutStatus("If you trust this certificate, do /znc AddTrustedServerFingerprint " + sSHA256);
             }
         }
 #endif
     }
-    m_pNetwork->ClearRawBuffer();
-    m_pNetwork->ClearMotdBuffer();
+    m_network->ClearRawBuffer();
+    m_network->ClearMotdBuffer();
 
     ResetChans();
-    m_scUserModes.clear();
+    m_userModes.clear();
 }
 
 void NoIrcSocket::TimeoutImpl()
 {
     NO_DEBUG(GetSockName() << " == Timeout()");
-    if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
-        m_pNetwork->PutStatus("IRC connection timed out.  Reconnecting...");
+    if (!m_network->GetUser()->IsBeingDeleted()) {
+        m_network->PutStatus("IRC connection timed out.  Reconnecting...");
     }
-    m_pNetwork->ClearRawBuffer();
-    m_pNetwork->ClearMotdBuffer();
+    m_network->ClearRawBuffer();
+    m_network->ClearMotdBuffer();
 
     ResetChans();
-    m_scUserModes.clear();
+    m_userModes.clear();
 }
 
 void NoIrcSocket::ConnectionRefusedImpl()
 {
     NO_DEBUG(GetSockName() << " == ConnectionRefused()");
-    if (!m_pNetwork->GetUser()->IsBeingDeleted()) {
-        m_pNetwork->PutStatus("Connection Refused.  Reconnecting...");
+    if (!m_network->GetUser()->IsBeingDeleted()) {
+        m_network->PutStatus("Connection Refused.  Reconnecting...");
     }
-    m_pNetwork->ClearRawBuffer();
-    m_pNetwork->ClearMotdBuffer();
+    m_network->ClearRawBuffer();
+    m_network->ClearMotdBuffer();
 }
 
 void NoIrcSocket::ReachedMaxBufferImpl()
 {
     NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
-    m_pNetwork->PutStatus("Received a too long line from the IRC server!");
+    m_network->PutStatus("Received a too long line from the IRC server!");
     Quit();
 }
 
@@ -1213,7 +1213,7 @@ void NoIrcSocket::ParseISupport(const NoString& sLine)
             break;
         }
 
-        m_mISupport[sName] = sValue;
+        m_iSupport[sName] = sValue;
 
         if (sName.equals("PREFIX")) {
             NoString sPrefixes = No::token(sValue, 1, ")");
@@ -1221,36 +1221,36 @@ void NoIrcSocket::ParseISupport(const NoString& sLine)
             sPermModes.trimLeft("(");
 
             if (!sPrefixes.empty() && sPermModes.size() == sPrefixes.size()) {
-                m_sPerms = sPrefixes;
-                m_sPermModes = sPermModes;
+                m_perms = sPrefixes;
+                m_permModes = sPermModes;
             }
         } else if (sName.equals("CHANTYPES")) {
-            m_pNetwork->SetChanPrefixes(sValue);
+            m_network->SetChanPrefixes(sValue);
         } else if (sName.equals("NICKLEN")) {
             uint uMax = sValue.toUInt();
 
             if (uMax) {
-                m_uMaxNickLen = uMax;
+                m_maxNickLen = uMax;
             }
         } else if (sName.equals("CHANMODES")) {
             if (!sValue.empty()) {
-                m_mueChanModes.clear();
+                m_chanModes.clear();
 
                 for (uint a = 0; a < 4; a++) {
                     NoString sModes = No::token(sValue, a, ",");
 
                     for (uint b = 0; b < sModes.size(); b++) {
-                        m_mueChanModes[sModes[b]] = (ChanModeArgs)a;
+                        m_chanModes[sModes[b]] = (ChanModeArgs)a;
                     }
                 }
             }
         } else if (sName.equals("NAMESX")) {
-            if (m_bNamesx) continue;
-            m_bNamesx = true;
+            if (m_hasNamesX) continue;
+            m_hasNamesX = true;
             PutIRC("PROTOCTL NAMESX");
         } else if (sName.equals("UHNAMES")) {
-            if (m_bUHNames) continue;
-            m_bUHNames = true;
+            if (m_hasUhNames) continue;
+            m_hasUhNames = true;
             PutIRC("PROTOCTL UHNAMES");
         }
     }
@@ -1258,8 +1258,8 @@ void NoIrcSocket::ParseISupport(const NoString& sLine)
 
 NoString NoIrcSocket::GetISupport(const NoString& sKey, const NoString& sDefault) const
 {
-    NoStringMap::const_iterator i = m_mISupport.find(sKey.toUpper());
-    if (i == m_mISupport.end()) {
+    NoStringMap::const_iterator i = m_iSupport.find(sKey.toUpper());
+    if (i == m_iSupport.end()) {
         return sDefault;
     } else {
         return i->second;
@@ -1268,7 +1268,7 @@ NoString NoIrcSocket::GetISupport(const NoString& sKey, const NoString& sDefault
 
 void NoIrcSocket::ForwardRaw353(const NoString& sLine) const
 {
-    const std::vector<NoClient*>& vClients = m_pNetwork->GetClients();
+    const std::vector<NoClient*>& vClients = m_network->GetClients();
 
     for (NoClient* pClient : vClients) {
         ForwardRaw353(sLine, pClient);
@@ -1279,9 +1279,9 @@ void NoIrcSocket::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
 {
     NoString sNicks = No::tokens(sLine, 5).trimPrefix_n();
 
-    if ((!m_bNamesx || pClient->HasNamesx()) && (!m_bUHNames || pClient->HasUHNames())) {
+    if ((!m_hasNamesX || pClient->HasNamesx()) && (!m_hasUhNames || pClient->HasUHNames())) {
         // Client and server have both the same UHNames and Namesx stuff enabled
-        m_pNetwork->PutUser(sLine, pClient);
+        m_network->PutUser(sLine, pClient);
     } else {
         // Get everything except the actual user list
         NoString sTmp = No::token(sLine, 0, " :") + " :";
@@ -1291,7 +1291,7 @@ void NoIrcSocket::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
         for (NoString sNick : vsNicks) {
             if (sNick.empty()) break;
 
-            if (m_bNamesx && !pClient->HasNamesx() && IsPermChar(sNick[0])) {
+            if (m_hasNamesX && !pClient->HasNamesx() && IsPermChar(sNick[0])) {
                 // Server has, client doesn't have NAMESX, so we just use the first perm char
                 size_t pos = sNick.find_first_not_of(GetPerms());
                 if (pos >= 2 && pos != NoString::npos) {
@@ -1299,7 +1299,7 @@ void NoIrcSocket::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
                 }
             }
 
-            if (m_bUHNames && !pClient->HasUHNames()) {
+            if (m_hasUhNames && !pClient->HasUHNames()) {
                 // Server has, client hasnt UHNAMES,
                 // so we strip away ident and host.
                 sNick = No::token(sNick, 0, "!");
@@ -1309,23 +1309,23 @@ void NoIrcSocket::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
         }
         // Strip away the spaces we inserted at the end
         sTmp.trimRight(" ");
-        m_pNetwork->PutUser(sTmp, pClient);
+        m_network->PutUser(sTmp, pClient);
     }
 }
 
 void NoIrcSocket::SendAltNick(const NoString& sBadNick)
 {
-    const NoString& sLastNick = m_Nick.nick();
+    const NoString& sLastNick = m_nick.nick();
 
     // We don't know the maximum allowed nick length yet, but we know which
     // nick we sent last. If sBadNick is shorter than that, we assume the
     // server truncated our nick.
-    if (sBadNick.length() < sLastNick.length()) m_uMaxNickLen = (uint)sBadNick.length();
+    if (sBadNick.length() < sLastNick.length()) m_maxNickLen = (uint)sBadNick.length();
 
-    uint uMax = m_uMaxNickLen;
+    uint uMax = m_maxNickLen;
 
-    const NoString& sConfNick = m_pNetwork->GetNick();
-    const NoString& sAltNick = m_pNetwork->GetAltNick();
+    const NoString& sConfNick = m_network->GetNick();
+    const NoString& sAltNick = m_network->GetAltNick();
     NoString sNewNick = sConfNick.left(uMax - 1);
 
     if (sLastNick.equals(sConfNick)) {
@@ -1345,7 +1345,7 @@ void NoIrcSocket::SendAltNick(const NoString& sBadNick)
     } else {
         char cLetter = 0;
         if (sBadNick.empty()) {
-            m_pNetwork->PutUser("No free nick available");
+            m_network->PutUser("No free nick available");
             Quit();
             return;
         }
@@ -1353,7 +1353,7 @@ void NoIrcSocket::SendAltNick(const NoString& sBadNick)
         cLetter = sBadNick.right(1)[0];
 
         if (cLetter == 'z') {
-            m_pNetwork->PutUser("No free nick found");
+            m_network->PutUser("No free nick found");
             Quit();
             return;
         }
@@ -1362,15 +1362,15 @@ void NoIrcSocket::SendAltNick(const NoString& sBadNick)
         if (sNewNick.equals(sAltNick)) sNewNick = sConfNick.left(uMax - 1) + ++cLetter;
     }
     PutIRC("NICK " + sNewNick);
-    m_Nick.setNick(sNewNick);
+    m_nick.setNick(sNewNick);
 }
 
 uchar NoIrcSocket::GetPermFromMode(uchar uMode) const
 {
-    if (m_sPermModes.size() == m_sPerms.size()) {
-        for (uint a = 0; a < m_sPermModes.size(); a++) {
-            if (m_sPermModes[a] == uMode) {
-                return m_sPerms[a];
+    if (m_permModes.size() == m_perms.size()) {
+        for (uint a = 0; a < m_permModes.size(); a++) {
+            if (m_permModes[a] == uMode) {
+                return m_perms[a];
             }
         }
     }
@@ -1378,41 +1378,41 @@ uchar NoIrcSocket::GetPermFromMode(uchar uMode) const
     return 0;
 }
 
-const std::map<uchar, NoIrcSocket::ChanModeArgs>&NoIrcSocket::GetChanModes() const { return m_mueChanModes; }
+const std::map<uchar, NoIrcSocket::ChanModeArgs>&NoIrcSocket::GetChanModes() const { return m_chanModes; }
 
 bool NoIrcSocket::IsPermChar(const char c) const { return (c != '\0' && GetPerms().find(c) != NoString::npos); }
 
 bool NoIrcSocket::IsPermMode(const char c) const { return (c != '\0' && GetPermModes().find(c) != NoString::npos); }
 
-const NoString& NoIrcSocket::GetPerms() const { return m_sPerms; }
+const NoString& NoIrcSocket::GetPerms() const { return m_perms; }
 
-const NoString& NoIrcSocket::GetPermModes() const { return m_sPermModes; }
+const NoString& NoIrcSocket::GetPermModes() const { return m_permModes; }
 
-NoString NoIrcSocket::GetNickMask() const { return m_Nick.nickMask(); }
+NoString NoIrcSocket::GetNickMask() const { return m_nick.nickMask(); }
 
-NoString NoIrcSocket::GetNick() const { return m_Nick.nick(); }
+NoString NoIrcSocket::GetNick() const { return m_nick.nick(); }
 
-const NoString& NoIrcSocket::GetPass() const { return m_sPass; }
+const NoString& NoIrcSocket::GetPass() const { return m_password; }
 
-NoNetwork*NoIrcSocket::GetNetwork() const { return m_pNetwork; }
+NoNetwork*NoIrcSocket::GetNetwork() const { return m_network; }
 
-bool NoIrcSocket::HasNamesx() const { return m_bNamesx; }
+bool NoIrcSocket::HasNamesx() const { return m_hasNamesX; }
 
-bool NoIrcSocket::HasUHNames() const { return m_bUHNames; }
+bool NoIrcSocket::HasUHNames() const { return m_hasUhNames; }
 
-const std::set<uchar>&NoIrcSocket::GetUserModes() const { return m_scUserModes; }
+const std::set<uchar>&NoIrcSocket::GetUserModes() const { return m_userModes; }
 
-bool NoIrcSocket::IsAuthed() const { return m_bAuthed; }
+bool NoIrcSocket::IsAuthed() const { return m_authed; }
 
-bool NoIrcSocket::IsCapAccepted(const NoString& sCap) { return 1 == m_ssAcceptedCaps.count(sCap); }
+bool NoIrcSocket::IsCapAccepted(const NoString& sCap) { return 1 == m_acceptedCaps.count(sCap); }
 
-const NoStringMap&NoIrcSocket::GetISupport() const { return m_mISupport; }
+const NoStringMap&NoIrcSocket::GetISupport() const { return m_iSupport; }
 
 NoIrcSocket::ChanModeArgs NoIrcSocket::GetModeType(uchar uMode) const
 {
-    std::map<uchar, ChanModeArgs>::const_iterator it = m_mueChanModes.find(uMode);
+    std::map<uchar, ChanModeArgs>::const_iterator it = m_chanModes.find(uMode);
 
-    if (it == m_mueChanModes.end()) {
+    if (it == m_chanModes.end()) {
         return NoArg;
     }
 
@@ -1421,7 +1421,7 @@ NoIrcSocket::ChanModeArgs NoIrcSocket::GetModeType(uchar uMode) const
 
 void NoIrcSocket::ResetChans()
 {
-    for (const auto& it : m_msChans) {
+    for (const auto& it : m_chans) {
         it.second->reset();
     }
 }

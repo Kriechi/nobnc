@@ -48,12 +48,12 @@ public:
     size_t AddSuccess(const NoString& sMessage);
 
 private:
-    NoString m_sId;
-    NoString m_sIP;
-    NoUser* m_pUser;
-    NoStringVector m_vsErrorMsgs;
-    NoStringVector m_vsSuccessMsgs;
-    time_t m_tmLastActive;
+    NoString m_id;
+    NoString m_ip;
+    NoUser* m_user;
+    NoStringVector m_errorMsgs;
+    NoStringVector m_successMsgs;
+    time_t m_lastActive;
 };
 
 #endif // NOWEBSESSION_H

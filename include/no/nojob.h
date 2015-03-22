@@ -51,7 +51,7 @@ public:
 
     enum JobState { Ready, Running, Done, Cancelled };
 
-    NoJob() : m_eState(Ready) {}
+    NoJob() : m_state(Ready) {}
 
     /// Destructor, always called from the main thread.
     virtual ~NoJob() {}
@@ -74,7 +74,7 @@ private:
     NoJob& operator=(const NoJob&);
 
     // Synchronized via the thread pool's mutex! Do not access without that mutex!
-    JobState m_eState;
+    JobState m_state;
 };
 
 #endif // HAVE_PTHREAD

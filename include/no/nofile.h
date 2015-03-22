@@ -113,14 +113,14 @@ private:
     // fcntl() locking wrapper
     bool Lock(short iType, bool bBlocking);
 
-    NoString m_sBuffer;
-    int m_iFD;
-    bool m_bHadError;
+    NoString m_buffer;
+    int m_fd;
+    bool m_hadError;
 
-    static NoString m_sHomePath;
+    static NoString m_homePath;
 
-    NoString m_sLongName; //!< Absolute filename (m_sPath + "/" + m_sShortName)
-    NoString m_sShortName; //!< Filename alone, without path
+    NoString m_longName; //!< Absolute filename (m_path + "/" + m_shortName)
+    NoString m_shortName; //!< Filename alone, without path
 };
 
 #endif // NOFILE_H

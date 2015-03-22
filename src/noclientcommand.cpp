@@ -31,7 +31,7 @@
 
 void NoClient::UserCommand(NoString& sLine)
 {
-    if (!d->pUser) {
+    if (!d->user) {
         return;
     }
 
@@ -40,7 +40,7 @@ void NoClient::UserCommand(NoString& sLine)
     }
 
     bool bReturn = false;
-    NETWORKMODULECALL(OnStatusCommand(sLine), d->pUser, d->pNetwork, this, &bReturn);
+    NETWORKMODULECALL(OnStatusCommand(sLine), d->user, d->network, this, &bReturn);
     if (bReturn) return;
 
     const NoString sCommand = No::token(sLine, 0);
@@ -48,7 +48,7 @@ void NoClient::UserCommand(NoString& sLine)
     if (sCommand.equals("HELP")) {
         HelpUser(No::token(sLine, 1));
     } else if (sCommand.equals("LISTNICKS")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -60,7 +60,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoChannel* pChan = d->pNetwork->FindChan(sChan);
+        NoChannel* pChan = d->network->FindChan(sChan);
 
         if (!pChan) {
             PutStatus("You are not on [" + sChan + "]");
@@ -73,7 +73,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         const std::map<NoString, NoNick>& msNicks = pChan->getNicks();
-        NoIrcSocket* pIRCSock = d->pNetwork->GetIRCSock();
+        NoIrcSocket* pIRCSock = d->network->GetIRCSock();
         const NoString& sPerms = (pIRCSock) ? pIRCSock->GetPerms() : "";
 
         if (msNicks.empty()) {
@@ -111,7 +111,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (sCommand.equals("DETACH")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -128,7 +128,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         std::set<NoChannel*> sChans;
         for (const NoString& sChan : vsChans) {
-            std::vector<NoChannel*> vChans = d->pNetwork->FindChans(sChan);
+            std::vector<NoChannel*> vChans = d->network->FindChans(sChan);
             sChans.insert(vChans.begin(), vChans.end());
         }
 
@@ -148,7 +148,7 @@ void NoClient::UserCommand(NoString& sLine)
         if (!SendMotd()) {
             PutStatus("There is no MOTD set.");
         }
-    } else if (d->pUser->IsAdmin() && sCommand.equals("Rehash")) {
+    } else if (d->user->IsAdmin() && sCommand.equals("Rehash")) {
         NoString sRet;
 
         if (NoApp::Get().RehashConfig(sRet)) {
@@ -156,18 +156,18 @@ void NoClient::UserCommand(NoString& sLine)
         } else {
             PutStatus("Rehashing failed: " + sRet);
         }
-    } else if (d->pUser->IsAdmin() && sCommand.equals("SaveConfig")) {
+    } else if (d->user->IsAdmin() && sCommand.equals("SaveConfig")) {
         if (NoApp::Get().WriteConfig()) {
             PutStatus("Wrote config to [" + NoApp::Get().GetConfigFile() + "]");
         } else {
             PutStatus("Error while trying to write config.");
         }
     } else if (sCommand.equals("LISTCLIENTS")) {
-        NoUser* pUser = d->pUser;
+        NoUser* pUser = d->user;
         NoString sNick = No::token(sLine, 1);
 
         if (!sNick.empty()) {
-            if (!d->pUser->IsAdmin()) {
+            if (!d->user->IsAdmin()) {
                 PutStatus("Usage: ListClients");
                 return;
             }
@@ -202,7 +202,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         PutStatus(Table);
-    } else if (d->pUser->IsAdmin() && sCommand.equals("LISTUSERS")) {
+    } else if (d->user->IsAdmin() && sCommand.equals("LISTUSERS")) {
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
         Table.AddColumn("Username");
@@ -217,7 +217,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         PutStatus(Table);
-    } else if (d->pUser->IsAdmin() && sCommand.equals("LISTALLUSERNETWORKS")) {
+    } else if (d->user->IsAdmin() && sCommand.equals("LISTALLUSERNETWORKS")) {
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
         Table.AddColumn("Username");
@@ -257,7 +257,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         PutStatus(Table);
-    } else if (d->pUser->IsAdmin() && sCommand.equals("SetMOTD")) {
+    } else if (d->user->IsAdmin() && sCommand.equals("SetMOTD")) {
         NoString sMessage = No::tokens(sLine, 1);
 
         if (sMessage.empty()) {
@@ -266,7 +266,7 @@ void NoClient::UserCommand(NoString& sLine)
             NoApp::Get().SetMotd(sMessage);
             PutStatus("MOTD set to [" + sMessage + "]");
         }
-    } else if (d->pUser->IsAdmin() && sCommand.equals("AddMOTD")) {
+    } else if (d->user->IsAdmin() && sCommand.equals("AddMOTD")) {
         NoString sMessage = No::tokens(sLine, 1);
 
         if (sMessage.empty()) {
@@ -275,12 +275,12 @@ void NoClient::UserCommand(NoString& sLine)
             NoApp::Get().AddMotd(sMessage);
             PutStatus("Added [" + sMessage + "] to MOTD");
         }
-    } else if (d->pUser->IsAdmin() && sCommand.equals("ClearMOTD")) {
+    } else if (d->user->IsAdmin() && sCommand.equals("ClearMOTD")) {
         NoApp::Get().ClearMotd();
         PutStatus("Cleared MOTD");
-    } else if (d->pUser->IsAdmin() && sCommand.equals("BROADCAST")) {
+    } else if (d->user->IsAdmin() && sCommand.equals("BROADCAST")) {
         NoApp::Get().Broadcast(No::tokens(sLine, 1));
-    } else if (d->pUser->IsAdmin() && (sCommand.equals("SHUTDOWN") || sCommand.equals("RESTART"))) {
+    } else if (d->user->IsAdmin() && (sCommand.equals("SHUTDOWN") || sCommand.equals("RESTART"))) {
         bool bRestart = sCommand.equals("RESTART");
         NoString sMessage = No::tokens(sLine, 1);
         bool bForce = false;
@@ -302,12 +302,12 @@ void NoClient::UserCommand(NoString& sLine)
             throw NoException(bRestart ? NoException::Restart : NoException::Shutdown);
         }
     } else if (sCommand.equals("JUMP") || sCommand.equals("CONNECT")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
 
-        if (!d->pNetwork->HasServers()) {
+        if (!d->network->HasServers()) {
             PutStatus("You don't have any servers added.");
             return;
         }
@@ -317,12 +317,12 @@ void NoClient::UserCommand(NoString& sLine)
         NoServerInfo* pServer = nullptr;
 
         if (!sArgs.empty()) {
-            pServer = d->pNetwork->FindServer(sArgs);
+            pServer = d->network->FindServer(sArgs);
             if (!pServer) {
                 PutStatus("Server [" + sArgs + "] not found");
                 return;
             }
-            d->pNetwork->SetNextServer(pServer);
+            d->network->SetNextServer(pServer);
 
             // If we are already connecting to some server,
             // we have to abort that attempt
@@ -345,10 +345,10 @@ void NoClient::UserCommand(NoString& sLine)
                 PutStatus("Connecting...");
         }
 
-        d->pNetwork->SetIRCConnectEnabled(true);
+        d->network->SetIRCConnectEnabled(true);
         return;
     } else if (sCommand.equals("DISCONNECT")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -358,11 +358,11 @@ void NoClient::UserCommand(NoString& sLine)
             GetIRCSock()->Quit(sQuitMsg);
         }
 
-        d->pNetwork->SetIRCConnectEnabled(false);
+        d->network->SetIRCConnectEnabled(false);
         PutStatus("Disconnected from IRC. Use 'connect' to reconnect.");
         return;
     } else if (sCommand.equals("ENABLECHAN")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -377,7 +377,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {
-                std::vector<NoChannel*> vChans = d->pNetwork->FindChans(sChan);
+                std::vector<NoChannel*> vChans = d->network->FindChans(sChan);
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
@@ -392,7 +392,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Enabled [" + NoString(uEnabled) + "] channels");
         }
     } else if (sCommand.equals("DISABLECHAN")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -407,7 +407,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {
-                std::vector<NoChannel*> vChans = d->pNetwork->FindChans(sChan);
+                std::vector<NoChannel*> vChans = d->network->FindChans(sChan);
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
@@ -422,7 +422,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Disabled [" + NoString(uDisabled) + "] channels");
         }
     } else if (sCommand.equals("SHOWCHAN")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -433,7 +433,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoChannel* pChan = d->pNetwork->FindChan(sChan);
+        NoChannel* pChan = d->network->FindChan(sChan);
         if (!pChan) {
             PutStatus("No such channel [" + sChan + "]");
             return;
@@ -477,7 +477,7 @@ void NoClient::UserCommand(NoString& sLine)
             NoStringVector vsUsers;
             vsUsers.push_back("All: " + NoString(pChan->getNickCount()));
 
-            NoIrcSocket* pIRCSock = d->pNetwork->GetIRCSock();
+            NoIrcSocket* pIRCSock = d->network->GetIRCSock();
             const NoString& sPerms = pIRCSock ? pIRCSock->GetPerms() : "";
             std::map<char, uint> mPerms = pChan->getPermCounts();
             for (char cPerm : sPerms) {
@@ -488,18 +488,18 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (sCommand.equals("LISTCHANS")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoNetwork* pNetwork = d->pNetwork;
+        NoNetwork* pNetwork = d->network;
 
         const NoString sNick = No::token(sLine, 1);
         const NoString sNetwork = No::token(sLine, 2);
 
         if (!sNick.empty()) {
-            if (!d->pUser->IsAdmin()) {
+            if (!d->user->IsAdmin()) {
                 PutStatus("Usage: ListChans");
                 return;
             }
@@ -547,7 +547,7 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus("Total: " + NoString(vChans.size()) + " - Joined: " + NoString(uNumJoined) + " - Detached: " +
                   NoString(uNumDetached) + " - Disabled: " + NoString(uNumDisabled));
     } else if (sCommand.equals("ADDNETWORK")) {
-        if (!d->pUser->IsAdmin() && !d->pUser->HasSpaceForNewNetwork()) {
+        if (!d->user->IsAdmin() && !d->user->HasSpaceForNewNetwork()) {
             PutStatus("Network number limit reached. Ask an admin to increase the limit for you, or delete unneeded "
                       "networks using /znc DelNetwork <name>");
             return;
@@ -565,9 +565,9 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         NoString sNetworkAddError;
-        if (d->pUser->AddNetwork(sNetwork, sNetworkAddError)) {
+        if (d->user->AddNetwork(sNetwork, sNetworkAddError)) {
             PutStatus("Network added. Use /znc JumpNetwork " + sNetwork + ", or connect to ZNC with username " +
-                      d->pUser->GetUserName() + "/" + sNetwork + " (instead of just " + d->pUser->GetUserName() +
+                      d->user->GetUserName() + "/" + sNetwork + " (instead of just " + d->user->GetUserName() +
                       ") to connect to it.");
         } else {
             PutStatus("Unable to add that network");
@@ -581,20 +581,20 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (d->pNetwork && d->pNetwork->GetName().equals(sNetwork)) {
+        if (d->network && d->network->GetName().equals(sNetwork)) {
             SetNetwork(nullptr);
         }
 
-        if (d->pUser->DeleteNetwork(sNetwork)) {
+        if (d->user->DeleteNetwork(sNetwork)) {
             PutStatus("Network deleted");
         } else {
             PutStatus("Failed to delete network");
             PutStatus("Perhaps this network doesn't exist");
         }
     } else if (sCommand.equals("LISTNETWORKS")) {
-        NoUser* pUser = d->pUser;
+        NoUser* pUser = d->user;
 
-        if (d->pUser->IsAdmin() && !No::token(sLine, 1).empty()) {
+        if (d->user->IsAdmin() && !No::token(sLine, 1).empty()) {
             pUser = NoApp::Get().FindUser(No::token(sLine, 1));
 
             if (!pUser) {
@@ -629,7 +629,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("No networks");
         }
     } else if (sCommand.equals("MOVENETWORK")) {
-        if (!d->pUser->IsAdmin()) {
+        if (!d->user->IsAdmin()) {
             PutStatus("Access Denied.");
             return;
         }
@@ -702,7 +702,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         pNewNetwork->Clone(*pOldNetwork, false);
 
-        if (d->pNetwork && d->pNetwork->GetName().equals(sOldNetwork) && d->pUser == pOldUser) {
+        if (d->network && d->network->GetName().equals(sOldNetwork) && d->user == pOldUser) {
             SetNetwork(nullptr);
         }
 
@@ -719,12 +719,12 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (d->pNetwork && (d->pNetwork->GetName() == sNetwork)) {
+        if (d->network && (d->network->GetName() == sNetwork)) {
             PutStatus("You are already connected with this network.");
             return;
         }
 
-        NoNetwork* pNetwork = d->pUser->FindNetwork(sNetwork);
+        NoNetwork* pNetwork = d->user->FindNetwork(sNetwork);
         if (pNetwork) {
             PutStatus("Switched to " + sNetwork);
             SetNetwork(pNetwork);
@@ -734,7 +734,7 @@ void NoClient::UserCommand(NoString& sLine)
     } else if (sCommand.equals("ADDSERVER")) {
         NoString sServer = No::token(sLine, 1);
 
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -744,14 +744,14 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (d->pNetwork->AddServer(No::tokens(sLine, 1))) {
+        if (d->network->AddServer(No::tokens(sLine, 1))) {
             PutStatus("Server added");
         } else {
             PutStatus("Unable to add that server");
             PutStatus("Perhaps the server is already added or openssl is disabled?");
         }
     } else if (sCommand.equals("REMSERVER") || sCommand.equals("DELSERVER")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -765,25 +765,25 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (!d->pNetwork->HasServers()) {
+        if (!d->network->HasServers()) {
             PutStatus("You don't have any servers added.");
             return;
         }
 
-        if (d->pNetwork->DelServer(sServer, uPort, sPass)) {
+        if (d->network->DelServer(sServer, uPort, sPass)) {
             PutStatus("Server removed");
         } else {
             PutStatus("No such server");
         }
     } else if (sCommand.equals("LISTSERVERS")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
 
-        if (d->pNetwork->HasServers()) {
-            const std::vector<NoServerInfo*>& vServers = d->pNetwork->GetServers();
-            NoServerInfo* pCurServ = d->pNetwork->GetCurrentServer();
+        if (d->network->HasServers()) {
+            const std::vector<NoServerInfo*>& vServers = d->network->GetServers();
+            NoServerInfo* pCurServ = d->network->GetCurrentServer();
             NoTable Table;
             Table.AddColumn("Host");
             Table.AddColumn("Port");
@@ -803,7 +803,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("You don't have any servers added.");
         }
     } else if (sCommand.equals("AddTrustedServerFingerprint")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -812,10 +812,10 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Usage: AddTrustedServerFingerprint <fi:ng:er>");
             return;
         }
-        d->pNetwork->AddTrustedFingerprint(sFP);
+        d->network->AddTrustedFingerprint(sFP);
         PutStatus("Done.");
     } else if (sCommand.equals("DelTrustedServerFingerprint")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -824,14 +824,14 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Usage: DelTrustedServerFingerprint <fi:ng:er>");
             return;
         }
-        d->pNetwork->DelTrustedFingerprint(sFP);
+        d->network->DelTrustedFingerprint(sFP);
         PutStatus("Done.");
     } else if (sCommand.equals("ListTrustedServerFingerprints")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
-        const NoStringSet& ssFPs = d->pNetwork->GetTrustedFingerprints();
+        const NoStringSet& ssFPs = d->network->GetTrustedFingerprints();
         if (ssFPs.empty()) {
             PutStatus("No fingerprints added.");
         } else {
@@ -841,12 +841,12 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
     } else if (sCommand.equals("TOPICS")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
 
-        const std::vector<NoChannel*>& vChans = d->pNetwork->GetChans();
+        const std::vector<NoChannel*>& vChans = d->network->GetChans();
         NoTable Table;
         Table.AddColumn("Name");
         Table.AddColumn("Set By");
@@ -861,7 +861,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(Table);
     } else if (sCommand.equals("LISTMODS") || sCommand.equals("LISTMODULES")) {
-        if (d->pUser->IsAdmin()) {
+        if (d->user->IsAdmin()) {
             NoModules& GModules = NoApp::Get().GetModules();
 
             if (!GModules.size()) {
@@ -882,7 +882,7 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        NoModules& Modules = d->pUser->GetModules();
+        NoModules& Modules = d->user->GetModules();
 
         if (!Modules.size()) {
             PutStatus("Your user has no modules loaded.");
@@ -901,8 +901,8 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus(Table);
         }
 
-        if (d->pNetwork) {
-            NoModules& NetworkModules = d->pNetwork->GetModules();
+        if (d->network) {
+            NoModules& NetworkModules = d->network->GetModules();
             if (NetworkModules.empty()) {
                 PutStatus("This network has no modules loaded.");
             } else {
@@ -923,12 +923,12 @@ void NoClient::UserCommand(NoString& sLine)
 
         return;
     } else if (sCommand.equals("LISTAVAILMODS") || sCommand.equals("LISTAVAILABLEMODULES")) {
-        if (d->pUser->DenyLoadMod()) {
+        if (d->user->DenyLoadMod()) {
             PutStatus("Access Denied.");
             return;
         }
 
-        if (d->pUser->IsAdmin()) {
+        if (d->user->IsAdmin()) {
             std::set<NoModuleInfo> ssGlobalMods;
             NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
 
@@ -963,7 +963,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             for (const NoModuleInfo& Info : ssUserMods) {
                 Table.AddRow();
-                Table.SetCell("Name", (d->pUser->GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
+                Table.SetCell("Name", (d->user->GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
                 Table.SetCell("Description", No::ellipsize(Info.GetDescription(), 128));
             }
 
@@ -983,7 +983,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             for (const NoModuleInfo& Info : ssNetworkMods) {
                 Table.AddRow();
-                Table.SetCell("Name", ((d->pNetwork && d->pNetwork->GetModules().FindModule(Info.GetName())) ? "*" : " ") + Info.GetName());
+                Table.SetCell("Name", ((d->network && d->network->GetModules().FindModule(Info.GetName())) ? "*" : " ") + Info.GetName());
                 Table.SetCell("Description", No::ellipsize(Info.GetDescription(), 128));
             }
 
@@ -1011,7 +1011,7 @@ void NoClient::UserCommand(NoString& sLine)
             eType = No::UserModule;
         }
 
-        if (d->pUser->DenyLoadMod()) {
+        if (d->user->DenyLoadMod()) {
             PutStatus("Unable to load [" + sMod + "]: Access Denied.");
             return;
         }
@@ -1032,12 +1032,12 @@ void NoClient::UserCommand(NoString& sLine)
             eType = ModInfo.GetDefaultType();
         }
 
-        if (eType == No::GlobalModule && !d->pUser->IsAdmin()) {
+        if (eType == No::GlobalModule && !d->user->IsAdmin()) {
             PutStatus("Unable to load global module [" + sMod + "]: Access Denied.");
             return;
         }
 
-        if (eType == No::NetworkModule && !d->pNetwork) {
+        if (eType == No::NetworkModule && !d->network) {
             PutStatus("Unable to load network module [" + sMod + "] Not connected with a network.");
             return;
         }
@@ -1050,10 +1050,10 @@ void NoClient::UserCommand(NoString& sLine)
             b = NoApp::Get().GetModules().LoadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
-            b = d->pUser->GetModules().LoadModule(sMod, sArgs, eType, d->pUser, nullptr, sModRet);
+            b = d->user->GetModules().LoadModule(sMod, sArgs, eType, d->user, nullptr, sModRet);
             break;
         case No::NetworkModule:
-            b = d->pNetwork->GetModules().LoadModule(sMod, sArgs, eType, d->pUser, d->pNetwork, sModRet);
+            b = d->network->GetModules().LoadModule(sMod, sArgs, eType, d->user, d->network, sModRet);
             break;
         default:
             sModRet = "Unable to load module [" + sMod + "]: Unknown module type";
@@ -1080,7 +1080,7 @@ void NoClient::UserCommand(NoString& sLine)
             sType = "default";
         }
 
-        if (d->pUser->DenyLoadMod()) {
+        if (d->user->DenyLoadMod()) {
             PutStatus("Unable to unload [" + sMod + "] Access Denied.");
             return;
         }
@@ -1101,12 +1101,12 @@ void NoClient::UserCommand(NoString& sLine)
             eType = ModInfo.GetDefaultType();
         }
 
-        if (eType == No::GlobalModule && !d->pUser->IsAdmin()) {
+        if (eType == No::GlobalModule && !d->user->IsAdmin()) {
             PutStatus("Unable to unload global module [" + sMod + "]: Access Denied.");
             return;
         }
 
-        if (eType == No::NetworkModule && !d->pNetwork) {
+        if (eType == No::NetworkModule && !d->network) {
             PutStatus("Unable to unload network module [" + sMod + "] Not connected with a network.");
             return;
         }
@@ -1118,10 +1118,10 @@ void NoClient::UserCommand(NoString& sLine)
             NoApp::Get().GetModules().UnloadModule(sMod, sModRet);
             break;
         case No::UserModule:
-            d->pUser->GetModules().UnloadModule(sMod, sModRet);
+            d->user->GetModules().UnloadModule(sMod, sModRet);
             break;
         case No::NetworkModule:
-            d->pNetwork->GetModules().UnloadModule(sMod, sModRet);
+            d->network->GetModules().UnloadModule(sMod, sModRet);
             break;
         default:
             sModRet = "Unable to unload module [" + sMod + "]: Unknown module type";
@@ -1135,7 +1135,7 @@ void NoClient::UserCommand(NoString& sLine)
         NoString sMod = No::token(sLine, 2);
         NoString sArgs = No::tokens(sLine, 3);
 
-        if (d->pUser->DenyLoadMod()) {
+        if (d->user->DenyLoadMod()) {
             PutStatus("Unable to reload modules. Access Denied.");
             return;
         }
@@ -1171,12 +1171,12 @@ void NoClient::UserCommand(NoString& sLine)
             eType = ModInfo.GetDefaultType();
         }
 
-        if (eType == No::GlobalModule && !d->pUser->IsAdmin()) {
+        if (eType == No::GlobalModule && !d->user->IsAdmin()) {
             PutStatus("Unable to reload global module [" + sMod + "]: Access Denied.");
             return;
         }
 
-        if (eType == No::NetworkModule && !d->pNetwork) {
+        if (eType == No::NetworkModule && !d->network) {
             PutStatus("Unable to load network module [" + sMod + "] Not connected with a network.");
             return;
         }
@@ -1188,10 +1188,10 @@ void NoClient::UserCommand(NoString& sLine)
             NoApp::Get().GetModules().ReloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
-            d->pUser->GetModules().ReloadModule(sMod, sArgs, d->pUser, nullptr, sModRet);
+            d->user->GetModules().ReloadModule(sMod, sArgs, d->user, nullptr, sModRet);
             break;
         case No::NetworkModule:
-            d->pNetwork->GetModules().ReloadModule(sMod, sArgs, d->pUser, d->pNetwork, sModRet);
+            d->network->GetModules().ReloadModule(sMod, sArgs, d->user, d->network, sModRet);
             break;
         default:
             sModRet = "Unable to reload module [" + sMod + "]: Unknown module type";
@@ -1199,7 +1199,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         PutStatus(sModRet);
         return;
-    } else if ((sCommand.equals("UPDATEMOD") || sCommand.equals("UPDATEMODULE")) && d->pUser->IsAdmin()) {
+    } else if ((sCommand.equals("UPDATEMOD") || sCommand.equals("UPDATEMODULE")) && d->user->IsAdmin()) {
         NoString sMod = No::token(sLine, 1);
 
         if (sMod.empty()) {
@@ -1213,7 +1213,7 @@ void NoClient::UserCommand(NoString& sLine)
         } else {
             PutStatus("Done, but there were errors, [" + sMod + "] could not be loaded everywhere.");
         }
-    } else if ((sCommand.equals("ADDBINDHOST") || sCommand.equals("ADDVHOST")) && d->pUser->IsAdmin()) {
+    } else if ((sCommand.equals("ADDBINDHOST") || sCommand.equals("ADDVHOST")) && d->user->IsAdmin()) {
         NoString sHost = No::token(sLine, 1);
 
         if (sHost.empty()) {
@@ -1228,7 +1228,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
     } else if ((sCommand.equals("REMBINDHOST") || sCommand.equals("DELBINDHOST") || sCommand.equals("REMVHOST") ||
                 sCommand.equals("DELVHOST")) &&
-               d->pUser->IsAdmin()) {
+               d->user->IsAdmin()) {
         NoString sHost = No::token(sLine, 1);
 
         if (sHost.empty()) {
@@ -1242,7 +1242,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("The host [" + sHost + "] is not in the list");
         }
     } else if ((sCommand.equals("LISTBINDHOSTS") || sCommand.equals("LISTVHOSTS")) &&
-               (d->pUser->IsAdmin() || !d->pUser->DenySetBindHost())) {
+               (d->user->IsAdmin() || !d->user->DenySetBindHost())) {
         const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
 
         if (vsHosts.empty()) {
@@ -1259,8 +1259,8 @@ void NoClient::UserCommand(NoString& sLine)
         }
         PutStatus(Table);
     } else if ((sCommand.equals("SETBINDHOST") || sCommand.equals("SETVHOST")) &&
-               (d->pUser->IsAdmin() || !d->pUser->DenySetBindHost())) {
-        if (!d->pNetwork) {
+               (d->user->IsAdmin() || !d->user->DenySetBindHost())) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command. Try SetUserBindHost instead");
             return;
         }
@@ -1271,13 +1271,13 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (sArg.equals(d->pNetwork->GetBindHost())) {
+        if (sArg.equals(d->network->GetBindHost())) {
             PutStatus("You already have this bind host!");
             return;
         }
 
         const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
-        if (!d->pUser->IsAdmin() && !vsHosts.empty()) {
+        if (!d->user->IsAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
             for (const NoString& sHost : vsHosts) {
@@ -1293,9 +1293,9 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        d->pNetwork->SetBindHost(sArg);
-        PutStatus("Set bind host for network [" + d->pNetwork->GetName() + "] to [" + d->pNetwork->GetBindHost() + "]");
-    } else if (sCommand.equals("SETUSERBINDHOST") && (d->pUser->IsAdmin() || !d->pUser->DenySetBindHost())) {
+        d->network->SetBindHost(sArg);
+        PutStatus("Set bind host for network [" + d->network->GetName() + "] to [" + d->network->GetBindHost() + "]");
+    } else if (sCommand.equals("SETUSERBINDHOST") && (d->user->IsAdmin() || !d->user->DenySetBindHost())) {
         NoString sArg = No::token(sLine, 1);
 
         if (sArg.empty()) {
@@ -1303,13 +1303,13 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (sArg.equals(d->pUser->GetBindHost())) {
+        if (sArg.equals(d->user->GetBindHost())) {
             PutStatus("You already have this bind host!");
             return;
         }
 
         const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
-        if (!d->pUser->IsAdmin() && !vsHosts.empty()) {
+        if (!d->user->IsAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
             for (const NoString& sHost : vsHosts) {
@@ -1325,28 +1325,28 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        d->pUser->SetBindHost(sArg);
-        PutStatus("Set bind host to [" + d->pUser->GetBindHost() + "]");
+        d->user->SetBindHost(sArg);
+        PutStatus("Set bind host to [" + d->user->GetBindHost() + "]");
     } else if ((sCommand.equals("CLEARBINDHOST") || sCommand.equals("CLEARVHOST")) &&
-               (d->pUser->IsAdmin() || !d->pUser->DenySetBindHost())) {
-        if (!d->pNetwork) {
+               (d->user->IsAdmin() || !d->user->DenySetBindHost())) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command. Try ClearUserBindHost instead");
             return;
         }
-        d->pNetwork->SetBindHost("");
+        d->network->SetBindHost("");
         PutStatus("Bind host cleared for this network.");
-    } else if (sCommand.equals("CLEARUSERBINDHOST") && (d->pUser->IsAdmin() || !d->pUser->DenySetBindHost())) {
-        d->pUser->SetBindHost("");
+    } else if (sCommand.equals("CLEARUSERBINDHOST") && (d->user->IsAdmin() || !d->user->DenySetBindHost())) {
+        d->user->SetBindHost("");
         PutStatus("Bind host cleared for your user.");
     } else if (sCommand.equals("SHOWBINDHOST")) {
         PutStatus("This user's default bind host " +
-                  (d->pUser->GetBindHost().empty() ? "not set" : "is [" + d->pUser->GetBindHost() + "]"));
-        if (d->pNetwork) {
+                  (d->user->GetBindHost().empty() ? "not set" : "is [" + d->user->GetBindHost() + "]"));
+        if (d->network) {
             PutStatus("This network's bind host " +
-                      (d->pNetwork->GetBindHost().empty() ? "not set" : "is [" + d->pNetwork->GetBindHost() + "]"));
+                      (d->network->GetBindHost().empty() ? "not set" : "is [" + d->network->GetBindHost() + "]"));
         }
     } else if (sCommand.equals("PLAYBUFFER")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -1358,8 +1358,8 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (d->pNetwork->IsChan(sBuffer)) {
-            NoChannel* pChan = d->pNetwork->FindChan(sBuffer);
+        if (d->network->IsChan(sBuffer)) {
+            NoChannel* pChan = d->network->FindChan(sBuffer);
 
             if (!pChan) {
                 PutStatus("You are not on [" + sBuffer + "]");
@@ -1378,7 +1378,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             pChan->sendBuffer(this);
         } else {
-            NoQuery* pQuery = d->pNetwork->FindQuery(sBuffer);
+            NoQuery* pQuery = d->network->FindQuery(sBuffer);
 
             if (!pQuery) {
                 PutStatus("No active query with [" + sBuffer + "]");
@@ -1393,7 +1393,7 @@ void NoClient::UserCommand(NoString& sLine)
             pQuery->sendBuffer(this);
         }
     } else if (sCommand.equals("CLEARBUFFER")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -1406,52 +1406,52 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         uint uMatches = 0;
-        std::vector<NoChannel*> vChans = d->pNetwork->FindChans(sBuffer);
+        std::vector<NoChannel*> vChans = d->network->FindChans(sBuffer);
         for (NoChannel* pChan : vChans) {
             uMatches++;
 
             pChan->clearBuffer();
         }
 
-        std::vector<NoQuery*> vQueries = d->pNetwork->FindQueries(sBuffer);
+        std::vector<NoQuery*> vQueries = d->network->FindQueries(sBuffer);
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
-            d->pNetwork->DelQuery(pQuery->getName());
+            d->network->DelQuery(pQuery->getName());
         }
 
         PutStatus("[" + NoString(uMatches) + "] buffers matching [" + sBuffer + "] have been cleared");
     } else if (sCommand.equals("CLEARALLCHANNELBUFFERS")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
 
-        for (NoChannel* pChan : d->pNetwork->GetChans()) {
+        for (NoChannel* pChan : d->network->GetChans()) {
             pChan->clearBuffer();
         }
         PutStatus("All channel buffers have been cleared");
     } else if (sCommand.equals("CLEARALLQUERYBUFFERS")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
 
-        d->pNetwork->ClearQueryBuffer();
+        d->network->ClearQueryBuffer();
         PutStatus("All query buffers have been cleared");
     } else if (sCommand.equals("CLEARALLBUFFERS")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
 
-        for (NoChannel* pChan : d->pNetwork->GetChans()) {
+        for (NoChannel* pChan : d->network->GetChans()) {
             pChan->clearBuffer();
         }
-        d->pNetwork->ClearQueryBuffer();
+        d->network->ClearQueryBuffer();
         PutStatus("All buffers have been cleared");
     } else if (sCommand.equals("SETBUFFER")) {
-        if (!d->pNetwork) {
+        if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
@@ -1465,14 +1465,14 @@ void NoClient::UserCommand(NoString& sLine)
 
         uint uLineCount = No::token(sLine, 2).toUInt();
         uint uMatches = 0, uFail = 0;
-        std::vector<NoChannel*> vChans = d->pNetwork->FindChans(sBuffer);
+        std::vector<NoChannel*> vChans = d->network->FindChans(sBuffer);
         for (NoChannel* pChan : vChans) {
             uMatches++;
 
             if (!pChan->setBufferCount(uLineCount)) uFail++;
         }
 
-        std::vector<NoQuery*> vQueries = d->pNetwork->FindQueries(sBuffer);
+        std::vector<NoQuery*> vQueries = d->network->FindQueries(sBuffer);
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
@@ -1485,7 +1485,7 @@ void NoClient::UserCommand(NoString& sLine)
                                                                             "max buffer count is " +
                       NoString(NoApp::Get().GetMaxBufferSize()));
         }
-    } else if (d->pUser->IsAdmin() && sCommand.equals("TRAFFIC")) {
+    } else if (d->user->IsAdmin() && sCommand.equals("TRAFFIC")) {
         NoApp::TrafficStatsPair Users, ZNC, Total;
         NoApp::TrafficStatsMap traffic = NoApp::Get().GetTrafficStats(Users, ZNC, Total);
 
@@ -1524,7 +1524,7 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(Table);
     } else if (sCommand.equals("UPTIME")) {
         PutStatus("Running for " + NoApp::Get().GetUptime());
-    } else if (d->pUser->IsAdmin() &&
+    } else if (d->user->IsAdmin() &&
                (sCommand.equals("LISTPORTS") || sCommand.equals("ADDPORT") || sCommand.equals("DELPORT"))) {
         UserPortCommand(sLine);
     } else {
@@ -1666,11 +1666,11 @@ void NoClient::HelpUser(const NoString& sFilter)
 
     AddCommandHelp(Table, "ListMods", "", "List all loaded modules", sFilter);
     AddCommandHelp(Table, "ListAvailMods", "", "List all available modules", sFilter);
-    if (!d->pUser->IsAdmin()) { // If they are an admin we will add this command below with an argument
+    if (!d->user->IsAdmin()) { // If they are an admin we will add this command below with an argument
         AddCommandHelp(Table, "ListChans", "", "List all channels", sFilter);
     }
     AddCommandHelp(Table, "ListNicks", "<#chan>", "List all nicks on a channel", sFilter);
-    if (!d->pUser->IsAdmin()) {
+    if (!d->user->IsAdmin()) {
         AddCommandHelp(Table, "ListClients", "", "List all clients connected to your ZNC user", sFilter);
     }
     AddCommandHelp(Table, "ListServers", "", "List all servers of current IRC network", sFilter);
@@ -1678,7 +1678,7 @@ void NoClient::HelpUser(const NoString& sFilter)
     AddCommandHelp(Table, "AddNetwork", "<name>", "Add a network to your user", sFilter);
     AddCommandHelp(Table, "DelNetwork", "<name>", "Delete a network from your user", sFilter);
     AddCommandHelp(Table, "ListNetworks", "", "List all networks", sFilter);
-    if (d->pUser->IsAdmin()) {
+    if (d->user->IsAdmin()) {
         AddCommandHelp(Table,
                        "MoveNetwork",
                        "<old user> <old network> <new user> [new network]",
@@ -1729,12 +1729,12 @@ void NoClient::HelpUser(const NoString& sFilter)
     AddCommandHelp(Table, "ClearAllQueryBuffers", "", "Clear the query buffers", sFilter);
     AddCommandHelp(Table, "SetBuffer", "<#chan|query> [linecount]", "Set the buffer count", sFilter);
 
-    if (d->pUser->IsAdmin()) {
+    if (d->user->IsAdmin()) {
         AddCommandHelp(Table, "AddBindHost", "<host (IP preferred)>", "Adds a bind host for normal users to use", sFilter);
         AddCommandHelp(Table, "DelBindHost", "<host>", "Removes a bind host from the list", sFilter);
     }
 
-    if (d->pUser->IsAdmin() || !d->pUser->DenySetBindHost()) {
+    if (d->user->IsAdmin() || !d->user->DenySetBindHost()) {
         AddCommandHelp(Table, "ListBindHosts", "", "Shows the configured list of bind hosts", sFilter);
         AddCommandHelp(Table, "SetBindHost", "<host (IP preferred)>", "Set the bind host for this connection", sFilter);
         AddCommandHelp(Table, "SetUserBindHost", "<host (IP preferred)>", "Set the default bind host for this user", sFilter);
@@ -1748,18 +1748,18 @@ void NoClient::HelpUser(const NoString& sFilter)
     AddCommandHelp(Table, "Connect", "", "Reconnect to IRC", sFilter);
     AddCommandHelp(Table, "Uptime", "", "Show for how long ZNC has been running", sFilter);
 
-    if (!d->pUser->DenyLoadMod()) {
+    if (!d->user->DenyLoadMod()) {
         AddCommandHelp(Table, "LoadMod", "[--type=global|user|network] <module>", "Load a module", sFilter);
         AddCommandHelp(Table, "UnloadMod", "[--type=global|user|network] <module>", "Unload a module", sFilter);
         AddCommandHelp(Table, "ReloadMod", "[--type=global|user|network] <module>", "Reload a module", sFilter);
-        if (d->pUser->IsAdmin()) {
+        if (d->user->IsAdmin()) {
             AddCommandHelp(Table, "UpdateMod", "<module>", "Reload a module everywhere", sFilter);
         }
     }
 
     AddCommandHelp(Table, "ShowMOTD", "", "Show ZNC's message of the day", sFilter);
 
-    if (d->pUser->IsAdmin()) {
+    if (d->user->IsAdmin()) {
         AddCommandHelp(Table, "SetMOTD", "<message>", "Set ZNC's message of the day", sFilter);
         AddCommandHelp(Table, "AddMOTD", "<message>", "Append <message> to ZNC's MOTD", sFilter);
         AddCommandHelp(Table, "ClearMOTD", "", "Clear ZNC's MOTD", sFilter);

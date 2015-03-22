@@ -31,7 +31,7 @@ struct NO_EXPORT NoSettingsEntry
     ~NoSettingsEntry();
     NoSettingsEntry& operator=(const NoSettingsEntry& other);
 
-    NoSettings* m_pSubConfig;
+    NoSettings* m_subConfig;
 };
 
 class NO_EXPORT NoSettings
@@ -76,8 +76,8 @@ public:
     void Write(NoFile& file, uint iIndentation = 0);
 
 private:
-    EntryMap m_ConfigEntries;
-    SubConfigMap m_SubConfigs;
+    EntryMap m_entries;
+    SubConfigMap m_subConfigs;
 };
 
 #endif // NOSETTINGS_H

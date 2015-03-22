@@ -57,7 +57,7 @@ public:
 
     NoSocket* GetSockObjImpl(const NoString& sHostname, u_short iPort) override
     {
-        NoSChatSock* p = new NoSChatSock(m_pModule, m_sChatNick, sHostname, iPort);
+        NoSChatSock* p = new NoSChatSock(m_module, m_sChatNick, sHostname, iPort);
         return (p);
     }
 
@@ -99,7 +99,7 @@ public:
     }
 
 private:
-    NoSChat* m_pModule;
+    NoSChat* m_module;
     NoString m_sChatNick;
     NoStringVector m_vBuffer;
 };
@@ -383,7 +383,7 @@ private:
 
 NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoModuleSocket(pMod)
 {
-    m_pModule = pMod;
+    m_module = pMod;
     m_sChatNick = sChatNick;
     SetSockName(pMod->GetModName().toUpper() + "::" + m_sChatNick);
     pMod->AddSocket(this);
@@ -392,7 +392,7 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoModuleSoc
 NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort)
     : NoModuleSocket(pMod, sHost, iPort)
 {
-    m_pModule = pMod;
+    m_module = pMod;
     EnableReadLine();
     m_sChatNick = sChatNick;
     SetSockName(pMod->GetModName().toUpper() + "::" + m_sChatNick);
@@ -401,44 +401,44 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoStrin
 
 NoSChatSock::~NoSChatSock()
 {
-    m_pModule->RemoveSocket(this);
+    m_module->RemoveSocket(this);
 }
 
 void NoSChatSock::PutQuery(const NoString& sText)
 {
-    m_pModule->SendToUser(m_sChatNick + "!" + m_sChatNick + "@" + GetRemoteIP(), sText);
+    m_module->SendToUser(m_sChatNick + "!" + m_sChatNick + "@" + GetRemoteIP(), sText);
 }
 
 void NoSChatSock::ReadLineImpl(const NoString& sLine)
 {
-    if (m_pModule) {
+    if (m_module) {
         NoString sText = sLine;
 
         sText.trimRight("\r\n");
 
-        if (m_pModule->IsAttached())
+        if (m_module->IsAttached())
             PutQuery(sText);
         else
-            AddLine(m_pModule->GetUser()->AddTimestamp(sText));
+            AddLine(m_module->GetUser()->AddTimestamp(sText));
     }
 }
 
 void NoSChatSock::DisconnectedImpl()
 {
-    if (m_pModule) PutQuery("*** Disconnected.");
+    if (m_module) PutQuery("*** Disconnected.");
 }
 
 void NoSChatSock::ConnectedImpl()
 {
     SetTimeout(0);
-    if (m_pModule) PutQuery("*** Connected.");
+    if (m_module) PutQuery("*** Connected.");
 }
 
 void NoSChatSock::TimeoutImpl()
 {
-    if (m_pModule) {
+    if (m_module) {
         if (IsListener())
-            m_pModule->PutModule("Timeout while waiting for [" + m_sChatNick + "]");
+            m_module->PutModule("Timeout while waiting for [" + m_sChatNick + "]");
         else
             PutQuery("*** Connection Timed out.");
     }

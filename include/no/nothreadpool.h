@@ -59,7 +59,7 @@ public:
     /// the jobs. This function BLOCKS until all jobs finish!
     void cancelJobs(const std::set<NoJob*>& jobs);
 
-    int getReadFD() const { return m_iJobPipe[0]; }
+    int getReadFD() const { return m_jobPipe[0]; }
 
     void handlePipeReadable() const;
 
@@ -90,19 +90,19 @@ private:
     NoConditionVariable m_cancellationCond;
 
     // condition variable for waiting running threads == 0
-    NoConditionVariable m_exit_cond;
+    NoConditionVariable m_exitCond;
 
     // when this is true, all threads should exit
     bool m_done;
 
     // total number of running threads
-    size_t m_num_threads;
+    size_t m_numThreads;
 
     // number of idle threads waiting on the condition variable
-    size_t m_num_idle;
+    size_t m_numIdle;
 
     // pipe for waking up the main thread
-    int m_iJobPipe[2];
+    int m_jobPipe[2];
 
     // list of pending jobs
     std::list<NoJob*> m_jobs;

@@ -62,15 +62,15 @@ public:
     void SetDefaultType(No::ModuleType eType);
 
 private:
-    std::set<No::ModuleType> m_seType;
-    No::ModuleType m_eDefaultType;
-    NoString m_sName;
-    NoString m_sPath;
-    NoString m_sDescription;
-    NoString m_sWikiPage;
-    NoString m_sArgsHelpText;
-    bool m_bHasArgs;
-    NoModuleLoader m_fLoader;
+    std::set<No::ModuleType> m_types;
+    No::ModuleType m_defaultType;
+    NoString m_name;
+    NoString m_path;
+    NoString m_description;
+    NoString m_wikiPage;
+    NoString m_argsHelpText;
+    bool m_hasArgs;
+    NoModuleLoader m_loader;
 };
 
 template <class T>

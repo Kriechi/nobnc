@@ -69,7 +69,7 @@ public:
     NoModule* GetModule() const;
 
 private:
-    NoModule* m_pModule; //!< pointer to the module that this sock instance belongs to
+    NoModule* m_module; //!< pointer to the module that this sock instance belongs to
 };
 
 #endif // NOMODULESOCKET_H

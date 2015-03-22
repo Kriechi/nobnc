@@ -110,12 +110,12 @@ private:
     static NoStringVector WrapWords(const NoString& s, size_type uWidth);
 
 private:
-    NoStringVector m_vsHeaders;
-    std::vector<NoString::size_type> m_vuMaxWidths; // Column don't need to be bigger than this
-    std::vector<NoString::size_type> m_vuMinWidths; // Column can't be thiner than this
-    std::vector<bool> m_vbWrappable;
-    size_type m_uPreferredWidth;
-    mutable NoStringVector m_vsOutput; // Rendered table
+    NoStringVector m_headers;
+    std::vector<NoString::size_type> m_maxWidths; // Column don't need to be bigger than this
+    std::vector<NoString::size_type> m_minWidths; // Column can't be thiner than this
+    std::vector<bool> m_wrappable;
+    size_type m_preferredWidth;
+    mutable NoStringVector m_output; // Rendered table
 };
 
 #endif // NOTABLE_H

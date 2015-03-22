@@ -90,7 +90,7 @@ protected:
     NoString m_sConnectIP;
     NoString m_sLocalIP;
     NoString m_sFileName;
-    NoBounceDccMod* m_pModule;
+    NoBounceDccMod* m_module;
     NoDccBounce* m_pPeer;
     ushort m_uRemotePort;
     bool m_bIsChat;
@@ -309,7 +309,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
     m_sRemoteIP = sRemoteIP;
     m_sFileName = sFileName;
     m_sRemoteNick = sRemoteNick;
-    m_pModule = pMod;
+    m_module = pMod;
     m_bIsChat = bIsChat;
     m_sLocalIP = pMod->GetLocalDCCIP();
     m_pPeer = nullptr;
@@ -334,7 +334,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
 {
     m_uRemotePort = 0;
     m_bIsChat = bIsChat;
-    m_pModule = pMod;
+    m_module = pMod;
     m_pPeer = nullptr;
     m_sRemoteNick = sRemoteNick;
     m_sFileName = sFileName;
@@ -356,7 +356,7 @@ NoDccBounce::~NoDccBounce()
         m_pPeer->Shutdown();
         m_pPeer = nullptr;
     }
-    m_pModule->RemoveSocket(this);
+    m_module->RemoveSocket(this);
 }
 
 void NoDccBounce::ReadLineImpl(const NoString& sData)
@@ -374,7 +374,7 @@ void NoDccBounce::ReachedMaxBufferImpl()
 
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
-    m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Too long line received");
+    m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Too long line received");
     Close();
 }
 
@@ -411,9 +411,9 @@ void NoDccBounce::TimeoutImpl()
             sHost = ".";
         }
 
-        m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Timeout while connecting" + sHost);
+        m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Timeout while connecting" + sHost);
     } else {
-        m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick +
+        m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick +
                              "): Timeout waiting for incoming connection [" + NoSocket::GetLocalIP() + ":" +
                              NoString(NoSocket::GetLocalPort()) + "]");
     }
@@ -431,7 +431,7 @@ void NoDccBounce::ConnectionRefusedImpl()
         sHost = ".";
     }
 
-    m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Connection Refused while connecting" + sHost);
+    m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Connection Refused while connecting" + sHost);
 }
 
 void NoDccBounce::SockErrorImpl(int iErrno, const NoString& sDescription)
@@ -445,9 +445,9 @@ void NoDccBounce::SockErrorImpl(int iErrno, const NoString& sDescription)
             sHost = "[" + sHost + " " + NoString(NoSocket::GetPort()) + "]";
         }
 
-        m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "]" + sHost);
+        m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "]" + sHost);
     } else {
-        m_pModule->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "] [" +
+        m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "] [" +
                              NoSocket::GetLocalIP() + ":" + NoString(NoSocket::GetLocalPort()) + "]");
     }
 }
@@ -475,8 +475,8 @@ NoSocket* NoDccBounce::GetSockObjImpl(const NoString& sHost, ushort uPort)
         m_sRemoteIP = sHost;
     }
 
-    NoDccBounce* pSock = new NoDccBounce(m_pModule, sHost, uPort, m_sRemoteNick, m_sRemoteIP, m_sFileName, m_bIsChat);
-    NoDccBounce* pRemoteSock = new NoDccBounce(m_pModule, sHost, uPort, m_sRemoteNick, m_sRemoteIP, m_sFileName, m_bIsChat);
+    NoDccBounce* pSock = new NoDccBounce(m_module, sHost, uPort, m_sRemoteNick, m_sRemoteIP, m_sFileName, m_bIsChat);
+    NoDccBounce* pRemoteSock = new NoDccBounce(m_module, sHost, uPort, m_sRemoteNick, m_sRemoteIP, m_sFileName, m_bIsChat);
     pSock->SetPeer(pRemoteSock);
     pRemoteSock->SetPeer(pSock);
     pRemoteSock->SetRemote(true);

@@ -29,7 +29,7 @@
 template <typename K, typename V = bool> class NoCacheMap
 {
 public:
-    NoCacheMap(uint uTTL = 5000) : m_mItems(), m_uTTL(uTTL) {}
+    NoCacheMap(uint uTTL = 5000) : m_items(), m_ttl(uTTL) {}
 
     virtual ~NoCacheMap() {}
 
@@ -37,7 +37,7 @@ public:
      * @brief This function adds an item to the cache using the default time-to-live value
      * @param Item the item to add to the cache
      */
-    void AddItem(const K& Item) { AddItem(Item, m_uTTL); }
+    void AddItem(const K& Item) { AddItem(Item, m_ttl); }
 
     /**
      * @brief This function adds an item to the cache using a custom time-to-live value
@@ -51,7 +51,7 @@ public:
      * @param Item the item to add to the cache
      * @param Val The value associated with the key Item
      */
-    void AddItem(const K& Item, const V& Val) { AddItem(Item, Val, m_uTTL); }
+    void AddItem(const K& Item, const V& Val) { AddItem(Item, Val, m_ttl); }
 
     /**
      * @brief This function adds an item to the cache using a custom time-to-live value
@@ -66,7 +66,7 @@ public:
             return;
         }
 
-        m_mItems[Item] = value(No::millTime() + uTTL, Val);
+        m_items[Item] = value(No::millTime() + uTTL, Val);
     }
 
     /**
@@ -77,7 +77,7 @@ public:
     bool HasItem(const K& Item)
     {
         Cleanup();
-        return (m_mItems.find(Item) != m_mItems.end());
+        return (m_items.find(Item) != m_items.end());
     }
 
     /**
@@ -88,8 +88,8 @@ public:
     V* GetItem(const K& Item)
     {
         Cleanup();
-        iterator it = m_mItems.find(Item);
-        if (it == m_mItems.end()) return nullptr;
+        iterator it = m_items.find(Item);
+        if (it == m_items.end()) return nullptr;
         return &it->second.second;
     }
 
@@ -98,18 +98,18 @@ public:
      * @param Item The item to be removed
      * @return true if item existed and was removed, false if it never existed
      */
-    bool RemItem(const K& Item) { return (m_mItems.erase(Item) != 0); }
+    bool RemItem(const K& Item) { return (m_items.erase(Item) != 0); }
 
     /**
      * @brief Cycles through the queue removing all of the stale entries
      */
     void Cleanup()
     {
-        iterator it = m_mItems.begin();
+        iterator it = m_items.begin();
 
-        while (it != m_mItems.end()) {
+        while (it != m_items.end()) {
             if (No::millTime() > (it->second.first)) {
-                m_mItems.erase(it++);
+                m_items.erase(it++);
             } else {
                 ++it;
             }
@@ -119,17 +119,17 @@ public:
     /**
      * @brief Clear all entries
      */
-    void Clear() { m_mItems.clear(); }
+    void Clear() { m_items.clear(); }
 
-    uint GetTTL() const { return m_uTTL; }
-    void SetTTL(uint u) { m_uTTL = u; }
+    uint GetTTL() const { return m_ttl; }
+    void SetTTL(uint u) { m_ttl = u; }
 
 protected:
     typedef std::pair<ulonglong, V> value;
     typedef typename std::map<K, value>::iterator iterator;
-    std::map<K, value> m_mItems; //!< Map of cached items.  The value portion of the map is for the expire time
+    std::map<K, value> m_items; //!< Map of cached items.  The value portion of the map is for the expire time
 private:
-    uint m_uTTL; //!< Default time-to-live duration
+    uint m_ttl; //!< Default time-to-live duration
 };
 
 #endif // NOCACHEMAP_H

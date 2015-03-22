@@ -44,10 +44,10 @@ public:
     const NoStringPairVector& GetParams() const;
 
 private:
-    uint m_uFlags;
-    NoString m_sName;
-    NoString m_sTitle;
-    NoStringPairVector m_vParams;
+    uint m_flags;
+    NoString m_name;
+    NoString m_title;
+    NoStringPairVector m_params;
 };
 
 #endif // NOWEBPAGE_H

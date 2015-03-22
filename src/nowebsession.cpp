@@ -32,7 +32,7 @@
 /// @todo Do we want to make this a configure option?
 #define _SKINDIR_ _DATADIR_ "/webskins"
 
-const uint NoWebSocket::m_uiMaxSessions = 5;
+const uint NoWebSocket::m_maxSessions = 5;
 
 class NoWebSessionMap : public NoCacheMap<NoString, std::shared_ptr<NoWebSession>>
 {
@@ -40,11 +40,11 @@ public:
     NoWebSessionMap(uint uTTL = 5000) : NoCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
     void FinishUserSessions(const NoUser& User)
     {
-        iterator it = m_mItems.begin();
+        iterator it = m_items.begin();
 
-        while (it != m_mItems.end()) {
+        while (it != m_items.end()) {
             if (it->second.second->GetUser() == &User) {
-                m_mItems.erase(it++);
+                m_items.erase(it++);
             } else {
                 ++it;
             }
@@ -114,7 +114,7 @@ private:
 NoWebSession::~NoWebSession()
 {
     // Find our entry in mIPSessions
-    std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(m_sIP);
+    std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(m_ip);
     mIPSessionsIterator it = p.first;
     mIPSessionsIterator end = p.second;
 
@@ -127,47 +127,47 @@ NoWebSession::~NoWebSession()
     }
 }
 
-const NoString& NoWebSession::GetId() const { return m_sId; }
+const NoString& NoWebSession::GetId() const { return m_id; }
 
-const NoString& NoWebSession::GetIP() const { return m_sIP; }
+const NoString& NoWebSession::GetIP() const { return m_ip; }
 
-NoUser* NoWebSession::GetUser() const { return m_pUser; }
+NoUser* NoWebSession::GetUser() const { return m_user; }
 
-time_t NoWebSession::GetLastActive() const { return m_tmLastActive; }
+time_t NoWebSession::GetLastActive() const { return m_lastActive; }
 
-bool NoWebSession::IsLoggedIn() const { return m_pUser != nullptr; }
+bool NoWebSession::IsLoggedIn() const { return m_user != nullptr; }
 
 NoWebSession::NoWebSession(const NoString& sId, const NoString& sIP)
-    : m_sId(sId), m_sIP(sIP), m_pUser(nullptr), m_vsErrorMsgs(), m_vsSuccessMsgs(), m_tmLastActive()
+    : m_id(sId), m_ip(sIP), m_user(nullptr), m_errorMsgs(), m_successMsgs(), m_lastActive()
 {
     Sessions.m_mIPSessions.insert(make_pair(sIP, this));
     UpdateLastActive();
 }
 
-void NoWebSession::UpdateLastActive() { time(&m_tmLastActive); }
+void NoWebSession::UpdateLastActive() { time(&m_lastActive); }
 
 NoUser*NoWebSession::SetUser(NoUser* p)
 {
-    m_pUser = p;
-    return m_pUser;
+    m_user = p;
+    return m_user;
 }
 
-bool NoWebSession::IsAdmin() const { return IsLoggedIn() && m_pUser->IsAdmin(); }
+bool NoWebSession::IsAdmin() const { return IsLoggedIn() && m_user->IsAdmin(); }
 
 void NoWebSession::ClearMessageLoops()
 {
-    m_vsErrorMsgs.clear();
-    m_vsSuccessMsgs.clear();
+    m_errorMsgs.clear();
+    m_successMsgs.clear();
 }
 
 void NoWebSession::FillMessageLoops(NoTemplate& Tmpl)
 {
-    for (const NoString& sMessage : m_vsErrorMsgs) {
+    for (const NoString& sMessage : m_errorMsgs) {
         NoTemplate& Row = Tmpl.AddRow("ErrorLoop");
         Row["Message"] = sMessage;
     }
 
-    for (const NoString& sMessage : m_vsSuccessMsgs) {
+    for (const NoString& sMessage : m_successMsgs) {
         NoTemplate& Row = Tmpl.AddRow("SuccessLoop");
         Row["Message"] = sMessage;
     }
@@ -175,14 +175,14 @@ void NoWebSession::FillMessageLoops(NoTemplate& Tmpl)
 
 size_t NoWebSession::AddError(const NoString& sMessage)
 {
-    m_vsErrorMsgs.push_back(sMessage);
-    return m_vsErrorMsgs.size();
+    m_errorMsgs.push_back(sMessage);
+    return m_errorMsgs.size();
 }
 
 size_t NoWebSession::AddSuccess(const NoString& sMessage)
 {
-    m_vsSuccessMsgs.push_back(sMessage);
-    return m_vsSuccessMsgs.size();
+    m_successMsgs.push_back(sMessage);
+    return m_successMsgs.size();
 }
 
 NoWebAuth::NoWebAuth(NoWebSocket* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic)
@@ -230,16 +230,16 @@ void NoWebAuth::invalidate()
 }
 
 NoWebSocket::NoWebSocket(const NoString& sURIPrefix)
-    : NoHttpSocket(nullptr, sURIPrefix), m_bPathsSet(false), m_Template(), m_spAuth(), m_sModName(""), m_sPath(""),
-      m_sPage(""), m_spSession()
+    : NoHttpSocket(nullptr, sURIPrefix), m_pathsSet(false), m_template(), m_authenticator(), m_modName(""), m_path(""),
+      m_page(""), m_session()
 {
-    m_Template.AddTagHandler(std::make_shared<NoTagHandler>(*this));
+    m_template.AddTagHandler(std::make_shared<NoTagHandler>(*this));
 }
 
 NoWebSocket::~NoWebSocket()
 {
-    if (m_spAuth) {
-        m_spAuth->invalidate();
+    if (m_authenticator) {
+        m_authenticator->invalidate();
     }
 
     // we have to account for traffic here because NoSocket does
@@ -347,7 +347,7 @@ NoString NoWebSocket::FindTmpl(NoModule* pModule, const NoString& sName)
     NoString sFile = pModule->GetModName() + "_" + sName;
     for (const NoString& sDir : vsDirs) {
         if (NoFile::Exists(NoDir::ChangeDir(sDir, sFile))) {
-            m_Template.AppendPath(sDir);
+            m_template.AppendPath(sDir);
             return sFile;
         }
     }
@@ -356,31 +356,31 @@ NoString NoWebSocket::FindTmpl(NoModule* pModule, const NoString& sName)
 
 void NoWebSocket::SetPaths(NoModule* pModule, bool bIsTemplate)
 {
-    m_Template.ClearPaths();
+    m_template.ClearPaths();
 
     NoStringVector vsDirs = GetDirs(pModule, bIsTemplate);
     for (const NoString& sDir : vsDirs) {
-        m_Template.AppendPath(sDir);
+        m_template.AppendPath(sDir);
     }
 
-    m_bPathsSet = true;
+    m_pathsSet = true;
 }
 
 void NoWebSocket::SetVars()
 {
-    m_Template["SessionUser"] = GetUser();
-    m_Template["SessionIP"] = GetRemoteIP();
-    m_Template["Tag"] = NoApp::GetTag(GetSession()->GetUser() != nullptr, true);
-    m_Template["Version"] = NoApp::GetVersion();
-    m_Template["SkinName"] = GetSkinName();
-    m_Template["_CSRF_Check"] = GetCSRFCheck();
-    m_Template["URIPrefix"] = GetURIPrefix();
+    m_template["SessionUser"] = GetUser();
+    m_template["SessionIP"] = GetRemoteIP();
+    m_template["Tag"] = NoApp::GetTag(GetSession()->GetUser() != nullptr, true);
+    m_template["Version"] = NoApp::GetVersion();
+    m_template["SkinName"] = GetSkinName();
+    m_template["_CSRF_Check"] = GetCSRFCheck();
+    m_template["URIPrefix"] = GetURIPrefix();
 
     if (GetSession()->IsAdmin()) {
-        m_Template["IsAdmin"] = "true";
+        m_template["IsAdmin"] = "true";
     }
 
-    GetSession()->FillMessageLoops(m_Template);
+    GetSession()->FillMessageLoops(m_template);
     GetSession()->ClearMessageLoops();
 
     // Global Mods
@@ -401,7 +401,7 @@ void NoWebSocket::SetVars()
         for (NoNetwork* pNetwork : vNetworks) {
             NoModules& vnMods = pNetwork->GetModules();
 
-            NoTemplate& Row = m_Template.AddRow("NetworkModLoop");
+            NoTemplate& Row = m_template.AddRow("NetworkModLoop");
             Row["NetworkName"] = pNetwork->GetName();
 
             for (NoModule* pnMod : vnMods) {
@@ -411,14 +411,14 @@ void NoWebSocket::SetVars()
     }
 
     if (IsLoggedIn()) {
-        m_Template["LoggedIn"] = "true";
+        m_template["LoggedIn"] = "true";
     }
 }
 
 bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemplate* pTemplate)
 {
     if (!pTemplate) {
-        pTemplate = &m_Template;
+        pTemplate = &m_template;
     }
 
     NoString sTitle(Module.GetWebMenuTitle());
@@ -432,7 +432,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
         Row["ModPath"] = Module.GetWebPath();
         Row["Title"] = sTitle;
 
-        if (m_sModName == Module.GetModName()) {
+        if (m_modName == Module.GetModName()) {
             NoString sModuleType = No::token(GetPath(), 1, "/");
             if (sModuleType == "global" && Module.GetType() == No::GlobalModule) {
                 bActiveModule = true;
@@ -463,7 +463,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
 
         for (TWebPage& SubPage : vSubPages) {
             // bActive is whether or not the current url matches this subpage (params will be checked below)
-            bool bActive = (m_sModName == Module.GetModName() && m_sPage == SubPage->GetName() && bActiveModule);
+            bool bActive = (m_modName == Module.GetModName() && m_page == SubPage->GetName() && bActiveModule);
 
             if (SubPage->RequiresAdmin() && !GetSession()->IsAdmin()) {
                 continue; // Don't add admin-only subpages to requests from non-admin users
@@ -511,7 +511,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
 NoWebSocket::PageRequest NoWebSocket::PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule)
 {
     SetPaths(pModule);
-    NoString sFile = m_Template.ExpandFile(sPath.trimLeft_n("/"));
+    NoString sFile = m_template.ExpandFile(sPath.trimLeft_n("/"));
     NO_DEBUG("About to print [" + sFile + "]");
     // Either PrintFile() fails and sends an error page or it suceeds and
     // sends a result. In both cases we don't have anything more to do.
@@ -523,27 +523,27 @@ NoWebSocket::PageRequest NoWebSocket::PrintTemplate(const NoString& sPageName, N
 {
     SetVars();
 
-    m_Template["PageName"] = sPageName;
+    m_template["PageName"] = sPageName;
 
     if (pModule) {
         NoUser* pUser = pModule->GetUser();
-        m_Template["ModUser"] = pUser ? pUser->GetUserName() : "";
-        m_Template["ModName"] = pModule->GetModName();
+        m_template["ModUser"] = pUser ? pUser->GetUserName() : "";
+        m_template["ModName"] = pModule->GetModName();
 
-        if (m_Template.find("Title") == m_Template.end()) {
-            m_Template["Title"] = pModule->GetWebMenuTitle();
+        if (m_template.find("Title") == m_template.end()) {
+            m_template["Title"] = pModule->GetWebMenuTitle();
         }
     }
 
-    if (!m_bPathsSet) {
+    if (!m_pathsSet) {
         SetPaths(pModule, true);
     }
 
-    if (m_Template.GetFileName().empty() && !m_Template.SetFile(sPageName + ".tmpl")) {
+    if (m_template.GetFileName().empty() && !m_template.SetFile(sPageName + ".tmpl")) {
         return NotFound;
     }
 
-    if (m_Template.PrintString(sPageRet)) {
+    if (m_template.PrintString(sPageRet)) {
         return Print;
     } else {
         return NotFound;
@@ -581,8 +581,8 @@ NoString NoWebSocket::GetRequestCookie(const NoString& sKey)
     const NoString sPrefixedKey = NoString(GetLocalPort()) + "-" + sKey;
     NoString sRet;
 
-    if (!m_sModName.empty()) {
-        sRet = NoHttpSocket::GetRequestCookie("Mod-" + m_sModName + "-" + sPrefixedKey);
+    if (!m_modName.empty()) {
+        sRet = NoHttpSocket::GetRequestCookie("Mod-" + m_modName + "-" + sPrefixedKey);
     }
 
     if (sRet.empty()) {
@@ -596,8 +596,8 @@ bool NoWebSocket::SendCookie(const NoString& sKey, const NoString& sValue)
 {
     const NoString sPrefixedKey = NoString(GetLocalPort()) + "-" + sKey;
 
-    if (!m_sModName.empty()) {
-        return NoHttpSocket::SendCookie("Mod-" + m_sModName + "-" + sPrefixedKey, sValue);
+    if (!m_modName.empty()) {
+        return NoHttpSocket::SendCookie("Mod-" + m_modName + "-" + sPrefixedKey, sValue);
     }
 
     return NoHttpSocket::SendCookie(sPrefixedKey, sValue);
@@ -659,13 +659,13 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
     SendCookie("SessionId", GetSession()->GetId());
 
     if (GetSession()->IsLoggedIn()) {
-        m_sUser = GetSession()->GetUser()->GetUserName();
-        m_bLoggedIn = true;
+        m_username = GetSession()->GetUser()->GetUserName();
+        m_loggedIn = true;
     }
 
     // Handle the static pages that don't require a login
     if (sURI == "/") {
-        if (!m_bLoggedIn && GetParam("cookie_check", false).toBool() && GetRequestCookie("SessionId").empty()) {
+        if (!m_loggedIn && GetParam("cookie_check", false).toBool() && GetRequestCookie("SessionId").empty()) {
             GetSession()->AddError("Your browser does not have cookies enabled for this site!");
         }
         return PrintTemplate("index", sPageRet);
@@ -682,9 +682,9 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
         return Done;
     } else if (sURI == "/login") {
         if (GetParam("submitted").toBool()) {
-            m_sUser = GetParam("user");
-            m_sPass = GetParam("pass");
-            m_bLoggedIn = OnLogin(m_sUser, m_sPass, false);
+            m_username = GetParam("user");
+            m_password = GetParam("pass");
+            m_loggedIn = OnLogin(m_username, m_password, false);
 
             // AcceptedLogin()/RefusedLogin() will call Redirect()
             return Deferred;
@@ -701,10 +701,10 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             NoString sFilePath = sSkinName.substr(uPathStart + 1);
             sSkinName.erase(uPathStart);
 
-            m_Template.ClearPaths();
-            m_Template.AppendPath(GetSkinPath(sSkinName) + "pub");
+            m_template.ClearPaths();
+            m_template.AppendPath(GetSkinPath(sSkinName) + "pub");
 
-            if (PrintFile(m_Template.ExpandFile(sFilePath))) {
+            if (PrintFile(m_template.ExpandFile(sFilePath))) {
                 return Done;
             } else {
                 return NotFound;
@@ -722,13 +722,13 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
         // The URI looks like:
         // /mods/[type]/([network]/)?[module][/page][?arg1=val1&arg2=val2...]
 
-        m_sPath = GetPath().trimLeft_n("/");
+        m_path = GetPath().trimLeft_n("/");
 
-        m_sPath.trimPrefix("mods/");
-        m_sPath.trimPrefix("modfiles/");
+        m_path.trimPrefix("mods/");
+        m_path.trimPrefix("modfiles/");
 
-        NoString sType = No::token(m_sPath, 0, "/");
-        m_sPath = No::tokens(m_sPath, 1, "/");
+        NoString sType = No::token(m_path, 0, "/");
+        m_path = No::tokens(m_path, 1, "/");
 
         No::ModuleType eModType;
         if (sType.equals("global")) {
@@ -749,8 +749,8 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
         NoNetwork* pNetwork = nullptr;
         if (eModType == No::NetworkModule) {
-            NoString sNetwork = No::token(m_sPath, 0, "/");
-            m_sPath = No::tokens(m_sPath, 1, "/");
+            NoString sNetwork = No::token(m_path, 0, "/");
+            m_path = No::tokens(m_path, 1, "/");
 
             pNetwork = GetSession()->GetUser()->FindNetwork(sNetwork);
 
@@ -760,33 +760,33 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             }
         }
 
-        m_sModName = No::token(m_sPath, 0, "/");
-        m_sPage = No::tokens(m_sPath, 1, "/");
+        m_modName = No::token(m_path, 0, "/");
+        m_page = No::tokens(m_path, 1, "/");
 
-        if (m_sPage.empty()) {
-            m_sPage = "index";
+        if (m_page.empty()) {
+            m_page = "index";
         }
 
-        NO_DEBUG("Path [" + m_sPath + "], Module [" + m_sModName + "], Page [" + m_sPage + "]");
+        NO_DEBUG("Path [" + m_path + "], Module [" + m_modName + "], Page [" + m_page + "]");
 
         NoModule* pModule = nullptr;
 
         switch (eModType) {
         case No::GlobalModule:
-            pModule = NoApp::Get().GetModules().FindModule(m_sModName);
+            pModule = NoApp::Get().GetModules().FindModule(m_modName);
             break;
         case No::UserModule:
-            pModule = GetSession()->GetUser()->GetModules().FindModule(m_sModName);
+            pModule = GetSession()->GetUser()->GetModules().FindModule(m_modName);
             break;
         case No::NetworkModule:
-            pModule = pNetwork->GetModules().FindModule(m_sModName);
+            pModule = pNetwork->GetModules().FindModule(m_modName);
             break;
         }
 
         if (!pModule) return NotFound;
 
-        m_Template["ModPath"] = pModule->GetWebPath();
-        m_Template["ModFilesPath"] = pModule->GetWebFilesPath();
+        m_template["ModPath"] = pModule->GetWebPath();
+        m_template["ModFilesPath"] = pModule->GetWebFilesPath();
 
         if (pModule->WebRequiresLogin() && !ForceLogin()) {
             return Print;
@@ -798,14 +798,14 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
                            "Forbidden",
                            "You must login as " + pModule->GetUser()->GetUserName() + " in order to view this page");
             return Done;
-        } else if (pModule->OnWebPreRequest(*this, m_sPage)) {
+        } else if (pModule->OnWebPreRequest(*this, m_page)) {
             return Deferred;
         }
 
         VWebPages& vSubPages = pModule->GetSubPages();
 
         for (TWebPage& SubPage : vSubPages) {
-            bool bActive = (m_sModName == pModule->GetModName() && m_sPage == SubPage->GetName());
+            bool bActive = (m_modName == pModule->GetModName() && m_page == SubPage->GetName());
 
             if (bActive && SubPage->RequiresAdmin() && !GetSession()->IsAdmin()) {
                 PrintErrorPage(403, "Forbidden", "You need to be an admin to access this page");
@@ -819,10 +819,10 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
         }
 
         if (sURI.left(10) == "/modfiles/") {
-            m_Template.AppendPath(GetSkinPath(GetSkinName()) + "/mods/" + m_sModName + "/files/");
-            m_Template.AppendPath(pModule->GetModDataDir() + "/files/");
+            m_template.AppendPath(GetSkinPath(GetSkinName()) + "/mods/" + m_modName + "/files/");
+            m_template.AppendPath(pModule->GetModDataDir() + "/files/");
 
-            if (PrintFile(m_Template.ExpandFile(m_sPage.trimLeft_n("/")))) {
+            if (PrintFile(m_template.ExpandFile(m_page.trimLeft_n("/")))) {
                 return Print;
             } else {
                 return NotFound;
@@ -832,13 +832,13 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
             /* if a module returns false from OnWebRequest, it does not
                want the template to be printed, usually because it did a redirect. */
-            if (pModule->OnWebRequest(*this, m_sPage, m_Template)) {
+            if (pModule->OnWebRequest(*this, m_page, m_template)) {
                 // If they already sent a reply, let's assume
                 // they did what they wanted to do.
                 if (SentHeader()) {
                     return Done;
                 }
-                return PrintTemplate(m_sPage, sPageRet, pModule);
+                return PrintTemplate(m_page, sPageRet, pModule);
             }
 
             if (!SentHeader()) {
@@ -866,11 +866,11 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
 void NoWebSocket::PrintErrorPage(const NoString& sMessage)
 {
-    m_Template.SetFile("Error.tmpl");
+    m_template.SetFile("Error.tmpl");
 
-    m_Template["Action"] = "error";
-    m_Template["Title"] = "Error";
-    m_Template["Error"] = sMessage;
+    m_template["Action"] = "error";
+    m_template["Title"] = "Error";
+    m_template["Error"] = sMessage;
 }
 
 static inline bool compareLastActive(const std::pair<const NoString, NoWebSession*>& first,
@@ -881,8 +881,8 @@ static inline bool compareLastActive(const std::pair<const NoString, NoWebSessio
 
 std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
 {
-    if (m_spSession) {
-        return m_spSession;
+    if (m_session) {
+        return m_session;
     }
 
     const NoString sCookieSessionId = GetRequestCookie("SessionId");
@@ -892,13 +892,13 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
         // Refresh the timeout
         Sessions.m_mspSessions.AddItem((*pSession)->GetId(), *pSession);
         (*pSession)->UpdateLastActive();
-        m_spSession = *pSession;
+        m_session = *pSession;
         NO_DEBUG("Found existing session from cookie: [" + sCookieSessionId + "] IsLoggedIn(" +
               NoString((*pSession)->IsLoggedIn() ? "true, " + ((*pSession)->GetUser()->GetUserName()) : "false") + ")");
         return *pSession;
     }
 
-    if (Sessions.m_mIPSessions.count(GetRemoteIP()) > m_uiMaxSessions) {
+    if (Sessions.m_mIPSessions.count(GetRemoteIP()) > m_maxSessions) {
         std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(GetRemoteIP());
         mIPSessionsIterator it = std::min_element(p.first, p.second, compareLastActive);
         NO_DEBUG("Remote IP:   " << GetRemoteIP() << "; discarding session [" << it->second->GetId() << "]");
@@ -919,7 +919,7 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
     std::shared_ptr<NoWebSession> spSession(new NoWebSession(sSessionID, GetRemoteIP()));
     Sessions.m_mspSessions.AddItem(spSession->GetId(), spSession);
 
-    m_spSession = spSession;
+    m_session = spSession;
 
     return spSession;
 }
@@ -933,12 +933,12 @@ NoString NoWebSocket::GetCSRFCheck()
 bool NoWebSocket::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic)
 {
     NO_DEBUG("=================== NoWebSocket::OnLogin(), basic auth? " << std::boolalpha << bBasic);
-    m_spAuth = std::make_shared<NoWebAuth>(this, sUser, sPass, bBasic);
+    m_authenticator = std::make_shared<NoWebAuth>(this, sUser, sPass, bBasic);
 
     // Some authentication module could need some time, block this socket
     // until then. CWebAuth will UnPauseRead().
     PauseRead();
-    NoApp::Get().AuthUser(m_spAuth);
+    NoApp::Get().AuthUser(m_authenticator);
 
     // If CWebAuth already set this, don't change it.
     return IsLoggedIn();

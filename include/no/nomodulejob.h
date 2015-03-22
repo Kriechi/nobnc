@@ -41,9 +41,9 @@ public:
     const NoString& GetDescription() const;
 
 private:
-    NoModule* m_pModule;
-    const NoString m_sName;
-    const NoString m_sDescription;
+    NoModule* m_module;
+    const NoString m_name;
+    const NoString m_description;
 };
 #endif // HAVE_PTHREAD
 

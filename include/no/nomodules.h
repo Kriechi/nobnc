@@ -38,12 +38,12 @@ public:
     NoModules(const NoModules&) = default;
     NoModules& operator=(const NoModules&) = default;
 
-    void SetUser(NoUser* pUser) { m_pUser = pUser; }
-    void SetNetwork(NoNetwork* pNetwork) { m_pNetwork = pNetwork; }
-    void SetClient(NoClient* pClient) { m_pClient = pClient; }
-    NoUser* GetUser() const { return m_pUser; }
-    NoNetwork* GetNetwork() const { return m_pNetwork; }
-    NoClient* GetClient() const { return m_pClient; }
+    void SetUser(NoUser* pUser) { m_user = pUser; }
+    void SetNetwork(NoNetwork* pNetwork) { m_network = pNetwork; }
+    void SetClient(NoClient* pClient) { m_client = pClient; }
+    NoUser* GetUser() const { return m_user; }
+    NoNetwork* GetNetwork() const { return m_network; }
+    NoClient* GetClient() const { return m_client; }
 
     void UnloadAll();
 
@@ -166,9 +166,9 @@ private:
     static NoModuleHandle
     OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg);
 
-    NoUser* m_pUser;
-    NoNetwork* m_pNetwork;
-    NoClient* m_pClient;
+    NoUser* m_user;
+    NoNetwork* m_network;
+    NoClient* m_client;
 };
 
 #endif // NOMODULES_H

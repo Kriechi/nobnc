@@ -187,41 +187,41 @@ private:
     bool AddListener(const NoString& sLine, NoString& sError);
     bool AddListener(NoSettings* pConfig, NoString& sError);
 
-    time_t m_TimeStarted;
+    time_t m_startTime;
 
-    ConfigState m_eConfigState;
-    std::vector<NoListener*> m_vpListeners;
-    std::map<NoString, NoUser*> m_msUsers;
-    std::map<NoString, NoUser*> m_msDelUsers;
-    NoSocketManager m_Manager;
+    ConfigState m_configState;
+    std::vector<NoListener*> m_listeners;
+    std::map<NoString, NoUser*> m_users;
+    std::map<NoString, NoUser*> m_delUsers;
+    NoSocketManager m_manager;
 
-    NoString m_sCurPath;
-    NoString m_sZNCPath;
+    NoString m_curPath;
+    NoString m_appPath;
 
-    NoString m_sConfigFile;
-    NoString m_sSkinName;
-    NoString m_sStatusPrefix;
-    NoString m_sPidFile;
-    NoString m_sSSLCertFile;
-    NoString m_sSSLCiphers;
-    NoString m_sSSLProtocols;
-    NoStringVector m_vsBindHosts;
-    NoStringVector m_vsTrustedProxies;
-    NoStringVector m_vsMotd;
-    NoFile* m_pLockFile;
-    uint m_uiConnectDelay;
-    uint m_uiAnonIPLimit;
-    uint m_uiMaxBufferSize;
-    uint m_uDisabledSSLProtocols;
-    NoModules* m_pModules;
-    ulonglong m_uBytesRead;
-    ulonglong m_uBytesWritten;
-    std::list<NoNetwork*> m_lpConnectQueue;
-    NoConnectQueueTimer* m_pConnectQueueTimer;
-    uint m_uiConnectPaused;
-    NoCacheMap<NoString> m_sConnectThrottle;
-    bool m_bProtectWebSessions;
-    bool m_bHideVersion;
+    NoString m_configFile;
+    NoString m_skinName;
+    NoString m_statusPrefix;
+    NoString m_pidFile;
+    NoString m_sslCertFile;
+    NoString m_sslCiphers;
+    NoString m_sslProtocols;
+    NoStringVector m_bindHosts;
+    NoStringVector m_trustedProxies;
+    NoStringVector m_motd;
+    NoFile* m_lockFile;
+    uint m_connectDelay;
+    uint m_anonIpLimit;
+    uint m_maxBufferSize;
+    uint m_disabledSslProtocols;
+    NoModules* m_modules;
+    ulonglong m_bytesRead;
+    ulonglong m_bytesWritten;
+    std::list<NoNetwork*> m_connectQueue;
+    NoConnectQueueTimer* m_connectQueueTimer;
+    uint m_connectPaused;
+    NoCacheMap<NoString> m_connectThrottle;
+    bool m_protectWebSessions;
+    bool m_hideVersion;
 };
 
 #endif // NOAPP_H

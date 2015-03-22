@@ -189,48 +189,48 @@ private:
     void JoinChans(std::set<NoChannel*>& sChans);
     bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 
-    NoString m_sName;
-    NoUser* m_pUser;
+    NoString m_name;
+    NoUser* m_user;
 
-    NoString m_sNick;
-    NoString m_sAltNick;
-    NoString m_sIdent;
-    NoString m_sRealName;
-    NoString m_sBindHost;
-    NoString m_sEncoding;
-    NoString m_sQuitMsg;
-    NoStringSet m_ssTrustedFingerprints;
+    NoString m_nickName;
+    NoString m_altNick;
+    NoString m_ident;
+    NoString m_realName;
+    NoString m_bindHost;
+    NoString m_encoding;
+    NoString m_quitMsg;
+    NoStringSet m_trustedFingerprints;
 
-    NoModules* m_pModules;
+    NoModules* m_modules;
 
-    std::vector<NoClient*> m_vClients;
+    std::vector<NoClient*> m_clients;
 
-    NoIrcSocket* m_pIRCSock;
+    NoIrcSocket* m_socket;
 
-    std::vector<NoChannel*> m_vChans;
-    std::vector<NoQuery*> m_vQueries;
+    std::vector<NoChannel*> m_channels;
+    std::vector<NoQuery*> m_queries;
 
-    NoString m_sChanPrefixes;
+    NoString m_chanPrefixes;
 
-    bool m_bIRCConnectEnabled;
-    NoString m_sIRCServer;
-    std::vector<NoServerInfo*> m_vServers;
-    size_t m_uServerIdx; ///< Index in m_vServers of our current server + 1
+    bool m_enabled;
+    NoString m_server;
+    std::vector<NoServerInfo*> m_servers;
+    size_t m_serverIndex; ///< Index in m_vServers of our current server + 1
 
-    NoNick m_IRCNick;
-    bool m_bIRCAway;
+    NoNick m_ircNick;
+    bool m_away;
 
-    double m_fFloodRate; ///< Set to -1 to disable protection.
-    ushort m_uFloodBurst;
+    double m_floodRate; ///< Set to -1 to disable protection.
+    ushort m_floodBurst;
 
-    NoBuffer m_RawBuffer;
-    NoBuffer m_MotdBuffer;
-    NoBuffer m_NoticeBuffer;
+    NoBuffer m_rawBuffer;
+    NoBuffer m_motdBuffer;
+    NoBuffer m_noticeBuffer;
 
-    NoNetworkPingTimer* m_pPingTimer;
-    NoNetworkJoinTimer* m_pJoinTimer;
+    NoNetworkPingTimer* m_pingTimer;
+    NoNetworkJoinTimer* m_joinTimer;
 
-    ushort m_uJoinDelay;
+    ushort m_joinDelay;
 };
 
 #endif // NONETWORK_H

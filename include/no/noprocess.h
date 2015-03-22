@@ -34,7 +34,7 @@ private:
     int popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand);
     void close2(int iPid, int iReadFD, int iWriteFD);
 
-    int m_iPid;
+    int m_pid;
 };
 
 #endif // NOPROCESS_H

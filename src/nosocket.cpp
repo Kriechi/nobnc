@@ -82,7 +82,7 @@ int NoSocketImpl::ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t
 int NoSocketImpl::VerifyPeerCertificate(int iPreVerify, X509_STORE_CTX* pStoreCTX)
 {
     if (iPreVerify == 0) {
-        ssCertVerificationErrors.insert(X509_verify_cert_error_string(X509_STORE_CTX_get_error(pStoreCTX)));
+        certVerificationErrors.insert(X509_verify_cert_error_string(X509_STORE_CTX_get_error(pStoreCTX)));
     }
     return 1;
 }
@@ -102,10 +102,10 @@ void NoSocketImpl::SSLHandShakeFinished()
     }
     NoString sHostVerifyError;
     if (!ZNC_SSLVerifyHost(q->GetHostToVerifySSL(), pCert, sHostVerifyError)) {
-        ssCertVerificationErrors.insert(sHostVerifyError);
+        certVerificationErrors.insert(sHostVerifyError);
     }
     X509_free(pCert);
-    if (ssCertVerificationErrors.empty()) {
+    if (certVerificationErrors.empty()) {
         NO_DEBUG(GetSockName() + ": Good cert");
         return;
     }
@@ -116,7 +116,7 @@ void NoSocketImpl::SSLHandShakeFinished()
     }
     NO_DEBUG(GetSockName() + ": Bad cert");
     NoString sErrorMsg = "Invalid SSL certificate: ";
-    sErrorMsg += NoString(", ").join(begin(ssCertVerificationErrors), end(ssCertVerificationErrors));
+    sErrorMsg += NoString(", ").join(begin(certVerificationErrors), end(certVerificationErrors));
     CallSockError(errnoBadSSLCert, sErrorMsg);
     Close();
 }
@@ -159,12 +159,12 @@ NoString NoSocket::GetSSLPeerFingerprint() const
 
 NoStringSet NoSocket::GetSSLTrustedPeerFingerprints() const
 {
-    return d->impl->ssTrustedFingerprints;
+    return d->impl->trustedFingerprints;
 }
 
 void NoSocket::SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs)
 {
-    d->impl->ssTrustedFingerprints = ssFPs;
+    d->impl->trustedFingerprints = ssFPs;
 }
 
 void NoSocket::SetEncoding(const NoString& sEncoding)

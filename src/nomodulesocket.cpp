@@ -22,7 +22,7 @@
 #include "noapp.h"
 #include "nodebug.h"
 
-NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_pModule(pModule)
+NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_module(pModule)
 {
     if (pModule)
         NoModulePrivate::get(pModule)->addSocket(this);
@@ -31,7 +31,7 @@ NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_pModule(pModul
 }
 
 NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort)
-    : NoSocket(sHostname, uPort), m_pModule(pModule)
+    : NoSocket(sHostname, uPort), m_module(pModule)
 {
     if (pModule)
         NoModulePrivate::get(pModule)->addSocket(this);
@@ -44,13 +44,13 @@ NoModuleSocket::~NoModuleSocket()
     NoUser* pUser = nullptr;
 
     // NoWebSocket could cause us to have a nullptr pointer here
-    if (m_pModule) {
-        pUser = m_pModule->GetUser();
-        NoModulePrivate::get(m_pModule)->removeSocket(this);
-        m_pModule->GetManager()->DelSockByAddr(this);
+    if (m_module) {
+        pUser = m_module->GetUser();
+        NoModulePrivate::get(m_module)->removeSocket(this);
+        m_module->GetManager()->DelSockByAddr(this);
     }
 
-    if (pUser && m_pModule && m_pModule->GetType() != No::GlobalModule) {
+    if (pUser && m_module && m_module->GetType() != No::GlobalModule) {
         pUser->AddBytesWritten(GetBytesWritten());
         pUser->AddBytesRead(GetBytesRead());
     } else {
@@ -62,7 +62,7 @@ NoModuleSocket::~NoModuleSocket()
 void NoModuleSocket::ReachedMaxBufferImpl()
 {
     NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
-    if (m_pModule) m_pModule->PutModule("Some socket reached its max buffer limit and was closed!");
+    if (m_module) m_module->PutModule("Some socket reached its max buffer limit and was closed!");
     Close();
 }
 
@@ -82,19 +82,19 @@ bool NoModuleSocket::ConnectionFromImpl(const NoString& sHost, ushort uPort)
 
 bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL, uint uTimeout)
 {
-    if (!m_pModule) {
+    if (!m_module) {
         NO_DEBUG("ERROR: NoSocket::Connect called on instance without m_pModule handle!");
         return false;
     }
 
-    NoUser* pUser = m_pModule->GetUser();
-    NoString sSockName = "MOD::C::" + m_pModule->GetModName();
+    NoUser* pUser = m_module->GetUser();
+    NoString sSockName = "MOD::C::" + m_module->GetModName();
     NoString sBindHost;
 
     if (pUser) {
         sSockName += "::" + pUser->GetUserName();
         sBindHost = pUser->GetBindHost();
-        NoNetwork* pNetwork = m_pModule->GetNetwork();
+        NoNetwork* pNetwork = m_module->GetNetwork();
         if (pNetwork) {
             sSockName += "::" + pNetwork->GetName();
             sBindHost = pNetwork->GetBindHost();
@@ -106,19 +106,19 @@ bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL,
         sSockName = GetSockName();
     }
 
-    m_pModule->GetManager()->Connect(sHostname, uPort, sSockName, uTimeout, bSSL, sBindHost, this);
+    m_module->GetManager()->Connect(sHostname, uPort, sSockName, uTimeout, bSSL, sBindHost, this);
     return true;
 }
 
 bool NoModuleSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
 {
-    if (!m_pModule) {
+    if (!m_module) {
         NO_DEBUG("ERROR: NoSocket::Listen called on instance without m_pModule handle!");
         return false;
     }
 
-    NoUser* pUser = m_pModule->GetUser();
-    NoString sSockName = "MOD::L::" + m_pModule->GetModName();
+    NoUser* pUser = m_module->GetUser();
+    NoString sSockName = "MOD::L::" + m_module->GetModName();
 
     if (pUser) {
         sSockName += "::" + pUser->GetUserName();
@@ -128,7 +128,7 @@ bool NoModuleSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
         sSockName = GetSockName();
     }
 
-    return m_pModule->GetManager()->ListenAll(uPort, sSockName, bSSL, SOMAXCONN, this);
+    return m_module->GetManager()->ListenAll(uPort, sSockName, bSSL, SOMAXCONN, this);
 }
 
-NoModule* NoModuleSocket::GetModule() const { return m_pModule; }
+NoModule* NoModuleSocket::GetModule() const { return m_module; }

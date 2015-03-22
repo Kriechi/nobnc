@@ -42,26 +42,26 @@ static inline NoString FormatBindError()
 }
 
 NoApp::NoApp()
-    : m_TimeStarted(time(nullptr)), m_eConfigState(ConfigNothing), m_vpListeners(), m_msUsers(), m_msDelUsers(),
-      m_Manager(), m_sCurPath(""), m_sZNCPath(""), m_sConfigFile(""), m_sSkinName(""), m_sStatusPrefix(""),
-      m_sPidFile(""), m_sSSLCertFile(""), m_sSSLCiphers(""), m_sSSLProtocols(""), m_vsBindHosts(), m_vsTrustedProxies(),
-      m_vsMotd(), m_pLockFile(nullptr), m_uiConnectDelay(5), m_uiAnonIPLimit(10), m_uiMaxBufferSize(500),
-      m_uDisabledSSLProtocols(Csock::EDP_SSL), m_pModules(new NoModules), m_uBytesRead(0), m_uBytesWritten(0),
-      m_lpConnectQueue(), m_pConnectQueueTimer(nullptr), m_uiConnectPaused(0), m_sConnectThrottle(),
-      m_bProtectWebSessions(true), m_bHideVersion(false)
+    : m_startTime(time(nullptr)), m_configState(ConfigNothing), m_listeners(), m_users(), m_delUsers(),
+      m_manager(), m_curPath(""), m_appPath(""), m_configFile(""), m_skinName(""), m_statusPrefix(""),
+      m_pidFile(""), m_sslCertFile(""), m_sslCiphers(""), m_sslProtocols(""), m_bindHosts(), m_trustedProxies(),
+      m_motd(), m_lockFile(nullptr), m_connectDelay(5), m_anonIpLimit(10), m_maxBufferSize(500),
+      m_disabledSslProtocols(Csock::EDP_SSL), m_modules(new NoModules), m_bytesRead(0), m_bytesWritten(0),
+      m_connectQueue(), m_connectQueueTimer(nullptr), m_connectPaused(0), m_connectThrottle(),
+      m_protectWebSessions(true), m_hideVersion(false)
 {
     if (!InitCsocket()) {
         No::printError("Could not initialize Csocket!");
         exit(-1);
     }
-    m_sConnectThrottle.SetTTL(30000);
+    m_connectThrottle.SetTTL(30000);
 }
 
 NoApp::~NoApp()
 {
-    m_pModules->UnloadAll();
+    m_modules->UnloadAll();
 
-    for (const auto& it : m_msUsers) {
+    for (const auto& it : m_users) {
         it.second->GetModules().UnloadAll();
 
         const std::vector<NoNetwork*>& networks = it.second->GetNetworks();
@@ -70,21 +70,21 @@ NoApp::~NoApp()
         }
     }
 
-    for (NoListener* pListener : m_vpListeners) {
+    for (NoListener* pListener : m_listeners) {
         delete pListener;
     }
 
-    for (const auto& it : m_msUsers) {
+    for (const auto& it : m_users) {
         it.second->SetBeingDeleted(true);
     }
 
-    m_pConnectQueueTimer = nullptr;
+    m_connectQueueTimer = nullptr;
     // This deletes m_pConnectQueueTimer
-    m_Manager.Cleanup();
+    m_manager.Cleanup();
     DeleteUsers();
 
-    delete m_pModules;
-    delete m_pLockFile;
+    delete m_modules;
+    delete m_lockFile;
 
     ShutdownCsocket();
     DeletePidFile();
@@ -94,7 +94,7 @@ NoString NoApp::GetVersion() { return NoString(NO_VERSION_STR) + NoString(NO_VER
 
 NoString NoApp::GetTag(bool bIncludeVersion, bool bHTML)
 {
-    if (!Get().m_bHideVersion) {
+    if (!Get().m_hideVersion) {
         bIncludeVersion = true;
     }
     NoString sAddress = bHTML ? "<a href=\"http://znc.in\">http://znc.in</a>" : "http://znc.in";
@@ -154,9 +154,9 @@ bool NoApp::OnBoot()
 
 bool NoApp::HandleUserDeletion()
 {
-    if (m_msDelUsers.empty()) return false;
+    if (m_delUsers.empty()) return false;
 
-    for (const auto& it : m_msDelUsers) {
+    for (const auto& it : m_delUsers) {
         NoUser* pUser = it.second;
         pUser->SetBeingDeleted(true);
 
@@ -164,12 +164,12 @@ bool NoApp::HandleUserDeletion()
             pUser->SetBeingDeleted(false);
             continue;
         }
-        m_msUsers.erase(pUser->GetUserName());
+        m_users.erase(pUser->GetUserName());
         NoWebSocket::FinishUserSessions(*pUser);
         delete pUser;
     }
 
-    m_msDelUsers.clear();
+    m_delUsers.clear();
 
     return true;
 }
@@ -213,20 +213,20 @@ void NoApp::Loop()
 
         // Csocket wants micro seconds
         // 100 msec to 600 sec
-        m_Manager.DynamicSelectLoop(100 * 1000, 600 * 1000 * 1000);
+        m_manager.DynamicSelectLoop(100 * 1000, 600 * 1000 * 1000);
     }
 }
 
 NoFile* NoApp::InitPidFile()
 {
-    if (!m_sPidFile.empty()) {
+    if (!m_pidFile.empty()) {
         NoString sFile;
 
         // absolute path or relative to the data dir?
-        if (m_sPidFile[0] != '/')
-            sFile = GetZNCPath() + "/" + m_sPidFile;
+        if (m_pidFile[0] != '/')
+            sFile = GetZNCPath() + "/" + m_pidFile;
         else
-            sFile = m_sPidFile;
+            sFile = m_pidFile;
 
         return new NoFile(sFile);
     }
@@ -391,47 +391,47 @@ bool NoApp::WritePemFile()
 #endif
 }
 
-const NoStringVector&NoApp::GetBindHosts() const { return m_vsBindHosts; }
+const NoStringVector&NoApp::GetBindHosts() const { return m_bindHosts; }
 
-const NoStringVector&NoApp::GetTrustedProxies() const { return m_vsTrustedProxies; }
+const NoStringVector&NoApp::GetTrustedProxies() const { return m_trustedProxies; }
 
-const std::vector<NoListener*>&NoApp::GetListeners() const { return m_vpListeners; }
+const std::vector<NoListener*>&NoApp::GetListeners() const { return m_listeners; }
 
-time_t NoApp::TimeStarted() const { return m_TimeStarted; }
+time_t NoApp::TimeStarted() const { return m_startTime; }
 
-uint NoApp::GetMaxBufferSize() const { return m_uiMaxBufferSize; }
+uint NoApp::GetMaxBufferSize() const { return m_maxBufferSize; }
 
-uint NoApp::GetAnonIPLimit() const { return m_uiAnonIPLimit; }
+uint NoApp::GetAnonIPLimit() const { return m_anonIpLimit; }
 
-uint NoApp::GetServerThrottle() const { return m_sConnectThrottle.GetTTL() / 1000; }
+uint NoApp::GetServerThrottle() const { return m_connectThrottle.GetTTL() / 1000; }
 
-uint NoApp::GetConnectDelay() const { return m_uiConnectDelay; }
+uint NoApp::GetConnectDelay() const { return m_connectDelay; }
 
-bool NoApp::GetProtectWebSessions() const { return m_bProtectWebSessions; }
+bool NoApp::GetProtectWebSessions() const { return m_protectWebSessions; }
 
-bool NoApp::GetHideVersion() const { return m_bHideVersion; }
+bool NoApp::GetHideVersion() const { return m_hideVersion; }
 
-NoString NoApp::GetSSLCiphers() const { return m_sSSLCiphers; }
+NoString NoApp::GetSSLCiphers() const { return m_sslCiphers; }
 
 uint NoApp::GetDisabledSSLProtocols() const
 {
-    return m_uDisabledSSLProtocols;
+    return m_disabledSslProtocols;
 }
 
 void NoApp::DeleteUsers()
 {
-    for (const auto& it : m_msUsers) {
+    for (const auto& it : m_users) {
         it.second->SetBeingDeleted(true);
         delete it.second;
     }
 
-    m_msUsers.clear();
+    m_users.clear();
     DisableConnectQueue();
 }
 
 bool NoApp::IsHostAllowed(const NoString& sHostMask) const
 {
-    for (const auto& it : m_msUsers) {
+    for (const auto& it : m_users) {
         if (it.second->IsHostAllowed(sHostMask)) {
             return true;
         }
@@ -442,8 +442,8 @@ bool NoApp::IsHostAllowed(const NoString& sHostMask) const
 
 bool NoApp::AllowConnectionFrom(const NoString& sIP) const
 {
-    if (m_uiAnonIPLimit == 0) return true;
-    return (GetManager().GetAnonConnectionCount(sIP) < m_uiAnonIPLimit);
+    if (m_anonIpLimit == 0) return true;
+    return (GetManager().GetAnonConnectionCount(sIP) < m_anonIpLimit);
 }
 
 void NoApp::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
@@ -451,25 +451,25 @@ void NoApp::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
     // If the bin was not ran from the current directory, we need to add that dir onto our cwd
     NoString::size_type uPos = sArgvPath.rfind('/');
     if (uPos == NoString::npos)
-        m_sCurPath = "./";
+        m_curPath = "./";
     else
-        m_sCurPath = NoDir::ChangeDir("./", sArgvPath.left(uPos), "");
+        m_curPath = NoDir::ChangeDir("./", sArgvPath.left(uPos), "");
 
     // Try to set the user's home dir, default to binpath on failure
-    NoFile::InitHomePath(m_sCurPath);
+    NoFile::InitHomePath(m_curPath);
 
     if (sDataDir.empty()) {
-        m_sZNCPath = NoFile::GetHomePath() + "/.znc";
+        m_appPath = NoFile::GetHomePath() + "/.znc";
     } else {
-        m_sZNCPath = sDataDir;
+        m_appPath = sDataDir;
     }
 
-    m_sSSLCertFile = m_sZNCPath + "/znc.pem";
+    m_sslCertFile = m_appPath + "/znc.pem";
 }
 
 NoString NoApp::GetConfPath(bool bAllowMkDir) const
 {
-    NoString sConfPath = m_sZNCPath + "/configs";
+    NoString sConfPath = m_appPath + "/configs";
     if (bAllowMkDir && !NoFile::Exists(sConfPath)) {
         NoDir::MakeDir(sConfPath);
     }
@@ -479,7 +479,7 @@ NoString NoApp::GetConfPath(bool bAllowMkDir) const
 
 NoString NoApp::GetUserPath() const
 {
-    NoString sUserPath = m_sZNCPath + "/users";
+    NoString sUserPath = m_appPath + "/users";
     if (!NoFile::Exists(sUserPath)) {
         NoDir::MakeDir(sUserPath);
     }
@@ -489,32 +489,32 @@ NoString NoApp::GetUserPath() const
 
 NoString NoApp::GetModPath() const
 {
-    NoString sModPath = m_sZNCPath + "/modules";
+    NoString sModPath = m_appPath + "/modules";
 
     return sModPath;
 }
 
 const NoString& NoApp::GetCurPath() const
 {
-    if (!NoFile::Exists(m_sCurPath)) {
-        NoDir::MakeDir(m_sCurPath);
+    if (!NoFile::Exists(m_curPath)) {
+        NoDir::MakeDir(m_curPath);
     }
-    return m_sCurPath;
+    return m_curPath;
 }
 
 const NoString& NoApp::GetHomePath() const { return NoFile::GetHomePath(); }
 
 const NoString& NoApp::GetZNCPath() const
 {
-    if (!NoFile::Exists(m_sZNCPath)) {
-        NoDir::MakeDir(m_sZNCPath);
+    if (!NoFile::Exists(m_appPath)) {
+        NoDir::MakeDir(m_appPath);
     }
-    return m_sZNCPath;
+    return m_appPath;
 }
 
-NoString NoApp::GetPemLocation() const { return NoDir::ChangeDir("", m_sSSLCertFile); }
+NoString NoApp::GetPemLocation() const { return NoDir::ChangeDir("", m_sslCertFile); }
 
-const NoString&NoApp::GetConfigFile() const { return m_sConfigFile; }
+const NoString&NoApp::GetConfigFile() const { return m_configFile; }
 
 NoString NoApp::ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir)
 {
@@ -564,15 +564,15 @@ bool NoApp::WriteConfig()
     pFile->Write(MakeConfigHeader() + "\n");
 
     NoSettings config;
-    config.AddKeyValuePair("AnonIPLimit", NoString(m_uiAnonIPLimit));
-    config.AddKeyValuePair("MaxBufferSize", NoString(m_uiMaxBufferSize));
-    config.AddKeyValuePair("SSLCertFile", NoString(m_sSSLCertFile));
-    config.AddKeyValuePair("ProtectWebSessions", NoString(m_bProtectWebSessions));
-    config.AddKeyValuePair("HideVersion", NoString(m_bHideVersion));
+    config.AddKeyValuePair("AnonIPLimit", NoString(m_anonIpLimit));
+    config.AddKeyValuePair("MaxBufferSize", NoString(m_maxBufferSize));
+    config.AddKeyValuePair("SSLCertFile", NoString(m_sslCertFile));
+    config.AddKeyValuePair("ProtectWebSessions", NoString(m_protectWebSessions));
+    config.AddKeyValuePair("HideVersion", NoString(m_hideVersion));
     config.AddKeyValuePair("Version", NoString(NO_VERSION_STR));
 
     uint l = 0;
-    for (NoListener* pListener : m_vpListeners) {
+    for (NoListener* pListener : m_listeners) {
         NoSettings listenerConfig;
 
         listenerConfig.AddKeyValuePair("Host", pListener->host());
@@ -590,38 +590,38 @@ bool NoApp::WriteConfig()
         config.AddSubConfig("Listener", "listener" + NoString(l++), listenerConfig);
     }
 
-    config.AddKeyValuePair("ConnectDelay", NoString(m_uiConnectDelay));
-    config.AddKeyValuePair("ServerThrottle", NoString(m_sConnectThrottle.GetTTL() / 1000));
+    config.AddKeyValuePair("ConnectDelay", NoString(m_connectDelay));
+    config.AddKeyValuePair("ServerThrottle", NoString(m_connectThrottle.GetTTL() / 1000));
 
-    if (!m_sPidFile.empty()) {
-        config.AddKeyValuePair("PidFile", No::firstLine(m_sPidFile));
+    if (!m_pidFile.empty()) {
+        config.AddKeyValuePair("PidFile", No::firstLine(m_pidFile));
     }
 
-    if (!m_sSkinName.empty()) {
-        config.AddKeyValuePair("Skin", No::firstLine(m_sSkinName));
+    if (!m_skinName.empty()) {
+        config.AddKeyValuePair("Skin", No::firstLine(m_skinName));
     }
 
-    if (!m_sStatusPrefix.empty()) {
-        config.AddKeyValuePair("StatusPrefix", No::firstLine(m_sStatusPrefix));
+    if (!m_statusPrefix.empty()) {
+        config.AddKeyValuePair("StatusPrefix", No::firstLine(m_statusPrefix));
     }
 
-    if (!m_sSSLCiphers.empty()) {
-        config.AddKeyValuePair("SSLCiphers", NoString(m_sSSLCiphers));
+    if (!m_sslCiphers.empty()) {
+        config.AddKeyValuePair("SSLCiphers", NoString(m_sslCiphers));
     }
 
-    if (!m_sSSLProtocols.empty()) {
-        config.AddKeyValuePair("SSLProtocols", m_sSSLProtocols);
+    if (!m_sslProtocols.empty()) {
+        config.AddKeyValuePair("SSLProtocols", m_sslProtocols);
     }
 
-    for (const NoString& sLine : m_vsMotd) {
+    for (const NoString& sLine : m_motd) {
         config.AddKeyValuePair("Motd", No::firstLine(sLine));
     }
 
-    for (const NoString& sHost : m_vsBindHosts) {
+    for (const NoString& sHost : m_bindHosts) {
         config.AddKeyValuePair("BindHost", No::firstLine(sHost));
     }
 
-    for (const NoString& sProxy : m_vsTrustedProxies) {
+    for (const NoString& sProxy : m_trustedProxies) {
         config.AddKeyValuePair("TrustedProxy", No::firstLine(sProxy));
     }
 
@@ -638,7 +638,7 @@ bool NoApp::WriteConfig()
         config.AddKeyValuePair("LoadModule", No::firstLine(sName) + sArgs);
     }
 
-    for (const auto& it : m_msUsers) {
+    for (const auto& it : m_users) {
         NoString sErr;
 
         if (!it.second->IsValid(sErr)) {
@@ -673,8 +673,8 @@ bool NoApp::WriteConfig()
     pFile->SetFileName(GetConfigFile());
 
     // Make sure the lock is kept alive as long as we need it.
-    delete m_pLockFile;
-    m_pLockFile = pFile;
+    delete m_lockFile;
+    m_lockFile = pFile;
 
     return true;
 }
@@ -700,10 +700,10 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     vsLines.push_back(MakeConfigHeader());
     vsLines.push_back("Version = " + NoString(NO_VERSION_STR));
 
-    m_sConfigFile = ExpandConfigPath(sConfigFile);
+    m_configFile = ExpandConfigPath(sConfigFile);
 
-    if (NoFile::Exists(m_sConfigFile)) {
-        No::printStatus(false, "WARNING: config [" + m_sConfigFile + "] already exists.");
+    if (NoFile::Exists(m_configFile)) {
+        No::printStatus(false, "WARNING: config [" + m_configFile + "] already exists.");
     }
 
     No::printMessage("");
@@ -904,25 +904,25 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     NoFile File;
     bool bFileOK, bFileOpen = false;
     do {
-        No::printAction("Writing config [" + m_sConfigFile + "]");
+        No::printAction("Writing config [" + m_configFile + "]");
 
         bFileOK = true;
-        if (NoFile::Exists(m_sConfigFile)) {
-            if (!File.TryExLock(m_sConfigFile)) {
+        if (NoFile::Exists(m_configFile)) {
+            if (!File.TryExLock(m_configFile)) {
                 No::printStatus(false, "ZNC is currently running on this config.");
                 bFileOK = false;
             } else {
                 File.Close();
                 No::printStatus(false, "This config already exists.");
                 if (No::getBoolInput("Are you sure you want to overwrite it?", false))
-                    No::printAction("Overwriting config [" + m_sConfigFile + "]");
+                    No::printAction("Overwriting config [" + m_configFile + "]");
                 else
                     bFileOK = false;
             }
         }
 
         if (bFileOK) {
-            File.SetFileName(m_sConfigFile);
+            File.SetFileName(m_configFile);
             if (File.Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
                 bFileOpen = true;
             } else {
@@ -932,14 +932,14 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         }
         if (!bFileOK) {
             while (!No::getInput("Please specify an alternate location",
-                                     m_sConfigFile,
+                                     m_configFile,
                                      "",
                                      "or \"stdout\" for displaying the config"))
                 ;
-            if (m_sConfigFile.equals("stdout"))
+            if (m_configFile.equals("stdout"))
                 bFileOK = true;
             else
-                m_sConfigFile = ExpandConfigPath(m_sConfigFile);
+                m_configFile = ExpandConfigPath(m_configFile);
         }
     } while (!bFileOK);
 
@@ -1004,8 +1004,8 @@ void NoApp::BackupConfigOnce(const NoString& sSuffix)
 
     No::printAction("Creating a config backup");
 
-    NoString sBackup = NoDir::ChangeDir(m_sConfigFile, "../znc.conf." + sSuffix);
-    if (NoFile::Copy(m_sConfigFile, sBackup))
+    NoString sBackup = NoDir::ChangeDir(m_configFile, "../znc.conf." + sSuffix);
+    if (NoFile::Copy(m_configFile, sBackup))
         No::printStatus(true, sBackup);
     else
         No::printStatus(false, strerror(errno));
@@ -1013,7 +1013,7 @@ void NoApp::BackupConfigOnce(const NoString& sSuffix)
 
 bool NoApp::ParseConfig(const NoString& sConfig, NoString& sError)
 {
-    m_sConfigFile = ExpandConfigPath(sConfig, false);
+    m_configFile = ExpandConfigPath(sConfig, false);
 
     return DoRehash(sError);
 }
@@ -1026,8 +1026,8 @@ bool NoApp::RehashConfig(NoString& sError)
     HandleUserDeletion();
 
     // Mark all users as going-to-be deleted
-    m_msDelUsers = m_msUsers;
-    m_msUsers.clear();
+    m_delUsers = m_users;
+    m_users.clear();
 
     if (DoRehash(sError)) {
         ALLMODULECALL(OnPostRehash(), NOTHING);
@@ -1037,9 +1037,9 @@ bool NoApp::RehashConfig(NoString& sError)
 
     // Rehashing failed, try to recover
     NoString s;
-    while (!m_msDelUsers.empty()) {
-        AddUser(m_msDelUsers.begin()->second, s);
-        m_msDelUsers.erase(m_msDelUsers.begin());
+    while (!m_delUsers.empty()) {
+        AddUser(m_delUsers.begin()->second, s);
+        m_delUsers.erase(m_delUsers.begin());
     }
 
     return false;
@@ -1049,26 +1049,26 @@ bool NoApp::DoRehash(NoString& sError)
 {
     sError.clear();
 
-    No::printAction("Opening config [" + m_sConfigFile + "]");
+    No::printAction("Opening config [" + m_configFile + "]");
 
-    if (!NoFile::Exists(m_sConfigFile)) {
+    if (!NoFile::Exists(m_configFile)) {
         sError = "No such file";
         No::printStatus(false, sError);
         No::printMessage("Restart ZNC with the --makeconf option if you wish to create this config.");
         return false;
     }
 
-    if (!NoFile::IsReg(m_sConfigFile)) {
+    if (!NoFile::IsReg(m_configFile)) {
         sError = "Not a file";
         No::printStatus(false, sError);
         return false;
     }
 
-    NoFile* pFile = new NoFile(m_sConfigFile);
+    NoFile* pFile = new NoFile(m_configFile);
 
     // need to open the config file Read/Write for fcntl()
     // exclusive locking to work properly!
-    if (!pFile->Open(m_sConfigFile, O_RDWR)) {
+    if (!pFile->Open(m_configFile, O_RDWR)) {
         sError = "Can not open config file";
         No::printStatus(false, sError);
         delete pFile;
@@ -1083,8 +1083,8 @@ bool NoApp::DoRehash(NoString& sError)
     }
 
     // (re)open the config file
-    delete m_pLockFile;
-    m_pLockFile = pFile;
+    delete m_lockFile;
+    m_lockFile = pFile;
     NoFile& File = *pFile;
 
     NoSettings config;
@@ -1109,14 +1109,14 @@ bool NoApp::DoRehash(NoString& sError)
         No::printError("Config was saved from ZNC " + sSavedVersion + ". It may or may not work with current ZNC " + GetVersion());
     }
 
-    m_vsBindHosts.clear();
-    m_vsTrustedProxies.clear();
-    m_vsMotd.clear();
+    m_bindHosts.clear();
+    m_trustedProxies.clear();
+    m_motd.clear();
 
     // Delete all listeners
-    while (!m_vpListeners.empty()) {
-        delete m_vpListeners[0];
-        m_vpListeners.erase(m_vpListeners.begin());
+    while (!m_listeners.empty()) {
+        delete m_listeners[0];
+        m_listeners.erase(m_listeners.begin());
     }
 
     NoStringMap msModules; // Modules are queued for later loading
@@ -1215,20 +1215,20 @@ bool NoApp::DoRehash(NoString& sError)
     }
 
     NoString sVal;
-    if (config.FindStringEntry("pidfile", sVal)) m_sPidFile = sVal;
-    if (config.FindStringEntry("statusprefix", sVal)) m_sStatusPrefix = sVal;
-    if (config.FindStringEntry("sslcertfile", sVal)) m_sSSLCertFile = sVal;
-    if (config.FindStringEntry("sslciphers", sVal)) m_sSSLCiphers = sVal;
+    if (config.FindStringEntry("pidfile", sVal)) m_pidFile = sVal;
+    if (config.FindStringEntry("statusprefix", sVal)) m_statusPrefix = sVal;
+    if (config.FindStringEntry("sslcertfile", sVal)) m_sslCertFile = sVal;
+    if (config.FindStringEntry("sslciphers", sVal)) m_sslCiphers = sVal;
     if (config.FindStringEntry("skin", sVal)) SetSkinName(sVal);
     if (config.FindStringEntry("connectdelay", sVal)) SetConnectDelay(sVal.toUInt());
-    if (config.FindStringEntry("serverthrottle", sVal)) m_sConnectThrottle.SetTTL(sVal.toUInt() * 1000);
-    if (config.FindStringEntry("anoniplimit", sVal)) m_uiAnonIPLimit = sVal.toUInt();
-    if (config.FindStringEntry("maxbuffersize", sVal)) m_uiMaxBufferSize = sVal.toUInt();
-    if (config.FindStringEntry("protectwebsessions", sVal)) m_bProtectWebSessions = sVal.toBool();
-    if (config.FindStringEntry("hideversion", sVal)) m_bHideVersion = sVal.toBool();
+    if (config.FindStringEntry("serverthrottle", sVal)) m_connectThrottle.SetTTL(sVal.toUInt() * 1000);
+    if (config.FindStringEntry("anoniplimit", sVal)) m_anonIpLimit = sVal.toUInt();
+    if (config.FindStringEntry("maxbuffersize", sVal)) m_maxBufferSize = sVal.toUInt();
+    if (config.FindStringEntry("protectwebsessions", sVal)) m_protectWebSessions = sVal.toBool();
+    if (config.FindStringEntry("hideversion", sVal)) m_hideVersion = sVal.toBool();
 
-    if (config.FindStringEntry("sslprotocols", m_sSSLProtocols)) {
-        NoStringVector vsProtocols = m_sSSLProtocols.split(" ", No::SkipEmptyParts);
+    if (config.FindStringEntry("sslprotocols", m_sslProtocols)) {
+        NoStringVector vsProtocols = m_sslProtocols.split(" ", No::SkipEmptyParts);
 
         for (NoString& sProtocol : vsProtocols) {
 
@@ -1257,11 +1257,11 @@ bool NoApp::DoRehash(NoString& sError)
             }
 
             if (bEnable) {
-                m_uDisabledSSLProtocols &= ~uFlag;
+                m_disabledSslProtocols &= ~uFlag;
             } else if (bDisable) {
-                m_uDisabledSSLProtocols |= uFlag;
+                m_disabledSslProtocols |= uFlag;
             } else {
-                m_uDisabledSSLProtocols = ~uFlag;
+                m_disabledSslProtocols = ~uFlag;
             }
         }
     }
@@ -1281,7 +1281,7 @@ bool NoApp::DoRehash(NoString& sError)
 
     config.FindSubConfig("listener", subConf);
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
-        NoSettings* pSubConf = subIt->second.m_pSubConfig;
+        NoSettings* pSubConf = subIt->second.m_subConfig;
         if (!AddListener(pSubConf, sError)) return false;
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in Listener config!";
@@ -1295,24 +1295,24 @@ bool NoApp::DoRehash(NoString& sError)
     config.FindSubConfig("user", subConf);
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
         const NoString& sUserName = subIt->first;
-        NoSettings* pSubConf = subIt->second.m_pSubConfig;
+        NoSettings* pSubConf = subIt->second.m_subConfig;
         NoUser* pRealUser = nullptr;
 
         No::printMessage("Loading user [" + sUserName + "]");
 
         // Either create a NoUser* or use an existing one
-        std::map<NoString, NoUser*>::iterator it = m_msDelUsers.find(sUserName);
+        std::map<NoString, NoUser*>::iterator it = m_delUsers.find(sUserName);
 
-        if (it != m_msDelUsers.end()) {
+        if (it != m_delUsers.end()) {
             pRealUser = it->second;
-            m_msDelUsers.erase(it);
+            m_delUsers.erase(it);
         }
 
         NoUser* pUser = new NoUser(sUserName);
 
-        if (!m_sStatusPrefix.empty()) {
-            if (!pUser->SetStatusPrefix(m_sStatusPrefix)) {
-                sError = "Invalid StatusPrefix [" + m_sStatusPrefix + "] Must be 1-5 chars, no spaces.";
+        if (!m_statusPrefix.empty()) {
+            if (!pUser->SetStatusPrefix(m_statusPrefix)) {
+                sError = "Invalid StatusPrefix [" + m_statusPrefix + "] Must be 1-5 chars, no spaces.";
                 No::printError(sError);
                 return false;
             }
@@ -1382,13 +1382,13 @@ bool NoApp::DoRehash(NoString& sError)
             No::printMessage("Could not unload [" + sMod + "]");
     }
 
-    if (m_msUsers.empty()) {
+    if (m_users.empty()) {
         sError = "You must define at least one user in your config.";
         No::printError(sError);
         return false;
     }
 
-    if (m_vpListeners.empty()) {
+    if (m_listeners.empty()) {
         sError = "You must supply at least one Listen port in your config.";
         No::printError(sError);
         return false;
@@ -1417,12 +1417,12 @@ void NoApp::DumpConfig(const NoSettings* pConfig)
 
         for (; it != sSub.end(); ++it) {
             No::printError("SubConfig [" + sKey + " " + it->first + "]:");
-            DumpConfig(it->second.m_pSubConfig);
+            DumpConfig(it->second.m_subConfig);
         }
     }
 }
 
-void NoApp::ClearBindHosts() { m_vsBindHosts.clear(); }
+void NoApp::ClearBindHosts() { m_bindHosts.clear(); }
 
 bool NoApp::AddBindHost(const NoString& sHost)
 {
@@ -1430,22 +1430,22 @@ bool NoApp::AddBindHost(const NoString& sHost)
         return false;
     }
 
-    for (const NoString& sBindHost : m_vsBindHosts) {
+    for (const NoString& sBindHost : m_bindHosts) {
         if (sBindHost.equals(sHost)) {
             return false;
         }
     }
 
-    m_vsBindHosts.push_back(sHost);
+    m_bindHosts.push_back(sHost);
     return true;
 }
 
 bool NoApp::RemBindHost(const NoString& sHost)
 {
     NoStringVector::iterator it;
-    for (it = m_vsBindHosts.begin(); it != m_vsBindHosts.end(); ++it) {
+    for (it = m_bindHosts.begin(); it != m_bindHosts.end(); ++it) {
         if (sHost.equals(*it)) {
-            m_vsBindHosts.erase(it);
+            m_bindHosts.erase(it);
             return true;
         }
     }
@@ -1453,7 +1453,7 @@ bool NoApp::RemBindHost(const NoString& sHost)
     return false;
 }
 
-void NoApp::ClearTrustedProxies() { m_vsTrustedProxies.clear(); }
+void NoApp::ClearTrustedProxies() { m_trustedProxies.clear(); }
 
 bool NoApp::AddTrustedProxy(const NoString& sHost)
 {
@@ -1461,22 +1461,22 @@ bool NoApp::AddTrustedProxy(const NoString& sHost)
         return false;
     }
 
-    for (const NoString& sTrustedProxy : m_vsTrustedProxies) {
+    for (const NoString& sTrustedProxy : m_trustedProxies) {
         if (sTrustedProxy.equals(sHost)) {
             return false;
         }
     }
 
-    m_vsTrustedProxies.push_back(sHost);
+    m_trustedProxies.push_back(sHost);
     return true;
 }
 
 bool NoApp::RemTrustedProxy(const NoString& sHost)
 {
     NoStringVector::iterator it;
-    for (it = m_vsTrustedProxies.begin(); it != m_vsTrustedProxies.end(); ++it) {
+    for (it = m_trustedProxies.begin(); it != m_trustedProxies.end(); ++it) {
         if (sHost.equals(*it)) {
-            m_vsTrustedProxies.erase(it);
+            m_trustedProxies.erase(it);
             return true;
         }
     }
@@ -1486,7 +1486,7 @@ bool NoApp::RemTrustedProxy(const NoString& sHost)
 
 void NoApp::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUser, NoClient* pSkipClient)
 {
-    for (const auto& it : m_msUsers) {
+    for (const auto& it : m_users) {
         if (bAdminOnly && !it.second->IsAdmin()) continue;
 
         if (it.second != pSkipUser) {
@@ -1501,13 +1501,13 @@ void NoApp::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUs
     }
 }
 
-void NoApp::AddBytesRead(ulonglong u) { m_uBytesRead += u; }
+void NoApp::AddBytesRead(ulonglong u) { m_bytesRead += u; }
 
-void NoApp::AddBytesWritten(ulonglong u) { m_uBytesWritten += u; }
+void NoApp::AddBytesWritten(ulonglong u) { m_bytesWritten += u; }
 
-ulonglong NoApp::BytesRead() const { return m_uBytesRead; }
+ulonglong NoApp::BytesRead() const { return m_bytesRead; }
 
-ulonglong NoApp::BytesWritten() const { return m_uBytesWritten; }
+ulonglong NoApp::BytesWritten() const { return m_bytesWritten; }
 
 NoModule* NoApp::FindModule(const NoString& sModName, const NoString& sUsername)
 {
@@ -1537,7 +1537,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
     std::map<NoNetwork*, NoString> mnsLoaded;
 
     // Unload the module for every user and network
-    for (const auto& it : m_msUsers) {
+    for (const auto& it : m_users) {
         NoUser* pUser = it.second;
 
         pModule = pUser->GetModules().FindModule(sModule);
@@ -1608,9 +1608,9 @@ bool NoApp::UpdateModule(const NoString& sModule)
 
 NoUser* NoApp::FindUser(const NoString& sUsername)
 {
-    std::map<NoString, NoUser*>::iterator it = m_msUsers.find(sUsername);
+    std::map<NoString, NoUser*>::iterator it = m_users.find(sUsername);
 
-    if (it != m_msUsers.end()) {
+    if (it != m_users.end()) {
         return it->second;
     }
 
@@ -1625,7 +1625,7 @@ bool NoApp::DeleteUser(const NoString& sUsername)
         return false;
     }
 
-    m_msDelUsers[pUser->GetUserName()] = pUser;
+    m_delUsers[pUser->GetUserName()] = pUser;
     return true;
 }
 
@@ -1646,15 +1646,15 @@ bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
         NO_DEBUG("AddUser [" << pUser->GetUserName() << "] aborted by a module [" << sErrorRet << "]");
         return false;
     }
-    m_msUsers[pUser->GetUserName()] = pUser;
+    m_users[pUser->GetUserName()] = pUser;
     return true;
 }
 
-const std::map<NoString, NoUser*>&NoApp::GetUserMap() const { return (m_msUsers); }
+const std::map<NoString, NoUser*>&NoApp::GetUserMap() const { return (m_users); }
 
 NoListener* NoApp::FindListener(u_short uPort, const NoString& sHost, No::AddressType eAddr)
 {
-    for (NoListener* pListener : m_vpListeners) {
+    for (NoListener* pListener : m_listeners) {
         if (pListener->port() != uPort) continue;
         if (pListener->host() != sHost) continue;
         if (pListener->addressType() != eAddr) continue;
@@ -1800,7 +1800,7 @@ bool NoApp::AddListener(ushort uPort,
         return false;
     }
 
-    m_vpListeners.push_back(pListener);
+    m_listeners.push_back(pListener);
     No::printStatus(true);
 
     return true;
@@ -1873,15 +1873,15 @@ bool NoApp::AddListener(NoListener* pListener)
     // We don't check if there is an identical listener already listening
     // since one can't listen on e.g. the same port multiple times
 
-    m_vpListeners.push_back(pListener);
+    m_listeners.push_back(pListener);
     return true;
 }
 
 bool NoApp::DelListener(NoListener* pListener)
 {
-    auto it = std::find(m_vpListeners.begin(), m_vpListeners.end(), pListener);
-    if (it != m_vpListeners.end()) {
-        m_vpListeners.erase(it);
+    auto it = std::find(m_listeners.begin(), m_listeners.end(), pListener);
+    if (it != m_listeners.end()) {
+        m_listeners.erase(it);
         delete pListener;
         return true;
     }
@@ -1898,19 +1898,19 @@ void NoApp::SetMotd(const NoString& sMessage)
 void NoApp::AddMotd(const NoString& sMessage)
 {
     if (!sMessage.empty()) {
-        m_vsMotd.push_back(sMessage);
+        m_motd.push_back(sMessage);
     }
 }
 
-void NoApp::ClearMotd() { m_vsMotd.clear(); }
+void NoApp::ClearMotd() { m_motd.clear(); }
 
-const NoStringVector&NoApp::GetMotd() const { return m_vsMotd; }
+const NoStringVector&NoApp::GetMotd() const { return m_motd; }
 
-void NoApp::AddServerThrottle(NoString sName) { m_sConnectThrottle.AddItem(sName, true); }
+void NoApp::AddServerThrottle(NoString sName) { m_connectThrottle.AddItem(sName, true); }
 
 bool NoApp::GetServerThrottle(NoString sName)
 {
-    bool* b = m_sConnectThrottle.GetItem(sName);
+    bool* b = m_connectThrottle.GetItem(sName);
     return (b && *b);
 }
 
@@ -1947,7 +1947,7 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
         uiUsers_out += it.second->BytesWritten();
     }
 
-    for (NoSocket* pSock : m_Manager.GetSockets()) {
+    for (NoSocket* pSock : m_manager.GetSockets()) {
         NoUser* pUser = nullptr;
         if (pSock->GetSockName().left(5) == "IRC::") {
             pUser = ((NoIrcSocket*)pSock)->GetNetwork()->GetUser();
@@ -2000,21 +2000,21 @@ void NoApp::AuthUser(std::shared_ptr<NoAuthenticator> AuthClass)
     AuthClass->acceptLogin(pUser);
 }
 
-void NoApp::SetConfigState(NoApp::ConfigState e) { m_eConfigState = e; }
+void NoApp::SetConfigState(NoApp::ConfigState e) { m_configState = e; }
 
-void NoApp::SetSkinName(const NoString& s) { m_sSkinName = s; }
+void NoApp::SetSkinName(const NoString& s) { m_skinName = s; }
 
-void NoApp::SetStatusPrefix(const NoString& s) { m_sStatusPrefix = (s.empty()) ? "*" : s; }
+void NoApp::SetStatusPrefix(const NoString& s) { m_statusPrefix = (s.empty()) ? "*" : s; }
 
-void NoApp::SetMaxBufferSize(uint i) { m_uiMaxBufferSize = i; }
+void NoApp::SetMaxBufferSize(uint i) { m_maxBufferSize = i; }
 
-void NoApp::SetAnonIPLimit(uint i) { m_uiAnonIPLimit = i; }
+void NoApp::SetAnonIPLimit(uint i) { m_anonIpLimit = i; }
 
-void NoApp::SetServerThrottle(uint i) { m_sConnectThrottle.SetTTL(i * 1000); }
+void NoApp::SetServerThrottle(uint i) { m_connectThrottle.SetTTL(i * 1000); }
 
-void NoApp::SetProtectWebSessions(bool b) { m_bProtectWebSessions = b; }
+void NoApp::SetProtectWebSessions(bool b) { m_protectWebSessions = b; }
 
-void NoApp::SetHideVersion(bool b) { m_bHideVersion = b; }
+void NoApp::SetHideVersion(bool b) { m_hideVersion = b; }
 
 class NoConnectQueueTimer : public CCron
 {
@@ -2082,78 +2082,78 @@ void NoApp::SetConnectDelay(uint i)
         // Don't hammer server with our failed connects
         i = 1;
     }
-    if (m_uiConnectDelay != i && m_pConnectQueueTimer != nullptr) {
-        m_pConnectQueueTimer->Start(i);
+    if (m_connectDelay != i && m_connectQueueTimer != nullptr) {
+        m_connectQueueTimer->Start(i);
     }
-    m_uiConnectDelay = i;
+    m_connectDelay = i;
 }
 
-NoApp::ConfigState NoApp::GetConfigState() const { return m_eConfigState; }
+NoApp::ConfigState NoApp::GetConfigState() const { return m_configState; }
 
-NoSocketManager&NoApp::GetManager() { return m_Manager; }
+NoSocketManager&NoApp::GetManager() { return m_manager; }
 
-const NoSocketManager&NoApp::GetManager() const { return m_Manager; }
+const NoSocketManager&NoApp::GetManager() const { return m_manager; }
 
-NoModules&NoApp::GetModules() { return *m_pModules; }
+NoModules&NoApp::GetModules() { return *m_modules; }
 
-NoString NoApp::GetSkinName() const { return m_sSkinName; }
+NoString NoApp::GetSkinName() const { return m_skinName; }
 
-const NoString&NoApp::GetStatusPrefix() const { return m_sStatusPrefix; }
+const NoString&NoApp::GetStatusPrefix() const { return m_statusPrefix; }
 
 void NoApp::EnableConnectQueue()
 {
-    if (!m_pConnectQueueTimer && !m_uiConnectPaused && !m_lpConnectQueue.empty()) {
-        m_pConnectQueueTimer = new NoConnectQueueTimer(m_uiConnectDelay);
-        GetManager().AddCron(m_pConnectQueueTimer);
+    if (!m_connectQueueTimer && !m_connectPaused && !m_connectQueue.empty()) {
+        m_connectQueueTimer = new NoConnectQueueTimer(m_connectDelay);
+        GetManager().AddCron(m_connectQueueTimer);
     }
 }
 
 void NoApp::DisableConnectQueue()
 {
-    if (m_pConnectQueueTimer) {
+    if (m_connectQueueTimer) {
         // This will kill the cron
-        m_pConnectQueueTimer->Stop();
-        m_pConnectQueueTimer = nullptr;
+        m_connectQueueTimer->Stop();
+        m_connectQueueTimer = nullptr;
     }
 }
 
 void NoApp::PauseConnectQueue()
 {
     NO_DEBUG("Connection queue paused");
-    m_uiConnectPaused++;
+    m_connectPaused++;
 
-    if (m_pConnectQueueTimer) {
-        m_pConnectQueueTimer->Pause();
+    if (m_connectQueueTimer) {
+        m_connectQueueTimer->Pause();
     }
 }
 
 void NoApp::ResumeConnectQueue()
 {
     NO_DEBUG("Connection queue resumed");
-    m_uiConnectPaused--;
+    m_connectPaused--;
 
     EnableConnectQueue();
-    if (m_pConnectQueueTimer) {
-        m_pConnectQueueTimer->UnPause();
+    if (m_connectQueueTimer) {
+        m_connectQueueTimer->UnPause();
     }
 }
 
 void NoApp::AddNetworkToQueue(NoNetwork* pNetwork)
 {
     // Make sure we are not already in the queue
-    if (std::find(m_lpConnectQueue.begin(), m_lpConnectQueue.end(), pNetwork) != m_lpConnectQueue.end()) {
+    if (std::find(m_connectQueue.begin(), m_connectQueue.end(), pNetwork) != m_connectQueue.end()) {
         return;
     }
 
-    m_lpConnectQueue.push_back(pNetwork);
+    m_connectQueue.push_back(pNetwork);
     EnableConnectQueue();
 }
 
-std::list<NoNetwork*>&NoApp::GetConnectionQueue() { return m_lpConnectQueue; }
+std::list<NoNetwork*>&NoApp::GetConnectionQueue() { return m_connectQueue; }
 
 void NoApp::LeakConnectQueueTimer(NoConnectQueueTimer* pTimer)
 {
-    if (m_pConnectQueueTimer == pTimer) m_pConnectQueueTimer = nullptr;
+    if (m_connectQueueTimer == pTimer) m_connectQueueTimer = nullptr;
 }
 
-bool NoApp::WaitForChildLock() { return m_pLockFile && m_pLockFile->ExLock(); }
+bool NoApp::WaitForChildLock() { return m_lockFile && m_lockFile->ExLock(); }

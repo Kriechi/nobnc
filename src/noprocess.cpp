@@ -19,13 +19,13 @@
 #include <unistd.h>
 #include <signal.h>
 
-NoProcess::NoProcess() : NoSocket(0), m_iPid(-1)
+NoProcess::NoProcess() : NoSocket(0), m_pid(-1)
 {
 }
 
 NoProcess::~NoProcess()
 {
-    close2(m_iPid, GetRSock(), GetWSock());
+    close2(m_pid, GetRSock(), GetWSock());
     SetRSock(-1);
     SetWSock(-1);
 }
@@ -33,15 +33,15 @@ NoProcess::~NoProcess()
 int NoProcess::Execute(const NoString& sExec)
 {
     int iReadFD, iWriteFD;
-    m_iPid = popen2(iReadFD, iWriteFD, sExec);
-    if (m_iPid != -1) {
+    m_pid = popen2(iReadFD, iWriteFD, sExec);
+    if (m_pid != -1) {
         ConnectFD(iReadFD, iWriteFD, "0.0.0.0:0");
     }
-    return (m_iPid);
+    return (m_pid);
 }
 void NoProcess::Kill(int iSignal)
 {
-    kill(m_iPid, iSignal);
+    kill(m_pid, iSignal);
     Close();
 }
 

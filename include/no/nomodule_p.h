@@ -24,36 +24,36 @@ class NoModulePrivate
 {
 public:
     NoModulePrivate(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
-        : eType(eType), pDLL(pDLL), pManager(&NoApp::Get().GetManager()), pUser(pUser), pNetwork(pNetwork),
-          pClient(nullptr), sModName(sModName), sDataDir(sDataDir) { }
+        : type(eType), handle(pDLL), manager(&NoApp::Get().GetManager()), user(pUser), network(pNetwork),
+          client(nullptr), name(sModName), dataDir(sDataDir) { }
 
     static NoModulePrivate* get(NoModule* module) { return module->d.get(); }
 
-    void addTimer(NoTimer* timer) { sTimers.insert(timer); }
-    void removeTimer(NoTimer* timer) { sTimers.erase(timer); }
-    void addSocket(NoModuleSocket* socket) { sSockets.insert(socket); }
-    void removeSocket(NoModuleSocket* socket) { sSockets.erase(socket); }
+    void addTimer(NoTimer* timer) { timers.insert(timer); }
+    void removeTimer(NoTimer* timer) { timers.erase(timer); }
+    void addSocket(NoModuleSocket* socket) { sockets.insert(socket); }
+    void removeSocket(NoModuleSocket* socket) { sockets.erase(socket); }
 
-    No::ModuleType eType;
-    NoString sDescription;
-    std::set<NoTimer*> sTimers;
-    std::set<NoModuleSocket*> sSockets;
+    No::ModuleType type;
+    NoString description;
+    std::set<NoTimer*> timers;
+    std::set<NoModuleSocket*> sockets;
 #ifdef HAVE_PTHREAD
-    std::set<NoModuleJob*> sJobs;
+    std::set<NoModuleJob*> jobs;
 #endif
-    NoModuleHandle pDLL;
-    NoSocketManager* pManager;
-    NoUser* pUser;
-    NoNetwork* pNetwork;
-    NoClient* pClient;
-    NoString sModName;
-    NoString sDataDir;
-    NoString sSavePath;
-    NoString sArgs;
-    NoString sModPath;
+    NoModuleHandle handle;
+    NoSocketManager* manager;
+    NoUser* user;
+    NoNetwork* network;
+    NoClient* client;
+    NoString name;
+    NoString dataDir;
+    NoString savePath;
+    NoString args;
+    NoString path;
 
-    VWebPages vSubPages;
-    std::map<NoString, NoModuleCommand> mCommands;
+    VWebPages subPages;
+    std::map<NoString, NoModuleCommand> commands;
 };
 
 #endif // NOMODULE_H

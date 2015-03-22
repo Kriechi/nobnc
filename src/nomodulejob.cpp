@@ -20,16 +20,16 @@
 #ifdef HAVE_PTHREAD
 
 NoModuleJob::NoModuleJob(NoModule* pModule, const NoString& sName, const NoString& sDesc)
-    : NoJob(), m_pModule(pModule), m_sName(sName), m_sDescription(sDesc)
+    : NoJob(), m_module(pModule), m_name(sName), m_description(sDesc)
 {
 }
 
-NoModuleJob::~NoModuleJob() { m_pModule->UnlinkJob(this); }
+NoModuleJob::~NoModuleJob() { m_module->UnlinkJob(this); }
 
-const NoString& NoModuleJob::GetDescription() const { return m_sDescription; }
+const NoString& NoModuleJob::GetDescription() const { return m_description; }
 
-const NoString& NoModuleJob::GetName() const { return m_sName; }
+const NoString& NoModuleJob::GetName() const { return m_name; }
 
-NoModule* NoModuleJob::GetModule() const { return m_pModule; }
+NoModule* NoModuleJob::GetModule() const { return m_module; }
 
 #endif // HAVE_PTHREAD

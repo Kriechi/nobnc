@@ -66,8 +66,8 @@ public:
     NoSocket* q;
     bool allowControlCodes;
     NoString hostToVerifySSL;
-    NoStringSet ssTrustedFingerprints;
-    NoStringSet ssCertVerificationErrors;
+    NoStringSet trustedFingerprints;
+    NoStringSet certVerificationErrors;
 };
 
 class NoSocketPrivate

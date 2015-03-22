@@ -53,8 +53,8 @@ public:
     static NoString GetCWD();
 
 private:
-    NoFile::Attribute m_eSortAttr;
-    bool m_bDesc;
+    NoFile::Attribute m_sort;
+    bool m_desc;
 };
 
 #endif // NODIR_H

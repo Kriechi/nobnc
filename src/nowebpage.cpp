@@ -18,25 +18,25 @@
 
 
 NoWebPage::NoWebPage(const NoString& sName, const NoString& sTitle, uint uFlags)
-    : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams()
+    : m_flags(uFlags), m_name(sName), m_title(sTitle), m_params()
 {
 }
 
 NoWebPage::NoWebPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags)
-    : m_uFlags(uFlags), m_sName(sName), m_sTitle(sTitle), m_vParams(vParams)
+    : m_flags(uFlags), m_name(sName), m_title(sTitle), m_params(vParams)
 {
 }
 
-void NoWebPage::SetName(const NoString& s) { m_sName = s; }
+void NoWebPage::SetName(const NoString& s) { m_name = s; }
 
-void NoWebPage::SetTitle(const NoString& s) { m_sTitle = s; }
+void NoWebPage::SetTitle(const NoString& s) { m_title = s; }
 
-void NoWebPage::AddParam(const NoString& sName, const NoString& sValue) { m_vParams.push_back(make_pair(sName, sValue)); }
+void NoWebPage::AddParam(const NoString& sName, const NoString& sValue) { m_params.push_back(make_pair(sName, sValue)); }
 
-bool NoWebPage::RequiresAdmin() const { return m_uFlags & Admin; }
+bool NoWebPage::RequiresAdmin() const { return m_flags & Admin; }
 
-const NoString& NoWebPage::GetName() const { return m_sName; }
+const NoString& NoWebPage::GetName() const { return m_name; }
 
-const NoString& NoWebPage::GetTitle() const { return m_sTitle; }
+const NoString& NoWebPage::GetTitle() const { return m_title; }
 
-const NoStringPairVector& NoWebPage::GetParams() const { return m_vParams; }
+const NoStringPairVector& NoWebPage::GetParams() const { return m_params; }

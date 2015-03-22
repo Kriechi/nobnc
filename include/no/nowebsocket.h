@@ -73,15 +73,15 @@ protected:
 private:
     PageRequest OnPageRequestInternal(const NoString& sURI, NoString& sPageRet);
 
-    bool m_bPathsSet;
-    NoTemplate m_Template;
-    std::shared_ptr<NoAuthenticator> m_spAuth;
-    NoString m_sModName;
-    NoString m_sPath;
-    NoString m_sPage;
-    std::shared_ptr<NoWebSession> m_spSession;
+    bool m_pathsSet;
+    NoTemplate m_template;
+    std::shared_ptr<NoAuthenticator> m_authenticator;
+    NoString m_modName;
+    NoString m_path;
+    NoString m_page;
+    std::shared_ptr<NoWebSession> m_session;
 
-    static const uint m_uiMaxSessions;
+    static const uint m_maxSessions;
 };
 
 #endif // NOWEBSOCKET_H

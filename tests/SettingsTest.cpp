@@ -98,7 +98,7 @@ public:
 
             while (it3 != it2->second.end()) {
                 sRes += "->" + it2->first + "/" + it3->first + "\n";
-                ToString(sRes, *it3->second.m_pSubConfig);
+                ToString(sRes, *it3->second.m_subConfig);
                 sRes += "<-\n";
                 ++it3;
             }
