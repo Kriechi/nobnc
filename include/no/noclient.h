@@ -22,20 +22,17 @@
 #include <memory>
 
 class NoUser;
+class NoTable;
 class NoSocket;
 class NoNetwork;
 class NoIrcSocket;
-class NoAuthenticator;
-class NoTable;
+class NoClientPrivate;
 
 class NO_EXPORT NoClient
 {
 public:
     NoClient();
-    virtual ~NoClient();
-
-    NoClient(const NoClient&) = delete;
-    NoClient& operator=(const NoClient&) = delete;
+    ~NoClient();
 
     NoSocket* GetSocket() const;
 
@@ -97,30 +94,12 @@ private:
     void ParseIdentifier(const NoString& sAuthLine);
 
 private:
-    bool m_bGotPass;
-    bool m_bGotNick;
-    bool m_bGotUser;
-    bool m_bInCap;
-    bool m_bNamesx;
-    bool m_bUHNames;
-    bool m_bAway;
-    bool m_bServerTime;
-    bool m_bBatch;
-    bool m_bSelfMessage;
-    bool m_bPlaybackActive;
-    NoSocket* m_pSocket;
-    NoUser* m_pUser;
-    NoNetwork* m_pNetwork;
-    NoString m_sNick;
-    NoString m_sPass;
-    NoString m_sUser;
-    NoString m_sNetwork;
-    NoString m_sIdentifier;
-    std::shared_ptr<NoAuthenticator> m_spAuth;
-    NoStringSet m_ssAcceptedCaps;
-
-    friend class ClientTest;
+    NoClient(const NoClient&) = delete;
+    NoClient& operator=(const NoClient&) = delete;
+    std::unique_ptr<NoClientPrivate> d;
+    friend class NoClientPrivate;
     friend class NoClientSocket;
+    friend class ClientTest;
 };
 
 #endif // NOCLIENT_H
