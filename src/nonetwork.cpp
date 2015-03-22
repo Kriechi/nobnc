@@ -26,6 +26,7 @@
 #include "noescape.h"
 #include "noclient.h"
 #include "noapp.h"
+#include "nonick.h"
 #include "Csocket/Csocket.h"
 #include <algorithm>
 #include <memory>
@@ -98,6 +99,53 @@ private:
     NoNetwork* m_pNetwork;
 };
 
+class NoNetworkPrivate
+{
+public:
+    NoString name = "";
+    NoUser* user = nullptr;
+
+    NoString nickName = "";
+    NoString altNick = "";
+    NoString ident = "";
+    NoString realName = "";
+    NoString bindHost = "";
+    NoString encoding = "";
+    NoString quitMsg = "";
+    NoStringSet trustedFingerprints;
+
+    NoModules* modules = nullptr;
+
+    std::vector<NoClient*> clients;
+
+    NoIrcSocket* socket = nullptr;
+
+    std::vector<NoChannel*> channels;
+    std::vector<NoQuery*> queries;
+
+    NoString chanPrefixes = "";
+
+    bool enabled = true;
+    NoString server = "";
+    std::vector<NoServerInfo*> servers;
+    size_t serverIndex = 0; ///< Index in servers of our current server + 1
+
+    NoNick ircNick;
+    bool away = false;
+
+    double floodRate = 1; ///< Set to -1 to disable protection.
+    ushort floodBurst = 4;
+
+    NoBuffer rawBuffer;
+    NoBuffer motdBuffer;
+    NoBuffer noticeBuffer;
+
+    NoNetworkPingTimer* pingTimer = nullptr;
+    NoNetworkJoinTimer* joinTimer = nullptr;
+
+    ushort joinDelay = 0;
+};
+
 bool NoNetwork::IsValidNetwork(const NoString& sNetwork)
 {
     // ^[-\w]+$
@@ -118,25 +166,23 @@ bool NoNetwork::IsValidNetwork(const NoString& sNetwork)
     return true;
 }
 
-NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName)
-    : m_name(sName), m_user(nullptr), m_nickName(""), m_altNick(""), m_ident(""), m_realName(""), m_bindHost(""),
-      m_encoding(""), m_quitMsg(""), m_trustedFingerprints(), m_modules(new NoModules), m_clients(),
-      m_socket(nullptr), m_channels(), m_queries(), m_chanPrefixes(""), m_enabled(true), m_server(""),
-      m_servers(), m_serverIndex(0), m_ircNick(), m_away(false), m_floodRate(1), m_floodBurst(4), m_rawBuffer(),
-      m_motdBuffer(), m_noticeBuffer(), m_pingTimer(nullptr), m_joinTimer(nullptr), m_joinDelay(0)
+NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName) : d(new NoNetworkPrivate)
 {
+    d->name = sName;
+    d->modules = new NoModules;
+
     SetUser(pUser);
 
-    m_rawBuffer.setLimit(100, true); // This should be more than enough raws, especially since we are buffering the
+    d->rawBuffer.setLimit(100, true); // This should be more than enough raws, especially since we are buffering the
     // MOTD separately
-    m_motdBuffer.setLimit(200, true); // This should be more than enough motd lines
-    m_noticeBuffer.setLimit(250, true);
+    d->motdBuffer.setLimit(200, true); // This should be more than enough motd lines
+    d->noticeBuffer.setLimit(250, true);
 
-    m_pingTimer = new NoNetworkPingTimer(this);
-    NoApp::Get().GetManager().AddCron(m_pingTimer);
+    d->pingTimer = new NoNetworkPingTimer(this);
+    NoApp::Get().GetManager().AddCron(d->pingTimer);
 
-    m_joinTimer = new NoNetworkJoinTimer(this);
-    NoApp::Get().GetManager().AddCron(m_joinTimer);
+    d->joinTimer = new NoNetworkJoinTimer(this);
+    NoApp::Get().GetManager().AddCron(d->joinTimer);
 
     SetIRCConnectEnabled(true);
 }
@@ -146,12 +192,12 @@ NoNetwork::NoNetwork(NoUser* pUser, const NoNetwork& Network) : NoNetwork(pUser,
 void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
 {
     if (bCloneName) {
-        m_name = Network.GetName();
+        d->name = Network.GetName();
     }
 
-    m_floodRate = Network.GetFloodRate();
-    m_floodBurst = Network.GetFloodBurst();
-    m_joinDelay = Network.GetJoinDelay();
+    d->floodRate = Network.GetFloodRate();
+    d->floodBurst = Network.GetFloodBurst();
+    d->joinDelay = Network.GetJoinDelay();
 
     SetNick(Network.GetNick());
     SetAltNick(Network.GetAltNick());
@@ -160,7 +206,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     SetBindHost(Network.GetBindHost());
     SetEncoding(Network.GetEncoding());
     SetQuitMsg(Network.GetQuitMsg());
-    m_trustedFingerprints = Network.m_trustedFingerprints;
+    d->trustedFingerprints = Network.d->trustedFingerprints;
 
     // Servers
     const std::vector<NoServerInfo*>& vServers = Network.GetServers();
@@ -177,15 +223,15 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
         AddServer(pServer->host(), pServer->port(), pServer->password(), pServer->isSsl());
     }
 
-    m_serverIndex = 0;
-    for (size_t a = 0; a < m_servers.size(); a++) {
-        if (sServer.equals(m_servers[a]->host())) {
-            m_serverIndex = a + 1;
+    d->serverIndex = 0;
+    for (size_t a = 0; a < d->servers.size(); a++) {
+        if (sServer.equals(d->servers[a]->host())) {
+            d->serverIndex = a + 1;
             break;
         }
     }
-    if (m_serverIndex == 0) {
-        m_serverIndex = m_servers.size();
+    if (d->serverIndex == 0) {
+        d->serverIndex = d->servers.size();
         NoIrcSocket* pSock = GetIRCSock();
 
         if (pSock) {
@@ -207,7 +253,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
         }
     }
 
-    for (NoChannel* pChan : m_channels) {
+    for (NoChannel* pChan : d->channels) {
         NoChannel* pNewChan = Network.FindChan(pChan->getName());
 
         if (!pNewChan) {
@@ -228,9 +274,9 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
         NoModule* pCurMod = vCurMods.FindModule(pNewMod->GetModName());
 
         if (!pCurMod) {
-            vCurMods.LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::NetworkModule, m_user, this, sModRet);
+            vCurMods.LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::NetworkModule, d->user, this, sModRet);
         } else if (pNewMod->GetArgs() != pCurMod->GetArgs()) {
-            vCurMods.ReloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), m_user, this, sModRet);
+            vCurMods.ReloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), d->user, this, sModRet);
         }
     }
 
@@ -252,56 +298,56 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
 
 NoNetwork::~NoNetwork()
 {
-    if (m_socket) {
-        NoApp::Get().GetManager().DelSockByAddr(m_socket);
-        m_socket = nullptr;
+    if (d->socket) {
+        NoApp::Get().GetManager().DelSockByAddr(d->socket);
+        d->socket = nullptr;
     }
 
     // Delete clients
-    while (!m_clients.empty()) {
-        NoApp::Get().GetManager().DelSockByAddr(m_clients[0]->GetSocket());
+    while (!d->clients.empty()) {
+        NoApp::Get().GetManager().DelSockByAddr(d->clients[0]->GetSocket());
     }
-    m_clients.clear();
+    d->clients.clear();
 
     // Delete servers
     DelServers();
 
     // Delete modules (this unloads all modules)
-    delete m_modules;
-    m_modules = nullptr;
+    delete d->modules;
+    d->modules = nullptr;
 
     // Delete Channels
-    for (NoChannel* pChan : m_channels) {
+    for (NoChannel* pChan : d->channels) {
         delete pChan;
     }
-    m_channels.clear();
+    d->channels.clear();
 
     // Delete Queries
-    for (NoQuery* pQuery : m_queries) {
+    for (NoQuery* pQuery : d->queries) {
         delete pQuery;
     }
-    m_queries.clear();
+    d->queries.clear();
 
     SetUser(nullptr);
 
     // Make sure we are not in the connection queue
     NoApp::Get().GetConnectionQueue().remove(this);
 
-    NoApp::Get().GetManager().DelCronByAddr(m_pingTimer);
-    NoApp::Get().GetManager().DelCronByAddr(m_joinTimer);
+    NoApp::Get().GetManager().DelCronByAddr(d->pingTimer);
+    NoApp::Get().GetManager().DelCronByAddr(d->joinTimer);
 }
 
 void NoNetwork::DelServers()
 {
-    for (NoServerInfo* pServer : m_servers) {
+    for (NoServerInfo* pServer : d->servers) {
         delete pServer;
     }
-    m_servers.clear();
+    d->servers.clear();
 }
 
 NoString NoNetwork::GetNetworkPath() const
 {
-    NoString sNetworkPath = m_user->GetUserPath() + "/networks/" + m_name;
+    NoString sNetworkPath = d->user->GetUserPath() + "/networks/" + d->name;
 
     if (!NoFile::Exists(sNetworkPath)) {
         NoDir::MakeDir(sNetworkPath);
@@ -433,7 +479,7 @@ bool NoNetwork::ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
         NoChannel* pChan = new NoChannel(sChanName, this, true, pSubConf);
 
         if (!pSubConf->empty()) {
-            sError = "Unhandled lines in config for User [" + m_user->GetUserName() + "], Network [" + GetName() +
+            sError = "Unhandled lines in config for User [" + d->user->GetUserName() + "], Network [" + GetName() +
                      "], Channel [" + sChanName + "]!";
             No::printError(sError);
 
@@ -459,33 +505,33 @@ NoSettings NoNetwork::ToConfig() const
 {
     NoSettings config;
 
-    if (!m_nickName.empty()) {
-        config.AddKeyValuePair("Nick", m_nickName);
+    if (!d->nickName.empty()) {
+        config.AddKeyValuePair("Nick", d->nickName);
     }
 
-    if (!m_altNick.empty()) {
-        config.AddKeyValuePair("AltNick", m_altNick);
+    if (!d->altNick.empty()) {
+        config.AddKeyValuePair("AltNick", d->altNick);
     }
 
-    if (!m_ident.empty()) {
-        config.AddKeyValuePair("Ident", m_ident);
+    if (!d->ident.empty()) {
+        config.AddKeyValuePair("Ident", d->ident);
     }
 
-    if (!m_realName.empty()) {
-        config.AddKeyValuePair("RealName", m_realName);
+    if (!d->realName.empty()) {
+        config.AddKeyValuePair("RealName", d->realName);
     }
-    if (!m_bindHost.empty()) {
-        config.AddKeyValuePair("BindHost", m_bindHost);
+    if (!d->bindHost.empty()) {
+        config.AddKeyValuePair("BindHost", d->bindHost);
     }
 
     config.AddKeyValuePair("IRCConnectEnabled", NoString(GetIRCConnectEnabled()));
     config.AddKeyValuePair("FloodRate", NoString(GetFloodRate()));
     config.AddKeyValuePair("FloodBurst", NoString(GetFloodBurst()));
     config.AddKeyValuePair("JoinDelay", NoString(GetJoinDelay()));
-    config.AddKeyValuePair("Encoding", m_encoding);
+    config.AddKeyValuePair("Encoding", d->encoding);
 
-    if (!m_quitMsg.empty()) {
-        config.AddKeyValuePair("QuitMsg", m_quitMsg);
+    if (!d->quitMsg.empty()) {
+        config.AddKeyValuePair("QuitMsg", d->quitMsg);
     }
 
     // Modules
@@ -504,16 +550,16 @@ NoSettings NoNetwork::ToConfig() const
     }
 
     // Servers
-    for (NoServerInfo* pServer : m_servers) {
+    for (NoServerInfo* pServer : d->servers) {
         config.AddKeyValuePair("Server", pServer->toString());
     }
 
-    for (const NoString& sFP : m_trustedFingerprints) {
+    for (const NoString& sFP : d->trustedFingerprints) {
         config.AddKeyValuePair("TrustedServerFingerprint", sFP);
     }
 
     // Chans
-    for (NoChannel* pChan : m_channels) {
+    for (NoChannel* pChan : d->channels) {
         if (pChan->inConfig()) {
             config.AddSubConfig("Chan", pChan->getName(), pChan->toConfig());
         }
@@ -524,18 +570,18 @@ NoSettings NoNetwork::ToConfig() const
 
 void NoNetwork::BounceAllClients()
 {
-    for (NoClient* pClient : m_clients) {
+    for (NoClient* pClient : d->clients) {
         pClient->BouncedOff();
     }
 
-    m_clients.clear();
+    d->clients.clear();
 }
 
-bool NoNetwork::IsUserAttached() const { return !m_clients.empty(); }
+bool NoNetwork::IsUserAttached() const { return !d->clients.empty(); }
 
 bool NoNetwork::IsUserOnline() const
 {
-    for (NoClient* pClient : m_clients) {
+    for (NoClient* pClient : d->clients) {
         if (!pClient->IsAway()) {
             return true;
         }
@@ -546,26 +592,26 @@ bool NoNetwork::IsUserOnline() const
 
 void NoNetwork::ClientConnected(NoClient* pClient)
 {
-    if (!m_user->MultiClients()) {
+    if (!d->user->MultiClients()) {
         BounceAllClients();
     }
 
-    m_clients.push_back(pClient);
+    d->clients.push_back(pClient);
 
     size_t uIdx, uSize;
 
     pClient->SetPlaybackActive(true);
 
-    if (m_rawBuffer.isEmpty()) {
+    if (d->rawBuffer.isEmpty()) {
         pClient->PutClient(":irc.znc.in 001 " + pClient->GetNick() + " :- Welcome to ZNC -");
     } else {
         const NoString& sClientNick = pClient->GetNick(false);
         NoStringMap msParams;
         msParams["target"] = sClientNick;
 
-        uSize = m_rawBuffer.size();
+        uSize = d->rawBuffer.size();
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            pClient->PutClient(m_rawBuffer.getMessage(uIdx, *pClient, msParams));
+            pClient->PutClient(d->rawBuffer.getMessage(uIdx, *pClient, msParams));
         }
 
         const NoNick& Nick = GetIRCNick();
@@ -579,10 +625,10 @@ void NoNetwork::ClientConnected(NoClient* pClient)
     msParams["target"] = GetIRCNick().nick();
 
     // Send the cached MOTD
-    uSize = m_motdBuffer.size();
+    uSize = d->motdBuffer.size();
     if (uSize > 0) {
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            pClient->PutClient(m_motdBuffer.getMessage(uIdx, *pClient, msParams));
+            pClient->PutClient(d->motdBuffer.getMessage(uIdx, *pClient, msParams));
         }
     }
 
@@ -597,7 +643,7 @@ void NoNetwork::ClientConnected(NoClient* pClient)
         }
     }
 
-    if (m_away) {
+    if (d->away) {
         // If they want to know their away reason they'll have to whois
         // themselves. At least we can tell them their away status...
         pClient->PutClient(":irc.znc.in 306 " + GetIRCNick().nick() + " :You have been marked as being away");
@@ -610,27 +656,27 @@ void NoNetwork::ClientConnected(NoClient* pClient)
         }
     }
 
-    bool bClearQuery = m_user->AutoClearQueryBuffer();
-    for (NoQuery* pQuery : m_queries) {
+    bool bClearQuery = d->user->AutoClearQueryBuffer();
+    for (NoQuery* pQuery : d->queries) {
         pQuery->sendBuffer(pClient);
         if (bClearQuery) {
             delete pQuery;
         }
     }
     if (bClearQuery) {
-        m_queries.clear();
+        d->queries.clear();
     }
 
-    uSize = m_noticeBuffer.size();
+    uSize = d->noticeBuffer.size();
     for (uIdx = 0; uIdx < uSize; uIdx++) {
-        const NoMessage& BufLine = m_noticeBuffer.getMessage(uIdx);
+        const NoMessage& BufLine = d->noticeBuffer.getMessage(uIdx);
         NoString sLine = BufLine.GetLine(*pClient, msParams);
         bool bContinue = false;
-        NETWORKMODULECALL(OnPrivBufferPlayLine2(*pClient, sLine, BufLine.GetTime()), m_user, this, nullptr, &bContinue);
+        NETWORKMODULECALL(OnPrivBufferPlayLine2(*pClient, sLine, BufLine.GetTime()), d->user, this, nullptr, &bContinue);
         if (bContinue) continue;
         pClient->PutClient(sLine);
     }
-    m_noticeBuffer.clear();
+    d->noticeBuffer.clear();
 
     pClient->SetPlaybackActive(false);
 
@@ -642,23 +688,23 @@ void NoNetwork::ClientConnected(NoClient* pClient)
 
 void NoNetwork::ClientDisconnected(NoClient* pClient)
 {
-    auto it = std::find(m_clients.begin(), m_clients.end(), pClient);
-    if (it != m_clients.end()) {
-        m_clients.erase(it);
+    auto it = std::find(d->clients.begin(), d->clients.end(), pClient);
+    if (it != d->clients.end()) {
+        d->clients.erase(it);
     }
 }
 
-NoUser* NoNetwork::GetUser() const { return m_user; }
+NoUser* NoNetwork::GetUser() const { return d->user; }
 
-NoString NoNetwork::GetName() const { return m_name; }
+NoString NoNetwork::GetName() const { return d->name; }
 
-bool NoNetwork::IsNetworkAttached() const { return !m_clients.empty(); }
-std::vector<NoClient*> NoNetwork::GetClients() const { return m_clients; }
+bool NoNetwork::IsNetworkAttached() const { return !d->clients.empty(); }
+std::vector<NoClient*> NoNetwork::GetClients() const { return d->clients; }
 
 std::vector<NoClient*> NoNetwork::FindClients(const NoString& sIdentifier) const
 {
     std::vector<NoClient*> vClients;
-    for (NoClient* pClient : m_clients) {
+    for (NoClient* pClient : d->clients) {
         if (pClient->GetIdentifier().equals(sIdentifier)) {
             vClients.push_back(pClient);
         }
@@ -669,39 +715,39 @@ std::vector<NoClient*> NoNetwork::FindClients(const NoString& sIdentifier) const
 
 void NoNetwork::SetUser(NoUser* pUser)
 {
-    for (NoClient* pClient : m_clients) {
+    for (NoClient* pClient : d->clients) {
         pClient->PutStatus("This network is being deleted or moved to another user.");
         pClient->SetNetwork(nullptr);
     }
 
-    m_clients.clear();
+    d->clients.clear();
 
-    if (m_user) {
-        m_user->RemoveNetwork(this);
+    if (d->user) {
+        d->user->RemoveNetwork(this);
     }
 
-    m_user = pUser;
-    if (m_user) {
-        m_user->AddNetwork(this);
+    d->user = pUser;
+    if (d->user) {
+        d->user->AddNetwork(this);
     }
 }
 
 bool NoNetwork::SetName(const NoString& sName)
 {
     if (IsValidNetwork(sName)) {
-        m_name = sName;
+        d->name = sName;
         return true;
     }
 
     return false;
 }
 
-NoModules& NoNetwork::GetModules() { return *m_modules; }
-const NoModules& NoNetwork::GetModules() const { return *m_modules; }
+NoModules& NoNetwork::GetModules() { return *d->modules; }
+const NoModules& NoNetwork::GetModules() const { return *d->modules; }
 
 bool NoNetwork::PutUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    for (NoClient* pEachClient : m_clients) {
+    for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutClient(sLine);
 
@@ -716,7 +762,7 @@ bool NoNetwork::PutUser(const NoString& sLine, NoClient* pClient, NoClient* pSki
 
 bool NoNetwork::PutStatus(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    for (NoClient* pEachClient : m_clients) {
+    for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutStatus(sLine);
 
@@ -731,7 +777,7 @@ bool NoNetwork::PutStatus(const NoString& sLine, NoClient* pClient, NoClient* pS
 
 bool NoNetwork::PutModule(const NoString& sModule, const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    for (NoClient* pEachClient : m_clients) {
+    for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutModule(sModule, sLine);
 
@@ -746,7 +792,7 @@ bool NoNetwork::PutModule(const NoString& sModule, const NoString& sLine, NoClie
 
 // Channels
 
-std::vector<NoChannel*> NoNetwork::GetChans() const { return m_channels; }
+std::vector<NoChannel*> NoNetwork::GetChans() const { return d->channels; }
 
 NoChannel* NoNetwork::FindChan(NoString sName) const
 {
@@ -755,7 +801,7 @@ NoChannel* NoNetwork::FindChan(NoString sName) const
         sName.trimLeft(GetIRCSock()->GetISupport("STATUSMSG", ""));
     }
 
-    for (NoChannel* pChan : m_channels) {
+    for (NoChannel* pChan : d->channels) {
         if (sName.equals(pChan->getName())) {
             return pChan;
         }
@@ -767,8 +813,8 @@ NoChannel* NoNetwork::FindChan(NoString sName) const
 std::vector<NoChannel*> NoNetwork::FindChans(const NoString& sWild) const
 {
     std::vector<NoChannel*> vChans;
-    vChans.reserve(m_channels.size());
-    for (NoChannel* pChan : m_channels) {
+    vChans.reserve(d->channels.size());
+    for (NoChannel* pChan : d->channels) {
         if (No::wildCmp(pChan->getName(), sWild, No::CaseInsensitive))
             vChans.push_back(pChan);
     }
@@ -781,14 +827,14 @@ bool NoNetwork::AddChan(NoChannel* pChan)
         return false;
     }
 
-    for (NoChannel* pEachChan : m_channels) {
+    for (NoChannel* pEachChan : d->channels) {
         if (pEachChan->getName().equals(pChan->getName())) {
             delete pChan;
             return false;
         }
     }
 
-    m_channels.push_back(pChan);
+    d->channels.push_back(pChan);
     return true;
 }
 
@@ -799,16 +845,16 @@ bool NoNetwork::AddChan(const NoString& sName, bool bInConfig)
     }
 
     NoChannel* pChan = new NoChannel(sName, this, bInConfig);
-    m_channels.push_back(pChan);
+    d->channels.push_back(pChan);
     return true;
 }
 
 bool NoNetwork::DelChan(const NoString& sName)
 {
-    for (std::vector<NoChannel*>::iterator a = m_channels.begin(); a != m_channels.end(); ++a) {
+    for (std::vector<NoChannel*>::iterator a = d->channels.begin(); a != d->channels.end(); ++a) {
         if (sName.equals((*a)->getName())) {
             delete *a;
-            m_channels.erase(a);
+            d->channels.erase(a);
             return true;
         }
     }
@@ -819,17 +865,17 @@ bool NoNetwork::DelChan(const NoString& sName)
 void NoNetwork::JoinChans()
 {
     // Avoid divsion by zero, it's bad!
-    if (m_channels.empty()) return;
+    if (d->channels.empty()) return;
 
     // We start at a random offset into the channel list so that if your
     // first 3 channels are invite-only and you got MaxJoins == 3, ZNC will
     // still be able to join the rest of your channels.
-    uint start = rand() % m_channels.size();
-    uint uJoins = m_user->MaxJoins();
+    uint start = rand() % d->channels.size();
+    uint uJoins = d->user->MaxJoins();
     std::set<NoChannel*> sChans;
-    for (uint a = 0; a < m_channels.size(); a++) {
-        uint idx = (start + a) % m_channels.size();
-        NoChannel* pChan = m_channels[idx];
+    for (uint a = 0; a < d->channels.size(); a++) {
+        uint idx = (start + a) % d->channels.size();
+        NoChannel* pChan = d->channels[idx];
         if (!pChan->isOn() && !pChan->isDisabled()) {
             if (!JoinChan(pChan)) continue;
 
@@ -838,7 +884,7 @@ void NoNetwork::JoinChans()
             // Limit the number of joins
             if (uJoins != 0 && --uJoins == 0) {
                 // Reset the timer.
-                m_joinTimer->Reset();
+                d->joinTimer->Reset();
                 break;
             }
         }
@@ -884,25 +930,25 @@ void NoNetwork::JoinChans(std::set<NoChannel*>& sChans)
 bool NoNetwork::JoinChan(NoChannel* pChan)
 {
     bool bReturn = false;
-    NETWORKMODULECALL(OnJoining(*pChan), m_user, this, nullptr, &bReturn);
+    NETWORKMODULECALL(OnJoining(*pChan), d->user, this, nullptr, &bReturn);
 
     if (bReturn) return false;
 
-    if (m_user->JoinTries() != 0 && pChan->getJoinTries() >= m_user->JoinTries()) {
+    if (d->user->JoinTries() != 0 && pChan->getJoinTries() >= d->user->JoinTries()) {
         PutStatus("The channel " + pChan->getName() + " could not be joined, disabling it.");
         pChan->disable();
     } else {
         pChan->incJoinTries();
         bool bFailed = false;
-        NETWORKMODULECALL(OnTimerAutoJoin(*pChan), m_user, this, nullptr, &bFailed);
+        NETWORKMODULECALL(OnTimerAutoJoin(*pChan), d->user, this, nullptr, &bFailed);
         if (bFailed) return false;
         return true;
     }
     return false;
 }
 
-NoString NoNetwork::GetChanPrefixes() const { return m_chanPrefixes; }
-void NoNetwork::SetChanPrefixes(const NoString& s) { m_chanPrefixes = s; }
+NoString NoNetwork::GetChanPrefixes() const { return d->chanPrefixes; }
+void NoNetwork::SetChanPrefixes(const NoString& s) { d->chanPrefixes = s; }
 
 bool NoNetwork::IsChan(const NoString& sChan) const
 {
@@ -914,11 +960,11 @@ bool NoNetwork::IsChan(const NoString& sChan) const
 
 // Queries
 
-std::vector<NoQuery*> NoNetwork::GetQueries() const { return m_queries; }
+std::vector<NoQuery*> NoNetwork::GetQueries() const { return d->queries; }
 
 NoQuery* NoNetwork::FindQuery(const NoString& sName) const
 {
-    for (NoQuery* pQuery : m_queries) {
+    for (NoQuery* pQuery : d->queries) {
         if (sName.equals(pQuery->getName())) {
             return pQuery;
         }
@@ -930,8 +976,8 @@ NoQuery* NoNetwork::FindQuery(const NoString& sName) const
 std::vector<NoQuery*> NoNetwork::FindQueries(const NoString& sWild) const
 {
     std::vector<NoQuery*> vQueries;
-    vQueries.reserve(m_queries.size());
-    for (NoQuery* pQuery : m_queries) {
+    vQueries.reserve(d->queries.size());
+    for (NoQuery* pQuery : d->queries) {
         if (No::wildCmp(pQuery->getName(), sWild, No::CaseInsensitive))
             vQueries.push_back(pQuery);
     }
@@ -947,12 +993,12 @@ NoQuery* NoNetwork::AddQuery(const NoString& sName)
     NoQuery* pQuery = FindQuery(sName);
     if (!pQuery) {
         pQuery = new NoQuery(sName, this);
-        m_queries.push_back(pQuery);
+        d->queries.push_back(pQuery);
 
-        if (m_user->MaxQueryBuffers() > 0) {
-            while (m_queries.size() > m_user->MaxQueryBuffers()) {
-                delete *m_queries.begin();
-                m_queries.erase(m_queries.begin());
+        if (d->user->MaxQueryBuffers() > 0) {
+            while (d->queries.size() > d->user->MaxQueryBuffers()) {
+                delete *d->queries.begin();
+                d->queries.erase(d->queries.begin());
             }
         }
     }
@@ -962,10 +1008,10 @@ NoQuery* NoNetwork::AddQuery(const NoString& sName)
 
 bool NoNetwork::DelQuery(const NoString& sName)
 {
-    for (std::vector<NoQuery*>::iterator a = m_queries.begin(); a != m_queries.end(); ++a) {
+    for (std::vector<NoQuery*>::iterator a = d->queries.begin(); a != d->queries.end(); ++a) {
         if (sName.equals((*a)->getName())) {
             delete *a;
-            m_queries.erase(a);
+            d->queries.erase(a);
             return true;
         }
     }
@@ -975,13 +1021,13 @@ bool NoNetwork::DelQuery(const NoString& sName)
 
 // Server list
 
-std::vector<NoServerInfo*> NoNetwork::GetServers() const { return m_servers; }
+std::vector<NoServerInfo*> NoNetwork::GetServers() const { return d->servers; }
 
-bool NoNetwork::HasServers() const { return !m_servers.empty(); }
+bool NoNetwork::HasServers() const { return !d->servers.empty(); }
 
 NoServerInfo* NoNetwork::FindServer(const NoString& sName) const
 {
-    for (NoServerInfo* pServer : m_servers) {
+    for (NoServerInfo* pServer : d->servers) {
         if (sName.equals(pServer->host())) {
             return pServer;
         }
@@ -1000,7 +1046,7 @@ bool NoNetwork::DelServer(const NoString& sName, ushort uPort, const NoString& s
     bool bSawCurrentServer = false;
     NoServerInfo* pCurServer = GetCurrentServer();
 
-    for (std::vector<NoServerInfo*>::iterator it = m_servers.begin(); it != m_servers.end(); ++it, a++) {
+    for (std::vector<NoServerInfo*>::iterator it = d->servers.begin(); it != d->servers.end(); ++it, a++) {
         NoServerInfo* pServer = *it;
 
         if (pServer == pCurServer) bSawCurrentServer = true;
@@ -1011,14 +1057,14 @@ bool NoNetwork::DelServer(const NoString& sName, ushort uPort, const NoString& s
 
         if (!sPass.empty() && pServer->password() != sPass) continue;
 
-        m_servers.erase(it);
+        d->servers.erase(it);
 
         if (pServer == pCurServer) {
             NoIrcSocket* pIRCSock = GetIRCSock();
 
             // Make sure we don't skip the next server in the list!
-            if (m_serverIndex) {
-                m_serverIndex--;
+            if (d->serverIndex) {
+                d->serverIndex--;
             }
 
             if (pIRCSock) {
@@ -1028,8 +1074,8 @@ bool NoNetwork::DelServer(const NoString& sName, ushort uPort, const NoString& s
         } else if (!bSawCurrentServer) {
             // Our current server comes after the server which we
             // are removing. This means that it now got a different
-            // index in m_vServers!
-            m_serverIndex--;
+            // index in d->vServers!
+            d->serverIndex--;
         }
 
         delete pServer;
@@ -1081,7 +1127,7 @@ bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& s
     }
 
     // Check if server is already added
-    for (NoServerInfo* pServer : m_servers) {
+    for (NoServerInfo* pServer : d->servers) {
         if (!sName.equals(pServer->host())) continue;
 
         if (uPort != pServer->port()) continue;
@@ -1097,7 +1143,7 @@ bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& s
     NoServerInfo* pServer = new NoServerInfo(sName, uPort);
     pServer->setPassword(sPass);
     pServer->setPort(uPort);
-    m_servers.push_back(pServer);
+    d->servers.push_back(pServer);
 
     CheckIRCConnect();
 
@@ -1106,35 +1152,35 @@ bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& s
 
 NoServerInfo* NoNetwork::GetNextServer()
 {
-    if (m_servers.empty()) {
+    if (d->servers.empty()) {
         return nullptr;
     }
 
-    if (m_serverIndex >= m_servers.size()) {
-        m_serverIndex = 0;
+    if (d->serverIndex >= d->servers.size()) {
+        d->serverIndex = 0;
     }
 
-    return m_servers[m_serverIndex++];
+    return d->servers[d->serverIndex++];
 }
 
 NoServerInfo* NoNetwork::GetCurrentServer() const
 {
-    size_t uIdx = (m_serverIndex) ? m_serverIndex - 1 : 0;
+    size_t uIdx = (d->serverIndex) ? d->serverIndex - 1 : 0;
 
-    if (uIdx >= m_servers.size()) {
+    if (uIdx >= d->servers.size()) {
         return nullptr;
     }
 
-    return m_servers[uIdx];
+    return d->servers[uIdx];
 }
 
-void NoNetwork::SetIRCServer(const NoString& s) { m_server = s; }
+void NoNetwork::SetIRCServer(const NoString& s) { d->server = s; }
 
 bool NoNetwork::SetNextServer(const NoServerInfo* pServer)
 {
-    for (uint a = 0; a < m_servers.size(); a++) {
-        if (m_servers[a] == pServer) {
-            m_serverIndex = a;
+    for (uint a = 0; a < d->servers.size(); a++) {
+        if (d->servers[a] == pServer) {
+            d->serverIndex = a;
             return true;
         }
     }
@@ -1142,24 +1188,24 @@ bool NoNetwork::SetNextServer(const NoServerInfo* pServer)
     return false;
 }
 
-bool NoNetwork::IsLastServer() const { return (m_serverIndex >= m_servers.size()); }
+bool NoNetwork::IsLastServer() const { return (d->serverIndex >= d->servers.size()); }
 
-NoStringSet NoNetwork::GetTrustedFingerprints() const { return m_trustedFingerprints; }
+NoStringSet NoNetwork::GetTrustedFingerprints() const { return d->trustedFingerprints; }
 void NoNetwork::AddTrustedFingerprint(const NoString& sFP)
 {
-    m_trustedFingerprints.insert(No::escape(sFP, No::HexColonFormat, No::HexColonFormat));
+    d->trustedFingerprints.insert(No::escape(sFP, No::HexColonFormat, No::HexColonFormat));
 }
-void NoNetwork::DelTrustedFingerprint(const NoString& sFP) { m_trustedFingerprints.erase(sFP); }
+void NoNetwork::DelTrustedFingerprint(const NoString& sFP) { d->trustedFingerprints.erase(sFP); }
 
-NoIrcSocket* NoNetwork::GetIRCSock() const { return m_socket; }
-NoString NoNetwork::GetIRCServer() const { return m_server; }
-const NoNick& NoNetwork::GetIRCNick() const { return m_ircNick; }
+NoIrcSocket* NoNetwork::GetIRCSock() const { return d->socket; }
+NoString NoNetwork::GetIRCServer() const { return d->server; }
+const NoNick& NoNetwork::GetIRCNick() const { return d->ircNick; }
 
 void NoNetwork::SetIRCNick(const NoNick& n)
 {
-    m_ircNick = n;
+    d->ircNick = n;
 
-    for (NoClient* pClient : m_clients) {
+    for (NoClient* pClient : d->clients) {
         pClient->SetNick(n.nick());
     }
 }
@@ -1172,19 +1218,19 @@ NoString NoNetwork::GetCurNick() const
         return pIRCSock->GetNick();
     }
 
-    if (!m_clients.empty()) {
-        return m_clients[0]->GetNick();
+    if (!d->clients.empty()) {
+        return d->clients[0]->GetNick();
     }
 
     return "";
 }
 
-bool NoNetwork::IsIRCAway() const { return m_away; }
-void NoNetwork::SetIRCAway(bool b) { m_away = b; }
+bool NoNetwork::IsIRCAway() const { return d->away; }
+void NoNetwork::SetIRCAway(bool b) { d->away = b; }
 
 bool NoNetwork::Connect()
 {
-    if (!GetIRCConnectEnabled() || m_socket || !HasServers()) return false;
+    if (!GetIRCConnectEnabled() || d->socket || !HasServers()) return false;
 
     NoServerInfo* pServer = GetNextServer();
     if (!pServer) return false;
@@ -1208,12 +1254,12 @@ bool NoNetwork::Connect()
 
     NoIrcSocket* pIRCSock = new NoIrcSocket(this);
     pIRCSock->SetPass(pServer->password());
-    pIRCSock->SetSSLTrustedPeerFingerprints(m_trustedFingerprints);
+    pIRCSock->SetSSLTrustedPeerFingerprints(d->trustedFingerprints);
 
-    NO_DEBUG("Connecting user/network [" << m_user->GetUserName() << "/" << m_name << "]");
+    NO_DEBUG("Connecting user/network [" << d->user->GetUserName() << "/" << d->name << "]");
 
     bool bAbort = false;
-    NETWORKMODULECALL(OnIRCConnecting(pIRCSock), m_user, this, nullptr, &bAbort);
+    NETWORKMODULECALL(OnIRCConnecting(pIRCSock), d->user, this, nullptr, &bAbort);
     if (bAbort) {
         NO_DEBUG("Some module aborted the connection attempt");
         PutStatus("Some module aborted the connection attempt");
@@ -1222,7 +1268,7 @@ bool NoNetwork::Connect()
         return false;
     }
 
-    NoString sSockName = "IRC::" + m_user->GetUserName() + "::" + m_name;
+    NoString sSockName = "IRC::" + d->user->GetUserName() + "::" + d->name;
     NoApp::Get().GetManager().Connect(pServer->host(), pServer->port(), sSockName, 120, bSSL, GetBindHost(), pIRCSock);
 
     return true;
@@ -1234,12 +1280,12 @@ bool NoNetwork::IsIRCConnected() const
     return (pSock && pSock->IsAuthed());
 }
 
-void NoNetwork::SetIRCSocket(NoIrcSocket* pIRCSock) { m_socket = pIRCSock; }
+void NoNetwork::SetIRCSocket(NoIrcSocket* pIRCSock) { d->socket = pIRCSock; }
 
 void NoNetwork::IRCConnected()
 {
-    if (m_joinDelay > 0) {
-        m_joinTimer->Delay(m_joinDelay);
+    if (d->joinDelay > 0) {
+        d->joinTimer->Delay(d->joinDelay);
     } else {
         JoinChans();
     }
@@ -1247,22 +1293,22 @@ void NoNetwork::IRCConnected()
 
 void NoNetwork::IRCDisconnected()
 {
-    m_socket = nullptr;
+    d->socket = nullptr;
 
     SetIRCServer("");
-    m_away = false;
+    d->away = false;
 
     // Get the reconnect going
     CheckIRCConnect();
 }
 
-bool NoNetwork::GetIRCConnectEnabled() const { return m_enabled; }
+bool NoNetwork::GetIRCConnectEnabled() const { return d->enabled; }
 
 void NoNetwork::SetIRCConnectEnabled(bool b)
 {
-    m_enabled = b;
+    d->enabled = b;
 
-    if (m_enabled) {
+    if (d->enabled) {
         CheckIRCConnect();
     } else if (GetIRCSock()) {
         if (GetIRCSock()->IsConnected()) {
@@ -1291,156 +1337,156 @@ bool NoNetwork::PutIRC(const NoString& sLine)
     return true;
 }
 
-void NoNetwork::AddRawBuffer(const NoString& sFormat, const NoString& sText) { m_rawBuffer.addMessage(sFormat, sText); }
+void NoNetwork::AddRawBuffer(const NoString& sFormat, const NoString& sText) { d->rawBuffer.addMessage(sFormat, sText); }
 void NoNetwork::UpdateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText)
 {
-    m_rawBuffer.updateMessage(sMatch, sFormat, sText);
+    d->rawBuffer.updateMessage(sMatch, sFormat, sText);
 }
 void NoNetwork::UpdateExactRawBuffer(const NoString& sFormat, const NoString& sText)
 {
-    m_rawBuffer.updateExactMessage(sFormat, sText);
+    d->rawBuffer.updateExactMessage(sFormat, sText);
 }
-void NoNetwork::ClearRawBuffer() { m_rawBuffer.clear(); }
+void NoNetwork::ClearRawBuffer() { d->rawBuffer.clear(); }
 
-void NoNetwork::AddMotdBuffer(const NoString& sFormat, const NoString& sText) { m_motdBuffer.addMessage(sFormat, sText); }
+void NoNetwork::AddMotdBuffer(const NoString& sFormat, const NoString& sText) { d->motdBuffer.addMessage(sFormat, sText); }
 void NoNetwork::UpdateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText)
 {
-    m_motdBuffer.updateMessage(sMatch, sFormat, sText);
+    d->motdBuffer.updateMessage(sMatch, sFormat, sText);
 }
-void NoNetwork::ClearMotdBuffer() { m_motdBuffer.clear(); }
+void NoNetwork::ClearMotdBuffer() { d->motdBuffer.clear(); }
 
-void NoNetwork::AddNoticeBuffer(const NoString& sFormat, const NoString& sText) { m_noticeBuffer.addMessage(sFormat, sText); }
+void NoNetwork::AddNoticeBuffer(const NoString& sFormat, const NoString& sText) { d->noticeBuffer.addMessage(sFormat, sText); }
 void NoNetwork::UpdateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText)
 {
-    m_noticeBuffer.updateMessage(sMatch, sFormat, sText);
+    d->noticeBuffer.updateMessage(sMatch, sFormat, sText);
 }
-void NoNetwork::ClearNoticeBuffer() { m_noticeBuffer.clear(); }
+void NoNetwork::ClearNoticeBuffer() { d->noticeBuffer.clear(); }
 
 void NoNetwork::ClearQueryBuffer()
 {
-    std::for_each(m_queries.begin(), m_queries.end(), std::default_delete<NoQuery>());
-    m_queries.clear();
+    std::for_each(d->queries.begin(), d->queries.end(), std::default_delete<NoQuery>());
+    d->queries.clear();
 }
 
 NoString NoNetwork::GetNick(const bool bAllowDefault) const
 {
-    if (m_nickName.empty()) {
-        return m_user->GetNick(bAllowDefault);
+    if (d->nickName.empty()) {
+        return d->user->GetNick(bAllowDefault);
     }
 
-    return m_nickName;
+    return d->nickName;
 }
 
 NoString NoNetwork::GetAltNick(const bool bAllowDefault) const
 {
-    if (m_altNick.empty()) {
-        return m_user->GetAltNick(bAllowDefault);
+    if (d->altNick.empty()) {
+        return d->user->GetAltNick(bAllowDefault);
     }
 
-    return m_altNick;
+    return d->altNick;
 }
 
 NoString NoNetwork::GetIdent(const bool bAllowDefault) const
 {
-    if (m_ident.empty()) {
-        return m_user->GetIdent(bAllowDefault);
+    if (d->ident.empty()) {
+        return d->user->GetIdent(bAllowDefault);
     }
 
-    return m_ident;
+    return d->ident;
 }
 
 NoString NoNetwork::GetRealName() const
 {
-    if (m_realName.empty()) {
-        return m_user->GetRealName();
+    if (d->realName.empty()) {
+        return d->user->GetRealName();
     }
 
-    return m_realName;
+    return d->realName;
 }
 
 NoString NoNetwork::GetBindHost() const
 {
-    if (m_bindHost.empty()) {
-        return m_user->GetBindHost();
+    if (d->bindHost.empty()) {
+        return d->user->GetBindHost();
     }
 
-    return m_bindHost;
+    return d->bindHost;
 }
 
-NoString NoNetwork::GetEncoding() const { return m_encoding; }
+NoString NoNetwork::GetEncoding() const { return d->encoding; }
 
 NoString NoNetwork::GetQuitMsg() const
 {
-    if (m_quitMsg.empty()) {
-        return m_user->GetQuitMsg();
+    if (d->quitMsg.empty()) {
+        return d->user->GetQuitMsg();
     }
 
-    return m_quitMsg;
+    return d->quitMsg;
 }
 
 void NoNetwork::SetNick(const NoString& s)
 {
-    if (m_user->GetNick().equals(s)) {
-        m_nickName = "";
+    if (d->user->GetNick().equals(s)) {
+        d->nickName = "";
     } else {
-        m_nickName = s;
+        d->nickName = s;
     }
 }
 
 void NoNetwork::SetAltNick(const NoString& s)
 {
-    if (m_user->GetAltNick().equals(s)) {
-        m_altNick = "";
+    if (d->user->GetAltNick().equals(s)) {
+        d->altNick = "";
     } else {
-        m_altNick = s;
+        d->altNick = s;
     }
 }
 
 void NoNetwork::SetIdent(const NoString& s)
 {
-    if (m_user->GetIdent().equals(s)) {
-        m_ident = "";
+    if (d->user->GetIdent().equals(s)) {
+        d->ident = "";
     } else {
-        m_ident = s;
+        d->ident = s;
     }
 }
 
 void NoNetwork::SetRealName(const NoString& s)
 {
-    if (m_user->GetRealName().equals(s)) {
-        m_realName = "";
+    if (d->user->GetRealName().equals(s)) {
+        d->realName = "";
     } else {
-        m_realName = s;
+        d->realName = s;
     }
 }
 
 void NoNetwork::SetBindHost(const NoString& s)
 {
-    if (m_user->GetBindHost().equals(s)) {
-        m_bindHost = "";
+    if (d->user->GetBindHost().equals(s)) {
+        d->bindHost = "";
     } else {
-        m_bindHost = s;
+        d->bindHost = s;
     }
 }
 
-void NoNetwork::SetEncoding(const NoString& s) { m_encoding = s; }
+void NoNetwork::SetEncoding(const NoString& s) { d->encoding = s; }
 
 void NoNetwork::SetQuitMsg(const NoString& s)
 {
-    if (m_user->GetQuitMsg().equals(s)) {
-        m_quitMsg = "";
+    if (d->user->GetQuitMsg().equals(s)) {
+        d->quitMsg = "";
     } else {
-        m_quitMsg = s;
+        d->quitMsg = s;
     }
 }
 
-double NoNetwork::GetFloodRate() const { return m_floodRate; }
-ushort NoNetwork::GetFloodBurst() const { return m_floodBurst; }
-void NoNetwork::SetFloodRate(double fFloodRate) { m_floodRate = fFloodRate; }
-void NoNetwork::SetFloodBurst(ushort uFloodBurst) { m_floodBurst = uFloodBurst; }
+double NoNetwork::GetFloodRate() const { return d->floodRate; }
+ushort NoNetwork::GetFloodBurst() const { return d->floodBurst; }
+void NoNetwork::SetFloodRate(double fFloodRate) { d->floodRate = fFloodRate; }
+void NoNetwork::SetFloodBurst(ushort uFloodBurst) { d->floodBurst = uFloodBurst; }
 
-ushort NoNetwork::GetJoinDelay() const { return m_joinDelay; }
-void NoNetwork::SetJoinDelay(ushort uJoinDelay) { m_joinDelay = uJoinDelay; }
+ushort NoNetwork::GetJoinDelay() const { return d->joinDelay; }
+void NoNetwork::SetJoinDelay(ushort uJoinDelay) { d->joinDelay = uJoinDelay; }
 
 NoString NoNetwork::ExpandString(const NoString& sStr) const
 {
@@ -1458,7 +1504,7 @@ NoString& NoNetwork::ExpandString(const NoString& sStr, NoString& sRet) const
     sRet.replace("%realname%", GetRealName());
     sRet.replace("%bindhost%", GetBindHost());
 
-    return m_user->ExpandString(sRet, sRet);
+    return d->user->ExpandString(sRet, sRet);
 }
 
 bool NoNetwork::LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError)

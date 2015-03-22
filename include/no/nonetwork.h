@@ -19,19 +19,18 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <no/nobuffer.h>
-#include <no/nonick.h>
+#include <memory>
 
-class NoModules;
 class NoUser;
-class NoClient;
-class NoSettings;
-class NoChannel;
+class NoNick;
 class NoQuery;
-class NoServerInfo;
+class NoClient;
+class NoChannel;
+class NoModules;
+class NoSettings;
 class NoIrcSocket;
-class NoNetworkPingTimer;
-class NoNetworkJoinTimer;
+class NoServerInfo;
+class NoNetworkPrivate;
 
 class NO_EXPORT NoNetwork
 {
@@ -41,9 +40,6 @@ public:
     NoNetwork(NoUser* pUser, const NoString& sName);
     NoNetwork(NoUser* pUser, const NoNetwork& Network);
     ~NoNetwork();
-
-    NoNetwork(const NoNetwork&) = delete;
-    NoNetwork& operator=(const NoNetwork&) = delete;
 
     enum {
         JOIN_FREQUENCY = 30,
@@ -189,48 +185,10 @@ private:
     void JoinChans(std::set<NoChannel*>& sChans);
     bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 
-    NoString m_name;
-    NoUser* m_user;
+    NoNetwork(const NoNetwork&) = delete;
+    NoNetwork& operator=(const NoNetwork&) = delete;
 
-    NoString m_nickName;
-    NoString m_altNick;
-    NoString m_ident;
-    NoString m_realName;
-    NoString m_bindHost;
-    NoString m_encoding;
-    NoString m_quitMsg;
-    NoStringSet m_trustedFingerprints;
-
-    NoModules* m_modules;
-
-    std::vector<NoClient*> m_clients;
-
-    NoIrcSocket* m_socket;
-
-    std::vector<NoChannel*> m_channels;
-    std::vector<NoQuery*> m_queries;
-
-    NoString m_chanPrefixes;
-
-    bool m_enabled;
-    NoString m_server;
-    std::vector<NoServerInfo*> m_servers;
-    size_t m_serverIndex; ///< Index in m_vServers of our current server + 1
-
-    NoNick m_ircNick;
-    bool m_away;
-
-    double m_floodRate; ///< Set to -1 to disable protection.
-    ushort m_floodBurst;
-
-    NoBuffer m_rawBuffer;
-    NoBuffer m_motdBuffer;
-    NoBuffer m_noticeBuffer;
-
-    NoNetworkPingTimer* m_pingTimer;
-    NoNetworkJoinTimer* m_joinTimer;
-
-    ushort m_joinDelay;
+    std::unique_ptr<NoNetworkPrivate> d;
 };
 
 #endif // NONETWORK_H
