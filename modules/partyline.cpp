@@ -20,6 +20,7 @@
 #include <no/noapp.h>
 #include <no/noclient.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
 
 // If you change these and it breaks, you get to keep the pieces
 #define CHAN_PREFIX_1 "~"

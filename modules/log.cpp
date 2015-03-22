@@ -24,6 +24,8 @@
 #include <no/noserverinfo.h>
 #include <no/nodebug.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
+
 #include <algorithm>
 
 class NoLogRule

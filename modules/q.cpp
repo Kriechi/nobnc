@@ -22,6 +22,7 @@
 #include <no/nowebsocket.h>
 #include <no/nowebsession.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
 
 #ifndef Q_DEBUG_COMMUNICATION
 #define Q_DEBUG_COMMUNICATION 0

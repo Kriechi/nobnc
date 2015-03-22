@@ -19,6 +19,7 @@
 #include <no/nonetwork.h>
 #include <no/nocachemap.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
 
 class NoAutoCycleMod : public NoModule
 {

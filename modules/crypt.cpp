@@ -37,6 +37,7 @@
 #include <no/nonetwork.h>
 #include <no/noescape.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
 
 #define REQUIRESSL 1
 #define NICK_PREFIX_KEY "[nick-prefix]"

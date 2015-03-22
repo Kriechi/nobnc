@@ -35,6 +35,7 @@
 #include <no/nofile.h>
 #include <no/noutils.h>
 #include <no/noclient.h>
+#include <no/nonick.h>
 
 #define CRYPT_VERIFICATION_TOKEN "::__:AWAY:__::"
 

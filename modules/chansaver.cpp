@@ -19,6 +19,7 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/noapp.h>
+#include <no/nonick.h>
 
 class NoChannelSaverMod : public NoModule
 {

@@ -17,6 +17,7 @@
 #include <no/nomodule.h>
 #include <no/nonetwork.h>
 #include <no/noircsocket.h>
+#include <no/nonick.h>
 
 class NoKeepNickTimer : public NoTimer
 {

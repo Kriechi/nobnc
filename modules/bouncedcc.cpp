@@ -22,6 +22,7 @@
 #include <no/noapp.h>
 #include <no/nomodulesocket.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
 
 class NoBounceDccMod;
 

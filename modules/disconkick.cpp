@@ -17,6 +17,7 @@
 #include <no/nomodule.h>
 #include <no/nonetwork.h>
 #include <no/nochannel.h>
+#include <no/nonick.h>
 
 class NoKickClientOnIrcDisconnect : public NoModule
 {

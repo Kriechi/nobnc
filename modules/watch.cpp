@@ -19,6 +19,9 @@
 #include <no/nonetwork.h>
 #include <no/noescape.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
+#include <no/nobuffer.h>
+
 #include <list>
 
 class NoWatchSource

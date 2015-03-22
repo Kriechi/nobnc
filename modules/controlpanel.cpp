@@ -23,6 +23,7 @@
 #include <no/nochannel.h>
 #include <no/noircsocket.h>
 #include <no/noapp.h>
+#include <no/nonick.h>
 
 template <std::size_t N> struct array_size_helper
 {

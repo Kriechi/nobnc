@@ -18,6 +18,7 @@
 #include <no/nochannel.h>
 #include <no/nonetwork.h>
 #include <no/noescape.h>
+#include <no/nonick.h>
 
 class NoBuffExtras : public NoModule
 {

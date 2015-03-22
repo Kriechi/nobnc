@@ -27,6 +27,7 @@
 #include <no/nonetwork.h>
 #include <no/noapp.h>
 #include <no/nomodulesocket.h>
+#include <no/nonick.h>
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>

@@ -28,6 +28,7 @@
 #include <no/noescape.h>
 #include <no/nolistener.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
 
 /* Stuff to be able to write this:
    // i will be name of local variable, see below

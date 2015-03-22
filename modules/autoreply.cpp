@@ -20,6 +20,7 @@
 #include <no/noircsocket.h>
 #include <no/nocachemap.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
 
 class NoAutoReplyMod : public NoModule
 {
