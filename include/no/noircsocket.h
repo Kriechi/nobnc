@@ -19,23 +19,18 @@
 
 #include <no/noglobal.h>
 #include <no/nosocket.h>
-#include <no/nonick.h>
+#include <memory>
 
-#include <deque>
-
-class NoChannel;
-class NoUser;
-class NoNetwork;
+class NoNick;
 class NoClient;
+class NoNetwork;
+class NoIrcSocketPrivate;
 
 class NO_EXPORT NoIrcSocket : public NoSocket
 {
 public:
     NoIrcSocket(NoNetwork* pNetwork);
     virtual ~NoIrcSocket();
-
-    NoIrcSocket(const NoIrcSocket&) = delete;
-    NoIrcSocket& operator=(const NoIrcSocket&) = delete;
 
     enum ChanModeArgs {
         // These values must line up with their position in the CHANMODE argument to raw 005
@@ -116,33 +111,13 @@ private:
     void SendNextCap();
     void TrySend();
 
-    bool m_authed;
-    bool m_hasNamesX;
-    bool m_hasUhNames;
-    NoString m_perms;
-    NoString m_permModes;
-    std::set<uchar> m_userModes;
-    std::map<uchar, ChanModeArgs> m_chanModes;
-    NoNetwork* m_network;
-    NoNick m_nick;
-    NoString m_password;
-    std::map<NoString, NoChannel*> m_chans;
-    uint m_maxNickLen;
-    uint m_capPaused;
-    NoStringSet m_acceptedCaps;
-    NoStringSet m_pendingCaps;
-    time_t m_lastCtcp;
-    uint m_numCtcp;
-    static const time_t m_ctcpFloodTime;
-    static const uint m_ctcpFloodCount;
-    NoStringMap m_iSupport;
-    std::deque<NoString> m_sendQueue;
-    short int m_sendsAllowed;
-    ushort m_floodBurst;
-    double m_floodRate;
-    bool m_floodProtection;
-
     friend class NoIrcFloodTimer;
+
+private:
+    NoIrcSocket(const NoIrcSocket&) = delete;
+    NoIrcSocket& operator=(const NoIrcSocket&) = delete;
+
+    std::unique_ptr<NoIrcSocketPrivate> d;
 };
 
 #endif // NOIRCCONNECTION_H
