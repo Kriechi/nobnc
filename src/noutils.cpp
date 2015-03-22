@@ -19,7 +19,6 @@
 #include "nofile.h"
 #include "nodir.h"
 #include "noescape.h"
-#include "noblowfish.h"
 #include "md5/md5.h"
 #include "sha2/sha2.h"
 #include <sys/time.h>
@@ -29,6 +28,10 @@
 #include <unicode/ucnv.h>
 #include <unicode/errorcode.h>
 #endif
+
+#ifdef HAVE_LIBSSL
+#include <openssl/blowfish.h>
+#endif // HAVE_LIBSSL
 
 // Required with GCC 4.3+ if openssl is disabled
 #include <cstring>
@@ -70,43 +73,39 @@ ulong No::formatLongIp(const NoString& sIP)
 }
 
 #ifdef HAVE_LIBSSL
-#include <openssl/blowfish.h>
-static NoString Crypt(const NoString& sStr, const NoString& sPass, bool bEncrypt, const NoString& sIvec)
+static NoString blowfish(const NoString& data, const NoString& password, int mode)
 {
-    NoString ret = sStr;
+    NoString ret = data;
 
-    uchar szIvec[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    BF_KEY bKey;
+    uchar ivec[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    BF_KEY key;
 
-    if (sIvec.length() >= 8)
-        memcpy(szIvec, sIvec.data(), 8);
+    BF_set_key(&key, (uint)password.length(), (uchar*)password.data());
+    uint pad = ret.length() % 8;
 
-    BF_set_key(&bKey, (uint)sPass.length(), (uchar*)sPass.data());
-    uint uPad = ret.length() % 8;
-
-    if (uPad) {
-        uPad = 8 - uPad;
-        ret.append(uPad, '\0');
+    if (pad) {
+        pad = 8 - pad;
+        ret.append(pad, '\0');
     }
 
-    size_t uLen = ret.length();
-    uchar* szBuff = (uchar*)malloc(uLen);
-    BF_cbc_encrypt((const uchar*)ret.data(), szBuff, uLen, &bKey, szIvec, ((bEncrypt) ? BF_ENCRYPT : BF_DECRYPT));
+    size_t len = ret.length();
+    uchar* buff = (uchar*)malloc(len);
+    BF_cbc_encrypt((const uchar*)ret.data(), buff, len, &key, ivec, mode);
 
     ret.clear();
-    ret.append((const char*)szBuff, uLen);
-    free(szBuff);
+    ret.append((const char*)buff, len);
+    free(buff);
     return ret;
 }
 
-NoString No::encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec)
+NoString No::encrypt(const NoString& data, const NoString& password)
 {
-    return Crypt(sStr, sPass, true, sIvec);
+    return blowfish(data, password, BF_ENCRYPT);
 }
 
-NoString No::decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec)
+NoString No::decrypt(const NoString& data, const NoString& password)
 {
-    return Crypt(sStr, sPass, false, sIvec);
+    return blowfish(data, password, BF_DECRYPT);
 }
 #endif // HAVE_LIBSSL
 

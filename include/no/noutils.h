@@ -32,8 +32,8 @@ namespace No
     NO_EXPORT void printStatus(bool bSuccess, const NoString& sMessage = "");
 
 #ifdef HAVE_LIBSSL
-    NO_EXPORT NoString encrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
-    NO_EXPORT NoString decrypt(const NoString& sStr, const NoString& sPass, const NoString& sIvec = "");
+    NO_EXPORT NoString encrypt(const NoString& data, const NoString& password);
+    NO_EXPORT NoString decrypt(const NoString& data, const NoString& password);
 #endif
 
     NO_EXPORT NoString salt();
