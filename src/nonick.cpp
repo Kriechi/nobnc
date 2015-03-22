@@ -54,6 +54,31 @@ NoNick::NoNick(const NoString& mask) : d(new NoNickPrivate)
     d->parse(mask);
 }
 
+NoNick::NoNick(const NoNick& other) : d(new NoNickPrivate)
+{
+    d->nick = other.nick();
+    d->ident = other.ident();
+    d->host = other.host();
+    d->perms = other.perms();
+    d->network = other.network();
+}
+
+NoNick& NoNick::operator=(const NoNick& other)
+{
+    if (this != &other) {
+        d->nick = other.nick();
+        d->ident = other.ident();
+        d->host = other.host();
+        d->perms = other.perms();
+        d->network = other.network();
+    }
+    return *this;
+}
+
+NoNick::~NoNick()
+{
+}
+
 bool NoNick::equals(const NoString& nick) const
 {
     // TODO add proper IRC case mapping here

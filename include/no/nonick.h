@@ -28,9 +28,9 @@ class NO_EXPORT NoNick
 {
 public:
     NoNick(const NoString& mask = "");
-
-    NoNick(const NoNick&) = default;
-    NoNick& operator=(const NoNick&) = default;
+    NoNick(const NoNick& other);
+    NoNick& operator=(const NoNick& other);
+    ~NoNick();
 
     bool equals(const NoString& nick) const;
 
