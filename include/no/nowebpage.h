@@ -22,8 +22,6 @@
 #include <memory>
 
 class NoWebPage;
-typedef std::shared_ptr<NoWebPage> TWebPage;
-typedef std::vector<TWebPage> VWebPages;
 
 class NO_EXPORT NoWebPage
 {

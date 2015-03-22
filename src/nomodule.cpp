@@ -337,11 +337,8 @@ const NoString& NoModule::GetModDataDir() const { return d->dataDir; }
 bool NoModule::OnWebPreRequest(NoWebSocket& WebSock, const NoString& sPageName) { return false; }
 bool NoModule::OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
 
-void NoModule::AddSubPage(TWebPage spSubPage) { d->subPages.push_back(spSubPage); }
+void NoModule::AddSubPage(std::shared_ptr<NoWebPage> spSubPage) { d->subPages.push_back(spSubPage); }
 
-void NoModule::ClearSubPages() { d->subPages.clear(); }
-
-VWebPages& NoModule::GetSubPages() { return d->subPages; }
 bool NoModule::OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
 // !Webmods
 

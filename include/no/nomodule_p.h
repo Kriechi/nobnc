@@ -52,7 +52,7 @@ public:
     NoString args;
     NoString path;
 
-    VWebPages subPages;
+    std::vector<std::shared_ptr<NoWebPage>> subPages;
     std::map<NoString, NoModuleCommand> commands;
 };
 

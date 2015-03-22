@@ -16,6 +16,7 @@
 
 #include "nowebsession.h"
 #include "nowebsocket.h"
+#include "nomodule_p.h"
 #include "nocachemap.h"
 #include "notemplate.h"
 #include "noauthenticator.h"
@@ -459,9 +460,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
             Row["Username"] = Module.GetUser()->GetUserName();
         }
 
-        VWebPages& vSubPages = Module.GetSubPages();
-
-        for (TWebPage& SubPage : vSubPages) {
+        for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(&Module)->subPages) {
             // bActive is whether or not the current url matches this subpage (params will be checked below)
             bool bActive = (m_modName == Module.GetModName() && m_page == SubPage->GetName() && bActiveModule);
 
@@ -802,9 +801,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             return Deferred;
         }
 
-        VWebPages& vSubPages = pModule->GetSubPages();
-
-        for (TWebPage& SubPage : vSubPages) {
+        for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(pModule)->subPages) {
             bool bActive = (m_modName == pModule->GetModName() && m_page == SubPage->GetName());
 
             if (bActive && SubPage->RequiresAdmin() && !GetSession()->IsAdmin()) {

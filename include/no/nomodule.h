@@ -235,14 +235,7 @@ public:
     /** Registers a sub page for the sidebar.
      *  @param spSubPage The SubPage instance.
      */
-    virtual void AddSubPage(TWebPage spSubPage);
-    /** Removes all registered (AddSubPage'd) SubPages.
-     */
-    virtual void ClearSubPages();
-    /** Returns a list of all registered SubPages. Don't mess with it too much.
-     *  @return The List.
-     */
-    virtual VWebPages& GetSubPages();
+    virtual void AddSubPage(std::shared_ptr<NoWebPage> spSubPage);
     /** Using this hook, module can embed web stuff directly to different places.
      *  This method is called whenever embededded modules I/O happens.
      *  Name of used .tmpl file (if any) is up to caller.
