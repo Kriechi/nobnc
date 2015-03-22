@@ -867,7 +867,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
             sHint = "host only";
         }
 
-        while (!No::getInput("Server host", sHost, sHost, sHint) || !NoServer::IsValidHostName(sHost))
+        while (!No::getInput("Server host", sHost, sHost, sHint) || !NoServer(sHost).isValid())
             ;
 #ifdef HAVE_LIBSSL
         bSSL = No::getBoolInput("Server uses SSL?", bSSL);

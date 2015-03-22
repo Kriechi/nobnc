@@ -335,12 +335,12 @@ void NoClient::UserCommand(NoString& sLine)
         if (GetIRCSock()) {
             GetIRCSock()->Quit();
             if (pServer)
-                PutStatus("Connecting to [" + pServer->GetName() + "]...");
+                PutStatus("Connecting to [" + pServer->host() + "]...");
             else
                 PutStatus("Jumping to the next server in the list...");
         } else {
             if (pServer)
-                PutStatus("Connecting to [" + pServer->GetName() + "]...");
+                PutStatus("Connecting to [" + pServer->host() + "]...");
             else
                 PutStatus("Connecting...");
         }
@@ -792,10 +792,10 @@ void NoClient::UserCommand(NoString& sLine)
 
             for (const NoServer* pServer : vServers) {
                 Table.AddRow();
-                Table.SetCell("Host", pServer->GetName() + (pServer == pCurServ ? "*" : ""));
-                Table.SetCell("Port", NoString(pServer->GetPort()));
-                Table.SetCell("SSL", (pServer->IsSSL()) ? "SSL" : "");
-                Table.SetCell("Pass", pServer->GetPass());
+                Table.SetCell("Host", pServer->host() + (pServer == pCurServ ? "*" : ""));
+                Table.SetCell("Port", NoString(pServer->port()));
+                Table.SetCell("SSL", (pServer->isSsl()) ? "SSL" : "");
+                Table.SetCell("Pass", pServer->password());
             }
 
             PutStatus(Table);

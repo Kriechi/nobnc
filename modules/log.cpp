@@ -257,8 +257,8 @@ NoString NoLogMod::GetServer()
 
     if (!pServer) return "(no server)";
 
-    if (pServer->IsSSL()) sSSL = "+";
-    return pServer->GetName() + " " + sSSL + NoString(pServer->GetPort());
+    if (pServer->isSsl()) sSSL = "+";
+    return pServer->host() + " " + sSSL + NoString(pServer->port());
 }
 
 bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)

@@ -23,21 +23,30 @@
 class NO_EXPORT NoServer
 {
 public:
-    NoServer(const NoString& sName, ushort uPort = 6667, const NoString& sPass = "", bool bSSL = false);
+    NoServer(const NoString& host = "", ushort port = 6667);
     ~NoServer();
 
-    const NoString& GetName() const;
-    ushort GetPort() const;
-    const NoString& GetPass() const;
-    bool IsSSL() const;
-    NoString GetString(bool bIncludePassword = true) const;
-    static bool IsValidHostName(const NoString& sHostName);
+    bool isValid() const;
+
+    NoString host() const;
+    void setHost(const NoString& host);
+
+    ushort port() const;
+    void setPort(ushort port);
+
+    NoString password() const;
+    void setPassword(const NoString& password);
+
+    bool isSsl() const;
+    void setSsl(bool ssl);
+
+    NoString toString() const;
 
 private:
-    NoString m_sName;
-    ushort m_uPort;
-    NoString m_sPass;
-    bool m_bSSL;
+    bool m_ssl;
+    ushort m_port;
+    NoString m_host;
+    NoString m_password;
 };
 
 #endif // NOSERVER_H

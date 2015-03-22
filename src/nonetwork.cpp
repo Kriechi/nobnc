@@ -168,18 +168,18 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     NoServer* pCurServ = GetCurrentServer();
 
     if (pCurServ) {
-        sServer = pCurServ->GetName();
+        sServer = pCurServ->host();
     }
 
     DelServers();
 
     for (NoServer* pServer : vServers) {
-        AddServer(pServer->GetName(), pServer->GetPort(), pServer->GetPass(), pServer->IsSSL());
+        AddServer(pServer->host(), pServer->port(), pServer->password(), pServer->isSsl());
     }
 
     m_uServerIdx = 0;
     for (size_t a = 0; a < m_vServers.size(); a++) {
-        if (sServer.equals(m_vServers[a]->GetName())) {
+        if (sServer.equals(m_vServers[a]->host())) {
             m_uServerIdx = a + 1;
             break;
         }
@@ -505,7 +505,7 @@ NoSettings NoNetwork::ToConfig() const
 
     // Servers
     for (NoServer* pServer : m_vServers) {
-        config.AddKeyValuePair("Server", pServer->GetString());
+        config.AddKeyValuePair("Server", pServer->toString());
     }
 
     for (const NoString& sFP : m_ssTrustedFingerprints) {
@@ -982,7 +982,7 @@ bool NoNetwork::HasServers() const { return !m_vServers.empty(); }
 NoServer* NoNetwork::FindServer(const NoString& sName) const
 {
     for (NoServer* pServer : m_vServers) {
-        if (sName.equals(pServer->GetName())) {
+        if (sName.equals(pServer->host())) {
             return pServer;
         }
     }
@@ -1005,11 +1005,11 @@ bool NoNetwork::DelServer(const NoString& sName, ushort uPort, const NoString& s
 
         if (pServer == pCurServer) bSawCurrentServer = true;
 
-        if (!pServer->GetName().equals(sName)) continue;
+        if (!pServer->host().equals(sName)) continue;
 
-        if (uPort != 0 && pServer->GetPort() != uPort) continue;
+        if (uPort != 0 && pServer->port() != uPort) continue;
 
-        if (!sPass.empty() && pServer->GetPass() != sPass) continue;
+        if (!sPass.empty() && pServer->password() != sPass) continue;
 
         m_vServers.erase(it);
 
@@ -1082,19 +1082,21 @@ bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& s
 
     // Check if server is already added
     for (NoServer* pServer : m_vServers) {
-        if (!sName.equals(pServer->GetName())) continue;
+        if (!sName.equals(pServer->host())) continue;
 
-        if (uPort != pServer->GetPort()) continue;
+        if (uPort != pServer->port()) continue;
 
-        if (sPass != pServer->GetPass()) continue;
+        if (sPass != pServer->password()) continue;
 
-        if (bSSL != pServer->IsSSL()) continue;
+        if (bSSL != pServer->isSsl()) continue;
 
         // Server is already added
         return false;
     }
 
-    NoServer* pServer = new NoServer(sName, uPort, sPass, bSSL);
+    NoServer* pServer = new NoServer(sName, uPort);
+    pServer->setPassword(sPass);
+    pServer->setPort(uPort);
     m_vServers.push_back(pServer);
 
     CheckIRCConnect();
@@ -1187,15 +1189,15 @@ bool NoNetwork::Connect()
     NoServer* pServer = GetNextServer();
     if (!pServer) return false;
 
-    if (NoApp::Get().GetServerThrottle(pServer->GetName())) {
+    if (NoApp::Get().GetServerThrottle(pServer->host())) {
         // Can't connect right now, schedule retry later
         NoApp::Get().AddNetworkToQueue(this);
         return false;
     }
 
-    NoApp::Get().AddServerThrottle(pServer->GetName());
+    NoApp::Get().AddServerThrottle(pServer->host());
 
-    bool bSSL = pServer->IsSSL();
+    bool bSSL = pServer->isSsl();
 #ifndef HAVE_LIBSSL
     if (bSSL) {
         PutStatus("Cannot connect to [" + pServer->GetString(false) + "], ZNC is not compiled with SSL.");
@@ -1205,7 +1207,7 @@ bool NoNetwork::Connect()
 #endif
 
     NoIrcSocket* pIRCSock = new NoIrcSocket(this);
-    pIRCSock->SetPass(pServer->GetPass());
+    pIRCSock->SetPass(pServer->password());
     pIRCSock->SetSSLTrustedPeerFingerprints(m_ssTrustedFingerprints);
 
     NO_DEBUG("Connecting user/network [" << m_pUser->GetUserName() << "/" << m_sName << "]");
@@ -1221,7 +1223,7 @@ bool NoNetwork::Connect()
     }
 
     NoString sSockName = "IRC::" + m_pUser->GetUserName() + "::" + m_sName;
-    NoApp::Get().GetManager().Connect(pServer->GetName(), pServer->GetPort(), sSockName, 120, bSSL, GetBindHost(), pIRCSock);
+    NoApp::Get().GetManager().Connect(pServer->host(), pServer->port(), sSockName, 120, bSSL, GetBindHost(), pIRCSock);
 
     return true;
 }

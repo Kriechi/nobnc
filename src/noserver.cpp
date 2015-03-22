@@ -16,25 +16,71 @@
 
 #include "noserver.h"
 
-NoServer::NoServer(const NoString& sName, ushort uPort, const NoString& sPass, bool bSSL)
-    : m_sName(sName), m_uPort((uPort) ? uPort : (ushort)6667), m_sPass(sPass), m_bSSL(bSSL)
+NoServer::NoServer(const NoString& host, ushort port) : m_host(host), m_port(port)
 {
 }
 
-NoServer::~NoServer() {}
-
-bool NoServer::IsValidHostName(const NoString& sHostName)
+NoServer::~NoServer()
 {
-    return (!sHostName.empty() && (sHostName.find(' ') == NoString::npos));
 }
 
-const NoString& NoServer::GetName() const { return m_sName; }
-ushort NoServer::GetPort() const { return m_uPort; }
-const NoString& NoServer::GetPass() const { return m_sPass; }
-bool NoServer::IsSSL() const { return m_bSSL; }
-
-NoString NoServer::GetString(bool bIncludePassword) const
+bool NoServer::isValid() const
 {
-    return m_sName + " " + NoString(m_bSSL ? "+" : "") + NoString(m_uPort) +
-           NoString(bIncludePassword ? (m_sPass.empty() ? "" : " " + m_sPass) : "");
+    return !m_host.empty() && !m_host.contains(" ");
+}
+
+NoString NoServer::host() const
+{
+    return m_host;
+}
+
+void NoServer::setHost(const NoString &host)
+{
+    m_host = host;
+}
+
+ushort NoServer::port() const
+{
+    return m_port;
+}
+
+void NoServer::setPort(ushort port)
+{
+    m_port = port;
+}
+
+NoString NoServer::password() const
+{
+    return m_password;
+}
+
+void NoServer::setPassword(const NoString& password)
+{
+    m_password = password;
+}
+
+bool NoServer::isSsl() const
+{
+    return m_ssl;
+}
+
+void NoServer::setSsl(bool ssl)
+{
+    m_ssl = ssl;
+}
+
+NoString NoServer::toString() const
+{
+    NoStringVector parts;
+    parts.push_back(m_host);
+
+    NoString port(m_port);
+    if (m_ssl)
+        port = "+" + port;
+    parts.push_back(port);
+
+    if (!m_password.empty())
+        parts.push_back(m_password);
+
+    return NoString(" ").join(parts.begin(), parts.end());
 }

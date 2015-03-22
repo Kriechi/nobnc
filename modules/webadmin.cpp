@@ -897,7 +897,7 @@ public:
                 const std::vector<NoServer*>& vServers = pNetwork->GetServers();
                 for (uint a = 0; a < vServers.size(); a++) {
                     NoTemplate& l = Tmpl.AddRow("ServerLoop");
-                    l["Server"] = vServers[a]->GetString();
+                    l["Server"] = vServers[a]->toString();
                 }
 
                 const std::vector<NoChannel*>& Channels = pNetwork->GetChans();
@@ -1275,7 +1275,7 @@ public:
                     l["IRCNick"] = vNetworks[a]->GetIRCNick().nick();
                     NoServer* pServer = vNetworks[a]->GetCurrentServer();
                     if (pServer) {
-                        l["Server"] = pServer->GetName() + ":" + (pServer->IsSSL() ? "+" : "") + NoString(pServer->GetPort());
+                        l["Server"] = pServer->host() + ":" + (pServer->isSsl() ? "+" : "") + NoString(pServer->port());
                     }
                 }
 

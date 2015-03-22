@@ -70,7 +70,7 @@ public:
     void OnIRCConnected() override
     {
         Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] connected to IRC: " +
-            GetNetwork()->GetCurrentServer()->GetName());
+            GetNetwork()->GetCurrentServer()->host());
     }
 
     void OnIRCDisconnected() override
@@ -86,7 +86,7 @@ public:
             NoString sError(sLine.substr(6));
             if (sError.left(1) == ":") sError.leftChomp(1);
             Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC: " +
-                GetNetwork()->GetCurrentServer()->GetName() + " [" + sError + "]",
+                GetNetwork()->GetCurrentServer()->host() + " [" + sError + "]",
                 LOG_NOTICE);
         }
         return CONTINUE;

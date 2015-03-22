@@ -213,7 +213,9 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             NoString sHost = No::token(sRest, 0);
             NoString sPort = No::token(sRest, 1);
             NoString sInfo = No::tokens(sRest, 2).trimPrefix_n();
-            m_pNetwork->PutStatus("Server [" + m_pNetwork->GetCurrentServer()->GetString(false) +
+            NoServer server = NoServer(*m_pNetwork->GetCurrentServer()); // TODO: store NoServer by value
+            server.setPassword("");
+            m_pNetwork->PutStatus("Server [" + server.toString() +
                                   "] redirects us to [" + sHost + ":" + sPort + "] with reason [" + sInfo + "]");
             m_pNetwork->PutStatus("Perhaps you want to add it as a new server.");
             // Don't send server redirects to the client
