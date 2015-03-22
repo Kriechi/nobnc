@@ -34,33 +34,6 @@ NoBlowfish::NoBlowfish(const NoString& sPassword, int iEncrypt, const NoString& 
 
 NoBlowfish::~NoBlowfish() { free(m_ivec); }
 
-//! output must be freed
-uchar* NoBlowfish::MD5(const uchar* input, u_int ilen)
-{
-    uchar* output = (uchar*)malloc(MD5_DIGEST_LENGTH);
-    ::MD5(input, ilen, output);
-    return output;
-}
-
-//! returns an md5 of the NoString (not hex encoded)
-NoString NoBlowfish::MD5(const NoString& sInput, bool bHexEncode)
-{
-    NoString sRet;
-    uchar* data = MD5((const uchar*)sInput.data(), (uint)sInput.length());
-
-    if (!bHexEncode) {
-        sRet.append((const char*)data, MD5_DIGEST_LENGTH);
-    } else {
-        for (int a = 0; a < MD5_DIGEST_LENGTH; a++) {
-            sRet += g_HexDigits[data[a] >> 4];
-            sRet += g_HexDigits[data[a] & 0xf];
-        }
-    }
-
-    free(data);
-    return sRet;
-}
-
 //! output must be the same size as input
 void NoBlowfish::Crypt(uchar* input, uchar* output, u_int uBytes)
 {

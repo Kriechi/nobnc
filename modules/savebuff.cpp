@@ -88,15 +88,15 @@ public:
         if (sArgs == CRYPT_ASK_PASS) {
             char* pPass = getpass("Enter pass for savebuff: ");
             if (pPass)
-                m_sPassword = NoBlowfish::MD5(pPass);
+                m_sPassword = No::md5(pPass);
             else {
                 m_bBootError = true;
                 sMessage = "Nothing retrieved from console. aborting";
             }
         } else if (sArgs.empty())
-            m_sPassword = NoBlowfish::MD5(CRYPT_LAME_PASS);
+            m_sPassword = No::md5(CRYPT_LAME_PASS);
         else
-            m_sPassword = NoBlowfish::MD5(sArgs);
+            m_sPassword = No::md5(sArgs);
 
         NoSaveBuffJob* timer = new NoSaveBuffJob(this);
         timer->start(60);
@@ -231,7 +231,7 @@ public:
         if (sArgs.empty()) sArgs = CRYPT_LAME_PASS;
 
         PutModule("Password set to [" + sArgs + "]");
-        m_sPassword = NoBlowfish::MD5(sArgs);
+        m_sPassword = No::md5(sArgs);
     }
 
     void OnModCommand(const NoString& sCmdLine) override
@@ -295,7 +295,7 @@ public:
     {
         NoString sBuffer = GetUser()->GetUserName() + sTarget.toLower();
         NoString sRet = GetSavePath();
-        sRet += "/" + NoBlowfish::MD5(sBuffer, true);
+        sRet += "/" + No::md5(sBuffer);
         return (sRet);
     }
 

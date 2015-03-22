@@ -24,7 +24,6 @@
 
 #include <openssl/aes.h>
 #include <openssl/blowfish.h>
-#include <openssl/md5.h>
 
 //! does Blowfish w/64 bit feedback, no padding
 class NO_EXPORT NoBlowfish
@@ -40,12 +39,6 @@ public:
 
     NoBlowfish(const NoBlowfish&) = default;
     NoBlowfish& operator=(const NoBlowfish&) = default;
-
-    //! output must be freed
-    static uchar* MD5(const uchar* input, u_int ilen);
-
-    //! returns an md5 of the NoString (not hex encoded)
-    static NoString MD5(const NoString& sInput, bool bHexEncode = false);
 
     //! output must be the same size as input
     void Crypt(uchar* input, uchar* output, u_int ibytes);

@@ -257,7 +257,7 @@ public:
         }
         if (m_saveMessages) {
             if (!sMyArgs.empty()) {
-                m_sPassword = NoBlowfish::MD5(sMyArgs);
+                m_sPassword = No::md5(sMyArgs);
             } else {
                 sMessage = "This module needs as an argument a keyphrase used for encryption";
                 return false;
@@ -332,7 +332,7 @@ public:
     {
         NoString sBuffer = GetUser()->GetUserName();
         NoString sRet = GetSavePath();
-        sRet += "/.znc-away-" + NoBlowfish::MD5(sBuffer, true);
+        sRet += "/.znc-away-" + No::md5(sBuffer);
         return (sRet);
     }
 
