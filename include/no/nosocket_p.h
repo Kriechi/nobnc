@@ -29,12 +29,11 @@
 #include <unicode/ucnv_cb.h>
 #endif
 
-class NoSocketPrivate : public Csock
+class NoSocketImpl : public Csock
 {
 public:
-    NoSocketPrivate(NoSocket *q, const NoString& host, u_short port, int timeout);
-
-    static NoSocketPrivate* get(NoSocket* socket) { return socket->d.get(); }
+    NoSocketImpl(NoSocket *q, const NoString& host, u_short port, int timeout);
+    ~NoSocketImpl();
 
     int ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const override;
 #ifdef HAVE_LIBSSL
@@ -65,10 +64,18 @@ public:
     bool ConnectionFrom(const NoString& sHost, ushort uPort) override { return q->ConnectionFromImpl(sHost, uPort); }
 
     NoSocket* q;
+    bool allowControlCodes;
     NoString hostToVerifySSL;
     NoStringSet ssTrustedFingerprints;
     NoStringSet ssCertVerificationErrors;
-    bool allowControlCodes;
+};
+
+class NoSocketPrivate
+{
+public:
+    static NoSocketImpl* get(NoSocket* socket) { return socket->d->impl; }
+
+    NoSocketImpl* impl;
 };
 
 #endif // NOSOCKET_P_H
