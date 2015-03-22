@@ -18,6 +18,7 @@
 #include <no/noclient.h>
 #include <no/nochannel.h>
 #include <no/nomodulejob.h>
+#include <no/nonick.h>
 #include <unistd.h>
 
 #ifdef HAVE_PTHREAD

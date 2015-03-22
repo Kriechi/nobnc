@@ -17,6 +17,7 @@
 #include <no/nomodule.h>
 #include <no/nochannel.h>
 #include <no/noregistry.h>
+#include <no/nonick.h>
 
 class NoAttachMatch
 {

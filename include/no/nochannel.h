@@ -18,14 +18,15 @@
 #define NOCHANNEL_H
 
 #include <no/noglobal.h>
-#include <no/nonick.h>
 #include <no/nostring.h>
-#include <no/nobuffer.h>
-#include <map>
+#include <memory>
 
-class NoNetwork;
+class NoNick;
+class NoBuffer;
 class NoClient;
+class NoNetwork;
 class NoSettings;
+class NoChannelPrivate;
 
 class NO_EXPORT NoChannel
 {
@@ -49,9 +50,6 @@ public:
 
     NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig, NoSettings* pConfig = nullptr);
     ~NoChannel();
-
-    NoChannel(const NoChannel&) = delete;
-    NoChannel& operator=(const NoChannel&) = delete;
 
     void reset();
     NoSettings toConfig() const;
@@ -135,28 +133,10 @@ public:
     bool hasAutoClearChanBufferSet() const;
 
 private:
-    bool m_detached;
-    bool m_isOn;
-    bool m_autoClearChanBuffer;
-    bool m_inConfig;
-    bool m_disabled;
-    bool m_hasBufferCountSet;
-    bool m_hasAutoClearChanBufferSet;
-    NoString m_name;
-    NoString m_key;
-    NoString m_topic;
-    NoString m_topicOwner;
-    ulong m_topicDate;
-    ulong m_creationDate;
-    NoNetwork* m_network;
-    NoNick m_nick;
-    uint m_joinTries;
-    NoString m_defaultModes;
-    std::map<NoString, NoNick> m_nicks; // Todo: make this caseless (irc style)
-    NoBuffer m_buffer;
+    NoChannel(const NoChannel&) = delete;
+    NoChannel& operator=(const NoChannel&) = delete;
 
-    bool m_modeKnown;
-    std::map<uchar, NoString> m_modes;
+    std::unique_ptr<NoChannelPrivate> d;
 };
 
 #endif // NOCHANNEL_H
