@@ -126,7 +126,7 @@ public:
             for (std::vector<NoNetwork*>::const_iterator i = pUser->GetNetworks().begin(); i != pUser->GetNetworks().end(); ++i) {
                 NoNetwork* pNetwork = *i;
                 if (pNetwork->GetIRCSock()) {
-                    if (pNetwork->GetChanPrefixes().find(CHAN_PREFIX_1) == NoString::npos) {
+                    if (!pNetwork->GetChanPrefixes().contains(CHAN_PREFIX_1)) {
                         pNetwork->PutUser(":" + GetIRCServer(pNetwork) + " 005 " + pNetwork->GetIRCNick().nick() +
                                           " CHANTYPES=" + pNetwork->GetChanPrefixes() + CHAN_PREFIX_1
                                           " :are supported by this server.");

@@ -1380,9 +1380,9 @@ uchar NoIrcSocket::GetPermFromMode(uchar uMode) const
 
 const std::map<uchar, NoIrcSocket::ChanModeArgs>&NoIrcSocket::GetChanModes() const { return m_chanModes; }
 
-bool NoIrcSocket::IsPermChar(const char c) const { return (c != '\0' && GetPerms().find(c) != NoString::npos); }
+bool NoIrcSocket::IsPermChar(const char c) const { return (c != '\0' && GetPerms().contains(c)); }
 
-bool NoIrcSocket::IsPermMode(const char c) const { return (c != '\0' && GetPermModes().find(c) != NoString::npos); }
+bool NoIrcSocket::IsPermMode(const char c) const { return (c != '\0' && GetPermModes().contains(c)); }
 
 const NoString& NoIrcSocket::GetPerms() const { return m_perms; }
 

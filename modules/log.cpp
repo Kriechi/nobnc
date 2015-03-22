@@ -274,22 +274,22 @@ bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)
 
     // Add default filename to path if it's a folder
     if (GetType() == No::UserModule) {
-        if (m_sLogPath.right(1) == "/" || m_sLogPath.find("$WINDOW") == NoString::npos || m_sLogPath.find("$NETWORK") == NoString::npos) {
+        if (m_sLogPath.right(1) == "/" || !m_sLogPath.contains("$WINDOW") || !m_sLogPath.contains("$NETWORK")) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
             }
             m_sLogPath += "$NETWORK/$WINDOW/%Y-%m-%d.log";
         }
     } else if (GetType() == No::NetworkModule) {
-        if (m_sLogPath.right(1) == "/" || m_sLogPath.find("$WINDOW") == NoString::npos) {
+        if (m_sLogPath.right(1) == "/" || !m_sLogPath.contains("$WINDOW")) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
             }
             m_sLogPath += "$WINDOW/%Y-%m-%d.log";
         }
     } else {
-        if (m_sLogPath.right(1) == "/" || m_sLogPath.find("$USER") == NoString::npos ||
-            m_sLogPath.find("$WINDOW") == NoString::npos || m_sLogPath.find("$NETWORK") == NoString::npos) {
+        if (m_sLogPath.right(1) == "/" || !m_sLogPath.contains("$USER") ||
+            !m_sLogPath.contains("$WINDOW") || !m_sLogPath.contains("$NETWORK")) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
             }

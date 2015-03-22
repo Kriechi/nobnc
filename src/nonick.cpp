@@ -149,7 +149,7 @@ void NoNick::setNetwork(NoNetwork* network)
 
 bool NoNick::hasPerm(uchar perm) const
 {
-    return perm && d->perms.find(perm) != NoString::npos;
+    return perm && d->perms.contains(perm);
 }
 
 void NoNick::addPerm(uchar perm)

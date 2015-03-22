@@ -1690,7 +1690,7 @@ bool NoApp::AddListener(const NoString& sLine, NoString& sError)
         sValue.replace(":", " ");
     }
 
-    if (sValue.find(" ") != NoString::npos) {
+    if (sValue.contains(" ")) {
         sBindHost = No::token(sValue, 0, " ");
         sPort = No::tokens(sValue, 1, " ");
     } else {

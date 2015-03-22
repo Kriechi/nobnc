@@ -137,7 +137,7 @@ void NoImapSock::ReadLineImpl(const NoString& sLine)
         const NoString& sFormat = m_pIMAPMod->GetUserFormat();
 
         if (!sFormat.empty()) {
-            if (sFormat.find('%') != NoString::npos) {
+            if (sFormat.contains('%')) {
                 sUsername = sFormat.replace_n("%", sUsername);
             } else {
                 sUsername += sFormat;

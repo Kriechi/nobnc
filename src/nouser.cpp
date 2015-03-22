@@ -1210,7 +1210,7 @@ bool NoUser::DelCTCPReply(const NoString& sCTCP) { return m_ctcpReplies.erase(sC
 
 bool NoUser::SetStatusPrefix(const NoString& s)
 {
-    if ((!s.empty()) && (s.length() < 6) && (s.find(' ') == NoString::npos)) {
+    if (!s.empty() && s.length() < 6 && !s.contains(' ')) {
         m_statusPrefix = (s.empty()) ? "*" : s;
         return true;
     }

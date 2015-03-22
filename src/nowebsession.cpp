@@ -713,8 +713,8 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
         return NotFound;
     } else if (sURI.left(6) == "/mods/" || sURI.left(10) == "/modfiles/") {
         // Make sure modules are treated as directories
-        if (sURI.right(1) != "/" && sURI.find(".") == NoString::npos &&
-            sURI.trimLeft_n("/mods/").trimLeft_n("/").find("/") == NoString::npos) {
+        if (sURI.right(1) != "/" && !sURI.contains(".") &&
+            !sURI.trimLeft_n("/mods/").trimLeft_n("/").contains("/")) {
             Redirect(sURI + "/");
             return Done;
         }

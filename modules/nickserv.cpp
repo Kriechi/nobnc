@@ -109,15 +109,15 @@ public:
         NoRegistry registry(this);
         NoString sNickServName = (!registry.value("NickServName").empty()) ? registry.value("NickServName") : "NickServ";
         if (!registry.value("Password").empty() && Nick.equals(sNickServName) &&
-            (sMessage.find("msg") != NoString::npos || sMessage.find("authenticate") != NoString::npos ||
-             sMessage.find("choose a different nickname") != NoString::npos ||
-             sMessage.find("please choose a different nick") != NoString::npos ||
-             sMessage.find("If this is your nick, identify yourself with") != NoString::npos ||
-             sMessage.find("If this is your nick, type") != NoString::npos ||
-             sMessage.find("This is a registered nickname, please identify") != NoString::npos ||
-             No::stripControls(sMessage).find("type /NickServ IDENTIFY password") != NoString::npos ||
-             No::stripControls(sMessage).find("type /msg NickServ IDENTIFY password") != NoString::npos) &&
-            sMessage.toUpper().find("IDENTIFY") != NoString::npos && sMessage.find("help") == NoString::npos) {
+            (sMessage.contains("msg") || sMessage.contains("authenticate") ||
+             sMessage.contains("choose a different nickname") ||
+             sMessage.contains("please choose a different nick") ||
+             sMessage.contains("If this is your nick, identify yourself with") ||
+             sMessage.contains("If this is your nick, type") ||
+             sMessage.contains("This is a registered nickname, please identify") ||
+             No::stripControls(sMessage).find("type /NickServ IDENTIFY password") ||
+             No::stripControls(sMessage).find("type /msg NickServ IDENTIFY password")) &&
+            sMessage.toUpper().contains("IDENTIFY") && sMessage.contains("help")) {
             NoStringMap msValues;
             msValues["password"] = registry.value("Password");
             PutIRC(No::namedFormat(registry.value("IdentifyCmd"), msValues));

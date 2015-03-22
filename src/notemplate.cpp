@@ -504,7 +504,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
             NoString sMid = NoString(sLine.substr(0, iPos2)).trim_n();
 
             // Make sure we don't have a nested tag
-            if (sMid.find("<?") == NoString::npos) {
+            if (!sMid.contains("<?")) {
                 sLine = sLine.substr(iPos2 + 2);
                 NoString sAction = No::token(sMid, 0);
                 NoString sArgs = No::tokens(sMid, 1);
@@ -866,26 +866,26 @@ bool NoTemplate::ValidExpr(const NoString& sExpression)
         sExpr.leftChomp(1);
     }
 
-    if (sExpr.find("!=") != NoString::npos) {
+    if (sExpr.contains("!=")) {
         sName = No::token(sExpr, 0, "!=").trim_n();
         sValue = Token_helper(sExpr, 1, true, "!=", "\"", "\"").trim_n().trim_n("\"");
         bNegate = !bNegate;
-    } else if (sExpr.find("==") != NoString::npos) {
+    } else if (sExpr.contains("==")) {
         sName = No::token(sExpr, 0, "==").trim_n();
         sValue = Token_helper(sExpr, 1, true, "==", "\"", "\"").trim_n().trim_n("\"");
-    } else if (sExpr.find(">=") != NoString::npos) {
+    } else if (sExpr.contains(">=")) {
         sName = No::token(sExpr, 0, ">=").trim_n();
         sValue = Token_helper(sExpr, 1, true, ">=", "\"", "\"").trim_n().trim_n("\"");
         return (GetValue(sName, true).toLong() >= sValue.toLong());
-    } else if (sExpr.find("<=") != NoString::npos) {
+    } else if (sExpr.contains("<=")) {
         sName = No::token(sExpr, 0, "<=").trim_n();
         sValue = Token_helper(sExpr, 1, true, "<=", "\"", "\"").trim_n().trim_n("\"");
         return (GetValue(sName, true).toLong() <= sValue.toLong());
-    } else if (sExpr.find(">") != NoString::npos) {
+    } else if (sExpr.contains(">")) {
         sName = No::token(sExpr, 0, ">").trim_n();
         sValue = Token_helper(sExpr, 1, true, ">", "\"", "\"").trim_n().trim_n("\"");
         return (GetValue(sName, true).toLong() > sValue.toLong());
-    } else if (sExpr.find("<") != NoString::npos) {
+    } else if (sExpr.contains("<")) {
         sName = No::token(sExpr, 0, "<").trim_n();
         sValue = Token_helper(sExpr, 1, true, "<", "\"", "\"").trim_n().trim_n("\"");
         return (GetValue(sName, true).toLong() < sValue.toLong());

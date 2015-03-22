@@ -263,7 +263,7 @@ bool NoModule::UnlinkJob(NoModuleJob* pJob) { return 0 != d->jobs.erase(pJob); }
 bool NoModule::AddCommand(const NoModuleCommand& Command)
 {
     if (Command.GetFunction() == nullptr) return false;
-    if (Command.GetCommand().find(' ') != NoString::npos) return false;
+    if (Command.GetCommand().contains(" ")) return false;
     if (FindCommand(Command.GetCommand()) != nullptr) return false;
 
     d->commands[Command.GetCommand()] = Command;

@@ -133,7 +133,7 @@ public:
         // No arguments left: Only port sharing
         if (sArgs.empty() && bShareIRCPorts) return true;
 
-        if (sArgs.find(" ") != NoString::npos) {
+        if (sArgs.contains(" ")) {
             sListenHost = No::token(sArgs, 0);
             sPort = No::tokens(sArgs, 1);
         } else {

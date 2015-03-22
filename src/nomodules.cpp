@@ -709,7 +709,7 @@ bool NoModules::FindModPath(const NoString& sModule, NoString& sModPath, NoStrin
 {
     NoString sMod = sModule;
     NoString sDir = sMod;
-    if (sModule.find(".") == NoString::npos) sMod += ".so";
+    if (!sModule.contains(".")) sMod += ".so";
 
     ModDirList dirs = GetModDirs();
 

@@ -909,7 +909,7 @@ bool NoNetwork::IsChan(const NoString& sChan) const
     if (sChan.empty()) return false; // There is no way this is a chan
     if (GetChanPrefixes().empty()) return true; // We can't know, so we allow everything
     // Thanks to the above if (empty), we can do sChan[0]
-    return GetChanPrefixes().find(sChan[0]) != NoString::npos;
+    return GetChanPrefixes().contains(sChan[0]);
 }
 
 // Queries

@@ -261,7 +261,7 @@ public:
     ModRet OnRaw(NoString& sLine) override
     {
         // use OnRaw because OnUserMode is not defined (yet?)
-        if (No::token(sLine, 1) == "396" && No::token(sLine, 3).find("users.quakenet.org") != NoString::npos) {
+        if (No::token(sLine, 1) == "396" && No::token(sLine, 3).contains("users.quakenet.org")) {
             m_bCloaked = true;
             PutModule("Cloak successful: Your hostname is now cloaked.");
 
@@ -448,11 +448,11 @@ private:
 #endif
 
         // WHOAMI
-        if (sMessage.find("WHOAMI is only available to authed users") != NoString::npos) {
+        if (sMessage.contains("WHOAMI is only available to authed users")) {
             m_bAuthed = false;
             Auth();
             m_bCatchResponse = m_bRequestedWhoami;
-        } else if (sMessage.find("Information for user") != NoString::npos) {
+        } else if (sMessage.contains("Information for user")) {
             m_bAuthed = true;
             m_msChanModes.clear();
             m_bCatchResponse = m_bRequestedWhoami;
@@ -479,10 +479,10 @@ private:
             return HALT;
         } else if (m_bRequestedChallenge && No::token(sMessage, 0).equals("CHALLENGE")) {
             m_bRequestedChallenge = false;
-            if (sMessage.find("not available once you have authed") != NoString::npos) {
+            if (sMessage.contains("not available once you have authed")) {
                 m_bAuthed = true;
             } else {
-                if (sMessage.find("HMAC-SHA-256") != NoString::npos) {
+                if (sMessage.contains("HMAC-SHA-256")) {
                     ChallengeAuth(No::token(sMessage, 1));
                 } else {
                     PutModule(
@@ -504,11 +504,11 @@ private:
         if (it == m_msChanModes.end()) return;
         NoString sModes = it->second;
 
-        bool bMaster = (sModes.find("m") != NoString::npos) || (sModes.find("n") != NoString::npos);
+        bool bMaster = sModes.contains("m") || sModes.contains("n");
 
-        if (sPerms.find("o") != NoString::npos) {
-            bool bOp = (sModes.find("o") != NoString::npos);
-            bool bAutoOp = (sModes.find("a") != NoString::npos);
+        if (sPerms.contains("o")) {
+            bool bOp = sModes.contains("o");
+            bool bAutoOp = sModes.contains("a");
             if (bMaster || bOp) {
                 if (!bAutoOp) {
                     PutModule("RequestPerms: Requesting op on " + Channel.getName());
@@ -518,9 +518,9 @@ private:
             }
         }
 
-        if (sPerms.find("v") != NoString::npos) {
-            bool bVoice = (sModes.find("v") != NoString::npos);
-            bool bAutoVoice = (sModes.find("g") != NoString::npos);
+        if (sPerms.contains("v")) {
+            bool bVoice = sModes.contains("v");
+            bool bAutoVoice = sModes.contains("g");
             if (bMaster || bVoice) {
                 if (!bAutoVoice) {
                     PutModule("RequestPerms: Requesting voice on " + Channel.getName());
