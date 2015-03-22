@@ -31,7 +31,7 @@
 #include <no/nofile.h>
 #include <no/nodir.h>
 #include <no/noquery.h>
-#include <no/noblowfish.h>
+#include <no/noutils.h>
 #include <no/noescape.h>
 #include <no/nomessage.h>
 
@@ -182,7 +182,7 @@ public:
             "@" + NoString(ts.tv_sec) + "," + NoString(ts.tv_usec) + " " + Line.GetFormat() + "\n" + Line.GetText() + "\n";
         }
 
-        sContent = NoBlowfish::encrypt(sContent, m_sPassword);
+        sContent = No::encrypt(sContent, m_sPassword);
 
         if (File.Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
             File.Chmod(0600);
@@ -379,7 +379,7 @@ private:
         File.Close();
 
         if (!sContent.empty()) {
-            sBuffer = NoBlowfish::decrypt(sContent, m_sPassword);
+            sBuffer = No::decrypt(sContent, m_sPassword);
 
             if (sBuffer.trimPrefix(LEGACY_VERIFICATION_TOKEN)) {
                 sName = FindLegacyBufferName(sPath);

@@ -33,7 +33,7 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/nofile.h>
-#include <no/noblowfish.h>
+#include <no/noutils.h>
 #include <no/noclient.h>
 
 #define CRYPT_VERIFICATION_TOKEN "::__:AWAY:__::"
@@ -311,7 +311,7 @@ public:
 
             for (u_int b = 0; b < m_vMessages.size(); b++) sFile += m_vMessages[b] + "\n";
 
-            sFile = NoBlowfish::encrypt(sFile, m_sPassword);
+            sFile = No::encrypt(sFile, m_sPassword);
             NoString sPath = GetPath();
             if (!sPath.empty()) {
                 NoFile File(sPath);
@@ -436,7 +436,7 @@ private:
         File.Close();
 
         if (!sFile.empty()) {
-            sBuffer = NoBlowfish::decrypt(sFile, m_sPassword);
+            sBuffer = No::decrypt(sFile, m_sPassword);
 
             if (sBuffer.left(strlen(CRYPT_VERIFICATION_TOKEN)) != CRYPT_VERIFICATION_TOKEN) {
                 // failed to decode :(

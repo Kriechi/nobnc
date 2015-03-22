@@ -30,7 +30,6 @@ endif()
 list(APPEND NO_HEADERS include/no/defines.h
                        include/no/noapp.h
                        include/no/noauthenticator.h
-                       include/no/noblowfish.h
                        include/no/nobuffer.h
                        include/no/nocachemap.h
                        include/no/nochannel.h
@@ -86,7 +85,6 @@ list(APPEND NO_HEADERS include/no/defines.h
 
 list(APPEND NO_SOURCES src/noapp.cpp
                        src/noauthenticator.cpp
-                       src/noblowfish.cpp
                        src/nobuffer.cpp
                        src/nochannel.cpp
                        src/noclient.cpp
