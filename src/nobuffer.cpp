@@ -49,13 +49,14 @@ uint NoBuffer::addMessage(const NoString& format, const NoString& text, const ti
     return d->lines.size();
 }
 
+#include "nomessage_p.h"
 uint NoBuffer::updateMessage(const NoString& match, const NoString& format, const NoString& text)
 {
     for (NoMessage& line : d->lines) {
-        if (line.GetFormat().startsWith(match, No::CaseSensitive) == 0) {
-            line.SetFormat(format);
-            line.SetText(text);
-            line.UpdateTime();
+        if (line.format().startsWith(match, No::CaseSensitive) == 0) {
+            line.setFormat(format);
+            line.setText(text);
+            NoMessagePrivate::get(line)->updateTime();
             return d->lines.size();
         }
     }
@@ -66,7 +67,7 @@ uint NoBuffer::updateMessage(const NoString& match, const NoString& format, cons
 uint NoBuffer::updateExactMessage(const NoString& format, const NoString& text)
 {
     for (const NoMessage& line : d->lines) {
-        if (line.GetFormat() == format && line.GetText() == text)
+        if (line.format() == format && line.text() == text)
             return d->lines.size();
     }
 
@@ -80,7 +81,7 @@ const NoMessage& NoBuffer::getMessage(uint idx) const
 
 NoString NoBuffer::getMessage(uint idx, const NoClient& client, const NoStringMap& params) const
 {
-    return d->lines[idx].GetLine(client, params);
+    return d->lines[idx].formatted(client, params);
 }
 
 uint NoBuffer::size() const

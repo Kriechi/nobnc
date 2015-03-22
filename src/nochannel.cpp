@@ -647,14 +647,14 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                 size_t uSize = Buffer.size();
                 for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
                     const NoMessage& BufLine = Buffer.getMessage(uIdx);
-                    NoString sLine = BufLine.GetLine(*pUseClient, NoStringMap());
+                    NoString sLine = BufLine.formatted(*pUseClient, NoStringMap());
                     if (bBatch) {
                         NoStringMap msBatchTags = No::messageTags(sLine);
                         msBatchTags["batch"] = sBatchName;
                         No::setMessageTags(sLine, msBatchTags);
                     }
                     bool bNotShowThisLine = false;
-                    NETWORKMODULECALL(OnChanBufferPlayLine2(*this, *pUseClient, sLine, BufLine.GetTime()),
+                    NETWORKMODULECALL(OnChanBufferPlayLine2(*this, *pUseClient, sLine, BufLine.timestamp()),
                                       d->network->GetUser(),
                                       d->network,
                                       nullptr,

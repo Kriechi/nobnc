@@ -671,9 +671,9 @@ void NoNetwork::ClientConnected(NoClient* pClient)
     uSize = d->noticeBuffer.size();
     for (uIdx = 0; uIdx < uSize; uIdx++) {
         const NoMessage& BufLine = d->noticeBuffer.getMessage(uIdx);
-        NoString sLine = BufLine.GetLine(*pClient, msParams);
+        NoString sLine = BufLine.formatted(*pClient, msParams);
         bool bContinue = false;
-        NETWORKMODULECALL(OnPrivBufferPlayLine2(*pClient, sLine, BufLine.GetTime()), d->user, this, nullptr, &bContinue);
+        NETWORKMODULECALL(OnPrivBufferPlayLine2(*pClient, sLine, BufLine.timestamp()), d->user, this, nullptr, &bContinue);
         if (bContinue) continue;
         pClient->PutClient(sLine);
     }

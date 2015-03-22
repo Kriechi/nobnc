@@ -178,9 +178,9 @@ public:
         size_t uSize = Buffer.size();
         for (uint uIdx = 0; uIdx < uSize; uIdx++) {
             const NoMessage& Line = Buffer.getMessage(uIdx);
-            timeval ts = Line.GetTime();
+            timeval ts = Line.timestamp();
             sContent +=
-            "@" + NoString(ts.tv_sec) + "," + NoString(ts.tv_usec) + " " + Line.GetFormat() + "\n" + Line.GetText() + "\n";
+            "@" + NoString(ts.tv_sec) + "," + NoString(ts.tv_usec) + " " + Line.format() + "\n" + Line.text() + "\n";
         }
 
         sContent = No::encrypt(sContent, m_sPassword);

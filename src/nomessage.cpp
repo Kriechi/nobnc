@@ -15,19 +15,20 @@
  */
 
 #include "nomessage.h"
+#include "nomessage_p.h"
 #include "nobuffer.h"
 #include "noclient.h"
 #include "noutils.h"
 #include "nouser.h"
 #include "noapp.h"
 
-class NoMessagePrivate
+void NoMessagePrivate::updateTime()
 {
-public:
-    NoString format;
-    NoString text;
-    timeval time;
-};
+    if (!gettimeofday(&ts, nullptr)) {
+        ts.tv_sec = time(nullptr);
+        ts.tv_usec = 0;
+    }
+}
 
 NoMessage::NoMessage(const NoString& format, const NoString& text, const timeval* ts)
     : d(new NoMessagePrivate)
@@ -36,24 +37,24 @@ NoMessage::NoMessage(const NoString& format, const NoString& text, const timeval
     d->text = text;
 
     if (!ts)
-        UpdateTime();
+        d->updateTime();
     else
-        d->time = *ts;
+        d->ts = *ts;
 }
 
 NoMessage::NoMessage(const NoMessage& other) : d(new NoMessagePrivate)
 {
-    d->format = other.GetFormat();
-    d->text = other.GetText();
-    d->time = other.GetTime();
+    d->format = other.format();
+    d->text = other.text();
+    d->ts = other.timestamp();
 }
 
 NoMessage& NoMessage::operator=(const NoMessage& other)
 {
     if (this != &other) {
-        d->format = other.GetFormat();
-        d->text = other.GetText();
-        d->time = other.GetTime();
+        d->format = other.format();
+        d->text = other.text();
+        d->ts = other.timestamp();
     }
     return *this;
 }
@@ -62,36 +63,46 @@ NoMessage::~NoMessage()
 {
 }
 
-void NoMessage::UpdateTime()
-{
-    if (!gettimeofday(&d->time, nullptr)) {
-        d->time.tv_sec = time(nullptr);
-        d->time.tv_usec = 0;
-    }
-}
-
-NoString NoMessage::GetLine(const NoClient& client, const NoStringMap& params) const
+NoString NoMessage::formatted(const NoClient& client, const NoStringMap& params) const
 {
     NoStringMap copy = params;
 
     if (client.HasServerTime()) {
         copy["text"] = d->text;
         NoString str = No::namedFormat(d->format, copy);
-        return "@time=" + No::formatServerTime(d->time) + " " + str;
+        return "@time=" + No::formatServerTime(d->ts) + " " + str;
     } else {
-        copy["text"] = client.GetUser()->AddTimestamp(d->time.tv_sec, d->text);
+        copy["text"] = client.GetUser()->AddTimestamp(d->ts.tv_sec, d->text);
         return No::namedFormat(d->format, copy);
     }
 }
 
-NoString NoMessage::GetFormat() const { return d->format; }
+NoString NoMessage::format() const
+{
+    return d->format;
+}
 
-void NoMessage::SetFormat(const NoString& format) { d->format = format; }
+void NoMessage::setFormat(const NoString& format)
+{
+    d->format = format;
+}
 
-NoString NoMessage::GetText() const { return d->text; }
+NoString NoMessage::text() const
+{
+    return d->text;
+}
 
-void NoMessage::SetText(const NoString& text) { d->text = text; }
+void NoMessage::setText(const NoString& text)
+{
+    d->text = text;
+}
 
-timeval NoMessage::GetTime() const { return d->time; }
+timeval NoMessage::timestamp() const
+{
+    return d->ts;
+}
 
-void NoMessage::SetTime(const timeval& ts) { d->time = ts; }
+void NoMessage::setTimestamp(const timeval& ts)
+{
+    d->ts = ts;
+}

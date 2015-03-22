@@ -33,20 +33,20 @@ public:
     NoMessage& operator=(const NoMessage& other);
     ~NoMessage();
 
-    NoString GetLine(const NoClient& client, const NoStringMap& params) const;
+    // TODO: better name
+    NoString formatted(const NoClient& client, const NoStringMap& params) const;
 
-    NoString GetFormat() const;
-    void SetFormat(const NoString& format);
+    NoString format() const;
+    void setFormat(const NoString& format);
 
-    NoString GetText() const;
-    void SetText(const NoString& text);
+    NoString text() const;
+    void setText(const NoString& text);
 
-    timeval GetTime() const;
-    void SetTime(const timeval& ts);
-
-    void UpdateTime();
+    timeval timestamp() const;
+    void setTimestamp(const timeval& ts);
 
 private:
+    friend class NoMessagePrivate;
     std::shared_ptr<NoMessagePrivate> d;
 };
 

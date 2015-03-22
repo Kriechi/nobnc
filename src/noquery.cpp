@@ -105,20 +105,20 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                     const NoMessage& message = buffer.getMessage(uIdx);
 
                     if (!useClient->HasSelfMessage()) {
-                        NoNick sender(No::token(message.GetFormat(), 0));
+                        NoNick sender(No::token(message.format(), 0));
                         if (sender.equals(useClient->GetNick())) {
                             continue;
                         }
                     }
 
-                    NoString line = message.GetLine(*useClient, params);
+                    NoString line = message.formatted(*useClient, params);
                     if (batch) {
                         NoStringMap tags = No::messageTags(line);
                         tags["batch"] = batchName;
                         No::setMessageTags(line, tags);
                     }
                     bool skip = false;
-                    NETWORKMODULECALL(OnPrivBufferPlayLine2(*useClient, line, message.GetTime()),
+                    NETWORKMODULECALL(OnPrivBufferPlayLine2(*useClient, line, message.timestamp()),
                                       d->network->GetUser(),
                                       d->network,
                                       nullptr,
