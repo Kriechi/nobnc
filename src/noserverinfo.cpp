@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include "noserver.h"
+#include "noserverinfo.h"
 
-class NoServerPrivate
+class NoServerInfoPrivate
 {
 public:
     bool ssl = false;
@@ -25,13 +25,13 @@ public:
     NoString password = "";
 };
 
-NoServer::NoServer(const NoString& host, ushort port) : d(new NoServerPrivate)
+NoServerInfo::NoServerInfo(const NoString& host, ushort port) : d(new NoServerInfoPrivate)
 {
     d->host = host;
     d->port = port;
 }
 
-NoServer::NoServer(const NoServer& other) : d(new NoServerPrivate)
+NoServerInfo::NoServerInfo(const NoServerInfo& other) : d(new NoServerInfoPrivate)
 {
     d->ssl = other.isSsl();
     d->port = other.port();
@@ -39,7 +39,7 @@ NoServer::NoServer(const NoServer& other) : d(new NoServerPrivate)
     d->password = other.password();
 }
 
-NoServer& NoServer::operator=(const NoServer& other)
+NoServerInfo& NoServerInfo::operator=(const NoServerInfo& other)
 {
     if (this != &other) {
         d->ssl = other.isSsl();
@@ -50,56 +50,56 @@ NoServer& NoServer::operator=(const NoServer& other)
     return *this;
 }
 
-NoServer::~NoServer()
+NoServerInfo::~NoServerInfo()
 {
 }
 
-bool NoServer::isValid() const
+bool NoServerInfo::isValid() const
 {
     return !d->host.empty() && !d->host.contains(" ");
 }
 
-NoString NoServer::host() const
+NoString NoServerInfo::host() const
 {
     return d->host;
 }
 
-void NoServer::setHost(const NoString &host)
+void NoServerInfo::setHost(const NoString &host)
 {
     d->host = host;
 }
 
-ushort NoServer::port() const
+ushort NoServerInfo::port() const
 {
     return d->port;
 }
 
-void NoServer::setPort(ushort port)
+void NoServerInfo::setPort(ushort port)
 {
     d->port = port;
 }
 
-NoString NoServer::password() const
+NoString NoServerInfo::password() const
 {
     return d->password;
 }
 
-void NoServer::setPassword(const NoString& password)
+void NoServerInfo::setPassword(const NoString& password)
 {
     d->password = password;
 }
 
-bool NoServer::isSsl() const
+bool NoServerInfo::isSsl() const
 {
     return d->ssl;
 }
 
-void NoServer::setSsl(bool ssl)
+void NoServerInfo::setSsl(bool ssl)
 {
     d->ssl = ssl;
 }
 
-NoString NoServer::toString() const
+NoString NoServerInfo::toString() const
 {
     NoStringVector parts;
     parts.push_back(d->host);

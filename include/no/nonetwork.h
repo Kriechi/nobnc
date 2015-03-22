@@ -28,7 +28,7 @@ class NoClient;
 class NoSettings;
 class NoChannel;
 class NoQuery;
-class NoServer;
+class NoServerInfo;
 class NoIrcSocket;
 class NoNetworkPingTimer;
 class NoNetworkJoinTimer;
@@ -105,16 +105,16 @@ public:
     void SetChanPrefixes(const NoString& s);
     bool IsChan(const NoString& sChan) const;
 
-    std::vector<NoServer*> GetServers() const;
+    std::vector<NoServerInfo*> GetServers() const;
     bool HasServers() const;
-    NoServer* FindServer(const NoString& sName) const;
+    NoServerInfo* FindServer(const NoString& sName) const;
     bool DelServer(const NoString& sName, ushort uPort, const NoString& sPass);
     bool AddServer(const NoString& sName);
     bool AddServer(const NoString& sName, ushort uPort, const NoString& sPass = "", bool bSSL = false);
-    NoServer* GetNextServer();
-    NoServer* GetCurrentServer() const;
+    NoServerInfo* GetNextServer();
+    NoServerInfo* GetCurrentServer() const;
     void SetIRCServer(const NoString& s);
-    bool SetNextServer(const NoServer* pServer);
+    bool SetNextServer(const NoServerInfo* pServer);
     bool IsLastServer() const;
 
     NoStringSet GetTrustedFingerprints() const;
@@ -214,7 +214,7 @@ private:
 
     bool m_bIRCConnectEnabled;
     NoString m_sIRCServer;
-    std::vector<NoServer*> m_vServers;
+    std::vector<NoServerInfo*> m_vServers;
     size_t m_uServerIdx; ///< Index in m_vServers of our current server + 1
 
     NoNick m_IRCNick;

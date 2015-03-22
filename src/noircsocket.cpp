@@ -19,7 +19,7 @@
 #include "nochannel.h"
 #include "nouser.h"
 #include "nonetwork.h"
-#include "noserver.h"
+#include "noserverinfo.h"
 #include "nomodulecall.h"
 #include "noclient.h"
 #include "noapp.h"
@@ -213,7 +213,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             NoString sHost = No::token(sRest, 0);
             NoString sPort = No::token(sRest, 1);
             NoString sInfo = No::tokens(sRest, 2).trimPrefix_n();
-            NoServer server = NoServer(*m_pNetwork->GetCurrentServer()); // TODO: store NoServer by value
+            NoServerInfo server = NoServerInfo(*m_pNetwork->GetCurrentServer()); // TODO: store NoServerInfo by value
             server.setPassword("");
             m_pNetwork->PutStatus("Server [" + server.toString() +
                                   "] redirects us to [" + sHost + ":" + sPort + "] with reason [" + sInfo + "]");

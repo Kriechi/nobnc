@@ -20,7 +20,7 @@
 #include "nosettings.h"
 #include "noircsocket.h"
 #include "nomessage.h"
-#include "noserver.h"
+#include "noserverinfo.h"
 #include "nochannel.h"
 #include "noquery.h"
 #include "noescape.h"
@@ -163,9 +163,9 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     m_ssTrustedFingerprints = Network.m_ssTrustedFingerprints;
 
     // Servers
-    const std::vector<NoServer*>& vServers = Network.GetServers();
+    const std::vector<NoServerInfo*>& vServers = Network.GetServers();
     NoString sServer;
-    NoServer* pCurServ = GetCurrentServer();
+    NoServerInfo* pCurServ = GetCurrentServer();
 
     if (pCurServ) {
         sServer = pCurServ->host();
@@ -173,7 +173,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
 
     DelServers();
 
-    for (NoServer* pServer : vServers) {
+    for (NoServerInfo* pServer : vServers) {
         AddServer(pServer->host(), pServer->port(), pServer->password(), pServer->isSsl());
     }
 
@@ -293,7 +293,7 @@ NoNetwork::~NoNetwork()
 
 void NoNetwork::DelServers()
 {
-    for (NoServer* pServer : m_vServers) {
+    for (NoServerInfo* pServer : m_vServers) {
         delete pServer;
     }
     m_vServers.clear();
@@ -504,7 +504,7 @@ NoSettings NoNetwork::ToConfig() const
     }
 
     // Servers
-    for (NoServer* pServer : m_vServers) {
+    for (NoServerInfo* pServer : m_vServers) {
         config.AddKeyValuePair("Server", pServer->toString());
     }
 
@@ -975,13 +975,13 @@ bool NoNetwork::DelQuery(const NoString& sName)
 
 // Server list
 
-std::vector<NoServer*> NoNetwork::GetServers() const { return m_vServers; }
+std::vector<NoServerInfo*> NoNetwork::GetServers() const { return m_vServers; }
 
 bool NoNetwork::HasServers() const { return !m_vServers.empty(); }
 
-NoServer* NoNetwork::FindServer(const NoString& sName) const
+NoServerInfo* NoNetwork::FindServer(const NoString& sName) const
 {
-    for (NoServer* pServer : m_vServers) {
+    for (NoServerInfo* pServer : m_vServers) {
         if (sName.equals(pServer->host())) {
             return pServer;
         }
@@ -998,10 +998,10 @@ bool NoNetwork::DelServer(const NoString& sName, ushort uPort, const NoString& s
 
     uint a = 0;
     bool bSawCurrentServer = false;
-    NoServer* pCurServer = GetCurrentServer();
+    NoServerInfo* pCurServer = GetCurrentServer();
 
-    for (std::vector<NoServer*>::iterator it = m_vServers.begin(); it != m_vServers.end(); ++it, a++) {
-        NoServer* pServer = *it;
+    for (std::vector<NoServerInfo*>::iterator it = m_vServers.begin(); it != m_vServers.end(); ++it, a++) {
+        NoServerInfo* pServer = *it;
 
         if (pServer == pCurServer) bSawCurrentServer = true;
 
@@ -1081,7 +1081,7 @@ bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& s
     }
 
     // Check if server is already added
-    for (NoServer* pServer : m_vServers) {
+    for (NoServerInfo* pServer : m_vServers) {
         if (!sName.equals(pServer->host())) continue;
 
         if (uPort != pServer->port()) continue;
@@ -1094,7 +1094,7 @@ bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& s
         return false;
     }
 
-    NoServer* pServer = new NoServer(sName, uPort);
+    NoServerInfo* pServer = new NoServerInfo(sName, uPort);
     pServer->setPassword(sPass);
     pServer->setPort(uPort);
     m_vServers.push_back(pServer);
@@ -1104,7 +1104,7 @@ bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& s
     return true;
 }
 
-NoServer* NoNetwork::GetNextServer()
+NoServerInfo* NoNetwork::GetNextServer()
 {
     if (m_vServers.empty()) {
         return nullptr;
@@ -1117,7 +1117,7 @@ NoServer* NoNetwork::GetNextServer()
     return m_vServers[m_uServerIdx++];
 }
 
-NoServer* NoNetwork::GetCurrentServer() const
+NoServerInfo* NoNetwork::GetCurrentServer() const
 {
     size_t uIdx = (m_uServerIdx) ? m_uServerIdx - 1 : 0;
 
@@ -1130,7 +1130,7 @@ NoServer* NoNetwork::GetCurrentServer() const
 
 void NoNetwork::SetIRCServer(const NoString& s) { m_sIRCServer = s; }
 
-bool NoNetwork::SetNextServer(const NoServer* pServer)
+bool NoNetwork::SetNextServer(const NoServerInfo* pServer)
 {
     for (uint a = 0; a < m_vServers.size(); a++) {
         if (m_vServers[a] == pServer) {
@@ -1186,7 +1186,7 @@ bool NoNetwork::Connect()
 {
     if (!GetIRCConnectEnabled() || m_pIRCSock || !HasServers()) return false;
 
-    NoServer* pServer = GetNextServer();
+    NoServerInfo* pServer = GetNextServer();
     if (!pServer) return false;
 
     if (NoApp::Get().GetServerThrottle(pServer->host())) {

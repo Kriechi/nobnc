@@ -17,7 +17,7 @@
 #include <no/nomodule.h>
 #include <no/nomodules.h>
 #include <no/nochannel.h>
-#include <no/noserver.h>
+#include <no/noserverinfo.h>
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/noircsocket.h>
@@ -894,7 +894,7 @@ public:
 
                 Tmpl["IRCConnectEnabled"] = NoString(pNetwork->GetIRCConnectEnabled());
 
-                const std::vector<NoServer*>& vServers = pNetwork->GetServers();
+                const std::vector<NoServerInfo*>& vServers = pNetwork->GetServers();
                 for (uint a = 0; a < vServers.size(); a++) {
                     NoTemplate& l = Tmpl.AddRow("ServerLoop");
                     l["Server"] = vServers[a]->toString();
@@ -1273,7 +1273,7 @@ public:
                     l["Username"] = pUser->GetUserName();
                     l["Clients"] = NoString(vNetworks[a]->GetClients().size());
                     l["IRCNick"] = vNetworks[a]->GetIRCNick().nick();
-                    NoServer* pServer = vNetworks[a]->GetCurrentServer();
+                    NoServerInfo* pServer = vNetworks[a]->GetCurrentServer();
                     if (pServer) {
                         l["Server"] = pServer->host() + ":" + (pServer->isSsl() ? "+" : "") + NoString(pServer->port());
                     }

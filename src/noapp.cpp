@@ -19,7 +19,7 @@
 #include "nofile.h"
 #include "noircsocket.h"
 #include "noauthenticator.h"
-#include "noserver.h"
+#include "noserverinfo.h"
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nosettings.h"
@@ -867,7 +867,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
             sHint = "host only";
         }
 
-        while (!No::getInput("Server host", sHost, sHost, sHint) || !NoServer(sHost).isValid())
+        while (!No::getInput("Server host", sHost, sHost, sHint) || !NoServerInfo(sHost).isValid())
             ;
 #ifdef HAVE_LIBSSL
         bSSL = No::getBoolInput("Server uses SSL?", bSSL);

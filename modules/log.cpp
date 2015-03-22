@@ -21,7 +21,7 @@
 #include <no/nouser.h>
 #include <no/nonetwork.h>
 #include <no/nochannel.h>
-#include <no/noserver.h>
+#include <no/noserverinfo.h>
 #include <no/nodebug.h>
 #include <no/noregistry.h>
 #include <algorithm>
@@ -252,7 +252,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoNick& Nick) { PutLog(sLine,
 
 NoString NoLogMod::GetServer()
 {
-    NoServer* pServer = GetNetwork()->GetCurrentServer();
+    NoServerInfo* pServer = GetNetwork()->GetCurrentServer();
     NoString sSSL;
 
     if (!pServer) return "(no server)";

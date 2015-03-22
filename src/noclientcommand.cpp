@@ -20,7 +20,7 @@
 #include "nodir.h"
 #include "nonetwork.h"
 #include "noircsocket.h"
-#include "noserver.h"
+#include "noserverinfo.h"
 #include "nouser.h"
 #include "noquery.h"
 #include "noexception.h"
@@ -314,7 +314,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         NoString sArgs = No::tokens(sLine, 1);
         sArgs.trim();
-        NoServer* pServer = nullptr;
+        NoServerInfo* pServer = nullptr;
 
         if (!sArgs.empty()) {
             pServer = d->pNetwork->FindServer(sArgs);
@@ -782,15 +782,15 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (d->pNetwork->HasServers()) {
-            const std::vector<NoServer*>& vServers = d->pNetwork->GetServers();
-            NoServer* pCurServ = d->pNetwork->GetCurrentServer();
+            const std::vector<NoServerInfo*>& vServers = d->pNetwork->GetServers();
+            NoServerInfo* pCurServ = d->pNetwork->GetCurrentServer();
             NoTable Table;
             Table.AddColumn("Host");
             Table.AddColumn("Port");
             Table.AddColumn("SSL");
             Table.AddColumn("Pass");
 
-            for (const NoServer* pServer : vServers) {
+            for (const NoServerInfo* pServer : vServers) {
                 Table.AddRow();
                 Table.SetCell("Host", pServer->host() + (pServer == pCurServ ? "*" : ""));
                 Table.SetCell("Port", NoString(pServer->port()));

@@ -16,7 +16,7 @@
 
 #include <no/nomodule.h>
 #include <no/nofile.h>
-#include <no/noserver.h>
+#include <no/noserverinfo.h>
 #include <no/nonetwork.h>
 #include <no/nouser.h>
 #include <no/nodebug.h>

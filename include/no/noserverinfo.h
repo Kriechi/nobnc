@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-#ifndef NOSERVER_H
-#define NOSERVER_H
+#ifndef NOSERVERINFO_H
+#define NOSERVERINFO_H
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
 #include <memory>
 
-class NoServerPrivate;
+class NoServerInfoPrivate;
 
-class NO_EXPORT NoServer
+class NO_EXPORT NoServerInfo
 {
 public:
-    NoServer(const NoString& host = "", ushort port = 6667);
-    NoServer(const NoServer& other);
-    NoServer& operator=(const NoServer& other);
-    ~NoServer();
+    NoServerInfo(const NoString& host = "", ushort port = 6667);
+    NoServerInfo(const NoServerInfo& other);
+    NoServerInfo& operator=(const NoServerInfo& other);
+    ~NoServerInfo();
 
     bool isValid() const;
 
@@ -48,7 +48,7 @@ public:
     NoString toString() const;
 
 private:
-    std::shared_ptr<NoServerPrivate> d;
+    std::shared_ptr<NoServerInfoPrivate> d;
 };
 
-#endif // NOSERVER_H
+#endif // NOSERVERINFO_H
