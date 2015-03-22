@@ -275,7 +275,6 @@ void NoSocketManager::DelSockByAddr(NoSocket* socket)
     if (it != m_sockets.end())
         m_sockets.erase(it);
     m_instance->DelSockByAddr(NoSocketPrivate::get(socket));
-    delete socket;
 }
 
 bool NoSocketManager::SwapSockByAddr(Csock* newSocket, Csock* originalSocket)
