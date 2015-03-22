@@ -21,6 +21,8 @@
 #include "nonetwork.h"
 #include "nosettings.h"
 #include "noclient.h"
+#include "nobuffer.h"
+#include "nonick.h"
 #include "noapp.h"
 
 class NoChannelPrivate

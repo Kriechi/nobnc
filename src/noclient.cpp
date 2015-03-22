@@ -28,6 +28,7 @@
 #include "nomodulecall.h"
 #include "noapp.h"
 #include "noescape.h"
+#include "nonick.h"
 
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                             \
     {                                                                         \
