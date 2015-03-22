@@ -18,22 +18,21 @@
 #define NOUSER_H
 
 #include <no/noglobal.h>
-#include <no/noutils.h>
+#include <no/nostring.h>
+#include <no/noutils.h> // TODO: kill NoUser::SaltedHash()
+#include <memory>
 
-class NoModules;
 class NoClient;
-class NoSettings;
 class NoNetwork;
-class NoUserTimer;
+class NoModules;
+class NoSettings;
+class NoUserPrivate;
 
 class NO_EXPORT NoUser
 {
 public:
     NoUser(const NoString& sUserName);
     ~NoUser();
-
-    NoUser(const NoUser&) = delete;
-    NoUser& operator=(const NoUser&) = delete;
 
     bool ParseConfig(NoSettings* Config, NoString& sError);
 
@@ -178,53 +177,10 @@ private:
     void SetKeepBuffer(bool b); // XXX compatibility crap, added in 0.207
     bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 
-    const NoString m_userName;
-    const NoString m_cleanUserName;
-    NoString m_nickName;
-    NoString m_altNick;
-    NoString m_ident;
-    NoString m_realName;
-    NoString m_bindHost;
-    NoString m_dccBindHost;
-    NoString m_password;
-    NoString m_passwordSalt;
-    NoString m_statusPrefix;
-    NoString m_defaultChanModes;
-    NoString m_clientEncoding;
+    NoUser(const NoUser&) = delete;
+    NoUser& operator=(const NoUser&) = delete;
 
-    NoString m_quitMsg;
-    NoStringMap m_ctcpReplies;
-    NoString m_timestampFormat;
-    NoString m_timezone;
-    eHashType m_hashType;
-
-    NoString m_userPath;
-
-    bool m_multiClients;
-    bool m_denyLoadMod;
-    bool m_admin;
-    bool m_denySetBindHost;
-    bool m_autoClearChanBuffer;
-    bool m_autoClearQueryBuffer;
-    bool m_beingDeleted;
-    bool m_appendTimestamp;
-    bool m_prependTimestamp;
-
-    NoUserTimer* m_userTimer;
-
-    std::vector<NoNetwork*> m_networks;
-    std::vector<NoClient*> m_clients;
-    std::set<NoString> m_allowedHosts;
-    uint m_bufferCount;
-    ulonglong m_bytesRead;
-    ulonglong m_bytesWritten;
-    uint m_maxJoinTries;
-    uint m_maxNetworks;
-    uint m_maxQueryBuffers;
-    uint m_maxJoins;
-    NoString m_skinName;
-
-    NoModules* m_modules;
+    std::unique_ptr<NoUserPrivate> d;
 };
 
 #endif // NOUSER_H
