@@ -182,8 +182,7 @@ public:
             "@" + NoString(ts.tv_sec) + "," + NoString(ts.tv_usec) + " " + Line.GetFormat() + "\n" + Line.GetText() + "\n";
         }
 
-        NoBlowfish c(m_sPassword, BF_ENCRYPT);
-        sContent = c.Crypt(sContent);
+        sContent = NoBlowfish::encrypt(sContent, m_sPassword);
 
         if (File.Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
             File.Chmod(0600);
@@ -380,8 +379,7 @@ private:
         File.Close();
 
         if (!sContent.empty()) {
-            NoBlowfish c(m_sPassword, BF_DECRYPT);
-            sBuffer = c.Crypt(sContent);
+            sBuffer = NoBlowfish::decrypt(sContent, m_sPassword);
 
             if (sBuffer.trimPrefix(LEGACY_VERIFICATION_TOKEN)) {
                 sName = FindLegacyBufferName(sPath);

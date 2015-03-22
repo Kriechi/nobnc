@@ -20,39 +20,12 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 
-#ifdef HAVE_LIBSSL
-
-#include <openssl/aes.h>
-#include <openssl/blowfish.h>
-
-//! does Blowfish w/64 bit feedback, no padding
 class NO_EXPORT NoBlowfish
 {
 public:
-    /**
-     * @param sPassword key to encrypt with
-     * @param iEncrypt encrypt method (BF_DECRYPT or BF_ENCRYPT)
-     * @param sIvec what to set the ivector to start with, default sets it all 0's
-     */
-    NoBlowfish(const NoString& sPassword, int iEncrypt, const NoString& sIvec = "");
-    ~NoBlowfish();
-
-    NoBlowfish(const NoBlowfish&) = default;
-    NoBlowfish& operator=(const NoBlowfish&) = default;
-
-    //! output must be the same size as input
-    void Crypt(uchar* input, uchar* output, u_int ibytes);
-
-    //! must free result
-    uchar* Crypt(uchar* input, u_int ibytes);
-    NoString Crypt(const NoString& sData);
-
-private:
-    uchar* m_ivec;
-    BF_KEY m_bkey;
-    int m_iEncrypt, m_num;
+    static bool isAvailable();
+    static NoString encrypt(const NoString& data, const NoString& password);
+    static NoString decrypt(const NoString& data, const NoString& password);
 };
-
-#endif // HAVE_LIBSSL
 
 #endif // NOBLOWFISH_H

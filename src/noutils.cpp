@@ -70,6 +70,7 @@ ulong No::formatLongIp(const NoString& sIP)
 }
 
 #ifdef HAVE_LIBSSL
+#include <openssl/blowfish.h>
 static NoString Crypt(const NoString& sStr, const NoString& sPass, bool bEncrypt, const NoString& sIvec)
 {
     NoString ret = sStr;

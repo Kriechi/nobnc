@@ -15,46 +15,62 @@
  */
 
 #include "noblowfish.h"
+#include <cassert>
 
 #ifdef HAVE_LIBSSL
-//#include <openssl/ssl.h>
-
-static const char g_HexDigits[] = "0123456789abcdef";
-
-NoBlowfish::NoBlowfish(const NoString& sPassword, int iEncrypt, const NoString& sIvec)
-    : m_ivec((uchar*)calloc(sizeof(uchar), 8)), m_bkey(), m_iEncrypt(iEncrypt), m_num(0)
-{
-
-    if (sIvec.length() >= 8) {
-        memcpy(m_ivec, sIvec.data(), 8);
-    }
-
-    BF_set_key(&m_bkey, (uint)sPassword.length(), (uchar*)sPassword.data());
-}
-
-NoBlowfish::~NoBlowfish() { free(m_ivec); }
-
-//! output must be the same size as input
-void NoBlowfish::Crypt(uchar* input, uchar* output, u_int uBytes)
-{
-    BF_cfb64_encrypt(input, output, uBytes, &m_bkey, m_ivec, &m_num, m_iEncrypt);
-}
-
-//! must free result
-uchar* NoBlowfish::Crypt(uchar* input, u_int uBytes)
-{
-    uchar* buff = (uchar*)malloc(uBytes);
-    Crypt(input, buff, uBytes);
-    return buff;
-}
-
-NoString NoBlowfish::Crypt(const NoString& sData)
-{
-    uchar* buff = Crypt((uchar*)sData.data(), (uint)sData.length());
-    NoString sOutput;
-    sOutput.append((const char*)buff, sData.length());
-    free(buff);
-    return sOutput;
-}
-
+#include <openssl/blowfish.h>
 #endif // HAVE_LIBSSL
+
+bool NoBlowfish::isAvailable()
+{
+#ifdef HAVE_LIBSSL
+    return true;
+#else
+    return false;
+#endif
+}
+
+#ifdef HAVE_LIBSSL
+static NoString blowfish(const NoString& data, const NoString& password, int encrypt)
+{
+    int num = 0;
+
+    BF_KEY key;
+    BF_set_key(&key, (uint)password.length(), (uchar*)password.data());
+
+    const uint len = data.length();
+    const uchar* input = (const uchar*)data.data();
+
+    uchar* output = (uchar*)malloc(len);
+    uchar* ivec = (uchar*)calloc(sizeof(uchar), 8);
+
+    BF_cfb64_encrypt(input, output, len, &key, ivec, &num, encrypt);
+
+    NoString str = NoString((const char*)output, len);
+
+    free(output);
+    free(ivec);
+
+    return str;
+}
+#endif // HAVE_LIBSSL
+
+NoString NoBlowfish::encrypt(const NoString& data, const NoString& password)
+{
+#ifdef HAVE_LIBSSL
+    return blowfish(data, password, BF_ENCRYPT);
+#else
+    assert(false); // NoBlowFish::isAvailable()
+    return "";
+#endif
+}
+
+NoString NoBlowfish::decrypt(const NoString& data, const NoString& password)
+{
+#ifdef HAVE_LIBSSL
+    return blowfish(data, password, BF_DECRYPT);
+#else
+    assert(false); // NoBlowFish::isAvailable()
+    return "";
+#endif
+}

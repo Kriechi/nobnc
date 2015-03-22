@@ -311,8 +311,7 @@ public:
 
             for (u_int b = 0; b < m_vMessages.size(); b++) sFile += m_vMessages[b] + "\n";
 
-            NoBlowfish c(m_sPassword, BF_ENCRYPT);
-            sFile = c.Crypt(sFile);
+            sFile = NoBlowfish::encrypt(sFile, m_sPassword);
             NoString sPath = GetPath();
             if (!sPath.empty()) {
                 NoFile File(sPath);
@@ -437,8 +436,7 @@ private:
         File.Close();
 
         if (!sFile.empty()) {
-            NoBlowfish c(m_sPassword, BF_DECRYPT);
-            sBuffer = c.Crypt(sFile);
+            sBuffer = NoBlowfish::decrypt(sFile, m_sPassword);
 
             if (sBuffer.left(strlen(CRYPT_VERIFICATION_TOKEN)) != CRYPT_VERIFICATION_TOKEN) {
                 // failed to decode :(
