@@ -19,19 +19,18 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <no/nobuffer.h>
+#include <memory>
 
+class NoBuffer;
 class NoClient;
 class NoNetwork;
+class NoQueryPrivate;
 
 class NO_EXPORT NoQuery
 {
 public:
     NoQuery(const NoString& name, NoNetwork* network);
     ~NoQuery();
-
-    NoQuery(const NoQuery&) = delete;
-    NoQuery& operator=(const NoQuery&) = delete;
 
     NoString getName() const;
 
@@ -45,9 +44,10 @@ public:
     void sendBuffer(NoClient* client, const NoBuffer& buffer);
 
 private:
-    NoString m_name;
-    NoNetwork* m_network;
-    NoBuffer m_buffer;
+    NoQuery(const NoQuery&) = delete;
+    NoQuery& operator=(const NoQuery&) = delete;
+
+    std::unique_ptr<NoQueryPrivate> d;
 };
 
 #endif // NOQUERY_H

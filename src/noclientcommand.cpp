@@ -29,6 +29,7 @@
 #include "nolistener.h"
 #include "noregistry.h"
 #include "nonick.h"
+#include "nobuffer.h"
 
 void NoClient::UserCommand(NoString& sLine)
 {

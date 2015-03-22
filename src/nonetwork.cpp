@@ -27,6 +27,7 @@
 #include "noclient.h"
 #include "noapp.h"
 #include "nonick.h"
+#include "nobuffer.h"
 #include "Csocket/Csocket.h"
 #include <algorithm>
 #include <memory>

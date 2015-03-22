@@ -34,6 +34,7 @@
 #include <no/noutils.h>
 #include <no/noescape.h>
 #include <no/nomessage.h>
+#include <no/nobuffer.h>
 
 #define LEGACY_VERIFICATION_TOKEN "::__:SAVEBUFF:__::"
 #define CHAN_VERIFICATION_TOKEN "::__:CHANBUFF:__::"

@@ -22,10 +22,21 @@
 #include "nomessage.h"
 #include "noapp.h"
 #include "nonick.h"
+#include "nobuffer.h"
 
-NoQuery::NoQuery(const NoString& name, NoNetwork* network) : m_name(name), m_network(network), m_buffer()
+class NoQueryPrivate
 {
-    setBufferCount(m_network->GetUser()->GetBufferCount(), true);
+public:
+    NoString name = "";
+    NoNetwork* network = nullptr;
+    NoBuffer buffer;
+};
+
+NoQuery::NoQuery(const NoString& name, NoNetwork* network) : d(new NoQueryPrivate)
+{
+    d->name = name;
+    d->network = network;
+    setBufferCount(d->network->GetUser()->GetBufferCount(), true);
 }
 
 NoQuery::~NoQuery()
@@ -34,45 +45,45 @@ NoQuery::~NoQuery()
 
 NoString NoQuery::getName() const
 {
-    return m_name;
+    return d->name;
 }
 
 const NoBuffer& NoQuery::getBuffer() const
 {
-    return m_buffer;
+    return d->buffer;
 }
 
 uint NoQuery::getBufferCount() const
 {
-    return m_buffer.getLimit();
+    return d->buffer.getLimit();
 }
 
 bool NoQuery::setBufferCount(uint count, bool force)
 {
-    return m_buffer.setLimit(count, force);
+    return d->buffer.setLimit(count, force);
 }
 
 size_t NoQuery::addBuffer(const NoString& format, const NoString& text, const timeval* ts)
 {
-    return m_buffer.addMessage(format, text, ts);
+    return d->buffer.addMessage(format, text, ts);
 }
 
 void NoQuery::clearBuffer()
 {
-    m_buffer.clear();
+    d->buffer.clear();
 }
 
 void NoQuery::sendBuffer(NoClient* client)
 {
-    sendBuffer(client, m_buffer);
+    sendBuffer(client, d->buffer);
 }
 
 void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
 {
-    if (m_network && m_network->IsUserAttached()) {
+    if (d->network && d->network->IsUserAttached()) {
         // Based on NoChannel::SendBuffer()
         if (!buffer.isEmpty()) {
-            const std::vector<NoClient*>& clients = m_network->GetClients();
+            const std::vector<NoClient*>& clients = d->network->GetClients();
             for (NoClient* eachClient : clients) {
                 NoClient* useClient = (client ? client : eachClient);
 
@@ -83,10 +94,10 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                 useClient->SetPlaybackActive(true);
 
                 bool batch = useClient->HasBatch();
-                NoString batchName = No::md5(m_name);
+                NoString batchName = No::md5(d->name);
 
                 if (batch) {
-                    m_network->PutUser(":znc.in BATCH +" + batchName + " znc.in/playback " + m_name, useClient);
+                    d->network->PutUser(":znc.in BATCH +" + batchName + " znc.in/playback " + d->name, useClient);
                 }
 
                 size_t size = buffer.size();
@@ -108,16 +119,16 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                     }
                     bool skip = false;
                     NETWORKMODULECALL(OnPrivBufferPlayLine2(*useClient, line, message.GetTime()),
-                                      m_network->GetUser(),
-                                      m_network,
+                                      d->network->GetUser(),
+                                      d->network,
                                       nullptr,
                                       &skip);
                     if (skip) continue;
-                    m_network->PutUser(line, useClient);
+                    d->network->PutUser(line, useClient);
                 }
 
                 if (batch) {
-                    m_network->PutUser(":znc.in BATCH -" + batchName, useClient);
+                    d->network->PutUser(":znc.in BATCH -" + batchName, useClient);
                 }
 
                 useClient->SetPlaybackActive(wasPlaybackActive);
