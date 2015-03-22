@@ -41,7 +41,7 @@ enum {
 class NO_EXPORT NoSocket
 {
 public:
-    NoSocket(const NoString& sHost = "", u_short port = 0, int timeout = 60);
+    NoSocket(const NoString& sHost = "", u_short port = 0);
     virtual ~NoSocket();
 
     NoString GetHostToVerifySSL() const;

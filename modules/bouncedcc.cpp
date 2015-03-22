@@ -41,7 +41,6 @@ public:
                const NoString& sRemoteNick,
                const NoString& sRemoteIP,
                const NoString& sFileName,
-               int iTimeout = 60,
                bool bIsChat = false);
     virtual ~NoDccBounce();
 
@@ -330,9 +329,8 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
                        const NoString& sRemoteNick,
                        const NoString& sRemoteIP,
                        const NoString& sFileName,
-                       int iTimeout,
                        bool bIsChat)
-    : NoModuleSocket(pMod, sHostname, uPort, iTimeout)
+    : NoModuleSocket(pMod, sHostname, uPort)
 {
     m_uRemotePort = 0;
     m_bIsChat = bIsChat;

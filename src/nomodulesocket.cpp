@@ -30,8 +30,8 @@ NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_pModule(pModul
     SetMaxBufferThreshold(10240);
 }
 
-NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort, int iTimeout)
-    : NoSocket(sHostname, uPort, iTimeout), m_pModule(pModule)
+NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort)
+    : NoSocket(sHostname, uPort), m_pModule(pModule)
 {
     if (pModule)
         NoModulePrivate::get(pModule)->addSocket(this);

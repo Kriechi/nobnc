@@ -39,8 +39,8 @@ const char* ZNC_DefaultCipher =
            "SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA";
 #endif
 
-NoSocketImpl::NoSocketImpl(NoSocket *q, const NoString& host, u_short port, int timeout)
-    : Csock(host, port, timeout), q(q), allowControlCodes(false)
+NoSocketImpl::NoSocketImpl(NoSocket *q, const NoString& host, u_short port)
+    : Csock(host, port), q(q), allowControlCodes(false)
 {
 #ifdef HAVE_LIBSSL
     DisableSSLCompression();
@@ -62,9 +62,9 @@ NoSocketImpl::~NoSocketImpl()
     delete q;
 }
 
-NoSocket::NoSocket(const NoString& host, u_short port, int timeout) : d(new NoSocketPrivate)
+NoSocket::NoSocket(const NoString& host, u_short port) : d(new NoSocketPrivate)
 {
-    d->impl = new NoSocketImpl(this, host, port, timeout);
+    d->impl = new NoSocketImpl(this, host, port);
 }
 
 NoSocket::~NoSocket()

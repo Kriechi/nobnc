@@ -43,9 +43,8 @@ public:
      * @param pModule the module this sock instance is associated to
      * @param sHostname the hostname being connected to
      * @param uPort the port being connected to
-     * @param iTimeout the timeout period for this specific sock
      */
-    NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort, int iTimeout = 60);
+    NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort);
     virtual ~NoModuleSocket();
 
     NoModuleSocket(const NoModuleSocket&) = delete;

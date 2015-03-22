@@ -27,7 +27,7 @@ class NO_EXPORT NoHttpSocket : public NoModuleSocket
 {
 public:
     NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix);
-    NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort, int iTimeout = 60);
+    NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort);
     virtual ~NoHttpSocket();
 
     void ReadDataImpl(const char* data, size_t len) override;

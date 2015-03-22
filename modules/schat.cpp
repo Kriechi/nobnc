@@ -52,7 +52,7 @@ class NoSChatSock : public NoModuleSocket
 {
 public:
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick);
-    NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout = 60);
+    NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort);
     ~NoSChatSock();
 
     NoSocket* GetSockObjImpl(const NoString& sHostname, u_short iPort) override
@@ -321,7 +321,7 @@ public:
 
     void AcceptSDCC(const NoString& sNick, u_long iIP, u_short iPort)
     {
-        NoSChatSock* p = new NoSChatSock(this, sNick, No::formatIp(iIP), iPort, 60);
+        NoSChatSock* p = new NoSChatSock(this, sNick, No::formatIp(iIP), iPort);
         GetManager()->Connect(No::formatIp(iIP), iPort, p->GetSockName(), 60, true, GetUser()->GetLocalDCCIP(), p);
         delete FindTimer("Remove " + sNick); // delete any associated timer to this nick
     }
@@ -389,8 +389,8 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoModuleSoc
     pMod->AddSocket(this);
 }
 
-NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort, int iTimeout)
-    : NoModuleSocket(pMod, sHost, iPort, iTimeout)
+NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort)
+    : NoModuleSocket(pMod, sHost, iPort)
 {
     m_pModule = pMod;
     EnableReadLine();

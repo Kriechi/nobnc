@@ -31,8 +31,8 @@
 
 NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSocket(pMod, sURIPrefix, "", 0) { Init(); }
 
-NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort, int iTimeout)
-    : NoModuleSocket(pMod, sHostname, uPort, iTimeout), m_bSentHeader(false), m_bGotHeader(false), m_bLoggedIn(false), m_bPost(false),
+NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort)
+    : NoModuleSocket(pMod, sHostname, uPort), m_bSentHeader(false), m_bGotHeader(false), m_bLoggedIn(false), m_bPost(false),
       m_bDone(false), m_uPostLen(0), m_sPostData(""), m_sURI(""), m_sUser(""), m_sPass(""), m_sContentType(""),
       m_sDocRoot(""), m_sForwardedIP(""), m_msvsPOSTParams(), m_msvsGETParams(), m_msHeaders(), m_bHTTP10Client(false),
       m_sIfNoneMatch(""), m_bAcceptGzip(false), m_msRequestCookies(), m_msResponseCookies(), m_sURIPrefix(sURIPrefix)
