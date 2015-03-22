@@ -1143,7 +1143,7 @@ bool NoNetwork::AddServer(const NoString& sName, ushort uPort, const NoString& s
 
     NoServerInfo* pServer = new NoServerInfo(sName, uPort);
     pServer->setPassword(sPass);
-    pServer->setPort(uPort);
+    pServer->setSsl(bSSL);
     d->servers.push_back(pServer);
 
     CheckIRCConnect();
