@@ -131,7 +131,7 @@ static void GenerateHelp(const char* appname)
     No::printMessage("\t-s, --makepass     Generates a password for use in config");
 #ifdef HAVE_LIBSSL
     No::printMessage("\t-p, --makepem      Generates a pemfile for use with SSL");
-#endif /* HAVE_LIBSSL */
+#endif // HAVE_LIBSSL
     No::printMessage("\t-d, --datadir      Set a different ZNC repository (default is ~/.znc)");
 }
 
@@ -240,7 +240,7 @@ int main(int argc, char** argv)
 #else
             No::PrintError("ZNC is compiled without SSL support.");
             return 1;
-#endif /* HAVE_LIBSSL */
+#endif // HAVE_LIBSSL
         case 'd':
             sDataDir = NoString(optarg);
             break;
@@ -274,7 +274,7 @@ int main(int argc, char** argv)
         NoApp::DestroyInstance();
         return 0;
     }
-#endif /* HAVE_LIBSSL */
+#endif // HAVE_LIBSSL
 
     if (bMakePass) {
         NoString sSalt;

@@ -217,7 +217,7 @@ void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const No
         StartTDNSThread(this, task, true);
     }
     StartTDNSThread(this, task, false);
-#else /* HAVE_THREADED_DNS */
+#else // HAVE_THREADED_DNS
     // Just let Csocket handle DNS itself
     FinishConnect(this, sHostname, iPort, sSockName, iTimeout, bSSL, sBindHost, pcSock);
 #endif
@@ -474,7 +474,7 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
 
     delete task;
 }
-#endif /* HAVE_THREADED_DNS */
+#endif // HAVE_THREADED_DNS
 
 void FinishConnect(NoSocketManager* manager, const NoString& sHostname,
                                  u_short iPort,

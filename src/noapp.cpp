@@ -34,7 +34,7 @@
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>
-#endif /* HAVE_LIBSSL */
+#endif // HAVE_LIBSSL
 
 static inline NoString FormatBindError()
 {
@@ -355,7 +355,7 @@ static void GenerateCert(FILE* pOut, const NoString& sHost)
         fprintf(pOut, "%s", szDefaultDH2048);
     }
 }
-#endif /* HAVE_LIBSSL */
+#endif // HAVE_LIBSSL
 
 bool NoApp::WritePemFile()
 {
