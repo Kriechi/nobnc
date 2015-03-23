@@ -22,13 +22,14 @@
 #include <no/nostring.h>
 #include <memory>
 
-class NoWebPage;
+class NoWebPagePrivate;
 
 class NO_EXPORT NoWebPage
 {
 public:
     NoWebPage(const NoString& sName, const NoString& sTitle = "", uint uFlags = 0);
     NoWebPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags = 0);
+    ~NoWebPage();
 
     enum { Admin = 1 };
 
@@ -43,10 +44,9 @@ public:
     const NoStringPairVector& GetParams() const;
 
 private:
-    uint m_flags;
-    NoString m_name;
-    NoString m_title;
-    NoStringPairVector m_params;
+    NoWebPage(const NoWebPage& other) = delete;
+    NoWebPage& operator=(const NoWebPage& other) = delete;
+    std::unique_ptr<NoWebPagePrivate> d;
 };
 
 #endif // NOWEBPAGE_H
