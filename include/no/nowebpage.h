@@ -27,21 +27,23 @@ class NoWebPagePrivate;
 class NO_EXPORT NoWebPage
 {
 public:
-    NoWebPage(const NoString& sName, const NoString& sTitle = "", uint uFlags = 0);
-    NoWebPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags = 0);
+    NoWebPage(const NoString& name);
     ~NoWebPage();
 
-    enum { Admin = 1 };
+    enum Flags { Admin = 1 };
 
-    void SetName(const NoString& s);
-    void SetTitle(const NoString& s);
-    void AddParam(const NoString& sName, const NoString& sValue);
+    uint flags() const;
+    void setFlags(uint flags);
 
-    bool RequiresAdmin() const;
+    NoString name() const;
+    void setName(const NoString& name);
 
-    const NoString& GetName() const;
-    const NoString& GetTitle() const;
-    const NoStringPairVector& GetParams() const;
+    NoString title() const;
+    void setTitle(const NoString& title);
+
+    NoStringPairVector params() const;
+    void addParam(const NoString& name, const NoString& value);
+    void removeParam(const NoString& name, const NoString& value);
 
 private:
     NoWebPage(const NoWebPage& other) = delete;

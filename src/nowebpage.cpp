@@ -20,43 +20,30 @@
 class NoWebPagePrivate
 {
 public:
-    uint flags;
-    NoString name;
-    NoString title;
+    uint flags = 0;
+    NoString name = "";
+    NoString title = "";
     NoStringPairVector params;
 };
 
-NoWebPage::NoWebPage(const NoString& sName, const NoString& sTitle, uint uFlags)
-    : d(new NoWebPagePrivate)
+NoWebPage::NoWebPage(const NoString& name) : d(new NoWebPagePrivate)
 {
-    d->flags = uFlags;
-    d->name = sName;
-    d->title = sTitle;
-}
-
-NoWebPage::NoWebPage(const NoString& sName, const NoString& sTitle, const NoStringPairVector& vParams, uint uFlags)
-    : d(new NoWebPagePrivate)
-{
-    d->flags = uFlags;
-    d->name = sName;
-    d->title = sTitle;
-    d->params = vParams;
+    d->name = name;
 }
 
 NoWebPage::~NoWebPage()
 {
 }
 
-void NoWebPage::SetName(const NoString& s) { d->name = s; }
+uint NoWebPage::flags() const { return d->flags; }
+void NoWebPage::setFlags(uint flags) { d->flags = flags; }
 
-void NoWebPage::SetTitle(const NoString& s) { d->title = s; }
+NoString NoWebPage::name() const { return d->name; }
+void NoWebPage::setName(const NoString& name) { d->name = name; }
 
-void NoWebPage::AddParam(const NoString& sName, const NoString& sValue) { d->params.push_back(make_pair(sName, sValue)); }
+NoString NoWebPage::title() const { return d->title; }
+void NoWebPage::setTitle(const NoString& title) { d->title = title; }
 
-bool NoWebPage::RequiresAdmin() const { return d->flags & Admin; }
-
-const NoString& NoWebPage::GetName() const { return d->name; }
-
-const NoString& NoWebPage::GetTitle() const { return d->title; }
-
-const NoStringPairVector& NoWebPage::GetParams() const { return d->params; }
+NoStringPairVector NoWebPage::params() const { return d->params; }
+void NoWebPage::addParam(const NoString& name, const NoString& value) { d->params.push_back(make_pair(name, value)); }
+void NoWebPage::removeParam(const NoString& name, const NoString& value) { d->params.push_back(make_pair(name, value)); }

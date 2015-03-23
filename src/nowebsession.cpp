@@ -463,9 +463,9 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
 
         for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(&Module)->subPages) {
             // bActive is whether or not the current url matches this subpage (params will be checked below)
-            bool bActive = (m_modName == Module.GetModName() && m_page == SubPage->GetName() && bActiveModule);
+            bool bActive = (m_modName == Module.GetModName() && m_page == SubPage->name() && bActiveModule);
 
-            if (SubPage->RequiresAdmin() && !GetSession()->IsAdmin()) {
+            if ((SubPage->flags() & NoWebPage::Admin) && !GetSession()->IsAdmin()) {
                 continue; // Don't add admin-only subpages to requests from non-admin users
             }
 
@@ -473,12 +473,12 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
 
             SubRow["ModName"] = Module.GetModName();
             SubRow["ModPath"] = Module.GetWebPath();
-            SubRow["PageName"] = SubPage->GetName();
-            SubRow["Title"] = SubPage->GetTitle().empty() ? SubPage->GetName() : SubPage->GetTitle();
+            SubRow["PageName"] = SubPage->name();
+            SubRow["Title"] = SubPage->title().empty() ? SubPage->name() : SubPage->title();
 
             NoString& sParams = SubRow["Params"];
 
-            const NoStringPairVector& vParams = SubPage->GetParams();
+            const NoStringPairVector& vParams = SubPage->params();
             for (const std::pair<NoString, NoString>& ssNV : vParams) {
                 if (!sParams.empty()) {
                     sParams += "&";
@@ -803,9 +803,9 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
         }
 
         for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(pModule)->subPages) {
-            bool bActive = (m_modName == pModule->GetModName() && m_page == SubPage->GetName());
+            bool bActive = (m_modName == pModule->GetModName() && m_page == SubPage->name());
 
-            if (bActive && SubPage->RequiresAdmin() && !GetSession()->IsAdmin()) {
+            if (bActive && (SubPage->flags() & NoWebPage::Admin) && !GetSession()->IsAdmin()) {
                 PrintErrorPage(403, "Forbidden", "You need to be an admin to access this page");
                 return Done;
             }

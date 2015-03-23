@@ -89,12 +89,25 @@ class NoWebAdminMod : public NoModule
 public:
     MODCONSTRUCTOR(NoWebAdminMod)
     {
-        NoStringPairVector vParams;
-        vParams.push_back(std::make_pair("user", ""));
-        AddSubPage(std::make_shared<NoWebPage>("settings", "Global Settings", NoWebPage::Admin));
-        AddSubPage(std::make_shared<NoWebPage>("edituser", "Your Settings", vParams));
-        AddSubPage(std::make_shared<NoWebPage>("traffic", "Traffic Info", NoWebPage::Admin));
-        AddSubPage(std::make_shared<NoWebPage>("listusers", "Manage Users", NoWebPage::Admin));
+        std::shared_ptr<NoWebPage> settings = std::make_shared<NoWebPage>("settings");
+        settings->setTitle("Global Settings");
+        settings->setFlags(NoWebPage::Admin);
+        AddSubPage(settings);
+
+        std::shared_ptr<NoWebPage> edituser = std::make_shared<NoWebPage>("edituser");
+        edituser->setTitle("Your Settings");
+        edituser->addParam("user", "");
+        AddSubPage(edituser);
+
+        std::shared_ptr<NoWebPage> traffic = std::make_shared<NoWebPage>("traffic");
+        traffic->setTitle("Traffic Info");
+        traffic->setFlags(NoWebPage::Admin);
+        AddSubPage(traffic);
+
+        std::shared_ptr<NoWebPage> listusers = std::make_shared<NoWebPage>("listusers");
+        listusers->setTitle("Manage Users");
+        listusers->setFlags(NoWebPage::Admin);
+        AddSubPage(listusers);
     }
 
     bool OnLoad(const NoString& sArgStr, NoString& sMessage) override
