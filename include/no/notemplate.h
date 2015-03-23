@@ -21,9 +21,11 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 #include <memory>
-#include <list>
 
 class NoTemplate;
+class NoTemplatePrivate;
+class NoTemplateOptions;
+class NoTemplateLoopContext;
 
 class NO_EXPORT NoTemplateTagHandler
 {
@@ -48,19 +50,14 @@ public:
     virtual bool HandleValue(NoTemplate& Tmpl, NoString& sValue, const NoStringMap& msOptions) { return false; }
 };
 
-class NoTemplateOptions;
-class NoTemplateLoopContext;
-
 class NO_EXPORT NoTemplate : public NoStringMap
 {
 public:
-    NoTemplate();
-    NoTemplate(const NoString& sFileName);
+    NoTemplate(const NoString& sFileName = "");
     NoTemplate(const std::shared_ptr<NoTemplateOptions>& Options, NoTemplate* pParent = nullptr);
-    virtual ~NoTemplate();
-
-    NoTemplate(const NoTemplate& other) = default;
-    NoTemplate& operator=(const NoTemplate& other) = default;
+    NoTemplate(const NoTemplate& other);
+    NoTemplate& operator=(const NoTemplate& other);
+    ~NoTemplate();
 
     //! Class for implementing custom tags in subclasses
     void AddTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler);
@@ -100,13 +97,7 @@ public:
     const NoString& GetFileName() const;
 
 private:
-    NoTemplate* m_parent;
-    NoString m_fileName;
-    std::list<std::pair<NoString, bool>> m_paths;
-    std::map<NoString, std::vector<NoTemplate*>> m_loops;
-    std::vector<NoTemplateLoopContext*> m_loopContexts;
-    std::shared_ptr<NoTemplateOptions> m_options;
-    std::vector<std::shared_ptr<NoTemplateTagHandler>> m_tagHandlers;
+    std::shared_ptr<NoTemplatePrivate> d;
 };
 
 #endif // NOTEMPLATE_H

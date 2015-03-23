@@ -22,6 +22,7 @@
 #include "noutils.h"
 #include "noescape.h"
 #include <algorithm>
+#include <list>
 
 class NoTemplateOptions
 {
@@ -86,6 +87,18 @@ private:
     uint m_uRowIndex; //!< The index of the current row we're on
     ulong m_uFilePosition; //!< The file position of the opening <?LOOP?> tag
     std::vector<NoTemplate*>* m_pvRows; //!< This holds pointers to the templates associated with this loop
+};
+
+class NoTemplatePrivate
+{
+public:
+    NoString fileName;
+    NoTemplate* parent = nullptr;
+    std::list<std::pair<NoString, bool>> paths;
+    std::map<NoString, std::vector<NoTemplate*>> loops;
+    std::vector<NoTemplateLoopContext*> loopContexts;
+    std::shared_ptr<NoTemplateOptions> options;
+    std::vector<std::shared_ptr<NoTemplateTagHandler>> tagHandlers;
 };
 
 static No::EscapeFormat ToEscapeFormat(const NoString& sEsc)
@@ -205,43 +218,42 @@ NoString NoTemplateLoopContext::GetValue(const NoString& sName, bool bFromIf)
     return pTemplate->GetValue(sName, bFromIf);
 }
 
-NoTemplate::NoTemplate() : NoTemplate("") {}
-
-NoTemplate::NoTemplate(const NoString& sFileName)
-    : NoStringMap(), m_parent(nullptr), m_fileName(sFileName), m_paths(), m_loops(), m_loopContexts(),
-      m_options(new NoTemplateOptions), m_tagHandlers()
+NoTemplate::NoTemplate(const NoString& sFileName) : d(new NoTemplatePrivate)
 {
+    d->fileName = sFileName;
+    d->options.reset(new NoTemplateOptions);
 }
 
-NoTemplate::NoTemplate(const std::shared_ptr<NoTemplateOptions>& Options, NoTemplate* pParent)
-    : NoStringMap(), m_parent(pParent), m_fileName(""), m_paths(), m_loops(), m_loopContexts(),
-      m_options(Options), m_tagHandlers()
+NoTemplate::NoTemplate(const std::shared_ptr<NoTemplateOptions>& options, NoTemplate* parent)
+    : d(new NoTemplatePrivate)
 {
+    d->options = options;
+    d->parent = parent;
 }
 
 NoTemplate::~NoTemplate()
 {
-    for (const auto& it : m_loops) {
+    for (const auto& it : d->loops) {
         const std::vector<NoTemplate*>& vLoop = it.second;
         for (NoTemplate* pTemplate : vLoop) {
             delete pTemplate;
         }
     }
 
-    for (NoTemplateLoopContext* pContext : m_loopContexts) {
+    for (NoTemplateLoopContext* pContext : d->loopContexts) {
         delete pContext;
     }
 }
 
-void NoTemplate::AddTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler) { m_tagHandlers.push_back(spTagHandler); }
+void NoTemplate::AddTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler) { d->tagHandlers.push_back(spTagHandler); }
 
 std::vector<std::shared_ptr<NoTemplateTagHandler> >&NoTemplate::GetTagHandlers()
 {
-    if (m_parent) {
-        return m_parent->GetTagHandlers();
+    if (d->parent) {
+        return d->parent->GetTagHandlers();
     }
 
-    return m_tagHandlers;
+    return d->tagHandlers;
 }
 
 void NoTemplate::Init()
@@ -256,7 +268,7 @@ void NoTemplate::Init()
     */
 
     ClearPaths();
-    m_parent = nullptr;
+    d->parent = nullptr;
 }
 
 NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
@@ -267,7 +279,7 @@ NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
 
     NoString sFile(ResolveLiteral(sFilename).trimLeft_n("/"));
 
-    for (auto& it : m_paths) {
+    for (auto& it : d->paths) {
         NoString& sRoot = it.first;
         NoString sFilePath(NoDir::ChangeDir(sRoot, sFile));
 
@@ -291,15 +303,15 @@ NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
         }
     }
 
-    switch (m_paths.size()) {
+    switch (d->paths.size()) {
     case 0:
         NO_DEBUG("Unable to find [" + sFile + "] using the current directory");
         break;
     case 1:
-        NO_DEBUG("Unable to find [" + sFile + "] in the defined path [" + m_paths.begin()->first + "]");
+        NO_DEBUG("Unable to find [" + sFile + "] in the defined path [" + d->paths.begin()->first + "]");
         break;
     default:
-        NO_DEBUG("Unable to find [" + sFile + "] in any of the " + NoString(m_paths.size()) + " defined paths");
+        NO_DEBUG("Unable to find [" + sFile + "] in any of the " + NoString(d->paths.size()) + " defined paths");
     }
 
     return "";
@@ -328,33 +340,33 @@ NoString NoTemplate::MakePath(const NoString& sPath) const
 void NoTemplate::PrependPath(const NoString& sPath, bool bIncludesOnly)
 {
     NO_DEBUG("NoTemplate::PrependPath(" + sPath + ") == [" + MakePath(sPath) + "]");
-    m_paths.push_front(make_pair(MakePath(sPath), bIncludesOnly));
+    d->paths.push_front(make_pair(MakePath(sPath), bIncludesOnly));
 }
 
 void NoTemplate::AppendPath(const NoString& sPath, bool bIncludesOnly)
 {
     NO_DEBUG("NoTemplate::AppendPath(" + sPath + ") == [" + MakePath(sPath) + "]");
-    m_paths.push_back(make_pair(MakePath(sPath), bIncludesOnly));
+    d->paths.push_back(make_pair(MakePath(sPath), bIncludesOnly));
 }
 
 void NoTemplate::RemovePath(const NoString& sPath)
 {
     NO_DEBUG("NoTemplate::RemovePath(" + sPath + ") == [" + NoDir::ChangeDir("./", sPath + "/") + "]");
 
-    for (const auto& it : m_paths) {
+    for (const auto& it : d->paths) {
         if (it.first == sPath) {
-            m_paths.remove(it);
+            d->paths.remove(it);
             RemovePath(sPath); // @todo probably shouldn't use recursion, being lazy
             return;
         }
     }
 }
 
-void NoTemplate::ClearPaths() { m_paths.clear(); }
+void NoTemplate::ClearPaths() { d->paths.clear(); }
 
 bool NoTemplate::SetFile(const NoString& sFileName)
 {
-    m_fileName = ExpandFile(sFileName, false);
+    d->fileName = ExpandFile(sFileName, false);
     PrependPath(sFileName + "/..");
 
     if (sFileName.empty()) {
@@ -362,12 +374,12 @@ bool NoTemplate::SetFile(const NoString& sFileName)
         return false;
     }
 
-    if (m_fileName.empty()) {
+    if (d->fileName.empty()) {
         NO_DEBUG("NoTemplate::SetFile() - [" + sFileName + "] does not exist");
         return false;
     }
 
-    NO_DEBUG("Set template file to [" + m_fileName + "]");
+    NO_DEBUG("Set template file to [" + d->fileName + "]");
 
     return true;
 }
@@ -386,8 +398,8 @@ public:
 
 NoTemplate& NoTemplate::AddRow(const NoString& sName)
 {
-    NoTemplate* pTmpl = new NoTemplate(m_options, this);
-    m_loops[sName].push_back(pTmpl);
+    NoTemplate* pTmpl = new NoTemplate(d->options, this);
+    d->loops[sName].push_back(pTmpl);
 
     return *pTmpl;
 }
@@ -417,9 +429,9 @@ std::vector<NoTemplate*>* NoTemplate::GetLoop(const NoString& sName)
         }
     }
 
-    std::map<NoString, std::vector<NoTemplate*>>::iterator it = m_loops.find(sName);
+    std::map<NoString, std::vector<NoTemplate*>>::iterator it = d->loops.find(sName);
 
-    if (it != m_loops.end()) {
+    if (it != d->loops.end()) {
         return &(it->second);
     }
 
@@ -437,7 +449,7 @@ bool NoTemplate::PrintString(NoString& sRet)
     return bRet;
 }
 
-bool NoTemplate::Print(std::ostream& oOut) { return Print(m_fileName, oOut); }
+bool NoTemplate::Print(std::ostream& oOut) { return Print(d->fileName, oOut); }
 
 bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 {
@@ -523,7 +535,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                             return false;
                         }
                     } else if (sAction.equals("SETOPTION")) {
-                        m_options->Parse(sArgs);
+                        d->options->Parse(sArgs);
                     } else if (sAction.equals("ADDROW")) {
                         NoString sLoopName = No::token(sArgs, 0);
                         NoStringMap msRow = No::optionSplit(No::tokens(sArgs, 1, " "));
@@ -643,7 +655,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                                     }
                                 }
 
-                                m_loopContexts.push_back(new NoTemplateLoopContext(uAfterLoopTag, sLoopName, bReverse, pvLoop));
+                                d->loopContexts.push_back(new NoTemplateLoopContext(uAfterLoopTag, sLoopName, bReverse, pvLoop));
                             } else { // If we don't have data, just skip this loop and everything inside
                                 uSkip++;
                             }
@@ -796,18 +808,18 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
 void NoTemplate::DelCurLoopContext()
 {
-    if (m_loopContexts.empty()) {
+    if (d->loopContexts.empty()) {
         return;
     }
 
-    delete m_loopContexts.back();
-    m_loopContexts.pop_back();
+    delete d->loopContexts.back();
+    d->loopContexts.pop_back();
 }
 
 NoTemplateLoopContext* NoTemplate::GetCurLoopContext()
 {
-    if (!m_loopContexts.empty()) {
-        return m_loopContexts.back();
+    if (!d->loopContexts.empty()) {
+        return d->loopContexts.back();
     }
 
     return nullptr;
@@ -917,10 +929,10 @@ bool NoTemplate::HasLoop(const NoString& sName) { return (GetLoop(sName) != null
 NoTemplate* NoTemplate::GetParent(bool bRoot)
 {
     if (!bRoot) {
-        return m_parent;
+        return d->parent;
     }
 
-    return (m_parent) ? m_parent->GetParent(bRoot) : this;
+    return (d->parent) ? d->parent->GetParent(bRoot) : this;
 }
 
 NoTemplate* NoTemplate::GetCurTemplate()
@@ -934,7 +946,7 @@ NoTemplate* NoTemplate::GetCurTemplate()
     return pContext->GetCurRow();
 }
 
-const NoString& NoTemplate::GetFileName() const { return m_fileName; }
+const NoString& NoTemplate::GetFileName() const { return d->fileName; }
 
 NoString NoTemplate::ResolveLiteral(const NoString& sString)
 {
@@ -1033,7 +1045,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
                 sRet = No::escape(sRet, ToEscapeFormat(sEsc));
             }
         } else {
-            sRet = No::escape(sRet, m_options->GetEscapeFrom(), m_options->GetEscapeTo());
+            sRet = No::escape(sRet, d->options->GetEscapeFrom(), d->options->GetEscapeTo());
         }
     }
 
