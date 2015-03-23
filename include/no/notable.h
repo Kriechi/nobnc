@@ -20,7 +20,9 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <vector>
+#include <memory>
+
+class NoTablePrivate;
 
 /** Generate a grid-like output from a given input.
  *
@@ -56,6 +58,9 @@ public:
      *possible
      */
     explicit NoTable(ulong uPreferredWidth = 110);
+    NoTable(const NoTable& other);
+    NoTable& operator=(const NoTable& other);
+    ~NoTable();
 
     /** Adds a new column to the table.
      *  Please note that you should add all columns before starting to fill
@@ -94,7 +99,7 @@ public:
      *  @param uIdx The index of the column you are interested in.
      *  @return The width of the column.
      */
-    NoString::size_type GetColumnWidth(uint uIdx) const;
+    uint GetColumnWidth(uint uIdx) const;
 
     /// Completely clear the table.
     void Clear();
@@ -106,18 +111,7 @@ public:
     bool empty() const;
 
 private:
-    uint GetColumnIndex(const NoString& sName) const;
-    NoStringVector Render() const;
-    static NoStringVector WrapWords(const NoString& s, uint uWidth);
-
-private:
-    NoStringVector m_headers;
-    std::vector<NoStringVector> m_rows;
-    std::vector<uint> m_maxWidths; // Column don't need to be bigger than this
-    std::vector<uint> m_minWidths; // Column can't be thiner than this
-    std::vector<bool> m_wrappable;
-    uint m_preferredWidth;
-    mutable NoStringVector m_output; // Rendered table
+    std::shared_ptr<NoTablePrivate> d;
 };
 
 #endif // NOTABLE_H
