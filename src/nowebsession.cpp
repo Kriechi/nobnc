@@ -149,9 +149,9 @@ NoWebSession::~NoWebSession()
     }
 }
 
-const NoString& NoWebSession::GetId() const { return d->id; }
+NoString NoWebSession::GetId() const { return d->id; }
 
-const NoString& NoWebSession::GetIP() const { return d->ip; }
+NoString NoWebSession::GetIP() const { return d->ip; }
 
 NoUser* NoWebSession::GetUser() const { return d->user; }
 

@@ -32,8 +32,8 @@ public:
     NoWebSession(const NoString& sId, const NoString& sIP);
     ~NoWebSession();
 
-    const NoString& GetId() const;
-    const NoString& GetIP() const;
+    NoString GetId() const;
+    NoString GetIP() const;
     NoUser* GetUser() const;
     time_t GetLastActive() const;
     bool IsLoggedIn() const;
