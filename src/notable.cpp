@@ -24,6 +24,16 @@ NoTable::NoTable(ulong uPreferredWidth)
 {
 }
 
+uint NoTable::size() const
+{
+    return m_rows.size();
+}
+
+bool NoTable::empty() const
+{
+    return m_rows.empty();
+}
+
 bool NoTable::AddColumn(const NoString& sName, bool bWrappable)
 {
     for (const NoString& sHeader : m_headers) {
@@ -41,21 +51,21 @@ bool NoTable::AddColumn(const NoString& sName, bool bWrappable)
     return true;
 }
 
-NoTable::size_type NoTable::AddRow()
+uint NoTable::AddRow()
 {
     // Don't add a row if no headers are defined
     if (m_headers.empty()) {
-        return (size_type)-1;
+        return -1;
     }
 
     // Add a vector with enough space for each column
-    push_back(vector<NoString>(m_headers.size()));
-    return size() - 1;
+    m_rows.push_back(NoStringVector(m_headers.size()));
+    return m_rows.size() - 1;
 }
 
-bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, size_type uRowIdx)
+bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, uint uRowIdx)
 {
-    if (uRowIdx == (size_type)~0) {
+    if (uRowIdx == ~0) {
         if (empty()) {
             return false;
         }
@@ -67,7 +77,7 @@ bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, size_type
 
     if (uColIdx == (uint)-1) return false;
 
-    (*this)[uRowIdx][uColIdx] = sValue;
+    m_rows[uRowIdx][uColIdx] = sValue;
 
     if (sValue.length() > m_maxWidths[uColIdx]) {
         m_maxWidths[uColIdx] = sValue.length();
@@ -75,7 +85,7 @@ bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, size_type
 
     if (m_wrappable[uColIdx]) {
         NoStringVector vsWords = sValue.split(" ");
-        size_type uMaxWord = 0;
+        uint uMaxWord = 0;
         for (const NoString& sWord : vsWords) {
             if (sWord.length() > uMaxWord) {
                 uMaxWord = sWord.length();
@@ -109,12 +119,12 @@ bool NoTable::GetLine(uint uIdx, NoString& sLine) const
 
 NoStringVector NoTable::Render() const
 {
-    size_type uTotalWidth = 1; // '|'
-    for (size_type uWidth : m_maxWidths) {
+    uint uTotalWidth = 1; // '|'
+    for (uint uWidth : m_maxWidths) {
         uTotalWidth += uWidth + 3; // '|', ' 'x2
     }
 
-    std::vector<size_type> vuWidth = m_maxWidths;
+    std::vector<uint> vuWidth = m_maxWidths;
 
     std::map<int, int> miColumnSpace;
     for (uint i = 0; i < m_headers.size(); ++i) {
@@ -152,7 +162,7 @@ NoStringVector NoTable::Render() const
         std::ostringstream ssLine;
         ssLine << std::setfill('-');
         ssLine << "+";
-        for (size_type uWidth : vuWidth) {
+        for (uint uWidth : vuWidth) {
             ssLine << std::setw(uWidth + 2) << std::left << "-";
             ssLine << "+";
         }
@@ -171,7 +181,7 @@ NoStringVector NoTable::Render() const
         vsOutput.emplace_back(ssLine.str());
     }
     vsOutput.emplace_back(vsOutput[0]);
-    for (const NoStringVector& vsRow : *this) {
+    for (const NoStringVector& vsRow : m_rows) {
         // Wrap words
         std::vector<NoStringVector> vvsColumns;
         vvsColumns.reserve(m_headers.size());
@@ -187,7 +197,7 @@ NoStringVector NoTable::Render() const
             }
         }
         NoString sEmpty;
-        for (size_type uCurrentLine = 0; uCurrentLine < uRowNum; ++uCurrentLine) {
+        for (uint uCurrentLine = 0; uCurrentLine < uRowNum; ++uCurrentLine) {
             std::ostringstream ssLine;
             ssLine << "|";
             for (uint iCol = 0; iCol < vvsColumns.size(); ++iCol) {
@@ -205,13 +215,13 @@ NoStringVector NoTable::Render() const
     return vsOutput;
 }
 
-NoStringVector NoTable::WrapWords(const NoString& s, size_type uWidth)
+NoStringVector NoTable::WrapWords(const NoString& s, uint uWidth)
 {
     NoStringVector vsWords = s.split(" ");
     NoStringVector vsResult;
     vsResult.emplace_back("");
     for (const NoString& sWord : vsWords) {
-        size_type uOldLen = vsResult.back().length();
+        uint uOldLen = vsResult.back().length();
         if (uOldLen != 0) {
             uOldLen++; // ' '
         }
@@ -248,7 +258,7 @@ NoString::size_type NoTable::GetColumnWidth(uint uIdx) const
 
 void NoTable::Clear()
 {
-    clear();
+    m_rows.clear();
     m_headers.clear();
     m_maxWidths.clear();
     m_minWidths.clear();

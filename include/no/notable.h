@@ -47,7 +47,7 @@
 | hello | world |
 +-------+-------+@endverbatim
  */
-class NO_EXPORT NoTable : protected std::vector<std::vector<NoString>>
+class NO_EXPORT NoTable
 {
 public:
     /** Constructor
@@ -70,7 +70,7 @@ public:
      *  After calling this you can fill the row with content.
      *  @return The index of this row
      */
-    size_type AddRow();
+    uint AddRow();
 
     /** Sets a given cell in the table to a value.
      *  @param sColumn The name of the column you want to fill.
@@ -79,7 +79,7 @@ public:
      *                 If this is not given, the last row will be used.
      *  @return True if setting the cell was successful.
      */
-    bool SetCell(const NoString& sColumn, const NoString& sValue, size_type uRowIdx = ~0);
+    bool SetCell(const NoString& sColumn, const NoString& sValue, uint uRowIdx = ~0);
 
     /** Get a line of the table's output
      *  @param uIdx The index of the line you want.
@@ -100,22 +100,23 @@ public:
     void Clear();
 
     /// @return The number of rows in this table, not counting the header.
-    using std::vector<std::vector<NoString>>::size;
+    uint size() const;
 
     /// @return True if this table doesn't contain any rows.
-    using std::vector<std::vector<NoString>>::empty;
+    bool empty() const;
 
 private:
     uint GetColumnIndex(const NoString& sName) const;
     NoStringVector Render() const;
-    static NoStringVector WrapWords(const NoString& s, size_type uWidth);
+    static NoStringVector WrapWords(const NoString& s, uint uWidth);
 
 private:
     NoStringVector m_headers;
-    std::vector<NoString::size_type> m_maxWidths; // Column don't need to be bigger than this
-    std::vector<NoString::size_type> m_minWidths; // Column can't be thiner than this
+    std::vector<NoStringVector> m_rows;
+    std::vector<uint> m_maxWidths; // Column don't need to be bigger than this
+    std::vector<uint> m_minWidths; // Column can't be thiner than this
     std::vector<bool> m_wrappable;
-    size_type m_preferredWidth;
+    uint m_preferredWidth;
     mutable NoStringVector m_output; // Rendered table
 };
 
