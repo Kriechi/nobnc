@@ -20,18 +20,17 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <no/nouser.h>
+#include <memory>
 
+class NoUser;
 class NoTemplate;
+class NoWebSessionPrivate;
 
 class NO_EXPORT NoWebSession
 {
 public:
     NoWebSession(const NoString& sId, const NoString& sIP);
     ~NoWebSession();
-
-    NoWebSession(const NoWebSession&) = delete;
-    NoWebSession& operator=(const NoWebSession&) = delete;
 
     const NoString& GetId() const;
     const NoString& GetIP() const;
@@ -49,12 +48,9 @@ public:
     size_t AddSuccess(const NoString& sMessage);
 
 private:
-    NoString m_id;
-    NoString m_ip;
-    NoUser* m_user;
-    NoStringVector m_errorMsgs;
-    NoStringVector m_successMsgs;
-    time_t m_lastActive;
+    NoWebSession(const NoWebSession& other) = delete;
+    NoWebSession& operator=(const NoWebSession& other) = delete;
+    std::unique_ptr<NoWebSessionPrivate> d;
 };
 
 #endif // NOWEBSESSION_H

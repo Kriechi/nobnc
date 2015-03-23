@@ -113,10 +113,30 @@ private:
     bool m_bBasic;
 };
 
+class NoWebSessionPrivate
+{
+public:
+    NoString id = "";
+    NoString ip = "";
+    NoUser* user = nullptr;
+    NoStringVector errorMsgs;
+    NoStringVector successMsgs;
+    time_t lastActive;
+};
+
+NoWebSession::NoWebSession(const NoString& sId, const NoString& sIP)
+    : d(new NoWebSessionPrivate)
+{
+    d->id = sId;
+    d->ip = sIP;
+    Sessions.m_mIPSessions.insert(make_pair(sIP, this));
+    UpdateLastActive();
+}
+
 NoWebSession::~NoWebSession()
 {
     // Find our entry in mIPSessions
-    std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(m_ip);
+    std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(d->ip);
     mIPSessionsIterator it = p.first;
     mIPSessionsIterator end = p.second;
 
@@ -129,47 +149,40 @@ NoWebSession::~NoWebSession()
     }
 }
 
-const NoString& NoWebSession::GetId() const { return m_id; }
+const NoString& NoWebSession::GetId() const { return d->id; }
 
-const NoString& NoWebSession::GetIP() const { return m_ip; }
+const NoString& NoWebSession::GetIP() const { return d->ip; }
 
-NoUser* NoWebSession::GetUser() const { return m_user; }
+NoUser* NoWebSession::GetUser() const { return d->user; }
 
-time_t NoWebSession::GetLastActive() const { return m_lastActive; }
+time_t NoWebSession::GetLastActive() const { return d->lastActive; }
 
-bool NoWebSession::IsLoggedIn() const { return m_user != nullptr; }
+bool NoWebSession::IsLoggedIn() const { return d->user != nullptr; }
 
-NoWebSession::NoWebSession(const NoString& sId, const NoString& sIP)
-    : m_id(sId), m_ip(sIP), m_user(nullptr), m_errorMsgs(), m_successMsgs(), m_lastActive()
-{
-    Sessions.m_mIPSessions.insert(make_pair(sIP, this));
-    UpdateLastActive();
-}
-
-void NoWebSession::UpdateLastActive() { time(&m_lastActive); }
+void NoWebSession::UpdateLastActive() { time(&d->lastActive); }
 
 NoUser*NoWebSession::SetUser(NoUser* p)
 {
-    m_user = p;
-    return m_user;
+    d->user = p;
+    return d->user;
 }
 
-bool NoWebSession::IsAdmin() const { return IsLoggedIn() && m_user->IsAdmin(); }
+bool NoWebSession::IsAdmin() const { return IsLoggedIn() && d->user->IsAdmin(); }
 
 void NoWebSession::ClearMessageLoops()
 {
-    m_errorMsgs.clear();
-    m_successMsgs.clear();
+    d->errorMsgs.clear();
+    d->successMsgs.clear();
 }
 
 void NoWebSession::FillMessageLoops(NoTemplate& Tmpl)
 {
-    for (const NoString& sMessage : m_errorMsgs) {
+    for (const NoString& sMessage : d->errorMsgs) {
         NoTemplate& Row = Tmpl.AddRow("ErrorLoop");
         Row["Message"] = sMessage;
     }
 
-    for (const NoString& sMessage : m_successMsgs) {
+    for (const NoString& sMessage : d->successMsgs) {
         NoTemplate& Row = Tmpl.AddRow("SuccessLoop");
         Row["Message"] = sMessage;
     }
@@ -177,14 +190,14 @@ void NoWebSession::FillMessageLoops(NoTemplate& Tmpl)
 
 size_t NoWebSession::AddError(const NoString& sMessage)
 {
-    m_errorMsgs.push_back(sMessage);
-    return m_errorMsgs.size();
+    d->errorMsgs.push_back(sMessage);
+    return d->errorMsgs.size();
 }
 
 size_t NoWebSession::AddSuccess(const NoString& sMessage)
 {
-    m_successMsgs.push_back(sMessage);
-    return m_successMsgs.size();
+    d->successMsgs.push_back(sMessage);
+    return d->successMsgs.size();
 }
 
 NoWebAuth::NoWebAuth(NoWebSocket* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic)
