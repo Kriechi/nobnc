@@ -30,7 +30,7 @@
  * thread after runThread() finishes.
  *
  * After you create a new instance of your class, you can pass it to
- * NoThreadPool()::Get().addJob(job) to start it. The thread pool automatically
+ * NoThread()::Get().addJob(job) to start it. The thread pool automatically
  * deletes your class after it finished.
  *
  * For modules you should use NoModuleJob instead.
@@ -61,7 +61,8 @@ private:
 
     // Synchronized via the thread pool's mutex! Do not access without that mutex!
     JobState m_state;
-    friend class NoThreadPool;
+    friend class NoThread;
+    friend class NoThreadPrivate;
 };
 
 #endif // HAVE_PTHREAD

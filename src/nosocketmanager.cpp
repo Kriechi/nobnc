@@ -19,6 +19,7 @@
 #include "nosocket.h"
 #include "nosocket_p.h"
 #include "nothread.h"
+#include "nothread_p.h"
 #include "nojob.h"
 #include "noapp.h"
 #include "Csocket/Csocket.h"
@@ -33,12 +34,12 @@ extern const char* ZNC_DefaultCipher;
 class NoDnsMonitorFD : public CSMonitorFD
 {
 public:
-    NoDnsMonitorFD() { Add(NoThreadPool::Get().getReadFD(), CSocketManager::ECT_Read); }
+    NoDnsMonitorFD() { Add(NoThreadPrivate::get()->getReadFD(), CSocketManager::ECT_Read); }
 
     bool FDsThatTriggered(const std::map<int, short>& miiReadyFds) override
     {
-        if (miiReadyFds.find(NoThreadPool::Get().getReadFD())->second) {
-            NoThreadPool::Get().handlePipeReadable();
+        if (miiReadyFds.find(NoThreadPrivate::get()->getReadFD())->second) {
+            NoThreadPrivate::get()->handlePipeReadable();
         }
         return true;
     }
@@ -344,7 +345,7 @@ void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind)
     arg->bBind = bBind;
     arg->pManager = manager;
 
-    NoThreadPool::Get().addJob(arg);
+    NoThread::run(arg);
 }
 
 static NoString RandomFromSet(const NoStringSet& sSet, std::default_random_engine& gen)

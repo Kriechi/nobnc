@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <no/nothread.h>
+#include <no/nothread_p.h>
 #include <no/nomutex.h>
 #include <no/nomutexlocker.h>
 #include <no/noconditionvariable.h>
@@ -74,10 +75,10 @@ TEST(Thread, RunJob)
     bool destroyed = false;
     CWaitingJob* pJob = new CWaitingJob(destroyed);
 
-    NoThreadPool::Get().addJob(pJob);
+    NoThread::run(pJob);
     pJob->signal();
 
-    while (!destroyed) NoThreadPool::Get().handlePipeReadable();
+    while (!destroyed) NoThreadPrivate::get()->handlePipeReadable();
 }
 
 class CCancelJob : public NoJob
@@ -133,10 +134,10 @@ TEST(Thread, CancelJobEarly)
     bool destroyed = false;
     CCancelJob* pJob = new CCancelJob(destroyed);
 
-    NoThreadPool::Get().addJob(pJob);
+    NoThread::run(pJob);
     // Don't wait for the job to run. The idea here is that we are calling
     // cancelJob() before pJob->runThread() runs, but this is a race.
-    NoThreadPool::Get().cancelJob(pJob);
+    NoThread::cancel(pJob);
 
     // cancelJob() should only return after successful cancellation
     EXPECT_TRUE(destroyed);
@@ -147,10 +148,10 @@ TEST(Thread, CancelJobWhileRunning)
     bool destroyed = false;
     CCancelJob* pJob = new CCancelJob(destroyed);
 
-    NoThreadPool::Get().addJob(pJob);
+    NoThread::run(pJob);
     // Wait for the job to run
     pJob->wait();
-    NoThreadPool::Get().cancelJob(pJob);
+    NoThread::cancel(pJob);
 
     // cancelJob() should only return after successful cancellation
     EXPECT_TRUE(destroyed);
@@ -179,16 +180,16 @@ TEST(Thread, CancelJobWhenDone)
     bool destroyed = false;
     CEmptyJob* pJob = new CEmptyJob(destroyed);
 
-    NoThreadPool::Get().addJob(pJob);
+    NoThread::run(pJob);
 
     // Wait for the job to finish
     fd_set fds;
     FD_ZERO(&fds);
-    FD_SET(NoThreadPool::Get().getReadFD(), &fds);
-    EXPECT_EQ(1, select(1 + NoThreadPool::Get().getReadFD(), &fds, nullptr, nullptr, nullptr));
+    FD_SET(NoThreadPrivate::get()->getReadFD(), &fds);
+    EXPECT_EQ(1, select(1 + NoThreadPrivate::get()->getReadFD(), &fds, nullptr, nullptr, nullptr));
 
     // And only cancel it afterwards
-    NoThreadPool::Get().cancelJob(pJob);
+    NoThread::cancel(pJob);
 
     // cancelJob() should only return after successful cancellation
     EXPECT_TRUE(destroyed);

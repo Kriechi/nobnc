@@ -71,6 +71,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/notable.h
                        include/no/notemplate.h
                        include/no/nothread.h
+                       include/no/nothread_p.h
                        include/no/notimer.h
                        include/no/nouser.h
                        include/no/noutils.h

@@ -228,7 +228,7 @@ void NoModule::ListSockets()
 #ifdef HAVE_PTHREAD
 void NoModule::AddJob(NoModuleJob* pJob)
 {
-    NoThreadPool::Get().addJob(pJob);
+    NoThread::run(pJob);
     d->jobs.insert(pJob);
 }
 
@@ -236,7 +236,7 @@ void NoModule::CancelJob(NoModuleJob* pJob)
 {
     if (pJob == nullptr) return;
     // Destructor calls UnlinkJob and removes the job from d->jobs
-    NoThreadPool::Get().cancelJob(pJob);
+    NoThread::cancel(pJob);
 }
 
 bool NoModule::CancelJob(const NoString& sJobName)
@@ -252,10 +252,10 @@ bool NoModule::CancelJob(const NoString& sJobName)
 
 void NoModule::CancelJobs(const std::set<NoModuleJob*>& sJobs)
 {
-    std::set<NoJob*> sPlainJobs(sJobs.begin(), sJobs.end());
-
-    // Destructor calls UnlinkJob and removes the jobs from d->jobs
-    NoThreadPool::Get().cancelJobs(sPlainJobs);
+    for (NoModuleJob* job : sJobs) {
+        // Destructor calls UnlinkJob and removes the jobs from d->jobs
+        NoThread::cancel(job);
+    }
 }
 
 bool NoModule::UnlinkJob(NoModuleJob* pJob) { return 0 != d->jobs.erase(pJob); }

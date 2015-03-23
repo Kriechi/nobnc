@@ -16,6 +16,7 @@
  */
 
 #include "nothread.h"
+#include "nothread_p.h"
 #include "nomutex.h"
 #include "nomutexlocker.h"
 #include "noconditionvariable.h"
@@ -53,25 +54,31 @@ static void startThread(ThreadFunc* func, void* arg)
     }
 }
 
-NoThreadPool& NoThreadPool::Get()
+static void* threadPoolFunc(void* arg)
+{
+    NoThreadPrivate* thread = reinterpret_cast<NoThreadPrivate*>(arg);
+    thread->threadFunc();
+    return nullptr;
+}
+
+NoThreadPrivate* NoThreadPrivate::get()
 {
     // Beware! The following is not thread-safe! This function must
     // be called once any thread is started.
-    static NoThreadPool pool;
-    return pool;
+    static NoThreadPrivate thread;
+    return &thread;
 }
 
-NoThreadPool::NoThreadPool()
-    : m_mutex(), m_cond(), m_cancellationCond(), m_exitCond(), m_done(false), m_numThreads(0), m_numIdle(0),
-      m_jobPipe{ 0, 0 }, m_jobs()
+NoThreadPrivate::NoThreadPrivate()
+    : done(false), numThreads(0), numIdle(0), jobPipe{ 0, 0 }
 {
-    if (pipe(m_jobPipe)) {
+    if (pipe(jobPipe)) {
         NO_DEBUG("Ouch, can't open pipe for thread pool: " << strerror(errno));
         exit(1);
     }
 }
 
-void NoThreadPool::jobDone(NoJob* job)
+void NoThreadPrivate::jobDone(NoJob* job)
 {
     // This must be called with the mutex locked!
 
@@ -80,27 +87,27 @@ void NoThreadPool::jobDone(NoJob* job)
 
     if (oldState == NoJob::Cancelled) {
         // Signal the main thread that cancellation is done
-        m_cancellationCond.signal();
+        cancellationCond.signal();
         return;
     }
 
     // This write() must succeed because POSIX guarantees that writes of
     // less than PIPE_BUF are atomic (and PIPE_BUF is at least 512).
     // (Yes, this really wants to write a pointer(!) to the pipe.
-    size_t w = write(m_jobPipe[1], &job, sizeof(job));
+    size_t w = write(jobPipe[1], &job, sizeof(job));
     if (w != sizeof(job)) {
         NO_DEBUG("Something bad happened during write() to a pipe for thread pool, wrote " << w << " bytes: " << strerror(errno));
         exit(1);
     }
 }
 
-void NoThreadPool::handlePipeReadable() const { finishJob(getJobFromPipe()); }
+void NoThreadPrivate::handlePipeReadable() const { finishJob(getJobFromPipe()); }
 
-NoJob* NoThreadPool::getJobFromPipe() const
+NoJob* NoThreadPrivate::getJobFromPipe() const
 {
     NoJob* a = nullptr;
     ssize_t need = sizeof(a);
-    ssize_t r = read(m_jobPipe[0], &a, need);
+    ssize_t r = read(jobPipe[0], &a, need);
     if (r != need) {
         NO_DEBUG("Something bad happened during read() from a pipe for thread pool: " << strerror(errno));
         exit(1);
@@ -108,48 +115,48 @@ NoJob* NoThreadPool::getJobFromPipe() const
     return a;
 }
 
-void NoThreadPool::finishJob(NoJob* job) const
+void NoThreadPrivate::finishJob(NoJob* job) const
 {
     job->finished();
     delete job;
 }
 
-NoThreadPool::~NoThreadPool()
+NoThreadPrivate::~NoThreadPrivate()
 {
-    NoMutexLocker guard(m_mutex);
-    m_done = true;
+    NoMutexLocker guard(mutex);
+    done = true;
 
-    while (m_numThreads > 0) {
-        m_cond.broadcast();
-        m_exitCond.wait(m_mutex);
+    while (numThreads > 0) {
+        cond.broadcast();
+        exitCond.wait(mutex);
     }
 }
 
-bool NoThreadPool::threadNeeded() const
+bool NoThreadPrivate::threadNeeded() const
 {
-    if (m_numIdle > MAX_IDLE_THREADS) return false;
-    return !m_done;
+    if (numIdle > MAX_IDLE_THREADS) return false;
+    return !done;
 }
 
-void NoThreadPool::threadFunc()
+void NoThreadPrivate::threadFunc()
 {
-    NoMutexLocker guard(m_mutex);
-    // m_num_threads was already increased
-    m_numIdle++;
+    NoMutexLocker guard(mutex);
+    // nuthreads was already increased
+    numIdle++;
 
     while (true) {
-        while (m_jobs.empty()) {
+        while (jobs.empty()) {
             if (!threadNeeded()) break;
-            m_cond.wait(m_mutex);
+            cond.wait(mutex);
         }
         if (!threadNeeded()) break;
 
         // Figure out a job to do
-        NoJob* job = m_jobs.front();
-        m_jobs.pop_front();
+        NoJob* job = jobs.front();
+        jobs.pop_front();
 
         // Now do the actual job
-        m_numIdle--;
+        numIdle--;
         job->m_state = NoJob::Running;
         guard.unlock();
 
@@ -157,44 +164,45 @@ void NoThreadPool::threadFunc()
 
         guard.lock();
         jobDone(job);
-        m_numIdle++;
+        numIdle++;
     }
-    assert(m_numThreads > 0 && m_numIdle > 0);
-    m_numThreads--;
-    m_numIdle--;
+    assert(numThreads > 0 && numIdle > 0);
+    numThreads--;
+    numIdle--;
 
-    if (m_numThreads == 0 && m_done) m_exitCond.signal();
+    if (numThreads == 0 && done) exitCond.signal();
 }
 
-void NoThreadPool::addJob(NoJob* job)
+void NoThread::run(NoJob* job)
 {
-    NoMutexLocker guard(m_mutex);
-    m_jobs.push_back(job);
+    NoThreadPrivate* d = NoThreadPrivate::get();
+    NoMutexLocker guard(d->mutex);
+    d->jobs.push_back(job);
 
     // Do we already have a thread which can handle this job?
-    if (m_numIdle > 0) {
-        m_cond.signal();
+    if (d->numIdle > 0) {
+        d->cond.signal();
         return;
     }
 
-    if (m_numThreads >= MAX_TOTAL_THREADS)
+    if (d->numThreads >= MAX_TOTAL_THREADS)
         // We can't start a new thread. The job will be handled once
         // some thread finishes its current job.
         return;
 
     // Start a new thread for our pool
-    m_numThreads++;
-    startThread(threadPoolFunc, this);
+    d->numThreads++;
+    startThread(threadPoolFunc, d);
 }
 
-void NoThreadPool::cancelJob(NoJob* job)
+void NoThread::cancel(NoJob* job)
 {
     std::set<NoJob*> jobs;
     jobs.insert(job);
-    cancelJobs(jobs);
+    NoThreadPrivate::get()->cancelJobs(jobs);
 }
 
-void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
+void NoThreadPrivate::cancelJobs(const std::set<NoJob*>& cancel)
 {
     // Thanks to the mutex, jobs cannot change state anymore. There are
     // three different states which can occur:
@@ -213,20 +221,20 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
     // status and sees that the job was cancelled. It signals to us that
     // cancellation is done by changing the job's status to DONE.
 
-    NoMutexLocker guard(m_mutex);
+    NoMutexLocker guard(mutex);
     std::set<NoJob*> wait, finished, deleteLater;
     std::set<NoJob*>::const_iterator it;
 
     // Start cancelling all jobs
-    for (it = jobs.begin(); it != jobs.end(); ++it) {
+    for (it = cancel.begin(); it != cancel.end(); ++it) {
         switch ((*it)->m_state) {
         case NoJob::Ready: {
             (*it)->m_state = NoJob::Cancelled;
 
             // Job wasn't started yet, must be in the queue
-            std::list<NoJob*>::iterator it2 = std::find(m_jobs.begin(), m_jobs.end(), *it);
-            assert(it2 != m_jobs.end());
-            m_jobs.erase(it2);
+            std::list<NoJob*>::iterator it2 = std::find(jobs.begin(), jobs.end(), *it);
+            assert(it2 != jobs.end());
+            jobs.erase(it2);
             deleteLater.insert(*it);
             continue;
         }
@@ -268,10 +276,10 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
         if (wait.empty()) break;
 
         // Then wait for more to be done
-        m_cancellationCond.wait(m_mutex);
+        cancellationCond.wait(mutex);
     }
 
-    // We must call destructors with m_mutex unlocked so that they can call wasCancelled()
+    // We must call destructors with mutex unlocked so that they can call wasCancelled()
     guard.unlock();
 
     // Handle finished jobs. They must already be in the pipe.
@@ -291,11 +299,11 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
     }
 }
 
-int NoThreadPool::getReadFD() const { return m_jobPipe[0]; }
+int NoThreadPrivate::getReadFD() const { return jobPipe[0]; }
 
 bool NoJob::wasCancelled() const
 {
-    NoMutexLocker guard(NoThreadPool::Get().m_mutex);
+    NoMutexLocker guard(NoThreadPrivate::get()->mutex);
     return m_state == Cancelled;
 }
 
