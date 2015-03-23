@@ -55,8 +55,6 @@ class NO_EXPORT NoTemplate : public NoStringMap
 public:
     NoTemplate(const NoString& sFileName = "");
     NoTemplate(const std::shared_ptr<NoTemplateOptions>& Options, NoTemplate* pParent = nullptr);
-    NoTemplate(const NoTemplate& other);
-    NoTemplate& operator=(const NoTemplate& other);
     ~NoTemplate();
 
     //! Class for implementing custom tags in subclasses
@@ -97,7 +95,9 @@ public:
     const NoString& GetFileName() const;
 
 private:
-    std::shared_ptr<NoTemplatePrivate> d;
+    NoTemplate(const NoTemplate& other) = delete;
+    NoTemplate& operator=(const NoTemplate& other) = delete;
+    std::unique_ptr<NoTemplatePrivate> d;
 };
 
 #endif // NOTEMPLATE_H
