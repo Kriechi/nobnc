@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2015 NoBNC
  * Copyright (C) 2004-2015 ZNC, see the NOTICE file for details.
  * Copyright (C) 2008 Michael "Svedrin" Ziegler diese-addy@funzt-halt.net
  *

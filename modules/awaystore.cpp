@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2015 NoBNC
  * Copyright (C) 2004-2015 ZNC, see the NOTICE file for details.
  * Author: imaginos <imaginos@imaginos.net>
  *
