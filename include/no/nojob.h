@@ -21,16 +21,6 @@
 
 #ifdef HAVE_PTHREAD
 
-#include <no/noutils.h>
-
-#include <cerrno>
-#include <csignal>
-#include <cstdlib>
-#include <cstring>
-#include <list>
-#include <pthread.h>
-#include <cassert>
-
 /**
  * A job is a task which should run without blocking the main thread. You do
  * this by inheriting from this class and implementing the pure virtual methods
