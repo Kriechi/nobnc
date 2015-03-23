@@ -16,7 +16,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <no/nothreadpool.h>
+#include <no/nothread.h>
 #include <no/nomutex.h>
 #include <no/nomutexlocker.h>
 #include <no/noconditionvariable.h>

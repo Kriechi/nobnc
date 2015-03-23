@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef NOTHREADPOOL_H
-#define NOTHREADPOOL_H
+#ifndef NOTHREAD_H
+#define NOTHREAD_H
 
 #include <no/noglobal.h>
 
@@ -111,4 +111,4 @@ private:
 
 #endif // HAVE_PTHREAD
 
-#endif // NOTHREADPOOL_H
+#endif // NOTHREAD_H

@@ -18,7 +18,7 @@
 #include "nosocketmanager.h"
 #include "nosocket.h"
 #include "nosocket_p.h"
-#include "nothreadpool.h"
+#include "nothread.h"
 #include "nojob.h"
 #include "noapp.h"
 #include "Csocket/Csocket.h"

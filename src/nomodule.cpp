@@ -24,7 +24,7 @@
 #include "noclient.h"
 #include "noapp.h"
 #include "nomodulejob.h"
-#include "nothreadpool.h"
+#include "nothread.h"
 #include "nomodulesocket.h"
 #include <dlfcn.h>
 

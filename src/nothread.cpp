@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "nothreadpool.h"
+#include "nothread.h"
 #include "nomutex.h"
 #include "nomutexlocker.h"
 #include "noconditionvariable.h"

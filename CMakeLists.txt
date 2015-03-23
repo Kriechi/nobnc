@@ -70,7 +70,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nostring.h
                        include/no/notable.h
                        include/no/notemplate.h
-                       include/no/nothreadpool.h
+                       include/no/nothread.h
                        include/no/notimer.h
                        include/no/nouser.h
                        include/no/noutils.h
@@ -117,7 +117,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nostring.cpp
                        src/notable.cpp
                        src/notemplate.cpp
-                       src/nothreads.cpp
+                       src/nothread.cpp
                        src/notimer.cpp
                        src/nouser.cpp
                        src/noutils.cpp
