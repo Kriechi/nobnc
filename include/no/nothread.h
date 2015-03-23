@@ -60,7 +60,7 @@ public:
     /// the jobs. This function BLOCKS until all jobs finish!
     void cancelJobs(const std::set<NoJob*>& jobs);
 
-    int getReadFD() const { return m_jobPipe[0]; }
+    int getReadFD() const;
 
     void handlePipeReadable() const;
 

@@ -291,6 +291,8 @@ void NoThreadPool::cancelJobs(const std::set<NoJob*>& jobs)
     }
 }
 
+int NoThreadPool::getReadFD() const { return m_jobPipe[0]; }
+
 bool NoJob::wasCancelled() const
 {
     NoMutexLocker guard(NoThreadPool::Get().m_mutex);
