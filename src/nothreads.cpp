@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#include "nothread.h"
 #include "nothreadpool.h"
 #include "nomutex.h"
 #include "nomutexlocker.h"
@@ -33,6 +32,26 @@ static const size_t MAX_IDLE_THREADS = 3;
 
 /* Just an arbitrary limit for the number of running threads */
 static const size_t MAX_TOTAL_THREADS = 20;
+
+typedef void* ThreadFunc(void*);
+static void startThread(ThreadFunc* func, void* arg)
+{
+    pthread_t thr;
+    sigset_t old_sigmask, sigmask;
+
+    /* Block all signals. The thread will inherit our signal mask
+     * and thus won't ever try to handle signals.
+     */
+    int i = sigfillset(&sigmask);
+    i |= pthread_sigmask(SIG_SETMASK, &sigmask, &old_sigmask);
+    i |= pthread_create(&thr, nullptr, func, arg);
+    i |= pthread_sigmask(SIG_SETMASK, &old_sigmask, nullptr);
+    i |= pthread_detach(thr);
+    if (i) {
+        No::printError("Can't start new thread: " + NoString(strerror(errno)));
+        exit(1);
+    }
+}
 
 NoThreadPool& NoThreadPool::Get()
 {
@@ -165,7 +184,7 @@ void NoThreadPool::addJob(NoJob* job)
 
     // Start a new thread for our pool
     m_numThreads++;
-    NoThread::startThread(threadPoolFunc, this);
+    startThread(threadPoolFunc, this);
 }
 
 void NoThreadPool::cancelJob(NoJob* job)

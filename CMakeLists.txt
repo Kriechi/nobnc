@@ -70,7 +70,6 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nostring.h
                        include/no/notable.h
                        include/no/notemplate.h
-                       include/no/nothread.h
                        include/no/nothreadpool.h
                        include/no/notimer.h
                        include/no/nouser.h
