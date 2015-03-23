@@ -85,8 +85,8 @@ public:
     int iRes;
     addrinfo* aiResult;
 
-    void runThread() override;
-    void runMain() override;
+    void run() override;
+    void finished() override;
 };
 
 static void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind);
@@ -298,7 +298,7 @@ void NoSocketManager::DoConnect(const CSConnection& cCon, Csock* pcSock)
 }
 
 #ifdef HAVE_THREADED_DNS
-void NoDnsJob::runThread()
+void NoDnsJob::run()
 {
     int iCount = 0;
     while (true) {
@@ -322,7 +322,7 @@ void NoDnsJob::runThread()
     }
 }
 
-void NoDnsJob::runMain()
+void NoDnsJob::finished()
 {
     if (0 != this->iRes) {
         NO_DEBUG("Error in threaded DNS: " << gai_strerror(this->iRes));

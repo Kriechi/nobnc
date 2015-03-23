@@ -37,34 +37,30 @@
 class NO_EXPORT NoJob
 {
 public:
-    friend class NoThreadPool;
-
     enum JobState { Ready, Running, Done, Cancelled };
 
     NoJob() : m_state(Ready) {}
-
-    /// Destructor, always called from the main thread.
-    virtual ~NoJob() {}
+    virtual ~NoJob() {} /// Always called from the main thread.
 
     /// This function is called in a separate thread and can do heavy, blocking work.
-    virtual void runThread() = 0;
+    virtual void run() = 0;
 
     /// This function is called from the main thread after runThread()
     /// finishes. It can be used to handle the results from runThread()
     /// without needing synchronization primitives.
-    virtual void runMain() = 0;
+    virtual void finished() = 0;
 
     /// This can be used to check if the job was cancelled. For example,
     /// runThread() can return early if this returns true.
     bool wasCancelled() const;
 
 private:
-    // Undefined copy constructor and assignment operator
-    NoJob(const NoJob&);
-    NoJob& operator=(const NoJob&);
+    NoJob(const NoJob&) = delete;
+    NoJob& operator=(const NoJob&) = delete;
 
     // Synchronized via the thread pool's mutex! Do not access without that mutex!
     JobState m_state;
+    friend class NoThreadPool;
 };
 
 #endif // HAVE_PTHREAD

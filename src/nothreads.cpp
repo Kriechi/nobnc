@@ -90,7 +90,7 @@ NoJob* NoThreadPool::getJobFromPipe() const
 
 void NoThreadPool::finishJob(NoJob* job) const
 {
-    job->runMain();
+    job->finished();
     delete job;
 }
 
@@ -133,7 +133,7 @@ void NoThreadPool::threadFunc()
         job->m_state = NoJob::Running;
         guard.unlock();
 
-        job->runThread();
+        job->run();
 
         guard.lock();
         jobDone(job);

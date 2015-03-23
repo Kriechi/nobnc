@@ -36,7 +36,7 @@ public:
         }
     }
 
-    void runThread() override
+    void run() override
     {
         // Cannot safely use GetModule() in here, because this runs in its
         // own thread and such an access would require synchronisation
@@ -49,7 +49,7 @@ public:
         }
     }
 
-    void runMain() override { GetModule()->PutModule("Sample job done"); }
+    void finished() override { GetModule()->PutModule("Sample job done"); }
 };
 #endif
 

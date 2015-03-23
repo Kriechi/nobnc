@@ -48,7 +48,7 @@ public:
         m_CV.broadcast();
     }
 
-    virtual void runThread()
+    virtual void run()
     {
         NoMutexLocker locker(m_Mutex);
         // We are running
@@ -59,7 +59,7 @@ public:
         while (!m_bThreadDone) m_CV.wait(m_Mutex);
     }
 
-    virtual void runMain() {}
+    virtual void finished() {}
 
 private:
     bool& m_bDestroyed;
@@ -98,7 +98,7 @@ public:
         while (!m_bThreadReady) m_CVThreadReady.wait(m_Mutex);
     }
 
-    virtual void runThread()
+    virtual void run()
     {
         m_Mutex.lock();
         // We are running, tell the main thread
@@ -119,7 +119,7 @@ public:
         }
     }
 
-    virtual void runMain() {}
+    virtual void finished() {}
 
 private:
     bool& m_bDestroyed;
@@ -167,8 +167,8 @@ public:
         m_bDestroyed = true;
     }
 
-    virtual void runThread() {}
-    virtual void runMain() {}
+    virtual void run() {}
+    virtual void finished() {}
 
 private:
     bool& m_bDestroyed;
