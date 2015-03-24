@@ -399,8 +399,8 @@ void NoWebSocket::SetVars()
     GetSession()->ClearMessageLoops();
 
     // Global Mods
-    NoModules& vgMods = NoApp::Get().GetModules();
-    for (NoModule* pgMod : vgMods) {
+    NoModules* vgMods = NoApp::Get().GetModules();
+    for (NoModule* pgMod : *vgMods) {
         AddModLoop("GlobalModLoop", *pgMod);
     }
 
@@ -786,7 +786,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
         switch (eModType) {
         case No::GlobalModule:
-            pModule = NoApp::Get().GetModules().FindModule(m_modName);
+            pModule = NoApp::Get().GetModules()->FindModule(m_modName);
             break;
         case No::UserModule:
             pModule = GetSession()->GetUser()->GetModules().FindModule(m_modName);

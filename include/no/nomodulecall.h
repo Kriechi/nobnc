@@ -25,9 +25,9 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define ALLMODULECALL(macFUNC, macEXITER)                                      \
     do {                                                                       \
-        NoModules& GMods = NoApp::Get().GetModules();                            \
+        NoModules* GMods = NoApp::Get().GetModules();                            \
         bool bAllExit = false;                                                 \
-        if (GMods.macFUNC) {                                                   \
+        if (GMods->macFUNC) {                                                   \
             bAllExit = true;                                                   \
         } else {                                                               \
             const std::map<NoString, NoUser*>& mUsers = NoApp::Get().GetUserMap();     \
@@ -55,22 +55,22 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define _GLOBALMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, macEXITER) \
     do {                                                                      \
-        NoModules& GMods = NoApp::Get().GetModules();                           \
-        NoUser* pOldGUser = GMods.GetUser();                                   \
-        NoNetwork* pOldGNetwork = GMods.GetNetwork();                       \
-        NoClient* pOldGClient = GMods.GetClient();                             \
-        GMods.SetUser(macUSER);                                               \
-        GMods.SetNetwork(macNETWORK);                                         \
-        GMods.SetClient(macCLIENT);                                           \
-        if (GMods.macFUNC) {                                                  \
-            GMods.SetUser(pOldGUser);                                         \
-            GMods.SetNetwork(pOldGNetwork);                                   \
-            GMods.SetClient(pOldGClient);                                     \
+        NoModules* GMods = NoApp::Get().GetModules();                           \
+        NoUser* pOldGUser = GMods->GetUser();                                   \
+        NoNetwork* pOldGNetwork = GMods->GetNetwork();                       \
+        NoClient* pOldGClient = GMods->GetClient();                             \
+        GMods->SetUser(macUSER);                                               \
+        GMods->SetNetwork(macNETWORK);                                         \
+        GMods->SetClient(macCLIENT);                                           \
+        if (GMods->macFUNC) {                                                  \
+            GMods->SetUser(pOldGUser);                                         \
+            GMods->SetNetwork(pOldGNetwork);                                   \
+            GMods->SetClient(pOldGClient);                                     \
             *macEXITER = true;                                                \
         }                                                                     \
-        GMods.SetUser(pOldGUser);                                             \
-        GMods.SetNetwork(pOldGNetwork);                                       \
-        GMods.SetClient(pOldGClient);                                         \
+        GMods->SetUser(pOldGUser);                                             \
+        GMods->SetNetwork(pOldGNetwork);                                       \
+        GMods->SetClient(pOldGClient);                                         \
     } while (false)
 
 #define _USERMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, macEXITER)         \

@@ -68,7 +68,7 @@ struct FOR_EACH_MODULE_Type
 
 inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, NoModules::iterator& i)
 {
-    if (state.where == FOR_EACH_MODULE_Type::AtGlobal && i == NoApp::Get().GetModules().end()) {
+    if (state.where == FOR_EACH_MODULE_Type::AtGlobal && i == NoApp::Get().GetModules()->end()) {
         i = state.CMuser.begin();
         state.where = FOR_EACH_MODULE_Type::AtUser;
     }
@@ -82,7 +82,7 @@ inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, NoModules::
 #define FOR_EACH_MODULE(I, pUserOrNetwork)                           \
     if (FOR_EACH_MODULE_Type FOR_EACH_MODULE_Var = pUserOrNetwork) { \
     } else                                                           \
-        for (NoModules::iterator I = NoApp::Get().GetModules().begin(); FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Var, I); ++I)
+        for (NoModules::iterator I = NoApp::Get().GetModules()->begin(); FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Var, I); ++I)
 
 class NoWebAdminMod : public NoModule
 {
@@ -823,7 +823,7 @@ public:
             Tmpl["Username"] = pUser->GetUserName();
 
             std::set<NoModuleInfo> ssNetworkMods;
-            NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, No::NetworkModule);
+            NoApp::Get().GetModules()->GetAvailableMods(ssNetworkMods, No::NetworkModule);
             for (std::set<NoModuleInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
@@ -844,7 +844,7 @@ public:
 
                 // Check if module is loaded globally
                 l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(No::GlobalModule));
-                l["LoadedGlobally"] = NoString(NoApp::Get().GetModules().FindModule(Info.GetName()) != nullptr);
+                l["LoadedGlobally"] = NoString(NoApp::Get().GetModules()->FindModule(Info.GetName()) != nullptr);
 
                 // Check if module is loaded by user
                 l["CanBeLoadedByUser"] = NoString(Info.SupportsType(No::UserModule));
@@ -1395,7 +1395,7 @@ public:
             }
 
             std::set<NoModuleInfo> ssUserMods;
-            NoApp::Get().GetModules().GetAvailableMods(ssUserMods);
+            NoApp::Get().GetModules()->GetAvailableMods(ssUserMods);
 
             for (std::set<NoModuleInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
@@ -1433,7 +1433,7 @@ public:
                 }
                 l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(No::GlobalModule));
                 // Check if module is loaded globally
-                l["LoadedGlobally"] = NoString(NoApp::Get().GetModules().FindModule(Info.GetName()) != nullptr);
+                l["LoadedGlobally"] = NoString(NoApp::Get().GetModules()->FindModule(Info.GetName()) != nullptr);
 
                 if (!spSession->IsAdmin() && pUser && pUser->DenyLoadMod()) {
                     l["Disabled"] = "true";
@@ -1850,13 +1850,13 @@ public:
             }
 
             std::set<NoModuleInfo> ssGlobalMods;
-            NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
+            NoApp::Get().GetModules()->GetAvailableMods(ssGlobalMods, No::GlobalModule);
 
             for (std::set<NoModuleInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
-                NoModule* pModule = NoApp::Get().GetModules().FindModule(Info.GetName());
+                NoModule* pModule = NoApp::Get().GetModules()->FindModule(Info.GetName());
                 if (pModule) {
                     l["Checked"] = "true";
                     l["Args"] = pModule->GetArgs();
@@ -1950,13 +1950,13 @@ public:
             if (!sModName.empty()) {
                 NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
-                NoModule* pMod = NoApp::Get().GetModules().FindModule(sModName);
+                NoModule* pMod = NoApp::Get().GetModules()->FindModule(sModName);
                 if (!pMod) {
-                    if (!NoApp::Get().GetModules().LoadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet)) {
+                    if (!NoApp::Get().GetModules()->LoadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } else if (pMod->GetArgs() != sArgs) {
-                    if (!NoApp::Get().GetModules().ReloadModule(sModName, sArgs, nullptr, nullptr, sModRet)) {
+                    if (!NoApp::Get().GetModules()->ReloadModule(sModName, sArgs, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                     }
                 }
@@ -1968,11 +1968,11 @@ public:
             }
         }
 
-        const NoModules& vCurMods = NoApp::Get().GetModules();
+        const NoModules* vCurMods = NoApp::Get().GetModules();
         std::set<NoString> ssUnloadMods;
 
-        for (a = 0; a < vCurMods.size(); a++) {
-            NoModule* pCurMod = vCurMods[a];
+        for (a = 0; a < vCurMods->size(); a++) {
+            NoModule* pCurMod = (*vCurMods)[a];
 
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() &&
                 (No::GlobalModule != GetType() || pCurMod->GetModName() != GetModName())) {
@@ -1981,7 +1981,7 @@ public:
         }
 
         for (std::set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
-            NoApp::Get().GetModules().UnloadModule(*it2);
+            NoApp::Get().GetModules()->UnloadModule(*it2);
         }
 
         if (!NoApp::Get().WriteConfig()) {

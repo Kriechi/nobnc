@@ -865,9 +865,9 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(Table);
     } else if (sCommand.equals("LISTMODS") || sCommand.equals("LISTMODULES")) {
         if (d->user->IsAdmin()) {
-            NoModules& GModules = NoApp::Get().GetModules();
+            NoModules* GModules = NoApp::Get().GetModules();
 
-            if (!GModules.size()) {
+            if (!GModules->size()) {
                 PutStatus("No global modules loaded.");
             } else {
                 PutStatus("Global modules:");
@@ -875,7 +875,7 @@ void NoClient::UserCommand(NoString& sLine)
                 GTable.addColumn("Name");
                 GTable.addColumn("Arguments");
 
-                for (const NoModule* pMod : GModules) {
+                for (const NoModule* pMod : *GModules) {
                     GTable.addRow();
                     GTable.setValue("Name", pMod->GetModName());
                     GTable.setValue("Arguments", pMod->GetArgs());
@@ -933,7 +933,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         if (d->user->IsAdmin()) {
             std::set<NoModuleInfo> ssGlobalMods;
-            NoApp::Get().GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
+            NoApp::Get().GetModules()->GetAvailableMods(ssGlobalMods, No::GlobalModule);
 
             if (ssGlobalMods.empty()) {
                 PutStatus("No global modules available.");
@@ -945,7 +945,7 @@ void NoClient::UserCommand(NoString& sLine)
 
                 for (const NoModuleInfo& Info : ssGlobalMods) {
                     GTable.addRow();
-                    GTable.setValue("Name", (NoApp::Get().GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
+                    GTable.setValue("Name", (NoApp::Get().GetModules()->FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
                     GTable.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
                 }
 
@@ -954,7 +954,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         std::set<NoModuleInfo> ssUserMods;
-        NoApp::Get().GetModules().GetAvailableMods(ssUserMods);
+        NoApp::Get().GetModules()->GetAvailableMods(ssUserMods);
 
         if (ssUserMods.empty()) {
             PutStatus("No user modules available.");
@@ -974,7 +974,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         std::set<NoModuleInfo> ssNetworkMods;
-        NoApp::Get().GetModules().GetAvailableMods(ssNetworkMods, No::NetworkModule);
+        NoApp::Get().GetModules()->GetAvailableMods(ssNetworkMods, No::NetworkModule);
 
         if (ssNetworkMods.empty()) {
             PutStatus("No network modules available.");
@@ -1026,7 +1026,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         NoModuleInfo ModInfo;
         NoString sRetMsg;
-        if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
+        if (!NoApp::Get().GetModules()->GetModInfo(ModInfo, sMod, sRetMsg)) {
             PutStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
             return;
         }
@@ -1050,7 +1050,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            b = NoApp::Get().GetModules().LoadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
+            b = NoApp::Get().GetModules()->LoadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
             b = d->user->GetModules().LoadModule(sMod, sArgs, eType, d->user, nullptr, sModRet);
@@ -1096,7 +1096,7 @@ void NoClient::UserCommand(NoString& sLine)
         if (sType.equals("default")) {
             NoModuleInfo ModInfo;
             NoString sRetMsg;
-            if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
+            if (!NoApp::Get().GetModules()->GetModInfo(ModInfo, sMod, sRetMsg)) {
                 PutStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
                 return;
             }
@@ -1118,7 +1118,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            NoApp::Get().GetModules().UnloadModule(sMod, sModRet);
+            NoApp::Get().GetModules()->UnloadModule(sMod, sModRet);
             break;
         case No::UserModule:
             d->user->GetModules().UnloadModule(sMod, sModRet);
@@ -1166,7 +1166,7 @@ void NoClient::UserCommand(NoString& sLine)
         if (sType.equals("default")) {
             NoModuleInfo ModInfo;
             NoString sRetMsg;
-            if (!NoApp::Get().GetModules().GetModInfo(ModInfo, sMod, sRetMsg)) {
+            if (!NoApp::Get().GetModules()->GetModInfo(ModInfo, sMod, sRetMsg)) {
                 PutStatus("Unable to find modinfo for [" + sMod + "] [" + sRetMsg + "]");
                 return;
             }
@@ -1188,7 +1188,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            NoApp::Get().GetModules().ReloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
+            NoApp::Get().GetModules()->ReloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
             d->user->GetModules().ReloadModule(sMod, sArgs, d->user, nullptr, sModRet);

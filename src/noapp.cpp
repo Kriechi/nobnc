@@ -161,7 +161,7 @@ bool NoApp::HandleUserDeletion()
         NoUser* pUser = it.second;
         pUser->SetBeingDeleted(true);
 
-        if (GetModules().OnDeleteUser(*pUser)) {
+        if (GetModules()->OnDeleteUser(*pUser)) {
             pUser->SetBeingDeleted(false);
             continue;
         }
@@ -626,9 +626,9 @@ bool NoApp::WriteConfig()
         config.AddKeyValuePair("TrustedProxy", No::firstLine(sProxy));
     }
 
-    NoModules& Mods = GetModules();
+    NoModules* Mods = GetModules();
 
-    for (const NoModule* pMod : Mods) {
+    for (const NoModule* pMod : *Mods) {
         NoString sName = pMod->GetModName();
         NoString sArgs = pMod->GetArgs();
 
@@ -783,7 +783,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     // !Listen
 
     std::set<NoModuleInfo> ssGlobalMods;
-    GetModules().GetDefaultMods(ssGlobalMods, No::GlobalModule);
+    GetModules()->GetDefaultMods(ssGlobalMods, No::GlobalModule);
     std::vector<NoString> vsGlobalModNames;
     for (const NoModuleInfo& Info : ssGlobalMods) {
         vsGlobalModNames.push_back(Info.GetName());
@@ -825,7 +825,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     }
 
     std::set<NoModuleInfo> ssUserMods;
-    GetModules().GetDefaultMods(ssUserMods, No::UserModule);
+    GetModules()->GetDefaultMods(ssUserMods, No::UserModule);
     std::vector<NoString> vsUserModNames;
     for (const NoModuleInfo& Info : ssUserMods) {
         vsUserModNames.push_back(Info.GetName());
@@ -848,7 +848,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         vsLines.push_back("\t<Network " + sNetwork + ">");
 
         std::set<NoModuleInfo> ssNetworkMods;
-        GetModules().GetDefaultMods(ssNetworkMods, No::NetworkModule);
+        GetModules()->GetDefaultMods(ssNetworkMods, No::NetworkModule);
         std::vector<NoString> vsNetworkModNames;
         for (const NoModuleInfo& Info : ssNetworkMods) {
             vsNetworkModNames.push_back(Info.GetName());
@@ -1142,11 +1142,11 @@ bool NoApp::DoRehash(NoString& sError)
         NoString sModRet;
         NoModule* pOldMod;
 
-        pOldMod = GetModules().FindModule(sModName);
+        pOldMod = GetModules()->FindModule(sModName);
         if (!pOldMod) {
             No::printAction("Loading global module [" + sModName + "]");
 
-            bool bModRet = GetModules().LoadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet);
+            bool bModRet = GetModules()->LoadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1156,7 +1156,7 @@ bool NoApp::DoRehash(NoString& sError)
         } else if (pOldMod->GetArgs() != sArgs) {
             No::printAction("Reloading global module [" + sModName + "]");
 
-            bool bModRet = GetModules().ReloadModule(sModName, sArgs, nullptr, nullptr, sModRet);
+            bool bModRet = GetModules()->ReloadModule(sModName, sArgs, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1173,12 +1173,12 @@ bool NoApp::DoRehash(NoString& sError)
     config.FindStringEntry("ispoofformat", sISpoofFormat);
     config.FindStringEntry("ispooffile", sISpoofFile);
     if (!sISpoofFormat.empty() || !sISpoofFile.empty()) {
-        NoModule* pIdentFileMod = GetModules().FindModule("identfile");
+        NoModule* pIdentFileMod = GetModules()->FindModule("identfile");
         if (!pIdentFileMod) {
             No::printAction("Loading global Module [identfile]");
 
             NoString sModRet;
-            bool bModRet = GetModules().LoadModule("identfile", "", No::GlobalModule, nullptr, nullptr, sModRet);
+            bool bModRet = GetModules()->LoadModule("identfile", "", No::GlobalModule, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1186,7 +1186,7 @@ bool NoApp::DoRehash(NoString& sError)
                 return false;
             }
 
-            pIdentFileMod = GetModules().FindModule("identfile");
+            pIdentFileMod = GetModules()->FindModule("identfile");
             msModules["identfile"] = "";
         }
 
@@ -1372,12 +1372,12 @@ bool NoApp::DoRehash(NoString& sError)
 
     // Unload modules which are no longer in the config
     std::set<NoString> ssUnload;
-    for (NoModule* pCurMod : GetModules()) {
+    for (NoModule* pCurMod : *GetModules()) {
         if (msModules.find(pCurMod->GetModName()) == msModules.end()) ssUnload.insert(pCurMod->GetModName());
     }
 
     for (const NoString& sMod : ssUnload) {
-        if (GetModules().UnloadModule(sMod))
+        if (GetModules()->UnloadModule(sMod))
             No::printMessage("Unloaded global module [" + sMod + "]");
         else
             No::printMessage("Could not unload [" + sMod + "]");
@@ -1513,7 +1513,7 @@ ulonglong NoApp::BytesWritten() const { return m_bytesWritten; }
 NoModule* NoApp::FindModule(const NoString& sModName, const NoString& sUsername)
 {
     if (sUsername.empty()) {
-        return NoApp::Get().GetModules().FindModule(sModName);
+        return NoApp::Get().GetModules()->FindModule(sModName);
     }
 
     NoUser* pUser = FindUser(sUsername);
@@ -1527,7 +1527,7 @@ NoModule* NoApp::FindModule(const NoString& sModName, NoUser* pUser)
         return pUser->GetModules().FindModule(sModName);
     }
 
-    return NoApp::Get().GetModules().FindModule(sModName);
+    return NoApp::Get().GetModules()->FindModule(sModName);
 }
 
 bool NoApp::UpdateModule(const NoString& sModule)
@@ -1562,11 +1562,11 @@ bool NoApp::UpdateModule(const NoString& sModule)
     bool bGlobal = false;
     NoString sGlobalArgs;
 
-    pModule = GetModules().FindModule(sModule);
+    pModule = GetModules()->FindModule(sModule);
     if (pModule) {
         bGlobal = true;
         sGlobalArgs = pModule->GetArgs();
-        GetModules().UnloadModule(sModule);
+        GetModules()->UnloadModule(sModule);
     }
 
     // Lets reload everything
@@ -1575,7 +1575,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
 
     // Reload the global module
     if (bGlobal) {
-        if (!GetModules().LoadModule(sModule, sGlobalArgs, No::GlobalModule, nullptr, nullptr, sErr)) {
+        if (!GetModules()->LoadModule(sModule, sGlobalArgs, No::GlobalModule, nullptr, nullptr, sErr)) {
             NO_DEBUG("Failed to reload [" << sModule << "] globally [" << sErr << "]");
             bError = true;
         }
@@ -2095,7 +2095,7 @@ NoSocketManager&NoApp::GetManager() { return m_manager; }
 
 const NoSocketManager&NoApp::GetManager() const { return m_manager; }
 
-NoModules&NoApp::GetModules() { return *m_modules; }
+NoModules* NoApp::GetModules() const { return m_modules; }
 
 NoString NoApp::GetSkinName() const { return m_skinName; }
 

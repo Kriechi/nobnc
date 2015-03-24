@@ -299,9 +299,9 @@ int main(int argc, char** argv)
         std::set<NoModuleInfo> ssUserMods;
         std::set<NoModuleInfo> ssNetworkMods;
         No::printAction("Checking for list of available modules");
-        pZNC->GetModules().GetAvailableMods(ssGlobalMods, No::GlobalModule);
-        pZNC->GetModules().GetAvailableMods(ssUserMods, No::UserModule);
-        pZNC->GetModules().GetAvailableMods(ssNetworkMods, No::NetworkModule);
+        pZNC->GetModules()->GetAvailableMods(ssGlobalMods, No::GlobalModule);
+        pZNC->GetModules()->GetAvailableMods(ssUserMods, No::UserModule);
+        pZNC->GetModules()->GetAvailableMods(ssNetworkMods, No::NetworkModule);
         if (ssGlobalMods.empty() && ssUserMods.empty() && ssNetworkMods.empty()) {
             No::printStatus(false, "");
             No::printError("No modules found. Perhaps you didn't install ZNC properly?");
