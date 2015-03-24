@@ -51,7 +51,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nomodulecommand.h
                        include/no/nomoduleinfo.h
                        include/no/nomodulejob.h
-                       include/no/nomodules.h
+                       include/no/nomoduleloader.h
                        include/no/nomodulesocket.h
                        include/no/nomutex.h
                        include/no/nomutexlocker.h
@@ -101,7 +101,7 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/nomodulecommand.cpp
                        src/nomoduleinfo.cpp
                        src/nomodulejob.cpp
-                       src/nomodules.cpp
+                       src/nomoduleloader.cpp
                        src/nomodulesocket.cpp
                        src/nonetwork.cpp
                        src/nonick.cpp

@@ -16,7 +16,7 @@
  */
 
 #include <no/nomodule.h>
-#include <no/nomodules.h>
+#include <no/nomoduleloader.h>
 #include <no/nochannel.h>
 #include <no/noserverinfo.h>
 #include <no/nouser.h>
@@ -35,7 +35,7 @@
    // i will be name of local variable, see below
    // pUser can be nullptr if only global modules are needed
    FOR_EACH_MODULE(i, pUser) {
-       // i is local variable of type NoModules::iterator,
+       // i is local variable of type NoModuleLoader::iterator,
        // so *i has type NoModule*
    }
 */
@@ -46,8 +46,8 @@ struct FOR_EACH_MODULE_Type
         AtUser,
         AtNetwork,
     } where;
-    NoModules* CMuser;
-    NoModules* CMnet;
+    NoModuleLoader* CMuser;
+    NoModuleLoader* CMnet;
     FOR_EACH_MODULE_Type(NoUser* pUser) : CMuser(pUser ? pUser->GetModules() : nullptr), CMnet(nullptr)
     {
         where = AtGlobal;
@@ -65,7 +65,7 @@ struct FOR_EACH_MODULE_Type
     operator bool() { return false; }
 };
 
-inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, NoModules::iterator& i)
+inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, NoModuleLoader::iterator& i)
 {
     if (state.where == FOR_EACH_MODULE_Type::AtGlobal && state.CMuser && i == NoApp::Get().GetModules()->end()) {
         i = state.CMuser->begin();
@@ -81,7 +81,7 @@ inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, NoModules::
 #define FOR_EACH_MODULE(I, pUserOrNetwork)                           \
     if (FOR_EACH_MODULE_Type FOR_EACH_MODULE_Var = pUserOrNetwork) { \
     } else                                                           \
-        for (NoModules::iterator I = NoApp::Get().GetModules()->begin(); FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Var, I); ++I)
+        for (NoModuleLoader::iterator I = NoApp::Get().GetModules()->begin(); FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Var, I); ++I)
 
 class NoWebAdminMod : public NoModule
 {
@@ -408,7 +408,7 @@ public:
                 }
             }
         } else if (pUser) {
-            NoModules* Modules = pUser->GetModules();
+            NoModuleLoader* Modules = pUser->GetModules();
 
             for (a = 0; a < Modules->size(); a++) {
                 NoString sModName = (*Modules)[a]->GetModName();
@@ -1137,7 +1137,7 @@ public:
             }
         }
 
-        const NoModules* vCurMods = pNetwork->GetModules();
+        const NoModuleLoader* vCurMods = pNetwork->GetModules();
         std::set<NoString> ssUnloadMods;
 
         for (uint a = 0; a < vCurMods->size(); a++) {
@@ -1414,7 +1414,7 @@ public:
                     uint networksWithRenderedModuleCount = 0;
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
-                        const NoModules* networkModules = pCurrentNetwork->GetModules();
+                        const NoModuleLoader* networkModules = pCurrentNetwork->GetModules();
                         if (networkModules->FindModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
@@ -1879,7 +1879,7 @@ public:
                     const NoUser& User = *usersIt->second;
 
                     // Count users which has loaded a render module
-                    const NoModules* userModules = User.GetModules();
+                    const NoModuleLoader* userModules = User.GetModules();
                     if (userModules->FindModule(Info.GetName())) {
                         usersWithRenderedModuleCount++;
                     }
@@ -1967,7 +1967,7 @@ public:
             }
         }
 
-        const NoModules* vCurMods = NoApp::Get().GetModules();
+        const NoModuleLoader* vCurMods = NoApp::Get().GetModules();
         std::set<NoString> ssUnloadMods;
 
         for (a = 0; a < vCurMods->size(); a++) {

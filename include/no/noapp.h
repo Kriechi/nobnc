@@ -21,7 +21,7 @@
 #include <no/noglobal.h>
 #include <no/nostring.h>
 #include <no/nosocketmanager.h>
-#include <no/nomodules.h>
+#include <no/nomoduleloader.h>
 #include <no/nocachemap.h>
 #include <list>
 
@@ -101,7 +101,7 @@ public:
     ConfigState GetConfigState() const;
     NoSocketManager& GetManager();
     const NoSocketManager& GetManager() const;
-    NoModules* GetModules() const;
+    NoModuleLoader* GetModules() const;
     NoString GetSkinName() const;
     const NoString& GetStatusPrefix() const;
     const NoString& GetCurPath() const;
@@ -214,7 +214,7 @@ private:
     uint m_anonIpLimit;
     uint m_maxBufferSize;
     uint m_disabledSslProtocols;
-    NoModules* m_modules;
+    NoModuleLoader* m_modules;
     ulonglong m_bytesRead;
     ulonglong m_bytesWritten;
     std::list<NoNetwork*> m_connectQueue;

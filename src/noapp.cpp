@@ -47,7 +47,7 @@ NoApp::NoApp()
       m_manager(), m_curPath(""), m_appPath(""), m_configFile(""), m_skinName(""), m_statusPrefix(""),
       m_pidFile(""), m_sslCertFile(""), m_sslCiphers(""), m_sslProtocols(""), m_bindHosts(), m_trustedProxies(),
       m_motd(), m_lockFile(nullptr), m_connectDelay(5), m_anonIpLimit(10), m_maxBufferSize(500),
-      m_disabledSslProtocols(Csock::EDP_SSL), m_modules(new NoModules), m_bytesRead(0), m_bytesWritten(0),
+      m_disabledSslProtocols(Csock::EDP_SSL), m_modules(new NoModuleLoader), m_bytesRead(0), m_bytesWritten(0),
       m_connectQueue(), m_connectQueueTimer(nullptr), m_connectPaused(0), m_connectThrottle(),
       m_protectWebSessions(true), m_hideVersion(false)
 {
@@ -626,7 +626,7 @@ bool NoApp::WriteConfig()
         config.AddKeyValuePair("TrustedProxy", No::firstLine(sProxy));
     }
 
-    NoModules* Mods = GetModules();
+    NoModuleLoader* Mods = GetModules();
 
     for (const NoModule* pMod : *Mods) {
         NoString sName = pMod->GetModName();
@@ -2095,7 +2095,7 @@ NoSocketManager&NoApp::GetManager() { return m_manager; }
 
 const NoSocketManager&NoApp::GetManager() const { return m_manager; }
 
-NoModules* NoApp::GetModules() const { return m_modules; }
+NoModuleLoader* NoApp::GetModules() const { return m_modules; }
 
 NoString NoApp::GetSkinName() const { return m_skinName; }
 

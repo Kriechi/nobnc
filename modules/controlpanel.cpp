@@ -1228,7 +1228,7 @@ class NoAdminMod : public NoModule
             PutModule("Error: [" + sCTCPRequest + "] not found for user [" + pUser->GetUserName() + "]!");
     }
 
-    void LoadModuleFor(NoModules* Modules, const NoString& sModName, const NoString& sArgs, No::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork)
+    void LoadModuleFor(NoModuleLoader* Modules, const NoString& sModName, const NoString& sArgs, No::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork)
     {
         if (pUser->DenyLoadMod() && !GetUser()->IsAdmin()) {
             PutModule("Loading modules has been disabled.");
@@ -1294,7 +1294,7 @@ class NoAdminMod : public NoModule
         LoadModuleFor(pNetwork->GetModules(), sModName, sArgs, No::NetworkModule, pUser, pNetwork);
     }
 
-    void UnLoadModuleFor(NoModules* Modules, const NoString& sModName, NoUser* pUser)
+    void UnLoadModuleFor(NoModuleLoader* Modules, const NoString& sModName, NoUser* pUser)
     {
         if (pUser->DenyLoadMod() && !GetUser()->IsAdmin()) {
             PutModule("Loading modules has been disabled.");
@@ -1352,7 +1352,7 @@ class NoAdminMod : public NoModule
         UnLoadModuleFor(pNetwork->GetModules(), sModName, pUser);
     }
 
-    void ListModulesFor(NoModules* Modules, const NoString& sWhere)
+    void ListModulesFor(NoModuleLoader* Modules, const NoString& sWhere)
     {
         if (!Modules->size()) {
             PutModule(sWhere + " has no modules loaded.");

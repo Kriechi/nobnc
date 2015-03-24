@@ -27,7 +27,7 @@ class NoNick;
 class NoQuery;
 class NoClient;
 class NoChannel;
-class NoModules;
+class NoModuleLoader;
 class NoSettings;
 class NoIrcSocket;
 class NoServerInfo;
@@ -77,7 +77,7 @@ public:
     void SetUser(NoUser* pUser);
     bool SetName(const NoString& sName);
 
-    NoModules* GetModules() const;
+    NoModuleLoader* GetModules() const;
 
     bool PutUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
     bool PutStatus(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);

@@ -678,7 +678,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const NoModules* vMods = pOldNetwork->GetModules();
+        const NoModuleLoader* vMods = pOldNetwork->GetModules();
         for (NoModule* pMod : *vMods) {
             NoString sOldModPath = pOldNetwork->GetNetworkPath() + "/moddata/" + pMod->GetModName();
             NoString sNewModPath = pNewUser->GetUserPath() + "/networks/" + sNewNetwork + "/moddata/" + pMod->GetModName();
@@ -865,7 +865,7 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(Table);
     } else if (sCommand.equals("LISTMODS") || sCommand.equals("LISTMODULES")) {
         if (d->user->IsAdmin()) {
-            NoModules* GModules = NoApp::Get().GetModules();
+            NoModuleLoader* GModules = NoApp::Get().GetModules();
 
             if (!GModules->size()) {
                 PutStatus("No global modules loaded.");
@@ -885,7 +885,7 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        NoModules* Modules = d->user->GetModules();
+        NoModuleLoader* Modules = d->user->GetModules();
 
         if (!Modules->size()) {
             PutStatus("Your user has no modules loaded.");
@@ -905,7 +905,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (d->network) {
-            NoModules* NetworkModules = d->network->GetModules();
+            NoModuleLoader* NetworkModules = d->network->GetModules();
             if (NetworkModules->empty()) {
                 PutStatus("This network has no modules loaded.");
             } else {

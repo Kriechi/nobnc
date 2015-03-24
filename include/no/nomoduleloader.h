@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef NOMODULES_H
-#define NOMODULES_H
+#ifndef NOMODULELOADER_H
+#define NOMODULELOADER_H
 
 #include <no/noglobal.h>
 #include <no/nomodule.h>
@@ -30,11 +30,11 @@ class NoTemplate;
 class NoIrcSocket;
 class NoNick;
 
-class NO_EXPORT NoModules : public std::vector<NoModule*>
+class NO_EXPORT NoModuleLoader : public std::vector<NoModule*>
 {
 public:
-    NoModules();
-    ~NoModules();
+    NoModuleLoader();
+    ~NoModuleLoader();
 
     void SetUser(NoUser* pUser);
     void SetNetwork(NoNetwork* pNetwork);
@@ -161,8 +161,8 @@ public:
     bool OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType);
 
 private:
-    NoModules(const NoModules&) = delete;
-    NoModules& operator=(const NoModules&) = delete;
+    NoModuleLoader(const NoModuleLoader&) = delete;
+    NoModuleLoader& operator=(const NoModuleLoader&) = delete;
 
     static NoModuleHandle
     OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg);
@@ -172,4 +172,4 @@ private:
     NoClient* m_client;
 };
 
-#endif // NOMODULES_H
+#endif // NOMODULELOADER_H

@@ -116,7 +116,7 @@ public:
     NoString quitMsg = "";
     NoStringSet trustedFingerprints;
 
-    NoModules* modules = nullptr;
+    NoModuleLoader* modules = nullptr;
 
     std::vector<NoClient*> clients;
 
@@ -171,7 +171,7 @@ bool NoNetwork::IsValidNetwork(const NoString& sNetwork)
 NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName) : d(new NoNetworkPrivate)
 {
     d->name = sName;
-    d->modules = new NoModules;
+    d->modules = new NoModuleLoader;
 
     SetUser(pUser);
 
@@ -268,8 +268,8 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
 
     // Modules
     std::set<NoString> ssUnloadMods;
-    NoModules* vCurMods = GetModules();
-    const NoModules* vNewMods = Network.GetModules();
+    NoModuleLoader* vCurMods = GetModules();
+    const NoModuleLoader* vNewMods = Network.GetModules();
 
     for (NoModule* pNewMod : *vNewMods) {
         NoString sModRet;
@@ -537,7 +537,7 @@ NoSettings NoNetwork::ToConfig() const
     }
 
     // Modules
-    const NoModules* Mods = GetModules();
+    const NoModuleLoader* Mods = GetModules();
 
     if (!Mods->empty()) {
         for (NoModule* pMod : *Mods) {
@@ -744,7 +744,7 @@ bool NoNetwork::SetName(const NoString& sName)
     return false;
 }
 
-NoModules* NoNetwork::GetModules() const { return d->modules; }
+NoModuleLoader* NoNetwork::GetModules() const { return d->modules; }
 
 bool NoNetwork::PutUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {

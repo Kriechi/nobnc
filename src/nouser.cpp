@@ -103,7 +103,7 @@ public:
     uint maxJoins = 0;
     NoString skinName = "";
 
-    NoModules* modules = nullptr;
+    NoModuleLoader* modules = nullptr;
 };
 
 NoUser::NoUser(const NoString& sUserName) : d(new NoUserPrivate)
@@ -113,7 +113,7 @@ NoUser::NoUser(const NoString& sUserName) : d(new NoUserPrivate)
     d->ident = d->cleanUserName;
     d->realName = sUserName;
     d->userPath = NoApp::Get().GetUserPath() + "/" + sUserName;
-    d->modules = new NoModules;
+    d->modules = new NoModuleLoader;
     d->userTimer = new NoUserTimer(this);
     NoApp::Get().GetManager().AddCron(d->userTimer);
 }
@@ -773,8 +773,8 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 
     // Modules
     std::set<NoString> ssUnloadMods;
-    NoModules* vCurMods = GetModules();
-    const NoModules* vNewMods = User.GetModules();
+    NoModuleLoader* vCurMods = GetModules();
+    const NoModuleLoader* vNewMods = User.GetModules();
 
     for (NoModule* pNewMod : *vNewMods) {
         NoString sModRet;
@@ -947,7 +947,7 @@ NoSettings NoUser::ToConfig() const
     }
 
     // Modules
-    const NoModules* Mods = GetModules();
+    const NoModuleLoader* Mods = GetModules();
 
     if (!Mods->empty()) {
         for (NoModule* pMod : *Mods) {
@@ -1109,7 +1109,7 @@ bool NoUser::PutModNotice(const NoString& sModule, const NoString& sLine, NoClie
 
 NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return No::token(sUserName, 0, "@").replace_n(".", ""); }
 
-NoModules* NoUser::GetModules() const { return d->modules; }
+NoModuleLoader* NoUser::GetModules() const { return d->modules; }
 
 bool NoUser::IsUserAttached() const
 {

@@ -399,14 +399,14 @@ void NoWebSocket::SetVars()
     GetSession()->ClearMessageLoops();
 
     // Global Mods
-    NoModules* vgMods = NoApp::Get().GetModules();
+    NoModuleLoader* vgMods = NoApp::Get().GetModules();
     for (NoModule* pgMod : *vgMods) {
         AddModLoop("GlobalModLoop", *pgMod);
     }
 
     // User Mods
     if (IsLoggedIn()) {
-        NoModules* vMods = GetSession()->GetUser()->GetModules();
+        NoModuleLoader* vMods = GetSession()->GetUser()->GetModules();
 
         for (NoModule* pMod : *vMods) {
             AddModLoop("UserModLoop", *pMod);
@@ -414,7 +414,7 @@ void NoWebSocket::SetVars()
 
         std::vector<NoNetwork*> vNetworks = GetSession()->GetUser()->GetNetworks();
         for (NoNetwork* pNetwork : vNetworks) {
-            NoModules* vnMods = pNetwork->GetModules();
+            NoModuleLoader* vnMods = pNetwork->GetModules();
 
             NoTemplate& Row = m_template.AddRow("NetworkModLoop");
             Row["NetworkName"] = pNetwork->GetName();

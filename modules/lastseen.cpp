@@ -96,7 +96,7 @@ public:
     bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            NoModules* GModules = NoApp::Get().GetModules();
+            NoModuleLoader* GModules = NoApp::Get().GetModules();
             Tmpl["WebAdminLoaded"] = NoString(GModules->FindModule("webadmin") != nullptr);
 
             MTimeMulti mmSorted;
