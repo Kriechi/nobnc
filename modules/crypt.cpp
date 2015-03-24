@@ -169,20 +169,20 @@ public:
             PutModule("You have no encryption keys set.");
         } else {
             NoTable Table;
-            Table.AddColumn("Target");
-            Table.AddColumn("Key");
+            Table.addColumn("Target");
+            Table.addColumn("Key");
 
             NoRegistry registry(this);
             for (const NoString& key : registry.keys()) {
-                Table.AddRow();
-                Table.SetCell("Target", key);
-                Table.SetCell("Key", registry.value(key));
+                Table.addRow();
+                Table.setValue("Target", key);
+                Table.setValue("Key", registry.value(key));
             }
 
             if (!registry.contains(NICK_PREFIX_KEY)) {
-                Table.AddRow();
-                Table.SetCell("Target", NICK_PREFIX_KEY);
-                Table.SetCell("Key", NickPrefix());
+                Table.addRow();
+                Table.setValue("Target", NICK_PREFIX_KEY);
+                Table.setValue("Key", NickPrefix());
             }
 
             PutModule(Table);

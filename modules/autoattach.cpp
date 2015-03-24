@@ -120,18 +120,18 @@ private:
     void HandleList(const NoString& sLine)
     {
         NoTable Table;
-        Table.AddColumn("Neg");
-        Table.AddColumn("Chan");
-        Table.AddColumn("Search");
-        Table.AddColumn("Host");
+        Table.addColumn("Neg");
+        Table.addColumn("Chan");
+        Table.addColumn("Search");
+        Table.addColumn("Host");
 
         VAttachIter it = m_vMatches.begin();
         for (; it != m_vMatches.end(); ++it) {
-            Table.AddRow();
-            Table.SetCell("Neg", it->IsNegated() ? "!" : "");
-            Table.SetCell("Chan", it->GetChans());
-            Table.SetCell("Search", it->GetSearch());
-            Table.SetCell("Host", it->GetHostMask());
+            Table.addRow();
+            Table.setValue("Neg", it->IsNegated() ? "!" : "");
+            Table.setValue("Chan", it->GetChans());
+            Table.setValue("Search", it->GetSearch());
+            Table.setValue("Host", it->GetHostMask());
         }
 
         if (Table.size()) {

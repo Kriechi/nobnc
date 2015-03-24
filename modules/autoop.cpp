@@ -316,25 +316,25 @@ public:
 
         NoTable Table;
 
-        Table.AddColumn("User");
-        Table.AddColumn("Hostmasks");
-        Table.AddColumn("Key");
-        Table.AddColumn("Channels");
+        Table.addColumn("User");
+        Table.addColumn("Hostmasks");
+        Table.addColumn("Key");
+        Table.addColumn("Channels");
 
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             NoStringVector vsHostmasks = it->second->GetHostmasks().split(",");
             for (uint a = 0; a < vsHostmasks.size(); a++) {
-                Table.AddRow();
+                Table.addRow();
                 if (a == 0) {
-                    Table.SetCell("User", it->second->GetUsername());
-                    Table.SetCell("Key", it->second->GetUserKey());
-                    Table.SetCell("Channels", it->second->GetChannels());
+                    Table.setValue("User", it->second->GetUsername());
+                    Table.setValue("Key", it->second->GetUserKey());
+                    Table.setValue("Channels", it->second->GetChannels());
                 } else if (a == vsHostmasks.size() - 1) {
-                    Table.SetCell("User", "`-");
+                    Table.setValue("User", "`-");
                 } else {
-                    Table.SetCell("User", "|-");
+                    Table.setValue("User", "|-");
                 }
-                Table.SetCell("Hostmasks", vsHostmasks[a]);
+                Table.setValue("Hostmasks", vsHostmasks[a]);
             }
         }
 

@@ -457,29 +457,29 @@ private:
     void List()
     {
         NoTable Table;
-        Table.AddColumn("Id");
-        Table.AddColumn("HostMask");
-        Table.AddColumn("Target");
-        Table.AddColumn("Pattern");
-        Table.AddColumn("Sources");
-        Table.AddColumn("Off");
-        Table.AddColumn("DetachedClientOnly");
-        Table.AddColumn("DetachedChannelOnly");
+        Table.addColumn("Id");
+        Table.addColumn("HostMask");
+        Table.addColumn("Target");
+        Table.addColumn("Pattern");
+        Table.addColumn("Sources");
+        Table.addColumn("Off");
+        Table.addColumn("DetachedClientOnly");
+        Table.addColumn("DetachedChannelOnly");
 
         uint uIdx = 1;
 
         for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it, uIdx++) {
             NoWatchEntry& WatchEntry = *it;
 
-            Table.AddRow();
-            Table.SetCell("Id", NoString(uIdx));
-            Table.SetCell("HostMask", WatchEntry.GetHostMask());
-            Table.SetCell("Target", WatchEntry.GetTarget());
-            Table.SetCell("Pattern", WatchEntry.GetPattern());
-            Table.SetCell("Sources", WatchEntry.GetSourcesStr());
-            Table.SetCell("Off", (WatchEntry.IsDisabled()) ? "Off" : "");
-            Table.SetCell("DetachedClientOnly", (WatchEntry.IsDetachedClientOnly()) ? "Yes" : "No");
-            Table.SetCell("DetachedChannelOnly", (WatchEntry.IsDetachedChannelOnly()) ? "Yes" : "No");
+            Table.addRow();
+            Table.setValue("Id", NoString(uIdx));
+            Table.setValue("HostMask", WatchEntry.GetHostMask());
+            Table.setValue("Target", WatchEntry.GetTarget());
+            Table.setValue("Pattern", WatchEntry.GetPattern());
+            Table.setValue("Sources", WatchEntry.GetSourcesStr());
+            Table.setValue("Off", (WatchEntry.IsDisabled()) ? "Off" : "");
+            Table.setValue("DetachedClientOnly", (WatchEntry.IsDetachedClientOnly()) ? "Yes" : "No");
+            Table.setValue("DetachedChannelOnly", (WatchEntry.IsDetachedChannelOnly()) ? "Yes" : "No");
         }
 
         if (Table.size()) {
@@ -563,56 +563,56 @@ private:
     {
         NoTable Table;
 
-        Table.AddColumn("Command");
-        Table.AddColumn("Description");
+        Table.addColumn("Command");
+        Table.addColumn("Description");
 
-        Table.AddRow();
-        Table.SetCell("Command", "Add <HostMask> [Target] [Pattern]");
-        Table.SetCell("Description", "Used to add an entry to watch for.");
+        Table.addRow();
+        Table.setValue("Command", "Add <HostMask> [Target] [Pattern]");
+        Table.setValue("Description", "Used to add an entry to watch for.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "List");
-        Table.SetCell("Description", "List all entries being watched.");
+        Table.addRow();
+        Table.setValue("Command", "List");
+        Table.setValue("Description", "List all entries being watched.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "Dump");
-        Table.SetCell("Description", "Dump a list of all current entries to be used later.");
+        Table.addRow();
+        Table.setValue("Command", "Dump");
+        Table.setValue("Description", "Dump a list of all current entries to be used later.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "Del <Id>");
-        Table.SetCell("Description", "Deletes Id from the list of watched entries.");
+        Table.addRow();
+        Table.setValue("Command", "Del <Id>");
+        Table.setValue("Description", "Deletes Id from the list of watched entries.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "Clear");
-        Table.SetCell("Description", "Delete all entries.");
+        Table.addRow();
+        Table.setValue("Command", "Clear");
+        Table.setValue("Description", "Delete all entries.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "Enable <Id | *>");
-        Table.SetCell("Description", "Enable a disabled entry.");
+        Table.addRow();
+        Table.setValue("Command", "Enable <Id | *>");
+        Table.setValue("Description", "Enable a disabled entry.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "Disable <Id | *>");
-        Table.SetCell("Description", "Disable (but don't delete) an entry.");
+        Table.addRow();
+        Table.setValue("Command", "Disable <Id | *>");
+        Table.setValue("Description", "Disable (but don't delete) an entry.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "SetDetachedClientOnly <Id | *> <True | False>");
-        Table.SetCell("Description", "Enable or disable detached client only for an entry.");
+        Table.addRow();
+        Table.setValue("Command", "SetDetachedClientOnly <Id | *> <True | False>");
+        Table.setValue("Description", "Enable or disable detached client only for an entry.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "SetDetachedChannelOnly <Id | *> <True | False>");
-        Table.SetCell("Description", "Enable or disable detached channel only for an entry.");
+        Table.addRow();
+        Table.setValue("Command", "SetDetachedChannelOnly <Id | *> <True | False>");
+        Table.setValue("Description", "Enable or disable detached channel only for an entry.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "Buffer [Count]");
-        Table.SetCell("Description", "Show/Set the amount of buffered lines while detached.");
+        Table.addRow();
+        Table.setValue("Command", "Buffer [Count]");
+        Table.setValue("Description", "Show/Set the amount of buffered lines while detached.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "SetSources <Id> [#chan priv #foo* !#bar]");
-        Table.SetCell("Description", "Set the source channels that you care about.");
+        Table.addRow();
+        Table.setValue("Command", "SetSources <Id> [#chan priv #foo* !#bar]");
+        Table.setValue("Description", "Set the source channels that you care about.");
 
-        Table.AddRow();
-        Table.SetCell("Command", "Help");
-        Table.SetCell("Description", "This help.");
+        Table.addRow();
+        Table.setValue("Command", "Help");
+        Table.setValue("Description", "This help.");
 
         PutModule(Table);
     }

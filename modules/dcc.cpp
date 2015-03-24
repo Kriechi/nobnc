@@ -200,30 +200,30 @@ public:
     void ListTransfersCommand(const NoString& sLine)
     {
         NoTable Table;
-        Table.AddColumn("Type");
-        Table.AddColumn("State");
-        Table.AddColumn("Speed");
-        Table.AddColumn("Nick");
-        Table.AddColumn("IP");
-        Table.AddColumn("File");
+        Table.addColumn("Type");
+        Table.addColumn("State");
+        Table.addColumn("Speed");
+        Table.addColumn("Nick");
+        Table.addColumn("IP");
+        Table.addColumn("File");
 
         for (NoDccSock* pSock : m_sockets) {
-            Table.AddRow();
-            Table.SetCell("Nick", pSock->GetRemoteNick());
-            Table.SetCell("IP", pSock->GetRemoteIP());
-            Table.SetCell("File", pSock->GetFileName());
+            Table.addRow();
+            Table.setValue("Nick", pSock->GetRemoteNick());
+            Table.setValue("IP", pSock->GetRemoteIP());
+            Table.setValue("File", pSock->GetFileName());
 
             if (pSock->IsSend()) {
-                Table.SetCell("Type", "Sending");
+                Table.setValue("Type", "Sending");
             } else {
-                Table.SetCell("Type", "Getting");
+                Table.setValue("Type", "Getting");
             }
 
             if (pSock->IsListener()) {
-                Table.SetCell("State", "Waiting");
+                Table.setValue("State", "Waiting");
             } else {
-                Table.SetCell("State", No::toPercent(pSock->GetProgress()));
-                Table.SetCell("Speed", NoString((int)(pSock->GetAvgRead() / 1024.0)) + " KiB/s");
+                Table.setValue("State", No::toPercent(pSock->GetProgress()));
+                Table.setValue("Speed", NoString((int)(pSock->GetAvgRead() / 1024.0)) + " KiB/s");
             }
         }
 

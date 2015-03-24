@@ -65,14 +65,14 @@ public:
 
         NoTable Table;
 
-        Table.AddColumn("Channel");
-        Table.AddColumn("Users");
+        Table.addColumn("Channel");
+        Table.addColumn("Users");
 
         for (std::set<NoPartylineChannel*>::const_iterator a = m_ssChannels.begin(); a != m_ssChannels.end(); ++a) {
-            Table.AddRow();
+            Table.addRow();
 
-            Table.SetCell("Channel", (*a)->GetName());
-            Table.SetCell("Users", NoString((*a)->GetNicks().size()));
+            Table.setValue("Channel", (*a)->GetName());
+            Table.setValue("Users", NoString((*a)->GetNicks().size()));
         }
 
         PutModule(Table);

@@ -150,16 +150,16 @@ void NoLogMod::ClearRulesCmd(const NoString& sLine)
 void NoLogMod::ListRulesCmd(const NoString& sLine)
 {
     NoTable Table;
-    Table.AddColumn("Rule");
-    Table.AddColumn("Logging enabled");
+    Table.addColumn("Rule");
+    Table.addColumn("Logging enabled");
 
     for (const NoLogRule& Rule : m_vRules) {
-        Table.AddRow();
-        Table.SetCell("Rule", Rule.GetRule());
-        Table.SetCell("Logging enabled", NoString(Rule.IsEnabled()));
+        Table.addRow();
+        Table.setValue("Rule", Rule.GetRule());
+        Table.setValue("Logging enabled", NoString(Rule.IsEnabled()));
     }
 
-    if (Table.empty()) {
+    if (Table.isEmpty()) {
         PutModule("No logging rules. Everything is logged.");
     } else {
         PutModule(Table);

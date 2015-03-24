@@ -91,13 +91,13 @@ public:
         HandleHelpCommand(sLine);
 
         NoTable Mechanisms;
-        Mechanisms.AddColumn("Mechanism");
-        Mechanisms.AddColumn("Description");
+        Mechanisms.addColumn("Mechanism");
+        Mechanisms.addColumn("Description");
 
         for (size_t i = 0; SupportedMechanisms[i].szName != nullptr; i++) {
-            Mechanisms.AddRow();
-            Mechanisms.SetCell("Mechanism", SupportedMechanisms[i].szName);
-            Mechanisms.SetCell("Description", SupportedMechanisms[i].szDescription);
+            Mechanisms.addRow();
+            Mechanisms.setValue("Mechanism", SupportedMechanisms[i].szName);
+            Mechanisms.setValue("Description", SupportedMechanisms[i].szDescription);
         }
 
         PutModule("The following mechanisms are available:");

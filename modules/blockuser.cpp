@@ -92,12 +92,12 @@ public:
         NoTable Table;
         NoStringMap::iterator it;
 
-        Table.AddColumn("Blocked user");
+        Table.addColumn("Blocked user");
 
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
-            Table.AddRow();
-            Table.SetCell("Blocked user", key);
+            Table.addRow();
+            Table.setValue("Blocked user", key);
         }
 
         if (PutModule(Table) == 0) PutModule("No users blocked");

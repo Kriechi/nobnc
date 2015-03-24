@@ -57,7 +57,7 @@ public:
      *  @param uPreferredWidth If width of table is bigger than this, text in cells will be wrapped to several lines, if
      *possible
      */
-    explicit NoTable(ulong uPreferredWidth = 110);
+    explicit NoTable(ulong preferredWidth = 110);
     NoTable(const NoTable& other);
     NoTable& operator=(const NoTable& other);
     ~NoTable();
@@ -65,17 +65,16 @@ public:
     /** Adds a new column to the table.
      *  Please note that you should add all columns before starting to fill
      *  the table!
-     *  @param sName The name of the column.
-     *  @param bWrappable True if long lines can be wrapped in the same cell.
+     *  @param name The name of the column.
+     *  @param wrap True if long lines can be wrapped in the same cell.
      *  @return false if a column by that name already existed.
      */
-    bool AddColumn(const NoString& sName, bool bWrappable = true);
+    bool addColumn(const NoString& name, bool wrap = true);
 
     /** Adds a new row to the table.
      *  After calling this you can fill the row with content.
-     *  @return The index of this row
      */
-    uint AddRow();
+    void addRow();
 
     /** Sets a given cell in the table to a value.
      *  @param sColumn The name of the column you want to fill.
@@ -84,31 +83,19 @@ public:
      *                 If this is not given, the last row will be used.
      *  @return True if setting the cell was successful.
      */
-    bool SetCell(const NoString& sColumn, const NoString& sValue, uint uRowIdx = ~0);
+    bool setValue(const NoString& column, const NoString& value);
 
-    /** Get a line of the table's output
-     *  @param uIdx The index of the line you want.
-     *  @param sLine This string will receive the output.
-     *  @return True unless uIdx is past the end of the table.
-     */
-    bool GetLine(uint uIdx, NoString& sLine) const;
-
-    /** Return the width of the given column.
-     *  Please note that adding and filling new rows might change the
-     *  result of this function!
-     *  @param uIdx The index of the column you are interested in.
-     *  @return The width of the column.
-     */
-    uint GetColumnWidth(uint uIdx) const;
+    /// @return The table as a string.
+    NoStringVector toString() const;
 
     /// Completely clear the table.
-    void Clear();
+    void clear();
 
     /// @return The number of rows in this table, not counting the header.
     uint size() const;
 
     /// @return True if this table doesn't contain any rows.
-    bool empty() const;
+    bool isEmpty() const;
 
 private:
     std::shared_ptr<NoTablePrivate> d;

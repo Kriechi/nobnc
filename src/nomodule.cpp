@@ -165,16 +165,16 @@ void NoModule::ListTimers()
     }
 
     NoTable Table;
-    Table.AddColumn("Name");
-    Table.AddColumn("Secs");
-    Table.AddColumn("Cycles");
-    Table.AddColumn("Description");
+    Table.addColumn("Name");
+    Table.addColumn("Secs");
+    Table.addColumn("Cycles");
+    Table.addColumn("Description");
 
     for (const NoTimer* pTimer : d->timers) {
-        Table.AddRow();
-        Table.SetCell("Name", pTimer->name());
-        Table.SetCell("Interval", NoString(pTimer->interval()) + " seconds");
-        Table.SetCell("Description", pTimer->description());
+        Table.addRow();
+        Table.setValue("Name", pTimer->name());
+        Table.setValue("Interval", NoString(pTimer->interval()) + " seconds");
+        Table.setValue("Description", pTimer->description());
     }
 
     PutModule(Table);
@@ -199,27 +199,27 @@ void NoModule::ListSockets()
     }
 
     NoTable Table;
-    Table.AddColumn("Name");
-    Table.AddColumn("State");
-    Table.AddColumn("LocalPort");
-    Table.AddColumn("SSL");
-    Table.AddColumn("RemoteIP");
-    Table.AddColumn("RemotePort");
+    Table.addColumn("Name");
+    Table.addColumn("State");
+    Table.addColumn("LocalPort");
+    Table.addColumn("SSL");
+    Table.addColumn("RemoteIP");
+    Table.addColumn("RemotePort");
 
     for (const NoModuleSocket* pSocket : d->sockets) {
-        Table.AddRow();
-        Table.SetCell("Name", pSocket->GetSockName());
+        Table.addRow();
+        Table.setValue("Name", pSocket->GetSockName());
 
         if (pSocket->IsListener()) {
-            Table.SetCell("State", "Listening");
+            Table.setValue("State", "Listening");
         } else {
-            Table.SetCell("State", (pSocket->IsConnected() ? "Connected" : ""));
+            Table.setValue("State", (pSocket->IsConnected() ? "Connected" : ""));
         }
 
-        Table.SetCell("LocalPort", NoString(pSocket->GetLocalPort()));
-        Table.SetCell("SSL", (pSocket->GetSSL() ? "yes" : "no"));
-        Table.SetCell("RemoteIP", pSocket->GetRemoteIP());
-        Table.SetCell("RemotePort", (pSocket->GetRemotePort()) ? NoString(pSocket->GetRemotePort()) : NoString(""));
+        Table.setValue("LocalPort", NoString(pSocket->GetLocalPort()));
+        Table.setValue("SSL", (pSocket->GetSSL() ? "yes" : "no"));
+        Table.setValue("RemoteIP", pSocket->GetRemoteIP());
+        Table.setValue("RemotePort", (pSocket->GetRemotePort()) ? NoString(pSocket->GetRemotePort()) : NoString(""));
     }
 
     PutModule(Table);
@@ -323,7 +323,7 @@ void NoModule::HandleHelpCommand(const NoString& sLine)
             it.second.AddHelp(Table);
         }
     }
-    if (Table.empty()) {
+    if (Table.isEmpty()) {
         PutModule("No matches for '" + sFilter + "'");
     } else {
         PutModule(Table);
@@ -493,10 +493,10 @@ uint NoModule::PutModule(const NoTable& table)
 {
     if (!d->user) return 0;
 
-    uint idx = 0;
-    NoString sLine;
-    while (table.GetLine(idx++, sLine)) PutModule(sLine);
-    return idx - 1;
+    NoStringVector lines = table.toString();
+    for (const NoString& line : lines)
+        PutModule(line);
+    return lines.size() - 1;
 }
 bool NoModule::PutModule(const NoString& sLine)
 {

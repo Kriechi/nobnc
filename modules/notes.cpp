@@ -178,25 +178,22 @@ public:
 
         if (pClient) {
             NoTable Table;
-            Table.AddColumn("Key");
-            Table.AddColumn("Note");
+            Table.addColumn("Key");
+            Table.addColumn("Note");
 
             NoRegistry registry(this);
             for (const NoString& key : registry.keys()) {
-                Table.AddRow();
-                Table.SetCell("Key", key);
-                Table.SetCell("Note", registry.value(key));
+                Table.addRow();
+                Table.setValue("Key", key);
+                Table.setValue("Note", registry.value(key));
             }
 
-            if (Table.size()) {
-                uint idx = 0;
-                NoString sLine;
-                while (Table.GetLine(idx++, sLine)) {
-                    if (bNotice) {
-                        pClient->PutModNotice(GetModName(), sLine);
-                    } else {
-                        pClient->PutModule(GetModName(), sLine);
-                    }
+            if (!Table.isEmpty()) {
+                for (const NoString& line : Table.toString()) {
+                    if (bNotice)
+                        pClient->PutModNotice(GetModName(), line);
+                    else
+                        pClient->PutModule(GetModName(), line);
                 }
             } else {
                 if (bNotice) {

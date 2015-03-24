@@ -89,27 +89,27 @@ void NoClient::UserCommand(NoString& sLine)
         for (uint p = 0; p < sPerms.size(); p++) {
             NoString sPerm;
             sPerm += sPerms[p];
-            Table.AddColumn(sPerm);
+            Table.addColumn(sPerm);
         }
 
-        Table.AddColumn("Nick");
-        Table.AddColumn("Ident");
-        Table.AddColumn("Host");
+        Table.addColumn("Nick");
+        Table.addColumn("Ident");
+        Table.addColumn("Host");
 
         for (const auto& it : msNicks) {
-            Table.AddRow();
+            Table.addRow();
 
             for (uint b = 0; b < sPerms.size(); b++) {
                 if (it.second.hasPerm(sPerms[b])) {
                     NoString sPerm;
                     sPerm += sPerms[b];
-                    Table.SetCell(sPerm, sPerm);
+                    Table.setValue(sPerm, sPerm);
                 }
             }
 
-            Table.SetCell("Nick", it.second.nick());
-            Table.SetCell("Ident", it.second.ident());
-            Table.SetCell("Host", it.second.host());
+            Table.setValue("Nick", it.second.nick());
+            Table.setValue("Ident", it.second.ident());
+            Table.setValue("Host", it.second.host());
         }
 
         PutStatus(Table);
@@ -191,70 +191,70 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         NoTable Table;
-        Table.AddColumn("Host");
-        Table.AddColumn("Network");
-        Table.AddColumn("Identifier");
+        Table.addColumn("Host");
+        Table.addColumn("Network");
+        Table.addColumn("Identifier");
 
         for (const NoClient* pClient : vClients) {
-            Table.AddRow();
-            Table.SetCell("Host", pClient->GetSocket()->GetRemoteIP());
+            Table.addRow();
+            Table.setValue("Host", pClient->GetSocket()->GetRemoteIP());
             if (pClient->GetNetwork()) {
-                Table.SetCell("Network", pClient->GetNetwork()->GetName());
+                Table.setValue("Network", pClient->GetNetwork()->GetName());
             }
-            Table.SetCell("Identifier", pClient->GetIdentifier());
+            Table.setValue("Identifier", pClient->GetIdentifier());
         }
 
         PutStatus(Table);
     } else if (d->user->IsAdmin() && sCommand.equals("LISTUSERS")) {
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
-        Table.AddColumn("Username");
-        Table.AddColumn("Networks");
-        Table.AddColumn("Clients");
+        Table.addColumn("Username");
+        Table.addColumn("Networks");
+        Table.addColumn("Clients");
 
         for (const auto& it : msUsers) {
-            Table.AddRow();
-            Table.SetCell("Username", it.first);
-            Table.SetCell("Networks", NoString(it.second->GetNetworks().size()));
-            Table.SetCell("Clients", NoString(it.second->GetAllClients().size()));
+            Table.addRow();
+            Table.setValue("Username", it.first);
+            Table.setValue("Networks", NoString(it.second->GetNetworks().size()));
+            Table.setValue("Clients", NoString(it.second->GetAllClients().size()));
         }
 
         PutStatus(Table);
     } else if (d->user->IsAdmin() && sCommand.equals("LISTALLUSERNETWORKS")) {
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
-        Table.AddColumn("Username");
-        Table.AddColumn("Network");
-        Table.AddColumn("Clients");
-        Table.AddColumn("OnIRC");
-        Table.AddColumn("IRC Server");
-        Table.AddColumn("IRC User");
-        Table.AddColumn("Channels");
+        Table.addColumn("Username");
+        Table.addColumn("Network");
+        Table.addColumn("Clients");
+        Table.addColumn("OnIRC");
+        Table.addColumn("IRC Server");
+        Table.addColumn("IRC User");
+        Table.addColumn("Channels");
 
         for (const auto& it : msUsers) {
-            Table.AddRow();
-            Table.SetCell("Username", it.first);
-            Table.SetCell("Network", "N/A");
-            Table.SetCell("Clients", NoString(it.second->GetUserClients().size()));
+            Table.addRow();
+            Table.setValue("Username", it.first);
+            Table.setValue("Network", "N/A");
+            Table.setValue("Clients", NoString(it.second->GetUserClients().size()));
 
             const std::vector<NoNetwork*>& vNetworks = it.second->GetNetworks();
 
             for (const NoNetwork* pNetwork : vNetworks) {
-                Table.AddRow();
+                Table.addRow();
                 if (pNetwork == vNetworks.back()) {
-                    Table.SetCell("Username", "`-");
+                    Table.setValue("Username", "`-");
                 } else {
-                    Table.SetCell("Username", "|-");
+                    Table.setValue("Username", "|-");
                 }
-                Table.SetCell("Network", pNetwork->GetName());
-                Table.SetCell("Clients", NoString(pNetwork->GetClients().size()));
+                Table.setValue("Network", pNetwork->GetName());
+                Table.setValue("Clients", NoString(pNetwork->GetClients().size()));
                 if (pNetwork->IsIRCConnected()) {
-                    Table.SetCell("OnIRC", "Yes");
-                    Table.SetCell("IRC Server", pNetwork->GetIRCServer());
-                    Table.SetCell("IRC User", pNetwork->GetIRCNick().nickMask());
-                    Table.SetCell("Channels", NoString(pNetwork->GetChans().size()));
+                    Table.setValue("OnIRC", "Yes");
+                    Table.setValue("IRC Server", pNetwork->GetIRCServer());
+                    Table.setValue("IRC User", pNetwork->GetIRCNick().nickMask());
+                    Table.setValue("Channels", NoString(pNetwork->GetChans().size()));
                 } else {
-                    Table.SetCell("OnIRC", "No");
+                    Table.setValue("OnIRC", "No");
                 }
             }
         }
@@ -446,36 +446,36 @@ void NoClient::UserCommand(NoString& sLine)
         pChan->isOn() ? (pChan->isDetached() ? "Detached" : "Joined") : (pChan->isDisabled() ? "Disabled" : "Trying");
 
         NoTable Table;
-        Table.AddColumn(sChan, false);
-        Table.AddColumn(sStatus);
+        Table.addColumn(sChan, false);
+        Table.addColumn(sStatus);
 
-        Table.AddRow();
-        Table.SetCell(sChan, "InConfig");
-        Table.SetCell(sStatus, NoString(pChan->inConfig() ? "yes" : "no"));
+        Table.addRow();
+        Table.setValue(sChan, "InConfig");
+        Table.setValue(sStatus, NoString(pChan->inConfig() ? "yes" : "no"));
 
-        Table.AddRow();
-        Table.SetCell(sChan, "Buffer");
-        Table.SetCell(sStatus,
+        Table.addRow();
+        Table.setValue(sChan, "Buffer");
+        Table.setValue(sStatus,
                       NoString(pChan->getBuffer().size()) + "/" + NoString(pChan->getBufferCount()) +
                       NoString(pChan->hasBufferCountSet() ? "" : " (default)"));
 
-        Table.AddRow();
-        Table.SetCell(sChan, "AutoClearChanBuffer");
-        Table.SetCell(sStatus,
+        Table.addRow();
+        Table.setValue(sChan, "AutoClearChanBuffer");
+        Table.setValue(sStatus,
                       NoString(pChan->autoClearChanBuffer() ? "yes" : "no") +
                       NoString(pChan->hasAutoClearChanBufferSet() ? "" : " (default)"));
 
         if (pChan->isOn()) {
-            Table.AddRow();
-            Table.SetCell(sChan, "Topic");
-            Table.SetCell(sStatus, pChan->getTopic());
+            Table.addRow();
+            Table.setValue(sChan, "Topic");
+            Table.setValue(sStatus, pChan->getTopic());
 
-            Table.AddRow();
-            Table.SetCell(sChan, "Modes");
-            Table.SetCell(sStatus, pChan->getModeString());
+            Table.addRow();
+            Table.setValue(sChan, "Modes");
+            Table.setValue(sStatus, pChan->getModeString());
 
-            Table.AddRow();
-            Table.SetCell(sChan, "Users");
+            Table.addRow();
+            Table.setValue(sChan, "Users");
 
             NoStringVector vsUsers;
             vsUsers.push_back("All: " + NoString(pChan->getNickCount()));
@@ -486,7 +486,7 @@ void NoClient::UserCommand(NoString& sLine)
             for (char cPerm : sPerms) {
                 vsUsers.push_back(NoString(cPerm) + ": " + NoString(mPerms[cPerm]));
             }
-            Table.SetCell(sStatus, NoString(", ").join(vsUsers.begin(), vsUsers.end()));
+            Table.setValue(sStatus, NoString(", ").join(vsUsers.begin(), vsUsers.end()));
         }
 
         PutStatus(Table);
@@ -529,15 +529,15 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         NoTable Table;
-        Table.AddColumn("Name");
-        Table.AddColumn("Status");
+        Table.addColumn("Name");
+        Table.addColumn("Status");
 
         uint uNumDetached = 0, uNumDisabled = 0, uNumJoined = 0;
 
         for (const NoChannel* pChan : vChans) {
-            Table.AddRow();
-            Table.SetCell("Name", pChan->getPermStr() + pChan->getName());
-            Table.SetCell("Status",
+            Table.addRow();
+            Table.setValue("Name", pChan->getPermStr() + pChan->getName());
+            Table.setValue("Status",
                           ((pChan->isOn()) ? ((pChan->isDetached()) ? "Detached" : "Joined") :
                                              ((pChan->isDisabled()) ? "Disabled" : "Trying")));
 
@@ -609,22 +609,22 @@ void NoClient::UserCommand(NoString& sLine)
         const std::vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
 
         NoTable Table;
-        Table.AddColumn("Network");
-        Table.AddColumn("OnIRC");
-        Table.AddColumn("IRC Server");
-        Table.AddColumn("IRC User");
-        Table.AddColumn("Channels");
+        Table.addColumn("Network");
+        Table.addColumn("OnIRC");
+        Table.addColumn("IRC Server");
+        Table.addColumn("IRC User");
+        Table.addColumn("Channels");
 
         for (const NoNetwork* pNetwork : vNetworks) {
-            Table.AddRow();
-            Table.SetCell("Network", pNetwork->GetName());
+            Table.addRow();
+            Table.setValue("Network", pNetwork->GetName());
             if (pNetwork->IsIRCConnected()) {
-                Table.SetCell("OnIRC", "Yes");
-                Table.SetCell("IRC Server", pNetwork->GetIRCServer());
-                Table.SetCell("IRC User", pNetwork->GetIRCNick().nickMask());
-                Table.SetCell("Channels", NoString(pNetwork->GetChans().size()));
+                Table.setValue("OnIRC", "Yes");
+                Table.setValue("IRC Server", pNetwork->GetIRCServer());
+                Table.setValue("IRC User", pNetwork->GetIRCNick().nickMask());
+                Table.setValue("Channels", NoString(pNetwork->GetChans().size()));
             } else {
-                Table.SetCell("OnIRC", "No");
+                Table.setValue("OnIRC", "No");
             }
         }
 
@@ -788,17 +788,17 @@ void NoClient::UserCommand(NoString& sLine)
             const std::vector<NoServerInfo*>& vServers = d->network->GetServers();
             NoServerInfo* pCurServ = d->network->GetCurrentServer();
             NoTable Table;
-            Table.AddColumn("Host");
-            Table.AddColumn("Port");
-            Table.AddColumn("SSL");
-            Table.AddColumn("Pass");
+            Table.addColumn("Host");
+            Table.addColumn("Port");
+            Table.addColumn("SSL");
+            Table.addColumn("Pass");
 
             for (const NoServerInfo* pServer : vServers) {
-                Table.AddRow();
-                Table.SetCell("Host", pServer->host() + (pServer == pCurServ ? "*" : ""));
-                Table.SetCell("Port", NoString(pServer->port()));
-                Table.SetCell("SSL", (pServer->isSsl()) ? "SSL" : "");
-                Table.SetCell("Pass", pServer->password());
+                Table.addRow();
+                Table.setValue("Host", pServer->host() + (pServer == pCurServ ? "*" : ""));
+                Table.setValue("Port", NoString(pServer->port()));
+                Table.setValue("SSL", (pServer->isSsl()) ? "SSL" : "");
+                Table.setValue("Pass", pServer->password());
             }
 
             PutStatus(Table);
@@ -851,15 +851,15 @@ void NoClient::UserCommand(NoString& sLine)
 
         const std::vector<NoChannel*>& vChans = d->network->GetChans();
         NoTable Table;
-        Table.AddColumn("Name");
-        Table.AddColumn("Set By");
-        Table.AddColumn("Topic");
+        Table.addColumn("Name");
+        Table.addColumn("Set By");
+        Table.addColumn("Topic");
 
         for (const NoChannel* pChan : vChans) {
-            Table.AddRow();
-            Table.SetCell("Name", pChan->getName());
-            Table.SetCell("Set By", pChan->getTopicOwner());
-            Table.SetCell("Topic", pChan->getTopic());
+            Table.addRow();
+            Table.setValue("Name", pChan->getName());
+            Table.setValue("Set By", pChan->getTopicOwner());
+            Table.setValue("Topic", pChan->getTopic());
         }
 
         PutStatus(Table);
@@ -872,13 +872,13 @@ void NoClient::UserCommand(NoString& sLine)
             } else {
                 PutStatus("Global modules:");
                 NoTable GTable;
-                GTable.AddColumn("Name");
-                GTable.AddColumn("Arguments");
+                GTable.addColumn("Name");
+                GTable.addColumn("Arguments");
 
                 for (const NoModule* pMod : GModules) {
-                    GTable.AddRow();
-                    GTable.SetCell("Name", pMod->GetModName());
-                    GTable.SetCell("Arguments", pMod->GetArgs());
+                    GTable.addRow();
+                    GTable.setValue("Name", pMod->GetModName());
+                    GTable.setValue("Arguments", pMod->GetArgs());
                 }
 
                 PutStatus(GTable);
@@ -892,13 +892,13 @@ void NoClient::UserCommand(NoString& sLine)
         } else {
             PutStatus("User modules:");
             NoTable Table;
-            Table.AddColumn("Name");
-            Table.AddColumn("Arguments");
+            Table.addColumn("Name");
+            Table.addColumn("Arguments");
 
             for (const NoModule* pMod : Modules) {
-                Table.AddRow();
-                Table.SetCell("Name", pMod->GetModName());
-                Table.SetCell("Arguments", pMod->GetArgs());
+                Table.addRow();
+                Table.setValue("Name", pMod->GetModName());
+                Table.setValue("Arguments", pMod->GetArgs());
             }
 
             PutStatus(Table);
@@ -911,13 +911,13 @@ void NoClient::UserCommand(NoString& sLine)
             } else {
                 PutStatus("Network modules:");
                 NoTable Table;
-                Table.AddColumn("Name");
-                Table.AddColumn("Arguments");
+                Table.addColumn("Name");
+                Table.addColumn("Arguments");
 
                 for (const NoModule* pMod : NetworkModules) {
-                    Table.AddRow();
-                    Table.SetCell("Name", pMod->GetModName());
-                    Table.SetCell("Arguments", pMod->GetArgs());
+                    Table.addRow();
+                    Table.setValue("Name", pMod->GetModName());
+                    Table.setValue("Arguments", pMod->GetArgs());
                 }
 
                 PutStatus(Table);
@@ -940,13 +940,13 @@ void NoClient::UserCommand(NoString& sLine)
             } else {
                 PutStatus("Global modules:");
                 NoTable GTable;
-                GTable.AddColumn("Name");
-                GTable.AddColumn("Description");
+                GTable.addColumn("Name");
+                GTable.addColumn("Description");
 
                 for (const NoModuleInfo& Info : ssGlobalMods) {
-                    GTable.AddRow();
-                    GTable.SetCell("Name", (NoApp::Get().GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
-                    GTable.SetCell("Description", No::ellipsize(Info.GetDescription(), 128));
+                    GTable.addRow();
+                    GTable.setValue("Name", (NoApp::Get().GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
+                    GTable.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
                 }
 
                 PutStatus(GTable);
@@ -961,13 +961,13 @@ void NoClient::UserCommand(NoString& sLine)
         } else {
             PutStatus("User modules:");
             NoTable Table;
-            Table.AddColumn("Name");
-            Table.AddColumn("Description");
+            Table.addColumn("Name");
+            Table.addColumn("Description");
 
             for (const NoModuleInfo& Info : ssUserMods) {
-                Table.AddRow();
-                Table.SetCell("Name", (d->user->GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
-                Table.SetCell("Description", No::ellipsize(Info.GetDescription(), 128));
+                Table.addRow();
+                Table.setValue("Name", (d->user->GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
+                Table.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
             }
 
             PutStatus(Table);
@@ -981,13 +981,13 @@ void NoClient::UserCommand(NoString& sLine)
         } else {
             PutStatus("Network modules:");
             NoTable Table;
-            Table.AddColumn("Name");
-            Table.AddColumn("Description");
+            Table.addColumn("Name");
+            Table.addColumn("Description");
 
             for (const NoModuleInfo& Info : ssNetworkMods) {
-                Table.AddRow();
-                Table.SetCell("Name", ((d->network && d->network->GetModules().FindModule(Info.GetName())) ? "*" : " ") + Info.GetName());
-                Table.SetCell("Description", No::ellipsize(Info.GetDescription(), 128));
+                Table.addRow();
+                Table.setValue("Name", ((d->network && d->network->GetModules().FindModule(Info.GetName())) ? "*" : " ") + Info.GetName());
+                Table.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
             }
 
             PutStatus(Table);
@@ -1254,11 +1254,11 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         NoTable Table;
-        Table.AddColumn("Host");
+        Table.addColumn("Host");
 
         for (const NoString& sHost : vsHosts) {
-            Table.AddRow();
-            Table.SetCell("Host", sHost);
+            Table.addRow();
+            Table.setValue("Host", sHost);
         }
         PutStatus(Table);
     } else if ((sCommand.equals("SETBINDHOST") || sCommand.equals("SETVHOST")) &&
@@ -1493,36 +1493,36 @@ void NoClient::UserCommand(NoString& sLine)
         NoApp::TrafficStatsMap traffic = NoApp::Get().GetTrafficStats(Users, ZNC, Total);
 
         NoTable Table;
-        Table.AddColumn("Username");
-        Table.AddColumn("In");
-        Table.AddColumn("Out");
-        Table.AddColumn("Total");
+        Table.addColumn("Username");
+        Table.addColumn("In");
+        Table.addColumn("Out");
+        Table.addColumn("Total");
 
         for (const auto& it : traffic) {
-            Table.AddRow();
-            Table.SetCell("Username", it.first);
-            Table.SetCell("In", No::toByteStr(it.second.first));
-            Table.SetCell("Out", No::toByteStr(it.second.second));
-            Table.SetCell("Total", No::toByteStr(it.second.first + it.second.second));
+            Table.addRow();
+            Table.setValue("Username", it.first);
+            Table.setValue("In", No::toByteStr(it.second.first));
+            Table.setValue("Out", No::toByteStr(it.second.second));
+            Table.setValue("Total", No::toByteStr(it.second.first + it.second.second));
         }
 
-        Table.AddRow();
-        Table.SetCell("Username", "<Users>");
-        Table.SetCell("In", No::toByteStr(Users.first));
-        Table.SetCell("Out", No::toByteStr(Users.second));
-        Table.SetCell("Total", No::toByteStr(Users.first + Users.second));
+        Table.addRow();
+        Table.setValue("Username", "<Users>");
+        Table.setValue("In", No::toByteStr(Users.first));
+        Table.setValue("Out", No::toByteStr(Users.second));
+        Table.setValue("Total", No::toByteStr(Users.first + Users.second));
 
-        Table.AddRow();
-        Table.SetCell("Username", "<ZNC>");
-        Table.SetCell("In", No::toByteStr(ZNC.first));
-        Table.SetCell("Out", No::toByteStr(ZNC.second));
-        Table.SetCell("Total", No::toByteStr(ZNC.first + ZNC.second));
+        Table.addRow();
+        Table.setValue("Username", "<ZNC>");
+        Table.setValue("In", No::toByteStr(ZNC.first));
+        Table.setValue("Out", No::toByteStr(ZNC.second));
+        Table.setValue("Total", No::toByteStr(ZNC.first + ZNC.second));
 
-        Table.AddRow();
-        Table.SetCell("Username", "<Total>");
-        Table.SetCell("In", No::toByteStr(Total.first));
-        Table.SetCell("Out", No::toByteStr(Total.second));
-        Table.SetCell("Total", No::toByteStr(Total.first + Total.second));
+        Table.addRow();
+        Table.setValue("Username", "<Total>");
+        Table.setValue("In", No::toByteStr(Total.first));
+        Table.setValue("Out", No::toByteStr(Total.second));
+        Table.setValue("Total", No::toByteStr(Total.first + Total.second));
 
         PutStatus(Table);
     } else if (sCommand.equals("UPTIME")) {
@@ -1541,30 +1541,30 @@ void NoClient::UserPortCommand(NoString& sLine)
 
     if (sCommand.equals("LISTPORTS")) {
         NoTable Table;
-        Table.AddColumn("Port");
-        Table.AddColumn("BindHost");
-        Table.AddColumn("SSL");
-        Table.AddColumn("Proto");
-        Table.AddColumn("IRC/Web");
-        Table.AddColumn("URIPrefix");
+        Table.addColumn("Port");
+        Table.addColumn("BindHost");
+        Table.addColumn("SSL");
+        Table.addColumn("Proto");
+        Table.addColumn("IRC/Web");
+        Table.addColumn("URIPrefix");
 
         std::vector<NoListener*>::const_iterator it;
         const std::vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
 
         for (const NoListener* pListener : vpListeners) {
-            Table.AddRow();
-            Table.SetCell("Port", NoString(pListener->port()));
-            Table.SetCell("BindHost", (pListener->host().empty() ? NoString("*") : pListener->host()));
-            Table.SetCell("SSL", NoString(pListener->isSsl()));
+            Table.addRow();
+            Table.setValue("Port", NoString(pListener->port()));
+            Table.setValue("BindHost", (pListener->host().empty() ? NoString("*") : pListener->host()));
+            Table.setValue("SSL", NoString(pListener->isSsl()));
 
             No::AddressType eAddr = pListener->addressType();
-            Table.SetCell("Proto", (eAddr == No::Ipv4AndIpv6Address ? "All" : (eAddr == No::Ipv4Address ? "IPv4" : "IPv6")));
+            Table.setValue("Proto", (eAddr == No::Ipv4AndIpv6Address ? "All" : (eAddr == No::Ipv4Address ? "IPv4" : "IPv6")));
 
             No::AcceptType eAccept = pListener->acceptType();
-            Table.SetCell("IRC/Web",
+            Table.setValue("IRC/Web",
                           (eAccept == No::AcceptAll ? "All" :
                                                               (eAccept == No::AcceptIrc ? "IRC" : "Web")));
-            Table.SetCell("URIPrefix", pListener->uriPrefix() + "/");
+            Table.setValue("URIPrefix", pListener->uriPrefix() + "/");
         }
 
         PutStatus(Table);
@@ -1646,19 +1646,19 @@ void NoClient::UserPortCommand(NoString& sLine)
 static void AddCommandHelp(NoTable& Table, const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, const NoString& sFilter = "")
 {
     if (sFilter.empty() || sCmd.startsWith(sFilter) || wildCmp(sCmd, sFilter, No::CaseInsensitive)) {
-        Table.AddRow();
-        Table.SetCell("Command", sCmd);
-        Table.SetCell("Arguments", sArgs);
-        Table.SetCell("Description", sDesc);
+        Table.addRow();
+        Table.setValue("Command", sCmd);
+        Table.setValue("Arguments", sArgs);
+        Table.setValue("Description", sDesc);
     }
 }
 
 void NoClient::HelpUser(const NoString& sFilter)
 {
     NoTable Table;
-    Table.AddColumn("Command");
-    Table.AddColumn("Arguments");
-    Table.AddColumn("Description");
+    Table.addColumn("Command");
+    Table.addColumn("Arguments");
+    Table.addColumn("Description");
 
     if (sFilter.empty()) {
         PutStatus("In the following list all occurrences of <#chan> support wildcards (* and ?)");
@@ -1785,7 +1785,7 @@ void NoClient::HelpUser(const NoString& sFilter)
         AddCommandHelp(Table, "Restart", "[message]", "Restart ZNC", sFilter);
     }
 
-    if (Table.empty()) {
+    if (Table.isEmpty()) {
         PutStatus("No matches for '" + sFilter + "'");
     } else {
         PutStatus(Table);

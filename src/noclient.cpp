@@ -804,10 +804,10 @@ void NoClient::PutStatusNotice(const NoString& sLine) { PutModNotice("status", s
 
 uint NoClient::PutStatus(const NoTable& table)
 {
-    uint idx = 0;
-    NoString sLine;
-    while (table.GetLine(idx++, sLine)) PutStatus(sLine);
-    return idx - 1;
+    NoStringVector lines = table.toString();
+    for (const NoString& line : lines)
+        PutStatus(line);
+    return lines.size() - 1;
 }
 
 void NoClient::PutStatus(const NoString& sLine) { PutModule("status", sLine); }

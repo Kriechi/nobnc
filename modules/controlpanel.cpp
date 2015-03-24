@@ -42,8 +42,8 @@ class NoAdminMod : public NoModule
     void PrintVarsHelp(const NoString& sFilter, const char* vars[][2], uint uSize, const NoString& sDescription)
     {
         NoTable VarTable;
-        VarTable.AddColumn("Type");
-        VarTable.AddColumn("Variables");
+        VarTable.addColumn("Type");
+        VarTable.addColumn("Variables");
         std::map<const char*, NoStringVector> mvsTypedVariables;
         for (uint i = 0; i != uSize; ++i) {
             NoString sVar = NoString(vars[i][0]).toLower();
@@ -52,11 +52,11 @@ class NoAdminMod : public NoModule
             }
         }
         for (const auto& i : mvsTypedVariables) {
-            VarTable.AddRow();
-            VarTable.SetCell("Type", i.first);
-            VarTable.SetCell("Variables", NoString(", ").join(i.second.cbegin(), i.second.cend()));
+            VarTable.addRow();
+            VarTable.setValue("Type", i.first);
+            VarTable.setValue("Variables", NoString(", ").join(i.second.cbegin(), i.second.cend()));
         }
-        if (!VarTable.empty()) {
+        if (!VarTable.isEmpty()) {
             PutModule(sDescription);
             PutModule(VarTable);
         }
@@ -785,26 +785,26 @@ class NoAdminMod : public NoModule
 
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
-        Table.AddColumn("Username");
-        Table.AddColumn("Realname");
-        Table.AddColumn("IsAdmin");
-        Table.AddColumn("Nick");
-        Table.AddColumn("AltNick");
-        Table.AddColumn("Ident");
-        Table.AddColumn("BindHost");
+        Table.addColumn("Username");
+        Table.addColumn("Realname");
+        Table.addColumn("IsAdmin");
+        Table.addColumn("Nick");
+        Table.addColumn("AltNick");
+        Table.addColumn("Ident");
+        Table.addColumn("BindHost");
 
         for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
-            Table.AddRow();
-            Table.SetCell("Username", it->first);
-            Table.SetCell("Realname", it->second->GetRealName());
+            Table.addRow();
+            Table.setValue("Username", it->first);
+            Table.setValue("Realname", it->second->GetRealName());
             if (!it->second->IsAdmin())
-                Table.SetCell("IsAdmin", "No");
+                Table.setValue("IsAdmin", "No");
             else
-                Table.SetCell("IsAdmin", "Yes");
-            Table.SetCell("Nick", it->second->GetNick());
-            Table.SetCell("AltNick", it->second->GetAltNick());
-            Table.SetCell("Ident", it->second->GetIdent());
-            Table.SetCell("BindHost", it->second->GetBindHost());
+                Table.setValue("IsAdmin", "Yes");
+            Table.setValue("Nick", it->second->GetNick());
+            Table.setValue("AltNick", it->second->GetAltNick());
+            Table.setValue("Ident", it->second->GetIdent());
+            Table.setValue("BindHost", it->second->GetBindHost());
         }
 
         PutModule(Table);
@@ -1009,23 +1009,23 @@ class NoAdminMod : public NoModule
         const std::vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
 
         NoTable Table;
-        Table.AddColumn("Network");
-        Table.AddColumn("OnIRC");
-        Table.AddColumn("IRC Server");
-        Table.AddColumn("IRC User");
-        Table.AddColumn("Channels");
+        Table.addColumn("Network");
+        Table.addColumn("OnIRC");
+        Table.addColumn("IRC Server");
+        Table.addColumn("IRC User");
+        Table.addColumn("Channels");
 
         for (uint a = 0; a < vNetworks.size(); a++) {
             NoNetwork* pNetwork = vNetworks[a];
-            Table.AddRow();
-            Table.SetCell("Network", pNetwork->GetName());
+            Table.addRow();
+            Table.setValue("Network", pNetwork->GetName());
             if (pNetwork->IsIRCConnected()) {
-                Table.SetCell("OnIRC", "Yes");
-                Table.SetCell("IRC Server", pNetwork->GetIRCServer());
-                Table.SetCell("IRC User", pNetwork->GetIRCNick().nickMask());
-                Table.SetCell("Channels", NoString(pNetwork->GetChans().size()));
+                Table.setValue("OnIRC", "Yes");
+                Table.setValue("IRC Server", pNetwork->GetIRCServer());
+                Table.setValue("IRC User", pNetwork->GetIRCNick().nickMask());
+                Table.setValue("Channels", NoString(pNetwork->GetChans().size()));
             } else {
-                Table.SetCell("OnIRC", "No");
+                Table.setValue("OnIRC", "No");
             }
         }
 
@@ -1162,15 +1162,15 @@ class NoAdminMod : public NoModule
 
         const NoStringMap& msCTCPReplies = pUser->GetCTCPReplies();
         NoTable Table;
-        Table.AddColumn("Request");
-        Table.AddColumn("Reply");
+        Table.addColumn("Request");
+        Table.addColumn("Reply");
         for (NoStringMap::const_iterator it = msCTCPReplies.begin(); it != msCTCPReplies.end(); ++it) {
-            Table.AddRow();
-            Table.SetCell("Request", it->first);
-            Table.SetCell("Reply", it->second);
+            Table.addRow();
+            Table.setValue("Request", it->first);
+            Table.setValue("Reply", it->second);
         }
 
-        if (Table.empty()) {
+        if (Table.isEmpty()) {
             PutModule("No CTCP replies for user [" + pUser->GetUserName() + "] configured!");
         } else {
             PutModule("CTCP replies for user [" + pUser->GetUserName() + "]:");
@@ -1359,13 +1359,13 @@ class NoAdminMod : public NoModule
         } else {
             PutModule("Modules loaded for " + sWhere + ":");
             NoTable Table;
-            Table.AddColumn("Name");
-            Table.AddColumn("Arguments");
+            Table.addColumn("Name");
+            Table.addColumn("Arguments");
 
             for (uint b = 0; b < Modules.size(); b++) {
-                Table.AddRow();
-                Table.SetCell("Name", Modules[b]->GetModName());
-                Table.SetCell("Arguments", Modules[b]->GetArgs());
+                Table.addRow();
+                Table.setValue("Name", Modules[b]->GetModName());
+                Table.setValue("Arguments", Modules[b]->GetArgs());
             }
 
             PutModule(Table);

@@ -87,16 +87,16 @@ public:
     void OnListCommand(const NoString& sLine)
     {
         NoTable Table;
-        Table.AddColumn("Chan");
+        Table.addColumn("Chan");
 
         for (uint a = 0; a < m_vsChans.size(); a++) {
-            Table.AddRow();
-            Table.SetCell("Chan", m_vsChans[a]);
+            Table.addRow();
+            Table.setValue("Chan", m_vsChans[a]);
         }
 
         for (uint b = 0; b < m_vsNegChans.size(); b++) {
-            Table.AddRow();
-            Table.SetCell("Chan", "!" + m_vsNegChans[b]);
+            Table.addRow();
+            Table.setValue("Chan", "!" + m_vsNegChans[b]);
         }
 
         if (Table.size()) {

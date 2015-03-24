@@ -113,26 +113,26 @@ public:
     void ListDCCsCommand(const NoString& sLine)
     {
         NoTable Table;
-        Table.AddColumn("Type");
-        Table.AddColumn("State");
-        Table.AddColumn("Speed");
-        Table.AddColumn("Nick");
-        Table.AddColumn("IP");
-        Table.AddColumn("File");
+        Table.addColumn("Type");
+        Table.addColumn("State");
+        Table.addColumn("Speed");
+        Table.addColumn("Nick");
+        Table.addColumn("IP");
+        Table.addColumn("File");
 
         for (NoDccBounce* pSock : m_sockets) {
             NoString sSockName = pSock->GetSockName();
 
             if (!(pSock->IsRemote())) {
-                Table.AddRow();
-                Table.SetCell("Nick", pSock->GetRemoteNick());
-                Table.SetCell("IP", pSock->GetRemoteAddr());
+                Table.addRow();
+                Table.setValue("Nick", pSock->GetRemoteNick());
+                Table.setValue("IP", pSock->GetRemoteAddr());
 
                 if (pSock->IsChat()) {
-                    Table.SetCell("Type", "Chat");
+                    Table.setValue("Type", "Chat");
                 } else {
-                    Table.SetCell("Type", "Xfer");
-                    Table.SetCell("File", pSock->GetFileName());
+                    Table.setValue("Type", "Xfer");
+                    Table.setValue("File", pSock->GetFileName());
                 }
 
                 NoString sState = "Waiting";
@@ -142,7 +142,7 @@ public:
                         sState = "Connected";
                     }
                 }
-                Table.SetCell("State", sState);
+                Table.setValue("State", sState);
             }
         }
 

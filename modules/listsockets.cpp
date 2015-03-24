@@ -222,34 +222,34 @@ public:
         std::priority_queue<NoSocketSorter> socks = GetSockets();
 
         NoTable Table;
-        Table.AddColumn("Name");
-        Table.AddColumn("Created");
-        Table.AddColumn("State");
+        Table.addColumn("Name");
+        Table.addColumn("Created");
+        Table.addColumn("State");
 #ifdef HAVE_LIBSSL
-        Table.AddColumn("SSL");
+        Table.addColumn("SSL");
 #endif
-        Table.AddColumn("Local");
-        Table.AddColumn("Remote");
-        Table.AddColumn("In");
-        Table.AddColumn("Out");
+        Table.addColumn("Local");
+        Table.addColumn("Remote");
+        Table.addColumn("In");
+        Table.addColumn("Out");
 
         while (!socks.empty()) {
             NoSocket* pSocket = socks.top().GetSock();
             socks.pop();
 
-            Table.AddRow();
-            Table.SetCell("Name", pSocket->GetSockName());
-            Table.SetCell("Created", GetCreatedTime(pSocket));
-            Table.SetCell("State", GetSocketState(pSocket));
+            Table.addRow();
+            Table.setValue("Name", pSocket->GetSockName());
+            Table.setValue("Created", GetCreatedTime(pSocket));
+            Table.setValue("State", GetSocketState(pSocket));
 
 #ifdef HAVE_LIBSSL
-            Table.SetCell("SSL", pSocket->GetSSL() ? "Yes" : "No");
+            Table.setValue("SSL", pSocket->GetSSL() ? "Yes" : "No");
 #endif
 
-            Table.SetCell("Local", GetLocalHost(pSocket, bShowHosts));
-            Table.SetCell("Remote", GetRemoteHost(pSocket, bShowHosts));
-            Table.SetCell("In", No::toByteStr(pSocket->GetBytesRead()));
-            Table.SetCell("Out", No::toByteStr(pSocket->GetBytesWritten()));
+            Table.setValue("Local", GetLocalHost(pSocket, bShowHosts));
+            Table.setValue("Remote", GetRemoteHost(pSocket, bShowHosts));
+            Table.setValue("In", No::toByteStr(pSocket->GetBytesRead()));
+            Table.setValue("Out", No::toByteStr(pSocket->GetBytesWritten()));
         }
 
         PutModule(Table);

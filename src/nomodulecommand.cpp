@@ -46,17 +46,17 @@ NoModuleCommand& NoModuleCommand::operator=(const NoModuleCommand& other)
 
 void NoModuleCommand::InitHelp(NoTable& Table)
 {
-    Table.AddColumn("Command");
-    Table.AddColumn("Arguments");
-    Table.AddColumn("Description");
+    Table.addColumn("Command");
+    Table.addColumn("Arguments");
+    Table.addColumn("Description");
 }
 
 void NoModuleCommand::AddHelp(NoTable& Table) const
 {
-    Table.AddRow();
-    Table.SetCell("Command", GetCommand());
-    Table.SetCell("Arguments", GetArgs());
-    Table.SetCell("Description", GetDescription());
+    Table.addRow();
+    Table.setValue("Command", GetCommand());
+    Table.setValue("Arguments", GetArgs());
+    Table.setValue("Description", GetDescription());
 }
 
 void NoModuleCommand::Call(const NoString& sLine) const { m_func(sLine); }

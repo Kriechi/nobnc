@@ -186,36 +186,36 @@ public:
 
         } else if (sCom.equals("list")) {
             NoTable Table;
-            Table.AddColumn("Nick");
-            Table.AddColumn("Created");
-            Table.AddColumn("Host");
-            Table.AddColumn("Port");
-            Table.AddColumn("Status");
-            Table.AddColumn("Cipher");
+            Table.addColumn("Nick");
+            Table.addColumn("Created");
+            Table.addColumn("Host");
+            Table.addColumn("Port");
+            Table.addColumn("Status");
+            Table.addColumn("Cipher");
 
             for (NoSChatSock* pSock : m_sockets) {
-                Table.AddRow();
-                Table.SetCell("Nick", pSock->GetChatNick());
+                Table.addRow();
+                Table.setValue("Nick", pSock->GetChatNick());
                 ulonglong iStartTime = pSock->GetStartTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
                     NoString sTime = pTime;
                     sTime.trim();
-                    Table.SetCell("Created", sTime);
+                    Table.setValue("Created", sTime);
                 }
 
                 if (!pSock->IsListener()) {
-                    Table.SetCell("Status", "Established");
-                    Table.SetCell("Host", pSock->GetRemoteIP());
-                    Table.SetCell("Port", NoString(pSock->GetRemotePort()));
+                    Table.setValue("Status", "Established");
+                    Table.setValue("Host", pSock->GetRemoteIP());
+                    Table.setValue("Port", NoString(pSock->GetRemotePort()));
                     SSL_SESSION* pSession = pSock->GetSSLSession();
                     if (pSession && pSession->cipher && pSession->cipher->name)
-                        Table.SetCell("Cipher", pSession->cipher->name);
+                        Table.setValue("Cipher", pSession->cipher->name);
 
                 } else {
-                    Table.SetCell("Status", "Waiting");
-                    Table.SetCell("Port", NoString(pSock->GetLocalPort()));
+                    Table.setValue("Status", "Waiting");
+                    Table.setValue("Port", NoString(pSock->GetLocalPort()));
                 }
             }
             if (Table.size()) {
@@ -235,42 +235,42 @@ public:
             PutModule("No Such Chat [" + sArgs + "]");
         } else if (sCom.equals("showsocks") && GetUser()->IsAdmin()) {
             NoTable Table;
-            Table.AddColumn("SockName");
-            Table.AddColumn("Created");
-            Table.AddColumn("LocalIP:Port");
-            Table.AddColumn("RemoteIP:Port");
-            Table.AddColumn("Type");
-            Table.AddColumn("Cipher");
+            Table.addColumn("SockName");
+            Table.addColumn("Created");
+            Table.addColumn("LocalIP:Port");
+            Table.addColumn("RemoteIP:Port");
+            Table.addColumn("Type");
+            Table.addColumn("Cipher");
 
             for (NoSChatSock* pSock : m_sockets) {
-                Table.AddRow();
-                Table.SetCell("SockName", pSock->GetSockName());
+                Table.addRow();
+                Table.setValue("SockName", pSock->GetSockName());
                 ulonglong iStartTime = pSock->GetStartTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
                     NoString sTime = pTime;
                     sTime.trim();
-                    Table.SetCell("Created", sTime);
+                    Table.setValue("Created", sTime);
                 }
 
                 if (!pSock->IsListener()) {
                     if (pSock->IsOutbound())
-                        Table.SetCell("Type", "Outbound");
+                        Table.setValue("Type", "Outbound");
                     else
-                        Table.SetCell("Type", "Inbound");
-                    Table.SetCell("LocalIP:Port", pSock->GetLocalIP() + ":" + NoString(pSock->GetLocalPort()));
-                    Table.SetCell("RemoteIP:Port", pSock->GetRemoteIP() + ":" + NoString(pSock->GetRemotePort()));
+                        Table.setValue("Type", "Inbound");
+                    Table.setValue("LocalIP:Port", pSock->GetLocalIP() + ":" + NoString(pSock->GetLocalPort()));
+                    Table.setValue("RemoteIP:Port", pSock->GetRemoteIP() + ":" + NoString(pSock->GetRemotePort()));
                     SSL_SESSION* pSession = pSock->GetSSLSession();
                     if (pSession && pSession->cipher && pSession->cipher->name)
-                        Table.SetCell("Cipher", pSession->cipher->name);
+                        Table.setValue("Cipher", pSession->cipher->name);
                     else
-                        Table.SetCell("Cipher", "None");
+                        Table.setValue("Cipher", "None");
 
                 } else {
-                    Table.SetCell("Type", "Listener");
-                    Table.SetCell("LocalIP:Port", pSock->GetLocalIP() + ":" + NoString(pSock->GetLocalPort()));
-                    Table.SetCell("RemoteIP:Port", "0.0.0.0:0");
+                    Table.setValue("Type", "Listener");
+                    Table.setValue("LocalIP:Port", pSock->GetLocalIP() + ":" + NoString(pSock->GetLocalPort()));
+                    Table.setValue("RemoteIP:Port", "0.0.0.0:0");
                 }
             }
             if (Table.size())

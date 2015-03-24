@@ -22,6 +22,7 @@
 class NoTablePrivate
 {
 public:
+    uint GetColumnWidth(uint uIdx) const;
     uint GetColumnIndex(const NoString& sName) const;
     NoStringVector Render() const;
     static NoStringVector WrapWords(const NoString& s, uint uWidth);
@@ -74,12 +75,12 @@ uint NoTable::size() const
     return d->rows.size();
 }
 
-bool NoTable::empty() const
+bool NoTable::isEmpty() const
 {
     return d->rows.empty();
 }
 
-bool NoTable::AddColumn(const NoString& sName, bool bWrappable)
+bool NoTable::addColumn(const NoString& sName, bool bWrappable)
 {
     for (const NoString& sHeader : d->headers) {
         if (sHeader.equals(sName)) {
@@ -96,28 +97,15 @@ bool NoTable::AddColumn(const NoString& sName, bool bWrappable)
     return true;
 }
 
-uint NoTable::AddRow()
+void NoTable::addRow()
 {
-    // Don't add a row if no headers are defined
-    if (d->headers.empty()) {
-        return -1;
-    }
-
     // Add a vector with enough space for each column
     d->rows.push_back(NoStringVector(d->headers.size()));
-    return d->rows.size() - 1;
 }
 
-bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, uint uRowIdx)
+bool NoTable::setValue(const NoString& sColumn, const NoString& sValue)
 {
-    if (uRowIdx == ~0) {
-        if (empty()) {
-            return false;
-        }
-
-        uRowIdx = size() - 1;
-    }
-
+    uint uRowIdx = size() - 1;
     uint uColIdx = d->GetColumnIndex(sColumn);
 
     if (uColIdx == (uint)-1) return false;
@@ -147,19 +135,11 @@ bool NoTable::SetCell(const NoString& sColumn, const NoString& sValue, uint uRow
     return true;
 }
 
-bool NoTable::GetLine(uint uIdx, NoString& sLine) const
+NoStringVector NoTable::toString() const
 {
-    if (empty()) {
-        return false;
-    }
-    if (d->output.empty()) {
+    if (d->output.empty())
         d->output = d->Render();
-    }
-    if (uIdx >= d->output.size()) {
-        return false;
-    }
-    sLine = d->output[uIdx];
-    return true;
+    return d->output;
 }
 
 NoStringVector NoTablePrivate::Render() const
@@ -293,15 +273,15 @@ uint NoTablePrivate::GetColumnIndex(const NoString& sName) const
     return (uint)-1;
 }
 
-uint NoTable::GetColumnWidth(uint uIdx) const
+uint NoTablePrivate::GetColumnWidth(uint uIdx) const
 {
-    if (uIdx >= d->headers.size()) {
+    if (uIdx >= headers.size()) {
         return 0;
     }
-    return d->maxWidths[uIdx];
+    return maxWidths[uIdx];
 }
 
-void NoTable::Clear()
+void NoTable::clear()
 {
     d->rows.clear();
     d->headers.clear();

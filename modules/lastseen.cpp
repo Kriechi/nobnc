@@ -56,13 +56,13 @@ private:
         MUsers::const_iterator it;
         NoTable Table;
 
-        Table.AddColumn("User");
-        Table.AddColumn("Last Seen");
+        Table.addColumn("User");
+        Table.addColumn("Last Seen");
 
         for (it = mUsers.begin(); it != mUsers.end(); ++it) {
-            Table.AddRow();
-            Table.SetCell("User", it->first);
-            Table.SetCell("Last Seen", FormatLastSeen(it->second, "never"));
+            Table.addRow();
+            Table.setValue("User", it->first);
+            Table.setValue("Last Seen", FormatLastSeen(it->second, "never"));
         }
 
         PutModule(Table);

@@ -55,19 +55,19 @@ class NoPerform : public NoModule
         NoTable Table;
         uint index = 1;
 
-        Table.AddColumn("Id");
-        Table.AddColumn("Perform");
-        Table.AddColumn("Expanded");
+        Table.addColumn("Id");
+        Table.addColumn("Perform");
+        Table.addColumn("Expanded");
 
         for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it, index++) {
-            Table.AddRow();
-            Table.SetCell("Id", NoString(index));
-            Table.SetCell("Perform", *it);
+            Table.addRow();
+            Table.setValue("Id", NoString(index));
+            Table.setValue("Perform", *it);
 
             NoString sExpanded = ExpandString(*it);
 
             if (sExpanded != *it) {
-                Table.SetCell("Expanded", sExpanded);
+                Table.setValue("Expanded", sExpanded);
             }
         }
 

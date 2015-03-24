@@ -181,8 +181,8 @@ public:
     {
         NoTable Table;
 
-        Table.AddColumn("Id");
-        Table.AddColumn("Key");
+        Table.addColumn("Id");
+        Table.addColumn("Key");
 
         MNoStringSet::const_iterator it = m_PubKeys.find(GetUser()->GetUserName());
         if (it == m_PubKeys.end()) {
@@ -192,9 +192,9 @@ public:
 
         uint id = 1;
         for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-            Table.AddRow();
-            Table.SetCell("Id", NoString(id++));
-            Table.SetCell("Key", *it2);
+            Table.addRow();
+            Table.setValue("Id", NoString(id++));
+            Table.setValue("Key", *it2);
         }
 
         if (PutModule(Table) == 0) {
