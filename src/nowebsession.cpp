@@ -399,14 +399,14 @@ void NoWebSocket::SetVars()
     GetSession()->ClearMessageLoops();
 
     // Global Mods
-    NoModuleLoader* vgMods = NoApp::Get().GetModules();
+    NoModuleLoader* vgMods = NoApp::Get().GetLoader();
     for (NoModule* pgMod : *vgMods) {
         AddModLoop("GlobalModLoop", *pgMod);
     }
 
     // User Mods
     if (IsLoggedIn()) {
-        NoModuleLoader* vMods = GetSession()->GetUser()->GetModules();
+        NoModuleLoader* vMods = GetSession()->GetUser()->GetLoader();
 
         for (NoModule* pMod : *vMods) {
             AddModLoop("UserModLoop", *pMod);
@@ -414,7 +414,7 @@ void NoWebSocket::SetVars()
 
         std::vector<NoNetwork*> vNetworks = GetSession()->GetUser()->GetNetworks();
         for (NoNetwork* pNetwork : vNetworks) {
-            NoModuleLoader* vnMods = pNetwork->GetModules();
+            NoModuleLoader* vnMods = pNetwork->GetLoader();
 
             NoTemplate& Row = m_template.AddRow("NetworkModLoop");
             Row["NetworkName"] = pNetwork->GetName();
@@ -786,13 +786,13 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
         switch (eModType) {
         case No::GlobalModule:
-            pModule = NoApp::Get().GetModules()->FindModule(m_modName);
+            pModule = NoApp::Get().GetLoader()->FindModule(m_modName);
             break;
         case No::UserModule:
-            pModule = GetSession()->GetUser()->GetModules()->FindModule(m_modName);
+            pModule = GetSession()->GetUser()->GetLoader()->FindModule(m_modName);
             break;
         case No::NetworkModule:
-            pModule = pNetwork->GetModules()->FindModule(m_modName);
+            pModule = pNetwork->GetLoader()->FindModule(m_modName);
             break;
         }
 

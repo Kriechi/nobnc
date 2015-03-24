@@ -1268,7 +1268,7 @@ class NoAdminMod : public NoModule
         NoUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        LoadModuleFor(pUser->GetModules(), sModName, sArgs, No::UserModule, pUser, nullptr);
+        LoadModuleFor(pUser->GetLoader(), sModName, sArgs, No::UserModule, pUser, nullptr);
     }
 
     void LoadModuleForNetwork(const NoString& sLine)
@@ -1291,7 +1291,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        LoadModuleFor(pNetwork->GetModules(), sModName, sArgs, No::NetworkModule, pUser, pNetwork);
+        LoadModuleFor(pNetwork->GetLoader(), sModName, sArgs, No::NetworkModule, pUser, pNetwork);
     }
 
     void UnLoadModuleFor(NoModuleLoader* Modules, const NoString& sModName, NoUser* pUser)
@@ -1327,7 +1327,7 @@ class NoAdminMod : public NoModule
         NoUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        UnLoadModuleFor(pUser->GetModules(), sModName, pUser);
+        UnLoadModuleFor(pUser->GetLoader(), sModName, pUser);
     }
 
     void UnLoadModuleForNetwork(const NoString& sLine)
@@ -1349,7 +1349,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        UnLoadModuleFor(pNetwork->GetModules(), sModName, pUser);
+        UnLoadModuleFor(pNetwork->GetLoader(), sModName, pUser);
     }
 
     void ListModulesFor(NoModuleLoader* Modules, const NoString& sWhere)
@@ -1384,7 +1384,7 @@ class NoAdminMod : public NoModule
         NoUser* pUser = FindUser(sUsername);
         if (!pUser) return;
 
-        ListModulesFor(pUser->GetModules(), "User [" + pUser->GetUserName() + "]");
+        ListModulesFor(pUser->GetLoader(), "User [" + pUser->GetUserName() + "]");
     }
 
     void ListModulesForNetwork(const NoString& sLine)
@@ -1405,7 +1405,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        ListModulesFor(pNetwork->GetModules(), "Network [" + pNetwork->GetName() + "] of user [" + pUser->GetUserName() + "]");
+        ListModulesFor(pNetwork->GetLoader(), "Network [" + pNetwork->GetName() + "] of user [" + pUser->GetUserName() + "]");
     }
 
 public:

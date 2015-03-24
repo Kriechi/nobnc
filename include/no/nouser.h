@@ -62,7 +62,7 @@ public:
     static bool IsValidUserName(const NoString& sUserName);
     static NoString MakeCleanUserName(const NoString& sUserName);
 
-    NoModuleLoader* GetModules() const;
+    NoModuleLoader* GetLoader() const;
 
     NoNetwork* AddNetwork(const NoString& sNetwork, NoString& sErrorRet);
     bool DeleteNetwork(const NoString& sNetwork);

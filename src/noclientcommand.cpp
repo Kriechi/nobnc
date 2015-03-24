@@ -678,7 +678,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const NoModuleLoader* vMods = pOldNetwork->GetModules();
+        const NoModuleLoader* vMods = pOldNetwork->GetLoader();
         for (NoModule* pMod : *vMods) {
             NoString sOldModPath = pOldNetwork->GetNetworkPath() + "/moddata/" + pMod->GetModName();
             NoString sNewModPath = pNewUser->GetUserPath() + "/networks/" + sNewNetwork + "/moddata/" + pMod->GetModName();
@@ -865,7 +865,7 @@ void NoClient::UserCommand(NoString& sLine)
         PutStatus(Table);
     } else if (sCommand.equals("LISTMODS") || sCommand.equals("LISTMODULES")) {
         if (d->user->IsAdmin()) {
-            NoModuleLoader* GModules = NoApp::Get().GetModules();
+            NoModuleLoader* GModules = NoApp::Get().GetLoader();
 
             if (!GModules->size()) {
                 PutStatus("No global modules loaded.");
@@ -885,7 +885,7 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        NoModuleLoader* Modules = d->user->GetModules();
+        NoModuleLoader* Modules = d->user->GetLoader();
 
         if (!Modules->size()) {
             PutStatus("Your user has no modules loaded.");
@@ -905,7 +905,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (d->network) {
-            NoModuleLoader* NetworkModules = d->network->GetModules();
+            NoModuleLoader* NetworkModules = d->network->GetLoader();
             if (NetworkModules->empty()) {
                 PutStatus("This network has no modules loaded.");
             } else {
@@ -933,7 +933,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         if (d->user->IsAdmin()) {
             std::set<NoModuleInfo> ssGlobalMods;
-            NoApp::Get().GetModules()->GetAvailableMods(ssGlobalMods, No::GlobalModule);
+            NoApp::Get().GetLoader()->GetAvailableMods(ssGlobalMods, No::GlobalModule);
 
             if (ssGlobalMods.empty()) {
                 PutStatus("No global modules available.");
@@ -945,7 +945,7 @@ void NoClient::UserCommand(NoString& sLine)
 
                 for (const NoModuleInfo& Info : ssGlobalMods) {
                     GTable.addRow();
-                    GTable.setValue("Name", (NoApp::Get().GetModules()->FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
+                    GTable.setValue("Name", (NoApp::Get().GetLoader()->FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
                     GTable.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
                 }
 
@@ -954,7 +954,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         std::set<NoModuleInfo> ssUserMods;
-        NoApp::Get().GetModules()->GetAvailableMods(ssUserMods);
+        NoApp::Get().GetLoader()->GetAvailableMods(ssUserMods);
 
         if (ssUserMods.empty()) {
             PutStatus("No user modules available.");
@@ -966,7 +966,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             for (const NoModuleInfo& Info : ssUserMods) {
                 Table.addRow();
-                Table.setValue("Name", (d->user->GetModules()->FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
+                Table.setValue("Name", (d->user->GetLoader()->FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
                 Table.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
             }
 
@@ -974,7 +974,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         std::set<NoModuleInfo> ssNetworkMods;
-        NoApp::Get().GetModules()->GetAvailableMods(ssNetworkMods, No::NetworkModule);
+        NoApp::Get().GetLoader()->GetAvailableMods(ssNetworkMods, No::NetworkModule);
 
         if (ssNetworkMods.empty()) {
             PutStatus("No network modules available.");
@@ -986,7 +986,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             for (const NoModuleInfo& Info : ssNetworkMods) {
                 Table.addRow();
-                Table.setValue("Name", ((d->network && d->network->GetModules()->FindModule(Info.GetName())) ? "*" : " ") + Info.GetName());
+                Table.setValue("Name", ((d->network && d->network->GetLoader()->FindModule(Info.GetName())) ? "*" : " ") + Info.GetName());
                 Table.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
             }
 
@@ -1026,7 +1026,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         NoModuleInfo ModInfo;
         NoString sRetMsg;
-        if (!NoApp::Get().GetModules()->GetModInfo(ModInfo, sMod, sRetMsg)) {
+        if (!NoApp::Get().GetLoader()->GetModInfo(ModInfo, sMod, sRetMsg)) {
             PutStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
             return;
         }
@@ -1050,13 +1050,13 @@ void NoClient::UserCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            b = NoApp::Get().GetModules()->LoadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
+            b = NoApp::Get().GetLoader()->LoadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
-            b = d->user->GetModules()->LoadModule(sMod, sArgs, eType, d->user, nullptr, sModRet);
+            b = d->user->GetLoader()->LoadModule(sMod, sArgs, eType, d->user, nullptr, sModRet);
             break;
         case No::NetworkModule:
-            b = d->network->GetModules()->LoadModule(sMod, sArgs, eType, d->user, d->network, sModRet);
+            b = d->network->GetLoader()->LoadModule(sMod, sArgs, eType, d->user, d->network, sModRet);
             break;
         default:
             sModRet = "Unable to load module [" + sMod + "]: Unknown module type";
@@ -1096,7 +1096,7 @@ void NoClient::UserCommand(NoString& sLine)
         if (sType.equals("default")) {
             NoModuleInfo ModInfo;
             NoString sRetMsg;
-            if (!NoApp::Get().GetModules()->GetModInfo(ModInfo, sMod, sRetMsg)) {
+            if (!NoApp::Get().GetLoader()->GetModInfo(ModInfo, sMod, sRetMsg)) {
                 PutStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
                 return;
             }
@@ -1118,13 +1118,13 @@ void NoClient::UserCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            NoApp::Get().GetModules()->UnloadModule(sMod, sModRet);
+            NoApp::Get().GetLoader()->UnloadModule(sMod, sModRet);
             break;
         case No::UserModule:
-            d->user->GetModules()->UnloadModule(sMod, sModRet);
+            d->user->GetLoader()->UnloadModule(sMod, sModRet);
             break;
         case No::NetworkModule:
-            d->network->GetModules()->UnloadModule(sMod, sModRet);
+            d->network->GetLoader()->UnloadModule(sMod, sModRet);
             break;
         default:
             sModRet = "Unable to unload module [" + sMod + "]: Unknown module type";
@@ -1166,7 +1166,7 @@ void NoClient::UserCommand(NoString& sLine)
         if (sType.equals("default")) {
             NoModuleInfo ModInfo;
             NoString sRetMsg;
-            if (!NoApp::Get().GetModules()->GetModInfo(ModInfo, sMod, sRetMsg)) {
+            if (!NoApp::Get().GetLoader()->GetModInfo(ModInfo, sMod, sRetMsg)) {
                 PutStatus("Unable to find modinfo for [" + sMod + "] [" + sRetMsg + "]");
                 return;
             }
@@ -1188,13 +1188,13 @@ void NoClient::UserCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            NoApp::Get().GetModules()->ReloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
+            NoApp::Get().GetLoader()->ReloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
-            d->user->GetModules()->ReloadModule(sMod, sArgs, d->user, nullptr, sModRet);
+            d->user->GetLoader()->ReloadModule(sMod, sArgs, d->user, nullptr, sModRet);
             break;
         case No::NetworkModule:
-            d->network->GetModules()->ReloadModule(sMod, sArgs, d->user, d->network, sModRet);
+            d->network->GetLoader()->ReloadModule(sMod, sArgs, d->user, d->network, sModRet);
             break;
         default:
             sModRet = "Unable to reload module [" + sMod + "]: Unknown module type";

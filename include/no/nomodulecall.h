@@ -25,7 +25,7 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define ALLMODULECALL(macFUNC, macEXITER)                                      \
     do {                                                                       \
-        NoModuleLoader* GMods = NoApp::Get().GetModules();                            \
+        NoModuleLoader* GMods = NoApp::Get().GetLoader();                            \
         bool bAllExit = false;                                                 \
         if (GMods->macFUNC) {                                                   \
             bAllExit = true;                                                   \
@@ -33,7 +33,7 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             const std::map<NoString, NoUser*>& mUsers = NoApp::Get().GetUserMap();     \
             std::map<NoString, NoUser*>::const_iterator it;                           \
             for (it = mUsers.begin(); it != mUsers.end(); ++it) {              \
-                NoModuleLoader* UMods = it->second->GetModules();                    \
+                NoModuleLoader* UMods = it->second->GetLoader();                    \
                 if (UMods->macFUNC) {                                           \
                     bAllExit = true;                                           \
                     break;                                                     \
@@ -41,7 +41,7 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
                 const std::vector<NoNetwork*>& mNets = it->second->GetNetworks(); \
                 std::vector<NoNetwork*>::const_iterator it2;                      \
                 for (it2 = mNets.begin(); it2 != mNets.end(); ++it2) {         \
-                    NoModuleLoader* NMods = (*it2)->GetModules();                    \
+                    NoModuleLoader* NMods = (*it2)->GetLoader();                    \
                     if (NMods->macFUNC) {                                       \
                         bAllExit = true;                                       \
                         break;                                                 \
@@ -55,7 +55,7 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define _GLOBALMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, macEXITER) \
     do {                                                                      \
-        NoModuleLoader* GMods = NoApp::Get().GetModules();                           \
+        NoModuleLoader* GMods = NoApp::Get().GetLoader();                           \
         NoUser* pOldGUser = GMods->GetUser();                                   \
         NoNetwork* pOldGNetwork = GMods->GetNetwork();                       \
         NoClient* pOldGClient = GMods->GetClient();                             \
@@ -82,7 +82,7 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             break;                                                                  \
         }                                                                           \
         if (macUSER != nullptr) {                                                   \
-            NoModuleLoader* UMods = macUSER->GetModules();                                \
+            NoModuleLoader* UMods = macUSER->GetLoader();                                \
             NoNetwork* pOldUNetwork = UMods->GetNetwork();                         \
             NoClient* pOldUClient = UMods->GetClient();                               \
             UMods->SetNetwork(macNETWORK);                                           \
@@ -106,7 +106,7 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             break;                                                              \
         }                                                                       \
         if (macNETWORK != nullptr) {                                            \
-            NoModuleLoader* NMods = macNETWORK->GetModules();                         \
+            NoModuleLoader* NMods = macNETWORK->GetLoader();                         \
             NoClient* pOldNClient = NMods->GetClient();                           \
             NMods->SetClient(macCLIENT);                                         \
             if (NMods->macFUNC) {                                                \

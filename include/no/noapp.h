@@ -101,7 +101,7 @@ public:
     ConfigState GetConfigState() const;
     NoSocketManager& GetManager();
     const NoSocketManager& GetManager() const;
-    NoModuleLoader* GetModules() const;
+    NoModuleLoader* GetLoader() const;
     NoString GetSkinName() const;
     const NoString& GetStatusPrefix() const;
     const NoString& GetCurPath() const;
