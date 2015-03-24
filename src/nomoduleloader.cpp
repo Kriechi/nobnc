@@ -28,7 +28,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 #endif
 
 #define MODUNLOADCHK(func)                              \
-    for (NoModule * pMod : *this) {                      \
+    for (NoModule * pMod : m_modules) {                      \
         try {                                           \
             NoClient* pOldClient = pMod->GetClient();    \
             pMod->SetClient(m_client);                 \
@@ -56,7 +56,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define MODHALTCHK(func)                                \
     bool bHaltCore = false;                             \
-    for (NoModule * pMod : *this) {                      \
+    for (NoModule * pMod : m_modules) {                      \
         try {                                           \
             NoModule::ModRet e = NoModule::CONTINUE;     \
             NoClient* pOldClient = pMod->GetClient();    \
@@ -95,6 +95,10 @@ NoModuleLoader::NoModuleLoader() : m_user(nullptr), m_network(nullptr), m_client
 
 NoModuleLoader::~NoModuleLoader() { UnloadAll(); }
 
+bool NoModuleLoader::isEmpty() const { return m_modules.empty(); }
+
+std::vector<NoModule*> NoModuleLoader::GetModules() const { return m_modules; }
+
 void NoModuleLoader::SetUser(NoUser* pUser) { m_user = pUser; }
 
 void NoModuleLoader::SetNetwork(NoNetwork* pNetwork) { m_network = pNetwork; }
@@ -109,16 +113,16 @@ NoClient* NoModuleLoader::GetClient() const { return m_client; }
 
 void NoModuleLoader::UnloadAll()
 {
-    while (size()) {
+    while (!m_modules.empty()) {
         NoString sRetMsg;
-        NoString sModName = back()->GetModName();
+        NoString sModName = m_modules.back()->GetModName();
         UnloadModule(sModName, sRetMsg);
     }
 }
 
 bool NoModuleLoader::OnBoot()
 {
-    for (NoModule* pMod : *this) {
+    for (NoModule* pMod : m_modules) {
         try {
             if (!pMod->OnBoot()) {
                 return true;
@@ -352,7 +356,7 @@ bool NoModuleLoader::OnModCTCP(const NoString& sMessage)
 bool NoModuleLoader::OnServerCapAvailable(const NoString& sCap)
 {
     bool bResult = false;
-    for (NoModule* pMod : *this) {
+    for (NoModule* pMod : m_modules) {
         try {
             NoClient* pOldClient = pMod->GetClient();
             pMod->SetClient(m_client);
@@ -414,7 +418,7 @@ bool NoModuleLoader::OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps)
 bool NoModuleLoader::IsClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState)
 {
     bool bResult = false;
-    for (NoModule* pMod : *this) {
+    for (NoModule* pMod : m_modules) {
         try {
             NoClient* pOldClient = pMod->GetClient();
             pMod->SetClient(m_client);
@@ -467,7 +471,7 @@ bool NoModuleLoader::OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::Modu
 
 NoModule* NoModuleLoader::FindModule(const NoString& sModule) const
 {
-    for (NoModule* pMod : *this) {
+    for (NoModule* pMod : m_modules) {
         if (sModule.equals(pMod->GetModName())) {
             return pMod;
         }
@@ -532,7 +536,7 @@ bool NoModuleLoader::LoadModule(const NoString& sModule, const NoString& sArgs, 
     pModule->SetDescription(Info.GetDescription());
     pModule->SetArgs(sArgs);
     pModule->SetModPath(NoDir::ChangeDir(NoApp::Get().GetCurPath(), sModPath));
-    push_back(pModule);
+    m_modules.push_back(pModule);
 
     bool bLoaded;
     try {
@@ -585,9 +589,9 @@ bool NoModuleLoader::UnloadModule(const NoString& sModule, NoString& sRetMsg)
     if (p) {
         delete pModule;
 
-        for (iterator it = begin(); it != end(); ++it) {
+        for (auto it = m_modules.begin(); it != m_modules.end(); ++it) {
             if (*it == pModule) {
-                erase(it);
+                m_modules.erase(it);
                 break;
             }
         }

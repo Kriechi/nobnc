@@ -271,7 +271,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     NoModuleLoader* vCurMods = GetLoader();
     const NoModuleLoader* vNewMods = Network.GetLoader();
 
-    for (NoModule* pNewMod : *vNewMods) {
+    for (NoModule* pNewMod : vNewMods->GetModules()) {
         NoString sModRet;
         NoModule* pCurMod = vCurMods->FindModule(pNewMod->GetModName());
 
@@ -282,7 +282,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
         }
     }
 
-    for (NoModule* pCurMod : *vCurMods) {
+    for (NoModule* pCurMod : vCurMods->GetModules()) {
         NoModule* pNewMod = vNewMods->FindModule(pCurMod->GetModName());
 
         if (!pNewMod) {
@@ -539,16 +539,14 @@ NoSettings NoNetwork::ToConfig() const
     // Modules
     const NoModuleLoader* Mods = GetLoader();
 
-    if (!Mods->empty()) {
-        for (NoModule* pMod : *Mods) {
-            NoString sArgs = pMod->GetArgs();
+    for (NoModule* pMod : Mods->GetModules()) {
+        NoString sArgs = pMod->GetArgs();
 
-            if (!sArgs.empty()) {
-                sArgs = " " + sArgs;
-            }
-
-            config.AddKeyValuePair("LoadModule", pMod->GetModName() + sArgs);
+        if (!sArgs.empty()) {
+            sArgs = " " + sArgs;
         }
+
+        config.AddKeyValuePair("LoadModule", pMod->GetModName() + sArgs);
     }
 
     // Servers

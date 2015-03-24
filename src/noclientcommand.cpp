@@ -678,8 +678,8 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const NoModuleLoader* vMods = pOldNetwork->GetLoader();
-        for (NoModule* pMod : *vMods) {
+        std::vector<NoModule*> vMods = pOldNetwork->GetLoader()->GetModules();
+        for (NoModule* pMod : vMods) {
             NoString sOldModPath = pOldNetwork->GetNetworkPath() + "/moddata/" + pMod->GetModName();
             NoString sNewModPath = pNewUser->GetUserPath() + "/networks/" + sNewNetwork + "/moddata/" + pMod->GetModName();
 
@@ -867,7 +867,7 @@ void NoClient::UserCommand(NoString& sLine)
         if (d->user->IsAdmin()) {
             NoModuleLoader* GModules = NoApp::Get().GetLoader();
 
-            if (!GModules->size()) {
+            if (GModules->isEmpty()) {
                 PutStatus("No global modules loaded.");
             } else {
                 PutStatus("Global modules:");
@@ -875,7 +875,7 @@ void NoClient::UserCommand(NoString& sLine)
                 GTable.addColumn("Name");
                 GTable.addColumn("Arguments");
 
-                for (const NoModule* pMod : *GModules) {
+                for (const NoModule* pMod : GModules->GetModules()) {
                     GTable.addRow();
                     GTable.setValue("Name", pMod->GetModName());
                     GTable.setValue("Arguments", pMod->GetArgs());
@@ -887,7 +887,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         NoModuleLoader* Modules = d->user->GetLoader();
 
-        if (!Modules->size()) {
+        if (Modules->isEmpty()) {
             PutStatus("Your user has no modules loaded.");
         } else {
             PutStatus("User modules:");
@@ -895,7 +895,7 @@ void NoClient::UserCommand(NoString& sLine)
             Table.addColumn("Name");
             Table.addColumn("Arguments");
 
-            for (const NoModule* pMod : *Modules) {
+            for (const NoModule* pMod : Modules->GetModules()) {
                 Table.addRow();
                 Table.setValue("Name", pMod->GetModName());
                 Table.setValue("Arguments", pMod->GetArgs());
@@ -906,7 +906,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         if (d->network) {
             NoModuleLoader* NetworkModules = d->network->GetLoader();
-            if (NetworkModules->empty()) {
+            if (NetworkModules->isEmpty()) {
                 PutStatus("This network has no modules loaded.");
             } else {
                 PutStatus("Network modules:");
@@ -914,7 +914,7 @@ void NoClient::UserCommand(NoString& sLine)
                 Table.addColumn("Name");
                 Table.addColumn("Arguments");
 
-                for (const NoModule* pMod : *NetworkModules) {
+                for (const NoModule* pMod : NetworkModules->GetModules()) {
                     Table.addRow();
                     Table.setValue("Name", pMod->GetModName());
                     Table.setValue("Arguments", pMod->GetArgs());

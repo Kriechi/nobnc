@@ -1354,7 +1354,7 @@ class NoAdminMod : public NoModule
 
     void ListModulesFor(NoModuleLoader* Modules, const NoString& sWhere)
     {
-        if (!Modules->size()) {
+        if (Modules->isEmpty()) {
             PutModule(sWhere + " has no modules loaded.");
         } else {
             PutModule("Modules loaded for " + sWhere + ":");
@@ -1362,10 +1362,10 @@ class NoAdminMod : public NoModule
             Table.addColumn("Name");
             Table.addColumn("Arguments");
 
-            for (uint b = 0; b < Modules->size(); b++) {
+            for (NoModule* mod : Modules->GetModules()) {
                 Table.addRow();
-                Table.setValue("Name", (*Modules)[b]->GetModName());
-                Table.setValue("Arguments", (*Modules)[b]->GetArgs());
+                Table.setValue("Name", mod->GetModName());
+                Table.setValue("Arguments", mod->GetArgs());
             }
 
             PutModule(Table);

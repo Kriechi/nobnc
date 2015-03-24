@@ -30,11 +30,14 @@ class NoTemplate;
 class NoIrcSocket;
 class NoNick;
 
-class NO_EXPORT NoModuleLoader : public std::vector<NoModule*>
+class NO_EXPORT NoModuleLoader
 {
 public:
     NoModuleLoader();
     ~NoModuleLoader();
+
+    bool isEmpty() const;
+    std::vector<NoModule*> GetModules() const;
 
     void SetUser(NoUser* pUser);
     void SetNetwork(NoNetwork* pNetwork);
@@ -170,6 +173,7 @@ private:
     NoUser* m_user;
     NoNetwork* m_network;
     NoClient* m_client;
+    std::vector<NoModule*> m_modules;
 };
 
 #endif // NOMODULELOADER_H

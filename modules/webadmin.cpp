@@ -31,57 +31,27 @@
 #include <no/noregistry.h>
 #include <no/nonick.h>
 
-/* Stuff to be able to write this:
-   // i will be name of local variable, see below
-   // pUser can be nullptr if only global modules are needed
-   FOR_EACH_MODULE(i, pUser) {
-       // i is local variable of type NoModuleLoader::iterator,
-       // so *i has type NoModule*
-   }
-*/
-struct FOR_EACH_MODULE_Type
+template <typename T>
+static std::vector<NoModule*> allModules(T* p)
 {
-    enum {
-        AtGlobal,
-        AtUser,
-        AtNetwork,
-    } where;
-    NoModuleLoader* CMuser;
-    NoModuleLoader* CMnet;
-    FOR_EACH_MODULE_Type(NoUser* pUser) : CMuser(pUser ? pUser->GetLoader() : nullptr), CMnet(nullptr)
-    {
-        where = AtGlobal;
-    }
-    FOR_EACH_MODULE_Type(NoNetwork* pNetwork)
-        : CMuser(pNetwork ? pNetwork->GetUser()->GetLoader() : nullptr), CMnet(pNetwork ? pNetwork->GetLoader() : nullptr)
-    {
-        where = AtGlobal;
-    }
-    FOR_EACH_MODULE_Type(std::pair<NoUser*, NoNetwork*> arg)
-        : CMuser(arg.first ? arg.first->GetLoader() : nullptr), CMnet(arg.second ? arg.second->GetLoader() : nullptr)
-    {
-        where = AtGlobal;
-    }
-    operator bool() { return false; }
-};
-
-inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, NoModuleLoader::iterator& i)
-{
-    if (state.where == FOR_EACH_MODULE_Type::AtGlobal && state.CMuser && i == NoApp::Get().GetLoader()->end()) {
-        i = state.CMuser->begin();
-        state.where = FOR_EACH_MODULE_Type::AtUser;
-    }
-    if (state.where == FOR_EACH_MODULE_Type::AtUser && state.CMnet && state.CMuser && i == state.CMuser->end()) {
-        i = state.CMnet->begin();
-        state.where = FOR_EACH_MODULE_Type::AtNetwork;
-    }
-    return !(state.where == FOR_EACH_MODULE_Type::AtNetwork && (!state.CMnet || i == state.CMnet->end()));
+    std::vector<NoModule*> allMods;
+    std::vector<NoModule*> globalMods = NoApp::Get().GetLoader()->GetModules();
+    std::vector<NoModule*> typeMods = p->GetLoader()->GetModules();
+    allMods.reserve(globalMods.size() + typeMods.size());
+    allMods.insert(allMods.end(), globalMods.begin(), globalMods.end());
+    allMods.insert(allMods.end(), typeMods.begin(), typeMods.end());
+    return allMods;
 }
 
-#define FOR_EACH_MODULE(I, pUserOrNetwork)                           \
-    if (FOR_EACH_MODULE_Type FOR_EACH_MODULE_Var = pUserOrNetwork) { \
-    } else                                                           \
-        for (NoModuleLoader::iterator I = NoApp::Get().GetLoader()->begin(); FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Var, I); ++I)
+template <typename T1, typename T2>
+static std::vector<NoModule*> allModules(T1* p1, T2* p2)
+{
+    std::vector<NoModule*> allMods = allModules(p1);
+    std::vector<NoModule*> typeMods = p2->GetLoader()->GetModules();
+    allMods.reserve(allMods.size() + typeMods.size());
+    allMods.insert(allMods.end(), typeMods.begin(), typeMods.end());
+    return allMods;
+}
 
 class NoWebAdminMod : public NoModule
 {
@@ -410,9 +380,9 @@ public:
         } else if (pUser) {
             NoModuleLoader* Modules = pUser->GetLoader();
 
-            for (a = 0; a < Modules->size(); a++) {
-                NoString sModName = (*Modules)[a]->GetModName();
-                NoString sArgs = (*Modules)[a]->GetArgs();
+            for (NoModule* pMod : Modules->GetModules()) {
+                NoString sModName = pMod->GetModName();
+                NoString sArgs = pMod->GetArgs();
                 NoString sModRet;
                 NoString sModLoadError;
 
@@ -727,14 +697,13 @@ public:
                 o4["Checked"] = "true";
             }
 
-            FOR_EACH_MODULE(i, pNetwork)
-            {
+            for (NoModule* pMod : allModules(pNetwork)) {
                 NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
-                if ((*i)->OnEmbeddedWebRequest(WebSock, "webadmin/channel", mod)) {
-                    mod["Embed"] = WebSock.FindTmpl(*i, "WebadminChan.tmpl");
-                    mod["ModName"] = (*i)->GetModName();
+                if (pMod->OnEmbeddedWebRequest(WebSock, "webadmin/channel", mod)) {
+                    mod["Embed"] = WebSock.FindTmpl(pMod, "WebadminChan.tmpl");
+                    mod["ModName"] = pMod->GetModName();
                 }
             }
 
@@ -795,7 +764,9 @@ public:
         TmplMod["User"] = pUser->GetUserName();
         TmplMod["ChanName"] = pChan->getName();
         TmplMod["WebadminAction"] = "change";
-        FOR_EACH_MODULE(it, pNetwork) { (*it)->OnEmbeddedWebRequest(WebSock, "webadmin/channel", TmplMod); }
+        for (NoModule* pMod : allModules(pNetwork)) {
+            pMod->OnEmbeddedWebRequest(WebSock, "webadmin/channel", TmplMod);
+        }
 
         if (!NoApp::Get().WriteConfig()) {
             WebSock.PrintErrorPage("Channel added/modified, but config was not written");
@@ -956,14 +927,13 @@ public:
                 Tmpl["JoinDelay"] = "0";
             }
 
-            FOR_EACH_MODULE(i, std::make_pair(pUser, pNetwork))
-            {
+            for (NoModule* pMod : allModules(pUser, pNetwork)) {
                 NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
-                if ((*i)->OnEmbeddedWebRequest(WebSock, "webadmin/network", mod)) {
-                    mod["Embed"] = WebSock.FindTmpl(*i, "WebadminNetwork.tmpl");
-                    mod["ModName"] = (*i)->GetModName();
+                if (pMod->OnEmbeddedWebRequest(WebSock, "webadmin/network", mod)) {
+                    mod["Embed"] = WebSock.FindTmpl(pMod, "WebadminNetwork.tmpl");
+                    mod["ModName"] = pMod->GetModName();
                 }
             }
 
@@ -1012,7 +982,7 @@ public:
                 return true;
             }
             if (pOldNetwork) {
-                for (NoModule* pModule : *pOldNetwork->GetLoader()) {
+                for (NoModule* pModule : pOldNetwork->GetLoader()->GetModules()) {
                     NoString sPath = pUser->GetUserPath() + "/networks/" + sName + "/moddata/" + pModule->GetModName();
                     NoRegistry registry(pModule);
                     registry.copy(sPath);
@@ -1140,9 +1110,7 @@ public:
         const NoModuleLoader* vCurMods = pNetwork->GetLoader();
         std::set<NoString> ssUnloadMods;
 
-        for (uint a = 0; a < vCurMods->size(); a++) {
-            NoModule* pCurMod = (*vCurMods)[a];
-
+        for (NoModule* pCurMod : vCurMods->GetModules()) {
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() && pCurMod->GetModName() != GetModName()) {
                 ssUnloadMods.insert(pCurMod->GetModName());
             }
@@ -1156,9 +1124,8 @@ public:
         TmplMod["Username"] = pUser->GetUserName();
         TmplMod["Name"] = pNetwork->GetName();
         TmplMod["WebadminAction"] = "change";
-        FOR_EACH_MODULE(it, std::make_pair(pUser, pNetwork))
-        {
-            (*it)->OnEmbeddedWebRequest(WebSock, "webadmin/network", TmplMod);
+        for (NoModule* pMod : allModules(pUser, pNetwork)) {
+            pMod->OnEmbeddedWebRequest(WebSock, "webadmin/network", TmplMod);
         }
 
         if (!NoApp::Get().WriteConfig()) {
@@ -1504,14 +1471,13 @@ public:
                 o12["Checked"] = "true";
             }
 
-            FOR_EACH_MODULE(i, pUser)
-            {
+            for (NoModule* pMod : allModules(pUser)) {
                 NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
-                if ((*i)->OnEmbeddedWebRequest(WebSock, "webadmin/user", mod)) {
-                    mod["Embed"] = WebSock.FindTmpl(*i, "WebadminUser.tmpl");
-                    mod["ModName"] = (*i)->GetModName();
+                if (pMod->OnEmbeddedWebRequest(WebSock, "webadmin/user", mod)) {
+                    mod["Embed"] = WebSock.FindTmpl(pMod, "WebadminUser.tmpl");
+                    mod["ModName"] = pMod->GetModName();
                 }
             }
 
@@ -1565,7 +1531,9 @@ public:
         NoTemplate TmplMod;
         TmplMod["Username"] = sUsername;
         TmplMod["WebadminAction"] = "change";
-        FOR_EACH_MODULE(it, pUser) { (*it)->OnEmbeddedWebRequest(WebSock, "webadmin/user", TmplMod); }
+        for (NoModule* pMod : allModules(pUser)) {
+            pMod->OnEmbeddedWebRequest(WebSock, "webadmin/user", TmplMod);
+        }
 
         if (!NoApp::Get().WriteConfig()) {
             WebSock.PrintErrorPage("User " + sAction + ", but config was not written");
@@ -1970,9 +1938,7 @@ public:
         const NoModuleLoader* vCurMods = NoApp::Get().GetLoader();
         std::set<NoString> ssUnloadMods;
 
-        for (a = 0; a < vCurMods->size(); a++) {
-            NoModule* pCurMod = (*vCurMods)[a];
-
+        for (NoModule* pCurMod : vCurMods->GetModules()) {
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() &&
                 (No::GlobalModule != GetType() || pCurMod->GetModName() != GetModName())) {
                 ssUnloadMods.insert(pCurMod->GetModName());
