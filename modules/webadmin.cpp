@@ -46,20 +46,19 @@ struct FOR_EACH_MODULE_Type
         AtUser,
         AtNetwork,
     } where;
-    NoModules CMtemp;
-    NoModules& CMuser;
-    NoModules& CMnet;
-    FOR_EACH_MODULE_Type(NoUser* pUser) : CMuser(pUser ? *pUser->GetModules() : CMtemp), CMnet(CMtemp)
+    NoModules* CMuser;
+    NoModules* CMnet;
+    FOR_EACH_MODULE_Type(NoUser* pUser) : CMuser(pUser ? pUser->GetModules() : nullptr), CMnet(nullptr)
     {
         where = AtGlobal;
     }
     FOR_EACH_MODULE_Type(NoNetwork* pNetwork)
-        : CMuser(pNetwork ? *pNetwork->GetUser()->GetModules() : CMtemp), CMnet(pNetwork ? *pNetwork->GetModules() : CMtemp)
+        : CMuser(pNetwork ? pNetwork->GetUser()->GetModules() : nullptr), CMnet(pNetwork ? pNetwork->GetModules() : nullptr)
     {
         where = AtGlobal;
     }
     FOR_EACH_MODULE_Type(std::pair<NoUser*, NoNetwork*> arg)
-        : CMuser(arg.first ? *arg.first->GetModules() : CMtemp), CMnet(arg.second ? *arg.second->GetModules() : CMtemp)
+        : CMuser(arg.first ? arg.first->GetModules() : nullptr), CMnet(arg.second ? arg.second->GetModules() : nullptr)
     {
         where = AtGlobal;
     }
@@ -68,15 +67,15 @@ struct FOR_EACH_MODULE_Type
 
 inline bool FOR_EACH_MODULE_CanContinue(FOR_EACH_MODULE_Type& state, NoModules::iterator& i)
 {
-    if (state.where == FOR_EACH_MODULE_Type::AtGlobal && i == NoApp::Get().GetModules()->end()) {
-        i = state.CMuser.begin();
+    if (state.where == FOR_EACH_MODULE_Type::AtGlobal && state.CMuser && i == NoApp::Get().GetModules()->end()) {
+        i = state.CMuser->begin();
         state.where = FOR_EACH_MODULE_Type::AtUser;
     }
-    if (state.where == FOR_EACH_MODULE_Type::AtUser && i == state.CMuser.end()) {
-        i = state.CMnet.begin();
+    if (state.where == FOR_EACH_MODULE_Type::AtUser && state.CMnet && state.CMuser && i == state.CMuser->end()) {
+        i = state.CMnet->begin();
         state.where = FOR_EACH_MODULE_Type::AtNetwork;
     }
-    return !(state.where == FOR_EACH_MODULE_Type::AtNetwork && i == state.CMnet.end());
+    return !(state.where == FOR_EACH_MODULE_Type::AtNetwork && (!state.CMnet || i == state.CMnet->end()));
 }
 
 #define FOR_EACH_MODULE(I, pUserOrNetwork)                           \

@@ -36,9 +36,6 @@ public:
     NoModules();
     ~NoModules();
 
-    NoModules(const NoModules&) = default;
-    NoModules& operator=(const NoModules&) = default;
-
     void SetUser(NoUser* pUser) { m_user = pUser; }
     void SetNetwork(NoNetwork* pNetwork) { m_network = pNetwork; }
     void SetClient(NoClient* pClient) { m_client = pClient; }
@@ -164,6 +161,9 @@ public:
     bool OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType);
 
 private:
+    NoModules(const NoModules&) = delete;
+    NoModules& operator=(const NoModules&) = delete;
+
     static NoModuleHandle
     OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg);
 
