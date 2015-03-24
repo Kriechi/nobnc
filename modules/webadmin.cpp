@@ -54,12 +54,12 @@ struct FOR_EACH_MODULE_Type
         where = AtGlobal;
     }
     FOR_EACH_MODULE_Type(NoNetwork* pNetwork)
-        : CMuser(pNetwork ? *pNetwork->GetUser()->GetModules() : CMtemp), CMnet(pNetwork ? pNetwork->GetModules() : CMtemp)
+        : CMuser(pNetwork ? *pNetwork->GetUser()->GetModules() : CMtemp), CMnet(pNetwork ? *pNetwork->GetModules() : CMtemp)
     {
         where = AtGlobal;
     }
     FOR_EACH_MODULE_Type(std::pair<NoUser*, NoNetwork*> arg)
-        : CMuser(arg.first ? *arg.first->GetModules() : CMtemp), CMnet(arg.second ? arg.second->GetModules() : CMtemp)
+        : CMuser(arg.first ? *arg.first->GetModules() : CMtemp), CMnet(arg.second ? *arg.second->GetModules() : CMtemp)
     {
         where = AtGlobal;
     }
@@ -835,7 +835,7 @@ public:
                 l["ArgsHelpText"] = Info.GetArgsHelpText();
 
                 if (pNetwork) {
-                    NoModule* pModule = pNetwork->GetModules().FindModule(Info.GetName());
+                    NoModule* pModule = pNetwork->GetModules()->FindModule(Info.GetName());
                     if (pModule) {
                         l["Checked"] = "true";
                         l["Args"] = pModule->GetArgs();
@@ -1013,7 +1013,7 @@ public:
                 return true;
             }
             if (pOldNetwork) {
-                for (NoModule* pModule : pOldNetwork->GetModules()) {
+                for (NoModule* pModule : *pOldNetwork->GetModules()) {
                     NoString sPath = pUser->GetUserPath() + "/networks/" + sName + "/moddata/" + pModule->GetModName();
                     NoRegistry registry(pModule);
                     registry.copy(sPath);
@@ -1118,14 +1118,14 @@ public:
                 if (!sModName.empty()) {
                     NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
-                    NoModule* pMod = pNetwork->GetModules().FindModule(sModName);
+                    NoModule* pMod = pNetwork->GetModules()->FindModule(sModName);
 
                     if (!pMod) {
-                        if (!pNetwork->GetModules().LoadModule(sModName, sArgs, No::NetworkModule, pUser, pNetwork, sModRet)) {
+                        if (!pNetwork->GetModules()->LoadModule(sModName, sArgs, No::NetworkModule, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } else if (pMod->GetArgs() != sArgs) {
-                        if (!pNetwork->GetModules().ReloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
+                        if (!pNetwork->GetModules()->ReloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                         }
                     }
@@ -1138,11 +1138,11 @@ public:
             }
         }
 
-        const NoModules& vCurMods = pNetwork->GetModules();
+        const NoModules* vCurMods = pNetwork->GetModules();
         std::set<NoString> ssUnloadMods;
 
-        for (uint a = 0; a < vCurMods.size(); a++) {
-            NoModule* pCurMod = vCurMods[a];
+        for (uint a = 0; a < vCurMods->size(); a++) {
+            NoModule* pCurMod = (*vCurMods)[a];
 
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() && pCurMod->GetModName() != GetModName()) {
                 ssUnloadMods.insert(pCurMod->GetModName());
@@ -1150,7 +1150,7 @@ public:
         }
 
         for (std::set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
-            pNetwork->GetModules().UnloadModule(*it2);
+            pNetwork->GetModules()->UnloadModule(*it2);
         }
 
         NoTemplate TmplMod;
@@ -1415,8 +1415,8 @@ public:
                     uint networksWithRenderedModuleCount = 0;
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
-                        const NoModules& networkModules = pCurrentNetwork->GetModules();
-                        if (networkModules.FindModule(Info.GetName())) {
+                        const NoModules* networkModules = pCurrentNetwork->GetModules();
+                        if (networkModules->FindModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
                     }
@@ -1889,7 +1889,7 @@ public:
                     networksCount += userNetworks.size();
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
-                        if (pCurrentNetwork->GetModules().FindModule(Info.GetName())) {
+                        if (pCurrentNetwork->GetModules()->FindModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
                     }

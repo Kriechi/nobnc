@@ -1291,7 +1291,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        LoadModuleFor(&pNetwork->GetModules(), sModName, sArgs, No::NetworkModule, pUser, pNetwork);
+        LoadModuleFor(pNetwork->GetModules(), sModName, sArgs, No::NetworkModule, pUser, pNetwork);
     }
 
     void UnLoadModuleFor(NoModules* Modules, const NoString& sModName, NoUser* pUser)
@@ -1349,7 +1349,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        UnLoadModuleFor(&pNetwork->GetModules(), sModName, pUser);
+        UnLoadModuleFor(pNetwork->GetModules(), sModName, pUser);
     }
 
     void ListModulesFor(NoModules* Modules, const NoString& sWhere)
@@ -1405,7 +1405,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        ListModulesFor(&pNetwork->GetModules(), "Network [" + pNetwork->GetName() + "] of user [" + pUser->GetUserName() + "]");
+        ListModulesFor(pNetwork->GetModules(), "Network [" + pNetwork->GetName() + "] of user [" + pUser->GetUserName() + "]");
     }
 
 public:

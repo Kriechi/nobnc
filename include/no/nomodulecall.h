@@ -41,8 +41,8 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
                 const std::vector<NoNetwork*>& mNets = it->second->GetNetworks(); \
                 std::vector<NoNetwork*>::const_iterator it2;                      \
                 for (it2 = mNets.begin(); it2 != mNets.end(); ++it2) {         \
-                    NoModules& NMods = (*it2)->GetModules();                    \
-                    if (NMods.macFUNC) {                                       \
+                    NoModules* NMods = (*it2)->GetModules();                    \
+                    if (NMods->macFUNC) {                                       \
                         bAllExit = true;                                       \
                         break;                                                 \
                     }                                                          \
@@ -106,14 +106,14 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             break;                                                              \
         }                                                                       \
         if (macNETWORK != nullptr) {                                            \
-            NoModules& NMods = macNETWORK->GetModules();                         \
-            NoClient* pOldNClient = NMods.GetClient();                           \
-            NMods.SetClient(macCLIENT);                                         \
-            if (NMods.macFUNC) {                                                \
-                NMods.SetClient(pOldNClient);                                   \
+            NoModules* NMods = macNETWORK->GetModules();                         \
+            NoClient* pOldNClient = NMods->GetClient();                           \
+            NMods->SetClient(macCLIENT);                                         \
+            if (NMods->macFUNC) {                                                \
+                NMods->SetClient(pOldNClient);                                   \
                 *macEXITER = true;                                              \
             }                                                                   \
-            NMods.SetClient(pOldNClient);                                       \
+            NMods->SetClient(pOldNClient);                                       \
         }                                                                       \
     } while (false)
 

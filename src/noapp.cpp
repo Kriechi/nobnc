@@ -67,7 +67,7 @@ NoApp::~NoApp()
 
         const std::vector<NoNetwork*>& networks = it.second->GetNetworks();
         for (NoNetwork* pNetwork : networks) {
-            pNetwork->GetModules().UnloadAll();
+            pNetwork->GetModules()->UnloadAll();
         }
     }
 
@@ -1550,10 +1550,10 @@ bool NoApp::UpdateModule(const NoString& sModule)
         // See if the user has this module loaded to a network
         std::vector<NoNetwork*> vNetworks = pUser->GetNetworks();
         for (NoNetwork* pNetwork : vNetworks) {
-            pModule = pNetwork->GetModules().FindModule(sModule);
+            pModule = pNetwork->GetModules()->FindModule(sModule);
             if (pModule) {
                 mnsLoaded[pNetwork] = pModule->GetArgs();
-                pNetwork->GetModules().UnloadModule(sModule);
+                pNetwork->GetModules()->UnloadModule(sModule);
             }
         }
     }
@@ -1597,7 +1597,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
         NoNetwork* pNetwork = it.first;
         const NoString& sArgs = it.second;
 
-        if (!pNetwork->GetModules().LoadModule(sModule, sArgs, No::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
+        if (!pNetwork->GetModules()->LoadModule(sModule, sArgs, No::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
             NO_DEBUG("Failed to reload [" << sModule << "] for [" << pNetwork->GetUser()->GetUserName() << "/"
                                        << pNetwork->GetName() << "] [" << sErr << "]");
             bError = true;

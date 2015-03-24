@@ -34,14 +34,14 @@
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                             \
     {                                                                         \
         NoModule* pModule = nullptr;                                           \
-        if (NETWORK && (pModule = (NETWORK)->GetModules().FindModule(MOD))) { \
+        if (NETWORK && (pModule = (NETWORK)->GetModules()->FindModule(MOD))) { \
             try {                                                             \
                 pModule->SetClient(CLIENT);                                   \
                 pModule->FUNC;                                                \
                 pModule->SetClient(nullptr);                                  \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
-                    (NETWORK)->GetModules().UnloadModule(MOD);                \
+                    (NETWORK)->GetModules()->UnloadModule(MOD);                \
                 }                                                             \
             }                                                                 \
         } else if ((pModule = (USER)->GetModules()->FindModule(MOD))) {        \

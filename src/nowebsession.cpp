@@ -414,12 +414,12 @@ void NoWebSocket::SetVars()
 
         std::vector<NoNetwork*> vNetworks = GetSession()->GetUser()->GetNetworks();
         for (NoNetwork* pNetwork : vNetworks) {
-            NoModules& vnMods = pNetwork->GetModules();
+            NoModules* vnMods = pNetwork->GetModules();
 
             NoTemplate& Row = m_template.AddRow("NetworkModLoop");
             Row["NetworkName"] = pNetwork->GetName();
 
-            for (NoModule* pnMod : vnMods) {
+            for (NoModule* pnMod : *vnMods) {
                 AddModLoop("ModLoop", *pnMod, &Row);
             }
         }
@@ -792,7 +792,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             pModule = GetSession()->GetUser()->GetModules()->FindModule(m_modName);
             break;
         case No::NetworkModule:
-            pModule = pNetwork->GetModules().FindModule(m_modName);
+            pModule = pNetwork->GetModules()->FindModule(m_modName);
             break;
         }
 

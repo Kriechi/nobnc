@@ -1156,7 +1156,7 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
                 fNVFile.Copy(sNetworkModPath + "/.registry");
             }
 
-            bModRet = pNetwork->GetModules().LoadModule(sModName, sArgs, No::NetworkModule, this, pNetwork, sModRet);
+            bModRet = pNetwork->GetModules()->LoadModule(sModName, sArgs, No::NetworkModule, this, pNetwork, sModRet);
             if (!bModRet) {
                 break;
             }
