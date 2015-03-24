@@ -36,12 +36,12 @@ public:
     NoModules();
     ~NoModules();
 
-    void SetUser(NoUser* pUser) { m_user = pUser; }
-    void SetNetwork(NoNetwork* pNetwork) { m_network = pNetwork; }
-    void SetClient(NoClient* pClient) { m_client = pClient; }
-    NoUser* GetUser() const { return m_user; }
-    NoNetwork* GetNetwork() const { return m_network; }
-    NoClient* GetClient() const { return m_client; }
+    void SetUser(NoUser* pUser);
+    void SetNetwork(NoNetwork* pNetwork);
+    void SetClient(NoClient* pClient);
+    NoUser* GetUser() const;
+    NoNetwork* GetNetwork() const;
+    NoClient* GetClient() const;
 
     void UnloadAll();
 

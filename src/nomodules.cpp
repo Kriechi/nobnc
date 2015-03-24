@@ -95,6 +95,18 @@ NoModules::NoModules() : m_user(nullptr), m_network(nullptr), m_client(nullptr) 
 
 NoModules::~NoModules() { UnloadAll(); }
 
+void NoModules::SetUser(NoUser* pUser) { m_user = pUser; }
+
+void NoModules::SetNetwork(NoNetwork* pNetwork) { m_network = pNetwork; }
+
+void NoModules::SetClient(NoClient* pClient) { m_client = pClient; }
+
+NoUser* NoModules::GetUser() const { return m_user; }
+
+NoNetwork* NoModules::GetNetwork() const { return m_network; }
+
+NoClient* NoModules::GetClient() const { return m_client; }
+
 void NoModules::UnloadAll()
 {
     while (size()) {
