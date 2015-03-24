@@ -33,8 +33,8 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             const std::map<NoString, NoUser*>& mUsers = NoApp::Get().GetUserMap();     \
             std::map<NoString, NoUser*>::const_iterator it;                           \
             for (it = mUsers.begin(); it != mUsers.end(); ++it) {              \
-                NoModules& UMods = it->second->GetModules();                    \
-                if (UMods.macFUNC) {                                           \
+                NoModules* UMods = it->second->GetModules();                    \
+                if (UMods->macFUNC) {                                           \
                     bAllExit = true;                                           \
                     break;                                                     \
                 }                                                              \
@@ -82,18 +82,18 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             break;                                                                  \
         }                                                                           \
         if (macUSER != nullptr) {                                                   \
-            NoModules& UMods = macUSER->GetModules();                                \
-            NoNetwork* pOldUNetwork = UMods.GetNetwork();                         \
-            NoClient* pOldUClient = UMods.GetClient();                               \
-            UMods.SetNetwork(macNETWORK);                                           \
-            UMods.SetClient(macCLIENT);                                             \
-            if (UMods.macFUNC) {                                                    \
-                UMods.SetNetwork(pOldUNetwork);                                     \
-                UMods.SetClient(pOldUClient);                                       \
+            NoModules* UMods = macUSER->GetModules();                                \
+            NoNetwork* pOldUNetwork = UMods->GetNetwork();                         \
+            NoClient* pOldUClient = UMods->GetClient();                               \
+            UMods->SetNetwork(macNETWORK);                                           \
+            UMods->SetClient(macCLIENT);                                             \
+            if (UMods->macFUNC) {                                                    \
+                UMods->SetNetwork(pOldUNetwork);                                     \
+                UMods->SetClient(pOldUClient);                                       \
                 *macEXITER = true;                                                  \
             }                                                                       \
-            UMods.SetNetwork(pOldUNetwork);                                         \
-            UMods.SetClient(pOldUClient);                                           \
+            UMods->SetNetwork(pOldUNetwork);                                         \
+            UMods->SetClient(pOldUClient);                                           \
         }                                                                           \
     } while (false)
 

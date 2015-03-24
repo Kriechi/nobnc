@@ -214,7 +214,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         if (sValue.toBool()) {
             No::printAction("Loading Module [bouncedcc]");
             NoString sModRet;
-            bool bModRet = GetModules().LoadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
+            bool bModRet = GetModules()->LoadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -223,7 +223,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             }
 
             if (sDCCLookupValue.equals("Client")) {
-                NoModule* pMod = GetModules().FindModule("bouncedcc");
+                NoModule* pMod = GetModules()->FindModule("bouncedcc");
                 if (pMod) {
                     NoRegistry registry(pMod);
                     registry.setValue("UseClientIP", "1");
@@ -773,22 +773,22 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 
     // Modules
     std::set<NoString> ssUnloadMods;
-    NoModules& vCurMods = GetModules();
-    const NoModules& vNewMods = User.GetModules();
+    NoModules* vCurMods = GetModules();
+    const NoModules* vNewMods = User.GetModules();
 
-    for (NoModule* pNewMod : vNewMods) {
+    for (NoModule* pNewMod : *vNewMods) {
         NoString sModRet;
-        NoModule* pCurMod = vCurMods.FindModule(pNewMod->GetModName());
+        NoModule* pCurMod = vCurMods->FindModule(pNewMod->GetModName());
 
         if (!pCurMod) {
-            vCurMods.LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::UserModule, this, nullptr, sModRet);
+            vCurMods->LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::UserModule, this, nullptr, sModRet);
         } else if (pNewMod->GetArgs() != pCurMod->GetArgs()) {
-            vCurMods.ReloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), this, nullptr, sModRet);
+            vCurMods->ReloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), this, nullptr, sModRet);
         }
     }
 
-    for (NoModule* pCurMod : vCurMods) {
-        NoModule* pNewMod = vNewMods.FindModule(pCurMod->GetModName());
+    for (NoModule* pCurMod : *vCurMods) {
+        NoModule* pNewMod = vNewMods->FindModule(pCurMod->GetModName());
 
         if (!pNewMod) {
             ssUnloadMods.insert(pCurMod->GetModName());
@@ -796,7 +796,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     }
 
     for (const NoString& sMod : ssUnloadMods) {
-        vCurMods.UnloadModule(sMod);
+        vCurMods->UnloadModule(sMod);
     }
     // !Modules
 
@@ -947,10 +947,10 @@ NoSettings NoUser::ToConfig() const
     }
 
     // Modules
-    const NoModules& Mods = GetModules();
+    const NoModules* Mods = GetModules();
 
-    if (!Mods.empty()) {
-        for (NoModule* pMod : Mods) {
+    if (!Mods->empty()) {
+        for (NoModule* pMod : *Mods) {
             NoString sArgs = pMod->GetArgs();
 
             if (!sArgs.empty()) {
@@ -1109,9 +1109,7 @@ bool NoUser::PutModNotice(const NoString& sModule, const NoString& sLine, NoClie
 
 NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return No::token(sUserName, 0, "@").replace_n(".", ""); }
 
-NoModules&NoUser::GetModules() { return *d->modules; }
-
-const NoModules&NoUser::GetModules() const { return *d->modules; }
+NoModules* NoUser::GetModules() const { return d->modules; }
 
 bool NoUser::IsUserAttached() const
 {
@@ -1164,7 +1162,7 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
             }
         }
     } else {
-        bModRet = GetModules().LoadModule(sModName, sArgs, No::UserModule, this, nullptr, sModRet);
+        bModRet = GetModules()->LoadModule(sModName, sArgs, No::UserModule, this, nullptr, sModRet);
     }
 
     if (!bModRet) {

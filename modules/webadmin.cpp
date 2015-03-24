@@ -49,17 +49,17 @@ struct FOR_EACH_MODULE_Type
     NoModules CMtemp;
     NoModules& CMuser;
     NoModules& CMnet;
-    FOR_EACH_MODULE_Type(NoUser* pUser) : CMuser(pUser ? pUser->GetModules() : CMtemp), CMnet(CMtemp)
+    FOR_EACH_MODULE_Type(NoUser* pUser) : CMuser(pUser ? *pUser->GetModules() : CMtemp), CMnet(CMtemp)
     {
         where = AtGlobal;
     }
     FOR_EACH_MODULE_Type(NoNetwork* pNetwork)
-        : CMuser(pNetwork ? pNetwork->GetUser()->GetModules() : CMtemp), CMnet(pNetwork ? pNetwork->GetModules() : CMtemp)
+        : CMuser(pNetwork ? *pNetwork->GetUser()->GetModules() : CMtemp), CMnet(pNetwork ? pNetwork->GetModules() : CMtemp)
     {
         where = AtGlobal;
     }
     FOR_EACH_MODULE_Type(std::pair<NoUser*, NoNetwork*> arg)
-        : CMuser(arg.first ? arg.first->GetModules() : CMtemp), CMnet(arg.second ? arg.second->GetModules() : CMtemp)
+        : CMuser(arg.first ? *arg.first->GetModules() : CMtemp), CMnet(arg.second ? arg.second->GetModules() : CMtemp)
     {
         where = AtGlobal;
     }
@@ -395,7 +395,7 @@ public:
                     NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
                     try {
-                        if (!pNewUser->GetModules().LoadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
+                        if (!pNewUser->GetModules()->LoadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } catch (...) {
@@ -409,16 +409,16 @@ public:
                 }
             }
         } else if (pUser) {
-            NoModules& Modules = pUser->GetModules();
+            NoModules* Modules = pUser->GetModules();
 
-            for (a = 0; a < Modules.size(); a++) {
-                NoString sModName = Modules[a]->GetModName();
-                NoString sArgs = Modules[a]->GetArgs();
+            for (a = 0; a < Modules->size(); a++) {
+                NoString sModName = (*Modules)[a]->GetModName();
+                NoString sArgs = (*Modules)[a]->GetArgs();
                 NoString sModRet;
                 NoString sModLoadError;
 
                 try {
-                    if (!pNewUser->GetModules().LoadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
+                    if (!pNewUser->GetModules()->LoadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } catch (...) {
@@ -848,7 +848,7 @@ public:
 
                 // Check if module is loaded by user
                 l["CanBeLoadedByUser"] = NoString(Info.SupportsType(No::UserModule));
-                l["LoadedByUser"] = NoString(pUser->GetModules().FindModule(Info.GetName()) != nullptr);
+                l["LoadedByUser"] = NoString(pUser->GetModules()->FindModule(Info.GetName()) != nullptr);
 
                 if (!spSession->IsAdmin() && pUser->DenyLoadMod()) {
                     l["Disabled"] = "true";
@@ -1409,7 +1409,7 @@ public:
 
                 NoModule* pModule = nullptr;
                 if (pUser) {
-                    pModule = pUser->GetModules().FindModule(Info.GetName());
+                    pModule = pUser->GetModules()->FindModule(Info.GetName());
                     // Check if module is loaded by all or some networks
                     const std::vector<NoNetwork*>& userNetworks = pUser->GetNetworks();
                     uint networksWithRenderedModuleCount = 0;
@@ -1880,8 +1880,8 @@ public:
                     const NoUser& User = *usersIt->second;
 
                     // Count users which has loaded a render module
-                    const NoModules& userModules = User.GetModules();
-                    if (userModules.FindModule(Info.GetName())) {
+                    const NoModules* userModules = User.GetModules();
+                    if (userModules->FindModule(Info.GetName())) {
                         usersWithRenderedModuleCount++;
                     }
                     // Count networks which has loaded a render module

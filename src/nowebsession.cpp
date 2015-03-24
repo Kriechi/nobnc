@@ -406,9 +406,9 @@ void NoWebSocket::SetVars()
 
     // User Mods
     if (IsLoggedIn()) {
-        NoModules& vMods = GetSession()->GetUser()->GetModules();
+        NoModules* vMods = GetSession()->GetUser()->GetModules();
 
-        for (NoModule* pMod : vMods) {
+        for (NoModule* pMod : *vMods) {
             AddModLoop("UserModLoop", *pMod);
         }
 
@@ -789,7 +789,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             pModule = NoApp::Get().GetModules()->FindModule(m_modName);
             break;
         case No::UserModule:
-            pModule = GetSession()->GetUser()->GetModules().FindModule(m_modName);
+            pModule = GetSession()->GetUser()->GetModules()->FindModule(m_modName);
             break;
         case No::NetworkModule:
             pModule = pNetwork->GetModules().FindModule(m_modName);

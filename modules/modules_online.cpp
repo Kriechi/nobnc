@@ -33,7 +33,7 @@ public:
 
         NoString sModNick = sNick.substr(sPrefix.length());
         if (sModNick.equals("status") || GetNetwork()->GetModules().FindModule(sModNick) ||
-            GetUser()->GetModules().FindModule(sModNick) || NoApp::Get().GetModules()->FindModule(sModNick))
+            GetUser()->GetModules()->FindModule(sModNick) || NoApp::Get().GetModules()->FindModule(sModNick))
             return true;
         return false;
     }

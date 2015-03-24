@@ -885,9 +885,9 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        NoModules& Modules = d->user->GetModules();
+        NoModules* Modules = d->user->GetModules();
 
-        if (!Modules.size()) {
+        if (!Modules->size()) {
             PutStatus("Your user has no modules loaded.");
         } else {
             PutStatus("User modules:");
@@ -895,7 +895,7 @@ void NoClient::UserCommand(NoString& sLine)
             Table.addColumn("Name");
             Table.addColumn("Arguments");
 
-            for (const NoModule* pMod : Modules) {
+            for (const NoModule* pMod : *Modules) {
                 Table.addRow();
                 Table.setValue("Name", pMod->GetModName());
                 Table.setValue("Arguments", pMod->GetArgs());
@@ -966,7 +966,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             for (const NoModuleInfo& Info : ssUserMods) {
                 Table.addRow();
-                Table.setValue("Name", (d->user->GetModules().FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
+                Table.setValue("Name", (d->user->GetModules()->FindModule(Info.GetName()) ? "*" : " ") + Info.GetName());
                 Table.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
             }
 
@@ -1053,7 +1053,7 @@ void NoClient::UserCommand(NoString& sLine)
             b = NoApp::Get().GetModules()->LoadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
-            b = d->user->GetModules().LoadModule(sMod, sArgs, eType, d->user, nullptr, sModRet);
+            b = d->user->GetModules()->LoadModule(sMod, sArgs, eType, d->user, nullptr, sModRet);
             break;
         case No::NetworkModule:
             b = d->network->GetModules().LoadModule(sMod, sArgs, eType, d->user, d->network, sModRet);
@@ -1121,7 +1121,7 @@ void NoClient::UserCommand(NoString& sLine)
             NoApp::Get().GetModules()->UnloadModule(sMod, sModRet);
             break;
         case No::UserModule:
-            d->user->GetModules().UnloadModule(sMod, sModRet);
+            d->user->GetModules()->UnloadModule(sMod, sModRet);
             break;
         case No::NetworkModule:
             d->network->GetModules().UnloadModule(sMod, sModRet);
@@ -1191,7 +1191,7 @@ void NoClient::UserCommand(NoString& sLine)
             NoApp::Get().GetModules()->ReloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
-            d->user->GetModules().ReloadModule(sMod, sArgs, d->user, nullptr, sModRet);
+            d->user->GetModules()->ReloadModule(sMod, sArgs, d->user, nullptr, sModRet);
             break;
         case No::NetworkModule:
             d->network->GetModules().ReloadModule(sMod, sArgs, d->user, d->network, sModRet);

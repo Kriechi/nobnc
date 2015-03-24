@@ -44,7 +44,7 @@
                     (NETWORK)->GetModules().UnloadModule(MOD);                \
                 }                                                             \
             }                                                                 \
-        } else if ((pModule = (USER)->GetModules().FindModule(MOD))) {        \
+        } else if ((pModule = (USER)->GetModules()->FindModule(MOD))) {        \
             try {                                                             \
                 pModule->SetClient(CLIENT);                                   \
                 pModule->SetNetwork(NETWORK);                                 \
@@ -53,7 +53,7 @@
                 pModule->SetNetwork(nullptr);                                 \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
-                    (USER)->GetModules().UnloadModule(MOD);                   \
+                    (USER)->GetModules()->UnloadModule(MOD);                   \
                 }                                                             \
             }                                                                 \
         } else if ((pModule = NoApp::Get().GetModules()->FindModule(MOD))) {    \

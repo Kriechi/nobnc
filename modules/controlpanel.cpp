@@ -1228,7 +1228,7 @@ class NoAdminMod : public NoModule
             PutModule("Error: [" + sCTCPRequest + "] not found for user [" + pUser->GetUserName() + "]!");
     }
 
-    void LoadModuleFor(NoModules& Modules, const NoString& sModName, const NoString& sArgs, No::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork)
+    void LoadModuleFor(NoModules* Modules, const NoString& sModName, const NoString& sArgs, No::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork)
     {
         if (pUser->DenyLoadMod() && !GetUser()->IsAdmin()) {
             PutModule("Loading modules has been disabled.");
@@ -1236,15 +1236,15 @@ class NoAdminMod : public NoModule
         }
 
         NoString sModRet;
-        NoModule* pMod = Modules.FindModule(sModName);
+        NoModule* pMod = Modules->FindModule(sModName);
         if (!pMod) {
-            if (!Modules.LoadModule(sModName, sArgs, eType, pUser, pNetwork, sModRet)) {
+            if (!Modules->LoadModule(sModName, sArgs, eType, pUser, pNetwork, sModRet)) {
                 PutModule("Unable to load module [" + sModName + "] [" + sModRet + "]");
             } else {
                 PutModule("Loaded module [" + sModName + "]");
             }
         } else if (pMod->GetArgs() != sArgs) {
-            if (!Modules.ReloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
+            if (!Modules->ReloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
                 PutModule("Unable to reload module [" + sModName + "] [" + sModRet + "]");
             } else {
                 PutModule("Reloaded module [" + sModName + "]");
@@ -1291,23 +1291,23 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        LoadModuleFor(pNetwork->GetModules(), sModName, sArgs, No::NetworkModule, pUser, pNetwork);
+        LoadModuleFor(&pNetwork->GetModules(), sModName, sArgs, No::NetworkModule, pUser, pNetwork);
     }
 
-    void UnLoadModuleFor(NoModules& Modules, const NoString& sModName, NoUser* pUser)
+    void UnLoadModuleFor(NoModules* Modules, const NoString& sModName, NoUser* pUser)
     {
         if (pUser->DenyLoadMod() && !GetUser()->IsAdmin()) {
             PutModule("Loading modules has been disabled.");
             return;
         }
 
-        if (Modules.FindModule(sModName) == this) {
+        if (Modules->FindModule(sModName) == this) {
             PutModule("Please use /znc unloadmod " + sModName);
             return;
         }
 
         NoString sModRet;
-        if (!Modules.UnloadModule(sModName, sModRet)) {
+        if (!Modules->UnloadModule(sModName, sModRet)) {
             PutModule("Unable to unload module [" + sModName + "] [" + sModRet + "]");
         } else {
             PutModule("Unloaded module [" + sModName + "]");
@@ -1349,12 +1349,12 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        UnLoadModuleFor(pNetwork->GetModules(), sModName, pUser);
+        UnLoadModuleFor(&pNetwork->GetModules(), sModName, pUser);
     }
 
-    void ListModulesFor(NoModules& Modules, const NoString& sWhere)
+    void ListModulesFor(NoModules* Modules, const NoString& sWhere)
     {
-        if (!Modules.size()) {
+        if (!Modules->size()) {
             PutModule(sWhere + " has no modules loaded.");
         } else {
             PutModule("Modules loaded for " + sWhere + ":");
@@ -1362,10 +1362,10 @@ class NoAdminMod : public NoModule
             Table.addColumn("Name");
             Table.addColumn("Arguments");
 
-            for (uint b = 0; b < Modules.size(); b++) {
+            for (uint b = 0; b < Modules->size(); b++) {
                 Table.addRow();
-                Table.setValue("Name", Modules[b]->GetModName());
-                Table.setValue("Arguments", Modules[b]->GetArgs());
+                Table.setValue("Name", (*Modules)[b]->GetModName());
+                Table.setValue("Arguments", (*Modules)[b]->GetArgs());
             }
 
             PutModule(Table);
@@ -1405,7 +1405,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        ListModulesFor(pNetwork->GetModules(), "Network [" + pNetwork->GetName() + "] of user [" + pUser->GetUserName() + "]");
+        ListModulesFor(&pNetwork->GetModules(), "Network [" + pNetwork->GetName() + "] of user [" + pUser->GetUserName() + "]");
     }
 
 public:

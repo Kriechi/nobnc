@@ -63,7 +63,7 @@ NoApp::~NoApp()
     m_modules->UnloadAll();
 
     for (const auto& it : m_users) {
-        it.second->GetModules().UnloadAll();
+        it.second->GetModules()->UnloadAll();
 
         const std::vector<NoNetwork*>& networks = it.second->GetNetworks();
         for (NoNetwork* pNetwork : networks) {
@@ -1518,13 +1518,13 @@ NoModule* NoApp::FindModule(const NoString& sModName, const NoString& sUsername)
 
     NoUser* pUser = FindUser(sUsername);
 
-    return (!pUser) ? nullptr : pUser->GetModules().FindModule(sModName);
+    return (!pUser) ? nullptr : pUser->GetModules()->FindModule(sModName);
 }
 
 NoModule* NoApp::FindModule(const NoString& sModName, NoUser* pUser)
 {
     if (pUser) {
-        return pUser->GetModules().FindModule(sModName);
+        return pUser->GetModules()->FindModule(sModName);
     }
 
     return NoApp::Get().GetModules()->FindModule(sModName);
@@ -1541,10 +1541,10 @@ bool NoApp::UpdateModule(const NoString& sModule)
     for (const auto& it : m_users) {
         NoUser* pUser = it.second;
 
-        pModule = pUser->GetModules().FindModule(sModule);
+        pModule = pUser->GetModules()->FindModule(sModule);
         if (pModule) {
             musLoaded[pUser] = pModule->GetArgs();
-            pUser->GetModules().UnloadModule(sModule);
+            pUser->GetModules()->UnloadModule(sModule);
         }
 
         // See if the user has this module loaded to a network
@@ -1586,7 +1586,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
         NoUser* pUser = it.first;
         const NoString& sArgs = it.second;
 
-        if (!pUser->GetModules().LoadModule(sModule, sArgs, No::UserModule, pUser, nullptr, sErr)) {
+        if (!pUser->GetModules()->LoadModule(sModule, sArgs, No::UserModule, pUser, nullptr, sErr)) {
             NO_DEBUG("Failed to reload [" << sModule << "] for [" << pUser->GetUserName() << "] [" << sErr << "]");
             bError = true;
         }
