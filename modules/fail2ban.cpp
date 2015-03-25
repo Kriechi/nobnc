@@ -48,14 +48,14 @@ public:
         }
 
         // SetTTL() wants milliseconds
-        m_Cache.SetTTL(timeout * 60 * 1000);
+        m_Cache.setTtl(timeout * 60 * 1000);
 
         return true;
     }
 
-    void onPostRehash() override { m_Cache.Clear(); }
+    void onPostRehash() override { m_Cache.clear(); }
 
-    void Add(const NoString& sHost, uint count) { m_Cache.AddItem(sHost, count); }
+    void Add(const NoString& sHost, uint count) { m_Cache.insert(sHost, count); }
 
     void onModCommand(const NoString& sCommand) override
     {
@@ -66,7 +66,7 @@ public:
 
     void onClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort) override
     {
-        uint* pCount = m_Cache.GetItem(sHost);
+        uint* pCount = m_Cache.value(sHost);
         if (sHost.empty() || pCount == nullptr || *pCount < m_uiAllowedFailed) {
             return;
         }
@@ -80,7 +80,7 @@ public:
 
     void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
     {
-        uint* pCount = m_Cache.GetItem(sRemoteIP);
+        uint* pCount = m_Cache.value(sRemoteIP);
         if (pCount)
             Add(sRemoteIP, *pCount + 1);
         else
@@ -94,7 +94,7 @@ public:
 
         if (sRemoteIP.empty()) return CONTINUE;
 
-        uint* pCount = m_Cache.GetItem(sRemoteIP);
+        uint* pCount = m_Cache.value(sRemoteIP);
         if (pCount && *pCount >= m_uiAllowedFailed) {
             // onFailedLogin() will refresh their ban
             Auth->refuseLogin("Please try again later - reconnecting too fast");

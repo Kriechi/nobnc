@@ -37,7 +37,7 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoReplyMod::OnShowCommand),
                    "",
                    "Displays the current query reply");
-        m_Messaged.SetTTL(1000 * 120);
+        m_Messaged.setTtl(1000 * 120);
     }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
@@ -69,11 +69,11 @@ public:
             // WTF?
             return;
         if (sNick == pIRCSock->GetNick()) return;
-        if (m_Messaged.HasItem(sNick)) return;
+        if (m_Messaged.contains(sNick)) return;
 
         if (GetNetwork()->IsUserAttached()) return;
 
-        m_Messaged.AddItem(sNick);
+        m_Messaged.insert(sNick);
         PutIRC("NOTICE " + sNick + " :" + GetReply());
     }
 

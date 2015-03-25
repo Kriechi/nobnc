@@ -58,7 +58,7 @@ class NoImapAuthMod : public NoModule
 public:
     MODCONSTRUCTOR(NoImapAuthMod)
     {
-        m_Cache.SetTTL(60000);
+        m_Cache.setTtl(60000);
         m_sServer = "localhost";
         m_uPort = 143;
         m_bSSL = false;
@@ -99,7 +99,7 @@ public:
             return HALT;
         }
 
-        if (pUser && m_Cache.HasItem(No::md5(Auth->username() + ":" + Auth->password()))) {
+        if (pUser && m_Cache.contains(No::md5(Auth->username() + ":" + Auth->password()))) {
             NO_DEBUG("+++ Found in cache");
             Auth->acceptLogin(pUser);
             return HALT;
@@ -113,7 +113,7 @@ public:
 
     void onModCommand(const NoString& sLine) override {}
 
-    void CacheLogin(const NoString& sLogin) { m_Cache.AddItem(sLogin); }
+    void CacheLogin(const NoString& sLogin) { m_Cache.insert(sLogin); }
 
     // Getters
     const NoString& GetUserFormat() const { return m_sUserFormat; }

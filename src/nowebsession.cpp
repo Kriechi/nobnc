@@ -42,11 +42,11 @@ public:
     NoWebSessionMap(uint uTTL = 5000) : NoCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
     void FinishUserSessions(const NoUser& User)
     {
-        iterator it = m_items.begin();
+        iterator it = begin();
 
-        while (it != m_items.end()) {
+        while (it != end()) {
             if (it->second.second->GetUser() == &User) {
-                m_items.erase(it++);
+                erase(it++);
             } else {
                 ++it;
             }
@@ -64,7 +64,7 @@ struct NoWebSessionManager
     {
         // Make sure all sessions are destroyed before any of our maps
         // are destroyed
-        m_mspSessions.Clear();
+        m_mspSessions.clear();
     }
 
     NoWebSessionMap m_mspSessions;
@@ -897,11 +897,11 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
     }
 
     const NoString sCookieSessionId = GetRequestCookie("SessionId");
-    std::shared_ptr<NoWebSession>* pSession = Sessions.m_mspSessions.GetItem(sCookieSessionId);
+    std::shared_ptr<NoWebSession>* pSession = Sessions.m_mspSessions.value(sCookieSessionId);
 
     if (pSession != nullptr) {
         // Refresh the timeout
-        Sessions.m_mspSessions.AddItem((*pSession)->GetId(), *pSession);
+        Sessions.m_mspSessions.insert((*pSession)->GetId(), *pSession);
         (*pSession)->UpdateLastActive();
         m_session = *pSession;
         NO_DEBUG("Found existing session from cookie: [" + sCookieSessionId + "] IsLoggedIn(" +
@@ -913,7 +913,7 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
         std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(GetRemoteIP());
         mIPSessionsIterator it = std::min_element(p.first, p.second, compareLastActive);
         NO_DEBUG("Remote IP:   " << GetRemoteIP() << "; discarding session [" << it->second->GetId() << "]");
-        Sessions.m_mspSessions.RemItem(it->second->GetId());
+        Sessions.m_mspSessions.remove(it->second->GetId());
     }
 
     NoString sSessionID;
@@ -925,10 +925,10 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
         sSessionID = No::sha256(sSessionID);
 
         NO_DEBUG("Auto generated session: [" + sSessionID + "]");
-    } while (Sessions.m_mspSessions.HasItem(sSessionID));
+    } while (Sessions.m_mspSessions.contains(sSessionID));
 
     std::shared_ptr<NoWebSession> spSession(new NoWebSession(sSessionID, GetRemoteIP()));
-    Sessions.m_mspSessions.AddItem(spSession->GetId(), spSession);
+    Sessions.m_mspSessions.insert(spSession->GetId(), spSession);
 
     m_session = spSession;
 

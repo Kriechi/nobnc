@@ -39,7 +39,7 @@ class NoSaslAuthMod : public NoModule
 public:
     MODCONSTRUCTOR(NoSaslAuthMod)
     {
-        m_Cache.SetTTL(60000 /*ms*/);
+        m_Cache.setTtl(60000 /*ms*/);
 
         AddHelpCommand();
         AddCommand("CreateUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CreateUserCommand), "[yes|no]");
@@ -107,12 +107,12 @@ public:
         }
 
         const NoString sCacheKey(No::md5(sUsername + ":" + sPassword));
-        if (m_Cache.HasItem(sCacheKey)) {
+        if (m_Cache.contains(sCacheKey)) {
             bSuccess = true;
             NO_DEBUG("saslauth: Found [" + sUsername + "] in cache");
         } else if (sasl_server_new("znc", nullptr, nullptr, nullptr, nullptr, m_cbs, 0, &sasl_conn) == SASL_OK &&
                    sasl_checkpass(sasl_conn, sUsername.c_str(), sUsername.size(), sPassword.c_str(), sPassword.size()) == SASL_OK) {
-            m_Cache.AddItem(sCacheKey);
+            m_Cache.insert(sCacheKey);
 
             NO_DEBUG("saslauth: Successful SASL authentication [" + sUsername + "]");
 

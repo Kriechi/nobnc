@@ -30,24 +30,21 @@
 template <typename K, typename V = bool> class NoCacheMap
 {
 public:
-    NoCacheMap(uint uTTL = 5000) : m_items(), m_ttl(uTTL) {}
-
-    virtual ~NoCacheMap() {}
+    NoCacheMap(uint ttl = 5000) : m_items(), m_ttl(ttl) { }
+    ~NoCacheMap() { }
 
     /**
      * @brief This function adds an item to the cache using a custom time-to-live value
-     * @param Item the item to add to the cache
-     * @param Val The value associated with the key Item
-     * @param uTTL the time-to-live for this specific item
+     * @param key The item to add to the cache
+     * @param value The value associated with the key Item
      */
-    void AddItem(const K& Item, const V& Val = V())
+    void insert(const K& key, const V& value = V())
     {
         if (!m_ttl) { // If time-to-live is zero we don't want to waste our time adding it
-            RemItem(Item); // Remove the item incase it already exists
+            remove(key); // Remove the item incase it already exists
             return;
         }
-
-        m_items[Item] = value(No::millTime() + m_ttl, Val);
+        m_items[key] = VP(No::millTime() + m_ttl, value);
     }
 
     /**
@@ -55,10 +52,10 @@ public:
      * @param Item The item to check for
      * @return true if item exists
      */
-    bool HasItem(const K& Item)
+    bool contains(const K& key) const
     {
-        Cleanup();
-        return (m_items.find(Item) != m_items.end());
+        const_cast<NoCacheMap*>(this)->cleanup();
+        return (m_items.find(key) != m_items.end());
     }
 
     /**
@@ -66,12 +63,22 @@ public:
      * @param Item The item to check for
      * @return Pointer to the item or nullptr if there is no suitable one
      */
-    V* GetItem(const K& Item)
+    const V* value(const K& key) const
     {
-        Cleanup();
-        iterator it = m_items.find(Item);
-        if (it == m_items.end()) return nullptr;
-        return &it->second.second;
+        const_cast<NoCacheMap*>(this)->cleanup();
+        const_iterator it = m_items.find(key);
+        if (it == m_items.end())
+            return nullptr;
+        return &it->second.second; // TODO: a pointer :/
+    }
+
+    V* value(const K& key)
+    {
+        cleanup();
+        iterator it = m_items.find(key);
+        if (it == m_items.end())
+            return nullptr;
+        return &it->second.second; // TODO: a pointer :/
     }
 
     /**
@@ -79,38 +86,45 @@ public:
      * @param Item The item to be removed
      * @return true if item existed and was removed, false if it never existed
      */
-    bool RemItem(const K& Item) { return (m_items.erase(Item) != 0); }
+    bool remove(const K& key) { return m_items.erase(key) != 0; }
 
     /**
      * @brief Cycles through the queue removing all of the stale entries
      */
-    void Cleanup()
+    void cleanup()
     {
         iterator it = m_items.begin();
-
         while (it != m_items.end()) {
-            if (No::millTime() > (it->second.first)) {
+            if (No::millTime() > it->second.first)
                 m_items.erase(it++);
-            } else {
+            else
                 ++it;
-            }
         }
     }
 
     /**
      * @brief Clear all entries
      */
-    void Clear() { m_items.clear(); }
+    void clear() { m_items.clear(); }
 
-    uint GetTTL() const { return m_ttl; }
-    void SetTTL(uint u) { m_ttl = u; }
+    uint ttl() const { return m_ttl; }
+    void setTtl(uint ttl) { m_ttl = ttl; }
 
-protected:
-    typedef std::pair<ulonglong, V> value;
-    typedef typename std::map<K, value>::iterator iterator;
-    std::map<K, value> m_items; //!< Map of cached items.  The value portion of the map is for the expire time
+    typedef std::pair<ulonglong, V> VP;
+    typedef typename std::map<K, VP>::iterator iterator;
+    typedef typename std::map<K, VP>::const_iterator const_iterator;
+
+    iterator begin() { return m_items.begin(); }
+    const_iterator begin() const { return m_items.begin(); }
+
+    iterator end() { return m_items.end(); }
+    const_iterator end() const { return m_items.end(); }
+
+    void erase(iterator it) { m_items.erase(it); }
+
 private:
-    uint m_ttl; //!< Default time-to-live duration
+    uint m_ttl;
+    std::map<K, VP> m_items;
 };
 
 #endif // NOCACHEMAP_H

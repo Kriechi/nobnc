@@ -37,7 +37,7 @@ public:
                    "[!]<#chan>",
                    "Remove an entry, needs to be an exact match");
         AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnListCommand), "", "List all entries");
-        m_recentlyCycled.SetTTL(15 * 1000);
+        m_recentlyCycled.setTtl(15 * 1000);
     }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
@@ -124,7 +124,7 @@ protected:
         if (!IsAutoCycle(Channel.getName())) return;
 
         // Did we recently annoy opers via cycling of an empty channel?
-        if (m_recentlyCycled.HasItem(Channel.getName())) return;
+        if (m_recentlyCycled.contains(Channel.getName())) return;
 
         // Is there only one person left in the channel?
         if (Channel.getNickCount() != 1) return;
@@ -133,7 +133,7 @@ protected:
         const NoNick& pNick = Channel.getNicks().begin()->second;
         if (!pNick.hasPerm(NoChannel::Op) && pNick.equals(GetNetwork()->GetCurNick())) {
             Channel.cycle();
-            m_recentlyCycled.AddItem(Channel.getName());
+            m_recentlyCycled.insert(Channel.getName());
         }
     }
 
