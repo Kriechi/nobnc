@@ -20,6 +20,7 @@
 
 #include <no/noglobal.h>
 #include <no/nomodule.h>
+#include <memory>
 
 class NoAuthenticator;
 class NoChannel;
@@ -29,6 +30,7 @@ class NoWebSocket;
 class NoTemplate;
 class NoIrcSocket;
 class NoNick;
+class NoModuleLoaderPrivate;
 
 class NO_EXPORT NoModuleLoader
 {
@@ -59,14 +61,6 @@ public:
     static bool modulePath(NoModuleInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg);
     static void availableModules(std::set<NoModuleInfo>& ssMods, No::ModuleType eType = No::UserModule);
     static void defaultModules(std::set<NoModuleInfo>& ssMods, No::ModuleType eType = No::UserModule);
-
-    // This returns the path to the .so and to the data dir
-    // which is where static data (webadmin skins) are saved
-    static bool findModulePath(const NoString& sModule, NoString& sModPath, NoString& sDataPath);
-    // Return a list of <module dir, data dir> pairs for directories in
-    // which modules can be found.
-    typedef std::queue<std::pair<NoString, NoString>> ModDirList;
-    static ModDirList moduleDirs();
 
     bool OnBoot();
     bool OnPreRehash();
@@ -168,13 +162,7 @@ private:
     NoModuleLoader(const NoModuleLoader&) = delete;
     NoModuleLoader& operator=(const NoModuleLoader&) = delete;
 
-    static NoModuleHandle
-    OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg);
-
-    NoUser* m_user;
-    NoNetwork* m_network;
-    NoClient* m_client;
-    std::vector<NoModule*> m_modules;
+    std::unique_ptr<NoModuleLoaderPrivate> d;
 };
 
 #endif // NOMODULELOADER_H

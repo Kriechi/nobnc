@@ -28,23 +28,23 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 #endif
 
 #define MODUNLOADCHK(func)                              \
-    for (NoModule * pMod : m_modules) {                      \
+    for (NoModule * pMod : d->modules) {                      \
         try {                                           \
             NoClient* pOldClient = pMod->GetClient();    \
-            pMod->SetClient(m_client);                 \
+            pMod->SetClient(d->client);                 \
             NoUser* pOldUser = nullptr;                  \
-            if (m_user) {                              \
+            if (d->user) {                              \
                 pOldUser = pMod->GetUser();             \
-                pMod->SetUser(m_user);                 \
+                pMod->SetUser(d->user);                 \
             }                                           \
             NoNetwork* pNetwork = nullptr;            \
-            if (m_network) {                           \
+            if (d->network) {                           \
                 pNetwork = pMod->GetNetwork();          \
-                pMod->SetNetwork(m_network);           \
+                pMod->SetNetwork(d->network);           \
             }                                           \
             pMod->func;                                 \
-            if (m_user) pMod->SetUser(pOldUser);       \
-            if (m_network) pMod->SetNetwork(pNetwork); \
+            if (d->user) pMod->SetUser(pOldUser);       \
+            if (d->network) pMod->SetNetwork(pNetwork); \
             pMod->SetClient(pOldClient);                \
         } catch (const NoModule::ModException& e) {     \
             if (e == NoModule::UNLOAD) {                 \
@@ -56,24 +56,24 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #define MODHALTCHK(func)                                \
     bool bHaltCore = false;                             \
-    for (NoModule * pMod : m_modules) {                      \
+    for (NoModule * pMod : d->modules) {                      \
         try {                                           \
             NoModule::ModRet e = NoModule::CONTINUE;     \
             NoClient* pOldClient = pMod->GetClient();    \
-            pMod->SetClient(m_client);                 \
+            pMod->SetClient(d->client);                 \
             NoUser* pOldUser = nullptr;                  \
-            if (m_user) {                              \
+            if (d->user) {                              \
                 pOldUser = pMod->GetUser();             \
-                pMod->SetUser(m_user);                 \
+                pMod->SetUser(d->user);                 \
             }                                           \
             NoNetwork* pNetwork = nullptr;            \
-            if (m_network) {                           \
+            if (d->network) {                           \
                 pNetwork = pMod->GetNetwork();          \
-                pMod->SetNetwork(m_network);           \
+                pMod->SetNetwork(d->network);           \
             }                                           \
             e = pMod->func;                             \
-            if (m_user) pMod->SetUser(pOldUser);       \
-            if (m_network) pMod->SetNetwork(pNetwork); \
+            if (d->user) pMod->SetUser(pOldUser);       \
+            if (d->network) pMod->SetNetwork(pNetwork); \
             pMod->SetClient(pOldClient);                \
             if (e == NoModule::HALTMODS) {               \
                 break;                                  \
@@ -91,38 +91,57 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
     }                                                   \
     return bHaltCore;
 
-NoModuleLoader::NoModuleLoader() : m_user(nullptr), m_network(nullptr), m_client(nullptr) {}
+// This returns the path to the .so and to the data dir
+// which is where static data (webadmin skins) are saved
+static bool findModulePath(const NoString& sModule, NoString& sModPath, NoString& sDataPath);
+// Return a list of <module dir, data dir> pairs for directories in
+// which modules can be found.
+typedef std::queue<std::pair<NoString, NoString>> NoModDirList;
+static NoModDirList moduleDirs();
+
+static NoModuleHandle OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg);
+
+class NoModuleLoaderPrivate
+{
+public:
+    NoUser* user = nullptr;
+    NoNetwork* network = nullptr;
+    NoClient* client = nullptr;
+    std::vector<NoModule*> modules;
+};
+
+NoModuleLoader::NoModuleLoader() : d(new NoModuleLoaderPrivate) {}
 
 NoModuleLoader::~NoModuleLoader() { unloadAllModules(); }
 
-bool NoModuleLoader::isEmpty() const { return m_modules.empty(); }
+bool NoModuleLoader::isEmpty() const { return d->modules.empty(); }
 
-std::vector<NoModule*> NoModuleLoader::GetModules() const { return m_modules; }
+std::vector<NoModule*> NoModuleLoader::GetModules() const { return d->modules; }
 
-void NoModuleLoader::setUser(NoUser* pUser) { m_user = pUser; }
+void NoModuleLoader::setUser(NoUser* pUser) { d->user = pUser; }
 
-void NoModuleLoader::setNetwork(NoNetwork* pNetwork) { m_network = pNetwork; }
+void NoModuleLoader::setNetwork(NoNetwork* pNetwork) { d->network = pNetwork; }
 
-void NoModuleLoader::setClient(NoClient* pClient) { m_client = pClient; }
+void NoModuleLoader::setClient(NoClient* pClient) { d->client = pClient; }
 
-NoUser* NoModuleLoader::user() const { return m_user; }
+NoUser* NoModuleLoader::user() const { return d->user; }
 
-NoNetwork* NoModuleLoader::network() const { return m_network; }
+NoNetwork* NoModuleLoader::network() const { return d->network; }
 
-NoClient* NoModuleLoader::client() const { return m_client; }
+NoClient* NoModuleLoader::client() const { return d->client; }
 
 void NoModuleLoader::unloadAllModules()
 {
-    while (!m_modules.empty()) {
+    while (!d->modules.empty()) {
         NoString sRetMsg;
-        NoString sModName = m_modules.back()->GetModName();
+        NoString sModName = d->modules.back()->GetModName();
         unloadModule(sModName, sRetMsg);
     }
 }
 
 bool NoModuleLoader::OnBoot()
 {
-    for (NoModule* pMod : m_modules) {
+    for (NoModule* pMod : d->modules) {
         try {
             if (!pMod->OnBoot()) {
                 return true;
@@ -356,13 +375,13 @@ bool NoModuleLoader::OnModCTCP(const NoString& sMessage)
 bool NoModuleLoader::OnServerCapAvailable(const NoString& sCap)
 {
     bool bResult = false;
-    for (NoModule* pMod : m_modules) {
+    for (NoModule* pMod : d->modules) {
         try {
             NoClient* pOldClient = pMod->GetClient();
-            pMod->SetClient(m_client);
-            if (m_user) {
+            pMod->SetClient(d->client);
+            if (d->user) {
                 NoUser* pOldUser = pMod->GetUser();
-                pMod->SetUser(m_user);
+                pMod->SetUser(d->user);
                 bResult |= pMod->OnServerCapAvailable(sCap);
                 pMod->SetUser(pOldUser);
             } else {
@@ -418,13 +437,13 @@ bool NoModuleLoader::OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps)
 bool NoModuleLoader::IsClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState)
 {
     bool bResult = false;
-    for (NoModule* pMod : m_modules) {
+    for (NoModule* pMod : d->modules) {
         try {
             NoClient* pOldClient = pMod->GetClient();
-            pMod->SetClient(m_client);
-            if (m_user) {
+            pMod->SetClient(d->client);
+            if (d->user) {
                 NoUser* pOldUser = pMod->GetUser();
-                pMod->SetUser(m_user);
+                pMod->SetUser(d->user);
                 bResult |= pMod->IsClientCapSupported(pClient, sCap, bState);
                 pMod->SetUser(pOldUser);
             } else {
@@ -471,7 +490,7 @@ bool NoModuleLoader::OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::Modu
 
 NoModule* NoModuleLoader::findModule(const NoString& sModule) const
 {
-    for (NoModule* pMod : m_modules) {
+    for (NoModule* pMod : d->modules) {
         if (sModule.equals(pMod->GetModName())) {
             return pMod;
         }
@@ -536,7 +555,7 @@ bool NoModuleLoader::loadModule(const NoString& sModule, const NoString& sArgs, 
     pModule->SetDescription(Info.GetDescription());
     pModule->SetArgs(sArgs);
     pModule->SetModPath(NoDir::ChangeDir(NoApp::Get().GetCurPath(), sModPath));
-    m_modules.push_back(pModule);
+    d->modules.push_back(pModule);
 
     bool bLoaded;
     try {
@@ -589,9 +608,9 @@ bool NoModuleLoader::unloadModule(const NoString& sModule, NoString& sRetMsg)
     if (p) {
         delete pModule;
 
-        for (auto it = m_modules.begin(); it != m_modules.end(); ++it) {
+        for (auto it = d->modules.begin(); it != d->modules.end(); ++it) {
             if (*it == pModule) {
-                m_modules.erase(it);
+                d->modules.erase(it);
                 break;
             }
         }
@@ -676,7 +695,7 @@ void NoModuleLoader::availableModules(std::set<NoModuleInfo>& ssMods, No::Module
     uint a = 0;
     NoDir Dir;
 
-    ModDirList dirs = moduleDirs();
+    NoModDirList dirs = moduleDirs();
 
     while (!dirs.empty()) {
         Dir.FillByWildcard(dirs.front().first, "*.so");
@@ -722,13 +741,13 @@ void NoModuleLoader::defaultModules(std::set<NoModuleInfo>& ssMods, No::ModuleTy
     }
 }
 
-bool NoModuleLoader::findModulePath(const NoString& sModule, NoString& sModPath, NoString& sDataPath)
+bool findModulePath(const NoString& sModule, NoString& sModPath, NoString& sDataPath)
 {
     NoString sMod = sModule;
     NoString sDir = sMod;
     if (!sModule.contains(".")) sMod += ".so";
 
-    ModDirList dirs = moduleDirs();
+    NoModDirList dirs = moduleDirs();
 
     while (!dirs.empty()) {
         sModPath = dirs.front().first + sMod;
@@ -744,9 +763,9 @@ bool NoModuleLoader::findModulePath(const NoString& sModule, NoString& sModPath,
     return false;
 }
 
-NoModuleLoader::ModDirList NoModuleLoader::moduleDirs()
+NoModDirList moduleDirs()
 {
-    ModDirList ret;
+    NoModDirList ret;
     NoString sDir;
 
     // ~/.znc/modules
@@ -759,7 +778,7 @@ NoModuleLoader::ModDirList NoModuleLoader::moduleDirs()
     return ret;
 }
 
-NoModuleHandle NoModuleLoader::OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg)
+NoModuleHandle OpenModule(const NoString& sModule, const NoString& sModPath, bool& bVersionMismatch, NoModuleInfo& Info, NoString& sRetMsg)
 {
     // Some sane defaults in case anything errors out below
     bVersionMismatch = false;
