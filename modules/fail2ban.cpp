@@ -55,7 +55,7 @@ public:
 
     void onPostRehash() override { m_Cache.Clear(); }
 
-    void Add(const NoString& sHost, uint count) { m_Cache.AddItem(sHost, count, m_Cache.GetTTL()); }
+    void Add(const NoString& sHost, uint count) { m_Cache.AddItem(sHost, count); }
 
     void onModCommand(const NoString& sCommand) override
     {

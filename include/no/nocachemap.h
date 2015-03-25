@@ -35,39 +35,19 @@ public:
     virtual ~NoCacheMap() {}
 
     /**
-     * @brief This function adds an item to the cache using the default time-to-live value
-     * @param Item the item to add to the cache
-     */
-    void AddItem(const K& Item) { AddItem(Item, m_ttl); }
-
-    /**
-     * @brief This function adds an item to the cache using a custom time-to-live value
-     * @param Item the item to add to the cache
-     * @param uTTL the time-to-live for this specific item
-     */
-    void AddItem(const K& Item, uint uTTL) { AddItem(Item, V(), uTTL); }
-
-    /**
-     * @brief This function adds an item to the cache using the default time-to-live value
-     * @param Item the item to add to the cache
-     * @param Val The value associated with the key Item
-     */
-    void AddItem(const K& Item, const V& Val) { AddItem(Item, Val, m_ttl); }
-
-    /**
      * @brief This function adds an item to the cache using a custom time-to-live value
      * @param Item the item to add to the cache
      * @param Val The value associated with the key Item
      * @param uTTL the time-to-live for this specific item
      */
-    void AddItem(const K& Item, const V& Val, uint uTTL)
+    void AddItem(const K& Item, const V& Val = V())
     {
-        if (!uTTL) { // If time-to-live is zero we don't want to waste our time adding it
+        if (!m_ttl) { // If time-to-live is zero we don't want to waste our time adding it
             RemItem(Item); // Remove the item incase it already exists
             return;
         }
 
-        m_items[Item] = value(No::millTime() + uTTL, Val);
+        m_items[Item] = value(No::millTime() + m_ttl, Val);
     }
 
     /**
