@@ -35,8 +35,8 @@ template <typename T>
 static std::vector<NoModule*> allModules(T* p)
 {
     std::vector<NoModule*> allMods;
-    std::vector<NoModule*> globalMods = NoApp::Get().GetLoader()->GetModules();
-    std::vector<NoModule*> typeMods = p->GetLoader()->GetModules();
+    std::vector<NoModule*> globalMods = NoApp::Get().GetLoader()->modules();
+    std::vector<NoModule*> typeMods = p->GetLoader()->modules();
     allMods.reserve(globalMods.size() + typeMods.size());
     allMods.insert(allMods.end(), globalMods.begin(), globalMods.end());
     allMods.insert(allMods.end(), typeMods.begin(), typeMods.end());
@@ -47,7 +47,7 @@ template <typename T1, typename T2>
 static std::vector<NoModule*> allModules(T1* p1, T2* p2)
 {
     std::vector<NoModule*> allMods = allModules(p1);
-    std::vector<NoModule*> typeMods = p2->GetLoader()->GetModules();
+    std::vector<NoModule*> typeMods = p2->GetLoader()->modules();
     allMods.reserve(allMods.size() + typeMods.size());
     allMods.insert(allMods.end(), typeMods.begin(), typeMods.end());
     return allMods;
@@ -380,7 +380,7 @@ public:
         } else if (pUser) {
             NoModuleLoader* Modules = pUser->GetLoader();
 
-            for (NoModule* pMod : Modules->GetModules()) {
+            for (NoModule* pMod : Modules->modules()) {
                 NoString sModName = pMod->GetModName();
                 NoString sArgs = pMod->GetArgs();
                 NoString sModRet;
@@ -982,7 +982,7 @@ public:
                 return true;
             }
             if (pOldNetwork) {
-                for (NoModule* pModule : pOldNetwork->GetLoader()->GetModules()) {
+                for (NoModule* pModule : pOldNetwork->GetLoader()->modules()) {
                     NoString sPath = pUser->GetUserPath() + "/networks/" + sName + "/moddata/" + pModule->GetModName();
                     NoRegistry registry(pModule);
                     registry.copy(sPath);
@@ -1110,7 +1110,7 @@ public:
         const NoModuleLoader* vCurMods = pNetwork->GetLoader();
         std::set<NoString> ssUnloadMods;
 
-        for (NoModule* pCurMod : vCurMods->GetModules()) {
+        for (NoModule* pCurMod : vCurMods->modules()) {
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() && pCurMod->GetModName() != GetModName()) {
                 ssUnloadMods.insert(pCurMod->GetModName());
             }
@@ -1938,7 +1938,7 @@ public:
         const NoModuleLoader* vCurMods = NoApp::Get().GetLoader();
         std::set<NoString> ssUnloadMods;
 
-        for (NoModule* pCurMod : vCurMods->GetModules()) {
+        for (NoModule* pCurMod : vCurMods->modules()) {
             if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() &&
                 (No::GlobalModule != GetType() || pCurMod->GetModName() != GetModName())) {
                 ssUnloadMods.insert(pCurMod->GetModName());

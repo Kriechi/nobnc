@@ -22,14 +22,12 @@
 #include <no/nomodule.h>
 #include <memory>
 
-class NoAuthenticator;
+class NoNick;
+class NoClient;
 class NoChannel;
 class NoNetwork;
-class NoClient;
-class NoWebSocket;
-class NoTemplate;
 class NoIrcSocket;
-class NoNick;
+class NoAuthenticator;
 class NoModuleLoaderPrivate;
 
 class NO_EXPORT NoModuleLoader
@@ -39,7 +37,7 @@ public:
     ~NoModuleLoader();
 
     bool isEmpty() const;
-    std::vector<NoModule*> GetModules() const;
+    std::vector<NoModule*> modules() const;
 
     NoUser* user() const;
     void setUser(NoUser* user);

@@ -678,7 +678,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        std::vector<NoModule*> vMods = pOldNetwork->GetLoader()->GetModules();
+        std::vector<NoModule*> vMods = pOldNetwork->GetLoader()->modules();
         for (NoModule* pMod : vMods) {
             NoString sOldModPath = pOldNetwork->GetNetworkPath() + "/moddata/" + pMod->GetModName();
             NoString sNewModPath = pNewUser->GetUserPath() + "/networks/" + sNewNetwork + "/moddata/" + pMod->GetModName();
@@ -875,7 +875,7 @@ void NoClient::UserCommand(NoString& sLine)
                 GTable.addColumn("Name");
                 GTable.addColumn("Arguments");
 
-                for (const NoModule* pMod : GModules->GetModules()) {
+                for (const NoModule* pMod : GModules->modules()) {
                     GTable.addRow();
                     GTable.setValue("Name", pMod->GetModName());
                     GTable.setValue("Arguments", pMod->GetArgs());
@@ -895,7 +895,7 @@ void NoClient::UserCommand(NoString& sLine)
             Table.addColumn("Name");
             Table.addColumn("Arguments");
 
-            for (const NoModule* pMod : Modules->GetModules()) {
+            for (const NoModule* pMod : Modules->modules()) {
                 Table.addRow();
                 Table.setValue("Name", pMod->GetModName());
                 Table.setValue("Arguments", pMod->GetArgs());
@@ -914,7 +914,7 @@ void NoClient::UserCommand(NoString& sLine)
                 Table.addColumn("Name");
                 Table.addColumn("Arguments");
 
-                for (const NoModule* pMod : NetworkModules->GetModules()) {
+                for (const NoModule* pMod : NetworkModules->modules()) {
                     Table.addRow();
                     Table.setValue("Name", pMod->GetModName());
                     Table.setValue("Arguments", pMod->GetArgs());

@@ -116,7 +116,7 @@ NoModuleLoader::~NoModuleLoader() { unloadAllModules(); }
 
 bool NoModuleLoader::isEmpty() const { return d->modules.empty(); }
 
-std::vector<NoModule*> NoModuleLoader::GetModules() const { return d->modules; }
+std::vector<NoModule*> NoModuleLoader::modules() const { return d->modules; }
 
 void NoModuleLoader::setUser(NoUser* pUser) { d->user = pUser; }
 

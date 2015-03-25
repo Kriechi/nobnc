@@ -776,7 +776,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     NoModuleLoader* vCurMods = GetLoader();
     const NoModuleLoader* vNewMods = User.GetLoader();
 
-    for (NoModule* pNewMod : vNewMods->GetModules()) {
+    for (NoModule* pNewMod : vNewMods->modules()) {
         NoString sModRet;
         NoModule* pCurMod = vCurMods->findModule(pNewMod->GetModName());
 
@@ -787,7 +787,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
         }
     }
 
-    for (NoModule* pCurMod : vCurMods->GetModules()) {
+    for (NoModule* pCurMod : vCurMods->modules()) {
         NoModule* pNewMod = vNewMods->findModule(pCurMod->GetModName());
 
         if (!pNewMod) {
@@ -949,7 +949,7 @@ NoSettings NoUser::ToConfig() const
     // Modules
     const NoModuleLoader* Mods = GetLoader();
 
-    for (NoModule* pMod : Mods->GetModules()) {
+    for (NoModule* pMod : Mods->modules()) {
         NoString sArgs = pMod->GetArgs();
 
         if (!sArgs.empty()) {

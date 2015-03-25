@@ -1362,7 +1362,7 @@ class NoAdminMod : public NoModule
             Table.addColumn("Name");
             Table.addColumn("Arguments");
 
-            for (NoModule* mod : Modules->GetModules()) {
+            for (NoModule* mod : Modules->modules()) {
                 Table.addRow();
                 Table.setValue("Name", mod->GetModName());
                 Table.setValue("Arguments", mod->GetArgs());

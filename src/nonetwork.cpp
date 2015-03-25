@@ -271,7 +271,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     NoModuleLoader* vCurMods = GetLoader();
     const NoModuleLoader* vNewMods = Network.GetLoader();
 
-    for (NoModule* pNewMod : vNewMods->GetModules()) {
+    for (NoModule* pNewMod : vNewMods->modules()) {
         NoString sModRet;
         NoModule* pCurMod = vCurMods->findModule(pNewMod->GetModName());
 
@@ -282,7 +282,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
         }
     }
 
-    for (NoModule* pCurMod : vCurMods->GetModules()) {
+    for (NoModule* pCurMod : vCurMods->modules()) {
         NoModule* pNewMod = vNewMods->findModule(pCurMod->GetModName());
 
         if (!pNewMod) {
@@ -539,7 +539,7 @@ NoSettings NoNetwork::ToConfig() const
     // Modules
     const NoModuleLoader* Mods = GetLoader();
 
-    for (NoModule* pMod : Mods->GetModules()) {
+    for (NoModule* pMod : Mods->modules()) {
         NoString sArgs = pMod->GetArgs();
 
         if (!sArgs.empty()) {

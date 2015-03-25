@@ -400,7 +400,7 @@ void NoWebSocket::SetVars()
 
     // Global Mods
     NoModuleLoader* vgMods = NoApp::Get().GetLoader();
-    for (NoModule* pgMod : vgMods->GetModules()) {
+    for (NoModule* pgMod : vgMods->modules()) {
         AddModLoop("GlobalModLoop", *pgMod);
     }
 
@@ -408,7 +408,7 @@ void NoWebSocket::SetVars()
     if (IsLoggedIn()) {
         NoModuleLoader* vMods = GetSession()->GetUser()->GetLoader();
 
-        for (NoModule* pMod : vMods->GetModules()) {
+        for (NoModule* pMod : vMods->modules()) {
             AddModLoop("UserModLoop", *pMod);
         }
 
@@ -419,7 +419,7 @@ void NoWebSocket::SetVars()
             NoTemplate& Row = m_template.AddRow("NetworkModLoop");
             Row["NetworkName"] = pNetwork->GetName();
 
-            for (NoModule* pnMod : vnMods->GetModules()) {
+            for (NoModule* pnMod : vnMods->modules()) {
                 AddModLoop("ModLoop", *pnMod, &Row);
             }
         }
