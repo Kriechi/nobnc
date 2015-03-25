@@ -486,7 +486,7 @@ NoNetwork* NoUser::AddNetwork(const NoString& sNetwork, NoString& sErrorRet)
     NoNetwork* pNetwork = new NoNetwork(this, sNetwork);
 
     bool bCancel = false;
-    USERMODULECALL(OnAddNetwork(*pNetwork, sErrorRet), this, nullptr, &bCancel);
+    USERMODULECALL(onAddNetwork(*pNetwork, sErrorRet), this, nullptr, &bCancel);
     if (bCancel) {
         RemoveNetwork(pNetwork);
         delete pNetwork;
@@ -521,7 +521,7 @@ bool NoUser::DeleteNetwork(const NoString& sNetwork)
 
     if (pNetwork) {
         bool bCancel = false;
-        USERMODULECALL(OnDeleteNetwork(*pNetwork), this, nullptr, &bCancel);
+        USERMODULECALL(onDeleteNetwork(*pNetwork), this, nullptr, &bCancel);
         if (!bCancel) {
             delete pNetwork;
             return true;

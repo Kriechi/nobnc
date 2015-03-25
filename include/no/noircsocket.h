@@ -41,15 +41,15 @@ public:
         NoArg = 3
     };
 
-    bool OnCTCPReply(NoNick& Nick, NoString& sMessage);
-    bool OnPrivCTCP(NoNick& Nick, NoString& sMessage);
-    bool OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMessage);
+    bool onCtcpReply(NoNick& Nick, NoString& sMessage);
+    bool onPrivCtcp(NoNick& Nick, NoString& sMessage);
+    bool onChanCtcp(NoNick& Nick, const NoString& sChan, NoString& sMessage);
     bool OnGeneralCTCP(NoNick& Nick, NoString& sMessage);
-    bool OnPrivMsg(NoNick& Nick, NoString& sMessage);
-    bool OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage);
-    bool OnPrivNotice(NoNick& Nick, NoString& sMessage);
-    bool OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage);
-    bool OnServerCapAvailable(const NoString& sCap);
+    bool onPrivMsg(NoNick& Nick, NoString& sMessage);
+    bool onChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage);
+    bool onPrivNotice(NoNick& Nick, NoString& sMessage);
+    bool onChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage);
+    bool onServerCapAvailable(const NoString& sCap);
 
     void ReadLineImpl(const NoString& sData) override;
     void ConnectedImpl() override;
@@ -64,7 +64,7 @@ public:
     void ResetChans();
     void Quit(const NoString& sQuitMsg = "");
 
-    /** You can call this from NoModule::OnServerCapResult to suspend
+    /** You can call this from NoModule::onServerCapResult to suspend
      *  sending other CAP requests and CAP END for a while. Each
      *  call to PauseCap should be balanced with a call to ResumeCap.
      */

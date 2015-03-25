@@ -208,9 +208,9 @@ public:
         }
     }
 
-    bool OnServerCapAvailable(const NoString& sCap) override { return sCap.equals("sasl"); }
+    bool onServerCapAvailable(const NoString& sCap) override { return sCap.equals("sasl"); }
 
-    void OnServerCapResult(const NoString& sCap, bool bSuccess) override
+    void onServerCapResult(const NoString& sCap, bool bSuccess) override
     {
         if (sCap.equals("sasl")) {
             if (bSuccess) {
@@ -231,7 +231,7 @@ public:
         }
     }
 
-    ModRet OnRaw(NoString& sLine) override
+    ModRet onRaw(NoString& sLine) override
     {
         if (No::token(sLine, 0).equals("AUTHENTICATE")) {
             Authenticate(No::tokens(sLine, 1));
@@ -266,7 +266,7 @@ public:
         return HALT;
     }
 
-    void OnIRCConnected() override
+    void onIrcConnected() override
     {
         /* Just incase something slipped through, perhaps the server doesn't
          * respond to our CAP negotiation. */
@@ -274,7 +274,7 @@ public:
         CheckRequireAuth();
     }
 
-    void OnIRCDisconnected() override { m_bAuthenticated = false; }
+    void onIrcDisconnected() override { m_bAuthenticated = false; }
 
 private:
     Mechanisms m_Mechanisms;

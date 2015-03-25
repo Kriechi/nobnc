@@ -106,7 +106,7 @@ public:
         return (!m_bBootError);
     }
 
-    bool OnBoot() override
+    bool onBoot() override
     {
         NoDir saveDir(GetSavePath());
         for (NoFile* pFile : saveDir) {
@@ -235,7 +235,7 @@ public:
         m_sPassword = No::md5(sArgs);
     }
 
-    void OnModCommand(const NoString& sCmdLine) override
+    void onModCommand(const NoString& sCmdLine) override
     {
         NoString sCommand = No::token(sCmdLine, 0);
         NoString sArgs = No::tokens(sCmdLine, 1);
@@ -326,11 +326,11 @@ public:
         chan.AddBuffer(sLine);
     }
 
-    void OnRawMode(const NoNick& cOpNick, NoChannel& cChannel, const NoString& sModes, const NoString& sArgs) override
+    void onRawMode(const NoNick& cOpNick, NoChannel& cChannel, const NoString& sModes, const NoString& sArgs) override
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cOpNick.GetNickMask() + " MODE " + sModes + " " + sArgs));
     }
-    void OnQuit(const NoNick& cNick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& cNick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         for (size_t a = 0; a < vChans.size(); a++) {
             AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " QUIT " + sMessage));
@@ -338,17 +338,17 @@ public:
         if (cNick.NickEquals(GetUser()->GetNick())) SaveBuffersToDisk(); // need to force a save here to see this!
     }
 
-    void OnNick(const NoNick& cNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
+    void onNick(const NoNick& cNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         for (size_t a = 0; a < vChans.size(); a++) {
             AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " NICK " + sNewNick));
         }
     }
-    void OnKick(const NoNick& cNick, const NoString& sOpNick, NoChannel& cChannel, const NoString& sMessage) override
+    void onKick(const NoNick& cNick, const NoString& sOpNick, NoChannel& cChannel, const NoString& sMessage) override
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), sOpNick + " KICK " + cNick.GetNickMask() + " " + sMessage));
     }
-    void OnJoin(const NoNick& cNick, NoChannel& cChannel) override
+    void onJoin(const NoNick& cNick, NoChannel& cChannel) override
     {
         if (cNick.NickEquals(GetUser()->GetNick()) && cChannel.GetBuffer().empty()) {
             BootStrap((NoChannel*)&cChannel);
@@ -356,7 +356,7 @@ public:
         }
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cNick.GetNickMask() + " JOIN"));
     }
-    void OnPart(const NoNick& cNick, NoChannel& cChannel) override
+    void onPart(const NoNick& cNick, NoChannel& cChannel) override
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cNick.GetNickMask() + " PART"));
         if (cNick.NickEquals(GetUser()->GetNick())) SaveBuffersToDisk(); // need to force a save here to see this!

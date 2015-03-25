@@ -342,7 +342,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if (!pZNC->OnBoot()) {
+    if (!pZNC->onBoot()) {
         No::printError("Exiting due to module boot errors.");
         NoApp::DestroyInstance();
         return 1;

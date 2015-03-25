@@ -66,7 +66,7 @@ public:
         return true;
     }
 
-    void OnIRCDisconnected() override { m_chans.clear(); }
+    void onIrcDisconnected() override { m_chans.clear(); }
 
     void Cleanup()
     {
@@ -152,26 +152,26 @@ public:
         }
     }
 
-    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    // This also catches OnChanAction()
-    ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    // This also catches onChanAction()
+    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Message(Channel);
         return CONTINUE;
     }
 
-    ModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
+    ModRet onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
         Message(Channel);
         return CONTINUE;

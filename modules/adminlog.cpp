@@ -68,18 +68,18 @@ public:
         return true;
     }
 
-    void OnIRCConnected() override
+    void onIrcConnected() override
     {
         Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] connected to IRC: " +
             GetNetwork()->GetCurrentServer()->host());
     }
 
-    void OnIRCDisconnected() override
+    void onIrcDisconnected() override
     {
         Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC");
     }
 
-    ModRet OnRaw(NoString& sLine) override
+    ModRet onRaw(NoString& sLine) override
     {
         if (sLine.startsWith("ERROR ")) {
             // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
@@ -93,17 +93,17 @@ public:
         return CONTINUE;
     }
 
-    void OnClientLogin() override
+    void onClientLogin() override
     {
         Log("[" + GetUser()->GetUserName() + "] connected to ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
     }
 
-    void OnClientDisconnect() override
+    void onClientDisconnect() override
     {
         Log("[" + GetUser()->GetUserName() + "] disconnected from ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
     }
 
-    void OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
+    void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
     {
         Log("[" + sUsername + "] failed to login from " + sRemoteIP, LOG_WARNING);
     }
@@ -130,7 +130,7 @@ public:
         }
     }
 
-    void OnModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& sCommand) override
     {
         if (!GetUser()->IsAdmin()) {
             PutModule("Access denied");

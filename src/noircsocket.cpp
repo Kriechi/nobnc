@@ -127,7 +127,7 @@ NoIrcSocket::NoIrcSocket(NoNetwork* pNetwork) : d(new NoIrcSocketPrivate)
 NoIrcSocket::~NoIrcSocket()
 {
     if (!d->authed) {
-        IRCSOCKMODULECALL(OnIRCConnectionError(this), NOTHING);
+        IRCSOCKMODULECALL(onIrcConnectionError(this), NOTHING);
     }
 
     const std::vector<NoChannel*>& vChans = d->network->GetChans();
@@ -170,7 +170,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
     NO_DEBUG("(" << d->network->GetUser()->GetUserName() << "/" << d->network->GetName() << ") IRC -> ZNC [" << sLine << "]");
 
     bool bReturn = false;
-    IRCSOCKMODULECALL(OnRaw(sLine), &bReturn);
+    IRCSOCKMODULECALL(onRaw(sLine), &bReturn);
     if (bReturn) return;
 
     if (sLine.startsWith("PING ")) {
@@ -230,7 +230,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
 
             SetNick(sNick);
 
-            IRCSOCKMODULECALL(OnIRCConnected(), NOTHING);
+            IRCSOCKMODULECALL(onIrcConnected(), NOTHING);
 
             d->network->ClearRawBuffer();
             d->network->AddRawBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
@@ -550,7 +550,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 d->network->PutUser(sLine);
             }
 
-            IRCSOCKMODULECALL(OnNick(Nick, sNewNick, vFoundChans), NOTHING);
+            IRCSOCKMODULECALL(onNick(Nick, sNewNick, vFoundChans), NOTHING);
 
             if (!bIsVisible) {
                 return;
@@ -582,7 +582,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 }
             }
 
-            IRCSOCKMODULECALL(OnQuit(Nick, sMessage, vFoundChans), NOTHING);
+            IRCSOCKMODULECALL(onQuit(Nick, sMessage, vFoundChans), NOTHING);
 
             if (!bIsVisible) {
                 return;
@@ -605,7 +605,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
 
             if (pChan) {
                 pChan->addNick(Nick.nickMask());
-                IRCSOCKMODULECALL(OnJoin(Nick.nickMask(), *pChan), NOTHING);
+                IRCSOCKMODULECALL(onJoin(Nick.nickMask(), *pChan), NOTHING);
 
                 if (pChan->isDetached()) {
                     return;
@@ -619,7 +619,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             bool bDetached = false;
             if (pChan) {
                 pChan->remNick(Nick.nick());
-                IRCSOCKMODULECALL(OnPart(Nick.nickMask(), *pChan, sMsg), NOTHING);
+                IRCSOCKMODULECALL(onPart(Nick.nickMask(), *pChan, sMsg), NOTHING);
 
                 if (pChan->isDetached()) bDetached = true;
             }
@@ -653,7 +653,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 NoString sModeArg = No::token(sModes, 0);
                 bool bAdd = true;
                 /* no module call defined (yet?)
-                                MODULECALL(OnRawUserMode(*pOpNick, *this, sModeArg, sArgs), d->pNetwork->GetUser(),
+                                MODULECALL(onRawUserMode(*pOpNick, *this, sModeArg, sArgs), d->pNetwork->GetUser(),
                    nullptr, );
                 */
                 for (uint a = 0; a < sModeArg.size(); a++) {
@@ -682,8 +682,8 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             NoChannel* pChan = d->network->FindChan(sChan);
 
             if (pChan) {
-                IRCSOCKMODULECALL(OnKick(Nick, sKickedNick, *pChan, sMsg), NOTHING);
-                // do not remove the nick till after the OnKick call, so modules
+                IRCSOCKMODULECALL(onKick(Nick, sKickedNick, *pChan, sMsg), NOTHING);
+                // do not remove the nick till after the onKick call, so modules
                 // can do Chan.FindNick or something to get more info.
                 pChan->remNick(sKickedNick);
             }
@@ -709,7 +709,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 sMsg.rightChomp(1);
 
                 if (sTarget.equals(GetNick())) {
-                    if (OnCTCPReply(Nick, sMsg)) {
+                    if (onCtcpReply(Nick, sMsg)) {
                         return;
                     }
                 }
@@ -718,11 +718,11 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 return;
             } else {
                 if (sTarget.equals(GetNick())) {
-                    if (OnPrivNotice(Nick, sMsg)) {
+                    if (onPrivNotice(Nick, sMsg)) {
                         return;
                     }
                 } else {
-                    if (OnChanNotice(Nick, sTarget, sMsg)) {
+                    if (onChanNotice(Nick, sTarget, sMsg)) {
                         return;
                     }
                 }
@@ -743,7 +743,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 NoString sTopic = No::tokens(sLine, 3);
                 sTopic.leftChomp(1);
 
-                IRCSOCKMODULECALL(OnTopic(Nick, *pChan, sTopic), &bReturn);
+                IRCSOCKMODULECALL(onTopic(Nick, *pChan, sTopic), &bReturn);
                 if (bReturn) return;
 
                 pChan->setTopicOwner(Nick.nick());
@@ -766,11 +766,11 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 sMsg.rightChomp(1);
 
                 if (sTarget.equals(GetNick())) {
-                    if (OnPrivCTCP(Nick, sMsg)) {
+                    if (onPrivCtcp(Nick, sMsg)) {
                         return;
                     }
                 } else {
-                    if (OnChanCTCP(Nick, sTarget, sMsg)) {
+                    if (onChanCtcp(Nick, sTarget, sMsg)) {
                         return;
                     }
                 }
@@ -779,11 +779,11 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 return;
             } else {
                 if (sTarget.equals(GetNick())) {
-                    if (OnPrivMsg(Nick, sMsg)) {
+                    if (onPrivMsg(Nick, sMsg)) {
                         return;
                     }
                 } else {
-                    if (OnChanMsg(Nick, sTarget, sMsg)) {
+                    if (onChanMsg(Nick, sTarget, sMsg)) {
                         return;
                     }
                 }
@@ -828,13 +828,13 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                     NoStringVector vsTokens = sArgs.split(" ", No::SkipEmptyParts);
 
                     for (const NoString& sCap : vsTokens) {
-                        if (OnServerCapAvailable(sCap) || sCap == "multi-prefix" || sCap == "userhost-in-names") {
+                        if (onServerCapAvailable(sCap) || sCap == "multi-prefix" || sCap == "userhost-in-names") {
                             d->pendingCaps.insert(sCap);
                         }
                     }
                 } else if (sSubCmd == "ACK") {
                     sArgs.trim();
-                    IRCSOCKMODULECALL(OnServerCapResult(sArgs, true), NOTHING);
+                    IRCSOCKMODULECALL(onServerCapResult(sArgs, true), NOTHING);
                     if ("multi-prefix" == sArgs) {
                         d->hasNamesX = true;
                     } else if ("userhost-in-names" == sArgs) {
@@ -845,7 +845,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                     // This should work because there's no [known]
                     // capability with length of name more than 100 characters.
                     sArgs.trim();
-                    IRCSOCKMODULECALL(OnServerCapResult(sArgs, false), NOTHING);
+                    IRCSOCKMODULECALL(onServerCapResult(sArgs, false), NOTHING);
                 }
 
                 SendNextCap();
@@ -853,7 +853,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             // Don't forward any CAP stuff to the client
             return;
         } else if (sCmd.equals("INVITE")) {
-            IRCSOCKMODULECALL(OnInvite(Nick, No::token(sLine, 3).trimPrefix_n(":")), &bReturn);
+            IRCSOCKMODULECALL(onInvite(Nick, No::token(sLine, 3).trimPrefix_n(":")), &bReturn);
             if (bReturn) return;
         }
     }
@@ -887,30 +887,30 @@ void NoIrcSocket::SetPass(const NoString& s) { d->password = s; }
 
 uint NoIrcSocket::GetMaxNickLen() const { return d->maxNickLen; }
 
-bool NoIrcSocket::OnServerCapAvailable(const NoString& sCap)
+bool NoIrcSocket::onServerCapAvailable(const NoString& sCap)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(OnServerCapAvailable(sCap), &bResult);
+    IRCSOCKMODULECALL(onServerCapAvailable(sCap), &bResult);
     return bResult;
 }
 
-bool NoIrcSocket::OnCTCPReply(NoNick& Nick, NoString& sMessage)
+bool NoIrcSocket::onCtcpReply(NoNick& Nick, NoString& sMessage)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(OnCTCPReply(Nick, sMessage), &bResult);
+    IRCSOCKMODULECALL(onCtcpReply(Nick, sMessage), &bResult);
 
     return bResult;
 }
 
-bool NoIrcSocket::OnPrivCTCP(NoNick& Nick, NoString& sMessage)
+bool NoIrcSocket::onPrivCtcp(NoNick& Nick, NoString& sMessage)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(OnPrivCTCP(Nick, sMessage), &bResult);
+    IRCSOCKMODULECALL(onPrivCtcp(Nick, sMessage), &bResult);
     if (bResult) return true;
 
     if (sMessage.trimPrefix("ACTION ")) {
         bResult = false;
-        IRCSOCKMODULECALL(OnPrivAction(Nick, sMessage), &bResult);
+        IRCSOCKMODULECALL(onPrivAction(Nick, sMessage), &bResult);
         if (bResult) return true;
 
         if (!d->network->IsUserOnline() || !d->network->GetUser()->AutoClearQueryBuffer()) {
@@ -971,10 +971,10 @@ bool NoIrcSocket::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
     return false;
 }
 
-bool NoIrcSocket::OnPrivNotice(NoNick& Nick, NoString& sMessage)
+bool NoIrcSocket::onPrivNotice(NoNick& Nick, NoString& sMessage)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(OnPrivNotice(Nick, sMessage), &bResult);
+    IRCSOCKMODULECALL(onPrivNotice(Nick, sMessage), &bResult);
     if (bResult) return true;
 
     if (!d->network->IsUserOnline()) {
@@ -985,10 +985,10 @@ bool NoIrcSocket::OnPrivNotice(NoNick& Nick, NoString& sMessage)
     return false;
 }
 
-bool NoIrcSocket::OnPrivMsg(NoNick& Nick, NoString& sMessage)
+bool NoIrcSocket::onPrivMsg(NoNick& Nick, NoString& sMessage)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(OnPrivMsg(Nick, sMessage), &bResult);
+    IRCSOCKMODULECALL(onPrivMsg(Nick, sMessage), &bResult);
     if (bResult) return true;
 
     if (!d->network->IsUserOnline() || !d->network->GetUser()->AutoClearQueryBuffer()) {
@@ -1001,18 +1001,18 @@ bool NoIrcSocket::OnPrivMsg(NoNick& Nick, NoString& sMessage)
     return false;
 }
 
-bool NoIrcSocket::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMessage)
+bool NoIrcSocket::onChanCtcp(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
     NoChannel* pChan = d->network->FindChan(sChan);
     if (pChan) {
         bool bResult = false;
-        IRCSOCKMODULECALL(OnChanCTCP(Nick, *pChan, sMessage), &bResult);
+        IRCSOCKMODULECALL(onChanCtcp(Nick, *pChan, sMessage), &bResult);
         if (bResult) return true;
 
         // Record a /me
         if (sMessage.trimPrefix("ACTION ")) {
             bResult = false;
-            IRCSOCKMODULECALL(OnChanAction(Nick, *pChan, sMessage), &bResult);
+            IRCSOCKMODULECALL(onChanAction(Nick, *pChan, sMessage), &bResult);
             if (bResult) return true;
             if (!pChan->autoClearChanBuffer() || !d->network->IsUserOnline() || pChan->isDetached()) {
                 pChan->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) +
@@ -1028,12 +1028,12 @@ bool NoIrcSocket::OnChanCTCP(NoNick& Nick, const NoString& sChan, NoString& sMes
     return (pChan && pChan->isDetached());
 }
 
-bool NoIrcSocket::OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage)
+bool NoIrcSocket::onChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
     NoChannel* pChan = d->network->FindChan(sChan);
     if (pChan) {
         bool bResult = false;
-        IRCSOCKMODULECALL(OnChanNotice(Nick, *pChan, sMessage), &bResult);
+        IRCSOCKMODULECALL(onChanNotice(Nick, *pChan, sMessage), &bResult);
         if (bResult) return true;
 
         if (!pChan->autoClearChanBuffer() || !d->network->IsUserOnline() || pChan->isDetached()) {
@@ -1044,12 +1044,12 @@ bool NoIrcSocket::OnChanNotice(NoNick& Nick, const NoString& sChan, NoString& sM
     return ((pChan) && (pChan->isDetached()));
 }
 
-bool NoIrcSocket::OnChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage)
+bool NoIrcSocket::onChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
     NoChannel* pChan = d->network->FindChan(sChan);
     if (pChan) {
         bool bResult = false;
-        IRCSOCKMODULECALL(OnChanMsg(Nick, *pChan, sMessage), &bResult);
+        IRCSOCKMODULECALL(onChanMsg(Nick, *pChan, sMessage), &bResult);
         if (bResult) return true;
 
         if (!pChan->autoClearChanBuffer() || !d->network->IsUserOnline() || pChan->isDetached()) {
@@ -1088,7 +1088,7 @@ void NoIrcSocket::TrySend()
         d->sendsAllowed--;
         bool bSkip = false;
         NoString& sLine = d->sendQueue.front();
-        IRCSOCKMODULECALL(OnSendToIRC(sLine), &bSkip);
+        IRCSOCKMODULECALL(onSendToIrc(sLine), &bSkip);
         if (!bSkip) {
             ;
             NO_DEBUG("(" << d->network->GetUser()->GetUserName() << "/" << d->network->GetName() << ") ZNC -> IRC [" << sLine << "]");
@@ -1114,7 +1114,7 @@ void NoIrcSocket::ConnectedImpl()
     NoString sRealName = d->network->GetRealName();
 
     bool bReturn = false;
-    IRCSOCKMODULECALL(OnIRCRegistration(sPass, sNick, sIdent, sRealName), &bReturn);
+    IRCSOCKMODULECALL(onIrcRegistration(sPass, sNick, sIdent, sRealName), &bReturn);
     if (bReturn) return;
 
     PutIRC("CAP LS");
@@ -1132,7 +1132,7 @@ void NoIrcSocket::ConnectedImpl()
 
 void NoIrcSocket::DisconnectedImpl()
 {
-    IRCSOCKMODULECALL(OnIRCDisconnected(), NOTHING);
+    IRCSOCKMODULECALL(onIrcDisconnected(), NOTHING);
 
     NO_DEBUG(GetSockName() << " == Disconnected()");
     if (!d->network->GetUser()->IsBeingDeleted() && d->network->GetIRCConnectEnabled() && d->network->GetServers().size() != 0) {

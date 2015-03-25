@@ -22,7 +22,7 @@ class NoBlockMotd : public NoModule
 public:
     MODCONSTRUCTOR(NoBlockMotd) {}
 
-    ModRet OnRaw(NoString& sLine) override
+    ModRet onRaw(NoString& sLine) override
     {
         const NoString sCmd = No::token(sLine, 1);
 

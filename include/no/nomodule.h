@@ -197,7 +197,7 @@ public:
      *  from znc.conf get this call.
      *  @return false to abort ZNC startup.
      */
-    virtual bool OnBoot();
+    virtual bool onBoot();
 
 
     /** Modules which can only be used with an active user session have to return true here.
@@ -250,24 +250,24 @@ public:
 
 
     /** Called just before znc.conf is rehashed */
-    virtual void OnPreRehash();
+    virtual void onPreRehash();
     /** This module hook is called after a <em>successful</em> rehash. */
-    virtual void OnPostRehash();
+    virtual void onPostRehash();
     /** This module hook is called when a user gets disconnected from IRC. */
-    virtual void OnIRCDisconnected();
+    virtual void onIrcDisconnected();
     /** This module hook is called after a successful login to IRC. */
-    virtual void OnIRCConnected();
+    virtual void onIrcConnected();
     /** This module hook is called just before ZNC tries to establish a
      *  connection to an IRC server.
      *  @param pIRCSock The socket that will be used for the connection.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnIRCConnecting(NoIrcSocket* pIRCSock);
+    virtual ModRet onIrcConnecting(NoIrcSocket* pIRCSock);
     /** This module hook is called when a NoIrcSock fails to connect or
-     *  a module returned HALTCORE from OnIRCConnecting.
+     *  a module returned HALTCORE from onIrcConnecting.
      *  @param pIRCSock The socket that failed to connect.
      */
-    virtual void OnIRCConnectionError(NoIrcSocket* pIRCSock);
+    virtual void onIrcConnectionError(NoIrcSocket* pIRCSock);
     /** This module hook is called before loging in to the IRC server. The
      *  low-level connection is established at this point, but SSL
      *  handshakes didn't necessarily finish yet.
@@ -278,12 +278,12 @@ public:
      *  @param sRealName The real name that will be used.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnIRCRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName);
+    virtual ModRet onIrcRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName);
     /** This module hook is called when a message is broadcasted to all users.
      *  @param sMessage The message that is broadcasted.
      *  @return see NoModule::ModRet
      */
-    virtual ModRet OnBroadcast(NoString& sMessage);
+    virtual ModRet onBroadcast(NoString& sMessage);
 
     /** This module hook is called when a user mode on a channel changes.
      *  @param pOpNick The nick who sent the mode change, or nullptr if set by server.
@@ -297,20 +297,20 @@ public:
      *       'o' for op).
      */
     virtual void
-    OnChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
-    virtual void OnChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
+    onChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
+    virtual void onChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
     /** Called when a nick is opped on a channel */
-    virtual void OnOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
-    virtual void OnOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    virtual void onOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    virtual void onOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
     /** Called when a nick is deopped on a channel */
-    virtual void OnDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
-    virtual void OnDeop(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    virtual void onDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    virtual void onDeop(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
     /** Called when a nick is voiced on a channel */
-    virtual void OnVoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
-    virtual void OnVoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    virtual void onVoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    virtual void onVoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
     /** Called when a nick is devoiced on a channel */
-    virtual void OnDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
-    virtual void OnDevoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    virtual void onDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
+    virtual void onDevoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);
     /** Called on an individual channel mode change.
      *  @param pOpNick The nick who changes the channel mode, or nullptr if set by server.
      *  @param Channel The channel whose mode is changed.
@@ -319,105 +319,105 @@ public:
      *  @param bAdded True if this mode is added ("+"), else false.
      *  @param bNoChange True if this mode was already effective before.
      */
-    virtual void OnMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange);
-    virtual void OnMode(const NoNick& OpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange);
+    virtual void onMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange);
+    virtual void onMode(const NoNick& OpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange);
     /** Called on any channel mode change. This is called before the more
-     *  detailed mode hooks like e.g. OnOp() and OnMode().
+     *  detailed mode hooks like e.g. onOp() and onMode().
      *  @param pOpNick The nick who changes the channel mode, or nullptr if set by server.
      *  @param Channel The channel whose mode is changed.
      *  @param sModes The raw mode change, e.g. "+s-io".
      *  @param sArgs All arguments to the mode change from sModes.
      */
-    virtual void OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs);
-    virtual void OnRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs);
+    virtual void onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs);
+    virtual void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs);
 
     /** Called on any raw IRC line received from the <em>IRC server</em>.
      *  @param sLine The line read from the server.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnRaw(NoString& sLine);
+    virtual ModRet onRaw(NoString& sLine);
 
     /** Called when a command to *status is sent.
      *  @param sCommand The command sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnStatusCommand(NoString& sCommand);
+    virtual ModRet onStatusCommand(NoString& sCommand);
     /** Called when a command to your module is sent, e.g. query to *modname.
      *  @param sCommand The command that was sent.
      */
-    virtual void OnModCommand(const NoString& sCommand);
-    /** This is similar to OnModCommand(), but it is only called if
+    virtual void onModCommand(const NoString& sCommand);
+    /** This is similar to onModCommand(), but it is only called if
      * HandleCommand didn't find any that wants to handle this. This is only
      * called if HandleCommand() is called, which practically means that
-     * this is only called if you don't overload OnModCommand().
+     * this is only called if you don't overload onModCommand().
      *  @param sCommand The command that was sent.
      */
     virtual void OnUnknownModCommand(const NoString& sCommand);
     /** Called when a your module nick was sent a notice.
      *  @param sMessage The message which was sent.
      */
-    virtual void OnModNotice(const NoString& sMessage);
-    /** Called when your module nick was sent a CTCP message. OnModCommand()
+    virtual void onModNotice(const NoString& sMessage);
+    /** Called when your module nick was sent a CTCP message. onModCommand()
      *  won't be called for this message.
      *  @param sMessage The message which was sent.
      */
-    virtual void OnModCTCP(const NoString& sMessage);
+    virtual void onModCTCP(const NoString& sMessage);
 
     /** Called when a nick quit from IRC.
      *  @param Nick The nick which quit.
      *  @param sMessage The quit message.
      *  @param vChans List of channels which you and nick share.
      */
-    virtual void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans);
+    virtual void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans);
     /** Called when a nickname change occurs. If we are changing our nick,
      *  sNewNick will equal m_pIRCSock->GetNick().
      *  @param Nick The nick which changed its nickname
      *  @param sNewNick The new nickname.
      *  @param vChans Channels which we and nick share.
      */
-    virtual void OnNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans);
+    virtual void onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans);
     /** Called when a nick is kicked from a channel.
      *  @param OpNick The nick which generated the kick.
      *  @param sKickedNick The nick which was kicked.
      *  @param Channel The channel on which this kick occurs.
      *  @param sMessage The kick message.
      */
-    virtual void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage);
+    virtual void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage);
     /** This module hook is called just before ZNC tries to join an IRC channel.
      *  @param Chan The channel which is about to get joined.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnJoining(NoChannel& Channel);
+    virtual ModRet onJoining(NoChannel& Channel);
     /** Called when a nick joins a channel.
      *  @param Nick The nick who joined.
      *  @param Channel The channel which was joined.
      */
-    virtual void OnJoin(const NoNick& Nick, NoChannel& Channel);
+    virtual void onJoin(const NoNick& Nick, NoChannel& Channel);
     /** Called when a nick parts a channel.
      *  @param Nick The nick who parted.
      *  @param Channel The channel which was parted.
      *  @param sMessage The part message.
      */
-    virtual void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage);
+    virtual void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage);
     /** Called when user is invited into a channel
      *  @param Nick The nick who invited you.
      *  @param sChan The channel the user got invited into
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnInvite(const NoNick& Nick, const NoString& sChan);
+    virtual ModRet onInvite(const NoNick& Nick, const NoString& sChan);
 
     /** Called before a channel buffer is played back to a client.
      *  @param Chan The channel which will be played back.
      *  @param Client The client the buffer will be played back to.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnChanBufferStarting(NoChannel& Chan, NoClient& Client);
+    virtual ModRet onChanBufferStarting(NoChannel& Chan, NoClient& Client);
     /** Called after a channel buffer was played back to a client.
      *  @param Chan The channel which was played back.
      *  @param Client The client the buffer was played back to.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnChanBufferEnding(NoChannel& Chan, NoClient& Client);
+    virtual ModRet onChanBufferEnding(NoChannel& Chan, NoClient& Client);
     /** Called when for each line during a channel's buffer play back.
      *  @param Chan The channel this playback is from.
      *  @param Client The client the buffer is played back to.
@@ -426,180 +426,180 @@ public:
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv);
-    virtual ModRet OnChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine);
+    virtual ModRet onChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv);
+    virtual ModRet onChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine);
     /** Called when a line from the query buffer is played back.
      *  @param Client The client this line will go to.
      *  @param sLine The raw IRC traffic line from the buffer.
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv);
-    virtual ModRet OnPrivBufferPlayLine(NoClient& Client, NoString& sLine);
+    virtual ModRet onPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv);
+    virtual ModRet onPrivBufferPlayLine(NoClient& Client, NoString& sLine);
 
     /** Called when a client successfully logged in to ZNC. */
-    virtual void OnClientLogin();
+    virtual void onClientLogin();
     /** Called when a client disconnected from ZNC. */
-    virtual void OnClientDisconnect();
+    virtual void onClientDisconnect();
     /** This module hook is called when a client sends a raw traffic line to ZNC.
      *  @param sLine The raw traffic line sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnUserRaw(NoString& sLine);
+    virtual ModRet onUserRaw(NoString& sLine);
     /** This module hook is called when a client sends a CTCP reply.
      *  @param sTarget The target for the CTCP reply. Could be a channel
      *                 name or a nick name.
      *  @param sMessage The CTCP reply message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnUserCTCPReply(NoString& sTarget, NoString& sMessage);
+    virtual ModRet onUserCtcpReply(NoString& sTarget, NoString& sMessage);
     /** This module hook is called when a client sends a CTCP request.
      *  @param sTarget The target for the CTCP request. Could be a channel
      *                 name or a nick name.
      *  @param sMessage The CTCP request message.
      *  @return See NoModule::ModRet.
      *  @note This is not called for CTCP ACTION messages, use
-     *        NoModule::OnUserAction() instead.
+     *        NoModule::onUserAction() instead.
      */
-    virtual ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage);
+    virtual ModRet onUserCtcp(NoString& sTarget, NoString& sMessage);
     /** Called when a client sends a CTCP ACTION request ("/me").
      *  @param sTarget The target for the CTCP ACTION. Could be a channel
      *                 name or a nick name.
      *  @param sMessage The action message.
      *  @return See NoModule::ModRet.
-     *  @note NoModule::OnUserCTCP() will not be called for this message.
+     *  @note NoModule::onUserCtcp() will not be called for this message.
      */
-    virtual ModRet OnUserAction(NoString& sTarget, NoString& sMessage);
+    virtual ModRet onUserAction(NoString& sTarget, NoString& sMessage);
     /** This module hook is called when a user sends a normal IRC message.
      *  @param sTarget The target of the message. Could be a channel name or
      *                 a nick name.
      *  @param sMessage The message which was sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnUserMsg(NoString& sTarget, NoString& sMessage);
+    virtual ModRet onUserMsg(NoString& sTarget, NoString& sMessage);
     /** This module hook is called when a user sends a notice message.
      *  @param sTarget The target of the message. Could be a channel name or
      *                 a nick name.
      *  @param sMessage The message which was sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnUserNotice(NoString& sTarget, NoString& sMessage);
+    virtual ModRet onUserNotice(NoString& sTarget, NoString& sMessage);
     /** This hooks is called when a user sends a JOIN message.
      *  @param sChannel The channel name the join is for.
      *  @param sKey The key for the channel.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnUserJoin(NoString& sChannel, NoString& sKey);
+    virtual ModRet onUserJoin(NoString& sChannel, NoString& sKey);
     /** This hooks is called when a user sends a PART message.
      *  @param sChannel The channel name the part is for.
      *  @param sMessage The part message the client sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnUserPart(NoString& sChannel, NoString& sMessage);
+    virtual ModRet onUserPart(NoString& sChannel, NoString& sMessage);
     /** This module hook is called when a user wants to change a channel topic.
      *  @param sChannel The channel.
      *  @param sTopic The new topic which the user sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnUserTopic(NoString& sChannel, NoString& sTopic);
+    virtual ModRet onUserTopic(NoString& sChannel, NoString& sTopic);
     /** This hook is called when a user requests a channel's topic.
      *  @param sChannel The channel for which the request is.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnUserTopicRequest(NoString& sChannel);
+    virtual ModRet onUserTopicRequest(NoString& sChannel);
     /** This module hook is called when a user requests to quit from network.
      *  @param sMessage The quit message the client sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnUserQuit(NoString& sMessage);
+    virtual ModRet onUserQuit(NoString& sMessage);
 
     /** Called when we receive a CTCP reply <em>from IRC</em>.
      *  @param Nick The nick the CTCP reply is from.
      *  @param sMessage The CTCP reply message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnCTCPReply(NoNick& Nick, NoString& sMessage);
+    virtual ModRet onCtcpReply(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a private CTCP request <em>from IRC</em>.
      *  @param Nick The nick the CTCP request is from.
      *  @param sMessage The CTCP request message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage);
+    virtual ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a channel CTCP request <em>from IRC</em>.
      *  @param Nick The nick the CTCP request is from.
      *  @param Channel The channel to which the request was sent.
      *  @param sMessage The CTCP request message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    virtual ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
     /** Called when we receive a private CTCP ACTION ("/me" in query) <em>from IRC</em>.
-     *  This is called after NoModule::OnPrivCTCP().
+     *  This is called after NoModule::onPrivCtcp().
      *  @param Nick The nick the action came from.
      *  @param sMessage The action message
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnPrivAction(NoNick& Nick, NoString& sMessage);
+    virtual ModRet onPrivAction(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a channel CTCP ACTION ("/me" in a channel) <em>from IRC</em>.
-     *  This is called after NoModule::OnChanCTCP().
+     *  This is called after NoModule::onChanCtcp().
      *  @param Nick The nick the action came from.
      *  @param Channel The channel the action was sent to.
      *  @param sMessage The action message
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    virtual ModRet onChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
     /** Called when we receive a private message <em>from IRC</em>.
      *  @param Nick The nick which sent the message.
      *  @param sMessage The message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage);
+    virtual ModRet onPrivMsg(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a channel message <em>from IRC</em>.
      *  @param Nick The nick which sent the message.
      *  @param Channel The channel to which the message was sent.
      *  @param sMessage The message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    virtual ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
     /** Called when we receive a private notice.
      *  @param Nick The nick which sent the notice.
      *  @param sMessage The notice message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage);
+    virtual ModRet onPrivNotice(NoNick& Nick, NoString& sMessage);
     /** Called when we receive a channel notice.
      *  @param Nick The nick which sent the notice.
      *  @param Channel The channel to which the notice was sent.
      *  @param sMessage The notice message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
+    virtual ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage);
     /** Called when we receive a channel topic change <em>from IRC</em>.
      *  @param Nick The nick which changed the topic.
      *  @param Channel The channel whose topic was changed.
      *  @param sTopic The new topic.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic);
+    virtual ModRet onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic);
 
     /** Called for every CAP received via CAP LS from server.
      *  @param sCap capability supported by server.
      *  @return true if your module supports this CAP and
      *          needs to turn it on with CAP REQ.
      */
-    virtual bool OnServerCapAvailable(const NoString& sCap);
+    virtual bool onServerCapAvailable(const NoString& sCap);
     /** Called for every CAP accepted or rejected by server
      *  (with CAP ACK or CAP NAK after our CAP REQ).
      *  @param sCap capability accepted/rejected by server.
      *  @param bSuccess true if capability was accepted, false if rejected.
      */
-    virtual void OnServerCapResult(const NoString& sCap, bool bSuccess);
+    virtual void onServerCapResult(const NoString& sCap, bool bSuccess);
 
     /** This module hook is called just before ZNC tries to join a channel
      *  by itself because it's in the config but wasn't joined yet.
      *  @param Channel The channel which will be joined.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnTimerAutoJoin(NoChannel& Channel);
+    virtual ModRet onTimerAutoJoin(NoChannel& Channel);
 
     /** This module hook is called when a network is being added.
      *  @param Network The new IRC network.
@@ -607,12 +607,12 @@ public:
      *                  the module stops adding the network.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnAddNetwork(NoNetwork& Network, NoString& sErrorRet);
+    virtual ModRet onAddNetwork(NoNetwork& Network, NoString& sErrorRet);
     /** This module hook is called when a network is deleted.
      *  @param Network The IRC network which is going to be deleted.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnDeleteNetwork(NoNetwork& Network);
+    virtual ModRet onDeleteNetwork(NoNetwork& Network);
 
     /** Called when ZNC sends a raw traffic line to a client.
      *  @param sLine The raw traffic line sent.
@@ -620,13 +620,13 @@ public:
      *  @warning Calling PutUser() from within this hook leads to infinite recursion.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnSendToClient(NoString& sLine, NoClient& Client);
+    virtual ModRet onSendToClient(NoString& sLine, NoClient& Client);
     /** Called when ZNC sends a raw traffic line to the IRC server.
      *  @param sLine The raw traffic line sent.
      *  @warning Calling PutIRC() from within this hook leads to infinite recursion.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnSendToIRC(NoString& sLine);
+    virtual ModRet onSendToIrc(NoString& sLine);
 
     NoModuleHandle GetDLL();
     static double GetCoreVersion();
@@ -759,58 +759,58 @@ public:
      *                  the module stops adding the user.
      * @return See NoModule::ModRet.
      */
-    virtual ModRet OnAddUser(NoUser& User, NoString& sErrorRet);
+    virtual ModRet onAddUser(NoUser& User, NoString& sErrorRet);
     /** This module hook is called when a user is deleted.
      *  @param User The user which will be deleted.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnDeleteUser(NoUser& User);
+    virtual ModRet onDeleteUser(NoUser& User);
     /** This module hook is called when there is an incoming connection on
      *  any of ZNC's listening sockets.
      *  @param pSock The incoming client socket.
      *  @param sHost The IP the client is connecting from.
      *  @param uPort The port the client is connecting from.
      */
-    virtual void OnClientConnect(NoSocket* pSock, const NoString& sHost, ushort uPort);
+    virtual void onClientConnect(NoSocket* pSock, const NoString& sHost, ushort uPort);
     /** This module hook is called when a client tries to login. If your
      *  module wants to handle the login attempt, it must return
      *  NoModule::ModRet::HALT;
      *  @param Auth The necessary authentication info for this login attempt.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth);
+    virtual ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth);
     /** Called after a client login was rejected.
      *  @param sUsername The username that tried to log in.
      *  @param sRemoteIP The IP address from which the client tried to login.
      */
-    virtual void OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP);
-    /** This function behaves like NoModule::OnUserRaw(), but is also called
+    virtual void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP);
+    /** This function behaves like NoModule::onUserRaw(), but is also called
      *  before the client successfully logged in to ZNC. You should always
-     *  prefer to use NoModule::OnUserRaw() if possible.
+     *  prefer to use NoModule::onUserRaw() if possible.
      *  @param pClient The client which send this line.
      *  @param sLine The raw traffic line which the client sent.
      */
-    virtual ModRet OnUnknownUserRaw(NoClient* pClient, NoString& sLine);
+    virtual ModRet onUnknownUserRaw(NoClient* pClient, NoString& sLine);
 
     /** Called when a client told us CAP LS. Use ssCaps.insert("cap-name")
      *  for announcing capabilities which your module supports.
      *  @param pClient The client which requested the list.
      *  @param ssCaps set of caps which will be sent to client.
      */
-    virtual void OnClientCapLs(NoClient* pClient, NoStringSet& ssCaps);
+    virtual void onClientCapLs(NoClient* pClient, NoStringSet& ssCaps);
     /** Called only to check if your module supports turning on/off named capability.
      *  @param pClient The client which wants to enable/disable a capability.
      *  @param sCap name of capability.
      *  @param bState On or off, depending on which case is interesting for client.
      *  @return true if your module supports this capability in the specified state.
      */
-    virtual bool IsClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState);
+    virtual bool isClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState);
     /** Called when we actually need to turn a capability on or off for a client.
      *  @param pClient The client which requested the capability.
      *  @param sCap name of wanted capability.
      *  @param bState On or off, depending on which case client needs.
      */
-    virtual void OnClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState);
+    virtual void onClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState);
 
     /** Called when a module is going to be loaded.
      *  @param sModName name of the module.
@@ -822,7 +822,7 @@ public:
      *  @return See NoModule::ModRet.
      */
     virtual ModRet
-    OnModuleLoading(const NoString& sModName, const NoString& sArgs, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg);
+    onModuleLoading(const NoString& sModName, const NoString& sArgs, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg);
     /** Called when a module is going to be unloaded.
      *  @param pModule the module.
      *  @param[out] bSuccess the module was unloaded successfully
@@ -830,7 +830,7 @@ public:
      *  @param[out] sRetMsg text about unloading of the module.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg);
+    virtual ModRet onModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg);
     /** Called when info about a module is needed.
      *  @param[out] ModInfo put result here, if your module knows it.
      *  @param sModule name of the module.
@@ -838,12 +838,12 @@ public:
      *  @param sRetMsg text describing possible issues.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet OnGetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
+    virtual ModRet onGetModuleInfo(NoModuleInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
     /** Called when list of available mods is requested.
      *  @param ssMods put new modules here.
      *  @param bGlobal true if global modules are needed.
      */
-    virtual void OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType);
+    virtual void onGetAvailableModules(std::set<NoModuleInfo>& ssMods, No::ModuleType eType);
 
 private:
     friend class NoModulePrivate;

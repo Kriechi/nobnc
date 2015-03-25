@@ -87,7 +87,7 @@ public:
         return true;
     }
 
-    void OnClientLogin() override
+    void onClientLogin() override
     {
         NoString sRemoteIP = GetClient()->GetSocket()->GetRemoteIP();
         if (!m_bNewOnly || m_sClientsSeen.find(sRemoteIP) == m_sClientsSeen.end()) {
@@ -100,7 +100,7 @@ public:
         }
     }
 
-    void OnClientDisconnect() override
+    void onClientDisconnect() override
     {
         if (m_bOnDisconnect) {
             SendNotification("A client disconnected from your user. "

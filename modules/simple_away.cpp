@@ -106,7 +106,7 @@ public:
         return true;
     }
 
-    void OnIRCConnected() override
+    void onIrcConnected() override
     {
         if (GetNetwork()->IsUserAttached())
             SetBack();
@@ -114,9 +114,9 @@ public:
             SetAway(false);
     }
 
-    void OnClientLogin() override { SetBack(); }
+    void onClientLogin() override { SetBack(); }
 
-    void OnClientDisconnect() override
+    void onClientDisconnect() override
     {
         /* There might still be other clients */
         if (!GetNetwork()->IsUserAttached()) SetAway();
@@ -156,7 +156,7 @@ public:
         PutModule("Timer disabled");
     }
 
-    ModRet OnUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& sLine) override
     {
         if (!No::token(sLine, 0).equals("AWAY")) return CONTINUE;
 

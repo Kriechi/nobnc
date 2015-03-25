@@ -71,43 +71,43 @@ public:
         }
     }
 
-    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         if (m_bRules[RULE_MSG]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserCtcp(NoString& sTarget, NoString& sMessage) override
     {
         if (m_bRules[RULE_CTCP]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet OnUserAction(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserAction(NoString& sTarget, NoString& sMessage) override
     {
         if (m_bRules[RULE_ACTION]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserNotice(NoString& sTarget, NoString& sMessage) override
     {
         if (m_bRules[RULE_NOTICE]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
+    ModRet onUserPart(NoString& sChannel, NoString& sMessage) override
     {
         if (m_bRules[RULE_PART]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet OnUserTopic(NoString& sChannel, NoString& sTopic) override
+    ModRet onUserTopic(NoString& sChannel, NoString& sTopic) override
     {
         if (m_bRules[RULE_TOPIC]) ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet OnUserQuit(NoString& sMessage) override
+    ModRet onUserQuit(NoString& sMessage) override
     {
         if (m_bRules[RULE_QUIT]) ClearAllBuffers();
         return CONTINUE;

@@ -134,7 +134,7 @@ public:
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");
         AddCommand("AddUser",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnAddUserCommand),
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::onAddUserCommand),
                    "<user> <hostmask> [channels]",
                    "Adds a user");
         AddCommand("DelUser",
@@ -180,7 +180,7 @@ public:
         m_msUsers.clear();
     }
 
-    void OnJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& Nick, NoChannel& Channel) override
     {
         // If we have ops in this chan
         if (Channel.hasPerm(NoChannel::Op) || Channel.hasPerm(NoChannel::HalfOp)) {
@@ -194,7 +194,7 @@ public:
         }
     }
 
-    void OnAddUserCommand(const NoString& sLine)
+    void onAddUserCommand(const NoString& sLine)
     {
         NoString sUser = No::token(sLine, 1);
         NoString sHost = No::token(sLine, 2);

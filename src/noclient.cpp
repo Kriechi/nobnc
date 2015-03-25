@@ -101,7 +101,7 @@ public:
 
         NoUser* pUser = m_pClient->GetUser();
         if (pUser)
-            NETWORKMODULECALL(OnClientDisconnect(), pUser, pNetwork, m_pClient, NOTHING);
+            NETWORKMODULECALL(onClientDisconnect(), pUser, pNetwork, m_pClient, NOTHING);
     }
 
     void ReachedMaxBufferImpl() override
@@ -193,9 +193,9 @@ void NoClient::ReadLine(const NoString& sData)
 
     bool bReturn = false;
     if (IsAttached()) {
-        NETWORKMODULECALL(OnUserRaw(sLine), d->user, d->network, this, &bReturn);
+        NETWORKMODULECALL(onUserRaw(sLine), d->user, d->network, this, &bReturn);
     } else {
-        GLOBALMODULECALL(OnUnknownUserRaw(this, sLine), &bReturn);
+        GLOBALMODULECALL(onUnknownUserRaw(this, sLine), &bReturn);
     }
     if (bReturn) return;
 
@@ -275,7 +275,7 @@ void NoClient::ReadLine(const NoString& sData)
             if (sModCommand.empty())
                 CALLMOD(sTarget, this, d->user, d->network, PutModule("Hello. How may I help you?"))
             else
-                CALLMOD(sTarget, this, d->user, d->network, OnModCommand(sModCommand))
+                CALLMOD(sTarget, this, d->user, d->network, onModCommand(sModCommand))
         }
         return;
     } else if (sCommand.equals("PING")) {
@@ -290,7 +290,7 @@ void NoClient::ReadLine(const NoString& sData)
         return;
     } else if (sCommand.equals("QUIT")) {
         NoString sMsg = No::tokens(sLine, 1).trimPrefix_n();
-        NETWORKMODULECALL(OnUserQuit(sMsg), d->user, d->network, this, &bReturn);
+        NETWORKMODULECALL(onUserQuit(sMsg), d->user, d->network, this, &bReturn);
         if (bReturn) return;
         d->socket->Close(NoSocket::CLT_AFTERWRITE); // Treat a client quit as a detach
         return; // Don't forward this msg.  We don't want the client getting us disconnected.
@@ -313,7 +313,7 @@ void NoClient::ReadLine(const NoString& sData)
         for (NoString& sTarget : vTargets) {
             if (sTarget.trimPrefix(d->user->GetStatusPrefix())) {
                 if (!sTarget.equals("status")) {
-                    CALLMOD(sTarget, this, d->user, d->network, OnModNotice(sMsg));
+                    CALLMOD(sTarget, this, d->user, d->network, onModNotice(sMsg));
                 }
                 continue;
             }
@@ -328,12 +328,12 @@ void NoClient::ReadLine(const NoString& sData)
                     sCTCP += " via " + NoApp::GetTag(false);
                 }
 
-                NETWORKMODULECALL(OnUserCTCPReply(sTarget, sCTCP), d->user, d->network, this, &bContinue);
+                NETWORKMODULECALL(onUserCtcpReply(sTarget, sCTCP), d->user, d->network, this, &bContinue);
                 if (bContinue) continue;
 
                 sMsg = "\001" + sCTCP + "\001";
             } else {
-                NETWORKMODULECALL(OnUserNotice(sTarget, sMsg), d->user, d->network, this, &bContinue);
+                NETWORKMODULECALL(onUserNotice(sTarget, sMsg), d->user, d->network, this, &bContinue);
                 if (bContinue) continue;
             }
 
@@ -382,7 +382,7 @@ void NoClient::ReadLine(const NoString& sData)
                     if (sTarget.equals("status")) {
                         StatusCTCP(sCTCP);
                     } else {
-                        CALLMOD(sTarget, this, d->user, d->network, OnModCTCP(sCTCP));
+                        CALLMOD(sTarget, this, d->user, d->network, onModCTCP(sCTCP));
                     }
                     continue;
                 }
@@ -390,7 +390,7 @@ void NoClient::ReadLine(const NoString& sData)
                 if (d->network) {
                     if (No::token(sCTCP, 0).equals("ACTION")) {
                         NoString sMessage = No::tokens(sCTCP, 1);
-                        NETWORKMODULECALL(OnUserAction(sTarget, sMessage), d->user, d->network, this, &bContinue);
+                        NETWORKMODULECALL(onUserAction(sTarget, sMessage), d->user, d->network, this, &bContinue);
                         if (bContinue) continue;
                         sCTCP = "ACTION " + sMessage;
 
@@ -421,7 +421,7 @@ void NoClient::ReadLine(const NoString& sData)
                             }
                         }
                     } else {
-                        NETWORKMODULECALL(OnUserCTCP(sTarget, sCTCP), d->user, d->network, this, &bContinue);
+                        NETWORKMODULECALL(onUserCtcp(sTarget, sCTCP), d->user, d->network, this, &bContinue);
                         if (bContinue) continue;
                     }
 
@@ -435,12 +435,12 @@ void NoClient::ReadLine(const NoString& sData)
                 if (sTarget.equals("status")) {
                     UserCommand(sMsg);
                 } else {
-                    CALLMOD(sTarget, this, d->user, d->network, OnModCommand(sMsg));
+                    CALLMOD(sTarget, this, d->user, d->network, onModCommand(sMsg));
                 }
                 continue;
             }
 
-            NETWORKMODULECALL(OnUserMsg(sTarget, sMsg), d->user, d->network, this, &bContinue);
+            NETWORKMODULECALL(onUserMsg(sTarget, sMsg), d->user, d->network, this, &bContinue);
             if (bContinue) continue;
 
             if (!GetIRCSock()) {
@@ -526,7 +526,7 @@ void NoClient::ReadLine(const NoString& sData)
 
         for (NoString& sChannel : vsChans) {
             bool bContinue = false;
-            NETWORKMODULECALL(OnUserJoin(sChannel, sKey), d->user, d->network, this, &bContinue);
+            NETWORKMODULECALL(onUserJoin(sChannel, sKey), d->user, d->network, this, &bContinue);
             if (bContinue) continue;
 
             NoChannel* pChan = d->network->FindChan(sChannel);
@@ -561,7 +561,7 @@ void NoClient::ReadLine(const NoString& sData)
 
         for (NoString& sChan : vsChans) {
             bool bContinue = false;
-            NETWORKMODULECALL(OnUserPart(sChan, sMessage), d->user, d->network, this, &bContinue);
+            NETWORKMODULECALL(onUserPart(sChan, sMessage), d->user, d->network, this, &bContinue);
             if (bContinue) continue;
 
             NoChannel* pChan = d->network->FindChan(sChan);
@@ -588,11 +588,11 @@ void NoClient::ReadLine(const NoString& sData)
         NoString sTopic = No::tokens(sLine, 2).trimPrefix_n();
 
         if (!sTopic.empty()) {
-            NETWORKMODULECALL(OnUserTopic(sChan, sTopic), d->user, d->network, this, &bReturn);
+            NETWORKMODULECALL(onUserTopic(sChan, sTopic), d->user, d->network, this, &bReturn);
             if (bReturn) return;
             sLine = "TOPIC " + sChan + " :" + sTopic;
         } else {
-            NETWORKMODULECALL(OnUserTopicRequest(sChan), d->user, d->network, this, &bReturn);
+            NETWORKMODULECALL(onUserTopicRequest(sChan), d->user, d->network, this, &bReturn);
             if (bReturn) return;
         }
     } else if (sCommand.equals("MODE")) {
@@ -760,7 +760,7 @@ void NoClient::AcceptLogin(NoUser& User)
 
     SendMotd();
 
-    NETWORKMODULECALL(OnClientLogin(), d->user, d->network, this, NOTHING);
+    NETWORKMODULECALL(onClientLogin(), d->user, d->network, this, NOTHING);
 }
 
 void NoClient::BouncedOff()
@@ -794,7 +794,7 @@ void NoClient::PutClient(const NoString& sLine)
 {
     bool bReturn = false;
     NoString sCopy = sLine;
-    NETWORKMODULECALL(OnSendToClient(sCopy, *this), d->user, d->network, this, &bReturn);
+    NETWORKMODULECALL(onSendToClient(sCopy, *this), d->user, d->network, this, &bReturn);
     if (bReturn) return;
     NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [" << sCopy << "]");
     d->socket->Write(sCopy + "\r\n");
@@ -905,7 +905,7 @@ void NoClient::HandleCap(const NoString& sLine)
 
     if (sSubCmd.equals("LS")) {
         NoStringSet ssOfferCaps;
-        GLOBALMODULECALL(OnClientCapLs(this, ssOfferCaps), NOTHING);
+        GLOBALMODULECALL(onClientCapLs(this, ssOfferCaps), NOTHING);
         ssOfferCaps.insert("userhost-in-names");
         ssOfferCaps.insert("multi-prefix");
         ssOfferCaps.insert("znc.in/server-time-iso");
@@ -933,7 +933,7 @@ void NoClient::HandleCap(const NoString& sLine)
 
             bool bAccepted = ("multi-prefix" == sCap) || ("userhost-in-names" == sCap) || ("znc.in/server-time-iso" == sCap) ||
                              ("znc.in/batch" == sCap) || ("znc.in/self-message" == sCap);
-            GLOBALMODULECALL(IsClientCapSupported(this, sCap, bVal), &bAccepted);
+            GLOBALMODULECALL(isClientCapSupported(this, sCap, bVal), &bAccepted);
 
             if (!bAccepted) {
                 // Some unsupported capability is requested
@@ -959,7 +959,7 @@ void NoClient::HandleCap(const NoString& sLine)
             } else if ("znc.in/self-message" == sCap) {
                 d->hasSelfMessage = bVal;
             }
-            GLOBALMODULECALL(OnClientCapRequest(this, sCap, bVal), NOTHING);
+            GLOBALMODULECALL(onClientCapRequest(this, sCap, bVal), NOTHING);
 
             if (bVal) {
                 d->acceptedCaps.insert(sCap);
@@ -976,9 +976,9 @@ void NoClient::HandleCap(const NoString& sLine)
         NoStringSet ssRemoved;
         for (const NoString& sCap : d->acceptedCaps) {
             bool bRemoving = false;
-            GLOBALMODULECALL(IsClientCapSupported(this, sCap, false), &bRemoving);
+            GLOBALMODULECALL(isClientCapSupported(this, sCap, false), &bRemoving);
             if (bRemoving) {
-                GLOBALMODULECALL(OnClientCapRequest(this, sCap, false), NOTHING);
+                GLOBALMODULECALL(onClientCapRequest(this, sCap, false), NOTHING);
                 ssRemoved.insert(sCap);
             }
         }

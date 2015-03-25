@@ -82,7 +82,7 @@ public:
         }
     }
 
-    void OnModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& sCommand) override
     {
         if (GetUser()->IsAdmin()) {
             HandleCommand(sCommand);
@@ -181,7 +181,7 @@ public:
         return true;
     }
 
-    ModRet OnIRCConnecting(NoIrcSocket* pIRCSock) override
+    ModRet onIrcConnecting(NoIrcSocket* pIRCSock) override
     {
         if (m_pISpoofLockFile != nullptr) {
             NO_DEBUG("Aborting connection, ident spoof lock file exists");
@@ -201,21 +201,21 @@ public:
         return CONTINUE;
     }
 
-    void OnIRCConnected() override
+    void onIrcConnected() override
     {
         if (m_pIRCSock == GetNetwork()->GetIRCSock()) {
             ReleaseISpoof();
         }
     }
 
-    void OnIRCConnectionError(NoIrcSocket* pIRCSock) override
+    void onIrcConnectionError(NoIrcSocket* pIRCSock) override
     {
         if (m_pIRCSock == pIRCSock) {
             ReleaseISpoof();
         }
     }
 
-    void OnIRCDisconnected() override
+    void onIrcDisconnected() override
     {
         if (m_pIRCSock == GetNetwork()->GetIRCSock()) {
             ReleaseISpoof();

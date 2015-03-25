@@ -78,7 +78,7 @@ class NoPerform : public NoModule
 
     void Execute(const NoString& sCommand)
     {
-        OnIRCConnected();
+        onIrcConnected();
         PutModule("perform commands sent");
     }
 
@@ -131,7 +131,7 @@ public:
         return true;
     }
 
-    void OnIRCConnected() override
+    void onIrcConnected() override
     {
         for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
             PutIRC(ExpandString(*it));

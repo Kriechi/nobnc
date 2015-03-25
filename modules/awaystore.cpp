@@ -276,7 +276,7 @@ public:
         return true;
     }
 
-    void OnIRCConnected() override
+    void onIrcConnected() override
     {
         if (m_bIsAway)
             Away(true); // reset away if we are reconnected
@@ -326,8 +326,8 @@ public:
         }
     }
 
-    void OnClientLogin() override { Back(true); }
-    void OnClientDisconnect() override { Away(); }
+    void onClientLogin() override { Back(true); }
+    void onClientDisconnect() override { Away(); }
 
     NoString GetPath()
     {
@@ -374,13 +374,13 @@ public:
         m_sReason = "";
     }
 
-    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         if (m_bIsAway) AddMessage(time(nullptr), Nick, sMessage);
         return (CONTINUE);
     }
 
-    ModRet OnPrivAction(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivAction(NoNick& Nick, NoString& sMessage) override
     {
         if (m_bIsAway) {
             AddMessage(time(nullptr), Nick, "* " + sMessage);
@@ -388,7 +388,7 @@ public:
         return (CONTINUE);
     }
 
-    ModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserNotice(NoString& sTarget, NoString& sMessage) override
     {
         Ping();
         if (m_bIsAway) Back();
@@ -396,7 +396,7 @@ public:
         return (CONTINUE);
     }
 
-    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         Ping();
         if (m_bIsAway) Back();
@@ -404,7 +404,7 @@ public:
         return (CONTINUE);
     }
 
-    ModRet OnUserAction(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserAction(NoString& sTarget, NoString& sMessage) override
     {
         Ping();
         if (m_bIsAway) Back();

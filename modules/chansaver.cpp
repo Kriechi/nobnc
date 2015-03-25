@@ -71,14 +71,14 @@ public:
         }
     }
 
-    void OnJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& Nick, NoChannel& Channel) override
     {
         if (!Channel.inConfig() && GetNetwork()->GetIRCNick().equals(Nick.nick())) {
             Channel.setInConfig(true);
         }
     }
 
-    void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
+    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
         if (Channel.inConfig() && GetNetwork()->GetIRCNick().equals(Nick.nick())) {
             Channel.setInConfig(false);

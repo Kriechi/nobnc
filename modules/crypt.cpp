@@ -68,7 +68,7 @@ public:
                    "List all keys");
     }
 
-    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         sTarget.trimLeft(NickPrefix());
 
@@ -101,13 +101,13 @@ public:
         return CONTINUE;
     }
 
-    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         FilterIncoming(Nick.nick(), Nick, sMessage);
         return CONTINUE;
     }
 
-    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         FilterIncoming(Channel.getName(), Nick, sMessage);
         return CONTINUE;

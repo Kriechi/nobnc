@@ -78,7 +78,7 @@ void NoAuthenticator::refuseLogin(const NoString& reason)
                         "to login as you, but was rejected [" + reason + "].");
     }
 
-    GLOBALMODULECALL(OnFailedLogin(d->username, d->socket->GetRemoteIP()), NOTHING);
+    GLOBALMODULECALL(onFailedLogin(d->username, d->socket->GetRemoteIP()), NOTHING);
     loginRefused(user, reason);
     invalidate();
 }

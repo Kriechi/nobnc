@@ -43,7 +43,7 @@ void NoClient::UserCommand(NoString& sLine)
     }
 
     bool bReturn = false;
-    NETWORKMODULECALL(OnStatusCommand(sLine), d->user, d->network, this, &bReturn);
+    NETWORKMODULECALL(onStatusCommand(sLine), d->user, d->network, this, &bReturn);
     if (bReturn) return;
 
     const NoString sCommand = No::token(sLine, 0);

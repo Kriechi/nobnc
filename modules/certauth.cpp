@@ -50,7 +50,7 @@ public:
                    "Print your current key");
     }
 
-    bool OnBoot() override
+    bool onBoot() override
     {
         const std::vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
         std::vector<NoListener*>::const_iterator it;
@@ -76,11 +76,11 @@ public:
         return true;
     }
 
-    void OnPostRehash() override { OnBoot(); }
+    void onPostRehash() override { onBoot(); }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        OnBoot();
+        onBoot();
 
         return true;
     }
@@ -112,7 +112,7 @@ public:
         return pair.second;
     }
 
-    ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         const NoString sUser = Auth->username();
         NoSocket* pSock = Auth->socket();

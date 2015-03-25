@@ -672,7 +672,7 @@ void NoNetwork::ClientConnected(NoClient* pClient)
         const NoMessage& BufLine = d->noticeBuffer.getMessage(uIdx);
         NoString sLine = BufLine.formatted(*pClient, msParams);
         bool bContinue = false;
-        NETWORKMODULECALL(OnPrivBufferPlayLine2(*pClient, sLine, BufLine.timestamp()), d->user, this, nullptr, &bContinue);
+        NETWORKMODULECALL(onPrivBufferPlayLine2(*pClient, sLine, BufLine.timestamp()), d->user, this, nullptr, &bContinue);
         if (bContinue) continue;
         pClient->PutClient(sLine);
     }
@@ -929,7 +929,7 @@ void NoNetwork::JoinChans(std::set<NoChannel*>& sChans)
 bool NoNetwork::JoinChan(NoChannel* pChan)
 {
     bool bReturn = false;
-    NETWORKMODULECALL(OnJoining(*pChan), d->user, this, nullptr, &bReturn);
+    NETWORKMODULECALL(onJoining(*pChan), d->user, this, nullptr, &bReturn);
 
     if (bReturn) return false;
 
@@ -939,7 +939,7 @@ bool NoNetwork::JoinChan(NoChannel* pChan)
     } else {
         pChan->incJoinTries();
         bool bFailed = false;
-        NETWORKMODULECALL(OnTimerAutoJoin(*pChan), d->user, this, nullptr, &bFailed);
+        NETWORKMODULECALL(onTimerAutoJoin(*pChan), d->user, this, nullptr, &bFailed);
         if (bFailed) return false;
         return true;
     }
@@ -1258,7 +1258,7 @@ bool NoNetwork::Connect()
     NO_DEBUG("Connecting user/network [" << d->user->GetUserName() << "/" << d->name << "]");
 
     bool bAbort = false;
-    NETWORKMODULECALL(OnIRCConnecting(pIRCSock), d->user, this, nullptr, &bAbort);
+    NETWORKMODULECALL(onIrcConnecting(pIRCSock), d->user, this, nullptr, &bAbort);
     if (bAbort) {
         NO_DEBUG("Some module aborted the connection attempt");
         PutStatus("Some module aborted the connection attempt");

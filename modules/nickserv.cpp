@@ -125,13 +125,13 @@ public:
         }
     }
 
-    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         HandleMessage(Nick, sMessage);
         return CONTINUE;
     }
 
-    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         HandleMessage(Nick, sMessage);
         return CONTINUE;

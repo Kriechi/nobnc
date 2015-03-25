@@ -25,7 +25,7 @@ class NoKickClientOnIrcDisconnect : public NoModule
 public:
     MODCONSTRUCTOR(NoKickClientOnIrcDisconnect) {}
 
-    void OnIRCDisconnected() override
+    void onIrcDisconnected() override
     {
         const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
 

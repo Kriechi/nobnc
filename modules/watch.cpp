@@ -181,12 +181,12 @@ public:
         Load();
     }
 
-    void OnRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
+    void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
     {
         Process(OpNick, "* " + OpNick.nick() + " sets mode: " + sModes + " " + sArgs + " on " + Channel.getName(), Channel.getName());
     }
 
-    void OnClientLogin() override
+    void onClientLogin() override
     {
         NoStringMap msParams;
         msParams["target"] = GetNetwork()->GetCurNick();
@@ -198,14 +198,14 @@ public:
         m_Buffer.clear();
     }
 
-    void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
+    void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
         Process(OpNick,
                 "* " + OpNick.nick() + " kicked " + sKickedNick + " from " + Channel.getName() + " because [" + sMessage + "]",
                 Channel.getName());
     }
 
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         Process(Nick,
                 "* Quits: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") "
@@ -214,14 +214,14 @@ public:
                 "");
     }
 
-    void OnJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& Nick, NoChannel& Channel) override
     {
         Process(Nick,
                 "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") joins " + Channel.getName(),
                 Channel.getName());
     }
 
-    void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
+    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
         Process(Nick,
                 "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") parts " + Channel.getName() +
@@ -229,24 +229,24 @@ public:
                 Channel.getName());
     }
 
-    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
+    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         Process(OldNick, "* " + OldNick.nick() + " is now known as " + sNewNick, "");
     }
 
-    ModRet OnCTCPReply(NoNick& Nick, NoString& sMessage) override
+    ModRet onCtcpReply(NoNick& Nick, NoString& sMessage) override
     {
         Process(Nick, "* CTCP: " + Nick.nick() + " reply [" + sMessage + "]", "priv");
         return CONTINUE;
     }
 
-    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
     {
         Process(Nick, "* CTCP: " + Nick.nick() + " [" + sMessage + "]", "priv");
         return CONTINUE;
     }
 
-    ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Process(Nick,
                 "* CTCP: " + Nick.nick() + " [" + sMessage + "] to "
@@ -256,31 +256,31 @@ public:
         return CONTINUE;
     }
 
-    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         Process(Nick, "-" + Nick.nick() + "- " + sMessage, "priv");
         return CONTINUE;
     }
 
-    ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Process(Nick, "-" + Nick.nick() + ":" + Channel.getName() + "- " + sMessage, Channel.getName());
         return CONTINUE;
     }
 
-    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         Process(Nick, "<" + Nick.nick() + "> " + sMessage, "priv");
         return CONTINUE;
     }
 
-    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         Process(Nick, "<" + Nick.nick() + ":" + Channel.getName() + "> " + sMessage, Channel.getName());
         return CONTINUE;
     }
 
-    void OnModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& sCommand) override
     {
         NoString sCmdName = No::token(sCommand, 0);
         if (sCmdName.equals("ADD") || sCmdName.equals("WATCH")) {

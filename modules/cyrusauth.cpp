@@ -49,7 +49,7 @@ public:
 
     virtual ~NoSaslAuthMod() { sasl_done(); }
 
-    void OnModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& sCommand) override
     {
         if (GetUser()->IsAdmin()) {
             HandleCommand(sCommand);
@@ -94,7 +94,7 @@ public:
         return true;
     }
 
-    ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         const NoString& sUsername = Auth->username();
         const NoString& sPassword = Auth->password();

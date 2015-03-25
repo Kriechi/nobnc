@@ -26,12 +26,12 @@ class NoNotifyConnectMod : public NoModule
 public:
     MODCONSTRUCTOR(NoNotifyConnectMod) {}
 
-    void OnClientLogin() override
+    void onClientLogin() override
     {
         SendAdmins(GetUser()->GetUserName() + " attached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
     }
 
-    void OnClientDisconnect() override
+    void onClientDisconnect() override
     {
         SendAdmins(GetUser()->GetUserName() + " detached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
     }

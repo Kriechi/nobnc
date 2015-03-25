@@ -22,7 +22,7 @@ class NoMissingMotd : public NoModule
 public:
     MODCONSTRUCTOR(NoMissingMotd) {}
 
-    void OnClientLogin() override { PutUser(":irc.znc.in 422 :MOTD File is missing"); }
+    void onClientLogin() override { PutUser(":irc.znc.in 422 :MOTD File is missing"); }
 };
 
 template <> void no_moduleInfo<NoMissingMotd>(NoModuleInfo& Info)

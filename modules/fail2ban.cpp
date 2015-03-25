@@ -53,18 +53,18 @@ public:
         return true;
     }
 
-    void OnPostRehash() override { m_Cache.Clear(); }
+    void onPostRehash() override { m_Cache.Clear(); }
 
     void Add(const NoString& sHost, uint count) { m_Cache.AddItem(sHost, count, m_Cache.GetTTL()); }
 
-    void OnModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& sCommand) override
     {
         PutModule("This module can only be configured through its arguments.");
         PutModule("The module argument is the number of minutes an IP");
         PutModule("is blocked after a failed login.");
     }
 
-    void OnClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort) override
+    void onClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort) override
     {
         uint* pCount = m_Cache.GetItem(sHost);
         if (sHost.empty() || pCount == nullptr || *pCount < m_uiAllowedFailed) {
@@ -78,7 +78,7 @@ public:
         pClient->Close(NoSocket::CLT_AFTERWRITE);
     }
 
-    void OnFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
+    void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
     {
         uint* pCount = m_Cache.GetItem(sRemoteIP);
         if (pCount)
@@ -87,7 +87,7 @@ public:
             Add(sRemoteIP, 1);
     }
 
-    ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         // e.g. webadmin ends up here
         const NoString& sRemoteIP = Auth->socket()->GetRemoteIP();
@@ -96,7 +96,7 @@ public:
 
         uint* pCount = m_Cache.GetItem(sRemoteIP);
         if (pCount && *pCount >= m_uiAllowedFailed) {
-            // OnFailedLogin() will refresh their ban
+            // onFailedLogin() will refresh their ban
             Auth->refuseLogin("Please try again later - reconnecting too fast");
             return HALT;
         }

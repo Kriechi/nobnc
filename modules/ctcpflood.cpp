@@ -97,9 +97,9 @@ public:
         return HALT;
     }
 
-    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override { return Message(Nick, sMessage); }
+    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override { return Message(Nick, sMessage); }
 
-    ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override { return Message(Nick, sMessage); }
+    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override { return Message(Nick, sMessage); }
 
     void OnSecsCommand(const NoString& sCommand)
     {

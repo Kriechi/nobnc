@@ -179,7 +179,7 @@ public:
 
     bool UseClientIP() { return NoRegistry(this).value("UseClientIP").toBool(); }
 
-    ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserCtcp(NoString& sTarget, NoString& sMessage) override
     {
         if (sMessage.startsWith("DCC ")) {
             NoStringVector tokens = No::quoteSplit(sMessage);
@@ -235,7 +235,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
     {
         NoNetwork* pNetwork = GetNetwork();
         if (sMessage.startsWith("DCC ") && pNetwork->IsUserAttached()) {

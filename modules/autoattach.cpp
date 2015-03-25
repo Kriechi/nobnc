@@ -207,19 +207,19 @@ public:
         }
     }
 
-    ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         TryAttach(Nick, Channel, sMessage);
         return CONTINUE;
     }
 
-    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         TryAttach(Nick, Channel, sMessage);
         return CONTINUE;
     }
 
-    ModRet OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         TryAttach(Nick, Channel, sMessage);
         return CONTINUE;

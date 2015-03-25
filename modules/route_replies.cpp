@@ -234,7 +234,7 @@ public:
         }
     }
 
-    void OnIRCConnected() override
+    void onIrcConnected() override
     {
         m_pDoing = nullptr;
         m_pReplies = nullptr;
@@ -244,12 +244,12 @@ public:
         delete FindTimer("RouteTimeout");
     }
 
-    void OnIRCDisconnected() override
+    void onIrcDisconnected() override
     {
-        OnIRCConnected(); // Let's keep it in one place
+        onIrcConnected(); // Let's keep it in one place
     }
 
-    void OnClientDisconnect() override
+    void onClientDisconnect() override
     {
         requestQueue::iterator it;
 
@@ -268,7 +268,7 @@ public:
         SendRequest();
     }
 
-    ModRet OnRaw(NoString& sLine) override
+    ModRet onRaw(NoString& sLine) override
     {
         NoString sCmd = No::token(sLine, 1).toUpper();
         size_t i = 0;
@@ -301,7 +301,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet OnUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& sLine) override
     {
         NoString sCmd = No::token(sLine, 0).toUpper();
 

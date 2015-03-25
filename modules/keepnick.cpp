@@ -53,7 +53,7 @@ public:
         m_pTimer = nullptr;
 
         // Check if we need to start the timer
-        if (GetNetwork()->IsIRCConnected()) OnIRCConnected();
+        if (GetNetwork()->IsIRCConnected()) onIrcConnected();
 
         return true;
     }
@@ -84,7 +84,7 @@ public:
         return sConfNick;
     }
 
-    void OnNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
+    void onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
         if (sNewNick == GetNetwork()->GetIRCSock()->GetNick()) {
             // We are changing our own nick
@@ -107,7 +107,7 @@ public:
         }
     }
 
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         // If someone with the nick we want quits, be fast and get the nick
         if (Nick.equals(GetNick())) {
@@ -115,13 +115,13 @@ public:
         }
     }
 
-    void OnIRCDisconnected() override
+    void onIrcDisconnected() override
     {
         // No way we can do something if we aren't connected to IRC.
         Disable();
     }
 
-    void OnIRCConnected() override
+    void onIrcConnected() override
     {
         if (!GetNetwork()->GetIRCSock()->GetNick().equals(GetNick())) {
             // We don't have the nick we want, try to get it
@@ -146,7 +146,7 @@ public:
         m_pTimer = nullptr;
     }
 
-    ModRet OnUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& sLine) override
     {
         // We dont care if we are not connected to IRC
         if (!GetNetwork()->IsIRCConnected()) return CONTINUE;
@@ -169,7 +169,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet OnRaw(NoString& sLine) override
+    ModRet onRaw(NoString& sLine) override
     {
         // Are we trying to get our primary nick and we caused this error?
         // :irc.server.net 433 mynick badnick :Nickname is already in use.

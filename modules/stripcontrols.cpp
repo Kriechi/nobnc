@@ -23,37 +23,37 @@ class NoStripControlsMod : public NoModule
 public:
     MODCONSTRUCTOR(NoStripControlsMod) {}
 
-    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
     {
         sMessage = No::stripControls(sMessage);
         return CONTINUE;
     }
 
-    ModRet OnChanCTCP(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         sMessage = No::stripControls(sMessage);
         return CONTINUE;
     }
 
-    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
         sMessage = No::stripControls(sMessage);
         return CONTINUE;
     }
 
-    ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         sMessage = No::stripControls(sMessage);
         return CONTINUE;
     }
 
-    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
         sMessage = No::stripControls(sMessage);
         return CONTINUE;
     }
 
-    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         sMessage = No::stripControls(sMessage);
         return CONTINUE;

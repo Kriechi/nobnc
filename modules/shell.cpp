@@ -83,7 +83,7 @@ public:
         return true;
     }
 
-    void OnModCommand(const NoString& sLine) override
+    void onModCommand(const NoString& sLine) override
     {
         NoString sCommand = No::token(sLine, 0);
         if (sCommand.equals("cd")) {

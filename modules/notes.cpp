@@ -98,14 +98,14 @@ public:
 
     NoString GetWebMenuTitle() override { return "Notes"; }
 
-    void OnClientLogin() override
+    void onClientLogin() override
     {
         if (bShowNotesOnLogin) {
             ListNotes(true);
         }
     }
 
-    ModRet OnUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& sLine) override
     {
         if (sLine.left(1) != "#") {
             return CONTINUE;

@@ -121,7 +121,7 @@ public:
             PutModule("Rejoin delay disabled");
     }
 
-    void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& pChan, const NoString& sMessage) override
+    void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& pChan, const NoString& sMessage) override
     {
         if (GetNetwork()->GetCurNick().equals(sKickedNick)) {
             if (!delay) {

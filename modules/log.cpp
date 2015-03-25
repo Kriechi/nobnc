@@ -84,32 +84,32 @@ public:
     NoString GetServer();
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override;
-    void OnIRCConnected() override;
-    void OnIRCDisconnected() override;
-    ModRet OnBroadcast(NoString& sMessage) override;
+    void onIrcConnected() override;
+    void onIrcDisconnected() override;
+    ModRet onBroadcast(NoString& sMessage) override;
 
-    void OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override;
-    void OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override;
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override;
-    void OnJoin(const NoNick& Nick, NoChannel& Channel) override;
-    void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override;
-    void OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override;
-    ModRet OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override;
+    void onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override;
+    void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override;
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override;
+    void onJoin(const NoNick& Nick, NoChannel& Channel) override;
+    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override;
+    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override;
+    ModRet onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override;
 
     /* notices */
-    ModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override;
-    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override;
-    ModRet OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
+    ModRet onUserNotice(NoString& sTarget, NoString& sMessage) override;
+    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override;
+    ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
 
     /* actions */
-    ModRet OnUserAction(NoString& sTarget, NoString& sMessage) override;
-    ModRet OnPrivAction(NoNick& Nick, NoString& sMessage) override;
-    ModRet OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
+    ModRet onUserAction(NoString& sTarget, NoString& sMessage) override;
+    ModRet onPrivAction(NoNick& Nick, NoString& sMessage) override;
+    ModRet onChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
 
     /* msgs */
-    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override;
-    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override;
-    ModRet OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
+    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override;
+    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override;
+    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override;
 
 private:
     NoString m_sLogPath;
@@ -317,57 +317,57 @@ bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)
 }
 
 
-void NoLogMod::OnIRCConnected() { PutLog("Connected to IRC (" + GetServer() + ")"); }
+void NoLogMod::onIrcConnected() { PutLog("Connected to IRC (" + GetServer() + ")"); }
 
-void NoLogMod::OnIRCDisconnected() { PutLog("Disconnected from IRC (" + GetServer() + ")"); }
+void NoLogMod::onIrcDisconnected() { PutLog("Disconnected from IRC (" + GetServer() + ")"); }
 
-NoModule::ModRet NoLogMod::OnBroadcast(NoString& sMessage)
+NoModule::ModRet NoLogMod::onBroadcast(NoString& sMessage)
 {
     PutLog("Broadcast: " + sMessage);
     return CONTINUE;
 }
 
-void NoLogMod::OnRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs)
+void NoLogMod::onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs)
 {
     const NoString sNick = pOpNick ? pOpNick->nick() : "Server";
     PutLog("*** " + sNick + " sets mode: " + sModes + " " + sArgs, Channel);
 }
 
-void NoLogMod::OnKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage)
+void NoLogMod::onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage)
 {
     PutLog("*** " + sKickedNick + " was kicked by " + OpNick.nick() + " (" + sMessage + ")", Channel);
 }
 
-void NoLogMod::OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans)
+void NoLogMod::onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans)
 {
     for (std::vector<NoChannel*>::const_iterator pChan = vChans.begin(); pChan != vChans.end(); ++pChan)
         PutLog("*** Quits: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") (" + sMessage + ")", **pChan);
 }
 
-void NoLogMod::OnJoin(const NoNick& Nick, NoChannel& Channel)
+void NoLogMod::onJoin(const NoNick& Nick, NoChannel& Channel)
 {
     PutLog("*** Joins: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ")", Channel);
 }
 
-void NoLogMod::OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage)
+void NoLogMod::onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage)
 {
     PutLog("*** Parts: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") (" + sMessage + ")", Channel);
 }
 
-void NoLogMod::OnNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans)
+void NoLogMod::onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans)
 {
     for (std::vector<NoChannel*>::const_iterator pChan = vChans.begin(); pChan != vChans.end(); ++pChan)
         PutLog("*** " + OldNick.nick() + " is now known as " + sNewNick, **pChan);
 }
 
-NoModule::ModRet NoLogMod::OnTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic)
+NoModule::ModRet NoLogMod::onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic)
 {
     PutLog("*** " + Nick.nick() + " changes topic to '" + sTopic + "'", Channel);
     return CONTINUE;
 }
 
 /* notices */
-NoModule::ModRet NoLogMod::OnUserNotice(NoString& sTarget, NoString& sMessage)
+NoModule::ModRet NoLogMod::onUserNotice(NoString& sTarget, NoString& sMessage)
 {
     NoNetwork* pNetwork = GetNetwork();
     if (pNetwork) {
@@ -377,20 +377,20 @@ NoModule::ModRet NoLogMod::OnUserNotice(NoString& sTarget, NoString& sMessage)
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::OnPrivNotice(NoNick& Nick, NoString& sMessage)
+NoModule::ModRet NoLogMod::onPrivNotice(NoNick& Nick, NoString& sMessage)
 {
     PutLog("-" + Nick.nick() + "- " + sMessage, Nick);
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::OnChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
+NoModule::ModRet NoLogMod::onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
     PutLog("-" + Nick.nick() + "- " + sMessage, Channel);
     return CONTINUE;
 }
 
 /* actions */
-NoModule::ModRet NoLogMod::OnUserAction(NoString& sTarget, NoString& sMessage)
+NoModule::ModRet NoLogMod::onUserAction(NoString& sTarget, NoString& sMessage)
 {
     NoNetwork* pNetwork = GetNetwork();
     if (pNetwork) {
@@ -400,20 +400,20 @@ NoModule::ModRet NoLogMod::OnUserAction(NoString& sTarget, NoString& sMessage)
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::OnPrivAction(NoNick& Nick, NoString& sMessage)
+NoModule::ModRet NoLogMod::onPrivAction(NoNick& Nick, NoString& sMessage)
 {
     PutLog("* " + Nick.nick() + " " + sMessage, Nick);
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::OnChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
+NoModule::ModRet NoLogMod::onChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
     PutLog("* " + Nick.nick() + " " + sMessage, Channel);
     return CONTINUE;
 }
 
 /* msgs */
-NoModule::ModRet NoLogMod::OnUserMsg(NoString& sTarget, NoString& sMessage)
+NoModule::ModRet NoLogMod::onUserMsg(NoString& sTarget, NoString& sMessage)
 {
     NoNetwork* pNetwork = GetNetwork();
     if (pNetwork) {
@@ -423,13 +423,13 @@ NoModule::ModRet NoLogMod::OnUserMsg(NoString& sTarget, NoString& sMessage)
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::OnPrivMsg(NoNick& Nick, NoString& sMessage)
+NoModule::ModRet NoLogMod::onPrivMsg(NoNick& Nick, NoString& sMessage)
 {
     PutLog("<" + Nick.nick() + "> " + sMessage, Nick);
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::OnChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
+NoModule::ModRet NoLogMod::onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage)
 {
     PutLog("<" + Nick.nick() + "> " + sMessage, Channel);
     return CONTINUE;

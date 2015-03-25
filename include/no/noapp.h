@@ -54,7 +54,7 @@ public:
     // This returns false if there are too many anonymous connections from this ip
     bool AllowConnectionFrom(const NoString& sIP) const;
     void InitDirs(const NoString& sArgvPath, const NoString& sDataDir);
-    bool OnBoot();
+    bool onBoot();
     NoString ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir = true);
     bool WriteNewConfig(const NoString& sConfigFile);
     bool WriteConfig();

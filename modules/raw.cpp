@@ -22,15 +22,15 @@ class NoRawMod : public NoModule
 public:
     MODCONSTRUCTOR(NoRawMod) {}
 
-    ModRet OnRaw(NoString& sLine) override
+    ModRet onRaw(NoString& sLine) override
     {
         PutModule("IRC -> [" + sLine + "]");
         return CONTINUE;
     }
 
-    void OnModCommand(const NoString& sCommand) override { PutIRC(sCommand); }
+    void onModCommand(const NoString& sCommand) override { PutIRC(sCommand); }
 
-    ModRet OnUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& sLine) override
     {
         PutModule("YOU -> [" + sLine + "]");
         return CONTINUE;

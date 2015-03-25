@@ -64,7 +64,7 @@ public:
         m_bSSL = false;
     }
 
-    bool OnBoot() override { return true; }
+    bool onBoot() override { return true; }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
@@ -90,7 +90,7 @@ public:
         return true;
     }
 
-    ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         NoUser* pUser = NoApp::Get().FindUser(Auth->username());
 
@@ -111,7 +111,7 @@ public:
         return HALT;
     }
 
-    void OnModCommand(const NoString& sLine) override {}
+    void onModCommand(const NoString& sLine) override {}
 
     void CacheLogin(const NoString& sLogin) { m_Cache.AddItem(sLogin); }
 

@@ -49,16 +49,16 @@ public:
         m_bUseCloakedHost = (sTmp = registry.value("UseCloakedHost")).empty() ? true : sTmp.toBool();
         m_bUseChallenge = (sTmp = registry.value("UseChallenge")).empty() ? true : sTmp.toBool();
         m_bRequestPerms = registry.value("RequestPerms").toBool();
-        m_bJoinOnInvite = (sTmp = registry.value("JoinOnInvite")).empty() ? true : sTmp.toBool();
+        m_bJoinonInvite = (sTmp = registry.value("JoinonInvite")).empty() ? true : sTmp.toBool();
         m_bJoinAfterCloaked = (sTmp = registry.value("JoinAfterCloaked")).empty() ? true : sTmp.toBool();
 
         // Make sure NVs are stored in config. Note: SetUseCloakedHost() is called further down.
         SetUseChallenge(m_bUseChallenge);
         SetRequestPerms(m_bRequestPerms);
-        SetJoinOnInvite(m_bJoinOnInvite);
+        SetJoinonInvite(m_bJoinonInvite);
         SetJoinAfterCloaked(m_bJoinAfterCloaked);
 
-        OnIRCDisconnected(); // reset module's state
+        onIrcDisconnected(); // reset module's state
 
         if (IsIRCConnected()) {
             // check for usermode +x if we are already connected
@@ -87,7 +87,7 @@ public:
         return true;
     }
 
-    void OnIRCDisconnected() override
+    void onIrcDisconnected() override
     {
         m_bCloaked = false;
         m_bAuthed = false;
@@ -96,13 +96,13 @@ public:
         m_bCatchResponse = false;
     }
 
-    void OnIRCConnected() override
+    void onIrcConnected() override
     {
         if (m_bUseCloakedHost) Cloak();
         WhoAmI();
     }
 
-    void OnModCommand(const NoString& sLine) override
+    void onModCommand(const NoString& sLine) override
     {
         NoString sCommand = No::token(sLine, 0).toLower();
 
@@ -158,7 +158,7 @@ public:
             Table2.setValue("Type", "Boolean");
             Table2.setValue("Description", "Whether to request voice/op from Q on join/devoice/deop.");
             Table2.addRow();
-            Table2.setValue("Setting", "JoinOnInvite");
+            Table2.setValue("Setting", "JoinonInvite");
             Table2.setValue("Type", "Boolean");
             Table2.setValue("Description", "Whether to join channels when Q invites you.");
             Table2.addRow();
@@ -191,8 +191,8 @@ public:
                 SetRequestPerms(sValue.toBool());
                 PutModule("RequestPerms set");
             } else if (sSetting == "joinoninvite") {
-                SetJoinOnInvite(sValue.toBool());
-                PutModule("JoinOnInvite set");
+                SetJoinonInvite(sValue.toBool());
+                PutModule("JoinonInvite set");
             } else if (sSetting == "joinaftercloaked") {
                 SetJoinAfterCloaked(sValue.toBool());
                 PutModule("JoinAfterCloaked set");
@@ -219,8 +219,8 @@ public:
             Table.setValue("Setting", "RequestPerms");
             Table.setValue("Value", NoString(m_bRequestPerms));
             Table.addRow();
-            Table.setValue("Setting", "JoinOnInvite");
-            Table.setValue("Value", NoString(m_bJoinOnInvite));
+            Table.setValue("Setting", "JoinonInvite");
+            Table.setValue("Value", NoString(m_bJoinonInvite));
             Table.addRow();
             Table.setValue("Setting", "JoinAfterCloaked");
             Table.setValue("Value", NoString(m_bJoinAfterCloaked));
@@ -260,9 +260,9 @@ public:
         }
     }
 
-    ModRet OnRaw(NoString& sLine) override
+    ModRet onRaw(NoString& sLine) override
     {
-        // use OnRaw because OnUserMode is not defined (yet?)
+        // use onRaw because OnUserMode is not defined (yet?)
         if (No::token(sLine, 1) == "396" && No::token(sLine, 3).contains("users.quakenet.org")) {
             m_bCloaked = true;
             PutModule("Cloak successful: Your hostname is now cloaked.");
@@ -276,11 +276,11 @@ public:
         return CONTINUE;
     }
 
-    ModRet OnPrivMsg(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
+    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
 
-    ModRet OnPrivNotice(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
+    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
 
-    ModRet OnJoining(NoChannel& Channel) override
+    ModRet onJoining(NoChannel& Channel) override
     {
         // Halt if are not already cloaked, but the user requres that we delay
         // channel join till after we are cloaked.
@@ -289,25 +289,25 @@ public:
         return CONTINUE;
     }
 
-    void OnJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& Nick, NoChannel& Channel) override
     {
         if (m_bRequestPerms && IsSelf(Nick)) HandleNeed(Channel, "ov");
     }
 
-    void OnDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
+    void onDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick))) HandleNeed(Channel, "o");
     }
 
-    void OnDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
+    void onDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick))) HandleNeed(Channel, "v");
     }
 
-    ModRet OnInvite(const NoNick& Nick, const NoString& sChan) override
+    ModRet onInvite(const NoNick& Nick, const NoString& sChan) override
     {
         if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org")) return CONTINUE;
-        if (m_bJoinOnInvite) GetNetwork()->AddChan(sChan, false);
+        if (m_bJoinonInvite) GetNetwork()->AddChan(sChan, false);
         return CONTINUE;
     }
 
@@ -328,7 +328,7 @@ public:
                 SetUseCloakedHost(WebSock.GetParam("usecloakedhost").toBool());
                 SetUseChallenge(WebSock.GetParam("usechallenge").toBool());
                 SetRequestPerms(WebSock.GetParam("requestperms").toBool());
-                SetJoinOnInvite(WebSock.GetParam("joinoninvite").toBool());
+                SetJoinonInvite(WebSock.GetParam("joinoninvite").toBool());
                 SetJoinAfterCloaked(WebSock.GetParam("joinaftercloaked").toBool());
             }
 
@@ -354,9 +354,9 @@ public:
 
             NoTemplate& o4 = Tmpl.AddRow("OptionLoop");
             o4["Name"] = "joinoninvite";
-            o4["DisplayName"] = "JoinOnInvite";
+            o4["DisplayName"] = "JoinonInvite";
             o4["Tooltip"] = "Whether to join channels when Q invites you.";
-            o4["Checked"] = NoString(m_bJoinOnInvite);
+            o4["Checked"] = NoString(m_bJoinonInvite);
 
             NoTemplate& o5 = Tmpl.AddRow("OptionLoop");
             o5["Name"] = "joinaftercloaked";
@@ -587,7 +587,7 @@ private:
     bool m_bUseCloakedHost;
     bool m_bUseChallenge;
     bool m_bRequestPerms;
-    bool m_bJoinOnInvite;
+    bool m_bJoinonInvite;
     bool m_bJoinAfterCloaked;
 
     void SetUsername(const NoString& sUsername)
@@ -627,11 +627,11 @@ private:
         m_bRequestPerms = bRequestPerms;
     }
 
-    void SetJoinOnInvite(const bool bJoinOnInvite)
+    void SetJoinonInvite(const bool bJoinonInvite)
     {
         NoRegistry registry(this);
-        registry.setValue("JoinOnInvite", NoString(bJoinOnInvite));
-        m_bJoinOnInvite = bJoinOnInvite;
+        registry.setValue("JoinonInvite", NoString(bJoinonInvite));
+        m_bJoinonInvite = bJoinonInvite;
     }
 
     void SetJoinAfterCloaked(const bool bJoinAfterCloaked)

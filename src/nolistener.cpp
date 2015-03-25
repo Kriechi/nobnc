@@ -76,11 +76,11 @@ NoSocket* NoListenerSocket::GetSockObjImpl(const NoString& host, ushort port)
 {
     NoPeerSocket* socket = new NoPeerSocket(host, port, m_listener);
     if (NoApp::Get().AllowConnectionFrom(host)) {
-        GLOBALMODULECALL(OnClientConnect(socket, host, port), NOTHING);
+        GLOBALMODULECALL(onClientConnect(socket, host, port), NOTHING);
     } else {
         socket->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
         socket->Close(NoSocket::CLT_AFTERWRITE);
-        GLOBALMODULECALL(OnFailedLogin("", host), NOTHING);
+        GLOBALMODULECALL(onFailedLogin("", host), NOTHING);
     }
     return socket;
 }

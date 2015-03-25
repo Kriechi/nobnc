@@ -68,7 +68,7 @@ public:
         return true;
     }
 
-    ModRet OnLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         if (IsBlocked(Auth->username())) {
             Auth->refuseLogin(MESSAGE);
@@ -78,7 +78,7 @@ public:
         return CONTINUE;
     }
 
-    void OnModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& sCommand) override
     {
         if (!GetUser()->IsAdmin()) {
             PutModule("Access denied");

@@ -144,10 +144,10 @@ NoString NoApp::GetUptime() const
     return No::toTimeStr(now - TimeStarted());
 }
 
-bool NoApp::OnBoot()
+bool NoApp::onBoot()
 {
     bool bFail = false;
-    ALLMODULECALL(OnBoot(), &bFail);
+    ALLMODULECALL(onBoot(), &bFail);
     if (bFail) return false;
 
     return true;
@@ -161,7 +161,7 @@ bool NoApp::HandleUserDeletion()
         NoUser* pUser = it.second;
         pUser->SetBeingDeleted(true);
 
-        if (GetLoader()->OnDeleteUser(*pUser)) {
+        if (GetLoader()->onDeleteUser(*pUser)) {
             pUser->SetBeingDeleted(false);
             continue;
         }
@@ -1021,7 +1021,7 @@ bool NoApp::ParseConfig(const NoString& sConfig, NoString& sError)
 
 bool NoApp::RehashConfig(NoString& sError)
 {
-    ALLMODULECALL(OnPreRehash(), NOTHING);
+    ALLMODULECALL(onPreRehash(), NOTHING);
 
     // This clears m_msDelUsers
     HandleUserDeletion();
@@ -1031,7 +1031,7 @@ bool NoApp::RehashConfig(NoString& sError)
     m_users.clear();
 
     if (DoRehash(sError)) {
-        ALLMODULECALL(OnPostRehash(), NOTHING);
+        ALLMODULECALL(onPostRehash(), NOTHING);
 
         return true;
     }
@@ -1494,7 +1494,7 @@ void NoApp::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUs
             NoString sMsg = sMessage;
 
             bool bContinue = false;
-            USERMODULECALL(OnBroadcast(sMsg), it.second, nullptr, &bContinue);
+            USERMODULECALL(onBroadcast(sMsg), it.second, nullptr, &bContinue);
             if (bContinue) continue;
 
             it.second->PutStatusNotice("*** " + sMsg, nullptr, pSkipClient);
@@ -1642,7 +1642,7 @@ bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
         return false;
     }
     bool bFailed = false;
-    GLOBALMODULECALL(OnAddUser(*pUser, sErrorRet), &bFailed);
+    GLOBALMODULECALL(onAddUser(*pUser, sErrorRet), &bFailed);
     if (bFailed) {
         NO_DEBUG("AddUser [" << pUser->GetUserName() << "] aborted by a module [" << sErrorRet << "]");
         return false;
@@ -1978,7 +1978,7 @@ void NoApp::AuthUser(std::shared_ptr<NoAuthenticator> AuthClass)
 {
     // TODO unless the auth module calls it, NoUser::IsHostAllowed() is not honoured
     bool bReturn = false;
-    GLOBALMODULECALL(OnLoginAttempt(AuthClass), &bReturn);
+    GLOBALMODULECALL(onLoginAttempt(AuthClass), &bReturn);
     if (bReturn) return;
 
     NoUser* pUser = FindUser(AuthClass->username());

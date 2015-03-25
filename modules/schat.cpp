@@ -127,7 +127,7 @@ public:
         return true;
     }
 
-    void OnClientLogin() override
+    void onClientLogin() override
     {
         for (NoSChatSock* p : m_sockets) {
             if (!p->IsListener())
@@ -135,22 +135,22 @@ public:
         }
     }
 
-    ModRet OnUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& sLine) override
     {
         if (sLine.startsWith("schat ")) {
-            OnModCommand("chat " + sLine.substr(6));
+            onModCommand("chat " + sLine.substr(6));
             return (HALT);
 
         } else if (sLine.equals("schat")) {
             PutModule("SChat User Area ...");
-            OnModCommand("help");
+            onModCommand("help");
             return (HALT);
         }
 
         return (CONTINUE);
     }
 
-    void OnModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& sCommand) override
     {
         NoString sCom = No::token(sCommand, 0);
         NoString sArgs = No::tokens(sCommand, 1);
@@ -294,7 +294,7 @@ public:
             PutModule("Unknown command [" + sCom + "] [" + sArgs + "]");
     }
 
-    ModRet OnPrivCTCP(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
     {
         if (sMessage.startsWith("DCC SCHAT ")) {
             // chat ip port
@@ -328,7 +328,7 @@ public:
         delete FindTimer("Remove " + sNick); // delete any associated timer to this nick
     }
 
-    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         if (sTarget.left(3) == "(s)") {
             NoString sSockName = GetModName().toUpper() + "::" + sTarget;

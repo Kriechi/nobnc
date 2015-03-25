@@ -111,7 +111,7 @@ public:
         }
     }
 
-    bool OnBoot() override
+    bool onBoot() override
     {
         // The config is now read completely, so all Users are set up
         Load();
@@ -192,7 +192,7 @@ public:
             registry.remove("topic:" + pChannel->GetName());
     }
 
-    ModRet OnDeleteUser(NoUser& User) override
+    ModRet onDeleteUser(NoUser& User) override
     {
         // Loop through each chan
         for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end();) {
@@ -206,7 +206,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet OnRaw(NoString& sLine) override
+    ModRet onRaw(NoString& sLine) override
     {
         if (No::token(sLine, 1) == "005") {
             NoString::size_type uPos = sLine.toUpper().find("CHANTYPES=");
@@ -224,9 +224,9 @@ public:
         return CONTINUE;
     }
 
-    void OnIRCDisconnected() override { m_spInjectedPrefixes.erase(GetNetwork()); }
+    void onIrcDisconnected() override { m_spInjectedPrefixes.erase(GetNetwork()); }
 
-    void OnClientLogin() override
+    void onClientLogin() override
     {
         NoUser* pUser = GetUser();
         NoClient* pClient = GetClient();
@@ -276,7 +276,7 @@ public:
         }
     }
 
-    void OnClientDisconnect() override
+    void onClientDisconnect() override
     {
         NoUser* pUser = GetUser();
         if (!pUser->IsUserAttached() && !pUser->IsBeingDeleted()) {
@@ -293,7 +293,7 @@ public:
         }
     }
 
-    ModRet OnUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& sLine) override
     {
         if (sLine.startsWith("WHO " CHAN_PREFIX_1)) {
             return HALT;
@@ -339,7 +339,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
+    ModRet onUserPart(NoString& sChannel, NoString& sMessage) override
     {
         if (sChannel.left(1) != CHAN_PREFIX_1) {
             return CONTINUE;
@@ -421,7 +421,7 @@ public:
         }
     }
 
-    ModRet OnUserJoin(NoString& sChannel, NoString& sKey) override
+    ModRet onUserJoin(NoString& sChannel, NoString& sKey) override
     {
         if (sChannel.left(1) != CHAN_PREFIX_1) {
             return CONTINUE;
@@ -556,27 +556,27 @@ public:
         return HALT;
     }
 
-    ModRet OnUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("PRIVMSG", sTarget, sMessage);
     }
 
-    ModRet OnUserNotice(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserNotice(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("NOTICE", sTarget, sMessage);
     }
 
-    ModRet OnUserAction(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserAction(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("PRIVMSG", sTarget, "\001ACTION " + sMessage + "\001");
     }
 
-    ModRet OnUserCTCP(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserCtcp(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("PRIVMSG", sTarget, "\001" + sMessage + "\001");
     }
 
-    ModRet OnUserCTCPReply(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserCtcpReply(NoString& sTarget, NoString& sMessage) override
     {
         return HandleMessage("NOTICE", sTarget, "\001" + sMessage + "\001");
     }

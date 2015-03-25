@@ -44,7 +44,7 @@ public:
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override;
 
-    ModRet OnUserPart(NoString& sChannel, NoString& sMessage) override
+    ModRet onUserPart(NoString& sChannel, NoString& sMessage) override
     {
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
@@ -61,7 +61,7 @@ public:
         return CONTINUE;
     }
 
-    virtual void OnMode(const NoNick& pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange) override
+    virtual void onMode(const NoNick& pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange) override
     {
         if (uMode == NoChannel::M_Key) {
             if (bAdded) {

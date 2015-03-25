@@ -77,11 +77,11 @@ public:
 
     // Event stuff:
 
-    void OnClientLogin() override { SetTime(GetUser()); }
+    void onClientLogin() override { SetTime(GetUser()); }
 
-    void OnClientDisconnect() override { SetTime(GetUser()); }
+    void onClientDisconnect() override { SetTime(GetUser()); }
 
-    ModRet OnDeleteUser(NoUser& User) override
+    ModRet onDeleteUser(NoUser& User) override
     {
         NoRegistry registry(this);
         registry.remove(User.GetUserName());

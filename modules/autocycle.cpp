@@ -106,14 +106,14 @@ public:
         }
     }
 
-    void OnPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override { AutoCycle(Channel); }
+    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override { AutoCycle(Channel); }
 
-    void OnQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
         for (uint i = 0; i < vChans.size(); i++) AutoCycle(*vChans[i]);
     }
 
-    void OnKick(const NoNick& Nick, const NoString& sOpNick, NoChannel& Channel, const NoString& sMessage) override
+    void onKick(const NoNick& Nick, const NoString& sOpNick, NoChannel& Channel, const NoString& sMessage) override
     {
         AutoCycle(Channel);
     }

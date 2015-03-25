@@ -38,7 +38,7 @@ public:
         return false;
     }
 
-    ModRet OnUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& sLine) override
     {
         // Handle ISON
         if (No::token(sLine, 0).equals("ison")) {
@@ -84,7 +84,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet OnRaw(NoString& sLine) override
+    ModRet onRaw(NoString& sLine) override
     {
         // Handle 303 reply if m_Requests is not empty
         if (No::token(sLine, 1) == "303" && !m_ISONRequests.empty()) {
