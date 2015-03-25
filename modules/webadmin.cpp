@@ -364,7 +364,7 @@ public:
                     NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
                     try {
-                        if (!pNewUser->GetLoader()->LoadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
+                        if (!pNewUser->GetLoader()->loadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } catch (...) {
@@ -387,7 +387,7 @@ public:
                 NoString sModLoadError;
 
                 try {
-                    if (!pNewUser->GetLoader()->LoadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
+                    if (!pNewUser->GetLoader()->loadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } catch (...) {
@@ -793,7 +793,7 @@ public:
             Tmpl["Username"] = pUser->GetUserName();
 
             std::set<NoModuleInfo> ssNetworkMods;
-            NoApp::Get().GetLoader()->GetAvailableMods(ssNetworkMods, No::NetworkModule);
+            NoApp::Get().GetLoader()->availableModules(ssNetworkMods, No::NetworkModule);
             for (std::set<NoModuleInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
@@ -805,7 +805,7 @@ public:
                 l["ArgsHelpText"] = Info.GetArgsHelpText();
 
                 if (pNetwork) {
-                    NoModule* pModule = pNetwork->GetLoader()->FindModule(Info.GetName());
+                    NoModule* pModule = pNetwork->GetLoader()->findModule(Info.GetName());
                     if (pModule) {
                         l["Checked"] = "true";
                         l["Args"] = pModule->GetArgs();
@@ -814,11 +814,11 @@ public:
 
                 // Check if module is loaded globally
                 l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(No::GlobalModule));
-                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->FindModule(Info.GetName()) != nullptr);
+                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.GetName()) != nullptr);
 
                 // Check if module is loaded by user
                 l["CanBeLoadedByUser"] = NoString(Info.SupportsType(No::UserModule));
-                l["LoadedByUser"] = NoString(pUser->GetLoader()->FindModule(Info.GetName()) != nullptr);
+                l["LoadedByUser"] = NoString(pUser->GetLoader()->findModule(Info.GetName()) != nullptr);
 
                 if (!spSession->IsAdmin() && pUser->DenyLoadMod()) {
                     l["Disabled"] = "true";
@@ -1087,14 +1087,14 @@ public:
                 if (!sModName.empty()) {
                     NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
-                    NoModule* pMod = pNetwork->GetLoader()->FindModule(sModName);
+                    NoModule* pMod = pNetwork->GetLoader()->findModule(sModName);
 
                     if (!pMod) {
-                        if (!pNetwork->GetLoader()->LoadModule(sModName, sArgs, No::NetworkModule, pUser, pNetwork, sModRet)) {
+                        if (!pNetwork->GetLoader()->loadModule(sModName, sArgs, No::NetworkModule, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } else if (pMod->GetArgs() != sArgs) {
-                        if (!pNetwork->GetLoader()->ReloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
+                        if (!pNetwork->GetLoader()->reloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                         }
                     }
@@ -1117,7 +1117,7 @@ public:
         }
 
         for (std::set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
-            pNetwork->GetLoader()->UnloadModule(*it2);
+            pNetwork->GetLoader()->unloadModule(*it2);
         }
 
         NoTemplate TmplMod;
@@ -1361,7 +1361,7 @@ public:
             }
 
             std::set<NoModuleInfo> ssUserMods;
-            NoApp::Get().GetLoader()->GetAvailableMods(ssUserMods);
+            NoApp::Get().GetLoader()->availableModules(ssUserMods);
 
             for (std::set<NoModuleInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
@@ -1375,14 +1375,14 @@ public:
 
                 NoModule* pModule = nullptr;
                 if (pUser) {
-                    pModule = pUser->GetLoader()->FindModule(Info.GetName());
+                    pModule = pUser->GetLoader()->findModule(Info.GetName());
                     // Check if module is loaded by all or some networks
                     const std::vector<NoNetwork*>& userNetworks = pUser->GetNetworks();
                     uint networksWithRenderedModuleCount = 0;
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
                         const NoModuleLoader* networkModules = pCurrentNetwork->GetLoader();
-                        if (networkModules->FindModule(Info.GetName())) {
+                        if (networkModules->findModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
                     }
@@ -1399,7 +1399,7 @@ public:
                 }
                 l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(No::GlobalModule));
                 // Check if module is loaded globally
-                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->FindModule(Info.GetName()) != nullptr);
+                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.GetName()) != nullptr);
 
                 if (!spSession->IsAdmin() && pUser && pUser->DenyLoadMod()) {
                     l["Disabled"] = "true";
@@ -1817,13 +1817,13 @@ public:
             }
 
             std::set<NoModuleInfo> ssGlobalMods;
-            NoApp::Get().GetLoader()->GetAvailableMods(ssGlobalMods, No::GlobalModule);
+            NoApp::Get().GetLoader()->availableModules(ssGlobalMods, No::GlobalModule);
 
             for (std::set<NoModuleInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.AddRow("ModuleLoop");
 
-                NoModule* pModule = NoApp::Get().GetLoader()->FindModule(Info.GetName());
+                NoModule* pModule = NoApp::Get().GetLoader()->findModule(Info.GetName());
                 if (pModule) {
                     l["Checked"] = "true";
                     l["Args"] = pModule->GetArgs();
@@ -1848,7 +1848,7 @@ public:
 
                     // Count users which has loaded a render module
                     const NoModuleLoader* userModules = User.GetLoader();
-                    if (userModules->FindModule(Info.GetName())) {
+                    if (userModules->findModule(Info.GetName())) {
                         usersWithRenderedModuleCount++;
                     }
                     // Count networks which has loaded a render module
@@ -1856,7 +1856,7 @@ public:
                     networksCount += userNetworks.size();
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
-                        if (pCurrentNetwork->GetLoader()->FindModule(Info.GetName())) {
+                        if (pCurrentNetwork->GetLoader()->findModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
                     }
@@ -1917,13 +1917,13 @@ public:
             if (!sModName.empty()) {
                 NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
-                NoModule* pMod = NoApp::Get().GetLoader()->FindModule(sModName);
+                NoModule* pMod = NoApp::Get().GetLoader()->findModule(sModName);
                 if (!pMod) {
-                    if (!NoApp::Get().GetLoader()->LoadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet)) {
+                    if (!NoApp::Get().GetLoader()->loadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } else if (pMod->GetArgs() != sArgs) {
-                    if (!NoApp::Get().GetLoader()->ReloadModule(sModName, sArgs, nullptr, nullptr, sModRet)) {
+                    if (!NoApp::Get().GetLoader()->reloadModule(sModName, sArgs, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                     }
                 }
@@ -1946,7 +1946,7 @@ public:
         }
 
         for (std::set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
-            NoApp::Get().GetLoader()->UnloadModule(*it2);
+            NoApp::Get().GetLoader()->unloadModule(*it2);
         }
 
         if (!NoApp::Get().WriteConfig()) {

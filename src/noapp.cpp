@@ -60,14 +60,14 @@ NoApp::NoApp()
 
 NoApp::~NoApp()
 {
-    m_modules->UnloadAll();
+    m_modules->unloadAllModules();
 
     for (const auto& it : m_users) {
-        it.second->GetLoader()->UnloadAll();
+        it.second->GetLoader()->unloadAllModules();
 
         const std::vector<NoNetwork*>& networks = it.second->GetNetworks();
         for (NoNetwork* pNetwork : networks) {
-            pNetwork->GetLoader()->UnloadAll();
+            pNetwork->GetLoader()->unloadAllModules();
         }
     }
 
@@ -783,7 +783,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     // !Listen
 
     std::set<NoModuleInfo> ssGlobalMods;
-    GetLoader()->GetDefaultMods(ssGlobalMods, No::GlobalModule);
+    GetLoader()->defaultModules(ssGlobalMods, No::GlobalModule);
     std::vector<NoString> vsGlobalModNames;
     for (const NoModuleInfo& Info : ssGlobalMods) {
         vsGlobalModNames.push_back(Info.GetName());
@@ -825,7 +825,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     }
 
     std::set<NoModuleInfo> ssUserMods;
-    GetLoader()->GetDefaultMods(ssUserMods, No::UserModule);
+    GetLoader()->defaultModules(ssUserMods, No::UserModule);
     std::vector<NoString> vsUserModNames;
     for (const NoModuleInfo& Info : ssUserMods) {
         vsUserModNames.push_back(Info.GetName());
@@ -848,7 +848,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         vsLines.push_back("\t<Network " + sNetwork + ">");
 
         std::set<NoModuleInfo> ssNetworkMods;
-        GetLoader()->GetDefaultMods(ssNetworkMods, No::NetworkModule);
+        GetLoader()->defaultModules(ssNetworkMods, No::NetworkModule);
         std::vector<NoString> vsNetworkModNames;
         for (const NoModuleInfo& Info : ssNetworkMods) {
             vsNetworkModNames.push_back(Info.GetName());
@@ -1142,11 +1142,11 @@ bool NoApp::DoRehash(NoString& sError)
         NoString sModRet;
         NoModule* pOldMod;
 
-        pOldMod = GetLoader()->FindModule(sModName);
+        pOldMod = GetLoader()->findModule(sModName);
         if (!pOldMod) {
             No::printAction("Loading global module [" + sModName + "]");
 
-            bool bModRet = GetLoader()->LoadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet);
+            bool bModRet = GetLoader()->loadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1156,7 +1156,7 @@ bool NoApp::DoRehash(NoString& sError)
         } else if (pOldMod->GetArgs() != sArgs) {
             No::printAction("Reloading global module [" + sModName + "]");
 
-            bool bModRet = GetLoader()->ReloadModule(sModName, sArgs, nullptr, nullptr, sModRet);
+            bool bModRet = GetLoader()->reloadModule(sModName, sArgs, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1173,12 +1173,12 @@ bool NoApp::DoRehash(NoString& sError)
     config.FindStringEntry("ispoofformat", sISpoofFormat);
     config.FindStringEntry("ispooffile", sISpoofFile);
     if (!sISpoofFormat.empty() || !sISpoofFile.empty()) {
-        NoModule* pIdentFileMod = GetLoader()->FindModule("identfile");
+        NoModule* pIdentFileMod = GetLoader()->findModule("identfile");
         if (!pIdentFileMod) {
             No::printAction("Loading global Module [identfile]");
 
             NoString sModRet;
-            bool bModRet = GetLoader()->LoadModule("identfile", "", No::GlobalModule, nullptr, nullptr, sModRet);
+            bool bModRet = GetLoader()->loadModule("identfile", "", No::GlobalModule, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1186,7 +1186,7 @@ bool NoApp::DoRehash(NoString& sError)
                 return false;
             }
 
-            pIdentFileMod = GetLoader()->FindModule("identfile");
+            pIdentFileMod = GetLoader()->findModule("identfile");
             msModules["identfile"] = "";
         }
 
@@ -1377,7 +1377,7 @@ bool NoApp::DoRehash(NoString& sError)
     }
 
     for (const NoString& sMod : ssUnload) {
-        if (GetLoader()->UnloadModule(sMod))
+        if (GetLoader()->unloadModule(sMod))
             No::printMessage("Unloaded global module [" + sMod + "]");
         else
             No::printMessage("Could not unload [" + sMod + "]");
@@ -1513,21 +1513,21 @@ ulonglong NoApp::BytesWritten() const { return m_bytesWritten; }
 NoModule* NoApp::FindModule(const NoString& sModName, const NoString& sUsername)
 {
     if (sUsername.empty()) {
-        return NoApp::Get().GetLoader()->FindModule(sModName);
+        return NoApp::Get().GetLoader()->findModule(sModName);
     }
 
     NoUser* pUser = FindUser(sUsername);
 
-    return (!pUser) ? nullptr : pUser->GetLoader()->FindModule(sModName);
+    return (!pUser) ? nullptr : pUser->GetLoader()->findModule(sModName);
 }
 
 NoModule* NoApp::FindModule(const NoString& sModName, NoUser* pUser)
 {
     if (pUser) {
-        return pUser->GetLoader()->FindModule(sModName);
+        return pUser->GetLoader()->findModule(sModName);
     }
 
-    return NoApp::Get().GetLoader()->FindModule(sModName);
+    return NoApp::Get().GetLoader()->findModule(sModName);
 }
 
 bool NoApp::UpdateModule(const NoString& sModule)
@@ -1541,19 +1541,19 @@ bool NoApp::UpdateModule(const NoString& sModule)
     for (const auto& it : m_users) {
         NoUser* pUser = it.second;
 
-        pModule = pUser->GetLoader()->FindModule(sModule);
+        pModule = pUser->GetLoader()->findModule(sModule);
         if (pModule) {
             musLoaded[pUser] = pModule->GetArgs();
-            pUser->GetLoader()->UnloadModule(sModule);
+            pUser->GetLoader()->unloadModule(sModule);
         }
 
         // See if the user has this module loaded to a network
         std::vector<NoNetwork*> vNetworks = pUser->GetNetworks();
         for (NoNetwork* pNetwork : vNetworks) {
-            pModule = pNetwork->GetLoader()->FindModule(sModule);
+            pModule = pNetwork->GetLoader()->findModule(sModule);
             if (pModule) {
                 mnsLoaded[pNetwork] = pModule->GetArgs();
-                pNetwork->GetLoader()->UnloadModule(sModule);
+                pNetwork->GetLoader()->unloadModule(sModule);
             }
         }
     }
@@ -1562,11 +1562,11 @@ bool NoApp::UpdateModule(const NoString& sModule)
     bool bGlobal = false;
     NoString sGlobalArgs;
 
-    pModule = GetLoader()->FindModule(sModule);
+    pModule = GetLoader()->findModule(sModule);
     if (pModule) {
         bGlobal = true;
         sGlobalArgs = pModule->GetArgs();
-        GetLoader()->UnloadModule(sModule);
+        GetLoader()->unloadModule(sModule);
     }
 
     // Lets reload everything
@@ -1575,7 +1575,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
 
     // Reload the global module
     if (bGlobal) {
-        if (!GetLoader()->LoadModule(sModule, sGlobalArgs, No::GlobalModule, nullptr, nullptr, sErr)) {
+        if (!GetLoader()->loadModule(sModule, sGlobalArgs, No::GlobalModule, nullptr, nullptr, sErr)) {
             NO_DEBUG("Failed to reload [" << sModule << "] globally [" << sErr << "]");
             bError = true;
         }
@@ -1586,7 +1586,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
         NoUser* pUser = it.first;
         const NoString& sArgs = it.second;
 
-        if (!pUser->GetLoader()->LoadModule(sModule, sArgs, No::UserModule, pUser, nullptr, sErr)) {
+        if (!pUser->GetLoader()->loadModule(sModule, sArgs, No::UserModule, pUser, nullptr, sErr)) {
             NO_DEBUG("Failed to reload [" << sModule << "] for [" << pUser->GetUserName() << "] [" << sErr << "]");
             bError = true;
         }
@@ -1597,7 +1597,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
         NoNetwork* pNetwork = it.first;
         const NoString& sArgs = it.second;
 
-        if (!pNetwork->GetLoader()->LoadModule(sModule, sArgs, No::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
+        if (!pNetwork->GetLoader()->loadModule(sModule, sArgs, No::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
             NO_DEBUG("Failed to reload [" << sModule << "] for [" << pNetwork->GetUser()->GetUserName() << "/"
                                        << pNetwork->GetName() << "] [" << sErr << "]");
             bError = true;

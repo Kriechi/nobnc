@@ -39,14 +39,34 @@ public:
     bool isEmpty() const;
     std::vector<NoModule*> GetModules() const;
 
-    void SetUser(NoUser* pUser);
-    void SetNetwork(NoNetwork* pNetwork);
-    void SetClient(NoClient* pClient);
-    NoUser* GetUser() const;
-    NoNetwork* GetNetwork() const;
-    NoClient* GetClient() const;
+    NoUser* user() const;
+    void setUser(NoUser* user);
 
-    void UnloadAll();
+    NoNetwork* network() const;
+    void setNetwork(NoNetwork* network);
+
+    NoClient* client() const;
+    void setClient(NoClient* client);
+
+    NoModule* findModule(const NoString& sModule) const;
+    bool loadModule(const NoString& sModule, const NoString& sArgs, No::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
+    bool unloadModule(const NoString& sModule);
+    bool unloadModule(const NoString& sModule, NoString& sRetMsg);
+    bool reloadModule(const NoString& sModule, const NoString& sArgs, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
+    void unloadAllModules();
+
+    static bool moduleInfo(NoModuleInfo& ModInfo, const NoString& sModule, NoString& sRetMsg);
+    static bool modulePath(NoModuleInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg);
+    static void availableModules(std::set<NoModuleInfo>& ssMods, No::ModuleType eType = No::UserModule);
+    static void defaultModules(std::set<NoModuleInfo>& ssMods, No::ModuleType eType = No::UserModule);
+
+    // This returns the path to the .so and to the data dir
+    // which is where static data (webadmin skins) are saved
+    static bool findModulePath(const NoString& sModule, NoString& sModPath, NoString& sDataPath);
+    // Return a list of <module dir, data dir> pairs for directories in
+    // which modules can be found.
+    typedef std::queue<std::pair<NoString, NoString>> ModDirList;
+    static ModDirList moduleDirs();
 
     bool OnBoot();
     bool OnPreRehash();
@@ -129,25 +149,6 @@ public:
 
     bool OnServerCapAvailable(const NoString& sCap);
     bool OnServerCapResult(const NoString& sCap, bool bSuccess);
-
-    NoModule* FindModule(const NoString& sModule) const;
-    bool LoadModule(const NoString& sModule, const NoString& sArgs, No::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
-    bool UnloadModule(const NoString& sModule);
-    bool UnloadModule(const NoString& sModule, NoString& sRetMsg);
-    bool ReloadModule(const NoString& sModule, const NoString& sArgs, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg);
-
-    static bool GetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, NoString& sRetMsg);
-    static bool GetModPathInfo(NoModuleInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg);
-    static void GetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType = No::UserModule);
-    static void GetDefaultMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType = No::UserModule);
-
-    // This returns the path to the .so and to the data dir
-    // which is where static data (webadmin skins) are saved
-    static bool FindModPath(const NoString& sModule, NoString& sModPath, NoString& sDataPath);
-    // Return a list of <module dir, data dir> pairs for directories in
-    // which modules can be found.
-    typedef std::queue<std::pair<NoString, NoString>> ModDirList;
-    static ModDirList GetModDirs();
 
     bool OnAddUser(NoUser& User, NoString& sErrorRet);
     bool OnDeleteUser(NoUser& User);

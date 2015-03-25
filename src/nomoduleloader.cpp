@@ -48,7 +48,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             pMod->SetClient(pOldClient);                \
         } catch (const NoModule::ModException& e) {     \
             if (e == NoModule::UNLOAD) {                 \
-                UnloadModule(pMod->GetModName());       \
+                unloadModule(pMod->GetModName());       \
             }                                           \
         }                                               \
     }
@@ -85,7 +85,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             }                                           \
         } catch (const NoModule::ModException& e) {     \
             if (e == NoModule::UNLOAD) {                 \
-                UnloadModule(pMod->GetModName());       \
+                unloadModule(pMod->GetModName());       \
             }                                           \
         }                                               \
     }                                                   \
@@ -93,30 +93,30 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 NoModuleLoader::NoModuleLoader() : m_user(nullptr), m_network(nullptr), m_client(nullptr) {}
 
-NoModuleLoader::~NoModuleLoader() { UnloadAll(); }
+NoModuleLoader::~NoModuleLoader() { unloadAllModules(); }
 
 bool NoModuleLoader::isEmpty() const { return m_modules.empty(); }
 
 std::vector<NoModule*> NoModuleLoader::GetModules() const { return m_modules; }
 
-void NoModuleLoader::SetUser(NoUser* pUser) { m_user = pUser; }
+void NoModuleLoader::setUser(NoUser* pUser) { m_user = pUser; }
 
-void NoModuleLoader::SetNetwork(NoNetwork* pNetwork) { m_network = pNetwork; }
+void NoModuleLoader::setNetwork(NoNetwork* pNetwork) { m_network = pNetwork; }
 
-void NoModuleLoader::SetClient(NoClient* pClient) { m_client = pClient; }
+void NoModuleLoader::setClient(NoClient* pClient) { m_client = pClient; }
 
-NoUser* NoModuleLoader::GetUser() const { return m_user; }
+NoUser* NoModuleLoader::user() const { return m_user; }
 
-NoNetwork* NoModuleLoader::GetNetwork() const { return m_network; }
+NoNetwork* NoModuleLoader::network() const { return m_network; }
 
-NoClient* NoModuleLoader::GetClient() const { return m_client; }
+NoClient* NoModuleLoader::client() const { return m_client; }
 
-void NoModuleLoader::UnloadAll()
+void NoModuleLoader::unloadAllModules()
 {
     while (!m_modules.empty()) {
         NoString sRetMsg;
         NoString sModName = m_modules.back()->GetModName();
-        UnloadModule(sModName, sRetMsg);
+        unloadModule(sModName, sRetMsg);
     }
 }
 
@@ -129,7 +129,7 @@ bool NoModuleLoader::OnBoot()
             }
         } catch (const NoModule::ModException& e) {
             if (e == NoModule::UNLOAD) {
-                UnloadModule(pMod->GetModName());
+                unloadModule(pMod->GetModName());
             }
         }
     }
@@ -372,7 +372,7 @@ bool NoModuleLoader::OnServerCapAvailable(const NoString& sCap)
             pMod->SetClient(pOldClient);
         } catch (const NoModule::ModException& e) {
             if (NoModule::UNLOAD == e) {
-                UnloadModule(pMod->GetModName());
+                unloadModule(pMod->GetModName());
             }
         }
     }
@@ -434,7 +434,7 @@ bool NoModuleLoader::IsClientCapSupported(NoClient* pClient, const NoString& sCa
             pMod->SetClient(pOldClient);
         } catch (const NoModule::ModException& e) {
             if (NoModule::UNLOAD == e) {
-                UnloadModule(pMod->GetModName());
+                unloadModule(pMod->GetModName());
             }
         }
     }
@@ -469,7 +469,7 @@ bool NoModuleLoader::OnGetAvailableMods(std::set<NoModuleInfo>& ssMods, No::Modu
 }
 
 
-NoModule* NoModuleLoader::FindModule(const NoString& sModule) const
+NoModule* NoModuleLoader::findModule(const NoString& sModule) const
 {
     for (NoModule* pMod : m_modules) {
         if (sModule.equals(pMod->GetModName())) {
@@ -480,11 +480,11 @@ NoModule* NoModuleLoader::FindModule(const NoString& sModule) const
     return nullptr;
 }
 
-bool NoModuleLoader::LoadModule(const NoString& sModule, const NoString& sArgs, No::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
+bool NoModuleLoader::loadModule(const NoString& sModule, const NoString& sArgs, No::ModuleType eType, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
 {
     sRetMsg = "";
 
-    if (FindModule(sModule) != nullptr) {
+    if (findModule(sModule) != nullptr) {
         sRetMsg = "Module [" + sModule + "] already loaded.";
         return false;
     }
@@ -498,7 +498,7 @@ bool NoModuleLoader::LoadModule(const NoString& sModule, const NoString& sArgs, 
     bool bVersionMismatch;
     NoModuleInfo Info;
 
-    if (!FindModPath(sModule, sModPath, sDataPath)) {
+    if (!findModulePath(sModule, sModPath, sDataPath)) {
         sRetMsg = "Unable to find module [" + sModule + "]";
         return false;
     }
@@ -547,7 +547,7 @@ bool NoModuleLoader::LoadModule(const NoString& sModule, const NoString& sArgs, 
     }
 
     if (!bLoaded) {
-        UnloadModule(sModule, sModPath);
+        unloadModule(sModule, sModPath);
         if (!sRetMsg.empty())
             sRetMsg = "Module [" + sModule + "] aborted: " + sRetMsg;
         else
@@ -562,16 +562,16 @@ bool NoModuleLoader::LoadModule(const NoString& sModule, const NoString& sArgs, 
     return true;
 }
 
-bool NoModuleLoader::UnloadModule(const NoString& sModule)
+bool NoModuleLoader::unloadModule(const NoString& sModule)
 {
     NoString s;
-    return UnloadModule(sModule, s);
+    return unloadModule(sModule, s);
 }
 
-bool NoModuleLoader::UnloadModule(const NoString& sModule, NoString& sRetMsg)
+bool NoModuleLoader::unloadModule(const NoString& sModule, NoString& sRetMsg)
 {
     NoString sMod = sModule; // Make a copy incase the reference passed in is from NoModule::GetModName()
-    NoModule* pModule = FindModule(sMod);
+    NoModule* pModule = findModule(sMod);
     sRetMsg = "";
 
     if (!pModule) {
@@ -606,10 +606,10 @@ bool NoModuleLoader::UnloadModule(const NoString& sModule, NoString& sRetMsg)
     return false;
 }
 
-bool NoModuleLoader::ReloadModule(const NoString& sModule, const NoString& sArgs, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
+bool NoModuleLoader::reloadModule(const NoString& sModule, const NoString& sArgs, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
 {
     NoString sMod = sModule; // Make a copy incase the reference passed in is from NoModule::GetModName()
-    NoModule* pModule = FindModule(sMod);
+    NoModule* pModule = findModule(sMod);
 
     if (!pModule) {
         sRetMsg = "Module [" + sMod + "] not loaded";
@@ -620,11 +620,11 @@ bool NoModuleLoader::ReloadModule(const NoString& sModule, const NoString& sArgs
     pModule = nullptr;
 
     sRetMsg = "";
-    if (!UnloadModule(sMod, sRetMsg)) {
+    if (!unloadModule(sMod, sRetMsg)) {
         return false;
     }
 
-    if (!LoadModule(sMod, sArgs, eType, pUser, pNetwork, sRetMsg)) {
+    if (!loadModule(sMod, sArgs, eType, pUser, pNetwork, sRetMsg)) {
         return false;
     }
 
@@ -632,7 +632,7 @@ bool NoModuleLoader::ReloadModule(const NoString& sModule, const NoString& sArgs
     return true;
 }
 
-bool NoModuleLoader::GetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, NoString& sRetMsg)
+bool NoModuleLoader::moduleInfo(NoModuleInfo& ModInfo, const NoString& sModule, NoString& sRetMsg)
 {
     NoString sModPath, sTmp;
 
@@ -641,15 +641,15 @@ bool NoModuleLoader::GetModInfo(NoModuleInfo& ModInfo, const NoString& sModule, 
     GLOBALMODULECALL(OnGetModInfo(ModInfo, sModule, bSuccess, sRetMsg), &bHandled);
     if (bHandled) return bSuccess;
 
-    if (!FindModPath(sModule, sModPath, sTmp)) {
+    if (!findModulePath(sModule, sModPath, sTmp)) {
         sRetMsg = "Unable to find module [" + sModule + "]";
         return false;
     }
 
-    return GetModPathInfo(ModInfo, sModule, sModPath, sRetMsg);
+    return modulePath(ModInfo, sModule, sModPath, sRetMsg);
 }
 
-bool NoModuleLoader::GetModPathInfo(NoModuleInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg)
+bool NoModuleLoader::modulePath(NoModuleInfo& ModInfo, const NoString& sModule, const NoString& sModPath, NoString& sRetMsg)
 {
     bool bVersionMismatch;
 
@@ -669,14 +669,14 @@ bool NoModuleLoader::GetModPathInfo(NoModuleInfo& ModInfo, const NoString& sModu
     return true;
 }
 
-void NoModuleLoader::GetAvailableMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType)
+void NoModuleLoader::availableModules(std::set<NoModuleInfo>& ssMods, No::ModuleType eType)
 {
     ssMods.clear();
 
     uint a = 0;
     NoDir Dir;
 
-    ModDirList dirs = GetModDirs();
+    ModDirList dirs = moduleDirs();
 
     while (!dirs.empty()) {
         Dir.FillByWildcard(dirs.front().first, "*.so");
@@ -690,7 +690,7 @@ void NoModuleLoader::GetAvailableMods(std::set<NoModuleInfo>& ssMods, No::Module
             sName.rightChomp(3);
 
             NoString sIgnoreRetMsg;
-            if (GetModPathInfo(ModInfo, sName, sPath, sIgnoreRetMsg)) {
+            if (modulePath(ModInfo, sName, sPath, sIgnoreRetMsg)) {
                 if (ModInfo.SupportsType(eType)) {
                     ssMods.insert(ModInfo);
                 }
@@ -701,10 +701,10 @@ void NoModuleLoader::GetAvailableMods(std::set<NoModuleInfo>& ssMods, No::Module
     GLOBALMODULECALL(OnGetAvailableMods(ssMods, eType), NOTHING);
 }
 
-void NoModuleLoader::GetDefaultMods(std::set<NoModuleInfo>& ssMods, No::ModuleType eType)
+void NoModuleLoader::defaultModules(std::set<NoModuleInfo>& ssMods, No::ModuleType eType)
 {
 
-    GetAvailableMods(ssMods, eType);
+    availableModules(ssMods, eType);
 
     const std::map<NoString, No::ModuleType> ns = { { "chansaver", No::UserModule },
                                                      { "controlpanel", No::UserModule },
@@ -722,13 +722,13 @@ void NoModuleLoader::GetDefaultMods(std::set<NoModuleInfo>& ssMods, No::ModuleTy
     }
 }
 
-bool NoModuleLoader::FindModPath(const NoString& sModule, NoString& sModPath, NoString& sDataPath)
+bool NoModuleLoader::findModulePath(const NoString& sModule, NoString& sModPath, NoString& sDataPath)
 {
     NoString sMod = sModule;
     NoString sDir = sMod;
     if (!sModule.contains(".")) sMod += ".so";
 
-    ModDirList dirs = GetModDirs();
+    ModDirList dirs = moduleDirs();
 
     while (!dirs.empty()) {
         sModPath = dirs.front().first + sMod;
@@ -744,7 +744,7 @@ bool NoModuleLoader::FindModPath(const NoString& sModule, NoString& sModPath, No
     return false;
 }
 
-NoModuleLoader::ModDirList NoModuleLoader::GetModDirs()
+NoModuleLoader::ModDirList NoModuleLoader::moduleDirs()
 {
     ModDirList ret;
     NoString sDir;

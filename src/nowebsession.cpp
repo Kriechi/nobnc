@@ -786,13 +786,13 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
         switch (eModType) {
         case No::GlobalModule:
-            pModule = NoApp::Get().GetLoader()->FindModule(m_modName);
+            pModule = NoApp::Get().GetLoader()->findModule(m_modName);
             break;
         case No::UserModule:
-            pModule = GetSession()->GetUser()->GetLoader()->FindModule(m_modName);
+            pModule = GetSession()->GetUser()->GetLoader()->findModule(m_modName);
             break;
         case No::NetworkModule:
-            pModule = pNetwork->GetLoader()->FindModule(m_modName);
+            pModule = pNetwork->GetLoader()->findModule(m_modName);
             break;
         }
 

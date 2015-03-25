@@ -214,7 +214,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         if (sValue.toBool()) {
             No::printAction("Loading Module [bouncedcc]");
             NoString sModRet;
-            bool bModRet = GetLoader()->LoadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
+            bool bModRet = GetLoader()->loadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -223,7 +223,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             }
 
             if (sDCCLookupValue.equals("Client")) {
-                NoModule* pMod = GetLoader()->FindModule("bouncedcc");
+                NoModule* pMod = GetLoader()->findModule("bouncedcc");
                 if (pMod) {
                     NoRegistry registry(pMod);
                     registry.setValue("UseClientIP", "1");
@@ -778,17 +778,17 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 
     for (NoModule* pNewMod : vNewMods->GetModules()) {
         NoString sModRet;
-        NoModule* pCurMod = vCurMods->FindModule(pNewMod->GetModName());
+        NoModule* pCurMod = vCurMods->findModule(pNewMod->GetModName());
 
         if (!pCurMod) {
-            vCurMods->LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::UserModule, this, nullptr, sModRet);
+            vCurMods->loadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::UserModule, this, nullptr, sModRet);
         } else if (pNewMod->GetArgs() != pCurMod->GetArgs()) {
-            vCurMods->ReloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), this, nullptr, sModRet);
+            vCurMods->reloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), this, nullptr, sModRet);
         }
     }
 
     for (NoModule* pCurMod : vCurMods->GetModules()) {
-        NoModule* pNewMod = vNewMods->FindModule(pCurMod->GetModName());
+        NoModule* pNewMod = vNewMods->findModule(pCurMod->GetModName());
 
         if (!pNewMod) {
             ssUnloadMods.insert(pCurMod->GetModName());
@@ -796,7 +796,7 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     }
 
     for (const NoString& sMod : ssUnloadMods) {
-        vCurMods->UnloadModule(sMod);
+        vCurMods->unloadModule(sMod);
     }
     // !Modules
 
@@ -1130,7 +1130,7 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
     NoString sModRet;
 
     NoModuleInfo ModInfo;
-    if (!NoApp::Get().GetLoader()->GetModInfo(ModInfo, sModName, sModRet)) {
+    if (!NoApp::Get().GetLoader()->moduleInfo(ModInfo, sModName, sModRet)) {
         sError = "Unable to find modinfo [" + sModName + "] [" + sModRet + "]";
         return false;
     }
@@ -1154,13 +1154,13 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
                 fNVFile.Copy(sNetworkModPath + "/.registry");
             }
 
-            bModRet = pNetwork->GetLoader()->LoadModule(sModName, sArgs, No::NetworkModule, this, pNetwork, sModRet);
+            bModRet = pNetwork->GetLoader()->loadModule(sModName, sArgs, No::NetworkModule, this, pNetwork, sModRet);
             if (!bModRet) {
                 break;
             }
         }
     } else {
-        bModRet = GetLoader()->LoadModule(sModName, sArgs, No::UserModule, this, nullptr, sModRet);
+        bModRet = GetLoader()->loadModule(sModName, sArgs, No::UserModule, this, nullptr, sModRet);
     }
 
     if (!bModRet) {

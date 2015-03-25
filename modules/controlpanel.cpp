@@ -1236,15 +1236,15 @@ class NoAdminMod : public NoModule
         }
 
         NoString sModRet;
-        NoModule* pMod = Modules->FindModule(sModName);
+        NoModule* pMod = Modules->findModule(sModName);
         if (!pMod) {
-            if (!Modules->LoadModule(sModName, sArgs, eType, pUser, pNetwork, sModRet)) {
+            if (!Modules->loadModule(sModName, sArgs, eType, pUser, pNetwork, sModRet)) {
                 PutModule("Unable to load module [" + sModName + "] [" + sModRet + "]");
             } else {
                 PutModule("Loaded module [" + sModName + "]");
             }
         } else if (pMod->GetArgs() != sArgs) {
-            if (!Modules->ReloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
+            if (!Modules->reloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
                 PutModule("Unable to reload module [" + sModName + "] [" + sModRet + "]");
             } else {
                 PutModule("Reloaded module [" + sModName + "]");
@@ -1301,13 +1301,13 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (Modules->FindModule(sModName) == this) {
+        if (Modules->findModule(sModName) == this) {
             PutModule("Please use /znc unloadmod " + sModName);
             return;
         }
 
         NoString sModRet;
-        if (!Modules->UnloadModule(sModName, sModRet)) {
+        if (!Modules->unloadModule(sModName, sModRet)) {
             PutModule("Unable to unload module [" + sModName + "] [" + sModRet + "]");
         } else {
             PutModule("Unloaded module [" + sModName + "]");

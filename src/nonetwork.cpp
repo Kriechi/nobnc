@@ -273,17 +273,17 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
 
     for (NoModule* pNewMod : vNewMods->GetModules()) {
         NoString sModRet;
-        NoModule* pCurMod = vCurMods->FindModule(pNewMod->GetModName());
+        NoModule* pCurMod = vCurMods->findModule(pNewMod->GetModName());
 
         if (!pCurMod) {
-            vCurMods->LoadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::NetworkModule, d->user, this, sModRet);
+            vCurMods->loadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::NetworkModule, d->user, this, sModRet);
         } else if (pNewMod->GetArgs() != pCurMod->GetArgs()) {
-            vCurMods->ReloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), d->user, this, sModRet);
+            vCurMods->reloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), d->user, this, sModRet);
         }
     }
 
     for (NoModule* pCurMod : vCurMods->GetModules()) {
-        NoModule* pNewMod = vNewMods->FindModule(pCurMod->GetModName());
+        NoModule* pNewMod = vNewMods->findModule(pCurMod->GetModName());
 
         if (!pNewMod) {
             ssUnloadMods.insert(pCurMod->GetModName());
@@ -291,7 +291,7 @@ void NoNetwork::Clone(const NoNetwork& Network, bool bCloneName)
     }
 
     for (const NoString& sMod : ssUnloadMods) {
-        vCurMods->UnloadModule(sMod);
+        vCurMods->unloadModule(sMod);
     }
     // !Modules
 
@@ -1511,7 +1511,7 @@ bool NoNetwork::LoadModule(const NoString& sModName, const NoString& sArgs, cons
     No::printAction(sNotice);
     NoString sModRet;
 
-    bool bModRet = GetLoader()->LoadModule(sModName, sArgs, No::NetworkModule, GetUser(), this, sModRet);
+    bool bModRet = GetLoader()->loadModule(sModName, sArgs, No::NetworkModule, GetUser(), this, sModRet);
 
     No::printStatus(bModRet, sModRet);
     if (!bModRet) {

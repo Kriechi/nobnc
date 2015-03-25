@@ -32,8 +32,8 @@ public:
         if (!sNick.startsWith(sPrefix)) return false;
 
         NoString sModNick = sNick.substr(sPrefix.length());
-        if (sModNick.equals("status") || GetNetwork()->GetLoader()->FindModule(sModNick) ||
-            GetUser()->GetLoader()->FindModule(sModNick) || NoApp::Get().GetLoader()->FindModule(sModNick))
+        if (sModNick.equals("status") || GetNetwork()->GetLoader()->findModule(sModNick) ||
+            GetUser()->GetLoader()->findModule(sModNick) || NoApp::Get().GetLoader()->findModule(sModNick))
             return true;
         return false;
     }

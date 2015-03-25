@@ -97,7 +97,7 @@ public:
     {
         if (sPageName == "index") {
             NoModuleLoader* GModules = NoApp::Get().GetLoader();
-            Tmpl["WebAdminLoaded"] = NoString(GModules->FindModule("webadmin") != nullptr);
+            Tmpl["WebAdminLoaded"] = NoString(GModules->findModule("webadmin") != nullptr);
 
             MTimeMulti mmSorted;
             const MUsers& mUsers = NoApp::Get().GetUserMap();

@@ -34,17 +34,17 @@
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                             \
     {                                                                         \
         NoModule* pModule = nullptr;                                           \
-        if (NETWORK && (pModule = (NETWORK)->GetLoader()->FindModule(MOD))) { \
+        if (NETWORK && (pModule = (NETWORK)->GetLoader()->findModule(MOD))) { \
             try {                                                             \
                 pModule->SetClient(CLIENT);                                   \
                 pModule->FUNC;                                                \
                 pModule->SetClient(nullptr);                                  \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
-                    (NETWORK)->GetLoader()->UnloadModule(MOD);                \
+                    (NETWORK)->GetLoader()->unloadModule(MOD);                \
                 }                                                             \
             }                                                                 \
-        } else if ((pModule = (USER)->GetLoader()->FindModule(MOD))) {        \
+        } else if ((pModule = (USER)->GetLoader()->findModule(MOD))) {        \
             try {                                                             \
                 pModule->SetClient(CLIENT);                                   \
                 pModule->SetNetwork(NETWORK);                                 \
@@ -53,10 +53,10 @@
                 pModule->SetNetwork(nullptr);                                 \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
-                    (USER)->GetLoader()->UnloadModule(MOD);                   \
+                    (USER)->GetLoader()->unloadModule(MOD);                   \
                 }                                                             \
             }                                                                 \
-        } else if ((pModule = NoApp::Get().GetLoader()->FindModule(MOD))) {    \
+        } else if ((pModule = NoApp::Get().GetLoader()->findModule(MOD))) {    \
             try {                                                             \
                 pModule->SetClient(CLIENT);                                   \
                 pModule->SetNetwork(NETWORK);                                 \
@@ -67,7 +67,7 @@
                 pModule->SetUser(nullptr);                                    \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
-                    NoApp::Get().GetLoader()->UnloadModule(MOD);               \
+                    NoApp::Get().GetLoader()->unloadModule(MOD);               \
                 }                                                             \
             }                                                                 \
         } else {                                                              \
