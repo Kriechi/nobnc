@@ -85,9 +85,8 @@ public:
     }
 
 private:
-    // Undefined copy constructor and assignment operator
-    NoConditionVariable(const NoConditionVariable&);
-    NoConditionVariable& operator=(const NoConditionVariable&);
+    NoConditionVariable(const NoConditionVariable&) = delete;
+    NoConditionVariable& operator=(const NoConditionVariable&) = delete;
 
     pthread_cond_t m_cond;
 };

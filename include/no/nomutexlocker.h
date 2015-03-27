@@ -65,9 +65,8 @@ public:
     }
 
 private:
-    // Undefined copy constructor and assignment operator
-    NoMutexLocker(const NoMutexLocker&);
-    NoMutexLocker& operator=(const NoMutexLocker&);
+    NoMutexLocker(const NoMutexLocker&) = delete;
+    NoMutexLocker& operator=(const NoMutexLocker&) = delete;
 
     NoMutex& m_mutex;
     bool m_locked;

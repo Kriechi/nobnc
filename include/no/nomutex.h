@@ -78,9 +78,8 @@ public:
     }
 
 private:
-    // Undefined copy constructor and assignment operator
-    NoMutex(const NoMutex&);
-    NoMutex& operator=(const NoMutex&);
+    NoMutex(const NoMutex&) = delete;
+    NoMutex& operator=(const NoMutex&) = delete;
 
     pthread_mutex_t m_mutex;
 };
