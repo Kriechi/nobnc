@@ -39,7 +39,7 @@ class NoSaslAuthMod : public NoModule
 public:
     MODCONSTRUCTOR(NoSaslAuthMod)
     {
-        m_Cache.setTtl(60000 /*ms*/);
+        m_Cache.setExpiration(60000 /*ms*/);
 
         AddHelpCommand();
         AddCommand("CreateUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CreateUserCommand), "[yes|no]");

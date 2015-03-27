@@ -58,7 +58,7 @@ class NoImapAuthMod : public NoModule
 public:
     MODCONSTRUCTOR(NoImapAuthMod)
     {
-        m_Cache.setTtl(60000);
+        m_Cache.setExpiration(60000);
         m_sServer = "localhost";
         m_uPort = 143;
         m_bSSL = false;

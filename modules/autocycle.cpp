@@ -37,7 +37,7 @@ public:
                    "[!]<#chan>",
                    "Remove an entry, needs to be an exact match");
         AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnListCommand), "", "List all entries");
-        m_recentlyCycled.setTtl(15 * 1000);
+        m_recentlyCycled.setExpiration(15 * 1000);
     }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override

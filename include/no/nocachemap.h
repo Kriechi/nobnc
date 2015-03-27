@@ -30,22 +30,20 @@
 template <typename K, typename V = bool> class NoCacheMap
 {
 public:
-    NoCacheMap(uint ttl = 5000) : m_items(), m_ttl(ttl) { }
-    ~NoCacheMap() { }
+    NoCacheMap(uint expiration = 5000) : m_items(), m_expiration(expiration) { }
 
-    /**
-     * @brief This function adds an item to the cache using a custom time-to-live value
-     * @param key The item to add to the cache
-     * @param value The value associated with the key Item
-     */
-    void insert(const K& key, const V& value = V())
-    {
-        if (!m_ttl) { // If time-to-live is zero we don't want to waste our time adding it
-            remove(key); // Remove the item incase it already exists
-            return;
-        }
-        m_items[key] = VP(No::millTime() + m_ttl, value);
-    }
+    uint expiration() const { return m_expiration; }
+    void setExpiration(uint expiration) { m_expiration = expiration; }
+
+    typedef std::pair<ulonglong, V> VP;
+    typedef typename std::map<K, VP>::iterator iterator;
+    typedef typename std::map<K, VP>::const_iterator const_iterator;
+
+    iterator begin() { return m_items.begin(); }
+    iterator end() { return m_items.end(); }
+
+    const_iterator begin() const { return m_items.begin(); }
+    const_iterator end() const { return m_items.end(); }
 
     /**
      * @brief Performs a Cleanup() and then checks to see if your item exists
@@ -55,7 +53,7 @@ public:
     bool contains(const K& key) const
     {
         const_cast<NoCacheMap*>(this)->cleanup();
-        return (m_items.find(key) != m_items.end());
+        return m_items.find(key) != m_items.end();
     }
 
     /**
@@ -65,11 +63,7 @@ public:
      */
     const V* value(const K& key) const
     {
-        const_cast<NoCacheMap*>(this)->cleanup();
-        const_iterator it = m_items.find(key);
-        if (it == m_items.end())
-            return nullptr;
-        return &it->second.second; // TODO: a pointer :/
+        return const_cast<NoCacheMap*>(this)->value(key);
     }
 
     V* value(const K& key)
@@ -82,12 +76,37 @@ public:
     }
 
     /**
+     * @brief This function adds an item to the cache using a custom time-to-live value
+     * @param key The item to add to the cache
+     * @param value The value associated with the key Item
+     */
+    void insert(const K& key, const V& value = V())
+    {
+        if (!m_expiration) { // If expiration is zero we don't want to waste our time adding it
+            remove(key); // Remove the item incase it already exists
+            return;
+        }
+        m_items[key] = VP(No::millTime() + m_expiration, value);
+    }
+
+    /**
      * @brief Removes a specific item from the cache
      * @param Item The item to be removed
      * @return true if item existed and was removed, false if it never existed
      */
     bool remove(const K& key) { return m_items.erase(key) != 0; }
 
+    /**
+     * @brief Removes ...
+     */
+    void remove(iterator it) { m_items.erase(it); }
+
+    /**
+     * @brief Clear all entries
+     */
+    void clear() { m_items.clear(); }
+
+private:
     /**
      * @brief Cycles through the queue removing all of the stale entries
      */
@@ -102,28 +121,7 @@ public:
         }
     }
 
-    /**
-     * @brief Clear all entries
-     */
-    void clear() { m_items.clear(); }
-
-    uint ttl() const { return m_ttl; }
-    void setTtl(uint ttl) { m_ttl = ttl; }
-
-    typedef std::pair<ulonglong, V> VP;
-    typedef typename std::map<K, VP>::iterator iterator;
-    typedef typename std::map<K, VP>::const_iterator const_iterator;
-
-    iterator begin() { return m_items.begin(); }
-    const_iterator begin() const { return m_items.begin(); }
-
-    iterator end() { return m_items.end(); }
-    const_iterator end() const { return m_items.end(); }
-
-    void erase(iterator it) { m_items.erase(it); }
-
-private:
-    uint m_ttl;
+    uint m_expiration;
     std::map<K, VP> m_items;
 };
 

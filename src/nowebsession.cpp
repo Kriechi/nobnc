@@ -46,7 +46,7 @@ public:
 
         while (it != end()) {
             if (it->second.second->GetUser() == &User) {
-                erase(it++);
+                remove(it++);
             } else {
                 ++it;
             }

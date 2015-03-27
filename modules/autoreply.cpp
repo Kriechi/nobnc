@@ -37,7 +37,7 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoReplyMod::OnShowCommand),
                    "",
                    "Displays the current query reply");
-        m_Messaged.setTtl(1000 * 120);
+        m_Messaged.setExpiration(1000 * 120);
     }
 
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override

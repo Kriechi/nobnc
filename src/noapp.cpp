@@ -55,7 +55,7 @@ NoApp::NoApp()
         No::printError("Could not initialize Csocket!");
         exit(-1);
     }
-    m_connectThrottle.setTtl(30000);
+    m_connectThrottle.setExpiration(30000);
 }
 
 NoApp::~NoApp()
@@ -404,7 +404,7 @@ uint NoApp::GetMaxBufferSize() const { return m_maxBufferSize; }
 
 uint NoApp::GetAnonIPLimit() const { return m_anonIpLimit; }
 
-uint NoApp::GetServerThrottle() const { return m_connectThrottle.ttl() / 1000; }
+uint NoApp::GetServerThrottle() const { return m_connectThrottle.expiration() / 1000; }
 
 uint NoApp::GetConnectDelay() const { return m_connectDelay; }
 
@@ -592,7 +592,7 @@ bool NoApp::WriteConfig()
     }
 
     config.AddKeyValuePair("ConnectDelay", NoString(m_connectDelay));
-    config.AddKeyValuePair("ServerThrottle", NoString(m_connectThrottle.ttl() / 1000));
+    config.AddKeyValuePair("ServerThrottle", NoString(m_connectThrottle.expiration() / 1000));
 
     if (!m_pidFile.empty()) {
         config.AddKeyValuePair("PidFile", No::firstLine(m_pidFile));
@@ -1222,7 +1222,7 @@ bool NoApp::DoRehash(NoString& sError)
     if (config.FindStringEntry("sslciphers", sVal)) m_sslCiphers = sVal;
     if (config.FindStringEntry("skin", sVal)) SetSkinName(sVal);
     if (config.FindStringEntry("connectdelay", sVal)) SetConnectDelay(sVal.toUInt());
-    if (config.FindStringEntry("serverthrottle", sVal)) m_connectThrottle.setTtl(sVal.toUInt() * 1000);
+    if (config.FindStringEntry("serverthrottle", sVal)) m_connectThrottle.setExpiration(sVal.toUInt() * 1000);
     if (config.FindStringEntry("anoniplimit", sVal)) m_anonIpLimit = sVal.toUInt();
     if (config.FindStringEntry("maxbuffersize", sVal)) m_maxBufferSize = sVal.toUInt();
     if (config.FindStringEntry("protectwebsessions", sVal)) m_protectWebSessions = sVal.toBool();
@@ -2010,7 +2010,7 @@ void NoApp::SetMaxBufferSize(uint i) { m_maxBufferSize = i; }
 
 void NoApp::SetAnonIPLimit(uint i) { m_anonIpLimit = i; }
 
-void NoApp::SetServerThrottle(uint i) { m_connectThrottle.setTtl(i * 1000); }
+void NoApp::SetServerThrottle(uint i) { m_connectThrottle.setExpiration(i * 1000); }
 
 void NoApp::SetProtectWebSessions(bool b) { m_protectWebSessions = b; }
 

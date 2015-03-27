@@ -48,7 +48,7 @@ public:
         }
 
         // SetTTL() wants milliseconds
-        m_Cache.setTtl(timeout * 60 * 1000);
+        m_Cache.setExpiration(timeout * 60 * 1000);
 
         return true;
     }
