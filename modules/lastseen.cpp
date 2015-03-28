@@ -111,7 +111,7 @@ public:
                 NoTemplate& Row = Tmpl.AddRow("UserLoop");
 
                 Row["Username"] = pUser->userName();
-                Row["IsSelf"] = NoString(pUser == WebSock.GetSession()->GetUser());
+                Row["IsSelf"] = NoString(pUser == WebSock.GetSession()->user());
                 Row["LastSeen"] = FormatLastSeen(pUser, "never");
             }
 
@@ -123,7 +123,7 @@ public:
 
     bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
-        if (sPageName == "webadmin/user" && WebSock.GetSession()->IsAdmin()) {
+        if (sPageName == "webadmin/user" && WebSock.GetSession()->isAdmin()) {
             NoUser* pUser = NoApp::Get().FindUser(Tmpl["Username"]);
             if (pUser) {
                 Tmpl["LastSeen"] = FormatLastSeen(pUser);

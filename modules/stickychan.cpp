@@ -144,7 +144,7 @@ public:
             }
 
             if (bSubmitted) {
-                WebSock.GetSession()->AddSuccess("Changes have been saved!");
+                WebSock.GetSession()->addSuccess("Changes have been saved!");
             }
 
             return true;
@@ -165,10 +165,10 @@ public:
                 bool bNewStick = WebSock.GetParam("embed_stickychan_sticky").toBool();
                 if (bNewStick && !bStick) {
                     registry.setValue(sChan, ""); // no password support for now unless chansaver is active too
-                    WebSock.GetSession()->AddSuccess("Channel become sticky!");
+                    WebSock.GetSession()->addSuccess("Channel become sticky!");
                 } else if (!bNewStick && bStick) {
                     registry.remove(sChan);
-                    WebSock.GetSession()->AddSuccess("Channel stopped being sticky!");
+                    WebSock.GetSession()->addSuccess("Channel stopped being sticky!");
                 }
             }
             return true;

@@ -143,32 +143,32 @@ public:
 
     bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
-        if (sPageName == "webadmin/user" && WebSock.GetSession()->IsAdmin()) {
+        if (sPageName == "webadmin/user" && WebSock.GetSession()->isAdmin()) {
             NoString sAction = Tmpl["WebadminAction"];
             if (sAction == "display") {
                 Tmpl["Blocked"] = NoString(IsBlocked(Tmpl["Username"]));
-                Tmpl["Self"] = NoString(Tmpl["Username"].equals(WebSock.GetSession()->GetUser()->userName()));
+                Tmpl["Self"] = NoString(Tmpl["Username"].equals(WebSock.GetSession()->user()->userName()));
                 return true;
             }
             if (sAction == "change" && WebSock.GetParam("embed_blockuser_presented").toBool()) {
-                if (Tmpl["Username"].equals(WebSock.GetSession()->GetUser()->userName()) &&
+                if (Tmpl["Username"].equals(WebSock.GetSession()->user()->userName()) &&
                     WebSock.GetParam("embed_blockuser_block").toBool()) {
-                    WebSock.GetSession()->AddError("You can't block yourself");
+                    WebSock.GetSession()->addError("You can't block yourself");
                 } else if (WebSock.GetParam("embed_blockuser_block").toBool()) {
                     if (!WebSock.GetParam("embed_blockuser_old").toBool()) {
                         if (Block(Tmpl["Username"])) {
-                            WebSock.GetSession()->AddSuccess("Blocked [" + Tmpl["Username"] + "]");
+                            WebSock.GetSession()->addSuccess("Blocked [" + Tmpl["Username"] + "]");
                         } else {
-                            WebSock.GetSession()->AddError("Couldn't block [" + Tmpl["Username"] + "]");
+                            WebSock.GetSession()->addError("Couldn't block [" + Tmpl["Username"] + "]");
                         }
                     }
                 } else if (WebSock.GetParam("embed_blockuser_old").toBool()) {
                     NoRegistry registry(this);
                     if (registry.contains(Tmpl["Username"])) {
                         registry.remove(Tmpl["Username"]);
-                        WebSock.GetSession()->AddSuccess("Unblocked [" + Tmpl["Username"] + "]");
+                        WebSock.GetSession()->addSuccess("Unblocked [" + Tmpl["Username"] + "]");
                     } else {
-                        WebSock.GetSession()->AddError("User [" + Tmpl["Username"] + "is not blocked");
+                        WebSock.GetSession()->addError("User [" + Tmpl["Username"] + "is not blocked");
                     }
                 }
                 return true;

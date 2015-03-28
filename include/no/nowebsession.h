@@ -32,20 +32,20 @@ public:
     NoWebSession(const NoString& sId, const NoString& sIP);
     ~NoWebSession();
 
-    NoString GetId() const;
-    NoString GetIP() const;
-    NoUser* GetUser() const;
-    time_t GetLastActive() const;
-    bool IsLoggedIn() const;
-    bool IsAdmin() const;
-    void UpdateLastActive();
+    NoString host() const;
+    NoString identifier() const;
+    NoUser* user() const;
+    time_t lastActive() const;
+    bool isLoggedIn() const;
+    bool isAdmin() const;
+    void updateLastActive();
 
-    NoUser* SetUser(NoUser* p);
+    NoUser* setUser(NoUser* p);
 
-    void ClearMessageLoops();
-    void FillMessageLoops(NoTemplate& Tmpl);
-    size_t AddError(const NoString& sMessage);
-    size_t AddSuccess(const NoString& sMessage);
+    void clearMessageLoops();
+    void fillMessageLoops(NoTemplate& Tmpl);
+    size_t addError(const NoString& sMessage);
+    size_t addSuccess(const NoString& sMessage);
 
 private:
     NoWebSession(const NoWebSession& other) = delete;

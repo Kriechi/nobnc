@@ -245,7 +245,7 @@ public:
 
         sArg = WebSock.GetParam("bindhost");
         // To change BindHosts be admin or don't have DenysetBindHost
-        if (spSession->IsAdmin() || !spSession->GetUser()->denysetBindHost()) {
+        if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
             NoString sArg2 = WebSock.GetParam("dccbindhost");
             if (!sArg.empty()) {
                 pNewUser->setBindHost(sArg);
@@ -255,7 +255,7 @@ public:
             }
 
             const NoStringVector& vsHosts = NoApp::Get().bindHosts();
-            if (!spSession->IsAdmin() && !vsHosts.empty()) {
+            if (!spSession->isAdmin() && !vsHosts.empty()) {
                 NoStringVector::const_iterator it;
                 bool bFound = false;
                 bool bFoundDCC = false;
@@ -282,11 +282,11 @@ public:
         }
 
         sArg = WebSock.GetParam("bufsize");
-        if (!sArg.empty()) pNewUser->setBufferCount(sArg.toUInt(), spSession->IsAdmin());
+        if (!sArg.empty()) pNewUser->setBufferCount(sArg.toUInt(), spSession->isAdmin());
         if (!sArg.empty()) {
             // First apply the old limit in case the new one is too high
             if (pUser) pNewUser->setBufferCount(pUser->bufferCount(), true);
-            pNewUser->setBufferCount(sArg.toUInt(), spSession->IsAdmin());
+            pNewUser->setBufferCount(sArg.toUInt(), spSession->isAdmin());
         }
 
         pNewUser->setSkinName(WebSock.GetParam("skin"));
@@ -318,7 +318,7 @@ public:
         }
 #endif
 
-        if (spSession->IsAdmin()) {
+        if (spSession->isAdmin()) {
             pNewUser->setDenyLoadMod(WebSock.GetParam("denyloadmod").toBool());
             pNewUser->setDenysetBindHost(WebSock.GetParam("denysetbindhost").toBool());
             sArg = WebSock.GetParam("maxnetworks");
@@ -337,7 +337,7 @@ public:
             pNewUser->setAdmin(pUser->isAdmin());
         }
 
-        if (spSession->IsAdmin() || (pUser && !pUser->denyLoadMod())) {
+        if (spSession->isAdmin() || (pUser && !pUser->denyLoadMod())) {
             WebSock.GetParamValues("loadmod", vsArgs);
 
             // disallow unload webadmin from itself
@@ -373,7 +373,7 @@ public:
 
                     if (!sModLoadError.empty()) {
                         NO_DEBUG(sModLoadError);
-                        spSession->AddError(sModLoadError);
+                        spSession->addError(sModLoadError);
                     }
                 }
             }
@@ -396,7 +396,7 @@ public:
 
                 if (!sModLoadError.empty()) {
                     NO_DEBUG(sModLoadError);
-                    spSession->AddError(sModLoadError);
+                    spSession->addError(sModLoadError);
                 }
             }
         }
@@ -447,14 +447,14 @@ public:
 
         if (sPageName == "settings") {
             // Admin Check
-            if (!spSession->IsAdmin()) {
+            if (!spSession->isAdmin()) {
                 return false;
             }
 
             return SettingsPage(WebSock, Tmpl);
         } else if (sPageName == "adduser") {
             // Admin Check
-            if (!spSession->IsAdmin()) {
+            if (!spSession->isAdmin()) {
                 return false;
             }
 
@@ -463,7 +463,7 @@ public:
             NoUser* pUser = SafeGetUserFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || spSession->GetUser() != pUser)) {
+            if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != pUser)) {
                 return false;
             }
 
@@ -477,7 +477,7 @@ public:
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->user())) {
+            if (!spSession->isAdmin() && (!spSession->user() || !pNetwork || spSession->user() != pNetwork->user())) {
                 return false;
             }
 
@@ -497,7 +497,7 @@ public:
             NoUser* pUser = NoApp::Get().FindUser(sUser);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || spSession->GetUser() != pUser)) {
+            if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != pUser)) {
                 return false;
             }
 
@@ -506,7 +506,7 @@ public:
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->user())) {
+            if (!spSession->isAdmin() && (!spSession->user() || !pNetwork || spSession->user() != pNetwork->user())) {
                 return false;
             }
 
@@ -530,7 +530,7 @@ public:
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->user())) {
+            if (!spSession->isAdmin() && (!spSession->user() || !pNetwork || spSession->user() != pNetwork->user())) {
                 return false;
             }
 
@@ -544,7 +544,7 @@ public:
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->user())) {
+            if (!spSession->isAdmin() && (!spSession->user() || !pNetwork || spSession->user() != pNetwork->user())) {
                 return false;
             }
 
@@ -555,7 +555,7 @@ public:
             WebSock.PrintErrorPage("No such username or network");
             return true;
         } else if (sPageName == "deluser") {
-            if (!spSession->IsAdmin()) {
+            if (!spSession->isAdmin()) {
                 return false;
             }
 
@@ -581,7 +581,7 @@ public:
             NoString sUser = WebSock.GetParam("user");
             NoUser* pUser = NoApp::Get().FindUser(sUser);
 
-            if (pUser && pUser == spSession->GetUser()) {
+            if (pUser && pUser == spSession->user()) {
                 WebSock.PrintErrorPage("Please don't delete yourself, suicide is not the answer!");
                 return true;
             } else if (NoApp::Get().DeleteUser(sUser)) {
@@ -597,12 +597,12 @@ public:
 
             if (!pUser) {
                 if (sUserName.empty()) {
-                    pUser = spSession->GetUser();
+                    pUser = spSession->user();
                 } // else: the "no such user" message will be printed.
             }
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || spSession->GetUser() != pUser)) {
+            if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != pUser)) {
                 return false;
             }
 
@@ -612,22 +612,22 @@ public:
 
             WebSock.PrintErrorPage("No such username");
             return true;
-        } else if (sPageName == "listusers" && spSession->IsAdmin()) {
+        } else if (sPageName == "listusers" && spSession->isAdmin()) {
             return ListUsersPage(WebSock, Tmpl);
-        } else if (sPageName == "traffic" && spSession->IsAdmin()) {
+        } else if (sPageName == "traffic" && spSession->isAdmin()) {
             return TrafficPage(WebSock, Tmpl);
         } else if (sPageName == "index") {
             return true;
         } else if (sPageName == "add_listener") {
             // Admin Check
-            if (!spSession->IsAdmin()) {
+            if (!spSession->isAdmin()) {
                 return false;
             }
 
             return AddListener(WebSock, Tmpl);
         } else if (sPageName == "del_listener") {
             // Admin Check
-            if (!spSession->IsAdmin()) {
+            if (!spSession->isAdmin()) {
                 return false;
             }
 
@@ -735,7 +735,7 @@ public:
 
         uint uBufferCount = WebSock.GetParam("buffercount").toUInt();
         if (pChan->bufferCount() != uBufferCount) {
-            pChan->setBufferCount(uBufferCount, spSession->IsAdmin());
+            pChan->setBufferCount(uBufferCount, spSession->isAdmin());
         }
         pChan->setDefaultModes(WebSock.GetParam("defmodes"));
         pChan->setInConfig(WebSock.GetParam("save").toBool());
@@ -820,13 +820,13 @@ public:
                 l["CanBeLoadedByUser"] = NoString(Info.SupportsType(No::UserModule));
                 l["LoadedByUser"] = NoString(pUser->loader()->findModule(Info.GetName()) != nullptr);
 
-                if (!spSession->IsAdmin() && pUser->denyLoadMod()) {
+                if (!spSession->isAdmin() && pUser->denyLoadMod()) {
                     l["Disabled"] = "true";
                 }
             }
 
             // To change BindHosts be admin or don't have DenysetBindHost
-            if (spSession->IsAdmin() || !spSession->GetUser()->denysetBindHost()) {
+            if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
                 const NoStringVector& vsBindHosts = NoApp::Get().bindHosts();
                 if (vsBindHosts.empty()) {
@@ -912,7 +912,7 @@ public:
                     l["FP"] = sFP;
                 }
             } else {
-                if (!spSession->IsAdmin() && !pUser->hasSpaceForNewNetwork()) {
+                if (!spSession->isAdmin() && !pUser->hasSpaceForNewNetwork()) {
                     WebSock.PrintErrorPage("Network number limit reached. Ask an admin to increase the limit for you, "
                                            "or delete unneeded networks from Your Settings.");
                     return true;
@@ -968,7 +968,7 @@ public:
             WebSock.PrintErrorPage("Network name is a required argument");
             return true;
         }
-        if (!pNetwork && !spSession->IsAdmin() && !pUser->hasSpaceForNewNetwork()) {
+        if (!pNetwork && !spSession->isAdmin() && !pUser->hasSpaceForNewNetwork()) {
             WebSock.PrintErrorPage("Network number limit reached. Ask an admin to increase the limit for you, or "
                                    "delete few old ones from Your Settings");
             return true;
@@ -1005,10 +1005,10 @@ public:
 
         sArg = WebSock.GetParam("bindhost");
         // To change BindHosts be admin or don't have DenysetBindHost
-        if (spSession->IsAdmin() || !spSession->GetUser()->denysetBindHost()) {
+        if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
             NoString sHost = WebSock.GetParam("bindhost");
             const NoStringVector& vsHosts = NoApp::Get().bindHosts();
-            if (!spSession->IsAdmin() && !vsHosts.empty()) {
+            if (!spSession->isAdmin() && !vsHosts.empty()) {
                 NoStringVector::const_iterator it;
                 bool bFound = false;
 
@@ -1078,7 +1078,7 @@ public:
 
         std::set<NoString> ssArgs;
         WebSock.GetParamValues("loadmod", ssArgs);
-        if (spSession->IsAdmin() || !pUser->denyLoadMod()) {
+        if (spSession->isAdmin() || !pUser->denyLoadMod()) {
             for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
                 NoString sModRet;
                 NoString sModName = (*it).trimRight_n("\r");
@@ -1101,7 +1101,7 @@ public:
 
                     if (!sModLoadError.empty()) {
                         NO_DEBUG(sModLoadError);
-                        WebSock.GetSession()->AddError(sModLoadError);
+                        WebSock.GetSession()->addError(sModLoadError);
                     }
                 }
             }
@@ -1222,7 +1222,7 @@ public:
                 }
             }
 
-            Tmpl["ImAdmin"] = NoString(spSession->IsAdmin());
+            Tmpl["ImAdmin"] = NoString(spSession->isAdmin());
 
             if (pUser) {
                 Tmpl["Username"] = pUser->userName();
@@ -1301,7 +1301,7 @@ public:
 #endif
 
             // To change BindHosts be admin or don't have DenysetBindHost
-            if (spSession->IsAdmin() || !spSession->GetUser()->denysetBindHost()) {
+            if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
                 const NoStringVector& vsBindHosts = NoApp::Get().bindHosts();
                 if (vsBindHosts.empty()) {
@@ -1401,7 +1401,7 @@ public:
                 // Check if module is loaded globally
                 l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.GetName()) != nullptr);
 
-                if (!spSession->IsAdmin() && pUser && pUser->denyLoadMod()) {
+                if (!spSession->isAdmin() && pUser && pUser->denyLoadMod()) {
                     l["Disabled"] = "true";
                 }
             }
@@ -1437,7 +1437,7 @@ public:
                 o8["Checked"] = "true";
             }
 
-            if (spSession->IsAdmin()) {
+            if (spSession->isAdmin()) {
                 NoTemplate& o9 = Tmpl.AddRow("OptionLoop");
                 o9["Name"] = "denyloadmod";
                 o9["DisplayName"] = "Deny LoadMod";
@@ -1540,7 +1540,7 @@ public:
             return true;
         }
 
-        if (spSession->IsAdmin() && WebSock.HasParam("submit_return")) {
+        if (spSession->isAdmin() && WebSock.HasParam("submit_return")) {
             WebSock.Redirect(GetWebPath() + "listusers");
         } else {
             WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->userName());
@@ -1567,7 +1567,7 @@ public:
             l["Clients"] = NoString(User.allClients().size());
             l["Networks"] = NoString(User.networks().size());
 
-            if (&User == spSession->GetUser()) {
+            if (&User == spSession->user()) {
                 l["IsSelf"] = "true";
             }
         }
@@ -1663,7 +1663,7 @@ public:
             if (bIPv6) {
                 eAddr = No::Ipv6Address;
             } else {
-                WebSock.GetSession()->AddError("Choose either IPv4 or IPv6 or both.");
+                WebSock.GetSession()->addError("Choose either IPv4 or IPv6 or both.");
                 return SettingsPage(WebSock, Tmpl);
             }
         }
@@ -1679,7 +1679,7 @@ public:
             if (bWeb) {
                 eAccept = No::AcceptHttp;
             } else {
-                WebSock.GetSession()->AddError("Choose either IRC or Web or both.");
+                WebSock.GetSession()->addError("Choose either IRC or Web or both.");
                 return SettingsPage(WebSock, Tmpl);
             }
         }
@@ -1687,13 +1687,13 @@ public:
         NoString sMessage;
         if (NoApp::Get().AddListener(uPort, sHost, sURIPrefix, bSSL, eAddr, eAccept, sMessage)) {
             if (!sMessage.empty()) {
-                WebSock.GetSession()->AddSuccess(sMessage);
+                WebSock.GetSession()->addSuccess(sMessage);
             }
             if (!NoApp::Get().WriteConfig()) {
-                WebSock.GetSession()->AddError("Port changed, but config was not written");
+                WebSock.GetSession()->addError("Port changed, but config was not written");
             }
         } else {
-            WebSock.GetSession()->AddError(sMessage);
+            WebSock.GetSession()->addError(sMessage);
         }
 
         return SettingsPage(WebSock, Tmpl);
@@ -1717,7 +1717,7 @@ public:
             if (bIPv6) {
                 eAddr = No::Ipv6Address;
             } else {
-                WebSock.GetSession()->AddError("Invalid request.");
+                WebSock.GetSession()->addError("Invalid request.");
                 return SettingsPage(WebSock, Tmpl);
             }
         }
@@ -1726,10 +1726,10 @@ public:
         if (pListener) {
             NoApp::Get().DelListener(pListener);
             if (!NoApp::Get().WriteConfig()) {
-                WebSock.GetSession()->AddError("Port changed, but config was not written");
+                WebSock.GetSession()->addError("Port changed, but config was not written");
             }
         } else {
-            WebSock.GetSession()->AddError("The specified listener was not found.");
+            WebSock.GetSession()->addError("The specified listener was not found.");
         }
 
         return SettingsPage(WebSock, Tmpl);
@@ -1930,7 +1930,7 @@ public:
 
                 if (!sModLoadError.empty()) {
                     NO_DEBUG(sModLoadError);
-                    WebSock.GetSession()->AddError(sModLoadError);
+                    WebSock.GetSession()->addError(sModLoadError);
                 }
             }
         }
@@ -1950,7 +1950,7 @@ public:
         }
 
         if (!NoApp::Get().WriteConfig()) {
-            WebSock.GetSession()->AddError("Settings changed, but config was not written");
+            WebSock.GetSession()->addError("Settings changed, but config was not written");
         }
 
         WebSock.Redirect(GetWebPath() + "settings");
