@@ -20,40 +20,62 @@
 #include <unistd.h>
 #include <signal.h>
 
-NoProcess::NoProcess() : NoSocket(0), m_pid(-1)
+static int no_popen(int& rfd, int& wfd, const NoString& command);
+static void no_close(int pid, int rfd, int wfd);
+
+class NoProcessPrivate
+{
+public:
+    int pid = -1;
+    NoString command;
+};
+
+NoProcess::NoProcess() : NoSocket(0), d(new NoProcessPrivate)
 {
 }
 
 NoProcess::~NoProcess()
 {
-    close2(m_pid, GetRSock(), GetWSock());
+    no_close(d->pid, GetRSock(), GetWSock());
     SetRSock(-1);
     SetWSock(-1);
 }
 
-int NoProcess::Execute(const NoString& sExec)
+int NoProcess::processId() const
 {
-    int iReadFD, iWriteFD;
-    m_pid = popen2(iReadFD, iWriteFD, sExec);
-    if (m_pid != -1) {
-        ConnectFD(iReadFD, iWriteFD, "0.0.0.0:0");
-    }
-    return (m_pid);
+    return d->pid;
 }
-void NoProcess::Kill(int iSignal)
+
+NoString NoProcess::command() const
 {
-    kill(m_pid, iSignal);
+    return d->command;
+}
+
+bool NoProcess::execute(const NoString& command)
+{
+    int rfd, wfd;
+    d->command = command;
+    d->pid = no_popen(rfd, wfd, command);
+    if (d->pid != -1)
+        ConnectFD(rfd, wfd, "0.0.0.0:0");
+    return d->pid != -1;
+}
+
+void NoProcess::kill()
+{
+    ::kill(d->pid, SIGKILL);
     Close();
 }
 
-int NoProcess::popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand)
+int no_popen(int& rfd, int& wfd, const NoString& command)
 {
     int rpipes[2] = { -1, -1 };
     int wpipes[2] = { -1, -1 };
-    iReadFD = -1;
-    iWriteFD = -1;
+    rfd = -1;
+    wfd = -1;
 
-    if (pipe(rpipes) < 0) return -1;
+    if (pipe(rpipes) < 0)
+        return -1;
 
     if (pipe(wpipes) < 0) {
         close(rpipes[0]);
@@ -61,9 +83,9 @@ int NoProcess::popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand)
         return -1;
     }
 
-    int iPid = fork();
+    int pid = fork();
 
-    if (iPid == -1) {
+    if (pid == -1) {
         close(rpipes[0]);
         close(rpipes[1]);
         close(wpipes[0]);
@@ -71,7 +93,7 @@ int NoProcess::popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand)
         return -1;
     }
 
-    if (iPid == 0) {
+    if (pid == 0) {
         close(wpipes[1]);
         close(rpipes[0]);
         dup2(wpipes[0], 0);
@@ -79,7 +101,7 @@ int NoProcess::popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand)
         dup2(rpipes[1], 2);
         close(wpipes[0]);
         close(rpipes[1]);
-        const char* pArgv[] = { "sh", "-c", sCommand.c_str(), nullptr };
+        const char* pArgv[] = { "sh", "-c", command.c_str(), nullptr };
         execvp("sh", (char* const*)pArgv);
         // if execvp returns, there was an error
         perror("execvp");
@@ -89,19 +111,20 @@ int NoProcess::popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand)
     close(wpipes[0]);
     close(rpipes[1]);
 
-    iWriteFD = wpipes[1];
-    iReadFD = rpipes[0];
+    wfd = wpipes[1];
+    rfd = rpipes[0];
 
-    return iPid;
+    return pid;
 }
 
-void NoProcess::close2(int iPid, int iReadFD, int iWriteFD)
+void no_close(int pid, int rfd, int wfd)
 {
-    close(iReadFD);
-    close(iWriteFD);
-    time_t iNow = time(nullptr);
-    while (waitpid(iPid, nullptr, WNOHANG) == 0) {
-        if ((time(nullptr) - iNow) > 5) break; // giveup
+    close(rfd);
+    close(wfd);
+    time_t now = time(nullptr);
+    while (waitpid(pid, nullptr, WNOHANG) == 0) {
+        if (time(nullptr) - now > 5)
+            break; // giveup
         usleep(100);
     }
     return;

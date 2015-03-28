@@ -35,7 +35,7 @@ public:
         m_pParent = pShellMod;
         m_pClient = pClient;
 
-        if (Execute(sExec) == -1) {
+        if (!execute(sExec)) {
             NoString s = "Failed to execute: ";
             s += strerror(errno);
             ReadLineImpl(s);

@@ -20,22 +20,28 @@
 
 #include <no/noglobal.h>
 #include <no/nosocket.h>
+#include <memory>
+
+class NoProcessPrivate;
 
 //! @author imaginos@imaginos.net
 class NO_EXPORT NoProcess : public NoSocket
 {
 public:
     NoProcess();
-    virtual ~NoProcess();
+    ~NoProcess();
 
-    int Execute(const NoString& sExec);
-    void Kill(int iSignal);
+    int processId() const;
+    NoString command() const;
+
+    bool execute(const NoString& command);
+    void kill();
 
 private:
-    int popen2(int& iReadFD, int& iWriteFD, const NoString& sCommand);
-    void close2(int iPid, int iReadFD, int iWriteFD);
+    NoProcess(const NoProcess&) = delete;
+    NoProcess& operator=(const NoProcess&) = delete;
 
-    int m_pid;
+    std::unique_ptr<NoProcessPrivate> d;
 };
 
 #endif // NOPROCESS_H
