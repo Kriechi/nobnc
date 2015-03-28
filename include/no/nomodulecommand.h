@@ -58,20 +58,20 @@ public:
     /** Initialize a NoTable so that it can be used with AddHelp().
      * @param Table The instance of NoTable to initialize.
      */
-    static void InitHelp(NoTable& Table);
+    static void initHelp(NoTable& Table);
 
     /** Add this command to the NoTable instance.
      * @param Table Instance of NoTable to which this should be added.
      * @warning The Table should be initialized via InitHelp().
      */
-    void AddHelp(NoTable& Table) const;
+    void addHelp(NoTable& Table) const;
 
-    const NoString& GetCommand() const;
-    CmdFunc GetFunction() const;
-    const NoString& GetArgs() const;
-    const NoString& GetDescription() const;
+    const NoString& command() const;
+    CmdFunc function() const;
+    const NoString& args() const;
+    const NoString& description() const;
 
-    void Call(const NoString& sLine) const;
+    void call(const NoString& sLine) const;
 
 private:
     NoString m_cmd;

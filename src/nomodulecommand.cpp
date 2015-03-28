@@ -44,27 +44,27 @@ NoModuleCommand& NoModuleCommand::operator=(const NoModuleCommand& other)
     return *this;
 }
 
-void NoModuleCommand::InitHelp(NoTable& Table)
+void NoModuleCommand::initHelp(NoTable& Table)
 {
     Table.addColumn("Command");
     Table.addColumn("Arguments");
     Table.addColumn("Description");
 }
 
-void NoModuleCommand::AddHelp(NoTable& Table) const
+void NoModuleCommand::addHelp(NoTable& Table) const
 {
     Table.addRow();
-    Table.setValue("Command", GetCommand());
-    Table.setValue("Arguments", GetArgs());
-    Table.setValue("Description", GetDescription());
+    Table.setValue("Command", command());
+    Table.setValue("Arguments", args());
+    Table.setValue("Description", description());
 }
 
-void NoModuleCommand::Call(const NoString& sLine) const { m_func(sLine); }
+void NoModuleCommand::call(const NoString& sLine) const { m_func(sLine); }
 
-const NoString& NoModuleCommand::GetDescription() const { return m_desc; }
+const NoString& NoModuleCommand::description() const { return m_desc; }
 
-const NoString& NoModuleCommand::GetArgs() const { return m_args; }
+const NoString& NoModuleCommand::args() const { return m_args; }
 
-NoModuleCommand::CmdFunc NoModuleCommand::GetFunction() const { return m_func; }
+NoModuleCommand::CmdFunc NoModuleCommand::function() const { return m_func; }
 
-const NoString& NoModuleCommand::GetCommand() const { return m_cmd; }
+const NoString& NoModuleCommand::command() const { return m_cmd; }

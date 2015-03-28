@@ -263,11 +263,11 @@ bool NoModule::UnlinkJob(NoModuleJob* pJob) { return 0 != d->jobs.erase(pJob); }
 
 bool NoModule::AddCommand(const NoModuleCommand& Command)
 {
-    if (Command.GetFunction() == nullptr) return false;
-    if (Command.GetCommand().contains(" ")) return false;
-    if (FindCommand(Command.GetCommand()) != nullptr) return false;
+    if (Command.function() == nullptr) return false;
+    if (Command.command().contains(" ")) return false;
+    if (FindCommand(Command.command()) != nullptr) return false;
 
-    d->commands[Command.GetCommand()] = Command;
+    d->commands[Command.command()] = Command;
     return true;
 }
 
@@ -302,7 +302,7 @@ bool NoModule::HandleCommand(const NoString& sLine)
     const NoModuleCommand* pCmd = FindCommand(sCmd);
 
     if (pCmd) {
-        pCmd->Call(sLine);
+        pCmd->call(sLine);
         return true;
     }
 
@@ -316,11 +316,11 @@ void NoModule::HandleHelpCommand(const NoString& sLine)
     NoString sFilter = No::token(sLine, 1).toLower();
     NoTable Table;
 
-    NoModuleCommand::InitHelp(Table);
+    NoModuleCommand::initHelp(Table);
     for (const auto& it : d->commands) {
-        NoString sCmd = it.second.GetCommand().toLower();
+        NoString sCmd = it.second.command().toLower();
         if (sFilter.empty() || (sCmd.startsWith(sFilter, No::CaseSensitive)) || No::wildCmp(sCmd, sFilter)) {
-            it.second.AddHelp(Table);
+            it.second.addHelp(Table);
         }
     }
     if (Table.isEmpty()) {
