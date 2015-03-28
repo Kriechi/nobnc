@@ -242,7 +242,7 @@ void NoModule::CancelJob(NoModuleJob* pJob)
 bool NoModule::CancelJob(const NoString& sJobName)
 {
     for (NoModuleJob* pJob : d->jobs) {
-        if (pJob->GetName().equals(sJobName)) {
+        if (pJob->name().equals(sJobName)) {
             CancelJob(pJob);
             return true;
         }

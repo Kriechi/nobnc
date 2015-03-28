@@ -31,9 +31,9 @@ public:
     ~NoSampleJob()
     {
         if (wasCancelled()) {
-            GetModule()->PutModule("Sample job cancelled");
+            module()->PutModule("Sample job cancelled");
         } else {
-            GetModule()->PutModule("Sample job destroyed");
+            module()->PutModule("Sample job destroyed");
         }
     }
 
@@ -50,7 +50,7 @@ public:
         }
     }
 
-    void finished() override { GetModule()->PutModule("Sample job done"); }
+    void finished() override { module()->PutModule("Sample job done"); }
 };
 #endif
 

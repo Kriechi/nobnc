@@ -37,9 +37,9 @@ public:
     NoModuleJob(const NoModuleJob&) = delete;
     NoModuleJob& operator=(const NoModuleJob&) = delete;
 
-    NoModule* GetModule() const;
-    const NoString& GetName() const;
-    const NoString& GetDescription() const;
+    NoModule* module() const;
+    const NoString& name() const;
+    const NoString& description() const;
 
 private:
     NoModule* m_module;

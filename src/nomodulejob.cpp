@@ -27,10 +27,10 @@ NoModuleJob::NoModuleJob(NoModule* pModule, const NoString& sName, const NoStrin
 
 NoModuleJob::~NoModuleJob() { m_module->UnlinkJob(this); }
 
-const NoString& NoModuleJob::GetDescription() const { return m_description; }
+const NoString& NoModuleJob::description() const { return m_description; }
 
-const NoString& NoModuleJob::GetName() const { return m_name; }
+const NoString& NoModuleJob::name() const { return m_name; }
 
-NoModule* NoModuleJob::GetModule() const { return m_module; }
+NoModule* NoModuleJob::module() const { return m_module; }
 
 #endif // HAVE_PTHREAD
