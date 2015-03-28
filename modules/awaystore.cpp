@@ -64,10 +64,10 @@ class NoAway : public NoModule
         time(&curtime);
 
         if (No::token(sCommand, 1) != "-quiet") {
-            sReason = No::formatTime(curtime, No::tokens(sCommand, 1), GetUser()->GetTimezone());
+            sReason = No::formatTime(curtime, No::tokens(sCommand, 1), GetUser()->timezone());
             PutModNotice("You have been marked as away");
         } else {
-            sReason = No::formatTime(curtime, No::tokens(sCommand, 2), GetUser()->GetTimezone());
+            sReason = No::formatTime(curtime, No::tokens(sCommand, 2), GetUser()->timezone());
         }
 
         Away(false, sReason);
@@ -331,7 +331,7 @@ public:
 
     NoString GetPath()
     {
-        NoString sBuffer = GetUser()->GetUserName();
+        NoString sBuffer = GetUser()->userName();
         NoString sRet = GetSavePath();
         sRet += "/.znc-away-" + No::md5(sBuffer);
         return (sRet);

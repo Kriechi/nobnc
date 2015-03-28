@@ -35,147 +35,146 @@ public:
     NoUser(const NoString& sUserName);
     ~NoUser();
 
-    bool ParseConfig(NoSettings* Config, NoString& sError);
+    bool parseConfig(NoSettings* Config, NoString& sError);
 
     // TODO refactor this
-    enum eHashType {
-        HASH_NONE,
-        HASH_MD5,
-        HASH_SHA256,
-
-        HASH_DEFAULT = HASH_SHA256
+    enum HashType {
+        HashNone,
+        HashMd5,
+        HashSha256,
+        HashDefault = HashSha256
     };
 
     // If you change the default hash here and in HASH_DEFAULT,
     // don't forget No::sDefaultHash!
     // TODO refactor this
-    static NoString SaltedHash(const NoString& sPass, const NoString& sSalt)
+    static NoString saltedHash(const NoString& sPass, const NoString& sSalt)
     {
         return No::saltedSha256(sPass, sSalt);
     }
 
-    NoSettings ToConfig() const;
-    bool CheckPass(const NoString& sPass) const;
-    bool AddAllowedHost(const NoString& sHostMask);
-    bool IsHostAllowed(const NoString& sHostMask) const;
-    bool IsValid(NoString& sErrMsg, bool bSkipPass = false) const;
-    static bool IsValidUserName(const NoString& sUserName);
-    static NoString MakeCleanUserName(const NoString& sUserName);
+    NoSettings toConfig() const;
+    bool checkPass(const NoString& sPass) const;
+    bool addAllowedHost(const NoString& sHostMask);
+    bool isHostAllowed(const NoString& sHostMask) const;
+    bool isValid(NoString& sErrMsg, bool bSkipPass = false) const;
+    static bool isValidUserName(const NoString& sUserName);
+    static NoString makeCleanUserName(const NoString& sUserName);
 
-    NoModuleLoader* GetLoader() const;
+    NoModuleLoader* loader() const;
 
-    NoNetwork* AddNetwork(const NoString& sNetwork, NoString& sErrorRet);
-    bool DeleteNetwork(const NoString& sNetwork);
-    bool AddNetwork(NoNetwork* pNetwork);
-    void RemoveNetwork(NoNetwork* pNetwork);
-    NoNetwork* FindNetwork(const NoString& sNetwork) const;
-    std::vector<NoNetwork*> GetNetworks() const;
-    bool HasSpaceForNewNetwork() const;
+    NoNetwork* addNetwork(const NoString& sNetwork, NoString& sErrorRet);
+    bool deleteNetwork(const NoString& sNetwork);
+    bool addNetwork(NoNetwork* pNetwork);
+    void removeNetwork(NoNetwork* pNetwork);
+    NoNetwork* findNetwork(const NoString& sNetwork) const;
+    std::vector<NoNetwork*> networks() const;
+    bool hasSpaceForNewNetwork() const;
 
-    bool PutUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
-    bool PutAllUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
-    bool PutStatus(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
-    bool PutStatusNotice(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
-    bool PutModule(const NoString& sModule, const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
-    bool PutModNotice(const NoString& sModule, const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool putUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool putAllUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool putStatus(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool putStatusNotice(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool putModule(const NoString& sModule, const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool putModuleNotice(const NoString& sModule, const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
 
-    bool IsUserAttached() const;
-    void UserConnected(NoClient* pClient);
-    void UserDisconnected(NoClient* pClient);
+    bool isUserAttached() const;
+    void userConnected(NoClient* pClient);
+    void userDisconnected(NoClient* pClient);
 
-    NoString GetLocalDCCIP() const;
+    NoString localDccIp() const;
 
-    NoString ExpandString(const NoString& sStr) const;
-    NoString& ExpandString(const NoString& sStr, NoString& sRet) const;
+    NoString expandString(const NoString& sStr) const;
+    NoString& expandString(const NoString& sStr, NoString& sRet) const;
 
-    NoString AddTimestamp(const NoString& sStr) const;
-    NoString AddTimestamp(time_t tm, const NoString& sStr) const;
+    NoString addTimestamp(const NoString& sStr) const;
+    NoString addTimestamp(time_t tm, const NoString& sStr) const;
 
-    void CloneNetworks(const NoUser& User);
-    bool Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks = true);
+    void cloneNetworks(const NoUser& User);
+    bool clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks = true);
 
-    void AddBytesRead(ulonglong u);
-    void AddBytesWritten(ulonglong u);
+    void addBytesRead(ulonglong u);
+    void addBytesWritten(ulonglong u);
 
-    void SetNick(const NoString& s);
-    void SetAltNick(const NoString& s);
-    void SetIdent(const NoString& s);
-    void SetRealName(const NoString& s);
-    void SetBindHost(const NoString& s);
-    void SetDCCBindHost(const NoString& s);
-    void SetPass(const NoString& s, eHashType eHash, const NoString& sSalt = "");
-    void SetMultiClients(bool b);
-    void SetDenyLoadMod(bool b);
-    void SetAdmin(bool b);
-    void SetDenySetBindHost(bool b);
-    bool SetStatusPrefix(const NoString& s);
-    void SetDefaultChanModes(const NoString& s);
-    void SetClientEncoding(const NoString& s);
-    void SetQuitMsg(const NoString& s);
-    bool AddCTCPReply(const NoString& sCTCP, const NoString& sReply);
-    bool DelCTCPReply(const NoString& sCTCP);
-    bool SetBufferCount(uint u, bool bForce = false);
-    void SetAutoClearChanBuffer(bool b);
-    void SetAutoClearQueryBuffer(bool b);
+    void setNick(const NoString& s);
+    void setAltNick(const NoString& s);
+    void setIdent(const NoString& s);
+    void setRealName(const NoString& s);
+    void setBindHost(const NoString& s);
+    void setDccBindHost(const NoString& s);
+    void setPassword(const NoString& s, HashType eHash, const NoString& sSalt = "");
+    void setMultiClients(bool b);
+    void setDenyLoadMod(bool b);
+    void setAdmin(bool b);
+    void setDenySetBindHost(bool b);
+    bool setStatusPrefix(const NoString& s);
+    void setDefaultChanModes(const NoString& s);
+    void setClientEncoding(const NoString& s);
+    void setQuitMsg(const NoString& s);
+    bool addCtcpReply(const NoString& sCTCP, const NoString& sReply);
+    bool removeCtcpReply(const NoString& sCTCP);
+    bool setBufferCount(uint u, bool bForce = false);
+    void setAutoClearChanBuffer(bool b);
+    void setAutoClearQueryBuffer(bool b);
 
-    void SetBeingDeleted(bool b);
-    void SetTimestampFormat(const NoString& s);
-    void SetTimestampAppend(bool b);
-    void SetTimestampPrepend(bool b);
-    void SetTimezone(const NoString& s);
-    void SetJoinTries(uint i);
-    void SetMaxJoins(uint i);
-    void SetSkinName(const NoString& s);
-    void SetMaxNetworks(uint i);
-    void SetMaxQueryBuffers(uint i);
+    void setBeingDeleted(bool b);
+    void setTimestampFormat(const NoString& s);
+    void setTimestampAppend(bool b);
+    void setTimestampPrepend(bool b);
+    void setTimezone(const NoString& s);
+    void setJoinTries(uint i);
+    void setMaxJoins(uint i);
+    void setSkinName(const NoString& s);
+    void setMaxNetworks(uint i);
+    void setMaxQueryBuffers(uint i);
 
-    std::vector<NoClient*> GetUserClients() const;
-    std::vector<NoClient*> GetAllClients() const;
-    NoString GetUserName() const;
-    NoString GetCleanUserName() const;
-    NoString GetNick(bool bAllowDefault = true) const;
-    NoString GetAltNick(bool bAllowDefault = true) const;
-    NoString GetIdent(bool bAllowDefault = true) const;
-    NoString GetRealName() const;
-    NoString GetBindHost() const;
-    NoString GetDCCBindHost() const;
-    NoString GetPass() const;
-    eHashType GetPassHashType() const;
-    NoString GetPassSalt() const;
-    std::set<NoString> GetAllowedHosts() const;
-    NoString GetTimestampFormat() const;
-    NoString GetClientEncoding() const;
-    bool GetTimestampAppend() const;
-    bool GetTimestampPrepend() const;
+    std::vector<NoClient*> userClients() const;
+    std::vector<NoClient*> allClients() const;
+    NoString userName() const;
+    NoString cleanUserName() const;
+    NoString nick(bool bAllowDefault = true) const;
+    NoString altNick(bool bAllowDefault = true) const;
+    NoString ident(bool bAllowDefault = true) const;
+    NoString realName() const;
+    NoString bindHost() const;
+    NoString dccBindHost() const;
+    NoString password() const;
+    HashType passwordHashType() const;
+    NoString passwordSalt() const;
+    std::set<NoString> allowedHosts() const;
+    NoString timestampFormat() const;
+    NoString clientEncoding() const;
+    bool timestampAppend() const;
+    bool timestampPrepend() const;
 
-    NoString GetUserPath() const;
+    NoString userPath() const;
 
-    bool DenyLoadMod() const;
-    bool IsAdmin() const;
-    bool DenySetBindHost() const;
-    bool MultiClients() const;
-    NoString GetStatusPrefix() const;
-    NoString GetDefaultChanModes() const;
+    bool denyLoadMod() const;
+    bool isAdmin() const;
+    bool denySetBindHost() const;
+    bool multiClients() const;
+    NoString statusPrefix() const;
+    NoString defaultChanModes() const;
 
-    NoString GetQuitMsg() const;
-    NoStringMap GetCTCPReplies() const;
-    uint GetBufferCount() const;
-    bool AutoClearChanBuffer() const;
-    bool AutoClearQueryBuffer() const;
-    bool IsBeingDeleted() const;
-    NoString GetTimezone() const;
-    ulonglong BytesRead() const;
-    ulonglong BytesWritten() const;
-    uint JoinTries() const;
-    uint MaxJoins() const;
-    NoString GetSkinName() const;
-    uint MaxNetworks() const;
-    uint MaxQueryBuffers() const;
+    NoString quitMsg() const;
+    NoStringMap ctcpReplies() const;
+    uint bufferCount() const;
+    bool autoClearChanBuffer() const;
+    bool autoClearQueryBuffer() const;
+    bool isBeingDeleted() const;
+    NoString timezone() const;
+    ulonglong bytesRead() const;
+    ulonglong bytesWritten() const;
+    uint joinTries() const;
+    uint maxJoins() const;
+    NoString skinName() const;
+    uint maxNetworks() const;
+    uint maxQueryBuffers() const;
 
 private:
-    void BounceAllClients();
-    void SetKeepBuffer(bool b); // XXX compatibility crap, added in 0.207
-    bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
+    void bounceAllClients();
+    void setKeepBuffer(bool b); // XXX compatibility crap, added in 0.207
+    bool loadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 
     NoUser(const NoUser&) = delete;
     NoUser& operator=(const NoUser&) = delete;

@@ -75,7 +75,7 @@ public:
         PutModule("m_pISpoofLockFile = " + NoString((long long)m_pISpoofLockFile));
         PutModule("m_pIRCSock = " + NoString((long long)m_pIRCSock));
         if (m_pIRCSock) {
-            PutModule("user/network - " + m_pIRCSock->GetNetwork()->GetUser()->GetUserName() + "/" +
+            PutModule("user/network - " + m_pIRCSock->GetNetwork()->GetUser()->userName() + "/" +
                       m_pIRCSock->GetNetwork()->GetName());
         } else {
             PutModule("identfile is free");
@@ -84,7 +84,7 @@ public:
 
     void onModCommand(const NoString& sCommand) override
     {
-        if (GetUser()->IsAdmin()) {
+        if (GetUser()->isAdmin()) {
             HandleCommand(sCommand);
         } else {
             PutModule("Access denied");
@@ -135,11 +135,11 @@ public:
         // If the format doesn't contain anything expandable, we'll
         // assume this is an "old"-style format string.
         if (sData == registry.value("Format")) {
-            sData.replace("%", GetUser()->GetIdent());
+            sData.replace("%", GetUser()->ident());
         }
 
         NO_DEBUG("Writing [" + sData + "] to ident spoof file [" + m_pISpoofLockFile->GetLongName() +
-              "] for user/network [" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "]");
+              "] for user/network [" + GetUser()->userName() + "/" + GetNetwork()->GetName() + "]");
 
         m_pISpoofLockFile->Write(sData + "\n");
 
@@ -149,7 +149,7 @@ public:
     void ReleaseISpoof()
     {
         NO_DEBUG("Releasing ident spoof for user/network [" +
-              (m_pIRCSock ? m_pIRCSock->GetNetwork()->GetUser()->GetUserName() + "/" + m_pIRCSock->GetNetwork()->GetName() : "<no user/network>") +
+              (m_pIRCSock ? m_pIRCSock->GetNetwork()->GetUser()->userName() + "/" + m_pIRCSock->GetNetwork()->GetName() : "<no user/network>") +
               "]");
 
         SetIRCSock(nullptr);

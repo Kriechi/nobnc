@@ -103,7 +103,7 @@ public:
 
     bool AddKey(NoUser* pUser, const NoString& sKey)
     {
-        const std::pair<NoStringSet::const_iterator, bool> pair = m_PubKeys[pUser->GetUserName()].insert(sKey.toLower());
+        const std::pair<NoStringSet::const_iterator, bool> pair = m_PubKeys[pUser->userName()].insert(sKey.toLower());
 
         if (pair.second) {
             Save();
@@ -184,7 +184,7 @@ public:
         Table.addColumn("Id");
         Table.addColumn("Key");
 
-        MNoStringSet::const_iterator it = m_PubKeys.find(GetUser()->GetUserName());
+        MNoStringSet::const_iterator it = m_PubKeys.find(GetUser()->userName());
         if (it == m_PubKeys.end()) {
             PutModule("No keys set for your user");
             return;
@@ -207,7 +207,7 @@ public:
     void HandleDelCommand(const NoString& sLine)
     {
         uint id = No::tokens(sLine, 1).toUInt();
-        MNoStringSet::iterator it = m_PubKeys.find(GetUser()->GetUserName());
+        MNoStringSet::iterator it = m_PubKeys.find(GetUser()->userName());
 
         if (it == m_PubKeys.end()) {
             PutModule("No keys set for your user");
@@ -258,7 +258,7 @@ public:
         NoUser* pUser = WebSock.GetSession()->GetUser();
 
         if (sPageName == "index") {
-            MNoStringSet::const_iterator it = m_PubKeys.find(pUser->GetUserName());
+            MNoStringSet::const_iterator it = m_PubKeys.find(pUser->userName());
             if (it != m_PubKeys.end()) {
                 for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
                     NoTemplate& row = Tmpl.AddRow("KeyLoop");
@@ -272,7 +272,7 @@ public:
             WebSock.Redirect(GetWebPath());
             return true;
         } else if (sPageName == "delete") {
-            MNoStringSet::iterator it = m_PubKeys.find(pUser->GetUserName());
+            MNoStringSet::iterator it = m_PubKeys.find(pUser->userName());
             if (it != m_PubKeys.end()) {
                 if (it->second.erase(WebSock.GetParam("key", false))) {
                     if (it->second.size() == 0) {

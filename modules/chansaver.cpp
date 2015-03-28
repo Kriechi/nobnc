@@ -53,7 +53,7 @@ public:
 
     void LoadUser(NoUser* pUser)
     {
-        const std::vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
+        const std::vector<NoNetwork*>& vNetworks = pUser->networks();
         for (const NoNetwork* pNetwork : vNetworks) {
             LoadNetwork(pNetwork);
         }

@@ -80,7 +80,7 @@ public:
 
     void onModCommand(const NoString& sCommand) override
     {
-        if (!GetUser()->IsAdmin()) {
+        if (!GetUser()->isAdmin()) {
             PutModule("Access denied");
         } else {
             HandleCommand(sCommand);
@@ -112,7 +112,7 @@ public:
             return;
         }
 
-        if (GetUser()->GetUserName().equals(sUser)) {
+        if (GetUser()->userName().equals(sUser)) {
             PutModule("You can't block yourself");
             return;
         }
@@ -147,11 +147,11 @@ public:
             NoString sAction = Tmpl["WebadminAction"];
             if (sAction == "display") {
                 Tmpl["Blocked"] = NoString(IsBlocked(Tmpl["Username"]));
-                Tmpl["Self"] = NoString(Tmpl["Username"].equals(WebSock.GetSession()->GetUser()->GetUserName()));
+                Tmpl["Self"] = NoString(Tmpl["Username"].equals(WebSock.GetSession()->GetUser()->userName()));
                 return true;
             }
             if (sAction == "change" && WebSock.GetParam("embed_blockuser_presented").toBool()) {
-                if (Tmpl["Username"].equals(WebSock.GetSession()->GetUser()->GetUserName()) &&
+                if (Tmpl["Username"].equals(WebSock.GetSession()->GetUser()->userName()) &&
                     WebSock.GetParam("embed_blockuser_block").toBool()) {
                     WebSock.GetSession()->AddError("You can't block yourself");
                 } else if (WebSock.GetParam("embed_blockuser_block").toBool()) {
@@ -190,7 +190,7 @@ private:
         if (!pUser) return false;
 
         // Disconnect all clients
-        std::vector<NoClient*> vpClients = pUser->GetAllClients();
+        std::vector<NoClient*> vpClients = pUser->allClients();
         std::vector<NoClient*>::iterator it;
         for (it = vpClients.begin(); it != vpClients.end(); ++it) {
             (*it)->PutStatusNotice(MESSAGE);
@@ -198,13 +198,13 @@ private:
         }
 
         // Disconnect all networks from irc
-        std::vector<NoNetwork*> vNetworks = pUser->GetNetworks();
+        std::vector<NoNetwork*> vNetworks = pUser->networks();
         for (std::vector<NoNetwork*>::iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
             (*it2)->SetIRCConnectEnabled(false);
         }
 
         NoRegistry registry(this);
-        registry.setValue(pUser->GetUserName(), "");
+        registry.setValue(pUser->userName(), "");
         return true;
     }
 };

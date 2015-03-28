@@ -218,7 +218,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
 
     time(&curtime);
     // Generate file name
-    sPath = No::formatTime(curtime, m_sLogPath, GetUser()->GetTimezone());
+    sPath = No::formatTime(curtime, m_sLogPath, GetUser()->timezone());
     if (sPath.empty()) {
         NO_DEBUG("Could not format log path [" << sPath << "]");
         return;
@@ -226,7 +226,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
 
     // TODO: Properly handle IRC case mapping
     // $WINDOW has to be handled last, since it can contain %
-    sPath.replace("$USER", NoString((GetUser() ? GetUser()->GetUserName() : "UNKNOWN")).toLower());
+    sPath.replace("$USER", NoString((GetUser() ? GetUser()->userName() : "UNKNOWN")).toLower());
     sPath.replace("$NETWORK", NoString((GetNetwork() ? GetNetwork()->GetName() : "znc")).toLower());
     sPath.replace("$WINDOW", NoString(sWindow.replace_n("/", "-").replace_n("\\", "-")).toLower());
 
@@ -243,7 +243,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
     NoFile::GetInfo(GetSavePath(), ModDirInfo);
     if (!NoFile::Exists(sLogDir)) NoDir::MakeDir(sLogDir, ModDirInfo.st_mode);
     if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT)) {
-        LogFile.Write(No::formatTime(curtime, "[%H:%M:%S] ", GetUser()->GetTimezone()) +
+        LogFile.Write(No::formatTime(curtime, "[%H:%M:%S] ", GetUser()->timezone()) +
                       (m_bSanitize ? No::stripControls(sLine) : sLine) + "\n");
     } else
         NO_DEBUG("Could not open log file [" << sPath << "]: " << strerror(errno));

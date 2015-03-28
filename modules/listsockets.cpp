@@ -76,7 +76,7 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
 #ifndef MOD_LISTSOCKETS_ALLOW_EVERYONE
-        if (!GetUser()->IsAdmin()) {
+        if (!GetUser()->isAdmin()) {
             sMessage = "You must be admin to use this module";
             return false;
         }
@@ -166,7 +166,7 @@ public:
     {
         ulonglong iStartTime = pSocket->GetStartTime();
         time_t iTime = iStartTime / 1000;
-        return No::formatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->GetTimezone());
+        return No::formatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->timezone());
     }
 
     NoString GetLocalHost(NoSocket* pSocket, bool bShowHosts)

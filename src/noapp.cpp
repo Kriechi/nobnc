@@ -63,11 +63,11 @@ NoApp::~NoApp()
     m_modules->unloadAllModules();
 
     for (const auto& it : m_users) {
-        it.second->GetLoader()->unloadAllModules();
+        it.second->loader()->unloadAllModules();
 
-        const std::vector<NoNetwork*>& networks = it.second->GetNetworks();
+        const std::vector<NoNetwork*>& networks = it.second->networks();
         for (NoNetwork* pNetwork : networks) {
-            pNetwork->GetLoader()->unloadAllModules();
+            pNetwork->loader()->unloadAllModules();
         }
     }
 
@@ -76,7 +76,7 @@ NoApp::~NoApp()
     }
 
     for (const auto& it : m_users) {
-        it.second->SetBeingDeleted(true);
+        it.second->setBeingDeleted(true);
     }
 
     m_connectQueueTimer = nullptr;
@@ -159,13 +159,13 @@ bool NoApp::HandleUserDeletion()
 
     for (const auto& it : m_delUsers) {
         NoUser* pUser = it.second;
-        pUser->SetBeingDeleted(true);
+        pUser->setBeingDeleted(true);
 
         if (GetLoader()->onDeleteUser(*pUser)) {
-            pUser->SetBeingDeleted(false);
+            pUser->setBeingDeleted(false);
             continue;
         }
-        m_users.erase(pUser->GetUserName());
+        m_users.erase(pUser->userName());
         NoWebSocket::FinishUserSessions(*pUser);
         delete pUser;
     }
@@ -422,7 +422,7 @@ uint NoApp::GetDisabledSSLProtocols() const
 void NoApp::DeleteUsers()
 {
     for (const auto& it : m_users) {
-        it.second->SetBeingDeleted(true);
+        it.second->setBeingDeleted(true);
         delete it.second;
     }
 
@@ -433,7 +433,7 @@ void NoApp::DeleteUsers()
 bool NoApp::IsHostAllowed(const NoString& sHostMask) const
 {
     for (const auto& it : m_users) {
-        if (it.second->IsHostAllowed(sHostMask)) {
+        if (it.second->isHostAllowed(sHostMask)) {
             return true;
         }
     }
@@ -642,12 +642,12 @@ bool NoApp::WriteConfig()
     for (const auto& it : m_users) {
         NoString sErr;
 
-        if (!it.second->IsValid(sErr)) {
+        if (!it.second->isValid(sErr)) {
             NO_DEBUG("** Error writing config for user [" << it.first << "] [" << sErr << "]");
             continue;
         }
 
-        config.AddSubConfig("User", it.second->GetUserName(), it.second->ToConfig());
+        config.AddSubConfig("User", it.second->userName(), it.second->toConfig());
     }
 
     config.Write(*pFile);
@@ -800,7 +800,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     NoString sNick;
     do {
         No::getInput("Username", sUser, "", "alphanumeric");
-    } while (!NoUser::IsValidUserName(sUser));
+    } while (!NoUser::isValidUserName(sUser));
 
     vsLines.push_back("<User " + sUser + ">");
     NoString sSalt;
@@ -809,7 +809,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
     vsLines.push_back("\tAdmin      = true");
 
-    No::getInput("Nick", sNick, NoUser::MakeCleanUserName(sUser));
+    No::getInput("Nick", sNick, NoUser::makeCleanUserName(sUser));
     vsLines.push_back("\tNick       = " + sNick);
     No::getInput("Alternate nick", sAnswer, sNick + "_");
     if (!sAnswer.empty()) {
@@ -1312,14 +1312,14 @@ bool NoApp::DoRehash(NoString& sError)
         NoUser* pUser = new NoUser(sUserName);
 
         if (!m_statusPrefix.empty()) {
-            if (!pUser->SetStatusPrefix(m_statusPrefix)) {
+            if (!pUser->setStatusPrefix(m_statusPrefix)) {
                 sError = "Invalid StatusPrefix [" + m_statusPrefix + "] Must be 1-5 chars, no spaces.";
                 No::printError(sError);
                 return false;
             }
         }
 
-        if (!pUser->ParseConfig(pSubConf, sError)) {
+        if (!pUser->parseConfig(pSubConf, sError)) {
             No::printError(sError);
             delete pUser;
             pUser = nullptr;
@@ -1336,21 +1336,21 @@ bool NoApp::DoRehash(NoString& sError)
 
         NoString sErr;
         if (pRealUser) {
-            if (!pRealUser->Clone(*pUser, sErr) || !AddUser(pRealUser, sErr)) {
-                sError = "Invalid user [" + pUser->GetUserName() + "] " + sErr;
+            if (!pRealUser->clone(*pUser, sErr) || !AddUser(pRealUser, sErr)) {
+                sError = "Invalid user [" + pUser->userName() + "] " + sErr;
                 NO_DEBUG("NoUser::Clone() failed in rehash");
             }
-            pUser->SetBeingDeleted(true);
+            pUser->setBeingDeleted(true);
             delete pUser;
             pUser = nullptr;
         } else if (!AddUser(pUser, sErr)) {
-            sError = "Invalid user [" + pUser->GetUserName() + "] " + sErr;
+            sError = "Invalid user [" + pUser->userName() + "] " + sErr;
         }
 
         if (!sError.empty()) {
             No::printError(sError);
             if (pUser) {
-                pUser->SetBeingDeleted(true);
+                pUser->setBeingDeleted(true);
                 delete pUser;
                 pUser = nullptr;
             }
@@ -1488,7 +1488,7 @@ bool NoApp::RemTrustedProxy(const NoString& sHost)
 void NoApp::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUser, NoClient* pSkipClient)
 {
     for (const auto& it : m_users) {
-        if (bAdminOnly && !it.second->IsAdmin()) continue;
+        if (bAdminOnly && !it.second->isAdmin()) continue;
 
         if (it.second != pSkipUser) {
             NoString sMsg = sMessage;
@@ -1497,7 +1497,7 @@ void NoApp::Broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUs
             USERMODULECALL(onBroadcast(sMsg), it.second, nullptr, &bContinue);
             if (bContinue) continue;
 
-            it.second->PutStatusNotice("*** " + sMsg, nullptr, pSkipClient);
+            it.second->putStatusNotice("*** " + sMsg, nullptr, pSkipClient);
         }
     }
 }
@@ -1518,13 +1518,13 @@ NoModule* NoApp::FindModule(const NoString& sModName, const NoString& sUsername)
 
     NoUser* pUser = FindUser(sUsername);
 
-    return (!pUser) ? nullptr : pUser->GetLoader()->findModule(sModName);
+    return (!pUser) ? nullptr : pUser->loader()->findModule(sModName);
 }
 
 NoModule* NoApp::FindModule(const NoString& sModName, NoUser* pUser)
 {
     if (pUser) {
-        return pUser->GetLoader()->findModule(sModName);
+        return pUser->loader()->findModule(sModName);
     }
 
     return NoApp::Get().GetLoader()->findModule(sModName);
@@ -1541,19 +1541,19 @@ bool NoApp::UpdateModule(const NoString& sModule)
     for (const auto& it : m_users) {
         NoUser* pUser = it.second;
 
-        pModule = pUser->GetLoader()->findModule(sModule);
+        pModule = pUser->loader()->findModule(sModule);
         if (pModule) {
             musLoaded[pUser] = pModule->GetArgs();
-            pUser->GetLoader()->unloadModule(sModule);
+            pUser->loader()->unloadModule(sModule);
         }
 
         // See if the user has this module loaded to a network
-        std::vector<NoNetwork*> vNetworks = pUser->GetNetworks();
+        std::vector<NoNetwork*> vNetworks = pUser->networks();
         for (NoNetwork* pNetwork : vNetworks) {
-            pModule = pNetwork->GetLoader()->findModule(sModule);
+            pModule = pNetwork->loader()->findModule(sModule);
             if (pModule) {
                 mnsLoaded[pNetwork] = pModule->GetArgs();
-                pNetwork->GetLoader()->unloadModule(sModule);
+                pNetwork->loader()->unloadModule(sModule);
             }
         }
     }
@@ -1586,8 +1586,8 @@ bool NoApp::UpdateModule(const NoString& sModule)
         NoUser* pUser = it.first;
         const NoString& sArgs = it.second;
 
-        if (!pUser->GetLoader()->loadModule(sModule, sArgs, No::UserModule, pUser, nullptr, sErr)) {
-            NO_DEBUG("Failed to reload [" << sModule << "] for [" << pUser->GetUserName() << "] [" << sErr << "]");
+        if (!pUser->loader()->loadModule(sModule, sArgs, No::UserModule, pUser, nullptr, sErr)) {
+            NO_DEBUG("Failed to reload [" << sModule << "] for [" << pUser->userName() << "] [" << sErr << "]");
             bError = true;
         }
     }
@@ -1597,8 +1597,8 @@ bool NoApp::UpdateModule(const NoString& sModule)
         NoNetwork* pNetwork = it.first;
         const NoString& sArgs = it.second;
 
-        if (!pNetwork->GetLoader()->loadModule(sModule, sArgs, No::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
-            NO_DEBUG("Failed to reload [" << sModule << "] for [" << pNetwork->GetUser()->GetUserName() << "/"
+        if (!pNetwork->loader()->loadModule(sModule, sArgs, No::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
+            NO_DEBUG("Failed to reload [" << sModule << "] for [" << pNetwork->GetUser()->userName() << "/"
                                        << pNetwork->GetName() << "] [" << sErr << "]");
             bError = true;
         }
@@ -1626,28 +1626,28 @@ bool NoApp::DeleteUser(const NoString& sUsername)
         return false;
     }
 
-    m_delUsers[pUser->GetUserName()] = pUser;
+    m_delUsers[pUser->userName()] = pUser;
     return true;
 }
 
 bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
 {
-    if (FindUser(pUser->GetUserName()) != nullptr) {
+    if (FindUser(pUser->userName()) != nullptr) {
         sErrorRet = "User already exists";
-        NO_DEBUG("User [" << pUser->GetUserName() << "] - already exists");
+        NO_DEBUG("User [" << pUser->userName() << "] - already exists");
         return false;
     }
-    if (!pUser->IsValid(sErrorRet)) {
-        NO_DEBUG("Invalid user [" << pUser->GetUserName() << "] - [" << sErrorRet << "]");
+    if (!pUser->isValid(sErrorRet)) {
+        NO_DEBUG("Invalid user [" << pUser->userName() << "] - [" << sErrorRet << "]");
         return false;
     }
     bool bFailed = false;
     GLOBALMODULECALL(onAddUser(*pUser, sErrorRet), &bFailed);
     if (bFailed) {
-        NO_DEBUG("AddUser [" << pUser->GetUserName() << "] aborted by a module [" << sErrorRet << "]");
+        NO_DEBUG("AddUser [" << pUser->userName() << "] aborted by a module [" << sErrorRet << "]");
         return false;
     }
-    m_users[pUser->GetUserName()] = pUser;
+    m_users[pUser->userName()] = pUser;
     return true;
 }
 
@@ -1942,9 +1942,9 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
     uiZNC_out = BytesWritten();
 
     for (const auto& it : msUsers) {
-        ret[it.first] = TrafficStatsPair(it.second->BytesRead(), it.second->BytesWritten());
-        uiUsers_in += it.second->BytesRead();
-        uiUsers_out += it.second->BytesWritten();
+        ret[it.first] = TrafficStatsPair(it.second->bytesRead(), it.second->bytesWritten());
+        uiUsers_in += it.second->bytesRead();
+        uiUsers_out += it.second->bytesWritten();
     }
 
     for (NoSocket* pSock : m_manager.GetSockets()) {
@@ -1956,8 +1956,8 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
         }
 
         if (pUser) {
-            ret[pUser->GetUserName()].first += pSock->GetBytesRead();
-            ret[pUser->GetUserName()].second += pSock->GetBytesWritten();
+            ret[pUser->userName()].first += pSock->GetBytesRead();
+            ret[pUser->userName()].second += pSock->GetBytesWritten();
             uiUsers_in += pSock->GetBytesRead();
             uiUsers_out += pSock->GetBytesWritten();
         } else {
@@ -1982,7 +1982,7 @@ void NoApp::AuthUser(std::shared_ptr<NoAuthenticator> AuthClass)
 
     NoUser* pUser = FindUser(AuthClass->username());
 
-    if (!pUser || !pUser->CheckPass(AuthClass->password())) {
+    if (!pUser || !pUser->checkPass(AuthClass->password())) {
         AuthClass->refuseLogin("Invalid Password");
         return;
     }
@@ -1992,7 +1992,7 @@ void NoApp::AuthUser(std::shared_ptr<NoAuthenticator> AuthClass)
     if (pSock)
         sHost = pSock->GetRemoteIP();
 
-    if (!pUser->IsHostAllowed(sHost)) {
+    if (!pUser->isHostAllowed(sHost)) {
         AuthClass->refuseLogin("Your host [" + sHost + "] is not allowed");
         return;
     }

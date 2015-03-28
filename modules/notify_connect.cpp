@@ -28,12 +28,12 @@ public:
 
     void onClientLogin() override
     {
-        SendAdmins(GetUser()->GetUserName() + " attached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
+        SendAdmins(GetUser()->userName() + " attached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
     }
 
     void onClientDisconnect() override
     {
-        SendAdmins(GetUser()->GetUserName() + " detached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
+        SendAdmins(GetUser()->userName() + " detached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
     }
 
 private:

@@ -56,7 +56,7 @@ NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig,
     : d(new NoChannelPrivate)
 {
     d->network = pNetwork;
-    d->autoClearChanBuffer = pNetwork->GetUser()->AutoClearChanBuffer();
+    d->autoClearChanBuffer = pNetwork->GetUser()->autoClearChanBuffer();
     d->inConfig = bInConfig;
 
     d->name = No::token(sName, 0);
@@ -67,7 +67,7 @@ NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig,
     }
 
     d->nick.setNetwork(d->network);
-    d->buffer.setLimit(d->network->GetUser()->GetBufferCount(), true);
+    d->buffer.setLimit(d->network->GetUser()->bufferCount(), true);
 
     if (pConfig) {
         NoString sValue;

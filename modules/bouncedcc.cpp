@@ -175,7 +175,7 @@ public:
                    "<true|false>");
     }
 
-    NoString GetLocalDCCIP() { return GetUser()->GetLocalDCCIP(); }
+    NoString GetLocalDCCIP() { return GetUser()->localDccIp(); }
 
     bool UseClientIP() { return NoRegistry(this).value("UseClientIP").toBool(); }
 

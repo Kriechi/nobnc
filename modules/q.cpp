@@ -497,7 +497,7 @@ private:
         }
 
         // prevent buffering of Q's responses
-        return !m_bCatchResponse && GetUser()->IsUserAttached() ? CONTINUE : HALT;
+        return !m_bCatchResponse && GetUser()->isUserAttached() ? CONTINUE : HALT;
     }
 
     void HandleNeed(const NoChannel& Channel, const NoString& sPerms)

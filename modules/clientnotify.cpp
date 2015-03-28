@@ -42,9 +42,9 @@ protected:
     void SendNotification(const NoString& sMessage)
     {
         if (m_sMethod == "message") {
-            GetUser()->PutStatus(sMessage, nullptr, GetClient());
+            GetUser()->putStatus(sMessage, nullptr, GetClient());
         } else if (m_sMethod == "notice") {
-            GetUser()->PutStatusNotice(sMessage, nullptr, GetClient());
+            GetUser()->putStatusNotice(sMessage, nullptr, GetClient());
         }
     }
 
@@ -93,7 +93,7 @@ public:
         if (!m_bNewOnly || m_sClientsSeen.find(sRemoteIP) == m_sClientsSeen.end()) {
             SendNotification("Another client authenticated as your user. "
                              "Use the 'ListClients' command to see all " +
-                             NoString(GetUser()->GetAllClients().size()) + " clients.");
+                             NoString(GetUser()->allClients().size()) + " clients.");
 
             // the std::set<> will automatically disregard duplicates:
             m_sClientsSeen.insert(sRemoteIP);
@@ -105,7 +105,7 @@ public:
         if (m_bOnDisconnect) {
             SendNotification("A client disconnected from your user. "
                              "Use the 'ListClients' command to see the " +
-                             NoString(GetUser()->GetAllClients().size()) + " remaining client(s).");
+                             NoString(GetUser()->allClients().size()) + " remaining client(s).");
         }
     }
 

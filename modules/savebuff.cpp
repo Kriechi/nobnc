@@ -294,7 +294,7 @@ public:
 
     NoString GetPath(const NoString& sTarget) const
     {
-        NoString sBuffer = GetUser()->GetUserName() + sTarget.toLower();
+        NoString sBuffer = GetUser()->userName() + sTarget.toLower();
         NoString sRet = GetSavePath();
         sRet += "/" + No::md5(sBuffer);
         return (sRet);
@@ -335,7 +335,7 @@ public:
         for (size_t a = 0; a < vChans.size(); a++) {
             AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " QUIT " + sMessage));
         }
-        if (cNick.NickEquals(GetUser()->GetNick())) SaveBuffersToDisk(); // need to force a save here to see this!
+        if (cNick.NickEquals(GetUser()->nick())) SaveBuffersToDisk(); // need to force a save here to see this!
     }
 
     void onNick(const NoNick& cNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
@@ -350,7 +350,7 @@ public:
     }
     void onJoin(const NoNick& cNick, NoChannel& cChannel) override
     {
-        if (cNick.NickEquals(GetUser()->GetNick()) && cChannel.GetBuffer().empty()) {
+        if (cNick.NickEquals(GetUser()->nick()) && cChannel.GetBuffer().empty()) {
             BootStrap((NoChannel*)&cChannel);
             if (!cChannel.GetBuffer().empty()) Replay(cChannel.GetName());
         }
@@ -359,7 +359,7 @@ public:
     void onPart(const NoNick& cNick, NoChannel& cChannel) override
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cNick.GetNickMask() + " PART"));
-        if (cNick.NickEquals(GetUser()->GetNick())) SaveBuffersToDisk(); // need to force a save here to see this!
+        if (cNick.NickEquals(GetUser()->nick())) SaveBuffersToDisk(); // need to force a save here to see this!
     }
 #endif /* LEGACY_SAVEBUFF */
 

@@ -167,7 +167,7 @@ NoUser*NoWebSession::SetUser(NoUser* p)
     return d->user;
 }
 
-bool NoWebSession::IsAdmin() const { return IsLoggedIn() && d->user->IsAdmin(); }
+bool NoWebSession::IsAdmin() const { return IsLoggedIn() && d->user->isAdmin(); }
 
 void NoWebSession::ClearMessageLoops()
 {
@@ -218,7 +218,7 @@ void NoWebAuth::loginAccepted(NoUser* user)
             m_pWebSock->Redirect("/?cookie_check=true");
         }
 
-        NO_DEBUG("Successful login attempt ==> USER [" + user->GetUserName() + "] ==> SESSION [" + spSession->GetId() + "]");
+        NO_DEBUG("Successful login attempt ==> USER [" + user->userName() + "] ==> SESSION [" + spSession->GetId() + "]");
     }
 }
 
@@ -261,8 +261,8 @@ NoWebSocket::~NoWebSocket()
     // not have a valid NoModule* pointer.
     NoUser* pUser = GetSession()->GetUser();
     if (pUser) {
-        pUser->AddBytesWritten(GetBytesWritten());
-        pUser->AddBytesRead(GetBytesRead());
+        pUser->addBytesWritten(GetBytesWritten());
+        pUser->addBytesRead(GetBytesRead());
     } else {
         NoApp::Get().AddBytesWritten(GetBytesWritten());
         NoApp::Get().AddBytesRead(GetBytesRead());
@@ -406,15 +406,15 @@ void NoWebSocket::SetVars()
 
     // User Mods
     if (IsLoggedIn()) {
-        NoModuleLoader* vMods = GetSession()->GetUser()->GetLoader();
+        NoModuleLoader* vMods = GetSession()->GetUser()->loader();
 
         for (NoModule* pMod : vMods->modules()) {
             AddModLoop("UserModLoop", *pMod);
         }
 
-        std::vector<NoNetwork*> vNetworks = GetSession()->GetUser()->GetNetworks();
+        std::vector<NoNetwork*> vNetworks = GetSession()->GetUser()->networks();
         for (NoNetwork* pNetwork : vNetworks) {
-            NoModuleLoader* vnMods = pNetwork->GetLoader();
+            NoModuleLoader* vnMods = pNetwork->loader();
 
             NoTemplate& Row = m_template.AddRow("NetworkModLoop");
             Row["NetworkName"] = pNetwork->GetName();
@@ -471,7 +471,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
         }
 
         if (Module.GetUser()) {
-            Row["Username"] = Module.GetUser()->GetUserName();
+            Row["Username"] = Module.GetUser()->userName();
         }
 
         for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(&Module)->subPages) {
@@ -540,7 +540,7 @@ NoWebSocket::PageRequest NoWebSocket::PrintTemplate(const NoString& sPageName, N
 
     if (pModule) {
         NoUser* pUser = pModule->GetUser();
-        m_template["ModUser"] = pUser ? pUser->GetUserName() : "";
+        m_template["ModUser"] = pUser ? pUser->userName() : "";
         m_template["ModName"] = pModule->GetModName();
 
         if (m_template.find("Title") == m_template.end()) {
@@ -672,7 +672,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
     SendCookie("SessionId", GetSession()->GetId());
 
     if (GetSession()->IsLoggedIn()) {
-        m_username = GetSession()->GetUser()->GetUserName();
+        m_username = GetSession()->GetUser()->userName();
         m_loggedIn = true;
     }
 
@@ -765,7 +765,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             NoString sNetwork = No::token(m_path, 0, "/");
             m_path = No::tokens(m_path, 1, "/");
 
-            pNetwork = GetSession()->GetUser()->FindNetwork(sNetwork);
+            pNetwork = GetSession()->GetUser()->findNetwork(sNetwork);
 
             if (!pNetwork) {
                 PrintErrorPage(404, "Not Found", "Network [" + sNetwork + "] not found.");
@@ -789,10 +789,10 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             pModule = NoApp::Get().GetLoader()->findModule(m_modName);
             break;
         case No::UserModule:
-            pModule = GetSession()->GetUser()->GetLoader()->findModule(m_modName);
+            pModule = GetSession()->GetUser()->loader()->findModule(m_modName);
             break;
         case No::NetworkModule:
-            pModule = pNetwork->GetLoader()->findModule(m_modName);
+            pModule = pNetwork->loader()->findModule(m_modName);
             break;
         }
 
@@ -809,7 +809,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
         } else if (pModule->GetType() != No::GlobalModule && pModule->GetUser() != GetSession()->GetUser()) {
             PrintErrorPage(403,
                            "Forbidden",
-                           "You must login as " + pModule->GetUser()->GetUserName() + " in order to view this page");
+                           "You must login as " + pModule->GetUser()->userName() + " in order to view this page");
             return Done;
         } else if (pModule->OnWebPreRequest(*this, m_page)) {
             return Deferred;
@@ -905,7 +905,7 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
         (*pSession)->UpdateLastActive();
         m_session = *pSession;
         NO_DEBUG("Found existing session from cookie: [" + sCookieSessionId + "] IsLoggedIn(" +
-              NoString((*pSession)->IsLoggedIn() ? "true, " + ((*pSession)->GetUser()->GetUserName()) : "false") + ")");
+              NoString((*pSession)->IsLoggedIn() ? "true, " + ((*pSession)->GetUser()->userName()) : "false") + ")");
         return *pSession;
     }
 
@@ -967,8 +967,8 @@ NoString NoWebSocket::GetSkinName()
 {
     std::shared_ptr<NoWebSession> spSession = GetSession();
 
-    if (spSession->IsLoggedIn() && !spSession->GetUser()->GetSkinName().empty()) {
-        return spSession->GetUser()->GetSkinName();
+    if (spSession->IsLoggedIn() && !spSession->GetUser()->skinName().empty()) {
+        return spSession->GetUser()->skinName();
     }
 
     return NoApp::Get().GetSkinName();

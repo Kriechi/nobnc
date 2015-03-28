@@ -34,7 +34,7 @@ NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, cons
     if (pNetwork) {
         d->savePath = pNetwork->GetNetworkPath() + "/moddata/" + sModName;
     } else if (pUser) {
-        d->savePath = pUser->GetUserPath() + "/moddata/" + sModName;
+        d->savePath = pUser->userPath() + "/moddata/" + sModName;
     } else {
         d->savePath = NoApp::Get().GetZNCPath() + "/moddata/" + sModName;
     }
@@ -76,7 +76,7 @@ NoString& NoModule::ExpandString(const NoString& sStr, NoString& sRet) const
     }
 
     if (d->user) {
-        return d->user->ExpandString(sRet, sRet);
+        return d->user->expandString(sRet, sRet);
     }
 
     return sRet;
@@ -330,7 +330,7 @@ void NoModule::HandleHelpCommand(const NoString& sLine)
     }
 }
 
-NoString NoModule::GetModNick() const { return (d->user ? d->user->GetStatusPrefix() : "*") + d->name; }
+NoString NoModule::GetModNick() const { return (d->user ? d->user->statusPrefix() : "*") + d->name; }
 
 const NoString& NoModule::GetModDataDir() const { return d->dataDir; }
 
@@ -510,7 +510,7 @@ bool NoModule::PutModule(const NoString& sLine)
     }
 
     if (d->user) {
-        return d->user->PutModule(GetModName(), sLine);
+        return d->user->putModule(GetModName(), sLine);
     }
 
     return false;
@@ -524,7 +524,7 @@ bool NoModule::PutModNotice(const NoString& sLine)
         return true;
     }
 
-    return d->user->PutModNotice(GetModName(), sLine);
+    return d->user->putModuleNotice(GetModName(), sLine);
 }
 
 const NoString& NoModule::GetModName() const { return d->name; }

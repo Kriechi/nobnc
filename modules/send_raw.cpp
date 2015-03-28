@@ -30,11 +30,11 @@ class NoSendRawMod : public NoModule
         NoUser* pUser = NoApp::Get().FindUser(No::token(sLine, 1));
 
         if (pUser) {
-            NoNetwork* pNetwork = pUser->FindNetwork(No::token(sLine, 2));
+            NoNetwork* pNetwork = pUser->findNetwork(No::token(sLine, 2));
 
             if (pNetwork) {
                 pNetwork->PutUser(No::tokens(sLine, 3));
-                PutModule("Sent [" + No::tokens(sLine, 3) + "] to " + pUser->GetUserName() + "/" + pNetwork->GetName());
+                PutModule("Sent [" + No::tokens(sLine, 3) + "] to " + pUser->userName() + "/" + pNetwork->GetName());
             } else {
                 PutModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
             }
@@ -48,11 +48,11 @@ class NoSendRawMod : public NoModule
         NoUser* pUser = NoApp::Get().FindUser(No::token(sLine, 1));
 
         if (pUser) {
-            NoNetwork* pNetwork = pUser->FindNetwork(No::token(sLine, 2));
+            NoNetwork* pNetwork = pUser->findNetwork(No::token(sLine, 2));
 
             if (pNetwork) {
                 pNetwork->PutIRC(No::tokens(sLine, 3));
-                PutModule("Sent [" + No::tokens(sLine, 3) + "] to IRC Server of " + pUser->GetUserName() + "/" + pNetwork->GetName());
+                PutModule("Sent [" + No::tokens(sLine, 3) + "] to IRC Server of " + pUser->userName() + "/" + pNetwork->GetName());
             } else {
                 PutModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
             }
@@ -70,7 +70,7 @@ class NoSendRawMod : public NoModule
 public:
     bool OnLoad(const NoString& sArgs, NoString& sErrorMsg) override
     {
-        if (!GetUser()->IsAdmin()) {
+        if (!GetUser()->isAdmin()) {
             sErrorMsg = "You must have admin privileges to load this module";
             return false;
         }
@@ -91,7 +91,7 @@ public:
                     return true;
                 }
 
-                NoNetwork* pNetwork = pUser->FindNetwork(No::token(WebSock.GetParam("network"), 1, "/"));
+                NoNetwork* pNetwork = pUser->findNetwork(No::token(WebSock.GetParam("network"), 1, "/"));
                 if (!pNetwork) {
                     WebSock.GetSession()->AddError("Network not found");
                     return true;
@@ -100,7 +100,7 @@ public:
                 bool bToServer = WebSock.GetParam("send_to") == "server";
                 const NoString sLine = WebSock.GetParam("line");
 
-                Tmpl["user"] = pUser->GetUserName();
+                Tmpl["user"] = pUser->userName();
                 Tmpl[bToServer ? "to_server" : "to_client"] = "true";
                 Tmpl["line"] = sLine;
 
@@ -116,12 +116,12 @@ public:
             const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
             for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
                 NoTemplate& l = Tmpl.AddRow("UserLoop");
-                l["Username"] = (*it->second).GetUserName();
+                l["Username"] = (*it->second).userName();
 
-                std::vector<NoNetwork*> vNetworks = (*it->second).GetNetworks();
+                std::vector<NoNetwork*> vNetworks = (*it->second).networks();
                 for (std::vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
                     NoTemplate& NetworkLoop = l.AddRow("NetworkLoop");
-                    NetworkLoop["Username"] = (*it->second).GetUserName();
+                    NetworkLoop["Username"] = (*it->second).userName();
                     NetworkLoop["Network"] = (*it2)->GetName();
                 }
             }

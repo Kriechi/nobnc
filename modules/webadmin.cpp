@@ -36,7 +36,7 @@ static std::vector<NoModule*> allModules(T* p)
 {
     std::vector<NoModule*> allMods;
     std::vector<NoModule*> globalMods = NoApp::Get().GetLoader()->modules();
-    std::vector<NoModule*> typeMods = p->GetLoader()->modules();
+    std::vector<NoModule*> typeMods = p->loader()->modules();
     allMods.reserve(globalMods.size() + typeMods.size());
     allMods.insert(allMods.end(), globalMods.begin(), globalMods.end());
     allMods.insert(allMods.end(), typeMods.begin(), typeMods.end());
@@ -47,7 +47,7 @@ template <typename T1, typename T2>
 static std::vector<NoModule*> allModules(T1* p1, T2* p2)
 {
     std::vector<NoModule*> allMods = allModules(p1);
-    std::vector<NoModule*> typeMods = p2->GetLoader()->modules();
+    std::vector<NoModule*> typeMods = p2->loader()->modules();
     allMods.reserve(allMods.size() + typeMods.size());
     allMods.insert(allMods.end(), typeMods.begin(), typeMods.end());
     return allMods;
@@ -175,7 +175,7 @@ public:
 
         if (pUser) {
             /* If we are editing a user we must not change the user name */
-            sUsername = pUser->GetUserName();
+            sUsername = pUser->userName();
         }
 
         NoString sArg = WebSock.GetParam("password");
@@ -189,8 +189,8 @@ public:
 
         if (!sArg.empty()) {
             NoString sSalt = No::salt();
-            NoString sHash = NoUser::SaltedHash(sArg, sSalt);
-            pNewUser->SetPass(sHash, NoUser::HASH_DEFAULT, sSalt);
+            NoString sHash = NoUser::saltedHash(sArg, sSalt);
+            pNewUser->setPassword(sHash, NoUser::HashDefault, sSalt);
         }
 
         NoStringVector vsArgs = WebSock.GetRawParam("allowedips").split("\n");
@@ -198,60 +198,60 @@ public:
 
         if (vsArgs.size()) {
             for (a = 0; a < vsArgs.size(); a++) {
-                pNewUser->AddAllowedHost(vsArgs[a].trim_n());
+                pNewUser->addAllowedHost(vsArgs[a].trim_n());
             }
         } else {
-            pNewUser->AddAllowedHost("*");
+            pNewUser->addAllowedHost("*");
         }
 
         vsArgs = WebSock.GetRawParam("ctcpreplies").split("\n");
         for (a = 0; a < vsArgs.size(); a++) {
             NoString sReply = vsArgs[a].trimRight_n("\r");
-            pNewUser->AddCTCPReply(No::token(sReply, 0).trim_n(), No::tokens(sReply, 1).trim_n());
+            pNewUser->addCtcpReply(No::token(sReply, 0).trim_n(), No::tokens(sReply, 1).trim_n());
         }
 
         sArg = WebSock.GetParam("nick");
         if (!sArg.empty()) {
-            pNewUser->SetNick(sArg);
+            pNewUser->setNick(sArg);
         }
         sArg = WebSock.GetParam("altnick");
         if (!sArg.empty()) {
-            pNewUser->SetAltNick(sArg);
+            pNewUser->setAltNick(sArg);
         }
         sArg = WebSock.GetParam("statusprefix");
         if (!sArg.empty()) {
-            pNewUser->SetStatusPrefix(sArg);
+            pNewUser->setStatusPrefix(sArg);
         }
         sArg = WebSock.GetParam("ident");
         if (!sArg.empty()) {
-            pNewUser->SetIdent(sArg);
+            pNewUser->setIdent(sArg);
         }
         sArg = WebSock.GetParam("realname");
         if (!sArg.empty()) {
-            pNewUser->SetRealName(sArg);
+            pNewUser->setRealName(sArg);
         }
         sArg = WebSock.GetParam("quitmsg");
         if (!sArg.empty()) {
-            pNewUser->SetQuitMsg(sArg);
+            pNewUser->setQuitMsg(sArg);
         }
         sArg = WebSock.GetParam("chanmodes");
         if (!sArg.empty()) {
-            pNewUser->SetDefaultChanModes(sArg);
+            pNewUser->setDefaultChanModes(sArg);
         }
         sArg = WebSock.GetParam("timestampformat");
         if (!sArg.empty()) {
-            pNewUser->SetTimestampFormat(sArg);
+            pNewUser->setTimestampFormat(sArg);
         }
 
         sArg = WebSock.GetParam("bindhost");
         // To change BindHosts be admin or don't have DenySetBindHost
-        if (spSession->IsAdmin() || !spSession->GetUser()->DenySetBindHost()) {
+        if (spSession->IsAdmin() || !spSession->GetUser()->denySetBindHost()) {
             NoString sArg2 = WebSock.GetParam("dccbindhost");
             if (!sArg.empty()) {
-                pNewUser->SetBindHost(sArg);
+                pNewUser->setBindHost(sArg);
             }
             if (!sArg2.empty()) {
-                pNewUser->SetDCCBindHost(sArg2);
+                pNewUser->setDccBindHost(sArg2);
             }
 
             const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
@@ -270,74 +270,74 @@ public:
                 }
 
                 if (!bFound) {
-                    pNewUser->SetBindHost(pUser ? pUser->GetBindHost() : "");
+                    pNewUser->setBindHost(pUser ? pUser->bindHost() : "");
                 }
                 if (!bFoundDCC) {
-                    pNewUser->SetDCCBindHost(pUser ? pUser->GetDCCBindHost() : "");
+                    pNewUser->setDccBindHost(pUser ? pUser->dccBindHost() : "");
                 }
             }
         } else if (pUser) {
-            pNewUser->SetBindHost(pUser->GetBindHost());
-            pNewUser->SetDCCBindHost(pUser->GetDCCBindHost());
+            pNewUser->setBindHost(pUser->bindHost());
+            pNewUser->setDccBindHost(pUser->dccBindHost());
         }
 
         sArg = WebSock.GetParam("bufsize");
-        if (!sArg.empty()) pNewUser->SetBufferCount(sArg.toUInt(), spSession->IsAdmin());
+        if (!sArg.empty()) pNewUser->setBufferCount(sArg.toUInt(), spSession->IsAdmin());
         if (!sArg.empty()) {
             // First apply the old limit in case the new one is too high
-            if (pUser) pNewUser->SetBufferCount(pUser->GetBufferCount(), true);
-            pNewUser->SetBufferCount(sArg.toUInt(), spSession->IsAdmin());
+            if (pUser) pNewUser->setBufferCount(pUser->bufferCount(), true);
+            pNewUser->setBufferCount(sArg.toUInt(), spSession->IsAdmin());
         }
 
-        pNewUser->SetSkinName(WebSock.GetParam("skin"));
-        pNewUser->SetAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").toBool());
-        pNewUser->SetMultiClients(WebSock.GetParam("multiclients").toBool());
-        pNewUser->SetTimestampAppend(WebSock.GetParam("appendtimestamp").toBool());
-        pNewUser->SetTimestampPrepend(WebSock.GetParam("prependtimestamp").toBool());
-        pNewUser->SetTimezone(WebSock.GetParam("timezone"));
-        pNewUser->SetJoinTries(WebSock.GetParam("jointries").toUInt());
-        pNewUser->SetMaxJoins(WebSock.GetParam("maxjoins").toUInt());
-        pNewUser->SetAutoClearQueryBuffer(WebSock.GetParam("autoclearquerybuffer").toBool());
-        pNewUser->SetMaxQueryBuffers(WebSock.GetParam("maxquerybuffers").toUInt());
+        pNewUser->setSkinName(WebSock.GetParam("skin"));
+        pNewUser->setAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").toBool());
+        pNewUser->setMultiClients(WebSock.GetParam("multiclients").toBool());
+        pNewUser->setTimestampAppend(WebSock.GetParam("appendtimestamp").toBool());
+        pNewUser->setTimestampPrepend(WebSock.GetParam("prependtimestamp").toBool());
+        pNewUser->setTimezone(WebSock.GetParam("timezone"));
+        pNewUser->setJoinTries(WebSock.GetParam("jointries").toUInt());
+        pNewUser->setMaxJoins(WebSock.GetParam("maxjoins").toUInt());
+        pNewUser->setAutoClearQueryBuffer(WebSock.GetParam("autoclearquerybuffer").toBool());
+        pNewUser->setMaxQueryBuffers(WebSock.GetParam("maxquerybuffers").toUInt());
 
 #ifdef HAVE_ICU
         NoString sEncodingUtf = WebSock.GetParam("encoding_utf");
         if (sEncodingUtf == "legacy") {
-            pNewUser->SetClientEncoding("");
+            pNewUser->setClientEncoding("");
         }
         NoString sEncoding = WebSock.GetParam("encoding");
         if (sEncoding.empty()) {
             sEncoding = "UTF-8";
         }
         if (sEncodingUtf == "send") {
-            pNewUser->SetClientEncoding("^" + sEncoding);
+            pNewUser->setClientEncoding("^" + sEncoding);
         } else if (sEncodingUtf == "receive") {
-            pNewUser->SetClientEncoding("*" + sEncoding);
+            pNewUser->setClientEncoding("*" + sEncoding);
         } else if (sEncodingUtf == "simple") {
-            pNewUser->SetClientEncoding(sEncoding);
+            pNewUser->setClientEncoding(sEncoding);
         }
 #endif
 
         if (spSession->IsAdmin()) {
-            pNewUser->SetDenyLoadMod(WebSock.GetParam("denyloadmod").toBool());
-            pNewUser->SetDenySetBindHost(WebSock.GetParam("denysetbindhost").toBool());
+            pNewUser->setDenyLoadMod(WebSock.GetParam("denyloadmod").toBool());
+            pNewUser->setDenySetBindHost(WebSock.GetParam("denysetbindhost").toBool());
             sArg = WebSock.GetParam("maxnetworks");
-            if (!sArg.empty()) pNewUser->SetMaxNetworks(sArg.toUInt());
+            if (!sArg.empty()) pNewUser->setMaxNetworks(sArg.toUInt());
         } else if (pUser) {
-            pNewUser->SetDenyLoadMod(pUser->DenyLoadMod());
-            pNewUser->SetDenySetBindHost(pUser->DenySetBindHost());
-            pNewUser->SetMaxNetworks(pUser->MaxNetworks());
+            pNewUser->setDenyLoadMod(pUser->denyLoadMod());
+            pNewUser->setDenySetBindHost(pUser->denySetBindHost());
+            pNewUser->setMaxNetworks(pUser->maxNetworks());
         }
 
         // If pUser is not nullptr, we are editing an existing user.
         // Users must not be able to change their own admin flag.
         if (pUser != NoApp::Get().FindUser(WebSock.GetUser())) {
-            pNewUser->SetAdmin(WebSock.GetParam("isadmin").toBool());
+            pNewUser->setAdmin(WebSock.GetParam("isadmin").toBool());
         } else if (pUser) {
-            pNewUser->SetAdmin(pUser->IsAdmin());
+            pNewUser->setAdmin(pUser->isAdmin());
         }
 
-        if (spSession->IsAdmin() || (pUser && !pUser->DenyLoadMod())) {
+        if (spSession->IsAdmin() || (pUser && !pUser->denyLoadMod())) {
             WebSock.GetParamValues("loadmod", vsArgs);
 
             // disallow unload webadmin from itself
@@ -364,7 +364,7 @@ public:
                     NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
                     try {
-                        if (!pNewUser->GetLoader()->loadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
+                        if (!pNewUser->loader()->loadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } catch (...) {
@@ -378,7 +378,7 @@ public:
                 }
             }
         } else if (pUser) {
-            NoModuleLoader* Modules = pUser->GetLoader();
+            NoModuleLoader* Modules = pUser->loader();
 
             for (NoModule* pMod : Modules->modules()) {
                 NoString sModName = pMod->GetModName();
@@ -387,7 +387,7 @@ public:
                 NoString sModLoadError;
 
                 try {
-                    if (!pNewUser->GetLoader()->loadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
+                    if (!pNewUser->loader()->loadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } catch (...) {
@@ -434,7 +434,7 @@ public:
         NoNetwork* pNetwork = nullptr;
 
         if (pUser) {
-            pNetwork = pUser->FindNetwork(SafeGetNetworkParam(WebSock));
+            pNetwork = pUser->findNetwork(SafeGetNetworkParam(WebSock));
         }
 
         return pNetwork;
@@ -649,14 +649,14 @@ public:
         }
 
         if (!WebSock.GetParam("submitted").toUInt()) {
-            Tmpl["User"] = pUser->GetUserName();
+            Tmpl["User"] = pUser->userName();
             Tmpl["Network"] = pNetwork->GetName();
 
             if (pChan) {
                 Tmpl["Action"] = "editchan";
                 Tmpl["Edit"] = "true";
                 Tmpl["Title"] = "Edit Channel" + NoString(" [" + pChan->getName() + "]") + " of Network [" +
-                                pNetwork->GetName() + "] of User [" + pNetwork->GetUser()->GetUserName() + "]";
+                                pNetwork->GetName() + "] of User [" + pNetwork->GetUser()->userName() + "]";
                 Tmpl["ChanName"] = pChan->getName();
                 Tmpl["BufferCount"] = NoString(pChan->getBufferCount());
                 Tmpl["DefModes"] = pChan->getDefaultModes();
@@ -667,9 +667,9 @@ public:
                 }
             } else {
                 Tmpl["Action"] = "addchan";
-                Tmpl["Title"] = "Add Channel" + NoString(" for User [" + pUser->GetUserName() + "]");
-                Tmpl["BufferCount"] = NoString(pUser->GetBufferCount());
-                Tmpl["DefModes"] = NoString(pUser->GetDefaultChanModes());
+                Tmpl["Title"] = "Add Channel" + NoString(" for User [" + pUser->userName() + "]");
+                Tmpl["BufferCount"] = NoString(pUser->bufferCount());
+                Tmpl["DefModes"] = NoString(pUser->defaultChanModes());
                 Tmpl["InConfig"] = "true";
             }
 
@@ -679,7 +679,7 @@ public:
             o2["Name"] = "autoclearchanbuffer";
             o2["DisplayName"] = "Auto Clear Chan Buffer";
             o2["Tooltip"] = "Automatically Clear Channel Buffer After Playback";
-            if ((pChan && pChan->autoClearChanBuffer()) || (!pChan && pUser->AutoClearChanBuffer())) {
+            if ((pChan && pChan->autoClearChanBuffer()) || (!pChan && pUser->autoClearChanBuffer())) {
                 o2["Checked"] = "true";
             }
 
@@ -761,7 +761,7 @@ public:
             pChan->enable();
 
         NoTemplate TmplMod;
-        TmplMod["User"] = pUser->GetUserName();
+        TmplMod["User"] = pUser->userName();
         TmplMod["ChanName"] = pChan->getName();
         TmplMod["WebadminAction"] = "change";
         for (NoModule* pMod : allModules(pNetwork)) {
@@ -774,10 +774,10 @@ public:
         }
 
         if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pUser->GetUserName(), No::UrlFormat) +
+            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->GetName(), No::UrlFormat));
         } else {
-            WebSock.Redirect(GetWebPath() + "editchan?user=" + No::escape(pUser->GetUserName(), No::UrlFormat) +
+            WebSock.Redirect(GetWebPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->GetName(), No::UrlFormat) + "&name=" +
                              No::escape(pChan->getName(), No::UrlFormat));
         }
@@ -790,7 +790,7 @@ public:
         Tmpl.SetFile("add_edit_network.tmpl");
 
         if (!WebSock.GetParam("submitted").toUInt()) {
-            Tmpl["Username"] = pUser->GetUserName();
+            Tmpl["Username"] = pUser->userName();
 
             std::set<NoModuleInfo> ssNetworkMods;
             NoApp::Get().GetLoader()->availableModules(ssNetworkMods, No::NetworkModule);
@@ -805,7 +805,7 @@ public:
                 l["ArgsHelpText"] = Info.GetArgsHelpText();
 
                 if (pNetwork) {
-                    NoModule* pModule = pNetwork->GetLoader()->findModule(Info.GetName());
+                    NoModule* pModule = pNetwork->loader()->findModule(Info.GetName());
                     if (pModule) {
                         l["Checked"] = "true";
                         l["Args"] = pModule->GetArgs();
@@ -818,15 +818,15 @@ public:
 
                 // Check if module is loaded by user
                 l["CanBeLoadedByUser"] = NoString(Info.SupportsType(No::UserModule));
-                l["LoadedByUser"] = NoString(pUser->GetLoader()->findModule(Info.GetName()) != nullptr);
+                l["LoadedByUser"] = NoString(pUser->loader()->findModule(Info.GetName()) != nullptr);
 
-                if (!spSession->IsAdmin() && pUser->DenyLoadMod()) {
+                if (!spSession->IsAdmin() && pUser->denyLoadMod()) {
                     l["Disabled"] = "true";
                 }
             }
 
             // To change BindHosts be admin or don't have DenySetBindHost
-            if (spSession->IsAdmin() || !spSession->GetUser()->DenySetBindHost()) {
+            if (spSession->IsAdmin() || !spSession->GetUser()->denySetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
                 const NoStringVector& vsBindHosts = NoApp::Get().GetBindHosts();
                 if (vsBindHosts.empty()) {
@@ -861,7 +861,7 @@ public:
                 Tmpl["Action"] = "editnetwork";
                 Tmpl["Edit"] = "true";
                 Tmpl["Title"] =
-                "Edit Network" + NoString(" [" + pNetwork->GetName() + "]") + " of User [" + pUser->GetUserName() + "]";
+                "Edit Network" + NoString(" [" + pNetwork->GetName() + "]") + " of User [" + pUser->userName() + "]";
                 Tmpl["Name"] = pNetwork->GetName();
 
                 Tmpl["Nick"] = pNetwork->GetNick();
@@ -891,7 +891,7 @@ public:
                     NoTemplate& l = Tmpl.AddRow("ChannelLoop");
 
                     l["Network"] = pNetwork->GetName();
-                    l["Username"] = pUser->GetUserName();
+                    l["Username"] = pUser->userName();
                     l["Name"] = pChan->getName();
                     l["Perms"] = pChan->getPermStr();
                     l["CurModes"] = pChan->getModeString();
@@ -912,14 +912,14 @@ public:
                     l["FP"] = sFP;
                 }
             } else {
-                if (!spSession->IsAdmin() && !pUser->HasSpaceForNewNetwork()) {
+                if (!spSession->IsAdmin() && !pUser->hasSpaceForNewNetwork()) {
                     WebSock.PrintErrorPage("Network number limit reached. Ask an admin to increase the limit for you, "
                                            "or delete unneeded networks from Your Settings.");
                     return true;
                 }
 
                 Tmpl["Action"] = "addnetwork";
-                Tmpl["Title"] = "Add Network for User [" + pUser->GetUserName() + "]";
+                Tmpl["Title"] = "Add Network for User [" + pUser->userName() + "]";
                 Tmpl["IRCConnectEnabled"] = "true";
                 Tmpl["FloodProtection"] = "true";
                 Tmpl["FloodRate"] = "1.0";
@@ -968,7 +968,7 @@ public:
             WebSock.PrintErrorPage("Network name is a required argument");
             return true;
         }
-        if (!pNetwork && !spSession->IsAdmin() && !pUser->HasSpaceForNewNetwork()) {
+        if (!pNetwork && !spSession->IsAdmin() && !pUser->hasSpaceForNewNetwork()) {
             WebSock.PrintErrorPage("Network number limit reached. Ask an admin to increase the limit for you, or "
                                    "delete few old ones from Your Settings");
             return true;
@@ -976,19 +976,19 @@ public:
         if (!pNetwork || pNetwork->GetName() != sName) {
             NoString sNetworkAddError;
             NoNetwork* pOldNetwork = pNetwork;
-            pNetwork = pUser->AddNetwork(sName, sNetworkAddError);
+            pNetwork = pUser->addNetwork(sName, sNetworkAddError);
             if (!pNetwork) {
                 WebSock.PrintErrorPage(sNetworkAddError);
                 return true;
             }
             if (pOldNetwork) {
-                for (NoModule* pModule : pOldNetwork->GetLoader()->modules()) {
-                    NoString sPath = pUser->GetUserPath() + "/networks/" + sName + "/moddata/" + pModule->GetModName();
+                for (NoModule* pModule : pOldNetwork->loader()->modules()) {
+                    NoString sPath = pUser->userPath() + "/networks/" + sName + "/moddata/" + pModule->GetModName();
                     NoRegistry registry(pModule);
                     registry.copy(sPath);
                 }
                 pNetwork->Clone(*pOldNetwork, false);
-                pUser->DeleteNetwork(pOldNetwork->GetName());
+                pUser->deleteNetwork(pOldNetwork->GetName());
             }
         }
 
@@ -1005,7 +1005,7 @@ public:
 
         sArg = WebSock.GetParam("bindhost");
         // To change BindHosts be admin or don't have DenySetBindHost
-        if (spSession->IsAdmin() || !spSession->GetUser()->DenySetBindHost()) {
+        if (spSession->IsAdmin() || !spSession->GetUser()->denySetBindHost()) {
             NoString sHost = WebSock.GetParam("bindhost");
             const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
             if (!spSession->IsAdmin() && !vsHosts.empty()) {
@@ -1078,7 +1078,7 @@ public:
 
         std::set<NoString> ssArgs;
         WebSock.GetParamValues("loadmod", ssArgs);
-        if (spSession->IsAdmin() || !pUser->DenyLoadMod()) {
+        if (spSession->IsAdmin() || !pUser->denyLoadMod()) {
             for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
                 NoString sModRet;
                 NoString sModName = (*it).trimRight_n("\r");
@@ -1087,14 +1087,14 @@ public:
                 if (!sModName.empty()) {
                     NoString sArgs = WebSock.GetParam("modargs_" + sModName);
 
-                    NoModule* pMod = pNetwork->GetLoader()->findModule(sModName);
+                    NoModule* pMod = pNetwork->loader()->findModule(sModName);
 
                     if (!pMod) {
-                        if (!pNetwork->GetLoader()->loadModule(sModName, sArgs, No::NetworkModule, pUser, pNetwork, sModRet)) {
+                        if (!pNetwork->loader()->loadModule(sModName, sArgs, No::NetworkModule, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } else if (pMod->GetArgs() != sArgs) {
-                        if (!pNetwork->GetLoader()->reloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
+                        if (!pNetwork->loader()->reloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                         }
                     }
@@ -1107,7 +1107,7 @@ public:
             }
         }
 
-        const NoModuleLoader* vCurMods = pNetwork->GetLoader();
+        const NoModuleLoader* vCurMods = pNetwork->loader();
         std::set<NoString> ssUnloadMods;
 
         for (NoModule* pCurMod : vCurMods->modules()) {
@@ -1117,11 +1117,11 @@ public:
         }
 
         for (std::set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
-            pNetwork->GetLoader()->unloadModule(*it2);
+            pNetwork->loader()->unloadModule(*it2);
         }
 
         NoTemplate TmplMod;
-        TmplMod["Username"] = pUser->GetUserName();
+        TmplMod["Username"] = pUser->userName();
         TmplMod["Name"] = pNetwork->GetName();
         TmplMod["WebadminAction"] = "change";
         for (NoModule* pMod : allModules(pUser, pNetwork)) {
@@ -1134,9 +1134,9 @@ public:
         }
 
         if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(GetWebPath() + "edituser?user=" + No::escape(pUser->GetUserName(), No::UrlFormat));
+            WebSock.Redirect(GetWebPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
         } else {
-            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pUser->GetUserName(), No::UrlFormat) +
+            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->GetName(), No::UrlFormat));
         }
         return true;
@@ -1163,19 +1163,19 @@ public:
             // Show the "Are you sure?" page:
 
             Tmpl.SetFile("del_network.tmpl");
-            Tmpl["Username"] = pUser->GetUserName();
+            Tmpl["Username"] = pUser->userName();
             Tmpl["Network"] = sNetwork;
             return true;
         }
 
-        pUser->DeleteNetwork(sNetwork);
+        pUser->deleteNetwork(sNetwork);
 
         if (!NoApp::Get().WriteConfig()) {
             WebSock.PrintErrorPage("Network deleted, but config was not written");
             return true;
         }
 
-        WebSock.Redirect(GetWebPath() + "edituser?user=" + No::escape(pUser->GetUserName(), No::UrlFormat));
+        WebSock.Redirect(GetWebPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
         return false;
     }
 
@@ -1196,7 +1196,7 @@ public:
             return true;
         }
 
-        WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pNetwork->GetUser()->GetUserName(), No::UrlFormat) +
+        WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pNetwork->GetUser()->userName(), No::UrlFormat) +
                          "&network=" + No::escape(pNetwork->GetName(), No::UrlFormat));
         return false;
     }
@@ -1209,49 +1209,49 @@ public:
         if (!WebSock.GetParam("submitted").toUInt()) {
             if (pUser) {
                 Tmpl["Action"] = "edituser";
-                Tmpl["Title"] = "Edit User [" + pUser->GetUserName() + "]";
+                Tmpl["Title"] = "Edit User [" + pUser->userName() + "]";
                 Tmpl["Edit"] = "true";
             } else {
                 NoString sUsername = WebSock.GetParam("clone", false);
                 pUser = NoApp::Get().FindUser(sUsername);
 
                 if (pUser) {
-                    Tmpl["Title"] = "Clone User [" + pUser->GetUserName() + "]";
+                    Tmpl["Title"] = "Clone User [" + pUser->userName() + "]";
                     Tmpl["Clone"] = "true";
-                    Tmpl["CloneUsername"] = pUser->GetUserName();
+                    Tmpl["CloneUsername"] = pUser->userName();
                 }
             }
 
             Tmpl["ImAdmin"] = NoString(spSession->IsAdmin());
 
             if (pUser) {
-                Tmpl["Username"] = pUser->GetUserName();
-                Tmpl["Nick"] = pUser->GetNick();
-                Tmpl["AltNick"] = pUser->GetAltNick();
-                Tmpl["StatusPrefix"] = pUser->GetStatusPrefix();
-                Tmpl["Ident"] = pUser->GetIdent();
-                Tmpl["RealName"] = pUser->GetRealName();
-                Tmpl["QuitMsg"] = pUser->GetQuitMsg();
-                Tmpl["DefaultChanModes"] = pUser->GetDefaultChanModes();
-                Tmpl["BufferCount"] = NoString(pUser->GetBufferCount());
-                Tmpl["TimestampFormat"] = pUser->GetTimestampFormat();
-                Tmpl["Timezone"] = pUser->GetTimezone();
-                Tmpl["JoinTries"] = NoString(pUser->JoinTries());
-                Tmpl["MaxNetworks"] = NoString(pUser->MaxNetworks());
-                Tmpl["MaxJoins"] = NoString(pUser->MaxJoins());
-                Tmpl["MaxQueryBuffers"] = NoString(pUser->MaxQueryBuffers());
+                Tmpl["Username"] = pUser->userName();
+                Tmpl["Nick"] = pUser->nick();
+                Tmpl["AltNick"] = pUser->altNick();
+                Tmpl["StatusPrefix"] = pUser->statusPrefix();
+                Tmpl["Ident"] = pUser->ident();
+                Tmpl["RealName"] = pUser->realName();
+                Tmpl["QuitMsg"] = pUser->quitMsg();
+                Tmpl["DefaultChanModes"] = pUser->defaultChanModes();
+                Tmpl["BufferCount"] = NoString(pUser->bufferCount());
+                Tmpl["TimestampFormat"] = pUser->timestampFormat();
+                Tmpl["Timezone"] = pUser->timezone();
+                Tmpl["JoinTries"] = NoString(pUser->joinTries());
+                Tmpl["MaxNetworks"] = NoString(pUser->maxNetworks());
+                Tmpl["MaxJoins"] = NoString(pUser->maxJoins());
+                Tmpl["MaxQueryBuffers"] = NoString(pUser->maxQueryBuffers());
 
-                const std::set<NoString>& ssAllowedHosts = pUser->GetAllowedHosts();
+                const std::set<NoString>& ssAllowedHosts = pUser->allowedHosts();
                 for (std::set<NoString>::const_iterator it = ssAllowedHosts.begin(); it != ssAllowedHosts.end(); ++it) {
                     NoTemplate& l = Tmpl.AddRow("AllowedHostLoop");
                     l["Host"] = *it;
                 }
 
-                const std::vector<NoNetwork*>& vNetworks = pUser->GetNetworks();
+                const std::vector<NoNetwork*>& vNetworks = pUser->networks();
                 for (uint a = 0; a < vNetworks.size(); a++) {
                     NoTemplate& l = Tmpl.AddRow("NetworkLoop");
                     l["Name"] = vNetworks[a]->GetName();
-                    l["Username"] = pUser->GetUserName();
+                    l["Username"] = pUser->userName();
                     l["Clients"] = NoString(vNetworks[a]->GetClients().size());
                     l["IRCNick"] = vNetworks[a]->GetIRCNick().nick();
                     NoServerInfo* pServer = vNetworks[a]->GetCurrentServer();
@@ -1260,7 +1260,7 @@ public:
                     }
                 }
 
-                const NoStringMap& msCTCPReplies = pUser->GetCTCPReplies();
+                const NoStringMap& msCTCPReplies = pUser->ctcpReplies();
                 for (NoStringMap::const_iterator it2 = msCTCPReplies.begin(); it2 != msCTCPReplies.end(); ++it2) {
                     NoTemplate& l = Tmpl.AddRow("CTCPLoop");
                     l["CTCP"] = it2->first + " " + it2->second;
@@ -1282,7 +1282,7 @@ public:
                 NoTemplate& l = Tmpl.AddRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
-            const NoString sEncoding = pUser ? pUser->GetClientEncoding() : "^UTF-8";
+            const NoString sEncoding = pUser ? pUser->clientEncoding() : "^UTF-8";
             if (sEncoding.empty()) {
                 Tmpl["EncodingUtf"] = "legacy";
             } else if (sEncoding[0] == '*') {
@@ -1301,13 +1301,13 @@ public:
 #endif
 
             // To change BindHosts be admin or don't have DenySetBindHost
-            if (spSession->IsAdmin() || !spSession->GetUser()->DenySetBindHost()) {
+            if (spSession->IsAdmin() || !spSession->GetUser()->denySetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
                 const NoStringVector& vsBindHosts = NoApp::Get().GetBindHosts();
                 if (vsBindHosts.empty()) {
                     if (pUser) {
-                        Tmpl["BindHost"] = pUser->GetBindHost();
-                        Tmpl["DCCBindHost"] = pUser->GetDCCBindHost();
+                        Tmpl["BindHost"] = pUser->bindHost();
+                        Tmpl["DCCBindHost"] = pUser->dccBindHost();
                     }
                 } else {
                     bool bFoundBindHost = false;
@@ -1320,28 +1320,28 @@ public:
                         l["BindHost"] = sBindHost;
                         k["BindHost"] = sBindHost;
 
-                        if (pUser && pUser->GetBindHost() == sBindHost) {
+                        if (pUser && pUser->bindHost() == sBindHost) {
                             l["Checked"] = "true";
                             bFoundBindHost = true;
                         }
 
-                        if (pUser && pUser->GetDCCBindHost() == sBindHost) {
+                        if (pUser && pUser->dccBindHost() == sBindHost) {
                             k["Checked"] = "true";
                             bFoundDCCBindHost = true;
                         }
                     }
 
                     // If our current bindhost is not in the global list...
-                    if (pUser && !bFoundBindHost && !pUser->GetBindHost().empty()) {
+                    if (pUser && !bFoundBindHost && !pUser->bindHost().empty()) {
                         NoTemplate& l = Tmpl.AddRow("BindHostLoop");
 
-                        l["BindHost"] = pUser->GetBindHost();
+                        l["BindHost"] = pUser->bindHost();
                         l["Checked"] = "true";
                     }
-                    if (pUser && !bFoundDCCBindHost && !pUser->GetDCCBindHost().empty()) {
+                    if (pUser && !bFoundDCCBindHost && !pUser->dccBindHost().empty()) {
                         NoTemplate& l = Tmpl.AddRow("DCCBindHostLoop");
 
-                        l["BindHost"] = pUser->GetDCCBindHost();
+                        l["BindHost"] = pUser->dccBindHost();
                         l["Checked"] = "true";
                     }
                 }
@@ -1355,7 +1355,7 @@ public:
                 NoTemplate& l = Tmpl.AddRow("SkinLoop");
                 l["Name"] = SubDir;
 
-                if (pUser && SubDir == pUser->GetSkinName()) {
+                if (pUser && SubDir == pUser->skinName()) {
                     l["Checked"] = "true";
                 }
             }
@@ -1375,13 +1375,13 @@ public:
 
                 NoModule* pModule = nullptr;
                 if (pUser) {
-                    pModule = pUser->GetLoader()->findModule(Info.GetName());
+                    pModule = pUser->loader()->findModule(Info.GetName());
                     // Check if module is loaded by all or some networks
-                    const std::vector<NoNetwork*>& userNetworks = pUser->GetNetworks();
+                    const std::vector<NoNetwork*>& userNetworks = pUser->networks();
                     uint networksWithRenderedModuleCount = 0;
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
-                        const NoModuleLoader* networkModules = pCurrentNetwork->GetLoader();
+                        const NoModuleLoader* networkModules = pCurrentNetwork->loader();
                         if (networkModules->findModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
@@ -1401,7 +1401,7 @@ public:
                 // Check if module is loaded globally
                 l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.GetName()) != nullptr);
 
-                if (!spSession->IsAdmin() && pUser && pUser->DenyLoadMod()) {
+                if (!spSession->IsAdmin() && pUser && pUser->denyLoadMod()) {
                     l["Disabled"] = "true";
                 }
             }
@@ -1410,7 +1410,7 @@ public:
             o1["Name"] = "autoclearchanbuffer";
             o1["DisplayName"] = "Auto Clear Chan Buffer";
             o1["Tooltip"] = "Automatically Clear Channel Buffer After Playback (the default value for new channels)";
-            if (!pUser || pUser->AutoClearChanBuffer()) {
+            if (!pUser || pUser->autoClearChanBuffer()) {
                 o1["Checked"] = "true";
             }
 
@@ -1419,21 +1419,21 @@ public:
             NoTemplate& o4 = Tmpl.AddRow("OptionLoop");
             o4["Name"] = "multiclients";
             o4["DisplayName"] = "Multi Clients";
-            if (!pUser || pUser->MultiClients()) {
+            if (!pUser || pUser->multiClients()) {
                 o4["Checked"] = "true";
             }
 
             NoTemplate& o7 = Tmpl.AddRow("OptionLoop");
             o7["Name"] = "appendtimestamp";
             o7["DisplayName"] = "Append Timestamps";
-            if (pUser && pUser->GetTimestampAppend()) {
+            if (pUser && pUser->timestampAppend()) {
                 o7["Checked"] = "true";
             }
 
             NoTemplate& o8 = Tmpl.AddRow("OptionLoop");
             o8["Name"] = "prependtimestamp";
             o8["DisplayName"] = "Prepend Timestamps";
-            if (pUser && pUser->GetTimestampPrepend()) {
+            if (pUser && pUser->timestampPrepend()) {
                 o8["Checked"] = "true";
             }
 
@@ -1441,14 +1441,14 @@ public:
                 NoTemplate& o9 = Tmpl.AddRow("OptionLoop");
                 o9["Name"] = "denyloadmod";
                 o9["DisplayName"] = "Deny LoadMod";
-                if (pUser && pUser->DenyLoadMod()) {
+                if (pUser && pUser->denyLoadMod()) {
                     o9["Checked"] = "true";
                 }
 
                 NoTemplate& o10 = Tmpl.AddRow("OptionLoop");
                 o10["Name"] = "isadmin";
                 o10["DisplayName"] = "Admin";
-                if (pUser && pUser->IsAdmin()) {
+                if (pUser && pUser->isAdmin()) {
                     o10["Checked"] = "true";
                 }
                 if (pUser && pUser == NoApp::Get().FindUser(WebSock.GetUser())) {
@@ -1458,7 +1458,7 @@ public:
                 NoTemplate& o11 = Tmpl.AddRow("OptionLoop");
                 o11["Name"] = "denysetbindhost";
                 o11["DisplayName"] = "Deny SetBindHost";
-                if (pUser && pUser->DenySetBindHost()) {
+                if (pUser && pUser->denySetBindHost()) {
                     o11["Checked"] = "true";
                 }
             }
@@ -1467,7 +1467,7 @@ public:
             o12["Name"] = "autoclearquerybuffer";
             o12["DisplayName"] = "Auto Clear Query Buffer";
             o12["Tooltip"] = "Automatically Clear Query Buffer After Playback";
-            if (!pUser || pUser->AutoClearQueryBuffer()) {
+            if (!pUser || pUser->autoClearQueryBuffer()) {
                 o12["Checked"] = "true";
             }
 
@@ -1504,7 +1504,7 @@ public:
         if (!pUser) {
             NoString sClone = WebSock.GetParam("clone");
             if (NoUser* pCloneUser = NoApp::Get().FindUser(sClone)) {
-                pNewUser->CloneNetworks(*pCloneUser);
+                pNewUser->cloneNetworks(*pCloneUser);
             }
 
             // Add User Submission
@@ -1518,7 +1518,7 @@ public:
             sAction = "added";
         } else {
             // Edit User Submission
-            if (!pUser->Clone(*pNewUser, sErr, false)) {
+            if (!pUser->clone(*pNewUser, sErr, false)) {
                 delete pNewUser;
                 WebSock.PrintErrorPage("Invalid Submission [" + sErr + "]");
                 return true;
@@ -1543,7 +1543,7 @@ public:
         if (spSession->IsAdmin() && WebSock.HasParam("submit_return")) {
             WebSock.Redirect(GetWebPath() + "listusers");
         } else {
-            WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->GetUserName());
+            WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->userName());
         }
 
         /* we don't want the template to be printed while we redirect */
@@ -1563,9 +1563,9 @@ public:
             NoTemplate& l = Tmpl.AddRow("UserLoop");
             NoUser& User = *it->second;
 
-            l["Username"] = User.GetUserName();
-            l["Clients"] = NoString(User.GetAllClients().size());
-            l["Networks"] = NoString(User.GetNetworks().size());
+            l["Username"] = User.userName();
+            l["Clients"] = NoString(User.allClients().size());
+            l["Networks"] = NoString(User.networks().size());
 
             if (&User == spSession->GetUser()) {
                 l["IsSelf"] = "true";
@@ -1587,7 +1587,7 @@ public:
 
         for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             NoUser& User = *it->second;
-            std::vector<NoNetwork*> vNetworks = User.GetNetworks();
+            std::vector<NoNetwork*> vNetworks = User.networks();
 
             for (std::vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
                 NoNetwork* pNetwork = *it2;
@@ -1604,7 +1604,7 @@ public:
                 uiClients += pNetwork->GetClients().size();
             }
 
-            uiClients += User.GetUserClients().size();
+            uiClients += User.userClients().size();
         }
 
         Tmpl["TotalNetworks"] = NoString(uiNetworks);
@@ -1847,16 +1847,16 @@ public:
                     const NoUser& User = *usersIt->second;
 
                     // Count users which has loaded a render module
-                    const NoModuleLoader* userModules = User.GetLoader();
+                    const NoModuleLoader* userModules = User.loader();
                     if (userModules->findModule(Info.GetName())) {
                         usersWithRenderedModuleCount++;
                     }
                     // Count networks which has loaded a render module
-                    const std::vector<NoNetwork*>& userNetworks = User.GetNetworks();
+                    const std::vector<NoNetwork*>& userNetworks = User.networks();
                     networksCount += userNetworks.size();
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
-                        if (pCurrentNetwork->GetLoader()->findModule(Info.GetName())) {
+                        if (pCurrentNetwork->loader()->findModule(Info.GetName())) {
                             networksWithRenderedModuleCount++;
                         }
                     }

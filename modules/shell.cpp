@@ -74,7 +74,7 @@ public:
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
 #ifndef MOD_SHELL_ALLOW_EVERYONE
-        if (!GetUser()->IsAdmin()) {
+        if (!GetUser()->isAdmin()) {
             sMessage = "You must be admin to use the shell module";
             return false;
         }

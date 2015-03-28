@@ -51,7 +51,7 @@ public:
 
     void onModCommand(const NoString& sCommand) override
     {
-        if (GetUser()->IsAdmin()) {
+        if (GetUser()->isAdmin()) {
             HandleCommand(sCommand);
         } else {
             PutModule("Access denied");
@@ -135,7 +135,7 @@ public:
                         pUser = nullptr;
                     }
 
-                    if (pUser && !pUser->Clone(*pBaseUser, sErr)) {
+                    if (pUser && !pUser->clone(*pBaseUser, sErr)) {
                         NO_DEBUG("saslauth: Clone User [" << CloneUser() << "] failed: " << sErr);
                         delete pUser;
                         pUser = nullptr;
@@ -144,7 +144,7 @@ public:
 
                 if (pUser) {
                     // "::" is an invalid MD5 hash, so user won't be able to login by usual method
-                    pUser->SetPass("::", NoUser::HASH_MD5, "::");
+                    pUser->setPassword("::", NoUser::HashMd5, "::");
                 }
 
                 if (pUser && !NoApp::Get().AddUser(pUser, sErr)) {

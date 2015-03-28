@@ -203,7 +203,7 @@ private:
         if (sReason.empty()) sReason = SIMPLE_AWAY_DEFAULT_REASON;
 
         time_t iTime = time(nullptr);
-        NoString sTime = No::cTime(iTime, GetUser()->GetTimezone());
+        NoString sTime = No::cTime(iTime, GetUser()->timezone());
         sReason.replace("%s", sTime);
 
         return sReason;

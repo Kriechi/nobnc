@@ -77,7 +77,7 @@ public:
     void SetUser(NoUser* pUser);
     bool SetName(const NoString& sName);
 
-    NoModuleLoader* GetLoader() const;
+    NoModuleLoader* loader() const;
 
     bool PutUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
     bool PutStatus(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);

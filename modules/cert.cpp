@@ -42,7 +42,7 @@ public:
             PutModule("You have a certificate in: " + PemFile());
         } else {
             PutModule("You do not have a certificate. Please use the web interface to add a certificate");
-            if (GetUser()->IsAdmin()) {
+            if (GetUser()->isAdmin()) {
                 PutModule("Alternatively you can either place one at " + PemFile());
             }
         }

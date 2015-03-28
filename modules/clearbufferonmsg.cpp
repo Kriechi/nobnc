@@ -65,9 +65,9 @@ public:
                 pNetwork->DelQuery(pQuery->getName());
             }
 
-            // We deny AutoClearQueryBuffer since this module
+            // We deny autoClearQueryBuffer since this module
             // doesn't make any sense with it
-            GetUser()->SetAutoClearQueryBuffer(false);
+            GetUser()->setAutoClearQueryBuffer(false);
         }
     }
 

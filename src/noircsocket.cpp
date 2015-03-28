@@ -143,8 +143,8 @@ NoIrcSocket::~NoIrcSocket()
 
     Quit();
     d->chans.clear();
-    d->network->GetUser()->AddBytesRead(GetBytesRead());
-    d->network->GetUser()->AddBytesWritten(GetBytesWritten());
+    d->network->GetUser()->addBytesRead(GetBytesRead());
+    d->network->GetUser()->addBytesWritten(GetBytesWritten());
 }
 
 void NoIrcSocket::Quit(const NoString& sQuitMsg)
@@ -167,7 +167,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
 
     sLine.trimRight("\n\r");
 
-    NO_DEBUG("(" << d->network->GetUser()->GetUserName() << "/" << d->network->GetName() << ") IRC -> ZNC [" << sLine << "]");
+    NO_DEBUG("(" << d->network->GetUser()->userName() << "/" << d->network->GetName() << ") IRC -> ZNC [" << sLine << "]");
 
     bool bReturn = false;
     IRCSOCKMODULECALL(onRaw(sLine), &bReturn);
@@ -446,7 +446,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                         NoString sModes = pChan->getDefaultModes();
 
                         if (sModes.empty()) {
-                            sModes = d->network->GetUser()->GetDefaultChanModes();
+                            sModes = d->network->GetUser()->defaultChanModes();
                         }
 
                         if (!sModes.empty()) {
@@ -913,7 +913,7 @@ bool NoIrcSocket::onPrivCtcp(NoNick& Nick, NoString& sMessage)
         IRCSOCKMODULECALL(onPrivAction(Nick, sMessage), &bResult);
         if (bResult) return true;
 
-        if (!d->network->IsUserOnline() || !d->network->GetUser()->AutoClearQueryBuffer()) {
+        if (!d->network->IsUserOnline() || !d->network->GetUser()->autoClearQueryBuffer()) {
             NoQuery* pQuery = d->network->AddQuery(Nick.nick());
             if (pQuery) {
                 pQuery->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG {target} :\001ACTION {text}\001", sMessage);
@@ -929,7 +929,7 @@ bool NoIrcSocket::onPrivCtcp(NoNick& Nick, NoString& sMessage)
 
 bool NoIrcSocket::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
 {
-    const NoStringMap& mssCTCPReplies = d->network->GetUser()->GetCTCPReplies();
+    const NoStringMap& mssCTCPReplies = d->network->GetUser()->ctcpReplies();
     NoString sQuery = No::token(sMessage, 0).toUpper();
     NoStringMap::const_iterator it = mssCTCPReplies.find(sQuery);
     bool bHaveReply = false;
@@ -991,7 +991,7 @@ bool NoIrcSocket::onPrivMsg(NoNick& Nick, NoString& sMessage)
     IRCSOCKMODULECALL(onPrivMsg(Nick, sMessage), &bResult);
     if (bResult) return true;
 
-    if (!d->network->IsUserOnline() || !d->network->GetUser()->AutoClearQueryBuffer()) {
+    if (!d->network->IsUserOnline() || !d->network->GetUser()->autoClearQueryBuffer()) {
         NoQuery* pQuery = d->network->AddQuery(Nick.nick());
         if (pQuery) {
             pQuery->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG {target} :{text}", sMessage);
@@ -1064,7 +1064,7 @@ void NoIrcSocket::PutIRC(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (d->floodProtection && d->sendsAllowed <= 0) {
-        NO_DEBUG("(" << d->network->GetUser()->GetUserName() << "/" << d->network->GetName() << ") ZNC -> IRC [" << sLine << "] (queued)");
+        NO_DEBUG("(" << d->network->GetUser()->userName() << "/" << d->network->GetName() << ") ZNC -> IRC [" << sLine << "] (queued)");
     }
     d->sendQueue.push_back(sLine);
     TrySend();
@@ -1074,7 +1074,7 @@ void NoIrcSocket::PutIRCQuick(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (d->floodProtection && d->sendsAllowed <= 0) {
-        NO_DEBUG("(" << d->network->GetUser()->GetUserName() << "/" << d->network->GetName() << ") ZNC -> IRC [" << sLine
+        NO_DEBUG("(" << d->network->GetUser()->userName() << "/" << d->network->GetName() << ") ZNC -> IRC [" << sLine
                   << "] (queued to front)");
     }
     d->sendQueue.push_front(sLine);
@@ -1091,7 +1091,7 @@ void NoIrcSocket::TrySend()
         IRCSOCKMODULECALL(onSendToIrc(sLine), &bSkip);
         if (!bSkip) {
             ;
-            NO_DEBUG("(" << d->network->GetUser()->GetUserName() << "/" << d->network->GetName() << ") ZNC -> IRC [" << sLine << "]");
+            NO_DEBUG("(" << d->network->GetUser()->userName() << "/" << d->network->GetName() << ") ZNC -> IRC [" << sLine << "]");
             Write(sLine + "\r\n");
         }
         d->sendQueue.pop_front();
@@ -1135,7 +1135,7 @@ void NoIrcSocket::DisconnectedImpl()
     IRCSOCKMODULECALL(onIrcDisconnected(), NOTHING);
 
     NO_DEBUG(GetSockName() << " == Disconnected()");
-    if (!d->network->GetUser()->IsBeingDeleted() && d->network->GetIRCConnectEnabled() && d->network->GetServers().size() != 0) {
+    if (!d->network->GetUser()->isBeingDeleted() && d->network->GetIRCConnectEnabled() && d->network->GetServers().size() != 0) {
         d->network->PutStatus("Disconnected from IRC. Reconnecting...");
     }
     d->network->ClearRawBuffer();
@@ -1164,7 +1164,7 @@ void NoIrcSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
     NoString sError = sDescription;
 
     NO_DEBUG(GetSockName() << " == SockError(" << iErrno << " " << sError << ")");
-    if (!d->network->GetUser()->IsBeingDeleted()) {
+    if (!d->network->GetUser()->isBeingDeleted()) {
         if (IsConOK()) {
             d->network->PutStatus("Cannot connect to IRC (" + sError + "). Retrying...");
         } else {
@@ -1208,7 +1208,7 @@ void NoIrcSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
 void NoIrcSocket::TimeoutImpl()
 {
     NO_DEBUG(GetSockName() << " == Timeout()");
-    if (!d->network->GetUser()->IsBeingDeleted()) {
+    if (!d->network->GetUser()->isBeingDeleted()) {
         d->network->PutStatus("IRC connection timed out.  Reconnecting...");
     }
     d->network->ClearRawBuffer();
@@ -1221,7 +1221,7 @@ void NoIrcSocket::TimeoutImpl()
 void NoIrcSocket::ConnectionRefusedImpl()
 {
     NO_DEBUG(GetSockName() << " == ConnectionRefused()");
-    if (!d->network->GetUser()->IsBeingDeleted()) {
+    if (!d->network->GetUser()->isBeingDeleted()) {
         d->network->PutStatus("Connection Refused.  Reconnecting...");
     }
     d->network->ClearRawBuffer();

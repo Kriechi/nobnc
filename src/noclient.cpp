@@ -34,17 +34,17 @@
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                             \
     {                                                                         \
         NoModule* pModule = nullptr;                                           \
-        if (NETWORK && (pModule = (NETWORK)->GetLoader()->findModule(MOD))) { \
+        if (NETWORK && (pModule = (NETWORK)->loader()->findModule(MOD))) { \
             try {                                                             \
                 pModule->SetClient(CLIENT);                                   \
                 pModule->FUNC;                                                \
                 pModule->SetClient(nullptr);                                  \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
-                    (NETWORK)->GetLoader()->unloadModule(MOD);                \
+                    (NETWORK)->loader()->unloadModule(MOD);                \
                 }                                                             \
             }                                                                 \
-        } else if ((pModule = (USER)->GetLoader()->findModule(MOD))) {        \
+        } else if ((pModule = (USER)->loader()->findModule(MOD))) {        \
             try {                                                             \
                 pModule->SetClient(CLIENT);                                   \
                 pModule->SetNetwork(NETWORK);                                 \
@@ -53,7 +53,7 @@
                 pModule->SetNetwork(nullptr);                                 \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
-                    (USER)->GetLoader()->unloadModule(MOD);                   \
+                    (USER)->loader()->unloadModule(MOD);                   \
                 }                                                             \
             }                                                                 \
         } else if ((pModule = NoApp::Get().GetLoader()->findModule(MOD))) {    \
@@ -159,8 +159,8 @@ NoClient::~NoClient()
         pAuth->invalidate();
     }
     if (d->user != nullptr) {
-        d->user->AddBytesRead(d->socket->GetBytesRead());
-        d->user->AddBytesWritten(d->socket->GetBytesWritten());
+        d->user->addBytesRead(d->socket->GetBytesRead());
+        d->user->addBytesWritten(d->socket->GetBytesWritten());
     }
     delete d->socket;
 }
@@ -259,7 +259,7 @@ void NoClient::ReadLine(const NoString& sData)
         NoString sTarget = No::token(sLine, 1);
         NoString sModCommand;
 
-        if (sTarget.trimPrefix(d->user->GetStatusPrefix())) {
+        if (sTarget.trimPrefix(d->user->statusPrefix())) {
             sModCommand = No::tokens(sLine, 2);
         } else {
             sTarget = "status";
@@ -311,7 +311,7 @@ void NoClient::ReadLine(const NoString& sData)
         NoStringVector vTargets = sTargets.split(",", No::SkipEmptyParts);
 
         for (NoString& sTarget : vTargets) {
-            if (sTarget.trimPrefix(d->user->GetStatusPrefix())) {
+            if (sTarget.trimPrefix(d->user->statusPrefix())) {
                 if (!sTarget.equals("status")) {
                     CALLMOD(sTarget, this, d->user, d->network, onModNotice(sMsg));
                 }
@@ -378,7 +378,7 @@ void NoClient::ReadLine(const NoString& sData)
                 sCTCP.leftChomp(1);
                 sCTCP.rightChomp(1);
 
-                if (sTarget.trimPrefix(d->user->GetStatusPrefix())) {
+                if (sTarget.trimPrefix(d->user->statusPrefix())) {
                     if (sTarget.equals("status")) {
                         StatusCTCP(sCTCP);
                     } else {
@@ -403,7 +403,7 @@ void NoClient::ReadLine(const NoString& sData)
                                                  sMessage);
                             }
                         } else {
-                            if (!d->user->AutoClearQueryBuffer() || !d->network->IsUserOnline()) {
+                            if (!d->user->autoClearQueryBuffer() || !d->network->IsUserOnline()) {
                                 NoQuery* pQuery = d->network->AddQuery(sTarget);
                                 if (pQuery) {
                                     pQuery->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) + " :\001ACTION {text}\001",
@@ -431,7 +431,7 @@ void NoClient::ReadLine(const NoString& sData)
                 continue;
             }
 
-            if (sTarget.trimPrefix(d->user->GetStatusPrefix())) {
+            if (sTarget.trimPrefix(d->user->statusPrefix())) {
                 if (sTarget.equals("status")) {
                     UserCommand(sMsg);
                 } else {
@@ -459,7 +459,7 @@ void NoClient::ReadLine(const NoString& sData)
                         pChan->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) + " :{text}", sMsg);
                     }
                 } else {
-                    if (!d->user->AutoClearQueryBuffer() || !d->network->IsUserOnline()) {
+                    if (!d->user->autoClearQueryBuffer() || !d->network->IsUserOnline()) {
                         NoQuery* pQuery = d->network->AddQuery(sTarget);
                         if (pQuery) {
                             pQuery->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) +
@@ -639,7 +639,7 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
                 }
             }
         } else if (d->user) {
-            d->user->UserDisconnected(this);
+            d->user->userDisconnected(this);
         }
     }
 
@@ -649,7 +649,7 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
         if (d->network) {
             d->network->ClientConnected(this);
         } else if (d->user) {
-            d->user->UserConnected(this);
+            d->user->userConnected(this);
         }
     }
 }
@@ -660,7 +660,7 @@ std::vector<NoClient*> NoClient::GetClients() const
         return d->network->GetClients();
     }
 
-    return d->user->GetUserClients();
+    return d->user->userClients();
 }
 
 NoIrcSocket* NoClient::GetIRCSock() const
@@ -695,7 +695,7 @@ bool NoClient::SendMotd()
         if (d->network) {
             PutStatusNotice(d->network->ExpandString(sLine));
         } else {
-            PutStatusNotice(d->user->ExpandString(sLine));
+            PutStatusNotice(d->user->expandString(sLine));
         }
     }
 
@@ -727,30 +727,30 @@ void NoClient::AcceptLogin(NoUser& User)
     // (constructor set a different timeout and mode)
     d->socket->SetTimeout(NoNetwork::NO_TRAFFIC_TIMEOUT, NoSocket::TMO_READ);
 
-    d->socket->SetSockName("USR::" + d->user->GetUserName());
-    d->socket->SetEncoding(d->user->GetClientEncoding());
+    d->socket->SetSockName("USR::" + d->user->userName());
+    d->socket->SetEncoding(d->user->clientEncoding());
 
     if (!d->sNetwork.empty()) {
-        d->network = d->user->FindNetwork(d->sNetwork);
+        d->network = d->user->findNetwork(d->sNetwork);
         if (!d->network) {
             PutStatus("Network (" + d->sNetwork + ") doesn't exist.");
         }
-    } else if (!d->user->GetNetworks().empty()) {
+    } else if (!d->user->networks().empty()) {
         // If a user didn't supply a network, and they have a network called "default" then automatically use this
         // network.
-        d->network = d->user->FindNetwork("default");
+        d->network = d->user->findNetwork("default");
         // If no "default" network, try "user" network. It's for compatibility with early network stuff in ZNC, which
         // converted old configs to "user" network.
-        if (!d->network) d->network = d->user->FindNetwork("user");
+        if (!d->network) d->network = d->user->findNetwork("user");
         // Otherwise, just try any network of the user.
-        if (!d->network) d->network = *d->user->GetNetworks().begin();
-        if (d->network && d->user->GetNetworks().size() > 1) {
+        if (!d->network) d->network = *d->user->networks().begin();
+        if (d->network && d->user->networks().size() > 1) {
             PutStatusNotice("You have several networks configured, but no network was specified for the connection.");
             PutStatusNotice("Selecting network [" + d->network->GetName() +
                             "]. To see list of all configured networks, use /znc ListNetworks");
             PutStatusNotice(
             "If you want to choose another network, use /znc JumpNetwork <network>, or connect to ZNC with username " +
-            d->user->GetUserName() + "/<network> (instead of just " + d->user->GetUserName() + ")");
+            d->user->userName() + "/<network> (instead of just " + d->user->userName() + ")");
         }
     } else {
         PutStatusNotice("You have no networks configured. Use /znc AddNetwork <network> to add one.");
@@ -784,7 +784,7 @@ void NoClient::PutIRC(const NoString& sLine)
 NoString NoClient::GetFullName() const
 {
     if (!d->user) return d->socket->GetRemoteIP();
-    NoString sFullName = d->user->GetUserName();
+    NoString sFullName = d->user->userName();
     if (!d->identifier.empty()) sFullName += "@" + d->identifier;
     if (d->network) sFullName += "/" + d->network->GetName();
     return sFullName;
@@ -818,9 +818,9 @@ void NoClient::PutModNotice(const NoString& sModule, const NoString& sLine)
         return;
     }
 
-    NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [:" + d->user->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE "
+    NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [:" + d->user->statusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE "
               << GetNick() << " :" << sLine << "]");
-    d->socket->Write(":" + d->user->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE " +
+    d->socket->Write(":" + d->user->statusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE " +
           GetNick() + " :" + sLine + "\r\n");
 }
 
@@ -830,12 +830,12 @@ void NoClient::PutModule(const NoString& sModule, const NoString& sLine)
         return;
     }
 
-    NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [:" + d->user->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG "
+    NO_DEBUG("(" << GetFullName() << ") ZNC -> CLI [:" + d->user->statusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG "
               << GetNick() << " :" << sLine << "]");
 
     NoStringVector vsLines = sLine.split("\n");
     for (const NoString& s : vsLines) {
-        d->socket->Write(":" + d->user->GetStatusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG " +
+        d->socket->Write(":" + d->user->statusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG " +
               GetNick() + " :" + s + "\r\n");
     }
 }
@@ -860,12 +860,12 @@ NoString NoClient::GetNickMask() const
         return GetIRCSock()->GetNickMask();
     }
 
-    NoString sHost = d->network ? d->network->GetBindHost() : d->user->GetBindHost();
+    NoString sHost = d->network ? d->network->GetBindHost() : d->user->bindHost();
     if (sHost.empty()) {
         sHost = "irc.znc.in";
     }
 
-    return GetNick() + "!" + (d->network ? d->network->GetBindHost() : d->user->GetIdent()) + "@" + sHost;
+    return GetNick() + "!" + (d->network ? d->network->GetBindHost() : d->user->ident()) + "@" + sHost;
 }
 
 NoString NoClient::GetIdentifier() const { return d->identifier; }

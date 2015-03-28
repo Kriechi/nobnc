@@ -37,7 +37,7 @@ NoQuery::NoQuery(const NoString& name, NoNetwork* network) : d(new NoQueryPrivat
 {
     d->name = name;
     d->network = network;
-    setBufferCount(d->network->GetUser()->GetBufferCount(), true);
+    setBufferCount(d->network->GetUser()->bufferCount(), true);
 }
 
 NoQuery::~NoQuery()

@@ -28,12 +28,12 @@ public:
 
     bool IsOnlineModNick(const NoString& sNick)
     {
-        const NoString& sPrefix = GetUser()->GetStatusPrefix();
+        const NoString& sPrefix = GetUser()->statusPrefix();
         if (!sNick.startsWith(sPrefix)) return false;
 
         NoString sModNick = sNick.substr(sPrefix.length());
-        if (sModNick.equals("status") || GetNetwork()->GetLoader()->findModule(sModNick) ||
-            GetUser()->GetLoader()->findModule(sModNick) || NoApp::Get().GetLoader()->findModule(sModNick))
+        if (sModNick.equals("status") || GetNetwork()->loader()->findModule(sModNick) ||
+            GetUser()->loader()->findModule(sModNick) || NoApp::Get().GetLoader()->findModule(sModNick))
             return true;
         return false;
     }

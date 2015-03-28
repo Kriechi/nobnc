@@ -52,8 +52,8 @@ NoModuleSocket::~NoModuleSocket()
     }
 
     if (pUser && m_module && m_module->GetType() != No::GlobalModule) {
-        pUser->AddBytesWritten(GetBytesWritten());
-        pUser->AddBytesRead(GetBytesRead());
+        pUser->addBytesWritten(GetBytesWritten());
+        pUser->addBytesRead(GetBytesRead());
     } else {
         NoApp::Get().AddBytesWritten(GetBytesWritten());
         NoApp::Get().AddBytesRead(GetBytesRead());
@@ -93,8 +93,8 @@ bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL,
     NoString sBindHost;
 
     if (pUser) {
-        sSockName += "::" + pUser->GetUserName();
-        sBindHost = pUser->GetBindHost();
+        sSockName += "::" + pUser->userName();
+        sBindHost = pUser->bindHost();
         NoNetwork* pNetwork = m_module->GetNetwork();
         if (pNetwork) {
             sSockName += "::" + pNetwork->GetName();
@@ -122,7 +122,7 @@ bool NoModuleSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
     NoString sSockName = "MOD::L::" + m_module->GetModName();
 
     if (pUser) {
-        sSockName += "::" + pUser->GetUserName();
+        sSockName += "::" + pUser->userName();
     }
     // Don't overwrite the socket name if one is already set
     if (!GetSockName().empty()) {

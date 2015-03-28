@@ -35,14 +35,14 @@ class NoUserTimer : public CCron
 public:
     NoUserTimer(NoUser* pUser) : CCron(), m_pUser(pUser)
     {
-        SetName("NoUserTimer::" + m_pUser->GetUserName());
+        SetName("NoUserTimer::" + m_pUser->userName());
         Start(NoNetwork::PING_SLACK);
     }
 
 protected:
     void RunJob() override
     {
-        const std::vector<NoClient*>& vUserClients = m_pUser->GetUserClients();
+        const std::vector<NoClient*>& vUserClients = m_pUser->userClients();
 
         for (NoClient* pUserClient : vUserClients) {
             if (pUserClient->GetSocket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
@@ -75,7 +75,7 @@ public:
     NoStringMap ctcpReplies;
     NoString timestampFormat = "[%H:%M:%S]";
     NoString timezone = "";
-    NoUser::eHashType hashType = NoUser::HASH_NONE;
+    NoUser::HashType hashType = NoUser::HashNone;
 
     NoString userPath = "";
 
@@ -109,7 +109,7 @@ public:
 NoUser::NoUser(const NoString& sUserName) : d(new NoUserPrivate)
 {
     d->userName = sUserName;
-    d->cleanUserName = MakeCleanUserName(sUserName);
+    d->cleanUserName = makeCleanUserName(sUserName);
     d->ident = d->cleanUserName;
     d->realName = sUserName;
     d->userPath = NoApp::Get().GetUserPath() + "/" + sUserName;
@@ -137,8 +137,8 @@ NoUser::~NoUser()
 
     NoApp::Get().GetManager().DelCronByAddr(d->userTimer);
 
-    NoApp::Get().AddBytesRead(BytesRead());
-    NoApp::Get().AddBytesWritten(BytesWritten());
+    NoApp::Get().AddBytesRead(bytesRead());
+    NoApp::Get().AddBytesWritten(bytesWritten());
 }
 
 template <class T> struct TOption
@@ -147,40 +147,40 @@ template <class T> struct TOption
     void (NoUser::*pSetter)(T);
 };
 
-bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
+bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
 {
     TOption<const NoString&> StringOptions[] = {
-        { "nick", &NoUser::SetNick },
-        { "quitmsg", &NoUser::SetQuitMsg },
-        { "altnick", &NoUser::SetAltNick },
-        { "ident", &NoUser::SetIdent },
-        { "realname", &NoUser::SetRealName },
-        { "chanmodes", &NoUser::SetDefaultChanModes },
-        { "bindhost", &NoUser::SetBindHost },
-        { "vhost", &NoUser::SetBindHost },
-        { "dccbindhost", &NoUser::SetDCCBindHost },
-        { "dccvhost", &NoUser::SetDCCBindHost },
-        { "timestampformat", &NoUser::SetTimestampFormat },
-        { "skin", &NoUser::SetSkinName },
-        { "clientencoding", &NoUser::SetClientEncoding },
+        { "nick", &NoUser::setNick },
+        { "quitmsg", &NoUser::setQuitMsg },
+        { "altnick", &NoUser::setAltNick },
+        { "ident", &NoUser::setIdent },
+        { "realname", &NoUser::setRealName },
+        { "chanmodes", &NoUser::setDefaultChanModes },
+        { "bindhost", &NoUser::setBindHost },
+        { "vhost", &NoUser::setBindHost },
+        { "dccbindhost", &NoUser::setDccBindHost },
+        { "dccvhost", &NoUser::setDccBindHost },
+        { "timestampformat", &NoUser::setTimestampFormat },
+        { "skin", &NoUser::setSkinName },
+        { "clientencoding", &NoUser::setClientEncoding },
     };
     TOption<uint> UIntOptions[] = {
-        { "jointries", &NoUser::SetJoinTries },
-        { "maxnetworks", &NoUser::SetMaxNetworks },
-        { "maxquerybuffers", &NoUser::SetMaxQueryBuffers },
-        { "maxjoins", &NoUser::SetMaxJoins },
+        { "jointries", &NoUser::setJoinTries },
+        { "maxnetworks", &NoUser::setMaxNetworks },
+        { "maxquerybuffers", &NoUser::setMaxQueryBuffers },
+        { "maxjoins", &NoUser::setMaxJoins },
     };
     TOption<bool> BoolOptions[] = {
-        { "keepbuffer", &NoUser::SetKeepBuffer }, // XXX compatibility crap from pre-0.207
-        { "autoclearchanbuffer", &NoUser::SetAutoClearChanBuffer },
-        { "autoclearquerybuffer", &NoUser::SetAutoClearQueryBuffer },
-        { "multiclients", &NoUser::SetMultiClients },
-        { "denyloadmod", &NoUser::SetDenyLoadMod },
-        { "admin", &NoUser::SetAdmin },
-        { "denysetbindhost", &NoUser::SetDenySetBindHost },
-        { "denysetvhost", &NoUser::SetDenySetBindHost },
-        { "appendtimestamp", &NoUser::SetTimestampAppend },
-        { "prependtimestamp", &NoUser::SetTimestampPrepend },
+        { "keepbuffer", &NoUser::setKeepBuffer }, // XXX compatibility crap from pre-0.207
+        { "autoclearchanbuffer", &NoUser::setAutoClearChanBuffer },
+        { "autoclearquerybuffer", &NoUser::setAutoClearQueryBuffer },
+        { "multiclients", &NoUser::setMultiClients },
+        { "denyloadmod", &NoUser::setDenyLoadMod },
+        { "admin", &NoUser::setAdmin },
+        { "denysetbindhost", &NoUser::setDenySetBindHost },
+        { "denysetvhost", &NoUser::setDenySetBindHost },
+        { "appendtimestamp", &NoUser::setTimestampAppend },
+        { "prependtimestamp", &NoUser::setTimestampPrepend },
     };
 
     for (const auto& Option : StringOptions) {
@@ -199,11 +199,11 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     NoStringVector vsList;
     pConfig->FindStringVector("allow", vsList);
     for (const NoString& sHost : vsList) {
-        AddAllowedHost(sHost);
+        addAllowedHost(sHost);
     }
     pConfig->FindStringVector("ctcpreply", vsList);
     for (const NoString& sReply : vsList) {
-        AddCTCPReply(No::token(sReply, 0), No::tokens(sReply, 1));
+        addCtcpReply(No::token(sReply, 0), No::tokens(sReply, 1));
     }
 
     NoString sValue;
@@ -214,7 +214,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         if (sValue.toBool()) {
             No::printAction("Loading Module [bouncedcc]");
             NoString sModRet;
-            bool bModRet = GetLoader()->loadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
+            bool bModRet = loader()->loadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -223,7 +223,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             }
 
             if (sDCCLookupValue.equals("Client")) {
-                NoModule* pMod = GetLoader()->findModule("bouncedcc");
+                NoModule* pMod = loader()->findModule("bouncedcc");
                 if (pMod) {
                     NoRegistry registry(pMod);
                     registry.setValue("UseClientIP", "1");
@@ -231,7 +231,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             }
         }
     }
-    if (pConfig->FindStringEntry("buffer", sValue)) SetBufferCount(sValue.toUInt(), true);
+    if (pConfig->FindStringEntry("buffer", sValue)) setBufferCount(sValue.toUInt(), true);
     if (pConfig->FindStringEntry("awaysuffix", sValue)) {
         No::printMessage("WARNING: AwaySuffix has been deprecated, instead try -> LoadModule = awaynick %nick%_" + sValue);
     }
@@ -244,14 +244,14 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
             No::printError("WARNING: KeepNick has been deprecated, instead try -> LoadModule = keepnick");
     }
     if (pConfig->FindStringEntry("statusprefix", sValue)) {
-        if (!SetStatusPrefix(sValue)) {
+        if (!setStatusPrefix(sValue)) {
             sError = "Invalid StatusPrefix [" + sValue + "] Must be 1-5 chars, no spaces.";
             No::printError(sError);
             return false;
         }
     }
     if (pConfig->FindStringEntry("timezone", sValue)) {
-        SetTimezone(sValue);
+        setTimezone(sValue);
     }
     if (pConfig->FindStringEntry("timezoneoffset", sValue)) {
         if (fabs(sValue.toDouble()) > 0.1) {
@@ -261,16 +261,16 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     if (pConfig->FindStringEntry("timestamp", sValue)) {
         if (!sValue.trim_n().equals("true")) {
             if (sValue.trim_n().equals("append")) {
-                SetTimestampAppend(true);
-                SetTimestampPrepend(false);
+                setTimestampAppend(true);
+                setTimestampPrepend(false);
             } else if (sValue.trim_n().equals("prepend")) {
-                SetTimestampAppend(false);
-                SetTimestampPrepend(true);
+                setTimestampAppend(false);
+                setTimestampPrepend(true);
             } else if (sValue.trim_n().equals("false")) {
-                SetTimestampAppend(false);
-                SetTimestampPrepend(false);
+                setTimestampAppend(false);
+                setTimestampPrepend(false);
             } else {
-                SetTimestampFormat(sValue);
+                setTimestampFormat(sValue);
             }
         }
     }
@@ -286,21 +286,21 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     if (sValue.right(1) == "-") {
         sValue.rightChomp(1);
         sValue.trim();
-        SetPass(sValue, NoUser::HASH_MD5);
+        setPassword(sValue, NoUser::HashMd5);
     } else {
         NoString sMethod = No::token(sValue, 0, "#");
         NoString sPass = No::tokens(sValue, 1, "#");
         if (sMethod == "md5" || sMethod == "sha256") {
-            NoUser::eHashType type = NoUser::HASH_MD5;
-            if (sMethod == "sha256") type = NoUser::HASH_SHA256;
+            NoUser::HashType type = NoUser::HashMd5;
+            if (sMethod == "sha256") type = NoUser::HashSha256;
 
             NoString sSalt = No::token(sPass, 1, "#");
             sPass = No::token(sPass, 0, "#");
-            SetPass(sPass, type, sSalt);
+            setPassword(sPass, type, sSalt);
         } else if (sMethod == "plain") {
-            SetPass(sPass, NoUser::HASH_NONE);
+            setPassword(sPass, NoUser::HashNone);
         } else {
-            SetPass(sValue, NoUser::HASH_NONE);
+            setPassword(sValue, NoUser::HashNone);
         }
     }
     NoSettings::SubConfig subConf;
@@ -317,23 +317,23 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         NoString sHash;
         NoString sMethod;
         NoString sSalt;
-        NoUser::eHashType method;
+        NoUser::HashType method;
         pSubConf->FindStringEntry("hash", sHash);
         pSubConf->FindStringEntry("method", sMethod);
         pSubConf->FindStringEntry("salt", sSalt);
         if (sMethod.empty() || sMethod.equals("plain"))
-            method = NoUser::HASH_NONE;
+            method = NoUser::HashNone;
         else if (sMethod.equals("md5"))
-            method = NoUser::HASH_MD5;
+            method = NoUser::HashMd5;
         else if (sMethod.equals("sha256"))
-            method = NoUser::HASH_SHA256;
+            method = NoUser::HashSha256;
         else {
             sError = "Invalid hash method";
             No::printError(sError);
             return false;
         }
 
-        SetPass(sHash, method, sSalt);
+        setPassword(sHash, method, sSalt);
         if (!pSubConf->empty()) {
             sError = "Unhandled lines in config!";
             No::printError(sError);
@@ -355,7 +355,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
 
         No::printMessage("Loading network [" + sNetworkName + "]");
 
-        NoNetwork* pNetwork = FindNetwork(sNetworkName);
+        NoNetwork* pNetwork = findNetwork(sNetworkName);
 
         if (!pNetwork) {
             pNetwork = new NoNetwork(this, sNetworkName);
@@ -368,10 +368,10 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
 
     if (pConfig->FindStringVector("server", vsList, false) || pConfig->FindStringVector("chan", vsList, false) ||
         pConfig->FindSubConfig("chan", subConf, false)) {
-        NoNetwork* pNetwork = FindNetwork("default");
+        NoNetwork* pNetwork = findNetwork("default");
         if (!pNetwork) {
             NoString sErrorDummy;
-            pNetwork = AddNetwork("default", sErrorDummy);
+            pNetwork = addNetwork("default", sErrorDummy);
         }
 
         if (pNetwork) {
@@ -431,7 +431,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
                 No::printStatus(false, "charset module was loaded with wrong parameters.");
                 continue;
             }
-            SetClientEncoding(vsClient[0]);
+            setClientEncoding(vsClient[0]);
             for (NoNetwork* pNetwork : d->networks) {
                 pNetwork->SetEncoding(vsServer[0]);
             }
@@ -442,7 +442,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
         NoString sModRet;
         NoString sArgs = No::tokens(sMod, 1);
 
-        bool bModRet = LoadModule(sModName, sArgs, sNotice, sModRet);
+        bool bModRet = loadModule(sModName, sArgs, sNotice, sModRet);
 
         No::printStatus(bModRet, sModRet);
         if (!bModRet) {
@@ -453,7 +453,7 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
                     sNotice = "Loading [simple_away] module instead";
                     sModName = "simple_away";
                     // not a fatal error if simple_away is not available
-                    LoadModule(sModName, sArgs, sNotice, sModRet);
+                    loadModule(sModName, sArgs, sNotice, sModRet);
                 }
             } else {
                 sError = sModRet;
@@ -473,12 +473,12 @@ bool NoUser::ParseConfig(NoSettings* pConfig, NoString& sError)
     return true;
 }
 
-NoNetwork* NoUser::AddNetwork(const NoString& sNetwork, NoString& sErrorRet)
+NoNetwork* NoUser::addNetwork(const NoString& sNetwork, NoString& sErrorRet)
 {
     if (!NoNetwork::IsValidNetwork(sNetwork)) {
         sErrorRet = "Invalid network name. It should be alphanumeric. Not to be confused with server name";
         return nullptr;
-    } else if (FindNetwork(sNetwork)) {
+    } else if (findNetwork(sNetwork)) {
         sErrorRet = "Network [" + No::token(sNetwork, 0) + "] already exists";
         return nullptr;
     }
@@ -488,7 +488,7 @@ NoNetwork* NoUser::AddNetwork(const NoString& sNetwork, NoString& sErrorRet)
     bool bCancel = false;
     USERMODULECALL(onAddNetwork(*pNetwork, sErrorRet), this, nullptr, &bCancel);
     if (bCancel) {
-        RemoveNetwork(pNetwork);
+        removeNetwork(pNetwork);
         delete pNetwork;
         return nullptr;
     }
@@ -496,9 +496,9 @@ NoNetwork* NoUser::AddNetwork(const NoString& sNetwork, NoString& sErrorRet)
     return pNetwork;
 }
 
-bool NoUser::AddNetwork(NoNetwork* pNetwork)
+bool NoUser::addNetwork(NoNetwork* pNetwork)
 {
-    if (FindNetwork(pNetwork->GetName())) {
+    if (findNetwork(pNetwork->GetName())) {
         return false;
     }
 
@@ -507,7 +507,7 @@ bool NoUser::AddNetwork(NoNetwork* pNetwork)
     return true;
 }
 
-void NoUser::RemoveNetwork(NoNetwork* pNetwork)
+void NoUser::removeNetwork(NoNetwork* pNetwork)
 {
     auto it = std::find(d->networks.begin(), d->networks.end(), pNetwork);
     if (it != d->networks.end()) {
@@ -515,9 +515,9 @@ void NoUser::RemoveNetwork(NoNetwork* pNetwork)
     }
 }
 
-bool NoUser::DeleteNetwork(const NoString& sNetwork)
+bool NoUser::deleteNetwork(const NoString& sNetwork)
 {
-    NoNetwork* pNetwork = FindNetwork(sNetwork);
+    NoNetwork* pNetwork = findNetwork(sNetwork);
 
     if (pNetwork) {
         bool bCancel = false;
@@ -531,7 +531,7 @@ bool NoUser::DeleteNetwork(const NoString& sNetwork)
     return false;
 }
 
-NoNetwork* NoUser::FindNetwork(const NoString& sNetwork) const
+NoNetwork* NoUser::findNetwork(const NoString& sNetwork) const
 {
     for (NoNetwork* pNetwork : d->networks) {
         if (pNetwork->GetName().equals(sNetwork)) {
@@ -542,27 +542,27 @@ NoNetwork* NoUser::FindNetwork(const NoString& sNetwork) const
     return nullptr;
 }
 
-std::vector<NoNetwork*> NoUser::GetNetworks() const { return d->networks; }
+std::vector<NoNetwork*> NoUser::networks() const { return d->networks; }
 
-NoString NoUser::ExpandString(const NoString& sStr) const
+NoString NoUser::expandString(const NoString& sStr) const
 {
     NoString sRet;
-    return ExpandString(sStr, sRet);
+    return expandString(sStr, sRet);
 }
 
-NoString& NoUser::ExpandString(const NoString& sStr, NoString& sRet) const
+NoString& NoUser::expandString(const NoString& sStr, NoString& sRet) const
 {
     NoString sTime = No::cTime(time(nullptr), d->timezone);
 
     sRet = sStr;
-    sRet.replace("%user%", GetUserName());
-    sRet.replace("%defnick%", GetNick());
-    sRet.replace("%nick%", GetNick());
-    sRet.replace("%altnick%", GetAltNick());
-    sRet.replace("%ident%", GetIdent());
-    sRet.replace("%realname%", GetRealName());
-    sRet.replace("%vhost%", GetBindHost());
-    sRet.replace("%bindhost%", GetBindHost());
+    sRet.replace("%user%", userName());
+    sRet.replace("%defnick%", nick());
+    sRet.replace("%nick%", nick());
+    sRet.replace("%altnick%", altNick());
+    sRet.replace("%ident%", ident());
+    sRet.replace("%realname%", realName());
+    sRet.replace("%vhost%", bindHost());
+    sRet.replace("%bindhost%", bindHost());
     sRet.replace("%version%", NoApp::GetVersion());
     sRet.replace("%time%", sTime);
     sRet.replace("%uptime%", NoApp::Get().GetUptime());
@@ -574,18 +574,18 @@ NoString& NoUser::ExpandString(const NoString& sStr, NoString& sRet) const
     return sRet;
 }
 
-NoString NoUser::AddTimestamp(const NoString& sStr) const
+NoString NoUser::addTimestamp(const NoString& sStr) const
 {
     time_t tm;
-    return AddTimestamp(time(&tm), sStr);
+    return addTimestamp(time(&tm), sStr);
 }
 
-NoString NoUser::AddTimestamp(time_t tm, const NoString& sStr) const
+NoString NoUser::addTimestamp(time_t tm, const NoString& sStr) const
 {
     NoString sRet = sStr;
 
-    if (!GetTimestampFormat().empty() && (d->appendTimestamp || d->prependTimestamp)) {
-        NoString sTimestamp = No::formatTime(tm, GetTimestampFormat(), d->timezone);
+    if (!timestampFormat().empty() && (d->appendTimestamp || d->prependTimestamp)) {
+        NoString sTimestamp = No::formatTime(tm, timestampFormat(), d->timezone);
         if (sTimestamp.empty()) {
             return sRet;
         }
@@ -621,7 +621,7 @@ NoString NoUser::AddTimestamp(time_t tm, const NoString& sStr) const
     return sRet;
 }
 
-void NoUser::BounceAllClients()
+void NoUser::bounceAllClients()
 {
     for (NoClient* pClient : d->clients) {
         pClient->BouncedOff();
@@ -630,12 +630,12 @@ void NoUser::BounceAllClients()
     d->clients.clear();
 }
 
-void NoUser::SetKeepBuffer(bool b) { SetAutoClearChanBuffer(!b); }
+void NoUser::setKeepBuffer(bool b) { setAutoClearChanBuffer(!b); }
 
-void NoUser::UserConnected(NoClient* pClient)
+void NoUser::userConnected(NoClient* pClient)
 {
-    if (!MultiClients()) {
-        BounceAllClients();
+    if (!multiClients()) {
+        bounceAllClients();
     }
 
     pClient->PutClient(":irc.znc.in 001 " + pClient->GetNick() + " :- Welcome to ZNC -");
@@ -643,7 +643,7 @@ void NoUser::UserConnected(NoClient* pClient)
     d->clients.push_back(pClient);
 }
 
-void NoUser::UserDisconnected(NoClient* pClient)
+void NoUser::userDisconnected(NoClient* pClient)
 {
     auto it = std::find(d->clients.begin(), d->clients.end(), pClient);
     if (it != d->clients.end()) {
@@ -651,11 +651,11 @@ void NoUser::UserDisconnected(NoClient* pClient)
     }
 }
 
-void NoUser::CloneNetworks(const NoUser& User)
+void NoUser::cloneNetworks(const NoUser& User)
 {
-    const std::vector<NoNetwork*>& vNetworks = User.GetNetworks();
+    const std::vector<NoNetwork*>& vNetworks = User.networks();
     for (NoNetwork* pUserNetwork : vNetworks) {
-        NoNetwork* pNetwork = FindNetwork(pUserNetwork->GetName());
+        NoNetwork* pNetwork = findNetwork(pUserNetwork->GetName());
 
         if (pNetwork) {
             pNetwork->Clone(*pUserNetwork);
@@ -666,7 +666,7 @@ void NoUser::CloneNetworks(const NoUser& User)
 
     std::set<NoString> ssDeleteNetworks;
     for (NoNetwork* pNetwork : d->networks) {
-        if (!(User.FindNetwork(pNetwork->GetName()))) {
+        if (!(User.findNetwork(pNetwork->GetName()))) {
             ssDeleteNetworks.insert(pNetwork->GetName());
         }
     }
@@ -677,7 +677,7 @@ void NoUser::CloneNetworks(const NoUser& User)
         // have requested the rehash. Then when we do
         // client->PutStatus("Rehashing succeeded!") we would
         // crash if there was no client anymore.
-        const std::vector<NoClient*>& vClients = FindNetwork(sNetwork)->GetClients();
+        const std::vector<NoClient*>& vClients = findNetwork(sNetwork)->GetClients();
 
         while (vClients.begin() != vClients.end()) {
             NoClient* pClient = vClients.front();
@@ -686,56 +686,56 @@ void NoUser::CloneNetworks(const NoUser& User)
             pClient->SetNetwork(nullptr);
         }
 
-        DeleteNetwork(sNetwork);
+        deleteNetwork(sNetwork);
     }
 }
 
-bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
+bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 {
     sErrorRet.clear();
 
-    if (!User.IsValid(sErrorRet, true)) {
+    if (!User.isValid(sErrorRet, true)) {
         return false;
     }
 
     // user names can only specified for the constructor, changing it later
     // on breaks too much stuff (e.g. lots of paths depend on the user name)
-    if (GetUserName() != User.GetUserName()) {
-        NO_DEBUG("Ignoring username in NoUser::Clone(), old username [" << GetUserName() << "]; New username ["
-                                                                    << User.GetUserName() << "]");
+    if (userName() != User.userName()) {
+        NO_DEBUG("Ignoring username in NoUser::Clone(), old username [" << userName() << "]; New username ["
+                                                                    << User.userName() << "]");
     }
 
-    if (!User.GetPass().empty()) {
-        SetPass(User.GetPass(), User.GetPassHashType(), User.GetPassSalt());
+    if (!User.password().empty()) {
+        setPassword(User.password(), User.passwordHashType(), User.passwordSalt());
     }
 
-    SetNick(User.GetNick(false));
-    SetAltNick(User.GetAltNick(false));
-    SetIdent(User.GetIdent(false));
-    SetRealName(User.GetRealName());
-    SetStatusPrefix(User.GetStatusPrefix());
-    SetBindHost(User.GetBindHost());
-    SetDCCBindHost(User.GetDCCBindHost());
-    SetQuitMsg(User.GetQuitMsg());
-    SetSkinName(User.GetSkinName());
-    SetDefaultChanModes(User.GetDefaultChanModes());
-    SetBufferCount(User.GetBufferCount(), true);
-    SetJoinTries(User.JoinTries());
-    SetMaxNetworks(User.MaxNetworks());
-    SetMaxQueryBuffers(User.MaxQueryBuffers());
-    SetMaxJoins(User.MaxJoins());
-    SetClientEncoding(User.GetClientEncoding());
+    setNick(User.nick(false));
+    setAltNick(User.altNick(false));
+    setIdent(User.ident(false));
+    setRealName(User.realName());
+    setStatusPrefix(User.statusPrefix());
+    setBindHost(User.bindHost());
+    setDccBindHost(User.dccBindHost());
+    setQuitMsg(User.quitMsg());
+    setSkinName(User.skinName());
+    setDefaultChanModes(User.defaultChanModes());
+    setBufferCount(User.bufferCount(), true);
+    setJoinTries(User.joinTries());
+    setMaxNetworks(User.maxNetworks());
+    setMaxQueryBuffers(User.maxQueryBuffers());
+    setMaxJoins(User.maxJoins());
+    setClientEncoding(User.clientEncoding());
 
     // Allowed Hosts
     d->allowedHosts.clear();
-    const std::set<NoString>& ssHosts = User.GetAllowedHosts();
+    const std::set<NoString>& ssHosts = User.allowedHosts();
     for (const NoString& sHost : ssHosts) {
-        AddAllowedHost(sHost);
+        addAllowedHost(sHost);
     }
 
     for (NoClient* pClient : d->clients) {
         NoSocket* pSock = pClient->GetSocket();
-        if (!IsHostAllowed(pSock->GetRemoteIP())) {
+        if (!isHostAllowed(pSock->GetRemoteIP())) {
             pClient->PutStatusNotice(
             "You are being disconnected because your IP is no longer allowed to connect to this user");
             pSock->Close();
@@ -746,35 +746,35 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 
     // Networks
     if (bCloneNetworks) {
-        CloneNetworks(User);
+        cloneNetworks(User);
     }
     // !Networks
 
     // CTCP Replies
     d->ctcpReplies.clear();
-    const NoStringMap& msReplies = User.GetCTCPReplies();
+    const NoStringMap& msReplies = User.ctcpReplies();
     for (const auto& it : msReplies) {
-        AddCTCPReply(it.first, it.second);
+        addCtcpReply(it.first, it.second);
     }
     // !CTCP Replies
 
     // Flags
-    SetAutoClearChanBuffer(User.AutoClearChanBuffer());
-    SetAutoClearQueryBuffer(User.AutoClearQueryBuffer());
-    SetMultiClients(User.MultiClients());
-    SetDenyLoadMod(User.DenyLoadMod());
-    SetAdmin(User.IsAdmin());
-    SetDenySetBindHost(User.DenySetBindHost());
-    SetTimestampAppend(User.GetTimestampAppend());
-    SetTimestampPrepend(User.GetTimestampPrepend());
-    SetTimestampFormat(User.GetTimestampFormat());
-    SetTimezone(User.GetTimezone());
+    setAutoClearChanBuffer(User.autoClearChanBuffer());
+    setAutoClearQueryBuffer(User.autoClearQueryBuffer());
+    setMultiClients(User.multiClients());
+    setDenyLoadMod(User.denyLoadMod());
+    setAdmin(User.isAdmin());
+    setDenySetBindHost(User.denySetBindHost());
+    setTimestampAppend(User.timestampAppend());
+    setTimestampPrepend(User.timestampPrepend());
+    setTimestampFormat(User.timestampFormat());
+    setTimezone(User.timezone());
     // !Flags
 
     // Modules
     std::set<NoString> ssUnloadMods;
-    NoModuleLoader* vCurMods = GetLoader();
-    const NoModuleLoader* vNewMods = User.GetLoader();
+    NoModuleLoader* vCurMods = loader();
+    const NoModuleLoader* vNewMods = User.loader();
 
     for (NoModule* pNewMod : vNewMods->modules()) {
         NoString sModRet;
@@ -803,12 +803,12 @@ bool NoUser::Clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     return true;
 }
 
-void NoUser::AddBytesRead(ulonglong u) { d->bytesRead += u; }
+void NoUser::addBytesRead(ulonglong u) { d->bytesRead += u; }
 
-void NoUser::AddBytesWritten(ulonglong u) { d->bytesWritten += u; }
+void NoUser::addBytesWritten(ulonglong u) { d->bytesWritten += u; }
 
-std::set<NoString> NoUser::GetAllowedHosts() const { return d->allowedHosts; }
-bool NoUser::AddAllowedHost(const NoString& sHostMask)
+std::set<NoString> NoUser::allowedHosts() const { return d->allowedHosts; }
+bool NoUser::addAllowedHost(const NoString& sHostMask)
 {
     if (sHostMask.empty() || d->allowedHosts.find(sHostMask) != d->allowedHosts.end()) {
         return false;
@@ -818,7 +818,7 @@ bool NoUser::AddAllowedHost(const NoString& sHostMask)
     return true;
 }
 
-bool NoUser::IsHostAllowed(const NoString& sHostMask) const
+bool NoUser::isHostAllowed(const NoString& sHostMask) const
 {
     if (d->allowedHosts.empty()) {
         return true;
@@ -833,11 +833,11 @@ bool NoUser::IsHostAllowed(const NoString& sHostMask) const
     return false;
 }
 
-NoString NoUser::GetTimestampFormat() const { return d->timestampFormat; }
-bool NoUser::GetTimestampAppend() const { return d->appendTimestamp; }
-bool NoUser::GetTimestampPrepend() const { return d->prependTimestamp; }
+NoString NoUser::timestampFormat() const { return d->timestampFormat; }
+bool NoUser::timestampAppend() const { return d->appendTimestamp; }
+bool NoUser::timestampPrepend() const { return d->prependTimestamp; }
 
-bool NoUser::IsValidUserName(const NoString& sUserName)
+bool NoUser::isValidUserName(const NoString& sUserName)
 {
     // /^[a-zA-Z][a-zA-Z@._\-]*$/
     const char* p = sUserName.c_str();
@@ -861,7 +861,7 @@ bool NoUser::IsValidUserName(const NoString& sUserName)
     return true;
 }
 
-bool NoUser::IsValid(NoString& sErrMsg, bool bSkipPass) const
+bool NoUser::isValid(NoString& sErrMsg, bool bSkipPass) const
 {
     sErrMsg.clear();
 
@@ -875,7 +875,7 @@ bool NoUser::IsValid(NoString& sErrMsg, bool bSkipPass) const
         return false;
     }
 
-    if (!NoUser::IsValidUserName(d->userName)) {
+    if (!NoUser::isValidUserName(d->userName)) {
         sErrMsg = "Username is invalid";
         return false;
     }
@@ -883,54 +883,54 @@ bool NoUser::IsValid(NoString& sErrMsg, bool bSkipPass) const
     return true;
 }
 
-NoSettings NoUser::ToConfig() const
+NoSettings NoUser::toConfig() const
 {
     NoSettings config;
     NoSettings passConfig;
 
     NoString sHash;
     switch (d->hashType) {
-    case HASH_NONE:
+    case HashNone:
         sHash = "Plain";
         break;
-    case HASH_MD5:
+    case HashMd5:
         sHash = "MD5";
         break;
-    case HASH_SHA256:
+    case HashSha256:
         sHash = "SHA256";
         break;
     }
     passConfig.AddKeyValuePair("Salt", d->passwordSalt);
     passConfig.AddKeyValuePair("Method", sHash);
-    passConfig.AddKeyValuePair("Hash", GetPass());
+    passConfig.AddKeyValuePair("Hash", password());
     config.AddSubConfig("Pass", "password", passConfig);
 
-    config.AddKeyValuePair("Nick", GetNick());
-    config.AddKeyValuePair("AltNick", GetAltNick());
-    config.AddKeyValuePair("Ident", GetIdent());
-    config.AddKeyValuePair("RealName", GetRealName());
-    config.AddKeyValuePair("BindHost", GetBindHost());
-    config.AddKeyValuePair("DCCBindHost", GetDCCBindHost());
-    config.AddKeyValuePair("QuitMsg", GetQuitMsg());
-    if (NoApp::Get().GetStatusPrefix() != GetStatusPrefix()) config.AddKeyValuePair("StatusPrefix", GetStatusPrefix());
-    config.AddKeyValuePair("Skin", GetSkinName());
-    config.AddKeyValuePair("ChanModes", GetDefaultChanModes());
-    config.AddKeyValuePair("Buffer", NoString(GetBufferCount()));
-    config.AddKeyValuePair("AutoClearChanBuffer", NoString(AutoClearChanBuffer()));
-    config.AddKeyValuePair("AutoClearQueryBuffer", NoString(AutoClearQueryBuffer()));
-    config.AddKeyValuePair("MultiClients", NoString(MultiClients()));
-    config.AddKeyValuePair("DenyLoadMod", NoString(DenyLoadMod()));
-    config.AddKeyValuePair("Admin", NoString(IsAdmin()));
-    config.AddKeyValuePair("DenySetBindHost", NoString(DenySetBindHost()));
-    config.AddKeyValuePair("TimestampFormat", GetTimestampFormat());
-    config.AddKeyValuePair("AppendTimestamp", NoString(GetTimestampAppend()));
-    config.AddKeyValuePair("PrependTimestamp", NoString(GetTimestampPrepend()));
+    config.AddKeyValuePair("Nick", nick());
+    config.AddKeyValuePair("AltNick", altNick());
+    config.AddKeyValuePair("Ident", ident());
+    config.AddKeyValuePair("RealName", realName());
+    config.AddKeyValuePair("BindHost", bindHost());
+    config.AddKeyValuePair("DCCBindHost", dccBindHost());
+    config.AddKeyValuePair("QuitMsg", quitMsg());
+    if (NoApp::Get().GetStatusPrefix() != statusPrefix()) config.AddKeyValuePair("StatusPrefix", statusPrefix());
+    config.AddKeyValuePair("Skin", skinName());
+    config.AddKeyValuePair("ChanModes", defaultChanModes());
+    config.AddKeyValuePair("Buffer", NoString(bufferCount()));
+    config.AddKeyValuePair("AutoClearChanBuffer", NoString(autoClearChanBuffer()));
+    config.AddKeyValuePair("autoClearQueryBuffer", NoString(autoClearQueryBuffer()));
+    config.AddKeyValuePair("MultiClients", NoString(multiClients()));
+    config.AddKeyValuePair("DenyLoadMod", NoString(denyLoadMod()));
+    config.AddKeyValuePair("Admin", NoString(isAdmin()));
+    config.AddKeyValuePair("DenySetBindHost", NoString(denySetBindHost()));
+    config.AddKeyValuePair("TimestampFormat", timestampFormat());
+    config.AddKeyValuePair("AppendTimestamp", NoString(timestampAppend()));
+    config.AddKeyValuePair("PrependTimestamp", NoString(timestampPrepend()));
     config.AddKeyValuePair("Timezone", d->timezone);
     config.AddKeyValuePair("JoinTries", NoString(d->maxJoinTries));
     config.AddKeyValuePair("MaxNetworks", NoString(d->maxNetworks));
     config.AddKeyValuePair("MaxQueryBuffers", NoString(d->maxQueryBuffers));
     config.AddKeyValuePair("MaxJoins", NoString(d->maxJoins));
-    config.AddKeyValuePair("ClientEncoding", GetClientEncoding());
+    config.AddKeyValuePair("ClientEncoding", clientEncoding());
 
     // Allow Hosts
     if (!d->allowedHosts.empty()) {
@@ -947,7 +947,7 @@ NoSettings NoUser::ToConfig() const
     }
 
     // Modules
-    const NoModuleLoader* Mods = GetLoader();
+    const NoModuleLoader* Mods = loader();
 
     for (NoModule* pMod : Mods->modules()) {
         NoString sArgs = pMod->GetArgs();
@@ -967,14 +967,14 @@ NoSettings NoUser::ToConfig() const
     return config;
 }
 
-bool NoUser::CheckPass(const NoString& sPass) const
+bool NoUser::checkPass(const NoString& sPass) const
 {
     switch (d->hashType) {
-    case HASH_MD5:
+    case HashMd5:
         return d->password.equals(No::saltedMd5(sPass, d->passwordSalt));
-    case HASH_SHA256:
+    case HashSha256:
         return d->password.equals(No::saltedSha256(sPass, d->passwordSalt));
-    case HASH_NONE:
+    case HashNone:
     default:
         return (sPass == d->password);
     }
@@ -997,9 +997,9 @@ bool NoUser::CheckPass(const NoString& sPass) const
     return (NoClient*) NoApp::Get().GetManager().FindSockByName(sSockName);
 }*/
 
-NoString NoUser::GetLocalDCCIP() const
+NoString NoUser::localDccIp() const
 {
-    if (!GetDCCBindHost().empty()) return GetDCCBindHost();
+    if (!dccBindHost().empty()) return dccBindHost();
 
     for (NoNetwork* pNetwork : d->networks) {
         NoIrcSocket* pIRCSock = pNetwork->GetIRCSock();
@@ -1008,14 +1008,14 @@ NoString NoUser::GetLocalDCCIP() const
         }
     }
 
-    if (!GetAllClients().empty()) {
-        return GetAllClients()[0]->GetSocket()->GetLocalIP();
+    if (!allClients().empty()) {
+        return allClients()[0]->GetSocket()->GetLocalIP();
     }
 
     return "";
 }
 
-bool NoUser::PutUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
+bool NoUser::putUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
     for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
@@ -1030,9 +1030,9 @@ bool NoUser::PutUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipCl
     return (pClient == nullptr);
 }
 
-bool NoUser::PutAllUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
+bool NoUser::putAllUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    PutUser(sLine, pClient, pSkipClient);
+    putUser(sLine, pClient, pSkipClient);
 
     for (NoNetwork* pNetwork : d->networks) {
         if (pNetwork->PutUser(sLine, pClient, pSkipClient)) {
@@ -1043,9 +1043,9 @@ bool NoUser::PutAllUser(const NoString& sLine, NoClient* pClient, NoClient* pSki
     return (pClient == nullptr);
 }
 
-bool NoUser::PutStatus(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
+bool NoUser::putStatus(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    std::vector<NoClient*> vClients = GetAllClients();
+    std::vector<NoClient*> vClients = allClients();
     for (NoClient* pEachClient : vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutStatus(sLine);
@@ -1059,9 +1059,9 @@ bool NoUser::PutStatus(const NoString& sLine, NoClient* pClient, NoClient* pSkip
     return (pClient == nullptr);
 }
 
-bool NoUser::PutStatusNotice(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
+bool NoUser::putStatusNotice(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
-    std::vector<NoClient*> vClients = GetAllClients();
+    std::vector<NoClient*> vClients = allClients();
     for (NoClient* pEachClient : vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
             pEachClient->PutStatusNotice(sLine);
@@ -1075,7 +1075,7 @@ bool NoUser::PutStatusNotice(const NoString& sLine, NoClient* pClient, NoClient*
     return (pClient == nullptr);
 }
 
-bool NoUser::PutModule(const NoString& sModule, const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
+bool NoUser::putModule(const NoString& sModule, const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
     for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
@@ -1090,7 +1090,7 @@ bool NoUser::PutModule(const NoString& sModule, const NoString& sLine, NoClient*
     return (pClient == nullptr);
 }
 
-bool NoUser::PutModNotice(const NoString& sModule, const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
+bool NoUser::putModuleNotice(const NoString& sModule, const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
     for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
@@ -1105,11 +1105,11 @@ bool NoUser::PutModNotice(const NoString& sModule, const NoString& sLine, NoClie
     return (pClient == nullptr);
 }
 
-NoString NoUser::MakeCleanUserName(const NoString& sUserName) { return No::token(sUserName, 0, "@").replace_n(".", ""); }
+NoString NoUser::makeCleanUserName(const NoString& sUserName) { return No::token(sUserName, 0, "@").replace_n(".", ""); }
 
-NoModuleLoader* NoUser::GetLoader() const { return d->modules; }
+NoModuleLoader* NoUser::loader() const { return d->modules; }
 
-bool NoUser::IsUserAttached() const
+bool NoUser::isUserAttached() const
 {
     if (!d->clients.empty()) {
         return true;
@@ -1124,7 +1124,7 @@ bool NoUser::IsUserAttached() const
     return false;
 }
 
-bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError)
+bool NoUser::loadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError)
 {
     bool bModRet = true;
     NoString sModRet;
@@ -1142,7 +1142,7 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
                              "] is a network module, loading module for all networks in user.");
 
         // Do they have old NV?
-        NoFile fNVFile = NoFile(GetUserPath() + "/moddata/" + sModName + "/.registry");
+        NoFile fNVFile = NoFile(userPath() + "/moddata/" + sModName + "/.registry");
 
         for (NoNetwork* pNetwork : d->networks) {
             if (fNVFile.Exists()) {
@@ -1154,13 +1154,13 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
                 fNVFile.Copy(sNetworkModPath + "/.registry");
             }
 
-            bModRet = pNetwork->GetLoader()->loadModule(sModName, sArgs, No::NetworkModule, this, pNetwork, sModRet);
+            bModRet = pNetwork->loader()->loadModule(sModName, sArgs, No::NetworkModule, this, pNetwork, sModRet);
             if (!bModRet) {
                 break;
             }
         }
     } else {
-        bModRet = GetLoader()->loadModule(sModName, sArgs, No::UserModule, this, nullptr, sModRet);
+        bModRet = loader()->loadModule(sModName, sArgs, No::UserModule, this, nullptr, sModRet);
     }
 
     if (!bModRet) {
@@ -1170,26 +1170,26 @@ bool NoUser::LoadModule(const NoString& sModName, const NoString& sArgs, const N
 }
 
 // Setters
-void NoUser::SetNick(const NoString& s) { d->nickName = s; }
-void NoUser::SetAltNick(const NoString& s) { d->altNick = s; }
-void NoUser::SetIdent(const NoString& s) { d->ident = s; }
-void NoUser::SetRealName(const NoString& s) { d->realName = s; }
-void NoUser::SetBindHost(const NoString& s) { d->bindHost = s; }
-void NoUser::SetDCCBindHost(const NoString& s) { d->dccBindHost = s; }
-void NoUser::SetPass(const NoString& s, eHashType eHash, const NoString& sSalt)
+void NoUser::setNick(const NoString& s) { d->nickName = s; }
+void NoUser::setAltNick(const NoString& s) { d->altNick = s; }
+void NoUser::setIdent(const NoString& s) { d->ident = s; }
+void NoUser::setRealName(const NoString& s) { d->realName = s; }
+void NoUser::setBindHost(const NoString& s) { d->bindHost = s; }
+void NoUser::setDccBindHost(const NoString& s) { d->dccBindHost = s; }
+void NoUser::setPassword(const NoString& s, HashType eHash, const NoString& sSalt)
 {
     d->password = s;
     d->hashType = eHash;
     d->passwordSalt = sSalt;
 }
-void NoUser::SetMultiClients(bool b) { d->multiClients = b; }
-void NoUser::SetDenyLoadMod(bool b) { d->denyLoadMod = b; }
-void NoUser::SetAdmin(bool b) { d->admin = b; }
-void NoUser::SetDenySetBindHost(bool b) { d->denySetBindHost = b; }
-void NoUser::SetDefaultChanModes(const NoString& s) { d->defaultChanModes = s; }
-void NoUser::SetClientEncoding(const NoString& s) { d->clientEncoding = s; }
-void NoUser::SetQuitMsg(const NoString& s) { d->quitMsg = s; }
-void NoUser::SetAutoClearChanBuffer(bool b)
+void NoUser::setMultiClients(bool b) { d->multiClients = b; }
+void NoUser::setDenyLoadMod(bool b) { d->denyLoadMod = b; }
+void NoUser::setAdmin(bool b) { d->admin = b; }
+void NoUser::setDenySetBindHost(bool b) { d->denySetBindHost = b; }
+void NoUser::setDefaultChanModes(const NoString& s) { d->defaultChanModes = s; }
+void NoUser::setClientEncoding(const NoString& s) { d->clientEncoding = s; }
+void NoUser::setQuitMsg(const NoString& s) { d->quitMsg = s; }
+void NoUser::setAutoClearChanBuffer(bool b)
 {
     for (NoNetwork* pNetwork : d->networks) {
         for (NoChannel* pChan : pNetwork->GetChans()) {
@@ -1198,31 +1198,31 @@ void NoUser::SetAutoClearChanBuffer(bool b)
     }
     d->autoClearChanBuffer = b;
 }
-void NoUser::SetAutoClearQueryBuffer(bool b) { d->autoClearQueryBuffer = b; }
+void NoUser::setAutoClearQueryBuffer(bool b) { d->autoClearQueryBuffer = b; }
 
-void NoUser::SetBeingDeleted(bool b) { d->beingDeleted = b; }
+void NoUser::setBeingDeleted(bool b) { d->beingDeleted = b; }
 
-void NoUser::SetTimestampFormat(const NoString& s) { d->timestampFormat = s; }
+void NoUser::setTimestampFormat(const NoString& s) { d->timestampFormat = s; }
 
-void NoUser::SetTimestampAppend(bool b) { d->appendTimestamp = b; }
+void NoUser::setTimestampAppend(bool b) { d->appendTimestamp = b; }
 
-void NoUser::SetTimestampPrepend(bool b) { d->prependTimestamp = b; }
+void NoUser::setTimestampPrepend(bool b) { d->prependTimestamp = b; }
 
-void NoUser::SetTimezone(const NoString& s) { d->timezone = s; }
+void NoUser::setTimezone(const NoString& s) { d->timezone = s; }
 
-void NoUser::SetJoinTries(uint i) { d->maxJoinTries = i; }
+void NoUser::setJoinTries(uint i) { d->maxJoinTries = i; }
 
-void NoUser::SetMaxJoins(uint i) { d->maxJoins = i; }
+void NoUser::setMaxJoins(uint i) { d->maxJoins = i; }
 
-void NoUser::SetSkinName(const NoString& s) { d->skinName = s; }
+void NoUser::setSkinName(const NoString& s) { d->skinName = s; }
 
-void NoUser::SetMaxNetworks(uint i) { d->maxNetworks = i; }
+void NoUser::setMaxNetworks(uint i) { d->maxNetworks = i; }
 
-void NoUser::SetMaxQueryBuffers(uint i) { d->maxQueryBuffers = i; }
+void NoUser::setMaxQueryBuffers(uint i) { d->maxQueryBuffers = i; }
 
-std::vector<NoClient*> NoUser::GetUserClients() const { return d->clients; }
+std::vector<NoClient*> NoUser::userClients() const { return d->clients; }
 
-bool NoUser::SetBufferCount(uint u, bool bForce)
+bool NoUser::setBufferCount(uint u, bool bForce)
 {
     if (!bForce && u > NoApp::Get().GetMaxBufferSize()) return false;
     for (NoNetwork* pNetwork : d->networks) {
@@ -1234,7 +1234,7 @@ bool NoUser::SetBufferCount(uint u, bool bForce)
     return true;
 }
 
-bool NoUser::AddCTCPReply(const NoString& sCTCP, const NoString& sReply)
+bool NoUser::addCtcpReply(const NoString& sCTCP, const NoString& sReply)
 {
     // Reject CTCP requests containing spaces
     if (sCTCP.find_first_of(' ') != NoString::npos) {
@@ -1248,9 +1248,9 @@ bool NoUser::AddCTCPReply(const NoString& sCTCP, const NoString& sReply)
     return true;
 }
 
-bool NoUser::DelCTCPReply(const NoString& sCTCP) { return d->ctcpReplies.erase(sCTCP) > 0; }
+bool NoUser::removeCtcpReply(const NoString& sCTCP) { return d->ctcpReplies.erase(sCTCP) > 0; }
 
-bool NoUser::SetStatusPrefix(const NoString& s)
+bool NoUser::setStatusPrefix(const NoString& s)
 {
     if (!s.empty() && s.length() < 6 && !s.contains(' ')) {
         d->statusPrefix = (s.empty()) ? "*" : s;
@@ -1262,7 +1262,7 @@ bool NoUser::SetStatusPrefix(const NoString& s)
 // !Setters
 
 // Getters
-std::vector<NoClient*> NoUser::GetAllClients() const
+std::vector<NoClient*> NoUser::allClients() const
 {
     std::vector<NoClient*> vClients;
 
@@ -1279,59 +1279,59 @@ std::vector<NoClient*> NoUser::GetAllClients() const
     return vClients;
 }
 
-NoString NoUser::GetUserName() const { return d->userName; }
-NoString NoUser::GetCleanUserName() const { return d->cleanUserName; }
-NoString NoUser::GetNick(bool bAllowDefault) const
+NoString NoUser::userName() const { return d->userName; }
+NoString NoUser::cleanUserName() const { return d->cleanUserName; }
+NoString NoUser::nick(bool bAllowDefault) const
 {
-    return (bAllowDefault && d->nickName.empty()) ? GetCleanUserName() : d->nickName;
+    return (bAllowDefault && d->nickName.empty()) ? cleanUserName() : d->nickName;
 }
-NoString NoUser::GetAltNick(bool bAllowDefault) const
+NoString NoUser::altNick(bool bAllowDefault) const
 {
-    return (bAllowDefault && d->altNick.empty()) ? GetCleanUserName() : d->altNick;
+    return (bAllowDefault && d->altNick.empty()) ? cleanUserName() : d->altNick;
 }
-NoString NoUser::GetIdent(bool bAllowDefault) const
+NoString NoUser::ident(bool bAllowDefault) const
 {
-    return (bAllowDefault && d->ident.empty()) ? GetCleanUserName() : d->ident;
+    return (bAllowDefault && d->ident.empty()) ? cleanUserName() : d->ident;
 }
-NoString NoUser::GetRealName() const { return d->realName.empty() ? d->userName : d->realName; }
-NoString NoUser::GetBindHost() const { return d->bindHost; }
-NoString NoUser::GetDCCBindHost() const { return d->dccBindHost; }
-NoString NoUser::GetPass() const { return d->password; }
-NoUser::eHashType NoUser::GetPassHashType() const { return d->hashType; }
-NoString NoUser::GetPassSalt() const { return d->passwordSalt; }
-bool NoUser::DenyLoadMod() const { return d->denyLoadMod; }
-bool NoUser::IsAdmin() const { return d->admin; }
-bool NoUser::DenySetBindHost() const { return d->denySetBindHost; }
-bool NoUser::MultiClients() const { return d->multiClients; }
-NoString NoUser::GetStatusPrefix() const { return d->statusPrefix; }
-NoString NoUser::GetDefaultChanModes() const { return d->defaultChanModes; }
-NoString NoUser::GetClientEncoding() const { return d->clientEncoding; }
-bool NoUser::HasSpaceForNewNetwork() const { return GetNetworks().size() < MaxNetworks(); }
+NoString NoUser::realName() const { return d->realName.empty() ? d->userName : d->realName; }
+NoString NoUser::bindHost() const { return d->bindHost; }
+NoString NoUser::dccBindHost() const { return d->dccBindHost; }
+NoString NoUser::password() const { return d->password; }
+NoUser::HashType NoUser::passwordHashType() const { return d->hashType; }
+NoString NoUser::passwordSalt() const { return d->passwordSalt; }
+bool NoUser::denyLoadMod() const { return d->denyLoadMod; }
+bool NoUser::isAdmin() const { return d->admin; }
+bool NoUser::denySetBindHost() const { return d->denySetBindHost; }
+bool NoUser::multiClients() const { return d->multiClients; }
+NoString NoUser::statusPrefix() const { return d->statusPrefix; }
+NoString NoUser::defaultChanModes() const { return d->defaultChanModes; }
+NoString NoUser::clientEncoding() const { return d->clientEncoding; }
+bool NoUser::hasSpaceForNewNetwork() const { return networks().size() < maxNetworks(); }
 
-NoString NoUser::GetQuitMsg() const { return (!d->quitMsg.trim_n().empty()) ? d->quitMsg : NoApp::GetTag(false); }
-NoStringMap NoUser::GetCTCPReplies() const { return d->ctcpReplies; }
-uint NoUser::GetBufferCount() const { return d->bufferCount; }
-bool NoUser::AutoClearChanBuffer() const { return d->autoClearChanBuffer; }
-bool NoUser::AutoClearQueryBuffer() const { return d->autoClearQueryBuffer; }
+NoString NoUser::quitMsg() const { return (!d->quitMsg.trim_n().empty()) ? d->quitMsg : NoApp::GetTag(false); }
+NoStringMap NoUser::ctcpReplies() const { return d->ctcpReplies; }
+uint NoUser::bufferCount() const { return d->bufferCount; }
+bool NoUser::autoClearChanBuffer() const { return d->autoClearChanBuffer; }
+bool NoUser::autoClearQueryBuffer() const { return d->autoClearQueryBuffer; }
 
-bool NoUser::IsBeingDeleted() const { return d->beingDeleted; }
+bool NoUser::isBeingDeleted() const { return d->beingDeleted; }
 
-NoString NoUser::GetTimezone() const { return d->timezone; }
+NoString NoUser::timezone() const { return d->timezone; }
 
-ulonglong NoUser::BytesRead() const { return d->bytesRead; }
+ulonglong NoUser::bytesRead() const { return d->bytesRead; }
 
-ulonglong NoUser::BytesWritten() const { return d->bytesWritten; }
+ulonglong NoUser::bytesWritten() const { return d->bytesWritten; }
 
-uint NoUser::JoinTries() const { return d->maxJoinTries; }
+uint NoUser::joinTries() const { return d->maxJoinTries; }
 
-uint NoUser::MaxJoins() const { return d->maxJoins; }
+uint NoUser::maxJoins() const { return d->maxJoins; }
 // NoString NoUser::GetSkinName() const { return (!d->sSkinName.empty()) ? d->sSkinName : NoApp::Get().GetSkinName(); }
-NoString NoUser::GetSkinName() const { return d->skinName; }
+NoString NoUser::skinName() const { return d->skinName; }
 
-uint NoUser::MaxNetworks() const { return d->maxNetworks; }
+uint NoUser::maxNetworks() const { return d->maxNetworks; }
 
-uint NoUser::MaxQueryBuffers() const { return d->maxQueryBuffers; }
-NoString NoUser::GetUserPath() const
+uint NoUser::maxQueryBuffers() const { return d->maxQueryBuffers; }
+NoString NoUser::userPath() const
 {
     if (!NoFile::Exists(d->userPath)) {
         NoDir::MakeDir(d->userPath);

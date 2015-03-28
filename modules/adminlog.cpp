@@ -70,13 +70,13 @@ public:
 
     void onIrcConnected() override
     {
-        Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] connected to IRC: " +
+        Log("[" + GetUser()->userName() + "/" + GetNetwork()->GetName() + "] connected to IRC: " +
             GetNetwork()->GetCurrentServer()->host());
     }
 
     void onIrcDisconnected() override
     {
-        Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC");
+        Log("[" + GetUser()->userName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC");
     }
 
     ModRet onRaw(NoString& sLine) override
@@ -86,7 +86,7 @@ public:
             // ERROR :Closing Link: nick[24.24.24.24] Killer (Local kill by Killer (reason))
             NoString sError(sLine.substr(6));
             if (sError.left(1) == ":") sError.leftChomp(1);
-            Log("[" + GetUser()->GetUserName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC: " +
+            Log("[" + GetUser()->userName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC: " +
                 GetNetwork()->GetCurrentServer()->host() + " [" + sError + "]",
                 LOG_NOTICE);
         }
@@ -95,12 +95,12 @@ public:
 
     void onClientLogin() override
     {
-        Log("[" + GetUser()->GetUserName() + "] connected to ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
+        Log("[" + GetUser()->userName() + "] connected to ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
     }
 
     void onClientDisconnect() override
     {
-        Log("[" + GetUser()->GetUserName() + "] disconnected from ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
+        Log("[" + GetUser()->userName() + "] disconnected from ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
     }
 
     void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
@@ -132,7 +132,7 @@ public:
 
     void onModCommand(const NoString& sCommand) override
     {
-        if (!GetUser()->IsAdmin()) {
+        if (!GetUser()->isAdmin()) {
             PutModule("Access denied");
         } else {
             HandleCommand(sCommand);

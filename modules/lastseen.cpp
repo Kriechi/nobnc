@@ -26,9 +26,9 @@
 class NoLastSeenMod : public NoModule
 {
 private:
-    time_t GetTime(const NoUser* pUser) { return NoRegistry(this).value(pUser->GetUserName()).toULong(); }
+    time_t GetTime(const NoUser* pUser) { return NoRegistry(this).value(pUser->userName()).toULong(); }
 
-    void SetTime(const NoUser* pUser) { NoRegistry(this).setValue(pUser->GetUserName(), NoString(time(nullptr))); }
+    void SetTime(const NoUser* pUser) { NoRegistry(this).setValue(pUser->userName(), NoString(time(nullptr))); }
 
     const NoString FormatLastSeen(const NoUser* pUser, const char* sDefault = "")
     {
@@ -47,7 +47,7 @@ private:
 
     void ShowCommand(const NoString& sLine)
     {
-        if (!GetUser()->IsAdmin()) {
+        if (!GetUser()->isAdmin()) {
             PutModule("Access denied");
             return;
         }
@@ -84,7 +84,7 @@ public:
     ModRet onDeleteUser(NoUser& User) override
     {
         NoRegistry registry(this);
-        registry.remove(User.GetUserName());
+        registry.remove(User.userName());
         return CONTINUE;
     }
 
@@ -110,7 +110,7 @@ public:
                 NoUser* pUser = it->second;
                 NoTemplate& Row = Tmpl.AddRow("UserLoop");
 
-                Row["Username"] = pUser->GetUserName();
+                Row["Username"] = pUser->userName();
                 Row["IsSelf"] = NoString(pUser == WebSock.GetSession()->GetUser());
                 Row["LastSeen"] = FormatLastSeen(pUser, "never");
             }

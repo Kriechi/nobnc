@@ -97,7 +97,7 @@ public:
 #ifndef MOD_DCC_ALLOW_EVERYONE
     bool OnLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        if (!GetUser()->IsAdmin()) {
+        if (!GetUser()->isAdmin()) {
             sMessage = "You must be admin to use the DCC module";
             return false;
         }
@@ -118,11 +118,11 @@ public:
             return false;
         }
 
-        NoString sLocalDCCIP = GetUser()->GetLocalDCCIP();
+        NoString sLocalDCCIP = GetUser()->localDccIp();
         ushort uPort =
         NoApp::Get().GetManager().ListenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
 
-        if (GetUser()->GetNick().equals(sRemoteNick)) {
+        if (GetUser()->nick().equals(sRemoteNick)) {
             PutUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
                     NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
         } else {
@@ -148,7 +148,7 @@ public:
             return false;
         }
 
-        NoApp::Get().GetManager().Connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, GetUser()->GetLocalDCCIP(), pSock);
+        NoApp::Get().GetManager().Connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, GetUser()->localDccIp(), pSock);
 
         PutModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - Attempting to connect to [" + sRemoteIP + "]");
         return true;
@@ -194,7 +194,7 @@ public:
             return;
         }
 
-        SendFile(GetUser()->GetNick(), sFile);
+        SendFile(GetUser()->nick(), sFile);
     }
 
     void ListTransfersCommand(const NoString& sLine)
@@ -244,10 +244,10 @@ public:
                     if (pSock->Seek(uResumeSize)) {
                         PutModule("DCC -> [" + pSock->GetRemoteNick() + "][" + pSock->GetFileName() +
                                   "] - Attempting to resume from file position [" + NoString(uResumeSize) + "]");
-                        PutUser(":*dcc!znc@znc.in PRIVMSG " + GetUser()->GetNick() + " :\001DCC ACCEPT " + sFile + " " +
+                        PutUser(":*dcc!znc@znc.in PRIVMSG " + GetUser()->nick() + " :\001DCC ACCEPT " + sFile + " " +
                                 NoString(uResumePort) + " " + NoString(uResumeSize) + "\001");
                     } else {
-                        PutModule("DCC -> [" + GetUser()->GetNick() + "][" + sFile +
+                        PutModule("DCC -> [" + GetUser()->nick() + "][" + sFile +
                                   "] Unable to find send to initiate resume.");
                     }
                 }

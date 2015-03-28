@@ -73,7 +73,7 @@ NoString NoMessage::formatted(const NoClient& client, const NoStringMap& params)
         NoString str = No::namedFormat(d->format, copy);
         return "@time=" + No::formatServerTime(d->ts) + " " + str;
     } else {
-        copy["text"] = client.GetUser()->AddTimestamp(d->ts.tv_sec, d->text);
+        copy["text"] = client.GetUser()->addTimestamp(d->ts.tv_sec, d->text);
         return No::namedFormat(d->format, copy);
     }
 }

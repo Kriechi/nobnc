@@ -169,7 +169,7 @@ public:
             pSock->SetPemLocation(m_sPemFile);
 
             u_short iPort =
-            GetManager()->ListenRand(pSock->GetSockName() + "::LISTENER", GetUser()->GetLocalDCCIP(), true, SOMAXCONN, pSock, 60);
+            GetManager()->ListenRand(pSock->GetSockName() + "::LISTENER", GetUser()->localDccIp(), true, SOMAXCONN, pSock, 60);
 
             if (iPort == 0) {
                 PutModule("Failed to start chat!");
@@ -179,7 +179,7 @@ public:
             std::stringstream s;
             s << "PRIVMSG " << sArgs << " :\001";
             s << "DCC SCHAT chat ";
-            s << No::formatLongIp(GetUser()->GetLocalDCCIP());
+            s << No::formatLongIp(GetUser()->localDccIp());
             s << " " << iPort << "\001";
 
             PutIRC(s.str());
@@ -233,7 +233,7 @@ public:
                 }
             }
             PutModule("No Such Chat [" + sArgs + "]");
-        } else if (sCom.equals("showsocks") && GetUser()->IsAdmin()) {
+        } else if (sCom.equals("showsocks") && GetUser()->isAdmin()) {
             NoTable Table;
             Table.addColumn("SockName");
             Table.addColumn("Created");
@@ -285,7 +285,7 @@ public:
             PutModule("    list           - List current chats.");
             PutModule("    close <nick>   - Close a chat to a nick.");
             PutModule("    timers         - Shows related timers.");
-            if (GetUser()->IsAdmin()) {
+            if (GetUser()->isAdmin()) {
                 PutModule("    showsocks      - Shows all socket connections.");
             }
         } else if (sCom.equals("timers"))
@@ -324,7 +324,7 @@ public:
     void AcceptSDCC(const NoString& sNick, u_long iIP, u_short iPort)
     {
         NoSChatSock* p = new NoSChatSock(this, sNick, No::formatIp(iIP), iPort);
-        GetManager()->Connect(No::formatIp(iIP), iPort, p->GetSockName(), 60, true, GetUser()->GetLocalDCCIP(), p);
+        GetManager()->Connect(No::formatIp(iIP), iPort, p->GetSockName(), 60, true, GetUser()->localDccIp(), p);
         delete FindTimer("Remove " + sNick); // delete any associated timer to this nick
     }
 
@@ -421,7 +421,7 @@ void NoSChatSock::ReadLineImpl(const NoString& sLine)
         if (m_module->IsAttached())
             PutQuery(sText);
         else
-            AddLine(m_module->GetUser()->AddTimestamp(sText));
+            AddLine(m_module->GetUser()->addTimestamp(sText));
     }
 }
 
