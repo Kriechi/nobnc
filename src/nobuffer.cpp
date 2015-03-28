@@ -75,12 +75,12 @@ uint NoBuffer::updateExactMessage(const NoString& format, const NoString& text)
     return addMessage(format, text);
 }
 
-const NoMessage& NoBuffer::getMessage(uint idx) const
+const NoMessage& NoBuffer::message(uint idx) const
 {
     return d->lines[idx];
 }
 
-NoString NoBuffer::getMessage(uint idx, const NoClient& client, const NoStringMap& params) const
+NoString NoBuffer::message(uint idx, const NoClient& client, const NoStringMap& params) const
 {
     return d->lines[idx].formatted(client, params);
 }
@@ -100,7 +100,7 @@ void NoBuffer::clear()
     d->lines.clear();
 }
 
-uint NoBuffer::getLimit() const
+uint NoBuffer::limit() const
 {
     return d->limit;
 }

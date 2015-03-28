@@ -56,7 +56,7 @@ const NoBuffer& NoQuery::buffer() const
 
 uint NoQuery::bufferCount() const
 {
-    return d->buffer.getLimit();
+    return d->buffer.limit();
 }
 
 bool NoQuery::setBufferCount(uint count, bool force)
@@ -103,7 +103,7 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
 
                 size_t size = buffer.size();
                 for (size_t uIdx = 0; uIdx < size; uIdx++) {
-                    const NoMessage& message = buffer.getMessage(uIdx);
+                    const NoMessage& message = buffer.message(uIdx);
 
                     if (!useClient->HasSelfMessage()) {
                         NoNick sender(No::token(message.format(), 0));

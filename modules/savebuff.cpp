@@ -178,7 +178,7 @@ public:
 
         size_t uSize = Buffer.size();
         for (uint uIdx = 0; uIdx < uSize; uIdx++) {
-            const NoMessage& Line = Buffer.getMessage(uIdx);
+            const NoMessage& Line = Buffer.message(uIdx);
             timeval ts = Line.timestamp();
             sContent +=
             "@" + NoString(ts.tv_sec) + "," + NoString(ts.tv_usec) + " " + Line.format() + "\n" + Line.text() + "\n";

@@ -193,7 +193,7 @@ public:
 
         size_t uSize = m_Buffer.size();
         for (uint uIdx = 0; uIdx < uSize; uIdx++) {
-            PutUser(m_Buffer.getMessage(uIdx, *GetClient(), msParams));
+            PutUser(m_Buffer.message(uIdx, *GetClient(), msParams));
         }
         m_Buffer.clear();
     }
@@ -338,7 +338,7 @@ public:
                 m_Buffer.setLimit(sCount.toUInt());
             }
 
-            PutModule("Buffer count is set to [" + NoString(m_Buffer.getLimit()) + "]");
+            PutModule("Buffer count is set to [" + NoString(m_Buffer.limit()) + "]");
         } else if (sCmdName.equals("DEL")) {
             Remove(No::token(sCommand, 1).toUInt());
         } else {

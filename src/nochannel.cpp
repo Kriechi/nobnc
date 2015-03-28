@@ -582,7 +582,7 @@ NoNick* NoChannel::findNick(const NoString& sNick)
 }
 
 const NoBuffer& NoChannel::buffer() const { return d->buffer; }
-uint NoChannel::bufferCount() const { return d->buffer.getLimit(); }
+uint NoChannel::bufferCount() const { return d->buffer.limit(); }
 bool NoChannel::setBufferCount(uint u, bool bForce)
 {
     d->hasBufferCountSet = true;
@@ -647,7 +647,7 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
 
                 size_t uSize = Buffer.size();
                 for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
-                    const NoMessage& BufLine = Buffer.getMessage(uIdx);
+                    const NoMessage& BufLine = Buffer.message(uIdx);
                     NoString sLine = BufLine.formatted(*pUseClient, NoStringMap());
                     if (bBatch) {
                         NoStringMap msBatchTags = No::messageTags(sLine);
