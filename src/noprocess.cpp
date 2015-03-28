@@ -64,6 +64,8 @@ bool NoProcess::execute(const NoString& command)
 void NoProcess::kill()
 {
     ::kill(d->pid, SIGKILL);
+    d->command = "";
+    d->pid = -1;
     Close();
 }
 
