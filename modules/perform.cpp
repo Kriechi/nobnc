@@ -182,8 +182,8 @@ private:
 
 template <> void no_moduleInfo<NoPerform>(NoModuleInfo& Info)
 {
-    Info.AddType(No::UserModule);
-    Info.SetWikiPage("perform");
+    Info.addType(No::UserModule);
+    Info.setWikiPage("perform");
 }
 
 NETWORKMODULEDEFS(NoPerform, "Keeps a list of commands to be executed when ZNC connects to IRC.")

@@ -233,9 +233,9 @@ void NoSimpleAwayJob::run() { ((NoSimpleAway*)module())->SetAway(false); }
 
 template <> void no_moduleInfo<NoSimpleAway>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("simple_away");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("You might enter up to 3 arguments, like -notimer awaymessage or -timer 5 awaymessage.");
+    Info.setWikiPage("simple_away");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("You might enter up to 3 arguments, like -notimer awaymessage or -timer 5 awaymessage.");
 }
 
 NETWORKMODULEDEFS(NoSimpleAway,

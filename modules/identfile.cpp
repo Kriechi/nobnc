@@ -223,6 +223,6 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoIdentFileModule>(NoModuleInfo& Info) { Info.SetWikiPage("identfile"); }
+template <> void no_moduleInfo<NoIdentFileModule>(NoModuleInfo& Info) { Info.setWikiPage("identfile"); }
 
 GLOBALMODULEDEFS(NoIdentFileModule, "Write the ident of a user to a file when they are trying to connect.")

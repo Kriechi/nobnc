@@ -648,6 +648,6 @@ void NoAutoOpTimer::run()
     static_cast<NoAutoOpMod*>(module())->ProcessQueue();
 }
 
-template <> void no_moduleInfo<NoAutoOpMod>(NoModuleInfo& Info) { Info.SetWikiPage("autoop"); }
+template <> void no_moduleInfo<NoAutoOpMod>(NoModuleInfo& Info) { Info.setWikiPage("autoop"); }
 
 NETWORKMODULEDEFS(NoAutoOpMod, "Auto op the good people")

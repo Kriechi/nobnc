@@ -202,6 +202,6 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoCryptMod>(NoModuleInfo& Info) { Info.SetWikiPage("crypt"); }
+template <> void no_moduleInfo<NoCryptMod>(NoModuleInfo& Info) { Info.setWikiPage("crypt"); }
 
 NETWORKMODULEDEFS(NoCryptMod, "Encryption for channel/private messages")

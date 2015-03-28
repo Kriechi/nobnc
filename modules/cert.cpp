@@ -100,8 +100,8 @@ public:
 
 template <> void no_moduleInfo<NoCertMod>(NoModuleInfo& Info)
 {
-    Info.AddType(No::UserModule);
-    Info.SetWikiPage("cert");
+    Info.addType(No::UserModule);
+    Info.setWikiPage("cert");
 }
 
 NETWORKMODULEDEFS(NoCertMod, "Use a ssl certificate to connect to a server")

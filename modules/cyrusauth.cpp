@@ -229,9 +229,9 @@ protected:
 
 template <> void no_moduleInfo<NoSaslAuthMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("cyrusauth");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText(
+    Info.setWikiPage("cyrusauth");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText(
     "This global module takes up to two arguments - the methods of authentication - auxprop and saslauthd");
 }
 

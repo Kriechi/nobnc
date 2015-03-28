@@ -81,8 +81,8 @@ public:
 
 template <> void no_moduleInfo<NoBuffExtras>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("buffextras");
-    Info.AddType(No::NetworkModule);
+    Info.setWikiPage("buffextras");
+    Info.addType(No::NetworkModule);
 }
 
 USERMODULEDEFS(NoBuffExtras, "Add joins, parts etc. to the playback buffer")

@@ -111,9 +111,9 @@ private:
 
 template <> void no_moduleInfo<NoFailToBanMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("fail2ban");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("You might enter the time in minutes for the IP banning and the number of failed logins "
+    Info.setWikiPage("fail2ban");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("You might enter the time in minutes for the IP banning and the number of failed logins "
                          "before any action is taken.");
 }
 

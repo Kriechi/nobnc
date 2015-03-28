@@ -945,8 +945,8 @@ void NoClient::UserCommand(NoString& sLine)
 
                 for (const NoModuleInfo& Info : ssGlobalMods) {
                     GTable.addRow();
-                    GTable.setValue("Name", (NoApp::Get().GetLoader()->findModule(Info.GetName()) ? "*" : " ") + Info.GetName());
-                    GTable.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
+                    GTable.setValue("Name", (NoApp::Get().GetLoader()->findModule(Info.name()) ? "*" : " ") + Info.name());
+                    GTable.setValue("Description", No::ellipsize(Info.description(), 128));
                 }
 
                 PutStatus(GTable);
@@ -966,8 +966,8 @@ void NoClient::UserCommand(NoString& sLine)
 
             for (const NoModuleInfo& Info : ssUserMods) {
                 Table.addRow();
-                Table.setValue("Name", (d->user->loader()->findModule(Info.GetName()) ? "*" : " ") + Info.GetName());
-                Table.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
+                Table.setValue("Name", (d->user->loader()->findModule(Info.name()) ? "*" : " ") + Info.name());
+                Table.setValue("Description", No::ellipsize(Info.description(), 128));
             }
 
             PutStatus(Table);
@@ -986,8 +986,8 @@ void NoClient::UserCommand(NoString& sLine)
 
             for (const NoModuleInfo& Info : ssNetworkMods) {
                 Table.addRow();
-                Table.setValue("Name", ((d->network && d->network->loader()->findModule(Info.GetName())) ? "*" : " ") + Info.GetName());
-                Table.setValue("Description", No::ellipsize(Info.GetDescription(), 128));
+                Table.setValue("Name", ((d->network && d->network->loader()->findModule(Info.name())) ? "*" : " ") + Info.name());
+                Table.setValue("Description", No::ellipsize(Info.description(), 128));
             }
 
             PutStatus(Table);
@@ -1032,7 +1032,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (sType.equals("default")) {
-            eType = ModInfo.GetDefaultType();
+            eType = ModInfo.defaultType();
         }
 
         if (eType == No::GlobalModule && !d->user->isAdmin()) {
@@ -1101,7 +1101,7 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            eType = ModInfo.GetDefaultType();
+            eType = ModInfo.defaultType();
         }
 
         if (eType == No::GlobalModule && !d->user->isAdmin()) {
@@ -1171,7 +1171,7 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            eType = ModInfo.GetDefaultType();
+            eType = ModInfo.defaultType();
         }
 
         if (eType == No::GlobalModule && !d->user->isAdmin()) {

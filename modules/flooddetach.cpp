@@ -239,9 +239,9 @@ private:
 
 template <> void no_moduleInfo<NoFloodDetachMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("flooddetach");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("This user module takes up to two arguments. Arguments are msgs and secs numbers.");
+    Info.setWikiPage("flooddetach");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("This user module takes up to two arguments. Arguments are msgs and secs numbers.");
 }
 
 USERMODULEDEFS(NoFloodDetachMod, "Detach channels when flooded")

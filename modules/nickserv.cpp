@@ -140,9 +140,9 @@ public:
 
 template <> void no_moduleInfo<NoNickServ>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("nickserv");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("Please enter your nickserv password.");
+    Info.setWikiPage("nickserv");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("Please enter your nickserv password.");
 }
 
 NETWORKMODULEDEFS(NoNickServ, "Auths you with NickServ")

@@ -150,9 +150,9 @@ private:
 
 template <> void no_moduleInfo<NoCtcpFloodMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("ctcpflood");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("This user module takes none to two arguments. The first argument is the number of lines "
+    Info.setWikiPage("ctcpflood");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("This user module takes none to two arguments. The first argument is the number of lines "
                          "after which the flood-protection is triggered. The second argument is the time (s) to in "
                          "which the number of lines is reached. The default setting is 4 CTCPs in 2 seconds");
 }

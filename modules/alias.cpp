@@ -357,8 +357,8 @@ public:
 
 template <> void no_moduleInfo<NoAliasMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("alias");
-    Info.AddType(No::NetworkModule);
+    Info.setWikiPage("alias");
+    Info.addType(No::NetworkModule);
 }
 
 USERMODULEDEFS(NoAliasMod, "Provides bouncer-side command alias support.")

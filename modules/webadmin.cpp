@@ -798,14 +798,14 @@ public:
                 const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.addRow("ModuleLoop");
 
-                l["Name"] = Info.GetName();
-                l["Description"] = Info.GetDescription();
-                l["Wiki"] = Info.GetWikiPage();
-                l["HasArgs"] = NoString(Info.GetHasArgs());
-                l["ArgsHelpText"] = Info.GetArgsHelpText();
+                l["Name"] = Info.name();
+                l["Description"] = Info.description();
+                l["Wiki"] = Info.wikiPage();
+                l["HasArgs"] = NoString(Info.hasArgs());
+                l["ArgsHelpText"] = Info.argsHelpText();
 
                 if (pNetwork) {
-                    NoModule* pModule = pNetwork->loader()->findModule(Info.GetName());
+                    NoModule* pModule = pNetwork->loader()->findModule(Info.name());
                     if (pModule) {
                         l["Checked"] = "true";
                         l["Args"] = pModule->GetArgs();
@@ -813,12 +813,12 @@ public:
                 }
 
                 // Check if module is loaded globally
-                l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(No::GlobalModule));
-                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.GetName()) != nullptr);
+                l["CanBeLoadedGlobally"] = NoString(Info.supportsType(No::GlobalModule));
+                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.name()) != nullptr);
 
                 // Check if module is loaded by user
-                l["CanBeLoadedByUser"] = NoString(Info.SupportsType(No::UserModule));
-                l["LoadedByUser"] = NoString(pUser->loader()->findModule(Info.GetName()) != nullptr);
+                l["CanBeLoadedByUser"] = NoString(Info.supportsType(No::UserModule));
+                l["LoadedByUser"] = NoString(pUser->loader()->findModule(Info.name()) != nullptr);
 
                 if (!spSession->isAdmin() && pUser->denyLoadMod()) {
                     l["Disabled"] = "true";
@@ -1367,39 +1367,39 @@ public:
                 const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.addRow("ModuleLoop");
 
-                l["Name"] = Info.GetName();
-                l["Description"] = Info.GetDescription();
-                l["Wiki"] = Info.GetWikiPage();
-                l["HasArgs"] = NoString(Info.GetHasArgs());
-                l["ArgsHelpText"] = Info.GetArgsHelpText();
+                l["Name"] = Info.name();
+                l["Description"] = Info.description();
+                l["Wiki"] = Info.wikiPage();
+                l["HasArgs"] = NoString(Info.hasArgs());
+                l["ArgsHelpText"] = Info.argsHelpText();
 
                 NoModule* pModule = nullptr;
                 if (pUser) {
-                    pModule = pUser->loader()->findModule(Info.GetName());
+                    pModule = pUser->loader()->findModule(Info.name());
                     // Check if module is loaded by all or some networks
                     const std::vector<NoNetwork*>& userNetworks = pUser->networks();
                     uint networksWithRenderedModuleCount = 0;
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
                         const NoModuleLoader* networkModules = pCurrentNetwork->loader();
-                        if (networkModules->findModule(Info.GetName())) {
+                        if (networkModules->findModule(Info.name())) {
                             networksWithRenderedModuleCount++;
                         }
                     }
-                    l["CanBeLoadedByNetwork"] = NoString(Info.SupportsType(No::NetworkModule));
+                    l["CanBeLoadedByNetwork"] = NoString(Info.supportsType(No::NetworkModule));
                     l["LoadedByAllNetworks"] = NoString(networksWithRenderedModuleCount == userNetworks.size());
                     l["LoadedBySomeNetworks"] = NoString(networksWithRenderedModuleCount != 0);
                 }
                 if (pModule) {
                     l["Checked"] = "true";
                     l["Args"] = pModule->GetArgs();
-                    if (No::UserModule == GetType() && Info.GetName() == GetModName()) {
+                    if (No::UserModule == GetType() && Info.name() == GetModName()) {
                         l["Disabled"] = "true";
                     }
                 }
-                l["CanBeLoadedGlobally"] = NoString(Info.SupportsType(No::GlobalModule));
+                l["CanBeLoadedGlobally"] = NoString(Info.supportsType(No::GlobalModule));
                 // Check if module is loaded globally
-                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.GetName()) != nullptr);
+                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.name()) != nullptr);
 
                 if (!spSession->isAdmin() && pUser && pUser->denyLoadMod()) {
                     l["Disabled"] = "true";
@@ -1823,20 +1823,20 @@ public:
                 const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.addRow("ModuleLoop");
 
-                NoModule* pModule = NoApp::Get().GetLoader()->findModule(Info.GetName());
+                NoModule* pModule = NoApp::Get().GetLoader()->findModule(Info.name());
                 if (pModule) {
                     l["Checked"] = "true";
                     l["Args"] = pModule->GetArgs();
-                    if (No::GlobalModule == GetType() && Info.GetName() == GetModName()) {
+                    if (No::GlobalModule == GetType() && Info.name() == GetModName()) {
                         l["Disabled"] = "true";
                     }
                 }
 
-                l["Name"] = Info.GetName();
-                l["Description"] = Info.GetDescription();
-                l["Wiki"] = Info.GetWikiPage();
-                l["HasArgs"] = NoString(Info.GetHasArgs());
-                l["ArgsHelpText"] = Info.GetArgsHelpText();
+                l["Name"] = Info.name();
+                l["Description"] = Info.description();
+                l["Wiki"] = Info.wikiPage();
+                l["HasArgs"] = NoString(Info.hasArgs());
+                l["ArgsHelpText"] = Info.argsHelpText();
 
                 // Check if the module is loaded by all or some users, and/or by all or some networks
                 uint usersWithRenderedModuleCount = 0;
@@ -1848,7 +1848,7 @@ public:
 
                     // Count users which has loaded a render module
                     const NoModuleLoader* userModules = User.loader();
-                    if (userModules->findModule(Info.GetName())) {
+                    if (userModules->findModule(Info.name())) {
                         usersWithRenderedModuleCount++;
                     }
                     // Count networks which has loaded a render module
@@ -1856,16 +1856,16 @@ public:
                     networksCount += userNetworks.size();
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
-                        if (pCurrentNetwork->loader()->findModule(Info.GetName())) {
+                        if (pCurrentNetwork->loader()->findModule(Info.name())) {
                             networksWithRenderedModuleCount++;
                         }
                     }
                 }
-                l["CanBeLoadedByNetwork"] = NoString(Info.SupportsType(No::NetworkModule));
+                l["CanBeLoadedByNetwork"] = NoString(Info.supportsType(No::NetworkModule));
                 l["LoadedByAllNetworks"] = NoString(networksWithRenderedModuleCount == networksCount);
                 l["LoadedBySomeNetworks"] = NoString(networksWithRenderedModuleCount != 0);
 
-                l["CanBeLoadedByUser"] = NoString(Info.SupportsType(No::UserModule));
+                l["CanBeLoadedByUser"] = NoString(Info.supportsType(No::UserModule));
                 l["LoadedByAllUsers"] = NoString(usersWithRenderedModuleCount == allUsers.size());
                 l["LoadedBySomeUsers"] = NoString(usersWithRenderedModuleCount != 0);
             }
@@ -1961,8 +1961,8 @@ public:
 
 template <> void no_moduleInfo<NoWebAdminMod>(NoModuleInfo& Info)
 {
-    Info.AddType(No::UserModule);
-    Info.SetWikiPage("webadmin");
+    Info.addType(No::UserModule);
+    Info.setWikiPage("webadmin");
 }
 
 GLOBALMODULEDEFS(NoWebAdminMod, "Web based administration module.")

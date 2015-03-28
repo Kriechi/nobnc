@@ -211,9 +211,9 @@ private:
 
 template <> void no_moduleInfo<NoBlockUser>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("blockuser");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("Enter one or more user names. Separate them by spaces.");
+    Info.setWikiPage("blockuser");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("Enter one or more user names. Separate them by spaces.");
 }
 
 GLOBALMODULEDEFS(NoBlockUser, "Block certain users from logging in.")

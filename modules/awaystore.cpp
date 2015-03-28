@@ -486,9 +486,9 @@ void NoAwayJob::run()
 
 template <> void no_moduleInfo<NoAway>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("awaystore");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("[ -notimer | -timer N ]  passw0rd . N is number of seconds, 600 by default.");
+    Info.setWikiPage("awaystore");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("[ -notimer | -timer N ]  passw0rd . N is number of seconds, 600 by default.");
 }
 
 NETWORKMODULEDEFS(NoAway, "Adds auto-away with logging, useful when you use ZNC from different locations");

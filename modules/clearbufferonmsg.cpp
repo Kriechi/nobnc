@@ -163,9 +163,9 @@ private:
 
 template <> void no_moduleInfo<NoClearBufferOnMsgMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("clearbufferonmsg");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("[ [!]<msg|ctcp|action|notice|part|topic|quit|all> ]");
+    Info.setWikiPage("clearbufferonmsg");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("[ [!]<msg|ctcp|action|notice|part|topic|quit|all> ]");
 }
 
 USERMODULEDEFS(NoClearBufferOnMsgMod, "Clear all channel and query buffers whenever the user does something")

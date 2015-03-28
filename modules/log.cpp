@@ -437,11 +437,11 @@ NoModule::ModRet NoLogMod::onChanMsg(NoNick& Nick, NoChannel& Channel, NoString&
 
 template <> void no_moduleInfo<NoLogMod>(NoModuleInfo& Info)
 {
-    Info.AddType(No::NetworkModule);
-    Info.AddType(No::GlobalModule);
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("[-sanitize] Optional path where to store logs.");
-    Info.SetWikiPage("log");
+    Info.addType(No::NetworkModule);
+    Info.addType(No::GlobalModule);
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("[-sanitize] Optional path where to store logs.");
+    Info.setWikiPage("log");
 }
 
 USERMODULEDEFS(NoLogMod, "Write IRC logs.")

@@ -39,8 +39,8 @@ public:
 
 template <> void no_moduleInfo<NoRawMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("raw");
-    Info.AddType(No::UserModule);
+    Info.setWikiPage("raw");
+    Info.addType(No::UserModule);
 }
 
 NETWORKMODULEDEFS(NoRawMod, "View all of the raw traffic")

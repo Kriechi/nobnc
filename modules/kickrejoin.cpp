@@ -138,9 +138,9 @@ public:
 
 template <> void no_moduleInfo<NoRejoinMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("kickrejoin");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("You might enter the number of seconds to wait before rejoining.");
+    Info.setWikiPage("kickrejoin");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("You might enter the number of seconds to wait before rejoining.");
 }
 
 NETWORKMODULEDEFS(NoRejoinMod, "Autorejoin on kick")

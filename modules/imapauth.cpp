@@ -166,9 +166,9 @@ void NoImapSock::ReadLineImpl(const NoString& sLine)
 
 template <> void no_moduleInfo<NoImapAuthMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("imapauth");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("[ server [+]port [ UserFormatString ] ]");
+    Info.setWikiPage("imapauth");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("[ server [+]port [ UserFormatString ] ]");
 }
 
 GLOBALMODULEDEFS(NoImapAuthMod, "Allow users to authenticate via IMAP.")

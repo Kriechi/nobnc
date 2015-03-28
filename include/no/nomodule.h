@@ -67,10 +67,10 @@ class NoModulePrivate;
         {                                                                    \
             if (version != NO_VERSION)                                       \
                 return false;                                                \
-            info.SetDescription(DESCRIPTION);                                \
-            info.SetDefaultType(TYPE);                                       \
-            info.AddType(TYPE);                                              \
-            info.SetLoader(no_loadModule<CLASS>);                            \
+            info.setDescription(DESCRIPTION);                                \
+            info.setDefaultType(TYPE);                                       \
+            info.addType(TYPE);                                              \
+            info.setLoader(no_loadModule<CLASS>);                            \
             no_moduleInfo<CLASS>(info);                                      \
             return true;                                                     \
         }                                                                    \

@@ -276,10 +276,10 @@ private:
 
 template <> void no_moduleInfo<NoChannelAttach>(NoModuleInfo& Info)
 {
-    Info.AddType(No::UserModule);
-    Info.SetWikiPage("autoattach");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("List of channel masks and channel masks with ! before them.");
+    Info.addType(No::UserModule);
+    Info.setWikiPage("autoattach");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("List of channel masks and channel masks with ! before them.");
 }
 
 NETWORKMODULEDEFS(NoChannelAttach, "Reattaches you to channels on activity.")

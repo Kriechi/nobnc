@@ -233,9 +233,9 @@ public:
 
 template <> void no_moduleInfo<NoNotesMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("notes");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText(
+    Info.setWikiPage("notes");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText(
     "This user module takes up to one arguments. It can be -disableNotesOnLogin not to show notes upon client login");
 }
 

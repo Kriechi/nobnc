@@ -233,9 +233,9 @@ private:
 
 template <> void no_moduleInfo<NoAutoCycleMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("autocycle");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("List of channel masks and channel masks with ! before them.");
+    Info.setWikiPage("autocycle");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("List of channel masks and channel masks with ! before them.");
 }
 
 NETWORKMODULEDEFS(NoAutoCycleMod, "Rejoins channels to gain Op if you're the only user left")

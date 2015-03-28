@@ -38,29 +38,29 @@ public:
 
     bool operator<(const NoModuleInfo& Info) const;
 
-    bool SupportsType(No::ModuleType eType) const;
+    bool supportsType(No::ModuleType eType) const;
 
-    void AddType(No::ModuleType eType);
+    void addType(No::ModuleType eType);
 
-    static NoString ModuleTypeToString(No::ModuleType eType);
+    static NoString moduleTypeToString(No::ModuleType eType);
 
-    const NoString& GetName() const;
-    const NoString& GetPath() const;
-    const NoString& GetDescription() const;
-    const NoString& GetWikiPage() const;
-    const NoString& GetArgsHelpText() const;
-    bool GetHasArgs() const;
-    NoModuleLoader GetLoader() const;
-    No::ModuleType GetDefaultType() const;
+    const NoString& name() const;
+    const NoString& path() const;
+    const NoString& description() const;
+    const NoString& wikiPage() const;
+    const NoString& argsHelpText() const;
+    bool hasArgs() const;
+    NoModuleLoader loader() const;
+    No::ModuleType defaultType() const;
 
-    void SetName(const NoString& s);
-    void SetPath(const NoString& s);
-    void SetDescription(const NoString& s);
-    void SetWikiPage(const NoString& s);
-    void SetArgsHelpText(const NoString& s);
-    void SetHasArgs(bool b = false);
-    void SetLoader(NoModuleLoader fLoader);
-    void SetDefaultType(No::ModuleType eType);
+    void setName(const NoString& s);
+    void setPath(const NoString& s);
+    void setDescription(const NoString& s);
+    void setWikiPage(const NoString& s);
+    void setArgsHelpText(const NoString& s);
+    void setHasArgs(bool b = false);
+    void setLoader(NoModuleLoader fLoader);
+    void setDefaultType(No::ModuleType eType);
 
 private:
     std::set<No::ModuleType> m_types;

@@ -1137,7 +1137,7 @@ bool NoUser::loadModule(const NoString& sModName, const NoString& sArgs, const N
 
     No::printAction(sNotice);
 
-    if (!ModInfo.SupportsType(No::UserModule) && ModInfo.SupportsType(No::NetworkModule)) {
+    if (!ModInfo.supportsType(No::UserModule) && ModInfo.supportsType(No::NetworkModule)) {
         No::printMessage("NOTICE: Module [" + sModName +
                              "] is a network module, loading module for all networks in user.");
 

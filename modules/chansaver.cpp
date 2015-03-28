@@ -88,9 +88,9 @@ public:
 
 template <> void no_moduleInfo<NoChannelSaverMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("chansaver");
-    Info.AddType(No::NetworkModule);
-    Info.AddType(No::GlobalModule);
+    Info.setWikiPage("chansaver");
+    Info.addType(No::NetworkModule);
+    Info.addType(No::GlobalModule);
 }
 
 USERMODULEDEFS(NoChannelSaverMod, "Keep config up-to-date when user joins/parts.")

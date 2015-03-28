@@ -62,8 +62,8 @@ public:
 
 template <> void no_moduleInfo<NoStripControlsMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("stripcontrols");
-    Info.AddType(No::UserModule);
+    Info.setWikiPage("stripcontrols");
+    Info.addType(No::UserModule);
 }
 
 NETWORKMODULEDEFS(NoStripControlsMod, "Strips control codes (Colors, Bold, ..) from channel and private messages.")

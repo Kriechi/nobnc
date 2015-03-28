@@ -525,6 +525,6 @@ bool NoDccSock::Seek(ulong uPos)
     return false;
 }
 
-template <> void no_moduleInfo<NoDccMod>(NoModuleInfo& Info) { Info.SetWikiPage("dcc"); }
+template <> void no_moduleInfo<NoDccMod>(NoModuleInfo& Info) { Info.setWikiPage("dcc"); }
 
 USERMODULEDEFS(NoDccMod, "This module allows you to transfer files to and from ZNC")

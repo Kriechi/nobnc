@@ -257,6 +257,6 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoListSockets>(NoModuleInfo& Info) { Info.SetWikiPage("listsockets"); }
+template <> void no_moduleInfo<NoListSockets>(NoModuleInfo& Info) { Info.setWikiPage("listsockets"); }
 
 USERMODULEDEFS(NoListSockets, "List active sockets")

@@ -456,6 +456,6 @@ void NoRouteTimeout::run()
     static_cast<NoRouteRepliesMod*>(module())->Timeout();
 }
 
-template <> void no_moduleInfo<NoRouteRepliesMod>(NoModuleInfo& Info) { Info.SetWikiPage("route_replies"); }
+template <> void no_moduleInfo<NoRouteRepliesMod>(NoModuleInfo& Info) { Info.setWikiPage("route_replies"); }
 
 NETWORKMODULEDEFS(NoRouteRepliesMod, "Send replies (e.g. to /who) to the right client only")

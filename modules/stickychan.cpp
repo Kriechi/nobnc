@@ -239,9 +239,9 @@ bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
 
 template <> void no_moduleInfo<NoStickyChan>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("stickychan");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("List of channels, separated by comma.");
+    Info.setWikiPage("stickychan");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("List of channels, separated by comma.");
 }
 
 NETWORKMODULEDEFS(NoStickyChan, "configless sticky chans, keeps you there very stickily even")

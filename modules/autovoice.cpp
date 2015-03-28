@@ -348,9 +348,9 @@ private:
 
 template <> void no_moduleInfo<NoAutoVoiceMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("autovoice");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("Each argument is either a channel you want autovoice for (which can include wildcards) or, "
+    Info.setWikiPage("autovoice");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("Each argument is either a channel you want autovoice for (which can include wildcards) or, "
                          "if it starts with !, it is an exception for autovoice.");
 }
 

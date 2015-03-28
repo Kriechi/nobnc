@@ -200,6 +200,6 @@ private:
     NoString m_sLogFile;
 };
 
-template <> void no_moduleInfo<NoAdminLogMod>(NoModuleInfo& Info) { Info.SetWikiPage("adminlog"); }
+template <> void no_moduleInfo<NoAdminLogMod>(NoModuleInfo& Info) { Info.setWikiPage("adminlog"); }
 
 GLOBALMODULEDEFS(NoAdminLogMod, "Log ZNC events to file and/or syslog.")

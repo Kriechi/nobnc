@@ -100,10 +100,10 @@ private:
 
 template <> void no_moduleInfo<NoAutoReplyMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("autoreply");
-    Info.AddType(No::NetworkModule);
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("You might specify a reply text. It is used when automatically answering queries, if you are "
+    Info.setWikiPage("autoreply");
+    Info.addType(No::NetworkModule);
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("You might specify a reply text. It is used when automatically answering queries, if you are "
                          "not connected to ZNC.");
 }
 

@@ -327,9 +327,9 @@ public:
 
 template <> void no_moduleInfo<NoSampleMod>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("sample");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("Description of module arguments goes here.");
+    Info.setWikiPage("sample");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("Description of module arguments goes here.");
 }
 
 MODULEDEFS(NoSampleMod, "To be used as a sample for writing modules")

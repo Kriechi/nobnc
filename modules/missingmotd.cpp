@@ -27,8 +27,8 @@ public:
 
 template <> void no_moduleInfo<NoMissingMotd>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("missingmotd");
-    Info.SetHasArgs(false);
+    Info.setWikiPage("missingmotd");
+    Info.setHasArgs(false);
 }
 
 USERMODULEDEFS(NoMissingMotd, "Sends 422 to clients when they login")

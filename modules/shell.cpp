@@ -149,7 +149,7 @@ void NoShellSock::DisconnectedImpl()
     m_pParent->SetClient(nullptr);
 }
 
-template <> void no_moduleInfo<NoShellMod>(NoModuleInfo& Info) { Info.SetWikiPage("shell"); }
+template <> void no_moduleInfo<NoShellMod>(NoModuleInfo& Info) { Info.setWikiPage("shell"); }
 
 #ifdef MOD_SHELL_ALLOW_EVERYONE
 USERMODULEDEFS(NoShellMod, "Gives shell access")

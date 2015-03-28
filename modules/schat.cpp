@@ -455,9 +455,9 @@ void NoRemMarkerJob::run()
 
 template <> void no_moduleInfo<NoSChat>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("schat");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("Path to .pem file, if differs from main ZNC's one");
+    Info.setWikiPage("schat");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("Path to .pem file, if differs from main ZNC's one");
 }
 
 NETWORKMODULEDEFS(NoSChat, "Secure cross platform (:P) chat system")

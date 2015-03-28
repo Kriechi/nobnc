@@ -786,8 +786,8 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     GetLoader()->defaultModules(ssGlobalMods, No::GlobalModule);
     std::vector<NoString> vsGlobalModNames;
     for (const NoModuleInfo& Info : ssGlobalMods) {
-        vsGlobalModNames.push_back(Info.GetName());
-        vsLines.push_back("LoadModule = " + Info.GetName());
+        vsGlobalModNames.push_back(Info.name());
+        vsLines.push_back("LoadModule = " + Info.name());
     }
     No::printMessage("Enabled global modules [" + NoString(", ").join(vsGlobalModNames.begin(), vsGlobalModNames.end()) + "]");
 
@@ -828,8 +828,8 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
     GetLoader()->defaultModules(ssUserMods, No::UserModule);
     std::vector<NoString> vsUserModNames;
     for (const NoModuleInfo& Info : ssUserMods) {
-        vsUserModNames.push_back(Info.GetName());
-        vsLines.push_back("\tLoadModule = " + Info.GetName());
+        vsUserModNames.push_back(Info.name());
+        vsLines.push_back("\tLoadModule = " + Info.name());
     }
     No::printMessage("Enabled user modules [" + NoString(", ").join(vsUserModNames.begin(), vsUserModNames.end()) + "]");
 
@@ -851,8 +851,8 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
         GetLoader()->defaultModules(ssNetworkMods, No::NetworkModule);
         std::vector<NoString> vsNetworkModNames;
         for (const NoModuleInfo& Info : ssNetworkMods) {
-            vsNetworkModNames.push_back(Info.GetName());
-            vsLines.push_back("\t\tLoadModule = " + Info.GetName());
+            vsNetworkModNames.push_back(Info.name());
+            vsLines.push_back("\t\tLoadModule = " + Info.name());
         }
 
         NoString sHost, sPass, sHint;

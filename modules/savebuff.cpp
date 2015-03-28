@@ -409,9 +409,9 @@ void NoSaveBuffJob::run()
 
 template <> void no_moduleInfo<NoSaveBuff>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("savebuff");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("This user module takes up to one arguments. Either --ask-pass or the password itself (which "
+    Info.setWikiPage("savebuff");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("This user module takes up to one arguments. Either --ask-pass or the password itself (which "
                          "may contain spaces) or nothing");
 }
 

@@ -532,10 +532,10 @@ bool NoModuleLoader::loadModule(const NoString& sModule, const NoString& sArgs, 
         return false;
     }
 
-    if (!Info.SupportsType(eType)) {
+    if (!Info.supportsType(eType)) {
         dlclose(p);
         sRetMsg =
-        "Module [" + sModule + "] does not support module type [" + NoModuleInfo::ModuleTypeToString(eType) + "].";
+        "Module [" + sModule + "] does not support module type [" + NoModuleInfo::moduleTypeToString(eType) + "].";
         return false;
     }
 
@@ -551,8 +551,8 @@ bool NoModuleLoader::loadModule(const NoString& sModule, const NoString& sArgs, 
         return false;
     }
 
-    NoModule* pModule = Info.GetLoader()(p, pUser, pNetwork, sModule, sDataPath, eType);
-    pModule->SetDescription(Info.GetDescription());
+    NoModule* pModule = Info.loader()(p, pUser, pNetwork, sModule, sDataPath, eType);
+    pModule->SetDescription(Info.description());
     pModule->SetArgs(sArgs);
     pModule->SetModPath(NoDir::ChangeDir(NoApp::Get().GetCurPath(), sModPath));
     d->modules.push_back(pModule);
@@ -676,11 +676,11 @@ bool NoModuleLoader::modulePath(NoModuleInfo& ModInfo, const NoString& sModule, 
 
     if (!p) return false;
 
-    ModInfo.SetName(sModule);
-    ModInfo.SetPath(sModPath);
+    ModInfo.setName(sModule);
+    ModInfo.setPath(sModPath);
 
     if (bVersionMismatch) {
-        ModInfo.SetDescription("--- Version mismatch, recompile this module. ---");
+        ModInfo.setDescription("--- Version mismatch, recompile this module. ---");
     }
 
     dlclose(p);
@@ -710,7 +710,7 @@ void NoModuleLoader::availableModules(std::set<NoModuleInfo>& ssMods, No::Module
 
             NoString sIgnoreRetMsg;
             if (modulePath(ModInfo, sName, sPath, sIgnoreRetMsg)) {
-                if (ModInfo.SupportsType(eType)) {
+                if (ModInfo.supportsType(eType)) {
                     ssMods.insert(ModInfo);
                 }
             }
@@ -732,7 +732,7 @@ void NoModuleLoader::defaultModules(std::set<NoModuleInfo>& ssMods, No::ModuleTy
 
     auto it = ssMods.begin();
     while (it != ssMods.end()) {
-        auto it2 = ns.find(it->GetName());
+        auto it2 = ns.find(it->name());
         if (it2 != ns.end() && it2->second == eType) {
             ++it;
         } else {

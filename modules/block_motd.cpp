@@ -39,9 +39,9 @@ public:
 
 template <> void no_moduleInfo<NoBlockMotd>(NoModuleInfo& Info)
 {
-    Info.AddType(No::NetworkModule);
-    Info.AddType(No::GlobalModule);
-    Info.SetWikiPage("block_motd");
+    Info.addType(No::NetworkModule);
+    Info.addType(No::GlobalModule);
+    Info.setWikiPage("block_motd");
 }
 
 USERMODULEDEFS(NoBlockMotd, "Block the MOTD from IRC so it's not sent to your client(s).")

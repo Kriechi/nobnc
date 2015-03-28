@@ -644,9 +644,9 @@ private:
 
 template <> void no_moduleInfo<NoQModule>(NoModuleInfo& Info)
 {
-    Info.SetWikiPage("Q");
-    Info.SetHasArgs(true);
-    Info.SetArgsHelpText("Please provide your username and password for Q.");
+    Info.setWikiPage("Q");
+    Info.setHasArgs(true);
+    Info.setArgsHelpText("Please provide your username and password for Q.");
 }
 
 NETWORKMODULEDEFS(NoQModule, "Auths you with QuakeNet's Q bot.")

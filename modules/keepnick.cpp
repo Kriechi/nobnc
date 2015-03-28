@@ -214,6 +214,6 @@ void NoKeepNickTimer::run()
     static_cast<NoKeepNickMod*>(module())->KeepNick();
 }
 
-template <> void no_moduleInfo<NoKeepNickMod>(NoModuleInfo& Info) { Info.SetWikiPage("keepnick"); }
+template <> void no_moduleInfo<NoKeepNickMod>(NoModuleInfo& Info) { Info.setWikiPage("keepnick"); }
 
 NETWORKMODULEDEFS(NoKeepNickMod, "Keep trying for your primary nick")

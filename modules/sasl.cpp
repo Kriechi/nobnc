@@ -281,6 +281,6 @@ private:
     bool m_bAuthenticated;
 };
 
-template <> void no_moduleInfo<NoSaslMod>(NoModuleInfo& Info) { Info.SetWikiPage("sasl"); }
+template <> void no_moduleInfo<NoSaslMod>(NoModuleInfo& Info) { Info.setWikiPage("sasl"); }
 
 NETWORKMODULEDEFS(NoSaslMod, "Adds support for sasl authentication capability to authenticate to an IRC server")
