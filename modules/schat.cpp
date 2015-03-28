@@ -365,11 +365,11 @@ public:
     void SendToUser(const NoString& sFrom, const NoString& sText)
     {
         //:*schat!znc@znc.in PRIVMSG Jim :
-        NoString sSend = ":" + sFrom + " PRIVMSG " + GetNetwork()->GetCurNick() + " :" + sText;
+        NoString sSend = ":" + sFrom + " PRIVMSG " + GetNetwork()->currentNick() + " :" + sText;
         PutUser(sSend);
     }
 
-    bool IsAttached() { return (GetNetwork()->IsUserAttached()); }
+    bool IsAttached() { return (GetNetwork()->isUserAttached()); }
 
     void AddSocket(NoSChatSock* socket) { m_sockets.insert(socket); }
     void RemoveSocket(NoSChatSock* socket) { m_sockets.erase(socket); }

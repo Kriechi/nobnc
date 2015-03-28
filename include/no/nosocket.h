@@ -61,7 +61,7 @@ public:
     bool Write( const NoString & sData );
     time_t GetTimeSinceLastDataTransaction( time_t iNow = 0 ) const;
     const NoString & GetSockName() const;
-    const NoString & GetBindHost() const;
+    const NoString & bindHost() const;
     void SetSockName( const NoString & sName );
     bool IsListener() const;
     bool IsOutbound() const;

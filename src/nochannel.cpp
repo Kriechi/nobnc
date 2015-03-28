@@ -56,18 +56,18 @@ NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig,
     : d(new NoChannelPrivate)
 {
     d->network = pNetwork;
-    d->autoClearChanBuffer = pNetwork->GetUser()->autoClearChanBuffer();
+    d->autoClearChanBuffer = pNetwork->user()->autoClearChanBuffer();
     d->inConfig = bInConfig;
 
     d->name = No::token(sName, 0);
     d->key = No::token(sName, 1);
 
-    if (!pNetwork->IsChan(d->name)) {
+    if (!pNetwork->isChannel(d->name)) {
         d->name = "#" + d->name;
     }
 
     d->nick.setNetwork(d->network);
-    d->buffer.setLimit(d->network->GetUser()->bufferCount(), true);
+    d->buffer.setLimit(d->network->user()->bufferCount(), true);
 
     if (pConfig) {
         NoString sValue;
@@ -139,35 +139,35 @@ void NoChannel::clone(NoChannel& chan)
     }
 }
 
-void NoChannel::cycle() const { d->network->PutIRC("PART " + getName() + "\r\nJOIN " + getName() + " " + getKey()); }
+void NoChannel::cycle() const { d->network->putIrc("PART " + getName() + "\r\nJOIN " + getName() + " " + getKey()); }
 
 void NoChannel::joinUser(const NoString& sKey)
 {
     if (!sKey.empty()) {
         setKey(sKey);
     }
-    d->network->PutIRC("JOIN " + getName() + " " + getKey());
+    d->network->putIrc("JOIN " + getName() + " " + getKey());
 }
 
 void NoChannel::attachUser(NoClient* pClient)
 {
-    d->network->PutUser(":" + d->network->GetIRCNick().nickMask() + " JOIN :" + getName(), pClient);
+    d->network->putUser(":" + d->network->ircNick().nickMask() + " JOIN :" + getName(), pClient);
 
     if (!getTopic().empty()) {
-        d->network->PutUser(":" + d->network->GetIRCServer() + " 332 " + d->network->GetIRCNick().nick() + " " +
+        d->network->putUser(":" + d->network->ircServer() + " 332 " + d->network->ircNick().nick() + " " +
                             getName() + " :" + getTopic(),
                             pClient);
-        d->network->PutUser(":" + d->network->GetIRCServer() + " 333 " + d->network->GetIRCNick().nick() + " " +
+        d->network->putUser(":" + d->network->ircServer() + " 333 " + d->network->ircNick().nick() + " " +
                             getName() + " " + getTopicOwner() + " " + NoString(getTopicDate()),
                             pClient);
     }
 
-    NoString sPre = ":" + d->network->GetIRCServer() + " 353 " + d->network->GetIRCNick().nick() + " " +
+    NoString sPre = ":" + d->network->ircServer() + " 353 " + d->network->ircNick().nick() + " " +
                    getModeForNames() + " " + getName() + " :";
     NoString sLine = sPre;
     NoString sPerm, sNick;
 
-    const std::vector<NoClient*>& vpClients = d->network->GetClients();
+    const std::vector<NoClient*>& vpClients = d->network->clients();
     for (NoClient* pEachClient : vpClients) {
         NoClient* pThisClient;
         if (!pClient)
@@ -194,7 +194,7 @@ void NoChannel::attachUser(NoClient* pClient)
             sLine += sPerm + sNick;
 
             if (sLine.size() >= 490 || a == (--d->nicks.end())) {
-                d->network->PutUser(sLine, pThisClient);
+                d->network->putUser(sLine, pThisClient);
                 sLine = sPre;
             } else {
                 sLine += " ";
@@ -205,7 +205,7 @@ void NoChannel::attachUser(NoClient* pClient)
             break;
     }
 
-    d->network->PutUser(":" + d->network->GetIRCServer() + " 366 " + d->network->GetIRCNick().nick() + " " + getName() + " :End of /NAMES list.",
+    d->network->putUser(":" + d->network->ircServer() + " 366 " + d->network->ircNick().nick() + " " + getName() + " :End of /NAMES list.",
                         pClient);
     d->detached = false;
 
@@ -216,7 +216,7 @@ void NoChannel::attachUser(NoClient* pClient)
 void NoChannel::detachUser()
 {
     if (!d->detached) {
-        d->network->PutUser(":" + d->network->GetIRCNick().nickMask() + " PART " + getName());
+        d->network->putUser(":" + d->network->ircNick().nickMask() + " PART " + getName());
         d->detached = true;
     }
 }
@@ -261,7 +261,7 @@ void NoChannel::setAutoClearChanBuffer(bool b)
     d->hasAutoClearChanBufferSet = true;
     d->autoClearChanBuffer = b;
 
-    if (d->autoClearChanBuffer && !isDetached() && d->network->IsUserOnline()) {
+    if (d->autoClearChanBuffer && !isDetached() && d->network->isUserOnline()) {
         clearBuffer();
     }
 }
@@ -271,7 +271,7 @@ void NoChannel::inheritAutoClearChanBuffer(bool b)
     if (!d->hasAutoClearChanBufferSet) {
         d->autoClearChanBuffer = b;
 
-        if (d->autoClearChanBuffer && !isDetached() && d->network->IsUserOnline()) {
+        if (d->autoClearChanBuffer && !isDetached() && d->network->isUserOnline()) {
             clearBuffer();
         }
     }
@@ -302,7 +302,7 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
         if (OpNick) pOpNick = OpNick;
     }
 
-    NETWORKMODULECALL(onRawMode2(pOpNick, *this, sModeArg, sArgs), d->network->GetUser(), d->network, nullptr, NOTHING);
+    NETWORKMODULECALL(onRawMode2(pOpNick, *this, sModeArg, sArgs), d->network->user(), d->network, nullptr, NOTHING);
 
     for (uint a = 0; a < sModeArg.size(); a++) {
         const uchar& uMode = sModeArg[a];
@@ -311,11 +311,11 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
             bAdd = true;
         } else if (uMode == '-') {
             bAdd = false;
-        } else if (d->network->GetIRCSock()->IsPermMode(uMode)) {
+        } else if (d->network->ircSocket()->IsPermMode(uMode)) {
             NoString sArg = getModeArg(sArgs);
             NoNick* pNick = findNick(sArg);
             if (pNick) {
-                uchar uPerm = d->network->GetIRCSock()->GetPermFromMode(uMode);
+                uchar uPerm = d->network->ircSocket()->GetPermFromMode(uMode);
 
                 if (uPerm) {
                     bool bNoChange = (pNick->hasPerm(uPerm) == bAdd);
@@ -323,34 +323,34 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
                     if (bAdd) {
                         pNick->addPerm(uPerm);
 
-                        if (pNick->equals(d->network->GetCurNick())) {
+                        if (pNick->equals(d->network->currentNick())) {
                             addPerm(uPerm);
                         }
                     } else {
                         pNick->removePerm(uPerm);
 
-                        if (pNick->equals(d->network->GetCurNick())) {
+                        if (pNick->equals(d->network->currentNick())) {
                             remPerm(uPerm);
                         }
                     }
 
                     NETWORKMODULECALL(onChanPermission2(pOpNick, *pNick, *this, uMode, bAdd, bNoChange),
-                                      d->network->GetUser(),
+                                      d->network->user(),
                                       d->network,
                                       nullptr,
                                       NOTHING);
 
                     if (uMode == NoChannel::M_Op) {
                         if (bAdd) {
-                            NETWORKMODULECALL(onOp2(pOpNick, *pNick, *this, bNoChange), d->network->GetUser(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onOp2(pOpNick, *pNick, *this, bNoChange), d->network->user(), d->network, nullptr, NOTHING);
                         } else {
-                            NETWORKMODULECALL(onDeop2(pOpNick, *pNick, *this, bNoChange), d->network->GetUser(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onDeop2(pOpNick, *pNick, *this, bNoChange), d->network->user(), d->network, nullptr, NOTHING);
                         }
                     } else if (uMode == NoChannel::M_Voice) {
                         if (bAdd) {
-                            NETWORKMODULECALL(onVoice2(pOpNick, *pNick, *this, bNoChange), d->network->GetUser(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onVoice2(pOpNick, *pNick, *this, bNoChange), d->network->user(), d->network, nullptr, NOTHING);
                         } else {
-                            NETWORKMODULECALL(onDevoice2(pOpNick, *pNick, *this, bNoChange), d->network->GetUser(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onDevoice2(pOpNick, *pNick, *this, bNoChange), d->network->user(), d->network, nullptr, NOTHING);
                         }
                     }
                 }
@@ -359,7 +359,7 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
             bool bList = false;
             NoString sArg;
 
-            switch (d->network->GetIRCSock()->GetModeType(uMode)) {
+            switch (d->network->ircSocket()->GetModeType(uMode)) {
             case NoIrcSocket::ListArg:
                 bList = true;
                 sArg = getModeArg(sArgs);
@@ -385,7 +385,7 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
             } else {
                 bNoChange = !hasMode(uMode);
             }
-            NETWORKMODULECALL(onMode2(pOpNick, *this, uMode, sArg, bAdd, bNoChange), d->network->GetUser(), d->network, nullptr, NOTHING);
+            NETWORKMODULECALL(onMode2(pOpNick, *this, uMode, sArg, bAdd, bNoChange), d->network->user(), d->network, nullptr, NOTHING);
 
             if (!bList) {
                 (bAdd) ? addMode(uMode, sArg) : remMode(uMode);
@@ -479,7 +479,7 @@ bool NoChannel::addNick(const NoString& sNick)
     const char* p = sNick.c_str();
     NoString sPrefix, sTmp, sIdent, sHost;
 
-    while (d->network->GetIRCSock()->IsPermChar(*p)) {
+    while (d->network->ircSocket()->IsPermChar(*p)) {
         sPrefix += *p;
 
         if (!*++p) {
@@ -510,7 +510,7 @@ bool NoChannel::addNick(const NoString& sNick)
         pNick->addPerm(sPrefix[i]);
     }
 
-    if (pNick->equals(d->network->GetCurNick())) {
+    if (pNick->equals(d->network->currentNick())) {
         for (NoString::size_type i = 0; i < sPrefix.length(); i++) {
             addPerm(sPrefix[i]);
         }
@@ -608,7 +608,7 @@ void NoChannel::sendBuffer(NoClient* pClient)
 
 void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
 {
-    if (d->network && d->network->IsUserAttached()) {
+    if (d->network && d->network->isUserAttached()) {
         // in the event that pClient is nullptr, need to send this to all clients for the user
         // I'm presuming here that pClient is listed inside vClients thus vClients at this
         // point can't be empty.
@@ -624,7 +624,7 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
         //
         // Rework this if you like ...
         if (!Buffer.isEmpty()) {
-            const std::vector<NoClient*>& vClients = d->network->GetClients();
+            const std::vector<NoClient*>& vClients = d->network->clients();
             for (NoClient* pEachClient : vClients) {
                 NoClient* pUseClient = (pClient ? pClient : pEachClient);
 
@@ -632,17 +632,17 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                 pUseClient->SetPlaybackActive(true);
 
                 bool bSkipStatusMsg = pUseClient->HasServerTime();
-                NETWORKMODULECALL(onChanBufferStarting(*this, *pUseClient), d->network->GetUser(), d->network, nullptr, &bSkipStatusMsg);
+                NETWORKMODULECALL(onChanBufferStarting(*this, *pUseClient), d->network->user(), d->network, nullptr, &bSkipStatusMsg);
 
                 if (!bSkipStatusMsg) {
-                    d->network->PutUser(":***!znc@znc.in PRIVMSG " + getName() + " :Buffer Playback...", pUseClient);
+                    d->network->putUser(":***!znc@znc.in PRIVMSG " + getName() + " :Buffer Playback...", pUseClient);
                 }
 
                 bool bBatch = pUseClient->HasBatch();
                 NoString sBatchName = No::md5(getName());
 
                 if (bBatch) {
-                    d->network->PutUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + getName(), pUseClient);
+                    d->network->putUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + getName(), pUseClient);
                 }
 
                 size_t uSize = Buffer.size();
@@ -656,22 +656,22 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                     }
                     bool bNotShowThisLine = false;
                     NETWORKMODULECALL(onChanBufferPlayLine2(*this, *pUseClient, sLine, BufLine.timestamp()),
-                                      d->network->GetUser(),
+                                      d->network->user(),
                                       d->network,
                                       nullptr,
                                       &bNotShowThisLine);
                     if (bNotShowThisLine) continue;
-                    d->network->PutUser(sLine, pUseClient);
+                    d->network->putUser(sLine, pUseClient);
                 }
 
                 bSkipStatusMsg = pUseClient->HasServerTime();
-                NETWORKMODULECALL(onChanBufferEnding(*this, *pUseClient), d->network->GetUser(), d->network, nullptr, &bSkipStatusMsg);
+                NETWORKMODULECALL(onChanBufferEnding(*this, *pUseClient), d->network->user(), d->network, nullptr, &bSkipStatusMsg);
                 if (!bSkipStatusMsg) {
-                    d->network->PutUser(":***!znc@znc.in PRIVMSG " + getName() + " :Playback Complete.", pUseClient);
+                    d->network->putUser(":***!znc@znc.in PRIVMSG " + getName() + " :Playback Complete.", pUseClient);
                 }
 
                 if (bBatch) {
-                    d->network->PutUser(":znc.in BATCH -" + sBatchName, pUseClient);
+                    d->network->putUser(":znc.in BATCH -" + sBatchName, pUseClient);
                 }
 
                 pUseClient->SetPlaybackActive(bWasPlaybackActive);

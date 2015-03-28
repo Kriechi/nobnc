@@ -392,7 +392,7 @@ bool NoApp::WritePemFile()
 #endif
 }
 
-const NoStringVector&NoApp::GetBindHosts() const { return m_bindHosts; }
+const NoStringVector&NoApp::bindHosts() const { return m_bindHosts; }
 
 const NoStringVector&NoApp::GetTrustedProxies() const { return m_trustedProxies; }
 
@@ -843,7 +843,7 @@ bool NoApp::WriteNewConfig(const NoString& sConfigFile)
 
         do {
             No::getInput("Name", sNetwork, "freenode");
-        } while (!NoNetwork::IsValidNetwork(sNetwork));
+        } while (!NoNetwork::isValidNetwork(sNetwork));
 
         vsLines.push_back("\t<Network " + sNetwork + ">");
 
@@ -1597,9 +1597,9 @@ bool NoApp::UpdateModule(const NoString& sModule)
         NoNetwork* pNetwork = it.first;
         const NoString& sArgs = it.second;
 
-        if (!pNetwork->loader()->loadModule(sModule, sArgs, No::NetworkModule, pNetwork->GetUser(), pNetwork, sErr)) {
-            NO_DEBUG("Failed to reload [" << sModule << "] for [" << pNetwork->GetUser()->userName() << "/"
-                                       << pNetwork->GetName() << "] [" << sErr << "]");
+        if (!pNetwork->loader()->loadModule(sModule, sArgs, No::NetworkModule, pNetwork->user(), pNetwork, sErr)) {
+            NO_DEBUG("Failed to reload [" << sModule << "] for [" << pNetwork->user()->userName() << "/"
+                                       << pNetwork->name() << "] [" << sErr << "]");
             bError = true;
         }
     }
@@ -1950,7 +1950,7 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
     for (NoSocket* pSock : m_manager.GetSockets()) {
         NoUser* pUser = nullptr;
         if (pSock->GetSockName().left(5) == "IRC::") {
-            pUser = ((NoIrcSocket*)pSock)->GetNetwork()->GetUser();
+            pUser = ((NoIrcSocket*)pSock)->GetNetwork()->user();
         } else if (pSock->GetSockName().left(5) == "USR::") {
             pUser = ((NoClient*)pSock)->GetUser();
         }
@@ -2059,7 +2059,7 @@ protected:
             NoNetwork* pNetwork = ConnectionQueue.front();
             ConnectionQueue.pop_front();
 
-            if (pNetwork->Connect()) {
+            if (pNetwork->connect()) {
                 break;
             }
         }

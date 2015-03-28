@@ -113,7 +113,7 @@ public:
     NoString GetPemLocation() const;
     const NoString& GetConfigFile() const;
     bool WritePemFile();
-    const NoStringVector& GetBindHosts() const;
+    const NoStringVector& bindHosts() const;
     const NoStringVector& GetTrustedProxies() const;
     const std::vector<NoListener*>& GetListeners() const;
     time_t TimeStarted() const;

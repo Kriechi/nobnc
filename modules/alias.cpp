@@ -345,7 +345,7 @@ public:
                 return HALT;
             }
         } catch (std::exception& e) {
-            NoString my_nick = (GetNetwork() == nullptr ? "" : GetNetwork()->GetCurNick());
+            NoString my_nick = (GetNetwork() == nullptr ? "" : GetNetwork()->currentNick());
             if (my_nick.empty()) my_nick = "*";
             PutUser(NoString(":znc.in 461 " + my_nick + " " + current_alias.GetName() + " :ZNC alias error: ") + e.what());
             return HALTCORE;

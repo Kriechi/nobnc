@@ -186,7 +186,7 @@ public:
     {
         NoRegistry registry(this);
         if (!m_bAuthenticated && registry.value(NV_REQUIRE_AUTH).toBool()) {
-            GetNetwork()->SetIRCConnectEnabled(false);
+            GetNetwork()->setEnabled(false);
             PutModule("Disabling network, we require authentication.");
             PutModule("Use 'RequireAuth no' to disable.");
             return true;
@@ -221,7 +221,7 @@ public:
                     return;
                 }
 
-                GetNetwork()->GetIRCSock()->PauseCap();
+                GetNetwork()->ircSocket()->PauseCap();
 
                 m_Mechanisms.SetIndex(0);
                 PutIRC("AUTHENTICATE " + m_Mechanisms.GetCurrent());
@@ -237,7 +237,7 @@ public:
             Authenticate(No::tokens(sLine, 1));
         } else if (No::token(sLine, 1).equals("903")) {
             /* SASL success! */
-            GetNetwork()->GetIRCSock()->ResumeCap();
+            GetNetwork()->ircSocket()->ResumeCap();
             m_bAuthenticated = true;
             NO_DEBUG("sasl: Authenticated with mechanism [" << m_Mechanisms.GetCurrent() << "]");
         } else if (No::token(sLine, 1).equals("904") || No::token(sLine, 1).equals("905")) {
@@ -249,7 +249,7 @@ public:
                 PutIRC("AUTHENTICATE " + m_Mechanisms.GetCurrent());
             } else {
                 CheckRequireAuth();
-                GetNetwork()->GetIRCSock()->ResumeCap();
+                GetNetwork()->ircSocket()->ResumeCap();
             }
         } else if (No::token(sLine, 1).equals("906")) {
             /* CAP wasn't paused? */
@@ -257,7 +257,7 @@ public:
             CheckRequireAuth();
         } else if (No::token(sLine, 1).equals("907")) {
             m_bAuthenticated = true;
-            GetNetwork()->GetIRCSock()->ResumeCap();
+            GetNetwork()->ircSocket()->ResumeCap();
             NO_DEBUG("sasl: Received 907 -- We are already registered");
         } else {
             return CONTINUE;

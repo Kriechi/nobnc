@@ -33,8 +33,8 @@ class NoSendRawMod : public NoModule
             NoNetwork* pNetwork = pUser->findNetwork(No::token(sLine, 2));
 
             if (pNetwork) {
-                pNetwork->PutUser(No::tokens(sLine, 3));
-                PutModule("Sent [" + No::tokens(sLine, 3) + "] to " + pUser->userName() + "/" + pNetwork->GetName());
+                pNetwork->putUser(No::tokens(sLine, 3));
+                PutModule("Sent [" + No::tokens(sLine, 3) + "] to " + pUser->userName() + "/" + pNetwork->name());
             } else {
                 PutModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
             }
@@ -51,8 +51,8 @@ class NoSendRawMod : public NoModule
             NoNetwork* pNetwork = pUser->findNetwork(No::token(sLine, 2));
 
             if (pNetwork) {
-                pNetwork->PutIRC(No::tokens(sLine, 3));
-                PutModule("Sent [" + No::tokens(sLine, 3) + "] to IRC Server of " + pUser->userName() + "/" + pNetwork->GetName());
+                pNetwork->putIrc(No::tokens(sLine, 3));
+                PutModule("Sent [" + No::tokens(sLine, 3) + "] to IRC Server of " + pUser->userName() + "/" + pNetwork->name());
             } else {
                 PutModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
             }
@@ -105,9 +105,9 @@ public:
                 Tmpl["line"] = sLine;
 
                 if (bToServer) {
-                    pNetwork->PutIRC(sLine);
+                    pNetwork->putIrc(sLine);
                 } else {
-                    pNetwork->PutUser(sLine);
+                    pNetwork->putUser(sLine);
                 }
 
                 WebSock.GetSession()->AddSuccess("Line sent");
@@ -122,7 +122,7 @@ public:
                 for (std::vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
                     NoTemplate& NetworkLoop = l.AddRow("NetworkLoop");
                     NetworkLoop["Username"] = (*it->second).userName();
-                    NetworkLoop["Network"] = (*it2)->GetName();
+                    NetworkLoop["Network"] = (*it2)->name();
                 }
             }
 

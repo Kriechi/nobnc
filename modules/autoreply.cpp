@@ -64,14 +64,14 @@ public:
 
     void Handle(const NoString& sNick)
     {
-        NoIrcSocket* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcSocket* pIRCSock = GetNetwork()->ircSocket();
         if (!pIRCSock)
             // WTF?
             return;
         if (sNick == pIRCSock->GetNick()) return;
         if (m_Messaged.contains(sNick)) return;
 
-        if (GetNetwork()->IsUserAttached()) return;
+        if (GetNetwork()->isUserAttached()) return;
 
         m_Messaged.insert(sNick);
         PutIRC("NOTICE " + sNick + " :" + GetReply());

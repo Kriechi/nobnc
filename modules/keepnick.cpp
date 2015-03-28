@@ -53,7 +53,7 @@ public:
         m_pTimer = nullptr;
 
         // Check if we need to start the timer
-        if (GetNetwork()->IsIRCConnected()) onIrcConnected();
+        if (GetNetwork()->isIrcConnected()) onIrcConnected();
 
         return true;
     }
@@ -64,7 +64,7 @@ public:
             // No timer means we are turned off
             return;
 
-        NoIrcSocket* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcSocket* pIRCSock = GetNetwork()->ircSocket();
 
         if (!pIRCSock) return;
 
@@ -76,8 +76,8 @@ public:
 
     NoString GetNick()
     {
-        NoString sConfNick = GetNetwork()->GetNick();
-        NoIrcSocket* pIRCSock = GetNetwork()->GetIRCSock();
+        NoString sConfNick = GetNetwork()->nick();
+        NoIrcSocket* pIRCSock = GetNetwork()->ircSocket();
 
         if (pIRCSock) sConfNick = sConfNick.left(pIRCSock->GetMaxNickLen());
 
@@ -86,7 +86,7 @@ public:
 
     void onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
-        if (sNewNick == GetNetwork()->GetIRCSock()->GetNick()) {
+        if (sNewNick == GetNetwork()->ircSocket()->GetNick()) {
             // We are changing our own nick
             if (Nick.equals(GetNick())) {
                 // We are changing our nick away from the conf setting.
@@ -123,7 +123,7 @@ public:
 
     void onIrcConnected() override
     {
-        if (!GetNetwork()->GetIRCSock()->GetNick().equals(GetNick())) {
+        if (!GetNetwork()->ircSocket()->GetNick().equals(GetNick())) {
             // We don't have the nick we want, try to get it
             Enable();
         }
@@ -149,7 +149,7 @@ public:
     ModRet onUserRaw(NoString& sLine) override
     {
         // We dont care if we are not connected to IRC
-        if (!GetNetwork()->IsIRCConnected()) return CONTINUE;
+        if (!GetNetwork()->isIrcConnected()) return CONTINUE;
 
         // We are trying to get the config nick and this is a /nick?
         if (!m_pTimer || !No::token(sLine, 0).equals("NICK")) return CONTINUE;
@@ -164,7 +164,7 @@ public:
 
         // Indeed trying to change to this nick, generate a 433 for it.
         // This way we can *always* block incoming 433s from the server.
-        PutUser(":" + GetNetwork()->GetIRCServer() + " 433 " + GetNetwork()->GetIRCNick().nick() + " " + sNick +
+        PutUser(":" + GetNetwork()->ircServer() + " 433 " + GetNetwork()->ircNick().nick() + " " + sNick +
                 " :ZNC is already trying to get this nickname");
         return CONTINUE;
     }

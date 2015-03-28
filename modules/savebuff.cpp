@@ -124,12 +124,12 @@ public:
                 }
                 break;
             case ChanBuffer:
-                if (NoChannel* pChan = GetNetwork()->FindChan(sName)) {
+                if (NoChannel* pChan = GetNetwork()->findChannel(sName)) {
                     BootStrap(pChan, sBuffer);
                 }
                 break;
             case QueryBuffer:
-                if (NoQuery* pQuery = GetNetwork()->AddQuery(sName)) {
+                if (NoQuery* pQuery = GetNetwork()->addQuery(sName)) {
                     BootStrap(pQuery, sBuffer);
                 }
                 break;
@@ -198,14 +198,14 @@ public:
         if (!m_sPassword.empty()) {
             std::set<NoString> ssPaths;
 
-            const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
+            const std::vector<NoChannel*>& vChans = GetNetwork()->channels();
             for (NoChannel* pChan : vChans) {
                 NoString sPath = GetPath(pChan->getName());
                 SaveBufferToDisk(pChan->getBuffer(), sPath, CHAN_VERIFICATION_TOKEN + pChan->getName());
                 ssPaths.insert(sPath);
             }
 
-            const std::vector<NoQuery*>& vQueries = GetNetwork()->GetQueries();
+            const std::vector<NoQuery*>& vQueries = GetNetwork()->queries();
             for (NoQuery* pQuery : vQueries) {
                 NoString sPath = GetPath(pQuery->getName());
                 SaveBufferToDisk(pQuery->getBuffer(), sPath, QUERY_VERIFICATION_TOKEN + pQuery->getName());
@@ -302,7 +302,7 @@ public:
 
     NoString FindLegacyBufferName(const NoString& sPath) const
     {
-        const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
+        const std::vector<NoChannel*>& vChans = GetNetwork()->channels();
         for (NoChannel* pChan : vChans) {
             const NoString& sName = pChan->getName();
             if (GetPath(sName).equals(sPath)) {
@@ -322,7 +322,7 @@ public:
     void AddBuffer(NoChannel& chan, const NoString& sLine)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
-        if (chan.AutoClearChanBuffer() && GetNetwork()->IsUserAttached()) return;
+        if (chan.AutoClearChanBuffer() && GetNetwork()->isUserAttached()) return;
         chan.AddBuffer(sLine);
     }
 

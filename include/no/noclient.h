@@ -81,8 +81,8 @@ public:
     NoUser* GetUser() const;
     void SetNetwork(NoNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
     NoNetwork* GetNetwork() const;
-    std::vector<NoClient*> GetClients() const;
-    NoIrcSocket* GetIRCSock() const;
+    std::vector<NoClient*> clients() const;
+    NoIrcSocket* ircSocket() const;
     NoString GetFullName() const;
 
     void ReadLine(const NoString& sData);

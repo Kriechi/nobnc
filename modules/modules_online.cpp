@@ -56,7 +56,7 @@ public:
             // Remove the leading space
             sBNNoNicks.leftChomp(1);
 
-            if (!GetNetwork()->GetIRCSock()) {
+            if (!GetNetwork()->ircSocket()) {
                 // if we are not connected to any IRC server, send
                 // an empty or module-nick filled response.
                 PutUser(":irc.znc.in 303 " + GetClient()->GetNick() + " :" + sBNNoNicks);
@@ -73,9 +73,9 @@ public:
 
             if (IsOnlineModNick(sNick)) {
                 NoNetwork* pNetwork = GetNetwork();
-                PutUser(":znc.in 311 " + pNetwork->GetCurNick() + " " + sNick + " " + sNick + " znc.in * :" + sNick);
-                PutUser(":znc.in 312 " + pNetwork->GetCurNick() + " " + sNick + " *.znc.in :Bouncer");
-                PutUser(":znc.in 318 " + pNetwork->GetCurNick() + " " + sNick + " :End of /WHOIS list.");
+                PutUser(":znc.in 311 " + pNetwork->currentNick() + " " + sNick + " " + sNick + " znc.in * :" + sNick);
+                PutUser(":znc.in 312 " + pNetwork->currentNick() + " " + sNick + " *.znc.in :Bouncer");
+                PutUser(":znc.in 318 " + pNetwork->currentNick() + " " + sNick + " :End of /WHOIS list.");
 
                 return HALT;
             }

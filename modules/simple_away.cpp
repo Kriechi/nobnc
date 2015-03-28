@@ -101,14 +101,14 @@ public:
         }
 
         // Set away on load, required if loaded via webadmin
-        if (GetNetwork()->IsIRCConnected() && !GetNetwork()->IsUserAttached()) SetAway(false);
+        if (GetNetwork()->isIrcConnected() && !GetNetwork()->isUserAttached()) SetAway(false);
 
         return true;
     }
 
     void onIrcConnected() override
     {
-        if (GetNetwork()->IsUserAttached())
+        if (GetNetwork()->isUserAttached())
             SetBack();
         else
             SetAway(false);
@@ -119,7 +119,7 @@ public:
     void onClientDisconnect() override
     {
         /* There might still be other clients */
-        if (!GetNetwork()->IsUserAttached()) SetAway();
+        if (!GetNetwork()->isUserAttached()) SetAway();
     }
 
     void OnReasonCommand(const NoString& sLine)

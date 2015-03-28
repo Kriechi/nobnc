@@ -47,7 +47,7 @@ public:
         NoNetwork* pNetwork = GetNetwork();
 
         if (pNetwork) {
-            const std::vector<NoChannel*>& vChans = pNetwork->GetChans();
+            const std::vector<NoChannel*>& vChans = pNetwork->channels();
 
             for (NoChannel* pChan : vChans) {
                 // Skip detached channels, they weren't read yet
@@ -59,15 +59,15 @@ public:
                 pChan->setAutoClearChanBuffer(false);
             }
 
-            std::vector<NoQuery*> VQueries = pNetwork->GetQueries();
+            std::vector<NoQuery*> VQueries = pNetwork->queries();
 
             for (NoQuery* pQuery : VQueries) {
-                pNetwork->DelQuery(pQuery->getName());
+                pNetwork->removeQuery(pQuery->getName());
             }
 
-            // We deny autoClearQueryBuffer since this module
+            // We deny autoclearQueryBuffer since this module
             // doesn't make any sense with it
-            GetUser()->setAutoClearQueryBuffer(false);
+            GetUser()->setAutoclearQueryBuffer(false);
         }
     }
 

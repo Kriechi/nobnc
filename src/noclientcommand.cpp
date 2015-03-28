@@ -63,7 +63,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoChannel* pChan = d->network->FindChan(sChan);
+        NoChannel* pChan = d->network->findChannel(sChan);
 
         if (!pChan) {
             PutStatus("You are not on [" + sChan + "]");
@@ -76,7 +76,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         const std::map<NoString, NoNick>& msNicks = pChan->getNicks();
-        NoIrcSocket* pIRCSock = d->network->GetIRCSock();
+        NoIrcSocket* pIRCSock = d->network->ircSocket();
         const NoString& sPerms = (pIRCSock) ? pIRCSock->GetPerms() : "";
 
         if (msNicks.empty()) {
@@ -131,7 +131,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         std::set<NoChannel*> sChans;
         for (const NoString& sChan : vsChans) {
-            std::vector<NoChannel*> vChans = d->network->FindChans(sChan);
+            std::vector<NoChannel*> vChans = d->network->findChannels(sChan);
             sChans.insert(vChans.begin(), vChans.end());
         }
 
@@ -199,7 +199,7 @@ void NoClient::UserCommand(NoString& sLine)
             Table.addRow();
             Table.setValue("Host", pClient->GetSocket()->GetRemoteIP());
             if (pClient->GetNetwork()) {
-                Table.setValue("Network", pClient->GetNetwork()->GetName());
+                Table.setValue("Network", pClient->GetNetwork()->name());
             }
             Table.setValue("Identifier", pClient->GetIdentifier());
         }
@@ -246,13 +246,13 @@ void NoClient::UserCommand(NoString& sLine)
                 } else {
                     Table.setValue("Username", "|-");
                 }
-                Table.setValue("Network", pNetwork->GetName());
-                Table.setValue("Clients", NoString(pNetwork->GetClients().size()));
-                if (pNetwork->IsIRCConnected()) {
+                Table.setValue("Network", pNetwork->name());
+                Table.setValue("Clients", NoString(pNetwork->clients().size()));
+                if (pNetwork->isIrcConnected()) {
                     Table.setValue("OnIRC", "Yes");
-                    Table.setValue("IRC Server", pNetwork->GetIRCServer());
-                    Table.setValue("IRC User", pNetwork->GetIRCNick().nickMask());
-                    Table.setValue("Channels", NoString(pNetwork->GetChans().size()));
+                    Table.setValue("IRC Server", pNetwork->ircServer());
+                    Table.setValue("IRC User", pNetwork->ircNick().nickMask());
+                    Table.setValue("Channels", NoString(pNetwork->channels().size()));
                 } else {
                     Table.setValue("OnIRC", "No");
                 }
@@ -310,7 +310,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (!d->network->HasServers()) {
+        if (!d->network->hasServers()) {
             PutStatus("You don't have any servers added.");
             return;
         }
@@ -320,23 +320,23 @@ void NoClient::UserCommand(NoString& sLine)
         NoServerInfo* pServer = nullptr;
 
         if (!sArgs.empty()) {
-            pServer = d->network->FindServer(sArgs);
+            pServer = d->network->findServer(sArgs);
             if (!pServer) {
                 PutStatus("Server [" + sArgs + "] not found");
                 return;
             }
-            d->network->SetNextServer(pServer);
+            d->network->setNextServer(pServer);
 
             // If we are already connecting to some server,
             // we have to abort that attempt
-            NoSocket* pIRCSock = GetIRCSock();
+            NoSocket* pIRCSock = ircSocket();
             if (pIRCSock && !pIRCSock->IsConnected()) {
                 pIRCSock->Close();
             }
         }
 
-        if (GetIRCSock()) {
-            GetIRCSock()->Quit();
+        if (ircSocket()) {
+            ircSocket()->Quit();
             if (pServer)
                 PutStatus("Connecting to [" + pServer->host() + "]...");
             else
@@ -348,7 +348,7 @@ void NoClient::UserCommand(NoString& sLine)
                 PutStatus("Connecting...");
         }
 
-        d->network->SetIRCConnectEnabled(true);
+        d->network->setEnabled(true);
         return;
     } else if (sCommand.equals("DISCONNECT")) {
         if (!d->network) {
@@ -356,12 +356,12 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (GetIRCSock()) {
+        if (ircSocket()) {
             NoString sQuitMsg = No::tokens(sLine, 1);
-            GetIRCSock()->Quit(sQuitMsg);
+            ircSocket()->Quit(sQuitMsg);
         }
 
-        d->network->SetIRCConnectEnabled(false);
+        d->network->setEnabled(false);
         PutStatus("Disconnected from IRC. Use 'connect' to reconnect.");
         return;
     } else if (sCommand.equals("ENABLECHAN")) {
@@ -380,7 +380,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {
-                std::vector<NoChannel*> vChans = d->network->FindChans(sChan);
+                std::vector<NoChannel*> vChans = d->network->findChannels(sChan);
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
@@ -410,7 +410,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {
-                std::vector<NoChannel*> vChans = d->network->FindChans(sChan);
+                std::vector<NoChannel*> vChans = d->network->findChannels(sChan);
                 sChans.insert(vChans.begin(), vChans.end());
             }
 
@@ -436,7 +436,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        NoChannel* pChan = d->network->FindChan(sChan);
+        NoChannel* pChan = d->network->findChannel(sChan);
         if (!pChan) {
             PutStatus("No such channel [" + sChan + "]");
             return;
@@ -480,7 +480,7 @@ void NoClient::UserCommand(NoString& sLine)
             NoStringVector vsUsers;
             vsUsers.push_back("All: " + NoString(pChan->getNickCount()));
 
-            NoIrcSocket* pIRCSock = d->network->GetIRCSock();
+            NoIrcSocket* pIRCSock = d->network->ircSocket();
             const NoString& sPerms = pIRCSock ? pIRCSock->GetPerms() : "";
             std::map<char, uint> mPerms = pChan->getPermCounts();
             for (char cPerm : sPerms) {
@@ -521,7 +521,7 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        const std::vector<NoChannel*>& vChans = pNetwork->GetChans();
+        const std::vector<NoChannel*>& vChans = pNetwork->channels();
 
         if (vChans.empty()) {
             PutStatus("There are no channels defined.");
@@ -562,7 +562,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Usage: AddNetwork <name>");
             return;
         }
-        if (!NoNetwork::IsValidNetwork(sNetwork)) {
+        if (!NoNetwork::isValidNetwork(sNetwork)) {
             PutStatus("Network name should be alphanumeric");
             return;
         }
@@ -584,7 +584,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (d->network && d->network->GetName().equals(sNetwork)) {
+        if (d->network && d->network->name().equals(sNetwork)) {
             SetNetwork(nullptr);
         }
 
@@ -617,12 +617,12 @@ void NoClient::UserCommand(NoString& sLine)
 
         for (const NoNetwork* pNetwork : vNetworks) {
             Table.addRow();
-            Table.setValue("Network", pNetwork->GetName());
-            if (pNetwork->IsIRCConnected()) {
+            Table.setValue("Network", pNetwork->name());
+            if (pNetwork->isIrcConnected()) {
                 Table.setValue("OnIRC", "Yes");
-                Table.setValue("IRC Server", pNetwork->GetIRCServer());
-                Table.setValue("IRC User", pNetwork->GetIRCNick().nickMask());
-                Table.setValue("Channels", NoString(pNetwork->GetChans().size()));
+                Table.setValue("IRC Server", pNetwork->ircServer());
+                Table.setValue("IRC User", pNetwork->ircNick().nickMask());
+                Table.setValue("Channels", NoString(pNetwork->channels().size()));
             } else {
                 Table.setValue("OnIRC", "No");
             }
@@ -673,14 +673,14 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (!NoNetwork::IsValidNetwork(sNewNetwork)) {
+        if (!NoNetwork::isValidNetwork(sNewNetwork)) {
             PutStatus("Invalid network name [" + sNewNetwork + "]");
             return;
         }
 
         std::vector<NoModule*> vMods = pOldNetwork->loader()->modules();
         for (NoModule* pMod : vMods) {
-            NoString sOldModPath = pOldNetwork->GetNetworkPath() + "/moddata/" + pMod->GetModName();
+            NoString sOldModPath = pOldNetwork->networkPath() + "/moddata/" + pMod->GetModName();
             NoString sNewModPath = pNewUser->userPath() + "/networks/" + sNewNetwork + "/moddata/" + pMod->GetModName();
 
             NoDir oldDir(sOldModPath);
@@ -703,9 +703,9 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        pNewNetwork->Clone(*pOldNetwork, false);
+        pNewNetwork->clone(*pOldNetwork, false);
 
-        if (d->network && d->network->GetName().equals(sOldNetwork) && d->user == pOldUser) {
+        if (d->network && d->network->name().equals(sOldNetwork) && d->user == pOldUser) {
             SetNetwork(nullptr);
         }
 
@@ -722,7 +722,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (d->network && (d->network->GetName() == sNetwork)) {
+        if (d->network && (d->network->name() == sNetwork)) {
             PutStatus("You are already connected with this network.");
             return;
         }
@@ -747,7 +747,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (d->network->AddServer(No::tokens(sLine, 1))) {
+        if (d->network->addServer(No::tokens(sLine, 1))) {
             PutStatus("Server added");
         } else {
             PutStatus("Unable to add that server");
@@ -764,16 +764,16 @@ void NoClient::UserCommand(NoString& sLine)
         NoString sPass = No::token(sLine, 3);
 
         if (sServer.empty()) {
-            PutStatus("Usage: DelServer <host> [port] [pass]");
+            PutStatus("Usage: removeServer <host> [port] [pass]");
             return;
         }
 
-        if (!d->network->HasServers()) {
+        if (!d->network->hasServers()) {
             PutStatus("You don't have any servers added.");
             return;
         }
 
-        if (d->network->DelServer(sServer, uPort, sPass)) {
+        if (d->network->removeServer(sServer, uPort, sPass)) {
             PutStatus("Server removed");
         } else {
             PutStatus("No such server");
@@ -784,9 +784,9 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (d->network->HasServers()) {
-            const std::vector<NoServerInfo*>& vServers = d->network->GetServers();
-            NoServerInfo* pCurServ = d->network->GetCurrentServer();
+        if (d->network->hasServers()) {
+            const std::vector<NoServerInfo*>& vServers = d->network->servers();
+            NoServerInfo* pCurServ = d->network->currentServer();
             NoTable Table;
             Table.addColumn("Host");
             Table.addColumn("Port");
@@ -815,7 +815,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Usage: AddTrustedServerFingerprint <fi:ng:er>");
             return;
         }
-        d->network->AddTrustedFingerprint(sFP);
+        d->network->addTrustedFingerprint(sFP);
         PutStatus("Done.");
     } else if (sCommand.equals("DelTrustedServerFingerprint")) {
         if (!d->network) {
@@ -827,14 +827,14 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("Usage: DelTrustedServerFingerprint <fi:ng:er>");
             return;
         }
-        d->network->DelTrustedFingerprint(sFP);
+        d->network->removeTrustedFingerprint(sFP);
         PutStatus("Done.");
     } else if (sCommand.equals("ListTrustedServerFingerprints")) {
         if (!d->network) {
             PutStatus("You must be connected with a network to use this command");
             return;
         }
-        const NoStringSet& ssFPs = d->network->GetTrustedFingerprints();
+        const NoStringSet& ssFPs = d->network->trustedFingerprints();
         if (ssFPs.empty()) {
             PutStatus("No fingerprints added.");
         } else {
@@ -849,7 +849,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const std::vector<NoChannel*>& vChans = d->network->GetChans();
+        const std::vector<NoChannel*>& vChans = d->network->channels();
         NoTable Table;
         Table.addColumn("Name");
         Table.addColumn("Set By");
@@ -1245,8 +1245,8 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("The host [" + sHost + "] is not in the list");
         }
     } else if ((sCommand.equals("LISTBINDHOSTS") || sCommand.equals("LISTVHOSTS")) &&
-               (d->user->isAdmin() || !d->user->denySetBindHost())) {
-        const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
+               (d->user->isAdmin() || !d->user->denysetBindHost())) {
+        const NoStringVector& vsHosts = NoApp::Get().bindHosts();
 
         if (vsHosts.empty()) {
             PutStatus("No bind hosts configured");
@@ -1262,7 +1262,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
         PutStatus(Table);
     } else if ((sCommand.equals("SETBINDHOST") || sCommand.equals("SETVHOST")) &&
-               (d->user->isAdmin() || !d->user->denySetBindHost())) {
+               (d->user->isAdmin() || !d->user->denysetBindHost())) {
         if (!d->network) {
             PutStatus("You must be connected with a network to use this command. Try SetUserBindHost instead");
             return;
@@ -1270,16 +1270,16 @@ void NoClient::UserCommand(NoString& sLine)
         NoString sArg = No::token(sLine, 1);
 
         if (sArg.empty()) {
-            PutStatus("Usage: SetBindHost <host>");
+            PutStatus("Usage: setBindHost <host>");
             return;
         }
 
-        if (sArg.equals(d->network->GetBindHost())) {
+        if (sArg.equals(d->network->bindHost())) {
             PutStatus("You already have this bind host!");
             return;
         }
 
-        const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
+        const NoStringVector& vsHosts = NoApp::Get().bindHosts();
         if (!d->user->isAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
@@ -1296,9 +1296,9 @@ void NoClient::UserCommand(NoString& sLine)
             }
         }
 
-        d->network->SetBindHost(sArg);
-        PutStatus("Set bind host for network [" + d->network->GetName() + "] to [" + d->network->GetBindHost() + "]");
-    } else if (sCommand.equals("SETUSERBINDHOST") && (d->user->isAdmin() || !d->user->denySetBindHost())) {
+        d->network->setBindHost(sArg);
+        PutStatus("Set bind host for network [" + d->network->name() + "] to [" + d->network->bindHost() + "]");
+    } else if (sCommand.equals("SETUSERBINDHOST") && (d->user->isAdmin() || !d->user->denysetBindHost())) {
         NoString sArg = No::token(sLine, 1);
 
         if (sArg.empty()) {
@@ -1311,7 +1311,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
+        const NoStringVector& vsHosts = NoApp::Get().bindHosts();
         if (!d->user->isAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
@@ -1331,14 +1331,14 @@ void NoClient::UserCommand(NoString& sLine)
         d->user->setBindHost(sArg);
         PutStatus("Set bind host to [" + d->user->bindHost() + "]");
     } else if ((sCommand.equals("CLEARBINDHOST") || sCommand.equals("CLEARVHOST")) &&
-               (d->user->isAdmin() || !d->user->denySetBindHost())) {
+               (d->user->isAdmin() || !d->user->denysetBindHost())) {
         if (!d->network) {
             PutStatus("You must be connected with a network to use this command. Try ClearUserBindHost instead");
             return;
         }
-        d->network->SetBindHost("");
+        d->network->setBindHost("");
         PutStatus("Bind host cleared for this network.");
-    } else if (sCommand.equals("CLEARUSERBINDHOST") && (d->user->isAdmin() || !d->user->denySetBindHost())) {
+    } else if (sCommand.equals("CLEARUSERBINDHOST") && (d->user->isAdmin() || !d->user->denysetBindHost())) {
         d->user->setBindHost("");
         PutStatus("Bind host cleared for your user.");
     } else if (sCommand.equals("SHOWBINDHOST")) {
@@ -1346,7 +1346,7 @@ void NoClient::UserCommand(NoString& sLine)
                   (d->user->bindHost().empty() ? "not set" : "is [" + d->user->bindHost() + "]"));
         if (d->network) {
             PutStatus("This network's bind host " +
-                      (d->network->GetBindHost().empty() ? "not set" : "is [" + d->network->GetBindHost() + "]"));
+                      (d->network->bindHost().empty() ? "not set" : "is [" + d->network->bindHost() + "]"));
         }
     } else if (sCommand.equals("PLAYBUFFER")) {
         if (!d->network) {
@@ -1361,8 +1361,8 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        if (d->network->IsChan(sBuffer)) {
-            NoChannel* pChan = d->network->FindChan(sBuffer);
+        if (d->network->isChannel(sBuffer)) {
+            NoChannel* pChan = d->network->findChannel(sBuffer);
 
             if (!pChan) {
                 PutStatus("You are not on [" + sBuffer + "]");
@@ -1381,7 +1381,7 @@ void NoClient::UserCommand(NoString& sLine)
 
             pChan->sendBuffer(this);
         } else {
-            NoQuery* pQuery = d->network->FindQuery(sBuffer);
+            NoQuery* pQuery = d->network->findQuery(sBuffer);
 
             if (!pQuery) {
                 PutStatus("No active query with [" + sBuffer + "]");
@@ -1409,18 +1409,18 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         uint uMatches = 0;
-        std::vector<NoChannel*> vChans = d->network->FindChans(sBuffer);
+        std::vector<NoChannel*> vChans = d->network->findChannels(sBuffer);
         for (NoChannel* pChan : vChans) {
             uMatches++;
 
             pChan->clearBuffer();
         }
 
-        std::vector<NoQuery*> vQueries = d->network->FindQueries(sBuffer);
+        std::vector<NoQuery*> vQueries = d->network->findQueries(sBuffer);
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
-            d->network->DelQuery(pQuery->getName());
+            d->network->removeQuery(pQuery->getName());
         }
 
         PutStatus("[" + NoString(uMatches) + "] buffers matching [" + sBuffer + "] have been cleared");
@@ -1430,7 +1430,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        for (NoChannel* pChan : d->network->GetChans()) {
+        for (NoChannel* pChan : d->network->channels()) {
             pChan->clearBuffer();
         }
         PutStatus("All channel buffers have been cleared");
@@ -1440,7 +1440,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        d->network->ClearQueryBuffer();
+        d->network->clearQueryBuffer();
         PutStatus("All query buffers have been cleared");
     } else if (sCommand.equals("CLEARALLBUFFERS")) {
         if (!d->network) {
@@ -1448,10 +1448,10 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        for (NoChannel* pChan : d->network->GetChans()) {
+        for (NoChannel* pChan : d->network->channels()) {
             pChan->clearBuffer();
         }
-        d->network->ClearQueryBuffer();
+        d->network->clearQueryBuffer();
         PutStatus("All buffers have been cleared");
     } else if (sCommand.equals("SETBUFFER")) {
         if (!d->network) {
@@ -1468,14 +1468,14 @@ void NoClient::UserCommand(NoString& sLine)
 
         uint uLineCount = No::token(sLine, 2).toUInt();
         uint uMatches = 0, uFail = 0;
-        std::vector<NoChannel*> vChans = d->network->FindChans(sBuffer);
+        std::vector<NoChannel*> vChans = d->network->findChannels(sBuffer);
         for (NoChannel* pChan : vChans) {
             uMatches++;
 
             if (!pChan->setBufferCount(uLineCount)) uFail++;
         }
 
-        std::vector<NoQuery*> vQueries = d->network->FindQueries(sBuffer);
+        std::vector<NoQuery*> vQueries = d->network->findQueries(sBuffer);
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
@@ -1701,7 +1701,7 @@ void NoClient::HelpUser(const NoString& sFilter)
                    "Add a server to the list of alternate/backup servers of current IRC network.",
                    sFilter);
     AddCommandHelp(Table,
-                   "DelServer",
+                   "removeServer",
                    "<host> [port] [pass]",
                    "Remove a server from the list of alternate/backup servers of current IRC network",
                    sFilter);
@@ -1737,9 +1737,9 @@ void NoClient::HelpUser(const NoString& sFilter)
         AddCommandHelp(Table, "DelBindHost", "<host>", "Removes a bind host from the list", sFilter);
     }
 
-    if (d->user->isAdmin() || !d->user->denySetBindHost()) {
+    if (d->user->isAdmin() || !d->user->denysetBindHost()) {
         AddCommandHelp(Table, "ListBindHosts", "", "Shows the configured list of bind hosts", sFilter);
-        AddCommandHelp(Table, "SetBindHost", "<host (IP preferred)>", "Set the bind host for this connection", sFilter);
+        AddCommandHelp(Table, "setBindHost", "<host (IP preferred)>", "Set the bind host for this connection", sFilter);
         AddCommandHelp(Table, "SetUserBindHost", "<host (IP preferred)>", "Set the default bind host for this user", sFilter);
         AddCommandHelp(Table, "ClearBindHost", "", "Clear the bind host for this connection", sFilter);
         AddCommandHelp(Table, "ClearUserBindHost", "", "Clear the default bind host for this user", sFilter);

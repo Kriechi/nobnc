@@ -32,71 +32,71 @@ TEST_F(NetworkTest, FindChan)
     NoUser user("user");
     NoNetwork network(&user, "network");
 
-    EXPECT_TRUE(network.AddChan("#foo", false));
-    EXPECT_TRUE(network.AddChan("#Bar", false));
-    EXPECT_TRUE(network.AddChan("#BAZ", false));
+    EXPECT_TRUE(network.addChannel("#foo", false));
+    EXPECT_TRUE(network.addChannel("#Bar", false));
+    EXPECT_TRUE(network.addChannel("#BAZ", false));
 
-    EXPECT_TRUE(network.FindChan("#foo"));
-    EXPECT_TRUE(network.FindChan("#Bar"));
-    EXPECT_TRUE(network.FindChan("#BAZ"));
+    EXPECT_TRUE(network.findChannel("#foo"));
+    EXPECT_TRUE(network.findChannel("#Bar"));
+    EXPECT_TRUE(network.findChannel("#BAZ"));
 
-    EXPECT_TRUE(network.FindChan("#Foo"));
-    EXPECT_TRUE(network.FindChan("#BAR"));
-    EXPECT_TRUE(network.FindChan("#baz"));
+    EXPECT_TRUE(network.findChannel("#Foo"));
+    EXPECT_TRUE(network.findChannel("#BAR"));
+    EXPECT_TRUE(network.findChannel("#baz"));
 
-    EXPECT_FALSE(network.FindChan("#f"));
-    EXPECT_FALSE(network.FindChan("&foo"));
-    EXPECT_FALSE(network.FindChan("##foo"));
+    EXPECT_FALSE(network.findChannel("#f"));
+    EXPECT_FALSE(network.findChannel("&foo"));
+    EXPECT_FALSE(network.findChannel("##foo"));
 }
 
-TEST_F(NetworkTest, FindChans)
+TEST_F(NetworkTest, findChannels)
 {
     NoUser user("user");
     NoNetwork network(&user, "network");
 
-    EXPECT_TRUE(network.AddChan("#foo", false));
-    EXPECT_TRUE(network.AddChan("#Bar", false));
-    EXPECT_TRUE(network.AddChan("#BAZ", false));
+    EXPECT_TRUE(network.addChannel("#foo", false));
+    EXPECT_TRUE(network.addChannel("#Bar", false));
+    EXPECT_TRUE(network.addChannel("#BAZ", false));
 
-    EXPECT_EQ(network.FindChans("#f*").size(), 1);
-    EXPECT_EQ(network.FindChans("#b*").size(), 2);
-    EXPECT_EQ(network.FindChans("#?A*").size(), 2);
-    EXPECT_EQ(network.FindChans("*z").size(), 1);
+    EXPECT_EQ(network.findChannels("#f*").size(), 1);
+    EXPECT_EQ(network.findChannels("#b*").size(), 2);
+    EXPECT_EQ(network.findChannels("#?A*").size(), 2);
+    EXPECT_EQ(network.findChannels("*z").size(), 1);
 }
 
-TEST_F(NetworkTest, FindQuery)
+TEST_F(NetworkTest, findQuery)
 {
     NoUser user("user");
     NoNetwork network(&user, "network");
 
-    EXPECT_TRUE(network.AddQuery("foo"));
-    EXPECT_TRUE(network.AddQuery("Bar"));
-    EXPECT_TRUE(network.AddQuery("BAZ"));
+    EXPECT_TRUE(network.addQuery("foo"));
+    EXPECT_TRUE(network.addQuery("Bar"));
+    EXPECT_TRUE(network.addQuery("BAZ"));
 
-    EXPECT_TRUE(network.FindQuery("foo"));
-    EXPECT_TRUE(network.FindQuery("Bar"));
-    EXPECT_TRUE(network.FindQuery("BAZ"));
+    EXPECT_TRUE(network.findQuery("foo"));
+    EXPECT_TRUE(network.findQuery("Bar"));
+    EXPECT_TRUE(network.findQuery("BAZ"));
 
-    EXPECT_TRUE(network.FindQuery("Foo"));
-    EXPECT_TRUE(network.FindQuery("BAR"));
-    EXPECT_TRUE(network.FindQuery("baz"));
+    EXPECT_TRUE(network.findQuery("Foo"));
+    EXPECT_TRUE(network.findQuery("BAR"));
+    EXPECT_TRUE(network.findQuery("baz"));
 
-    EXPECT_FALSE(network.FindQuery("f"));
-    EXPECT_FALSE(network.FindQuery("fo"));
-    EXPECT_FALSE(network.FindQuery("FF"));
+    EXPECT_FALSE(network.findQuery("f"));
+    EXPECT_FALSE(network.findQuery("fo"));
+    EXPECT_FALSE(network.findQuery("FF"));
 }
 
-TEST_F(NetworkTest, FindQueries)
+TEST_F(NetworkTest, findQueries)
 {
     NoUser user("user");
     NoNetwork network(&user, "network");
 
-    EXPECT_TRUE(network.AddQuery("foo"));
-    EXPECT_TRUE(network.AddQuery("Bar"));
-    EXPECT_TRUE(network.AddQuery("BAZ"));
+    EXPECT_TRUE(network.addQuery("foo"));
+    EXPECT_TRUE(network.addQuery("Bar"));
+    EXPECT_TRUE(network.addQuery("BAZ"));
 
-    EXPECT_EQ(network.FindQueries("f*").size(), 1);
-    EXPECT_EQ(network.FindQueries("b*").size(), 2);
-    EXPECT_EQ(network.FindQueries("?A*").size(), 2);
-    EXPECT_EQ(network.FindQueries("*z").size(), 1);
+    EXPECT_EQ(network.findQueries("f*").size(), 1);
+    EXPECT_EQ(network.findQueries("b*").size(), 2);
+    EXPECT_EQ(network.findQueries("?A*").size(), 2);
+    EXPECT_EQ(network.findQueries("*z").size(), 1);
 }

@@ -49,7 +49,7 @@ public:
         : m_sUsername(sUsername), m_sUserKey(sUserKey)
     {
         AddHostmasks(sHostmasks);
-        AddChans(sChannels);
+        addChannels(sChannels);
     }
 
     const NoString& GetUsername() const { return m_sUsername; }
@@ -100,7 +100,7 @@ public:
         }
     }
 
-    void DelChans(const NoString& sChans)
+    void removeChannels(const NoString& sChans)
     {
         NoStringVector vsChans = sChans.split(" ");
 
@@ -109,7 +109,7 @@ public:
         }
     }
 
-    void AddChans(const NoString& sChans)
+    void addChannels(const NoString& sChans)
     {
         NoStringVector vsChans = sChans.split(" ");
 
@@ -152,12 +152,12 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnListUsersCommand),
                    "",
                    "List all users");
-        AddCommand("AddChans",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnAddChansCommand),
+        AddCommand("addChannels",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnaddChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Adds channels to a user");
-        AddCommand("DelChans",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnDelChansCommand),
+        AddCommand("removeChannels",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnremoveChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");
         AddCommand("AddMasks",
@@ -254,7 +254,7 @@ public:
 
     void onOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        if (Nick.nick() == GetNetwork()->GetIRCNick().nick()) {
+        if (Nick.nick() == GetNetwork()->ircNick().nick()) {
             const std::map<NoString, NoNick>& msNicks = Channel.getNicks();
 
             for (std::map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
@@ -341,13 +341,13 @@ public:
         PutModule(Table);
     }
 
-    void OnAddChansCommand(const NoString& sLine)
+    void OnaddChannelsCommand(const NoString& sLine)
     {
         NoString sUser = No::token(sLine, 1);
         NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
-            PutModule("Usage: AddChans <user> <channel> [channel] ...");
+            PutModule("Usage: addChannels <user> <channel> [channel] ...");
             return;
         }
 
@@ -358,20 +358,20 @@ public:
             return;
         }
 
-        pUser->AddChans(sChans);
+        pUser->addChannels(sChans);
         PutModule("Channel(s) added to user [" + pUser->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(pUser->GetUsername(), pUser->ToString());
     }
 
-    void OnDelChansCommand(const NoString& sLine)
+    void OnremoveChannelsCommand(const NoString& sLine)
     {
         NoString sUser = No::token(sLine, 1);
         NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
-            PutModule("Usage: DelChans <user> <channel> [channel] ...");
+            PutModule("Usage: removeChannels <user> <channel> [channel] ...");
             return;
         }
 
@@ -382,7 +382,7 @@ public:
             return;
         }
 
-        pUser->DelChans(sChans);
+        pUser->removeChannels(sChans);
         PutModule("Channel(s) Removed from user [" + pUser->GetUsername() + "]");
 
         NoRegistry registry(this);
@@ -523,7 +523,7 @@ public:
 
             // First verify that the person who challenged us matches a user's host
             if (pUser->HostMatches(Nick.hostMask())) {
-                const std::vector<NoChannel*>& Chans = GetNetwork()->GetChans();
+                const std::vector<NoChannel*>& Chans = GetNetwork()->channels();
                 bMatchedHost = true;
 
                 // Also verify that they are opped in at least one of the user's chans
@@ -623,7 +623,7 @@ public:
 
     void OpUser(const NoNick& Nick, const NoAutoOpUser& User)
     {
-        const std::vector<NoChannel*>& Chans = GetNetwork()->GetChans();
+        const std::vector<NoChannel*>& Chans = GetNetwork()->channels();
 
         for (size_t a = 0; a < Chans.size(); a++) {
             const NoChannel& Chan = *Chans[a];

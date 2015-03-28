@@ -32,7 +32,7 @@ NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, cons
     : d(new NoModulePrivate(pDLL, pUser, pNetwork, sModName, sDataDir, eType))
 {
     if (pNetwork) {
-        d->savePath = pNetwork->GetNetworkPath() + "/moddata/" + sModName;
+        d->savePath = pNetwork->networkPath() + "/moddata/" + sModName;
     } else if (pUser) {
         d->savePath = pUser->userPath() + "/moddata/" + sModName;
     } else {
@@ -72,7 +72,7 @@ NoString& NoModule::ExpandString(const NoString& sStr, NoString& sRet) const
     sRet = sStr;
 
     if (d->network) {
-        return d->network->ExpandString(sRet, sRet);
+        return d->network->expandString(sRet, sRet);
     }
 
     if (d->user) {
@@ -122,7 +122,7 @@ NoString NoModule::GetWebPath()
     case No::UserModule:
         return "/mods/user/" + GetModName() + "/";
     case No::NetworkModule:
-        return "/mods/network/" + d->network->GetName() + "/" + GetModName() + "/";
+        return "/mods/network/" + d->network->name() + "/" + GetModName() + "/";
     default:
         return "/";
     }
@@ -136,7 +136,7 @@ NoString NoModule::GetWebFilesPath()
     case No::UserModule:
         return "/modfiles/user/" + GetModName() + "/";
     case No::NetworkModule:
-        return "/modfiles/network/" + d->network->GetName() + "/" + GetModName() + "/";
+        return "/modfiles/network/" + d->network->name() + "/" + GetModName() + "/";
     default:
         return "/";
     }
@@ -486,9 +486,9 @@ double NoModule::GetCoreVersion() { return NO_VERSION; }
 bool NoModule::onServerCapAvailable(const NoString& sCap) { return false; }
 void NoModule::onServerCapResult(const NoString& sCap, bool bSuccess) {}
 
-bool NoModule::PutIRC(const NoString& sLine) { return (d->network) ? d->network->PutIRC(sLine) : false; }
-bool NoModule::PutUser(const NoString& sLine) { return (d->network) ? d->network->PutUser(sLine, d->client) : false; }
-bool NoModule::PutStatus(const NoString& sLine) { return (d->network) ? d->network->PutStatus(sLine, d->client) : false; }
+bool NoModule::PutIRC(const NoString& sLine) { return (d->network) ? d->network->putIrc(sLine) : false; }
+bool NoModule::PutUser(const NoString& sLine) { return (d->network) ? d->network->putUser(sLine, d->client) : false; }
+bool NoModule::PutStatus(const NoString& sLine) { return (d->network) ? d->network->putStatus(sLine, d->client) : false; }
 uint NoModule::PutModule(const NoTable& table)
 {
     if (!d->user) return 0;
@@ -506,7 +506,7 @@ bool NoModule::PutModule(const NoString& sLine)
     }
 
     if (d->network) {
-        return d->network->PutModule(GetModName(), sLine);
+        return d->network->putModule(GetModName(), sLine);
     }
 
     if (d->user) {

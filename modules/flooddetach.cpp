@@ -77,7 +77,7 @@ public:
             // The timeout for this channel did not expire yet?
             if (it->second.first + (time_t)m_iThresholdSecs >= now) continue;
 
-            NoChannel* pChan = GetNetwork()->FindChan(it->first);
+            NoChannel* pChan = GetNetwork()->findChannel(it->first);
             if (it->second.second >= m_iThresholdMsgs && pChan && pChan->isDetached()) {
                 // The channel is detached and it is over the
                 // messages limit. Since we only track those

@@ -99,7 +99,7 @@ public:
 
         if (!bGoodSource) return false;
         if (!No::wildCmp(Nick.hostMask(), m_sHostMask, No::CaseInsensitive)) return false;
-        return (No::wildCmp(sText, pNetwork->ExpandString(m_sPattern), No::CaseInsensitive));
+        return (No::wildCmp(sText, pNetwork->expandString(m_sPattern), No::CaseInsensitive));
     }
 
     bool operator==(const NoWatchEntry& WatchEntry)
@@ -189,7 +189,7 @@ public:
     void onClientLogin() override
     {
         NoStringMap msParams;
-        msParams["target"] = GetNetwork()->GetCurNick();
+        msParams["target"] = GetNetwork()->currentNick();
 
         size_t uSize = m_Buffer.size();
         for (uint uIdx = 0; uIdx < uSize; uIdx++) {
@@ -351,12 +351,12 @@ private:
     {
         std::set<NoString> sHandledTargets;
         NoNetwork* pNetwork = GetNetwork();
-        NoChannel* pChannel = pNetwork->FindChan(sSource);
+        NoChannel* pChannel = pNetwork->findChannel(sSource);
 
         for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
             NoWatchEntry& WatchEntry = *it;
 
-            if (pNetwork->IsUserAttached() && WatchEntry.IsDetachedClientOnly()) {
+            if (pNetwork->isUserAttached() && WatchEntry.IsDetachedClientOnly()) {
                 continue;
             }
 
@@ -365,8 +365,8 @@ private:
             }
 
             if (WatchEntry.IsMatch(Nick, sMessage, sSource, pNetwork) && sHandledTargets.count(WatchEntry.GetTarget()) < 1) {
-                if (pNetwork->IsUserAttached()) {
-                    pNetwork->PutUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " + pNetwork->GetCurNick() + " :" + sMessage);
+                if (pNetwork->isUserAttached()) {
+                    pNetwork->putUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " + pNetwork->currentNick() + " :" + sMessage);
                 } else {
                     m_Buffer.addMessage(":" + _NAMEDFMT(WatchEntry.GetTarget()) + "!watch@znc.in PRIVMSG {target} :{text}", sMessage);
                 }

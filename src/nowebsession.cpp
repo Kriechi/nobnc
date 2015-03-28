@@ -417,7 +417,7 @@ void NoWebSocket::SetVars()
             NoModuleLoader* vnMods = pNetwork->loader();
 
             NoTemplate& Row = m_template.AddRow("NetworkModLoop");
-            Row["NetworkName"] = pNetwork->GetName();
+            Row["NetworkName"] = pNetwork->name();
 
             for (NoModule* pnMod : vnMods->modules()) {
                 AddModLoop("ModLoop", *pnMod, &Row);
@@ -457,7 +457,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
                 NoNetwork* Network = Module.GetNetwork();
                 if (Network) {
                     NoString sNetworkName = No::token(GetPath(), 2, "/");
-                    if (sNetworkName == Network->GetName()) {
+                    if (sNetworkName == Network->name()) {
                         bActiveModule = true;
                     }
                 } else {

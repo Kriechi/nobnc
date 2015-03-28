@@ -61,7 +61,7 @@ public:
 
     void LoadNetwork(const NoNetwork* pNetwork)
     {
-        const std::vector<NoChannel*>& vChans = pNetwork->GetChans();
+        const std::vector<NoChannel*>& vChans = pNetwork->channels();
         for (NoChannel* pChan : vChans) {
             // If that channel isn't yet in the config,
             // we'll have to add it...
@@ -73,14 +73,14 @@ public:
 
     void onJoin(const NoNick& Nick, NoChannel& Channel) override
     {
-        if (!Channel.inConfig() && GetNetwork()->GetIRCNick().equals(Nick.nick())) {
+        if (!Channel.inConfig() && GetNetwork()->ircNick().equals(Nick.nick())) {
             Channel.setInConfig(true);
         }
     }
 
     void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
-        if (Channel.inConfig() && GetNetwork()->GetIRCNick().equals(Nick.nick())) {
+        if (Channel.inConfig() && GetNetwork()->ircNick().equals(Nick.nick())) {
             Channel.setInConfig(false);
         }
     }

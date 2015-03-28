@@ -227,7 +227,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
     // TODO: Properly handle IRC case mapping
     // $WINDOW has to be handled last, since it can contain %
     sPath.replace("$USER", NoString((GetUser() ? GetUser()->userName() : "UNKNOWN")).toLower());
-    sPath.replace("$NETWORK", NoString((GetNetwork() ? GetNetwork()->GetName() : "znc")).toLower());
+    sPath.replace("$NETWORK", NoString((GetNetwork() ? GetNetwork()->name() : "znc")).toLower());
     sPath.replace("$WINDOW", NoString(sWindow.replace_n("/", "-").replace_n("\\", "-")).toLower());
 
     // Check if it's allowed to write in this specific path
@@ -255,7 +255,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoNick& Nick) { PutLog(sLine,
 
 NoString NoLogMod::GetServer()
 {
-    NoServerInfo* pServer = GetNetwork()->GetCurrentServer();
+    NoServerInfo* pServer = GetNetwork()->currentServer();
     NoString sSSL;
 
     if (!pServer) return "(no server)";
@@ -371,7 +371,7 @@ NoModule::ModRet NoLogMod::onUserNotice(NoString& sTarget, NoString& sMessage)
 {
     NoNetwork* pNetwork = GetNetwork();
     if (pNetwork) {
-        PutLog("-" + pNetwork->GetCurNick() + "- " + sMessage, sTarget);
+        PutLog("-" + pNetwork->currentNick() + "- " + sMessage, sTarget);
     }
 
     return CONTINUE;
@@ -394,7 +394,7 @@ NoModule::ModRet NoLogMod::onUserAction(NoString& sTarget, NoString& sMessage)
 {
     NoNetwork* pNetwork = GetNetwork();
     if (pNetwork) {
-        PutLog("* " + pNetwork->GetCurNick() + " " + sMessage, sTarget);
+        PutLog("* " + pNetwork->currentNick() + " " + sMessage, sTarget);
     }
 
     return CONTINUE;
@@ -417,7 +417,7 @@ NoModule::ModRet NoLogMod::onUserMsg(NoString& sTarget, NoString& sMessage)
 {
     NoNetwork* pNetwork = GetNetwork();
     if (pNetwork) {
-        PutLog("<" + pNetwork->GetCurNick() + "> " + sMessage, sTarget);
+        PutLog("<" + pNetwork->currentNick() + "> " + sMessage, sTarget);
     }
 
     return CONTINUE;

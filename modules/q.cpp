@@ -60,9 +60,9 @@ public:
 
         onIrcDisconnected(); // reset module's state
 
-        if (IsIRCConnected()) {
+        if (isIrcConnected()) {
             // check for usermode +x if we are already connected
-            std::set<uchar> scUserModes = GetNetwork()->GetIRCSock()->GetUserModes();
+            std::set<uchar> scUserModes = GetNetwork()->ircSocket()->GetUserModes();
             if (scUserModes.find('x') != scUserModes.end()) m_bCloaked = true;
 
             // This will only happen once, and only if the user loads the module after connecting to IRC.
@@ -227,13 +227,13 @@ public:
             PutModule(Table);
 
         } else if (sCommand == "status") {
-            PutModule("Connected: " + NoString(IsIRCConnected() ? "yes" : "no"));
+            PutModule("Connected: " + NoString(isIrcConnected() ? "yes" : "no"));
             PutModule("Cloaked: " + NoString(m_bCloaked ? "yes" : "no"));
             PutModule("Authed: " + NoString(m_bAuthed ? "yes" : "no"));
 
         } else {
             // The following commands require an IRC connection.
-            if (!IsIRCConnected()) {
+            if (!isIrcConnected()) {
                 PutModule("Error: You are not connected to IRC.");
                 return;
             }
@@ -270,7 +270,7 @@ public:
             // Join channels immediately after our spoof is set, but only if
             // both UseCloakedHost and JoinAfterCloaked is enabled. See #602.
             if (m_bJoinAfterCloaked) {
-                GetNetwork()->JoinChans();
+                GetNetwork()->joinChannels();
             }
         }
         return CONTINUE;
@@ -307,7 +307,7 @@ public:
     ModRet onInvite(const NoNick& Nick, const NoString& sChan) override
     {
         if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org")) return CONTINUE;
-        if (m_bJoinonInvite) GetNetwork()->AddChan(sChan, false);
+        if (m_bJoinonInvite) GetNetwork()->addChannel(sChan, false);
         return CONTINUE;
     }
 
@@ -395,7 +395,7 @@ private:
         if (m_bCloaked) return;
 
         PutModule("Cloak: Trying to cloak your hostname, setting +x...");
-        PutIRC("MODE " + GetNetwork()->GetIRCSock()->GetNick() + " +x");
+        PutIRC("MODE " + GetNetwork()->ircSocket()->GetNick() + " +x");
     }
 
     void WhoAmI()
@@ -535,13 +535,13 @@ private:
 
 
     /* Utility Functions */
-    bool IsIRCConnected()
+    bool isIrcConnected()
     {
-        NoIrcSocket* pIRCSock = GetNetwork()->GetIRCSock();
+        NoIrcSocket* pIRCSock = GetNetwork()->ircSocket();
         return pIRCSock && pIRCSock->IsAuthed();
     }
 
-    bool IsSelf(const NoNick& Nick) { return Nick.equals(GetNetwork()->GetCurNick()); }
+    bool IsSelf(const NoNick& Nick) { return Nick.equals(GetNetwork()->currentNick()); }
 
     bool PackHex(const NoString& sHex, NoString& sPackedHex)
     {
@@ -610,7 +610,7 @@ private:
         registry.setValue("UseCloakedHost", NoString(bUseCloakedHost));
         m_bUseCloakedHost = bUseCloakedHost;
 
-        if (!m_bCloaked && m_bUseCloakedHost && IsIRCConnected()) Cloak();
+        if (!m_bCloaked && m_bUseCloakedHost && isIrcConnected()) Cloak();
     }
 
     void SetUseChallenge(const bool bUseChallenge)

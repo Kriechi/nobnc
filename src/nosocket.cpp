@@ -221,7 +221,7 @@ bool NoSocket::Write( const char *data, size_t len ) { return d->impl->Write(dat
 bool NoSocket::Write( const NoString & sData ) { return d->impl->Write(sData); }
 time_t NoSocket::GetTimeSinceLastDataTransaction( time_t iNow ) const { return d->impl->GetTimeSinceLastDataTransaction(iNow); }
 const NoString & NoSocket::GetSockName() const { return d->impl->GetSockName(); }
-const NoString & NoSocket::GetBindHost() const { return d->impl->GetBindHost(); }
+const NoString & NoSocket::bindHost() const { return d->impl->GetBindHost(); }
 void NoSocket::SetSockName( const NoString & sName ) { d->impl->SetSockName(sName); }
 bool NoSocket::IsListener() const { return d->impl->GetType() == Csock::LISTENER; }
 bool NoSocket::IsOutbound() const { return d->impl->GetType() == Csock::OUTBOUND; }

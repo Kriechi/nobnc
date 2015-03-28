@@ -75,8 +75,8 @@ public:
         PutModule("m_pISpoofLockFile = " + NoString((long long)m_pISpoofLockFile));
         PutModule("m_pIRCSock = " + NoString((long long)m_pIRCSock));
         if (m_pIRCSock) {
-            PutModule("user/network - " + m_pIRCSock->GetNetwork()->GetUser()->userName() + "/" +
-                      m_pIRCSock->GetNetwork()->GetName());
+            PutModule("user/network - " + m_pIRCSock->GetNetwork()->user()->userName() + "/" +
+                      m_pIRCSock->GetNetwork()->name());
         } else {
             PutModule("identfile is free");
         }
@@ -139,7 +139,7 @@ public:
         }
 
         NO_DEBUG("Writing [" + sData + "] to ident spoof file [" + m_pISpoofLockFile->GetLongName() +
-              "] for user/network [" + GetUser()->userName() + "/" + GetNetwork()->GetName() + "]");
+              "] for user/network [" + GetUser()->userName() + "/" + GetNetwork()->name() + "]");
 
         m_pISpoofLockFile->Write(sData + "\n");
 
@@ -149,7 +149,7 @@ public:
     void ReleaseISpoof()
     {
         NO_DEBUG("Releasing ident spoof for user/network [" +
-              (m_pIRCSock ? m_pIRCSock->GetNetwork()->GetUser()->userName() + "/" + m_pIRCSock->GetNetwork()->GetName() : "<no user/network>") +
+              (m_pIRCSock ? m_pIRCSock->GetNetwork()->user()->userName() + "/" + m_pIRCSock->GetNetwork()->name() : "<no user/network>") +
               "]");
 
         SetIRCSock(nullptr);
@@ -203,7 +203,7 @@ public:
 
     void onIrcConnected() override
     {
-        if (m_pIRCSock == GetNetwork()->GetIRCSock()) {
+        if (m_pIRCSock == GetNetwork()->ircSocket()) {
             ReleaseISpoof();
         }
     }
@@ -217,7 +217,7 @@ public:
 
     void onIrcDisconnected() override
     {
-        if (m_pIRCSock == GetNetwork()->GetIRCSock()) {
+        if (m_pIRCSock == GetNetwork()->ircSocket()) {
             ReleaseISpoof();
         }
     }

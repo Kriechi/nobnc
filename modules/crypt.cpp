@@ -79,8 +79,8 @@ public:
 
         NoRegistry registry(this);
         if (registry.contains(sTarget.toLower())) {
-            NoChannel* pChan = GetNetwork()->FindChan(sTarget);
-            NoString sNickMask = GetNetwork()->GetIRCNick().nickMask();
+            NoChannel* pChan = GetNetwork()->findChannel(sTarget);
+            NoString sNickMask = GetNetwork()->ircNick().nickMask();
             if (pChan) {
                 if (!pChan->autoClearChanBuffer())
                     pChan->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +

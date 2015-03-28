@@ -30,7 +30,7 @@ public:
     NoAutoVoiceUser(const NoString& sUsername, const NoString& sHostmask, const NoString& sChannels)
         : m_sUsername(sUsername), m_sHostmask(sHostmask)
     {
-        AddChans(sChannels);
+        addChannels(sChannels);
     }
 
     const NoString& GetUsername() const { return m_sUsername; }
@@ -64,7 +64,7 @@ public:
         return sRet;
     }
 
-    void DelChans(const NoString& sChans)
+    void removeChannels(const NoString& sChans)
     {
         NoStringVector vsChans = sChans.split(" ");
 
@@ -73,7 +73,7 @@ public:
         }
     }
 
-    void AddChans(const NoString& sChans)
+    void addChannels(const NoString& sChans)
     {
         NoStringVector vsChans = sChans.split(" ");
 
@@ -125,12 +125,12 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnListUsersCommand),
                    "",
                    "List all users");
-        AddCommand("AddChans",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnAddChansCommand),
+        AddCommand("addChannels",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnaddChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Adds channels to a user");
-        AddCommand("DelChans",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnDelChansCommand),
+        AddCommand("removeChannels",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnremoveChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");
         AddCommand("AddUser",
@@ -247,13 +247,13 @@ public:
         PutModule(Table);
     }
 
-    void OnAddChansCommand(const NoString& sLine)
+    void OnaddChannelsCommand(const NoString& sLine)
     {
         NoString sUser = No::token(sLine, 1);
         NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
-            PutModule("Usage: AddChans <user> <channel> [channel] ...");
+            PutModule("Usage: addChannels <user> <channel> [channel] ...");
             return;
         }
 
@@ -264,20 +264,20 @@ public:
             return;
         }
 
-        pUser->AddChans(sChans);
+        pUser->addChannels(sChans);
         PutModule("Channel(s) added to user [" + pUser->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(pUser->GetUsername(), pUser->ToString());
     }
 
-    void OnDelChansCommand(const NoString& sLine)
+    void OnremoveChannelsCommand(const NoString& sLine)
     {
         NoString sUser = No::token(sLine, 1);
         NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
-            PutModule("Usage: DelChans <user> <channel> [channel] ...");
+            PutModule("Usage: removeChannels <user> <channel> [channel] ...");
             return;
         }
 
@@ -288,7 +288,7 @@ public:
             return;
         }
 
-        pUser->DelChans(sChans);
+        pUser->removeChannels(sChans);
         PutModule("Channel(s) Removed from user [" + pUser->GetUsername() + "]");
 
         NoRegistry registry(this);

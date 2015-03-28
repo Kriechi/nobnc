@@ -70,13 +70,13 @@ public:
 
     void onIrcConnected() override
     {
-        Log("[" + GetUser()->userName() + "/" + GetNetwork()->GetName() + "] connected to IRC: " +
-            GetNetwork()->GetCurrentServer()->host());
+        Log("[" + GetUser()->userName() + "/" + GetNetwork()->name() + "] connected to IRC: " +
+            GetNetwork()->currentServer()->host());
     }
 
     void onIrcDisconnected() override
     {
-        Log("[" + GetUser()->userName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC");
+        Log("[" + GetUser()->userName() + "/" + GetNetwork()->name() + "] disconnected from IRC");
     }
 
     ModRet onRaw(NoString& sLine) override
@@ -86,8 +86,8 @@ public:
             // ERROR :Closing Link: nick[24.24.24.24] Killer (Local kill by Killer (reason))
             NoString sError(sLine.substr(6));
             if (sError.left(1) == ":") sError.leftChomp(1);
-            Log("[" + GetUser()->userName() + "/" + GetNetwork()->GetName() + "] disconnected from IRC: " +
-                GetNetwork()->GetCurrentServer()->host() + " [" + sError + "]",
+            Log("[" + GetUser()->userName() + "/" + GetNetwork()->name() + "] disconnected from IRC: " +
+                GetNetwork()->currentServer()->host() + " [" + sError + "]",
                 LOG_NOTICE);
         }
         return CONTINUE;

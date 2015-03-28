@@ -238,7 +238,7 @@ public:
     ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
     {
         NoNetwork* pNetwork = GetNetwork();
-        if (sMessage.startsWith("DCC ") && pNetwork->IsUserAttached()) {
+        if (sMessage.startsWith("DCC ") && pNetwork->isUserAttached()) {
             // DCC CHAT chat 2453612361 44592
             NoStringVector tokens = No::quoteSplit(sMessage);
             tokens.resize(6);
@@ -254,7 +254,7 @@ public:
                 NoDccBounce::DCCRequest(FromNick.nick(), uLongIP, uPort, "", true, this, No::formatIp(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
-                    PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC CHAT chat " +
+                    PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC CHAT chat " +
                             NoString(No::formatLongIp(sIP)) + " " + NoString(uBNCPort) + "\001");
                 }
             } else if (sType.equals("SEND")) {
@@ -263,7 +263,7 @@ public:
                 NoDccBounce::DCCRequest(Nick.nick(), uLongIP, uPort, sFile, false, this, No::formatIp(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
-                    PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC SEND " + sFile + " " +
+                    PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC SEND " + sFile + " " +
                             NoString(No::formatLongIp(sIP)) + " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.equals("RESUME")) {
@@ -272,7 +272,7 @@ public:
 
                 for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetLocalPort() == uResumePort) {
-                        PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
+                        PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC " + sType +
                                 " " + sFile + " " + NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
@@ -280,7 +280,7 @@ public:
                 // Need to lookup the connection by port, filter the port, and forward to the user
                 for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
-                        PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->GetCurNick() + " :\001DCC " + sType +
+                        PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC " + sType +
                                 " " + sFile + " " + NoString(pSock->GetLocalPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }

@@ -36,154 +36,154 @@ class NoNetworkPrivate;
 class NO_EXPORT NoNetwork
 {
 public:
-    static bool IsValidNetwork(const NoString& sNetwork);
+    static bool isValidNetwork(const NoString& sNetwork);
 
     NoNetwork(NoUser* pUser, const NoString& sName);
     NoNetwork(NoUser* pUser, const NoNetwork& Network);
     ~NoNetwork();
 
     enum {
-        JOIN_FREQUENCY = 30,
+        JoinFrequence = 30,
         /** How long must an IRC connection be idle before ZNC sends a ping */
-        PING_FREQUENCY = 270,
+        PingFrequency = 270,
         /** Time between checks if PINGs need to be sent */
-        PING_SLACK = 30,
+        PingSlack = 30,
         /** Timeout after which IRC connections are closed. Must
          *  obviously be greater than PING_FREQUENCY + PING_SLACK.
          */
-        NO_TRAFFIC_TIMEOUT = 540
+        NoTrafficTimeout = 540
     };
 
-    void Clone(const NoNetwork& Network, bool bCloneName = true);
+    void clone(const NoNetwork& Network, bool bCloneName = true);
 
-    NoString GetNetworkPath() const;
+    NoString networkPath() const;
 
-    void DelServers();
+    void delServers();
 
-    bool ParseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade = false);
-    NoSettings ToConfig() const;
+    bool parseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade = false);
+    NoSettings toConfig() const;
 
-    bool IsUserAttached() const;
-    bool IsUserOnline() const;
-    void ClientConnected(NoClient* pClient);
-    void ClientDisconnected(NoClient* pClient);
+    bool isUserAttached() const;
+    bool isUserOnline() const;
+    void clientConnected(NoClient* pClient);
+    void clientDisconnected(NoClient* pClient);
 
-    NoUser* GetUser() const;
-    NoString GetName() const;
-    bool IsNetworkAttached() const;
-    std::vector<NoClient*> GetClients() const;
-    std::vector<NoClient*> FindClients(const NoString& sIdentifier) const;
+    NoUser* user() const;
+    NoString name() const;
+    bool isNetworkAttached() const;
+    std::vector<NoClient*> clients() const;
+    std::vector<NoClient*> findClients(const NoString& sIdentifier) const;
 
-    void SetUser(NoUser* pUser);
-    bool SetName(const NoString& sName);
+    void setUser(NoUser* pUser);
+    bool setName(const NoString& sName);
 
     NoModuleLoader* loader() const;
 
-    bool PutUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
-    bool PutStatus(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
-    bool PutModule(const NoString& sModule, const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool putUser(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool putStatus(const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
+    bool putModule(const NoString& sModule, const NoString& sLine, NoClient* pClient = nullptr, NoClient* pSkipClient = nullptr);
 
-    std::vector<NoChannel*> GetChans() const;
-    NoChannel* FindChan(NoString sName) const;
-    std::vector<NoChannel*> FindChans(const NoString& sWild) const;
-    bool AddChan(NoChannel* pChan);
-    bool AddChan(const NoString& sName, bool bInConfig);
-    bool DelChan(const NoString& sName);
-    void JoinChans();
+    std::vector<NoChannel*> channels() const;
+    NoChannel* findChannel(NoString sName) const;
+    std::vector<NoChannel*> findChannels(const NoString& sWild) const;
+    bool addChannel(NoChannel* pChan);
+    bool addChannel(const NoString& sName, bool bInConfig);
+    bool removeChannel(const NoString& sName);
+    void joinChannels();
 
-    std::vector<NoQuery*> GetQueries() const;
-    NoQuery* FindQuery(const NoString& sName) const;
-    std::vector<NoQuery*> FindQueries(const NoString& sWild) const;
-    NoQuery* AddQuery(const NoString& sName);
-    bool DelQuery(const NoString& sName);
+    std::vector<NoQuery*> queries() const;
+    NoQuery* findQuery(const NoString& sName) const;
+    std::vector<NoQuery*> findQueries(const NoString& sWild) const;
+    NoQuery* addQuery(const NoString& sName);
+    bool removeQuery(const NoString& sName);
 
-    NoString GetChanPrefixes() const;
-    void SetChanPrefixes(const NoString& s);
-    bool IsChan(const NoString& sChan) const;
+    NoString channelPrefixes() const;
+    void setChannelPrefixes(const NoString& s);
+    bool isChannel(const NoString& sChan) const;
 
-    std::vector<NoServerInfo*> GetServers() const;
-    bool HasServers() const;
-    NoServerInfo* FindServer(const NoString& sName) const;
-    bool DelServer(const NoString& sName, ushort uPort, const NoString& sPass);
-    bool AddServer(const NoString& sName);
-    bool AddServer(const NoString& sName, ushort uPort, const NoString& sPass = "", bool bSSL = false);
-    NoServerInfo* GetNextServer();
-    NoServerInfo* GetCurrentServer() const;
-    void SetIRCServer(const NoString& s);
-    bool SetNextServer(const NoServerInfo* pServer);
-    bool IsLastServer() const;
+    std::vector<NoServerInfo*> servers() const;
+    bool hasServers() const;
+    NoServerInfo* findServer(const NoString& sName) const;
+    bool removeServer(const NoString& sName, ushort uPort, const NoString& sPass);
+    bool addServer(const NoString& sName);
+    bool addServer(const NoString& sName, ushort uPort, const NoString& sPass = "", bool bSSL = false);
+    NoServerInfo* nextServer();
+    NoServerInfo* currentServer() const;
+    void setIrcServer(const NoString& s);
+    bool setNextServer(const NoServerInfo* pServer);
+    bool isLastServer() const;
 
-    NoStringSet GetTrustedFingerprints() const;
-    void AddTrustedFingerprint(const NoString& sFP);
-    void DelTrustedFingerprint(const NoString& sFP);
+    NoStringSet trustedFingerprints() const;
+    void addTrustedFingerprint(const NoString& sFP);
+    void removeTrustedFingerprint(const NoString& sFP);
 
-    void SetIRCConnectEnabled(bool b);
-    bool GetIRCConnectEnabled() const;
+    void setEnabled(bool b);
+    bool isEnabled() const;
 
-    NoIrcSocket* GetIRCSock() const;
-    NoString GetIRCServer() const;
-    const NoNick& GetIRCNick() const;
-    void SetIRCNick(const NoNick& n);
-    NoString GetCurNick() const;
-    bool IsIRCAway() const;
-    void SetIRCAway(bool b);
+    NoIrcSocket* ircSocket() const;
+    NoString ircServer() const;
+    const NoNick& ircNick() const;
+    void setIrcNick(const NoNick& n);
+    NoString currentNick() const;
+    bool isIrcAway() const;
+    void setIrcAway(bool b);
 
-    bool Connect();
-    bool IsIRCConnected() const;
-    void SetIRCSocket(NoIrcSocket* pIRCSock);
-    void IRCConnected();
-    void IRCDisconnected();
-    void CheckIRCConnect();
+    bool connect();
+    bool isIrcConnected() const;
+    void setIrcSocket(NoIrcSocket* pIRCSock);
+    void ircConnected();
+    void ircDisconnected();
+    void checkIrcConnect();
 
-    bool PutIRC(const NoString& sLine);
+    bool putIrc(const NoString& sLine);
 
-    void AddRawBuffer(const NoString& sFormat, const NoString& sText = "");
-    void UpdateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "");
-    void UpdateExactRawBuffer(const NoString& sFormat, const NoString& sText = "");
-    void ClearRawBuffer();
+    void addRawBuffer(const NoString& sFormat, const NoString& sText = "");
+    void updateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "");
+    void updateExactRawBuffer(const NoString& sFormat, const NoString& sText = "");
+    void clearRawBuffer();
 
-    void AddMotdBuffer(const NoString& sFormat, const NoString& sText = "");
-    void UpdateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "");
-    void ClearMotdBuffer();
+    void addMotdBuffer(const NoString& sFormat, const NoString& sText = "");
+    void updateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "");
+    void clearMotdBuffer();
 
-    void AddNoticeBuffer(const NoString& sFormat, const NoString& sText = "");
-    void UpdateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "");
-    void ClearNoticeBuffer();
+    void addNoticeBuffer(const NoString& sFormat, const NoString& sText = "");
+    void updateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText = "");
+    void clearNoticeBuffer();
 
-    void ClearQueryBuffer();
+    void clearQueryBuffer();
 
-    NoString GetNick(const bool bAllowDefault = true) const;
-    NoString GetAltNick(const bool bAllowDefault = true) const;
-    NoString GetIdent(const bool bAllowDefault = true) const;
-    NoString GetRealName() const;
-    NoString GetBindHost() const;
-    NoString GetEncoding() const;
-    NoString GetQuitMsg() const;
+    NoString nick(const bool bAllowDefault = true) const;
+    NoString altNick(const bool bAllowDefault = true) const;
+    NoString ident(const bool bAllowDefault = true) const;
+    NoString realName() const;
+    NoString bindHost() const;
+    NoString encoding() const;
+    NoString quitMsg() const;
 
-    void SetNick(const NoString& s);
-    void SetAltNick(const NoString& s);
-    void SetIdent(const NoString& s);
-    void SetRealName(const NoString& s);
-    void SetBindHost(const NoString& s);
-    void SetEncoding(const NoString& s);
-    void SetQuitMsg(const NoString& s);
+    void setNick(const NoString& s);
+    void setAltNick(const NoString& s);
+    void setIdent(const NoString& s);
+    void setRealName(const NoString& s);
+    void setBindHost(const NoString& s);
+    void setEncoding(const NoString& s);
+    void setQuitMsg(const NoString& s);
 
-    double GetFloodRate() const;
-    ushort GetFloodBurst() const;
-    void SetFloodRate(double fFloodRate);
-    void SetFloodBurst(ushort uFloodBurst);
+    double floodRate() const;
+    ushort floodBurst() const;
+    void setFloodRate(double fFloodRate);
+    void setFloodBurst(ushort uFloodBurst);
 
-    ushort GetJoinDelay() const;
-    void SetJoinDelay(ushort uJoinDelay);
+    ushort joinDelay() const;
+    void setJoinDelay(ushort uJoinDelay);
 
-    NoString ExpandString(const NoString& sStr) const;
-    NoString& ExpandString(const NoString& sStr, NoString& sRet) const;
+    NoString expandString(const NoString& sStr) const;
+    NoString& expandString(const NoString& sStr, NoString& sRet) const;
 
 private:
-    void BounceAllClients();
-    bool JoinChan(NoChannel* pChan);
-    void JoinChans(std::set<NoChannel*>& sChans);
-    bool LoadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
+    void bounceAllClients();
+    bool joinChan(NoChannel* pChan);
+    void joinChannels(std::set<NoChannel*>& sChans);
+    bool loadModule(const NoString& sModName, const NoString& sArgs, const NoString& sNotice, NoString& sError);
 
     NoNetwork(const NoNetwork&) = delete;
     NoNetwork& operator=(const NoNetwork&) = delete;

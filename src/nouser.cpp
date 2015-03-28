@@ -36,7 +36,7 @@ public:
     NoUserTimer(NoUser* pUser) : CCron(), m_pUser(pUser)
     {
         SetName("NoUserTimer::" + m_pUser->userName());
-        Start(NoNetwork::PING_SLACK);
+        Start(NoNetwork::PingSlack);
     }
 
 protected:
@@ -45,7 +45,7 @@ protected:
         const std::vector<NoClient*>& vUserClients = m_pUser->userClients();
 
         for (NoClient* pUserClient : vUserClients) {
-            if (pUserClient->GetSocket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PING_FREQUENCY) {
+            if (pUserClient->GetSocket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
                 pUserClient->PutClient("PING :ZNC");
             }
         }
@@ -82,9 +82,9 @@ public:
     bool multiClients = true;
     bool denyLoadMod = false;
     bool admin = false;
-    bool denySetBindHost = false;
+    bool denysetBindHost = false;
     bool autoClearChanBuffer = true;
-    bool autoClearQueryBuffer = true;
+    bool autoclearQueryBuffer = true;
     bool beingDeleted = false;
     bool appendTimestamp = false;
     bool prependTimestamp = true;
@@ -173,12 +173,12 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
     TOption<bool> BoolOptions[] = {
         { "keepbuffer", &NoUser::setKeepBuffer }, // XXX compatibility crap from pre-0.207
         { "autoclearchanbuffer", &NoUser::setAutoClearChanBuffer },
-        { "autoclearquerybuffer", &NoUser::setAutoClearQueryBuffer },
+        { "autoclearquerybuffer", &NoUser::setAutoclearQueryBuffer },
         { "multiclients", &NoUser::setMultiClients },
         { "denyloadmod", &NoUser::setDenyLoadMod },
         { "admin", &NoUser::setAdmin },
-        { "denysetbindhost", &NoUser::setDenySetBindHost },
-        { "denysetvhost", &NoUser::setDenySetBindHost },
+        { "denysetbindhost", &NoUser::setDenysetBindHost },
+        { "denysetvhost", &NoUser::setDenysetBindHost },
         { "appendtimestamp", &NoUser::setTimestampAppend },
         { "prependtimestamp", &NoUser::setTimestampPrepend },
     };
@@ -361,7 +361,7 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
             pNetwork = new NoNetwork(this, sNetworkName);
         }
 
-        if (!pNetwork->ParseConfig(subIt->second.m_subConfig, sError)) {
+        if (!pNetwork->parseConfig(subIt->second.m_subConfig, sError)) {
             return false;
         }
     }
@@ -377,7 +377,7 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
         if (pNetwork) {
             No::printMessage("NOTICE: Found deprecated config, upgrading to a network");
 
-            if (!pNetwork->ParseConfig(pConfig, sError, true)) {
+            if (!pNetwork->parseConfig(pConfig, sError, true)) {
                 return false;
             }
         }
@@ -433,7 +433,7 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
             }
             setClientEncoding(vsClient[0]);
             for (NoNetwork* pNetwork : d->networks) {
-                pNetwork->SetEncoding(vsServer[0]);
+                pNetwork->setEncoding(vsServer[0]);
             }
             No::printStatus(true, "Using [" + vsClient[0] + "] for clients, and [" + vsServer[0] + "] for servers");
             continue;
@@ -466,7 +466,7 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
     // Move ircconnectenabled to the networks
     if (pConfig->FindStringEntry("ircconnectenabled", sValue)) {
         for (NoNetwork* pNetwork : d->networks) {
-            pNetwork->SetIRCConnectEnabled(sValue.toBool());
+            pNetwork->setEnabled(sValue.toBool());
         }
     }
 
@@ -475,7 +475,7 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
 
 NoNetwork* NoUser::addNetwork(const NoString& sNetwork, NoString& sErrorRet)
 {
-    if (!NoNetwork::IsValidNetwork(sNetwork)) {
+    if (!NoNetwork::isValidNetwork(sNetwork)) {
         sErrorRet = "Invalid network name. It should be alphanumeric. Not to be confused with server name";
         return nullptr;
     } else if (findNetwork(sNetwork)) {
@@ -498,7 +498,7 @@ NoNetwork* NoUser::addNetwork(const NoString& sNetwork, NoString& sErrorRet)
 
 bool NoUser::addNetwork(NoNetwork* pNetwork)
 {
-    if (findNetwork(pNetwork->GetName())) {
+    if (findNetwork(pNetwork->name())) {
         return false;
     }
 
@@ -534,7 +534,7 @@ bool NoUser::deleteNetwork(const NoString& sNetwork)
 NoNetwork* NoUser::findNetwork(const NoString& sNetwork) const
 {
     for (NoNetwork* pNetwork : d->networks) {
-        if (pNetwork->GetName().equals(sNetwork)) {
+        if (pNetwork->name().equals(sNetwork)) {
             return pNetwork;
         }
     }
@@ -655,10 +655,10 @@ void NoUser::cloneNetworks(const NoUser& User)
 {
     const std::vector<NoNetwork*>& vNetworks = User.networks();
     for (NoNetwork* pUserNetwork : vNetworks) {
-        NoNetwork* pNetwork = findNetwork(pUserNetwork->GetName());
+        NoNetwork* pNetwork = findNetwork(pUserNetwork->name());
 
         if (pNetwork) {
-            pNetwork->Clone(*pUserNetwork);
+            pNetwork->clone(*pUserNetwork);
         } else {
             new NoNetwork(this, *pUserNetwork);
         }
@@ -666,8 +666,8 @@ void NoUser::cloneNetworks(const NoUser& User)
 
     std::set<NoString> ssDeleteNetworks;
     for (NoNetwork* pNetwork : d->networks) {
-        if (!(User.findNetwork(pNetwork->GetName()))) {
-            ssDeleteNetworks.insert(pNetwork->GetName());
+        if (!(User.findNetwork(pNetwork->name()))) {
+            ssDeleteNetworks.insert(pNetwork->name());
         }
     }
 
@@ -677,7 +677,7 @@ void NoUser::cloneNetworks(const NoUser& User)
         // have requested the rehash. Then when we do
         // client->PutStatus("Rehashing succeeded!") we would
         // crash if there was no client anymore.
-        const std::vector<NoClient*>& vClients = findNetwork(sNetwork)->GetClients();
+        const std::vector<NoClient*>& vClients = findNetwork(sNetwork)->clients();
 
         while (vClients.begin() != vClients.end()) {
             NoClient* pClient = vClients.front();
@@ -760,11 +760,11 @@ bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 
     // Flags
     setAutoClearChanBuffer(User.autoClearChanBuffer());
-    setAutoClearQueryBuffer(User.autoClearQueryBuffer());
+    setAutoclearQueryBuffer(User.autoclearQueryBuffer());
     setMultiClients(User.multiClients());
     setDenyLoadMod(User.denyLoadMod());
     setAdmin(User.isAdmin());
-    setDenySetBindHost(User.denySetBindHost());
+    setDenysetBindHost(User.denysetBindHost());
     setTimestampAppend(User.timestampAppend());
     setTimestampPrepend(User.timestampPrepend());
     setTimestampFormat(User.timestampFormat());
@@ -917,11 +917,11 @@ NoSettings NoUser::toConfig() const
     config.AddKeyValuePair("ChanModes", defaultChanModes());
     config.AddKeyValuePair("Buffer", NoString(bufferCount()));
     config.AddKeyValuePair("AutoClearChanBuffer", NoString(autoClearChanBuffer()));
-    config.AddKeyValuePair("autoClearQueryBuffer", NoString(autoClearQueryBuffer()));
+    config.AddKeyValuePair("autoclearQueryBuffer", NoString(autoclearQueryBuffer()));
     config.AddKeyValuePair("MultiClients", NoString(multiClients()));
     config.AddKeyValuePair("DenyLoadMod", NoString(denyLoadMod()));
     config.AddKeyValuePair("Admin", NoString(isAdmin()));
-    config.AddKeyValuePair("DenySetBindHost", NoString(denySetBindHost()));
+    config.AddKeyValuePair("DenysetBindHost", NoString(denysetBindHost()));
     config.AddKeyValuePair("TimestampFormat", timestampFormat());
     config.AddKeyValuePair("AppendTimestamp", NoString(timestampAppend()));
     config.AddKeyValuePair("PrependTimestamp", NoString(timestampPrepend()));
@@ -961,7 +961,7 @@ NoSettings NoUser::toConfig() const
 
     // Networks
     for (NoNetwork* pNetwork : d->networks) {
-        config.AddSubConfig("Network", pNetwork->GetName(), pNetwork->ToConfig());
+        config.AddSubConfig("Network", pNetwork->name(), pNetwork->toConfig());
     }
 
     return config;
@@ -1002,7 +1002,7 @@ NoString NoUser::localDccIp() const
     if (!dccBindHost().empty()) return dccBindHost();
 
     for (NoNetwork* pNetwork : d->networks) {
-        NoIrcSocket* pIRCSock = pNetwork->GetIRCSock();
+        NoIrcSocket* pIRCSock = pNetwork->ircSocket();
         if (pIRCSock) {
             return pIRCSock->GetLocalIP();
         }
@@ -1035,7 +1035,7 @@ bool NoUser::putAllUser(const NoString& sLine, NoClient* pClient, NoClient* pSki
     putUser(sLine, pClient, pSkipClient);
 
     for (NoNetwork* pNetwork : d->networks) {
-        if (pNetwork->PutUser(sLine, pClient, pSkipClient)) {
+        if (pNetwork->putUser(sLine, pClient, pSkipClient)) {
             return true;
         }
     }
@@ -1116,7 +1116,7 @@ bool NoUser::isUserAttached() const
     }
 
     for (const NoNetwork* pNetwork : d->networks) {
-        if (pNetwork->IsUserAttached()) {
+        if (pNetwork->isUserAttached()) {
             return true;
         }
     }
@@ -1146,7 +1146,7 @@ bool NoUser::loadModule(const NoString& sModName, const NoString& sArgs, const N
 
         for (NoNetwork* pNetwork : d->networks) {
             if (fNVFile.Exists()) {
-                NoString sNetworkModPath = pNetwork->GetNetworkPath() + "/moddata/" + sModName;
+                NoString sNetworkModPath = pNetwork->networkPath() + "/moddata/" + sModName;
                 if (!NoFile::Exists(sNetworkModPath)) {
                     NoDir::MakeDir(sNetworkModPath);
                 }
@@ -1185,20 +1185,20 @@ void NoUser::setPassword(const NoString& s, HashType eHash, const NoString& sSal
 void NoUser::setMultiClients(bool b) { d->multiClients = b; }
 void NoUser::setDenyLoadMod(bool b) { d->denyLoadMod = b; }
 void NoUser::setAdmin(bool b) { d->admin = b; }
-void NoUser::setDenySetBindHost(bool b) { d->denySetBindHost = b; }
+void NoUser::setDenysetBindHost(bool b) { d->denysetBindHost = b; }
 void NoUser::setDefaultChanModes(const NoString& s) { d->defaultChanModes = s; }
 void NoUser::setClientEncoding(const NoString& s) { d->clientEncoding = s; }
 void NoUser::setQuitMsg(const NoString& s) { d->quitMsg = s; }
 void NoUser::setAutoClearChanBuffer(bool b)
 {
     for (NoNetwork* pNetwork : d->networks) {
-        for (NoChannel* pChan : pNetwork->GetChans()) {
+        for (NoChannel* pChan : pNetwork->channels()) {
             pChan->inheritAutoClearChanBuffer(b);
         }
     }
     d->autoClearChanBuffer = b;
 }
-void NoUser::setAutoClearQueryBuffer(bool b) { d->autoClearQueryBuffer = b; }
+void NoUser::setAutoclearQueryBuffer(bool b) { d->autoclearQueryBuffer = b; }
 
 void NoUser::setBeingDeleted(bool b) { d->beingDeleted = b; }
 
@@ -1226,7 +1226,7 @@ bool NoUser::setBufferCount(uint u, bool bForce)
 {
     if (!bForce && u > NoApp::Get().GetMaxBufferSize()) return false;
     for (NoNetwork* pNetwork : d->networks) {
-        for (NoChannel* pChan : pNetwork->GetChans()) {
+        for (NoChannel* pChan : pNetwork->channels()) {
             pChan->inheritBufferCount(u, bForce);
         }
     }
@@ -1267,7 +1267,7 @@ std::vector<NoClient*> NoUser::allClients() const
     std::vector<NoClient*> vClients;
 
     for (NoNetwork* pNetwork : d->networks) {
-        for (NoClient* pClient : pNetwork->GetClients()) {
+        for (NoClient* pClient : pNetwork->clients()) {
             vClients.push_back(pClient);
         }
     }
@@ -1301,7 +1301,7 @@ NoUser::HashType NoUser::passwordHashType() const { return d->hashType; }
 NoString NoUser::passwordSalt() const { return d->passwordSalt; }
 bool NoUser::denyLoadMod() const { return d->denyLoadMod; }
 bool NoUser::isAdmin() const { return d->admin; }
-bool NoUser::denySetBindHost() const { return d->denySetBindHost; }
+bool NoUser::denysetBindHost() const { return d->denysetBindHost; }
 bool NoUser::multiClients() const { return d->multiClients; }
 NoString NoUser::statusPrefix() const { return d->statusPrefix; }
 NoString NoUser::defaultChanModes() const { return d->defaultChanModes; }
@@ -1312,7 +1312,7 @@ NoString NoUser::quitMsg() const { return (!d->quitMsg.trim_n().empty()) ? d->qu
 NoStringMap NoUser::ctcpReplies() const { return d->ctcpReplies; }
 uint NoUser::bufferCount() const { return d->bufferCount; }
 bool NoUser::autoClearChanBuffer() const { return d->autoClearChanBuffer; }
-bool NoUser::autoClearQueryBuffer() const { return d->autoClearQueryBuffer; }
+bool NoUser::autoclearQueryBuffer() const { return d->autoclearQueryBuffer; }
 
 bool NoUser::isBeingDeleted() const { return d->beingDeleted; }
 

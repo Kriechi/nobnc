@@ -244,8 +244,8 @@ public:
         }
 
         sArg = WebSock.GetParam("bindhost");
-        // To change BindHosts be admin or don't have DenySetBindHost
-        if (spSession->IsAdmin() || !spSession->GetUser()->denySetBindHost()) {
+        // To change BindHosts be admin or don't have DenysetBindHost
+        if (spSession->IsAdmin() || !spSession->GetUser()->denysetBindHost()) {
             NoString sArg2 = WebSock.GetParam("dccbindhost");
             if (!sArg.empty()) {
                 pNewUser->setBindHost(sArg);
@@ -254,7 +254,7 @@ public:
                 pNewUser->setDccBindHost(sArg2);
             }
 
-            const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
+            const NoStringVector& vsHosts = NoApp::Get().bindHosts();
             if (!spSession->IsAdmin() && !vsHosts.empty()) {
                 NoStringVector::const_iterator it;
                 bool bFound = false;
@@ -297,7 +297,7 @@ public:
         pNewUser->setTimezone(WebSock.GetParam("timezone"));
         pNewUser->setJoinTries(WebSock.GetParam("jointries").toUInt());
         pNewUser->setMaxJoins(WebSock.GetParam("maxjoins").toUInt());
-        pNewUser->setAutoClearQueryBuffer(WebSock.GetParam("autoclearquerybuffer").toBool());
+        pNewUser->setAutoclearQueryBuffer(WebSock.GetParam("autoclearquerybuffer").toBool());
         pNewUser->setMaxQueryBuffers(WebSock.GetParam("maxquerybuffers").toUInt());
 
 #ifdef HAVE_ICU
@@ -320,12 +320,12 @@ public:
 
         if (spSession->IsAdmin()) {
             pNewUser->setDenyLoadMod(WebSock.GetParam("denyloadmod").toBool());
-            pNewUser->setDenySetBindHost(WebSock.GetParam("denysetbindhost").toBool());
+            pNewUser->setDenysetBindHost(WebSock.GetParam("denysetbindhost").toBool());
             sArg = WebSock.GetParam("maxnetworks");
             if (!sArg.empty()) pNewUser->setMaxNetworks(sArg.toUInt());
         } else if (pUser) {
             pNewUser->setDenyLoadMod(pUser->denyLoadMod());
-            pNewUser->setDenySetBindHost(pUser->denySetBindHost());
+            pNewUser->setDenysetBindHost(pUser->denysetBindHost());
             pNewUser->setMaxNetworks(pUser->maxNetworks());
         }
 
@@ -477,7 +477,7 @@ public:
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
+            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->user())) {
                 return false;
             }
 
@@ -486,7 +486,7 @@ public:
                 return true;
             }
 
-            return NetworkPage(WebSock, Tmpl, pNetwork->GetUser(), pNetwork);
+            return NetworkPage(WebSock, Tmpl, pNetwork->user(), pNetwork);
 
         } else if (sPageName == "delnetwork") {
             NoString sUser = WebSock.GetParam("user");
@@ -506,7 +506,7 @@ public:
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
+            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->user())) {
                 return false;
             }
 
@@ -519,7 +519,7 @@ public:
             if (sChan.empty() && !WebSock.IsPost()) {
                 sChan = WebSock.GetParam("name", false);
             }
-            NoChannel* pChan = pNetwork->FindChan(sChan);
+            NoChannel* pChan = pNetwork->findChannel(sChan);
             if (!pChan) {
                 WebSock.PrintErrorPage("No such channel");
                 return true;
@@ -530,7 +530,7 @@ public:
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
+            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->user())) {
                 return false;
             }
 
@@ -544,12 +544,12 @@ public:
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->GetUser())) {
+            if (!spSession->IsAdmin() && (!spSession->GetUser() || !pNetwork || spSession->GetUser() != pNetwork->user())) {
                 return false;
             }
 
             if (pNetwork) {
-                return DelChan(WebSock, pNetwork);
+                return removeChannel(WebSock, pNetwork);
             }
 
             WebSock.PrintErrorPage("No such username or network");
@@ -641,7 +641,7 @@ public:
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.SetFile("add_edit_chan.tmpl");
-        NoUser* pUser = pNetwork->GetUser();
+        NoUser* pUser = pNetwork->user();
 
         if (!pUser) {
             WebSock.PrintErrorPage("That user doesn't exist");
@@ -650,13 +650,13 @@ public:
 
         if (!WebSock.GetParam("submitted").toUInt()) {
             Tmpl["User"] = pUser->userName();
-            Tmpl["Network"] = pNetwork->GetName();
+            Tmpl["Network"] = pNetwork->name();
 
             if (pChan) {
                 Tmpl["Action"] = "editchan";
                 Tmpl["Edit"] = "true";
                 Tmpl["Title"] = "Edit Channel" + NoString(" [" + pChan->getName() + "]") + " of Network [" +
-                                pNetwork->GetName() + "] of User [" + pNetwork->GetUser()->userName() + "]";
+                                pNetwork->name() + "] of User [" + pNetwork->user()->userName() + "]";
                 Tmpl["ChanName"] = pChan->getName();
                 Tmpl["BufferCount"] = NoString(pChan->getBufferCount());
                 Tmpl["DefModes"] = pChan->getDefaultModes();
@@ -721,13 +721,13 @@ public:
             // This could change the channel name and e.g. add a "#" prefix
             pChan = new NoChannel(sChanName, pNetwork, true);
 
-            if (pNetwork->FindChan(pChan->getName())) {
+            if (pNetwork->findChannel(pChan->getName())) {
                 WebSock.PrintErrorPage("Channel [" + pChan->getName() + "] already exists");
                 delete pChan;
                 return true;
             }
 
-            if (!pNetwork->AddChan(pChan)) {
+            if (!pNetwork->addChannel(pChan)) {
                 WebSock.PrintErrorPage("Could not add channel [" + pChan->getName() + "]");
                 return true;
             }
@@ -775,10 +775,10 @@ public:
 
         if (WebSock.HasParam("submit_return")) {
             WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
-                             "&network=" + No::escape(pNetwork->GetName(), No::UrlFormat));
+                             "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         } else {
             WebSock.Redirect(GetWebPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) +
-                             "&network=" + No::escape(pNetwork->GetName(), No::UrlFormat) + "&name=" +
+                             "&network=" + No::escape(pNetwork->name(), No::UrlFormat) + "&name=" +
                              No::escape(pChan->getName(), No::UrlFormat));
         }
         return true;
@@ -825,13 +825,13 @@ public:
                 }
             }
 
-            // To change BindHosts be admin or don't have DenySetBindHost
-            if (spSession->IsAdmin() || !spSession->GetUser()->denySetBindHost()) {
+            // To change BindHosts be admin or don't have DenysetBindHost
+            if (spSession->IsAdmin() || !spSession->GetUser()->denysetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
-                const NoStringVector& vsBindHosts = NoApp::Get().GetBindHosts();
+                const NoStringVector& vsBindHosts = NoApp::Get().bindHosts();
                 if (vsBindHosts.empty()) {
                     if (pNetwork) {
-                        Tmpl["BindHost"] = pNetwork->GetBindHost();
+                        Tmpl["BindHost"] = pNetwork->bindHost();
                     }
                 } else {
                     bool bFoundBindHost = false;
@@ -841,17 +841,17 @@ public:
 
                         l["BindHost"] = sBindHost;
 
-                        if (pNetwork && pNetwork->GetBindHost() == sBindHost) {
+                        if (pNetwork && pNetwork->bindHost() == sBindHost) {
                             l["Checked"] = "true";
                             bFoundBindHost = true;
                         }
                     }
 
                     // If our current bindhost is not in the global list...
-                    if (pNetwork && !bFoundBindHost && !pNetwork->GetBindHost().empty()) {
+                    if (pNetwork && !bFoundBindHost && !pNetwork->bindHost().empty()) {
                         NoTemplate& l = Tmpl.AddRow("BindHostLoop");
 
-                        l["BindHost"] = pNetwork->GetBindHost();
+                        l["BindHost"] = pNetwork->bindHost();
                         l["Checked"] = "true";
                     }
                 }
@@ -861,36 +861,36 @@ public:
                 Tmpl["Action"] = "editnetwork";
                 Tmpl["Edit"] = "true";
                 Tmpl["Title"] =
-                "Edit Network" + NoString(" [" + pNetwork->GetName() + "]") + " of User [" + pUser->userName() + "]";
-                Tmpl["Name"] = pNetwork->GetName();
+                "Edit Network" + NoString(" [" + pNetwork->name() + "]") + " of User [" + pUser->userName() + "]";
+                Tmpl["Name"] = pNetwork->name();
 
-                Tmpl["Nick"] = pNetwork->GetNick();
-                Tmpl["AltNick"] = pNetwork->GetAltNick();
-                Tmpl["Ident"] = pNetwork->GetIdent();
-                Tmpl["RealName"] = pNetwork->GetRealName();
+                Tmpl["Nick"] = pNetwork->nick();
+                Tmpl["AltNick"] = pNetwork->altNick();
+                Tmpl["Ident"] = pNetwork->ident();
+                Tmpl["RealName"] = pNetwork->realName();
 
-                Tmpl["QuitMsg"] = pNetwork->GetQuitMsg();
+                Tmpl["QuitMsg"] = pNetwork->quitMsg();
 
-                Tmpl["FloodProtection"] = NoString(NoIrcSocket::IsFloodProtected(pNetwork->GetFloodRate()));
-                Tmpl["FloodRate"] = NoString(pNetwork->GetFloodRate());
-                Tmpl["FloodBurst"] = NoString(pNetwork->GetFloodBurst());
+                Tmpl["FloodProtection"] = NoString(NoIrcSocket::IsFloodProtected(pNetwork->floodRate()));
+                Tmpl["FloodRate"] = NoString(pNetwork->floodRate());
+                Tmpl["FloodBurst"] = NoString(pNetwork->floodBurst());
 
-                Tmpl["JoinDelay"] = NoString(pNetwork->GetJoinDelay());
+                Tmpl["JoinDelay"] = NoString(pNetwork->joinDelay());
 
-                Tmpl["IRCConnectEnabled"] = NoString(pNetwork->GetIRCConnectEnabled());
+                Tmpl["IRCConnectEnabled"] = NoString(pNetwork->isEnabled());
 
-                const std::vector<NoServerInfo*>& vServers = pNetwork->GetServers();
+                const std::vector<NoServerInfo*>& vServers = pNetwork->servers();
                 for (uint a = 0; a < vServers.size(); a++) {
                     NoTemplate& l = Tmpl.AddRow("ServerLoop");
                     l["Server"] = vServers[a]->toString();
                 }
 
-                const std::vector<NoChannel*>& Channels = pNetwork->GetChans();
+                const std::vector<NoChannel*>& Channels = pNetwork->channels();
                 for (uint c = 0; c < Channels.size(); c++) {
                     NoChannel* pChan = Channels[c];
                     NoTemplate& l = Tmpl.AddRow("ChannelLoop");
 
-                    l["Network"] = pNetwork->GetName();
+                    l["Network"] = pNetwork->name();
                     l["Username"] = pUser->userName();
                     l["Name"] = pChan->getName();
                     l["Perms"] = pChan->getPermStr();
@@ -907,7 +907,7 @@ public:
                         l["InConfig"] = "true";
                     }
                 }
-                for (const NoString& sFP : pNetwork->GetTrustedFingerprints()) {
+                for (const NoString& sFP : pNetwork->trustedFingerprints()) {
                     NoTemplate& l = Tmpl.AddRow("TrustedFingerprints");
                     l["FP"] = sFP;
                 }
@@ -942,7 +942,7 @@ public:
                 NoTemplate& l = Tmpl.AddRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
-            const NoString sEncoding = pNetwork ? pNetwork->GetEncoding() : "^UTF-8";
+            const NoString sEncoding = pNetwork ? pNetwork->encoding() : "^UTF-8";
             if (sEncoding.empty()) {
                 Tmpl["EncodingUtf"] = "legacy";
             } else if (sEncoding[0] == '*') {
@@ -973,7 +973,7 @@ public:
                                    "delete few old ones from Your Settings");
             return true;
         }
-        if (!pNetwork || pNetwork->GetName() != sName) {
+        if (!pNetwork || pNetwork->name() != sName) {
             NoString sNetworkAddError;
             NoNetwork* pOldNetwork = pNetwork;
             pNetwork = pUser->addNetwork(sName, sNetworkAddError);
@@ -987,27 +987,27 @@ public:
                     NoRegistry registry(pModule);
                     registry.copy(sPath);
                 }
-                pNetwork->Clone(*pOldNetwork, false);
-                pUser->deleteNetwork(pOldNetwork->GetName());
+                pNetwork->clone(*pOldNetwork, false);
+                pUser->deleteNetwork(pOldNetwork->name());
             }
         }
 
         NoString sArg;
 
-        pNetwork->SetNick(WebSock.GetParam("nick"));
-        pNetwork->SetAltNick(WebSock.GetParam("altnick"));
-        pNetwork->SetIdent(WebSock.GetParam("ident"));
-        pNetwork->SetRealName(WebSock.GetParam("realname"));
+        pNetwork->setNick(WebSock.GetParam("nick"));
+        pNetwork->setAltNick(WebSock.GetParam("altnick"));
+        pNetwork->setIdent(WebSock.GetParam("ident"));
+        pNetwork->setRealName(WebSock.GetParam("realname"));
 
-        pNetwork->SetQuitMsg(WebSock.GetParam("quitmsg"));
+        pNetwork->setQuitMsg(WebSock.GetParam("quitmsg"));
 
-        pNetwork->SetIRCConnectEnabled(WebSock.GetParam("doconnect").toBool());
+        pNetwork->setEnabled(WebSock.GetParam("doconnect").toBool());
 
         sArg = WebSock.GetParam("bindhost");
-        // To change BindHosts be admin or don't have DenySetBindHost
-        if (spSession->IsAdmin() || !spSession->GetUser()->denySetBindHost()) {
+        // To change BindHosts be admin or don't have DenysetBindHost
+        if (spSession->IsAdmin() || !spSession->GetUser()->denysetBindHost()) {
             NoString sHost = WebSock.GetParam("bindhost");
-            const NoStringVector& vsHosts = NoApp::Get().GetBindHosts();
+            const NoStringVector& vsHosts = NoApp::Get().bindHosts();
             if (!spSession->IsAdmin() && !vsHosts.empty()) {
                 NoStringVector::const_iterator it;
                 bool bFound = false;
@@ -1020,57 +1020,57 @@ public:
                 }
 
                 if (!bFound) {
-                    sHost = pNetwork->GetBindHost();
+                    sHost = pNetwork->bindHost();
                 }
             }
-            pNetwork->SetBindHost(sHost);
+            pNetwork->setBindHost(sHost);
         }
 
         if (WebSock.GetParam("floodprotection").toBool()) {
-            pNetwork->SetFloodRate(WebSock.GetParam("floodrate").toDouble());
-            pNetwork->SetFloodBurst(WebSock.GetParam("floodburst").toUShort());
+            pNetwork->setFloodRate(WebSock.GetParam("floodrate").toDouble());
+            pNetwork->setFloodBurst(WebSock.GetParam("floodburst").toUShort());
         } else {
-            pNetwork->SetFloodRate(-1);
+            pNetwork->setFloodRate(-1);
         }
 
-        pNetwork->SetJoinDelay(WebSock.GetParam("joindelay").toUShort());
+        pNetwork->setJoinDelay(WebSock.GetParam("joindelay").toUShort());
 
 #ifdef HAVE_ICU
         NoString sEncodingUtf = WebSock.GetParam("encoding_utf");
         if (sEncodingUtf == "legacy") {
-            pNetwork->SetEncoding("");
+            pNetwork->setEncoding("");
         }
         NoString sEncoding = WebSock.GetParam("encoding");
         if (sEncoding.empty()) {
             sEncoding = "UTF-8";
         }
         if (sEncodingUtf == "send") {
-            pNetwork->SetEncoding("^" + sEncoding);
+            pNetwork->setEncoding("^" + sEncoding);
         } else if (sEncodingUtf == "receive") {
-            pNetwork->SetEncoding("*" + sEncoding);
+            pNetwork->setEncoding("*" + sEncoding);
         } else if (sEncodingUtf == "simple") {
-            pNetwork->SetEncoding(sEncoding);
+            pNetwork->setEncoding(sEncoding);
         }
 #endif
 
-        pNetwork->DelServers();
+        pNetwork->delServers();
         NoStringVector vsArgs = WebSock.GetRawParam("servers").split("\n");
         for (uint a = 0; a < vsArgs.size(); a++) {
-            pNetwork->AddServer(vsArgs[a].trim_n());
+            pNetwork->addServer(vsArgs[a].trim_n());
         }
 
         vsArgs = WebSock.GetRawParam("fingerprints").split("\n");
-        while (!pNetwork->GetTrustedFingerprints().empty()) {
-            pNetwork->DelTrustedFingerprint(*pNetwork->GetTrustedFingerprints().begin());
+        while (!pNetwork->trustedFingerprints().empty()) {
+            pNetwork->removeTrustedFingerprint(*pNetwork->trustedFingerprints().begin());
         }
         for (const NoString& sFP : vsArgs) {
-            pNetwork->AddTrustedFingerprint(sFP);
+            pNetwork->addTrustedFingerprint(sFP);
         }
 
         WebSock.GetParamValues("channel", vsArgs);
         for (uint a = 0; a < vsArgs.size(); a++) {
             const NoString& sChan = vsArgs[a];
-            NoChannel* pChan = pNetwork->FindChan(sChan.trimRight_n("\r"));
+            NoChannel* pChan = pNetwork->findChannel(sChan.trimRight_n("\r"));
             if (pChan) {
                 pChan->setInConfig(WebSock.GetParam("save_" + sChan).toBool());
             }
@@ -1122,7 +1122,7 @@ public:
 
         NoTemplate TmplMod;
         TmplMod["Username"] = pUser->userName();
-        TmplMod["Name"] = pNetwork->GetName();
+        TmplMod["Name"] = pNetwork->name();
         TmplMod["WebadminAction"] = "change";
         for (NoModule* pMod : allModules(pUser, pNetwork)) {
             pMod->OnEmbeddedWebRequest(WebSock, "webadmin/network", TmplMod);
@@ -1137,7 +1137,7 @@ public:
             WebSock.Redirect(GetWebPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
         } else {
             WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
-                             "&network=" + No::escape(pNetwork->GetName(), No::UrlFormat));
+                             "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         }
         return true;
     }
@@ -1179,7 +1179,7 @@ public:
         return false;
     }
 
-    bool DelChan(NoWebSocket& WebSock, NoNetwork* pNetwork)
+    bool removeChannel(NoWebSocket& WebSock, NoNetwork* pNetwork)
     {
         NoString sChan = WebSock.GetParam("name", false);
 
@@ -1188,16 +1188,16 @@ public:
             return true;
         }
 
-        pNetwork->DelChan(sChan);
-        pNetwork->PutIRC("PART " + sChan);
+        pNetwork->removeChannel(sChan);
+        pNetwork->putIrc("PART " + sChan);
 
         if (!NoApp::Get().WriteConfig()) {
             WebSock.PrintErrorPage("Channel deleted, but config was not written");
             return true;
         }
 
-        WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pNetwork->GetUser()->userName(), No::UrlFormat) +
-                         "&network=" + No::escape(pNetwork->GetName(), No::UrlFormat));
+        WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pNetwork->user()->userName(), No::UrlFormat) +
+                         "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         return false;
     }
 
@@ -1250,11 +1250,11 @@ public:
                 const std::vector<NoNetwork*>& vNetworks = pUser->networks();
                 for (uint a = 0; a < vNetworks.size(); a++) {
                     NoTemplate& l = Tmpl.AddRow("NetworkLoop");
-                    l["Name"] = vNetworks[a]->GetName();
+                    l["Name"] = vNetworks[a]->name();
                     l["Username"] = pUser->userName();
-                    l["Clients"] = NoString(vNetworks[a]->GetClients().size());
-                    l["IRCNick"] = vNetworks[a]->GetIRCNick().nick();
-                    NoServerInfo* pServer = vNetworks[a]->GetCurrentServer();
+                    l["Clients"] = NoString(vNetworks[a]->clients().size());
+                    l["IRCNick"] = vNetworks[a]->ircNick().nick();
+                    NoServerInfo* pServer = vNetworks[a]->currentServer();
                     if (pServer) {
                         l["Server"] = pServer->host() + ":" + (pServer->isSsl() ? "+" : "") + NoString(pServer->port());
                     }
@@ -1300,10 +1300,10 @@ public:
             Tmpl["EncodingUtf"] = "legacy";
 #endif
 
-            // To change BindHosts be admin or don't have DenySetBindHost
-            if (spSession->IsAdmin() || !spSession->GetUser()->denySetBindHost()) {
+            // To change BindHosts be admin or don't have DenysetBindHost
+            if (spSession->IsAdmin() || !spSession->GetUser()->denysetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
-                const NoStringVector& vsBindHosts = NoApp::Get().GetBindHosts();
+                const NoStringVector& vsBindHosts = NoApp::Get().bindHosts();
                 if (vsBindHosts.empty()) {
                     if (pUser) {
                         Tmpl["BindHost"] = pUser->bindHost();
@@ -1457,8 +1457,8 @@ public:
 
                 NoTemplate& o11 = Tmpl.AddRow("OptionLoop");
                 o11["Name"] = "denysetbindhost";
-                o11["DisplayName"] = "Deny SetBindHost";
-                if (pUser && pUser->denySetBindHost()) {
+                o11["DisplayName"] = "Deny setBindHost";
+                if (pUser && pUser->denysetBindHost()) {
                     o11["Checked"] = "true";
                 }
             }
@@ -1467,7 +1467,7 @@ public:
             o12["Name"] = "autoclearquerybuffer";
             o12["DisplayName"] = "Auto Clear Query Buffer";
             o12["Tooltip"] = "Automatically Clear Query Buffer After Playback";
-            if (!pUser || pUser->autoClearQueryBuffer()) {
+            if (!pUser || pUser->autoclearQueryBuffer()) {
                 o12["Checked"] = "true";
             }
 
@@ -1593,15 +1593,15 @@ public:
                 NoNetwork* pNetwork = *it2;
                 uiNetworks++;
 
-                if (pNetwork->IsIRCConnected()) {
+                if (pNetwork->isIrcConnected()) {
                     uiServers++;
                 }
 
-                if (pNetwork->IsNetworkAttached()) {
+                if (pNetwork->isNetworkAttached()) {
                     uiAttached++;
                 }
 
-                uiClients += pNetwork->GetClients().size();
+                uiClients += pNetwork->clients().size();
             }
 
             uiClients += User.userClients().size();
@@ -1749,7 +1749,7 @@ public:
             Tmpl["ProtectWebSessions"] = NoString(NoApp::Get().GetProtectWebSessions());
             Tmpl["HideVersion"] = NoString(NoApp::Get().GetHideVersion());
 
-            const NoStringVector& vsBindHosts = NoApp::Get().GetBindHosts();
+            const NoStringVector& vsBindHosts = NoApp::Get().bindHosts();
             for (uint a = 0; a < vsBindHosts.size(); a++) {
                 NoTemplate& l = Tmpl.AddRow("BindHostLoop");
                 l["BindHost"] = vsBindHosts[a];

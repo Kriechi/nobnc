@@ -200,7 +200,7 @@ private:
         // Disconnect all networks from irc
         std::vector<NoNetwork*> vNetworks = pUser->networks();
         for (std::vector<NoNetwork*>::iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
-            (*it2)->SetIRCConnectEnabled(false);
+            (*it2)->setEnabled(false);
         }
 
         NoRegistry registry(this);

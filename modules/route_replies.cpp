@@ -305,7 +305,7 @@ public:
     {
         NoString sCmd = No::token(sLine, 0).toUpper();
 
-        if (!GetNetwork()->GetIRCSock()) return CONTINUE;
+        if (!GetNetwork()->ircSocket()) return CONTINUE;
 
         if (sCmd.equals("MODE")) {
             // Check if this is a mode request that needs to be handled
@@ -383,7 +383,7 @@ private:
 
         // 353 needs special treatment due to NAMESX and UHNAMES
         if (bIsRaw353)
-            GetNetwork()->GetIRCSock()->ForwardRaw353(sLine, m_pDoing);
+            GetNetwork()->ircSocket()->ForwardRaw353(sLine, m_pDoing);
         else
             m_pDoing->PutClient(sLine);
 

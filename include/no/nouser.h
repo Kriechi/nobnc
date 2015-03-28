@@ -106,7 +106,7 @@ public:
     void setMultiClients(bool b);
     void setDenyLoadMod(bool b);
     void setAdmin(bool b);
-    void setDenySetBindHost(bool b);
+    void setDenysetBindHost(bool b);
     bool setStatusPrefix(const NoString& s);
     void setDefaultChanModes(const NoString& s);
     void setClientEncoding(const NoString& s);
@@ -115,7 +115,7 @@ public:
     bool removeCtcpReply(const NoString& sCTCP);
     bool setBufferCount(uint u, bool bForce = false);
     void setAutoClearChanBuffer(bool b);
-    void setAutoClearQueryBuffer(bool b);
+    void setAutoclearQueryBuffer(bool b);
 
     void setBeingDeleted(bool b);
     void setTimestampFormat(const NoString& s);
@@ -151,7 +151,7 @@ public:
 
     bool denyLoadMod() const;
     bool isAdmin() const;
-    bool denySetBindHost() const;
+    bool denysetBindHost() const;
     bool multiClients() const;
     NoString statusPrefix() const;
     NoString defaultChanModes() const;
@@ -160,7 +160,7 @@ public:
     NoStringMap ctcpReplies() const;
     uint bufferCount() const;
     bool autoClearChanBuffer() const;
-    bool autoClearQueryBuffer() const;
+    bool autoclearQueryBuffer() const;
     bool isBeingDeleted() const;
     NoString timezone() const;
     ulonglong bytesRead() const;

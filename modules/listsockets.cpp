@@ -174,7 +174,7 @@ public:
         NoString sBindHost;
 
         if (bShowHosts) {
-            sBindHost = pSocket->GetBindHost();
+            sBindHost = pSocket->bindHost();
         }
 
         if (sBindHost.empty()) {

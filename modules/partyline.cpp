@@ -127,10 +127,10 @@ public:
             NoUser* pUser = it->second;
             for (std::vector<NoNetwork*>::const_iterator i = pUser->networks().begin(); i != pUser->networks().end(); ++i) {
                 NoNetwork* pNetwork = *i;
-                if (pNetwork->GetIRCSock()) {
-                    if (!pNetwork->GetChanPrefixes().contains(CHAN_PREFIX_1)) {
-                        pNetwork->PutUser(":" + GetIRCServer(pNetwork) + " 005 " + pNetwork->GetIRCNick().nick() +
-                                          " CHANTYPES=" + pNetwork->GetChanPrefixes() + CHAN_PREFIX_1
+                if (pNetwork->ircSocket()) {
+                    if (!pNetwork->channelPrefixes().contains(CHAN_PREFIX_1)) {
+                        pNetwork->putUser(":" + ircServer(pNetwork) + " 005 " + pNetwork->ircNick().nick() +
+                                          " CHANTYPES=" + pNetwork->channelPrefixes() + CHAN_PREFIX_1
                                           " :are supported by this server.");
                     }
                 }
@@ -231,9 +231,9 @@ public:
         NoUser* pUser = GetUser();
         NoClient* pClient = GetClient();
         NoNetwork* pNetwork = GetNetwork();
-        if (m_spInjectedPrefixes.find(pNetwork) == m_spInjectedPrefixes.end() && pNetwork && !pNetwork->GetChanPrefixes().empty()) {
-            pClient->PutClient(":" + GetIRCServer(pNetwork) + " 005 " + pClient->GetNick() + " CHANTYPES=" +
-                               pNetwork->GetChanPrefixes() + CHAN_PREFIX_1 " :are supported by this server.");
+        if (m_spInjectedPrefixes.find(pNetwork) == m_spInjectedPrefixes.end() && pNetwork && !pNetwork->channelPrefixes().empty()) {
+            pClient->PutClient(":" + ircServer(pNetwork) + " 005 " + pClient->GetNick() + " CHANTYPES=" +
+                               pNetwork->channelPrefixes() + CHAN_PREFIX_1 " :are supported by this server.");
         }
 
         // Make sure this user is in the default channels
@@ -263,7 +263,7 @@ public:
                 pClient->PutClient(":" + sNickMask + " JOIN " + (*it)->GetName());
 
                 if (!(*it)->GetTopic().empty()) {
-                    pClient->PutClient(":" + GetIRCServer(pNetwork) + " 332 " + pClient->GetNickMask() + " " +
+                    pClient->PutClient(":" + ircServer(pNetwork) + " 332 " + pClient->GetNickMask() + " " +
                                        (*it)->GetName() + " :" + (*it)->GetTopic());
                 }
 
@@ -346,7 +346,7 @@ public:
         }
 
         if (sChannel.left(2) != CHAN_PREFIX) {
-            GetClient()->PutClient(":" + GetIRCServer(GetNetwork()) + " 401 " + GetClient()->GetNick() + " " + sChannel + " :No such channel");
+            GetClient()->PutClient(":" + ircServer(GetNetwork()) + " 401 " + GetClient()->GetNick() + " " + sChannel + " :No such channel");
             return HALT;
         }
 
@@ -428,7 +428,7 @@ public:
         }
 
         if (sChannel.left(2) != CHAN_PREFIX) {
-            GetClient()->PutClient(":" + GetIRCServer(GetNetwork()) + " 403 " + GetClient()->GetNick() + " " +
+            GetClient()->PutClient(":" + ircServer(GetNetwork()) + " 403 " + GetClient()->GetNick() + " " +
                                    sChannel + " :Channels look like " CHAN_PREFIX "znc");
             return HALT;
         }
@@ -470,7 +470,7 @@ public:
             if (!pChannel->GetTopic().empty()) {
                 for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
                     NoClient* pClient = *it;
-                    pClient->PutClient(":" + GetIRCServer(pClient->GetNetwork()) + " 332 " + pClient->GetNickMask() +
+                    pClient->PutClient(":" + ircServer(pClient->GetNetwork()) + " 332 " + pClient->GetNickMask() +
                                        " " + pChannel->GetName() + " :" + pChannel->GetTopic());
                 }
             }
@@ -518,7 +518,7 @@ public:
 
         if (cPrefix == CHAN_PREFIX_1C) {
             if (FindChannel(sTarget) == nullptr) {
-                pClient->PutClient(":" + GetIRCServer(pNetwork) + " 401 " + pClient->GetNick() + " " + sTarget +
+                pClient->PutClient(":" + ircServer(pNetwork) + " 401 " + pClient->GetNick() + " " + sTarget +
                                    " :No such channel");
                 return HALT;
             }
@@ -536,7 +536,7 @@ public:
                 std::vector<NoClient*> vClients = pTargetUser->allClients();
 
                 if (vClients.empty()) {
-                    pClient->PutClient(":" + GetIRCServer(pNetwork) + " 401 " + pClient->GetNick() + " " + sTarget +
+                    pClient->PutClient(":" + ircServer(pNetwork) + " 401 " + pClient->GetNick() + " " + sTarget +
                                        " :User is not attached: " + sNick + "");
                     return HALT;
                 }
@@ -548,7 +548,7 @@ public:
                                        sHost + " " + sCmd + " " + pTarget->GetNick() + " :" + sMessage);
                 }
             } else {
-                pClient->PutClient(":" + GetIRCServer(pNetwork) + " 401 " + pClient->GetNick() + " " + sTarget +
+                pClient->PutClient(":" + ircServer(pNetwork) + " 401 " + pClient->GetNick() + " " + sTarget +
                                    " :No such znc user: " + sNick + "");
             }
         }
@@ -581,13 +581,13 @@ public:
         return HandleMessage("NOTICE", sTarget, "\001" + sMessage + "\001");
     }
 
-    const NoString GetIRCServer(NoNetwork* pNetwork)
+    const NoString ircServer(NoNetwork* pNetwork)
     {
         if (!pNetwork) {
             return "irc.znc.in";
         }
 
-        const NoString& sServer = pNetwork->GetIRCServer();
+        const NoString& sServer = pNetwork->ircServer();
         if (!sServer.empty()) return sServer;
         return "irc.znc.in";
     }
@@ -661,23 +661,23 @@ public:
             sNickList += NICK_PREFIX + (*it) + " ";
 
             if (sNickList.size() >= 500) {
-                PutUserIRCNick(pUser, ":" + GetIRCServer(pNetwork) + " 353 ", " @ " + sChan + " :" + sNickList);
+                PutUserIRCNick(pUser, ":" + ircServer(pNetwork) + " 353 ", " @ " + sChan + " :" + sNickList);
                 sNickList.clear();
             }
         }
 
         if (sNickList.size()) {
-            PutUserIRCNick(pUser, ":" + GetIRCServer(pNetwork) + " 353 ", " @ " + sChan + " :" + sNickList);
+            PutUserIRCNick(pUser, ":" + ircServer(pNetwork) + " 353 ", " @ " + sChan + " :" + sNickList);
         }
 
         std::vector<NoClient*> vClients = pUser->allClients();
         for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
             NoClient* pClient = *it;
-            pClient->PutClient(":" + GetIRCServer(pNetwork) + " 353 " + pClient->GetNick() + " @ " + sChan + " :" +
+            pClient->PutClient(":" + ircServer(pNetwork) + " 353 " + pClient->GetNick() + " @ " + sChan + " :" +
                                ((pUser->isAdmin()) ? "@" : "+") + pClient->GetNick());
         }
 
-        PutUserIRCNick(pUser, ":" + GetIRCServer(pNetwork) + " 366 ", " " + sChan + " :End of /NAMES list.");
+        PutUserIRCNick(pUser, ":" + ircServer(pNetwork) + " 366 ", " " + sChan + " :End of /NAMES list.");
     }
 
     NoPartylineChannel* FindChannel(const NoString& sChan)

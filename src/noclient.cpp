@@ -337,7 +337,7 @@ void NoClient::ReadLine(const NoString& sData)
                 if (bContinue) continue;
             }
 
-            if (!GetIRCSock()) {
+            if (!ircSocket()) {
                 // Some lagmeters do a NOTICE to their own nick, ignore those.
                 if (!sTarget.equals(d->nickname))
                     PutStatus("Your notice to [" + sTarget + "] got lost, "
@@ -346,17 +346,17 @@ void NoClient::ReadLine(const NoString& sData)
             }
 
             if (d->network) {
-                NoChannel* pChan = d->network->FindChan(sTarget);
+                NoChannel* pChan = d->network->findChannel(sTarget);
 
                 if ((pChan) && (!pChan->autoClearChanBuffer())) {
                     pChan->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " NOTICE " + _NAMEDFMT(sTarget) + " :{text}", sMsg);
                 }
 
                 // Relay to the rest of the clients that may be connected to this user
-                const std::vector<NoClient*>& vClients = GetClients();
+                const std::vector<NoClient*>& vClients = clients();
 
                 for (NoClient* pClient : vClients) {
-                    if (pClient != this && (d->network->IsChan(sTarget) || pClient->HasSelfMessage())) {
+                    if (pClient != this && (d->network->isChannel(sTarget) || pClient->HasSelfMessage())) {
                         pClient->PutClient(":" + GetNickMask() + " NOTICE " + sTarget + " :" + sMsg);
                     }
                 }
@@ -394,17 +394,17 @@ void NoClient::ReadLine(const NoString& sData)
                         if (bContinue) continue;
                         sCTCP = "ACTION " + sMessage;
 
-                        if (d->network->IsChan(sTarget)) {
-                            NoChannel* pChan = d->network->FindChan(sTarget);
+                        if (d->network->isChannel(sTarget)) {
+                            NoChannel* pChan = d->network->findChannel(sTarget);
 
-                            if (pChan && (!pChan->autoClearChanBuffer() || !d->network->IsUserOnline())) {
+                            if (pChan && (!pChan->autoClearChanBuffer() || !d->network->isUserOnline())) {
                                 pChan->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) +
                                                  " :\001ACTION {text}\001",
                                                  sMessage);
                             }
                         } else {
-                            if (!d->user->autoClearQueryBuffer() || !d->network->IsUserOnline()) {
-                                NoQuery* pQuery = d->network->AddQuery(sTarget);
+                            if (!d->user->autoclearQueryBuffer() || !d->network->isUserOnline()) {
+                                NoQuery* pQuery = d->network->addQuery(sTarget);
                                 if (pQuery) {
                                     pQuery->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) + " :\001ACTION {text}\001",
                                                       sMessage);
@@ -413,10 +413,10 @@ void NoClient::ReadLine(const NoString& sData)
                         }
 
                         // Relay to the rest of the clients that may be connected to this user
-                        const std::vector<NoClient*>& vClients = GetClients();
+                        const std::vector<NoClient*>& vClients = clients();
 
                         for (NoClient* pClient : vClients) {
-                            if (pClient != this && (d->network->IsChan(sTarget) || pClient->HasSelfMessage())) {
+                            if (pClient != this && (d->network->isChannel(sTarget) || pClient->HasSelfMessage())) {
                                 pClient->PutClient(":" + GetNickMask() + " PRIVMSG " + sTarget + " :\001" + sCTCP + "\001");
                             }
                         }
@@ -443,7 +443,7 @@ void NoClient::ReadLine(const NoString& sData)
             NETWORKMODULECALL(onUserMsg(sTarget, sMsg), d->user, d->network, this, &bContinue);
             if (bContinue) continue;
 
-            if (!GetIRCSock()) {
+            if (!ircSocket()) {
                 // Some lagmeters do a PRIVMSG to their own nick, ignore those.
                 if (!sTarget.equals(d->nickname))
                     PutStatus("Your message to [" + sTarget + "] got lost, "
@@ -452,15 +452,15 @@ void NoClient::ReadLine(const NoString& sData)
             }
 
             if (d->network) {
-                if (d->network->IsChan(sTarget)) {
-                    NoChannel* pChan = d->network->FindChan(sTarget);
+                if (d->network->isChannel(sTarget)) {
+                    NoChannel* pChan = d->network->findChannel(sTarget);
 
-                    if ((pChan) && (!pChan->autoClearChanBuffer() || !d->network->IsUserOnline())) {
+                    if ((pChan) && (!pChan->autoClearChanBuffer() || !d->network->isUserOnline())) {
                         pChan->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) + " :{text}", sMsg);
                     }
                 } else {
-                    if (!d->user->autoClearQueryBuffer() || !d->network->IsUserOnline()) {
-                        NoQuery* pQuery = d->network->AddQuery(sTarget);
+                    if (!d->user->autoclearQueryBuffer() || !d->network->isUserOnline()) {
+                        NoQuery* pQuery = d->network->addQuery(sTarget);
                         if (pQuery) {
                             pQuery->addBuffer(":" + _NAMEDFMT(GetNickMask()) + " PRIVMSG " + _NAMEDFMT(sTarget) +
                                               " :{text}",
@@ -472,10 +472,10 @@ void NoClient::ReadLine(const NoString& sData)
                 PutIRC("PRIVMSG " + sTarget + " :" + sMsg);
 
                 // Relay to the rest of the clients that may be connected to this user
-                const std::vector<NoClient*>& vClients = GetClients();
+                const std::vector<NoClient*>& vClients = clients();
 
                 for (NoClient* pClient : vClients) {
-                    if (pClient != this && (d->network->IsChan(sTarget) || pClient->HasSelfMessage())) {
+                    if (pClient != this && (d->network->isChannel(sTarget) || pClient->HasSelfMessage())) {
                         pClient->PutClient(":" + GetNickMask() + " PRIVMSG " + sTarget + " :" + sMsg);
                     }
                 }
@@ -502,7 +502,7 @@ void NoClient::ReadLine(const NoString& sData)
 
         std::set<NoChannel*> sChans;
         for (const NoString& sChan : vsChans) {
-            std::vector<NoChannel*> vChans = d->network->FindChans(sChan);
+            std::vector<NoChannel*> vChans = d->network->findChannels(sChan);
             sChans.insert(vChans.begin(), vChans.end());
         }
 
@@ -529,7 +529,7 @@ void NoClient::ReadLine(const NoString& sData)
             NETWORKMODULECALL(onUserJoin(sChannel, sKey), d->user, d->network, this, &bContinue);
             if (bContinue) continue;
 
-            NoChannel* pChan = d->network->FindChan(sChannel);
+            NoChannel* pChan = d->network->findChannel(sChannel);
             if (pChan) {
                 if (pChan->isDetached())
                     pChan->attachUser(this);
@@ -564,11 +564,11 @@ void NoClient::ReadLine(const NoString& sData)
             NETWORKMODULECALL(onUserPart(sChan, sMessage), d->user, d->network, this, &bContinue);
             if (bContinue) continue;
 
-            NoChannel* pChan = d->network->FindChan(sChan);
+            NoChannel* pChan = d->network->findChannel(sChan);
 
             if (pChan && !pChan->isOn()) {
                 PutStatusNotice("Removing channel [" + sChan + "]");
-                d->network->DelChan(sChan);
+                d->network->removeChannel(sChan);
             } else {
                 sChans += (sChans.empty()) ? sChan : NoString("," + sChan);
             }
@@ -599,16 +599,16 @@ void NoClient::ReadLine(const NoString& sData)
         NoString sTarget = No::token(sLine, 1);
         NoString sModes = No::tokens(sLine, 2);
 
-        if (d->network->IsChan(sTarget) && sModes.empty()) {
+        if (d->network->isChannel(sTarget) && sModes.empty()) {
             // If we are on that channel and already received a
             // /mode reply from the server, we can answer this
             // request ourself.
 
-            NoChannel* pChan = d->network->FindChan(sTarget);
+            NoChannel* pChan = d->network->findChannel(sTarget);
             if (pChan && pChan->isOn() && !pChan->getModeString().empty()) {
-                PutClient(":" + d->network->GetIRCServer() + " 324 " + GetNick() + " " + sTarget + " " + pChan->getModeString());
+                PutClient(":" + d->network->ircServer() + " 324 " + GetNick() + " " + sTarget + " " + pChan->getModeString());
                 if (pChan->getCreationDate() > 0) {
-                    PutClient(":" + d->network->GetIRCServer() + " 329 " + GetNick() + " " + sTarget + " " +
+                    PutClient(":" + d->network->ircServer() + " 329 " + GetNick() + " " + sTarget + " " +
                               NoString(pChan->getCreationDate()));
                 }
                 return;
@@ -629,13 +629,13 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
 {
     if (bDisconnect) {
         if (d->network) {
-            d->network->ClientDisconnected(this);
+            d->network->clientDisconnected(this);
 
             // Tell the client they are no longer in these channels.
-            const std::vector<NoChannel*>& vChans = d->network->GetChans();
+            const std::vector<NoChannel*>& vChans = d->network->channels();
             for (const NoChannel* pChan : vChans) {
                 if (!(pChan->isDetached())) {
-                    PutClient(":" + d->network->GetIRCNick().nickMask() + " PART " + pChan->getName());
+                    PutClient(":" + d->network->ircNick().nickMask() + " PART " + pChan->getName());
                 }
             }
         } else if (d->user) {
@@ -647,26 +647,26 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
 
     if (bReconnect) {
         if (d->network) {
-            d->network->ClientConnected(this);
+            d->network->clientConnected(this);
         } else if (d->user) {
             d->user->userConnected(this);
         }
     }
 }
 
-std::vector<NoClient*> NoClient::GetClients() const
+std::vector<NoClient*> NoClient::clients() const
 {
     if (d->network) {
-        return d->network->GetClients();
+        return d->network->clients();
     }
 
     return d->user->userClients();
 }
 
-NoIrcSocket* NoClient::GetIRCSock() const
+NoIrcSocket* NoClient::ircSocket() const
 {
     if (d->network) {
-        return d->network->GetIRCSock();
+        return d->network->ircSocket();
     }
 
     return nullptr;
@@ -693,7 +693,7 @@ bool NoClient::SendMotd()
 
     for (const NoString& sLine : vsMotd) {
         if (d->network) {
-            PutStatusNotice(d->network->ExpandString(sLine));
+            PutStatusNotice(d->network->expandString(sLine));
         } else {
             PutStatusNotice(d->user->expandString(sLine));
         }
@@ -725,7 +725,7 @@ void NoClient::AcceptLogin(NoUser& User)
 
     // Set our proper timeout and set back our proper timeout mode
     // (constructor set a different timeout and mode)
-    d->socket->SetTimeout(NoNetwork::NO_TRAFFIC_TIMEOUT, NoSocket::TMO_READ);
+    d->socket->SetTimeout(NoNetwork::NoTrafficTimeout, NoSocket::TMO_READ);
 
     d->socket->SetSockName("USR::" + d->user->userName());
     d->socket->SetEncoding(d->user->clientEncoding());
@@ -746,7 +746,7 @@ void NoClient::AcceptLogin(NoUser& User)
         if (!d->network) d->network = *d->user->networks().begin();
         if (d->network && d->user->networks().size() > 1) {
             PutStatusNotice("You have several networks configured, but no network was specified for the connection.");
-            PutStatusNotice("Selecting network [" + d->network->GetName() +
+            PutStatusNotice("Selecting network [" + d->network->name() +
                             "]. To see list of all configured networks, use /znc ListNetworks");
             PutStatusNotice(
             "If you want to choose another network, use /znc JumpNetwork <network>, or connect to ZNC with username " +
@@ -777,7 +777,7 @@ void NoClient::SetPlaybackActive(bool bActive) { d->inPlayback = bActive; }
 void NoClient::PutIRC(const NoString& sLine)
 {
     if (d->network) {
-        d->network->PutIRC(sLine);
+        d->network->putIrc(sLine);
     }
 }
 
@@ -786,7 +786,7 @@ NoString NoClient::GetFullName() const
     if (!d->user) return d->socket->GetRemoteIP();
     NoString sFullName = d->user->userName();
     if (!d->identifier.empty()) sFullName += "@" + d->identifier;
-    if (d->network) sFullName += "/" + d->network->GetName();
+    if (d->network) sFullName += "/" + d->network->name();
     return sFullName;
 }
 
@@ -846,7 +846,7 @@ NoString NoClient::GetNick(bool bAllowIRCNick) const
 {
     NoString sRet;
 
-    const NoIrcSocket* pSock = GetIRCSock();
+    const NoIrcSocket* pSock = ircSocket();
     if (bAllowIRCNick && pSock && pSock->IsAuthed()) {
         sRet = pSock->GetNick();
     }
@@ -856,16 +856,16 @@ NoString NoClient::GetNick(bool bAllowIRCNick) const
 
 NoString NoClient::GetNickMask() const
 {
-    if (GetIRCSock() && GetIRCSock()->IsAuthed()) {
-        return GetIRCSock()->GetNickMask();
+    if (ircSocket() && ircSocket()->IsAuthed()) {
+        return ircSocket()->GetNickMask();
     }
 
-    NoString sHost = d->network ? d->network->GetBindHost() : d->user->bindHost();
+    NoString sHost = d->network ? d->network->bindHost() : d->user->bindHost();
     if (sHost.empty()) {
         sHost = "irc.znc.in";
     }
 
-    return GetNick() + "!" + (d->network ? d->network->GetBindHost() : d->user->ident()) + "@" + sHost;
+    return GetNick() + "!" + (d->network ? d->network->bindHost() : d->user->ident()) + "@" + sHost;
 }
 
 NoString NoClient::GetIdentifier() const { return d->identifier; }

@@ -27,11 +27,11 @@ public:
 
     void onIrcDisconnected() override
     {
-        const std::vector<NoChannel*>& vChans = GetNetwork()->GetChans();
+        const std::vector<NoChannel*>& vChans = GetNetwork()->channels();
 
         for (std::vector<NoChannel*>::const_iterator it = vChans.begin(); it != vChans.end(); ++it) {
             if ((*it)->isOn()) {
-                PutUser(":ZNC!znc@znc.in KICK " + (*it)->getName() + " " + GetNetwork()->GetIRCNick().nick() +
+                PutUser(":ZNC!znc@znc.in KICK " + (*it)->getName() + " " + GetNetwork()->ircNick().nick() +
                         " :You have been disconnected from the IRC server");
             }
         }

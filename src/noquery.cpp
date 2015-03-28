@@ -37,7 +37,7 @@ NoQuery::NoQuery(const NoString& name, NoNetwork* network) : d(new NoQueryPrivat
 {
     d->name = name;
     d->network = network;
-    setBufferCount(d->network->GetUser()->bufferCount(), true);
+    setBufferCount(d->network->user()->bufferCount(), true);
 }
 
 NoQuery::~NoQuery()
@@ -81,10 +81,10 @@ void NoQuery::sendBuffer(NoClient* client)
 
 void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
 {
-    if (d->network && d->network->IsUserAttached()) {
+    if (d->network && d->network->isUserAttached()) {
         // Based on NoChannel::SendBuffer()
         if (!buffer.isEmpty()) {
-            const std::vector<NoClient*>& clients = d->network->GetClients();
+            const std::vector<NoClient*>& clients = d->network->clients();
             for (NoClient* eachClient : clients) {
                 NoClient* useClient = (client ? client : eachClient);
 
@@ -98,7 +98,7 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                 NoString batchName = No::md5(d->name);
 
                 if (batch) {
-                    d->network->PutUser(":znc.in BATCH +" + batchName + " znc.in/playback " + d->name, useClient);
+                    d->network->putUser(":znc.in BATCH +" + batchName + " znc.in/playback " + d->name, useClient);
                 }
 
                 size_t size = buffer.size();
@@ -120,16 +120,16 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                     }
                     bool skip = false;
                     NETWORKMODULECALL(onPrivBufferPlayLine2(*useClient, line, message.timestamp()),
-                                      d->network->GetUser(),
+                                      d->network->user(),
                                       d->network,
                                       nullptr,
                                       &skip);
                     if (skip) continue;
-                    d->network->PutUser(line, useClient);
+                    d->network->putUser(line, useClient);
                 }
 
                 if (batch) {
-                    d->network->PutUser(":znc.in BATCH -" + batchName, useClient);
+                    d->network->putUser(":znc.in BATCH -" + batchName, useClient);
                 }
 
                 useClient->SetPlaybackActive(wasPlaybackActive);

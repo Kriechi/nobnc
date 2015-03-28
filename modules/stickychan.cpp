@@ -49,7 +49,7 @@ public:
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
             if (sChannel.equals(key)) {
-                NoChannel* pChan = GetNetwork()->FindChan(sChannel);
+                NoChannel* pChan = GetNetwork()->findChannel(sChannel);
 
                 if (pChan) {
                     pChan->joinUser();
@@ -123,7 +123,7 @@ public:
             bool bSubmitted = (WebSock.GetParam("submitted").toInt() != 0);
 
             NoRegistry registry(this);
-            const std::vector<NoChannel*>& Channels = GetNetwork()->GetChans();
+            const std::vector<NoChannel*>& Channels = GetNetwork()->channels();
             for (uint c = 0; c < Channels.size(); c++) {
                 const NoString sChan = Channels[c]->getName();
                 bool bStick = registry.contains(sChan);
@@ -193,23 +193,23 @@ protected:
             return;
 
         NoNetwork* pNetwork = mod->GetNetwork();
-        if (!pNetwork->GetIRCSock())
+        if (!pNetwork->ircSocket())
             return;
 
         NoRegistry registry(module());
         for (const NoString& key : registry.keys()) {
-            NoChannel* pChan = pNetwork->FindChan(key);
+            NoChannel* pChan = pNetwork->findChannel(key);
             if (!pChan) {
                 pChan = new NoChannel(key, pNetwork, true);
                 if (!registry.value(key).empty())
                     pChan->setKey(registry.value(key));
-                if (!pNetwork->AddChan(pChan)) {
-                    /* AddChan() deleted that channel */
+                if (!pNetwork->addChannel(pChan)) {
+                    /* addChannel() deleted that channel */
                     mod->PutModule("Could not join [" + key + "] (# prefix missing?)");
                     continue;
                 }
             }
-            if (!pChan->isOn() && pNetwork->IsIRCConnected()) {
+            if (!pChan->isOn() && pNetwork->isIrcConnected()) {
                 mod->PutModule("Joining [" + pChan->getName() + "]");
                 mod->PutIRC("JOIN " + pChan->getName() + (pChan->getKey().empty() ? "" : " " + pChan->getKey()));
             }

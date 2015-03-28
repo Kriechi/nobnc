@@ -97,8 +97,8 @@ bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL,
         sBindHost = pUser->bindHost();
         NoNetwork* pNetwork = m_module->GetNetwork();
         if (pNetwork) {
-            sSockName += "::" + pNetwork->GetName();
-            sBindHost = pNetwork->GetBindHost();
+            sSockName += "::" + pNetwork->name();
+            sBindHost = pNetwork->bindHost();
         }
     }
 

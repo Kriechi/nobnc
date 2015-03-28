@@ -41,7 +41,7 @@ protected:
     void run() override
     {
         NoNetwork* pNetwork = module()->GetNetwork();
-        NoChannel* pChan = pNetwork->FindChan(No::tokens(name(), 1));
+        NoChannel* pChan = pNetwork->findChannel(No::tokens(name(), 1));
 
         if (pChan) {
             pChan->enable();
@@ -123,7 +123,7 @@ public:
 
     void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& pChan, const NoString& sMessage) override
     {
-        if (GetNetwork()->GetCurNick().equals(sKickedNick)) {
+        if (GetNetwork()->currentNick().equals(sKickedNick)) {
             if (!delay) {
                 PutIRC("JOIN " + pChan.getName() + " " + pChan.getKey());
                 pChan.enable();

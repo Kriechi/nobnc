@@ -50,7 +50,7 @@ public:
 
     const NoString& GetSearch() const { return m_sSearchWildcard; }
 
-    const NoString& GetChans() const { return m_sChannelWildcard; }
+    const NoString& channels() const { return m_sChannelWildcard; }
 
     NoString ToString()
     {
@@ -129,7 +129,7 @@ private:
         for (; it != m_vMatches.end(); ++it) {
             Table.addRow();
             Table.setValue("Neg", it->IsNegated() ? "!" : "");
-            Table.setValue("Chan", it->GetChans());
+            Table.setValue("Chan", it->channels());
             Table.setValue("Search", it->GetSearch());
             Table.setValue("Host", it->GetHostMask());
         }
@@ -231,7 +231,7 @@ public:
         for (; it != m_vMatches.end(); ++it) {
             if (sHost.empty() || it->GetHostMask() != sHost) continue;
             if (sSearch.empty() || it->GetSearch() != sSearch) continue;
-            if (sChan.empty() || it->GetChans() != sChan) continue;
+            if (sChan.empty() || it->channels() != sChan) continue;
             return it;
         }
         return m_vMatches.end();
@@ -244,7 +244,7 @@ public:
         // Check for duplicates
         VAttachIter it = m_vMatches.begin();
         for (; it != m_vMatches.end(); ++it) {
-            if (it->GetHostMask() == attach.GetHostMask() && it->GetChans() == attach.GetChans() &&
+            if (it->GetHostMask() == attach.GetHostMask() && it->channels() == attach.channels() &&
                 it->GetSearch() == attach.GetSearch())
                 return false;
         }
