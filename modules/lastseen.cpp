@@ -108,7 +108,7 @@ public:
 
             for (MTimeMulti::const_iterator it = mmSorted.begin(); it != mmSorted.end(); ++it) {
                 NoUser* pUser = it->second;
-                NoTemplate& Row = Tmpl.AddRow("UserLoop");
+                NoTemplate& Row = Tmpl.addRow("UserLoop");
 
                 Row["Username"] = pUser->userName();
                 Row["IsSelf"] = NoString(pUser == WebSock.GetSession()->user());

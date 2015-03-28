@@ -115,12 +115,12 @@ public:
 
             const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
             for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
-                NoTemplate& l = Tmpl.AddRow("UserLoop");
+                NoTemplate& l = Tmpl.addRow("UserLoop");
                 l["Username"] = (*it->second).userName();
 
                 std::vector<NoNetwork*> vNetworks = (*it->second).networks();
                 for (std::vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
-                    NoTemplate& NetworkLoop = l.AddRow("NetworkLoop");
+                    NoTemplate& NetworkLoop = l.addRow("NetworkLoop");
                     NetworkLoop["Username"] = (*it->second).userName();
                     NetworkLoop["Network"] = (*it2)->name();
                 }

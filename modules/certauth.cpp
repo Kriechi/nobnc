@@ -261,7 +261,7 @@ public:
             MNoStringSet::const_iterator it = m_PubKeys.find(pUser->userName());
             if (it != m_PubKeys.end()) {
                 for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-                    NoTemplate& row = Tmpl.AddRow("KeyLoop");
+                    NoTemplate& row = Tmpl.addRow("KeyLoop");
                     row["Key"] = *it2;
                 }
             }

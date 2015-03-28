@@ -158,7 +158,7 @@ public:
         }
 
         for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
-            NoTemplate& Row = Tmpl.AddRow("PerformLoop");
+            NoTemplate& Row = Tmpl.addRow("PerformLoop");
             Row["Perform"] = *it;
         }
 

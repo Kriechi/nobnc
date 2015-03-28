@@ -118,7 +118,7 @@ public:
                 NoSocket* pSocket = socks.top().GetSock();
                 socks.pop();
 
-                NoTemplate& Row = Tmpl.AddRow("SocketsLoop");
+                NoTemplate& Row = Tmpl.addRow("SocketsLoop");
                 Row["Name"] = pSocket->GetSockName();
                 Row["Created"] = GetCreatedTime(pSocket);
                 Row["State"] = GetSocketState(pSocket);

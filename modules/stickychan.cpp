@@ -138,7 +138,7 @@ public:
                     bStick = bNewStick;
                 }
 
-                NoTemplate& Row = Tmpl.AddRow("ChannelLoop");
+                NoTemplate& Row = Tmpl.addRow("ChannelLoop");
                 Row["Name"] = sChan;
                 Row["Sticky"] = NoString(bStick);
             }

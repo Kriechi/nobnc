@@ -334,31 +334,31 @@ public:
 
             Tmpl["Username"] = m_sUsername;
 
-            NoTemplate& o1 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o1 = Tmpl.addRow("OptionLoop");
             o1["Name"] = "usecloakedhost";
             o1["DisplayName"] = "UseCloakedHost";
             o1["Tooltip"] = "Whether to cloak your hostname (+x) automatically on connect.";
             o1["Checked"] = NoString(m_bUseCloakedHost);
 
-            NoTemplate& o2 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o2 = Tmpl.addRow("OptionLoop");
             o2["Name"] = "usechallenge";
             o2["DisplayName"] = "UseChallenge";
             o2["Tooltip"] = "Whether to use the CHALLENGEAUTH mechanism to avoid sending passwords in cleartext.";
             o2["Checked"] = NoString(m_bUseChallenge);
 
-            NoTemplate& o3 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o3 = Tmpl.addRow("OptionLoop");
             o3["Name"] = "requestperms";
             o3["DisplayName"] = "RequestPerms";
             o3["Tooltip"] = "Whether to request voice/op from Q on join/devoice/deop.";
             o3["Checked"] = NoString(m_bRequestPerms);
 
-            NoTemplate& o4 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o4 = Tmpl.addRow("OptionLoop");
             o4["Name"] = "joinoninvite";
             o4["DisplayName"] = "JoinonInvite";
             o4["Tooltip"] = "Whether to join channels when Q invites you.";
             o4["Checked"] = NoString(m_bJoinonInvite);
 
-            NoTemplate& o5 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o5 = Tmpl.addRow("OptionLoop");
             o5["Name"] = "joinaftercloaked";
             o5["DisplayName"] = "JoinAfterCloaked";
             o5["Tooltip"] = "Whether to delay joining channels until after you are cloaked.";

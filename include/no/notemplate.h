@@ -32,22 +32,22 @@ class NO_EXPORT NoTemplateTagHandler
 public:
     virtual ~NoTemplateTagHandler() {}
 
-    virtual bool HandleVar(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
+    virtual bool handleVar(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
     {
         return false;
     }
 
-    virtual bool HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
+    virtual bool handleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
     {
         return false;
     }
 
-    virtual bool HandleIf(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
+    virtual bool handleIf(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
     {
-        return HandleVar(Tmpl, sName, sArgs, sOutput);
+        return handleVar(Tmpl, sName, sArgs, sOutput);
     }
 
-    virtual bool HandleValue(NoTemplate& Tmpl, NoString& sValue, const NoStringMap& msOptions) { return false; }
+    virtual bool handleValue(NoTemplate& Tmpl, NoString& sValue, const NoStringMap& msOptions) { return false; }
 };
 
 class NO_EXPORT NoTemplate : public NoStringMap
@@ -58,41 +58,41 @@ public:
     ~NoTemplate();
 
     //! Class for implementing custom tags in subclasses
-    void AddTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler);
+    void addTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler);
 
-    std::vector<std::shared_ptr<NoTemplateTagHandler>>& GetTagHandlers();
+    std::vector<std::shared_ptr<NoTemplateTagHandler>>& tagHandlers();
 
-    NoString ResolveLiteral(const NoString& sString);
+    NoString resolveLiteral(const NoString& sString);
 
-    void Init();
+    void init();
 
-    NoTemplate* GetParent(bool bRoot);
-    NoString ExpandFile(const NoString& sFilename, bool bFromInc = false);
-    bool SetFile(const NoString& sFileName);
+    NoTemplate* parent(bool bRoot);
+    NoString expandFile(const NoString& sFilename, bool bFromInc = false);
+    bool setFile(const NoString& sFileName);
 
-    void SetPath(const NoString& sPath); // Sets the dir:dir:dir type path to look at for templates, as of right now no
+    void setPath(const NoString& sPath); // Sets the dir:dir:dir type path to look at for templates, as of right now no
     // ../../.. protection
-    NoString MakePath(const NoString& sPath) const;
-    void PrependPath(const NoString& sPath, bool bIncludesOnly = false);
-    void AppendPath(const NoString& sPath, bool bIncludesOnly = false);
-    void RemovePath(const NoString& sPath);
-    void ClearPaths();
-    bool PrintString(NoString& sRet);
-    bool Print(std::ostream& oOut);
-    bool Print(const NoString& sFileName, std::ostream& oOut);
-    bool ValidIf(const NoString& sArgs);
-    bool ValidExpr(const NoString& sExpr);
-    bool IsTrue(const NoString& sName);
-    bool HasLoop(const NoString& sName);
-    NoString GetValue(const NoString& sName, bool bFromIf = false);
-    NoTemplate& AddRow(const NoString& sName);
-    NoTemplate* GetRow(const NoString& sName, uint uIndex);
-    std::vector<NoTemplate*>* GetLoop(const NoString& sName);
-    void DelCurLoopContext();
-    NoTemplateLoopContext* GetCurLoopContext();
-    NoTemplate* GetCurTemplate();
+    NoString makePath(const NoString& sPath) const;
+    void prependPath(const NoString& sPath, bool bIncludesOnly = false);
+    void appendPath(const NoString& sPath, bool bIncludesOnly = false);
+    void removePath(const NoString& sPath);
+    void clearPaths();
+    bool printString(NoString& sRet);
+    bool print(std::ostream& oOut);
+    bool print(const NoString& sFileName, std::ostream& oOut);
+    bool validIf(const NoString& sArgs);
+    bool validExpr(const NoString& sExpr);
+    bool isTrue(const NoString& sName);
+    bool hasLoop(const NoString& sName);
+    NoString value(const NoString& sName, bool bFromIf = false);
+    NoTemplate& addRow(const NoString& sName);
+    NoTemplate* row(const NoString& sName, uint uIndex);
+    std::vector<NoTemplate*>* loop(const NoString& sName);
+    void deleteCurLoopContext();
+    NoTemplateLoopContext* currentLoopContext();
+    NoTemplate* currentTemplate();
 
-    const NoString& GetFileName() const;
+    const NoString& fileName() const;
 
 private:
     NoTemplate(const NoTemplate& other) = delete;

@@ -79,7 +79,7 @@ class NoTagHandler : public NoTemplateTagHandler
 public:
     NoTagHandler(NoWebSocket& WebSock) : NoTemplateTagHandler(), m_WebSock(WebSock) {}
 
-    bool HandleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override
+    bool handleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override
     {
         if (sName.equals("URLPARAM")) {
             // sOutput = NoApp::Get()
@@ -178,12 +178,12 @@ void NoWebSession::clearMessageLoops()
 void NoWebSession::fillMessageLoops(NoTemplate& Tmpl)
 {
     for (const NoString& sMessage : d->errorMsgs) {
-        NoTemplate& Row = Tmpl.AddRow("ErrorLoop");
+        NoTemplate& Row = Tmpl.addRow("ErrorLoop");
         Row["Message"] = sMessage;
     }
 
     for (const NoString& sMessage : d->successMsgs) {
-        NoTemplate& Row = Tmpl.AddRow("SuccessLoop");
+        NoTemplate& Row = Tmpl.addRow("SuccessLoop");
         Row["Message"] = sMessage;
     }
 }
@@ -248,7 +248,7 @@ NoWebSocket::NoWebSocket(const NoString& sURIPrefix)
     : NoHttpSocket(nullptr, sURIPrefix), m_pathsSet(false), m_template(), m_authenticator(), m_modName(""), m_path(""),
       m_page(""), m_session()
 {
-    m_template.AddTagHandler(std::make_shared<NoTagHandler>(*this));
+    m_template.addTagHandler(std::make_shared<NoTagHandler>(*this));
 }
 
 NoWebSocket::~NoWebSocket()
@@ -362,7 +362,7 @@ NoString NoWebSocket::FindTmpl(NoModule* pModule, const NoString& sName)
     NoString sFile = pModule->GetModName() + "_" + sName;
     for (const NoString& sDir : vsDirs) {
         if (NoFile::Exists(NoDir::ChangeDir(sDir, sFile))) {
-            m_template.AppendPath(sDir);
+            m_template.appendPath(sDir);
             return sFile;
         }
     }
@@ -371,11 +371,11 @@ NoString NoWebSocket::FindTmpl(NoModule* pModule, const NoString& sName)
 
 void NoWebSocket::SetPaths(NoModule* pModule, bool bIsTemplate)
 {
-    m_template.ClearPaths();
+    m_template.clearPaths();
 
     NoStringVector vsDirs = GetDirs(pModule, bIsTemplate);
     for (const NoString& sDir : vsDirs) {
-        m_template.AppendPath(sDir);
+        m_template.appendPath(sDir);
     }
 
     m_pathsSet = true;
@@ -416,7 +416,7 @@ void NoWebSocket::SetVars()
         for (NoNetwork* pNetwork : vNetworks) {
             NoModuleLoader* vnMods = pNetwork->loader();
 
-            NoTemplate& Row = m_template.AddRow("NetworkModLoop");
+            NoTemplate& Row = m_template.addRow("NetworkModLoop");
             Row["NetworkName"] = pNetwork->name();
 
             for (NoModule* pnMod : vnMods->modules()) {
@@ -440,7 +440,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
 
     if (!sTitle.empty() && (IsLoggedIn() || (!Module.WebRequiresLogin() && !Module.WebRequiresAdmin())) &&
         (GetSession()->isAdmin() || !Module.WebRequiresAdmin())) {
-        NoTemplate& Row = pTemplate->AddRow(sLoopName);
+        NoTemplate& Row = pTemplate->addRow(sLoopName);
         bool bActiveModule = false;
 
         Row["ModName"] = Module.GetModName();
@@ -482,7 +482,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
                 continue; // Don't add admin-only subpages to requests from non-admin users
             }
 
-            NoTemplate& SubRow = Row.AddRow("SubPageLoop");
+            NoTemplate& SubRow = Row.addRow("SubPageLoop");
 
             SubRow["ModName"] = Module.GetModName();
             SubRow["ModPath"] = Module.GetWebPath();
@@ -524,7 +524,7 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
 NoWebSocket::PageRequest NoWebSocket::PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule)
 {
     SetPaths(pModule);
-    NoString sFile = m_template.ExpandFile(sPath.trimLeft_n("/"));
+    NoString sFile = m_template.expandFile(sPath.trimLeft_n("/"));
     NO_DEBUG("About to print [" + sFile + "]");
     // Either PrintFile() fails and sends an error page or it suceeds and
     // sends a result. In both cases we don't have anything more to do.
@@ -552,11 +552,11 @@ NoWebSocket::PageRequest NoWebSocket::PrintTemplate(const NoString& sPageName, N
         SetPaths(pModule, true);
     }
 
-    if (m_template.GetFileName().empty() && !m_template.SetFile(sPageName + ".tmpl")) {
+    if (m_template.fileName().empty() && !m_template.setFile(sPageName + ".tmpl")) {
         return NotFound;
     }
 
-    if (m_template.PrintString(sPageRet)) {
+    if (m_template.printString(sPageRet)) {
         return Print;
     } else {
         return NotFound;
@@ -714,10 +714,10 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             NoString sFilePath = sSkinName.substr(uPathStart + 1);
             sSkinName.erase(uPathStart);
 
-            m_template.ClearPaths();
-            m_template.AppendPath(GetSkinPath(sSkinName) + "pub");
+            m_template.clearPaths();
+            m_template.appendPath(GetSkinPath(sSkinName) + "pub");
 
-            if (PrintFile(m_template.ExpandFile(sFilePath))) {
+            if (PrintFile(m_template.expandFile(sFilePath))) {
                 return Done;
             } else {
                 return NotFound;
@@ -830,10 +830,10 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
         }
 
         if (sURI.left(10) == "/modfiles/") {
-            m_template.AppendPath(GetSkinPath(GetSkinName()) + "/mods/" + m_modName + "/files/");
-            m_template.AppendPath(pModule->GetModDataDir() + "/files/");
+            m_template.appendPath(GetSkinPath(GetSkinName()) + "/mods/" + m_modName + "/files/");
+            m_template.appendPath(pModule->GetModDataDir() + "/files/");
 
-            if (PrintFile(m_template.ExpandFile(m_page.trimLeft_n("/")))) {
+            if (PrintFile(m_template.expandFile(m_page.trimLeft_n("/")))) {
                 return Print;
             } else {
                 return NotFound;
@@ -877,7 +877,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
 void NoWebSocket::PrintErrorPage(const NoString& sMessage)
 {
-    m_template.SetFile("Error.tmpl");
+    m_template.setFile("Error.tmpl");
 
     m_template["Action"] = "error";
     m_template["Title"] = "Error";

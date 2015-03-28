@@ -570,7 +570,7 @@ public:
                     return true;
                 }
 
-                Tmpl.SetFile("del_user.tmpl");
+                Tmpl.setFile("del_user.tmpl");
                 Tmpl["Username"] = sUser;
                 return true;
             }
@@ -640,7 +640,7 @@ public:
     bool ChanPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoNetwork* pNetwork, NoChannel* pChan = nullptr)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
-        Tmpl.SetFile("add_edit_chan.tmpl");
+        Tmpl.setFile("add_edit_chan.tmpl");
         NoUser* pUser = pNetwork->user();
 
         if (!pUser) {
@@ -675,7 +675,7 @@ public:
 
             // o1 used to be AutoCycle which was removed
 
-            NoTemplate& o2 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o2 = Tmpl.addRow("OptionLoop");
             o2["Name"] = "autoclearchanbuffer";
             o2["DisplayName"] = "Auto Clear Chan Buffer";
             o2["Tooltip"] = "Automatically Clear Channel Buffer After Playback";
@@ -683,14 +683,14 @@ public:
                 o2["Checked"] = "true";
             }
 
-            NoTemplate& o3 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o3 = Tmpl.addRow("OptionLoop");
             o3["Name"] = "detached";
             o3["DisplayName"] = "Detached";
             if (pChan && pChan->isDetached()) {
                 o3["Checked"] = "true";
             }
 
-            NoTemplate& o4 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o4 = Tmpl.addRow("OptionLoop");
             o4["Name"] = "disabled";
             o4["DisplayName"] = "Disabled";
             if (pChan && pChan->isDisabled()) {
@@ -698,7 +698,7 @@ public:
             }
 
             for (NoModule* pMod : allModules(pNetwork)) {
-                NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
+                NoTemplate& mod = Tmpl.addRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
                 if (pMod->OnEmbeddedWebRequest(WebSock, "webadmin/channel", mod)) {
@@ -787,7 +787,7 @@ public:
     bool NetworkPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* pUser, NoNetwork* pNetwork = nullptr)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
-        Tmpl.SetFile("add_edit_network.tmpl");
+        Tmpl.setFile("add_edit_network.tmpl");
 
         if (!WebSock.GetParam("submitted").toUInt()) {
             Tmpl["Username"] = pUser->userName();
@@ -796,7 +796,7 @@ public:
             NoApp::Get().GetLoader()->availableModules(ssNetworkMods, No::NetworkModule);
             for (std::set<NoModuleInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
-                NoTemplate& l = Tmpl.AddRow("ModuleLoop");
+                NoTemplate& l = Tmpl.addRow("ModuleLoop");
 
                 l["Name"] = Info.GetName();
                 l["Description"] = Info.GetDescription();
@@ -837,7 +837,7 @@ public:
                     bool bFoundBindHost = false;
                     for (uint b = 0; b < vsBindHosts.size(); b++) {
                         const NoString& sBindHost = vsBindHosts[b];
-                        NoTemplate& l = Tmpl.AddRow("BindHostLoop");
+                        NoTemplate& l = Tmpl.addRow("BindHostLoop");
 
                         l["BindHost"] = sBindHost;
 
@@ -849,7 +849,7 @@ public:
 
                     // If our current bindhost is not in the global list...
                     if (pNetwork && !bFoundBindHost && !pNetwork->bindHost().empty()) {
-                        NoTemplate& l = Tmpl.AddRow("BindHostLoop");
+                        NoTemplate& l = Tmpl.addRow("BindHostLoop");
 
                         l["BindHost"] = pNetwork->bindHost();
                         l["Checked"] = "true";
@@ -881,14 +881,14 @@ public:
 
                 const std::vector<NoServerInfo*>& vServers = pNetwork->servers();
                 for (uint a = 0; a < vServers.size(); a++) {
-                    NoTemplate& l = Tmpl.AddRow("ServerLoop");
+                    NoTemplate& l = Tmpl.addRow("ServerLoop");
                     l["Server"] = vServers[a]->toString();
                 }
 
                 const std::vector<NoChannel*>& Channels = pNetwork->channels();
                 for (uint c = 0; c < Channels.size(); c++) {
                     NoChannel* pChan = Channels[c];
-                    NoTemplate& l = Tmpl.AddRow("ChannelLoop");
+                    NoTemplate& l = Tmpl.addRow("ChannelLoop");
 
                     l["Network"] = pNetwork->name();
                     l["Username"] = pUser->userName();
@@ -908,7 +908,7 @@ public:
                     }
                 }
                 for (const NoString& sFP : pNetwork->trustedFingerprints()) {
-                    NoTemplate& l = Tmpl.AddRow("TrustedFingerprints");
+                    NoTemplate& l = Tmpl.addRow("TrustedFingerprints");
                     l["FP"] = sFP;
                 }
             } else {
@@ -928,7 +928,7 @@ public:
             }
 
             for (NoModule* pMod : allModules(pUser, pNetwork)) {
-                NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
+                NoTemplate& mod = Tmpl.addRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
                 if (pMod->OnEmbeddedWebRequest(WebSock, "webadmin/network", mod)) {
@@ -939,7 +939,7 @@ public:
 
 #ifdef HAVE_ICU
             for (const NoString& sEncoding : No::encodings()) {
-                NoTemplate& l = Tmpl.AddRow("EncodingLoop");
+                NoTemplate& l = Tmpl.addRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
             const NoString sEncoding = pNetwork ? pNetwork->encoding() : "^UTF-8";
@@ -1162,7 +1162,7 @@ public:
         if (!WebSock.IsPost()) {
             // Show the "Are you sure?" page:
 
-            Tmpl.SetFile("del_network.tmpl");
+            Tmpl.setFile("del_network.tmpl");
             Tmpl["Username"] = pUser->userName();
             Tmpl["Network"] = sNetwork;
             return true;
@@ -1204,7 +1204,7 @@ public:
     bool UserPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* pUser = nullptr)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
-        Tmpl.SetFile("add_edit_user.tmpl");
+        Tmpl.setFile("add_edit_user.tmpl");
 
         if (!WebSock.GetParam("submitted").toUInt()) {
             if (pUser) {
@@ -1243,13 +1243,13 @@ public:
 
                 const std::set<NoString>& ssAllowedHosts = pUser->allowedHosts();
                 for (std::set<NoString>::const_iterator it = ssAllowedHosts.begin(); it != ssAllowedHosts.end(); ++it) {
-                    NoTemplate& l = Tmpl.AddRow("AllowedHostLoop");
+                    NoTemplate& l = Tmpl.addRow("AllowedHostLoop");
                     l["Host"] = *it;
                 }
 
                 const std::vector<NoNetwork*>& vNetworks = pUser->networks();
                 for (uint a = 0; a < vNetworks.size(); a++) {
-                    NoTemplate& l = Tmpl.AddRow("NetworkLoop");
+                    NoTemplate& l = Tmpl.addRow("NetworkLoop");
                     l["Name"] = vNetworks[a]->name();
                     l["Username"] = pUser->userName();
                     l["Clients"] = NoString(vNetworks[a]->clients().size());
@@ -1262,7 +1262,7 @@ public:
 
                 const NoStringMap& msCTCPReplies = pUser->ctcpReplies();
                 for (NoStringMap::const_iterator it2 = msCTCPReplies.begin(); it2 != msCTCPReplies.end(); ++it2) {
-                    NoTemplate& l = Tmpl.AddRow("CTCPLoop");
+                    NoTemplate& l = Tmpl.addRow("CTCPLoop");
                     l["CTCP"] = it2->first + " " + it2->second;
                 }
             } else {
@@ -1273,13 +1273,13 @@ public:
 
             NoStringSet ssTimezones = No::timezones();
             for (NoStringSet::iterator i = ssTimezones.begin(); i != ssTimezones.end(); ++i) {
-                NoTemplate& l = Tmpl.AddRow("TZLoop");
+                NoTemplate& l = Tmpl.addRow("TZLoop");
                 l["TZ"] = *i;
             }
 
 #ifdef HAVE_ICU
             for (const NoString& sEncoding : No::encodings()) {
-                NoTemplate& l = Tmpl.AddRow("EncodingLoop");
+                NoTemplate& l = Tmpl.addRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
             const NoString sEncoding = pUser ? pUser->clientEncoding() : "^UTF-8";
@@ -1314,8 +1314,8 @@ public:
                     bool bFoundDCCBindHost = false;
                     for (uint b = 0; b < vsBindHosts.size(); b++) {
                         const NoString& sBindHost = vsBindHosts[b];
-                        NoTemplate& l = Tmpl.AddRow("BindHostLoop");
-                        NoTemplate& k = Tmpl.AddRow("DCCBindHostLoop");
+                        NoTemplate& l = Tmpl.addRow("BindHostLoop");
+                        NoTemplate& k = Tmpl.addRow("DCCBindHostLoop");
 
                         l["BindHost"] = sBindHost;
                         k["BindHost"] = sBindHost;
@@ -1333,13 +1333,13 @@ public:
 
                     // If our current bindhost is not in the global list...
                     if (pUser && !bFoundBindHost && !pUser->bindHost().empty()) {
-                        NoTemplate& l = Tmpl.AddRow("BindHostLoop");
+                        NoTemplate& l = Tmpl.addRow("BindHostLoop");
 
                         l["BindHost"] = pUser->bindHost();
                         l["Checked"] = "true";
                     }
                     if (pUser && !bFoundDCCBindHost && !pUser->dccBindHost().empty()) {
-                        NoTemplate& l = Tmpl.AddRow("DCCBindHostLoop");
+                        NoTemplate& l = Tmpl.addRow("DCCBindHostLoop");
 
                         l["BindHost"] = pUser->dccBindHost();
                         l["Checked"] = "true";
@@ -1352,7 +1352,7 @@ public:
 
             for (uint d = 0; d < vDirs.size(); d++) {
                 const NoString& SubDir = vDirs[d];
-                NoTemplate& l = Tmpl.AddRow("SkinLoop");
+                NoTemplate& l = Tmpl.addRow("SkinLoop");
                 l["Name"] = SubDir;
 
                 if (pUser && SubDir == pUser->skinName()) {
@@ -1365,7 +1365,7 @@ public:
 
             for (std::set<NoModuleInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
-                NoTemplate& l = Tmpl.AddRow("ModuleLoop");
+                NoTemplate& l = Tmpl.addRow("ModuleLoop");
 
                 l["Name"] = Info.GetName();
                 l["Description"] = Info.GetDescription();
@@ -1406,7 +1406,7 @@ public:
                 }
             }
 
-            NoTemplate& o1 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o1 = Tmpl.addRow("OptionLoop");
             o1["Name"] = "autoclearchanbuffer";
             o1["DisplayName"] = "Auto Clear Chan Buffer";
             o1["Tooltip"] = "Automatically Clear Channel Buffer After Playback (the default value for new channels)";
@@ -1416,21 +1416,21 @@ public:
 
             /* o2 used to be auto cycle which was removed */
 
-            NoTemplate& o4 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o4 = Tmpl.addRow("OptionLoop");
             o4["Name"] = "multiclients";
             o4["DisplayName"] = "Multi Clients";
             if (!pUser || pUser->multiClients()) {
                 o4["Checked"] = "true";
             }
 
-            NoTemplate& o7 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o7 = Tmpl.addRow("OptionLoop");
             o7["Name"] = "appendtimestamp";
             o7["DisplayName"] = "Append Timestamps";
             if (pUser && pUser->timestampAppend()) {
                 o7["Checked"] = "true";
             }
 
-            NoTemplate& o8 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o8 = Tmpl.addRow("OptionLoop");
             o8["Name"] = "prependtimestamp";
             o8["DisplayName"] = "Prepend Timestamps";
             if (pUser && pUser->timestampPrepend()) {
@@ -1438,14 +1438,14 @@ public:
             }
 
             if (spSession->isAdmin()) {
-                NoTemplate& o9 = Tmpl.AddRow("OptionLoop");
+                NoTemplate& o9 = Tmpl.addRow("OptionLoop");
                 o9["Name"] = "denyloadmod";
                 o9["DisplayName"] = "Deny LoadMod";
                 if (pUser && pUser->denyLoadMod()) {
                     o9["Checked"] = "true";
                 }
 
-                NoTemplate& o10 = Tmpl.AddRow("OptionLoop");
+                NoTemplate& o10 = Tmpl.addRow("OptionLoop");
                 o10["Name"] = "isadmin";
                 o10["DisplayName"] = "Admin";
                 if (pUser && pUser->isAdmin()) {
@@ -1455,7 +1455,7 @@ public:
                     o10["Disabled"] = "true";
                 }
 
-                NoTemplate& o11 = Tmpl.AddRow("OptionLoop");
+                NoTemplate& o11 = Tmpl.addRow("OptionLoop");
                 o11["Name"] = "denysetbindhost";
                 o11["DisplayName"] = "Deny setBindHost";
                 if (pUser && pUser->denysetBindHost()) {
@@ -1463,7 +1463,7 @@ public:
                 }
             }
 
-            NoTemplate& o12 = Tmpl.AddRow("OptionLoop");
+            NoTemplate& o12 = Tmpl.addRow("OptionLoop");
             o12["Name"] = "autoclearquerybuffer";
             o12["DisplayName"] = "Auto Clear Query Buffer";
             o12["Tooltip"] = "Automatically Clear Query Buffer After Playback";
@@ -1472,7 +1472,7 @@ public:
             }
 
             for (NoModule* pMod : allModules(pUser)) {
-                NoTemplate& mod = Tmpl.AddRow("EmbeddedModuleLoop");
+                NoTemplate& mod = Tmpl.addRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
                 if (pMod->OnEmbeddedWebRequest(WebSock, "webadmin/user", mod)) {
@@ -1560,7 +1560,7 @@ public:
         uint a = 0;
 
         for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it, a++) {
-            NoTemplate& l = Tmpl.AddRow("UserLoop");
+            NoTemplate& l = Tmpl.addRow("UserLoop");
             NoUser& User = *it->second;
 
             l["Username"] = User.userName();
@@ -1617,7 +1617,7 @@ public:
         NoApp::TrafficStatsMap::const_iterator it;
 
         for (it = traffic.begin(); it != traffic.end(); ++it) {
-            NoTemplate& l = Tmpl.AddRow("TrafficLoop");
+            NoTemplate& l = Tmpl.addRow("TrafficLoop");
 
             l["Username"] = it->first;
             l["In"] = No::toByteStr(it->second.first);
@@ -1737,7 +1737,7 @@ public:
 
     bool SettingsPage(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
-        Tmpl.SetFile("settings.tmpl");
+        Tmpl.setFile("settings.tmpl");
         if (!WebSock.GetParam("submitted").toUInt()) {
             Tmpl["Action"] = "settings";
             Tmpl["Title"] = "Settings";
@@ -1751,20 +1751,20 @@ public:
 
             const NoStringVector& vsBindHosts = NoApp::Get().bindHosts();
             for (uint a = 0; a < vsBindHosts.size(); a++) {
-                NoTemplate& l = Tmpl.AddRow("BindHostLoop");
+                NoTemplate& l = Tmpl.addRow("BindHostLoop");
                 l["BindHost"] = vsBindHosts[a];
             }
 
             const NoStringVector& vsMotd = NoApp::Get().GetMotd();
             for (uint b = 0; b < vsMotd.size(); b++) {
-                NoTemplate& l = Tmpl.AddRow("MOTDLoop");
+                NoTemplate& l = Tmpl.addRow("MOTDLoop");
                 l["Line"] = vsMotd[b];
             }
 
             const std::vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
             for (uint c = 0; c < vpListeners.size(); c++) {
                 NoListener* pListener = vpListeners[c];
-                NoTemplate& l = Tmpl.AddRow("ListenLoop");
+                NoTemplate& l = Tmpl.addRow("ListenLoop");
 
                 l["Port"] = NoString(pListener->port());
                 l["BindHost"] = pListener->host();
@@ -1808,7 +1808,7 @@ public:
 
             for (uint d = 0; d < vDirs.size(); d++) {
                 const NoString& SubDir = vDirs[d];
-                NoTemplate& l = Tmpl.AddRow("SkinLoop");
+                NoTemplate& l = Tmpl.addRow("SkinLoop");
                 l["Name"] = SubDir;
 
                 if (SubDir == NoApp::Get().GetSkinName()) {
@@ -1821,7 +1821,7 @@ public:
 
             for (std::set<NoModuleInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
-                NoTemplate& l = Tmpl.AddRow("ModuleLoop");
+                NoTemplate& l = Tmpl.addRow("ModuleLoop");
 
                 NoModule* pModule = NoApp::Get().GetLoader()->findModule(Info.GetName());
                 if (pModule) {

@@ -210,7 +210,7 @@ public:
         if (sPageName == "index") {
             NoRegistry registry(this);
             for (const NoString& key : registry.keys()) {
-                NoTemplate& Row = Tmpl.AddRow("NotesLoop");
+                NoTemplate& Row = Tmpl.addRow("NotesLoop");
 
                 Row["Key"] = key;
                 Row["Note"] = registry.value(key);

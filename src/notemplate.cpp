@@ -215,7 +215,7 @@ NoString NoTemplateLoopContext::GetValue(const NoString& sName, bool bFromIf)
         return ((GetRowIndex() == 0 || GetRowIndex() == m_pvRows->size() - 1) ? "" : "1");
     }
 
-    return pTemplate->GetValue(sName, bFromIf);
+    return pTemplate->value(sName, bFromIf);
 }
 
 NoTemplate::NoTemplate(const NoString& sFileName) : d(new NoTemplatePrivate)
@@ -245,18 +245,18 @@ NoTemplate::~NoTemplate()
     }
 }
 
-void NoTemplate::AddTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler) { d->tagHandlers.push_back(spTagHandler); }
+void NoTemplate::addTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler) { d->tagHandlers.push_back(spTagHandler); }
 
-std::vector<std::shared_ptr<NoTemplateTagHandler> >&NoTemplate::GetTagHandlers()
+std::vector<std::shared_ptr<NoTemplateTagHandler> >&NoTemplate::tagHandlers()
 {
     if (d->parent) {
-        return d->parent->GetTagHandlers();
+        return d->parent->tagHandlers();
     }
 
     return d->tagHandlers;
 }
 
-void NoTemplate::Init()
+void NoTemplate::init()
 {
     /* We have no NoSettings in ZNC land
      * Hmm... Actually, we do have it now.
@@ -267,17 +267,17 @@ void NoTemplate::Init()
     }
     */
 
-    ClearPaths();
+    clearPaths();
     d->parent = nullptr;
 }
 
-NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
+NoString NoTemplate::expandFile(const NoString& sFilename, bool bFromInc)
 {
     /*if (sFilename.Left(1) == "/" || sFilename.Left(2) == "./") {
         return sFilename;
     }*/
 
-    NoString sFile(ResolveLiteral(sFilename).trimLeft_n("/"));
+    NoString sFile(resolveLiteral(sFilename).trimLeft_n("/"));
 
     for (auto& it : d->paths) {
         NoString& sRoot = it.first;
@@ -317,16 +317,16 @@ NoString NoTemplate::ExpandFile(const NoString& sFilename, bool bFromInc)
     return "";
 }
 
-void NoTemplate::SetPath(const NoString& sPaths)
+void NoTemplate::setPath(const NoString& sPaths)
 {
     NoStringVector vsDirs = sPaths.split(":", No::SkipEmptyParts);
 
     for (const NoString& sDir : vsDirs) {
-        AppendPath(sDir, false);
+        appendPath(sDir, false);
     }
 }
 
-NoString NoTemplate::MakePath(const NoString& sPath) const
+NoString NoTemplate::makePath(const NoString& sPath) const
 {
     NoString sRet(NoDir::ChangeDir("./", sPath + "/"));
 
@@ -337,37 +337,37 @@ NoString NoTemplate::MakePath(const NoString& sPath) const
     return sRet;
 }
 
-void NoTemplate::PrependPath(const NoString& sPath, bool bIncludesOnly)
+void NoTemplate::prependPath(const NoString& sPath, bool bIncludesOnly)
 {
-    NO_DEBUG("NoTemplate::PrependPath(" + sPath + ") == [" + MakePath(sPath) + "]");
-    d->paths.push_front(make_pair(MakePath(sPath), bIncludesOnly));
+    NO_DEBUG("NoTemplate::PrependPath(" + sPath + ") == [" + makePath(sPath) + "]");
+    d->paths.push_front(make_pair(makePath(sPath), bIncludesOnly));
 }
 
-void NoTemplate::AppendPath(const NoString& sPath, bool bIncludesOnly)
+void NoTemplate::appendPath(const NoString& sPath, bool bIncludesOnly)
 {
-    NO_DEBUG("NoTemplate::AppendPath(" + sPath + ") == [" + MakePath(sPath) + "]");
-    d->paths.push_back(make_pair(MakePath(sPath), bIncludesOnly));
+    NO_DEBUG("NoTemplate::AppendPath(" + sPath + ") == [" + makePath(sPath) + "]");
+    d->paths.push_back(make_pair(makePath(sPath), bIncludesOnly));
 }
 
-void NoTemplate::RemovePath(const NoString& sPath)
+void NoTemplate::removePath(const NoString& sPath)
 {
     NO_DEBUG("NoTemplate::RemovePath(" + sPath + ") == [" + NoDir::ChangeDir("./", sPath + "/") + "]");
 
     for (const auto& it : d->paths) {
         if (it.first == sPath) {
             d->paths.remove(it);
-            RemovePath(sPath); // @todo probably shouldn't use recursion, being lazy
+            removePath(sPath); // @todo probably shouldn't use recursion, being lazy
             return;
         }
     }
 }
 
-void NoTemplate::ClearPaths() { d->paths.clear(); }
+void NoTemplate::clearPaths() { d->paths.clear(); }
 
-bool NoTemplate::SetFile(const NoString& sFileName)
+bool NoTemplate::setFile(const NoString& sFileName)
 {
-    d->fileName = ExpandFile(sFileName, false);
-    PrependPath(sFileName + "/..");
+    d->fileName = expandFile(sFileName, false);
+    prependPath(sFileName + "/..");
 
     if (sFileName.empty()) {
         NO_DEBUG("NoTemplate::SetFile() - Filename is empty");
@@ -392,11 +392,11 @@ public:
     NoLoopSorter(const NoString& sType) : m_sType(sType) {}
     bool operator()(NoTemplate* pTemplate1, NoTemplate* pTemplate2)
     {
-        return (pTemplate1->GetValue(m_sType, false) < pTemplate2->GetValue(m_sType, false));
+        return (pTemplate1->value(m_sType, false) < pTemplate2->value(m_sType, false));
     }
 };
 
-NoTemplate& NoTemplate::AddRow(const NoString& sName)
+NoTemplate& NoTemplate::addRow(const NoString& sName)
 {
     NoTemplate* pTmpl = new NoTemplate(d->options, this);
     d->loops[sName].push_back(pTmpl);
@@ -404,9 +404,9 @@ NoTemplate& NoTemplate::AddRow(const NoString& sName)
     return *pTmpl;
 }
 
-NoTemplate* NoTemplate::GetRow(const NoString& sName, uint uIndex)
+NoTemplate* NoTemplate::row(const NoString& sName, uint uIndex)
 {
-    std::vector<NoTemplate*>* pvLoop = GetLoop(sName);
+    std::vector<NoTemplate*>* pvLoop = loop(sName);
 
     if (pvLoop) {
         if (pvLoop->size() > uIndex) {
@@ -417,15 +417,15 @@ NoTemplate* NoTemplate::GetRow(const NoString& sName, uint uIndex)
     return nullptr;
 }
 
-std::vector<NoTemplate*>* NoTemplate::GetLoop(const NoString& sName)
+std::vector<NoTemplate*>* NoTemplate::loop(const NoString& sName)
 {
-    NoTemplateLoopContext* pContext = GetCurLoopContext();
+    NoTemplateLoopContext* pContext = currentLoopContext();
 
     if (pContext) {
         NoTemplate* pTemplate = pContext->GetCurRow();
 
         if (pTemplate) {
-            return pTemplate->GetLoop(sName);
+            return pTemplate->loop(sName);
         }
     }
 
@@ -438,20 +438,20 @@ std::vector<NoTemplate*>* NoTemplate::GetLoop(const NoString& sName)
     return nullptr;
 }
 
-bool NoTemplate::PrintString(NoString& sRet)
+bool NoTemplate::printString(NoString& sRet)
 {
     sRet.clear();
     std::stringstream sStream;
-    bool bRet = Print(sStream);
+    bool bRet = print(sStream);
 
     sRet = sStream.str();
 
     return bRet;
 }
 
-bool NoTemplate::Print(std::ostream& oOut) { return Print(d->fileName, oOut); }
+bool NoTemplate::print(std::ostream& oOut) { return print(d->fileName, oOut); }
 
-bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
+bool NoTemplate::print(const NoString& sFileName, std::ostream& oOut)
 {
     if (sFileName.empty()) {
         NO_DEBUG("Empty filename in NoTemplate::Print()");
@@ -530,7 +530,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
 
                 if (!uSkip) {
                     if (sAction.equals("INC")) {
-                        if (!Print(ExpandFile(sArgs, true), oOut)) {
+                        if (!print(expandFile(sArgs, true), oOut)) {
                             NO_DEBUG("Unable to print INC'd file [" + sArgs + "]");
                             return false;
                         }
@@ -540,7 +540,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         NoString sLoopName = No::token(sArgs, 0);
                         NoStringMap msRow = No::optionSplit(No::tokens(sArgs, 1, " "));
                         if (!msRow.empty()) {
-                            NoTemplate& NewRow = AddRow(sLoopName);
+                            NoTemplate& NewRow = addRow(sLoopName);
 
                             for (const auto& it : msRow) {
                                 NewRow[it.first] = it.second;
@@ -562,7 +562,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                                 if (sArg.startsWith("ESC=")) {
                                     eEscape = ToEscapeFormat(sArg.leftChomp_n(4));
                                 } else {
-                                    NoString sValue = GetValue(sArg);
+                                    NoString sValue = value(sArg);
 
                                     if (!sValue.empty()) {
                                         if (bFoundOne) {
@@ -579,15 +579,15 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         sSetBlockVar = sArgs;
                         bInSetBlock = true;
                     } else if (sAction.equals("EXPAND")) {
-                        sOutput += ExpandFile(sArgs, true);
+                        sOutput += expandFile(sArgs, true);
                     } else if (sAction.equals("VAR")) {
-                        sOutput += GetValue(sArgs);
+                        sOutput += value(sArgs);
                     } else if (sAction.equals("LT")) {
                         sOutput += "<?";
                     } else if (sAction.equals("GT")) {
                         sOutput += "?>";
                     } else if (sAction.equals("CONTINUE")) {
-                        NoTemplateLoopContext* pContext = GetCurLoopContext();
+                        NoTemplateLoopContext* pContext = currentLoopContext();
 
                         if (pContext) {
                             uSkip++;
@@ -600,7 +600,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         }
                     } else if (sAction.equals("BREAK")) {
                         // break from loop
-                        NoTemplateLoopContext* pContext = GetCurLoopContext();
+                        NoTemplateLoopContext* pContext = currentLoopContext();
 
                         if (pContext) {
                             uSkip++;
@@ -616,7 +616,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                     } else if (sAction.equals("DEBUG")) {
                         NO_DEBUG("NoTemplate DEBUG [" + sFileName + "@" + NoString(uCurPos - iPos2 - 4) + "b] -> [" + sArgs + "]");
                     } else if (sAction.equals("LOOP")) {
-                        NoTemplateLoopContext* pContext = GetCurLoopContext();
+                        NoTemplateLoopContext* pContext = currentLoopContext();
 
                         if (!pContext || pContext->GetFilePosition() != uCurPos) {
                             // we are at a brand new loop (be it new or a first pass at an inner loop)
@@ -624,7 +624,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                             NoString sLoopName = No::token(sArgs, 0);
                             bool bReverse = (No::token(sArgs, 1).equals("REVERSE"));
                             bool bSort = (No::token(sArgs, 1).left(4).equals("SORT"));
-                            std::vector<NoTemplate*>* pvLoop = GetLoop(sLoopName);
+                            std::vector<NoTemplate*>* pvLoop = loop(sLoopName);
 
                             if (bSort && pvLoop != nullptr && pvLoop->size() > 1) {
                                 NoString sKey;
@@ -661,7 +661,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                             }
                         }
                     } else if (sAction.equals("IF")) {
-                        if (ValidIf(sArgs)) {
+                        if (validIf(sArgs)) {
                             uNestedIfs++;
                             bValidLastIf = true;
                         } else {
@@ -708,7 +708,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                         uSkip--;
                     } else {
                         // We are at the end of the loop so we need to inc the index
-                        NoTemplateLoopContext* pContext = GetCurLoopContext();
+                        NoTemplateLoopContext* pContext = currentLoopContext();
 
                         if (pContext) {
                             pContext->IncRowIndex();
@@ -733,7 +733,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                                 }
 
                                 bTmplLoopHasData = pContext->HasData();
-                                DelCurLoopContext();
+                                deleteCurLoopContext();
                                 bLoopBreak = false;
                             }
                         }
@@ -742,7 +742,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                     if (!bValidLastIf && uSkip == 1) {
                         NoString sArg = No::token(sArgs, 0);
 
-                        if (sArg.empty() || (sArg.equals("IF") && ValidIf(No::tokens(sArgs, 1)))) {
+                        if (sArg.empty() || (sArg.equals("IF") && validIf(No::tokens(sArgs, 1)))) {
                             uSkip = 0;
                             bValidLastIf = true;
                         }
@@ -751,14 +751,14 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
                     }
                 } else if (bNotFound) {
                     // Unknown tag that isn't being skipped...
-                    std::vector<std::shared_ptr<NoTemplateTagHandler>>& vspTagHandlers = GetTagHandlers();
+                    std::vector<std::shared_ptr<NoTemplateTagHandler>>& vspTagHandlers = tagHandlers();
 
                     if (!vspTagHandlers.empty()) { // @todo this should go up to the top to grab handlers
-                        NoTemplate* pTmpl = GetCurTemplate();
+                        NoTemplate* pTmpl = currentTemplate();
                         NoString sCustomOutput;
 
                         for (const auto& spTagHandler : vspTagHandlers) {
-                            if (spTagHandler->HandleTag(*pTmpl, sAction, sArgs, sCustomOutput)) {
+                            if (spTagHandler->handleTag(*pTmpl, sAction, sArgs, sCustomOutput)) {
                                 sOutput += sCustomOutput;
                                 bNotFound = false;
                                 break;
@@ -806,7 +806,7 @@ bool NoTemplate::Print(const NoString& sFileName, std::ostream& oOut)
     return true;
 }
 
-void NoTemplate::DelCurLoopContext()
+void NoTemplate::deleteCurLoopContext()
 {
     if (d->loopContexts.empty()) {
         return;
@@ -816,7 +816,7 @@ void NoTemplate::DelCurLoopContext()
     d->loopContexts.pop_back();
 }
 
-NoTemplateLoopContext* NoTemplate::GetCurLoopContext()
+NoTemplateLoopContext* NoTemplate::currentLoopContext()
 {
     if (!d->loopContexts.empty()) {
         return d->loopContexts.back();
@@ -825,7 +825,7 @@ NoTemplateLoopContext* NoTemplate::GetCurLoopContext()
     return nullptr;
 }
 
-bool NoTemplate::ValidIf(const NoString& sArgs)
+bool NoTemplate::validIf(const NoString& sArgs)
 {
     NoString sArgStr = sArgs;
     // SafeReplace(sArgStr, " ", "", "\"", "\"", true);
@@ -847,7 +847,7 @@ bool NoTemplate::ValidIf(const NoString& sArgs)
         NoString sExpr = No::token(sArgStr, 0, ((bAnd) ? "&&" : "||"));
         sArgStr = No::tokens(sArgStr, 1, ((bAnd) ? "&&" : "||"));
 
-        if (ValidExpr(sExpr)) {
+        if (validExpr(sExpr)) {
             if (!bAnd) {
                 return true;
             }
@@ -867,7 +867,7 @@ bool NoTemplate::ValidIf(const NoString& sArgs)
 // TODO: cleanup
 extern NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight);
 
-bool NoTemplate::ValidExpr(const NoString& sExpression)
+bool NoTemplate::validExpr(const NoString& sExpression)
 {
     bool bNegate = false;
     NoString sExpr(sExpression);
@@ -889,55 +889,55 @@ bool NoTemplate::ValidExpr(const NoString& sExpression)
     } else if (sExpr.contains(">=")) {
         sName = No::token(sExpr, 0, ">=").trim_n();
         sValue = Token_helper(sExpr, 1, true, ">=", "\"", "\"").trim_n().trim_n("\"");
-        return (GetValue(sName, true).toLong() >= sValue.toLong());
+        return (value(sName, true).toLong() >= sValue.toLong());
     } else if (sExpr.contains("<=")) {
         sName = No::token(sExpr, 0, "<=").trim_n();
         sValue = Token_helper(sExpr, 1, true, "<=", "\"", "\"").trim_n().trim_n("\"");
-        return (GetValue(sName, true).toLong() <= sValue.toLong());
+        return (value(sName, true).toLong() <= sValue.toLong());
     } else if (sExpr.contains(">")) {
         sName = No::token(sExpr, 0, ">").trim_n();
         sValue = Token_helper(sExpr, 1, true, ">", "\"", "\"").trim_n().trim_n("\"");
-        return (GetValue(sName, true).toLong() > sValue.toLong());
+        return (value(sName, true).toLong() > sValue.toLong());
     } else if (sExpr.contains("<")) {
         sName = No::token(sExpr, 0, "<").trim_n();
         sValue = Token_helper(sExpr, 1, true, "<", "\"", "\"").trim_n().trim_n("\"");
-        return (GetValue(sName, true).toLong() < sValue.toLong());
+        return (value(sName, true).toLong() < sValue.toLong());
     } else {
         sName = sExpr.trim_n();
     }
 
     if (sValue.empty()) {
-        return (bNegate != IsTrue(sName));
+        return (bNegate != isTrue(sName));
     }
 
-    sValue = ResolveLiteral(sValue);
+    sValue = resolveLiteral(sValue);
 
-    return (bNegate != GetValue(sName, true).equals(sValue));
+    return (bNegate != value(sName, true).equals(sValue));
 }
 
-bool NoTemplate::IsTrue(const NoString& sName)
+bool NoTemplate::isTrue(const NoString& sName)
 {
-    if (HasLoop(sName)) {
+    if (hasLoop(sName)) {
         return true;
     }
 
-    return GetValue(sName, true).toBool();
+    return value(sName, true).toBool();
 }
 
-bool NoTemplate::HasLoop(const NoString& sName) { return (GetLoop(sName) != nullptr); }
+bool NoTemplate::hasLoop(const NoString& sName) { return (loop(sName) != nullptr); }
 
-NoTemplate* NoTemplate::GetParent(bool bRoot)
+NoTemplate* NoTemplate::parent(bool bRoot)
 {
     if (!bRoot) {
         return d->parent;
     }
 
-    return (d->parent) ? d->parent->GetParent(bRoot) : this;
+    return (d->parent) ? d->parent->parent(bRoot) : this;
 }
 
-NoTemplate* NoTemplate::GetCurTemplate()
+NoTemplate* NoTemplate::currentTemplate()
 {
-    NoTemplateLoopContext* pContext = GetCurLoopContext();
+    NoTemplateLoopContext* pContext = currentLoopContext();
 
     if (!pContext) {
         return this;
@@ -946,24 +946,24 @@ NoTemplate* NoTemplate::GetCurTemplate()
     return pContext->GetCurRow();
 }
 
-const NoString& NoTemplate::GetFileName() const { return d->fileName; }
+const NoString& NoTemplate::fileName() const { return d->fileName; }
 
-NoString NoTemplate::ResolveLiteral(const NoString& sString)
+NoString NoTemplate::resolveLiteral(const NoString& sString)
 {
     if (sString.left(2) == "**") {
         // Allow string to start with a literal * by using two in a row
         return sString.substr(1);
     } else if (sString.left(1) == "*") {
         // If it starts with only one * then treat it as a var and do a lookup
-        return GetValue(sString.substr(1));
+        return value(sString.substr(1));
     }
 
     return sString;
 }
 
-NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
+NoString NoTemplate::value(const NoString& sArgs, bool bFromIf)
 {
-    NoTemplateLoopContext* pContext = GetCurLoopContext();
+    NoTemplateLoopContext* pContext = currentLoopContext();
     NoString sName = No::token(sArgs, 0);
     NoString sRest = No::tokens(sArgs, 1);
     NoString sRet;
@@ -986,7 +986,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
 	if (msArgs.find("CONFIG") != msArgs.end()) {
 		sRet = NoSettings::GetValue(sName);
 	} else*/ if (msArgs.find("ROWS") != msArgs.end()) {
-        std::vector<NoTemplate*>* pLoop = GetLoop(sName);
+        std::vector<NoTemplate*>* pLoop = loop(sName);
         sRet = NoString((pLoop) ? pLoop->size() : 0);
     } else if (msArgs.find("TOP") == msArgs.end() && pContext) {
         sRet = pContext->GetValue(sArgs, bFromIf);
@@ -1005,19 +1005,19 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
         sRet = (it != end()) ? it->second : "";
     }
 
-    std::vector<std::shared_ptr<NoTemplateTagHandler>>& vspTagHandlers = GetTagHandlers();
+    std::vector<std::shared_ptr<NoTemplateTagHandler>>& vspTagHandlers = tagHandlers();
 
     if (!vspTagHandlers.empty()) { // @todo this should go up to the top to grab handlers
-        NoTemplate* pTmpl = GetCurTemplate();
+        NoTemplate* pTmpl = currentTemplate();
 
         if (sRet.empty()) {
             for (const auto& spTagHandler : vspTagHandlers) {
                 NoString sCustomOutput;
 
-                if (!bFromIf && spTagHandler->HandleVar(*pTmpl, No::token(sArgs, 0), No::tokens(sArgs, 1), sCustomOutput)) {
+                if (!bFromIf && spTagHandler->handleVar(*pTmpl, No::token(sArgs, 0), No::tokens(sArgs, 1), sCustomOutput)) {
                     sRet = sCustomOutput;
                     break;
-                } else if (bFromIf && spTagHandler->HandleIf(*pTmpl, No::token(sArgs, 0), No::tokens(sArgs, 1), sCustomOutput)) {
+                } else if (bFromIf && spTagHandler->handleIf(*pTmpl, No::token(sArgs, 0), No::tokens(sArgs, 1), sCustomOutput)) {
                     sRet = sCustomOutput;
                     break;
                 }
@@ -1025,7 +1025,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
         }
 
         for (const auto& spTagHandler : vspTagHandlers) {
-            if (spTagHandler->HandleValue(*pTmpl, sRet, msArgs)) {
+            if (spTagHandler->handleValue(*pTmpl, sRet, msArgs)) {
                 break;
             }
         }
@@ -1033,7 +1033,7 @@ NoString NoTemplate::GetValue(const NoString& sArgs, bool bFromIf)
 
     if (!bFromIf) {
         if (sRet.empty()) {
-            sRet = ResolveLiteral(msArgs["DEFAULT"]);
+            sRet = resolveLiteral(msArgs["DEFAULT"]);
         }
 
         NoStringMap::iterator it = msArgs.find("ESC");
