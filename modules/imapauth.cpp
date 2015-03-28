@@ -66,7 +66,7 @@ public:
 
     bool onBoot() override { return true; }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (sArgs.trim_n().empty()) {
             return true; // use defaults

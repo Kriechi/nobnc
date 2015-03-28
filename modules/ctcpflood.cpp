@@ -28,16 +28,16 @@ public:
         m_tLastCTCP = 0;
         m_iNumCTCP = 0;
 
-        AddHelpCommand();
-        AddCommand("Secs",
+        addHelpCommand();
+        addCommand("Secs",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCtcpFloodMod::OnSecsCommand),
                    "<limit>",
                    "Set seconds limit");
-        AddCommand("Lines",
+        addCommand("Lines",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCtcpFloodMod::OnLinesCommand),
                    "<limit>",
                    "Set lines limit");
-        AddCommand("Show",
+        addCommand("Show",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCtcpFloodMod::OnShowCommand),
                    "",
                    "Show the current limits");
@@ -52,10 +52,10 @@ public:
         registry.setValue("secs", NoString(m_iThresholdSecs));
         registry.setValue("msgs", NoString(m_iThresholdMsgs));
 
-        SetArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
+        setArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         m_iThresholdMsgs = No::token(sArgs, 0).toUInt();
         m_iThresholdSecs = No::token(sArgs, 1).toUInt();
@@ -89,7 +89,7 @@ public:
         if (m_iNumCTCP < m_iThresholdMsgs)
             return CONTINUE;
         else if (m_iNumCTCP == m_iThresholdMsgs)
-            PutModule("Limit reached by [" + Nick.hostMask() + "], blocking all CTCP");
+            putModule("Limit reached by [" + Nick.hostMask() + "], blocking all CTCP");
 
         // Reset the timeout so that we continue blocking messages
         m_tLastCTCP = time(nullptr);
@@ -106,14 +106,14 @@ public:
         const NoString& sArg = No::tokens(sCommand, 1);
 
         if (sArg.empty()) {
-            PutModule("Usage: Secs <limit>");
+            putModule("Usage: Secs <limit>");
             return;
         }
 
         m_iThresholdSecs = sArg.toUInt();
         if (m_iThresholdSecs == 0) m_iThresholdSecs = 1;
 
-        PutModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
+        putModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
         Save();
     }
 
@@ -122,20 +122,20 @@ public:
         const NoString& sArg = No::tokens(sCommand, 1);
 
         if (sArg.empty()) {
-            PutModule("Usage: Lines <limit>");
+            putModule("Usage: Lines <limit>");
             return;
         }
 
         m_iThresholdMsgs = sArg.toUInt();
         if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 2;
 
-        PutModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");
+        putModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");
         Save();
     }
 
     void OnShowCommand(const NoString& sCommand)
     {
-        PutModule("Current limit is " + NoString(m_iThresholdMsgs) + " CTCPs "
+        putModule("Current limit is " + NoString(m_iThresholdMsgs) + " CTCPs "
                                                                     "in " +
                   NoString(m_iThresholdSecs) + " secs");
     }

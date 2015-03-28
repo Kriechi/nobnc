@@ -99,8 +99,8 @@ public:
     void SetConnectDelay(uint i);
 
     ConfigState GetConfigState() const;
-    NoSocketManager& GetManager();
-    const NoSocketManager& GetManager() const;
+    NoSocketManager& manager();
+    const NoSocketManager& manager() const;
     NoModuleLoader* GetLoader() const;
     NoString GetSkinName() const;
     const NoString& GetStatusPrefix() const;

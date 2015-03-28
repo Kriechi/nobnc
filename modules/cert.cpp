@@ -30,35 +30,35 @@ public:
     void Delete(const NoString& line)
     {
         if (NoFile::Delete(PemFile())) {
-            PutModule("Pem file deleted");
+            putModule("Pem file deleted");
         } else {
-            PutModule("The pem file doesn't exist or there was a error deleting the pem file.");
+            putModule("The pem file doesn't exist or there was a error deleting the pem file.");
         }
     }
 
     void Info(const NoString& line)
     {
         if (HasPemFile()) {
-            PutModule("You have a certificate in: " + PemFile());
+            putModule("You have a certificate in: " + PemFile());
         } else {
-            PutModule("You do not have a certificate. Please use the web interface to add a certificate");
-            if (GetUser()->isAdmin()) {
-                PutModule("Alternatively you can either place one at " + PemFile());
+            putModule("You do not have a certificate. Please use the web interface to add a certificate");
+            if (user()->isAdmin()) {
+                putModule("Alternatively you can either place one at " + PemFile());
             }
         }
     }
 
     MODCONSTRUCTOR(NoCertMod)
     {
-        AddHelpCommand();
-        AddCommand("delete",
+        addHelpCommand();
+        addCommand("delete",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCertMod::Delete),
                    "",
                    "Delete the current certificate");
-        AddCommand("info", static_cast<NoModuleCommand::ModCmdFunc>(&NoCertMod::Info));
+        addCommand("info", static_cast<NoModuleCommand::ModCmdFunc>(&NoCertMod::Info));
     }
 
-    NoString PemFile() const { return GetSavePath() + "/user.pem"; }
+    NoString PemFile() const { return savePath() + "/user.pem"; }
 
     bool HasPemFile() const { return (NoFile::Exists(PemFile())); }
 
@@ -71,9 +71,9 @@ public:
         return CONTINUE;
     }
 
-    NoString GetWebMenuTitle() override { return "Certificate"; }
+    NoString webMenuTitle() override { return "Certificate"; }
 
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             Tmpl["Cert"] = NoString(HasPemFile());
@@ -86,11 +86,11 @@ public:
                 fPemFile.Close();
             }
 
-            WebSock.Redirect(GetWebPath());
+            WebSock.Redirect(webPath());
             return true;
         } else if (sPageName == "delete") {
             NoFile::Delete(PemFile());
-            WebSock.Redirect(GetWebPath());
+            WebSock.Redirect(webPath());
             return true;
         }
 

@@ -34,7 +34,7 @@ class NoQModule : public NoModule
 public:
     MODCONSTRUCTOR(NoQModule) {}
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoRegistry registry(this);
         if (!sArgs.empty()) {
@@ -62,14 +62,14 @@ public:
 
         if (isIrcConnected()) {
             // check for usermode +x if we are already connected
-            std::set<uchar> scUserModes = GetNetwork()->ircSocket()->GetUserModes();
+            std::set<uchar> scUserModes = network()->ircSocket()->GetUserModes();
             if (scUserModes.find('x') != scUserModes.end()) m_bCloaked = true;
 
             // This will only happen once, and only if the user loads the module after connecting to IRC.
             // Also don't notify the user in case he already had mode +x set.
             if (registry.value("UseCloakedHost").empty()) {
                 if (!m_bCloaked)
-                    PutModule("Notice: Your host will be cloaked the next time you reconnect to IRC. "
+                    putModule("Notice: Your host will be cloaked the next time you reconnect to IRC. "
                               "If you want to cloak your host now, /msg *q Cloak. You can set your preference "
                               "with /msg *q Set UseCloakedHost true/false.");
                 m_bUseCloakedHost = true;
@@ -107,7 +107,7 @@ public:
         NoString sCommand = No::token(sLine, 0).toLower();
 
         if (sCommand == "help") {
-            PutModule("The following commands are available:");
+            putModule("The following commands are available:");
             NoTable Table;
             Table.addColumn("Command");
             Table.addColumn("Description");
@@ -129,9 +129,9 @@ public:
             Table.addRow();
             Table.setValue("Command", "Get");
             Table.setValue("Description", "Prints out the current configuration. See the list of settings below.");
-            PutModule(Table);
+            putModule(Table);
 
-            PutModule("The following settings are available:");
+            putModule("The following settings are available:");
             NoTable Table2;
             Table2.addColumn("Setting");
             Table2.addColumn("Type");
@@ -165,39 +165,39 @@ public:
             Table2.setValue("Setting", "JoinAfterCloaked");
             Table2.setValue("Type", "Boolean");
             Table2.setValue("Description", "Whether to delay joining channels until after you are cloaked.");
-            PutModule(Table2);
+            putModule(Table2);
 
-            PutModule("This module takes 2 optional parameters: <username> <password>");
-            PutModule("Module settings are stored between restarts.");
+            putModule("This module takes 2 optional parameters: <username> <password>");
+            putModule("Module settings are stored between restarts.");
 
         } else if (sCommand == "set") {
             NoString sSetting = No::token(sLine, 1).toLower();
             NoString sValue = No::token(sLine, 2);
             if (sSetting.empty() || sValue.empty()) {
-                PutModule("Syntax: Set <setting> <value>");
+                putModule("Syntax: Set <setting> <value>");
             } else if (sSetting == "username") {
                 SetUsername(sValue);
-                PutModule("Username set");
+                putModule("Username set");
             } else if (sSetting == "password") {
                 SetPassword(sValue);
-                PutModule("Password set");
+                putModule("Password set");
             } else if (sSetting == "usecloakedhost") {
                 SetUseCloakedHost(sValue.toBool());
-                PutModule("UseCloakedHost set");
+                putModule("UseCloakedHost set");
             } else if (sSetting == "usechallenge") {
                 SetUseChallenge(sValue.toBool());
-                PutModule("UseChallenge set");
+                putModule("UseChallenge set");
             } else if (sSetting == "requestperms") {
                 SetRequestPerms(sValue.toBool());
-                PutModule("RequestPerms set");
+                putModule("RequestPerms set");
             } else if (sSetting == "joinoninvite") {
                 SetJoinonInvite(sValue.toBool());
-                PutModule("JoinonInvite set");
+                putModule("JoinonInvite set");
             } else if (sSetting == "joinaftercloaked") {
                 SetJoinAfterCloaked(sValue.toBool());
-                PutModule("JoinAfterCloaked set");
+                putModule("JoinAfterCloaked set");
             } else
-                PutModule("Unknown setting: " + sSetting);
+                putModule("Unknown setting: " + sSetting);
 
         } else if (sCommand == "get" || sCommand == "list") {
             NoTable Table;
@@ -224,17 +224,17 @@ public:
             Table.addRow();
             Table.setValue("Setting", "JoinAfterCloaked");
             Table.setValue("Value", NoString(m_bJoinAfterCloaked));
-            PutModule(Table);
+            putModule(Table);
 
         } else if (sCommand == "status") {
-            PutModule("Connected: " + NoString(isIrcConnected() ? "yes" : "no"));
-            PutModule("Cloaked: " + NoString(m_bCloaked ? "yes" : "no"));
-            PutModule("Authed: " + NoString(m_bAuthed ? "yes" : "no"));
+            putModule("Connected: " + NoString(isIrcConnected() ? "yes" : "no"));
+            putModule("Cloaked: " + NoString(m_bCloaked ? "yes" : "no"));
+            putModule("Authed: " + NoString(m_bAuthed ? "yes" : "no"));
 
         } else {
             // The following commands require an IRC connection.
             if (!isIrcConnected()) {
-                PutModule("Error: You are not connected to IRC.");
+                putModule("Error: You are not connected to IRC.");
                 return;
             }
 
@@ -242,20 +242,20 @@ public:
                 if (!m_bCloaked)
                     Cloak();
                 else
-                    PutModule("Error: You are already cloaked!");
+                    putModule("Error: You are already cloaked!");
 
             } else if (sCommand == "auth") {
                 if (!m_bAuthed)
                     Auth(No::token(sLine, 1), No::token(sLine, 2));
                 else
-                    PutModule("Error: You are already authed!");
+                    putModule("Error: You are already authed!");
 
             } else if (sCommand == "update") {
                 WhoAmI();
-                PutModule("Update requested.");
+                putModule("Update requested.");
 
             } else {
-                PutModule("Unknown command. Try 'help'.");
+                putModule("Unknown command. Try 'help'.");
             }
         }
     }
@@ -265,12 +265,12 @@ public:
         // use onRaw because OnUserMode is not defined (yet?)
         if (No::token(sLine, 1) == "396" && No::token(sLine, 3).contains("users.quakenet.org")) {
             m_bCloaked = true;
-            PutModule("Cloak successful: Your hostname is now cloaked.");
+            putModule("Cloak successful: Your hostname is now cloaked.");
 
             // Join channels immediately after our spoof is set, but only if
             // both UseCloakedHost and JoinAfterCloaked is enabled. See #602.
             if (m_bJoinAfterCloaked) {
-                GetNetwork()->joinChannels();
+                network()->joinChannels();
             }
         }
         return CONTINUE;
@@ -307,13 +307,13 @@ public:
     ModRet onInvite(const NoNick& Nick, const NoString& sChan) override
     {
         if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org")) return CONTINUE;
-        if (m_bJoinonInvite) GetNetwork()->addChannel(sChan, false);
+        if (m_bJoinonInvite) network()->addChannel(sChan, false);
         return CONTINUE;
     }
 
-    NoString GetWebMenuTitle() override { return "Q"; }
+    NoString webMenuTitle() override { return "Q"; }
 
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             bool bSubmitted = (WebSock.GetParam("submitted").toInt() != 0);
@@ -384,9 +384,9 @@ private:
 
     void PutQ(const NoString& sMessage)
     {
-        PutIRC("PRIVMSG Q@CServe.quakenet.org :" + sMessage);
+        putIrc("PRIVMSG Q@CServe.quakenet.org :" + sMessage);
 #if Q_DEBUG_COMMUNICATION
-        PutModule("[ZNC --> Q] " + sMessage);
+        putModule("[ZNC --> Q] " + sMessage);
 #endif
     }
 
@@ -394,8 +394,8 @@ private:
     {
         if (m_bCloaked) return;
 
-        PutModule("Cloak: Trying to cloak your hostname, setting +x...");
-        PutIRC("MODE " + GetNetwork()->ircSocket()->GetNick() + " +x");
+        putModule("Cloak: Trying to cloak your hostname, setting +x...");
+        putIrc("MODE " + network()->ircSocket()->GetNick() + " +x");
     }
 
     void WhoAmI()
@@ -412,16 +412,16 @@ private:
         if (!sPassword.empty()) SetPassword(sPassword);
 
         if (m_sUsername.empty() || m_sPassword.empty()) {
-            PutModule("You have to set a username and password to use this module! See 'help' for details.");
+            putModule("You have to set a username and password to use this module! See 'help' for details.");
             return;
         }
 
         if (m_bUseChallenge) {
-            PutModule("Auth: Requesting CHALLENGE...");
+            putModule("Auth: Requesting CHALLENGE...");
             m_bRequestedChallenge = true;
             PutQ("CHALLENGE");
         } else {
-            PutModule("Auth: Sending AUTH request...");
+            putModule("Auth: Sending AUTH request...");
             PutQ("AUTH " + m_sUsername + " " + m_sPassword);
         }
     }
@@ -435,7 +435,7 @@ private:
         NoString sKey = No::sha256(sUsername + ":" + sPasswordHash);
         NoString sResponse = HMAC_SHA256(sKey, sChallenge);
 
-        PutModule("Auth: Received challenge, sending CHALLENGEAUTH request...");
+        putModule("Auth: Received challenge, sending CHALLENGEAUTH request...");
         PutQ("CHALLENGEAUTH " + m_sUsername + " " + sResponse + " HMAC-SHA-256");
     }
 
@@ -446,7 +446,7 @@ private:
         sMessage.trim();
 
 #if Q_DEBUG_COMMUNICATION
-        PutModule("[ZNC <-- Q] " + sMessage);
+        putModule("[ZNC <-- Q] " + sMessage);
 #endif
 
         // WHOAMI
@@ -472,11 +472,11 @@ private:
         // AUTH
         else if (sMessage.equals("Username or password incorrect.")) {
             m_bAuthed = false;
-            PutModule("Auth failed: " + sMessage);
+            putModule("Auth failed: " + sMessage);
             return HALT;
         } else if (No::wildCmp(sMessage, "You are now logged in as *.")) {
             m_bAuthed = true;
-            PutModule("Auth successful: " + sMessage);
+            putModule("Auth successful: " + sMessage);
             WhoAmI();
             return HALT;
         } else if (m_bRequestedChallenge && No::token(sMessage, 0).equals("CHALLENGE")) {
@@ -487,7 +487,7 @@ private:
                 if (sMessage.contains("HMAC-SHA-256")) {
                     ChallengeAuth(No::token(sMessage, 1));
                 } else {
-                    PutModule(
+                    putModule(
                     "Auth failed: Q does not support HMAC-SHA-256 for CHALLENGEAUTH, falling back to standard AUTH.");
                     SetUseChallenge(false);
                     Auth();
@@ -497,7 +497,7 @@ private:
         }
 
         // prevent buffering of Q's responses
-        return !m_bCatchResponse && GetUser()->isUserAttached() ? CONTINUE : HALT;
+        return !m_bCatchResponse && user()->isUserAttached() ? CONTINUE : HALT;
     }
 
     void HandleNeed(const NoChannel& Channel, const NoString& sPerms)
@@ -513,7 +513,7 @@ private:
             bool bAutoOp = sModes.contains("a");
             if (bMaster || bOp) {
                 if (!bAutoOp) {
-                    PutModule("RequestPerms: Requesting op on " + Channel.name());
+                    putModule("RequestPerms: Requesting op on " + Channel.name());
                     PutQ("OP " + Channel.name());
                 }
                 return;
@@ -525,7 +525,7 @@ private:
             bool bAutoVoice = sModes.contains("g");
             if (bMaster || bVoice) {
                 if (!bAutoVoice) {
-                    PutModule("RequestPerms: Requesting voice on " + Channel.name());
+                    putModule("RequestPerms: Requesting voice on " + Channel.name());
                     PutQ("VOICE " + Channel.name());
                 }
                 return;
@@ -537,11 +537,11 @@ private:
     /* Utility Functions */
     bool isIrcConnected()
     {
-        NoIrcSocket* pIRCSock = GetNetwork()->ircSocket();
+        NoIrcSocket* pIRCSock = network()->ircSocket();
         return pIRCSock && pIRCSock->IsAuthed();
     }
 
-    bool IsSelf(const NoNick& Nick) { return Nick.equals(GetNetwork()->currentNick()); }
+    bool IsSelf(const NoNick& Nick) { return Nick.equals(network()->currentNick()); }
 
     bool PackHex(const NoString& sHex, NoString& sPackedHex)
     {

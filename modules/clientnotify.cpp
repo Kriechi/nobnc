@@ -42,35 +42,35 @@ protected:
     void SendNotification(const NoString& sMessage)
     {
         if (m_sMethod == "message") {
-            GetUser()->putStatus(sMessage, nullptr, GetClient());
+            user()->putStatus(sMessage, nullptr, client());
         } else if (m_sMethod == "notice") {
-            GetUser()->putStatusNotice(sMessage, nullptr, GetClient());
+            user()->putStatusNotice(sMessage, nullptr, client());
         }
     }
 
 public:
     MODCONSTRUCTOR(NoClientNotifyMod)
     {
-        AddHelpCommand();
-        AddCommand("Method",
+        addHelpCommand();
+        addCommand("Method",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoClientNotifyMod::OnMethodCommand),
                    "<message|notice|off>",
                    "Sets the notify method");
-        AddCommand("NewOnly",
+        addCommand("NewOnly",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoClientNotifyMod::OnNewOnlyCommand),
                    "<on|off>",
                    "Turns notifies for unseen IP addresses only on or off");
-        AddCommand("OnDisconnect",
+        addCommand("OnDisconnect",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoClientNotifyMod::OnDisconnectCommand),
                    "<on|off>",
                    "Turns notifies on disconnecting clients on or off");
-        AddCommand("Show",
+        addCommand("Show",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoClientNotifyMod::OnShowCommand),
                    "",
                    "Show the current settings");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoRegistry registry(this);
         m_sMethod = registry.value("method");
@@ -89,11 +89,11 @@ public:
 
     void onClientLogin() override
     {
-        NoString sRemoteIP = GetClient()->GetSocket()->GetRemoteIP();
+        NoString sRemoteIP = client()->GetSocket()->GetRemoteIP();
         if (!m_bNewOnly || m_sClientsSeen.find(sRemoteIP) == m_sClientsSeen.end()) {
             SendNotification("Another client authenticated as your user. "
                              "Use the 'ListClients' command to see all " +
-                             NoString(GetUser()->allClients().size()) + " clients.");
+                             NoString(user()->allClients().size()) + " clients.");
 
             // the std::set<> will automatically disregard duplicates:
             m_sClientsSeen.insert(sRemoteIP);
@@ -105,7 +105,7 @@ public:
         if (m_bOnDisconnect) {
             SendNotification("A client disconnected from your user. "
                              "Use the 'ListClients' command to see the " +
-                             NoString(GetUser()->allClients().size()) + " remaining client(s).");
+                             NoString(user()->allClients().size()) + " remaining client(s).");
         }
     }
 
@@ -114,13 +114,13 @@ public:
         const NoString& sArg = No::tokens(sCommand, 1).toLower();
 
         if (sArg != "notice" && sArg != "message" && sArg != "off") {
-            PutModule("Usage: Method <message|notice|off>");
+            putModule("Usage: Method <message|notice|off>");
             return;
         }
 
         m_sMethod = sArg;
         SaveSettings();
-        PutModule("Saved.");
+        putModule("Saved.");
     }
 
     void OnNewOnlyCommand(const NoString& sCommand)
@@ -128,13 +128,13 @@ public:
         const NoString& sArg = No::tokens(sCommand, 1).toLower();
 
         if (sArg.empty()) {
-            PutModule("Usage: NewOnly <on|off>");
+            putModule("Usage: NewOnly <on|off>");
             return;
         }
 
         m_bNewOnly = sArg.toBool();
         SaveSettings();
-        PutModule("Saved.");
+        putModule("Saved.");
     }
 
     void OnDisconnectCommand(const NoString& sCommand)
@@ -142,18 +142,18 @@ public:
         const NoString& sArg = No::tokens(sCommand, 1).toLower();
 
         if (sArg.empty()) {
-            PutModule("Usage: OnDisconnect <on|off>");
+            putModule("Usage: OnDisconnect <on|off>");
             return;
         }
 
         m_bOnDisconnect = sArg.toBool();
         SaveSettings();
-        PutModule("Saved.");
+        putModule("Saved.");
     }
 
     void OnShowCommand(const NoString& sLine)
     {
-        PutModule("Current settings: Method: " + m_sMethod + ", for unseen IP addresses only: " + NoString(m_bNewOnly) +
+        putModule("Current settings: Method: " + m_sMethod + ", for unseen IP addresses only: " + NoString(m_bNewOnly) +
                   ", notify on disconnecting clients: " + NoString(m_bOnDisconnect));
     }
 };

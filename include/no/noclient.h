@@ -62,13 +62,13 @@ public:
     bool IsPlaybackActive() const;
     void SetPlaybackActive(bool bActive);
 
-    void PutIRC(const NoString& sLine);
+    void putIrc(const NoString& sLine);
     void PutClient(const NoString& sLine);
-    uint PutStatus(const NoTable& table);
-    void PutStatus(const NoString& sLine);
-    void PutStatusNotice(const NoString& sLine);
-    void PutModule(const NoString& sModule, const NoString& sLine);
-    void PutModNotice(const NoString& sModule, const NoString& sLine);
+    uint putStatus(const NoTable& table);
+    void putStatus(const NoString& sLine);
+    void putStatusNotice(const NoString& sLine);
+    void putModule(const NoString& sModule, const NoString& sLine);
+    void putModuleNotice(const NoString& sModule, const NoString& sLine);
 
     bool IsCapEnabled(const NoString& sCap) const;
 
@@ -78,9 +78,9 @@ public:
 
     void SetNick(const NoString& s);
     void SetAway(bool bAway);
-    NoUser* GetUser() const;
+    NoUser* user() const;
     void SetNetwork(NoNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
-    NoNetwork* GetNetwork() const;
+    NoNetwork* network() const;
     std::vector<NoClient*> clients() const;
     NoIrcSocket* ircSocket() const;
     NoString GetFullName() const;

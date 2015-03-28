@@ -65,7 +65,7 @@ public:
     NoString GetPath() const;
     bool IsLoggedIn() const;
     const NoString& GetDocRoot() const;
-    const NoString& GetUser() const;
+    const NoString& user() const;
     const NoString& GetPass() const;
     const NoString& GetParamString() const;
     const NoString& GetContentType() const;

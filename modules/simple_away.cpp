@@ -55,26 +55,26 @@ public:
         m_bClientSetAway = false;
         m_bWeSetAway = false;
 
-        AddHelpCommand();
-        AddCommand("Reason",
+        addHelpCommand();
+        addCommand("Reason",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSimpleAway::OnReasonCommand),
                    "[<text>]",
                    "Prints or sets the away reason (%s is replaced with the time you were set away)");
-        AddCommand("Timer",
+        addCommand("Timer",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSimpleAway::OnTimerCommand),
                    "",
                    "Prints the current time to wait before setting you away");
-        AddCommand("SetTimer",
+        addCommand("SetTimer",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSimpleAway::OnSetTimerCommand),
                    "<seconds>",
                    "Sets the time to wait before setting you away");
-        AddCommand("DisableTimer",
+        addCommand("DisableTimer",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSimpleAway::OnDisableTimerCommand),
                    "",
                    "Disables the wait time before setting you away");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoString sReasonArg;
 
@@ -101,14 +101,14 @@ public:
         }
 
         // Set away on load, required if loaded via webadmin
-        if (GetNetwork()->isIrcConnected() && !GetNetwork()->isUserAttached()) SetAway(false);
+        if (network()->isIrcConnected() && !network()->isUserAttached()) SetAway(false);
 
         return true;
     }
 
     void onIrcConnected() override
     {
-        if (GetNetwork()->isUserAttached())
+        if (network()->isUserAttached())
             SetBack();
         else
             SetAway(false);
@@ -119,7 +119,7 @@ public:
     void onClientDisconnect() override
     {
         /* There might still be other clients */
-        if (!GetNetwork()->isUserAttached()) SetAway();
+        if (!network()->isUserAttached()) SetAway();
     }
 
     void OnReasonCommand(const NoString& sLine)
@@ -128,16 +128,16 @@ public:
 
         if (!sReason.empty()) {
             SetReason(sReason);
-            PutModule("Away reason set");
+            putModule("Away reason set");
         } else {
-            PutModule("Away reason: " + m_sReason);
-            PutModule("Current away reason would be: " + ExpandReason());
+            putModule("Away reason: " + m_sReason);
+            putModule("Current away reason would be: " + ExpandReason());
         }
     }
 
     void OnTimerCommand(const NoString& sLine)
     {
-        PutModule("Current timer setting: " + NoString(m_iAwayWait) + " seconds");
+        putModule("Current timer setting: " + NoString(m_iAwayWait) + " seconds");
     }
 
     void OnSetTimerCommand(const NoString& sLine)
@@ -145,15 +145,15 @@ public:
         SetAwayWait(No::token(sLine, 1).toUInt());
 
         if (m_iAwayWait == 0)
-            PutModule("Timer disabled");
+            putModule("Timer disabled");
         else
-            PutModule("Timer set to " + NoString(m_iAwayWait) + " seconds");
+            putModule("Timer set to " + NoString(m_iAwayWait) + " seconds");
     }
 
     void OnDisableTimerCommand(const NoString& sLine)
     {
         SetAwayWait(0);
-        PutModule("Timer disabled");
+        putModule("Timer disabled");
     }
 
     ModRet onUserRaw(NoString& sLine) override
@@ -175,13 +175,13 @@ public:
     void SetAway(bool bTimer = true)
     {
         if (bTimer) {
-            delete FindTimer("simple_away");
+            delete findTimer("simple_away");
             NoSimpleAwayJob* timer = new NoSimpleAwayJob(this);
             timer->setSingleShot(true);
             timer->start(m_iAwayWait);
         } else {
             if (!m_bClientSetAway) {
-                PutIRC("AWAY :" + ExpandReason());
+                putIrc("AWAY :" + ExpandReason());
                 m_bWeSetAway = true;
             }
         }
@@ -189,9 +189,9 @@ public:
 
     void SetBack()
     {
-        delete FindTimer("simple_away");
+        delete findTimer("simple_away");
         if (m_bWeSetAway) {
-            PutIRC("AWAY");
+            putIrc("AWAY");
             m_bWeSetAway = false;
         }
     }
@@ -203,7 +203,7 @@ private:
         if (sReason.empty()) sReason = SIMPLE_AWAY_DEFAULT_REASON;
 
         time_t iTime = time(nullptr);
-        NoString sTime = No::cTime(iTime, GetUser()->timezone());
+        NoString sTime = No::cTime(iTime, user()->timezone());
         sReason.replace("%s", sTime);
 
         return sReason;

@@ -64,17 +64,17 @@ public:
 
     virtual ~NoShellMod()
     {
-        std::vector<NoSocket*> vSocks = GetManager()->FindSocksByName("SHELL");
+        std::vector<NoSocket*> vSocks = manager()->FindSocksByName("SHELL");
 
         for (uint a = 0; a < vSocks.size(); a++) {
-            GetManager()->DelSockByAddr(vSocks[a]);
+            manager()->DelSockByAddr(vSocks[a]);
         }
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
 #ifndef MOD_SHELL_ALLOW_EVERYONE
-        if (!GetUser()->isAdmin()) {
+        if (!user()->isAdmin()) {
             sMessage = "You must be admin to use the shell module";
             return false;
         }
@@ -109,16 +109,16 @@ public:
     void PutShell(const NoString& sMsg)
     {
         NoString sPath = m_sPath.replace_n(" ", "_");
-        NoString sSource = ":" + GetModNick() + "!shell@" + sPath;
-        NoString sLine = sSource + " PRIVMSG " + GetClient()->GetNick() + " :" + sMsg;
-        GetClient()->PutClient(sLine);
+        NoString sSource = ":" + moduleNick() + "!shell@" + sPath;
+        NoString sLine = sSource + " PRIVMSG " + client()->GetNick() + " :" + sMsg;
+        client()->PutClient(sLine);
     }
 
     void RunCommand(const NoString& sCommand)
     {
         // TODO: who deletes the instance?
-        NoShellSock* sock = new NoShellSock(this, GetClient(), "cd " + m_sPath + " && " + sCommand);
-        GetManager()->AddSock(sock, "SHELL");
+        NoShellSock* sock = new NoShellSock(this, client(), "cd " + m_sPath + " && " + sCommand);
+        manager()->AddSock(sock, "SHELL");
     }
 
 private:
@@ -132,9 +132,9 @@ void NoShellSock::ReadLineImpl(const NoString& sData)
     sLine.trimRight("\r\n");
     sLine.replace("\t", "    ");
 
-    m_pParent->SetClient(m_pClient);
+    m_pParent->setClient(m_pClient);
     m_pParent->PutShell(sLine);
-    m_pParent->SetClient(nullptr);
+    m_pParent->setClient(nullptr);
 }
 
 void NoShellSock::DisconnectedImpl()
@@ -144,9 +144,9 @@ void NoShellSock::DisconnectedImpl()
     NoString& sBuffer = GetInternalReadBuffer();
     if (!sBuffer.empty()) ReadLineImpl(sBuffer);
 
-    m_pParent->SetClient(m_pClient);
+    m_pParent->setClient(m_pClient);
     m_pParent->PutShell("znc$");
-    m_pParent->SetClient(nullptr);
+    m_pParent->setClient(nullptr);
 }
 
 template <> void no_moduleInfo<NoShellMod>(NoModuleInfo& Info) { Info.setWikiPage("shell"); }

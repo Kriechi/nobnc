@@ -25,7 +25,7 @@ NoModuleJob::NoModuleJob(NoModule* pModule, const NoString& sName, const NoStrin
 {
 }
 
-NoModuleJob::~NoModuleJob() { m_module->UnlinkJob(this); }
+NoModuleJob::~NoModuleJob() { m_module->unlinkJob(this); }
 
 const NoString& NoModuleJob::description() const { return m_description; }
 

@@ -115,7 +115,7 @@ NoUser::NoUser(const NoString& sUserName) : d(new NoUserPrivate)
     d->userPath = NoApp::Get().GetUserPath() + "/" + sUserName;
     d->modules = new NoModuleLoader;
     d->userTimer = new NoUserTimer(this);
-    NoApp::Get().GetManager().AddCron(d->userTimer);
+    NoApp::Get().manager().AddCron(d->userTimer);
 }
 
 NoUser::~NoUser()
@@ -127,7 +127,7 @@ NoUser::~NoUser()
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::Get().GetManager().DelSockByAddr(d->clients[0]->GetSocket());
+        NoApp::Get().manager().DelSockByAddr(d->clients[0]->GetSocket());
     }
     d->clients.clear();
 
@@ -135,7 +135,7 @@ NoUser::~NoUser()
     delete d->modules;
     d->modules = nullptr;
 
-    NoApp::Get().GetManager().DelCronByAddr(d->userTimer);
+    NoApp::Get().manager().DelCronByAddr(d->userTimer);
 
     NoApp::Get().AddBytesRead(bytesRead());
     NoApp::Get().AddBytesWritten(bytesWritten());
@@ -675,7 +675,7 @@ void NoUser::cloneNetworks(const NoUser& User)
         // The following will move all the clients to the user.
         // So the clients are not disconnected. The client could
         // have requested the rehash. Then when we do
-        // client->PutStatus("Rehashing succeeded!") we would
+        // client->putStatus("Rehashing succeeded!") we would
         // crash if there was no client anymore.
         const std::vector<NoClient*>& vClients = findNetwork(sNetwork)->clients();
 
@@ -736,7 +736,7 @@ bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     for (NoClient* pClient : d->clients) {
         NoSocket* pSock = pClient->GetSocket();
         if (!isHostAllowed(pSock->GetRemoteIP())) {
-            pClient->PutStatusNotice(
+            pClient->putStatusNotice(
             "You are being disconnected because your IP is no longer allowed to connect to this user");
             pSock->Close();
         }
@@ -778,20 +778,20 @@ bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 
     for (NoModule* pNewMod : vNewMods->modules()) {
         NoString sModRet;
-        NoModule* pCurMod = vCurMods->findModule(pNewMod->GetModName());
+        NoModule* pCurMod = vCurMods->findModule(pNewMod->moduleName());
 
         if (!pCurMod) {
-            vCurMods->loadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::UserModule, this, nullptr, sModRet);
-        } else if (pNewMod->GetArgs() != pCurMod->GetArgs()) {
-            vCurMods->reloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), this, nullptr, sModRet);
+            vCurMods->loadModule(pNewMod->moduleName(), pNewMod->args(), No::UserModule, this, nullptr, sModRet);
+        } else if (pNewMod->args() != pCurMod->args()) {
+            vCurMods->reloadModule(pNewMod->moduleName(), pNewMod->args(), this, nullptr, sModRet);
         }
     }
 
     for (NoModule* pCurMod : vCurMods->modules()) {
-        NoModule* pNewMod = vNewMods->findModule(pCurMod->GetModName());
+        NoModule* pNewMod = vNewMods->findModule(pCurMod->moduleName());
 
         if (!pNewMod) {
-            ssUnloadMods.insert(pCurMod->GetModName());
+            ssUnloadMods.insert(pCurMod->moduleName());
         }
     }
 
@@ -950,13 +950,13 @@ NoSettings NoUser::toConfig() const
     const NoModuleLoader* Mods = loader();
 
     for (NoModule* pMod : Mods->modules()) {
-        NoString sArgs = pMod->GetArgs();
+        NoString sArgs = pMod->args();
 
         if (!sArgs.empty()) {
             sArgs = " " + sArgs;
         }
 
-        config.AddKeyValuePair("LoadModule", pMod->GetModName() + sArgs);
+        config.AddKeyValuePair("LoadModule", pMod->moduleName() + sArgs);
     }
 
     // Networks
@@ -980,9 +980,9 @@ bool NoUser::checkPass(const NoString& sPass) const
     }
 }
 
-/*NoClient* NoUser::GetClient() {
+/*NoClient* NoUser::client() {
     // Todo: optimize this by saving a pointer to the sock
-    NoSocketManager& Manager = NoApp::Get().GetManager();
+    NoSocketManager& Manager = NoApp::Get().manager();
     NoString sSockName = "USR::" + d->sUserName;
 
     for (uint a = 0; a < Manager.size(); a++) {
@@ -994,7 +994,7 @@ bool NoUser::checkPass(const NoString& sPass) const
         }
     }
 
-    return (NoClient*) NoApp::Get().GetManager().FindSockByName(sSockName);
+    return (NoClient*) NoApp::Get().manager().FindSockByName(sSockName);
 }*/
 
 NoString NoUser::localDccIp() const
@@ -1048,7 +1048,7 @@ bool NoUser::putStatus(const NoString& sLine, NoClient* pClient, NoClient* pSkip
     std::vector<NoClient*> vClients = allClients();
     for (NoClient* pEachClient : vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
-            pEachClient->PutStatus(sLine);
+            pEachClient->putStatus(sLine);
 
             if (pClient) {
                 return true;
@@ -1064,7 +1064,7 @@ bool NoUser::putStatusNotice(const NoString& sLine, NoClient* pClient, NoClient*
     std::vector<NoClient*> vClients = allClients();
     for (NoClient* pEachClient : vClients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
-            pEachClient->PutStatusNotice(sLine);
+            pEachClient->putStatusNotice(sLine);
 
             if (pClient) {
                 return true;
@@ -1079,7 +1079,7 @@ bool NoUser::putModule(const NoString& sModule, const NoString& sLine, NoClient*
 {
     for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
-            pEachClient->PutModule(sModule, sLine);
+            pEachClient->putModule(sModule, sLine);
 
             if (pClient) {
                 return true;
@@ -1094,7 +1094,7 @@ bool NoUser::putModuleNotice(const NoString& sModule, const NoString& sLine, NoC
 {
     for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
-            pEachClient->PutModNotice(sModule, sLine);
+            pEachClient->putModuleNotice(sModule, sLine);
 
             if (pClient) {
                 return true;

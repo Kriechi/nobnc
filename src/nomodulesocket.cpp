@@ -46,12 +46,12 @@ NoModuleSocket::~NoModuleSocket()
 
     // NoWebSocket could cause us to have a nullptr pointer here
     if (m_module) {
-        pUser = m_module->GetUser();
+        pUser = m_module->user();
         NoModulePrivate::get(m_module)->removeSocket(this);
-        m_module->GetManager()->DelSockByAddr(this);
+        m_module->manager()->DelSockByAddr(this);
     }
 
-    if (pUser && m_module && m_module->GetType() != No::GlobalModule) {
+    if (pUser && m_module && m_module->type() != No::GlobalModule) {
         pUser->addBytesWritten(GetBytesWritten());
         pUser->addBytesRead(GetBytesRead());
     } else {
@@ -63,7 +63,7 @@ NoModuleSocket::~NoModuleSocket()
 void NoModuleSocket::ReachedMaxBufferImpl()
 {
     NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
-    if (m_module) m_module->PutModule("Some socket reached its max buffer limit and was closed!");
+    if (m_module) m_module->putModule("Some socket reached its max buffer limit and was closed!");
     Close();
 }
 
@@ -88,14 +88,14 @@ bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL,
         return false;
     }
 
-    NoUser* pUser = m_module->GetUser();
-    NoString sSockName = "MOD::C::" + m_module->GetModName();
+    NoUser* pUser = m_module->user();
+    NoString sSockName = "MOD::C::" + m_module->moduleName();
     NoString sBindHost;
 
     if (pUser) {
         sSockName += "::" + pUser->userName();
         sBindHost = pUser->bindHost();
-        NoNetwork* pNetwork = m_module->GetNetwork();
+        NoNetwork* pNetwork = m_module->network();
         if (pNetwork) {
             sSockName += "::" + pNetwork->name();
             sBindHost = pNetwork->bindHost();
@@ -107,7 +107,7 @@ bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL,
         sSockName = GetSockName();
     }
 
-    m_module->GetManager()->Connect(sHostname, uPort, sSockName, uTimeout, bSSL, sBindHost, this);
+    m_module->manager()->Connect(sHostname, uPort, sSockName, uTimeout, bSSL, sBindHost, this);
     return true;
 }
 
@@ -118,8 +118,8 @@ bool NoModuleSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
         return false;
     }
 
-    NoUser* pUser = m_module->GetUser();
-    NoString sSockName = "MOD::L::" + m_module->GetModName();
+    NoUser* pUser = m_module->user();
+    NoString sSockName = "MOD::L::" + m_module->moduleName();
 
     if (pUser) {
         sSockName += "::" + pUser->userName();
@@ -129,7 +129,7 @@ bool NoModuleSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
         sSockName = GetSockName();
     }
 
-    return m_module->GetManager()->ListenAll(uPort, sSockName, bSSL, SOMAXCONN, this);
+    return m_module->manager()->ListenAll(uPort, sSockName, bSSL, SOMAXCONN, this);
 }
 
 NoModule* NoModuleSocket::GetModule() const { return m_module; }

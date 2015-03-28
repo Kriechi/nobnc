@@ -28,19 +28,19 @@ class NoAutoReplyMod : public NoModule
 public:
     MODCONSTRUCTOR(NoAutoReplyMod)
     {
-        AddHelpCommand();
-        AddCommand("Set",
+        addHelpCommand();
+        addCommand("Set",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoReplyMod::OnSetCommand),
                    "<reply>",
                    "Sets a new reply");
-        AddCommand("Show",
+        addCommand("Show",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoReplyMod::OnShowCommand),
                    "",
                    "Displays the current query reply");
         m_Messaged.setExpiration(1000 * 120);
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (!sArgs.empty()) {
             SetReply(sArgs);
@@ -59,22 +59,22 @@ public:
             SetReply(sReply);
         }
 
-        return ExpandString(sReply);
+        return expandString(sReply);
     }
 
     void Handle(const NoString& sNick)
     {
-        NoIrcSocket* pIRCSock = GetNetwork()->ircSocket();
+        NoIrcSocket* pIRCSock = network()->ircSocket();
         if (!pIRCSock)
             // WTF?
             return;
         if (sNick == pIRCSock->GetNick()) return;
         if (m_Messaged.contains(sNick)) return;
 
-        if (GetNetwork()->isUserAttached()) return;
+        if (network()->isUserAttached()) return;
 
         m_Messaged.insert(sNick);
-        PutIRC("NOTICE " + sNick + " :" + GetReply());
+        putIrc("NOTICE " + sNick + " :" + GetReply());
     }
 
     ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
@@ -85,13 +85,13 @@ public:
 
     void OnShowCommand(const NoString& sCommand)
     {
-        PutModule("Current reply is: " + NoRegistry(this).value("Reply") + " (" + GetReply() + ")");
+        putModule("Current reply is: " + NoRegistry(this).value("Reply") + " (" + GetReply() + ")");
     }
 
     void OnSetCommand(const NoString& sCommand)
     {
         SetReply(No::tokens(sCommand, 1));
-        PutModule("New reply set");
+        putModule("New reply set");
     }
 
 private:

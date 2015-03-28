@@ -32,19 +32,19 @@ class NoBlockUser : public NoModule
 public:
     MODCONSTRUCTOR(NoBlockUser)
     {
-        AddHelpCommand();
-        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnListCommand), "", "List blocked users");
-        AddCommand("Block",
+        addHelpCommand();
+        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnListCommand), "", "List blocked users");
+        addCommand("Block",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnBlockCommand),
                    "<user>",
                    "Block a user");
-        AddCommand("Unblock",
+        addCommand("Unblock",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnUnblockCommand),
                    "<user>",
                    "Unblock a user");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector::iterator it;
 
@@ -80,10 +80,10 @@ public:
 
     void onModCommand(const NoString& sCommand) override
     {
-        if (!GetUser()->isAdmin()) {
-            PutModule("Access denied");
+        if (!user()->isAdmin()) {
+            putModule("Access denied");
         } else {
-            HandleCommand(sCommand);
+            handleCommand(sCommand);
         }
     }
 
@@ -100,7 +100,7 @@ public:
             Table.setValue("Blocked user", key);
         }
 
-        if (PutModule(Table) == 0) PutModule("No users blocked");
+        if (putModule(Table) == 0) putModule("No users blocked");
     }
 
     void OnBlockCommand(const NoString& sCommand)
@@ -108,19 +108,19 @@ public:
         NoString sUser = No::tokens(sCommand, 1);
 
         if (sUser.empty()) {
-            PutModule("Usage: Block <user>");
+            putModule("Usage: Block <user>");
             return;
         }
 
-        if (GetUser()->userName().equals(sUser)) {
-            PutModule("You can't block yourself");
+        if (user()->userName().equals(sUser)) {
+            putModule("You can't block yourself");
             return;
         }
 
         if (Block(sUser))
-            PutModule("Blocked [" + sUser + "]");
+            putModule("Blocked [" + sUser + "]");
         else
-            PutModule("Could not block [" + sUser + "] (misspelled?)");
+            putModule("Could not block [" + sUser + "] (misspelled?)");
     }
 
     void OnUnblockCommand(const NoString& sCommand)
@@ -128,20 +128,20 @@ public:
         NoString sUser = No::tokens(sCommand, 1);
 
         if (sUser.empty()) {
-            PutModule("Usage: Unblock <user>");
+            putModule("Usage: Unblock <user>");
             return;
         }
 
         NoRegistry registry(this);
         if (registry.contains(sUser)) {
             registry.remove(sUser);
-            PutModule("Unblocked [" + sUser + "]");
+            putModule("Unblocked [" + sUser + "]");
         } else {
-            PutModule("This user is not blocked");
+            putModule("This user is not blocked");
         }
     }
 
-    bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/user" && WebSock.GetSession()->isAdmin()) {
             NoString sAction = Tmpl["WebadminAction"];
@@ -193,7 +193,7 @@ private:
         std::vector<NoClient*> vpClients = pUser->allClients();
         std::vector<NoClient*>::iterator it;
         for (it = vpClients.begin(); it != vpClients.end(); ++it) {
-            (*it)->PutStatusNotice(MESSAGE);
+            (*it)->putStatusNotice(MESSAGE);
             (*it)->GetSocket()->Close(NoSocket::CLT_AFTERWRITE);
         }
 

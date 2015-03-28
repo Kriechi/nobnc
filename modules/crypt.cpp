@@ -56,13 +56,13 @@ class NoCryptMod : public NoModule
 public:
     MODCONSTRUCTOR(NoCryptMod)
     {
-        AddHelpCommand();
-        AddCommand("DelKey",
+        addHelpCommand();
+        addCommand("DelKey",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnDelKeyCommand),
                    "<#chan|Nick>",
                    "Remove a key for nick or channel");
-        AddCommand("SetKey", static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnSetKeyCommand), "<#chan|Nick> <Key>", "Set a key for nick or channel");
-        AddCommand("ListKeys",
+        addCommand("SetKey", static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnSetKeyCommand), "<#chan|Nick> <Key>", "Set a key for nick or channel");
+        addCommand("ListKeys",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnListKeysCommand),
                    "",
                    "List all keys");
@@ -79,14 +79,14 @@ public:
 
         NoRegistry registry(this);
         if (registry.contains(sTarget.toLower())) {
-            NoChannel* pChan = GetNetwork()->findChannel(sTarget);
-            NoString sNickMask = GetNetwork()->ircNick().nickMask();
+            NoChannel* pChan = network()->findChannel(sTarget);
+            NoString sNickMask = network()->ircNick().nickMask();
             if (pChan) {
                 if (!pChan->autoClearChanBuffer())
                     pChan->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +
                                      " :{text}",
                                      sMessage);
-                GetUser()->putUser(":" + NickPrefix() + sNickMask + " PRIVMSG " + sTarget + " :" + sMessage, nullptr, GetClient());
+                user()->putUser(":" + NickPrefix() + sNickMask + " PRIVMSG " + sTarget + " :" + sMessage, nullptr, client());
             }
 
             NoString sMsg = MakeIvec() + sMessage;
@@ -94,7 +94,7 @@ public:
             sMsg = sMsg.toBase64();
             sMsg = "+OK *" + sMsg;
 
-            PutIRC("PRIVMSG " + sTarget + " :" + sMsg);
+            putIrc("PRIVMSG " + sTarget + " :" + sMsg);
             return HALTCORE;
         }
 
@@ -136,12 +136,12 @@ public:
             NoRegistry registry(this);
             if (registry.contains(sTarget.toLower())) {
                 registry.remove(sTarget.toLower());
-                PutModule("Target [" + sTarget + "] deleted");
+                putModule("Target [" + sTarget + "] deleted");
             } else {
-                PutModule("Target [" + sTarget + "] not found");
+                putModule("Target [" + sTarget + "] not found");
             }
         } else {
-            PutModule("Usage DelKey <#chan|Nick>");
+            putModule("Usage DelKey <#chan|Nick>");
         }
     }
 
@@ -156,9 +156,9 @@ public:
         if (!sKey.empty()) {
             NoRegistry registry(this);
             registry.setValue(sTarget.toLower(), sKey);
-            PutModule("Set encryption key for [" + sTarget + "] to [" + sKey + "]");
+            putModule("Set encryption key for [" + sTarget + "] to [" + sKey + "]");
         } else {
-            PutModule("Usage: SetKey <#chan|Nick> <Key>");
+            putModule("Usage: SetKey <#chan|Nick> <Key>");
         }
     }
 
@@ -166,7 +166,7 @@ public:
     {
         NoRegistry registry(this);
         if (registry.isEmpty()) {
-            PutModule("You have no encryption keys set.");
+            putModule("You have no encryption keys set.");
         } else {
             NoTable Table;
             Table.addColumn("Target");
@@ -185,7 +185,7 @@ public:
                 Table.setValue("Key", NickPrefix());
             }
 
-            PutModule(Table);
+            putModule(Table);
         }
     }
 

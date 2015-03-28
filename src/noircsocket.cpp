@@ -154,9 +154,9 @@ void NoIrcSocket::Quit(const NoString& sQuitMsg)
         return;
     }
     if (!sQuitMsg.empty()) {
-        PutIRC("QUIT :" + sQuitMsg);
+        putIrc("QUIT :" + sQuitMsg);
     } else {
-        PutIRC("QUIT :" + d->network->expandString(d->network->quitMsg()));
+        putIrc("QUIT :" + d->network->expandString(d->network->quitMsg()));
     }
     Close(CLT_AFTERWRITE);
 }
@@ -176,7 +176,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
     if (sLine.startsWith("PING ")) {
         // Generate a reply and don't forward this to any user,
         // we don't want any PING forwarded
-        PutIRCQuick("PONG " + sLine.substr(5));
+        putIrcQuick("PONG " + sLine.substr(5));
         return;
     } else if (No::token(sLine, 1).equals("PONG")) {
         // Block PONGs, we already responded to the pings
@@ -210,7 +210,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             d->network->setIrcServer(sServer);
             SetTimeout(NoNetwork::NoTrafficTimeout,
                        TMO_READ); // Now that we are connected, let nature take its course
-            PutIRC("WHO " + sNick);
+            putIrc("WHO " + sNick);
 
             d->authed = true;
             d->network->putStatus("Connected!");
@@ -450,7 +450,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                         }
 
                         if (!sModes.empty()) {
-                            PutIRC("MODE " + pChan->name() + " " + sModes);
+                            putIrc("MODE " + pChan->name() + " " + sModes);
                         }
                     }
                 }
@@ -597,7 +597,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 if (pChan) {
                     pChan->enable();
                     pChan->setIsOn(true);
-                    PutIRC("MODE " + sChan);
+                    putIrc("MODE " + sChan);
                 }
             } else {
                 pChan = d->network->findChannel(sChan);
@@ -653,7 +653,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                 NoString sModeArg = No::token(sModes, 0);
                 bool bAdd = true;
                 /* no module call defined (yet?)
-                                MODULECALL(onRawUserMode(*pOpNick, *this, sModeArg, sArgs), d->pNetwork->GetUser(),
+                                MODULECALL(onRawUserMode(*pOpNick, *this, sModeArg, sArgs), d->pNetwork->user(),
                    nullptr, );
                 */
                 for (uint a = 0; a < sModeArg.size(); a++) {
@@ -866,11 +866,11 @@ void NoIrcSocket::SendNextCap()
     if (!d->capPaused) {
         if (d->pendingCaps.empty()) {
             // We already got all needed ACK/NAK replies.
-            PutIRC("CAP END");
+            putIrc("CAP END");
         } else {
             NoString sCap = *d->pendingCaps.begin();
             d->pendingCaps.erase(d->pendingCaps.begin());
-            PutIRC("CAP REQ :" + sCap);
+            putIrc("CAP REQ :" + sCap);
         }
     }
 }
@@ -964,7 +964,7 @@ bool NoIrcSocket::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
         }
         d->numCtcp++;
 
-        PutIRC("NOTICE " + Nick.nick() + " :\001" + sQuery + " " + sReply + "\001");
+        putIrc("NOTICE " + Nick.nick() + " :\001" + sQuery + " " + sReply + "\001");
         return true;
     }
 
@@ -1060,7 +1060,7 @@ bool NoIrcSocket::onChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMess
     return ((pChan) && (pChan->isDetached()));
 }
 
-void NoIrcSocket::PutIRC(const NoString& sLine)
+void NoIrcSocket::putIrc(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (d->floodProtection && d->sendsAllowed <= 0) {
@@ -1070,7 +1070,7 @@ void NoIrcSocket::PutIRC(const NoString& sLine)
     TrySend();
 }
 
-void NoIrcSocket::PutIRCQuick(const NoString& sLine)
+void NoIrcSocket::putIrcQuick(const NoString& sLine)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (d->floodProtection && d->sendsAllowed <= 0) {
@@ -1083,7 +1083,7 @@ void NoIrcSocket::PutIRCQuick(const NoString& sLine)
 
 void NoIrcSocket::TrySend()
 {
-    // This condition must be the same as in PutIRC() and PutIRCQuick()!
+    // This condition must be the same as in putIrc() and putIrcQuick()!
     while (!d->sendQueue.empty() && (!d->floodProtection || d->sendsAllowed > 0)) {
         d->sendsAllowed--;
         bool bSkip = false;
@@ -1117,14 +1117,14 @@ void NoIrcSocket::ConnectedImpl()
     IRCSOCKMODULECALL(onIrcRegistration(sPass, sNick, sIdent, sRealName), &bReturn);
     if (bReturn) return;
 
-    PutIRC("CAP LS");
+    putIrc("CAP LS");
 
     if (!sPass.empty()) {
-        PutIRC("PASS " + sPass);
+        putIrc("PASS " + sPass);
     }
 
-    PutIRC("NICK " + sNick);
-    PutIRC("USER " + sIdent + " \"" + sIdent + "\" \"" + sIdent + "\" :" + sRealName);
+    putIrc("NICK " + sNick);
+    putIrc("USER " + sIdent + " \"" + sIdent + "\" \"" + sIdent + "\" :" + sRealName);
 
     // SendAltNick() needs this
     d->nick.setNick(sNick);
@@ -1281,11 +1281,11 @@ void NoIrcSocket::ParseISupport(const NoString& sLine)
         } else if (sName.equals("NAMESX")) {
             if (d->hasNamesX) continue;
             d->hasNamesX = true;
-            PutIRC("PROTOCTL NAMESX");
+            putIrc("PROTOCTL NAMESX");
         } else if (sName.equals("UHNAMES")) {
             if (d->hasUhNames) continue;
             d->hasUhNames = true;
-            PutIRC("PROTOCTL UHNAMES");
+            putIrc("PROTOCTL UHNAMES");
         }
     }
 }
@@ -1395,7 +1395,7 @@ void NoIrcSocket::SendAltNick(const NoString& sBadNick)
         sNewNick = sConfNick.left(uMax - 1) + ++cLetter;
         if (sNewNick.equals(sAltNick)) sNewNick = sConfNick.left(uMax - 1) + ++cLetter;
     }
-    PutIRC("NICK " + sNewNick);
+    putIrc("NICK " + sNewNick);
     d->nick.setNick(sNewNick);
 }
 
@@ -1428,7 +1428,7 @@ NoString NoIrcSocket::GetNick() const { return d->nick.nick(); }
 
 const NoString& NoIrcSocket::GetPass() const { return d->password; }
 
-NoNetwork*NoIrcSocket::GetNetwork() const { return d->network; }
+NoNetwork*NoIrcSocket::network() const { return d->network; }
 
 bool NoIrcSocket::HasNamesx() const { return d->hasNamesX; }
 

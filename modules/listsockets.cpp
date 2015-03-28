@@ -66,17 +66,17 @@ class NoListSockets : public NoModule
 public:
     MODCONSTRUCTOR(NoListSockets)
     {
-        AddHelpCommand();
-        AddCommand("List",
+        addHelpCommand();
+        addCommand("List",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoListSockets::OnListCommand),
                    "[-n]",
                    "Show the list of active sockets. Pass -n to show IP addresses");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
 #ifndef MOD_LISTSOCKETS_ALLOW_EVERYONE
-        if (!GetUser()->isAdmin()) {
+        if (!user()->isAdmin()) {
             sMessage = "You must be admin to use this module";
             return false;
         }
@@ -87,7 +87,7 @@ public:
 
     std::priority_queue<NoSocketSorter> GetSockets()
     {
-        NoSocketManager& m = NoApp::Get().GetManager();
+        NoSocketManager& m = NoApp::Get().manager();
         std::priority_queue<NoSocketSorter> ret;
 
         for (NoSocket* pSock : m.GetSockets()) {
@@ -102,13 +102,13 @@ public:
         return ret;
     }
 
-    bool WebRequiresAdmin() override { return true; }
-    NoString GetWebMenuTitle() override { return "List sockets"; }
+    bool webRequiresAdmin() override { return true; }
+    NoString webMenuTitle() override { return "List sockets"; }
 
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            if (NoApp::Get().GetManager().GetSockets().empty()) {
+            if (NoApp::Get().manager().GetSockets().empty()) {
                 return false;
             }
 
@@ -166,7 +166,7 @@ public:
     {
         ulonglong iStartTime = pSocket->GetStartTime();
         time_t iTime = iStartTime / 1000;
-        return No::formatTime(iTime, "%Y-%m-%d %H:%M:%S", GetUser()->timezone());
+        return No::formatTime(iTime, "%Y-%m-%d %H:%M:%S", user()->timezone());
     }
 
     NoString GetLocalHost(NoSocket* pSocket, bool bShowHosts)
@@ -214,8 +214,8 @@ public:
 
     void ShowSocks(bool bShowHosts)
     {
-        if (NoApp::Get().GetManager().GetSockets().empty()) {
-            PutStatus("You have no open sockets.");
+        if (NoApp::Get().manager().GetSockets().empty()) {
+            putStatus("You have no open sockets.");
             return;
         }
 
@@ -252,7 +252,7 @@ public:
             Table.setValue("Out", No::toByteStr(pSocket->GetBytesWritten()));
         }
 
-        PutModule(Table);
+        putModule(Table);
         return;
     }
 };

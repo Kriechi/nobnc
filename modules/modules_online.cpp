@@ -28,12 +28,12 @@ public:
 
     bool IsOnlineModNick(const NoString& sNick)
     {
-        const NoString& sPrefix = GetUser()->statusPrefix();
+        const NoString& sPrefix = user()->statusPrefix();
         if (!sNick.startsWith(sPrefix)) return false;
 
         NoString sModNick = sNick.substr(sPrefix.length());
-        if (sModNick.equals("status") || GetNetwork()->loader()->findModule(sModNick) ||
-            GetUser()->loader()->findModule(sModNick) || NoApp::Get().GetLoader()->findModule(sModNick))
+        if (sModNick.equals("status") || network()->loader()->findModule(sModNick) ||
+            user()->loader()->findModule(sModNick) || NoApp::Get().GetLoader()->findModule(sModNick))
             return true;
         return false;
     }
@@ -56,10 +56,10 @@ public:
             // Remove the leading space
             sBNNoNicks.leftChomp(1);
 
-            if (!GetNetwork()->ircSocket()) {
+            if (!network()->ircSocket()) {
                 // if we are not connected to any IRC server, send
                 // an empty or module-nick filled response.
-                PutUser(":irc.znc.in 303 " + GetClient()->GetNick() + " :" + sBNNoNicks);
+                putUser(":irc.znc.in 303 " + client()->GetNick() + " :" + sBNNoNicks);
             } else {
                 // We let the server handle this request and then act on
                 // the 303 response from the IRC server.
@@ -72,10 +72,10 @@ public:
             NoString sNick = No::token(sLine, 1);
 
             if (IsOnlineModNick(sNick)) {
-                NoNetwork* pNetwork = GetNetwork();
-                PutUser(":znc.in 311 " + pNetwork->currentNick() + " " + sNick + " " + sNick + " znc.in * :" + sNick);
-                PutUser(":znc.in 312 " + pNetwork->currentNick() + " " + sNick + " *.znc.in :Bouncer");
-                PutUser(":znc.in 318 " + pNetwork->currentNick() + " " + sNick + " :End of /WHOIS list.");
+                NoNetwork* pNetwork = network();
+                putUser(":znc.in 311 " + pNetwork->currentNick() + " " + sNick + " " + sNick + " znc.in * :" + sNick);
+                putUser(":znc.in 312 " + pNetwork->currentNick() + " " + sNick + " *.znc.in :Bouncer");
+                putUser(":znc.in 318 " + pNetwork->currentNick() + " " + sNick + " :End of /WHOIS list.");
 
                 return HALT;
             }

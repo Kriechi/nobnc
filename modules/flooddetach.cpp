@@ -28,11 +28,11 @@ public:
         m_iThresholdSecs = 0;
         m_iThresholdMsgs = 0;
 
-        AddHelpCommand();
-        AddCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::ShowCommand), "");
-        AddCommand("Secs", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::SecsCommand), "[<limit>]");
-        AddCommand("Lines", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::LinesCommand), "[<limit>]");
-        AddCommand("Silent", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::SilentCommand), "[yes|no]");
+        addHelpCommand();
+        addCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::ShowCommand), "");
+        addCommand("Secs", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::SecsCommand), "[<limit>]");
+        addCommand("Lines", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::LinesCommand), "[<limit>]");
+        addCommand("Silent", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::SilentCommand), "[yes|no]");
     }
 
     void Save()
@@ -44,10 +44,10 @@ public:
         registry.setValue("secs", NoString(m_iThresholdSecs));
         registry.setValue("msgs", NoString(m_iThresholdMsgs));
 
-        SetArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
+        setArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         m_iThresholdMsgs = No::token(sArgs, 0).toUInt();
         m_iThresholdSecs = No::token(sArgs, 1).toUInt();
@@ -77,7 +77,7 @@ public:
             // The timeout for this channel did not expire yet?
             if (it->second.first + (time_t)m_iThresholdSecs >= now) continue;
 
-            NoChannel* pChan = GetNetwork()->findChannel(it->first);
+            NoChannel* pChan = network()->findChannel(it->first);
             if (it->second.second >= m_iThresholdMsgs && pChan && pChan->isDetached()) {
                 // The channel is detached and it is over the
                 // messages limit. Since we only track those
@@ -87,7 +87,7 @@ public:
 
                 NoRegistry registry(this);
                 if (!registry.value("silent").toBool()) {
-                    PutModule("Flood in [" + pChan->name() + "] is over, "
+                    putModule("Flood in [" + pChan->name() + "] is over, "
                                                                 "re-attaching...");
                 }
                 // No buffer playback, makes sense, doesn't it?
@@ -147,7 +147,7 @@ public:
 
         NoRegistry registry(this);
         if (!registry.value("silent").toBool()) {
-            PutModule("Channel [" + Channel.name() + "] was "
+            putModule("Channel [" + Channel.name() + "] was "
                                                         "flooded, you've been detached");
         }
     }
@@ -179,7 +179,7 @@ public:
 
     void ShowCommand(const NoString& sLine)
     {
-        PutModule("Current limit is " + NoString(m_iThresholdMsgs) + " lines "
+        putModule("Current limit is " + NoString(m_iThresholdMsgs) + " lines "
                                                                     "in " +
                   NoString(m_iThresholdSecs) + " secs.");
     }
@@ -189,12 +189,12 @@ public:
         const NoString sArg = No::tokens(sLine, 1);
 
         if (sArg.empty()) {
-            PutModule("Seconds limit is [" + NoString(m_iThresholdSecs) + "]");
+            putModule("Seconds limit is [" + NoString(m_iThresholdSecs) + "]");
         } else {
             m_iThresholdSecs = sArg.toUInt();
             if (m_iThresholdSecs == 0) m_iThresholdSecs = 1;
 
-            PutModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
+            putModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
             Save();
         }
     }
@@ -204,12 +204,12 @@ public:
         const NoString sArg = No::tokens(sLine, 1);
 
         if (sArg.empty()) {
-            PutModule("Lines limit is [" + NoString(m_iThresholdMsgs) + "]");
+            putModule("Lines limit is [" + NoString(m_iThresholdMsgs) + "]");
         } else {
             m_iThresholdMsgs = sArg.toUInt();
             if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 2;
 
-            PutModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");
+            putModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");
             Save();
         }
     }
@@ -224,9 +224,9 @@ public:
         }
 
         if (registry.value("silent").toBool()) {
-            PutModule("Module messages are disabled");
+            putModule("Module messages are disabled");
         } else {
-            PutModule("Module messages are enabled");
+            putModule("Module messages are enabled");
         }
     }
 

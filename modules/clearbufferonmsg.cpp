@@ -44,7 +44,7 @@ public:
 
     void ClearAllBuffers()
     {
-        NoNetwork* pNetwork = GetNetwork();
+        NoNetwork* pNetwork = network();
 
         if (pNetwork) {
             const std::vector<NoChannel*>& vChans = pNetwork->channels();
@@ -67,7 +67,7 @@ public:
 
             // We deny autoclearQueryBuffer since this module
             // doesn't make any sense with it
-            GetUser()->setAutoclearQueryBuffer(false);
+            user()->setAutoclearQueryBuffer(false);
         }
     }
 
@@ -143,7 +143,7 @@ public:
         }
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector vsOpts = sArgs.split(" ", No::SkipEmptyParts);
 

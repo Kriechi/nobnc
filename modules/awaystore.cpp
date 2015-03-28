@@ -64,10 +64,10 @@ class NoAway : public NoModule
         time(&curtime);
 
         if (No::token(sCommand, 1) != "-quiet") {
-            sReason = No::formatTime(curtime, No::tokens(sCommand, 1), GetUser()->timezone());
-            PutModNotice("You have been marked as away");
+            sReason = No::formatTime(curtime, No::tokens(sCommand, 1), user()->timezone());
+            putModuleNotice("You have been marked as away");
         } else {
-            sReason = No::formatTime(curtime, No::tokens(sCommand, 2), GetUser()->timezone());
+            sReason = No::formatTime(curtime, No::tokens(sCommand, 2), user()->timezone());
         }
 
         Away(false, sReason);
@@ -75,23 +75,23 @@ class NoAway : public NoModule
 
     void BackCommand(const NoString& sCommand)
     {
-        if ((m_vMessages.empty()) && (No::token(sCommand, 1) != "-quiet")) PutModNotice("Welcome Back!");
+        if ((m_vMessages.empty()) && (No::token(sCommand, 1) != "-quiet")) putModuleNotice("Welcome Back!");
         Ping();
         Back();
     }
 
     void MessagesCommand(const NoString& sCommand)
     {
-        for (u_int a = 0; a < m_vMessages.size(); a++) PutModule(m_vMessages[a]);
+        for (u_int a = 0; a < m_vMessages.size(); a++) putModule(m_vMessages[a]);
     }
 
     void ReplayCommand(const NoString& sCommand)
     {
-        NoString nick = GetClient()->GetNick();
+        NoString nick = client()->GetNick();
         for (u_int a = 0; a < m_vMessages.size(); a++) {
             NoString sWhom = No::token(m_vMessages[a], 1, ":");
             NoString sMessage = No::tokens(m_vMessages[a], 2, ":");
-            PutUser(":" + sWhom + " PRIVMSG " + nick + " :" + sMessage);
+            putUser(":" + sWhom + " PRIVMSG " + nick + " :" + sMessage);
         }
     }
 
@@ -99,19 +99,19 @@ class NoAway : public NoModule
     {
         NoString sWhich = No::token(sCommand, 1);
         if (sWhich == "all") {
-            PutModNotice("Deleted " + NoString(m_vMessages.size()) + " Messages.");
+            putModuleNotice("Deleted " + NoString(m_vMessages.size()) + " Messages.");
             for (u_int a = 0; a < m_vMessages.size(); a++) m_vMessages.erase(m_vMessages.begin() + a--);
         } else if (sWhich.empty()) {
-            PutModNotice("USAGE: delete <num|all>");
+            putModuleNotice("USAGE: delete <num|all>");
             return;
         } else {
             u_int iNum = sWhich.toUInt();
             if (iNum >= m_vMessages.size()) {
-                PutModNotice("Illegal Message # Requested");
+                putModuleNotice("Illegal Message # Requested");
                 return;
             } else {
                 m_vMessages.erase(m_vMessages.begin() + iNum);
-                PutModNotice("Message Erased.");
+                putModuleNotice("Message Erased.");
             }
             SaveBufferToDisk();
         }
@@ -121,9 +121,9 @@ class NoAway : public NoModule
     {
         if (m_saveMessages) {
             SaveBufferToDisk();
-            PutModNotice("Messages saved to disk.");
+            putModuleNotice("Messages saved to disk.");
         } else {
-            PutModNotice("There are no messages to save.");
+            putModuleNotice("There are no messages to save.");
         }
     }
 
@@ -136,7 +136,7 @@ class NoAway : public NoModule
     void PassCommand(const NoString& sCommand)
     {
         m_sPassword = No::token(sCommand, 1);
-        PutModNotice("Password Updated to [" + m_sPassword + "]");
+        putModuleNotice("Password Updated to [" + m_sPassword + "]");
     }
 
     void ShowCommand(const NoString& sCommand)
@@ -149,7 +149,7 @@ class NoAway : public NoModule
 
             if ((sTime.empty()) || (sWhom.empty()) || (sMessage.empty())) {
                 // illegal format
-                PutModule("Corrupt message! [" + m_vMessages[a] + "]");
+                putModule("Corrupt message! [" + m_vMessages[a] + "]");
                 m_vMessages.erase(m_vMessages.begin() + a--);
                 continue;
             }
@@ -161,7 +161,7 @@ class NoAway : public NoModule
             size_t iCount = strftime(szFormat, 64, "%F %T", &t);
 
             if (iCount <= 0) {
-                PutModule("Corrupt time stamp! [" + m_vMessages[a] + "]");
+                putModule("Corrupt time stamp! [" + m_vMessages[a] + "]");
                 m_vMessages.erase(m_vMessages.begin() + a--);
                 continue;
             }
@@ -174,23 +174,23 @@ class NoAway : public NoModule
         }
 
         for (std::map<NoString, std::vector<NoString>>::iterator it = msvOutput.begin(); it != msvOutput.end(); ++it) {
-            PutModule(it->first);
-            for (u_int a = 0; a < it->second.size(); a++) PutModule(it->second[a]);
+            putModule(it->first);
+            for (u_int a = 0; a < it->second.size(); a++) putModule(it->second[a]);
         }
 
-        PutModule("#--- End Messages");
+        putModule("#--- End Messages");
     }
 
     void EnableTimerCommand(const NoString& sCommand)
     {
         SetAwayTime(300);
-        PutModule("Timer set to 300 seconds");
+        putModule("Timer set to 300 seconds");
     }
 
     void DisableTimerCommand(const NoString& sCommand)
     {
         SetAwayTime(0);
-        PutModule("Timer disabled");
+        putModule("Timer disabled");
     }
 
     void SetTimerCommand(const NoString& sCommand)
@@ -200,14 +200,14 @@ class NoAway : public NoModule
         SetAwayTime(iSetting);
 
         if (iSetting == 0)
-            PutModule("Timer disabled");
+            putModule("Timer disabled");
         else
-            PutModule("Timer set to " + NoString(iSetting) + " seconds");
+            putModule("Timer set to " + NoString(iSetting) + " seconds");
     }
 
     void TimerCommand(const NoString& sCommand)
     {
-        PutModule("Current timer setting: " + NoString(GetAwayTime()) + " seconds");
+        putModule("Current timer setting: " + NoString(GetAwayTime()) + " seconds");
     }
 
 public:
@@ -221,20 +221,20 @@ public:
         NoAwayJob* timer = new NoAwayJob(this);
         timer->start(60);
 
-        AddHelpCommand();
-        AddCommand("Away", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::AwayCommand), "[-quiet]");
-        AddCommand("Back", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::BackCommand), "[-quiet]");
-        AddCommand("Messages", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::BackCommand));
-        AddCommand("Delete", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::DeleteCommand), "delete <num|all>");
-        AddCommand("Save", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::SaveCommand));
-        AddCommand("Ping", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::PingCommand));
-        AddCommand("Pass", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::PassCommand));
-        AddCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::ShowCommand));
-        AddCommand("Replay", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::ReplayCommand));
-        AddCommand("EnableTimer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::EnableTimerCommand));
-        AddCommand("DisableTimer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::DisableTimerCommand));
-        AddCommand("SetTimer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::SetTimerCommand), "<secs>");
-        AddCommand("Timer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::TimerCommand));
+        addHelpCommand();
+        addCommand("Away", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::AwayCommand), "[-quiet]");
+        addCommand("Back", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::BackCommand), "[-quiet]");
+        addCommand("Messages", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::BackCommand));
+        addCommand("Delete", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::DeleteCommand), "delete <num|all>");
+        addCommand("Save", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::SaveCommand));
+        addCommand("Ping", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::PingCommand));
+        addCommand("Pass", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::PassCommand));
+        addCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::ShowCommand));
+        addCommand("Replay", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::ReplayCommand));
+        addCommand("EnableTimer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::EnableTimerCommand));
+        addCommand("DisableTimer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::DisableTimerCommand));
+        addCommand("SetTimer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::SetTimerCommand), "<secs>");
+        addCommand("Timer", static_cast<NoModuleCommand::ModCmdFunc>(&NoAway::TimerCommand));
     }
 
     virtual ~NoAway()
@@ -242,7 +242,7 @@ public:
         if (!m_bBootError) SaveBufferToDisk();
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoString sMyArgs = sArgs;
         size_t uIndex = 0;
@@ -299,7 +299,7 @@ public:
             }
         } else {
             m_sPassword = "";
-            No::printError("[" + GetModName() + ".so] Failed to Decrypt Messages");
+            No::printError("[" + moduleName() + ".so] Failed to Decrypt Messages");
             return (false);
         }
 
@@ -331,8 +331,8 @@ public:
 
     NoString GetPath()
     {
-        NoString sBuffer = GetUser()->userName();
-        NoString sRet = GetSavePath();
+        NoString sBuffer = user()->userName();
+        NoString sRet = savePath();
         sRet += "/.znc-away-" + No::md5(sBuffer);
         return (sRet);
     }
@@ -353,22 +353,22 @@ public:
                 sTime.trim();
             }
             if (m_sReason.empty()) m_sReason = "Auto Away at " + sTime;
-            PutIRC("AWAY :" + m_sReason);
+            putIrc("AWAY :" + m_sReason);
             m_bIsAway = true;
         }
     }
 
     void Back(bool bUsePrivMessage = false)
     {
-        PutIRC("away");
+        putIrc("away");
         m_bIsAway = false;
         if (!m_vMessages.empty()) {
             if (bUsePrivMessage) {
-                PutModule("Welcome Back!");
-                PutModule("You have " + NoString(m_vMessages.size()) + " messages!");
+                putModule("Welcome Back!");
+                putModule("You have " + NoString(m_vMessages.size()) + " messages!");
             } else {
-                PutModNotice("Welcome Back!");
-                PutModNotice("You have " + NoString(m_vMessages.size()) + " messages!");
+                putModuleNotice("Welcome Back!");
+                putModuleNotice("You have " + NoString(m_vMessages.size()) + " messages!");
             }
         }
         m_sReason = "";
@@ -431,7 +431,7 @@ private:
         NoFile File(sMessages);
 
         if (sMessages.empty() || !File.Open() || !File.ReadFile(sFile)) {
-            PutModule("Unable to find buffer");
+            putModule("Unable to find buffer");
             return (true); // gonna be successful here
         }
 
@@ -442,7 +442,7 @@ private:
 
             if (sBuffer.left(strlen(CRYPT_VERIFICATION_TOKEN)) != CRYPT_VERIFICATION_TOKEN) {
                 // failed to decode :(
-                PutModule("Unable to decode Encrypted messages");
+                putModule("Unable to decode Encrypted messages");
                 return (false);
             }
             sBuffer.erase(0, strlen(CRYPT_VERIFICATION_TOKEN));
@@ -452,7 +452,7 @@ private:
 
     void AddMessage(time_t iTime, const NoNick& Nick, const NoString& sMessage)
     {
-        if (Nick.nick() == GetNetwork()->ircNick().nick()) return; // ignore messages from self
+        if (Nick.nick() == network()->ircNick().nick()) return; // ignore messages from self
         AddMessage(NoString(iTime) + " " + Nick.nickMask() + " " + sMessage);
     }
 

@@ -27,29 +27,29 @@ class NoStickyChan : public NoModule
 public:
     MODCONSTRUCTOR(NoStickyChan)
     {
-        AddHelpCommand();
-        AddCommand("Stick",
+        addHelpCommand();
+        addCommand("Stick",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnStickCommand),
                    "<#channel> [key]",
                    "Sticks a channel");
-        AddCommand("Unstick",
+        addCommand("Unstick",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnUnstickCommand),
                    "<#channel>",
                    "Unsticks a channel");
-        AddCommand("List",
+        addCommand("List",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnListCommand),
                    "",
                    "Lists sticky channels");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override;
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override;
 
     ModRet onUserPart(NoString& sChannel, NoString& sMessage) override
     {
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
             if (sChannel.equals(key)) {
-                NoChannel* pChan = GetNetwork()->findChannel(sChannel);
+                NoChannel* pChan = network()->findChannel(sChannel);
 
                 if (pChan) {
                     pChan->joinUser();
@@ -81,24 +81,24 @@ public:
     {
         NoString sChannel = No::token(sCommand, 1).toLower();
         if (sChannel.empty()) {
-            PutModule("Usage: Stick <#channel> [key]");
+            putModule("Usage: Stick <#channel> [key]");
             return;
         }
         NoRegistry registry(this);
         registry.setValue(sChannel, No::token(sCommand, 2));
-        PutModule("Stuck " + sChannel);
+        putModule("Stuck " + sChannel);
     }
 
     void OnUnstickCommand(const NoString& sCommand)
     {
         NoString sChannel = No::token(sCommand, 1);
         if (sChannel.empty()) {
-            PutModule("Usage: Unstick <#channel>");
+            putModule("Usage: Unstick <#channel>");
             return;
         }
         NoRegistry registry(this);
         registry.remove(sChannel);
-        PutModule("Unstuck " + sChannel);
+        putModule("Unstuck " + sChannel);
     }
 
     void OnListCommand(const NoString& sCommand)
@@ -108,22 +108,22 @@ public:
         for (const NoString& key : registry.keys()) {
             NoString value = registry.value(key);
             if (value.empty())
-                PutModule(NoString(i) + ": " + key);
+                putModule(NoString(i) + ": " + key);
             else
-                PutModule(NoString(i) + ": " + key + " (" + value + ")");
+                putModule(NoString(i) + ": " + key + " (" + value + ")");
         }
-        PutModule(" -- End of List");
+        putModule(" -- End of List");
     }
 
-    NoString GetWebMenuTitle() override { return "Sticky Chans"; }
+    NoString webMenuTitle() override { return "Sticky Chans"; }
 
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             bool bSubmitted = (WebSock.GetParam("submitted").toInt() != 0);
 
             NoRegistry registry(this);
-            const std::vector<NoChannel*>& Channels = GetNetwork()->channels();
+            const std::vector<NoChannel*>& Channels = network()->channels();
             for (uint c = 0; c < Channels.size(); c++) {
                 const NoString sChan = Channels[c]->name();
                 bool bStick = registry.contains(sChan);
@@ -153,7 +153,7 @@ public:
         return false;
     }
 
-    bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/channel") {
             NoString sChan = Tmpl["ChanName"];
@@ -192,7 +192,7 @@ protected:
         if (!mod)
             return;
 
-        NoNetwork* pNetwork = mod->GetNetwork();
+        NoNetwork* pNetwork = mod->network();
         if (!pNetwork->ircSocket())
             return;
 
@@ -205,19 +205,19 @@ protected:
                     pChan->setKey(registry.value(key));
                 if (!pNetwork->addChannel(pChan)) {
                     /* addChannel() deleted that channel */
-                    mod->PutModule("Could not join [" + key + "] (# prefix missing?)");
+                    mod->putModule("Could not join [" + key + "] (# prefix missing?)");
                     continue;
                 }
             }
             if (!pChan->isOn() && pNetwork->isIrcConnected()) {
-                mod->PutModule("Joining [" + pChan->name() + "]");
-                mod->PutIRC("JOIN " + pChan->name() + (pChan->key().empty() ? "" : " " + pChan->key()));
+                mod->putModule("Joining [" + pChan->name() + "]");
+                mod->putIrc("JOIN " + pChan->name() + (pChan->key().empty() ? "" : " " + pChan->key()));
             }
         }
     }
 };
 
-bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
+bool NoStickyChan::onLoad(const NoString& sArgs, NoString& sMessage)
 {
     NoStringVector vsChans = sArgs.split(",", No::SkipEmptyParts);
     NoStringVector::iterator it;
@@ -230,7 +230,7 @@ bool NoStickyChan::OnLoad(const NoString& sArgs, NoString& sMessage)
     }
 
     // Since we now have these channels added, clear the argument list
-    SetArgs("");
+    setArgs("");
 
     NoStickyTimer* timer = new NoStickyTimer(this);
     timer->start(15);

@@ -27,26 +27,26 @@ class NoAutoCycleMod : public NoModule
 public:
     MODCONSTRUCTOR(NoAutoCycleMod)
     {
-        AddHelpCommand();
-        AddCommand("Add",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnAddCommand),
+        addHelpCommand();
+        addCommand("Add",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnaddCommand),
                    "[!]<#chan>",
                    "Add an entry, use !#chan to negate and * for wildcards");
-        AddCommand("Del",
+        addCommand("Del",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnDelCommand),
                    "[!]<#chan>",
                    "Remove an entry, needs to be an exact match");
-        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnListCommand), "", "List all entries");
+        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnListCommand), "", "List all entries");
         m_recentlyCycled.setExpiration(15 * 1000);
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector vsChans = sArgs.split(" ", No::SkipEmptyParts);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             if (!Add(*it)) {
-                PutModule("Unable to add [" + *it + "]");
+                putModule("Unable to add [" + *it + "]");
             }
         }
 
@@ -61,16 +61,16 @@ public:
         return true;
     }
 
-    void OnAddCommand(const NoString& sLine)
+    void OnaddCommand(const NoString& sLine)
     {
         NoString sChan = No::token(sLine, 1);
 
         if (AlreadyAdded(sChan)) {
-            PutModule(sChan + " is already added");
+            putModule(sChan + " is already added");
         } else if (Add(sChan)) {
-            PutModule("Added " + sChan + " to list");
+            putModule("Added " + sChan + " to list");
         } else {
-            PutModule("Usage: Add [!]<#chan>");
+            putModule("Usage: Add [!]<#chan>");
         }
     }
 
@@ -79,9 +79,9 @@ public:
         NoString sChan = No::token(sLine, 1);
 
         if (Del(sChan))
-            PutModule("Removed " + sChan + " from list");
+            putModule("Removed " + sChan + " from list");
         else
-            PutModule("Usage: Del [!]<#chan>");
+            putModule("Usage: Del [!]<#chan>");
     }
 
     void OnListCommand(const NoString& sLine)
@@ -100,9 +100,9 @@ public:
         }
 
         if (Table.size()) {
-            PutModule(Table);
+            putModule(Table);
         } else {
-            PutModule("You have no entries.");
+            putModule("You have no entries.");
         }
     }
 
@@ -131,7 +131,7 @@ protected:
 
         // Is that person us and we don't have op?
         const NoNick& pNick = Channel.nicks().begin()->second;
-        if (!pNick.hasPerm(NoChannel::Op) && pNick.equals(GetNetwork()->currentNick())) {
+        if (!pNick.hasPerm(NoChannel::Op) && pNick.equals(network()->currentNick())) {
             Channel.cycle();
             m_recentlyCycled.insert(Channel.name());
         }

@@ -37,14 +37,14 @@ class NoSslClientCertMod : public NoModule
 public:
     MODCONSTRUCTOR(NoSslClientCertMod)
     {
-        AddHelpCommand();
-        AddCommand("Add",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleAddCommand),
+        addHelpCommand();
+        addCommand("Add",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleaddCommand),
                    "[pubkey]",
                    "If pubkey is not provided will use the current key");
-        AddCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleDelCommand), "id");
-        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleListCommand));
-        AddCommand("Show",
+        addCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleDelCommand), "id");
+        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleListCommand));
+        addCommand("Show",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSslClientCertMod::HandleShowCommand),
                    "",
                    "Print your current key");
@@ -78,7 +78,7 @@ public:
 
     void onPostRehash() override { onBoot(); }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         onBoot();
 
@@ -149,30 +149,30 @@ public:
 
     void HandleShowCommand(const NoString& sLine)
     {
-        const NoString sPubKey = GetKey(GetClient()->GetSocket());
+        const NoString sPubKey = GetKey(client()->GetSocket());
 
         if (sPubKey.empty()) {
-            PutModule("You are not connected with any valid public key");
+            putModule("You are not connected with any valid public key");
         } else {
-            PutModule("Your current public key is: " + sPubKey);
+            putModule("Your current public key is: " + sPubKey);
         }
     }
 
-    void HandleAddCommand(const NoString& sLine)
+    void HandleaddCommand(const NoString& sLine)
     {
         NoString sPubKey = No::token(sLine, 1);
 
         if (sPubKey.empty()) {
-            sPubKey = GetKey(GetClient()->GetSocket());
+            sPubKey = GetKey(client()->GetSocket());
         }
 
         if (sPubKey.empty()) {
-            PutModule("You did not supply a public key or connect with one.");
+            putModule("You did not supply a public key or connect with one.");
         } else {
-            if (AddKey(GetUser(), sPubKey)) {
-                PutModule("'" + sPubKey + "' added.");
+            if (AddKey(user(), sPubKey)) {
+                putModule("'" + sPubKey + "' added.");
             } else {
-                PutModule("The key '" + sPubKey + "' is already added.");
+                putModule("The key '" + sPubKey + "' is already added.");
             }
         }
     }
@@ -184,9 +184,9 @@ public:
         Table.addColumn("Id");
         Table.addColumn("Key");
 
-        MNoStringSet::const_iterator it = m_PubKeys.find(GetUser()->userName());
+        MNoStringSet::const_iterator it = m_PubKeys.find(user()->userName());
         if (it == m_PubKeys.end()) {
-            PutModule("No keys set for your user");
+            putModule("No keys set for your user");
             return;
         }
 
@@ -197,25 +197,25 @@ public:
             Table.setValue("Key", *it2);
         }
 
-        if (PutModule(Table) == 0) {
+        if (putModule(Table) == 0) {
             // This double check is necessary, because the
             // set could be empty.
-            PutModule("No keys set for your user");
+            putModule("No keys set for your user");
         }
     }
 
     void HandleDelCommand(const NoString& sLine)
     {
         uint id = No::tokens(sLine, 1).toUInt();
-        MNoStringSet::iterator it = m_PubKeys.find(GetUser()->userName());
+        MNoStringSet::iterator it = m_PubKeys.find(user()->userName());
 
         if (it == m_PubKeys.end()) {
-            PutModule("No keys set for your user");
+            putModule("No keys set for your user");
             return;
         }
 
         if (id == 0 || id > it->second.size()) {
-            PutModule("Invalid #, check \"list\"");
+            putModule("Invalid #, check \"list\"");
             return;
         }
 
@@ -227,7 +227,7 @@ public:
 
         it->second.erase(it2);
         if (it->second.size() == 0) m_PubKeys.erase(it);
-        PutModule("Removed");
+        putModule("Removed");
 
         Save();
     }
@@ -251,9 +251,9 @@ public:
         }
     }
 
-    NoString GetWebMenuTitle() override { return "certauth"; }
+    NoString webMenuTitle() override { return "certauth"; }
 
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         NoUser* pUser = WebSock.GetSession()->user();
 
@@ -269,7 +269,7 @@ public:
             return true;
         } else if (sPageName == "add") {
             AddKey(pUser, WebSock.GetParam("key"));
-            WebSock.Redirect(GetWebPath());
+            WebSock.Redirect(webPath());
             return true;
         } else if (sPageName == "delete") {
             MNoStringSet::iterator it = m_PubKeys.find(pUser->userName());
@@ -283,7 +283,7 @@ public:
                 }
             }
 
-            WebSock.Redirect(GetWebPath());
+            WebSock.Redirect(webPath());
             return true;
         }
 

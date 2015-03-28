@@ -34,12 +34,12 @@ class NoAdminLogMod : public NoModule
 public:
     MODCONSTRUCTOR(NoAdminLogMod)
     {
-        AddHelpCommand();
-        AddCommand("Show",
+        addHelpCommand();
+        addCommand("Show",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminLogMod::OnShowCommand),
                    "",
                    "Show the logging target");
-        AddCommand("Target", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminLogMod::OnTargetCommand), "<file|syslog|both>", "Set the logging target");
+        addCommand("Target", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminLogMod::OnTargetCommand), "<file|syslog|both>", "Set the logging target");
         openlog("znc", LOG_PID, LOG_DAEMON);
     }
 
@@ -49,7 +49,7 @@ public:
         closelog();
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoRegistry registry(this);
         NoString sTarget = registry.value("target");
@@ -62,7 +62,7 @@ public:
         else
             m_eLogMode = LOG_TO_FILE;
 
-        m_sLogFile = GetSavePath() + "/znc.log";
+        m_sLogFile = savePath() + "/znc.log";
 
         Log("Logging started. ZNC PID[" + NoString(getpid()) + "] UID/GID[" + NoString(getuid()) + ":" + NoString(getgid()) + "]");
         return true;
@@ -70,13 +70,13 @@ public:
 
     void onIrcConnected() override
     {
-        Log("[" + GetUser()->userName() + "/" + GetNetwork()->name() + "] connected to IRC: " +
-            GetNetwork()->currentServer()->host());
+        Log("[" + user()->userName() + "/" + network()->name() + "] connected to IRC: " +
+            network()->currentServer()->host());
     }
 
     void onIrcDisconnected() override
     {
-        Log("[" + GetUser()->userName() + "/" + GetNetwork()->name() + "] disconnected from IRC");
+        Log("[" + user()->userName() + "/" + network()->name() + "] disconnected from IRC");
     }
 
     ModRet onRaw(NoString& sLine) override
@@ -86,8 +86,8 @@ public:
             // ERROR :Closing Link: nick[24.24.24.24] Killer (Local kill by Killer (reason))
             NoString sError(sLine.substr(6));
             if (sError.left(1) == ":") sError.leftChomp(1);
-            Log("[" + GetUser()->userName() + "/" + GetNetwork()->name() + "] disconnected from IRC: " +
-                GetNetwork()->currentServer()->host() + " [" + sError + "]",
+            Log("[" + user()->userName() + "/" + network()->name() + "] disconnected from IRC: " +
+                network()->currentServer()->host() + " [" + sError + "]",
                 LOG_NOTICE);
         }
         return CONTINUE;
@@ -95,12 +95,12 @@ public:
 
     void onClientLogin() override
     {
-        Log("[" + GetUser()->userName() + "] connected to ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
+        Log("[" + user()->userName() + "] connected to ZNC from " + client()->GetSocket()->GetRemoteIP());
     }
 
     void onClientDisconnect() override
     {
-        Log("[" + GetUser()->userName() + "] disconnected from ZNC from " + GetClient()->GetSocket()->GetRemoteIP());
+        Log("[" + user()->userName() + "] disconnected from ZNC from " + client()->GetSocket()->GetRemoteIP());
     }
 
     void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
@@ -132,10 +132,10 @@ public:
 
     void onModCommand(const NoString& sCommand) override
     {
-        if (!GetUser()->isAdmin()) {
-            PutModule("Access denied");
+        if (!user()->isAdmin()) {
+            putModule("Access denied");
         } else {
-            HandleCommand(sCommand);
+            handleCommand(sCommand);
         }
     }
 
@@ -160,9 +160,9 @@ public:
             mode = LOG_TO_BOTH;
         } else {
             if (sArg.empty()) {
-                PutModule("Usage: Target <file|syslog|both>");
+                putModule("Usage: Target <file|syslog|both>");
             } else {
-                PutModule("Unknown target");
+                putModule("Unknown target");
             }
             return;
         }
@@ -171,7 +171,7 @@ public:
         NoRegistry registry(this);
         registry.setValue("target", sTarget);
         m_eLogMode = mode;
-        PutModule(sMessage);
+        putModule(sMessage);
     }
 
     void OnShowCommand(const NoString& sCommand)
@@ -190,8 +190,8 @@ public:
             break;
         }
 
-        PutModule("Logging is enabled for " + sTarget);
-        if (m_eLogMode != LOG_TO_SYSLOG) PutModule("Log file will be written to [" + m_sLogFile + "]");
+        putModule("Logging is enabled for " + sTarget);
+        if (m_eLogMode != LOG_TO_SYSLOG) putModule("Log file will be written to [" + m_sLogFile + "]");
     }
 
 private:

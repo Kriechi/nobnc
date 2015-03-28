@@ -60,7 +60,7 @@ NoTimer::NoTimer(NoModule* module)
 
     if (module) {
         NoModulePrivate::get(module)->addTimer(this);
-        module->GetManager()->AddCron(d->impl);
+        module->manager()->AddCron(d->impl);
     }
 }
 
@@ -68,7 +68,7 @@ NoTimer::~NoTimer()
 {
     if (d->module) {
         NoModulePrivate::get(d->module)->removeTimer(this);
-        d->module->GetManager()->DelCronByAddr(d->impl);
+        d->module->manager()->DelCronByAddr(d->impl);
     }
 }
 

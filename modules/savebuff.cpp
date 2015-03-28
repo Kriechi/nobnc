@@ -67,16 +67,16 @@ public:
     {
         m_bBootError = false;
 
-        AddHelpCommand();
-        AddCommand("SetPass",
+        addHelpCommand();
+        addCommand("SetPass",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnSetPassCommand),
                    "<password>",
                    "Sets the password");
-        AddCommand("Replay",
+        addCommand("Replay",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnReplayCommand),
                    "<buffer>",
                    "Replays the buffer");
-        AddCommand("Save", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnSaveCommand), "", "Saves all buffers");
+        addCommand("Save", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnSaveCommand), "", "Saves all buffers");
     }
     virtual ~NoSaveBuff()
     {
@@ -85,7 +85,7 @@ public:
         }
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         if (sArgs == CRYPT_ASK_PASS) {
             char* pPass = getpass("Enter pass for savebuff: ");
@@ -108,7 +108,7 @@ public:
 
     bool onBoot() override
     {
-        NoDir saveDir(GetSavePath());
+        NoDir saveDir(savePath());
         for (NoFile* pFile : saveDir) {
             NoString sName;
             NoString sBuffer;
@@ -117,19 +117,19 @@ public:
             switch (eType) {
             case InvalidBuffer:
                 m_sPassword = "";
-                No::printError("[" + GetModName() + ".so] Failed to Decrypt [" + pFile->GetLongName() + "]");
+                No::printError("[" + moduleName() + ".so] Failed to Decrypt [" + pFile->GetLongName() + "]");
                 if (!sName.empty()) {
-                    PutUser(":***!znc@znc.in PRIVMSG " + sName +
+                    putUser(":***!znc@znc.in PRIVMSG " + sName +
                             " :Failed to decrypt this buffer, did you change the encryption pass?");
                 }
                 break;
             case ChanBuffer:
-                if (NoChannel* pChan = GetNetwork()->findChannel(sName)) {
+                if (NoChannel* pChan = network()->findChannel(sName)) {
                     BootStrap(pChan, sBuffer);
                 }
                 break;
             case QueryBuffer:
-                if (NoQuery* pQuery = GetNetwork()->addQuery(sName)) {
+                if (NoQuery* pQuery = network()->addQuery(sName)) {
                     BootStrap(pQuery, sBuffer);
                 }
                 break;
@@ -198,14 +198,14 @@ public:
         if (!m_sPassword.empty()) {
             std::set<NoString> ssPaths;
 
-            const std::vector<NoChannel*>& vChans = GetNetwork()->channels();
+            const std::vector<NoChannel*>& vChans = network()->channels();
             for (NoChannel* pChan : vChans) {
                 NoString sPath = GetPath(pChan->name());
                 SaveBufferToDisk(pChan->buffer(), sPath, CHAN_VERIFICATION_TOKEN + pChan->name());
                 ssPaths.insert(sPath);
             }
 
-            const std::vector<NoQuery*>& vQueries = GetNetwork()->queries();
+            const std::vector<NoQuery*>& vQueries = network()->queries();
             for (NoQuery* pQuery : vQueries) {
                 NoString sPath = GetPath(pQuery->name());
                 SaveBufferToDisk(pQuery->buffer(), sPath, QUERY_VERIFICATION_TOKEN + pQuery->name());
@@ -213,14 +213,14 @@ public:
             }
 
             // cleanup leftovers ie. cleared buffers
-            NoDir saveDir(GetSavePath());
+            NoDir saveDir(savePath());
             for (NoFile* pFile : saveDir) {
                 if (ssPaths.count(pFile->GetLongName()) == 0) {
                     pFile->Delete();
                 }
             }
         } else {
-            PutModule("Password is unset usually meaning the decryption failed. You can setpass to the appropriate "
+            putModule("Password is unset usually meaning the decryption failed. You can setpass to the appropriate "
                       "pass and things should start working, or setpass to a new pass and save to reinstantiate");
         }
     }
@@ -231,7 +231,7 @@ public:
 
         if (sArgs.empty()) sArgs = CRYPT_LAME_PASS;
 
-        PutModule("Password set to [" + sArgs + "]");
+        putModule("Password set to [" + sArgs + "]");
         m_sPassword = No::md5(sArgs);
     }
 
@@ -251,12 +251,12 @@ public:
                 for (it = vsLines.begin(); it != vsLines.end(); ++it) {
                     NoString sLine(*it);
                     sLine.trim();
-                    PutModule("[" + sLine + "]");
+                    putModule("[" + sLine + "]");
                 }
             }
-            PutModule("//!-- EOF " + sArgs);
+            putModule("//!-- EOF " + sArgs);
         } else {
-            HandleCommand(sCmdLine);
+            handleCommand(sCmdLine);
         }
     }
 
@@ -265,20 +265,20 @@ public:
         NoString sArgs = No::tokens(sCmdLine, 1);
 
         Replay(sArgs);
-        PutModule("Replayed " + sArgs);
+        putModule("Replayed " + sArgs);
     }
 
     void OnSaveCommand(const NoString& sCmdLine)
     {
         SaveBuffersToDisk();
-        PutModule("Done.");
+        putModule("Done.");
     }
 
     void Replay(const NoString& sBuffer)
     {
         NoString sFile;
         NoString sName;
-        PutUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Buffer Playback...");
+        putUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Buffer Playback...");
         if (DecryptBuffer(GetPath(sBuffer), sFile, sName)) {
             NoStringVector vsLines = sFile.split("\n");
             NoStringVector::iterator it;
@@ -286,23 +286,23 @@ public:
             for (it = vsLines.begin(); it != vsLines.end(); ++it) {
                 NoString sLine(*it);
                 sLine.trim();
-                PutUser(sLine);
+                putUser(sLine);
             }
         }
-        PutUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Playback Complete.");
+        putUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Playback Complete.");
     }
 
     NoString GetPath(const NoString& sTarget) const
     {
-        NoString sBuffer = GetUser()->userName() + sTarget.toLower();
-        NoString sRet = GetSavePath();
+        NoString sBuffer = user()->userName() + sTarget.toLower();
+        NoString sRet = savePath();
         sRet += "/" + No::md5(sBuffer);
         return (sRet);
     }
 
     NoString FindLegacyBufferName(const NoString& sPath) const
     {
-        const std::vector<NoChannel*>& vChans = GetNetwork()->channels();
+        const std::vector<NoChannel*>& vChans = network()->channels();
         for (NoChannel* pChan : vChans) {
             const NoString& sName = pChan->name();
             if (GetPath(sName).equals(sPath)) {
@@ -315,14 +315,14 @@ public:
 #ifdef LEGACY_SAVEBUFF /* event logging is deprecated now in savebuf. Use buffextras module along side of this */
     NoString SpoofChanMsg(const NoString& sChannel, const NoString& sMesg)
     {
-        NoString sReturn = ":*" + GetModName() + "!znc@znc.in PRIVMSG " + sChannel + " :" + NoString(time(nullptr)) + " " + sMesg;
+        NoString sReturn = ":*" + moduleName() + "!znc@znc.in PRIVMSG " + sChannel + " :" + NoString(time(nullptr)) + " " + sMesg;
         return (sReturn);
     }
 
     void AddBuffer(NoChannel& chan, const NoString& sLine)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
-        if (chan.AutoClearChanBuffer() && GetNetwork()->isUserAttached()) return;
+        if (chan.AutoClearChanBuffer() && network()->isUserAttached()) return;
         chan.AddBuffer(sLine);
     }
 
@@ -335,7 +335,7 @@ public:
         for (size_t a = 0; a < vChans.size(); a++) {
             AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " QUIT " + sMessage));
         }
-        if (cNick.NickEquals(GetUser()->nick())) SaveBuffersToDisk(); // need to force a save here to see this!
+        if (cNick.NickEquals(user()->nick())) SaveBuffersToDisk(); // need to force a save here to see this!
     }
 
     void onNick(const NoNick& cNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
@@ -350,7 +350,7 @@ public:
     }
     void onJoin(const NoNick& cNick, NoChannel& cChannel) override
     {
-        if (cNick.NickEquals(GetUser()->nick()) && cChannel.GetBuffer().empty()) {
+        if (cNick.NickEquals(user()->nick()) && cChannel.GetBuffer().empty()) {
             BootStrap((NoChannel*)&cChannel);
             if (!cChannel.GetBuffer().empty()) Replay(cChannel.GetName());
         }
@@ -359,7 +359,7 @@ public:
     void onPart(const NoNick& cNick, NoChannel& cChannel) override
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cNick.GetNickMask() + " PART"));
-        if (cNick.NickEquals(GetUser()->nick())) SaveBuffersToDisk(); // need to force a save here to see this!
+        if (cNick.NickEquals(user()->nick())) SaveBuffersToDisk(); // need to force a save here to see this!
     }
 #endif /* LEGACY_SAVEBUFF */
 
@@ -394,7 +394,7 @@ private:
                 if (sBuffer.trimLeft(sName + "\n")) return QueryBuffer;
             }
 
-            PutModule("Unable to decode Encrypted file [" + sPath + "]");
+            putModule("Unable to decode Encrypted file [" + sPath + "]");
             return InvalidBuffer;
         }
         return EmptyBuffer;

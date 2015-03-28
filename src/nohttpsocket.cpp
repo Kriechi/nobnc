@@ -490,7 +490,7 @@ void NoHttpSocket::SetLoggedIn(bool b) { m_loggedIn = b; }
 
 const NoString& NoHttpSocket::GetDocRoot() const { return m_docRoot; }
 
-const NoString& NoHttpSocket::GetUser() const { return m_username; }
+const NoString& NoHttpSocket::user() const { return m_username; }
 
 const NoString& NoHttpSocket::GetPass() const { return m_password; }
 

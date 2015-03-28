@@ -28,16 +28,16 @@ public:
 
     void onClientLogin() override
     {
-        SendAdmins(GetUser()->userName() + " attached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
+        SendAdmins(user()->userName() + " attached (from " + client()->GetSocket()->GetRemoteIP() + ")");
     }
 
     void onClientDisconnect() override
     {
-        SendAdmins(GetUser()->userName() + " detached (from " + GetClient()->GetSocket()->GetRemoteIP() + ")");
+        SendAdmins(user()->userName() + " detached (from " + client()->GetSocket()->GetRemoteIP() + ")");
     }
 
 private:
-    void SendAdmins(const NoString& msg) { NoApp::Get().Broadcast(msg, true, nullptr, GetClient()); }
+    void SendAdmins(const NoString& msg) { NoApp::Get().Broadcast(msg, true, nullptr, client()); }
 };
 
 template <> void no_moduleInfo<NoNotifyConnectMod>(NoModuleInfo& Info) { Info.setWikiPage("notify_connect"); }

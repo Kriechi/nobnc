@@ -31,9 +31,9 @@ public:
     ~NoSampleJob()
     {
         if (wasCancelled()) {
-            module()->PutModule("Sample job cancelled");
+            module()->putModule("Sample job cancelled");
         } else {
-            module()->PutModule("Sample job destroyed");
+            module()->putModule("Sample job destroyed");
         }
     }
 
@@ -50,7 +50,7 @@ public:
         }
     }
 
-    void finished() override { module()->PutModule("Sample job done"); }
+    void finished() override { module()->putModule("Sample job done"); }
 };
 #endif
 
@@ -67,7 +67,7 @@ public:
     }
 
 protected:
-    void run() override { module()->PutModule("TEST!!!!"); }
+    void run() override { module()->putModule("TEST!!!!"); }
 };
 
 class NoSampleMod : public NoModule
@@ -75,19 +75,19 @@ class NoSampleMod : public NoModule
 public:
     MODCONSTRUCTOR(NoSampleMod) {}
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        PutModule("I'm being loaded with the arguments: [" + sArgs + "]");
+        putModule("I'm being loaded with the arguments: [" + sArgs + "]");
 // AddTimer(new NoSampleTimer(this, 300, 0, "Sample", "Sample timer for sample things."));
 // AddTimer(new NoSampleTimer(this, 5, 20, "Another", "Another sample timer."));
 // AddTimer(new NoSampleTimer(this, 25000, 5, "Third", "A third sample timer."));
 #ifdef HAVE_PTHREAD
-        AddJob(new NoSampleJob(this));
+        addJob(new NoSampleJob(this));
 #endif
         return true;
     }
 
-    virtual ~NoSampleMod() { PutModule("I'm being unloaded!"); }
+    virtual ~NoSampleMod() { putModule("I'm being unloaded!"); }
 
     bool onBoot() override
     {
@@ -95,9 +95,9 @@ public:
         return true;
     }
 
-    void onIrcConnected() override { PutModule("You got connected BoyOh."); }
+    void onIrcConnected() override { putModule("You got connected BoyOh."); }
 
-    void onIrcDisconnected() override { PutModule("You got disconnected BoyOh."); }
+    void onIrcDisconnected() override { putModule("You got disconnected BoyOh."); }
 
     ModRet onIrcRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName) override
     {
@@ -107,104 +107,104 @@ public:
 
     ModRet onBroadcast(NoString& sMessage) override
     {
-        PutModule("------ [" + sMessage + "]");
+        putModule("------ [" + sMessage + "]");
         sMessage = "======== [" + sMessage + "] ========";
         return CONTINUE;
     }
 
     void onChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange) override
     {
-        PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] set mode [" + Channel.name() +
+        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] set mode [" + Channel.name() +
                   ((bAdded) ? "] +" : "] -") + NoString(uMode) + " " + Nick.nick());
     }
 
     void onOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] opped [" + Nick.nick() + "] on [" +
+        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] opped [" + Nick.nick() + "] on [" +
                   Channel.name() + "]");
     }
 
     void onDeop(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] deopped [" + Nick.nick() + "] on [" +
+        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] deopped [" + Nick.nick() + "] on [" +
                   Channel.name() + "]");
     }
 
     void onVoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] voiced [" + Nick.nick() + "] on [" +
+        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] voiced [" + Nick.nick() + "] on [" +
                   Channel.name() + "]");
     }
 
     void onDevoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] devoiced [" + Nick.nick() + "] on [" +
+        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] devoiced [" + Nick.nick() + "] on [" +
                   Channel.name() + "]");
     }
 
     void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
     {
-        PutModule("* " + OpNick.nick() + " sets mode: " + sModes + " " + sArgs + " (" + Channel.name() + ")");
+        putModule("* " + OpNick.nick() + " sets mode: " + sModes + " " + sArgs + " (" + Channel.name() + ")");
     }
 
     ModRet onRaw(NoString& sLine) override
     {
-        // PutModule("onRaw() [" + sLine + "]");
+        // putModule("onRaw() [" + sLine + "]");
         return CONTINUE;
     }
 
     ModRet onUserRaw(NoString& sLine) override
     {
-        // PutModule("UserRaw() [" + sLine + "]");
+        // putModule("UserRaw() [" + sLine + "]");
         return CONTINUE;
     }
 
     void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
-        PutModule("[" + OpNick.nick() + "] kicked [" + sKickedNick + "] from [" + Channel.name() +
+        putModule("[" + OpNick.nick() + "] kicked [" + sKickedNick + "] from [" + Channel.name() +
                   "] with the msg [" + sMessage + "]");
     }
 
     void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
-        PutModule("* Quits: " + Nick.nick() + " (" + Nick.ident() + "!" + Nick.host() + ") (" + sMessage + ")");
+        putModule("* Quits: " + Nick.nick() + " (" + Nick.ident() + "!" + Nick.host() + ") (" + sMessage + ")");
     }
 
     ModRet onTimerAutoJoin(NoChannel& Channel) override
     {
-        PutModule("Attempting to join " + Channel.name());
+        putModule("Attempting to join " + Channel.name());
         return CONTINUE;
     }
 
     void onJoin(const NoNick& Nick, NoChannel& Channel) override
     {
-        PutModule("* Joins: " + Nick.nick() + " (" + Nick.ident() + "!" + Nick.host() + ")");
+        putModule("* Joins: " + Nick.nick() + " (" + Nick.ident() + "!" + Nick.host() + ")");
     }
 
     void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
-        PutModule("* Parts: " + Nick.nick() + " (" + Nick.ident() + "!" + Nick.host() + ")");
+        putModule("* Parts: " + Nick.nick() + " (" + Nick.ident() + "!" + Nick.host() + ")");
     }
 
     ModRet onInvite(const NoNick& Nick, const NoString& sChan) override
     {
         if (sChan.equals("#test")) {
-            PutModule(Nick.nick() + " invited us to " + sChan + ", ignoring invites to " + sChan);
+            putModule(Nick.nick() + " invited us to " + sChan + ", ignoring invites to " + sChan);
             return HALT;
         }
 
-        PutModule(Nick.nick() + " invited us to " + sChan);
+        putModule(Nick.nick() + " invited us to " + sChan);
         return CONTINUE;
     }
 
     void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
-        PutModule("* " + OldNick.nick() + " is now known as " + sNewNick);
+        putModule("* " + OldNick.nick() + " is now known as " + sNewNick);
     }
 
     ModRet onUserCtcpReply(NoString& sTarget, NoString& sMessage) override
     {
-        PutModule("[" + sTarget + "] userctcpreply [" + sMessage + "]");
+        putModule("[" + sTarget + "] userctcpreply [" + sMessage + "]");
         sMessage = "\037" + sMessage + "\037";
 
         return CONTINUE;
@@ -212,21 +212,21 @@ public:
 
     ModRet onCtcpReply(NoNick& Nick, NoString& sMessage) override
     {
-        PutModule("[" + Nick.nick() + "] ctcpreply [" + sMessage + "]");
+        putModule("[" + Nick.nick() + "] ctcpreply [" + sMessage + "]");
 
         return CONTINUE;
     }
 
     ModRet onUserCtcp(NoString& sTarget, NoString& sMessage) override
     {
-        PutModule("[" + sTarget + "] userctcp [" + sMessage + "]");
+        putModule("[" + sTarget + "] userctcp [" + sMessage + "]");
 
         return CONTINUE;
     }
 
     ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
     {
-        PutModule("[" + Nick.nick() + "] privctcp [" + sMessage + "]");
+        putModule("[" + Nick.nick() + "] privctcp [" + sMessage + "]");
         sMessage = "\002" + sMessage + "\002";
 
         return CONTINUE;
@@ -234,7 +234,7 @@ public:
 
     ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        PutModule("[" + Nick.nick() + "] chanctcp [" + sMessage + "] to [" + Channel.name() + "]");
+        putModule("[" + Nick.nick() + "] chanctcp [" + sMessage + "] to [" + Channel.name() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
 
         return CONTINUE;
@@ -242,7 +242,7 @@ public:
 
     ModRet onUserNotice(NoString& sTarget, NoString& sMessage) override
     {
-        PutModule("[" + sTarget + "] usernotice [" + sMessage + "]");
+        putModule("[" + sTarget + "] usernotice [" + sMessage + "]");
         sMessage = "\037" + sMessage + "\037";
 
         return CONTINUE;
@@ -250,7 +250,7 @@ public:
 
     ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
     {
-        PutModule("[" + Nick.nick() + "] privnotice [" + sMessage + "]");
+        putModule("[" + Nick.nick() + "] privnotice [" + sMessage + "]");
         sMessage = "\002" + sMessage + "\002";
 
         return CONTINUE;
@@ -258,7 +258,7 @@ public:
 
     ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        PutModule("[" + Nick.nick() + "] channotice [" + sMessage + "] to [" + Channel.name() + "]");
+        putModule("[" + Nick.nick() + "] channotice [" + sMessage + "] to [" + Channel.name() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
 
         return CONTINUE;
@@ -266,21 +266,21 @@ public:
 
     ModRet onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
-        PutModule("* " + Nick.nick() + " changes topic on " + Channel.name() + " to '" + sTopic + "'");
+        putModule("* " + Nick.nick() + " changes topic on " + Channel.name() + " to '" + sTopic + "'");
 
         return CONTINUE;
     }
 
     ModRet onUserTopic(NoString& sTarget, NoString& sTopic) override
     {
-        PutModule("* " + GetClient()->GetNick() + " changed topic on " + sTarget + " to '" + sTopic + "'");
+        putModule("* " + client()->GetNick() + " changed topic on " + sTarget + " to '" + sTopic + "'");
 
         return CONTINUE;
     }
 
     ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
     {
-        PutModule("[" + sTarget + "] usermsg [" + sMessage + "]");
+        putModule("[" + sTarget + "] usermsg [" + sMessage + "]");
         sMessage = "Sample: \0034" + sMessage + "\003";
 
         return CONTINUE;
@@ -288,7 +288,7 @@ public:
 
     ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
-        PutModule("[" + Nick.nick() + "] privmsg [" + sMessage + "]");
+        putModule("[" + Nick.nick() + "] privmsg [" + sMessage + "]");
         sMessage = "\002" + sMessage + "\002";
 
         return CONTINUE;
@@ -297,12 +297,12 @@ public:
     ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         if (sMessage == "!ping") {
-            PutIRC("PRIVMSG " + Channel.name() + " :PONG?");
+            putIrc("PRIVMSG " + Channel.name() + " :PONG?");
         }
 
         sMessage = "x " + sMessage + " x";
 
-        PutModule(sMessage);
+        putModule(sMessage);
 
         return CONTINUE;
     }
@@ -310,14 +310,14 @@ public:
     void onModCommand(const NoString& sCommand) override
     {
         if (sCommand.equals("TIMERS")) {
-            ListTimers();
+            listTimers();
         }
     }
 
     ModRet onStatusCommand(NoString& sCommand) override
     {
         if (sCommand.equals("SAMPLE")) {
-            PutModule("Hi, I'm your friendly sample module.");
+            putModule("Hi, I'm your friendly sample module.");
             return HALT;
         }
 

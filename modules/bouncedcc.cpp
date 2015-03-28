@@ -146,8 +146,8 @@ public:
             }
         }
 
-        if (PutModule(Table) == 0) {
-            PutModule("You have no active DCCs.");
+        if (putModule(Table) == 0) {
+            putModule("You have no active DCCs.");
         }
     }
 
@@ -160,22 +160,22 @@ public:
             registry.setValue("UseClientIP", sValue);
         }
 
-        PutModule("UseClientIP: " + NoString(registry.value("UseClientIP").toBool()));
+        putModule("UseClientIP: " + NoString(registry.value("UseClientIP").toBool()));
     }
 
     MODCONSTRUCTOR(NoBounceDccMod)
     {
-        AddHelpCommand();
-        AddCommand("ListDCCs",
+        addHelpCommand();
+        addCommand("ListDCCs",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoBounceDccMod::ListDCCsCommand),
                    "",
                    "List all active DCCs");
-        AddCommand("UseClientIP",
+        addCommand("UseClientIP",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoBounceDccMod::UseClientIPCommand),
                    "<true|false>");
     }
 
-    NoString GetLocalDCCIP() { return GetUser()->localDccIp(); }
+    NoString GetLocalDCCIP() { return user()->localDccIp(); }
 
     bool UseClientIP() { return NoRegistry(this).value("UseClientIP").toBool(); }
 
@@ -192,20 +192,20 @@ public:
             NoString sIP = GetLocalDCCIP();
 
             if (!UseClientIP()) {
-                uLongIP = No::formatLongIp(GetClient()->GetSocket()->GetRemoteIP());
+                uLongIP = No::formatLongIp(client()->GetSocket()->GetRemoteIP());
             }
 
             if (sType.equals("CHAT")) {
                 ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, "", true, this, "");
                 if (uBNCPort) {
-                    PutIRC("PRIVMSG " + sTarget + " :\001DCC CHAT chat " + NoString(No::formatLongIp(sIP)) + " " +
+                    putIrc("PRIVMSG " + sTarget + " :\001DCC CHAT chat " + NoString(No::formatLongIp(sIP)) + " " +
                            NoString(uBNCPort) + "\001");
                 }
             } else if (sType.equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
                 ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, uPort, sFile, false, this, "");
                 if (uBNCPort) {
-                    PutIRC("PRIVMSG " + sTarget + " :\001DCC SEND " + sFile + " " + NoString(No::formatLongIp(sIP)) +
+                    putIrc("PRIVMSG " + sTarget + " :\001DCC SEND " + sFile + " " + NoString(No::formatLongIp(sIP)) +
                            " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.equals("RESUME")) {
@@ -214,7 +214,7 @@ public:
 
                 for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetLocalPort() == uResumePort) {
-                        PutIRC("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
+                        putIrc("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
                                NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
@@ -223,7 +223,7 @@ public:
 
                 for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
-                        PutIRC("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
+                        putIrc("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
                                NoString(pSock->GetLocalPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
@@ -237,7 +237,7 @@ public:
 
     ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
     {
-        NoNetwork* pNetwork = GetNetwork();
+        NoNetwork* pNetwork = network();
         if (sMessage.startsWith("DCC ") && pNetwork->isUserAttached()) {
             // DCC CHAT chat 2453612361 44592
             NoStringVector tokens = No::quoteSplit(sMessage);
@@ -254,7 +254,7 @@ public:
                 NoDccBounce::DCCRequest(FromNick.nick(), uLongIP, uPort, "", true, this, No::formatIp(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
-                    PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC CHAT chat " +
+                    putUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC CHAT chat " +
                             NoString(No::formatLongIp(sIP)) + " " + NoString(uBNCPort) + "\001");
                 }
             } else if (sType.equals("SEND")) {
@@ -263,7 +263,7 @@ public:
                 NoDccBounce::DCCRequest(Nick.nick(), uLongIP, uPort, sFile, false, this, No::formatIp(uLongIP));
                 if (uBNCPort) {
                     NoString sIP = GetLocalDCCIP();
-                    PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC SEND " + sFile + " " +
+                    putUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC SEND " + sFile + " " +
                             NoString(No::formatLongIp(sIP)) + " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.equals("RESUME")) {
@@ -272,7 +272,7 @@ public:
 
                 for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetLocalPort() == uResumePort) {
-                        PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC " + sType +
+                        putUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC " + sType +
                                 " " + sFile + " " + NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
@@ -280,7 +280,7 @@ public:
                 // Need to lookup the connection by port, filter the port, and forward to the user
                 for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
-                        PutUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC " + sType +
+                        putUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC " + sType +
                                 " " + sFile + " " + NoString(pSock->GetLocalPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
@@ -376,7 +376,7 @@ void NoDccBounce::ReachedMaxBufferImpl()
 
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
-    m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Too long line received");
+    m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Too long line received");
     Close();
 }
 
@@ -413,9 +413,9 @@ void NoDccBounce::TimeoutImpl()
             sHost = ".";
         }
 
-        m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Timeout while connecting" + sHost);
+        m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Timeout while connecting" + sHost);
     } else {
-        m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick +
+        m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick +
                              "): Timeout waiting for incoming connection [" + NoSocket::GetLocalIP() + ":" +
                              NoString(NoSocket::GetLocalPort()) + "]");
     }
@@ -433,7 +433,7 @@ void NoDccBounce::ConnectionRefusedImpl()
         sHost = ".";
     }
 
-    m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Connection Refused while connecting" + sHost);
+    m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Connection Refused while connecting" + sHost);
 }
 
 void NoDccBounce::SockErrorImpl(int iErrno, const NoString& sDescription)
@@ -447,9 +447,9 @@ void NoDccBounce::SockErrorImpl(int iErrno, const NoString& sDescription)
             sHost = "[" + sHost + " " + NoString(NoSocket::GetPort()) + "]";
         }
 
-        m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "]" + sHost);
+        m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "]" + sHost);
     } else {
-        m_module->PutModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "] [" +
+        m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "] [" +
                              NoSocket::GetLocalIP() + ":" + NoString(NoSocket::GetLocalPort()) + "]");
     }
 }
@@ -484,7 +484,7 @@ NoSocket* NoDccBounce::GetSockObjImpl(const NoString& sHost, ushort uPort)
     pRemoteSock->SetRemote(true);
     pSock->SetRemote(false);
 
-    NoApp::Get().GetManager().Connect(m_sConnectIP,
+    NoApp::Get().manager().Connect(m_sConnectIP,
                                      m_uRemotePort,
                                      "DCC::" + NoString((m_bIsChat) ? "Chat" : "XFER") + "::Remote::" + m_sRemoteNick,
                                      60,
@@ -520,7 +520,7 @@ ushort NoDccBounce::DCCRequest(const NoString& sNick,
                                       const NoString& sRemoteIP)
 {
     NoDccBounce* pDCCBounce = new NoDccBounce(pMod, uLongIP, uPort, sFileName, sNick, sRemoteIP, bIsChat);
-    ushort uListenPort = NoApp::Get().GetManager().ListenRand(
+    ushort uListenPort = NoApp::Get().manager().ListenRand(
     "DCC::" + NoString((bIsChat) ? "Chat" : "Xfer") + "::Local::" + sNick, pMod->GetLocalDCCIP(), false, SOMAXCONN, pDCCBounce, 120);
 
     return uListenPort;

@@ -61,27 +61,27 @@ public:
         std::shared_ptr<NoWebPage> settings = std::make_shared<NoWebPage>("settings");
         settings->setTitle("Global Settings");
         settings->setFlags(NoWebPage::Admin);
-        AddSubPage(settings);
+        addSubPage(settings);
 
         std::shared_ptr<NoWebPage> edituser = std::make_shared<NoWebPage>("edituser");
         edituser->setTitle("Your Settings");
         edituser->addParam("user", "");
-        AddSubPage(edituser);
+        addSubPage(edituser);
 
         std::shared_ptr<NoWebPage> traffic = std::make_shared<NoWebPage>("traffic");
         traffic->setTitle("Traffic Info");
         traffic->setFlags(NoWebPage::Admin);
-        AddSubPage(traffic);
+        addSubPage(traffic);
 
         std::shared_ptr<NoWebPage> listusers = std::make_shared<NoWebPage>("listusers");
         listusers->setTitle("Manage Users");
         listusers->setFlags(NoWebPage::Admin);
-        AddSubPage(listusers);
+        addSubPage(listusers);
     }
 
-    bool OnLoad(const NoString& sArgStr, NoString& sMessage) override
+    bool onLoad(const NoString& sArgStr, NoString& sMessage) override
     {
-        if (sArgStr.empty() || No::GlobalModule != GetType()) return true;
+        if (sArgStr.empty() || No::GlobalModule != type()) return true;
 
         // We don't accept any arguments, but for backwards
         // compatibility we have to do some magic here.
@@ -155,7 +155,7 @@ public:
         }
         NoApp::Get().AddListener(pListener);
 
-        SetArgs("");
+        setArgs("");
         return true;
     }
 
@@ -331,7 +331,7 @@ public:
 
         // If pUser is not nullptr, we are editing an existing user.
         // Users must not be able to change their own admin flag.
-        if (pUser != NoApp::Get().FindUser(WebSock.GetUser())) {
+        if (pUser != NoApp::Get().FindUser(WebSock.user())) {
             pNewUser->setAdmin(WebSock.GetParam("isadmin").toBool());
         } else if (pUser) {
             pNewUser->setAdmin(pUser->isAdmin());
@@ -341,17 +341,17 @@ public:
             WebSock.GetParamValues("loadmod", vsArgs);
 
             // disallow unload webadmin from itself
-            if (No::UserModule == GetType() && pUser == NoApp::Get().FindUser(WebSock.GetUser())) {
+            if (No::UserModule == type() && pUser == NoApp::Get().FindUser(WebSock.user())) {
                 bool bLoadedWebadmin = false;
                 for (a = 0; a < vsArgs.size(); ++a) {
                     NoString sModName = vsArgs[a].trimRight_n("\r");
-                    if (sModName == GetModName()) {
+                    if (sModName == moduleName()) {
                         bLoadedWebadmin = true;
                         break;
                     }
                 }
                 if (!bLoadedWebadmin) {
-                    vsArgs.push_back(GetModName());
+                    vsArgs.push_back(moduleName());
                 }
             }
 
@@ -381,8 +381,8 @@ public:
             NoModuleLoader* Modules = pUser->loader();
 
             for (NoModule* pMod : Modules->modules()) {
-                NoString sModName = pMod->GetModName();
-                NoString sArgs = pMod->GetArgs();
+                NoString sModName = pMod->moduleName();
+                NoString sArgs = pMod->args();
                 NoString sModRet;
                 NoString sModLoadError;
 
@@ -440,8 +440,8 @@ public:
         return pNetwork;
     }
 
-    NoString GetWebMenuTitle() override { return "webadmin"; }
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    NoString webMenuTitle() override { return "webadmin"; }
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
 
@@ -585,7 +585,7 @@ public:
                 WebSock.PrintErrorPage("Please don't delete yourself, suicide is not the answer!");
                 return true;
             } else if (NoApp::Get().DeleteUser(sUser)) {
-                WebSock.Redirect(GetWebPath() + "listusers");
+                WebSock.Redirect(webPath() + "listusers");
                 return true;
             }
 
@@ -701,9 +701,9 @@ public:
                 NoTemplate& mod = Tmpl.addRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
-                if (pMod->OnEmbeddedWebRequest(WebSock, "webadmin/channel", mod)) {
+                if (pMod->onEmbeddedWebRequest(WebSock, "webadmin/channel", mod)) {
                     mod["Embed"] = WebSock.FindTmpl(pMod, "WebadminChan.tmpl");
-                    mod["ModName"] = pMod->GetModName();
+                    mod["ModName"] = pMod->moduleName();
                 }
             }
 
@@ -765,7 +765,7 @@ public:
         TmplMod["ChanName"] = pChan->name();
         TmplMod["WebadminAction"] = "change";
         for (NoModule* pMod : allModules(pNetwork)) {
-            pMod->OnEmbeddedWebRequest(WebSock, "webadmin/channel", TmplMod);
+            pMod->onEmbeddedWebRequest(WebSock, "webadmin/channel", TmplMod);
         }
 
         if (!NoApp::Get().WriteConfig()) {
@@ -774,10 +774,10 @@ public:
         }
 
         if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
+            WebSock.Redirect(webPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         } else {
-            WebSock.Redirect(GetWebPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) +
+            WebSock.Redirect(webPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->name(), No::UrlFormat) + "&name=" +
                              No::escape(pChan->name(), No::UrlFormat));
         }
@@ -808,7 +808,7 @@ public:
                     NoModule* pModule = pNetwork->loader()->findModule(Info.name());
                     if (pModule) {
                         l["Checked"] = "true";
-                        l["Args"] = pModule->GetArgs();
+                        l["Args"] = pModule->args();
                     }
                 }
 
@@ -931,9 +931,9 @@ public:
                 NoTemplate& mod = Tmpl.addRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
-                if (pMod->OnEmbeddedWebRequest(WebSock, "webadmin/network", mod)) {
+                if (pMod->onEmbeddedWebRequest(WebSock, "webadmin/network", mod)) {
                     mod["Embed"] = WebSock.FindTmpl(pMod, "WebadminNetwork.tmpl");
-                    mod["ModName"] = pMod->GetModName();
+                    mod["ModName"] = pMod->moduleName();
                 }
             }
 
@@ -983,7 +983,7 @@ public:
             }
             if (pOldNetwork) {
                 for (NoModule* pModule : pOldNetwork->loader()->modules()) {
-                    NoString sPath = pUser->userPath() + "/networks/" + sName + "/moddata/" + pModule->GetModName();
+                    NoString sPath = pUser->userPath() + "/networks/" + sName + "/moddata/" + pModule->moduleName();
                     NoRegistry registry(pModule);
                     registry.copy(sPath);
                 }
@@ -1093,7 +1093,7 @@ public:
                         if (!pNetwork->loader()->loadModule(sModName, sArgs, No::NetworkModule, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
-                    } else if (pMod->GetArgs() != sArgs) {
+                    } else if (pMod->args() != sArgs) {
                         if (!pNetwork->loader()->reloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
                             sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                         }
@@ -1111,8 +1111,8 @@ public:
         std::set<NoString> ssUnloadMods;
 
         for (NoModule* pCurMod : vCurMods->modules()) {
-            if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() && pCurMod->GetModName() != GetModName()) {
-                ssUnloadMods.insert(pCurMod->GetModName());
+            if (ssArgs.find(pCurMod->moduleName()) == ssArgs.end() && pCurMod->moduleName() != moduleName()) {
+                ssUnloadMods.insert(pCurMod->moduleName());
             }
         }
 
@@ -1125,7 +1125,7 @@ public:
         TmplMod["Name"] = pNetwork->name();
         TmplMod["WebadminAction"] = "change";
         for (NoModule* pMod : allModules(pUser, pNetwork)) {
-            pMod->OnEmbeddedWebRequest(WebSock, "webadmin/network", TmplMod);
+            pMod->onEmbeddedWebRequest(WebSock, "webadmin/network", TmplMod);
         }
 
         if (!NoApp::Get().WriteConfig()) {
@@ -1134,9 +1134,9 @@ public:
         }
 
         if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(GetWebPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
+            WebSock.Redirect(webPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
         } else {
-            WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
+            WebSock.Redirect(webPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         }
         return true;
@@ -1175,7 +1175,7 @@ public:
             return true;
         }
 
-        WebSock.Redirect(GetWebPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
+        WebSock.Redirect(webPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
         return false;
     }
 
@@ -1196,7 +1196,7 @@ public:
             return true;
         }
 
-        WebSock.Redirect(GetWebPath() + "editnetwork?user=" + No::escape(pNetwork->user()->userName(), No::UrlFormat) +
+        WebSock.Redirect(webPath() + "editnetwork?user=" + No::escape(pNetwork->user()->userName(), No::UrlFormat) +
                          "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         return false;
     }
@@ -1392,8 +1392,8 @@ public:
                 }
                 if (pModule) {
                     l["Checked"] = "true";
-                    l["Args"] = pModule->GetArgs();
-                    if (No::UserModule == GetType() && Info.name() == GetModName()) {
+                    l["Args"] = pModule->args();
+                    if (No::UserModule == type() && Info.name() == moduleName()) {
                         l["Disabled"] = "true";
                     }
                 }
@@ -1451,7 +1451,7 @@ public:
                 if (pUser && pUser->isAdmin()) {
                     o10["Checked"] = "true";
                 }
-                if (pUser && pUser == NoApp::Get().FindUser(WebSock.GetUser())) {
+                if (pUser && pUser == NoApp::Get().FindUser(WebSock.user())) {
                     o10["Disabled"] = "true";
                 }
 
@@ -1475,9 +1475,9 @@ public:
                 NoTemplate& mod = Tmpl.addRow("EmbeddedModuleLoop");
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
-                if (pMod->OnEmbeddedWebRequest(WebSock, "webadmin/user", mod)) {
+                if (pMod->onEmbeddedWebRequest(WebSock, "webadmin/user", mod)) {
                     mod["Embed"] = WebSock.FindTmpl(pMod, "WebadminUser.tmpl");
-                    mod["ModName"] = pMod->GetModName();
+                    mod["ModName"] = pMod->moduleName();
                 }
             }
 
@@ -1532,7 +1532,7 @@ public:
         TmplMod["Username"] = sUsername;
         TmplMod["WebadminAction"] = "change";
         for (NoModule* pMod : allModules(pUser)) {
-            pMod->OnEmbeddedWebRequest(WebSock, "webadmin/user", TmplMod);
+            pMod->onEmbeddedWebRequest(WebSock, "webadmin/user", TmplMod);
         }
 
         if (!NoApp::Get().WriteConfig()) {
@@ -1541,9 +1541,9 @@ public:
         }
 
         if (spSession->isAdmin() && WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(GetWebPath() + "listusers");
+            WebSock.Redirect(webPath() + "listusers");
         } else {
-            WebSock.Redirect(GetWebPath() + "edituser?user=" + pUser->userName());
+            WebSock.Redirect(webPath() + "edituser?user=" + pUser->userName());
         }
 
         /* we don't want the template to be printed while we redirect */
@@ -1826,8 +1826,8 @@ public:
                 NoModule* pModule = NoApp::Get().GetLoader()->findModule(Info.name());
                 if (pModule) {
                     l["Checked"] = "true";
-                    l["Args"] = pModule->GetArgs();
-                    if (No::GlobalModule == GetType() && Info.name() == GetModName()) {
+                    l["Args"] = pModule->args();
+                    if (No::GlobalModule == type() && Info.name() == moduleName()) {
                         l["Disabled"] = "true";
                     }
                 }
@@ -1922,7 +1922,7 @@ public:
                     if (!NoApp::Get().GetLoader()->loadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
-                } else if (pMod->GetArgs() != sArgs) {
+                } else if (pMod->args() != sArgs) {
                     if (!NoApp::Get().GetLoader()->reloadModule(sModName, sArgs, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                     }
@@ -1939,9 +1939,9 @@ public:
         std::set<NoString> ssUnloadMods;
 
         for (NoModule* pCurMod : vCurMods->modules()) {
-            if (ssArgs.find(pCurMod->GetModName()) == ssArgs.end() &&
-                (No::GlobalModule != GetType() || pCurMod->GetModName() != GetModName())) {
-                ssUnloadMods.insert(pCurMod->GetModName());
+            if (ssArgs.find(pCurMod->moduleName()) == ssArgs.end() &&
+                (No::GlobalModule != type() || pCurMod->moduleName() != moduleName())) {
+                ssUnloadMods.insert(pCurMod->moduleName());
             }
         }
 
@@ -1953,7 +1953,7 @@ public:
             WebSock.GetSession()->addError("Settings changed, but config was not written");
         }
 
-        WebSock.Redirect(GetWebPath() + "settings");
+        WebSock.Redirect(webPath() + "settings");
         /* we don't want the template to be printed while we redirect */
         return false;
     }

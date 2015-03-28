@@ -27,17 +27,17 @@ class NoChannelSaverMod : public NoModule
 public:
     MODCONSTRUCTOR(NoChannelSaverMod) {}
 
-    bool OnLoad(const NoString& sArgsi, NoString& sMessage) override
+    bool onLoad(const NoString& sArgsi, NoString& sMessage) override
     {
-        switch (GetType()) {
+        switch (type()) {
         case No::GlobalModule:
             LoadUsers();
             break;
         case No::UserModule:
-            LoadUser(GetUser());
+            LoadUser(user());
             break;
         case No::NetworkModule:
-            LoadNetwork(GetNetwork());
+            LoadNetwork(network());
             break;
         }
         return true;
@@ -73,14 +73,14 @@ public:
 
     void onJoin(const NoNick& Nick, NoChannel& Channel) override
     {
-        if (!Channel.inConfig() && GetNetwork()->ircNick().equals(Nick.nick())) {
+        if (!Channel.inConfig() && network()->ircNick().equals(Nick.nick())) {
             Channel.setInConfig(true);
         }
     }
 
     void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
-        if (Channel.inConfig() && GetNetwork()->ircNick().equals(Nick.nick())) {
+        if (Channel.inConfig() && network()->ircNick().equals(Nick.nick())) {
             Channel.setInConfig(false);
         }
     }

@@ -120,30 +120,30 @@ class NoAutoVoiceMod : public NoModule
 public:
     MODCONSTRUCTOR(NoAutoVoiceMod)
     {
-        AddHelpCommand();
-        AddCommand("ListUsers",
+        addHelpCommand();
+        addCommand("ListUsers",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnListUsersCommand),
                    "",
                    "List all users");
-        AddCommand("addChannels",
+        addCommand("addChannels",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnaddChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Adds channels to a user");
-        AddCommand("removeChannels",
+        addCommand("removeChannels",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnremoveChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");
-        AddCommand("AddUser",
+        addCommand("AddUser",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::onAddUserCommand),
                    "<user> <hostmask> [channels]",
                    "Adds a user");
-        AddCommand("DelUser",
+        addCommand("DelUser",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoVoiceMod::OnDelUserCommand),
                    "<user>",
                    "Removes a user");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         // Load the chans from the command line
         uint a = 0;
@@ -187,7 +187,7 @@ public:
             for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
                 // and the nick who joined is a valid user
                 if (it->second->HostMatches(Nick.hostMask()) && it->second->ChannelMatches(Channel.name())) {
-                    PutIRC("MODE " + Channel.name() + " +v " + Nick.nick());
+                    putIrc("MODE " + Channel.name() + " +v " + Nick.nick());
                     break;
                 }
             }
@@ -200,7 +200,7 @@ public:
         NoString sHost = No::token(sLine, 2);
 
         if (sHost.empty()) {
-            PutModule("Usage: AddUser <user> <hostmask> [channels]");
+            putModule("Usage: AddUser <user> <hostmask> [channels]");
         } else {
             NoAutoVoiceUser* pUser = AddUser(sUser, sHost, No::tokens(sLine, 3));
 
@@ -216,7 +216,7 @@ public:
         NoString sUser = No::token(sLine, 1);
 
         if (sUser.empty()) {
-            PutModule("Usage: DelUser <user>");
+            putModule("Usage: DelUser <user>");
         } else {
             DelUser(sUser);
             NoRegistry registry(this);
@@ -227,7 +227,7 @@ public:
     void OnListUsersCommand(const NoString& sLine)
     {
         if (m_msUsers.empty()) {
-            PutModule("There are no users defined");
+            putModule("There are no users defined");
             return;
         }
 
@@ -244,7 +244,7 @@ public:
             Table.setValue("Channels", it->second->GetChannels());
         }
 
-        PutModule(Table);
+        putModule(Table);
     }
 
     void OnaddChannelsCommand(const NoString& sLine)
@@ -253,19 +253,19 @@ public:
         NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
-            PutModule("Usage: addChannels <user> <channel> [channel] ...");
+            putModule("Usage: addChannels <user> <channel> [channel] ...");
             return;
         }
 
         NoAutoVoiceUser* pUser = FindUser(sUser);
 
         if (!pUser) {
-            PutModule("No such user");
+            putModule("No such user");
             return;
         }
 
         pUser->addChannels(sChans);
-        PutModule("Channel(s) added to user [" + pUser->GetUsername() + "]");
+        putModule("Channel(s) added to user [" + pUser->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(pUser->GetUsername(), pUser->ToString());
@@ -277,19 +277,19 @@ public:
         NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
-            PutModule("Usage: removeChannels <user> <channel> [channel] ...");
+            putModule("Usage: removeChannels <user> <channel> [channel] ...");
             return;
         }
 
         NoAutoVoiceUser* pUser = FindUser(sUser);
 
         if (!pUser) {
-            PutModule("No such user");
+            putModule("No such user");
             return;
         }
 
         pUser->removeChannels(sChans);
-        PutModule("Channel(s) Removed from user [" + pUser->GetUsername() + "]");
+        putModule("Channel(s) Removed from user [" + pUser->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(pUser->GetUsername(), pUser->ToString());
@@ -320,25 +320,25 @@ public:
         std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.find(sUser.toLower());
 
         if (it == m_msUsers.end()) {
-            PutModule("That user does not exist");
+            putModule("That user does not exist");
             return;
         }
 
         delete it->second;
         m_msUsers.erase(it);
-        PutModule("User [" + sUser + "] removed");
+        putModule("User [" + sUser + "] removed");
     }
 
     NoAutoVoiceUser* AddUser(const NoString& sUser, const NoString& sHost, const NoString& sChans)
     {
         if (m_msUsers.find(sUser) != m_msUsers.end()) {
-            PutModule("That user already exists");
+            putModule("That user already exists");
             return nullptr;
         }
 
         NoAutoVoiceUser* pUser = new NoAutoVoiceUser(sUser, sHost, sChans);
         m_msUsers[sUser.toLower()] = pUser;
-        PutModule("User [" + sUser + "] added with hostmask [" + sHost + "]");
+        putModule("User [" + sUser + "] added with hostmask [" + sHost + "]");
         return pUser;
     }
 

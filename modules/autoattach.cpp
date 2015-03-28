@@ -40,7 +40,7 @@ public:
     {
         if (!No::wildCmp(sHost, m_sHostmaskWildcard, No::CaseInsensitive)) return false;
         if (!No::wildCmp(sChan, m_sChannelWildcard, No::CaseInsensitive)) return false;
-        if (!No::wildCmp(sMessage, m_pModule->ExpandString(m_sSearchWildcard), No::CaseInsensitive)) return false;
+        if (!No::wildCmp(sMessage, m_pModule->expandString(m_sSearchWildcard), No::CaseInsensitive)) return false;
         return true;
     }
 
@@ -91,14 +91,14 @@ private:
         if (sChan.empty()) {
             bHelp = true;
         } else if (Add(bNegated, sChan, sSearch, sHost)) {
-            PutModule("Added to list");
+            putModule("Added to list");
         } else {
-            PutModule(No::tokens(sLine, 1) + " is already added");
+            putModule(No::tokens(sLine, 1) + " is already added");
             bHelp = true;
         }
         if (bHelp) {
-            PutModule("Usage: Add [!]<#chan> <search> <host>");
-            PutModule("Wildcards are allowed");
+            putModule("Usage: Add [!]<#chan> <search> <host>");
+            putModule("Wildcards are allowed");
         }
     }
 
@@ -111,9 +111,9 @@ private:
         NoString sHost = No::token(sMsg, 2);
 
         if (Del(bNegated, sChan, sSearch, sHost)) {
-            PutModule("Removed " + sChan + " from list");
+            putModule("Removed " + sChan + " from list");
         } else {
-            PutModule("Usage: Del [!]<#chan> <search> <host>");
+            putModule("Usage: Del [!]<#chan> <search> <host>");
         }
     }
 
@@ -135,25 +135,25 @@ private:
         }
 
         if (Table.size()) {
-            PutModule(Table);
+            putModule(Table);
         } else {
-            PutModule("You have no entries.");
+            putModule("You have no entries.");
         }
     }
 
 public:
     MODCONSTRUCTOR(NoChannelAttach)
     {
-        AddHelpCommand();
-        AddCommand("Add",
+        addHelpCommand();
+        addCommand("Add",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleAdd),
                    "[!]<#chan> <search> <host>",
                    "Add an entry, use !#chan to negate and * for wildcards");
-        AddCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleDel), "[!]<#chan> <search> <host>", "Remove an entry, needs to be an exact match");
-        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleList), "", "List all entries");
+        addCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleDel), "[!]<#chan> <search> <host>", "Remove an entry, needs to be an exact match");
+        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleList), "", "List all entries");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector vsChans = sArgs.split(" ", No::SkipEmptyParts);
 
@@ -165,7 +165,7 @@ public:
             NoString sHost = No::tokens(sAdd, 2);
 
             if (!Add(bNegated, sChan, sSearch, sHost)) {
-                PutModule("Unable to add [" + *it + "]");
+                putModule("Unable to add [" + *it + "]");
             }
         }
 

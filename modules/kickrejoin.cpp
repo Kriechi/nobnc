@@ -40,12 +40,12 @@ public:
 protected:
     void run() override
     {
-        NoNetwork* pNetwork = module()->GetNetwork();
+        NoNetwork* pNetwork = module()->network();
         NoChannel* pChan = pNetwork->findChannel(No::tokens(name(), 1));
 
         if (pChan) {
             pChan->enable();
-            module()->PutIRC("JOIN " + pChan->name() + " " + pChan->key());
+            module()->putIrc("JOIN " + pChan->name() + " " + pChan->key());
         }
     }
 };
@@ -58,18 +58,18 @@ private:
 public:
     MODCONSTRUCTOR(NoRejoinMod)
     {
-        AddHelpCommand();
-        AddCommand("SetDelay",
+        addHelpCommand();
+        addCommand("SetDelay",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoRejoinMod::OnSetDelayCommand),
                    "<secs>",
                    "Set the rejoin delay");
-        AddCommand("ShowDelay",
+        addCommand("ShowDelay",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoRejoinMod::OnShowDelayCommand),
                    "",
                    "Show the rejoin delay");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sErrorMsg) override
+    bool onLoad(const NoString& sArgs, NoString& sErrorMsg) override
     {
         if (sArgs.empty()) {
             NoRegistry registry(this);
@@ -99,7 +99,7 @@ public:
         i = No::token(sCommand, 1).toInt();
 
         if (i < 0) {
-            PutModule("Negative delays don't make any sense!");
+            putModule("Negative delays don't make any sense!");
             return;
         }
 
@@ -108,24 +108,24 @@ public:
         registry.setValue("delay", NoString(delay));
 
         if (delay)
-            PutModule("Rejoin delay set to " + NoString(delay) + " seconds");
+            putModule("Rejoin delay set to " + NoString(delay) + " seconds");
         else
-            PutModule("Rejoin delay disabled");
+            putModule("Rejoin delay disabled");
     }
 
     void OnShowDelayCommand(const NoString& sCommand)
     {
         if (delay)
-            PutModule("Rejoin delay enabled, " + NoString(delay) + " seconds");
+            putModule("Rejoin delay enabled, " + NoString(delay) + " seconds");
         else
-            PutModule("Rejoin delay disabled");
+            putModule("Rejoin delay disabled");
     }
 
     void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& pChan, const NoString& sMessage) override
     {
-        if (GetNetwork()->currentNick().equals(sKickedNick)) {
+        if (network()->currentNick().equals(sKickedNick)) {
             if (!delay) {
-                PutIRC("JOIN " + pChan.name() + " " + pChan.key());
+                putIrc("JOIN " + pChan.name() + " " + pChan.key());
                 pChan.enable();
                 return;
             }

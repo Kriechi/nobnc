@@ -59,7 +59,7 @@ public:
     void ListChannelsCommand(const NoString& sLine)
     {
         if (m_ssChannels.empty()) {
-            PutModule("There are no open channels.");
+            putModule("There are no open channels.");
             return;
         }
 
@@ -75,13 +75,13 @@ public:
             Table.setValue("Users", NoString((*a)->GetNicks().size()));
         }
 
-        PutModule(Table);
+        putModule(Table);
     }
 
     MODCONSTRUCTOR(NoPartylineMod)
     {
-        AddHelpCommand();
-        AddCommand("List",
+        addHelpCommand();
+        addCommand("List",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoPartylineMod::ListChannelsCommand),
                    "",
                    "List all open channels");
@@ -99,8 +99,8 @@ public:
 
                 for (std::vector<NoClient*>::const_iterator it3 = vClients.begin(); it3 != vClients.end(); ++it3) {
                     NoClient* pClient = *it3;
-                    pClient->PutClient(":*" + GetModName() + "!znc@znc.in KICK " + (*it)->GetName() + " " +
-                                       pClient->GetNick() + " :" + GetModName() + " unloaded");
+                    pClient->PutClient(":*" + moduleName() + "!znc@znc.in KICK " + (*it)->GetName() + " " +
+                                       pClient->GetNick() + " :" + moduleName() + " unloaded");
                 }
             }
         }
@@ -119,7 +119,7 @@ public:
         return true;
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
 
@@ -217,20 +217,20 @@ public:
                     sLine.append(CHAN_PREFIX_1);
                 else
                     sLine.insert(uPos, CHAN_PREFIX_1);
-                m_spInjectedPrefixes.insert(GetNetwork());
+                m_spInjectedPrefixes.insert(network());
             }
         }
 
         return CONTINUE;
     }
 
-    void onIrcDisconnected() override { m_spInjectedPrefixes.erase(GetNetwork()); }
+    void onIrcDisconnected() override { m_spInjectedPrefixes.erase(network()); }
 
     void onClientLogin() override
     {
-        NoUser* pUser = GetUser();
-        NoClient* pClient = GetClient();
-        NoNetwork* pNetwork = GetNetwork();
+        NoUser* pUser = user();
+        NoClient* pClient = client();
+        NoNetwork* pNetwork = network();
         if (m_spInjectedPrefixes.find(pNetwork) == m_spInjectedPrefixes.end() && pNetwork && !pNetwork->channelPrefixes().empty()) {
             pClient->PutClient(":" + ircServer(pNetwork) + " 005 " + pClient->GetNick() + " CHANTYPES=" +
                                pNetwork->channelPrefixes() + CHAN_PREFIX_1 " :are supported by this server.");
@@ -269,7 +269,7 @@ public:
 
                 SendNickList(pUser, pNetwork, ssNicks, (*it)->GetName());
                 PutChan(ssNicks,
-                        ":*" + GetModName() + "!znc@znc.in MODE " + (*it)->GetName() + " +" +
+                        ":*" + moduleName() + "!znc@znc.in MODE " + (*it)->GetName() + " +" +
                         NoString(pUser->isAdmin() ? "o" : "v") + " " + NICK_PREFIX + pUser->userName(),
                         false);
             }
@@ -278,14 +278,14 @@ public:
 
     void onClientDisconnect() override
     {
-        NoUser* pUser = GetUser();
+        NoUser* pUser = user();
         if (!pUser->isUserAttached() && !pUser->isBeingDeleted()) {
             for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
                 const std::set<NoString>& ssNicks = (*it)->GetNicks();
 
                 if (ssNicks.find(pUser->userName()) != ssNicks.end()) {
                     PutChan(ssNicks,
-                            ":*" + GetModName() + "!znc@znc.in MODE " + (*it)->GetName() + " -ov " + NICK_PREFIX +
+                            ":*" + moduleName() + "!znc@znc.in MODE " + (*it)->GetName() + " -ov " + NICK_PREFIX +
                             pUser->userName() + " " + NICK_PREFIX + pUser->userName(),
                             false);
                 }
@@ -305,8 +305,8 @@ public:
 
             sTopic.trimPrefix(":");
 
-            NoUser* pUser = GetUser();
-            NoClient* pClient = GetClient();
+            NoUser* pUser = user();
+            NoClient* pClient = client();
             NoPartylineChannel* pChannel = FindChannel(sChannel);
 
             if (pChannel && pChannel->IsInChannel(pUser->userName())) {
@@ -346,13 +346,13 @@ public:
         }
 
         if (sChannel.left(2) != CHAN_PREFIX) {
-            GetClient()->PutClient(":" + ircServer(GetNetwork()) + " 401 " + GetClient()->GetNick() + " " + sChannel + " :No such channel");
+            client()->PutClient(":" + ircServer(network()) + " 401 " + client()->GetNick() + " " + sChannel + " :No such channel");
             return HALT;
         }
 
         NoPartylineChannel* pChannel = FindChannel(sChannel);
 
-        PartUser(GetUser(), pChannel);
+        PartUser(user(), pChannel);
 
         return HALT;
     }
@@ -428,7 +428,7 @@ public:
         }
 
         if (sChannel.left(2) != CHAN_PREFIX) {
-            GetClient()->PutClient(":" + ircServer(GetNetwork()) + " 403 " + GetClient()->GetNick() + " " +
+            client()->PutClient(":" + ircServer(network()) + " 403 " + client()->GetNick() + " " +
                                    sChannel + " :Channels look like " CHAN_PREFIX "znc");
             return HALT;
         }
@@ -436,7 +436,7 @@ public:
         sChannel = sChannel.left(32);
         NoPartylineChannel* pChannel = GetChannel(sChannel);
 
-        JoinUser(GetUser(), pChannel);
+        JoinUser(user(), pChannel);
 
         return HALT;
     }
@@ -470,7 +470,7 @@ public:
             if (!pChannel->GetTopic().empty()) {
                 for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
                     NoClient* pClient = *it;
-                    pClient->PutClient(":" + ircServer(pClient->GetNetwork()) + " 332 " + pClient->GetNickMask() +
+                    pClient->PutClient(":" + ircServer(pClient->network()) + " 332 " + pClient->GetNickMask() +
                                        " " + pChannel->GetName() + " :" + pChannel->GetTopic());
                 }
             }
@@ -481,14 +481,14 @@ public:
 
             if (pUser->isAdmin()) {
                 PutChan(ssNicks,
-                        ":*" + GetModName() + "!znc@znc.in MODE " + pChannel->GetName() + " +o " + NICK_PREFIX + pUser->userName(),
+                        ":*" + moduleName() + "!znc@znc.in MODE " + pChannel->GetName() + " +o " + NICK_PREFIX + pUser->userName(),
                         false,
                         false,
                         pUser);
             }
 
             PutChan(ssNicks,
-                    ":*" + GetModName() + "!znc@znc.in MODE " + pChannel->GetName() + " +v " + NICK_PREFIX + pUser->userName(),
+                    ":*" + moduleName() + "!znc@znc.in MODE " + pChannel->GetName() + " +v " + NICK_PREFIX + pUser->userName(),
                     false,
                     false,
                     pUser);
@@ -507,9 +507,9 @@ public:
             return CONTINUE;
         }
 
-        NoUser* pUser = GetUser();
-        NoClient* pClient = GetClient();
-        NoNetwork* pNetwork = GetNetwork();
+        NoUser* pUser = user();
+        NoClient* pClient = client();
+        NoNetwork* pNetwork = network();
         NoString sHost = pUser->bindHost();
 
         if (sHost.empty()) {
@@ -618,8 +618,8 @@ public:
     {
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
 
-        if (!pUser) pUser = GetUser();
-        if (!pClient) pClient = GetClient();
+        if (!pUser) pUser = user();
+        if (!pClient) pClient = client();
 
         for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             if (ssNicks.find(it->first) != ssNicks.end()) {
@@ -634,7 +634,7 @@ public:
         }
     }
 
-    void PutUserIRCNick(NoUser* pUser, const NoString& sPre, const NoString& sPost)
+    void putUserIRCNick(NoUser* pUser, const NoString& sPre, const NoString& sPost)
     {
         const std::vector<NoClient*>& vClients = pUser->allClients();
         std::vector<NoClient*>::const_iterator it;
@@ -661,13 +661,13 @@ public:
             sNickList += NICK_PREFIX + (*it) + " ";
 
             if (sNickList.size() >= 500) {
-                PutUserIRCNick(pUser, ":" + ircServer(pNetwork) + " 353 ", " @ " + sChan + " :" + sNickList);
+                putUserIRCNick(pUser, ":" + ircServer(pNetwork) + " 353 ", " @ " + sChan + " :" + sNickList);
                 sNickList.clear();
             }
         }
 
         if (sNickList.size()) {
-            PutUserIRCNick(pUser, ":" + ircServer(pNetwork) + " 353 ", " @ " + sChan + " :" + sNickList);
+            putUserIRCNick(pUser, ":" + ircServer(pNetwork) + " 353 ", " @ " + sChan + " :" + sNickList);
         }
 
         std::vector<NoClient*> vClients = pUser->allClients();
@@ -677,7 +677,7 @@ public:
                                ((pUser->isAdmin()) ? "@" : "+") + pClient->GetNick());
         }
 
-        PutUserIRCNick(pUser, ":" + ircServer(pNetwork) + " 366 ", " " + sChan + " :End of /NAMES list.");
+        putUserIRCNick(pUser, ":" + ircServer(pNetwork) + " 366 ", " " + sChan + " :End of /NAMES list.");
     }
 
     NoPartylineChannel* FindChannel(const NoString& sChan)

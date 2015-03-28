@@ -36,9 +36,9 @@
         NoModule* pModule = nullptr;                                           \
         if (NETWORK && (pModule = (NETWORK)->loader()->findModule(MOD))) { \
             try {                                                             \
-                pModule->SetClient(CLIENT);                                   \
+                pModule->setClient(CLIENT);                                   \
                 pModule->FUNC;                                                \
-                pModule->SetClient(nullptr);                                  \
+                pModule->setClient(nullptr);                                  \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
                     (NETWORK)->loader()->unloadModule(MOD);                \
@@ -46,11 +46,11 @@
             }                                                                 \
         } else if ((pModule = (USER)->loader()->findModule(MOD))) {        \
             try {                                                             \
-                pModule->SetClient(CLIENT);                                   \
-                pModule->SetNetwork(NETWORK);                                 \
+                pModule->setClient(CLIENT);                                   \
+                pModule->setNetwork(NETWORK);                                 \
                 pModule->FUNC;                                                \
-                pModule->SetClient(nullptr);                                  \
-                pModule->SetNetwork(nullptr);                                 \
+                pModule->setClient(nullptr);                                  \
+                pModule->setNetwork(nullptr);                                 \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
                     (USER)->loader()->unloadModule(MOD);                   \
@@ -58,20 +58,20 @@
             }                                                                 \
         } else if ((pModule = NoApp::Get().GetLoader()->findModule(MOD))) {    \
             try {                                                             \
-                pModule->SetClient(CLIENT);                                   \
-                pModule->SetNetwork(NETWORK);                                 \
-                pModule->SetUser(USER);                                       \
+                pModule->setClient(CLIENT);                                   \
+                pModule->setNetwork(NETWORK);                                 \
+                pModule->setUser(USER);                                       \
                 pModule->FUNC;                                                \
-                pModule->SetClient(nullptr);                                  \
-                pModule->SetNetwork(nullptr);                                 \
-                pModule->SetUser(nullptr);                                    \
+                pModule->setClient(nullptr);                                  \
+                pModule->setNetwork(nullptr);                                 \
+                pModule->setUser(nullptr);                                    \
             } catch (const NoModule::ModException& e) {                       \
                 if (e == NoModule::UNLOAD) {                                   \
                     NoApp::Get().GetLoader()->unloadModule(MOD);               \
                 }                                                             \
             }                                                                 \
         } else {                                                              \
-            PutStatus("No such module [" + MOD + "]");                        \
+            putStatus("No such module [" + MOD + "]");                        \
         }                                                                     \
     }
 
@@ -96,10 +96,10 @@ public:
     void DisconnectedImpl() override
     {
         NO_DEBUG(GetSockName() << " == Disconnected()");
-        NoNetwork* pNetwork = m_pClient->GetNetwork();
+        NoNetwork* pNetwork = m_pClient->network();
         m_pClient->SetNetwork(nullptr, true, false);
 
-        NoUser* pUser = m_pClient->GetUser();
+        NoUser* pUser = m_pClient->user();
         if (pUser)
             NETWORKMODULECALL(onClientDisconnect(), pUser, pNetwork, m_pClient, NOTHING);
     }
@@ -268,12 +268,12 @@ void NoClient::ReadLine(const NoString& sData)
 
         if (sTarget.equals("status")) {
             if (sModCommand.empty())
-                PutStatus("Hello. How may I help you?");
+                putStatus("Hello. How may I help you?");
             else
                 UserCommand(sModCommand);
         } else {
             if (sModCommand.empty())
-                CALLMOD(sTarget, this, d->user, d->network, PutModule("Hello. How may I help you?"))
+                CALLMOD(sTarget, this, d->user, d->network, putModule("Hello. How may I help you?"))
             else
                 CALLMOD(sTarget, this, d->user, d->network, onModCommand(sModCommand))
         }
@@ -340,7 +340,7 @@ void NoClient::ReadLine(const NoString& sData)
             if (!ircSocket()) {
                 // Some lagmeters do a NOTICE to their own nick, ignore those.
                 if (!sTarget.equals(d->nickname))
-                    PutStatus("Your notice to [" + sTarget + "] got lost, "
+                    putStatus("Your notice to [" + sTarget + "] got lost, "
                                                              "you are not connected to IRC!");
                 continue;
             }
@@ -361,7 +361,7 @@ void NoClient::ReadLine(const NoString& sData)
                     }
                 }
 
-                PutIRC("NOTICE " + sTarget + " :" + sMsg);
+                putIrc("NOTICE " + sTarget + " :" + sMsg);
             }
         }
 
@@ -425,7 +425,7 @@ void NoClient::ReadLine(const NoString& sData)
                         if (bContinue) continue;
                     }
 
-                    PutIRC("PRIVMSG " + sTarget + " :\001" + sCTCP + "\001");
+                    putIrc("PRIVMSG " + sTarget + " :\001" + sCTCP + "\001");
                 }
 
                 continue;
@@ -446,7 +446,7 @@ void NoClient::ReadLine(const NoString& sData)
             if (!ircSocket()) {
                 // Some lagmeters do a PRIVMSG to their own nick, ignore those.
                 if (!sTarget.equals(d->nickname))
-                    PutStatus("Your message to [" + sTarget + "] got lost, "
+                    putStatus("Your message to [" + sTarget + "] got lost, "
                                                               "you are not connected to IRC!");
                 continue;
             }
@@ -469,7 +469,7 @@ void NoClient::ReadLine(const NoString& sData)
                     }
                 }
 
-                PutIRC("PRIVMSG " + sTarget + " :" + sMsg);
+                putIrc("PRIVMSG " + sTarget + " :" + sMsg);
 
                 // Relay to the rest of the clients that may be connected to this user
                 const std::vector<NoClient*>& vClients = clients();
@@ -493,7 +493,7 @@ void NoClient::ReadLine(const NoString& sData)
         NoString sPatterns = No::tokens(sLine, 1);
 
         if (sPatterns.empty()) {
-            PutStatusNotice("Usage: /detach <#chans>");
+            putStatusNotice("Usage: /detach <#chans>");
             return;
         }
 
@@ -513,8 +513,8 @@ void NoClient::ReadLine(const NoString& sData)
             pChan->detachUser();
         }
 
-        PutStatusNotice("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
-        PutStatusNotice("Detached [" + NoString(uDetached) + "] channels");
+        putStatusNotice("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
+        putStatusNotice("Detached [" + NoString(uDetached) + "] channels");
 
         return;
     } else if (sCommand.equals("JOIN")) {
@@ -567,7 +567,7 @@ void NoClient::ReadLine(const NoString& sData)
             NoChannel* pChan = d->network->findChannel(sChan);
 
             if (pChan && !pChan->isOn()) {
-                PutStatusNotice("Removing channel [" + sChan + "]");
+                putStatusNotice("Removing channel [" + sChan + "]");
                 d->network->removeChannel(sChan);
             } else {
                 sChans += (sChans.empty()) ? sChan : NoString("," + sChan);
@@ -616,15 +616,15 @@ void NoClient::ReadLine(const NoString& sData)
         }
     }
 
-    PutIRC(sLine);
+    putIrc(sLine);
 }
 
 void NoClient::SetNick(const NoString& s) { d->nickname = s; }
 
 void NoClient::SetAway(bool bAway) { d->away = bAway; }
-NoUser* NoClient::GetUser() const { return d->user; }
+NoUser* NoClient::user() const { return d->user; }
 
-NoNetwork* NoClient::GetNetwork() const { return d->network; }
+NoNetwork* NoClient::network() const { return d->network; }
 void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect)
 {
     if (bDisconnect) {
@@ -677,9 +677,9 @@ void NoClient::StatusCTCP(const NoString& sLine)
     NoString sCommand = No::token(sLine, 0);
 
     if (sCommand.equals("PING")) {
-        PutStatusNotice("\001PING " + No::tokens(sLine, 1) + "\001");
+        putStatusNotice("\001PING " + No::tokens(sLine, 1) + "\001");
     } else if (sCommand.equals("VERSION")) {
-        PutStatusNotice("\001VERSION " + NoApp::GetTag() + "\001");
+        putStatusNotice("\001VERSION " + NoApp::GetTag() + "\001");
     }
 }
 
@@ -693,9 +693,9 @@ bool NoClient::SendMotd()
 
     for (const NoString& sLine : vsMotd) {
         if (d->network) {
-            PutStatusNotice(d->network->expandString(sLine));
+            putStatusNotice(d->network->expandString(sLine));
         } else {
-            PutStatusNotice(d->user->expandString(sLine));
+            putStatusNotice(d->user->expandString(sLine));
         }
     }
 
@@ -713,7 +713,7 @@ void NoClient::AuthUser()
 
 void NoClient::RefuseLogin(const NoString& sReason)
 {
-    PutStatus("Bad username and/or password.");
+    putStatus("Bad username and/or password.");
     PutClient(":irc.znc.in 464 " + GetNick() + " :" + sReason);
     d->socket->Close(NoSocket::CLT_AFTERWRITE);
 }
@@ -733,7 +733,7 @@ void NoClient::AcceptLogin(NoUser& User)
     if (!d->sNetwork.empty()) {
         d->network = d->user->findNetwork(d->sNetwork);
         if (!d->network) {
-            PutStatus("Network (" + d->sNetwork + ") doesn't exist.");
+            putStatus("Network (" + d->sNetwork + ") doesn't exist.");
         }
     } else if (!d->user->networks().empty()) {
         // If a user didn't supply a network, and they have a network called "default" then automatically use this
@@ -745,15 +745,15 @@ void NoClient::AcceptLogin(NoUser& User)
         // Otherwise, just try any network of the user.
         if (!d->network) d->network = *d->user->networks().begin();
         if (d->network && d->user->networks().size() > 1) {
-            PutStatusNotice("You have several networks configured, but no network was specified for the connection.");
-            PutStatusNotice("Selecting network [" + d->network->name() +
+            putStatusNotice("You have several networks configured, but no network was specified for the connection.");
+            putStatusNotice("Selecting network [" + d->network->name() +
                             "]. To see list of all configured networks, use /znc ListNetworks");
-            PutStatusNotice(
+            putStatusNotice(
             "If you want to choose another network, use /znc JumpNetwork <network>, or connect to ZNC with username " +
             d->user->userName() + "/<network> (instead of just " + d->user->userName() + ")");
         }
     } else {
-        PutStatusNotice("You have no networks configured. Use /znc AddNetwork <network> to add one.");
+        putStatusNotice("You have no networks configured. Use /znc AddNetwork <network> to add one.");
     }
 
     SetNetwork(d->network, false);
@@ -765,7 +765,7 @@ void NoClient::AcceptLogin(NoUser& User)
 
 void NoClient::BouncedOff()
 {
-    PutStatusNotice("You are being disconnected because another user just authenticated as you.");
+    putStatusNotice("You are being disconnected because another user just authenticated as you.");
     d->socket->Close(NoSocket::CLT_AFTERWRITE);
 }
 
@@ -774,7 +774,7 @@ bool NoClient::IsAttached() const { return d->user != nullptr; }
 bool NoClient::IsPlaybackActive() const { return d->inPlayback; }
 void NoClient::SetPlaybackActive(bool bActive) { d->inPlayback = bActive; }
 
-void NoClient::PutIRC(const NoString& sLine)
+void NoClient::putIrc(const NoString& sLine)
 {
     if (d->network) {
         d->network->putIrc(sLine);
@@ -800,19 +800,19 @@ void NoClient::PutClient(const NoString& sLine)
     d->socket->Write(sCopy + "\r\n");
 }
 
-void NoClient::PutStatusNotice(const NoString& sLine) { PutModNotice("status", sLine); }
+void NoClient::putStatusNotice(const NoString& sLine) { putModuleNotice("status", sLine); }
 
-uint NoClient::PutStatus(const NoTable& table)
+uint NoClient::putStatus(const NoTable& table)
 {
     NoStringVector lines = table.toString();
     for (const NoString& line : lines)
-        PutStatus(line);
+        putStatus(line);
     return lines.size() - 1;
 }
 
-void NoClient::PutStatus(const NoString& sLine) { PutModule("status", sLine); }
+void NoClient::putStatus(const NoString& sLine) { putModule("status", sLine); }
 
-void NoClient::PutModNotice(const NoString& sModule, const NoString& sLine)
+void NoClient::putModuleNotice(const NoString& sModule, const NoString& sLine)
 {
     if (!d->user) {
         return;
@@ -824,7 +824,7 @@ void NoClient::PutModNotice(const NoString& sModule, const NoString& sLine)
           GetNick() + " :" + sLine + "\r\n");
 }
 
-void NoClient::PutModule(const NoString& sModule, const NoString& sLine)
+void NoClient::putModule(const NoString& sModule, const NoString& sLine)
 {
     if (!d->user) {
         return;

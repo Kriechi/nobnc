@@ -29,7 +29,7 @@ class NoNickServ : public NoModule
         msValues["nickname"] = sNick;
         NoRegistry registry(this);
         msValues["password"] = registry.value("Password");
-        PutIRC(No::namedFormat(registry.value(sCmd), msValues));
+        putIrc(No::namedFormat(registry.value(sCmd), msValues));
     }
 
 public:
@@ -37,7 +37,7 @@ public:
     {
         NoRegistry registry(this);
         registry.setValue("Password", No::tokens(sLine, 1));
-        PutModule("Password set");
+        putModule("Password set");
     }
 
     void ClearCommand(const NoString& sLine) { NoRegistry(this).remove("Password"); }
@@ -46,12 +46,12 @@ public:
     {
         NoRegistry registry(this);
         registry.setValue("NickServName", No::tokens(sLine, 1));
-        PutModule("NickServ name set");
+        putModule("NickServ name set");
     }
 
     void ClearNSNameCommand(const NoString& sLine) { NoRegistry(this).remove("NickServName"); }
 
-    void ViewCommandsCommand(const NoString& sLine) { PutModule("IDENTIFY " + NoRegistry(this).value("IdentifyCmd")); }
+    void ViewCommandsCommand(const NoString& sLine) { putModule("IDENTIFY " + NoRegistry(this).value("IdentifyCmd")); }
 
     void SetCommandCommand(const NoString& sLine)
     {
@@ -61,41 +61,41 @@ public:
             NoRegistry registry(this);
             registry.setValue("IdentifyCmd", sNewCmd);
         } else {
-            PutModule("No such editable command. See ViewCommands for list.");
+            putModule("No such editable command. See ViewCommands for list.");
             return;
         }
-        PutModule("Ok");
+        putModule("Ok");
     }
 
     MODCONSTRUCTOR(NoNickServ)
     {
-        AddHelpCommand();
-        AddCommand("Set", static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetCommand), "password");
-        AddCommand("Clear",
+        addHelpCommand();
+        addCommand("Set", static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetCommand), "password");
+        addCommand("Clear",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::ClearCommand),
                    "",
                    "Clear your nickserv password");
-        AddCommand("SetNSName",
+        addCommand("SetNSName",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetNSNameCommand),
                    "nickname",
                    "Set NickServ name (Useful on networks like EpiKnet, where NickServ is named Themis)");
-        AddCommand("ClearNSName",
+        addCommand("ClearNSName",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::ClearNSNameCommand),
                    "",
                    "Reset NickServ name to default (NickServ)");
-        AddCommand("ViewCommands",
+        addCommand("ViewCommands",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::ViewCommandsCommand),
                    "",
                    "Show patterns for lines, which are being sent to NickServ");
-        AddCommand("SetCommand", static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetCommandCommand), "cmd new-pattern", "Set pattern for commands");
+        addCommand("SetCommand", static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetCommandCommand), "cmd new-pattern", "Set pattern for commands");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoRegistry registry(this);
         if (!sArgs.empty() && sArgs != "<hidden>") {
             registry.setValue("Password", sArgs);
-            SetArgs("<hidden>");
+            setArgs("<hidden>");
         }
 
         if (registry.value("IdentifyCmd").empty()) {
@@ -121,7 +121,7 @@ public:
             sMessage.toUpper().contains("IDENTIFY") && sMessage.contains("help")) {
             NoStringMap msValues;
             msValues["password"] = registry.value("Password");
-            PutIRC(No::namedFormat(registry.value("IdentifyCmd"), msValues));
+            putIrc(No::namedFormat(registry.value("IdentifyCmd"), msValues));
         }
     }
 

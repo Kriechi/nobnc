@@ -147,38 +147,38 @@ class NoAutoOpMod : public NoModule
 public:
     MODCONSTRUCTOR(NoAutoOpMod)
     {
-        AddHelpCommand();
-        AddCommand("ListUsers",
+        addHelpCommand();
+        addCommand("ListUsers",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnListUsersCommand),
                    "",
                    "List all users");
-        AddCommand("addChannels",
+        addCommand("addChannels",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnaddChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Adds channels to a user");
-        AddCommand("removeChannels",
+        addCommand("removeChannels",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnremoveChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");
-        AddCommand("AddMasks",
+        addCommand("AddMasks",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnAddMasksCommand),
                    "<user> <mask>,[mask] ...",
                    "Adds masks to a user");
-        AddCommand("DelMasks",
+        addCommand("DelMasks",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnDelMasksCommand),
                    "<user> <mask>,[mask] ...",
                    "Removes masks from a user");
-        AddCommand("AddUser",
+        addCommand("AddUser",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::onAddUserCommand),
                    "<user> <hostmask>[,<hostmasks>...] <key> [channels]",
                    "Adds a user");
-        AddCommand("DelUser",
+        addCommand("DelUser",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoOpMod::OnDelUserCommand),
                    "<user>",
                    "Removes a user");
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoAutoOpTimer* timer = new NoAutoOpTimer(this);
         timer->start(20);
@@ -254,7 +254,7 @@ public:
 
     void onOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        if (Nick.nick() == GetNetwork()->ircNick().nick()) {
+        if (Nick.nick() == network()->ircNick().nick()) {
             const std::map<NoString, NoNick>& msNicks = Channel.nicks();
 
             for (std::map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
@@ -270,9 +270,9 @@ public:
         NoString sCommand = No::token(sLine, 0).toUpper();
         if (sCommand.equals("TIMERS")) {
             // for testing purposes - hidden from help
-            ListTimers();
+            listTimers();
         } else {
-            HandleCommand(sLine);
+            handleCommand(sLine);
         }
     }
 
@@ -283,7 +283,7 @@ public:
         NoString sKey = No::token(sLine, 3);
 
         if (sHost.empty()) {
-            PutModule("Usage: AddUser <user> <hostmask>[,<hostmasks>...] <key> [channels]");
+            putModule("Usage: AddUser <user> <hostmask>[,<hostmasks>...] <key> [channels]");
         } else {
             NoAutoOpUser* pUser = AddUser(sUser, sKey, sHost, No::tokens(sLine, 4));
 
@@ -299,7 +299,7 @@ public:
         NoString sUser = No::token(sLine, 1);
 
         if (sUser.empty()) {
-            PutModule("Usage: DelUser <user>");
+            putModule("Usage: DelUser <user>");
         } else {
             DelUser(sUser);
             NoRegistry registry(this);
@@ -310,7 +310,7 @@ public:
     void OnListUsersCommand(const NoString& sLine)
     {
         if (m_msUsers.empty()) {
-            PutModule("There are no users defined");
+            putModule("There are no users defined");
             return;
         }
 
@@ -338,7 +338,7 @@ public:
             }
         }
 
-        PutModule(Table);
+        putModule(Table);
     }
 
     void OnaddChannelsCommand(const NoString& sLine)
@@ -347,19 +347,19 @@ public:
         NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
-            PutModule("Usage: addChannels <user> <channel> [channel] ...");
+            putModule("Usage: addChannels <user> <channel> [channel] ...");
             return;
         }
 
         NoAutoOpUser* pUser = FindUser(sUser);
 
         if (!pUser) {
-            PutModule("No such user");
+            putModule("No such user");
             return;
         }
 
         pUser->addChannels(sChans);
-        PutModule("Channel(s) added to user [" + pUser->GetUsername() + "]");
+        putModule("Channel(s) added to user [" + pUser->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(pUser->GetUsername(), pUser->ToString());
@@ -371,19 +371,19 @@ public:
         NoString sChans = No::tokens(sLine, 2);
 
         if (sChans.empty()) {
-            PutModule("Usage: removeChannels <user> <channel> [channel] ...");
+            putModule("Usage: removeChannels <user> <channel> [channel] ...");
             return;
         }
 
         NoAutoOpUser* pUser = FindUser(sUser);
 
         if (!pUser) {
-            PutModule("No such user");
+            putModule("No such user");
             return;
         }
 
         pUser->removeChannels(sChans);
-        PutModule("Channel(s) Removed from user [" + pUser->GetUsername() + "]");
+        putModule("Channel(s) Removed from user [" + pUser->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(pUser->GetUsername(), pUser->ToString());
@@ -395,19 +395,19 @@ public:
         NoString sHostmasks = No::tokens(sLine, 2);
 
         if (sHostmasks.empty()) {
-            PutModule("Usage: AddMasks <user> <mask>,[mask] ...");
+            putModule("Usage: AddMasks <user> <mask>,[mask] ...");
             return;
         }
 
         NoAutoOpUser* pUser = FindUser(sUser);
 
         if (!pUser) {
-            PutModule("No such user");
+            putModule("No such user");
             return;
         }
 
         pUser->AddHostmasks(sHostmasks);
-        PutModule("Hostmasks(s) added to user [" + pUser->GetUsername() + "]");
+        putModule("Hostmasks(s) added to user [" + pUser->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(pUser->GetUsername(), pUser->ToString());
@@ -419,25 +419,25 @@ public:
         NoString sHostmasks = No::tokens(sLine, 2);
 
         if (sHostmasks.empty()) {
-            PutModule("Usage: DelMasks <user> <mask>,[mask] ...");
+            putModule("Usage: DelMasks <user> <mask>,[mask] ...");
             return;
         }
 
         NoAutoOpUser* pUser = FindUser(sUser);
 
         if (!pUser) {
-            PutModule("No such user");
+            putModule("No such user");
             return;
         }
 
         if (pUser->DelHostmasks(sHostmasks)) {
-            PutModule("Removed user [" + pUser->GetUsername() + "] with key [" + pUser->GetUserKey() +
+            putModule("Removed user [" + pUser->GetUsername() + "] with key [" + pUser->GetUserKey() +
                       "] and channels [" + pUser->GetChannels() + "]");
             DelUser(sUser);
             NoRegistry registry(this);
             registry.remove(sUser);
         } else {
-            PutModule("Hostmasks(s) Removed from user [" + pUser->GetUsername() + "]");
+            putModule("Hostmasks(s) Removed from user [" + pUser->GetUsername() + "]");
             NoRegistry registry(this);
             registry.setValue(pUser->GetUsername(), pUser->ToString());
         }
@@ -472,7 +472,7 @@ public:
         }
 
         if (pUser->GetUserKey().equals("__NOKEY__")) {
-            PutIRC("MODE " + Channel.name() + " +o " + Nick.nick());
+            putIrc("MODE " + Channel.name() + " +o " + Nick.nick());
         } else {
             // then insert this nick into the queue, the timer does the rest
             NoString sNick = Nick.nick().toLower();
@@ -489,25 +489,25 @@ public:
         std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.find(sUser.toLower());
 
         if (it == m_msUsers.end()) {
-            PutModule("That user does not exist");
+            putModule("That user does not exist");
             return;
         }
 
         delete it->second;
         m_msUsers.erase(it);
-        PutModule("User [" + sUser + "] removed");
+        putModule("User [" + sUser + "] removed");
     }
 
     NoAutoOpUser* AddUser(const NoString& sUser, const NoString& sKey, const NoString& sHosts, const NoString& sChans)
     {
         if (m_msUsers.find(sUser) != m_msUsers.end()) {
-            PutModule("That user already exists");
+            putModule("That user already exists");
             return nullptr;
         }
 
         NoAutoOpUser* pUser = new NoAutoOpUser(sUser, sKey, sHosts, sChans);
         m_msUsers[sUser.toLower()] = pUser;
-        PutModule("User [" + sUser + "] added with hostmask(s) [" + sHosts + "]");
+        putModule("User [" + sUser + "] added with hostmask(s) [" + sHosts + "]");
         return pUser;
     }
 
@@ -523,7 +523,7 @@ public:
 
             // First verify that the person who challenged us matches a user's host
             if (pUser->HostMatches(Nick.hostMask())) {
-                const std::vector<NoChannel*>& Chans = GetNetwork()->channels();
+                const std::vector<NoChannel*>& Chans = network()->channels();
                 bMatchedHost = true;
 
                 // Also verify that they are opped in at least one of the user's chans
@@ -548,22 +548,22 @@ public:
 
         if (!bValid) {
             if (bMatchedHost) {
-                PutModule("[" + Nick.hostMask() +
+                putModule("[" + Nick.hostMask() +
                           "] sent us a challenge but they are not opped in any defined channels.");
             } else {
-                PutModule("[" + Nick.hostMask() + "] sent us a challenge but they do not match a defined user.");
+                putModule("[" + Nick.hostMask() + "] sent us a challenge but they do not match a defined user.");
             }
 
             return false;
         }
 
         if (sChallenge.length() != AUTOOP_CHALLENGE_LENGTH) {
-            PutModule("WARNING! [" + Nick.hostMask() + "] sent an invalid challenge.");
+            putModule("WARNING! [" + Nick.hostMask() + "] sent an invalid challenge.");
             return false;
         }
 
         NoString sResponse = pUser->GetUserKey() + "::" + sChallenge;
-        PutIRC("NOTICE " + Nick.nick() + " :!ZNCAO RESPONSE " + No::md5(sResponse));
+        putIrc("NOTICE " + Nick.nick() + " :!ZNCAO RESPONSE " + No::md5(sResponse));
         return false;
     }
 
@@ -572,7 +572,7 @@ public:
         NoStringMap::iterator itQueue = m_msQueue.find(Nick.nick().toLower());
 
         if (itQueue == m_msQueue.end()) {
-            PutModule("[" + Nick.hostMask() + "] sent an unchallenged response.  This could be due to lag.");
+            putModule("[" + Nick.hostMask() + "] sent an unchallenged response.  This could be due to lag.");
             return false;
         }
 
@@ -585,14 +585,14 @@ public:
                     OpUser(Nick, *it->second);
                     return true;
                 } else {
-                    PutModule("WARNING! [" + Nick.hostMask() +
+                    putModule("WARNING! [" + Nick.hostMask() +
                               "] sent a bad response.  Please verify that you have their correct password.");
                     return false;
                 }
             }
         }
 
-        PutModule("WARNING! [" + Nick.hostMask() + "] sent a response but did not match any defined users.");
+        putModule("WARNING! [" + Nick.hostMask() + "] sent a response but did not match any defined users.");
         return false;
     }
 
@@ -617,13 +617,13 @@ public:
         // Now issue challenges for the new users in the queue
         for (NoStringMap::iterator it = m_msQueue.begin(); it != m_msQueue.end(); ++it) {
             it->second = No::randomString(AUTOOP_CHALLENGE_LENGTH);
-            PutIRC("NOTICE " + it->first + " :!ZNCAO CHALLENGE " + it->second);
+            putIrc("NOTICE " + it->first + " :!ZNCAO CHALLENGE " + it->second);
         }
     }
 
     void OpUser(const NoNick& Nick, const NoAutoOpUser& User)
     {
-        const std::vector<NoChannel*>& Chans = GetNetwork()->channels();
+        const std::vector<NoChannel*>& Chans = network()->channels();
 
         for (size_t a = 0; a < Chans.size(); a++) {
             const NoChannel& Chan = *Chans[a];
@@ -632,7 +632,7 @@ public:
                 const NoNick* pNick = Chan.findNick(Nick.nick());
 
                 if (pNick && !pNick->hasPerm(NoChannel::Op)) {
-                    PutIRC("MODE " + Chan.name() + " +o " + Nick.nick());
+                    putIrc("MODE " + Chan.name() + " +o " + Nick.nick());
                 }
             }
         }

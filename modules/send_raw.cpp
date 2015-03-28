@@ -34,12 +34,12 @@ class NoSendRawMod : public NoModule
 
             if (pNetwork) {
                 pNetwork->putUser(No::tokens(sLine, 3));
-                PutModule("Sent [" + No::tokens(sLine, 3) + "] to " + pUser->userName() + "/" + pNetwork->name());
+                putModule("Sent [" + No::tokens(sLine, 3) + "] to " + pUser->userName() + "/" + pNetwork->name());
             } else {
-                PutModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
+                putModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
             }
         } else {
-            PutModule("User [" + No::token(sLine, 1) + "] not found");
+            putModule("User [" + No::token(sLine, 1) + "] not found");
         }
     }
 
@@ -52,25 +52,25 @@ class NoSendRawMod : public NoModule
 
             if (pNetwork) {
                 pNetwork->putIrc(No::tokens(sLine, 3));
-                PutModule("Sent [" + No::tokens(sLine, 3) + "] to IRC Server of " + pUser->userName() + "/" + pNetwork->name());
+                putModule("Sent [" + No::tokens(sLine, 3) + "] to IRC Server of " + pUser->userName() + "/" + pNetwork->name());
             } else {
-                PutModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
+                putModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
             }
         } else {
-            PutModule("User [" + No::token(sLine, 1) + "] not found");
+            putModule("User [" + No::token(sLine, 1) + "] not found");
         }
     }
 
     void CurrentClient(const NoString& sLine)
     {
         NoString sData = No::tokens(sLine, 1);
-        GetClient()->PutClient(sData);
+        client()->PutClient(sData);
     }
 
 public:
-    bool OnLoad(const NoString& sArgs, NoString& sErrorMsg) override
+    bool onLoad(const NoString& sArgs, NoString& sErrorMsg) override
     {
-        if (!GetUser()->isAdmin()) {
+        if (!user()->isAdmin()) {
             sErrorMsg = "You must have admin privileges to load this module";
             return false;
         }
@@ -78,10 +78,10 @@ public:
         return true;
     }
 
-    NoString GetWebMenuTitle() override { return "Send Raw"; }
-    bool WebRequiresAdmin() override { return true; }
+    NoString webMenuTitle() override { return "Send Raw"; }
+    bool webRequiresAdmin() override { return true; }
 
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             if (WebSock.IsPost()) {
@@ -134,16 +134,16 @@ public:
 
     MODCONSTRUCTOR(NoSendRawMod)
     {
-        AddHelpCommand();
-        AddCommand("Client",
+        addHelpCommand();
+        addCommand("Client",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSendRawMod::SendClient),
                    "[user] [network] [data to send]",
                    "The data will be sent to the user's IRC client(s)");
-        AddCommand("Server",
+        addCommand("Server",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSendRawMod::SendServer),
                    "[user] [network] [data to send]",
                    "The data will be sent to the IRC server the user is connected to");
-        AddCommand("Current",
+        addCommand("Current",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSendRawMod::CurrentClient),
                    "[data to send]",
                    "The data will be sent to your current client");

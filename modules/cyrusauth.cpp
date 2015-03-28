@@ -41,24 +41,24 @@ public:
     {
         m_Cache.setExpiration(60000 /*ms*/);
 
-        AddHelpCommand();
-        AddCommand("CreateUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CreateUserCommand), "[yes|no]");
-        AddCommand("CloneUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CloneUserCommand), "[username]");
-        AddCommand("DisableCloneUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::DisableCloneUserCommand));
+        addHelpCommand();
+        addCommand("CreateUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CreateUserCommand), "[yes|no]");
+        addCommand("CloneUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CloneUserCommand), "[username]");
+        addCommand("DisableCloneUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::DisableCloneUserCommand));
     }
 
     virtual ~NoSaslAuthMod() { sasl_done(); }
 
     void onModCommand(const NoString& sCommand) override
     {
-        if (GetUser()->isAdmin()) {
-            HandleCommand(sCommand);
+        if (user()->isAdmin()) {
+            handleCommand(sCommand);
         } else {
-            PutModule("Access denied");
+            putModule("Access denied");
         }
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoStringVector::const_iterator it;
         NoStringVector vsArgs = sArgs.split(" ", No::SkipEmptyParts);
@@ -175,9 +175,9 @@ public:
         }
 
         if (CreateUser()) {
-            PutModule("We will create users on their first login");
+            putModule("We will create users on their first login");
         } else {
-            PutModule("We will not create users on their first login");
+            putModule("We will not create users on their first login");
         }
     }
 
@@ -191,9 +191,9 @@ public:
         }
 
         if (ShouldCloneUser()) {
-            PutModule("We will clone [" + CloneUser() + "]");
+            putModule("We will clone [" + CloneUser() + "]");
         } else {
-            PutModule("We will not clone a user");
+            putModule("We will not clone a user");
         }
     }
 
@@ -201,7 +201,7 @@ public:
     {
         NoRegistry registry(this);
         registry.remove("CloneUser");
-        PutModule("Clone user disabled");
+        putModule("Clone user disabled");
     }
 
     bool CreateUser() const { return NoRegistry(this).value("CreateUser").toBool(); }

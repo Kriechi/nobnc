@@ -51,7 +51,7 @@ protected:
         NoIrcSocket* pIRCSock = m_pNetwork->ircSocket();
 
         if (pIRCSock && pIRCSock->GetTimeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
-            pIRCSock->PutIRC("PING :ZNC");
+            pIRCSock->putIrc("PING :ZNC");
         }
 
         const std::vector<NoClient*>& vClients = m_pNetwork->clients();
@@ -181,10 +181,10 @@ NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName) : d(new NoNetworkPriv
     d->noticeBuffer.setLimit(250, true);
 
     d->pingTimer = new NoNetworkPingTimer(this);
-    NoApp::Get().GetManager().AddCron(d->pingTimer);
+    NoApp::Get().manager().AddCron(d->pingTimer);
 
     d->joinTimer = new NoNetworkJoinTimer(this);
-    NoApp::Get().GetManager().AddCron(d->joinTimer);
+    NoApp::Get().manager().AddCron(d->joinTimer);
 
     setEnabled(true);
 }
@@ -273,20 +273,20 @@ void NoNetwork::clone(const NoNetwork& Network, bool bCloneName)
 
     for (NoModule* pNewMod : vNewMods->modules()) {
         NoString sModRet;
-        NoModule* pCurMod = vCurMods->findModule(pNewMod->GetModName());
+        NoModule* pCurMod = vCurMods->findModule(pNewMod->moduleName());
 
         if (!pCurMod) {
-            vCurMods->loadModule(pNewMod->GetModName(), pNewMod->GetArgs(), No::NetworkModule, d->user, this, sModRet);
-        } else if (pNewMod->GetArgs() != pCurMod->GetArgs()) {
-            vCurMods->reloadModule(pNewMod->GetModName(), pNewMod->GetArgs(), d->user, this, sModRet);
+            vCurMods->loadModule(pNewMod->moduleName(), pNewMod->args(), No::NetworkModule, d->user, this, sModRet);
+        } else if (pNewMod->args() != pCurMod->args()) {
+            vCurMods->reloadModule(pNewMod->moduleName(), pNewMod->args(), d->user, this, sModRet);
         }
     }
 
     for (NoModule* pCurMod : vCurMods->modules()) {
-        NoModule* pNewMod = vNewMods->findModule(pCurMod->GetModName());
+        NoModule* pNewMod = vNewMods->findModule(pCurMod->moduleName());
 
         if (!pNewMod) {
-            ssUnloadMods.insert(pCurMod->GetModName());
+            ssUnloadMods.insert(pCurMod->moduleName());
         }
     }
 
@@ -301,13 +301,13 @@ void NoNetwork::clone(const NoNetwork& Network, bool bCloneName)
 NoNetwork::~NoNetwork()
 {
     if (d->socket) {
-        NoApp::Get().GetManager().DelSockByAddr(d->socket);
+        NoApp::Get().manager().DelSockByAddr(d->socket);
         d->socket = nullptr;
     }
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::Get().GetManager().DelSockByAddr(d->clients[0]->GetSocket());
+        NoApp::Get().manager().DelSockByAddr(d->clients[0]->GetSocket());
     }
     d->clients.clear();
 
@@ -335,8 +335,8 @@ NoNetwork::~NoNetwork()
     // Make sure we are not in the connection queue
     NoApp::Get().GetConnectionQueue().remove(this);
 
-    NoApp::Get().GetManager().DelCronByAddr(d->pingTimer);
-    NoApp::Get().GetManager().DelCronByAddr(d->joinTimer);
+    NoApp::Get().manager().DelCronByAddr(d->pingTimer);
+    NoApp::Get().manager().DelCronByAddr(d->joinTimer);
 }
 
 void NoNetwork::delServers()
@@ -540,13 +540,13 @@ NoSettings NoNetwork::toConfig() const
     const NoModuleLoader* Mods = loader();
 
     for (NoModule* pMod : Mods->modules()) {
-        NoString sArgs = pMod->GetArgs();
+        NoString sArgs = pMod->args();
 
         if (!sArgs.empty()) {
             sArgs = " " + sArgs;
         }
 
-        config.AddKeyValuePair("LoadModule", pMod->GetModName() + sArgs);
+        config.AddKeyValuePair("LoadModule", pMod->moduleName() + sArgs);
     }
 
     // Servers
@@ -682,7 +682,7 @@ void NoNetwork::clientConnected(NoClient* pClient)
 
     // Tell them why they won't connect
     if (!isEnabled())
-        pClient->PutStatus("You are currently disconnected from IRC. "
+        pClient->putStatus("You are currently disconnected from IRC. "
                            "Use 'connect' to reconnect.");
 }
 
@@ -716,7 +716,7 @@ std::vector<NoClient*> NoNetwork::findClients(const NoString& sIdentifier) const
 void NoNetwork::setUser(NoUser* pUser)
 {
     for (NoClient* pClient : d->clients) {
-        pClient->PutStatus("This network is being deleted or moved to another user.");
+        pClient->putStatus("This network is being deleted or moved to another user.");
         pClient->SetNetwork(nullptr);
     }
 
@@ -763,7 +763,7 @@ bool NoNetwork::putStatus(const NoString& sLine, NoClient* pClient, NoClient* pS
 {
     for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
-            pEachClient->PutStatus(sLine);
+            pEachClient->putStatus(sLine);
 
             if (pClient) {
                 return true;
@@ -778,7 +778,7 @@ bool NoNetwork::putModule(const NoString& sModule, const NoString& sLine, NoClie
 {
     for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
-            pEachClient->PutModule(sModule, sLine);
+            pEachClient->putModule(sModule, sLine);
 
             if (pClient) {
                 return true;
@@ -1245,7 +1245,7 @@ bool NoNetwork::connect()
     bool bSSL = pServer->isSsl();
 #ifndef HAVE_LIBSSL
     if (bSSL) {
-        PutStatus("Cannot connect to [" + pServer->GetString(false) + "], ZNC is not compiled with SSL.");
+        putStatus("Cannot connect to [" + pServer->GetString(false) + "], ZNC is not compiled with SSL.");
         NoApp::Get().AddNetworkToQueue(this);
         return false;
     }
@@ -1268,7 +1268,7 @@ bool NoNetwork::connect()
     }
 
     NoString sSockName = "IRC::" + d->user->userName() + "::" + d->name;
-    NoApp::Get().GetManager().Connect(pServer->host(), pServer->port(), sSockName, 120, bSSL, bindHost(), pIRCSock);
+    NoApp::Get().manager().Connect(pServer->host(), pServer->port(), sSockName, 120, bSSL, bindHost(), pIRCSock);
 
     return true;
 }
@@ -1332,7 +1332,7 @@ bool NoNetwork::putIrc(const NoString& sLine)
         return false;
     }
 
-    pIRCSock->PutIRC(sLine);
+    pIRCSock->putIrc(sLine);
     return true;
 }
 

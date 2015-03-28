@@ -35,11 +35,11 @@ class NoNotesMod : public NoModule
 
         NoRegistry registry(this);
         if (!registry.value(sKey).empty()) {
-            PutModule("That note already exists.  Use MOD <key> <note> to overwrite.");
+            putModule("That note already exists.  Use MOD <key> <note> to overwrite.");
         } else if (AddNote(sKey, sValue)) {
-            PutModule("Added note [" + sKey + "]");
+            putModule("Added note [" + sKey + "]");
         } else {
-            PutModule("Unable to add note [" + sKey + "]");
+            putModule("Unable to add note [" + sKey + "]");
         }
     }
 
@@ -49,9 +49,9 @@ class NoNotesMod : public NoModule
         NoString sValue(No::tokens(sLine, 2));
 
         if (AddNote(sKey, sValue)) {
-            PutModule("Set note for [" + sKey + "]");
+            putModule("Set note for [" + sKey + "]");
         } else {
-            PutModule("Unable to add note [" + sKey + "]");
+            putModule("Unable to add note [" + sKey + "]");
         }
     }
 
@@ -61,9 +61,9 @@ class NoNotesMod : public NoModule
         NoString sNote = registry.value(No::tokens(sLine, 1));
 
         if (sNote.empty()) {
-            PutModule("This note doesn't exist.");
+            putModule("This note doesn't exist.");
         } else {
-            PutModule(sNote);
+            putModule(sNote);
         }
     }
 
@@ -72,9 +72,9 @@ class NoNotesMod : public NoModule
         NoString sKey(No::token(sLine, 1));
 
         if (DelNote(sKey)) {
-            PutModule("Deleted note [" + sKey + "]");
+            putModule("Deleted note [" + sKey + "]");
         } else {
-            PutModule("Unable to delete note [" + sKey + "]");
+            putModule("Unable to delete note [" + sKey + "]");
         }
     }
 
@@ -82,21 +82,21 @@ public:
     MODCONSTRUCTOR(NoNotesMod)
     {
         using std::placeholders::_1;
-        AddHelpCommand();
-        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::ListCommand));
-        AddCommand("Add", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::AddNoteCommand), "<key> <note>");
-        AddCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::DelCommand), "<key>", "Delete a note");
-        AddCommand("Mod", "<key> <note>", "Modify a note", std::bind(&NoNotesMod::ModCommand, this, _1));
-        AddCommand("Get", "<key>", "", [this](const NoString& sLine) { GetCommand(sLine); });
+        addHelpCommand();
+        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::ListCommand));
+        addCommand("Add", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::AddNoteCommand), "<key> <note>");
+        addCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::DelCommand), "<key>", "Delete a note");
+        addCommand("Mod", "<key> <note>", "Modify a note", std::bind(&NoNotesMod::ModCommand, this, _1));
+        addCommand("Get", "<key>", "", [this](const NoString& sLine) { GetCommand(sLine); });
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         bShowNotesOnLogin = !sArgs.equals("-disableNotesOnLogin");
         return true;
     }
 
-    NoString GetWebMenuTitle() override { return "Notes"; }
+    NoString webMenuTitle() override { return "Notes"; }
 
     void onClientLogin() override
     {
@@ -120,9 +120,9 @@ public:
         } else if (sLine.left(2) == "#-") {
             sKey = No::token(sLine, 0).leftChomp_n(2);
             if (DelNote(sKey)) {
-                PutModNotice("Deleted note [" + sKey + "]");
+                putModuleNotice("Deleted note [" + sKey + "]");
             } else {
-                PutModNotice("Unable to delete note [" + sKey + "]");
+                putModuleNotice("Unable to delete note [" + sKey + "]");
             }
             return HALT;
         } else if (sLine.left(2) == "#+") {
@@ -136,15 +136,15 @@ public:
 
         if (!sKey.empty()) {
             if (!bOverwrite && NoRegistry(this).contains(sKey)) {
-                PutModNotice("That note already exists.  Use /#+<key> <note> to overwrite.");
+                putModuleNotice("That note already exists.  Use /#+<key> <note> to overwrite.");
             } else if (AddNote(sKey, sValue)) {
                 if (!bOverwrite) {
-                    PutModNotice("Added note [" + sKey + "]");
+                    putModuleNotice("Added note [" + sKey + "]");
                 } else {
-                    PutModNotice("Set note for [" + sKey + "]");
+                    putModuleNotice("Set note for [" + sKey + "]");
                 }
             } else {
-                PutModNotice("Unable to add note [" + sKey + "]");
+                putModuleNotice("Unable to add note [" + sKey + "]");
             }
         }
 
@@ -174,7 +174,7 @@ public:
 
     void ListNotes(bool bNotice = false)
     {
-        NoClient* pClient = GetClient();
+        NoClient* pClient = client();
 
         if (pClient) {
             NoTable Table;
@@ -191,21 +191,21 @@ public:
             if (!Table.isEmpty()) {
                 for (const NoString& line : Table.toString()) {
                     if (bNotice)
-                        pClient->PutModNotice(GetModName(), line);
+                        pClient->putModuleNotice(moduleName(), line);
                     else
-                        pClient->PutModule(GetModName(), line);
+                        pClient->putModule(moduleName(), line);
                 }
             } else {
                 if (bNotice) {
-                    PutModNotice("You have no entries.");
+                    putModuleNotice("You have no entries.");
                 } else {
-                    PutModule("You have no entries.");
+                    putModule("You have no entries.");
                 }
             }
         }
     }
 
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             NoRegistry registry(this);
@@ -219,11 +219,11 @@ public:
             return true;
         } else if (sPageName == "delnote") {
             DelNote(WebSock.GetParam("key", false));
-            WebSock.Redirect(GetWebPath());
+            WebSock.Redirect(webPath());
             return true;
         } else if (sPageName == "addnote") {
             AddNote(WebSock.GetParam("key"), WebSock.GetParam("note"));
-            WebSock.Redirect(GetWebPath());
+            WebSock.Redirect(webPath());
             return true;
         }
 

@@ -88,16 +88,16 @@ class NoDccMod : public NoModule
 public:
     MODCONSTRUCTOR(NoDccMod)
     {
-        AddHelpCommand();
-        AddCommand("Send", static_cast<NoModuleCommand::ModCmdFunc>(&NoDccMod::SendCommand), "<nick> <file>");
-        AddCommand("Get", static_cast<NoModuleCommand::ModCmdFunc>(&NoDccMod::GetCommand), "<file>");
-        AddCommand("ListTransfers", static_cast<NoModuleCommand::ModCmdFunc>(&NoDccMod::ListTransfersCommand));
+        addHelpCommand();
+        addCommand("Send", static_cast<NoModuleCommand::ModCmdFunc>(&NoDccMod::SendCommand), "<nick> <file>");
+        addCommand("Get", static_cast<NoModuleCommand::ModCmdFunc>(&NoDccMod::GetCommand), "<file>");
+        addCommand("ListTransfers", static_cast<NoModuleCommand::ModCmdFunc>(&NoDccMod::ListTransfersCommand));
     }
 
 #ifndef MOD_DCC_ALLOW_EVERYONE
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        if (!GetUser()->isAdmin()) {
+        if (!user()->isAdmin()) {
             sMessage = "You must be admin to use the DCC module";
             return false;
         }
@@ -108,7 +108,7 @@ public:
 
     bool SendFile(const NoString& sRemoteNick, const NoString& sFileName)
     {
-        NoString sFullPath = NoDir::ChangeDir(GetSavePath(), sFileName, NoApp::Get().GetHomePath());
+        NoString sFullPath = NoDir::ChangeDir(savePath(), sFileName, NoApp::Get().GetHomePath());
         NoDccSock* pSock = new NoDccSock(this, sRemoteNick, sFullPath);
 
         NoFile* pFile = pSock->OpenFile(false);
@@ -118,26 +118,26 @@ public:
             return false;
         }
 
-        NoString sLocalDCCIP = GetUser()->localDccIp();
+        NoString sLocalDCCIP = user()->localDccIp();
         ushort uPort =
-        NoApp::Get().GetManager().ListenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
+        NoApp::Get().manager().ListenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
 
-        if (GetUser()->nick().equals(sRemoteNick)) {
-            PutUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
+        if (user()->nick().equals(sRemoteNick)) {
+            putUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
                     NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
         } else {
-            PutIRC("PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
+            putIrc("PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
                    NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
         }
 
-        PutModule("DCC -> [" + sRemoteNick + "][" + pFile->GetShortName() + "] - Attempting Send.");
+        putModule("DCC -> [" + sRemoteNick + "][" + pFile->GetShortName() + "] - Attempting Send.");
         return true;
     }
 
     bool GetFile(const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sFileName, ulong uFileSize)
     {
         if (NoFile::Exists(sFileName)) {
-            PutModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - File already exists.");
+            putModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - File already exists.");
             return false;
         }
 
@@ -148,9 +148,9 @@ public:
             return false;
         }
 
-        NoApp::Get().GetManager().Connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, GetUser()->localDccIp(), pSock);
+        NoApp::Get().manager().Connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, user()->localDccIp(), pSock);
 
-        PutModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - Attempting to connect to [" + sRemoteIP + "]");
+        putModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - Attempting to connect to [" + sRemoteIP + "]");
         return true;
     }
 
@@ -158,18 +158,18 @@ public:
     {
         NoString sToNick = No::token(sLine, 1);
         NoString sFile = No::token(sLine, 2);
-        NoString sAllowedPath = GetSavePath();
+        NoString sAllowedPath = savePath();
         NoString sAbsolutePath;
 
         if ((sToNick.empty()) || (sFile.empty())) {
-            PutModule("Usage: Send <nick> <file>");
+            putModule("Usage: Send <nick> <file>");
             return;
         }
 
         sAbsolutePath = NoDir::CheckPathPrefix(sAllowedPath, sFile);
 
         if (sAbsolutePath.empty()) {
-            PutStatus("Illegal path.");
+            putStatus("Illegal path.");
             return;
         }
 
@@ -179,22 +179,22 @@ public:
     void GetCommand(const NoString& sLine)
     {
         NoString sFile = No::token(sLine, 1);
-        NoString sAllowedPath = GetSavePath();
+        NoString sAllowedPath = savePath();
         NoString sAbsolutePath;
 
         if (sFile.empty()) {
-            PutModule("Usage: Get <file>");
+            putModule("Usage: Get <file>");
             return;
         }
 
         sAbsolutePath = NoDir::CheckPathPrefix(sAllowedPath, sFile);
 
         if (sAbsolutePath.empty()) {
-            PutModule("Illegal path.");
+            putModule("Illegal path.");
             return;
         }
 
-        SendFile(GetUser()->nick(), sFile);
+        SendFile(user()->nick(), sFile);
     }
 
     void ListTransfersCommand(const NoString& sLine)
@@ -227,8 +227,8 @@ public:
             }
         }
 
-        if (PutModule(Table) == 0) {
-            PutModule("You have no active DCC transfers.");
+        if (putModule(Table) == 0) {
+            putModule("You have no active DCC transfers.");
         }
     }
 
@@ -242,25 +242,25 @@ public:
             for (NoDccSock* pSock : m_sockets) {
                 if (pSock->GetLocalPort() == uResumePort) {
                     if (pSock->Seek(uResumeSize)) {
-                        PutModule("DCC -> [" + pSock->GetRemoteNick() + "][" + pSock->GetFileName() +
+                        putModule("DCC -> [" + pSock->GetRemoteNick() + "][" + pSock->GetFileName() +
                                   "] - Attempting to resume from file position [" + NoString(uResumeSize) + "]");
-                        PutUser(":*dcc!znc@znc.in PRIVMSG " + GetUser()->nick() + " :\001DCC ACCEPT " + sFile + " " +
+                        putUser(":*dcc!znc@znc.in PRIVMSG " + user()->nick() + " :\001DCC ACCEPT " + sFile + " " +
                                 NoString(uResumePort) + " " + NoString(uResumeSize) + "\001");
                     } else {
-                        PutModule("DCC -> [" + GetUser()->nick() + "][" + sFile +
+                        putModule("DCC -> [" + user()->nick() + "][" + sFile +
                                   "] Unable to find send to initiate resume.");
                     }
                 }
             }
         } else if (sMessage.startsWith("DCC SEND ")) {
-            NoString sLocalFile = NoDir::CheckPathPrefix(GetSavePath(), No::token(sMessage, 2));
+            NoString sLocalFile = NoDir::CheckPathPrefix(savePath(), No::token(sMessage, 2));
             if (sLocalFile.empty()) {
-                PutModule("Bad DCC file: " + No::token(sMessage, 2));
+                putModule("Bad DCC file: " + No::token(sMessage, 2));
             }
             ulong uLongIP = No::token(sMessage, 3).toULong();
             ushort uPort = No::token(sMessage, 4).toUShort();
             ulong uFileSize = No::token(sMessage, 5).toULong();
-            GetFile(GetClient()->GetNick(), No::formatIp(uLongIP), uPort, sLocalFile, uFileSize);
+            GetFile(client()->GetNick(), No::formatIp(uLongIP), uPort, sLocalFile, uFileSize);
         }
     }
     void AddSocket(NoDccSock* socket) { m_sockets.insert(socket); }
@@ -320,7 +320,7 @@ void NoDccSock::ReadDataImpl(const char* data, size_t len)
 {
     if (!m_pFile) {
         NO_DEBUG("File not open! closing get.");
-        m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+        m_module->putModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                              "] - File not open!");
         Close();
     }
@@ -358,27 +358,27 @@ void NoDccSock::ReadDataImpl(const char* data, size_t len)
 void NoDccSock::ConnectionRefusedImpl()
 {
     NO_DEBUG(GetSockName() << " == ConnectionRefused()");
-    m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+    m_module->putModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Connection Refused.");
 }
 
 void NoDccSock::TimeoutImpl()
 {
     NO_DEBUG(GetSockName() << " == Timeout()");
-    m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - Timed Out.");
+    m_module->putModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - Timed Out.");
 }
 
 void NoDccSock::SockErrorImpl(int iErrno, const NoString& sDescription)
 {
     NO_DEBUG(GetSockName() << " == SockError(" << iErrno << ", " << sDescription << ")");
-    m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+    m_module->putModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Socket Error [" + sDescription + "]");
 }
 
 void NoDccSock::ConnectedImpl()
 {
     NO_DEBUG(GetSockName() << " == Connected(" << GetRemoteIP() << ")");
-    m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+    m_module->putModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                          "] - Transfer Started.");
 
     if (m_bSend) {
@@ -395,24 +395,24 @@ void NoDccSock::DisconnectedImpl()
     NO_DEBUG(GetSockName() << " == Disconnected()");
 
     if (m_uBytesSoFar > m_uFileSize) {
-        m_module->PutModule(sStart + "TooMuchData!");
+        m_module->putModule(sStart + "TooMuchData!");
     } else if (m_uBytesSoFar == m_uFileSize) {
         if (m_bSend) {
-            m_module->PutModule(sStart + "Completed! - Sent [" + m_sLocalFile + "] at [" +
+            m_module->putModule(sStart + "Completed! - Sent [" + m_sLocalFile + "] at [" +
                                  NoString((int)(GetAvgWrite() / 1024.0)) + " KiB/s ]");
         } else {
-            m_module->PutModule(sStart + "Completed! - Saved to [" + m_sLocalFile + "] at [" +
+            m_module->putModule(sStart + "Completed! - Saved to [" + m_sLocalFile + "] at [" +
                                  NoString((int)(GetAvgRead() / 1024.0)) + " KiB/s ]");
         }
     } else {
-        m_module->PutModule(sStart + "Incomplete!");
+        m_module->putModule(sStart + "Incomplete!");
     }
 }
 
 void NoDccSock::SendPacket()
 {
     if (!m_pFile) {
-        m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+        m_module->putModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                              "] - File closed prematurely.");
         Close();
         return;
@@ -430,7 +430,7 @@ void NoDccSock::SendPacket()
     ssize_t iLen = m_pFile->Read(szBuf, 4096);
 
     if (iLen < 0) {
-        m_module->PutModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
+        m_module->putModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
                              "] - Error reading from file.");
         Close();
         return;
@@ -459,7 +459,7 @@ NoSocket* NoDccSock::GetSockObjImpl(const NoString& sHost, ushort uPort)
 NoFile* NoDccSock::OpenFile(bool bWrite)
 {
     if ((m_pFile) || (m_sLocalFile.empty())) {
-        m_module->PutModule(((bWrite) ? "DCC <- [" : "DCC -> [") + m_sRemoteNick + "][" + m_sLocalFile +
+        m_module->putModule(((bWrite) ? "DCC <- [" : "DCC -> [") + m_sRemoteNick + "][" + m_sLocalFile +
                              "] - Unable to open file.");
         return nullptr;
     }
@@ -470,28 +470,28 @@ NoFile* NoDccSock::OpenFile(bool bWrite)
         if (m_pFile->Exists()) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_module->PutModule("DCC <- [" + m_sRemoteNick + "] - File already exists [" + m_sLocalFile + "]");
+            m_module->putModule("DCC <- [" + m_sRemoteNick + "] - File already exists [" + m_sLocalFile + "]");
             return nullptr;
         }
 
         if (!m_pFile->Open(O_WRONLY | O_TRUNC | O_CREAT)) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_module->PutModule("DCC <- [" + m_sRemoteNick + "] - Could not open file [" + m_sLocalFile + "]");
+            m_module->putModule("DCC <- [" + m_sRemoteNick + "] - Could not open file [" + m_sLocalFile + "]");
             return nullptr;
         }
     } else {
         if (!m_pFile->IsReg()) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_module->PutModule("DCC -> [" + m_sRemoteNick + "] - Not a file [" + m_sLocalFile + "]");
+            m_module->putModule("DCC -> [" + m_sRemoteNick + "] - Not a file [" + m_sLocalFile + "]");
             return nullptr;
         }
 
         if (!m_pFile->Open()) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_module->PutModule("DCC -> [" + m_sRemoteNick + "] - Could not open file [" + m_sLocalFile + "]");
+            m_module->putModule("DCC -> [" + m_sRemoteNick + "] - Could not open file [" + m_sLocalFile + "]");
             return nullptr;
         }
 
@@ -501,7 +501,7 @@ NoFile* NoDccSock::OpenFile(bool bWrite)
         if (uFileSize > (ulonglong)0xffffffffULL) {
             delete m_pFile;
             m_pFile = nullptr;
-            m_module->PutModule("DCC -> [" + m_sRemoteNick + "] - File too large (>4 GiB) [" + m_sLocalFile + "]");
+            m_module->putModule("DCC -> [" + m_sRemoteNick + "] - File too large (>4 GiB) [" + m_sLocalFile + "]");
             return nullptr;
         }
 

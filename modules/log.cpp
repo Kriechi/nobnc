@@ -55,16 +55,16 @@ public:
     MODCONSTRUCTOR(NoLogMod)
     {
         m_bSanitize = false;
-        AddHelpCommand();
-        AddCommand("SetRules",
+        addHelpCommand();
+        addCommand("SetRules",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoLogMod::SetRulesCmd),
                    "<rules>",
                    "Set logging rules, use !#chan or !query to negate and * for wildcards");
-        AddCommand("ClearRules",
+        addCommand("ClearRules",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoLogMod::ClearRulesCmd),
                    "",
                    "Clear all logging rules");
-        AddCommand("ListRules",
+        addCommand("ListRules",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoLogMod::ListRulesCmd),
                    "",
                    "List all logging rules");
@@ -83,7 +83,7 @@ public:
     void PutLog(const NoString& sLine, const NoNick& Nick);
     NoString GetServer();
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override;
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override;
     void onIrcConnected() override;
     void onIrcDisconnected() override;
     ModRet onBroadcast(NoString& sMessage) override;
@@ -122,8 +122,8 @@ void NoLogMod::SetRulesCmd(const NoString& sLine)
     NoStringVector vsRules = SplitRules(No::tokens(sLine, 1));
 
     if (vsRules.empty()) {
-        PutModule("Usage: SetRules <rules>");
-        PutModule("Wildcards are allowed");
+        putModule("Usage: SetRules <rules>");
+        putModule("Wildcards are allowed");
     } else {
         SetRules(vsRules);
         NoRegistry registry(this);
@@ -137,13 +137,13 @@ void NoLogMod::ClearRulesCmd(const NoString& sLine)
     size_t uCount = m_vRules.size();
 
     if (uCount == 0) {
-        PutModule("No logging rules. Everything is logged.");
+        putModule("No logging rules. Everything is logged.");
     } else {
         NoString sRules = JoinRules(" ");
         SetRules(NoStringVector());
         NoRegistry registry(this);
         registry.remove("rules");
-        PutModule(NoString(uCount) + " rule(s) removed: " + sRules);
+        putModule(NoString(uCount) + " rule(s) removed: " + sRules);
     }
 }
 
@@ -160,9 +160,9 @@ void NoLogMod::ListRulesCmd(const NoString& sLine)
     }
 
     if (Table.isEmpty()) {
-        PutModule("No logging rules. Everything is logged.");
+        putModule("No logging rules. Everything is logged.");
     } else {
-        PutModule(Table);
+        putModule(Table);
     }
 }
 
@@ -218,7 +218,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
 
     time(&curtime);
     // Generate file name
-    sPath = No::formatTime(curtime, m_sLogPath, GetUser()->timezone());
+    sPath = No::formatTime(curtime, m_sLogPath, user()->timezone());
     if (sPath.empty()) {
         NO_DEBUG("Could not format log path [" << sPath << "]");
         return;
@@ -226,12 +226,12 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
 
     // TODO: Properly handle IRC case mapping
     // $WINDOW has to be handled last, since it can contain %
-    sPath.replace("$USER", NoString((GetUser() ? GetUser()->userName() : "UNKNOWN")).toLower());
-    sPath.replace("$NETWORK", NoString((GetNetwork() ? GetNetwork()->name() : "znc")).toLower());
+    sPath.replace("$USER", NoString((user() ? user()->userName() : "UNKNOWN")).toLower());
+    sPath.replace("$NETWORK", NoString((network() ? network()->name() : "znc")).toLower());
     sPath.replace("$WINDOW", NoString(sWindow.replace_n("/", "-").replace_n("\\", "-")).toLower());
 
     // Check if it's allowed to write in this specific path
-    sPath = NoDir::CheckPathPrefix(GetSavePath(), sPath);
+    sPath = NoDir::CheckPathPrefix(savePath(), sPath);
     if (sPath.empty()) {
         NO_DEBUG("Invalid log path [" << m_sLogPath << "].");
         return;
@@ -240,10 +240,10 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
     NoFile LogFile(sPath);
     NoString sLogDir = LogFile.GetDir();
     struct stat ModDirInfo;
-    NoFile::GetInfo(GetSavePath(), ModDirInfo);
+    NoFile::GetInfo(savePath(), ModDirInfo);
     if (!NoFile::Exists(sLogDir)) NoDir::MakeDir(sLogDir, ModDirInfo.st_mode);
     if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT)) {
-        LogFile.Write(No::formatTime(curtime, "[%H:%M:%S] ", GetUser()->timezone()) +
+        LogFile.Write(No::formatTime(curtime, "[%H:%M:%S] ", user()->timezone()) +
                       (m_bSanitize ? No::stripControls(sLine) : sLine) + "\n");
     } else
         NO_DEBUG("Could not open log file [" << sPath << "]: " << strerror(errno));
@@ -255,7 +255,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoNick& Nick) { PutLog(sLine,
 
 NoString NoLogMod::GetServer()
 {
-    NoServerInfo* pServer = GetNetwork()->currentServer();
+    NoServerInfo* pServer = network()->currentServer();
     NoString sSSL;
 
     if (!pServer) return "(no server)";
@@ -264,7 +264,7 @@ NoString NoLogMod::GetServer()
     return pServer->host() + " " + sSSL + NoString(pServer->port());
 }
 
-bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)
+bool NoLogMod::onLoad(const NoString& sArgs, NoString& sMessage)
 {
     size_t uIndex = 0;
     if (No::token(sArgs, 0).equals("-sanitize")) {
@@ -276,14 +276,14 @@ bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)
     m_sLogPath = No::token(sArgs, uIndex);
 
     // Add default filename to path if it's a folder
-    if (GetType() == No::UserModule) {
+    if (type() == No::UserModule) {
         if (m_sLogPath.right(1) == "/" || !m_sLogPath.contains("$WINDOW") || !m_sLogPath.contains("$NETWORK")) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
             }
             m_sLogPath += "$NETWORK/$WINDOW/%Y-%m-%d.log";
         }
-    } else if (GetType() == No::NetworkModule) {
+    } else if (type() == No::NetworkModule) {
         if (m_sLogPath.right(1) == "/" || !m_sLogPath.contains("$WINDOW")) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
@@ -306,7 +306,7 @@ bool NoLogMod::OnLoad(const NoString& sArgs, NoString& sMessage)
     SetRules(vsRules);
 
     // Check if it's allowed to write in this path in general
-    m_sLogPath = NoDir::CheckPathPrefix(GetSavePath(), m_sLogPath);
+    m_sLogPath = NoDir::CheckPathPrefix(savePath(), m_sLogPath);
     if (m_sLogPath.empty()) {
         sMessage = "Invalid log path [" + m_sLogPath + "].";
         return false;
@@ -369,7 +369,7 @@ NoModule::ModRet NoLogMod::onTopic(NoNick& Nick, NoChannel& Channel, NoString& s
 /* notices */
 NoModule::ModRet NoLogMod::onUserNotice(NoString& sTarget, NoString& sMessage)
 {
-    NoNetwork* pNetwork = GetNetwork();
+    NoNetwork* pNetwork = network();
     if (pNetwork) {
         PutLog("-" + pNetwork->currentNick() + "- " + sMessage, sTarget);
     }
@@ -392,7 +392,7 @@ NoModule::ModRet NoLogMod::onChanNotice(NoNick& Nick, NoChannel& Channel, NoStri
 /* actions */
 NoModule::ModRet NoLogMod::onUserAction(NoString& sTarget, NoString& sMessage)
 {
-    NoNetwork* pNetwork = GetNetwork();
+    NoNetwork* pNetwork = network();
     if (pNetwork) {
         PutLog("* " + pNetwork->currentNick() + " " + sMessage, sTarget);
     }
@@ -415,7 +415,7 @@ NoModule::ModRet NoLogMod::onChanAction(NoNick& Nick, NoChannel& Channel, NoStri
 /* msgs */
 NoModule::ModRet NoLogMod::onUserMsg(NoString& sTarget, NoString& sMessage)
 {
-    NoNetwork* pNetwork = GetNetwork();
+    NoNetwork* pNetwork = network();
     if (pNetwork) {
         PutLog("<" + pNetwork->currentNick() + "> " + sMessage, sTarget);
     }

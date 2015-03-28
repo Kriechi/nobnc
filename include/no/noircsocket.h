@@ -59,8 +59,8 @@ public:
     void TimeoutImpl() override;
     void ReachedMaxBufferImpl() override;
 
-    void PutIRC(const NoString& sLine);
-    void PutIRCQuick(const NoString& sLine); //!< Should be used for PONG only
+    void putIrc(const NoString& sLine);
+    void putIrcQuick(const NoString& sLine); //!< Should be used for PONG only
     void ResetChans();
     void Quit(const NoString& sQuitMsg = "");
 
@@ -87,7 +87,7 @@ public:
     NoString GetNickMask() const;
     NoString GetNick() const;
     const NoString& GetPass() const;
-    NoNetwork* GetNetwork() const;
+    NoNetwork* network() const;
     bool HasNamesx() const;
     bool HasUHNames() const;
     const std::set<uchar>& GetUserModes() const;

@@ -316,7 +316,7 @@ NoStringVector NoWebSocket::GetDirs(NoModule* pModule, bool bIsTemplate)
     // Module specific paths
 
     if (pModule) {
-        const NoString& sModName(pModule->GetModName());
+        const NoString& sModName(pModule->moduleName());
 
         // 1. ~/.znc/webskins/<user_skin_setting>/mods/<mod_name>/
         //
@@ -330,7 +330,7 @@ NoStringVector NoWebSocket::GetDirs(NoModule* pModule, bool bIsTemplate)
 
         // 3. ./modules/<mod_name>/tmpl/
         //
-        vsResult.push_back(pModule->GetModDataDir() + "/tmpl/");
+        vsResult.push_back(pModule->moduleDataDir() + "/tmpl/");
 
         // 4. ~/.znc/webskins/<user_skin_setting>/mods/<mod_name>/
         //
@@ -359,7 +359,7 @@ NoStringVector NoWebSocket::GetDirs(NoModule* pModule, bool bIsTemplate)
 NoString NoWebSocket::FindTmpl(NoModule* pModule, const NoString& sName)
 {
     NoStringVector vsDirs = GetDirs(pModule, true);
-    NoString sFile = pModule->GetModName() + "_" + sName;
+    NoString sFile = pModule->moduleName() + "_" + sName;
     for (const NoString& sDir : vsDirs) {
         if (NoFile::Exists(NoDir::ChangeDir(sDir, sFile))) {
             m_template.appendPath(sDir);
@@ -383,7 +383,7 @@ void NoWebSocket::SetPaths(NoModule* pModule, bool bIsTemplate)
 
 void NoWebSocket::SetVars()
 {
-    m_template["SessionUser"] = GetUser();
+    m_template["SessionUser"] = user();
     m_template["SessionIP"] = GetRemoteIP();
     m_template["Tag"] = NoApp::GetTag(GetSession()->user() != nullptr, true);
     m_template["Version"] = NoApp::GetVersion();
@@ -436,25 +436,25 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
         pTemplate = &m_template;
     }
 
-    NoString sTitle(Module.GetWebMenuTitle());
+    NoString sTitle(Module.webMenuTitle());
 
-    if (!sTitle.empty() && (IsLoggedIn() || (!Module.WebRequiresLogin() && !Module.WebRequiresAdmin())) &&
-        (GetSession()->isAdmin() || !Module.WebRequiresAdmin())) {
+    if (!sTitle.empty() && (IsLoggedIn() || (!Module.webRequiresLogin() && !Module.webRequiresAdmin())) &&
+        (GetSession()->isAdmin() || !Module.webRequiresAdmin())) {
         NoTemplate& Row = pTemplate->addRow(sLoopName);
         bool bActiveModule = false;
 
-        Row["ModName"] = Module.GetModName();
-        Row["ModPath"] = Module.GetWebPath();
+        Row["ModName"] = Module.moduleName();
+        Row["ModPath"] = Module.webPath();
         Row["Title"] = sTitle;
 
-        if (m_modName == Module.GetModName()) {
+        if (m_modName == Module.moduleName()) {
             NoString sModuleType = No::token(GetPath(), 1, "/");
-            if (sModuleType == "global" && Module.GetType() == No::GlobalModule) {
+            if (sModuleType == "global" && Module.type() == No::GlobalModule) {
                 bActiveModule = true;
-            } else if (sModuleType == "user" && Module.GetType() == No::UserModule) {
+            } else if (sModuleType == "user" && Module.type() == No::UserModule) {
                 bActiveModule = true;
-            } else if (sModuleType == "network" && Module.GetType() == No::NetworkModule) {
-                NoNetwork* Network = Module.GetNetwork();
+            } else if (sModuleType == "network" && Module.type() == No::NetworkModule) {
+                NoNetwork* Network = Module.network();
                 if (Network) {
                     NoString sNetworkName = No::token(GetPath(), 2, "/");
                     if (sNetworkName == Network->name()) {
@@ -470,13 +470,13 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
             Row["Active"] = "true";
         }
 
-        if (Module.GetUser()) {
-            Row["Username"] = Module.GetUser()->userName();
+        if (Module.user()) {
+            Row["Username"] = Module.user()->userName();
         }
 
         for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(&Module)->subPages) {
             // bActive is whether or not the current url matches this subpage (params will be checked below)
-            bool bActive = (m_modName == Module.GetModName() && m_page == SubPage->name() && bActiveModule);
+            bool bActive = (m_modName == Module.moduleName() && m_page == SubPage->name() && bActiveModule);
 
             if ((SubPage->flags() & NoWebPage::Admin) && !GetSession()->isAdmin()) {
                 continue; // Don't add admin-only subpages to requests from non-admin users
@@ -484,8 +484,8 @@ bool NoWebSocket::AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemp
 
             NoTemplate& SubRow = Row.addRow("SubPageLoop");
 
-            SubRow["ModName"] = Module.GetModName();
-            SubRow["ModPath"] = Module.GetWebPath();
+            SubRow["ModName"] = Module.moduleName();
+            SubRow["ModPath"] = Module.webPath();
             SubRow["PageName"] = SubPage->name();
             SubRow["Title"] = SubPage->title().empty() ? SubPage->name() : SubPage->title();
 
@@ -539,12 +539,12 @@ NoWebSocket::PageRequest NoWebSocket::PrintTemplate(const NoString& sPageName, N
     m_template["PageName"] = sPageName;
 
     if (pModule) {
-        NoUser* pUser = pModule->GetUser();
+        NoUser* pUser = pModule->user();
         m_template["ModUser"] = pUser ? pUser->userName() : "";
-        m_template["ModName"] = pModule->GetModName();
+        m_template["ModName"] = pModule->moduleName();
 
         if (m_template.find("Title") == m_template.end()) {
-            m_template["Title"] = pModule->GetWebMenuTitle();
+            m_template["Title"] = pModule->webMenuTitle();
         }
     }
 
@@ -798,25 +798,25 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
         if (!pModule) return NotFound;
 
-        m_template["ModPath"] = pModule->GetWebPath();
-        m_template["ModFilesPath"] = pModule->GetWebFilesPath();
+        m_template["ModPath"] = pModule->webPath();
+        m_template["ModFilesPath"] = pModule->webFilesPath();
 
-        if (pModule->WebRequiresLogin() && !ForceLogin()) {
+        if (pModule->webRequiresLogin() && !ForceLogin()) {
             return Print;
-        } else if (pModule->WebRequiresAdmin() && !GetSession()->isAdmin()) {
+        } else if (pModule->webRequiresAdmin() && !GetSession()->isAdmin()) {
             PrintErrorPage(403, "Forbidden", "You need to be an admin to access this module");
             return Done;
-        } else if (pModule->GetType() != No::GlobalModule && pModule->GetUser() != GetSession()->user()) {
+        } else if (pModule->type() != No::GlobalModule && pModule->user() != GetSession()->user()) {
             PrintErrorPage(403,
                            "Forbidden",
-                           "You must login as " + pModule->GetUser()->userName() + " in order to view this page");
+                           "You must login as " + pModule->user()->userName() + " in order to view this page");
             return Done;
-        } else if (pModule->OnWebPreRequest(*this, m_page)) {
+        } else if (pModule->onWebPreRequest(*this, m_page)) {
             return Deferred;
         }
 
         for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(pModule)->subPages) {
-            bool bActive = (m_modName == pModule->GetModName() && m_page == SubPage->name());
+            bool bActive = (m_modName == pModule->moduleName() && m_page == SubPage->name());
 
             if (bActive && (SubPage->flags() & NoWebPage::Admin) && !GetSession()->isAdmin()) {
                 PrintErrorPage(403, "Forbidden", "You need to be an admin to access this page");
@@ -824,14 +824,14 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             }
         }
 
-        if (pModule && pModule->GetType() != No::GlobalModule &&
-            (!IsLoggedIn() || pModule->GetUser() != GetSession()->user())) {
+        if (pModule && pModule->type() != No::GlobalModule &&
+            (!IsLoggedIn() || pModule->user() != GetSession()->user())) {
             AddModLoop("UserModLoop", *pModule);
         }
 
         if (sURI.left(10) == "/modfiles/") {
             m_template.appendPath(GetSkinPath(GetSkinName()) + "/mods/" + m_modName + "/files/");
-            m_template.appendPath(pModule->GetModDataDir() + "/files/");
+            m_template.appendPath(pModule->moduleDataDir() + "/files/");
 
             if (PrintFile(m_template.expandFile(m_page.trimLeft_n("/")))) {
                 return Print;
@@ -843,7 +843,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
 
             /* if a module returns false from OnWebRequest, it does not
                want the template to be printed, usually because it did a redirect. */
-            if (pModule->OnWebRequest(*this, m_page, m_template)) {
+            if (pModule->onWebRequest(*this, m_page, m_template)) {
                 // If they already sent a reply, let's assume
                 // they did what they wanted to do.
                 if (SentHeader()) {

@@ -47,8 +47,8 @@ private:
 
     void ShowCommand(const NoString& sLine)
     {
-        if (!GetUser()->isAdmin()) {
-            PutModule("Access denied");
+        if (!user()->isAdmin()) {
+            putModule("Access denied");
             return;
         }
 
@@ -65,21 +65,21 @@ private:
             Table.setValue("Last Seen", FormatLastSeen(it->second, "never"));
         }
 
-        PutModule(Table);
+        putModule(Table);
     }
 
 public:
     MODCONSTRUCTOR(NoLastSeenMod)
     {
-        AddHelpCommand();
-        AddCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoLastSeenMod::ShowCommand));
+        addHelpCommand();
+        addCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoLastSeenMod::ShowCommand));
     }
 
     // Event stuff:
 
-    void onClientLogin() override { SetTime(GetUser()); }
+    void onClientLogin() override { SetTime(user()); }
 
-    void onClientDisconnect() override { SetTime(GetUser()); }
+    void onClientDisconnect() override { SetTime(user()); }
 
     ModRet onDeleteUser(NoUser& User) override
     {
@@ -90,10 +90,10 @@ public:
 
     // Web stuff:
 
-    bool WebRequiresAdmin() override { return true; }
-    NoString GetWebMenuTitle() override { return "Last Seen"; }
+    bool webRequiresAdmin() override { return true; }
+    NoString webMenuTitle() override { return "Last Seen"; }
 
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
             NoModuleLoader* GModules = NoApp::Get().GetLoader();
@@ -121,7 +121,7 @@ public:
         return false;
     }
 
-    bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/user" && WebSock.GetSession()->isAdmin()) {
             NoUser* pUser = NoApp::Get().FindUser(Tmpl["Username"]);

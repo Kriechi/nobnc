@@ -444,7 +444,7 @@ bool NoApp::IsHostAllowed(const NoString& sHostMask) const
 bool NoApp::AllowConnectionFrom(const NoString& sIP) const
 {
     if (m_anonIpLimit == 0) return true;
-    return (GetManager().GetAnonConnectionCount(sIP) < m_anonIpLimit);
+    return (manager().GetAnonConnectionCount(sIP) < m_anonIpLimit);
 }
 
 void NoApp::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
@@ -629,8 +629,8 @@ bool NoApp::WriteConfig()
     NoModuleLoader* Mods = GetLoader();
 
     for (const NoModule* pMod : Mods->modules()) {
-        NoString sName = pMod->GetModName();
-        NoString sArgs = pMod->GetArgs();
+        NoString sName = pMod->moduleName();
+        NoString sArgs = pMod->args();
 
         if (!sArgs.empty()) {
             sArgs = " " + No::firstLine(sArgs);
@@ -1153,7 +1153,7 @@ bool NoApp::DoRehash(NoString& sError)
                 sError = sModRet;
                 return false;
             }
-        } else if (pOldMod->GetArgs() != sArgs) {
+        } else if (pOldMod->args() != sArgs) {
             No::printAction("Reloading global module [" + sModName + "]");
 
             bool bModRet = GetLoader()->reloadModule(sModName, sArgs, nullptr, nullptr, sModRet);
@@ -1373,7 +1373,7 @@ bool NoApp::DoRehash(NoString& sError)
     // Unload modules which are no longer in the config
     std::set<NoString> ssUnload;
     for (NoModule* pCurMod : GetLoader()->modules()) {
-        if (msModules.find(pCurMod->GetModName()) == msModules.end()) ssUnload.insert(pCurMod->GetModName());
+        if (msModules.find(pCurMod->moduleName()) == msModules.end()) ssUnload.insert(pCurMod->moduleName());
     }
 
     for (const NoString& sMod : ssUnload) {
@@ -1543,7 +1543,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
 
         pModule = pUser->loader()->findModule(sModule);
         if (pModule) {
-            musLoaded[pUser] = pModule->GetArgs();
+            musLoaded[pUser] = pModule->args();
             pUser->loader()->unloadModule(sModule);
         }
 
@@ -1552,7 +1552,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
         for (NoNetwork* pNetwork : vNetworks) {
             pModule = pNetwork->loader()->findModule(sModule);
             if (pModule) {
-                mnsLoaded[pNetwork] = pModule->GetArgs();
+                mnsLoaded[pNetwork] = pModule->args();
                 pNetwork->loader()->unloadModule(sModule);
             }
         }
@@ -1565,7 +1565,7 @@ bool NoApp::UpdateModule(const NoString& sModule)
     pModule = GetLoader()->findModule(sModule);
     if (pModule) {
         bGlobal = true;
-        sGlobalArgs = pModule->GetArgs();
+        sGlobalArgs = pModule->args();
         GetLoader()->unloadModule(sModule);
     }
 
@@ -1950,9 +1950,9 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
     for (NoSocket* pSock : m_manager.GetSockets()) {
         NoUser* pUser = nullptr;
         if (pSock->GetSockName().left(5) == "IRC::") {
-            pUser = ((NoIrcSocket*)pSock)->GetNetwork()->user();
+            pUser = ((NoIrcSocket*)pSock)->network()->user();
         } else if (pSock->GetSockName().left(5) == "USR::") {
-            pUser = ((NoClient*)pSock)->GetUser();
+            pUser = ((NoClient*)pSock)->user();
         }
 
         if (pUser) {
@@ -2090,9 +2090,9 @@ void NoApp::SetConnectDelay(uint i)
 
 NoApp::ConfigState NoApp::GetConfigState() const { return m_configState; }
 
-NoSocketManager&NoApp::GetManager() { return m_manager; }
+NoSocketManager&NoApp::manager() { return m_manager; }
 
-const NoSocketManager&NoApp::GetManager() const { return m_manager; }
+const NoSocketManager&NoApp::manager() const { return m_manager; }
 
 NoModuleLoader* NoApp::GetLoader() const { return m_modules; }
 
@@ -2104,7 +2104,7 @@ void NoApp::EnableConnectQueue()
 {
     if (!m_connectQueueTimer && !m_connectPaused && !m_connectQueue.empty()) {
         m_connectQueueTimer = new NoConnectQueueTimer(m_connectDelay);
-        GetManager().AddCron(m_connectQueueTimer);
+        manager().AddCron(m_connectQueueTimer);
     }
 }
 

@@ -25,7 +25,7 @@ class NoModulePrivate
 {
 public:
     NoModulePrivate(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
-        : type(eType), handle(pDLL), manager(&NoApp::Get().GetManager()), user(pUser), network(pNetwork),
+        : type(eType), handle(pDLL), manager(&NoApp::Get().manager()), user(pUser), network(pNetwork),
           client(nullptr), name(sModName), dataDir(sDataDir) { }
 
     static NoModulePrivate* get(NoModule* module) { return module->d.get(); }

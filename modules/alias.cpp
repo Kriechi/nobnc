@@ -140,7 +140,7 @@ public:
     {
         NoString output;
         NoString alias_data = GetCommands();
-        alias_data = parent->ExpandString(alias_data);
+        alias_data = parent->expandString(alias_data);
         size_t lastfound = 0, skip = 0;
 
         // it would be very inefficient to attempt to blindly replace every possible token
@@ -178,9 +178,9 @@ public:
         if (!NoAlias::AliasExists(this, name)) {
             NoAlias na(this, name);
             na.Commit();
-            PutModule("Created alias: " + na.GetName());
+            putModule("Created alias: " + na.GetName());
         } else
-            PutModule("Alias already exists.");
+            putModule("Alias already exists.");
     }
 
     void DeleteCommand(const NoString& sLine)
@@ -188,10 +188,10 @@ public:
         NoString name = No::token(sLine, 1, " ");
         NoAlias delete_alias;
         if (NoAlias::AliasGet(delete_alias, this, name)) {
-            PutModule("Deleted alias: " + delete_alias.GetName());
+            putModule("Deleted alias: " + delete_alias.GetName());
             delete_alias.Delete();
         } else
-            PutModule("Alias does not exist.");
+            putModule("Alias does not exist.");
     }
 
     void AddCmd(const NoString& sLine)
@@ -201,9 +201,9 @@ public:
         if (NoAlias::AliasGet(add_alias, this, name)) {
             add_alias.AliasCmds().push_back(No::tokens(sLine, 2, " "));
             add_alias.Commit();
-            PutModule("Modified alias.");
+            putModule("Modified alias.");
         } else
-            PutModule("Alias does not exist.");
+            putModule("Alias does not exist.");
     }
 
     void InsertCommand(const NoString& sLine)
@@ -214,15 +214,15 @@ public:
         if (NoAlias::AliasGet(insert_alias, this, name)) {
             // if Convert succeeds, then i has been successfully read from user input
             if (!No::token(sLine, 2, " ").convert(&index) || index < 0 || index > (int)insert_alias.AliasCmds().size()) {
-                PutModule("Invalid index.");
+                putModule("Invalid index.");
                 return;
             }
 
             insert_alias.AliasCmds().insert(insert_alias.AliasCmds().begin() + index, No::tokens(sLine, 3, " "));
             insert_alias.Commit();
-            PutModule("Modified alias.");
+            putModule("Modified alias.");
         } else
-            PutModule("Alias does not exist.");
+            putModule("Alias does not exist.");
     }
 
     void RemoveCommand(const NoString& sLine)
@@ -232,15 +232,15 @@ public:
         int index;
         if (NoAlias::AliasGet(remove_alias, this, name)) {
             if (!No::token(sLine, 2, " ").convert(&index) || index < 0 || index > (int)remove_alias.AliasCmds().size() - 1) {
-                PutModule("Invalid index.");
+                putModule("Invalid index.");
                 return;
             }
 
             remove_alias.AliasCmds().erase(remove_alias.AliasCmds().begin() + index);
             remove_alias.Commit();
-            PutModule("Modified alias.");
+            putModule("Modified alias.");
         } else
-            PutModule("Alias does not exist.");
+            putModule("Alias does not exist.");
     }
 
     void ClearCommand(const NoString& sLine)
@@ -250,9 +250,9 @@ public:
         if (NoAlias::AliasGet(clear_alias, this, name)) {
             clear_alias.AliasCmds().clear();
             clear_alias.Commit();
-            PutModule("Modified alias.");
+            putModule("Modified alias.");
         } else
-            PutModule("Alias does not exist.");
+            putModule("Alias does not exist.");
     }
 
     void ListCommand(const NoString& sLine)
@@ -264,7 +264,7 @@ public:
             output += NoString(" ").join(aliases.begin(), aliases.end());
         else
             output += " [none]";
-        PutModule(output);
+        putModule(output);
     }
 
     void InfoCommand(const NoString& sLine)
@@ -272,49 +272,49 @@ public:
         NoString name = No::token(sLine, 1, " ");
         NoAlias info_alias;
         if (NoAlias::AliasGet(info_alias, this, name)) {
-            PutModule("Actions for alias " + info_alias.GetName() + ":");
+            putModule("Actions for alias " + info_alias.GetName() + ":");
             for (size_t i = 0; i < info_alias.AliasCmds().size(); ++i) {
                 NoString num(i);
                 NoString padding(4 - (num.length() > 3 ? 3 : num.length()), ' ');
-                PutModule(num + padding + info_alias.AliasCmds()[i]);
+                putModule(num + padding + info_alias.AliasCmds()[i]);
             }
-            PutModule("End of actions for alias " + info_alias.GetName() + ".");
+            putModule("End of actions for alias " + info_alias.GetName() + ".");
         } else
-            PutModule("Alias does not exist.");
+            putModule("Alias does not exist.");
     }
 
     MODCONSTRUCTOR(NoAliasMod), sending_lines(false)
     {
-        AddHelpCommand();
-        AddCommand("Create",
+        addHelpCommand();
+        addCommand("Create",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::CreateCommand),
                    "<name>",
                    "Creates a new, blank alias called name.");
-        AddCommand("Delete",
+        addCommand("Delete",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::DeleteCommand),
                    "<name>",
                    "Deletes an existing alias.");
-        AddCommand("Add",
+        addCommand("Add",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::AddCmd),
                    "<name> <action ...>",
                    "Adds a line to an existing alias.");
-        AddCommand("Insert",
+        addCommand("Insert",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::InsertCommand),
                    "<name> <pos> <action ...>",
                    "Inserts a line into an existing alias.");
-        AddCommand("Remove",
+        addCommand("Remove",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::RemoveCommand),
                    "<name> <linenum>",
                    "Removes a line from an existing alias.");
-        AddCommand("Clear",
+        addCommand("Clear",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::ClearCommand),
                    "<name>",
                    "Removes all line from an existing alias.");
-        AddCommand("List",
+        addCommand("List",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::ListCommand),
                    "",
                    "Lists all aliases by name.");
-        AddCommand("Info",
+        addCommand("Info",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::InfoCommand),
                    "<name>",
                    "Reports the actions performed by an alias.");
@@ -329,7 +329,7 @@ public:
         try {
             if (sLine.equals("ZNC-CLEAR-ALL-ALIASES!")) {
                 ListCommand("");
-                PutModule("Clearing all of them!");
+                putModule("Clearing all of them!");
                 NoRegistry registry(this);
                 registry.clear();
                 return HALT;
@@ -338,16 +338,16 @@ public:
                 sending_lines = true;
 
                 for (size_t i = 0; i < rawLines.size(); ++i) {
-                    GetClient()->ReadLine(rawLines[i]);
+                    client()->ReadLine(rawLines[i]);
                 }
 
                 sending_lines = false;
                 return HALT;
             }
         } catch (std::exception& e) {
-            NoString my_nick = (GetNetwork() == nullptr ? "" : GetNetwork()->currentNick());
+            NoString my_nick = (network() == nullptr ? "" : network()->currentNick());
             if (my_nick.empty()) my_nick = "*";
-            PutUser(NoString(":znc.in 461 " + my_nick + " " + current_alias.GetName() + " :ZNC alias error: ") + e.what());
+            putUser(NoString(":znc.in 461 " + my_nick + " " + current_alias.GetName() + " :ZNC alias error: ") + e.what());
             return HALTCORE;
         }
 

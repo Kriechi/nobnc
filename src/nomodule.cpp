@@ -51,23 +51,23 @@ NoModule::~NoModule()
     d->sockets.clear();
 
 #ifdef HAVE_PTHREAD
-    CancelJobs(d->jobs);
+    cancelJobs(d->jobs);
 #endif
 }
 
-void NoModule::SetUser(NoUser* pUser) { d->user = pUser; }
-void NoModule::SetNetwork(NoNetwork* pNetwork) { d->network = pNetwork; }
-void NoModule::SetClient(NoClient* pClient) { d->client = pClient; }
+void NoModule::setUser(NoUser* pUser) { d->user = pUser; }
+void NoModule::setNetwork(NoNetwork* pNetwork) { d->network = pNetwork; }
+void NoModule::setClient(NoClient* pClient) { d->client = pClient; }
 
-void NoModule::Unload() { throw UNLOAD; }
+void NoModule::unload() { throw UNLOAD; }
 
-NoString NoModule::ExpandString(const NoString& sStr) const
+NoString NoModule::expandString(const NoString& sStr) const
 {
     NoString sRet;
-    return ExpandString(sStr, sRet);
+    return expandString(sStr, sRet);
 }
 
-NoString& NoModule::ExpandString(const NoString& sStr, NoString& sRet) const
+NoString& NoModule::expandString(const NoString& sStr, NoString& sRet) const
 {
     sRet = sStr;
 
@@ -82,31 +82,31 @@ NoString& NoModule::ExpandString(const NoString& sStr, NoString& sRet) const
     return sRet;
 }
 
-void NoModule::SetType(No::ModuleType eType) { d->type = eType; }
+void NoModule::setType(No::ModuleType eType) { d->type = eType; }
 
-void NoModule::SetDescription(const NoString& s) { d->description = s; }
+void NoModule::setDescription(const NoString& s) { d->description = s; }
 
-void NoModule::SetModPath(const NoString& s) { d->path = s; }
+void NoModule::setModulePath(const NoString& s) { d->path = s; }
 
-void NoModule::SetArgs(const NoString& s) { d->args = s; }
+void NoModule::setArgs(const NoString& s) { d->args = s; }
 
-No::ModuleType NoModule::GetType() const { return d->type; }
+No::ModuleType NoModule::type() const { return d->type; }
 
-const NoString& NoModule::GetDescription() const { return d->description; }
+const NoString& NoModule::description() const { return d->description; }
 
-const NoString& NoModule::GetArgs() const { return d->args; }
+const NoString& NoModule::args() const { return d->args; }
 
-const NoString& NoModule::GetModPath() const { return d->path; }
+const NoString& NoModule::modulePath() const { return d->path; }
 
-NoUser* NoModule::GetUser() const { return d->user; }
+NoUser* NoModule::user() const { return d->user; }
 
-NoNetwork* NoModule::GetNetwork() const { return d->network; }
+NoNetwork* NoModule::network() const { return d->network; }
 
-NoClient* NoModule::GetClient() const { return d->client; }
+NoClient* NoModule::client() const { return d->client; }
 
-NoSocketManager* NoModule::GetManager() const { return d->manager; }
+NoSocketManager* NoModule::manager() const { return d->manager; }
 
-const NoString& NoModule::GetSavePath() const
+const NoString& NoModule::savePath() const
 {
     if (!NoFile::Exists(d->savePath)) {
         NoDir::MakeDir(d->savePath);
@@ -114,35 +114,35 @@ const NoString& NoModule::GetSavePath() const
     return d->savePath;
 }
 
-NoString NoModule::GetWebPath()
+NoString NoModule::webPath()
 {
     switch (d->type) {
     case No::GlobalModule:
-        return "/mods/global/" + GetModName() + "/";
+        return "/mods/global/" + moduleName() + "/";
     case No::UserModule:
-        return "/mods/user/" + GetModName() + "/";
+        return "/mods/user/" + moduleName() + "/";
     case No::NetworkModule:
-        return "/mods/network/" + d->network->name() + "/" + GetModName() + "/";
+        return "/mods/network/" + d->network->name() + "/" + moduleName() + "/";
     default:
         return "/";
     }
 }
 
-NoString NoModule::GetWebFilesPath()
+NoString NoModule::webFilesPath()
 {
     switch (d->type) {
     case No::GlobalModule:
-        return "/modfiles/global/" + GetModName() + "/";
+        return "/modfiles/global/" + moduleName() + "/";
     case No::UserModule:
-        return "/modfiles/user/" + GetModName() + "/";
+        return "/modfiles/user/" + moduleName() + "/";
     case No::NetworkModule:
-        return "/modfiles/network/" + d->network->name() + "/" + GetModName() + "/";
+        return "/modfiles/network/" + d->network->name() + "/" + moduleName() + "/";
     default:
         return "/";
     }
 }
 
-NoTimer* NoModule::FindTimer(const NoString& sLabel) const
+NoTimer* NoModule::findTimer(const NoString& sLabel) const
 {
     if (sLabel.empty()) {
         return nullptr;
@@ -157,10 +157,10 @@ NoTimer* NoModule::FindTimer(const NoString& sLabel) const
     return nullptr;
 }
 
-void NoModule::ListTimers()
+void NoModule::listTimers()
 {
     if (d->timers.empty()) {
-        PutModule("You have no timers running.");
+        putModule("You have no timers running.");
         return;
     }
 
@@ -177,10 +177,10 @@ void NoModule::ListTimers()
         Table.setValue("Description", pTimer->description());
     }
 
-    PutModule(Table);
+    putModule(Table);
 }
 
-NoModuleSocket* NoModule::FindSocket(const NoString& sName) const
+NoModuleSocket* NoModule::findSocket(const NoString& sName) const
 {
     for (NoModuleSocket* pSocket : d->sockets) {
         if (pSocket->GetSockName().equals(sName)) {
@@ -191,10 +191,10 @@ NoModuleSocket* NoModule::FindSocket(const NoString& sName) const
     return nullptr;
 }
 
-void NoModule::ListSockets()
+void NoModule::listSockets()
 {
     if (d->sockets.empty()) {
-        PutModule("You have no open sockets.");
+        putModule("You have no open sockets.");
         return;
     }
 
@@ -222,35 +222,35 @@ void NoModule::ListSockets()
         Table.setValue("RemotePort", (pSocket->GetRemotePort()) ? NoString(pSocket->GetRemotePort()) : NoString(""));
     }
 
-    PutModule(Table);
+    putModule(Table);
 }
 
 #ifdef HAVE_PTHREAD
-void NoModule::AddJob(NoModuleJob* pJob)
+void NoModule::addJob(NoModuleJob* pJob)
 {
     NoThread::run(pJob);
     d->jobs.insert(pJob);
 }
 
-void NoModule::CancelJob(NoModuleJob* pJob)
+void NoModule::cancelJob(NoModuleJob* pJob)
 {
     if (pJob == nullptr) return;
     // Destructor calls UnlinkJob and removes the job from d->jobs
     NoThread::cancel(pJob);
 }
 
-bool NoModule::CancelJob(const NoString& sJobName)
+bool NoModule::cancelJob(const NoString& sJobName)
 {
     for (NoModuleJob* pJob : d->jobs) {
         if (pJob->name().equals(sJobName)) {
-            CancelJob(pJob);
+            cancelJob(pJob);
             return true;
         }
     }
     return false;
 }
 
-void NoModule::CancelJobs(const std::set<NoModuleJob*>& sJobs)
+void NoModule::cancelJobs(const std::set<NoModuleJob*>& sJobs)
 {
     for (NoModuleJob* job : sJobs) {
         // Destructor calls UnlinkJob and removes the jobs from d->jobs
@@ -258,36 +258,36 @@ void NoModule::CancelJobs(const std::set<NoModuleJob*>& sJobs)
     }
 }
 
-bool NoModule::UnlinkJob(NoModuleJob* pJob) { return 0 != d->jobs.erase(pJob); }
+bool NoModule::unlinkJob(NoModuleJob* pJob) { return 0 != d->jobs.erase(pJob); }
 #endif
 
-bool NoModule::AddCommand(const NoModuleCommand& Command)
+bool NoModule::addCommand(const NoModuleCommand& Command)
 {
     if (Command.function() == nullptr) return false;
     if (Command.command().contains(" ")) return false;
-    if (FindCommand(Command.command()) != nullptr) return false;
+    if (findCommand(Command.command()) != nullptr) return false;
 
     d->commands[Command.command()] = Command;
     return true;
 }
 
-bool NoModule::AddCommand(const NoString& sCmd, NoModuleCommand::ModCmdFunc func, const NoString& sArgs, const NoString& sDesc)
+bool NoModule::addCommand(const NoString& sCmd, NoModuleCommand::ModCmdFunc func, const NoString& sArgs, const NoString& sDesc)
 {
     NoModuleCommand cmd(sCmd, this, func, sArgs, sDesc);
-    return AddCommand(cmd);
+    return addCommand(cmd);
 }
 
-bool NoModule::AddCommand(const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, std::function<void(const NoString& sLine)> func)
+bool NoModule::addCommand(const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, std::function<void(const NoString& sLine)> func)
 {
     NoModuleCommand cmd(sCmd, std::move(func), sArgs, sDesc);
-    return AddCommand(std::move(cmd));
+    return addCommand(std::move(cmd));
 }
 
-void NoModule::AddHelpCommand() { AddCommand("Help", &NoModule::HandleHelpCommand, "search", "Generate this output"); }
+void NoModule::addHelpCommand() { addCommand("Help", &NoModule::handleHelpCommand, "search", "Generate this output"); }
 
-bool NoModule::RemCommand(const NoString& sCmd) { return d->commands.erase(sCmd) > 0; }
+bool NoModule::removeCommand(const NoString& sCmd) { return d->commands.erase(sCmd) > 0; }
 
-const NoModuleCommand* NoModule::FindCommand(const NoString& sCmd) const
+const NoModuleCommand* NoModule::findCommand(const NoString& sCmd) const
 {
     for (const auto& it : d->commands) {
         if (!it.first.equals(sCmd)) continue;
@@ -296,22 +296,22 @@ const NoModuleCommand* NoModule::FindCommand(const NoString& sCmd) const
     return nullptr;
 }
 
-bool NoModule::HandleCommand(const NoString& sLine)
+bool NoModule::handleCommand(const NoString& sLine)
 {
     const NoString& sCmd = No::token(sLine, 0);
-    const NoModuleCommand* pCmd = FindCommand(sCmd);
+    const NoModuleCommand* pCmd = findCommand(sCmd);
 
     if (pCmd) {
         pCmd->call(sLine);
         return true;
     }
 
-    OnUnknownModCommand(sLine);
+    onUnknownModCommand(sLine);
 
     return false;
 }
 
-void NoModule::HandleHelpCommand(const NoString& sLine)
+void NoModule::handleHelpCommand(const NoString& sLine)
 {
     NoString sFilter = No::token(sLine, 1).toLower();
     NoTable Table;
@@ -324,37 +324,37 @@ void NoModule::HandleHelpCommand(const NoString& sLine)
         }
     }
     if (Table.isEmpty()) {
-        PutModule("No matches for '" + sFilter + "'");
+        putModule("No matches for '" + sFilter + "'");
     } else {
-        PutModule(Table);
+        putModule(Table);
     }
 }
 
-NoString NoModule::GetModNick() const { return (d->user ? d->user->statusPrefix() : "*") + d->name; }
+NoString NoModule::moduleNick() const { return (d->user ? d->user->statusPrefix() : "*") + d->name; }
 
-const NoString& NoModule::GetModDataDir() const { return d->dataDir; }
+const NoString& NoModule::moduleDataDir() const { return d->dataDir; }
 
 // Webmods
-bool NoModule::OnWebPreRequest(NoWebSocket& WebSock, const NoString& sPageName) { return false; }
-bool NoModule::OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
+bool NoModule::onWebPreRequest(NoWebSocket& WebSock, const NoString& sPageName) { return false; }
+bool NoModule::onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
 
-void NoModule::AddSubPage(std::shared_ptr<NoWebPage> spSubPage) { d->subPages.push_back(spSubPage); }
+void NoModule::addSubPage(std::shared_ptr<NoWebPage> spSubPage) { d->subPages.push_back(spSubPage); }
 
-bool NoModule::OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
+bool NoModule::onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) { return false; }
 // !Webmods
 
-bool NoModule::OnLoad(const NoString& sArgs, NoString& sMessage)
+bool NoModule::onLoad(const NoString& sArgs, NoString& sMessage)
 {
     sMessage = "";
     return true;
 }
 bool NoModule::onBoot() { return true; }
 
-bool NoModule::WebRequiresLogin() { return true; }
+bool NoModule::webRequiresLogin() { return true; }
 
-bool NoModule::WebRequiresAdmin() { return false; }
+bool NoModule::webRequiresAdmin() { return false; }
 
-NoString NoModule::GetWebMenuTitle() { return ""; }
+NoString NoModule::webMenuTitle() { return ""; }
 void NoModule::onPreRehash() {}
 void NoModule::onPostRehash() {}
 void NoModule::onIrcDisconnected() {}
@@ -414,16 +414,16 @@ NoModule::ModRet NoModule::onStatusCommand(NoString& sCommand) { return CONTINUE
 void NoModule::onModNotice(const NoString& sMessage) {}
 void NoModule::onModCTCP(const NoString& sMessage) {}
 
-void NoModule::onModCommand(const NoString& sCommand) { HandleCommand(sCommand); }
-void NoModule::OnUnknownModCommand(const NoString& sLine)
+void NoModule::onModCommand(const NoString& sCommand) { handleCommand(sCommand); }
+void NoModule::onUnknownModCommand(const NoString& sLine)
 {
     if (d->commands.empty())
         // This function is only called if onModCommand wasn't
         // overriden, so no false warnings for modules which don't use
         // NoModuleCommand for command handling.
-        PutModule("This module doesn't implement any commands.");
+        putModule("This module doesn't implement any commands.");
     else
-        PutModule("Unknown command!");
+        putModule("Unknown command!");
 }
 
 void NoModule::onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) {}
@@ -486,48 +486,48 @@ double NoModule::GetCoreVersion() { return NO_VERSION; }
 bool NoModule::onServerCapAvailable(const NoString& sCap) { return false; }
 void NoModule::onServerCapResult(const NoString& sCap, bool bSuccess) {}
 
-bool NoModule::PutIRC(const NoString& sLine) { return (d->network) ? d->network->putIrc(sLine) : false; }
-bool NoModule::PutUser(const NoString& sLine) { return (d->network) ? d->network->putUser(sLine, d->client) : false; }
-bool NoModule::PutStatus(const NoString& sLine) { return (d->network) ? d->network->putStatus(sLine, d->client) : false; }
-uint NoModule::PutModule(const NoTable& table)
+bool NoModule::putIrc(const NoString& sLine) { return (d->network) ? d->network->putIrc(sLine) : false; }
+bool NoModule::putUser(const NoString& sLine) { return (d->network) ? d->network->putUser(sLine, d->client) : false; }
+bool NoModule::putStatus(const NoString& sLine) { return (d->network) ? d->network->putStatus(sLine, d->client) : false; }
+uint NoModule::putModule(const NoTable& table)
 {
     if (!d->user) return 0;
 
     NoStringVector lines = table.toString();
     for (const NoString& line : lines)
-        PutModule(line);
+        putModule(line);
     return lines.size() - 1;
 }
-bool NoModule::PutModule(const NoString& sLine)
+bool NoModule::putModule(const NoString& sLine)
 {
     if (d->client) {
-        d->client->PutModule(GetModName(), sLine);
+        d->client->putModule(moduleName(), sLine);
         return true;
     }
 
     if (d->network) {
-        return d->network->putModule(GetModName(), sLine);
+        return d->network->putModule(moduleName(), sLine);
     }
 
     if (d->user) {
-        return d->user->putModule(GetModName(), sLine);
+        return d->user->putModule(moduleName(), sLine);
     }
 
     return false;
 }
-bool NoModule::PutModNotice(const NoString& sLine)
+bool NoModule::putModuleNotice(const NoString& sLine)
 {
     if (!d->user) return false;
 
     if (d->client) {
-        d->client->PutModNotice(GetModName(), sLine);
+        d->client->putModuleNotice(moduleName(), sLine);
         return true;
     }
 
-    return d->user->putModuleNotice(GetModName(), sLine);
+    return d->user->putModuleNotice(moduleName(), sLine);
 }
 
-const NoString& NoModule::GetModName() const { return d->name; }
+const NoString& NoModule::moduleName() const { return d->name; }
 
 ///////////////////
 // Global Module //

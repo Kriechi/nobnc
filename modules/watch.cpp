@@ -189,11 +189,11 @@ public:
     void onClientLogin() override
     {
         NoStringMap msParams;
-        msParams["target"] = GetNetwork()->currentNick();
+        msParams["target"] = network()->currentNick();
 
         size_t uSize = m_Buffer.size();
         for (uint uIdx = 0; uIdx < uSize; uIdx++) {
-            PutUser(m_Buffer.message(uIdx, *GetClient(), msParams));
+            putUser(m_Buffer.message(uIdx, *client(), msParams));
         }
         m_Buffer.clear();
     }
@@ -329,7 +329,7 @@ public:
             SetSources(No::token(sCommand, 1).toUInt(), No::tokens(sCommand, 2));
         } else if (sCmdName.equals("CLEAR")) {
             m_lsWatchers.clear();
-            PutModule("All entries cleared.");
+            putModule("All entries cleared.");
             Save();
         } else if (sCmdName.equals("BUFFER")) {
             NoString sCount = No::token(sCommand, 1);
@@ -338,11 +338,11 @@ public:
                 m_Buffer.setLimit(sCount.toUInt());
             }
 
-            PutModule("Buffer count is set to [" + NoString(m_Buffer.limit()) + "]");
+            putModule("Buffer count is set to [" + NoString(m_Buffer.limit()) + "]");
         } else if (sCmdName.equals("DEL")) {
             Remove(No::token(sCommand, 1).toUInt());
         } else {
-            PutModule("Unknown command: [" + sCmdName + "]");
+            putModule("Unknown command: [" + sCmdName + "]");
         }
     }
 
@@ -350,7 +350,7 @@ private:
     void Process(const NoNick& Nick, const NoString& sMessage, const NoString& sSource)
     {
         std::set<NoString> sHandledTargets;
-        NoNetwork* pNetwork = GetNetwork();
+        NoNetwork* pNetwork = network();
         NoChannel* pChannel = pNetwork->findChannel(sSource);
 
         for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
@@ -382,14 +382,14 @@ private:
                 (*it).SetDisabled(bDisabled);
             }
 
-            PutModule(((bDisabled) ? "Disabled all entries." : "Enabled all entries."));
+            putModule(((bDisabled) ? "Disabled all entries." : "Enabled all entries."));
             Save();
             return;
         }
 
         uIdx--; // "convert" index to zero based
         if (uIdx >= m_lsWatchers.size()) {
-            PutModule("Invalid Id");
+            putModule("Invalid Id");
             return;
         }
 
@@ -397,7 +397,7 @@ private:
         for (uint a = 0; a < uIdx; a++) ++it;
 
         (*it).SetDisabled(bDisabled);
-        PutModule("Id " + NoString(uIdx + 1) + ((bDisabled) ? " Disabled" : " Enabled"));
+        putModule("Id " + NoString(uIdx + 1) + ((bDisabled) ? " Disabled" : " Enabled"));
         Save();
     }
 
@@ -408,14 +408,14 @@ private:
                 (*it).SetDetachedClientOnly(bDetachedClientOnly);
             }
 
-            PutModule(NoString("Set DetachedClientOnly for all entries to: ") + ((bDetachedClientOnly) ? "Yes" : "No"));
+            putModule(NoString("Set DetachedClientOnly for all entries to: ") + ((bDetachedClientOnly) ? "Yes" : "No"));
             Save();
             return;
         }
 
         uIdx--; // "convert" index to zero based
         if (uIdx >= m_lsWatchers.size()) {
-            PutModule("Invalid Id");
+            putModule("Invalid Id");
             return;
         }
 
@@ -423,7 +423,7 @@ private:
         for (uint a = 0; a < uIdx; a++) ++it;
 
         (*it).SetDetachedClientOnly(bDetachedClientOnly);
-        PutModule("Id " + NoString(uIdx + 1) + " set to: " + ((bDetachedClientOnly) ? "Yes" : "No"));
+        putModule("Id " + NoString(uIdx + 1) + " set to: " + ((bDetachedClientOnly) ? "Yes" : "No"));
         Save();
     }
 
@@ -434,7 +434,7 @@ private:
                 (*it).SetDetachedChannelOnly(bDetachedChannelOnly);
             }
 
-            PutModule(NoString("Set DetachedChannelOnly for all entries to: ") +
+            putModule(NoString("Set DetachedChannelOnly for all entries to: ") +
                       ((bDetachedChannelOnly) ? "Yes" : "No"));
             Save();
             return;
@@ -442,7 +442,7 @@ private:
 
         uIdx--; // "convert" index to zero based
         if (uIdx >= m_lsWatchers.size()) {
-            PutModule("Invalid Id");
+            putModule("Invalid Id");
             return;
         }
 
@@ -450,7 +450,7 @@ private:
         for (uint a = 0; a < uIdx; a++) ++it;
 
         (*it).SetDetachedChannelOnly(bDetachedChannelOnly);
-        PutModule("Id " + NoString(uIdx + 1) + " set to: " + ((bDetachedChannelOnly) ? "Yes" : "No"));
+        putModule("Id " + NoString(uIdx + 1) + " set to: " + ((bDetachedChannelOnly) ? "Yes" : "No"));
         Save();
     }
 
@@ -483,55 +483,55 @@ private:
         }
 
         if (Table.size()) {
-            PutModule(Table);
+            putModule(Table);
         } else {
-            PutModule("You have no entries.");
+            putModule("You have no entries.");
         }
     }
 
     void Dump()
     {
         if (m_lsWatchers.empty()) {
-            PutModule("You have no entries.");
+            putModule("You have no entries.");
             return;
         }
 
-        PutModule("---------------");
-        PutModule("/msg " + GetModNick() + " CLEAR");
+        putModule("---------------");
+        putModule("/msg " + moduleNick() + " CLEAR");
 
         uint uIdx = 1;
 
         for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it, uIdx++) {
             NoWatchEntry& WatchEntry = *it;
 
-            PutModule("/msg " + GetModNick() + " ADD " + WatchEntry.GetHostMask() + " " + WatchEntry.GetTarget() + " " +
+            putModule("/msg " + moduleNick() + " ADD " + WatchEntry.GetHostMask() + " " + WatchEntry.GetTarget() + " " +
                       WatchEntry.GetPattern());
 
             if (WatchEntry.GetSourcesStr().size()) {
-                PutModule("/msg " + GetModNick() + " SETSOURCES " + NoString(uIdx) + " " + WatchEntry.GetSourcesStr());
+                putModule("/msg " + moduleNick() + " SETSOURCES " + NoString(uIdx) + " " + WatchEntry.GetSourcesStr());
             }
 
             if (WatchEntry.IsDisabled()) {
-                PutModule("/msg " + GetModNick() + " DISABLE " + NoString(uIdx));
+                putModule("/msg " + moduleNick() + " DISABLE " + NoString(uIdx));
             }
 
             if (WatchEntry.IsDetachedClientOnly()) {
-                PutModule("/msg " + GetModNick() + " SETDETACHEDCLIENTONLY " + NoString(uIdx) + " TRUE");
+                putModule("/msg " + moduleNick() + " SETDETACHEDCLIENTONLY " + NoString(uIdx) + " TRUE");
             }
 
             if (WatchEntry.IsDetachedChannelOnly()) {
-                PutModule("/msg " + GetModNick() + " SETDETACHEDCHANNELONLY " + NoString(uIdx) + " TRUE");
+                putModule("/msg " + moduleNick() + " SETDETACHEDCHANNELONLY " + NoString(uIdx) + " TRUE");
             }
         }
 
-        PutModule("---------------");
+        putModule("---------------");
     }
 
     void SetSources(uint uIdx, const NoString& sSources)
     {
         uIdx--; // "convert" index to zero based
         if (uIdx >= m_lsWatchers.size()) {
-            PutModule("Invalid Id");
+            putModule("Invalid Id");
             return;
         }
 
@@ -539,7 +539,7 @@ private:
         for (uint a = 0; a < uIdx; a++) ++it;
 
         (*it).SetSources(sSources);
-        PutModule("Sources set for Id " + NoString(uIdx + 1) + ".");
+        putModule("Sources set for Id " + NoString(uIdx + 1) + ".");
         Save();
     }
 
@@ -547,7 +547,7 @@ private:
     {
         uIdx--; // "convert" index to zero based
         if (uIdx >= m_lsWatchers.size()) {
-            PutModule("Invalid Id");
+            putModule("Invalid Id");
             return;
         }
 
@@ -555,7 +555,7 @@ private:
         for (uint a = 0; a < uIdx; a++) ++it;
 
         m_lsWatchers.erase(it);
-        PutModule("Id " + NoString(uIdx + 1) + " Removed.");
+        putModule("Id " + NoString(uIdx + 1) + " Removed.");
         Save();
     }
 
@@ -614,7 +614,7 @@ private:
         Table.setValue("Command", "Help");
         Table.setValue("Description", "This help.");
 
-        PutModule(Table);
+        putModule(Table);
     }
 
     void Watch(const NoString& sHostMask, const NoString& sTarget, const NoString& sPattern, bool bNotice = false)
@@ -644,9 +644,9 @@ private:
         }
 
         if (bNotice) {
-            PutModNotice(sMessage);
+            putModuleNotice(sMessage);
         } else {
-            PutModule(sMessage);
+            putModule(sMessage);
         }
         Save();
     }
@@ -708,7 +708,7 @@ private:
             m_lsWatchers.push_back(WatchEntry);
         }
 
-        if (bWarn) PutModule("WARNING: malformed entry found while loading");
+        if (bWarn) putModule("WARNING: malformed entry found while loading");
     }
 
     std::list<NoWatchEntry> m_lsWatchers;

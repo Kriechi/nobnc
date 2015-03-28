@@ -30,25 +30,25 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 #define MODUNLOADCHK(func)                              \
     for (NoModule * pMod : d->modules) {                      \
         try {                                           \
-            NoClient* pOldClient = pMod->GetClient();    \
-            pMod->SetClient(d->client);                 \
+            NoClient* pOldClient = pMod->client();    \
+            pMod->setClient(d->client);                 \
             NoUser* pOldUser = nullptr;                  \
             if (d->user) {                              \
-                pOldUser = pMod->GetUser();             \
-                pMod->SetUser(d->user);                 \
+                pOldUser = pMod->user();             \
+                pMod->setUser(d->user);                 \
             }                                           \
             NoNetwork* pNetwork = nullptr;            \
             if (d->network) {                           \
-                pNetwork = pMod->GetNetwork();          \
-                pMod->SetNetwork(d->network);           \
+                pNetwork = pMod->network();          \
+                pMod->setNetwork(d->network);           \
             }                                           \
             pMod->func;                                 \
-            if (d->user) pMod->SetUser(pOldUser);       \
-            if (d->network) pMod->SetNetwork(pNetwork); \
-            pMod->SetClient(pOldClient);                \
+            if (d->user) pMod->setUser(pOldUser);       \
+            if (d->network) pMod->setNetwork(pNetwork); \
+            pMod->setClient(pOldClient);                \
         } catch (const NoModule::ModException& e) {     \
             if (e == NoModule::UNLOAD) {                 \
-                unloadModule(pMod->GetModName());       \
+                unloadModule(pMod->moduleName());       \
             }                                           \
         }                                               \
     }
@@ -59,22 +59,22 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
     for (NoModule * pMod : d->modules) {                      \
         try {                                           \
             NoModule::ModRet e = NoModule::CONTINUE;     \
-            NoClient* pOldClient = pMod->GetClient();    \
-            pMod->SetClient(d->client);                 \
+            NoClient* pOldClient = pMod->client();    \
+            pMod->setClient(d->client);                 \
             NoUser* pOldUser = nullptr;                  \
             if (d->user) {                              \
-                pOldUser = pMod->GetUser();             \
-                pMod->SetUser(d->user);                 \
+                pOldUser = pMod->user();             \
+                pMod->setUser(d->user);                 \
             }                                           \
             NoNetwork* pNetwork = nullptr;            \
             if (d->network) {                           \
-                pNetwork = pMod->GetNetwork();          \
-                pMod->SetNetwork(d->network);           \
+                pNetwork = pMod->network();          \
+                pMod->setNetwork(d->network);           \
             }                                           \
             e = pMod->func;                             \
-            if (d->user) pMod->SetUser(pOldUser);       \
-            if (d->network) pMod->SetNetwork(pNetwork); \
-            pMod->SetClient(pOldClient);                \
+            if (d->user) pMod->setUser(pOldUser);       \
+            if (d->network) pMod->setNetwork(pNetwork); \
+            pMod->setClient(pOldClient);                \
             if (e == NoModule::HALTMODS) {               \
                 break;                                  \
             } else if (e == NoModule::HALTCORE) {        \
@@ -85,7 +85,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             }                                           \
         } catch (const NoModule::ModException& e) {     \
             if (e == NoModule::UNLOAD) {                 \
-                unloadModule(pMod->GetModName());       \
+                unloadModule(pMod->moduleName());       \
             }                                           \
         }                                               \
     }                                                   \
@@ -134,7 +134,7 @@ void NoModuleLoader::unloadAllModules()
 {
     while (!d->modules.empty()) {
         NoString sRetMsg;
-        NoString sModName = d->modules.back()->GetModName();
+        NoString sModName = d->modules.back()->moduleName();
         unloadModule(sModName, sRetMsg);
     }
 }
@@ -148,7 +148,7 @@ bool NoModuleLoader::onBoot()
             }
         } catch (const NoModule::ModException& e) {
             if (e == NoModule::UNLOAD) {
-                unloadModule(pMod->GetModName());
+                unloadModule(pMod->moduleName());
             }
         }
     }
@@ -377,21 +377,21 @@ bool NoModuleLoader::onServerCapAvailable(const NoString& sCap)
     bool bResult = false;
     for (NoModule* pMod : d->modules) {
         try {
-            NoClient* pOldClient = pMod->GetClient();
-            pMod->SetClient(d->client);
+            NoClient* pOldClient = pMod->client();
+            pMod->setClient(d->client);
             if (d->user) {
-                NoUser* pOldUser = pMod->GetUser();
-                pMod->SetUser(d->user);
+                NoUser* pOldUser = pMod->user();
+                pMod->setUser(d->user);
                 bResult |= pMod->onServerCapAvailable(sCap);
-                pMod->SetUser(pOldUser);
+                pMod->setUser(pOldUser);
             } else {
                 // WTF? Is that possible?
                 bResult |= pMod->onServerCapAvailable(sCap);
             }
-            pMod->SetClient(pOldClient);
+            pMod->setClient(pOldClient);
         } catch (const NoModule::ModException& e) {
             if (NoModule::UNLOAD == e) {
-                unloadModule(pMod->GetModName());
+                unloadModule(pMod->moduleName());
             }
         }
     }
@@ -439,21 +439,21 @@ bool NoModuleLoader::isClientCapSupported(NoClient* pClient, const NoString& sCa
     bool bResult = false;
     for (NoModule* pMod : d->modules) {
         try {
-            NoClient* pOldClient = pMod->GetClient();
-            pMod->SetClient(d->client);
+            NoClient* pOldClient = pMod->client();
+            pMod->setClient(d->client);
             if (d->user) {
-                NoUser* pOldUser = pMod->GetUser();
-                pMod->SetUser(d->user);
+                NoUser* pOldUser = pMod->user();
+                pMod->setUser(d->user);
                 bResult |= pMod->isClientCapSupported(pClient, sCap, bState);
-                pMod->SetUser(pOldUser);
+                pMod->setUser(pOldUser);
             } else {
                 // WTF? Is that possible?
                 bResult |= pMod->isClientCapSupported(pClient, sCap, bState);
             }
-            pMod->SetClient(pOldClient);
+            pMod->setClient(pOldClient);
         } catch (const NoModule::ModException& e) {
             if (NoModule::UNLOAD == e) {
-                unloadModule(pMod->GetModName());
+                unloadModule(pMod->moduleName());
             }
         }
     }
@@ -491,7 +491,7 @@ bool NoModuleLoader::onGetAvailableModules(std::set<NoModuleInfo>& ssMods, No::M
 NoModule* NoModuleLoader::findModule(const NoString& sModule) const
 {
     for (NoModule* pMod : d->modules) {
-        if (sModule.equals(pMod->GetModName())) {
+        if (sModule.equals(pMod->moduleName())) {
             return pMod;
         }
     }
@@ -552,14 +552,14 @@ bool NoModuleLoader::loadModule(const NoString& sModule, const NoString& sArgs, 
     }
 
     NoModule* pModule = Info.loader()(p, pUser, pNetwork, sModule, sDataPath, eType);
-    pModule->SetDescription(Info.description());
-    pModule->SetArgs(sArgs);
-    pModule->SetModPath(NoDir::ChangeDir(NoApp::Get().GetCurPath(), sModPath));
+    pModule->setDescription(Info.description());
+    pModule->setArgs(sArgs);
+    pModule->setModulePath(NoDir::ChangeDir(NoApp::Get().GetCurPath(), sModPath));
     d->modules.push_back(pModule);
 
     bool bLoaded;
     try {
-        bLoaded = pModule->OnLoad(sArgs, sRetMsg);
+        bLoaded = pModule->onLoad(sArgs, sRetMsg);
     } catch (const NoModule::ModException&) {
         bLoaded = false;
         sRetMsg = "Caught an exception";
@@ -589,7 +589,7 @@ bool NoModuleLoader::unloadModule(const NoString& sModule)
 
 bool NoModuleLoader::unloadModule(const NoString& sModule, NoString& sRetMsg)
 {
-    NoString sMod = sModule; // Make a copy incase the reference passed in is from NoModule::GetModName()
+    NoString sMod = sModule; // Make a copy incase the reference passed in is from NoModule::moduleName()
     NoModule* pModule = findModule(sMod);
     sRetMsg = "";
 
@@ -600,7 +600,7 @@ bool NoModuleLoader::unloadModule(const NoString& sModule, NoString& sRetMsg)
 
     bool bSuccess;
     bool bHandled = false;
-    _GLOBALMODULECALL(onModuleUnloading(pModule, bSuccess, sRetMsg), pModule->GetUser(), pModule->GetNetwork(), nullptr, &bHandled);
+    _GLOBALMODULECALL(onModuleUnloading(pModule, bSuccess, sRetMsg), pModule->user(), pModule->network(), nullptr, &bHandled);
     if (bHandled) return bSuccess;
 
     NoModuleHandle p = pModule->GetDLL();
@@ -627,7 +627,7 @@ bool NoModuleLoader::unloadModule(const NoString& sModule, NoString& sRetMsg)
 
 bool NoModuleLoader::reloadModule(const NoString& sModule, const NoString& sArgs, NoUser* pUser, NoNetwork* pNetwork, NoString& sRetMsg)
 {
-    NoString sMod = sModule; // Make a copy incase the reference passed in is from NoModule::GetModName()
+    NoString sMod = sModule; // Make a copy incase the reference passed in is from NoModule::moduleName()
     NoModule* pModule = findModule(sMod);
 
     if (!pModule) {
@@ -635,7 +635,7 @@ bool NoModuleLoader::reloadModule(const NoString& sModule, const NoString& sArgs
         return false;
     }
 
-    No::ModuleType eType = pModule->GetType();
+    No::ModuleType eType = pModule->type();
     pModule = nullptr;
 
     sRetMsg = "";

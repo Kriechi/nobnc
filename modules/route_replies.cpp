@@ -214,8 +214,8 @@ public:
         m_pDoing = nullptr;
         m_pReplies = nullptr;
 
-        AddHelpCommand();
-        AddCommand("Silent", static_cast<NoModuleCommand::ModCmdFunc>(&NoRouteRepliesMod::SilentCommand), "[yes|no]");
+        addHelpCommand();
+        addCommand("Silent", static_cast<NoModuleCommand::ModCmdFunc>(&NoRouteRepliesMod::SilentCommand), "[yes|no]");
     }
 
     virtual ~NoRouteRepliesMod()
@@ -226,7 +226,7 @@ public:
             it = m_vsPending.begin();
 
             while (!it->second.empty()) {
-                PutIRC(it->second[0].sLine);
+                putIrc(it->second[0].sLine);
                 it->second.erase(it->second.begin());
             }
 
@@ -241,7 +241,7 @@ public:
         m_vsPending.clear();
 
         // No way we get a reply, so stop the timer (If it's running)
-        delete FindTimer("RouteTimeout");
+        delete findTimer("RouteTimeout");
     }
 
     void onIrcDisconnected() override
@@ -253,15 +253,15 @@ public:
     {
         requestQueue::iterator it;
 
-        if (GetClient() == m_pDoing) {
+        if (client() == m_pDoing) {
             // The replies which aren't received yet will be
             // broadcasted to everyone, but at least nothing breaks
-            delete FindTimer("RouteTimeout");
+            delete findTimer("RouteTimeout");
             m_pDoing = nullptr;
             m_pReplies = nullptr;
         }
 
-        it = m_vsPending.find(GetClient());
+        it = m_vsPending.find(client());
 
         if (it != m_vsPending.end()) m_vsPending.erase(it);
 
@@ -305,7 +305,7 @@ public:
     {
         NoString sCmd = No::token(sLine, 0).toUpper();
 
-        if (!GetNetwork()->ircSocket()) return CONTINUE;
+        if (!network()->ircSocket()) return CONTINUE;
 
         if (sCmd.equals("MODE")) {
             // Check if this is a mode request that needs to be handled
@@ -342,7 +342,7 @@ public:
         for (size_t i = 0; vRouteReplies[i].szRequest != nullptr; i++) {
             if (vRouteReplies[i].szRequest == sCmd) {
                 struct queued_req req = { sLine, vRouteReplies[i].vReplies };
-                m_vsPending[GetClient()].push_back(req);
+                m_vsPending[client()].push_back(req);
                 SendRequest();
 
                 return HALTCORE;
@@ -358,16 +358,16 @@ public:
 
         NoRegistry registry(this);
         if (!registry.value("silent_timeouts").toBool()) {
-            PutModule("This module hit a timeout which is possibly a bug.");
-            PutModule("To disable this message, do \"/msg " + GetModNick() + " silent yes\"");
-            PutModule("Last request: " + m_sLastRequest);
-            PutModule("Expected replies: ");
+            putModule("This module hit a timeout which is possibly a bug.");
+            putModule("To disable this message, do \"/msg " + moduleNick() + " silent yes\"");
+            putModule("Last request: " + m_sLastRequest);
+            putModule("Expected replies: ");
 
             for (size_t i = 0; m_pReplies[i].szReply != nullptr; i++) {
                 if (m_pReplies[i].bLastResponse)
-                    PutModule(m_pReplies[i].szReply + NoString(" (last)"));
+                    putModule(m_pReplies[i].szReply + NoString(" (last)"));
                 else
-                    PutModule(m_pReplies[i].szReply);
+                    putModule(m_pReplies[i].szReply);
             }
         }
 
@@ -383,13 +383,13 @@ private:
 
         // 353 needs special treatment due to NAMESX and UHNAMES
         if (bIsRaw353)
-            GetNetwork()->ircSocket()->ForwardRaw353(sLine, m_pDoing);
+            network()->ircSocket()->ForwardRaw353(sLine, m_pDoing);
         else
             m_pDoing->PutClient(sLine);
 
         if (bFinished) {
             // Stop the timeout
-            delete FindTimer("RouteTimeout");
+            delete findTimer("RouteTimeout");
 
             m_pDoing = nullptr;
             m_pReplies = nullptr;
@@ -418,7 +418,7 @@ private:
         // When we are called from the timer, we need to remove it.
         // We can't delete it (segfault on return), thus we
         // just stop it. The main loop will delete it.
-        delete FindTimer("RouteTimeout");
+        delete findTimer("RouteTimeout");
 
         NoRouteTimeout* timer = new NoRouteTimeout(this);
         timer->setSingleShot(true);
@@ -427,7 +427,7 @@ private:
         m_pDoing = it->first;
         m_pReplies = it->second[0].reply;
         m_sLastRequest = it->second[0].sLine;
-        PutIRC(it->second[0].sLine);
+        putIrc(it->second[0].sLine);
         it->second.erase(it->second.begin());
     }
 
@@ -441,7 +441,7 @@ private:
         }
 
         NoString sPrefix = registry.value("silent_timeouts").toBool() ? "dis" : "en";
-        PutModule("Timeout messages are " + sPrefix + "abled.");
+        putModule("Timeout messages are " + sPrefix + "abled.");
     }
 
     NoClient* m_pDoing;

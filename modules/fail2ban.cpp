@@ -26,7 +26,7 @@ class NoFailToBanMod : public NoModule
 public:
     MODCONSTRUCTOR(NoFailToBanMod) {}
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         NoString sTimeout = No::token(sArgs, 0);
         NoString sAttempts = No::token(sArgs, 1);
@@ -59,9 +59,9 @@ public:
 
     void onModCommand(const NoString& sCommand) override
     {
-        PutModule("This module can only be configured through its arguments.");
-        PutModule("The module argument is the number of minutes an IP");
-        PutModule("is blocked after a failed login.");
+        putModule("This module can only be configured through its arguments.");
+        putModule("The module argument is the number of minutes an IP");
+        putModule("is blocked after a failed login.");
     }
 
     void onClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort) override

@@ -33,12 +33,12 @@ class NoIdentFileModule : public NoModule
 public:
     MODCONSTRUCTOR(NoIdentFileModule)
     {
-        AddHelpCommand();
-        AddCommand("GetFile", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::GetFile));
-        AddCommand("SetFile", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::SetFile), "<file>");
-        AddCommand("GetFormat", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::GetFormat));
-        AddCommand("SetFormat", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::SetFormat), "<format>");
-        AddCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::Show));
+        addHelpCommand();
+        addCommand("GetFile", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::GetFile));
+        addCommand("SetFile", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::SetFile), "<file>");
+        addCommand("GetFormat", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::GetFormat));
+        addCommand("SetFormat", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::SetFormat), "<format>");
+        addCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::Show));
 
         m_pISpoofLockFile = nullptr;
         m_pIRCSock = nullptr;
@@ -46,48 +46,48 @@ public:
 
     virtual ~NoIdentFileModule() { ReleaseISpoof(); }
 
-    void GetFile(const NoString& sLine) { PutModule("File is set to: " + NoRegistry(this).value("File")); }
+    void GetFile(const NoString& sLine) { putModule("File is set to: " + NoRegistry(this).value("File")); }
 
     void SetFile(const NoString& sLine)
     {
         NoRegistry registry(this);
         registry.setValue("File", No::tokens(sLine, 1));
-        PutModule("File has been set to: " + registry.value("File"));
+        putModule("File has been set to: " + registry.value("File"));
     }
 
     void SetFormat(const NoString& sLine)
     {
         NoRegistry registry(this);
         registry.setValue("Format", No::tokens(sLine, 1));
-        PutModule("Format has been set to: " + registry.value("Format"));
-        PutModule("Format would be expanded to: " + ExpandString(registry.value("Format")));
+        putModule("Format has been set to: " + registry.value("Format"));
+        putModule("Format would be expanded to: " + expandString(registry.value("Format")));
     }
 
     void GetFormat(const NoString& sLine)
     {
         NoRegistry registry(this);
-        PutModule("Format is set to: " + registry.value("Format"));
-        PutModule("Format would be expanded to: " + ExpandString(registry.value("Format")));
+        putModule("Format is set to: " + registry.value("Format"));
+        putModule("Format would be expanded to: " + expandString(registry.value("Format")));
     }
 
     void Show(const NoString& sLine)
     {
-        PutModule("m_pISpoofLockFile = " + NoString((long long)m_pISpoofLockFile));
-        PutModule("m_pIRCSock = " + NoString((long long)m_pIRCSock));
+        putModule("m_pISpoofLockFile = " + NoString((long long)m_pISpoofLockFile));
+        putModule("m_pIRCSock = " + NoString((long long)m_pIRCSock));
         if (m_pIRCSock) {
-            PutModule("user/network - " + m_pIRCSock->GetNetwork()->user()->userName() + "/" +
-                      m_pIRCSock->GetNetwork()->name());
+            putModule("user/network - " + m_pIRCSock->network()->user()->userName() + "/" +
+                      m_pIRCSock->network()->name());
         } else {
-            PutModule("identfile is free");
+            putModule("identfile is free");
         }
     }
 
     void onModCommand(const NoString& sCommand) override
     {
-        if (GetUser()->isAdmin()) {
-            HandleCommand(sCommand);
+        if (user()->isAdmin()) {
+            handleCommand(sCommand);
         } else {
-            PutModule("Access denied");
+            putModule("Access denied");
         }
     }
 
@@ -130,16 +130,16 @@ public:
             return false;
         }
 
-        NoString sData = ExpandString(registry.value("Format"));
+        NoString sData = expandString(registry.value("Format"));
 
         // If the format doesn't contain anything expandable, we'll
         // assume this is an "old"-style format string.
         if (sData == registry.value("Format")) {
-            sData.replace("%", GetUser()->ident());
+            sData.replace("%", user()->ident());
         }
 
         NO_DEBUG("Writing [" + sData + "] to ident spoof file [" + m_pISpoofLockFile->GetLongName() +
-              "] for user/network [" + GetUser()->userName() + "/" + GetNetwork()->name() + "]");
+              "] for user/network [" + user()->userName() + "/" + network()->name() + "]");
 
         m_pISpoofLockFile->Write(sData + "\n");
 
@@ -149,7 +149,7 @@ public:
     void ReleaseISpoof()
     {
         NO_DEBUG("Releasing ident spoof for user/network [" +
-              (m_pIRCSock ? m_pIRCSock->GetNetwork()->user()->userName() + "/" + m_pIRCSock->GetNetwork()->name() : "<no user/network>") +
+              (m_pIRCSock ? m_pIRCSock->network()->user()->userName() + "/" + m_pIRCSock->network()->name() : "<no user/network>") +
               "]");
 
         SetIRCSock(nullptr);
@@ -164,7 +164,7 @@ public:
         }
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         m_pISpoofLockFile = nullptr;
         m_pIRCSock = nullptr;
@@ -185,7 +185,7 @@ public:
     {
         if (m_pISpoofLockFile != nullptr) {
             NO_DEBUG("Aborting connection, ident spoof lock file exists");
-            PutModule(
+            putModule(
             "Aborting connection, another user or network is currently connecting and using the ident spoof file");
             return HALTCORE;
         }
@@ -193,7 +193,7 @@ public:
         if (!WriteISpoof()) {
             NoRegistry registry(this);
             NO_DEBUG("identfile [" + registry.value("File") + "] could not be written");
-            PutModule("[" + registry.value("File") + "] could not be written, retrying...");
+            putModule("[" + registry.value("File") + "] could not be written, retrying...");
             return HALTCORE;
         }
 
@@ -203,7 +203,7 @@ public:
 
     void onIrcConnected() override
     {
-        if (m_pIRCSock == GetNetwork()->ircSocket()) {
+        if (m_pIRCSock == network()->ircSocket()) {
             ReleaseISpoof();
         }
     }
@@ -217,7 +217,7 @@ public:
 
     void onIrcDisconnected() override
     {
-        if (m_pIRCSock == GetNetwork()->ircSocket()) {
+        if (m_pIRCSock == network()->ircSocket()) {
             ReleaseISpoof();
         }
     }

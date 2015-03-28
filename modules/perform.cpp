@@ -27,12 +27,12 @@ class NoPerform : public NoModule
         NoString sPerf = No::tokens(sCommand, 1);
 
         if (sPerf.empty()) {
-            PutModule("Usage: add <command>");
+            putModule("Usage: add <command>");
             return;
         }
 
         m_vPerform.push_back(ParsePerform(sPerf));
-        PutModule("Added!");
+        putModule("Added!");
         Save();
     }
 
@@ -41,11 +41,11 @@ class NoPerform : public NoModule
         u_int iNum = No::tokens(sCommand, 1).toUInt();
 
         if (iNum > m_vPerform.size() || iNum <= 0) {
-            PutModule("Illegal # Requested");
+            putModule("Illegal # Requested");
             return;
         } else {
             m_vPerform.erase(m_vPerform.begin() + iNum - 1);
-            PutModule("Command Erased.");
+            putModule("Command Erased.");
         }
         Save();
     }
@@ -64,22 +64,22 @@ class NoPerform : public NoModule
             Table.setValue("Id", NoString(index));
             Table.setValue("Perform", *it);
 
-            NoString sExpanded = ExpandString(*it);
+            NoString sExpanded = expandString(*it);
 
             if (sExpanded != *it) {
                 Table.setValue("Expanded", sExpanded);
             }
         }
 
-        if (PutModule(Table) == 0) {
-            PutModule("No commands in your perform list.");
+        if (putModule(Table) == 0) {
+            putModule("No commands in your perform list.");
         }
     }
 
     void Execute(const NoString& sCommand)
     {
         onIrcConnected();
-        PutModule("perform commands sent");
+        putModule("perform commands sent");
     }
 
     void Swap(const NoString& sCommand)
@@ -88,10 +88,10 @@ class NoPerform : public NoModule
         u_int iNumB = No::token(sCommand, 2).toUInt();
 
         if (iNumA > m_vPerform.size() || iNumA <= 0 || iNumB > m_vPerform.size() || iNumB <= 0) {
-            PutModule("Illegal # Requested");
+            putModule("Illegal # Requested");
         } else {
             std::iter_swap(m_vPerform.begin() + (iNumA - 1), m_vPerform.begin() + (iNumB - 1));
-            PutModule("Commands Swapped.");
+            putModule("Commands Swapped.");
             Save();
         }
     }
@@ -99,12 +99,12 @@ class NoPerform : public NoModule
 public:
     MODCONSTRUCTOR(NoPerform)
     {
-        AddHelpCommand();
-        AddCommand("Add", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Add), "<command>");
-        AddCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Del), "<nr>");
-        AddCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::List));
-        AddCommand("Execute", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Execute));
-        AddCommand("Swap", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Swap), "<nr> <nr>");
+        addHelpCommand();
+        addCommand("Add", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Add), "<command>");
+        addCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Del), "<nr>");
+        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::List));
+        addCommand("Execute", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Execute));
+        addCommand("Swap", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Swap), "<nr> <nr>");
     }
 
     NoString ParsePerform(const NoString& sArg) const
@@ -124,7 +124,7 @@ public:
         return sPerf;
     }
 
-    bool OnLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
         m_vPerform = NoRegistry(this).value("Perform").split("\n", No::SkipEmptyParts);
 
@@ -134,13 +134,13 @@ public:
     void onIrcConnected() override
     {
         for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
-            PutIRC(ExpandString(*it));
+            putIrc(expandString(*it));
         }
     }
 
-    NoString GetWebMenuTitle() override { return "Perform"; }
+    NoString webMenuTitle() override { return "Perform"; }
 
-    bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName != "index") {
             // only accept requests to index

@@ -44,7 +44,7 @@ NoRegistry::~NoRegistry()
 
 NoString NoRegistry::filePath() const
 {
-    return d->module->GetSavePath() + "/.registry";
+    return d->module->savePath() + "/.registry";
 }
 
 const NoModule* NoRegistry::module() const
@@ -66,7 +66,7 @@ bool NoRegistry::save()
 
 bool NoRegistry::copy(const NoString& path)
 {
-    NoString oldPath = d->module->GetSavePath();
+    NoString oldPath = d->module->savePath();
     if (oldPath != path) {
         NoFile file(oldPath + "/.registry");
         if (!file.Exists() || (!NoFile::Exists(path) && !NoDir::MakeDir(path)))

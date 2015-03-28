@@ -22,7 +22,7 @@ class NoAwayNickMod : public NoModule
 public:
     MODCONSTRUCTOR(NoAwayNickMod) {}
 
-    bool OnLoad(const NoString&, NoString& sMessage) override
+    bool onLoad(const NoString&, NoString& sMessage) override
     {
         sMessage = "retired module - see http://wiki.znc.in/awaynick";
         return false;

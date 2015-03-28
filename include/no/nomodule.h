@@ -178,13 +178,13 @@ public:
         UNLOAD
     };
 
-    void SetUser(NoUser* pUser);
-    void SetNetwork(NoNetwork* pNetwork);
-    void SetClient(NoClient* pClient);
+    void setUser(NoUser* pUser);
+    void setNetwork(NoNetwork* pNetwork);
+    void setClient(NoClient* pClient);
 
     /** This function throws NoModule::UNLOAD which causes this module to be unloaded.
      */
-    void Unload();
+    void unload();
 
     /** This module hook is called when a module is loaded
      *  @param sArgsi The arguments for the modules.
@@ -192,7 +192,7 @@ public:
      *                  loading the module. Useful for returning error messages.
      *  @return true if the module loaded successfully, else false.
      */
-    virtual bool OnLoad(const NoString& sArgsi, NoString& sMessage);
+    virtual bool onLoad(const NoString& sArgsi, NoString& sMessage);
     /** This module hook is called during ZNC startup. Only modules loaded
      *  from znc.conf get this call.
      *  @return false to abort ZNC startup.
@@ -203,17 +203,17 @@ public:
     /** Modules which can only be used with an active user session have to return true here.
      *  @return false for modules that can do stuff for non-logged in web users as well.
      */
-    virtual bool WebRequiresLogin();
+    virtual bool webRequiresLogin();
     /** Return true if this module should only be usable for admins on the web.
      *  @return false if normal users can use this module's web pages as well.
      */
-    virtual bool WebRequiresAdmin();
+    virtual bool webRequiresAdmin();
     /** Return the title of the module's section in the web interface's side bar.
      *  @return The Title.
      */
-    virtual NoString GetWebMenuTitle();
-    virtual NoString GetWebPath();
-    virtual NoString GetWebFilesPath();
+    virtual NoString webMenuTitle();
+    virtual NoString webPath();
+    virtual NoString webFilesPath();
     /** For WebMods: Called before the list of registered SubPages will be checked.
      *  Important: If you return true, you need to take care of calling WebSock.Close!
      *  This allows for stuff like returning non-templated data, long-polling and other fun.
@@ -222,7 +222,7 @@ public:
      *  @return true if you handled the page request or false if the name is to be checked
      *          against the list of registered SubPages and their permission settings.
      */
-    virtual bool OnWebPreRequest(NoWebSocket& WebSock, const NoString& sPageName);
+    virtual bool onWebPreRequest(NoWebSocket& WebSock, const NoString& sPageName);
     /** If OnWebPreRequest returned false, and the RequiresAdmin/IsAdmin check has been passed,
      *  this method will be called with the page name. It will also be called for pages that
      *  have NOT been specifically registered with AddSubPage.
@@ -232,11 +232,11 @@ public:
      *  @return You MUST return true if you want the template to be evaluated and sent to the browser.
      *          Return false if you called Redirect() or PrintErrorPage(). If you didn't, a 404 page will be sent.
      */
-    virtual bool OnWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl);
+    virtual bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl);
     /** Registers a sub page for the sidebar.
      *  @param spSubPage The SubPage instance.
      */
-    virtual void AddSubPage(std::shared_ptr<NoWebPage> spSubPage);
+    virtual void addSubPage(std::shared_ptr<NoWebPage> spSubPage);
     /** Using this hook, module can embed web stuff directly to different places.
      *  This method is called whenever embededded modules I/O happens.
      *  Name of used .tmpl file (if any) is up to caller.
@@ -246,7 +246,7 @@ public:
      *  @return If you don't need to embed web stuff to the specified place, just return false.
      *          Exact meaning of return value is up to caller, and depends on context.
      */
-    virtual bool OnEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl);
+    virtual bool onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl);
 
 
     /** Called just before znc.conf is rehashed */
@@ -347,12 +347,12 @@ public:
      */
     virtual void onModCommand(const NoString& sCommand);
     /** This is similar to onModCommand(), but it is only called if
-     * HandleCommand didn't find any that wants to handle this. This is only
-     * called if HandleCommand() is called, which practically means that
+     * handleCommand didn't find any that wants to handle this. This is only
+     * called if handleCommand() is called, which practically means that
      * this is only called if you don't overload onModCommand().
      *  @param sCommand The command that was sent.
      */
-    virtual void OnUnknownModCommand(const NoString& sCommand);
+    virtual void onUnknownModCommand(const NoString& sCommand);
     /** Called when a your module nick was sent a notice.
      *  @param sMessage The message which was sent.
      */
@@ -617,13 +617,13 @@ public:
     /** Called when ZNC sends a raw traffic line to a client.
      *  @param sLine The raw traffic line sent.
      *  @param Client The client this line is sent to.
-     *  @warning Calling PutUser() from within this hook leads to infinite recursion.
+     *  @warning Calling putUser() from within this hook leads to infinite recursion.
      *  @return See NoModule::ModRet.
      */
     virtual ModRet onSendToClient(NoString& sLine, NoClient& Client);
     /** Called when ZNC sends a raw traffic line to the IRC server.
      *  @param sLine The raw traffic line sent.
-     *  @warning Calling PutIRC() from within this hook leads to infinite recursion.
+     *  @warning Calling putIrc() from within this hook leads to infinite recursion.
      *  @return See NoModule::ModRet.
      */
     virtual ModRet onSendToIrc(NoString& sLine);
@@ -636,7 +636,7 @@ public:
      *  @param sLine The line which should be sent.
      *  @return true if the line was queued for sending.
      */
-    virtual bool PutIRC(const NoString& sLine);
+    virtual bool putIrc(const NoString& sLine);
     /** This function sends a given raw IRC line to a client.
      *  If we are in a module hook which is called for a specific client,
      *  only that client will get the line, else all connected clients will
@@ -644,114 +644,114 @@ public:
      *  @param sLine The line which should be sent.
      *  @return true if the line was sent to at least one client.
      */
-    virtual bool PutUser(const NoString& sLine);
+    virtual bool putUser(const NoString& sLine);
     /** This function generates a query from *status. If we are in a module
      *  hook for a specific client, only that client gets this message, else
      *  all connected clients will receive it.
      *  @param sLine The message which should be sent from *status.
      *  @return true if the line was sent to at least one client.
      */
-    virtual bool PutStatus(const NoString& sLine);
+    virtual bool putStatus(const NoString& sLine);
     /** This function sends a query from your module nick. If we are in a
      *  module hook for a specific client, only that client gets this
      *  message, else all connected clients will receive it.
      *  @param sLine The message which should be sent.
      *  @return true if the line was sent to at least one client.
      */
-    virtual bool PutModule(const NoString& sLine);
-    /** This function calls NoModule::PutModule(const NoString&, const
+    virtual bool putModule(const NoString& sLine);
+    /** This function calls NoModule::putModule(const NoString&, const
      *  NoString&, const NoString&) for each line in the table.
      *  @param table The table which should be send.
      *  @return The number of lines sent.
      */
-    virtual uint PutModule(const NoTable& table);
+    virtual uint putModule(const NoTable& table);
     /** Send a notice from your module nick. If we are in a module hook for
      *  a specific client, only that client gets this notice, else all
      *  clients will receive it.
      *  @param sLine The line which should be sent.
      *  @return true if the line was sent to at least one client.
      */
-    virtual bool PutModNotice(const NoString& sLine);
+    virtual bool putModuleNotice(const NoString& sLine);
 
     /** @returns The name of the module. */
-    const NoString& GetModName() const;
+    const NoString& moduleName() const;
 
     /** @returns The nick of the module. This is just the module name
      *           prefixed by the status prefix.
      */
-    NoString GetModNick() const;
+    NoString moduleNick() const;
 
     /** Get the module's data dir.
      *  Modules can be accompanied by static data, e.g. skins for webadmin.
      *  These function will return the path to that data.
      */
-    const NoString& GetModDataDir() const;
+    const NoString& moduleDataDir() const;
 
-    NoTimer* FindTimer(const NoString& sLabel) const;
-    virtual void ListTimers();
+    NoTimer* findTimer(const NoString& sLabel) const;
+    virtual void listTimers();
 
-    NoModuleSocket* FindSocket(const NoString& sName) const;
-    virtual void ListSockets();
+    NoModuleSocket* findSocket(const NoString& sName) const;
+    virtual void listSockets();
 
 #ifdef HAVE_PTHREAD
-    void AddJob(NoModuleJob* pJob);
-    void CancelJob(NoModuleJob* pJob);
-    bool CancelJob(const NoString& sJobName);
-    void CancelJobs(const std::set<NoModuleJob*>& sJobs);
-    bool UnlinkJob(NoModuleJob* pJob);
+    void addJob(NoModuleJob* pJob);
+    void cancelJob(NoModuleJob* pJob);
+    bool cancelJob(const NoString& sJobName);
+    void cancelJobs(const std::set<NoModuleJob*>& sJobs);
+    bool unlinkJob(NoModuleJob* pJob);
 #endif
 
     /// Register the "Help" command.
-    void AddHelpCommand();
+    void addHelpCommand();
     /// @return True if the command was successfully added.
-    bool AddCommand(const NoModuleCommand& Command);
+    bool addCommand(const NoModuleCommand& Command);
     /// @return True if the command was successfully added.
-    bool AddCommand(const NoString& sCmd, NoModuleCommand::ModCmdFunc func, const NoString& sArgs = "", const NoString& sDesc = "");
+    bool addCommand(const NoString& sCmd, NoModuleCommand::ModCmdFunc func, const NoString& sArgs = "", const NoString& sDesc = "");
     /// @return True if the command was successfully added.
-    bool AddCommand(const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, std::function<void(const NoString& sLine)> func);
+    bool addCommand(const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, std::function<void(const NoString& sLine)> func);
     /// @return True if the command was successfully removed.
-    bool RemCommand(const NoString& sCmd);
+    bool removeCommand(const NoString& sCmd);
     /// @return The NoModuleCommand instance or nullptr if none was found.
-    const NoModuleCommand* FindCommand(const NoString& sCmd) const;
+    const NoModuleCommand* findCommand(const NoString& sCmd) const;
     /** This function tries to dispatch the given command via the correct
      * instance of NoModuleCommand. Before this can be called, commands have to
-     * be added via AddCommand(). If no matching commands are found then
+     * be added via addCommand(). If no matching commands are found then
      * OnUnknownModCommand will be called.
      * @param sLine The command line to handle.
      * @return True if something was done, else false.
      */
-    bool HandleCommand(const NoString& sLine);
-    /** Send a description of all registered commands via PutModule().
+    bool handleCommand(const NoString& sLine);
+    /** Send a description of all registered commands via putModule().
      * @param sLine The help command that is being asked for.
      */
-    void HandleHelpCommand(const NoString& sLine = "");
+    void handleHelpCommand(const NoString& sLine = "");
 
-    const NoString& GetSavePath() const;
-    NoString ExpandString(const NoString& sStr) const;
-    NoString& ExpandString(const NoString& sStr, NoString& sRet) const;
+    const NoString& savePath() const;
+    NoString expandString(const NoString& sStr) const;
+    NoString& expandString(const NoString& sStr, NoString& sRet) const;
 
-    void SetType(No::ModuleType eType);
-    void SetDescription(const NoString& s);
-    void SetModPath(const NoString& s);
-    void SetArgs(const NoString& s);
+    void setType(No::ModuleType eType);
+    void setDescription(const NoString& s);
+    void setModulePath(const NoString& s);
+    void setArgs(const NoString& s);
 
-    No::ModuleType GetType() const;
-    const NoString& GetDescription() const;
-    const NoString& GetArgs() const;
-    const NoString& GetModPath() const;
+    No::ModuleType type() const;
+    const NoString& description() const;
+    const NoString& args() const;
+    const NoString& modulePath() const;
 
     /** @returns For user modules this returns the user for which this
      *           module was loaded. For global modules this returns nullptr,
      *           except when we are in a user-specific module hook in which
      *           case this is the user pointer.
      */
-    NoUser* GetUser() const;
+    NoUser* user() const;
     /** @returns nullptr except when we are in a client-specific module hook in
      *           which case this is the client for which the hook is called.
      */
-    NoNetwork* GetNetwork() const;
-    NoClient* GetClient() const;
-    NoSocketManager* GetManager() const;
+    NoNetwork* network() const;
+    NoClient* client() const;
+    NoSocketManager* manager() const;
 
     /** This module hook is called when a user is being added.
      * @param User The user which will be added.

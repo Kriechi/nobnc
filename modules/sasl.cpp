@@ -66,19 +66,19 @@ class NoSaslMod : public NoModule
 public:
     MODCONSTRUCTOR(NoSaslMod)
     {
-        AddCommand("Help",
+        addCommand("Help",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslMod::PrintHelp),
                    "search",
                    "Generate this output");
-        AddCommand("Set",
+        addCommand("Set",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslMod::Set),
                    "<username> [<password>]",
                    "Set username and password for the mechanisms that need them. Password is optional");
-        AddCommand("Mechanism",
+        addCommand("Mechanism",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslMod::SetMechanismCommand),
                    "[mechanism[ ...]]",
                    "Set the mechanisms to be attempted (in order)");
-        AddCommand("RequireAuth",
+        addCommand("RequireAuth",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslMod::RequireAuthCommand),
                    "[yes|no]",
                    "Don't connect unless SASL authentication succeeds");
@@ -88,7 +88,7 @@ public:
 
     void PrintHelp(const NoString& sLine)
     {
-        HandleHelpCommand(sLine);
+        handleHelpCommand(sLine);
 
         NoTable Mechanisms;
         Mechanisms.addColumn("Mechanism");
@@ -100,8 +100,8 @@ public:
             Mechanisms.setValue("Description", SupportedMechanisms[i].szDescription);
         }
 
-        PutModule("The following mechanisms are available:");
-        PutModule(Mechanisms);
+        putModule("The following mechanisms are available:");
+        putModule(Mechanisms);
     }
 
     void Set(const NoString& sLine)
@@ -110,8 +110,8 @@ public:
         registry.setValue("username", No::token(sLine, 1));
         registry.setValue("password", No::token(sLine, 2));
 
-        PutModule("Username has been set to [" + registry.value("username") + "]");
-        PutModule("Password has been set to [" + registry.value("password") + "]");
+        putModule("Username has been set to [" + registry.value("username") + "]");
+        putModule("Password has been set to [" + registry.value("password") + "]");
     }
 
     void SetMechanismCommand(const NoString& sLine)
@@ -123,7 +123,7 @@ public:
 
             for (NoStringVector::const_iterator it = vsMechanisms.begin(); it != vsMechanisms.end(); ++it) {
                 if (!SupportsMechanism(*it)) {
-                    PutModule("Unsupported mechanism: " + *it);
+                    putModule("Unsupported mechanism: " + *it);
                     return;
                 }
             }
@@ -132,7 +132,7 @@ public:
             registry.setValue(NV_MECHANISMS, sMechanisms);
         }
 
-        PutModule("Current mechanisms set: " + GetMechanismsString());
+        putModule("Current mechanisms set: " + GetMechanismsString());
     }
 
     void RequireAuthCommand(const NoString& sLine)
@@ -143,9 +143,9 @@ public:
         }
 
         if (registry.value(NV_REQUIRE_AUTH).toBool()) {
-            PutModule("We require SASL negotiation to connect");
+            putModule("We require SASL negotiation to connect");
         } else {
-            PutModule("We will connect even if SASL fails");
+            putModule("We will connect even if SASL fails");
         }
     }
 
@@ -186,9 +186,9 @@ public:
     {
         NoRegistry registry(this);
         if (!m_bAuthenticated && registry.value(NV_REQUIRE_AUTH).toBool()) {
-            GetNetwork()->setEnabled(false);
-            PutModule("Disabling network, we require authentication.");
-            PutModule("Use 'RequireAuth no' to disable.");
+            network()->setEnabled(false);
+            putModule("Disabling network, we require authentication.");
+            putModule("Use 'RequireAuth no' to disable.");
             return true;
         }
 
@@ -201,10 +201,10 @@ public:
             NoRegistry registry(this);
             NoString sAuthLine = registry.value("username") + '\0' + registry.value("username") + '\0' + registry.value("password");
             sAuthLine = sAuthLine.toBase64();
-            PutIRC("AUTHENTICATE " + sAuthLine);
+            putIrc("AUTHENTICATE " + sAuthLine);
         } else {
             /* Send blank authenticate for other mechanisms (like EXTERNAL). */
-            PutIRC("AUTHENTICATE +");
+            putIrc("AUTHENTICATE +");
         }
     }
 
@@ -221,10 +221,10 @@ public:
                     return;
                 }
 
-                GetNetwork()->ircSocket()->PauseCap();
+                network()->ircSocket()->PauseCap();
 
                 m_Mechanisms.SetIndex(0);
-                PutIRC("AUTHENTICATE " + m_Mechanisms.GetCurrent());
+                putIrc("AUTHENTICATE " + m_Mechanisms.GetCurrent());
             } else {
                 CheckRequireAuth();
             }
@@ -237,19 +237,19 @@ public:
             Authenticate(No::tokens(sLine, 1));
         } else if (No::token(sLine, 1).equals("903")) {
             /* SASL success! */
-            GetNetwork()->ircSocket()->ResumeCap();
+            network()->ircSocket()->ResumeCap();
             m_bAuthenticated = true;
             NO_DEBUG("sasl: Authenticated with mechanism [" << m_Mechanisms.GetCurrent() << "]");
         } else if (No::token(sLine, 1).equals("904") || No::token(sLine, 1).equals("905")) {
             NO_DEBUG("sasl: Mechanism [" << m_Mechanisms.GetCurrent() << "] failed.");
-            PutModule(m_Mechanisms.GetCurrent() + " mechanism failed.");
+            putModule(m_Mechanisms.GetCurrent() + " mechanism failed.");
 
             if (m_Mechanisms.HasNext()) {
                 m_Mechanisms.IncrementIndex();
-                PutIRC("AUTHENTICATE " + m_Mechanisms.GetCurrent());
+                putIrc("AUTHENTICATE " + m_Mechanisms.GetCurrent());
             } else {
                 CheckRequireAuth();
-                GetNetwork()->ircSocket()->ResumeCap();
+                network()->ircSocket()->ResumeCap();
             }
         } else if (No::token(sLine, 1).equals("906")) {
             /* CAP wasn't paused? */
@@ -257,7 +257,7 @@ public:
             CheckRequireAuth();
         } else if (No::token(sLine, 1).equals("907")) {
             m_bAuthenticated = true;
-            GetNetwork()->ircSocket()->ResumeCap();
+            network()->ircSocket()->ResumeCap();
             NO_DEBUG("sasl: Received 907 -- We are already registered");
         } else {
             return CONTINUE;
