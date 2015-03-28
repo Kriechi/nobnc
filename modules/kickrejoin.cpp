@@ -45,7 +45,7 @@ protected:
 
         if (pChan) {
             pChan->enable();
-            module()->PutIRC("JOIN " + pChan->getName() + " " + pChan->getKey());
+            module()->PutIRC("JOIN " + pChan->name() + " " + pChan->key());
         }
     }
 };
@@ -125,11 +125,11 @@ public:
     {
         if (GetNetwork()->currentNick().equals(sKickedNick)) {
             if (!delay) {
-                PutIRC("JOIN " + pChan.getName() + " " + pChan.getKey());
+                PutIRC("JOIN " + pChan.name() + " " + pChan.key());
                 pChan.enable();
                 return;
             }
-            NoRejoinJob* timer = new NoRejoinJob(this, pChan.getName());
+            NoRejoinJob* timer = new NoRejoinJob(this, pChan.name());
             timer->setSingleShot(true);
             timer->start(delay);
         }

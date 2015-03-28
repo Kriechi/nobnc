@@ -442,15 +442,15 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             if (pChan) {
                 if (pChan->isOn()) {
                     // If we are the only one in the chan, set our default modes
-                    if (pChan->getNickCount() == 1) {
-                        NoString sModes = pChan->getDefaultModes();
+                    if (pChan->nickCount() == 1) {
+                        NoString sModes = pChan->defaultModes();
 
                         if (sModes.empty()) {
                             sModes = d->network->user()->defaultChanModes();
                         }
 
                         if (!sModes.empty()) {
-                            PutIRC("MODE " + pChan->getName() + " " + sModes);
+                            PutIRC("MODE " + pChan->name() + " " + sModes);
                         }
                     }
                 }
@@ -505,7 +505,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             }
             if (pChan) {
                 pChan->disable();
-                d->network->putStatus("Channel [" + pChan->getName() + "] is linked to "
+                d->network->putStatus("Channel [" + pChan->name() + "] is linked to "
                                                                        "another channel and was thus disabled.");
             }
             break;
@@ -754,7 +754,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
                     return; // Don't forward this
                 }
 
-                sLine = ":" + Nick.nickMask() + " TOPIC " + pChan->getName() + " :" + sTopic;
+                sLine = ":" + Nick.nickMask() + " TOPIC " + pChan->name() + " :" + sTopic;
             }
         } else if (sCmd.equals("PRIVMSG")) {
             // :nick!ident@host.com PRIVMSG #chan :Message

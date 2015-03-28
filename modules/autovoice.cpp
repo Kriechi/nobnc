@@ -186,8 +186,8 @@ public:
         if (Channel.hasPerm(NoChannel::Op) || Channel.hasPerm(NoChannel::HalfOp)) {
             for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
                 // and the nick who joined is a valid user
-                if (it->second->HostMatches(Nick.hostMask()) && it->second->ChannelMatches(Channel.getName())) {
-                    PutIRC("MODE " + Channel.getName() + " +v " + Nick.nick());
+                if (it->second->HostMatches(Nick.hostMask()) && it->second->ChannelMatches(Channel.name())) {
+                    PutIRC("MODE " + Channel.name() + " +v " + Nick.nick());
                     break;
                 }
             }

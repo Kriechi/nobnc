@@ -62,7 +62,7 @@ public:
             std::vector<NoQuery*> VQueries = pNetwork->queries();
 
             for (NoQuery* pQuery : VQueries) {
-                pNetwork->removeQuery(pQuery->getName());
+                pNetwork->removeQuery(pQuery->name());
             }
 
             // We deny autoclearQueryBuffer since this module

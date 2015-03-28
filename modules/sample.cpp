@@ -114,37 +114,37 @@ public:
 
     void onChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange) override
     {
-        PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] set mode [" + Channel.getName() +
+        PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] set mode [" + Channel.name() +
                   ((bAdded) ? "] +" : "] -") + NoString(uMode) + " " + Nick.nick());
     }
 
     void onOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] opped [" + Nick.nick() + "] on [" +
-                  Channel.getName() + "]");
+                  Channel.name() + "]");
     }
 
     void onDeop(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] deopped [" + Nick.nick() + "] on [" +
-                  Channel.getName() + "]");
+                  Channel.name() + "]");
     }
 
     void onVoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] voiced [" + Nick.nick() + "] on [" +
-                  Channel.getName() + "]");
+                  Channel.name() + "]");
     }
 
     void onDevoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         PutModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] devoiced [" + Nick.nick() + "] on [" +
-                  Channel.getName() + "]");
+                  Channel.name() + "]");
     }
 
     void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
     {
-        PutModule("* " + OpNick.nick() + " sets mode: " + sModes + " " + sArgs + " (" + Channel.getName() + ")");
+        PutModule("* " + OpNick.nick() + " sets mode: " + sModes + " " + sArgs + " (" + Channel.name() + ")");
     }
 
     ModRet onRaw(NoString& sLine) override
@@ -161,7 +161,7 @@ public:
 
     void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
-        PutModule("[" + OpNick.nick() + "] kicked [" + sKickedNick + "] from [" + Channel.getName() +
+        PutModule("[" + OpNick.nick() + "] kicked [" + sKickedNick + "] from [" + Channel.name() +
                   "] with the msg [" + sMessage + "]");
     }
 
@@ -172,7 +172,7 @@ public:
 
     ModRet onTimerAutoJoin(NoChannel& Channel) override
     {
-        PutModule("Attempting to join " + Channel.getName());
+        PutModule("Attempting to join " + Channel.name());
         return CONTINUE;
     }
 
@@ -234,7 +234,7 @@ public:
 
     ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        PutModule("[" + Nick.nick() + "] chanctcp [" + sMessage + "] to [" + Channel.getName() + "]");
+        PutModule("[" + Nick.nick() + "] chanctcp [" + sMessage + "] to [" + Channel.name() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
 
         return CONTINUE;
@@ -258,7 +258,7 @@ public:
 
     ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        PutModule("[" + Nick.nick() + "] channotice [" + sMessage + "] to [" + Channel.getName() + "]");
+        PutModule("[" + Nick.nick() + "] channotice [" + sMessage + "] to [" + Channel.name() + "]");
         sMessage = "\00311,5 " + sMessage + " \003";
 
         return CONTINUE;
@@ -266,7 +266,7 @@ public:
 
     ModRet onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
     {
-        PutModule("* " + Nick.nick() + " changes topic on " + Channel.getName() + " to '" + sTopic + "'");
+        PutModule("* " + Nick.nick() + " changes topic on " + Channel.name() + " to '" + sTopic + "'");
 
         return CONTINUE;
     }
@@ -297,7 +297,7 @@ public:
     ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
         if (sMessage == "!ping") {
-            PutIRC("PRIVMSG " + Channel.getName() + " :PONG?");
+            PutIRC("PRIVMSG " + Channel.name() + " :PONG?");
         }
 
         sMessage = "x " + sMessage + " x";

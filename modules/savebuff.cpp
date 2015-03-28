@@ -142,7 +142,7 @@ public:
 
     template <typename T> void BootStrap(T* pTarget, const NoString& sContent)
     {
-        if (!pTarget->getBuffer().isEmpty()) return; // in this case the module was probably reloaded
+        if (!pTarget->buffer().isEmpty()) return; // in this case the module was probably reloaded
 
         NoStringVector::iterator it;
 
@@ -200,15 +200,15 @@ public:
 
             const std::vector<NoChannel*>& vChans = GetNetwork()->channels();
             for (NoChannel* pChan : vChans) {
-                NoString sPath = GetPath(pChan->getName());
-                SaveBufferToDisk(pChan->getBuffer(), sPath, CHAN_VERIFICATION_TOKEN + pChan->getName());
+                NoString sPath = GetPath(pChan->name());
+                SaveBufferToDisk(pChan->buffer(), sPath, CHAN_VERIFICATION_TOKEN + pChan->name());
                 ssPaths.insert(sPath);
             }
 
             const std::vector<NoQuery*>& vQueries = GetNetwork()->queries();
             for (NoQuery* pQuery : vQueries) {
-                NoString sPath = GetPath(pQuery->getName());
-                SaveBufferToDisk(pQuery->getBuffer(), sPath, QUERY_VERIFICATION_TOKEN + pQuery->getName());
+                NoString sPath = GetPath(pQuery->name());
+                SaveBufferToDisk(pQuery->buffer(), sPath, QUERY_VERIFICATION_TOKEN + pQuery->name());
                 ssPaths.insert(sPath);
             }
 
@@ -304,7 +304,7 @@ public:
     {
         const std::vector<NoChannel*>& vChans = GetNetwork()->channels();
         for (NoChannel* pChan : vChans) {
-            const NoString& sName = pChan->getName();
+            const NoString& sName = pChan->name();
             if (GetPath(sName).equals(sPath)) {
                 return sName;
             }

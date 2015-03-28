@@ -87,7 +87,7 @@ public:
 
                 NoRegistry registry(this);
                 if (!registry.value("silent").toBool()) {
-                    PutModule("Flood in [" + pChan->getName() + "] is over, "
+                    PutModule("Flood in [" + pChan->name() + "] is over, "
                                                                 "re-attaching...");
                 }
                 // No buffer playback, makes sense, doesn't it?
@@ -111,7 +111,7 @@ public:
         // First: Clean up old entries and reattach where necessary
         Cleanup();
 
-        it = m_chans.find(Channel.getName());
+        it = m_chans.find(Channel.name());
 
         if (it == m_chans.end()) {
             // We don't track detached channels
@@ -120,7 +120,7 @@ public:
             // This is the first message for this channel, start a
             // new timeout.
             std::pair<time_t, uint> tmp(now, 1);
-            m_chans[Channel.getName()] = tmp;
+            m_chans[Channel.name()] = tmp;
             return;
         }
 
@@ -147,7 +147,7 @@ public:
 
         NoRegistry registry(this);
         if (!registry.value("silent").toBool()) {
-            PutModule("Channel [" + Channel.getName() + "] was "
+            PutModule("Channel [" + Channel.name() + "] was "
                                                         "flooded, you've been detached");
         }
     }

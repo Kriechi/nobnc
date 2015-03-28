@@ -68,11 +68,11 @@ public:
                 // We ignore channel key "*" because of some broken nets.
                 if (sArg != "*") {
                     NoRegistry registry(this);
-                    registry.setValue(Channel.getName(), sArg);
+                    registry.setValue(Channel.name(), sArg);
                 }
             } else {
                 NoRegistry registry(this);
-                registry.setValue(Channel.getName(), "");
+                registry.setValue(Channel.name(), "");
             }
         }
     }
@@ -125,7 +125,7 @@ public:
             NoRegistry registry(this);
             const std::vector<NoChannel*>& Channels = GetNetwork()->channels();
             for (uint c = 0; c < Channels.size(); c++) {
-                const NoString sChan = Channels[c]->getName();
+                const NoString sChan = Channels[c]->name();
                 bool bStick = registry.contains(sChan);
 
                 if (bSubmitted) {
@@ -210,8 +210,8 @@ protected:
                 }
             }
             if (!pChan->isOn() && pNetwork->isIrcConnected()) {
-                mod->PutModule("Joining [" + pChan->getName() + "]");
-                mod->PutIRC("JOIN " + pChan->getName() + (pChan->getKey().empty() ? "" : " " + pChan->getKey()));
+                mod->PutModule("Joining [" + pChan->name() + "]");
+                mod->PutIRC("JOIN " + pChan->name() + (pChan->key().empty() ? "" : " " + pChan->key()));
             }
         }
     }

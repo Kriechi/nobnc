@@ -121,19 +121,19 @@ public:
 protected:
     void AutoCycle(NoChannel& Channel)
     {
-        if (!IsAutoCycle(Channel.getName())) return;
+        if (!IsAutoCycle(Channel.name())) return;
 
         // Did we recently annoy opers via cycling of an empty channel?
-        if (m_recentlyCycled.contains(Channel.getName())) return;
+        if (m_recentlyCycled.contains(Channel.name())) return;
 
         // Is there only one person left in the channel?
-        if (Channel.getNickCount() != 1) return;
+        if (Channel.nickCount() != 1) return;
 
         // Is that person us and we don't have op?
-        const NoNick& pNick = Channel.getNicks().begin()->second;
+        const NoNick& pNick = Channel.nicks().begin()->second;
         if (!pNick.hasPerm(NoChannel::Op) && pNick.equals(GetNetwork()->currentNick())) {
             Channel.cycle();
-            m_recentlyCycled.insert(Channel.getName());
+            m_recentlyCycled.insert(Channel.name());
         }
     }
 

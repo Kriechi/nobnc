@@ -255,7 +255,7 @@ public:
     void onOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
         if (Nick.nick() == GetNetwork()->ircNick().nick()) {
-            const std::map<NoString, NoNick>& msNicks = Channel.getNicks();
+            const std::map<NoString, NoNick>& msNicks = Channel.nicks();
 
             for (std::map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
                 if (!it->second.hasPerm(NoChannel::Op)) {
@@ -465,14 +465,14 @@ public:
 
     bool CheckAutoOp(const NoNick& Nick, NoChannel& Channel)
     {
-        NoAutoOpUser* pUser = FindUserByHost(Nick.hostMask(), Channel.getName());
+        NoAutoOpUser* pUser = FindUserByHost(Nick.hostMask(), Channel.name());
 
         if (!pUser) {
             return false;
         }
 
         if (pUser->GetUserKey().equals("__NOKEY__")) {
-            PutIRC("MODE " + Channel.getName() + " +o " + Nick.nick());
+            PutIRC("MODE " + Channel.name() + " +o " + Nick.nick());
         } else {
             // then insert this nick into the queue, the timer does the rest
             NoString sNick = Nick.nick().toLower();
@@ -533,7 +533,7 @@ public:
                     const NoNick* pNick = Chan.findNick(Nick.nick());
 
                     if (pNick) {
-                        if (pNick->hasPerm(NoChannel::Op) && pUser->ChannelMatches(Chan.getName())) {
+                        if (pNick->hasPerm(NoChannel::Op) && pUser->ChannelMatches(Chan.name())) {
                             bValid = true;
                             break;
                         }
@@ -628,11 +628,11 @@ public:
         for (size_t a = 0; a < Chans.size(); a++) {
             const NoChannel& Chan = *Chans[a];
 
-            if (Chan.hasPerm(NoChannel::Op) && User.ChannelMatches(Chan.getName())) {
+            if (Chan.hasPerm(NoChannel::Op) && User.ChannelMatches(Chan.name())) {
                 const NoNick* pNick = Chan.findNick(Nick.nick());
 
                 if (pNick && !pNick->hasPerm(NoChannel::Op)) {
-                    PutIRC("MODE " + Chan.getName() + " +o " + Nick.nick());
+                    PutIRC("MODE " + Chan.name() + " +o " + Nick.nick());
                 }
             }
         }

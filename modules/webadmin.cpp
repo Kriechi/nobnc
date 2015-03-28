@@ -655,12 +655,12 @@ public:
             if (pChan) {
                 Tmpl["Action"] = "editchan";
                 Tmpl["Edit"] = "true";
-                Tmpl["Title"] = "Edit Channel" + NoString(" [" + pChan->getName() + "]") + " of Network [" +
+                Tmpl["Title"] = "Edit Channel" + NoString(" [" + pChan->name() + "]") + " of Network [" +
                                 pNetwork->name() + "] of User [" + pNetwork->user()->userName() + "]";
-                Tmpl["ChanName"] = pChan->getName();
-                Tmpl["BufferCount"] = NoString(pChan->getBufferCount());
-                Tmpl["DefModes"] = pChan->getDefaultModes();
-                Tmpl["Key"] = pChan->getKey();
+                Tmpl["ChanName"] = pChan->name();
+                Tmpl["BufferCount"] = NoString(pChan->bufferCount());
+                Tmpl["DefModes"] = pChan->defaultModes();
+                Tmpl["Key"] = pChan->key();
 
                 if (pChan->inConfig()) {
                     Tmpl["InConfig"] = "true";
@@ -721,20 +721,20 @@ public:
             // This could change the channel name and e.g. add a "#" prefix
             pChan = new NoChannel(sChanName, pNetwork, true);
 
-            if (pNetwork->findChannel(pChan->getName())) {
-                WebSock.PrintErrorPage("Channel [" + pChan->getName() + "] already exists");
+            if (pNetwork->findChannel(pChan->name())) {
+                WebSock.PrintErrorPage("Channel [" + pChan->name() + "] already exists");
                 delete pChan;
                 return true;
             }
 
             if (!pNetwork->addChannel(pChan)) {
-                WebSock.PrintErrorPage("Could not add channel [" + pChan->getName() + "]");
+                WebSock.PrintErrorPage("Could not add channel [" + pChan->name() + "]");
                 return true;
             }
         }
 
         uint uBufferCount = WebSock.GetParam("buffercount").toUInt();
-        if (pChan->getBufferCount() != uBufferCount) {
+        if (pChan->bufferCount() != uBufferCount) {
             pChan->setBufferCount(uBufferCount, spSession->IsAdmin());
         }
         pChan->setDefaultModes(WebSock.GetParam("defmodes"));
@@ -762,7 +762,7 @@ public:
 
         NoTemplate TmplMod;
         TmplMod["User"] = pUser->userName();
-        TmplMod["ChanName"] = pChan->getName();
+        TmplMod["ChanName"] = pChan->name();
         TmplMod["WebadminAction"] = "change";
         for (NoModule* pMod : allModules(pNetwork)) {
             pMod->OnEmbeddedWebRequest(WebSock, "webadmin/channel", TmplMod);
@@ -779,7 +779,7 @@ public:
         } else {
             WebSock.Redirect(GetWebPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->name(), No::UrlFormat) + "&name=" +
-                             No::escape(pChan->getName(), No::UrlFormat));
+                             No::escape(pChan->name(), No::UrlFormat));
         }
         return true;
     }
@@ -892,16 +892,16 @@ public:
 
                     l["Network"] = pNetwork->name();
                     l["Username"] = pUser->userName();
-                    l["Name"] = pChan->getName();
-                    l["Perms"] = pChan->getPermStr();
-                    l["CurModes"] = pChan->getModeString();
-                    l["DefModes"] = pChan->getDefaultModes();
+                    l["Name"] = pChan->name();
+                    l["Perms"] = pChan->permStr();
+                    l["CurModes"] = pChan->modeString();
+                    l["DefModes"] = pChan->defaultModes();
                     if (pChan->hasBufferCountSet()) {
-                        l["BufferCount"] = NoString(pChan->getBufferCount());
+                        l["BufferCount"] = NoString(pChan->bufferCount());
                     } else {
-                        l["BufferCount"] = NoString(pChan->getBufferCount()) + " (default)";
+                        l["BufferCount"] = NoString(pChan->bufferCount()) + " (default)";
                     }
-                    l["Options"] = pChan->getOptions();
+                    l["Options"] = pChan->options();
 
                     if (pChan->inConfig()) {
                         l["InConfig"] = "true";

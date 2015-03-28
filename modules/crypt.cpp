@@ -109,7 +109,7 @@ public:
 
     ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
     {
-        FilterIncoming(Channel.getName(), Nick, sMessage);
+        FilterIncoming(Channel.name(), Nick, sMessage);
         return CONTINUE;
     }
 

@@ -66,9 +66,9 @@ public:
     void modeChange(const NoString& sModes, const NoNick* OpNick = nullptr);
     bool addMode(uchar uMode, const NoString& sArg);
     bool remMode(uchar uMode);
-    NoString getModeString() const;
-    NoString getModeArg(NoString& sArgs) const;
-    NoString getModeForNames() const;
+    NoString modeString() const;
+    NoString modeArg(NoString& sArgs) const;
+    NoString modeForNames() const;
 
     void clearNicks();
     const NoNick* findNick(const NoString& sNick) const;
@@ -78,8 +78,8 @@ public:
     bool remNick(const NoString& sNick);
     bool changeNick(const NoString& sOldNick, const NoString& sNewNick);
 
-    const NoBuffer& getBuffer() const;
-    uint getBufferCount() const;
+    const NoBuffer& buffer() const;
+    uint bufferCount() const;
     bool setBufferCount(uint u, bool bForce = false);
     void inheritBufferCount(uint u, bool bForce = false);
     size_t addBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr);
@@ -87,7 +87,7 @@ public:
     void sendBuffer(NoClient* pClient);
     void sendBuffer(NoClient* pClient, const NoBuffer& Buffer);
 
-    NoString getPermStr() const;
+    NoString permStr() const;
     bool hasPerm(uchar uPerm) const;
     void addPerm(uchar uPerm);
     void remPerm(uchar uPerm);
@@ -111,25 +111,25 @@ public:
 
     bool isModeKnown() const;
     bool hasMode(uchar uMode) const;
-    NoString getOptions() const;
-    NoString getModeArg(uchar uMode) const;
-    std::map<char, uint> getPermCounts() const;
+    NoString options() const;
+    NoString modeArg(uchar uMode) const;
+    std::map<char, uint> permCounts() const;
     bool isOn() const;
-    NoString getName() const;
-    std::map<uchar, NoString> getModes() const;
-    NoString getKey() const;
-    NoString getTopic() const;
-    NoString getTopicOwner() const;
-    ulong getTopicDate() const;
-    NoString getDefaultModes() const;
-    std::map<NoString, NoNick> getNicks() const;
-    size_t getNickCount() const;
+    NoString name() const;
+    std::map<uchar, NoString> modes() const;
+    NoString key() const;
+    NoString topic() const;
+    NoString topicOwner() const;
+    ulong topicDate() const;
+    NoString defaultModes() const;
+    std::map<NoString, NoNick> nicks() const;
+    size_t nickCount() const;
     bool autoClearChanBuffer() const;
     bool isDetached() const;
     bool inConfig() const;
-    ulong getCreationDate() const;
+    ulong creationDate() const;
     bool isDisabled() const;
-    uint getJoinTries() const;
+    uint joinTries() const;
     bool hasBufferCountSet() const;
     bool hasAutoClearChanBufferSet() const;
 

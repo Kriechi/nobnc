@@ -44,17 +44,17 @@ NoQuery::~NoQuery()
 {
 }
 
-NoString NoQuery::getName() const
+NoString NoQuery::name() const
 {
     return d->name;
 }
 
-const NoBuffer& NoQuery::getBuffer() const
+const NoBuffer& NoQuery::buffer() const
 {
     return d->buffer;
 }
 
-uint NoQuery::getBufferCount() const
+uint NoQuery::bufferCount() const
 {
     return d->buffer.getLimit();
 }

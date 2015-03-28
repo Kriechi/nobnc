@@ -605,11 +605,11 @@ void NoClient::ReadLine(const NoString& sData)
             // request ourself.
 
             NoChannel* pChan = d->network->findChannel(sTarget);
-            if (pChan && pChan->isOn() && !pChan->getModeString().empty()) {
-                PutClient(":" + d->network->ircServer() + " 324 " + GetNick() + " " + sTarget + " " + pChan->getModeString());
-                if (pChan->getCreationDate() > 0) {
+            if (pChan && pChan->isOn() && !pChan->modeString().empty()) {
+                PutClient(":" + d->network->ircServer() + " 324 " + GetNick() + " " + sTarget + " " + pChan->modeString());
+                if (pChan->creationDate() > 0) {
                     PutClient(":" + d->network->ircServer() + " 329 " + GetNick() + " " + sTarget + " " +
-                              NoString(pChan->getCreationDate()));
+                              NoString(pChan->creationDate()));
                 }
                 return;
             }
@@ -635,7 +635,7 @@ void NoClient::SetNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect
             const std::vector<NoChannel*>& vChans = d->network->channels();
             for (const NoChannel* pChan : vChans) {
                 if (!(pChan->isDetached())) {
-                    PutClient(":" + d->network->ircNick().nickMask() + " PART " + pChan->getName());
+                    PutClient(":" + d->network->ircNick().nickMask() + " PART " + pChan->name());
                 }
             }
         } else if (d->user) {

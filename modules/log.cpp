@@ -249,7 +249,7 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
         NO_DEBUG("Could not open log file [" << sPath << "]: " << strerror(errno));
 }
 
-void NoLogMod::PutLog(const NoString& sLine, const NoChannel& Channel) { PutLog(sLine, Channel.getName()); }
+void NoLogMod::PutLog(const NoString& sLine, const NoChannel& Channel) { PutLog(sLine, Channel.name()); }
 
 void NoLogMod::PutLog(const NoString& sLine, const NoNick& Nick) { PutLog(sLine, Nick.nick()); }
 

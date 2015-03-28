@@ -75,7 +75,7 @@ void NoClient::UserCommand(NoString& sLine)
             return;
         }
 
-        const std::map<NoString, NoNick>& msNicks = pChan->getNicks();
+        const std::map<NoString, NoNick>& msNicks = pChan->nicks();
         NoIrcSocket* pIRCSock = d->network->ircSocket();
         const NoString& sPerms = (pIRCSock) ? pIRCSock->GetPerms() : "";
 
@@ -441,7 +441,7 @@ void NoClient::UserCommand(NoString& sLine)
             PutStatus("No such channel [" + sChan + "]");
             return;
         }
-        sChan = pChan->getPermStr() + pChan->getName();
+        sChan = pChan->permStr() + pChan->name();
         NoString sStatus =
         pChan->isOn() ? (pChan->isDetached() ? "Detached" : "Joined") : (pChan->isDisabled() ? "Disabled" : "Trying");
 
@@ -456,7 +456,7 @@ void NoClient::UserCommand(NoString& sLine)
         Table.addRow();
         Table.setValue(sChan, "Buffer");
         Table.setValue(sStatus,
-                      NoString(pChan->getBuffer().size()) + "/" + NoString(pChan->getBufferCount()) +
+                      NoString(pChan->buffer().size()) + "/" + NoString(pChan->bufferCount()) +
                       NoString(pChan->hasBufferCountSet() ? "" : " (default)"));
 
         Table.addRow();
@@ -468,21 +468,21 @@ void NoClient::UserCommand(NoString& sLine)
         if (pChan->isOn()) {
             Table.addRow();
             Table.setValue(sChan, "Topic");
-            Table.setValue(sStatus, pChan->getTopic());
+            Table.setValue(sStatus, pChan->topic());
 
             Table.addRow();
             Table.setValue(sChan, "Modes");
-            Table.setValue(sStatus, pChan->getModeString());
+            Table.setValue(sStatus, pChan->modeString());
 
             Table.addRow();
             Table.setValue(sChan, "Users");
 
             NoStringVector vsUsers;
-            vsUsers.push_back("All: " + NoString(pChan->getNickCount()));
+            vsUsers.push_back("All: " + NoString(pChan->nickCount()));
 
             NoIrcSocket* pIRCSock = d->network->ircSocket();
             const NoString& sPerms = pIRCSock ? pIRCSock->GetPerms() : "";
-            std::map<char, uint> mPerms = pChan->getPermCounts();
+            std::map<char, uint> mPerms = pChan->permCounts();
             for (char cPerm : sPerms) {
                 vsUsers.push_back(NoString(cPerm) + ": " + NoString(mPerms[cPerm]));
             }
@@ -536,7 +536,7 @@ void NoClient::UserCommand(NoString& sLine)
 
         for (const NoChannel* pChan : vChans) {
             Table.addRow();
-            Table.setValue("Name", pChan->getPermStr() + pChan->getName());
+            Table.setValue("Name", pChan->permStr() + pChan->name());
             Table.setValue("Status",
                           ((pChan->isOn()) ? ((pChan->isDetached()) ? "Detached" : "Joined") :
                                              ((pChan->isDisabled()) ? "Disabled" : "Trying")));
@@ -857,9 +857,9 @@ void NoClient::UserCommand(NoString& sLine)
 
         for (const NoChannel* pChan : vChans) {
             Table.addRow();
-            Table.setValue("Name", pChan->getName());
-            Table.setValue("Set By", pChan->getTopicOwner());
-            Table.setValue("Topic", pChan->getTopic());
+            Table.setValue("Name", pChan->name());
+            Table.setValue("Set By", pChan->topicOwner());
+            Table.setValue("Topic", pChan->topic());
         }
 
         PutStatus(Table);
@@ -1374,7 +1374,7 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            if (pChan->getBuffer().isEmpty()) {
+            if (pChan->buffer().isEmpty()) {
                 PutStatus("The buffer for [" + sBuffer + "] is empty");
                 return;
             }
@@ -1388,7 +1388,7 @@ void NoClient::UserCommand(NoString& sLine)
                 return;
             }
 
-            if (pQuery->getBuffer().isEmpty()) {
+            if (pQuery->buffer().isEmpty()) {
                 PutStatus("The buffer for [" + sBuffer + "] is empty");
                 return;
             }
@@ -1420,7 +1420,7 @@ void NoClient::UserCommand(NoString& sLine)
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
-            d->network->removeQuery(pQuery->getName());
+            d->network->removeQuery(pQuery->name());
         }
 
         PutStatus("[" + NoString(uMatches) + "] buffers matching [" + sBuffer + "] have been cleared");
