@@ -112,6 +112,7 @@ public:
     bool StartTLS();
     bool IsConOK() const;
 
+protected:
     virtual void ConnectedImpl();
     virtual void TimeoutImpl();
     virtual void DisconnectedImpl();
@@ -127,6 +128,7 @@ private:
     NoSocket& operator=(const NoSocket&) = delete;
     std::unique_ptr<NoSocketPrivate> d;
     friend class NoSocketPrivate;
+    friend class NoSocketImpl;
 };
 
 #endif // NOSOCKET_H
