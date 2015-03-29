@@ -18,7 +18,7 @@
 #include "nofile.h"
 #include "noutils.h"
 #include "nodebug.h"
-#include <pwd.h>
+#include "nodir.h"
 #include <sys/types.h>
 
 #ifndef HAVE_LSTAT
@@ -37,8 +37,6 @@ static inline void SetFdCloseOnExec(int fd)
     fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
 }
 
-NoString NoFile::m_homePath;
-
 NoFile::NoFile(const NoString& sLongName) : m_buffer(""), m_fd(-1), m_hadError(false), m_longName(""), m_shortName("")
 {
     SetFileName(sLongName);
@@ -49,7 +47,7 @@ NoFile::~NoFile() { Close(); }
 void NoFile::SetFileName(const NoString& sLongName)
 {
     if (sLongName.left(2) == "~/") {
-        m_longName = NoFile::GetHomePath() + sLongName.substr(1);
+        m_longName = NoDir::home().path() + sLongName.substr(1);
     } else
         m_longName = sLongName;
 
@@ -493,27 +491,3 @@ NoString NoFile::GetDir() const
 bool NoFile::HadError() const { return m_hadError; }
 
 void NoFile::ResetError() { m_hadError = false; }
-
-void NoFile::InitHomePath(const NoString& sFallback)
-{
-    const char* home = getenv("HOME");
-
-    m_homePath.clear();
-    if (home) {
-        m_homePath = home;
-    }
-
-    if (m_homePath.empty()) {
-        const struct passwd* pUserInfo = getpwuid(getuid());
-
-        if (pUserInfo) {
-            m_homePath = pUserInfo->pw_dir;
-        }
-    }
-
-    if (m_homePath.empty()) {
-        m_homePath = sFallback;
-    }
-}
-
-const NoString& NoFile::GetHomePath() { return m_homePath; }

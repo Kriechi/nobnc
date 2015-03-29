@@ -41,8 +41,10 @@ public:
     uint remove();
     uint chmod(mode_t mode);
 
-    bool isParent(const NoString& filePath) const;
+    NoString path() const;
     NoString filePath(const NoString& fileName) const;
+
+    bool isParent(const NoString& filePath) const;
 
 private:
     std::shared_ptr<NoDirPrivate> d;

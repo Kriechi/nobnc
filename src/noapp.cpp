@@ -456,11 +456,8 @@ void NoApp::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
     else
         m_curPath = NoDir("./").filePath(sArgvPath.left(uPos));
 
-    // Try to set the user's home dir, default to binpath on failure
-    NoFile::InitHomePath(m_curPath);
-
     if (sDataDir.empty()) {
-        m_appPath = NoFile::GetHomePath() + "/.znc";
+        m_appPath = NoDir::home().filePath("/.znc");
     } else {
         m_appPath = sDataDir;
     }
@@ -503,7 +500,7 @@ const NoString& NoApp::GetCurPath() const
     return m_curPath;
 }
 
-const NoString& NoApp::GetHomePath() const { return NoFile::GetHomePath(); }
+NoString NoApp::GetHomePath() const { return NoDir::home().path(); }
 
 const NoString& NoApp::GetZNCPath() const
 {

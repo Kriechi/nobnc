@@ -99,9 +99,6 @@ public:
     bool HadError() const;
     void ResetError();
 
-    static void InitHomePath(const NoString& sFallback);
-    static const NoString& GetHomePath();
-
 private:
     // fcntl() locking wrapper
     bool Lock(short iType, bool bBlocking);
@@ -109,8 +106,6 @@ private:
     NoString m_buffer;
     int m_fd;
     bool m_hadError;
-
-    static NoString m_homePath;
 
     NoString m_longName; //!< Absolute filename (m_path + "/" + m_shortName)
     NoString m_shortName; //!< Filename alone, without path

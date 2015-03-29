@@ -191,6 +191,11 @@ bool NoDir::isParent(const NoString& filePath) const
     return absolutePath.startsWith(prefix);
 }
 
+NoString NoDir::path() const
+{
+    return d->path;
+}
+
 NoString NoDir::filePath(const NoString& fileName) const
 {
     if (fileName == "~")
