@@ -500,8 +500,6 @@ const NoString& NoApp::GetCurPath() const
     return m_curPath;
 }
 
-NoString NoApp::GetHomePath() const { return NoDir::home().path(); }
-
 const NoString& NoApp::GetZNCPath() const
 {
     if (!NoFile::Exists(m_appPath)) {

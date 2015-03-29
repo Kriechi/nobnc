@@ -105,7 +105,6 @@ public:
     NoString GetSkinName() const;
     const NoString& GetStatusPrefix() const;
     const NoString& GetCurPath() const;
-    NoString GetHomePath() const;
     const NoString& GetZNCPath() const;
     NoString GetConfPath(bool bAllowMkDir = true) const;
     NoString GetUserPath() const;
