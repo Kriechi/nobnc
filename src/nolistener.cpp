@@ -25,7 +25,9 @@
 class NoListenerPrivate
 {
 public:
-    NoListenerPrivate(const NoString& host, ushort port) : port(port), host(host) { }
+    NoListenerPrivate(const NoString& host, ushort port) : port(port), host(host)
+    {
+    }
 
     bool ssl = false;
     ushort port = 0;
@@ -39,8 +41,13 @@ public:
 class NoListenerSocket : public NoSocket
 {
 public:
-    NoListenerSocket(NoListenerPrivate* listener) : m_listener(listener) { }
-    ~NoListenerSocket() { m_listener->socket = nullptr; }
+    NoListenerSocket(NoListenerPrivate* listener) : m_listener(listener)
+    {
+    }
+    ~NoListenerSocket()
+    {
+        m_listener->socket = nullptr;
+    }
 
     bool ConnectionFromImpl(const NoString& host, ushort port) override;
     NoSocket* GetSockObjImpl(const NoString& host, ushort port) override;

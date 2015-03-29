@@ -263,7 +263,8 @@ public:
 
         it = m_vsPending.find(client());
 
-        if (it != m_vsPending.end()) m_vsPending.erase(it);
+        if (it != m_vsPending.end())
+            m_vsPending.erase(it);
 
         SendRequest();
     }
@@ -273,7 +274,8 @@ public:
         NoString sCmd = No::token(sLine, 1).toUpper();
         size_t i = 0;
 
-        if (!m_pReplies) return CONTINUE;
+        if (!m_pReplies)
+            return CONTINUE;
 
         // Is this a "not enough arguments" error?
         if (sCmd == "461") {
@@ -282,14 +284,16 @@ public:
 
             if (No::token(m_sLastRequest, 0).equals(sOrigCmd)) {
                 // This is the reply to the last request
-                if (RouteReply(sLine, true)) return HALTCORE;
+                if (RouteReply(sLine, true))
+                    return HALTCORE;
                 return CONTINUE;
             }
         }
 
         while (m_pReplies[i].szReply != nullptr) {
             if (m_pReplies[i].szReply == sCmd) {
-                if (RouteReply(sLine, m_pReplies[i].bLastResponse, sCmd == "353")) return HALTCORE;
+                if (RouteReply(sLine, m_pReplies[i].bLastResponse, sCmd == "353"))
+                    return HALTCORE;
                 return CONTINUE;
             }
             i++;
@@ -305,25 +309,29 @@ public:
     {
         NoString sCmd = No::token(sLine, 0).toUpper();
 
-        if (!network()->ircSocket()) return CONTINUE;
+        if (!network()->ircSocket())
+            return CONTINUE;
 
         if (sCmd.equals("MODE")) {
             // Check if this is a mode request that needs to be handled
 
             // If there are arguments to a mode change,
             // we must not route it.
-            if (!No::tokens(sLine, 3).empty()) return CONTINUE;
+            if (!No::tokens(sLine, 3).empty())
+                return CONTINUE;
 
             // Grab the mode change parameter
             NoString sMode = No::token(sLine, 2);
 
             // If this is a channel mode request, znc core replies to it
-            if (sMode.empty()) return CONTINUE;
+            if (sMode.empty())
+                return CONTINUE;
 
             // Check if this is a mode change or a specific
             // mode request (the later needs to be routed).
             sMode.trimPrefix("+");
-            if (sMode.length() != 1) return CONTINUE;
+            if (sMode.length() != 1)
+                return CONTINUE;
 
             // Now just check if it's one of the supported modes
             switch (sMode[0]) {
@@ -379,7 +387,8 @@ public:
 private:
     bool RouteReply(const NoString& sLine, bool bFinished = false, bool bIsRaw353 = false)
     {
-        if (!m_pDoing) return false;
+        if (!m_pDoing)
+            return false;
 
         // 353 needs special treatment due to NAMESX and UHNAMES
         if (bIsRaw353)
@@ -403,9 +412,11 @@ private:
     {
         requestQueue::iterator it;
 
-        if (m_pDoing || m_pReplies) return;
+        if (m_pDoing || m_pReplies)
+            return;
 
-        if (m_vsPending.empty()) return;
+        if (m_vsPending.empty())
+            return;
 
         it = m_vsPending.begin();
 
@@ -456,6 +467,10 @@ void NoRouteTimeout::run()
     static_cast<NoRouteRepliesMod*>(module())->Timeout();
 }
 
-template <> void no_moduleInfo<NoRouteRepliesMod>(NoModuleInfo& Info) { Info.setWikiPage("route_replies"); }
+template <>
+void no_moduleInfo<NoRouteRepliesMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("route_replies");
+}
 
 NETWORKMODULEDEFS(NoRouteRepliesMod, "Send replies (e.g. to /who) to the right client only")

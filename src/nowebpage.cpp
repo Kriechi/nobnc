@@ -35,15 +35,42 @@ NoWebPage::~NoWebPage()
 {
 }
 
-uint NoWebPage::flags() const { return d->flags; }
-void NoWebPage::setFlags(uint flags) { d->flags = flags; }
+uint NoWebPage::flags() const
+{
+    return d->flags;
+}
+void NoWebPage::setFlags(uint flags)
+{
+    d->flags = flags;
+}
 
-NoString NoWebPage::name() const { return d->name; }
-void NoWebPage::setName(const NoString& name) { d->name = name; }
+NoString NoWebPage::name() const
+{
+    return d->name;
+}
+void NoWebPage::setName(const NoString& name)
+{
+    d->name = name;
+}
 
-NoString NoWebPage::title() const { return d->title; }
-void NoWebPage::setTitle(const NoString& title) { d->title = title; }
+NoString NoWebPage::title() const
+{
+    return d->title;
+}
+void NoWebPage::setTitle(const NoString& title)
+{
+    d->title = title;
+}
 
-NoStringPairVector NoWebPage::params() const { return d->params; }
-void NoWebPage::addParam(const NoString& name, const NoString& value) { d->params.push_back(make_pair(name, value)); }
-void NoWebPage::removeParam(const NoString& name, const NoString& value) { d->params.push_back(make_pair(name, value)); }
+NoStringPairVector NoWebPage::params() const
+{
+    return d->params;
+}
+void NoWebPage::addParam(const NoString& name, const NoString& value)
+{
+    d->params.push_back(make_pair(name, value));
+}
+void NoWebPage::removeParam(const NoString& name, const NoString& value)
+{
+    d->params.push_back(make_pair(name, value));
+}

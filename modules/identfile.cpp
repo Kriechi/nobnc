@@ -44,9 +44,15 @@ public:
         m_pIRCSock = nullptr;
     }
 
-    virtual ~NoIdentFileModule() { ReleaseISpoof(); }
+    virtual ~NoIdentFileModule()
+    {
+        ReleaseISpoof();
+    }
 
-    void GetFile(const NoString& sLine) { putModule("File is set to: " + NoRegistry(this).value("File")); }
+    void GetFile(const NoString& sLine)
+    {
+        putModule("File is set to: " + NoRegistry(this).value("File"));
+    }
 
     void SetFile(const NoString& sLine)
     {
@@ -75,8 +81,7 @@ public:
         putModule("m_pISpoofLockFile = " + NoString((long long)m_pISpoofLockFile));
         putModule("m_pIRCSock = " + NoString((long long)m_pIRCSock));
         if (m_pIRCSock) {
-            putModule("user/network - " + m_pIRCSock->network()->user()->userName() + "/" +
-                      m_pIRCSock->network()->name());
+            putModule("user/network - " + m_pIRCSock->network()->user()->userName() + "/" + m_pIRCSock->network()->name());
         } else {
             putModule("identfile is free");
         }
@@ -139,7 +144,7 @@ public:
         }
 
         NO_DEBUG("Writing [" + sData + "] to ident spoof file [" + m_pISpoofLockFile->GetLongName() +
-              "] for user/network [" + user()->userName() + "/" + network()->name() + "]");
+                 "] for user/network [" + user()->userName() + "/" + network()->name() + "]");
 
         m_pISpoofLockFile->Write(sData + "\n");
 
@@ -149,8 +154,9 @@ public:
     void ReleaseISpoof()
     {
         NO_DEBUG("Releasing ident spoof for user/network [" +
-              (m_pIRCSock ? m_pIRCSock->network()->user()->userName() + "/" + m_pIRCSock->network()->name() : "<no user/network>") +
-              "]");
+                 (m_pIRCSock ? m_pIRCSock->network()->user()->userName() + "/" + m_pIRCSock->network()->name() :
+                               "<no user/network>") +
+                 "]");
 
         SetIRCSock(nullptr);
 
@@ -223,6 +229,10 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoIdentFileModule>(NoModuleInfo& Info) { Info.setWikiPage("identfile"); }
+template <>
+void no_moduleInfo<NoIdentFileModule>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("identfile");
+}
 
 GLOBALMODULEDEFS(NoIdentFileModule, "Write the ident of a user to a file when they are trying to connect.")

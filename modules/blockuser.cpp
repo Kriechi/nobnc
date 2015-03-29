@@ -33,7 +33,10 @@ public:
     MODCONSTRUCTOR(NoBlockUser)
     {
         addHelpCommand();
-        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnListCommand), "", "List blocked users");
+        addCommand("List",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnListCommand),
+                   "",
+                   "List blocked users");
         addCommand("Block",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnBlockCommand),
                    "<user>",
@@ -100,7 +103,8 @@ public:
             Table.setValue("Blocked user", key);
         }
 
-        if (putModule(Table) == 0) putModule("No users blocked");
+        if (putModule(Table) == 0)
+            putModule("No users blocked");
     }
 
     void OnBlockCommand(const NoString& sCommand)
@@ -187,7 +191,8 @@ private:
     {
         NoUser* pUser = NoApp::Get().FindUser(sUser);
 
-        if (!pUser) return false;
+        if (!pUser)
+            return false;
 
         // Disconnect all clients
         std::vector<NoClient*> vpClients = pUser->allClients();
@@ -209,7 +214,8 @@ private:
     }
 };
 
-template <> void no_moduleInfo<NoBlockUser>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoBlockUser>(NoModuleInfo& Info)
 {
     Info.setWikiPage("blockuser");
     Info.setHasArgs(true);

@@ -66,8 +66,10 @@ public:
             m_iThresholdSecs = registry.value("secs").toUInt();
         }
 
-        if (m_iThresholdSecs == 0) m_iThresholdSecs = 2;
-        if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 4;
+        if (m_iThresholdSecs == 0)
+            m_iThresholdSecs = 2;
+        if (m_iThresholdMsgs == 0)
+            m_iThresholdMsgs = 4;
 
         Save();
 
@@ -77,7 +79,8 @@ public:
     ModRet Message(const NoNick& Nick, const NoString& sMessage)
     {
         // We never block /me, because it doesn't cause a reply
-        if (No::token(sMessage, 0).equals("ACTION")) return CONTINUE;
+        if (No::token(sMessage, 0).equals("ACTION"))
+            return CONTINUE;
 
         if (m_tLastCTCP + m_iThresholdSecs < time(nullptr)) {
             m_tLastCTCP = time(nullptr);
@@ -97,9 +100,15 @@ public:
         return HALT;
     }
 
-    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override { return Message(Nick, sMessage); }
+    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
+    {
+        return Message(Nick, sMessage);
+    }
 
-    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override { return Message(Nick, sMessage); }
+    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    {
+        return Message(Nick, sMessage);
+    }
 
     void OnSecsCommand(const NoString& sCommand)
     {
@@ -111,7 +120,8 @@ public:
         }
 
         m_iThresholdSecs = sArg.toUInt();
-        if (m_iThresholdSecs == 0) m_iThresholdSecs = 1;
+        if (m_iThresholdSecs == 0)
+            m_iThresholdSecs = 1;
 
         putModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
         Save();
@@ -127,7 +137,8 @@ public:
         }
 
         m_iThresholdMsgs = sArg.toUInt();
-        if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 2;
+        if (m_iThresholdMsgs == 0)
+            m_iThresholdMsgs = 2;
 
         putModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");
         Save();
@@ -136,7 +147,7 @@ public:
     void OnShowCommand(const NoString& sCommand)
     {
         putModule("Current limit is " + NoString(m_iThresholdMsgs) + " CTCPs "
-                                                                    "in " +
+                                                                     "in " +
                   NoString(m_iThresholdSecs) + " secs");
     }
 
@@ -148,7 +159,8 @@ private:
     uint m_iThresholdMsgs;
 };
 
-template <> void no_moduleInfo<NoCtcpFloodMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoCtcpFloodMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("ctcpflood");
     Info.setHasArgs(true);

@@ -111,7 +111,8 @@ public:
     {
         NoString sPerf = sArg;
 
-        if (sPerf.left(1) == "/") sPerf.leftChomp(1);
+        if (sPerf.left(1) == "/")
+            sPerf.leftChomp(1);
 
         if (No::token(sPerf, 0).equals("MSG")) {
             sPerf = "PRIVMSG " + No::tokens(sPerf, 1);
@@ -138,7 +139,10 @@ public:
         }
     }
 
-    NoString webMenuTitle() override { return "Perform"; }
+    NoString webMenuTitle() override
+    {
+        return "Perform";
+    }
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
@@ -180,7 +184,8 @@ private:
     NoStringVector m_vPerform;
 };
 
-template <> void no_moduleInfo<NoPerform>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoPerform>(NoModuleInfo& Info)
 {
     Info.addType(No::UserModule);
     Info.setWikiPage("perform");

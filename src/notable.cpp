@@ -108,7 +108,8 @@ bool NoTable::setValue(const NoString& sColumn, const NoString& sValue)
     uint uRowIdx = size() - 1;
     uint uColIdx = d->GetColumnIndex(sColumn);
 
-    if (uColIdx == (uint)-1) return false;
+    if (uColIdx == (uint)-1)
+        return false;
 
     d->rows[uRowIdx][uColIdx] = sValue;
 
@@ -265,7 +266,8 @@ NoStringVector NoTablePrivate::WrapWords(const NoString& s, uint uWidth)
 uint NoTablePrivate::GetColumnIndex(const NoString& sName) const
 {
     for (uint i = 0; i < headers.size(); i++) {
-        if (headers[i] == sName) return i;
+        if (headers[i] == sName)
+            return i;
     }
 
     NO_DEBUG("NoTable::GetColumnIndex(" + sName + ") failed");

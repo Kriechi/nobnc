@@ -24,7 +24,9 @@
 class NoFailToBanMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoFailToBanMod) {}
+    MODCONSTRUCTOR(NoFailToBanMod)
+    {
+    }
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
@@ -53,9 +55,15 @@ public:
         return true;
     }
 
-    void onPostRehash() override { m_Cache.clear(); }
+    void onPostRehash() override
+    {
+        m_Cache.clear();
+    }
 
-    void Add(const NoString& sHost, uint count) { m_Cache.insert(sHost, count); }
+    void Add(const NoString& sHost, uint count)
+    {
+        m_Cache.insert(sHost, count);
+    }
 
     void onModCommand(const NoString& sCommand) override
     {
@@ -92,7 +100,8 @@ public:
         // e.g. webadmin ends up here
         const NoString& sRemoteIP = Auth->socket()->GetRemoteIP();
 
-        if (sRemoteIP.empty()) return CONTINUE;
+        if (sRemoteIP.empty())
+            return CONTINUE;
 
         uint* pCount = m_Cache.value(sRemoteIP);
         if (pCount && *pCount >= m_uiAllowedFailed) {
@@ -109,7 +118,8 @@ private:
     uint m_uiAllowedFailed;
 };
 
-template <> void no_moduleInfo<NoFailToBanMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoFailToBanMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("fail2ban");
     Info.setHasArgs(true);

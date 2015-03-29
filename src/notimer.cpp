@@ -24,10 +24,15 @@
 class NoTimerImpl : public CCron
 {
 public:
-    NoTimerImpl(NoTimer* q) : q(q) { }
+    NoTimerImpl(NoTimer* q) : q(q)
+    {
+    }
 
 protected:
-    void RunJob() override { q->run(); }
+    void RunJob() override
+    {
+        q->run();
+    }
 
 private:
     NoTimer* q;
@@ -36,7 +41,9 @@ private:
 class NoTimerPrivate
 {
 public:
-    NoTimerPrivate(NoModule* mod) : module(mod) { }
+    NoTimerPrivate(NoModule* mod) : module(mod)
+    {
+    }
 
     void restart()
     {
@@ -53,8 +60,7 @@ public:
     uint interval = 60;
 };
 
-NoTimer::NoTimer(NoModule* module)
-    : d(new NoTimerPrivate(module))
+NoTimer::NoTimer(NoModule* module) : d(new NoTimerPrivate(module))
 {
     d->impl = new NoTimerImpl(this);
 

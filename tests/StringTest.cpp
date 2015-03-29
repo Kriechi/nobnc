@@ -98,8 +98,8 @@ TEST(StringTest, Case)
 TEST(StringTest, Replace)
 {
     EXPECT_EQ("(b()b)", NoString("(a()a)").replace_n("a", "b"));
-//    EXPECT_EQ("(a()b)", NoString("(a()a)").Replace_n("a", "b", "(", ")"));
-//    EXPECT_EQ("a(b)", NoString("(a()a)").Replace_n("a", "b", "(", ")", true));
+    //    EXPECT_EQ("(a()b)", NoString("(a()a)").Replace_n("a", "b", "(", ")"));
+    //    EXPECT_EQ("a(b)", NoString("(a()a)").Replace_n("a", "b", "(", ")", true));
 }
 
 TEST(StringTest, LeftRight)

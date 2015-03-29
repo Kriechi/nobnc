@@ -76,7 +76,10 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnReplayCommand),
                    "<buffer>",
                    "Replays the buffer");
-        addCommand("Save", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnSaveCommand), "", "Saves all buffers");
+        addCommand("Save",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSaveBuff::OnSaveCommand),
+                   "",
+                   "Saves all buffers");
     }
     virtual ~NoSaveBuff()
     {
@@ -140,9 +143,11 @@ public:
         return true;
     }
 
-    template <typename T> void BootStrap(T* pTarget, const NoString& sContent)
+    template <typename T>
+    void BootStrap(T* pTarget, const NoString& sContent)
     {
-        if (!pTarget->buffer().isEmpty()) return; // in this case the module was probably reloaded
+        if (!pTarget->buffer().isEmpty())
+            return; // in this case the module was probably reloaded
 
         NoStringVector::iterator it;
 
@@ -180,8 +185,7 @@ public:
         for (uint uIdx = 0; uIdx < uSize; uIdx++) {
             const NoMessage& Line = Buffer.message(uIdx);
             timeval ts = Line.timestamp();
-            sContent +=
-            "@" + NoString(ts.tv_sec) + "," + NoString(ts.tv_usec) + " " + Line.format() + "\n" + Line.text() + "\n";
+            sContent += "@" + NoString(ts.tv_sec) + "," + NoString(ts.tv_usec) + " " + Line.format() + "\n" + Line.text() + "\n";
         }
 
         sContent = No::encrypt(sContent, m_sPassword);
@@ -229,7 +233,8 @@ public:
     {
         NoString sArgs = No::tokens(sCmdLine, 1);
 
-        if (sArgs.empty()) sArgs = CRYPT_LAME_PASS;
+        if (sArgs.empty())
+            sArgs = CRYPT_LAME_PASS;
 
         putModule("Password set to [" + sArgs + "]");
         m_sPassword = No::md5(sArgs);
@@ -322,7 +327,8 @@ public:
     void AddBuffer(NoChannel& chan, const NoString& sLine)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
-        if (chan.AutoClearChanBuffer() && network()->isUserAttached()) return;
+        if (chan.AutoClearChanBuffer() && network()->isUserAttached())
+            return;
         chan.AddBuffer(sLine);
     }
 
@@ -335,7 +341,8 @@ public:
         for (size_t a = 0; a < vChans.size(); a++) {
             AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " QUIT " + sMessage));
         }
-        if (cNick.NickEquals(user()->nick())) SaveBuffersToDisk(); // need to force a save here to see this!
+        if (cNick.NickEquals(user()->nick()))
+            SaveBuffersToDisk(); // need to force a save here to see this!
     }
 
     void onNick(const NoNick& cNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
@@ -352,14 +359,16 @@ public:
     {
         if (cNick.NickEquals(user()->nick()) && cChannel.GetBuffer().empty()) {
             BootStrap((NoChannel*)&cChannel);
-            if (!cChannel.GetBuffer().empty()) Replay(cChannel.GetName());
+            if (!cChannel.GetBuffer().empty())
+                Replay(cChannel.GetName());
         }
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cNick.GetNickMask() + " JOIN"));
     }
     void onPart(const NoNick& cNick, NoChannel& cChannel) override
     {
         AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cNick.GetNickMask() + " PART"));
-        if (cNick.NickEquals(user()->nick())) SaveBuffersToDisk(); // need to force a save here to see this!
+        if (cNick.NickEquals(user()->nick()))
+            SaveBuffersToDisk(); // need to force a save here to see this!
     }
 #endif /* LEGACY_SAVEBUFF */
 
@@ -376,7 +385,8 @@ private:
 
         NoFile File(sPath);
 
-        if (sPath.empty() || !File.Open() || !File.ReadFile(sContent)) return EmptyBuffer;
+        if (sPath.empty() || !File.Open() || !File.ReadFile(sContent))
+            return EmptyBuffer;
 
         File.Close();
 
@@ -388,10 +398,12 @@ private:
                 return ChanBuffer;
             } else if (sBuffer.trimPrefix(CHAN_VERIFICATION_TOKEN)) {
                 sName = No::firstLine(sBuffer);
-                if (sBuffer.trimLeft(sName + "\n")) return ChanBuffer;
+                if (sBuffer.trimLeft(sName + "\n"))
+                    return ChanBuffer;
             } else if (sBuffer.trimPrefix(QUERY_VERIFICATION_TOKEN)) {
                 sName = No::firstLine(sBuffer);
-                if (sBuffer.trimLeft(sName + "\n")) return QueryBuffer;
+                if (sBuffer.trimLeft(sName + "\n"))
+                    return QueryBuffer;
             }
 
             putModule("Unable to decode Encrypted file [" + sPath + "]");
@@ -407,7 +419,8 @@ void NoSaveBuffJob::run()
     static_cast<NoSaveBuff*>(module())->SaveBuffersToDisk();
 }
 
-template <> void no_moduleInfo<NoSaveBuff>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoSaveBuff>(NoModuleInfo& Info)
 {
     Info.setWikiPage("savebuff");
     Info.setHasArgs(true);

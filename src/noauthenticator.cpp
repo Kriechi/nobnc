@@ -75,7 +75,8 @@ void NoAuthenticator::refuseLogin(const NoString& reason)
     // password" for a login to be rejected (e.g. fail2ban).
     if (user) {
         user->putStatus("A client from [" + d->socket->GetRemoteIP() + "] attempted "
-                        "to login as you, but was rejected [" + reason + "].");
+                                                                       "to login as you, but was rejected [" +
+                        reason + "].");
     }
 
     GLOBALMODULECALL(onFailedLogin(d->username, d->socket->GetRemoteIP()), NOTHING);

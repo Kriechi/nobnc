@@ -32,7 +32,8 @@
 static inline void SetFdCloseOnExec(int fd)
 {
     int flags = fcntl(fd, F_GETFD, 0);
-    if (flags < 0) return; // Ignore errors
+    if (flags < 0)
+        return; // Ignore errors
     // When we execve() a new process this fd is now automatically closed.
     fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
 }
@@ -42,7 +43,10 @@ NoFile::NoFile(const NoString& sLongName) : m_buffer(""), m_fd(-1), m_hadError(f
     SetFileName(sLongName);
 }
 
-NoFile::~NoFile() { Close(); }
+NoFile::~NoFile()
+{
+    Close();
+}
 
 void NoFile::SetFileName(const NoString& sLongName)
 {
@@ -69,12 +73,30 @@ bool NoFile::IsDir(bool bUseLstat) const
     return NoFile::FType(m_longName.trimRight_n("/"), Directory, bUseLstat);
 }
 
-bool NoFile::IsReg(bool bUseLstat) const { return NoFile::FType(m_longName, Regular, bUseLstat); }
-bool NoFile::IsChr(bool bUseLstat) const { return NoFile::FType(m_longName, Character, bUseLstat); }
-bool NoFile::IsBlk(bool bUseLstat) const { return NoFile::FType(m_longName, Block, bUseLstat); }
-bool NoFile::IsFifo(bool bUseLstat) const { return NoFile::FType(m_longName, Fifo, bUseLstat); }
-bool NoFile::IsLnk(bool bUseLstat) const { return NoFile::FType(m_longName, Link, bUseLstat); }
-bool NoFile::IsSock(bool bUseLstat) const { return NoFile::FType(m_longName, Socket, bUseLstat); }
+bool NoFile::IsReg(bool bUseLstat) const
+{
+    return NoFile::FType(m_longName, Regular, bUseLstat);
+}
+bool NoFile::IsChr(bool bUseLstat) const
+{
+    return NoFile::FType(m_longName, Character, bUseLstat);
+}
+bool NoFile::IsBlk(bool bUseLstat) const
+{
+    return NoFile::FType(m_longName, Block, bUseLstat);
+}
+bool NoFile::IsFifo(bool bUseLstat) const
+{
+    return NoFile::FType(m_longName, Fifo, bUseLstat);
+}
+bool NoFile::IsLnk(bool bUseLstat) const
+{
+    return NoFile::FType(m_longName, Link, bUseLstat);
+}
+bool NoFile::IsSock(bool bUseLstat) const
+{
+    return NoFile::FType(m_longName, Socket, bUseLstat);
+}
 
 // for gettin file types, using fstat instead
 bool NoFile::FType(const NoString& sFileName, FileType eType, bool bUseLstat)
@@ -115,13 +137,34 @@ bool NoFile::FType(const NoString& sFileName, FileType eType, bool bUseLstat)
 //
 // Functions to retrieve file information
 //
-bool NoFile::Exists() const { return NoFile::Exists(m_longName); }
-off_t NoFile::GetSize() const { return NoFile::GetSize(m_longName); }
-time_t NoFile::GetATime() const { return NoFile::GetATime(m_longName); }
-time_t NoFile::GetMTime() const { return NoFile::GetMTime(m_longName); }
-time_t NoFile::GetCTime() const { return NoFile::GetCTime(m_longName); }
-uid_t NoFile::GetUID() const { return NoFile::GetUID(m_longName); }
-gid_t NoFile::GetGID() const { return NoFile::GetGID(m_longName); }
+bool NoFile::Exists() const
+{
+    return NoFile::Exists(m_longName);
+}
+off_t NoFile::GetSize() const
+{
+    return NoFile::GetSize(m_longName);
+}
+time_t NoFile::GetATime() const
+{
+    return NoFile::GetATime(m_longName);
+}
+time_t NoFile::GetMTime() const
+{
+    return NoFile::GetMTime(m_longName);
+}
+time_t NoFile::GetCTime() const
+{
+    return NoFile::GetCTime(m_longName);
+}
+uid_t NoFile::GetUID() const
+{
+    return NoFile::GetUID(m_longName);
+}
+gid_t NoFile::GetGID() const
+{
+    return NoFile::GetGID(m_longName);
+}
 bool NoFile::Exists(const NoString& sFile)
 {
     struct stat st;
@@ -167,33 +210,42 @@ gid_t NoFile::GetGID(const NoString& sFile)
     struct stat st;
     return (stat(sFile.c_str(), &st) != 0) ? -1 : (int)st.st_gid;
 }
-int NoFile::GetInfo(const NoString& sFile, struct stat& st) { return stat(sFile.c_str(), &st); }
+int NoFile::GetInfo(const NoString& sFile, struct stat& st)
+{
+    return stat(sFile.c_str(), &st);
+}
 
 //
 // Functions to manipulate the file on the filesystem
 //
 bool NoFile::Delete()
 {
-    if (NoFile::Delete(m_longName)) return true;
+    if (NoFile::Delete(m_longName))
+        return true;
     m_hadError = true;
     return false;
 }
 
 bool NoFile::Move(const NoString& sNewFileName, bool bOverwrite)
 {
-    if (NoFile::Move(m_longName, sNewFileName, bOverwrite)) return true;
+    if (NoFile::Move(m_longName, sNewFileName, bOverwrite))
+        return true;
     m_hadError = true;
     return false;
 }
 
 bool NoFile::Copy(const NoString& sNewFileName, bool bOverwrite)
 {
-    if (NoFile::Copy(m_longName, sNewFileName, bOverwrite)) return true;
+    if (NoFile::Copy(m_longName, sNewFileName, bOverwrite))
+        return true;
     m_hadError = true;
     return false;
 }
 
-bool NoFile::Delete(const NoString& sFileName) { return (unlink(sFileName.c_str()) == 0) ? true : false; }
+bool NoFile::Delete(const NoString& sFileName)
+{
+    return (unlink(sFileName.c_str()) == 0) ? true : false;
+}
 
 bool NoFile::Move(const NoString& sOldFileName, const NoString& sNewFileName, bool bOverwrite)
 {
@@ -270,7 +322,10 @@ bool NoFile::Chmod(mode_t mode)
     return true;
 }
 
-bool NoFile::Chmod(const NoString& sFile, mode_t mode) { return (chmod(sFile.c_str(), mode) == 0); }
+bool NoFile::Chmod(const NoString& sFile, mode_t mode)
+{
+    return (chmod(sFile.c_str(), mode) == 0);
+}
 
 bool NoFile::Seek(off_t uPos)
 {
@@ -306,7 +361,8 @@ bool NoFile::Sync()
     /* This sets errno in case m_iFD == -1 */
     errno = EBADF;
 
-    if (m_fd != -1 && fsync(m_fd) == 0) return true;
+    if (m_fd != -1 && fsync(m_fd) == 0)
+        return true;
     m_hadError = true;
     return false;
 }
@@ -352,7 +408,8 @@ ssize_t NoFile::Read(char* pszBuffer, int iBytes)
     }
 
     ssize_t res = read(m_fd, pszBuffer, iBytes);
-    if (res != iBytes) m_hadError = true;
+    if (res != iBytes)
+        m_hadError = true;
     return res;
 }
 
@@ -429,11 +486,15 @@ ssize_t NoFile::Write(const char* pszBuffer, size_t iBytes)
     }
 
     ssize_t res = write(m_fd, pszBuffer, iBytes);
-    if (-1 == res) m_hadError = true;
+    if (-1 == res)
+        m_hadError = true;
     return res;
 }
 
-ssize_t NoFile::Write(const NoString& sData) { return Write(sData.data(), sData.size()); }
+ssize_t NoFile::Write(const NoString& sData)
+{
+    return Write(sData.data(), sData.size());
+}
 void NoFile::Close()
 {
     if (m_fd >= 0) {
@@ -445,7 +506,10 @@ void NoFile::Close()
     m_fd = -1;
     ClearBuffer();
 }
-void NoFile::ClearBuffer() { m_buffer.clear(); }
+void NoFile::ClearBuffer()
+{
+    m_buffer.clear();
+}
 
 bool NoFile::TryExLock(const NoString& sLockFile, int iFlags)
 {
@@ -453,11 +517,20 @@ bool NoFile::TryExLock(const NoString& sLockFile, int iFlags)
     return TryExLock();
 }
 
-bool NoFile::TryExLock() { return Lock(F_WRLCK, false); }
+bool NoFile::TryExLock()
+{
+    return Lock(F_WRLCK, false);
+}
 
-bool NoFile::ExLock() { return Lock(F_WRLCK, true); }
+bool NoFile::ExLock()
+{
+    return Lock(F_WRLCK, true);
+}
 
-bool NoFile::UnLock() { return Lock(F_UNLCK, true); }
+bool NoFile::UnLock()
+{
+    return Lock(F_UNLCK, true);
+}
 
 bool NoFile::Lock(short iType, bool bBlocking)
 {
@@ -474,9 +547,18 @@ bool NoFile::Lock(short iType, bool bBlocking)
     return (fcntl(m_fd, (bBlocking ? F_SETLKW : F_SETLK), &fl) != -1);
 }
 
-bool NoFile::IsOpen() const { return (m_fd != -1); }
-NoString NoFile::GetLongName() const { return m_longName; }
-NoString NoFile::GetShortName() const { return m_shortName; }
+bool NoFile::IsOpen() const
+{
+    return (m_fd != -1);
+}
+NoString NoFile::GetLongName() const
+{
+    return m_longName;
+}
+NoString NoFile::GetShortName() const
+{
+    return m_shortName;
+}
 NoString NoFile::GetDir() const
 {
     NoString sDir(m_longName);
@@ -488,6 +570,12 @@ NoString NoFile::GetDir() const
     return sDir;
 }
 
-bool NoFile::HadError() const { return m_hadError; }
+bool NoFile::HadError() const
+{
+    return m_hadError;
+}
 
-void NoFile::ResetError() { m_hadError = false; }
+void NoFile::ResetError()
+{
+    m_hadError = false;
+}

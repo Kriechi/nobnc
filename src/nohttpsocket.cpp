@@ -30,13 +30,34 @@
 
 #define MAX_POST_SIZE 1024 * 1024
 
-NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSocket(pMod, sURIPrefix, "", 0) { Init(); }
+NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSocket(pMod, sURIPrefix, "", 0)
+{
+    Init();
+}
 
 NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort)
-    : NoModuleSocket(pMod, sHostname, uPort), m_sentHeader(false), m_gotHeader(false), m_loggedIn(false), m_post(false),
-      m_done(false), m_postLen(0), m_postData(""), m_uri(""), m_username(""), m_password(""), m_contentType(""),
-      m_forwardedIp(""), m_postParams(), m_getParams(), m_headers(), m_http10Client(false),
-      m_ifNoneMatch(""), m_acceptGzip(false), m_requestCookies(), m_responseCookies(), m_uriPrefix(sURIPrefix)
+    : NoModuleSocket(pMod, sHostname, uPort),
+      m_sentHeader(false),
+      m_gotHeader(false),
+      m_loggedIn(false),
+      m_post(false),
+      m_done(false),
+      m_postLen(0),
+      m_postData(""),
+      m_uri(""),
+      m_username(""),
+      m_password(""),
+      m_contentType(""),
+      m_forwardedIp(""),
+      m_postParams(),
+      m_getParams(),
+      m_headers(),
+      m_http10Client(false),
+      m_ifNoneMatch(""),
+      m_acceptGzip(false),
+      m_requestCookies(),
+      m_responseCookies(),
+      m_uriPrefix(sURIPrefix)
 {
     Init();
 }
@@ -47,7 +68,9 @@ void NoHttpSocket::Init()
     SetMaxBufferThreshold(10240);
 }
 
-NoHttpSocket::~NoHttpSocket() {}
+NoHttpSocket::~NoHttpSocket()
+{
+}
 
 void NoHttpSocket::ReadDataImpl(const char* data, size_t len)
 {
@@ -193,7 +216,8 @@ NoString NoHttpSocket::GetDate(time_t stamp)
     const char* wkday[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
     const char* month[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-    if (stamp == 0) time(&stamp);
+    if (stamp == 0)
+        time(&stamp);
     gmtime_r(&stamp, &tm);
 
     stream << wkday[tm.tm_wday] << ", ";
@@ -448,9 +472,15 @@ void NoHttpSocket::ParseURI()
     m_uri = No::token(m_uri, 0, "?");
 }
 
-NoString NoHttpSocket::GetPath() const { return No::token(m_uri, 0, "?"); }
+NoString NoHttpSocket::GetPath() const
+{
+    return No::token(m_uri, 0, "?");
+}
 
-bool NoHttpSocket::IsLoggedIn() const { return m_loggedIn; }
+bool NoHttpSocket::IsLoggedIn() const
+{
+    return m_loggedIn;
+}
 
 void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams)
 {
@@ -466,27 +496,47 @@ void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStr
     }
 }
 
-void NoHttpSocket::SetLoggedIn(bool b) { m_loggedIn = b; }
+void NoHttpSocket::SetLoggedIn(bool b)
+{
+    m_loggedIn = b;
+}
 
-NoString NoHttpSocket::user() const { return m_username; }
+NoString NoHttpSocket::user() const
+{
+    return m_username;
+}
 
-NoString NoHttpSocket::GetPass() const { return m_password; }
+NoString NoHttpSocket::GetPass() const
+{
+    return m_password;
+}
 
-NoString NoHttpSocket::GetContentType() const { return m_contentType; }
+NoString NoHttpSocket::GetContentType() const
+{
+    return m_contentType;
+}
 
-NoString NoHttpSocket::GetParamString() const { return m_postData; }
+NoString NoHttpSocket::GetParamString() const
+{
+    return m_postData;
+}
 
-NoString NoHttpSocket::GetURIPrefix() const { return m_uriPrefix; }
+NoString NoHttpSocket::GetURIPrefix() const
+{
+    return m_uriPrefix;
+}
 
 bool NoHttpSocket::HasParam(const NoString& sName, bool bPost) const
 {
-    if (bPost) return (m_postParams.find(sName) != m_postParams.end());
+    if (bPost)
+        return (m_postParams.find(sName) != m_postParams.end());
     return (m_getParams.find(sName) != m_getParams.end());
 }
 
 NoString NoHttpSocket::GetRawParam(const NoString& sName, bool bPost) const
 {
-    if (bPost) return GetRawParam(sName, m_postParams);
+    if (bPost)
+        return GetRawParam(sName, m_postParams);
     return GetRawParam(sName, m_getParams);
 }
 
@@ -505,7 +555,8 @@ NoString NoHttpSocket::GetRawParam(const NoString& sName, const std::map<NoStrin
 
 NoString NoHttpSocket::GetParam(const NoString& sName, bool bPost, const NoString& sFilter) const
 {
-    if (bPost) return GetParam(sName, m_postParams, sFilter);
+    if (bPost)
+        return GetParam(sName, m_postParams, sFilter);
     return GetParam(sName, m_getParams, sFilter);
 }
 
@@ -523,11 +574,15 @@ NoString NoHttpSocket::GetParam(const NoString& sName, const std::map<NoString, 
 
 size_t NoHttpSocket::GetParamValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost, const NoString& sFilter) const
 {
-    if (bPost) return GetParamValues(sName, ssRet, m_postParams, sFilter);
+    if (bPost)
+        return GetParamValues(sName, ssRet, m_postParams, sFilter);
     return GetParamValues(sName, ssRet, m_getParams, sFilter);
 }
 
-size_t NoHttpSocket::GetParamValues(const NoString& sName, std::set<NoString>& ssRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+size_t NoHttpSocket::GetParamValues(const NoString& sName,
+                                    std::set<NoString>& ssRet,
+                                    const std::map<NoString, NoStringVector>& msvsParams,
+                                    const NoString& sFilter)
 {
     ssRet.clear();
 
@@ -549,11 +604,15 @@ size_t NoHttpSocket::GetParamValues(const NoString& sName, std::set<NoString>& s
 
 size_t NoHttpSocket::GetParamValues(const NoString& sName, NoStringVector& vsRet, bool bPost, const NoString& sFilter) const
 {
-    if (bPost) return GetParamValues(sName, vsRet, m_postParams, sFilter);
+    if (bPost)
+        return GetParamValues(sName, vsRet, m_postParams, sFilter);
     return GetParamValues(sName, vsRet, m_getParams, sFilter);
 }
 
-size_t NoHttpSocket::GetParamValues(const NoString& sName, NoStringVector& vsRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+size_t NoHttpSocket::GetParamValues(const NoString& sName,
+                                    NoStringVector& vsRet,
+                                    const std::map<NoString, NoStringVector>& msvsParams,
+                                    const NoString& sFilter)
 {
     vsRet.clear();
 
@@ -575,11 +634,15 @@ size_t NoHttpSocket::GetParamValues(const NoString& sName, NoStringVector& vsRet
 
 const std::map<NoString, NoStringVector>& NoHttpSocket::GetParams(bool bPost) const
 {
-    if (bPost) return m_postParams;
+    if (bPost)
+        return m_postParams;
     return m_getParams;
 }
 
-bool NoHttpSocket::IsPost() const { return m_post; }
+bool NoHttpSocket::IsPost() const
+{
+    return m_post;
+}
 
 bool NoHttpSocket::PrintNotFound()
 {
@@ -594,24 +657,24 @@ bool NoHttpSocket::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, co
     }
 
     NoString sPage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
-                    "<!DOCTYPE html>\r\n"
-                    "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\r\n"
-                    "<head>\r\n"
-                    "<meta charset=\"UTF-8\"/>\r\n"
-                    "<title>" +
-                    NoString(uStatusId) + " " + No::escape(sStatusMsg, No::HtmlFormat) + "</title>\r\n"
-                                                                                     "</head>\r\n"
-                                                                                     "<body>\r\n"
-                                                                                     "<h1>" +
-                    No::escape(sStatusMsg, No::HtmlFormat) + "</h1>\r\n"
-                                                          "<p>" +
-                    No::escape(sMessage, No::HtmlFormat) + "</p>\r\n"
-                                                        "<hr/>\r\n"
-                                                        "<address>" +
-                    NoApp::GetTag(false, /* bHTML = */ true) + " at " + No::escape(GetLocalIP(), No::HtmlFormat) +
-                    " Port " + NoString(GetLocalPort()) + "</address>\r\n"
-                                                         "</body>\r\n"
-                                                         "</html>\r\n";
+                     "<!DOCTYPE html>\r\n"
+                     "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\r\n"
+                     "<head>\r\n"
+                     "<meta charset=\"UTF-8\"/>\r\n"
+                     "<title>" +
+                     NoString(uStatusId) + " " + No::escape(sStatusMsg, No::HtmlFormat) + "</title>\r\n"
+                                                                                          "</head>\r\n"
+                                                                                          "<body>\r\n"
+                                                                                          "<h1>" +
+                     No::escape(sStatusMsg, No::HtmlFormat) + "</h1>\r\n"
+                                                              "<p>" +
+                     No::escape(sMessage, No::HtmlFormat) + "</p>\r\n"
+                                                            "<hr/>\r\n"
+                                                            "<address>" +
+                     NoApp::GetTag(false, /* bHTML = */ true) + " at " + No::escape(GetLocalIP(), No::HtmlFormat) +
+                     " Port " + NoString(GetLocalPort()) + "</address>\r\n"
+                                                           "</body>\r\n"
+                                                           "</html>\r\n";
 
     PrintHeader(sPage.length(), "text/html; charset=utf-8", uStatusId, sStatusMsg);
     Write(sPage);
@@ -637,9 +700,15 @@ bool NoHttpSocket::ForceLogin()
     return false;
 }
 
-bool NoHttpSocket::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic) { return false; }
+bool NoHttpSocket::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic)
+{
+    return false;
+}
 
-bool NoHttpSocket::SentHeader() const { return m_sentHeader; }
+bool NoHttpSocket::SentHeader() const
+{
+    return m_sentHeader;
+}
 
 bool NoHttpSocket::PrintHeader(off_t uContentLength, const NoString& sContentType, uint uStatusId, const NoString& sStatusMsg)
 {
@@ -683,9 +752,15 @@ bool NoHttpSocket::PrintHeader(off_t uContentLength, const NoString& sContentTyp
     return true;
 }
 
-void NoHttpSocket::SetContentType(const NoString& sContentType) { m_contentType = sContentType; }
+void NoHttpSocket::SetContentType(const NoString& sContentType)
+{
+    m_contentType = sContentType;
+}
 
-void NoHttpSocket::AddHeader(const NoString& sName, const NoString& sValue) { m_headers[sName] = sValue; }
+void NoHttpSocket::AddHeader(const NoString& sName, const NoString& sValue)
+{
+    m_headers[sName] = sValue;
+}
 
 bool NoHttpSocket::Redirect(const NoString& sURL)
 {
@@ -709,4 +784,7 @@ bool NoHttpSocket::Redirect(const NoString& sURL)
     }
 }
 
-void NoHttpSocket::ConnectedImpl() { SetTimeout(120); }
+void NoHttpSocket::ConnectedImpl()
+{
+    SetTimeout(120);
+}

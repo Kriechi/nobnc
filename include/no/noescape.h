@@ -25,19 +25,19 @@
 
 namespace No
 {
-    enum EscapeFormat {
-        AsciiFormat,
-        UrlFormat,
-        HtmlFormat,
-        SqlFormat,
-        NamedFormat,
-        DebugFormat,
-        MsgTagFormat,
-        HexColonFormat
-    };
+enum EscapeFormat {
+    AsciiFormat,
+    UrlFormat,
+    HtmlFormat,
+    SqlFormat,
+    NamedFormat,
+    DebugFormat,
+    MsgTagFormat,
+    HexColonFormat
+};
 
-    NO_EXPORT NoString escape(const NoString& str, No::EscapeFormat to);
-    NO_EXPORT NoString escape(const NoString& str, No::EscapeFormat from, No::EscapeFormat to);
+NO_EXPORT NoString escape(const NoString& str, No::EscapeFormat to);
+NO_EXPORT NoString escape(const NoString& str, No::EscapeFormat from, No::EscapeFormat to);
 }
 
 #endif // NOESCAPE_H

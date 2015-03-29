@@ -23,8 +23,14 @@
 class NetworkTest : public ::testing::Test
 {
 protected:
-    void SetUp() { NoApp::CreateInstance(); }
-    void TearDown() { NoApp::DestroyInstance(); }
+    void SetUp()
+    {
+        NoApp::CreateInstance();
+    }
+    void TearDown()
+    {
+        NoApp::DestroyInstance();
+    }
 };
 
 TEST_F(NetworkTest, FindChan)

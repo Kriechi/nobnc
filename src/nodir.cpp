@@ -60,8 +60,9 @@ void NoDirPrivate::init()
         if (strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0)
             continue;
 
-        NoFile* file = new NoFile(path.trimSuffix_n("/") + "/" +
-                                  de->d_name /*, this*/); // @todo need to pass pointer to 'this' if we want to do Sort()
+        NoFile* file =
+        new NoFile(path.trimSuffix_n("/") + "/" +
+                   de->d_name /*, this*/); // @todo need to pass pointer to 'this' if we want to do Sort()
         files.push_back(file);
     }
 

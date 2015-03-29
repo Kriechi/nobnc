@@ -22,8 +22,14 @@
 class ClientTest : public ::testing::Test
 {
 protected:
-    void SetUp() { NoApp::CreateInstance(); }
-    void TearDown() { NoApp::DestroyInstance(); }
+    void SetUp()
+    {
+        NoApp::CreateInstance();
+    }
+    void TearDown()
+    {
+        NoApp::DestroyInstance();
+    }
     void testPass(const NoString& sInput, const NoString& sUser, const NoString& sIdentifier, const NoString& sNetwork, const NoString& sPass) const
     {
         NoClient client;

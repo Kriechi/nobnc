@@ -26,7 +26,10 @@ class NoNotesMod : public NoModule
 {
     bool bShowNotesOnLogin;
 
-    void ListCommand(const NoString& sLine) { ListNotes(); }
+    void ListCommand(const NoString& sLine)
+    {
+        ListNotes();
+    }
 
     void AddNoteCommand(const NoString& sLine)
     {
@@ -96,7 +99,10 @@ public:
         return true;
     }
 
-    NoString webMenuTitle() override { return "Notes"; }
+    NoString webMenuTitle() override
+    {
+        return "Notes";
+    }
 
     void onClientLogin() override
     {
@@ -231,7 +237,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoNotesMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoNotesMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("notes");
     Info.setHasArgs(true);

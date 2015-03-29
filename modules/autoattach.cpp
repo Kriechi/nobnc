@@ -31,31 +31,50 @@ public:
         m_sHostmaskWildcard = sHostmasks;
         m_bNegated = bNegated;
 
-        if (m_sChannelWildcard.empty()) m_sChannelWildcard = "*";
-        if (m_sSearchWildcard.empty()) m_sSearchWildcard = "*";
-        if (m_sHostmaskWildcard.empty()) m_sHostmaskWildcard = "*!*@*";
+        if (m_sChannelWildcard.empty())
+            m_sChannelWildcard = "*";
+        if (m_sSearchWildcard.empty())
+            m_sSearchWildcard = "*";
+        if (m_sHostmaskWildcard.empty())
+            m_sHostmaskWildcard = "*!*@*";
     }
 
     bool IsMatch(const NoString& sChan, const NoString& sHost, const NoString& sMessage) const
     {
-        if (!No::wildCmp(sHost, m_sHostmaskWildcard, No::CaseInsensitive)) return false;
-        if (!No::wildCmp(sChan, m_sChannelWildcard, No::CaseInsensitive)) return false;
-        if (!No::wildCmp(sMessage, m_pModule->expandString(m_sSearchWildcard), No::CaseInsensitive)) return false;
+        if (!No::wildCmp(sHost, m_sHostmaskWildcard, No::CaseInsensitive))
+            return false;
+        if (!No::wildCmp(sChan, m_sChannelWildcard, No::CaseInsensitive))
+            return false;
+        if (!No::wildCmp(sMessage, m_pModule->expandString(m_sSearchWildcard), No::CaseInsensitive))
+            return false;
         return true;
     }
 
-    bool IsNegated() const { return m_bNegated; }
+    bool IsNegated() const
+    {
+        return m_bNegated;
+    }
 
-    const NoString& GetHostMask() const { return m_sHostmaskWildcard; }
+    const NoString& GetHostMask() const
+    {
+        return m_sHostmaskWildcard;
+    }
 
-    const NoString& GetSearch() const { return m_sSearchWildcard; }
+    const NoString& GetSearch() const
+    {
+        return m_sSearchWildcard;
+    }
 
-    const NoString& channels() const { return m_sChannelWildcard; }
+    const NoString& channels() const
+    {
+        return m_sChannelWildcard;
+    }
 
     NoString ToString()
     {
         NoString sRes;
-        if (m_bNegated) sRes += "!";
+        if (m_bNegated)
+            sRes += "!";
         sRes += m_sChannelWildcard;
         sRes += " ";
         sRes += m_sSearchWildcard;
@@ -149,8 +168,14 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleAdd),
                    "[!]<#chan> <search> <host>",
                    "Add an entry, use !#chan to negate and * for wildcards");
-        addCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleDel), "[!]<#chan> <search> <host>", "Remove an entry, needs to be an exact match");
-        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleList), "", "List all entries");
+        addCommand("Del",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleDel),
+                   "[!]<#chan> <search> <host>",
+                   "Remove an entry, needs to be an exact match");
+        addCommand("List",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleList),
+                   "",
+                   "List all entries");
     }
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
@@ -191,11 +216,13 @@ public:
         const NoString& sMessage = Message;
         VAttachIter it;
 
-        if (!Channel.isDetached()) return;
+        if (!Channel.isDetached())
+            return;
 
         // Any negated match?
         for (it = m_vMatches.begin(); it != m_vMatches.end(); ++it) {
-            if (it->IsNegated() && it->IsMatch(sChan, sHost, sMessage)) return;
+            if (it->IsNegated() && it->IsMatch(sChan, sHost, sMessage))
+                return;
         }
 
         // Now check for a positive match
@@ -229,9 +256,12 @@ public:
     {
         VAttachIter it = m_vMatches.begin();
         for (; it != m_vMatches.end(); ++it) {
-            if (sHost.empty() || it->GetHostMask() != sHost) continue;
-            if (sSearch.empty() || it->GetSearch() != sSearch) continue;
-            if (sChan.empty() || it->channels() != sChan) continue;
+            if (sHost.empty() || it->GetHostMask() != sHost)
+                continue;
+            if (sSearch.empty() || it->GetSearch() != sSearch)
+                continue;
+            if (sChan.empty() || it->channels() != sChan)
+                continue;
             return it;
         }
         return m_vMatches.end();
@@ -261,7 +291,8 @@ public:
     bool Del(bool bNegated, const NoString& sChan, const NoString& sSearch, const NoString& sHost)
     {
         VAttachIter it = FindEntry(sChan, sSearch, sHost);
-        if (it == m_vMatches.end() || it->IsNegated() != bNegated) return false;
+        if (it == m_vMatches.end() || it->IsNegated() != bNegated)
+            return false;
 
         NoRegistry registry(this);
         registry.remove(it->ToString());
@@ -274,7 +305,8 @@ private:
     VAttachMatch m_vMatches;
 };
 
-template <> void no_moduleInfo<NoChannelAttach>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoChannelAttach>(NoModuleInfo& Info)
 {
     Info.addType(No::UserModule);
     Info.setWikiPage("autoattach");

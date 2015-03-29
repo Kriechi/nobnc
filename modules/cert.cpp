@@ -58,9 +58,15 @@ public:
         addCommand("info", static_cast<NoModuleCommand::ModCmdFunc>(&NoCertMod::Info));
     }
 
-    NoString PemFile() const { return savePath() + "/user.pem"; }
+    NoString PemFile() const
+    {
+        return savePath() + "/user.pem";
+    }
 
-    bool HasPemFile() const { return (NoFile::Exists(PemFile())); }
+    bool HasPemFile() const
+    {
+        return (NoFile::Exists(PemFile()));
+    }
 
     ModRet onIrcConnecting(NoIrcSocket* pIRCSock) override
     {
@@ -71,7 +77,10 @@ public:
         return CONTINUE;
     }
 
-    NoString webMenuTitle() override { return "Certificate"; }
+    NoString webMenuTitle() override
+    {
+        return "Certificate";
+    }
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
@@ -98,7 +107,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoCertMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoCertMod>(NoModuleInfo& Info)
 {
     Info.addType(No::UserModule);
     Info.setWikiPage("cert");

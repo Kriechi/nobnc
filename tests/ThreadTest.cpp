@@ -42,7 +42,8 @@ public:
     {
         NoMutexLocker locker(m_Mutex);
         // Wait for the thread to run
-        while (!m_bThreadReady) m_CV.wait(m_Mutex);
+        while (!m_bThreadReady)
+            m_CV.wait(m_Mutex);
 
         // and signal it to exit
         m_bThreadDone = true;
@@ -57,10 +58,13 @@ public:
         m_CV.broadcast();
 
         // wait for our exit signal
-        while (!m_bThreadDone) m_CV.wait(m_Mutex);
+        while (!m_bThreadDone)
+            m_CV.wait(m_Mutex);
     }
 
-    virtual void finished() {}
+    virtual void finished()
+    {
+    }
 
 private:
     bool& m_bDestroyed;
@@ -78,13 +82,16 @@ TEST(Thread, RunJob)
     NoThread::run(pJob);
     pJob->signal();
 
-    while (!destroyed) NoThreadPrivate::get()->handlePipeReadable();
+    while (!destroyed)
+        NoThreadPrivate::get()->handlePipeReadable();
 }
 
 class CCancelJob : public NoJob
 {
 public:
-    CCancelJob(bool& destroyed) : m_bDestroyed(destroyed), m_Mutex(), m_CVThreadReady(), m_bThreadReady(false) {}
+    CCancelJob(bool& destroyed) : m_bDestroyed(destroyed), m_Mutex(), m_CVThreadReady(), m_bThreadReady(false)
+    {
+    }
 
     ~CCancelJob()
     {
@@ -96,7 +103,8 @@ public:
     {
         NoMutexLocker locker(m_Mutex);
         // Wait for the thread to run
-        while (!m_bThreadReady) m_CVThreadReady.wait(m_Mutex);
+        while (!m_bThreadReady)
+            m_CVThreadReady.wait(m_Mutex);
     }
 
     virtual void run()
@@ -120,7 +128,9 @@ public:
         }
     }
 
-    virtual void finished() {}
+    virtual void finished()
+    {
+    }
 
 private:
     bool& m_bDestroyed;
@@ -160,7 +170,9 @@ TEST(Thread, CancelJobWhileRunning)
 class CEmptyJob : public NoJob
 {
 public:
-    CEmptyJob(bool& destroyed) : m_bDestroyed(destroyed) {}
+    CEmptyJob(bool& destroyed) : m_bDestroyed(destroyed)
+    {
+    }
 
     ~CEmptyJob()
     {
@@ -168,8 +180,12 @@ public:
         m_bDestroyed = true;
     }
 
-    virtual void run() {}
-    virtual void finished() {}
+    virtual void run()
+    {
+    }
+    virtual void finished()
+    {
+    }
 
 private:
     bool& m_bDestroyed;

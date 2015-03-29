@@ -24,12 +24,15 @@
 class NoFakeOnlineModule : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoFakeOnlineModule) {}
+    MODCONSTRUCTOR(NoFakeOnlineModule)
+    {
+    }
 
     bool IsOnlineModNick(const NoString& sNick)
     {
         const NoString& sPrefix = user()->statusPrefix();
-        if (!sNick.startsWith(sPrefix)) return false;
+        if (!sNick.startsWith(sPrefix))
+            return false;
 
         NoString sModNick = sNick.substr(sPrefix.length());
         if (sModNick.equals("status") || network()->loader()->findModule(sModNick) ||
@@ -109,6 +112,10 @@ private:
     NoStringVector m_ISONRequests;
 };
 
-template <> void no_moduleInfo<NoFakeOnlineModule>(NoModuleInfo& Info) { Info.setWikiPage("modules_online"); }
+template <>
+void no_moduleInfo<NoFakeOnlineModule>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("modules_online");
+}
 
 NETWORKMODULEDEFS(NoFakeOnlineModule, "Make ZNC's *modules to be \"online\".")

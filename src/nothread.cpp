@@ -69,8 +69,7 @@ NoThreadPrivate* NoThreadPrivate::get()
     return &thread;
 }
 
-NoThreadPrivate::NoThreadPrivate()
-    : done(false), numThreads(0), numIdle(0), jobPipe{ 0, 0 }
+NoThreadPrivate::NoThreadPrivate() : done(false), numThreads(0), numIdle(0), jobPipe{ 0, 0 }
 {
     if (pipe(jobPipe)) {
         NO_DEBUG("Ouch, can't open pipe for thread pool: " << strerror(errno));
@@ -101,7 +100,10 @@ void NoThreadPrivate::jobDone(NoJob* job)
     }
 }
 
-void NoThreadPrivate::handlePipeReadable() const { finishJob(getJobFromPipe()); }
+void NoThreadPrivate::handlePipeReadable() const
+{
+    finishJob(getJobFromPipe());
+}
 
 NoJob* NoThreadPrivate::getJobFromPipe() const
 {
@@ -134,7 +136,8 @@ NoThreadPrivate::~NoThreadPrivate()
 
 bool NoThreadPrivate::threadNeeded() const
 {
-    if (numIdle > MAX_IDLE_THREADS) return false;
+    if (numIdle > MAX_IDLE_THREADS)
+        return false;
     return !done;
 }
 
@@ -146,10 +149,12 @@ void NoThreadPrivate::threadFunc()
 
     while (true) {
         while (jobs.empty()) {
-            if (!threadNeeded()) break;
+            if (!threadNeeded())
+                break;
             cond.wait(mutex);
         }
-        if (!threadNeeded()) break;
+        if (!threadNeeded())
+            break;
 
         // Figure out a job to do
         NoJob* job = jobs.front();
@@ -170,7 +175,8 @@ void NoThreadPrivate::threadFunc()
     numThreads--;
     numIdle--;
 
-    if (numThreads == 0 && done) exitCond.signal();
+    if (numThreads == 0 && done)
+        exitCond.signal();
 }
 
 void NoThread::run(NoJob* job)
@@ -273,7 +279,8 @@ void NoThreadPrivate::cancelJobs(const std::set<NoJob*>& cancel)
                 it++;
         }
 
-        if (wait.empty()) break;
+        if (wait.empty())
+            break;
 
         // Then wait for more to be done
         cancellationCond.wait(mutex);
@@ -299,7 +306,10 @@ void NoThreadPrivate::cancelJobs(const std::set<NoJob*>& cancel)
     }
 }
 
-int NoThreadPrivate::getReadFD() const { return jobPipe[0]; }
+int NoThreadPrivate::getReadFD() const
+{
+    return jobPipe[0];
+}
 
 bool NoJob::wasCancelled() const
 {

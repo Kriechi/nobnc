@@ -70,7 +70,8 @@ public:
      * @param target The object to cast into. If the cast fails, its state is unspecified.
      * @return True if the cast succeeds, and false if it fails.
      */
-    template <typename T> bool convert(T* target) const
+    template <typename T>
+    bool convert(T* target) const
     {
         std::stringstream ss(*this);
         ss >> *target;
@@ -84,14 +85,17 @@ public:
      * @param i_end An iterator pointing past the end of a group of objects.
      * @return The joined string
      */
-    template <typename Iterator> NoString join(Iterator i_start, const Iterator& i_end) const
+    template <typename Iterator>
+    NoString join(Iterator i_start, const Iterator& i_end) const
     {
-        if (i_start == i_end) return NoString("");
+        if (i_start == i_end)
+            return NoString("");
         std::ostringstream output;
         output << *i_start;
         while (true) {
             ++i_start;
-            if (i_start == i_end) return NoString(output.str());
+            if (i_start == i_end)
+                return NoString(output.str());
             output << *this;
             output << *i_start;
         }

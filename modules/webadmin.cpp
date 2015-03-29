@@ -81,7 +81,8 @@ public:
 
     bool onLoad(const NoString& sArgStr, NoString& sMessage) override
     {
-        if (sArgStr.empty() || No::GlobalModule != type()) return true;
+        if (sArgStr.empty() || No::GlobalModule != type())
+            return true;
 
         // We don't accept any arguments, but for backwards
         // compatibility we have to do some magic here.
@@ -115,7 +116,8 @@ public:
         }
 
         // No arguments left: Only port sharing
-        if (sArgs.empty() && bShareIRCPorts) return true;
+        if (sArgs.empty() && bShareIRCPorts)
+            return true;
 
         if (sArgs.contains(" ")) {
             sListenHost = No::token(sArgs, 0);
@@ -282,10 +284,12 @@ public:
         }
 
         sArg = WebSock.GetParam("bufsize");
-        if (!sArg.empty()) pNewUser->setBufferCount(sArg.toUInt(), spSession->isAdmin());
+        if (!sArg.empty())
+            pNewUser->setBufferCount(sArg.toUInt(), spSession->isAdmin());
         if (!sArg.empty()) {
             // First apply the old limit in case the new one is too high
-            if (pUser) pNewUser->setBufferCount(pUser->bufferCount(), true);
+            if (pUser)
+                pNewUser->setBufferCount(pUser->bufferCount(), true);
             pNewUser->setBufferCount(sArg.toUInt(), spSession->isAdmin());
         }
 
@@ -322,7 +326,8 @@ public:
             pNewUser->setDenyLoadMod(WebSock.GetParam("denyloadmod").toBool());
             pNewUser->setDenysetBindHost(WebSock.GetParam("denysetbindhost").toBool());
             sArg = WebSock.GetParam("maxnetworks");
-            if (!sArg.empty()) pNewUser->setMaxNetworks(sArg.toUInt());
+            if (!sArg.empty())
+                pNewUser->setMaxNetworks(sArg.toUInt());
         } else if (pUser) {
             pNewUser->setDenyLoadMod(pUser->denyLoadMod());
             pNewUser->setDenysetBindHost(pUser->denysetBindHost());
@@ -426,7 +431,10 @@ public:
         return sNetwork;
     }
 
-    NoUser* SafeGetUserFromParam(NoWebSocket& WebSock) { return NoApp::Get().FindUser(SafeGetUserNameParam(WebSock)); }
+    NoUser* SafeGetUserFromParam(NoWebSocket& WebSock)
+    {
+        return NoApp::Get().FindUser(SafeGetUserNameParam(WebSock));
+    }
 
     NoNetwork* SafeGetNetworkFromParam(NoWebSocket& WebSock)
     {
@@ -440,7 +448,10 @@ public:
         return pNetwork;
     }
 
-    NoString webMenuTitle() override { return "webadmin"; }
+    NoString webMenuTitle() override
+    {
+        return "webadmin";
+    }
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
@@ -777,9 +788,8 @@ public:
             WebSock.Redirect(webPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         } else {
-            WebSock.Redirect(webPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) +
-                             "&network=" + No::escape(pNetwork->name(), No::UrlFormat) + "&name=" +
-                             No::escape(pChan->name(), No::UrlFormat));
+            WebSock.Redirect(webPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) + "&network=" +
+                             No::escape(pNetwork->name(), No::UrlFormat) + "&name=" + No::escape(pChan->name(), No::UrlFormat));
         }
         return true;
     }
@@ -860,8 +870,7 @@ public:
             if (pNetwork) {
                 Tmpl["Action"] = "editnetwork";
                 Tmpl["Edit"] = "true";
-                Tmpl["Title"] =
-                "Edit Network" + NoString(" [" + pNetwork->name() + "]") + " of User [" + pUser->userName() + "]";
+                Tmpl["Title"] = "Edit Network" + NoString(" [" + pNetwork->name() + "]") + " of User [" + pUser->userName() + "]";
                 Tmpl["Name"] = pNetwork->name();
 
                 Tmpl["Nick"] = pNetwork->nick();
@@ -1645,7 +1654,8 @@ public:
         ushort uPort = WebSock.GetParam("port").toUShort();
         NoString sHost = WebSock.GetParam("host");
         NoString sURIPrefix = WebSock.GetParam("uriprefix");
-        if (sHost == "*") sHost = "";
+        if (sHost == "*")
+            sHost = "";
         bool bSSL = WebSock.GetParam("ssl").toBool();
         bool bIPv4 = WebSock.GetParam("ipv4").toBool();
         bool bIPv6 = WebSock.GetParam("ipv6").toBool();
@@ -1959,7 +1969,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoWebAdminMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoWebAdminMod>(NoModuleInfo& Info)
 {
     Info.addType(No::UserModule);
     Info.setWikiPage("webadmin");

@@ -26,7 +26,9 @@
 class NoSampleJob : public NoModuleJob
 {
 public:
-    NoSampleJob(NoModule* pModule) : NoModuleJob(pModule, "sample", "Message the user after a delay") {}
+    NoSampleJob(NoModule* pModule) : NoModuleJob(pModule, "sample", "Message the user after a delay")
+    {
+    }
 
     ~NoSampleJob()
     {
@@ -45,12 +47,16 @@ public:
 
         for (int i = 0; i < 10; i++) {
             // Regularly check if we were cancelled
-            if (wasCancelled()) return;
+            if (wasCancelled())
+                return;
             sleep(1);
         }
     }
 
-    void finished() override { module()->putModule("Sample job done"); }
+    void finished() override
+    {
+        module()->putModule("Sample job done");
+    }
 };
 #endif
 
@@ -67,13 +73,18 @@ public:
     }
 
 protected:
-    void run() override { module()->putModule("TEST!!!!"); }
+    void run() override
+    {
+        module()->putModule("TEST!!!!");
+    }
 };
 
 class NoSampleMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoSampleMod) {}
+    MODCONSTRUCTOR(NoSampleMod)
+    {
+    }
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
@@ -87,7 +98,10 @@ public:
         return true;
     }
 
-    virtual ~NoSampleMod() { putModule("I'm being unloaded!"); }
+    virtual ~NoSampleMod()
+    {
+        putModule("I'm being unloaded!");
+    }
 
     bool onBoot() override
     {
@@ -95,9 +109,15 @@ public:
         return true;
     }
 
-    void onIrcConnected() override { putModule("You got connected BoyOh."); }
+    void onIrcConnected() override
+    {
+        putModule("You got connected BoyOh.");
+    }
 
-    void onIrcDisconnected() override { putModule("You got disconnected BoyOh."); }
+    void onIrcDisconnected() override
+    {
+        putModule("You got disconnected BoyOh.");
+    }
 
     ModRet onIrcRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName) override
     {
@@ -120,26 +140,22 @@ public:
 
     void onOp(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] opped [" + Nick.nick() + "] on [" +
-                  Channel.name() + "]");
+        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] opped [" + Nick.nick() + "] on [" + Channel.name() + "]");
     }
 
     void onDeop(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] deopped [" + Nick.nick() + "] on [" +
-                  Channel.name() + "]");
+        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] deopped [" + Nick.nick() + "] on [" + Channel.name() + "]");
     }
 
     void onVoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] voiced [" + Nick.nick() + "] on [" +
-                  Channel.name() + "]");
+        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] voiced [" + Nick.nick() + "] on [" + Channel.name() + "]");
     }
 
     void onDevoice(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] devoiced [" + Nick.nick() + "] on [" +
-                  Channel.name() + "]");
+        putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] devoiced [" + Nick.nick() + "] on [" + Channel.name() + "]");
     }
 
     void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
@@ -161,8 +177,7 @@ public:
 
     void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
     {
-        putModule("[" + OpNick.nick() + "] kicked [" + sKickedNick + "] from [" + Channel.name() +
-                  "] with the msg [" + sMessage + "]");
+        putModule("[" + OpNick.nick() + "] kicked [" + sKickedNick + "] from [" + Channel.name() + "] with the msg [" + sMessage + "]");
     }
 
     void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
@@ -325,7 +340,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoSampleMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoSampleMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("sample");
     Info.setHasArgs(true);

@@ -25,7 +25,9 @@
 class NoChannelSaverMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoChannelSaverMod) {}
+    MODCONSTRUCTOR(NoChannelSaverMod)
+    {
+    }
 
     bool onLoad(const NoString& sArgsi, NoString& sMessage) override
     {
@@ -86,7 +88,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoChannelSaverMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoChannelSaverMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("chansaver");
     Info.addType(No::NetworkModule);

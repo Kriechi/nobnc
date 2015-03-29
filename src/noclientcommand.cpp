@@ -45,7 +45,8 @@ void NoClient::userCommand(NoString& sLine)
 
     bool bReturn = false;
     NETWORKMODULECALL(onStatusCommand(sLine), d->user, d->network, this, &bReturn);
-    if (bReturn) return;
+    if (bReturn)
+        return;
 
     const NoString sCommand = No::token(sLine, 0);
 
@@ -138,7 +139,8 @@ void NoClient::userCommand(NoString& sLine)
 
         uint uDetached = 0;
         for (NoChannel* pChan : sChans) {
-            if (pChan->isDetached()) continue;
+            if (pChan->isDetached())
+                continue;
             uDetached++;
             pChan->detachUser();
         }
@@ -387,7 +389,8 @@ void NoClient::userCommand(NoString& sLine)
 
             uint uEnabled = 0;
             for (NoChannel* pChan : sChans) {
-                if (!pChan->isDisabled()) continue;
+                if (!pChan->isDisabled())
+                    continue;
                 uEnabled++;
                 pChan->enable();
             }
@@ -417,7 +420,8 @@ void NoClient::userCommand(NoString& sLine)
 
             uint uDisabled = 0;
             for (NoChannel* pChan : sChans) {
-                if (pChan->isDisabled()) continue;
+                if (pChan->isDisabled())
+                    continue;
                 uDisabled++;
                 pChan->disable();
             }
@@ -457,14 +461,14 @@ void NoClient::userCommand(NoString& sLine)
         Table.addRow();
         Table.setValue(sChan, "Buffer");
         Table.setValue(sStatus,
-                      NoString(pChan->buffer().size()) + "/" + NoString(pChan->bufferCount()) +
-                      NoString(pChan->hasBufferCountSet() ? "" : " (default)"));
+                       NoString(pChan->buffer().size()) + "/" + NoString(pChan->bufferCount()) +
+                       NoString(pChan->hasBufferCountSet() ? "" : " (default)"));
 
         Table.addRow();
         Table.setValue(sChan, "AutoClearChanBuffer");
         Table.setValue(sStatus,
-                      NoString(pChan->autoClearChanBuffer() ? "yes" : "no") +
-                      NoString(pChan->hasAutoClearChanBufferSet() ? "" : " (default)"));
+                       NoString(pChan->autoClearChanBuffer() ? "yes" : "no") +
+                       NoString(pChan->hasAutoClearChanBufferSet() ? "" : " (default)"));
 
         if (pChan->isOn()) {
             Table.addRow();
@@ -539,12 +543,15 @@ void NoClient::userCommand(NoString& sLine)
             Table.addRow();
             Table.setValue("Name", pChan->permStr() + pChan->name());
             Table.setValue("Status",
-                          ((pChan->isOn()) ? ((pChan->isDetached()) ? "Detached" : "Joined") :
-                                             ((pChan->isDisabled()) ? "Disabled" : "Trying")));
+                           ((pChan->isOn()) ? ((pChan->isDetached()) ? "Detached" : "Joined") :
+                                              ((pChan->isDisabled()) ? "Disabled" : "Trying")));
 
-            if (pChan->isDetached()) uNumDetached++;
-            if (pChan->isOn()) uNumJoined++;
-            if (pChan->isDisabled()) uNumDisabled++;
+            if (pChan->isDetached())
+                uNumDetached++;
+            if (pChan->isOn())
+                uNumJoined++;
+            if (pChan->isDisabled())
+                uNumDisabled++;
         }
 
         putStatus(Table);
@@ -570,9 +577,8 @@ void NoClient::userCommand(NoString& sLine)
 
         NoString sNetworkAddError;
         if (d->user->addNetwork(sNetwork, sNetworkAddError)) {
-            putStatus("Network added. Use /znc JumpNetwork " + sNetwork + ", or connect to ZNC with username " +
-                      d->user->userName() + "/" + sNetwork + " (instead of just " + d->user->userName() +
-                      ") to connect to it.");
+            putStatus("Network added. Use /znc JumpNetwork " + sNetwork + ", or connect to ZNC with username " + d->user->userName() +
+                      "/" + sNetwork + " (instead of just " + d->user->userName() + ") to connect to it.");
         } else {
             putStatus("Unable to add that network");
             putStatus(sNetworkAddError);
@@ -1063,7 +1069,8 @@ void NoClient::userCommand(NoString& sLine)
             sModRet = "Unable to load module [" + sMod + "]: Unknown module type";
         }
 
-        if (b) sModRet = "Loaded module [" + sMod + "] " + sModRet;
+        if (b)
+            sModRet = "Loaded module [" + sMod + "] " + sModRet;
 
         putStatus(sModRet);
         return;
@@ -1343,8 +1350,7 @@ void NoClient::userCommand(NoString& sLine)
         d->user->setBindHost("");
         putStatus("Bind host cleared for your user.");
     } else if (sCommand.equals("SHOWBINDHOST")) {
-        putStatus("This user's default bind host " +
-                  (d->user->bindHost().empty() ? "not set" : "is [" + d->user->bindHost() + "]"));
+        putStatus("This user's default bind host " + (d->user->bindHost().empty() ? "not set" : "is [" + d->user->bindHost() + "]"));
         if (d->network) {
             putStatus("This network's bind host " +
                       (d->network->bindHost().empty() ? "not set" : "is [" + d->network->bindHost() + "]"));
@@ -1473,20 +1479,22 @@ void NoClient::userCommand(NoString& sLine)
         for (NoChannel* pChan : vChans) {
             uMatches++;
 
-            if (!pChan->setBufferCount(uLineCount)) uFail++;
+            if (!pChan->setBufferCount(uLineCount))
+                uFail++;
         }
 
         std::vector<NoQuery*> vQueries = d->network->findQueries(sBuffer);
         for (NoQuery* pQuery : vQueries) {
             uMatches++;
 
-            if (!pQuery->setBufferCount(uLineCount)) uFail++;
+            if (!pQuery->setBufferCount(uLineCount))
+                uFail++;
         }
 
         putStatus("BufferCount for [" + NoString(uMatches - uFail) + "] buffer was set to [" + NoString(uLineCount) + "]");
         if (uFail > 0) {
             putStatus("Setting BufferCount failed for [" + NoString(uFail) + "] buffers, "
-                                                                            "max buffer count is " +
+                                                                             "max buffer count is " +
                       NoString(NoApp::Get().GetMaxBufferSize()));
         }
     } else if (d->user->isAdmin() && sCommand.equals("TRAFFIC")) {
@@ -1559,12 +1567,11 @@ void NoClient::yserPortCommand(NoString& sLine)
             Table.setValue("SSL", NoString(pListener->isSsl()));
 
             No::AddressType eAddr = pListener->addressType();
-            Table.setValue("Proto", (eAddr == No::Ipv4AndIpv6Address ? "All" : (eAddr == No::Ipv4Address ? "IPv4" : "IPv6")));
+            Table.setValue("Proto",
+                           (eAddr == No::Ipv4AndIpv6Address ? "All" : (eAddr == No::Ipv4Address ? "IPv4" : "IPv6")));
 
             No::AcceptType eAccept = pListener->acceptType();
-            Table.setValue("IRC/Web",
-                          (eAccept == No::AcceptAll ? "All" :
-                                                              (eAccept == No::AcceptIrc ? "IRC" : "Web")));
+            Table.setValue("IRC/Web", (eAccept == No::AcceptAll ? "All" : (eAccept == No::AcceptIrc ? "IRC" : "Web")));
             Table.setValue("URIPrefix", pListener->uriPrefix() + "/");
         }
 
@@ -1644,7 +1651,8 @@ void NoClient::yserPortCommand(NoString& sLine)
     }
 }
 
-static void addCommandHelp(NoTable& Table, const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, const NoString& sFilter = "")
+static void
+addCommandHelp(NoTable& Table, const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, const NoString& sFilter = "")
 {
     if (sFilter.empty() || sCmd.startsWith(sFilter) || wildCmp(sCmd, sFilter, No::CaseInsensitive)) {
         Table.addRow();

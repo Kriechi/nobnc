@@ -62,7 +62,8 @@ ulong No::formatLongIp(const NoString& sIP)
     uint i;
 
     i = sscanf(sIP.c_str(), "%3[0-9].%3[0-9].%3[0-9].%3[0-9]", ip[0], ip[1], ip[2], ip[3]);
-    if (i != 4) return 0;
+    if (i != 4)
+        return 0;
 
     // Beware that atoi("200") << 24 would overflow and turn negative!
     ret = atol(ip[0]) << 24;
@@ -131,14 +132,23 @@ NoString No::getSaltedHashPass(NoString& sSalt)
     }
 }
 
-NoString No::salt() { return randomString(20); }
+NoString No::salt()
+{
+    return randomString(20);
+}
 
 // If you change this here and in GetSaltedHashPass(),
 // don't forget NoUser::HASH_DEFAULT!
 // TODO refactor this
-NoString No::defaultHash() { return "sha256"; }
+NoString No::defaultHash()
+{
+    return "sha256";
+}
 
-NoString No::md5(const NoString& sStr) { return MD5::md5(sStr); }
+NoString No::md5(const NoString& sStr)
+{
+    return MD5::md5(sStr);
+}
 
 NoString No::sha256(const NoString& sStr)
 {
@@ -190,9 +200,15 @@ NoString No::sha256(const NoString& sStr)
     return digest_hex;
 }
 
-NoString No::saltedMd5(const NoString& sPass, const NoString& sSalt) { return md5(sPass + sSalt); }
+NoString No::saltedMd5(const NoString& sPass, const NoString& sSalt)
+{
+    return md5(sPass + sSalt);
+}
 
-NoString No::saltedSha256(const NoString& sPass, const NoString& sSalt) { return sha256(sPass + sSalt); }
+NoString No::saltedSha256(const NoString& sPass, const NoString& sSalt)
+{
+    return sha256(sPass + sSalt);
+}
 
 NoString No::getPass(const NoString& sPrompt)
 {
@@ -204,7 +220,10 @@ NoString No::getPass(const NoString& sPrompt)
 #endif
 }
 
-bool No::getBoolInput(const NoString& sPrompt, bool bDefault) { return No::getBoolInput(sPrompt, &bDefault); }
+bool No::getBoolInput(const NoString& sPrompt, bool bDefault)
+{
+    return No::getBoolInput(sPrompt, &bDefault);
+}
 
 bool No::getBoolInput(const NoString& sPrompt, bool* pbDefault)
 {
@@ -409,7 +428,8 @@ NoString No::cTime(time_t t, const NoString& sTimezone)
 
     // backup old value
     char* oldTZ = getenv("TZ");
-    if (oldTZ) oldTZ = strdup(oldTZ);
+    if (oldTZ)
+        oldTZ = strdup(oldTZ);
     setenv("TZ", sTZ.c_str(), 1);
     tzset();
 
@@ -440,7 +460,8 @@ NoString No::formatTime(time_t t, const NoString& sFormat, const NoString& sTime
 
     // backup old value
     char* oldTZ = getenv("TZ");
-    if (oldTZ) oldTZ = strdup(oldTZ);
+    if (oldTZ)
+        oldTZ = strdup(oldTZ);
     setenv("TZ", sTZ.c_str(), 1);
     tzset();
 
@@ -485,8 +506,10 @@ void FillTimezones(const NoString& sPath, NoStringSet& result, const NoString& s
     for (NoFile* pFile : Dir.files()) {
         NoString sName = pFile->GetShortName();
         NoString sFile = pFile->GetLongName();
-        if (sName == "posix" || sName == "right") continue; // these 2 dirs contain the same filenames
-        if (sName.right(4) == ".tab" || sName == "posixrules" || sName == "localtime") continue;
+        if (sName == "posix" || sName == "right")
+            continue; // these 2 dirs contain the same filenames
+        if (sName.right(4) == ".tab" || sName == "posixrules" || sName == "localtime")
+            continue;
         if (pFile->IsDir()) {
             if (sName == "Etc") {
                 FillTimezones(sFile, result, sPrefix);
@@ -565,7 +588,8 @@ void No::setMessageTags(NoString& sLine, const NoStringMap& mssTags)
                 sTags += ";";
             }
             sTags += it.first;
-            if (!it.second.empty()) sTags += "=" + No::escape(it.second, No::MsgTagFormat);
+            if (!it.second.empty())
+                sTags += "=" + No::escape(it.second, No::MsgTagFormat);
         }
         sLine = "@" + sTags + " " + sLine;
     }
@@ -597,8 +621,10 @@ No::status_t No::writeToDisk(const NoStringMap& values, const NoString& sPath, m
     NoFile cFile(sPath);
 
     if (values.empty()) {
-        if (!cFile.Exists()) return MCS_SUCCESS;
-        if (cFile.Delete()) return MCS_SUCCESS;
+        if (!cFile.Exists())
+            return MCS_SUCCESS;
+        if (cFile.Delete())
+            return MCS_SUCCESS;
     }
 
     if (!cFile.Open(O_WRONLY | O_CREAT | O_TRUNC, iMode))
@@ -697,10 +723,10 @@ NoString No::toTimeStr(ulong s)
     const ulong y = d * 365;
     NoString sRet;
 
-#define TIMESPAN(time, str)                  \
-    if (s >= time) {                         \
+#define TIMESPAN(time, str)                   \
+    if (s >= time) {                          \
         sRet += NoString(s / time) + str " "; \
-        s = s % time;                        \
+        s = s % time;                         \
     }
     TIMESPAN(y, "y");
     TIMESPAN(w, "w");
@@ -709,7 +735,8 @@ NoString No::toTimeStr(ulong s)
     TIMESPAN(m, "m");
     TIMESPAN(1, "s");
 
-    if (sRet.empty()) return "0s";
+    if (sRet.empty())
+        return "0s";
 
     return sRet.rightChomp_n(1);
 }
@@ -758,7 +785,8 @@ NoString No::stripControls(const NoString& str)
             }
         }
         // CO controls codes
-        if (ch < 0x20 || ch == 0x7F) continue;
+        if (ch < 0x20 || ch == 0x7F)
+            continue;
         sRet += ch;
     }
     if (colorCode && digits == 0 && comma) {
@@ -855,7 +883,8 @@ NoString No::ellipsize(const NoString& str, uint uLen)
     return sRet;
 }
 
-NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes)
+NoStringVector
+Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes)
 {
     NoStringVector vsRet;
 
@@ -954,7 +983,8 @@ static NoString Token_impl(const NoString& s, size_t uPos, bool bRest, const NoS
     }
 
     // String is over?
-    if (start_pos >= str_len) return "";
+    if (start_pos >= str_len)
+        return "";
 
     // If they want everything from here on, give it to them
     if (bRest) {
@@ -964,7 +994,8 @@ static NoString Token_impl(const NoString& s, size_t uPos, bool bRest, const NoS
     // Now look for the end of the token they want
     end_pos = start_pos;
     while (end_pos < str_len) {
-        if (strncmp(&str[end_pos], sep_str, sep_len) == 0) return s.substr(start_pos, end_pos - start_pos);
+        if (strncmp(&str[end_pos], sep_str, sep_len) == 0)
+            return s.substr(start_pos, end_pos - start_pos);
 
         end_pos++;
     }

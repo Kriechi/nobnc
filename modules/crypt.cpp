@@ -61,7 +61,10 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnDelKeyCommand),
                    "<#chan|Nick>",
                    "Remove a key for nick or channel");
-        addCommand("SetKey", static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnSetKeyCommand), "<#chan|Nick> <Key>", "Set a key for nick or channel");
+        addCommand("SetKey",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnSetKeyCommand),
+                   "<#chan|Nick> <Key>",
+                   "Set a key for nick or channel");
         addCommand("ListKeys",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnListKeysCommand),
                    "",
@@ -202,6 +205,10 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoCryptMod>(NoModuleInfo& Info) { Info.setWikiPage("crypt"); }
+template <>
+void no_moduleInfo<NoCryptMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("crypt");
+}
 
 NETWORKMODULEDEFS(NoCryptMod, "Encryption for channel/private messages")

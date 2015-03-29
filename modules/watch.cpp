@@ -35,8 +35,14 @@ public:
     }
 
     // Getters
-    const NoString& GetSource() const { return m_sSource; }
-    bool IsNegated() const { return m_bNegated; }
+    const NoString& GetSource() const
+    {
+        return m_sSource;
+    }
+    bool IsNegated() const
+    {
+        return m_bNegated;
+    }
     // !Getters
 
     // Setters
@@ -97,8 +103,10 @@ public:
             }
         }
 
-        if (!bGoodSource) return false;
-        if (!No::wildCmp(Nick.hostMask(), m_sHostMask, No::CaseInsensitive)) return false;
+        if (!bGoodSource)
+            return false;
+        if (!No::wildCmp(Nick.hostMask(), m_sHostMask, No::CaseInsensitive))
+            return false;
         return (No::wildCmp(sText, pNetwork->expandString(m_sPattern), No::CaseInsensitive));
     }
 
@@ -109,13 +117,34 @@ public:
     }
 
     // Getters
-    const NoString& GetHostMask() const { return m_sHostMask; }
-    const NoString& GetTarget() const { return m_sTarget; }
-    const NoString& GetPattern() const { return m_sPattern; }
-    bool IsDisabled() const { return m_bDisabled; }
-    bool IsDetachedClientOnly() const { return m_bDetachedClientOnly; }
-    bool IsDetachedChannelOnly() const { return m_bDetachedChannelOnly; }
-    const std::vector<NoWatchSource>& GetSources() const { return m_vsSources; }
+    const NoString& GetHostMask() const
+    {
+        return m_sHostMask;
+    }
+    const NoString& GetTarget() const
+    {
+        return m_sTarget;
+    }
+    const NoString& GetPattern() const
+    {
+        return m_sPattern;
+    }
+    bool IsDisabled() const
+    {
+        return m_bDisabled;
+    }
+    bool IsDetachedClientOnly() const
+    {
+        return m_bDetachedClientOnly;
+    }
+    bool IsDetachedChannelOnly() const
+    {
+        return m_bDetachedChannelOnly;
+    }
+    const std::vector<NoWatchSource>& GetSources() const
+    {
+        return m_vsSources;
+    }
     NoString GetSourcesStr() const
     {
         NoString sRet;
@@ -139,12 +168,30 @@ public:
     // !Getters
 
     // Setters
-    void SetHostMask(const NoString& s) { m_sHostMask = s; }
-    void SetTarget(const NoString& s) { m_sTarget = s; }
-    void SetPattern(const NoString& s) { m_sPattern = s; }
-    void SetDisabled(bool b = true) { m_bDisabled = b; }
-    void SetDetachedClientOnly(bool b = true) { m_bDetachedClientOnly = b; }
-    void SetDetachedChannelOnly(bool b = true) { m_bDetachedChannelOnly = b; }
+    void SetHostMask(const NoString& s)
+    {
+        m_sHostMask = s;
+    }
+    void SetTarget(const NoString& s)
+    {
+        m_sTarget = s;
+    }
+    void SetPattern(const NoString& s)
+    {
+        m_sPattern = s;
+    }
+    void SetDisabled(bool b = true)
+    {
+        m_bDisabled = b;
+    }
+    void SetDetachedClientOnly(bool b = true)
+    {
+        m_bDetachedClientOnly = b;
+    }
+    void SetDetachedChannelOnly(bool b = true)
+    {
+        m_bDetachedChannelOnly = b;
+    }
     void SetSources(const NoString& sSources)
     {
         NoStringVector vsSources = sSources.split(" ", No::SkipEmptyParts);
@@ -209,23 +256,20 @@ public:
     {
         Process(Nick,
                 "* Quits: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") "
-                                                                                               "(" +
+                                                                                      "(" +
                 sMessage + ")",
                 "");
     }
 
     void onJoin(const NoNick& Nick, NoChannel& Channel) override
     {
-        Process(Nick,
-                "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") joins " + Channel.name(),
-                Channel.name());
+        Process(Nick, "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") joins " + Channel.name(), Channel.name());
     }
 
     void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
         Process(Nick,
-                "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") parts " + Channel.name() +
-                "(" + sMessage + ")",
+                "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") parts " + Channel.name() + "(" + sMessage + ")",
                 Channel.name());
     }
 
@@ -250,7 +294,7 @@ public:
     {
         Process(Nick,
                 "* CTCP: " + Nick.nick() + " [" + sMessage + "] to "
-                                                                "[" +
+                                                             "[" +
                 Channel.name() + "]",
                 Channel.name());
         return CONTINUE;
@@ -366,9 +410,12 @@ private:
 
             if (WatchEntry.IsMatch(Nick, sMessage, sSource, pNetwork) && sHandledTargets.count(WatchEntry.GetTarget()) < 1) {
                 if (pNetwork->isUserAttached()) {
-                    pNetwork->putUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " + pNetwork->currentNick() + " :" + sMessage);
+                    pNetwork->putUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " +
+                                      pNetwork->currentNick() + " :" + sMessage);
                 } else {
-                    m_Buffer.addMessage(":" + _NAMEDFMT(WatchEntry.GetTarget()) + "!watch@znc.in PRIVMSG {target} :{text}", sMessage);
+                    m_Buffer.addMessage(":" + _NAMEDFMT(WatchEntry.GetTarget()) +
+                                        "!watch@znc.in PRIVMSG {target} :{text}",
+                                        sMessage);
                 }
                 sHandledTargets.insert(WatchEntry.GetTarget());
             }
@@ -394,7 +441,8 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (uint a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++)
+            ++it;
 
         (*it).SetDisabled(bDisabled);
         putModule("Id " + NoString(uIdx + 1) + ((bDisabled) ? " Disabled" : " Enabled"));
@@ -420,7 +468,8 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (uint a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++)
+            ++it;
 
         (*it).SetDetachedClientOnly(bDetachedClientOnly);
         putModule("Id " + NoString(uIdx + 1) + " set to: " + ((bDetachedClientOnly) ? "Yes" : "No"));
@@ -447,7 +496,8 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (uint a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++)
+            ++it;
 
         (*it).SetDetachedChannelOnly(bDetachedChannelOnly);
         putModule("Id " + NoString(uIdx + 1) + " set to: " + ((bDetachedChannelOnly) ? "Yes" : "No"));
@@ -536,7 +586,8 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (uint a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++)
+            ++it;
 
         (*it).SetSources(sSources);
         putModule("Sources set for Id " + NoString(uIdx + 1) + ".");
@@ -552,7 +603,8 @@ private:
         }
 
         std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin();
-        for (uint a = 0; a < uIdx; a++) ++it;
+        for (uint a = 0; a < uIdx; a++)
+            ++it;
 
         m_lsWatchers.erase(it);
         putModule("Id " + NoString(uIdx + 1) + " Removed.");
@@ -708,13 +760,18 @@ private:
             m_lsWatchers.push_back(WatchEntry);
         }
 
-        if (bWarn) putModule("WARNING: malformed entry found while loading");
+        if (bWarn)
+            putModule("WARNING: malformed entry found while loading");
     }
 
     std::list<NoWatchEntry> m_lsWatchers;
     NoBuffer m_Buffer;
 };
 
-template <> void no_moduleInfo<NoWatcherMod>(NoModuleInfo& Info) { Info.setWikiPage("watch"); }
+template <>
+void no_moduleInfo<NoWatcherMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("watch");
+}
 
 NETWORKMODULEDEFS(NoWatcherMod, "Copy activity from a specific user into a separate window")

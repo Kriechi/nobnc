@@ -63,7 +63,8 @@ NoModuleSocket::~NoModuleSocket()
 void NoModuleSocket::ReachedMaxBufferImpl()
 {
     NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
-    if (m_module) m_module->putModule("Some socket reached its max buffer limit and was closed!");
+    if (m_module)
+        m_module->putModule("Some socket reached its max buffer limit and was closed!");
     Close();
 }
 
@@ -132,4 +133,7 @@ bool NoModuleSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
     return m_module->manager()->ListenAll(uPort, sSockName, bSSL, SOMAXCONN, this);
 }
 
-NoModule* NoModuleSocket::GetModule() const { return m_module; }
+NoModule* NoModuleSocket::GetModule() const
+{
+    return m_module;
+}

@@ -49,7 +49,10 @@ public:
         return true;
     }
 
-    void SetReply(const NoString& sReply) { NoRegistry(this).setValue("Reply", sReply); }
+    void SetReply(const NoString& sReply)
+    {
+        NoRegistry(this).setValue("Reply", sReply);
+    }
 
     NoString GetReply()
     {
@@ -68,10 +71,13 @@ public:
         if (!pIRCSock)
             // WTF?
             return;
-        if (sNick == pIRCSock->GetNick()) return;
-        if (m_Messaged.contains(sNick)) return;
+        if (sNick == pIRCSock->GetNick())
+            return;
+        if (m_Messaged.contains(sNick))
+            return;
 
-        if (network()->isUserAttached()) return;
+        if (network()->isUserAttached())
+            return;
 
         m_Messaged.insert(sNick);
         putIrc("NOTICE " + sNick + " :" + GetReply());
@@ -98,7 +104,8 @@ private:
     NoCacheMap<NoString> m_Messaged;
 };
 
-template <> void no_moduleInfo<NoAutoReplyMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoAutoReplyMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("autoreply");
     Info.addType(No::NetworkModule);

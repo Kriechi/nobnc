@@ -88,7 +88,8 @@ public:
             sReasonArg = No::tokens(sArgs, 2);
         } else {
             NoString sAwayWait = NoRegistry(this).value("awaywait");
-            if (!sAwayWait.empty()) SetAwayWait(sAwayWait.toUInt(), false);
+            if (!sAwayWait.empty())
+                SetAwayWait(sAwayWait.toUInt(), false);
             sReasonArg = sArgs;
         }
 
@@ -97,11 +98,13 @@ public:
             SetReason(sReasonArg);
         } else {
             NoString sSavedReason = NoRegistry(this).value("reason");
-            if (!sSavedReason.empty()) SetReason(sSavedReason, false);
+            if (!sSavedReason.empty())
+                SetReason(sSavedReason, false);
         }
 
         // Set away on load, required if loaded via webadmin
-        if (network()->isIrcConnected() && !network()->isUserAttached()) SetAway(false);
+        if (network()->isIrcConnected() && !network()->isUserAttached())
+            SetAway(false);
 
         return true;
     }
@@ -114,12 +117,16 @@ public:
             SetAway(false);
     }
 
-    void onClientLogin() override { SetBack(); }
+    void onClientLogin() override
+    {
+        SetBack();
+    }
 
     void onClientDisconnect() override
     {
         /* There might still be other clients */
-        if (!network()->isUserAttached()) SetAway();
+        if (!network()->isUserAttached())
+            SetAway();
     }
 
     void OnReasonCommand(const NoString& sLine)
@@ -158,7 +165,8 @@ public:
 
     ModRet onUserRaw(NoString& sLine) override
     {
-        if (!No::token(sLine, 0).equals("AWAY")) return CONTINUE;
+        if (!No::token(sLine, 0).equals("AWAY"))
+            return CONTINUE;
 
         // If a client set us away, we don't touch that away message
         const NoString sArg = No::tokens(sLine, 1).trim_n(" ");
@@ -200,7 +208,8 @@ private:
     NoString ExpandReason()
     {
         NoString sReason = m_sReason;
-        if (sReason.empty()) sReason = SIMPLE_AWAY_DEFAULT_REASON;
+        if (sReason.empty())
+            sReason = SIMPLE_AWAY_DEFAULT_REASON;
 
         time_t iTime = time(nullptr);
         NoString sTime = No::cTime(iTime, user()->timezone());
@@ -229,9 +238,13 @@ private:
     }
 };
 
-void NoSimpleAwayJob::run() { ((NoSimpleAway*)module())->SetAway(false); }
+void NoSimpleAwayJob::run()
+{
+    ((NoSimpleAway*)module())->SetAway(false);
+}
 
-template <> void no_moduleInfo<NoSimpleAway>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoSimpleAway>(NoModuleInfo& Info)
 {
     Info.setWikiPage("simple_away");
     Info.setHasArgs(true);

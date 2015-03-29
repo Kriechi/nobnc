@@ -36,17 +36,36 @@ static const struct
 class Mechanisms : public NoStringVector
 {
 public:
-    Mechanisms& operator=(const NoStringVector& other) { *this = other; return *this; }
+    Mechanisms& operator=(const NoStringVector& other)
+    {
+        *this = other;
+        return *this;
+    }
 
-    void SetIndex(uint uiIndex) { m_uiIndex = uiIndex; }
+    void SetIndex(uint uiIndex)
+    {
+        m_uiIndex = uiIndex;
+    }
 
-    uint GetIndex() const { return m_uiIndex; }
+    uint GetIndex() const
+    {
+        return m_uiIndex;
+    }
 
-    bool HasNext() const { return size() > (m_uiIndex + 1); }
+    bool HasNext() const
+    {
+        return size() > (m_uiIndex + 1);
+    }
 
-    void IncrementIndex() { m_uiIndex++; }
+    void IncrementIndex()
+    {
+        m_uiIndex++;
+    }
 
-    NoString GetCurrent() const { return at(m_uiIndex); }
+    NoString GetCurrent() const
+    {
+        return at(m_uiIndex);
+    }
 
     NoString GetNext() const
     {
@@ -208,7 +227,10 @@ public:
         }
     }
 
-    bool onServerCapAvailable(const NoString& sCap) override { return sCap.equals("sasl"); }
+    bool onServerCapAvailable(const NoString& sCap) override
+    {
+        return sCap.equals("sasl");
+    }
 
     void onServerCapResult(const NoString& sCap, bool bSuccess) override
     {
@@ -274,13 +296,20 @@ public:
         CheckRequireAuth();
     }
 
-    void onIrcDisconnected() override { m_bAuthenticated = false; }
+    void onIrcDisconnected() override
+    {
+        m_bAuthenticated = false;
+    }
 
 private:
     Mechanisms m_Mechanisms;
     bool m_bAuthenticated;
 };
 
-template <> void no_moduleInfo<NoSaslMod>(NoModuleInfo& Info) { Info.setWikiPage("sasl"); }
+template <>
+void no_moduleInfo<NoSaslMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("sasl");
+}
 
 NETWORKMODULEDEFS(NoSaslMod, "Adds support for sasl authentication capability to authenticate to an IRC server")

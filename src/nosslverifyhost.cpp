@@ -145,7 +145,8 @@ static int Curl_raw_nequal(const char* first, const char* second, size_t max)
         first++;
         second++;
     }
-    if (0 == max) return 1; /* they are equal this far */
+    if (0 == max)
+        return 1; /* they are equal this far */
     return Curl_raw_toupper(*first) == Curl_raw_toupper(*second);
 }
 
@@ -184,15 +185,19 @@ static int hostmatch(char* hostname, char* pattern)
 
     /* normalize pattern and hostname by stripping off trailing dots */
     size_t len = strlen(hostname);
-    if (hostname[len - 1] == '.') hostname[len - 1] = 0;
+    if (hostname[len - 1] == '.')
+        hostname[len - 1] = 0;
     len = strlen(pattern);
-    if (pattern[len - 1] == '.') pattern[len - 1] = 0;
+    if (pattern[len - 1] == '.')
+        pattern[len - 1] = 0;
 
     pattern_wildcard = strchr(pattern, '*');
-    if (pattern_wildcard == nullptr) return Curl_raw_equal(pattern, hostname) ? CURL_HOST_MATCH : CURL_HOST_NOMATCH;
+    if (pattern_wildcard == nullptr)
+        return Curl_raw_equal(pattern, hostname) ? CURL_HOST_MATCH : CURL_HOST_NOMATCH;
 
     /* detect IP address as hostname and fail the match if so */
-    if (inet_pton(AF_INET, hostname, &ignored) > 0) return CURL_HOST_NOMATCH;
+    if (inet_pton(AF_INET, hostname, &ignored) > 0)
+        return CURL_HOST_NOMATCH;
 #ifdef ENABLE_IPV6
     else if (Curl_inet_pton(AF_INET6, hostname, &si6.sin6_addr) > 0)
         return CURL_HOST_NOMATCH;
@@ -206,7 +211,8 @@ static int hostmatch(char* hostname, char* pattern)
         pattern_wildcard > pattern_label_end || Curl_raw_nequal(pattern, "xn--", 4)) {
         wildcard_enabled = 0;
     }
-    if (!wildcard_enabled) return Curl_raw_equal(pattern, hostname) ? CURL_HOST_MATCH : CURL_HOST_NOMATCH;
+    if (!wildcard_enabled)
+        return Curl_raw_equal(pattern, hostname) ? CURL_HOST_MATCH : CURL_HOST_NOMATCH;
 
     hostname_label_end = strchr(hostname, '.');
     if (hostname_label_end == nullptr || !Curl_raw_equal(pattern_label_end, hostname_label_end))
@@ -215,7 +221,8 @@ static int hostmatch(char* hostname, char* pattern)
     /* The wildcard must match at least one character, so the left-most
        label of the hostname is at least as large as the left-most label
        of the pattern. */
-    if (hostname_label_end - hostname < pattern_label_end - pattern) return CURL_HOST_NOMATCH;
+    if (hostname_label_end - hostname < pattern_label_end - pattern)
+        return CURL_HOST_NOMATCH;
 
     prefixlen = pattern_wildcard - pattern;
     suffixlen = pattern_label_end - (pattern_wildcard + 1);
@@ -237,7 +244,8 @@ static int Curl_cert_hostcheck(const char* match_pattern, const char* hostname)
         if (matchp) {
             hostp = strdup(hostname);
             if (hostp) {
-                if (hostmatch(hostp, matchp) == CURL_HOST_MATCH) res = 1;
+                if (hostmatch(hostp, matchp) == CURL_HOST_MATCH)
+                    res = 1;
                 free(hostp);
             }
             free(matchp);
@@ -391,7 +399,8 @@ static HostnameValidationResult validate_hostname(const char* hostname, const X5
 {
     HostnameValidationResult result;
 
-    if ((hostname == nullptr) || (server_cert == nullptr)) return Error;
+    if ((hostname == nullptr) || (server_cert == nullptr))
+        return Error;
 
     // First try the Subject Alternative Names extension
     result = matches_subject_alternative_name(hostname, server_cert);

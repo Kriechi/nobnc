@@ -24,7 +24,9 @@
 class NoRegistryPrivate
 {
 public:
-    NoRegistryPrivate(const NoModule* module) : module(module) { }
+    NoRegistryPrivate(const NoModule* module) : module(module)
+    {
+    }
     NoStringMap registry;
     const NoModule* module;
     bool dirty = false;

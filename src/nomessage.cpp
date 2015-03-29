@@ -31,8 +31,7 @@ void NoMessagePrivate::updateTime()
     }
 }
 
-NoMessage::NoMessage(const NoString& format, const NoString& text, const timeval* ts)
-    : d(new NoMessagePrivate)
+NoMessage::NoMessage(const NoString& format, const NoString& text, const timeval* ts) : d(new NoMessagePrivate)
 {
     d->format = format;
     d->text = text;

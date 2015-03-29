@@ -136,7 +136,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoRejoinMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoRejoinMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("kickrejoin");
     Info.setHasArgs(true);

@@ -80,10 +80,14 @@ public:
 private:
     static NoString GetRawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams);
     static NoString GetParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter);
-    static size_t
-    GetParamValues(const NoString& sName, NoStringVector& vsRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter);
-    static size_t
-    GetParamValues(const NoString& sName, std::set<NoString>& ssRet, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter);
+    static size_t GetParamValues(const NoString& sName,
+                                 NoStringVector& vsRet,
+                                 const std::map<NoString, NoStringVector>& msvsParams,
+                                 const NoString& sFilter);
+    static size_t GetParamValues(const NoString& sName,
+                                 std::set<NoString>& ssRet,
+                                 const std::map<NoString, NoStringVector>& msvsParams,
+                                 const NoString& sFilter);
 
     void WriteFileUncompressed(NoFile& File);
     void WriteFileGzipped(NoFile& File);

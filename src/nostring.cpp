@@ -18,7 +18,8 @@
 #include "nostring.h"
 #include <sstream>
 
-NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
+NoStringVector
+Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
 
 static const uchar XX = 0xff;
 static const uchar base64_table[256] = {
@@ -219,7 +220,8 @@ NoString NoString::right(uint uCount) const
     return substr(length() - uCount, uCount);
 }
 
-extern NoStringVector Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
+extern NoStringVector
+Split_helper(const NoString& str, const NoString& sDelim, No::SplitBehavior behavior, const NoString& sLeft, const NoString& sRight, bool bTrimQuotes);
 
 NoStringVector NoString::split(const NoString& separator, No::SplitBehavior behavior) const
 {
@@ -392,7 +394,8 @@ bool NoString::trimLeft(const NoString& s)
 {
     size_type i = find_first_not_of(s);
 
-    if (i == 0) return false;
+    if (i == 0)
+        return false;
 
     if (i != npos)
         this->erase(0, i);
@@ -406,7 +409,8 @@ bool NoString::trimRight(const NoString& s)
 {
     size_type i = find_last_not_of(s);
 
-    if (i + 1 == length()) return false;
+    if (i + 1 == length())
+        return false;
 
     if (i != npos)
         this->erase(i + 1, npos);

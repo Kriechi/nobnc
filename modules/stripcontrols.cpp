@@ -21,7 +21,9 @@
 class NoStripControlsMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoStripControlsMod) {}
+    MODCONSTRUCTOR(NoStripControlsMod)
+    {
+    }
 
     ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
     {
@@ -60,7 +62,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoStripControlsMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoStripControlsMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("stripcontrols");
     Info.addType(No::UserModule);

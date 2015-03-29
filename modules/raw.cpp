@@ -20,7 +20,9 @@
 class NoRawMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoRawMod) {}
+    MODCONSTRUCTOR(NoRawMod)
+    {
+    }
 
     ModRet onRaw(NoString& sLine) override
     {
@@ -28,7 +30,10 @@ public:
         return CONTINUE;
     }
 
-    void onModCommand(const NoString& sCommand) override { putIrc(sCommand); }
+    void onModCommand(const NoString& sCommand) override
+    {
+        putIrc(sCommand);
+    }
 
     ModRet onUserRaw(NoString& sLine) override
     {
@@ -37,7 +42,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoRawMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoRawMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("raw");
     Info.addType(No::UserModule);

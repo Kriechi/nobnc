@@ -40,8 +40,12 @@ class NO_EXPORT NoJob
 public:
     enum JobState { Ready, Running, Done, Cancelled };
 
-    NoJob() : m_state(Ready) {}
-    virtual ~NoJob() {} /// Always called from the main thread.
+    NoJob() : m_state(Ready)
+    {
+    }
+    virtual ~NoJob()
+    {
+    } /// Always called from the main thread.
 
     /// This function is called in a separate thread and can do heavy, blocking work.
     virtual void run() = 0;

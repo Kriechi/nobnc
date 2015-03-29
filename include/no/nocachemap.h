@@ -27,23 +27,44 @@
  * @author prozac <prozac@rottenboy.com>
  * @brief Insert an object with a time-to-live and check later if it still exists
  */
-template <typename K, typename V = bool> class NoCacheMap
+template <typename K, typename V = bool>
+class NoCacheMap
 {
 public:
-    NoCacheMap(uint expiration = 5000) : m_expiration(expiration) { }
+    NoCacheMap(uint expiration = 5000) : m_expiration(expiration)
+    {
+    }
 
-    uint expiration() const { return m_expiration; }
-    void setExpiration(uint expiration) { m_expiration = expiration; }
+    uint expiration() const
+    {
+        return m_expiration;
+    }
+    void setExpiration(uint expiration)
+    {
+        m_expiration = expiration;
+    }
 
     typedef std::pair<ulonglong, V> VP;
     typedef typename std::map<K, VP>::iterator iterator;
     typedef typename std::map<K, VP>::const_iterator const_iterator;
 
-    iterator begin() { return m_items.begin(); }
-    iterator end() { return m_items.end(); }
+    iterator begin()
+    {
+        return m_items.begin();
+    }
+    iterator end()
+    {
+        return m_items.end();
+    }
 
-    const_iterator begin() const { return m_items.begin(); }
-    const_iterator end() const { return m_items.end(); }
+    const_iterator begin() const
+    {
+        return m_items.begin();
+    }
+    const_iterator end() const
+    {
+        return m_items.end();
+    }
 
     /**
      * @brief Performs a Cleanup() and then checks to see if your item exists
@@ -94,17 +115,26 @@ public:
      * @param Item The item to be removed
      * @return true if item existed and was removed, false if it never existed
      */
-    bool remove(const K& key) { return m_items.erase(key) != 0; }
+    bool remove(const K& key)
+    {
+        return m_items.erase(key) != 0;
+    }
 
     /**
      * @brief Removes ...
      */
-    void remove(iterator it) { m_items.erase(it); }
+    void remove(iterator it)
+    {
+        m_items.erase(it);
+    }
 
     /**
      * @brief Clear all entries
      */
-    void clear() { m_items.clear(); }
+    void clear()
+    {
+        m_items.clear();
+    }
 
 private:
     /**

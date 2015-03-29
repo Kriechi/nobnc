@@ -39,7 +39,10 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminLogMod::OnShowCommand),
                    "",
                    "Show the logging target");
-        addCommand("Target", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminLogMod::OnTargetCommand), "<file|syslog|both>", "Set the logging target");
+        addCommand("Target",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminLogMod::OnTargetCommand),
+                   "<file|syslog|both>",
+                   "Set the logging target");
         openlog("znc", LOG_PID, LOG_DAEMON);
     }
 
@@ -70,8 +73,7 @@ public:
 
     void onIrcConnected() override
     {
-        Log("[" + user()->userName() + "/" + network()->name() + "] connected to IRC: " +
-            network()->currentServer()->host());
+        Log("[" + user()->userName() + "/" + network()->name() + "] connected to IRC: " + network()->currentServer()->host());
     }
 
     void onIrcDisconnected() override
@@ -85,7 +87,8 @@ public:
             // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
             // ERROR :Closing Link: nick[24.24.24.24] Killer (Local kill by Killer (reason))
             NoString sError(sLine.substr(6));
-            if (sError.left(1) == ":") sError.leftChomp(1);
+            if (sError.left(1) == ":")
+                sError.leftChomp(1);
             Log("[" + user()->userName() + "/" + network()->name() + "] disconnected from IRC: " +
                 network()->currentServer()->host() + " [" + sError + "]",
                 LOG_NOTICE);
@@ -110,7 +113,8 @@ public:
 
     void Log(NoString sLine, int iPrio = LOG_INFO)
     {
-        if (m_eLogMode & LOG_TO_SYSLOG) syslog(iPrio, "%s", sLine.c_str());
+        if (m_eLogMode & LOG_TO_SYSLOG)
+            syslog(iPrio, "%s", sLine.c_str());
 
         if (m_eLogMode & LOG_TO_FILE) {
             time_t curtime;
@@ -191,7 +195,8 @@ public:
         }
 
         putModule("Logging is enabled for " + sTarget);
-        if (m_eLogMode != LOG_TO_SYSLOG) putModule("Log file will be written to [" + m_sLogFile + "]");
+        if (m_eLogMode != LOG_TO_SYSLOG)
+            putModule("Log file will be written to [" + m_sLogFile + "]");
     }
 
 private:
@@ -200,6 +205,10 @@ private:
     NoString m_sLogFile;
 };
 
-template <> void no_moduleInfo<NoAdminLogMod>(NoModuleInfo& Info) { Info.setWikiPage("adminlog"); }
+template <>
+void no_moduleInfo<NoAdminLogMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("adminlog");
+}
 
 GLOBALMODULEDEFS(NoAdminLogMod, "Log ZNC events to file and/or syslog.")

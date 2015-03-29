@@ -24,7 +24,10 @@
 class NoSocketSorter
 {
 public:
-    NoSocketSorter(NoSocket* p) { m_pSock = p; }
+    NoSocketSorter(NoSocket* p)
+    {
+        m_pSock = p;
+    }
     bool operator<(const NoSocketSorter& other) const
     {
         // The 'biggest' item is displayed first.
@@ -33,8 +36,10 @@ public:
 
         // Listeners go to the top
         if (m_pSock->IsListener() != other.m_pSock->IsListener()) {
-            if (m_pSock->IsListener()) return false;
-            if (other.m_pSock->IsListener()) return true;
+            if (m_pSock->IsListener())
+                return false;
+            if (other.m_pSock->IsListener())
+                return true;
         }
         const NoString& sMyName = m_pSock->GetSockName();
         const NoString& sMyName2 = No::tokens(sMyName, 1, "::");
@@ -44,18 +49,25 @@ public:
         bool bHisEmpty = sHisName2.empty();
 
         // Then sort by first token after "::"
-        if (bMyEmpty && !bHisEmpty) return false;
-        if (bHisEmpty && !bMyEmpty) return true;
+        if (bMyEmpty && !bHisEmpty)
+            return false;
+        if (bHisEmpty && !bMyEmpty)
+            return true;
 
         if (!bMyEmpty && !bHisEmpty) {
             int c = sMyName2.compare(sHisName2, No::CaseSensitive);
-            if (c < 0) return false;
-            if (c > 0) return true;
+            if (c < 0)
+                return false;
+            if (c > 0)
+                return true;
         }
         // and finally sort by the whole socket name
         return sMyName.compare(sHisName, No::CaseSensitive) > 0;
     }
-    NoSocket* GetSock() const { return m_pSock; }
+    NoSocket* GetSock() const
+    {
+        return m_pSock;
+    }
 
 private:
     NoSocket* m_pSock;
@@ -95,15 +107,22 @@ public:
             // another socket took over the connection from this
             // socket. So ignore this to avoid listing the
             // connection twice.
-            if (pSock->GetCloseType() == NoSocket::CLT_DEREFERENCE) continue;
+            if (pSock->GetCloseType() == NoSocket::CLT_DEREFERENCE)
+                continue;
             ret.push(pSock);
         }
 
         return ret;
     }
 
-    bool webRequiresAdmin() override { return true; }
-    NoString webMenuTitle() override { return "List sockets"; }
+    bool webRequiresAdmin() override
+    {
+        return true;
+    }
+    NoString webMenuTitle() override
+    {
+        return "List sockets";
+    }
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
@@ -257,6 +276,10 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoListSockets>(NoModuleInfo& Info) { Info.setWikiPage("listsockets"); }
+template <>
+void no_moduleInfo<NoListSockets>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("listsockets");
+}
 
 USERMODULEDEFS(NoListSockets, "List active sockets")

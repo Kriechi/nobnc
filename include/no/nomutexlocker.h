@@ -42,12 +42,14 @@ class NO_EXPORT NoMutexLocker
 public:
     NoMutexLocker(NoMutex& mutex, bool initiallyLocked = true) : m_mutex(mutex), m_locked(false)
     {
-        if (initiallyLocked) lock();
+        if (initiallyLocked)
+            lock();
     }
 
     ~NoMutexLocker()
     {
-        if (m_locked) unlock();
+        if (m_locked)
+            unlock();
     }
 
     void lock()

@@ -26,12 +26,17 @@
 #include <no/noapp.h>
 #include <no/nonick.h>
 
-template <std::size_t N> struct array_size_helper
+template <std::size_t N>
+struct array_size_helper
 {
     char __place_holder[N];
 };
 
-template <class T, std::size_t N> static array_size_helper<N> array_size(T (&)[N]) { return array_size_helper<N>(); }
+template <class T, std::size_t N>
+static array_size_helper<N> array_size(T (&)[N])
+{
+    return array_size_helper<N>();
+}
 
 #define ARRAY_SIZE(array) sizeof(array_size((array)))
 
@@ -152,7 +157,8 @@ class NoAdminMod : public NoModule
 
     NoUser* FindUser(const NoString& sUsername)
     {
-        if (sUsername.equals("$me") || sUsername.equals("$user")) return user();
+        if (sUsername.equals("$me") || sUsername.equals("$user"))
+            return user();
         NoUser* pUser = NoApp::Get().FindUser(sUsername);
         if (!pUser) {
             putModule("Error: User [" + sUsername + "] not found.");
@@ -198,7 +204,8 @@ class NoAdminMod : public NoModule
             pUser = FindUser(sUsername);
         }
 
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         if (sVar == "nick")
             putModule("Nick = " + pUser->nick());
@@ -271,7 +278,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUserName);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         if (sVar == "nick") {
             pUser->setNick(sValue);
@@ -595,7 +603,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         NoNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
@@ -626,7 +635,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         NoNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
@@ -664,7 +674,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         NoNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
@@ -722,7 +733,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         NoNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
@@ -781,7 +793,8 @@ class NoAdminMod : public NoModule
 
     void ListUsers(const NoString&)
     {
-        if (!user()->isAdmin()) return;
+        if (!user()->isAdmin())
+            return;
 
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         NoTable Table;
@@ -1046,7 +1059,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         NoNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
@@ -1074,7 +1088,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         NoNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
@@ -1158,7 +1173,8 @@ class NoAdminMod : public NoModule
             sUserName = user()->userName();
         }
         NoUser* pUser = FindUser(sUserName);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         const NoStringMap& msCTCPReplies = pUser->ctcpReplies();
         NoTable Table;
@@ -1197,7 +1213,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUserName);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         if (pUser->addCtcpReply(sCTCPRequest, sCTCPReply))
             putModule("Added!");
@@ -1215,7 +1232,8 @@ class NoAdminMod : public NoModule
             sUserName = user()->userName();
         }
         NoUser* pUser = FindUser(sUserName);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         if (sCTCPRequest.empty()) {
             putModule("Usage: DelCTCP [user] [request]");
@@ -1266,7 +1284,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         LoadModuleFor(pUser->loader(), sModName, sArgs, No::UserModule, pUser, nullptr);
     }
@@ -1284,7 +1303,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         NoNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
@@ -1325,7 +1345,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         UnLoadModuleFor(pUser->loader(), sModName, pUser);
     }
@@ -1342,7 +1363,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         NoNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
@@ -1382,7 +1404,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         ListModulesFor(pUser->loader(), "User [" + pUser->userName() + "]");
     }
@@ -1398,7 +1421,8 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pUser = FindUser(sUsername);
-        if (!pUser) return;
+        if (!pUser)
+            return;
 
         NoNetwork* pNetwork = FindNetwork(pUser, sNetwork);
         if (!pNetwork) {
@@ -1419,10 +1443,7 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::Get),
                    "<variable> [username]",
                    "Prints the variable's value for the given or current user");
-        addCommand("Set",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::Set),
-                   "<variable> <username> <value>",
-                   "Sets the variable's value for the given user");
+        addCommand("Set", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::Set), "<variable> <username> <value>", "Sets the variable's value for the given user");
         addCommand("GetNetwork",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::GetNetwork),
                    "<variable> [username] [network]",
@@ -1439,13 +1460,16 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::SetChan),
                    "<variable> <username> <network> <chan> <value>",
                    "Sets the variable's value for the given channel");
-        addCommand("addChannel", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::addChannel), "<username> <network> <chan>", "Adds a new channel");
-        addCommand("removeChannel", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::removeChannel), "<username> <network> <chan>", "Deletes a channel");
+        addCommand("addChannel",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::addChannel),
+                   "<username> <network> <chan>",
+                   "Adds a new channel");
+        addCommand("removeChannel",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::removeChannel),
+                   "<username> <network> <chan>",
+                   "Deletes a channel");
         addCommand("ListUsers", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListUsers), "", "Lists users");
-        addCommand("AddUser",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddUser),
-                   "<username> <password>",
-                   "Adds a new user");
+        addCommand("AddUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddUser), "<username> <password>", "Adds a new user");
         addCommand("DelUser",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DelUser),
                    "<username>",
@@ -1462,7 +1486,10 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::removeServer),
                    "<username> <network> <server>",
                    "Deletes an IRC server from the given or current user");
-        addCommand("Reconnect", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ReconnectUser), "<username> <network>", "Cycles the user's IRC server connection");
+        addCommand("Reconnect",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ReconnectUser),
+                   "<username> <network>",
+                   "Cycles the user's IRC server connection");
         addCommand("Disconnect",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DisconnectUser),
                    "<username> <network>",
@@ -1475,10 +1502,7 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::UnLoadModuleForUser),
                    "<username> <modulename>",
                    "Removes a Module of a user");
-        addCommand("ListMods",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListModulesForUser),
-                   "<username>",
-                   "Get the list of modules for a user");
+        addCommand("ListMods", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListModulesForUser), "<username>", "Get the list of modules for a user");
         addCommand("LoadNetModule",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::LoadModuleForNetwork),
                    "<username> <network> <modulename> [args]",
@@ -1495,22 +1519,32 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListCTCP),
                    "<username>",
                    "List the configured CTCP replies");
-        addCommand("AddCTCP", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddCTCP), "<username> <ctcp> [reply]", "Configure a new CTCP reply");
+        addCommand("AddCTCP",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddCTCP),
+                   "<username> <ctcp> [reply]",
+                   "Configure a new CTCP reply");
         addCommand("DelCTCP",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DelCTCP),
                    "<username> <ctcp>",
                    "Remove a CTCP reply");
 
         // Network commands
-        addCommand("AddNetwork", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddNetwork), "[username] <network>", "Add a network for a user");
-        addCommand("DelNetwork", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DelNetwork), "[username] <network>", "Delete a network for a user");
-        addCommand("ListNetworks",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListNetworks),
-                   "[username]",
-                   "List all networks for a user");
+        addCommand("AddNetwork",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddNetwork),
+                   "[username] <network>",
+                   "Add a network for a user");
+        addCommand("DelNetwork",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::DelNetwork),
+                   "[username] <network>",
+                   "Delete a network for a user");
+        addCommand("ListNetworks", static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::ListNetworks), "[username]", "List all networks for a user");
     }
 };
 
-template <> void no_moduleInfo<NoAdminMod>(NoModuleInfo& Info) { Info.setWikiPage("controlpanel"); }
+template <>
+void no_moduleInfo<NoAdminMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("controlpanel");
+}
 
 USERMODULEDEFS(NoAdminMod, "Dynamic configuration through IRC. Allows editing only yourself if you're not ZNC admin.")

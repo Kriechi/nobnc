@@ -190,7 +190,10 @@ NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName) : d(new NoNetworkPriv
     setEnabled(true);
 }
 
-NoNetwork::NoNetwork(NoUser* pUser, const NoNetwork& Network) : NoNetwork(pUser, "") { clone(Network); }
+NoNetwork::NoNetwork(NoUser* pUser, const NoNetwork& Network) : NoNetwork(pUser, "")
+{
+    clone(Network);
+}
 
 void NoNetwork::clone(const NoNetwork& Network, bool bCloneName)
 {
@@ -359,7 +362,8 @@ NoString NoNetwork::networkPath() const
     return sNetworkPath;
 }
 
-template <class T> struct TOption
+template <class T>
+struct TOption
 {
     const char* name;
     void (NoNetwork::*pSetter)(T);
@@ -391,22 +395,26 @@ bool NoNetwork::parseConfig(NoSettings* pConfig, NoString& sError, bool bUpgrade
 
         for (const auto& Option : StringOptions) {
             NoString sValue;
-            if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue);
+            if (pConfig->FindStringEntry(Option.name, sValue))
+                (this->*Option.pSetter)(sValue);
         }
 
         for (const auto& Option : BoolOptions) {
             NoString sValue;
-            if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.toBool());
+            if (pConfig->FindStringEntry(Option.name, sValue))
+                (this->*Option.pSetter)(sValue.toBool());
         }
 
         for (const auto& Option : DoubleOptions) {
             double fValue;
-            if (pConfig->FindDoubleEntry(Option.name, fValue)) (this->*Option.pSetter)(fValue);
+            if (pConfig->FindDoubleEntry(Option.name, fValue))
+                (this->*Option.pSetter)(fValue);
         }
 
         for (const auto& Option : SUIntOptions) {
             ushort value;
-            if (pConfig->FindUShortEntry(Option.name, value)) (this->*Option.pSetter)(value);
+            if (pConfig->FindUShortEntry(Option.name, value))
+                (this->*Option.pSetter)(value);
         }
 
         pConfig->FindStringVector("loadmodule", vsList);
@@ -578,7 +586,10 @@ void NoNetwork::bounceAllClients()
     d->clients.clear();
 }
 
-bool NoNetwork::isUserAttached() const { return !d->clients.empty(); }
+bool NoNetwork::isUserAttached() const
+{
+    return !d->clients.empty();
+}
 
 bool NoNetwork::isUserOnline() const
 {
@@ -674,7 +685,8 @@ void NoNetwork::clientConnected(NoClient* pClient)
         NoString sLine = BufLine.formatted(*pClient, msParams);
         bool bContinue = false;
         NETWORKMODULECALL(onPrivBufferPlayLine2(*pClient, sLine, BufLine.timestamp()), d->user, this, nullptr, &bContinue);
-        if (bContinue) continue;
+        if (bContinue)
+            continue;
         pClient->putClient(sLine);
     }
     d->noticeBuffer.clear();
@@ -695,12 +707,24 @@ void NoNetwork::clientDisconnected(NoClient* pClient)
     }
 }
 
-NoUser* NoNetwork::user() const { return d->user; }
+NoUser* NoNetwork::user() const
+{
+    return d->user;
+}
 
-NoString NoNetwork::name() const { return d->name; }
+NoString NoNetwork::name() const
+{
+    return d->name;
+}
 
-bool NoNetwork::isNetworkAttached() const { return !d->clients.empty(); }
-std::vector<NoClient*> NoNetwork::clients() const { return d->clients; }
+bool NoNetwork::isNetworkAttached() const
+{
+    return !d->clients.empty();
+}
+std::vector<NoClient*> NoNetwork::clients() const
+{
+    return d->clients;
+}
 
 std::vector<NoClient*> NoNetwork::findClients(const NoString& sIdentifier) const
 {
@@ -743,7 +767,10 @@ bool NoNetwork::setName(const NoString& sName)
     return false;
 }
 
-NoModuleLoader* NoNetwork::loader() const { return d->modules; }
+NoModuleLoader* NoNetwork::loader() const
+{
+    return d->modules;
+}
 
 bool NoNetwork::putUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipClient)
 {
@@ -792,7 +819,10 @@ bool NoNetwork::putModule(const NoString& sModule, const NoString& sLine, NoClie
 
 // Channels
 
-std::vector<NoChannel*> NoNetwork::channels() const { return d->channels; }
+std::vector<NoChannel*> NoNetwork::channels() const
+{
+    return d->channels;
+}
 
 NoChannel* NoNetwork::findChannel(NoString sName) const
 {
@@ -865,7 +895,8 @@ bool NoNetwork::removeChannel(const NoString& sName)
 void NoNetwork::joinChannels()
 {
     // Avoid divsion by zero, it's bad!
-    if (d->channels.empty()) return;
+    if (d->channels.empty())
+        return;
 
     // We start at a random offset into the channel list so that if your
     // first 3 channels are invite-only and you got MaxJoins == 3, ZNC will
@@ -877,7 +908,8 @@ void NoNetwork::joinChannels()
         uint idx = (start + a) % d->channels.size();
         NoChannel* pChan = d->channels[idx];
         if (!pChan->isOn() && !pChan->isDisabled()) {
-            if (!joinChan(pChan)) continue;
+            if (!joinChan(pChan))
+                continue;
 
             sChans.insert(pChan);
 
@@ -890,7 +922,8 @@ void NoNetwork::joinChannels()
         }
     }
 
-    while (!sChans.empty()) joinChannels(sChans);
+    while (!sChans.empty())
+        joinChannels(sChans);
 }
 
 void NoNetwork::joinChannels(std::set<NoChannel*>& sChans)
@@ -906,7 +939,8 @@ void NoNetwork::joinChannels(std::set<NoChannel*>& sChans)
         size_t len = sName.length() + sKey.length();
         len += 2; // two comma
 
-        if (!sKeys.empty() && uiJoinLength + len >= 512) break;
+        if (!sKeys.empty() && uiJoinLength + len >= 512)
+            break;
 
         if (!sJoin.empty()) {
             sJoin += ",";
@@ -932,7 +966,8 @@ bool NoNetwork::joinChan(NoChannel* pChan)
     bool bReturn = false;
     NETWORKMODULECALL(onJoining(*pChan), d->user, this, nullptr, &bReturn);
 
-    if (bReturn) return false;
+    if (bReturn)
+        return false;
 
     if (d->user->joinTries() != 0 && pChan->joinTries() >= d->user->joinTries()) {
         putStatus("The channel " + pChan->name() + " could not be joined, disabling it.");
@@ -941,26 +976,38 @@ bool NoNetwork::joinChan(NoChannel* pChan)
         pChan->incJoinTries();
         bool bFailed = false;
         NETWORKMODULECALL(onTimerAutoJoin(*pChan), d->user, this, nullptr, &bFailed);
-        if (bFailed) return false;
+        if (bFailed)
+            return false;
         return true;
     }
     return false;
 }
 
-NoString NoNetwork::channelPrefixes() const { return d->chanPrefixes; }
-void NoNetwork::setChannelPrefixes(const NoString& s) { d->chanPrefixes = s; }
+NoString NoNetwork::channelPrefixes() const
+{
+    return d->chanPrefixes;
+}
+void NoNetwork::setChannelPrefixes(const NoString& s)
+{
+    d->chanPrefixes = s;
+}
 
 bool NoNetwork::isChannel(const NoString& sChan) const
 {
-    if (sChan.empty()) return false; // There is no way this is a chan
-    if (channelPrefixes().empty()) return true; // We can't know, so we allow everything
+    if (sChan.empty())
+        return false; // There is no way this is a chan
+    if (channelPrefixes().empty())
+        return true; // We can't know, so we allow everything
     // Thanks to the above if (empty), we can do sChan[0]
     return channelPrefixes().contains(sChan[0]);
 }
 
 // Queries
 
-std::vector<NoQuery*> NoNetwork::queries() const { return d->queries; }
+std::vector<NoQuery*> NoNetwork::queries() const
+{
+    return d->queries;
+}
 
 NoQuery* NoNetwork::findQuery(const NoString& sName) const
 {
@@ -1021,9 +1068,15 @@ bool NoNetwork::removeQuery(const NoString& sName)
 
 // Server list
 
-std::vector<NoServerInfo*> NoNetwork::servers() const { return d->servers; }
+std::vector<NoServerInfo*> NoNetwork::servers() const
+{
+    return d->servers;
+}
 
-bool NoNetwork::hasServers() const { return !d->servers.empty(); }
+bool NoNetwork::hasServers() const
+{
+    return !d->servers.empty();
+}
 
 NoServerInfo* NoNetwork::findServer(const NoString& sName) const
 {
@@ -1049,13 +1102,17 @@ bool NoNetwork::removeServer(const NoString& sName, ushort uPort, const NoString
     for (std::vector<NoServerInfo*>::iterator it = d->servers.begin(); it != d->servers.end(); ++it, a++) {
         NoServerInfo* pServer = *it;
 
-        if (pServer == pCurServer) bSawCurrentServer = true;
+        if (pServer == pCurServer)
+            bSawCurrentServer = true;
 
-        if (!pServer->host().equals(sName)) continue;
+        if (!pServer->host().equals(sName))
+            continue;
 
-        if (uPort != 0 && pServer->port() != uPort) continue;
+        if (uPort != 0 && pServer->port() != uPort)
+            continue;
 
-        if (!sPass.empty() && pServer->password() != sPass) continue;
+        if (!sPass.empty() && pServer->password() != sPass)
+            continue;
 
         d->servers.erase(it);
 
@@ -1128,13 +1185,17 @@ bool NoNetwork::addServer(const NoString& sName, ushort uPort, const NoString& s
 
     // Check if server is already added
     for (NoServerInfo* pServer : d->servers) {
-        if (!sName.equals(pServer->host())) continue;
+        if (!sName.equals(pServer->host()))
+            continue;
 
-        if (uPort != pServer->port()) continue;
+        if (uPort != pServer->port())
+            continue;
 
-        if (sPass != pServer->password()) continue;
+        if (sPass != pServer->password())
+            continue;
 
-        if (bSSL != pServer->isSsl()) continue;
+        if (bSSL != pServer->isSsl())
+            continue;
 
         // Server is already added
         return false;
@@ -1174,7 +1235,10 @@ NoServerInfo* NoNetwork::currentServer() const
     return d->servers[uIdx];
 }
 
-void NoNetwork::setIrcServer(const NoString& s) { d->server = s; }
+void NoNetwork::setIrcServer(const NoString& s)
+{
+    d->server = s;
+}
 
 bool NoNetwork::setNextServer(const NoServerInfo* pServer)
 {
@@ -1188,18 +1252,36 @@ bool NoNetwork::setNextServer(const NoServerInfo* pServer)
     return false;
 }
 
-bool NoNetwork::isLastServer() const { return (d->serverIndex >= d->servers.size()); }
+bool NoNetwork::isLastServer() const
+{
+    return (d->serverIndex >= d->servers.size());
+}
 
-NoStringSet NoNetwork::trustedFingerprints() const { return d->trustedFingerprints; }
+NoStringSet NoNetwork::trustedFingerprints() const
+{
+    return d->trustedFingerprints;
+}
 void NoNetwork::addTrustedFingerprint(const NoString& sFP)
 {
     d->trustedFingerprints.insert(No::escape(sFP, No::HexColonFormat, No::HexColonFormat));
 }
-void NoNetwork::removeTrustedFingerprint(const NoString& sFP) { d->trustedFingerprints.erase(sFP); }
+void NoNetwork::removeTrustedFingerprint(const NoString& sFP)
+{
+    d->trustedFingerprints.erase(sFP);
+}
 
-NoIrcSocket* NoNetwork::ircSocket() const { return d->socket; }
-NoString NoNetwork::ircServer() const { return d->server; }
-NoNick NoNetwork::ircNick() const { return d->ircNick; }
+NoIrcSocket* NoNetwork::ircSocket() const
+{
+    return d->socket;
+}
+NoString NoNetwork::ircServer() const
+{
+    return d->server;
+}
+NoNick NoNetwork::ircNick() const
+{
+    return d->ircNick;
+}
 
 void NoNetwork::setIrcNick(const NoNick& n)
 {
@@ -1225,15 +1307,23 @@ NoString NoNetwork::currentNick() const
     return "";
 }
 
-bool NoNetwork::isIrcAway() const { return d->away; }
-void NoNetwork::setIrcAway(bool b) { d->away = b; }
+bool NoNetwork::isIrcAway() const
+{
+    return d->away;
+}
+void NoNetwork::setIrcAway(bool b)
+{
+    d->away = b;
+}
 
 bool NoNetwork::connect()
 {
-    if (!isEnabled() || d->socket || !hasServers()) return false;
+    if (!isEnabled() || d->socket || !hasServers())
+        return false;
 
     NoServerInfo* pServer = nextServer();
-    if (!pServer) return false;
+    if (!pServer)
+        return false;
 
     if (NoApp::Get().GetServerThrottle(pServer->host())) {
         // Can't connect right now, schedule retry later
@@ -1280,7 +1370,10 @@ bool NoNetwork::isIrcConnected() const
     return (pSock && pSock->IsAuthed());
 }
 
-void NoNetwork::setIrcSocket(NoIrcSocket* pIRCSock) { d->socket = pIRCSock; }
+void NoNetwork::setIrcSocket(NoIrcSocket* pIRCSock)
+{
+    d->socket = pIRCSock;
+}
 
 void NoNetwork::ircConnected()
 {
@@ -1302,7 +1395,10 @@ void NoNetwork::ircDisconnected()
     checkIrcConnect();
 }
 
-bool NoNetwork::isEnabled() const { return d->enabled; }
+bool NoNetwork::isEnabled() const
+{
+    return d->enabled;
+}
 
 void NoNetwork::setEnabled(bool b)
 {
@@ -1322,7 +1418,8 @@ void NoNetwork::setEnabled(bool b)
 void NoNetwork::checkIrcConnect()
 {
     // Do we want to connect?
-    if (isEnabled() && ircSocket() == nullptr) NoApp::Get().AddNetworkToQueue(this);
+    if (isEnabled() && ircSocket() == nullptr)
+        NoApp::Get().AddNetworkToQueue(this);
 }
 
 bool NoNetwork::putIrc(const NoString& sLine)
@@ -1337,7 +1434,10 @@ bool NoNetwork::putIrc(const NoString& sLine)
     return true;
 }
 
-void NoNetwork::addRawBuffer(const NoString& sFormat, const NoString& sText) { d->rawBuffer.addMessage(sFormat, sText); }
+void NoNetwork::addRawBuffer(const NoString& sFormat, const NoString& sText)
+{
+    d->rawBuffer.addMessage(sFormat, sText);
+}
 void NoNetwork::updateRawBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText)
 {
     d->rawBuffer.updateMessage(sMatch, sFormat, sText);
@@ -1346,21 +1446,36 @@ void NoNetwork::updateExactRawBuffer(const NoString& sFormat, const NoString& sT
 {
     d->rawBuffer.updateExactMessage(sFormat, sText);
 }
-void NoNetwork::clearRawBuffer() { d->rawBuffer.clear(); }
+void NoNetwork::clearRawBuffer()
+{
+    d->rawBuffer.clear();
+}
 
-void NoNetwork::addMotdBuffer(const NoString& sFormat, const NoString& sText) { d->motdBuffer.addMessage(sFormat, sText); }
+void NoNetwork::addMotdBuffer(const NoString& sFormat, const NoString& sText)
+{
+    d->motdBuffer.addMessage(sFormat, sText);
+}
 void NoNetwork::updateMotdBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText)
 {
     d->motdBuffer.updateMessage(sMatch, sFormat, sText);
 }
-void NoNetwork::clearMotdBuffer() { d->motdBuffer.clear(); }
+void NoNetwork::clearMotdBuffer()
+{
+    d->motdBuffer.clear();
+}
 
-void NoNetwork::addNoticeBuffer(const NoString& sFormat, const NoString& sText) { d->noticeBuffer.addMessage(sFormat, sText); }
+void NoNetwork::addNoticeBuffer(const NoString& sFormat, const NoString& sText)
+{
+    d->noticeBuffer.addMessage(sFormat, sText);
+}
 void NoNetwork::updateNoticeBuffer(const NoString& sMatch, const NoString& sFormat, const NoString& sText)
 {
     d->noticeBuffer.updateMessage(sMatch, sFormat, sText);
 }
-void NoNetwork::clearNoticeBuffer() { d->noticeBuffer.clear(); }
+void NoNetwork::clearNoticeBuffer()
+{
+    d->noticeBuffer.clear();
+}
 
 void NoNetwork::clearQueryBuffer()
 {
@@ -1413,7 +1528,10 @@ NoString NoNetwork::bindHost() const
     return d->bindHost;
 }
 
-NoString NoNetwork::encoding() const { return d->encoding; }
+NoString NoNetwork::encoding() const
+{
+    return d->encoding;
+}
 
 NoString NoNetwork::quitMsg() const
 {
@@ -1469,7 +1587,10 @@ void NoNetwork::setBindHost(const NoString& s)
     }
 }
 
-void NoNetwork::setEncoding(const NoString& s) { d->encoding = s; }
+void NoNetwork::setEncoding(const NoString& s)
+{
+    d->encoding = s;
+}
 
 void NoNetwork::setQuitMsg(const NoString& s)
 {
@@ -1480,13 +1601,31 @@ void NoNetwork::setQuitMsg(const NoString& s)
     }
 }
 
-double NoNetwork::floodRate() const { return d->floodRate; }
-ushort NoNetwork::floodBurst() const { return d->floodBurst; }
-void NoNetwork::setFloodRate(double fFloodRate) { d->floodRate = fFloodRate; }
-void NoNetwork::setFloodBurst(ushort uFloodBurst) { d->floodBurst = uFloodBurst; }
+double NoNetwork::floodRate() const
+{
+    return d->floodRate;
+}
+ushort NoNetwork::floodBurst() const
+{
+    return d->floodBurst;
+}
+void NoNetwork::setFloodRate(double fFloodRate)
+{
+    d->floodRate = fFloodRate;
+}
+void NoNetwork::setFloodBurst(ushort uFloodBurst)
+{
+    d->floodBurst = uFloodBurst;
+}
 
-ushort NoNetwork::joinDelay() const { return d->joinDelay; }
-void NoNetwork::setJoinDelay(ushort uJoinDelay) { d->joinDelay = uJoinDelay; }
+ushort NoNetwork::joinDelay() const
+{
+    return d->joinDelay;
+}
+void NoNetwork::setJoinDelay(ushort uJoinDelay)
+{
+    d->joinDelay = uJoinDelay;
+}
 
 NoString NoNetwork::expandString(const NoString& sStr) const
 {

@@ -26,9 +26,15 @@
 class NoLastSeenMod : public NoModule
 {
 private:
-    time_t GetTime(const NoUser* pUser) { return NoRegistry(this).value(pUser->userName()).toULong(); }
+    time_t GetTime(const NoUser* pUser)
+    {
+        return NoRegistry(this).value(pUser->userName()).toULong();
+    }
 
-    void SetTime(const NoUser* pUser) { NoRegistry(this).setValue(pUser->userName(), NoString(time(nullptr))); }
+    void SetTime(const NoUser* pUser)
+    {
+        NoRegistry(this).setValue(pUser->userName(), NoString(time(nullptr)));
+    }
 
     const NoString FormatLastSeen(const NoUser* pUser, const char* sDefault = "")
     {
@@ -77,9 +83,15 @@ public:
 
     // Event stuff:
 
-    void onClientLogin() override { SetTime(user()); }
+    void onClientLogin() override
+    {
+        SetTime(user());
+    }
 
-    void onClientDisconnect() override { SetTime(user()); }
+    void onClientDisconnect() override
+    {
+        SetTime(user());
+    }
 
     ModRet onDeleteUser(NoUser& User) override
     {
@@ -90,8 +102,14 @@ public:
 
     // Web stuff:
 
-    bool webRequiresAdmin() override { return true; }
-    NoString webMenuTitle() override { return "Last Seen"; }
+    bool webRequiresAdmin() override
+    {
+        return true;
+    }
+    NoString webMenuTitle() override
+    {
+        return "Last Seen";
+    }
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
@@ -135,6 +153,10 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoLastSeenMod>(NoModuleInfo& Info) { Info.setWikiPage("lastseen"); }
+template <>
+void no_moduleInfo<NoLastSeenMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("lastseen");
+}
 
 GLOBALMODULEDEFS(NoLastSeenMod, "Collects data about when a user last logged in.")

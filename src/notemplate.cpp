@@ -27,14 +27,24 @@
 class NoTemplateOptions
 {
 public:
-    NoTemplateOptions() : m_eEscapeFrom(No::AsciiFormat), m_eEscapeTo(No::AsciiFormat) {}
+    NoTemplateOptions() : m_eEscapeFrom(No::AsciiFormat), m_eEscapeTo(No::AsciiFormat)
+    {
+    }
 
-    virtual ~NoTemplateOptions() {}
+    virtual ~NoTemplateOptions()
+    {
+    }
 
     void Parse(const NoString& sLine);
 
-    No::EscapeFormat GetEscapeFrom() const { return m_eEscapeFrom; }
-    No::EscapeFormat GetEscapeTo() const { return m_eEscapeTo; }
+    No::EscapeFormat GetEscapeFrom() const
+    {
+        return m_eEscapeFrom;
+    }
+    No::EscapeFormat GetEscapeTo() const
+    {
+        return m_eEscapeTo;
+    }
 
 private:
     No::EscapeFormat m_eEscapeFrom;
@@ -45,20 +55,33 @@ class NoTemplateLoopContext
 {
 public:
     NoTemplateLoopContext(ulong uFilePos, const NoString& sLoopName, bool bReverse, std::vector<NoTemplate*>* pRows)
-        : m_bReverse(bReverse), m_bHasData(false), m_sName(sLoopName), m_uRowIndex(0), m_uFilePosition(uFilePos),
-          m_pvRows(pRows)
+        : m_bReverse(bReverse), m_bHasData(false), m_sName(sLoopName), m_uRowIndex(0), m_uFilePosition(uFilePos), m_pvRows(pRows)
     {
     }
 
-    virtual ~NoTemplateLoopContext() {}
+    virtual ~NoTemplateLoopContext()
+    {
+    }
 
     NoTemplateLoopContext(const NoTemplateLoopContext&) = default;
     NoTemplateLoopContext& operator=(const NoTemplateLoopContext&) = default;
 
-    void SetHasData(bool b = true) { m_bHasData = b; }
-    void SetName(const NoString& s) { m_sName = s; }
-    void SetRowIndex(uint u) { m_uRowIndex = u; }
-    uint IncRowIndex() { return ++m_uRowIndex; }
+    void SetHasData(bool b = true)
+    {
+        m_bHasData = b;
+    }
+    void SetName(const NoString& s)
+    {
+        m_sName = s;
+    }
+    void SetRowIndex(uint u)
+    {
+        m_uRowIndex = u;
+    }
+    uint IncRowIndex()
+    {
+        return ++m_uRowIndex;
+    }
     uint DecRowIndex()
     {
         if (m_uRowIndex == 0) {
@@ -66,16 +89,43 @@ public:
         }
         return --m_uRowIndex;
     }
-    void SetFilePosition(uint u) { m_uFilePosition = u; }
+    void SetFilePosition(uint u)
+    {
+        m_uFilePosition = u;
+    }
 
-    bool HasData() const { return m_bHasData; }
-    const NoString& GetName() const { return m_sName; }
-    ulong GetFilePosition() const { return m_uFilePosition; }
-    uint GetRowIndex() const { return m_uRowIndex; }
-    size_t GetRowCount() { return m_pvRows->size(); }
-    std::vector<NoTemplate*>* GetRows() { return m_pvRows; }
-    NoTemplate* GetNextRow() { return GetRow(IncRowIndex()); }
-    NoTemplate* GetCurRow() { return GetRow(m_uRowIndex); }
+    bool HasData() const
+    {
+        return m_bHasData;
+    }
+    const NoString& GetName() const
+    {
+        return m_sName;
+    }
+    ulong GetFilePosition() const
+    {
+        return m_uFilePosition;
+    }
+    uint GetRowIndex() const
+    {
+        return m_uRowIndex;
+    }
+    size_t GetRowCount()
+    {
+        return m_pvRows->size();
+    }
+    std::vector<NoTemplate*>* GetRows()
+    {
+        return m_pvRows;
+    }
+    NoTemplate* GetNextRow()
+    {
+        return GetRow(IncRowIndex());
+    }
+    NoTemplate* GetCurRow()
+    {
+        return GetRow(m_uRowIndex);
+    }
 
     NoTemplate* GetRow(uint uIndex);
     NoString GetValue(const NoString& sName, bool bFromIf = false);
@@ -224,8 +274,7 @@ NoTemplate::NoTemplate(const NoString& sFileName) : d(new NoTemplatePrivate)
     d->options.reset(new NoTemplateOptions);
 }
 
-NoTemplate::NoTemplate(const std::shared_ptr<NoTemplateOptions>& options, NoTemplate* parent)
-    : d(new NoTemplatePrivate)
+NoTemplate::NoTemplate(const std::shared_ptr<NoTemplateOptions>& options, NoTemplate* parent) : d(new NoTemplatePrivate)
 {
     d->options = options;
     d->parent = parent;
@@ -245,9 +294,12 @@ NoTemplate::~NoTemplate()
     }
 }
 
-void NoTemplate::addTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler) { d->tagHandlers.push_back(spTagHandler); }
+void NoTemplate::addTagHandler(std::shared_ptr<NoTemplateTagHandler> spTagHandler)
+{
+    d->tagHandlers.push_back(spTagHandler);
+}
 
-std::vector<std::shared_ptr<NoTemplateTagHandler> >&NoTemplate::tagHandlers()
+std::vector<std::shared_ptr<NoTemplateTagHandler>>& NoTemplate::tagHandlers()
 {
     if (d->parent) {
         return d->parent->tagHandlers();
@@ -362,7 +414,10 @@ void NoTemplate::removePath(const NoString& sPath)
     }
 }
 
-void NoTemplate::clearPaths() { d->paths.clear(); }
+void NoTemplate::clearPaths()
+{
+    d->paths.clear();
+}
 
 bool NoTemplate::setFile(const NoString& sFileName)
 {
@@ -389,7 +444,9 @@ class NoLoopSorter
     NoString m_sType;
 
 public:
-    NoLoopSorter(const NoString& sType) : m_sType(sType) {}
+    NoLoopSorter(const NoString& sType) : m_sType(sType)
+    {
+    }
     bool operator()(NoTemplate* pTemplate1, NoTemplate* pTemplate2)
     {
         return (pTemplate1->value(m_sType, false) < pTemplate2->value(m_sType, false));
@@ -449,7 +506,10 @@ bool NoTemplate::printString(NoString& sRet)
     return bRet;
 }
 
-bool NoTemplate::print(std::ostream& oOut) { return print(d->fileName, oOut); }
+bool NoTemplate::print(std::ostream& oOut)
+{
+    return print(d->fileName, oOut);
+}
 
 bool NoTemplate::print(const NoString& sFileName, std::ostream& oOut)
 {
@@ -596,7 +656,7 @@ bool NoTemplate::print(const NoString& sFileName, std::ostream& oOut)
                             break;
                         } else {
                             NO_DEBUG("[" + sFileName + ":" + NoString(uCurPos - iPos2 - 4) +
-                                  "] <? CONTINUE ?> must be used inside of a loop!");
+                                     "] <? CONTINUE ?> must be used inside of a loop!");
                         }
                     } else if (sAction.equals("BREAK")) {
                         // break from loop
@@ -609,7 +669,7 @@ bool NoTemplate::print(const NoString& sFileName, std::ostream& oOut)
                             break;
                         } else {
                             NO_DEBUG("[" + sFileName + ":" + NoString(uCurPos - iPos2 - 4) +
-                                  "] <? BREAK ?> must be used inside of a loop!");
+                                     "] <? BREAK ?> must be used inside of a loop!");
                         }
                     } else if (sAction.equals("EXIT")) {
                         bExit = true;
@@ -865,7 +925,8 @@ bool NoTemplate::validIf(const NoString& sArgs)
 }
 
 // TODO: cleanup
-extern NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight);
+extern NoString
+Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight);
 
 bool NoTemplate::validExpr(const NoString& sExpression)
 {
@@ -924,7 +985,10 @@ bool NoTemplate::isTrue(const NoString& sName)
     return value(sName, true).toBool();
 }
 
-bool NoTemplate::hasLoop(const NoString& sName) { return (loop(sName) != nullptr); }
+bool NoTemplate::hasLoop(const NoString& sName)
+{
+    return (loop(sName) != nullptr);
+}
 
 NoTemplate* NoTemplate::parent(bool bRoot)
 {
@@ -946,7 +1010,10 @@ NoTemplate* NoTemplate::currentTemplate()
     return pContext->GetCurRow();
 }
 
-NoString NoTemplate::fileName() const { return d->fileName; }
+NoString NoTemplate::fileName() const
+{
+    return d->fileName;
+}
 
 NoString NoTemplate::resolveLiteral(const NoString& sString)
 {

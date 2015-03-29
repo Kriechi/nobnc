@@ -33,7 +33,7 @@
 class NoSocketImpl : public Csock
 {
 public:
-    NoSocketImpl(NoSocket *q, const NoString& host, u_short port);
+    NoSocketImpl(NoSocket* q, const NoString& host, u_short port);
     ~NoSocketImpl();
 
     int ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const override;
@@ -43,26 +43,59 @@ public:
 #endif
 
 #ifdef HAVE_ICU
-    void IcuExtToUCallback(UConverterToUnicodeArgs* toArgs, const char* codeUnits, int32_t length, UConverterCallbackReason reason, UErrorCode* err ) override;
-    void IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs, const UChar* codeUnits, int32_t length, UChar32 codePoint, UConverterCallbackReason reason, UErrorCode* err ) override;
+    void IcuExtToUCallback(UConverterToUnicodeArgs* toArgs,
+                           const char* codeUnits,
+                           int32_t length,
+                           UConverterCallbackReason reason,
+                           UErrorCode* err) override;
+    void IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs,
+                             const UChar* codeUnits,
+                             int32_t length,
+                             UChar32 codePoint,
+                             UConverterCallbackReason reason,
+                             UErrorCode* err) override;
 #endif
 
     Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
 
-    void ReadLine( const NoString & sLine ) override;
+    void ReadLine(const NoString& sLine) override;
     void ReadData(const char* data, size_t len) override;
-    void PushBuff( const char *data, size_t len, bool bStartAtZero = false ) override;
+    void PushBuff(const char* data, size_t len, bool bStartAtZero = false) override;
 
-    void SockError( int iErrno, const NoString & sDescription ) override { q->SockErrorImpl(iErrno, sDescription); }
+    void SockError(int iErrno, const NoString& sDescription) override
+    {
+        q->SockErrorImpl(iErrno, sDescription);
+    }
 
-    void Connected() override { q->ConnectedImpl(); }
-    void Timeout() override { q->TimeoutImpl(); }
-    void Disconnected() override { q->DisconnectedImpl(); }
-    void ConnectionRefused() override { q->ConnectionRefusedImpl(); }
+    void Connected() override
+    {
+        q->ConnectedImpl();
+    }
+    void Timeout() override
+    {
+        q->TimeoutImpl();
+    }
+    void Disconnected() override
+    {
+        q->DisconnectedImpl();
+    }
+    void ConnectionRefused() override
+    {
+        q->ConnectionRefusedImpl();
+    }
 
-    void ReadPaused() override { q->ReadPausedImpl(); }
-    void ReachedMaxBuffer() override { q->ReachedMaxBufferImpl(); }
-    bool ConnectionFrom(const NoString& sHost, ushort uPort) override { return q->ConnectionFromImpl(sHost, uPort); }
+    void ReadPaused() override
+    {
+        q->ReadPausedImpl();
+    }
+    void ReachedMaxBuffer() override
+    {
+        q->ReachedMaxBufferImpl();
+    }
+    bool ConnectionFrom(const NoString& sHost, ushort uPort) override
+    {
+        return q->ConnectionFromImpl(sHost, uPort);
+    }
 
     NoSocket* q;
     bool allowControlCodes;
@@ -74,7 +107,10 @@ public:
 class NoSocketPrivate
 {
 public:
-    static NoSocketImpl* get(NoSocket* socket) { return socket->d->impl; }
+    static NoSocketImpl* get(NoSocket* socket)
+    {
+        return socket->d->impl;
+    }
 
     NoSocketImpl* impl;
 };

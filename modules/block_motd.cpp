@@ -20,7 +20,9 @@
 class NoBlockMotd : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoBlockMotd) {}
+    MODCONSTRUCTOR(NoBlockMotd)
+    {
+    }
 
     ModRet onRaw(NoString& sLine) override
     {
@@ -37,7 +39,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoBlockMotd>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoBlockMotd>(NoModuleInfo& Info)
 {
     Info.addType(No::NetworkModule);
     Info.addType(No::GlobalModule);

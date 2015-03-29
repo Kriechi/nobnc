@@ -24,14 +24,18 @@
 class NoBuffExtras : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoBuffExtras) {}
+    MODCONSTRUCTOR(NoBuffExtras)
+    {
+    }
 
     void AddBuffer(NoChannel& Channel, const NoString& sMessage)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
-        if (Channel.autoClearChanBuffer() && network()->isUserOnline()) return;
+        if (Channel.autoClearChanBuffer() && network()->isUserOnline())
+            return;
 
-        Channel.addBuffer(":" + moduleNick() + "!" + moduleName() + "@znc.in PRIVMSG " + _NAMEDFMT(Channel.name()) + " :{text}",
+        Channel.addBuffer(":" + moduleNick() + "!" + moduleName() + "@znc.in PRIVMSG " + _NAMEDFMT(Channel.name()) +
+                          " :{text}",
                           sMessage);
     }
 
@@ -55,7 +59,10 @@ public:
         }
     }
 
-    void onJoin(const NoNick& Nick, NoChannel& Channel) override { AddBuffer(Channel, Nick.nickMask() + " joined"); }
+    void onJoin(const NoNick& Nick, NoChannel& Channel) override
+    {
+        AddBuffer(Channel, Nick.nickMask() + " joined");
+    }
 
     void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
     {
@@ -79,7 +86,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoBuffExtras>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoBuffExtras>(NoModuleInfo& Info)
 {
     Info.setWikiPage("buffextras");
     Info.addType(No::NetworkModule);

@@ -72,7 +72,10 @@ public:
     void ConnectedImpl() override;
     void TimeoutImpl() override;
 
-    const NoString& GetChatNick() const { return (m_sChatNick); }
+    const NoString& GetChatNick() const
+    {
+        return (m_sChatNick);
+    }
 
     void PutQuery(const NoString& sText);
 
@@ -82,7 +85,8 @@ public:
     void AddLine(const NoString& sLine)
     {
         m_vBuffer.insert(m_vBuffer.begin(), sLine);
-        if (m_vBuffer.size() > 200) m_vBuffer.pop_back();
+        if (m_vBuffer.size() > 200)
+            m_vBuffer.pop_back();
     }
 
     void DumpBuffer()
@@ -94,7 +98,8 @@ public:
         } else {
             // Buffer playback
             std::vector<NoString>::reverse_iterator it = m_vBuffer.rbegin();
-            for (; it != m_vBuffer.rend(); ++it) ReadLineImpl(*it);
+            for (; it != m_vBuffer.rend(); ++it)
+                ReadLineImpl(*it);
 
             m_vBuffer.clear();
         }
@@ -109,7 +114,9 @@ private:
 class NoSChat : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoSChat) {}
+    MODCONSTRUCTOR(NoSChat)
+    {
+    }
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
@@ -224,7 +231,8 @@ public:
                 putModule("No SDCCs currently in session");
 
         } else if (sCom.equals("close")) {
-            if (!sArgs.startsWith("(s)")) sArgs = "(s)" + sArgs;
+            if (!sArgs.startsWith("(s)"))
+                sArgs = "(s)" + sArgs;
 
             for (NoSChatSock* pSock : m_sockets) {
                 if (sArgs.equals(pSock->GetChatNick())) {
@@ -359,7 +367,8 @@ public:
     void RemoveMarker(const NoString& sNick)
     {
         std::map<NoString, std::pair<u_long, u_short>>::iterator it = m_siiWaitingChats.find(sNick);
-        if (it != m_siiWaitingChats.end()) m_siiWaitingChats.erase(it);
+        if (it != m_siiWaitingChats.end())
+            m_siiWaitingChats.erase(it);
     }
 
     void SendToUser(const NoString& sFrom, const NoString& sText)
@@ -369,10 +378,19 @@ public:
         putUser(sSend);
     }
 
-    bool IsAttached() { return (network()->isUserAttached()); }
+    bool IsAttached()
+    {
+        return (network()->isUserAttached());
+    }
 
-    void AddSocket(NoSChatSock* socket) { m_sockets.insert(socket); }
-    void RemoveSocket(NoSChatSock* socket) { m_sockets.erase(socket); }
+    void AddSocket(NoSChatSock* socket)
+    {
+        m_sockets.insert(socket);
+    }
+    void RemoveSocket(NoSChatSock* socket)
+    {
+        m_sockets.erase(socket);
+    }
 
 private:
     std::map<NoString, std::pair<u_long, u_short>> m_siiWaitingChats;
@@ -427,13 +445,15 @@ void NoSChatSock::ReadLineImpl(const NoString& sLine)
 
 void NoSChatSock::DisconnectedImpl()
 {
-    if (m_module) PutQuery("*** Disconnected.");
+    if (m_module)
+        PutQuery("*** Disconnected.");
 }
 
 void NoSChatSock::ConnectedImpl()
 {
     SetTimeout(0);
-    if (m_module) PutQuery("*** Connected.");
+    if (m_module)
+        PutQuery("*** Connected.");
 }
 
 void NoSChatSock::TimeoutImpl()
@@ -453,7 +473,8 @@ void NoRemMarkerJob::run()
     // store buffer
 }
 
-template <> void no_moduleInfo<NoSChat>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoSChat>(NoModuleInfo& Info)
 {
     Info.setWikiPage("schat");
     Info.setHasArgs(true);

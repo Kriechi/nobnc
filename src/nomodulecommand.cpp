@@ -18,7 +18,9 @@
 #include "nomodulecommand.h"
 #include "notable.h"
 
-NoModuleCommand::NoModuleCommand() : m_cmd(), m_func(nullptr), m_args(), m_desc() {}
+NoModuleCommand::NoModuleCommand() : m_cmd(), m_func(nullptr), m_args(), m_desc()
+{
+}
 
 NoModuleCommand::NoModuleCommand(const NoString& sCmd, NoModule* pMod, ModCmdFunc func, const NoString& sArgs, const NoString& sDesc)
     : m_cmd(sCmd), m_func([pMod, func](const NoString& sLine) { (pMod->*func)(sLine); }), m_args(sArgs), m_desc(sDesc)
@@ -59,12 +61,27 @@ void NoModuleCommand::addHelp(NoTable& Table) const
     Table.setValue("Description", description());
 }
 
-void NoModuleCommand::call(const NoString& sLine) const { m_func(sLine); }
+void NoModuleCommand::call(const NoString& sLine) const
+{
+    m_func(sLine);
+}
 
-NoString NoModuleCommand::description() const { return m_desc; }
+NoString NoModuleCommand::description() const
+{
+    return m_desc;
+}
 
-NoString NoModuleCommand::args() const { return m_args; }
+NoString NoModuleCommand::args() const
+{
+    return m_args;
+}
 
-NoModuleCommand::CmdFunc NoModuleCommand::function() const { return m_func; }
+NoModuleCommand::CmdFunc NoModuleCommand::function() const
+{
+    return m_func;
+}
 
-NoString NoModuleCommand::command() const { return m_cmd; }
+NoString NoModuleCommand::command() const
+{
+    return m_cmd;
+}

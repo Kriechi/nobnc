@@ -79,7 +79,7 @@ public:
     uint GetAnonConnectionCount(const NoString& sIP) const;
 
     void Cleanup();
-    void DynamicSelectLoop( uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution = 3600 );
+    void DynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution = 3600);
     void AddSock(NoSocket* pcSock, const NoString& sSockName);
     void DelSockByAddr(NoSocket* socket);
     bool SwapSockByAddr(Csock* newSocket, Csock* originalSocket);

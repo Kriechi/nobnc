@@ -51,7 +51,8 @@ public:
 
             for (NoChannel* pChan : vChans) {
                 // Skip detached channels, they weren't read yet
-                if (pChan->isDetached()) continue;
+                if (pChan->isDetached())
+                    continue;
 
                 pChan->clearBuffer();
                 // We deny AutoClearChanBuffer on all channels since this module
@@ -73,49 +74,57 @@ public:
 
     ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
     {
-        if (m_bRules[RULE_MSG]) ClearAllBuffers();
+        if (m_bRules[RULE_MSG])
+            ClearAllBuffers();
         return CONTINUE;
     }
 
     ModRet onUserCtcp(NoString& sTarget, NoString& sMessage) override
     {
-        if (m_bRules[RULE_CTCP]) ClearAllBuffers();
+        if (m_bRules[RULE_CTCP])
+            ClearAllBuffers();
         return CONTINUE;
     }
 
     ModRet onUserAction(NoString& sTarget, NoString& sMessage) override
     {
-        if (m_bRules[RULE_ACTION]) ClearAllBuffers();
+        if (m_bRules[RULE_ACTION])
+            ClearAllBuffers();
         return CONTINUE;
     }
 
     ModRet onUserNotice(NoString& sTarget, NoString& sMessage) override
     {
-        if (m_bRules[RULE_NOTICE]) ClearAllBuffers();
+        if (m_bRules[RULE_NOTICE])
+            ClearAllBuffers();
         return CONTINUE;
     }
 
     ModRet onUserPart(NoString& sChannel, NoString& sMessage) override
     {
-        if (m_bRules[RULE_PART]) ClearAllBuffers();
+        if (m_bRules[RULE_PART])
+            ClearAllBuffers();
         return CONTINUE;
     }
 
     ModRet onUserTopic(NoString& sChannel, NoString& sTopic) override
     {
-        if (m_bRules[RULE_TOPIC]) ClearAllBuffers();
+        if (m_bRules[RULE_TOPIC])
+            ClearAllBuffers();
         return CONTINUE;
     }
 
     ModRet onUserQuit(NoString& sMessage) override
     {
-        if (m_bRules[RULE_QUIT]) ClearAllBuffers();
+        if (m_bRules[RULE_QUIT])
+            ClearAllBuffers();
         return CONTINUE;
     }
 
     void SetAllRules(bool bVal)
     {
-        for (int i = 0; i < RULE_MAX; i++) m_bRules[i] = bVal;
+        for (int i = 0; i < RULE_MAX; i++)
+            m_bRules[i] = bVal;
     }
 
     void SetRule(const NoString& sOpt, bool bVal)
@@ -138,7 +147,8 @@ public:
             SetAllRules(bVal);
         } else {
             for (int i = 0; i < RULE_MAX; i++) {
-                if (sOpt.equals(Names[i].sName)) m_bRules[Names[i].Index] = bVal;
+                if (sOpt.equals(Names[i].sName))
+                    m_bRules[Names[i].Index] = bVal;
             }
         }
     }
@@ -161,7 +171,8 @@ private:
     bool m_bRules[RULE_MAX];
 };
 
-template <> void no_moduleInfo<NoClearBufferOnMsgMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoClearBufferOnMsgMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("clearbufferonmsg");
     Info.setHasArgs(true);

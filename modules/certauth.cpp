@@ -76,7 +76,10 @@ public:
         return true;
     }
 
-    void onPostRehash() override { onBoot(); }
+    void onPostRehash() override
+    {
+        onBoot();
+    }
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
@@ -95,7 +98,8 @@ public:
                 sVal += *it2 + " ";
             }
 
-            if (!sVal.empty()) registry.setValue(it->first, sVal);
+            if (!sVal.empty())
+                registry.setValue(it->first, sVal);
         }
 
         return registry.save();
@@ -118,7 +122,8 @@ public:
         NoSocket* pSock = Auth->socket();
         NoUser* pUser = NoApp::Get().FindUser(sUser);
 
-        if (pSock == nullptr || pUser == nullptr) return CONTINUE;
+        if (pSock == nullptr || pUser == nullptr)
+            return CONTINUE;
 
         const NoString sPubKey = GetKey(pSock);
         NO_DEBUG("User: " << sUser << " Key: " << sPubKey);
@@ -226,7 +231,8 @@ public:
         }
 
         it->second.erase(it2);
-        if (it->second.size() == 0) m_PubKeys.erase(it);
+        if (it->second.size() == 0)
+            m_PubKeys.erase(it);
         putModule("Removed");
 
         Save();
@@ -251,7 +257,10 @@ public:
         }
     }
 
-    NoString webMenuTitle() override { return "certauth"; }
+    NoString webMenuTitle() override
+    {
+        return "certauth";
+    }
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
@@ -296,6 +305,10 @@ private:
     MNoStringSet m_PubKeys;
 };
 
-template <> void no_moduleInfo<NoSslClientCertMod>(NoModuleInfo& Info) { Info.setWikiPage("certauth"); }
+template <>
+void no_moduleInfo<NoSslClientCertMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("certauth");
+}
 
 GLOBALMODULEDEFS(NoSslClientCertMod, "Allow users to authenticate via SSL client certificates.")

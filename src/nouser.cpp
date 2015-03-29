@@ -141,7 +141,8 @@ NoUser::~NoUser()
     NoApp::Get().AddBytesWritten(bytesWritten());
 }
 
-template <class T> struct TOption
+template <class T>
+struct TOption
 {
     const char* name;
     void (NoUser::*pSetter)(T);
@@ -185,15 +186,18 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
 
     for (const auto& Option : StringOptions) {
         NoString sValue;
-        if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue);
+        if (pConfig->FindStringEntry(Option.name, sValue))
+            (this->*Option.pSetter)(sValue);
     }
     for (const auto& Option : UIntOptions) {
         NoString sValue;
-        if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.toUInt());
+        if (pConfig->FindStringEntry(Option.name, sValue))
+            (this->*Option.pSetter)(sValue.toUInt());
     }
     for (const auto& Option : BoolOptions) {
         NoString sValue;
-        if (pConfig->FindStringEntry(Option.name, sValue)) (this->*Option.pSetter)(sValue.toBool());
+        if (pConfig->FindStringEntry(Option.name, sValue))
+            (this->*Option.pSetter)(sValue.toBool());
     }
 
     NoStringVector vsList;
@@ -231,7 +235,8 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
             }
         }
     }
-    if (pConfig->FindStringEntry("buffer", sValue)) setBufferCount(sValue.toUInt(), true);
+    if (pConfig->FindStringEntry("buffer", sValue))
+        setBufferCount(sValue.toUInt(), true);
     if (pConfig->FindStringEntry("awaysuffix", sValue)) {
         No::printMessage("WARNING: AwaySuffix has been deprecated, instead try -> LoadModule = awaynick %nick%_" + sValue);
     }
@@ -292,7 +297,8 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
         NoString sPass = No::tokens(sValue, 1, "#");
         if (sMethod == "md5" || sMethod == "sha256") {
             NoUser::HashType type = NoUser::HashMd5;
-            if (sMethod == "sha256") type = NoUser::HashSha256;
+            if (sMethod == "sha256")
+                type = NoUser::HashSha256;
 
             NoString sSalt = No::token(sPass, 1, "#");
             sPass = No::token(sPass, 0, "#");
@@ -542,7 +548,10 @@ NoNetwork* NoUser::findNetwork(const NoString& sNetwork) const
     return nullptr;
 }
 
-std::vector<NoNetwork*> NoUser::networks() const { return d->networks; }
+std::vector<NoNetwork*> NoUser::networks() const
+{
+    return d->networks;
+}
 
 NoString NoUser::expandString(const NoString& sStr) const
 {
@@ -630,7 +639,10 @@ void NoUser::bounceAllClients()
     d->clients.clear();
 }
 
-void NoUser::setKeepBuffer(bool b) { setAutoClearChanBuffer(!b); }
+void NoUser::setKeepBuffer(bool b)
+{
+    setAutoClearChanBuffer(!b);
+}
 
 void NoUser::userConnected(NoClient* pClient)
 {
@@ -702,7 +714,7 @@ bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     // on breaks too much stuff (e.g. lots of paths depend on the user name)
     if (userName() != User.userName()) {
         NO_DEBUG("Ignoring username in NoUser::Clone(), old username [" << userName() << "]; New username ["
-                                                                    << User.userName() << "]");
+                                                                        << User.userName() << "]");
     }
 
     if (!User.password().empty()) {
@@ -803,11 +815,20 @@ bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     return true;
 }
 
-void NoUser::addBytesRead(ulonglong u) { d->bytesRead += u; }
+void NoUser::addBytesRead(ulonglong u)
+{
+    d->bytesRead += u;
+}
 
-void NoUser::addBytesWritten(ulonglong u) { d->bytesWritten += u; }
+void NoUser::addBytesWritten(ulonglong u)
+{
+    d->bytesWritten += u;
+}
 
-std::set<NoString> NoUser::allowedHosts() const { return d->allowedHosts; }
+std::set<NoString> NoUser::allowedHosts() const
+{
+    return d->allowedHosts;
+}
 bool NoUser::addAllowedHost(const NoString& sHostMask)
 {
     if (sHostMask.empty() || d->allowedHosts.find(sHostMask) != d->allowedHosts.end()) {
@@ -833,9 +854,18 @@ bool NoUser::isHostAllowed(const NoString& sHostMask) const
     return false;
 }
 
-NoString NoUser::timestampFormat() const { return d->timestampFormat; }
-bool NoUser::timestampAppend() const { return d->appendTimestamp; }
-bool NoUser::timestampPrepend() const { return d->prependTimestamp; }
+NoString NoUser::timestampFormat() const
+{
+    return d->timestampFormat;
+}
+bool NoUser::timestampAppend() const
+{
+    return d->appendTimestamp;
+}
+bool NoUser::timestampPrepend() const
+{
+    return d->prependTimestamp;
+}
 
 bool NoUser::isValidUserName(const NoString& sUserName)
 {
@@ -912,7 +942,8 @@ NoSettings NoUser::toConfig() const
     config.AddKeyValuePair("BindHost", bindHost());
     config.AddKeyValuePair("DCCBindHost", dccBindHost());
     config.AddKeyValuePair("QuitMsg", quitMsg());
-    if (NoApp::Get().GetStatusPrefix() != statusPrefix()) config.AddKeyValuePair("StatusPrefix", statusPrefix());
+    if (NoApp::Get().GetStatusPrefix() != statusPrefix())
+        config.AddKeyValuePair("StatusPrefix", statusPrefix());
     config.AddKeyValuePair("Skin", skinName());
     config.AddKeyValuePair("ChanModes", defaultChanModes());
     config.AddKeyValuePair("Buffer", NoString(bufferCount()));
@@ -999,7 +1030,8 @@ bool NoUser::checkPass(const NoString& sPass) const
 
 NoString NoUser::localDccIp() const
 {
-    if (!dccBindHost().empty()) return dccBindHost();
+    if (!dccBindHost().empty())
+        return dccBindHost();
 
     for (NoNetwork* pNetwork : d->networks) {
         NoIrcSocket* pIRCSock = pNetwork->ircSocket();
@@ -1105,9 +1137,15 @@ bool NoUser::putModuleNotice(const NoString& sModule, const NoString& sLine, NoC
     return (pClient == nullptr);
 }
 
-NoString NoUser::makeCleanUserName(const NoString& sUserName) { return No::token(sUserName, 0, "@").replace_n(".", ""); }
+NoString NoUser::makeCleanUserName(const NoString& sUserName)
+{
+    return No::token(sUserName, 0, "@").replace_n(".", "");
+}
 
-NoModuleLoader* NoUser::loader() const { return d->modules; }
+NoModuleLoader* NoUser::loader() const
+{
+    return d->modules;
+}
 
 bool NoUser::isUserAttached() const
 {
@@ -1139,7 +1177,7 @@ bool NoUser::loadModule(const NoString& sModName, const NoString& sArgs, const N
 
     if (!ModInfo.supportsType(No::UserModule) && ModInfo.supportsType(No::NetworkModule)) {
         No::printMessage("NOTICE: Module [" + sModName +
-                             "] is a network module, loading module for all networks in user.");
+                         "] is a network module, loading module for all networks in user.");
 
         // Do they have old NV?
         NoFile fNVFile = NoFile(userPath() + "/moddata/" + sModName + "/.registry");
@@ -1170,25 +1208,64 @@ bool NoUser::loadModule(const NoString& sModName, const NoString& sArgs, const N
 }
 
 // Setters
-void NoUser::setNick(const NoString& s) { d->nickName = s; }
-void NoUser::setAltNick(const NoString& s) { d->altNick = s; }
-void NoUser::setIdent(const NoString& s) { d->ident = s; }
-void NoUser::setRealName(const NoString& s) { d->realName = s; }
-void NoUser::setBindHost(const NoString& s) { d->bindHost = s; }
-void NoUser::setDccBindHost(const NoString& s) { d->dccBindHost = s; }
+void NoUser::setNick(const NoString& s)
+{
+    d->nickName = s;
+}
+void NoUser::setAltNick(const NoString& s)
+{
+    d->altNick = s;
+}
+void NoUser::setIdent(const NoString& s)
+{
+    d->ident = s;
+}
+void NoUser::setRealName(const NoString& s)
+{
+    d->realName = s;
+}
+void NoUser::setBindHost(const NoString& s)
+{
+    d->bindHost = s;
+}
+void NoUser::setDccBindHost(const NoString& s)
+{
+    d->dccBindHost = s;
+}
 void NoUser::setPassword(const NoString& s, HashType eHash, const NoString& sSalt)
 {
     d->password = s;
     d->hashType = eHash;
     d->passwordSalt = sSalt;
 }
-void NoUser::setMultiClients(bool b) { d->multiClients = b; }
-void NoUser::setDenyLoadMod(bool b) { d->denyLoadMod = b; }
-void NoUser::setAdmin(bool b) { d->admin = b; }
-void NoUser::setDenysetBindHost(bool b) { d->denysetBindHost = b; }
-void NoUser::setDefaultChanModes(const NoString& s) { d->defaultChanModes = s; }
-void NoUser::setClientEncoding(const NoString& s) { d->clientEncoding = s; }
-void NoUser::setQuitMsg(const NoString& s) { d->quitMsg = s; }
+void NoUser::setMultiClients(bool b)
+{
+    d->multiClients = b;
+}
+void NoUser::setDenyLoadMod(bool b)
+{
+    d->denyLoadMod = b;
+}
+void NoUser::setAdmin(bool b)
+{
+    d->admin = b;
+}
+void NoUser::setDenysetBindHost(bool b)
+{
+    d->denysetBindHost = b;
+}
+void NoUser::setDefaultChanModes(const NoString& s)
+{
+    d->defaultChanModes = s;
+}
+void NoUser::setClientEncoding(const NoString& s)
+{
+    d->clientEncoding = s;
+}
+void NoUser::setQuitMsg(const NoString& s)
+{
+    d->quitMsg = s;
+}
 void NoUser::setAutoClearChanBuffer(bool b)
 {
     for (NoNetwork* pNetwork : d->networks) {
@@ -1198,33 +1275,70 @@ void NoUser::setAutoClearChanBuffer(bool b)
     }
     d->autoClearChanBuffer = b;
 }
-void NoUser::setAutoclearQueryBuffer(bool b) { d->autoclearQueryBuffer = b; }
+void NoUser::setAutoclearQueryBuffer(bool b)
+{
+    d->autoclearQueryBuffer = b;
+}
 
-void NoUser::setBeingDeleted(bool b) { d->beingDeleted = b; }
+void NoUser::setBeingDeleted(bool b)
+{
+    d->beingDeleted = b;
+}
 
-void NoUser::setTimestampFormat(const NoString& s) { d->timestampFormat = s; }
+void NoUser::setTimestampFormat(const NoString& s)
+{
+    d->timestampFormat = s;
+}
 
-void NoUser::setTimestampAppend(bool b) { d->appendTimestamp = b; }
+void NoUser::setTimestampAppend(bool b)
+{
+    d->appendTimestamp = b;
+}
 
-void NoUser::setTimestampPrepend(bool b) { d->prependTimestamp = b; }
+void NoUser::setTimestampPrepend(bool b)
+{
+    d->prependTimestamp = b;
+}
 
-void NoUser::setTimezone(const NoString& s) { d->timezone = s; }
+void NoUser::setTimezone(const NoString& s)
+{
+    d->timezone = s;
+}
 
-void NoUser::setJoinTries(uint i) { d->maxJoinTries = i; }
+void NoUser::setJoinTries(uint i)
+{
+    d->maxJoinTries = i;
+}
 
-void NoUser::setMaxJoins(uint i) { d->maxJoins = i; }
+void NoUser::setMaxJoins(uint i)
+{
+    d->maxJoins = i;
+}
 
-void NoUser::setSkinName(const NoString& s) { d->skinName = s; }
+void NoUser::setSkinName(const NoString& s)
+{
+    d->skinName = s;
+}
 
-void NoUser::setMaxNetworks(uint i) { d->maxNetworks = i; }
+void NoUser::setMaxNetworks(uint i)
+{
+    d->maxNetworks = i;
+}
 
-void NoUser::setMaxQueryBuffers(uint i) { d->maxQueryBuffers = i; }
+void NoUser::setMaxQueryBuffers(uint i)
+{
+    d->maxQueryBuffers = i;
+}
 
-std::vector<NoClient*> NoUser::userClients() const { return d->clients; }
+std::vector<NoClient*> NoUser::userClients() const
+{
+    return d->clients;
+}
 
 bool NoUser::setBufferCount(uint u, bool bForce)
 {
-    if (!bForce && u > NoApp::Get().GetMaxBufferSize()) return false;
+    if (!bForce && u > NoApp::Get().GetMaxBufferSize())
+        return false;
     for (NoNetwork* pNetwork : d->networks) {
         for (NoChannel* pChan : pNetwork->channels()) {
             pChan->inheritBufferCount(u, bForce);
@@ -1248,7 +1362,10 @@ bool NoUser::addCtcpReply(const NoString& sCTCP, const NoString& sReply)
     return true;
 }
 
-bool NoUser::removeCtcpReply(const NoString& sCTCP) { return d->ctcpReplies.erase(sCTCP) > 0; }
+bool NoUser::removeCtcpReply(const NoString& sCTCP)
+{
+    return d->ctcpReplies.erase(sCTCP) > 0;
+}
 
 bool NoUser::setStatusPrefix(const NoString& s)
 {
@@ -1279,8 +1396,14 @@ std::vector<NoClient*> NoUser::allClients() const
     return vClients;
 }
 
-NoString NoUser::userName() const { return d->userName; }
-NoString NoUser::cleanUserName() const { return d->cleanUserName; }
+NoString NoUser::userName() const
+{
+    return d->userName;
+}
+NoString NoUser::cleanUserName() const
+{
+    return d->cleanUserName;
+}
 NoString NoUser::nick(bool bAllowDefault) const
 {
     return (bAllowDefault && d->nickName.empty()) ? cleanUserName() : d->nickName;
@@ -1293,44 +1416,128 @@ NoString NoUser::ident(bool bAllowDefault) const
 {
     return (bAllowDefault && d->ident.empty()) ? cleanUserName() : d->ident;
 }
-NoString NoUser::realName() const { return d->realName.empty() ? d->userName : d->realName; }
-NoString NoUser::bindHost() const { return d->bindHost; }
-NoString NoUser::dccBindHost() const { return d->dccBindHost; }
-NoString NoUser::password() const { return d->password; }
-NoUser::HashType NoUser::passwordHashType() const { return d->hashType; }
-NoString NoUser::passwordSalt() const { return d->passwordSalt; }
-bool NoUser::denyLoadMod() const { return d->denyLoadMod; }
-bool NoUser::isAdmin() const { return d->admin; }
-bool NoUser::denysetBindHost() const { return d->denysetBindHost; }
-bool NoUser::multiClients() const { return d->multiClients; }
-NoString NoUser::statusPrefix() const { return d->statusPrefix; }
-NoString NoUser::defaultChanModes() const { return d->defaultChanModes; }
-NoString NoUser::clientEncoding() const { return d->clientEncoding; }
-bool NoUser::hasSpaceForNewNetwork() const { return networks().size() < maxNetworks(); }
+NoString NoUser::realName() const
+{
+    return d->realName.empty() ? d->userName : d->realName;
+}
+NoString NoUser::bindHost() const
+{
+    return d->bindHost;
+}
+NoString NoUser::dccBindHost() const
+{
+    return d->dccBindHost;
+}
+NoString NoUser::password() const
+{
+    return d->password;
+}
+NoUser::HashType NoUser::passwordHashType() const
+{
+    return d->hashType;
+}
+NoString NoUser::passwordSalt() const
+{
+    return d->passwordSalt;
+}
+bool NoUser::denyLoadMod() const
+{
+    return d->denyLoadMod;
+}
+bool NoUser::isAdmin() const
+{
+    return d->admin;
+}
+bool NoUser::denysetBindHost() const
+{
+    return d->denysetBindHost;
+}
+bool NoUser::multiClients() const
+{
+    return d->multiClients;
+}
+NoString NoUser::statusPrefix() const
+{
+    return d->statusPrefix;
+}
+NoString NoUser::defaultChanModes() const
+{
+    return d->defaultChanModes;
+}
+NoString NoUser::clientEncoding() const
+{
+    return d->clientEncoding;
+}
+bool NoUser::hasSpaceForNewNetwork() const
+{
+    return networks().size() < maxNetworks();
+}
 
-NoString NoUser::quitMsg() const { return (!d->quitMsg.trim_n().empty()) ? d->quitMsg : NoApp::GetTag(false); }
-NoStringMap NoUser::ctcpReplies() const { return d->ctcpReplies; }
-uint NoUser::bufferCount() const { return d->bufferCount; }
-bool NoUser::autoClearChanBuffer() const { return d->autoClearChanBuffer; }
-bool NoUser::autoclearQueryBuffer() const { return d->autoclearQueryBuffer; }
+NoString NoUser::quitMsg() const
+{
+    return (!d->quitMsg.trim_n().empty()) ? d->quitMsg : NoApp::GetTag(false);
+}
+NoStringMap NoUser::ctcpReplies() const
+{
+    return d->ctcpReplies;
+}
+uint NoUser::bufferCount() const
+{
+    return d->bufferCount;
+}
+bool NoUser::autoClearChanBuffer() const
+{
+    return d->autoClearChanBuffer;
+}
+bool NoUser::autoclearQueryBuffer() const
+{
+    return d->autoclearQueryBuffer;
+}
 
-bool NoUser::isBeingDeleted() const { return d->beingDeleted; }
+bool NoUser::isBeingDeleted() const
+{
+    return d->beingDeleted;
+}
 
-NoString NoUser::timezone() const { return d->timezone; }
+NoString NoUser::timezone() const
+{
+    return d->timezone;
+}
 
-ulonglong NoUser::bytesRead() const { return d->bytesRead; }
+ulonglong NoUser::bytesRead() const
+{
+    return d->bytesRead;
+}
 
-ulonglong NoUser::bytesWritten() const { return d->bytesWritten; }
+ulonglong NoUser::bytesWritten() const
+{
+    return d->bytesWritten;
+}
 
-uint NoUser::joinTries() const { return d->maxJoinTries; }
+uint NoUser::joinTries() const
+{
+    return d->maxJoinTries;
+}
 
-uint NoUser::maxJoins() const { return d->maxJoins; }
+uint NoUser::maxJoins() const
+{
+    return d->maxJoins;
+}
 // NoString NoUser::GetSkinName() const { return (!d->sSkinName.empty()) ? d->sSkinName : NoApp::Get().GetSkinName(); }
-NoString NoUser::skinName() const { return d->skinName; }
+NoString NoUser::skinName() const
+{
+    return d->skinName;
+}
 
-uint NoUser::maxNetworks() const { return d->maxNetworks; }
+uint NoUser::maxNetworks() const
+{
+    return d->maxNetworks;
+}
 
-uint NoUser::maxQueryBuffers() const { return d->maxQueryBuffers; }
+uint NoUser::maxQueryBuffers() const
+{
+    return d->maxQueryBuffers;
+}
 NoString NoUser::userPath() const
 {
     if (!NoFile::Exists(d->userPath)) {

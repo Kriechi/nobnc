@@ -53,7 +53,8 @@ public:
         m_pTimer = nullptr;
 
         // Check if we need to start the timer
-        if (network()->isIrcConnected()) onIrcConnected();
+        if (network()->isIrcConnected())
+            onIrcConnected();
 
         return true;
     }
@@ -66,10 +67,12 @@ public:
 
         NoIrcSocket* pIRCSock = network()->ircSocket();
 
-        if (!pIRCSock) return;
+        if (!pIRCSock)
+            return;
 
         // Do we already have the nick we want?
-        if (pIRCSock->GetNick().equals(GetNick())) return;
+        if (pIRCSock->GetNick().equals(GetNick()))
+            return;
 
         putIrc("NICK " + GetNick());
     }
@@ -79,7 +82,8 @@ public:
         NoString sConfNick = network()->nick();
         NoIrcSocket* pIRCSock = network()->ircSocket();
 
-        if (pIRCSock) sConfNick = sConfNick.left(pIRCSock->GetMaxNickLen());
+        if (pIRCSock)
+            sConfNick = sConfNick.left(pIRCSock->GetMaxNickLen());
 
         return sConfNick;
     }
@@ -131,7 +135,8 @@ public:
 
     void Enable()
     {
-        if (m_pTimer) return;
+        if (m_pTimer)
+            return;
 
         m_pTimer = new NoKeepNickTimer(this);
         m_pTimer->start(30);
@@ -139,7 +144,8 @@ public:
 
     void Disable()
     {
-        if (!m_pTimer) return;
+        if (!m_pTimer)
+            return;
 
         m_pTimer->stop();
         delete m_pTimer;
@@ -149,18 +155,22 @@ public:
     ModRet onUserRaw(NoString& sLine) override
     {
         // We dont care if we are not connected to IRC
-        if (!network()->isIrcConnected()) return CONTINUE;
+        if (!network()->isIrcConnected())
+            return CONTINUE;
 
         // We are trying to get the config nick and this is a /nick?
-        if (!m_pTimer || !No::token(sLine, 0).equals("NICK")) return CONTINUE;
+        if (!m_pTimer || !No::token(sLine, 0).equals("NICK"))
+            return CONTINUE;
 
         // Is the nick change for the nick we are trying to get?
         NoString sNick = No::token(sLine, 1);
 
         // Don't even think of using spaces in your nick!
-        if (sNick.left(1) == ":") sNick.leftChomp(1);
+        if (sNick.left(1) == ":")
+            sNick.leftChomp(1);
 
-        if (!sNick.equals(GetNick())) return CONTINUE;
+        if (!sNick.equals(GetNick()))
+            return CONTINUE;
 
         // Indeed trying to change to this nick, generate a 433 for it.
         // This way we can *always* block incoming 433s from the server.
@@ -173,7 +183,8 @@ public:
     {
         // Are we trying to get our primary nick and we caused this error?
         // :irc.server.net 433 mynick badnick :Nickname is already in use.
-        if (m_pTimer && No::token(sLine, 1) == "433" && No::token(sLine, 3).equals(GetNick())) return HALT;
+        if (m_pTimer && No::token(sLine, 1) == "433" && No::token(sLine, 3).equals(GetNick()))
+            return HALT;
 
         return CONTINUE;
     }
@@ -214,6 +225,10 @@ void NoKeepNickTimer::run()
     static_cast<NoKeepNickMod*>(module())->KeepNick();
 }
 
-template <> void no_moduleInfo<NoKeepNickMod>(NoModuleInfo& Info) { Info.setWikiPage("keepnick"); }
+template <>
+void no_moduleInfo<NoKeepNickMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("keepnick");
+}
 
 NETWORKMODULEDEFS(NoKeepNickMod, "Keep trying for your primary nick")

@@ -75,14 +75,16 @@ class NoAway : public NoModule
 
     void BackCommand(const NoString& sCommand)
     {
-        if ((m_vMessages.empty()) && (No::token(sCommand, 1) != "-quiet")) putModuleNotice("Welcome Back!");
+        if ((m_vMessages.empty()) && (No::token(sCommand, 1) != "-quiet"))
+            putModuleNotice("Welcome Back!");
         Ping();
         Back();
     }
 
     void MessagesCommand(const NoString& sCommand)
     {
-        for (u_int a = 0; a < m_vMessages.size(); a++) putModule(m_vMessages[a]);
+        for (u_int a = 0; a < m_vMessages.size(); a++)
+            putModule(m_vMessages[a]);
     }
 
     void ReplayCommand(const NoString& sCommand)
@@ -100,7 +102,8 @@ class NoAway : public NoModule
         NoString sWhich = No::token(sCommand, 1);
         if (sWhich == "all") {
             putModuleNotice("Deleted " + NoString(m_vMessages.size()) + " Messages.");
-            for (u_int a = 0; a < m_vMessages.size(); a++) m_vMessages.erase(m_vMessages.begin() + a--);
+            for (u_int a = 0; a < m_vMessages.size(); a++)
+                m_vMessages.erase(m_vMessages.begin() + a--);
         } else if (sWhich.empty()) {
             putModuleNotice("USAGE: delete <num|all>");
             return;
@@ -130,7 +133,8 @@ class NoAway : public NoModule
     void PingCommand(const NoString& sCommand)
     {
         Ping();
-        if (m_bIsAway) Back();
+        if (m_bIsAway)
+            Back();
     }
 
     void PassCommand(const NoString& sCommand)
@@ -175,7 +179,8 @@ class NoAway : public NoModule
 
         for (std::map<NoString, std::vector<NoString>>::iterator it = msvOutput.begin(); it != msvOutput.end(); ++it) {
             putModule(it->first);
-            for (u_int a = 0; a < it->second.size(); a++) putModule(it->second[a]);
+            for (u_int a = 0; a < it->second.size(); a++)
+                putModule(it->second[a]);
         }
 
         putModule("#--- End Messages");
@@ -239,7 +244,8 @@ public:
 
     virtual ~NoAway()
     {
-        if (!m_bBootError) SaveBufferToDisk();
+        if (!m_bBootError)
+            SaveBufferToDisk();
     }
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
@@ -311,7 +317,8 @@ public:
         if (!m_sPassword.empty()) {
             NoString sFile = CRYPT_VERIFICATION_TOKEN;
 
-            for (u_int b = 0; b < m_vMessages.size(); b++) sFile += m_vMessages[b] + "\n";
+            for (u_int b = 0; b < m_vMessages.size(); b++)
+                sFile += m_vMessages[b] + "\n";
 
             sFile = No::encrypt(sFile, m_sPassword);
             NoString sPath = GetPath();
@@ -326,8 +333,14 @@ public:
         }
     }
 
-    void onClientLogin() override { Back(true); }
-    void onClientDisconnect() override { Away(); }
+    void onClientLogin() override
+    {
+        Back(true);
+    }
+    void onClientDisconnect() override
+    {
+        Away();
+    }
 
     NoString GetPath()
     {
@@ -352,7 +365,8 @@ public:
                 sTime = pTime;
                 sTime.trim();
             }
-            if (m_sReason.empty()) m_sReason = "Auto Away at " + sTime;
+            if (m_sReason.empty())
+                m_sReason = "Auto Away at " + sTime;
             putIrc("AWAY :" + m_sReason);
             m_bIsAway = true;
         }
@@ -376,7 +390,8 @@ public:
 
     ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
     {
-        if (m_bIsAway) AddMessage(time(nullptr), Nick, sMessage);
+        if (m_bIsAway)
+            AddMessage(time(nullptr), Nick, sMessage);
         return (CONTINUE);
     }
 
@@ -391,7 +406,8 @@ public:
     ModRet onUserNotice(NoString& sTarget, NoString& sMessage) override
     {
         Ping();
-        if (m_bIsAway) Back();
+        if (m_bIsAway)
+            Back();
 
         return (CONTINUE);
     }
@@ -399,7 +415,8 @@ public:
     ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
     {
         Ping();
-        if (m_bIsAway) Back();
+        if (m_bIsAway)
+            Back();
 
         return (CONTINUE);
     }
@@ -407,17 +424,33 @@ public:
     ModRet onUserAction(NoString& sTarget, NoString& sMessage) override
     {
         Ping();
-        if (m_bIsAway) Back();
+        if (m_bIsAway)
+            Back();
 
         return (CONTINUE);
     }
 
-    time_t GetTimeStamp() const { return (m_iLastSentData); }
-    void Ping() { m_iLastSentData = time(nullptr); }
-    time_t GetAwayTime() { return m_iAutoAway; }
-    void SetAwayTime(time_t u) { m_iAutoAway = u; }
+    time_t GetTimeStamp() const
+    {
+        return (m_iLastSentData);
+    }
+    void Ping()
+    {
+        m_iLastSentData = time(nullptr);
+    }
+    time_t GetAwayTime()
+    {
+        return m_iAutoAway;
+    }
+    void SetAwayTime(time_t u)
+    {
+        m_iAutoAway = u;
+    }
 
-    bool IsAway() { return (m_bIsAway); }
+    bool IsAway()
+    {
+        return (m_bIsAway);
+    }
 
 private:
     NoString m_sPassword;
@@ -452,7 +485,8 @@ private:
 
     void AddMessage(time_t iTime, const NoNick& Nick, const NoString& sMessage)
     {
-        if (Nick.nick() == network()->ircNick().nick()) return; // ignore messages from self
+        if (Nick.nick() == network()->ircNick().nick())
+            return; // ignore messages from self
         AddMessage(NoString(iTime) + " " + Nick.nickMask() + " " + sMessage);
     }
 
@@ -480,11 +514,13 @@ void NoAwayJob::run()
     if (!p->IsAway()) {
         time_t iNow = time(nullptr);
 
-        if ((iNow - p->GetTimeStamp()) > p->GetAwayTime() && p->GetAwayTime() != 0) p->Away();
+        if ((iNow - p->GetTimeStamp()) > p->GetAwayTime() && p->GetAwayTime() != 0)
+            p->Away();
     }
 }
 
-template <> void no_moduleInfo<NoAway>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoAway>(NoModuleInfo& Info)
 {
     Info.setWikiPage("awaystore");
     Info.setHasArgs(true);

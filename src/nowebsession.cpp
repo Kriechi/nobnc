@@ -39,7 +39,9 @@ const uint NoWebSocket::m_maxSessions = 5;
 class NoWebSessionMap : public NoCacheMap<NoString, std::shared_ptr<NoWebSession>>
 {
 public:
-    NoWebSessionMap(uint uTTL = 5000) : NoCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL) {}
+    NoWebSessionMap(uint uTTL = 5000) : NoCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL)
+    {
+    }
     void FinishUserSessions(const NoUser& User)
     {
         iterator it = begin();
@@ -59,7 +61,9 @@ public:
 struct NoWebSessionManager
 {
     // Sessions are valid for a day, (24h, ...)
-    NoWebSessionManager() : m_mspSessions(24 * 60 * 60 * 1000), m_mIPSessions() {}
+    NoWebSessionManager() : m_mspSessions(24 * 60 * 60 * 1000), m_mIPSessions()
+    {
+    }
     ~NoWebSessionManager()
     {
         // Make sure all sessions are destroyed before any of our maps
@@ -77,7 +81,9 @@ static NoWebSessionManager Sessions;
 class NoTagHandler : public NoTemplateTagHandler
 {
 public:
-    NoTagHandler(NoWebSocket& WebSock) : NoTemplateTagHandler(), m_WebSock(WebSock) {}
+    NoTagHandler(NoWebSocket& WebSock) : NoTemplateTagHandler(), m_WebSock(WebSock)
+    {
+    }
 
     bool handleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override
     {
@@ -101,7 +107,10 @@ public:
     NoWebAuth(const NoWebAuth&) = delete;
     NoWebAuth& operator=(const NoWebAuth&) = delete;
 
-    void SetWebSock(NoWebSocket* pWebSock) { m_pWebSock = pWebSock; }
+    void SetWebSock(NoWebSocket* pWebSock)
+    {
+        m_pWebSock = pWebSock;
+    }
     void invalidate() override;
 
 protected:
@@ -124,8 +133,7 @@ public:
     time_t lastActive;
 };
 
-NoWebSession::NoWebSession(const NoString& sId, const NoString& sIP)
-    : d(new NoWebSessionPrivate)
+NoWebSession::NoWebSession(const NoString& sId, const NoString& sIP) : d(new NoWebSessionPrivate)
 {
     d->id = sId;
     d->ip = sIP;
@@ -149,25 +157,46 @@ NoWebSession::~NoWebSession()
     }
 }
 
-NoString NoWebSession::identifier() const { return d->id; }
+NoString NoWebSession::identifier() const
+{
+    return d->id;
+}
 
-NoString NoWebSession::host() const { return d->ip; }
+NoString NoWebSession::host() const
+{
+    return d->ip;
+}
 
-NoUser* NoWebSession::user() const { return d->user; }
+NoUser* NoWebSession::user() const
+{
+    return d->user;
+}
 
-time_t NoWebSession::lastActive() const { return d->lastActive; }
+time_t NoWebSession::lastActive() const
+{
+    return d->lastActive;
+}
 
-bool NoWebSession::isLoggedIn() const { return d->user != nullptr; }
+bool NoWebSession::isLoggedIn() const
+{
+    return d->user != nullptr;
+}
 
-void NoWebSession::updateLastActive() { time(&d->lastActive); }
+void NoWebSession::updateLastActive()
+{
+    time(&d->lastActive);
+}
 
-NoUser*NoWebSession::setUser(NoUser* p)
+NoUser* NoWebSession::setUser(NoUser* p)
 {
     d->user = p;
     return d->user;
 }
 
-bool NoWebSession::isAdmin() const { return isLoggedIn() && d->user->isAdmin(); }
+bool NoWebSession::isAdmin() const
+{
+    return isLoggedIn() && d->user->isAdmin();
+}
 
 void NoWebSession::clearMessageLoops()
 {
@@ -245,8 +274,7 @@ void NoWebAuth::invalidate()
 }
 
 NoWebSocket::NoWebSocket(const NoString& sURIPrefix)
-    : NoHttpSocket(nullptr, sURIPrefix), m_pathsSet(false), m_template(), m_authenticator(), m_modName(""), m_path(""),
-      m_page(""), m_session()
+    : NoHttpSocket(nullptr, sURIPrefix), m_pathsSet(false), m_template(), m_authenticator(), m_modName(""), m_path(""), m_page(""), m_session()
 {
     m_template.addTagHandler(std::make_shared<NoTagHandler>(*this));
 }
@@ -273,7 +301,10 @@ NoWebSocket::~NoWebSocket()
     ResetBytesRead();
 }
 
-void NoWebSocket::FinishUserSessions(const NoUser& User) { Sessions.m_mspSessions.FinishUserSessions(User); }
+void NoWebSocket::FinishUserSessions(const NoUser& User)
+{
+    Sessions.m_mspSessions.FinishUserSessions(User);
+}
 
 void NoWebSocket::GetAvailSkins(NoStringVector& vRet) const
 {
@@ -726,8 +757,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
         return NotFound;
     } else if (sURI.left(6) == "/mods/" || sURI.left(10) == "/modfiles/") {
         // Make sure modules are treated as directories
-        if (sURI.right(1) != "/" && !sURI.contains(".") &&
-            !sURI.trimLeft_n("/mods/").trimLeft_n("/").contains("/")) {
+        if (sURI.right(1) != "/" && !sURI.contains(".") && !sURI.trimLeft_n("/mods/").trimLeft_n("/").contains("/")) {
             Redirect(sURI + "/");
             return Done;
         }
@@ -796,7 +826,8 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             break;
         }
 
-        if (!pModule) return NotFound;
+        if (!pModule)
+            return NotFound;
 
         m_template["ModPath"] = pModule->webPath();
         m_template["ModFilesPath"] = pModule->webFilesPath();
@@ -824,8 +855,7 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
             }
         }
 
-        if (pModule && pModule->type() != No::GlobalModule &&
-            (!IsLoggedIn() || pModule->user() != GetSession()->user())) {
+        if (pModule && pModule->type() != No::GlobalModule && (!IsLoggedIn() || pModule->user() != GetSession()->user())) {
             AddModLoop("UserModLoop", *pModule);
         }
 
@@ -905,7 +935,7 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
         (*pSession)->updateLastActive();
         m_session = *pSession;
         NO_DEBUG("Found existing session from cookie: [" + sCookieSessionId + "] IsLoggedIn(" +
-              NoString((*pSession)->isLoggedIn() ? "true, " + ((*pSession)->user()->userName()) : "false") + ")");
+                 NoString((*pSession)->isLoggedIn() ? "true, " + ((*pSession)->user()->userName()) : "false") + ")");
         return *pSession;
     }
 

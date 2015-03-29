@@ -60,7 +60,10 @@ private:
 class NoShellMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoShellMod) { m_sPath = NoDir::home().path(); }
+    MODCONSTRUCTOR(NoShellMod)
+    {
+        m_sPath = NoDir::home().path();
+    }
 
     virtual ~NoShellMod()
     {
@@ -141,14 +144,19 @@ void NoShellSock::DisconnectedImpl()
     // If there is some incomplete line in the buffer, read it
     // (e.g. echo echo -n "hi" triggered this)
     NoString& sBuffer = GetInternalReadBuffer();
-    if (!sBuffer.empty()) ReadLineImpl(sBuffer);
+    if (!sBuffer.empty())
+        ReadLineImpl(sBuffer);
 
     m_pParent->setClient(m_pClient);
     m_pParent->PutShell("znc$");
     m_pParent->setClient(nullptr);
 }
 
-template <> void no_moduleInfo<NoShellMod>(NoModuleInfo& Info) { Info.setWikiPage("shell"); }
+template <>
+void no_moduleInfo<NoShellMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("shell");
+}
 
 #ifdef MOD_SHELL_ALLOW_EVERYONE
 USERMODULEDEFS(NoShellMod, "Gives shell access")

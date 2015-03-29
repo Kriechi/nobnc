@@ -25,15 +25,38 @@ class NoModulePrivate
 {
 public:
     NoModulePrivate(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
-        : type(eType), handle(pDLL), manager(&NoApp::Get().manager()), user(pUser), network(pNetwork),
-          client(nullptr), name(sModName), dataDir(sDataDir) { }
+        : type(eType),
+          handle(pDLL),
+          manager(&NoApp::Get().manager()),
+          user(pUser),
+          network(pNetwork),
+          client(nullptr),
+          name(sModName),
+          dataDir(sDataDir)
+    {
+    }
 
-    static NoModulePrivate* get(NoModule* module) { return module->d.get(); }
+    static NoModulePrivate* get(NoModule* module)
+    {
+        return module->d.get();
+    }
 
-    void addTimer(NoTimer* timer) { timers.insert(timer); }
-    void removeTimer(NoTimer* timer) { timers.erase(timer); }
-    void addSocket(NoModuleSocket* socket) { sockets.insert(socket); }
-    void removeSocket(NoModuleSocket* socket) { sockets.erase(socket); }
+    void addTimer(NoTimer* timer)
+    {
+        timers.insert(timer);
+    }
+    void removeTimer(NoTimer* timer)
+    {
+        timers.erase(timer);
+    }
+    void addSocket(NoModuleSocket* socket)
+    {
+        sockets.insert(socket);
+    }
+    void removeSocket(NoModuleSocket* socket)
+    {
+        sockets.erase(socket);
+    }
 
     No::ModuleType type;
     NoString description;

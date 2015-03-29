@@ -42,12 +42,19 @@ public:
         m_Cache.setExpiration(60000 /*ms*/);
 
         addHelpCommand();
-        addCommand("CreateUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CreateUserCommand), "[yes|no]");
-        addCommand("CloneUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CloneUserCommand), "[username]");
+        addCommand("CreateUser",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CreateUserCommand),
+                   "[yes|no]");
+        addCommand("CloneUser",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::CloneUserCommand),
+                   "[username]");
         addCommand("DisableCloneUser", static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslAuthMod::DisableCloneUserCommand));
     }
 
-    virtual ~NoSaslAuthMod() { sasl_done(); }
+    virtual ~NoSaslAuthMod()
+    {
+        sasl_done();
+    }
 
     void onModCommand(const NoString& sCommand) override
     {
@@ -163,7 +170,10 @@ public:
         return CONTINUE;
     }
 
-    const NoString& GetMethod() const { return m_sMethod; }
+    const NoString& GetMethod() const
+    {
+        return m_sMethod;
+    }
 
     void CreateUserCommand(const NoString& sLine)
     {
@@ -204,11 +214,20 @@ public:
         putModule("Clone user disabled");
     }
 
-    bool CreateUser() const { return NoRegistry(this).value("CreateUser").toBool(); }
+    bool CreateUser() const
+    {
+        return NoRegistry(this).value("CreateUser").toBool();
+    }
 
-    NoString CloneUser() const { return NoRegistry(this).value("CloneUser"); }
+    NoString CloneUser() const
+    {
+        return NoRegistry(this).value("CloneUser");
+    }
 
-    bool ShouldCloneUser() { return !NoRegistry(this).value("CloneUser").empty(); }
+    bool ShouldCloneUser()
+    {
+        return !NoRegistry(this).value("CloneUser").empty();
+    }
 
 protected:
     NoCacheMap<NoString> m_Cache;
@@ -227,7 +246,8 @@ protected:
     }
 };
 
-template <> void no_moduleInfo<NoSaslAuthMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoSaslAuthMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("cyrusauth");
     Info.setHasArgs(true);

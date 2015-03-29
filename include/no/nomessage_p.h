@@ -23,7 +23,10 @@
 class NoMessagePrivate
 {
 public:
-    static NoMessagePrivate* get(const NoMessage& msg) { return msg.d.get(); }
+    static NoMessagePrivate* get(const NoMessage& msg)
+    {
+        return msg.d.get();
+    }
 
     void updateTime();
 

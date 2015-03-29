@@ -36,7 +36,10 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnDelCommand),
                    "[!]<#chan>",
                    "Remove an entry, needs to be an exact match");
-        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnListCommand), "", "List all entries");
+        addCommand("List",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnListCommand),
+                   "",
+                   "List all entries");
         m_recentlyCycled.setExpiration(15 * 1000);
     }
 
@@ -56,7 +59,8 @@ public:
             Add(key);
 
         // Default is auto cycle for all channels
-        if (m_vsChans.empty()) Add("*");
+        if (m_vsChans.empty())
+            Add("*");
 
         return true;
     }
@@ -106,11 +110,15 @@ public:
         }
     }
 
-    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override { AutoCycle(Channel); }
+    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
+    {
+        AutoCycle(Channel);
+    }
 
     void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
     {
-        for (uint i = 0; i < vChans.size(); i++) AutoCycle(*vChans[i]);
+        for (uint i = 0; i < vChans.size(); i++)
+            AutoCycle(*vChans[i]);
     }
 
     void onKick(const NoNick& Nick, const NoString& sOpNick, NoChannel& Channel, const NoString& sMessage) override
@@ -121,13 +129,16 @@ public:
 protected:
     void AutoCycle(NoChannel& Channel)
     {
-        if (!IsAutoCycle(Channel.name())) return;
+        if (!IsAutoCycle(Channel.name()))
+            return;
 
         // Did we recently annoy opers via cycling of an empty channel?
-        if (m_recentlyCycled.contains(Channel.name())) return;
+        if (m_recentlyCycled.contains(Channel.name()))
+            return;
 
         // Is there only one person left in the channel?
-        if (Channel.nickCount() != 1) return;
+        if (Channel.nickCount() != 1)
+            return;
 
         // Is that person us and we don't have op?
         const NoNick& pNick = Channel.nicks().begin()->second;
@@ -144,11 +155,13 @@ protected:
         if (sInput.left(1) == "!") {
             NoString sChan = sInput.substr(1);
             for (it = m_vsNegChans.begin(); it != m_vsNegChans.end(); ++it) {
-                if (*it == sChan) return true;
+                if (*it == sChan)
+                    return true;
             }
         } else {
             for (it = m_vsChans.begin(); it != m_vsChans.end(); ++it) {
-                if (*it == sInput) return true;
+                if (*it == sInput)
+                    return true;
             }
         }
         return false;
@@ -177,7 +190,8 @@ protected:
     {
         std::vector<NoString>::iterator it, end;
 
-        if (sChan.empty() || sChan == "!") return false;
+        if (sChan.empty() || sChan == "!")
+            return false;
 
         if (sChan.left(1) == "!") {
             NoString sTmp = sChan.substr(1);
@@ -185,9 +199,11 @@ protected:
             end = m_vsNegChans.end();
 
             for (; it != end; ++it)
-                if (*it == sTmp) break;
+                if (*it == sTmp)
+                    break;
 
-            if (it == end) return false;
+            if (it == end)
+                return false;
 
             m_vsNegChans.erase(it);
         } else {
@@ -195,9 +211,11 @@ protected:
             end = m_vsChans.end();
 
             for (; it != end; ++it)
-                if (*it == sChan) break;
+                if (*it == sChan)
+                    break;
 
-            if (it == end) return false;
+            if (it == end)
+                return false;
 
             m_vsChans.erase(it);
         }
@@ -231,7 +249,8 @@ private:
     NoCacheMap<NoString> m_recentlyCycled;
 };
 
-template <> void no_moduleInfo<NoAutoCycleMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoAutoCycleMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("autocycle");
     Info.setHasArgs(true);

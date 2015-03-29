@@ -31,48 +31,48 @@
 #include "noescape.h"
 #include "nonick.h"
 
-#define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                             \
-    {                                                                         \
-        NoModule* pModule = nullptr;                                           \
-        if (NETWORK && (pModule = (NETWORK)->loader()->findModule(MOD))) { \
-            try {                                                             \
-                pModule->setClient(CLIENT);                                   \
-                pModule->FUNC;                                                \
-                pModule->setClient(nullptr);                                  \
-            } catch (const NoModule::ModException& e) {                       \
-                if (e == NoModule::UNLOAD) {                                   \
-                    (NETWORK)->loader()->unloadModule(MOD);                \
-                }                                                             \
-            }                                                                 \
-        } else if ((pModule = (USER)->loader()->findModule(MOD))) {        \
-            try {                                                             \
-                pModule->setClient(CLIENT);                                   \
-                pModule->setNetwork(NETWORK);                                 \
-                pModule->FUNC;                                                \
-                pModule->setClient(nullptr);                                  \
-                pModule->setNetwork(nullptr);                                 \
-            } catch (const NoModule::ModException& e) {                       \
-                if (e == NoModule::UNLOAD) {                                   \
-                    (USER)->loader()->unloadModule(MOD);                   \
-                }                                                             \
-            }                                                                 \
-        } else if ((pModule = NoApp::Get().GetLoader()->findModule(MOD))) {    \
-            try {                                                             \
-                pModule->setClient(CLIENT);                                   \
-                pModule->setNetwork(NETWORK);                                 \
-                pModule->setUser(USER);                                       \
-                pModule->FUNC;                                                \
-                pModule->setClient(nullptr);                                  \
-                pModule->setNetwork(nullptr);                                 \
-                pModule->setUser(nullptr);                                    \
-            } catch (const NoModule::ModException& e) {                       \
-                if (e == NoModule::UNLOAD) {                                   \
-                    NoApp::Get().GetLoader()->unloadModule(MOD);               \
-                }                                                             \
-            }                                                                 \
-        } else {                                                              \
-            putStatus("No such module [" + MOD + "]");                        \
-        }                                                                     \
+#define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                           \
+    {                                                                       \
+        NoModule* pModule = nullptr;                                        \
+        if (NETWORK && (pModule = (NETWORK)->loader()->findModule(MOD))) {  \
+            try {                                                           \
+                pModule->setClient(CLIENT);                                 \
+                pModule->FUNC;                                              \
+                pModule->setClient(nullptr);                                \
+            } catch (const NoModule::ModException& e) {                     \
+                if (e == NoModule::UNLOAD) {                                \
+                    (NETWORK)->loader()->unloadModule(MOD);                 \
+                }                                                           \
+            }                                                               \
+        } else if ((pModule = (USER)->loader()->findModule(MOD))) {         \
+            try {                                                           \
+                pModule->setClient(CLIENT);                                 \
+                pModule->setNetwork(NETWORK);                               \
+                pModule->FUNC;                                              \
+                pModule->setClient(nullptr);                                \
+                pModule->setNetwork(nullptr);                               \
+            } catch (const NoModule::ModException& e) {                     \
+                if (e == NoModule::UNLOAD) {                                \
+                    (USER)->loader()->unloadModule(MOD);                    \
+                }                                                           \
+            }                                                               \
+        } else if ((pModule = NoApp::Get().GetLoader()->findModule(MOD))) { \
+            try {                                                           \
+                pModule->setClient(CLIENT);                                 \
+                pModule->setNetwork(NETWORK);                               \
+                pModule->setUser(USER);                                     \
+                pModule->FUNC;                                              \
+                pModule->setClient(nullptr);                                \
+                pModule->setNetwork(nullptr);                               \
+                pModule->setUser(nullptr);                                  \
+            } catch (const NoModule::ModException& e) {                     \
+                if (e == NoModule::UNLOAD) {                                \
+                    NoApp::Get().GetLoader()->unloadModule(MOD);            \
+                }                                                           \
+            }                                                               \
+        } else {                                                            \
+            putStatus("No such module [" + MOD + "]");                      \
+        }                                                                   \
     }
 
 class NoClientSocket : public NoSocket
@@ -88,10 +88,22 @@ public:
         SetMaxBufferThreshold(1024);
     }
 
-    void ReadLineImpl(const NoString& sData) override { m_pClient->readLine(sData); }
-    void TimeoutImpl() override { m_pClient->putClient("ERROR :Closing link [Timeout]"); }
-    void ConnectedImpl() override { NO_DEBUG(GetSockName() << " == Connected();"); }
-    void ConnectionRefusedImpl() override { NO_DEBUG(GetSockName() << " == ConnectionRefused()"); }
+    void ReadLineImpl(const NoString& sData) override
+    {
+        m_pClient->readLine(sData);
+    }
+    void TimeoutImpl() override
+    {
+        m_pClient->putClient("ERROR :Closing link [Timeout]");
+    }
+    void ConnectedImpl() override
+    {
+        NO_DEBUG(GetSockName() << " == Connected();");
+    }
+    void ConnectionRefusedImpl() override
+    {
+        NO_DEBUG(GetSockName() << " == ConnectionRefused()");
+    }
 
     void DisconnectedImpl() override
     {
@@ -165,7 +177,10 @@ NoClient::~NoClient()
     delete d->socket;
 }
 
-NoSocket*NoClient::socket() const { return d->socket; }
+NoSocket* NoClient::socket() const
+{
+    return d->socket;
+}
 
 void NoClient::sendRequiredPasswordNotice()
 {
@@ -197,7 +212,8 @@ void NoClient::readLine(const NoString& sData)
     } else {
         GLOBALMODULECALL(onUnknownUserRaw(this, sLine), &bReturn);
     }
-    if (bReturn) return;
+    if (bReturn)
+        return;
 
     NoString sCommand = No::token(sLine, 0);
     if (sCommand.left(1) == ":") {
@@ -291,7 +307,8 @@ void NoClient::readLine(const NoString& sData)
     } else if (sCommand.equals("QUIT")) {
         NoString sMsg = No::tokens(sLine, 1).trimPrefix_n();
         NETWORKMODULECALL(onUserQuit(sMsg), d->user, d->network, this, &bReturn);
-        if (bReturn) return;
+        if (bReturn)
+            return;
         d->socket->Close(NoSocket::CLT_AFTERWRITE); // Treat a client quit as a detach
         return; // Don't forward this msg.  We don't want the client getting us disconnected.
     } else if (sCommand.equals("PROTOCTL")) {
@@ -329,12 +346,14 @@ void NoClient::readLine(const NoString& sData)
                 }
 
                 NETWORKMODULECALL(onUserCtcpReply(sTarget, sCTCP), d->user, d->network, this, &bContinue);
-                if (bContinue) continue;
+                if (bContinue)
+                    continue;
 
                 sMsg = "\001" + sCTCP + "\001";
             } else {
                 NETWORKMODULECALL(onUserNotice(sTarget, sMsg), d->user, d->network, this, &bContinue);
-                if (bContinue) continue;
+                if (bContinue)
+                    continue;
             }
 
             if (!ircSocket()) {
@@ -391,7 +410,8 @@ void NoClient::readLine(const NoString& sData)
                     if (No::token(sCTCP, 0).equals("ACTION")) {
                         NoString sMessage = No::tokens(sCTCP, 1);
                         NETWORKMODULECALL(onUserAction(sTarget, sMessage), d->user, d->network, this, &bContinue);
-                        if (bContinue) continue;
+                        if (bContinue)
+                            continue;
                         sCTCP = "ACTION " + sMessage;
 
                         if (d->network->isChannel(sTarget)) {
@@ -422,7 +442,8 @@ void NoClient::readLine(const NoString& sData)
                         }
                     } else {
                         NETWORKMODULECALL(onUserCtcp(sTarget, sCTCP), d->user, d->network, this, &bContinue);
-                        if (bContinue) continue;
+                        if (bContinue)
+                            continue;
                     }
 
                     putIrc("PRIVMSG " + sTarget + " :\001" + sCTCP + "\001");
@@ -441,7 +462,8 @@ void NoClient::readLine(const NoString& sData)
             }
 
             NETWORKMODULECALL(onUserMsg(sTarget, sMsg), d->user, d->network, this, &bContinue);
-            if (bContinue) continue;
+            if (bContinue)
+                continue;
 
             if (!ircSocket()) {
                 // Some lagmeters do a PRIVMSG to their own nick, ignore those.
@@ -508,7 +530,8 @@ void NoClient::readLine(const NoString& sData)
 
         uint uDetached = 0;
         for (NoChannel* pChan : sChans) {
-            if (pChan->isDetached()) continue;
+            if (pChan->isDetached())
+                continue;
             uDetached++;
             pChan->detachUser();
         }
@@ -527,7 +550,8 @@ void NoClient::readLine(const NoString& sData)
         for (NoString& sChannel : vsChans) {
             bool bContinue = false;
             NETWORKMODULECALL(onUserJoin(sChannel, sKey), d->user, d->network, this, &bContinue);
-            if (bContinue) continue;
+            if (bContinue)
+                continue;
 
             NoChannel* pChan = d->network->findChannel(sChannel);
             if (pChan) {
@@ -562,7 +586,8 @@ void NoClient::readLine(const NoString& sData)
         for (NoString& sChan : vsChans) {
             bool bContinue = false;
             NETWORKMODULECALL(onUserPart(sChan, sMessage), d->user, d->network, this, &bContinue);
-            if (bContinue) continue;
+            if (bContinue)
+                continue;
 
             NoChannel* pChan = d->network->findChannel(sChan);
 
@@ -589,11 +614,13 @@ void NoClient::readLine(const NoString& sData)
 
         if (!sTopic.empty()) {
             NETWORKMODULECALL(onUserTopic(sChan, sTopic), d->user, d->network, this, &bReturn);
-            if (bReturn) return;
+            if (bReturn)
+                return;
             sLine = "TOPIC " + sChan + " :" + sTopic;
         } else {
             NETWORKMODULECALL(onUserTopicRequest(sChan), d->user, d->network, this, &bReturn);
-            if (bReturn) return;
+            if (bReturn)
+                return;
         }
     } else if (sCommand.equals("MODE")) {
         NoString sTarget = No::token(sLine, 1);
@@ -619,12 +646,24 @@ void NoClient::readLine(const NoString& sData)
     putIrc(sLine);
 }
 
-void NoClient::setNick(const NoString& s) { d->nickname = s; }
+void NoClient::setNick(const NoString& s)
+{
+    d->nickname = s;
+}
 
-void NoClient::setAway(bool bAway) { d->away = bAway; }
-NoUser* NoClient::user() const { return d->user; }
+void NoClient::setAway(bool bAway)
+{
+    d->away = bAway;
+}
+NoUser* NoClient::user() const
+{
+    return d->user;
+}
 
-NoNetwork* NoClient::network() const { return d->network; }
+NoNetwork* NoClient::network() const
+{
+    return d->network;
+}
 void NoClient::setNetwork(NoNetwork* pNetwork, bool bDisconnect, bool bReconnect)
 {
     if (bDisconnect) {
@@ -704,7 +743,8 @@ bool NoClient::sendMotd()
 
 void NoClient::authUser()
 {
-    if (!d->receivedNick || !d->receivedUser || !d->receivedPass || d->inCapLs || isAttached()) return;
+    if (!d->receivedNick || !d->receivedUser || !d->receivedPass || d->inCapLs || isAttached())
+        return;
 
     d->authenticator = std::make_shared<NoClientAuth>(this, d->username, d->password);
 
@@ -741,9 +781,11 @@ void NoClient::acceptLogin(NoUser& User)
         d->network = d->user->findNetwork("default");
         // If no "default" network, try "user" network. It's for compatibility with early network stuff in ZNC, which
         // converted old configs to "user" network.
-        if (!d->network) d->network = d->user->findNetwork("user");
+        if (!d->network)
+            d->network = d->user->findNetwork("user");
         // Otherwise, just try any network of the user.
-        if (!d->network) d->network = *d->user->networks().begin();
+        if (!d->network)
+            d->network = *d->user->networks().begin();
         if (d->network && d->user->networks().size() > 1) {
             putStatusNotice("You have several networks configured, but no network was specified for the connection.");
             putStatusNotice("Selecting network [" + d->network->name() +
@@ -769,10 +811,19 @@ void NoClient::bouncedOff()
     d->socket->Close(NoSocket::CLT_AFTERWRITE);
 }
 
-bool NoClient::isAttached() const { return d->user != nullptr; }
+bool NoClient::isAttached() const
+{
+    return d->user != nullptr;
+}
 
-bool NoClient::isPlaybackActive() const { return d->inPlayback; }
-void NoClient::setPlaybackActive(bool bActive) { d->inPlayback = bActive; }
+bool NoClient::isPlaybackActive() const
+{
+    return d->inPlayback;
+}
+void NoClient::setPlaybackActive(bool bActive)
+{
+    d->inPlayback = bActive;
+}
 
 void NoClient::putIrc(const NoString& sLine)
 {
@@ -783,10 +834,13 @@ void NoClient::putIrc(const NoString& sLine)
 
 NoString NoClient::fullName() const
 {
-    if (!d->user) return d->socket->GetRemoteIP();
+    if (!d->user)
+        return d->socket->GetRemoteIP();
     NoString sFullName = d->user->userName();
-    if (!d->identifier.empty()) sFullName += "@" + d->identifier;
-    if (d->network) sFullName += "/" + d->network->name();
+    if (!d->identifier.empty())
+        sFullName += "@" + d->identifier;
+    if (d->network)
+        sFullName += "/" + d->network->name();
     return sFullName;
 }
 
@@ -795,12 +849,16 @@ void NoClient::putClient(const NoString& sLine)
     bool bReturn = false;
     NoString sCopy = sLine;
     NETWORKMODULECALL(onSendToClient(sCopy, *this), d->user, d->network, this, &bReturn);
-    if (bReturn) return;
+    if (bReturn)
+        return;
     NO_DEBUG("(" << fullName() << ") ZNC -> CLI [" << sCopy << "]");
     d->socket->Write(sCopy + "\r\n");
 }
 
-void NoClient::putStatusNotice(const NoString& sLine) { putModuleNotice("status", sLine); }
+void NoClient::putStatusNotice(const NoString& sLine)
+{
+    putModuleNotice("status", sLine);
+}
 
 uint NoClient::putStatus(const NoTable& table)
 {
@@ -810,7 +868,10 @@ uint NoClient::putStatus(const NoTable& table)
     return lines.size() - 1;
 }
 
-void NoClient::putStatus(const NoString& sLine) { putModule("status", sLine); }
+void NoClient::putStatus(const NoString& sLine)
+{
+    putModule("status", sLine);
+}
 
 void NoClient::putModuleNotice(const NoString& sModule, const NoString& sLine)
 {
@@ -819,9 +880,9 @@ void NoClient::putModuleNotice(const NoString& sModule, const NoString& sLine)
     }
 
     NO_DEBUG("(" << fullName() << ") ZNC -> CLI [:" + d->user->statusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE "
-              << nick() << " :" << sLine << "]");
+                 << nick() << " :" << sLine << "]");
     d->socket->Write(":" + d->user->statusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in NOTICE " +
-          nick() + " :" + sLine + "\r\n");
+                     nick() + " :" + sLine + "\r\n");
 }
 
 void NoClient::putModule(const NoString& sModule, const NoString& sLine)
@@ -831,16 +892,19 @@ void NoClient::putModule(const NoString& sModule, const NoString& sLine)
     }
 
     NO_DEBUG("(" << fullName() << ") ZNC -> CLI [:" + d->user->statusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG "
-              << nick() << " :" << sLine << "]");
+                 << nick() << " :" << sLine << "]");
 
     NoStringVector vsLines = sLine.split("\n");
     for (const NoString& s : vsLines) {
-        d->socket->Write(":" + d->user->statusPrefix() + ((sModule.empty()) ? "status" : sModule) + "!znc@znc.in PRIVMSG " +
-              nick() + " :" + s + "\r\n");
+        d->socket->Write(":" + d->user->statusPrefix() + ((sModule.empty()) ? "status" : sModule) +
+                         "!znc@znc.in PRIVMSG " + nick() + " :" + s + "\r\n");
     }
 }
 
-bool NoClient::isCapEnabled(const NoString& sCap) const { return 1 == d->acceptedCaps.count(sCap); }
+bool NoClient::isCapEnabled(const NoString& sCap) const
+{
+    return 1 == d->acceptedCaps.count(sCap);
+}
 
 NoString NoClient::nick(bool bAllowIRCNick) const
 {
@@ -868,13 +932,34 @@ NoString NoClient::nickMask() const
     return nick() + "!" + (d->network ? d->network->bindHost() : d->user->ident()) + "@" + sHost;
 }
 
-NoString NoClient::identifier() const { return d->identifier; }
-bool NoClient::hasNamesX() const { return d->hasNamesX; }
-bool NoClient::hasUhNames() const { return d->hasUhNames; }
-bool NoClient::isAway() const { return d->away; }
-bool NoClient::hasServerTime() const { return d->hasServerTime; }
-bool NoClient::hasBatch() const { return d->hasBatch; }
-bool NoClient::hasSelfMessage() const { return d->hasSelfMessage; }
+NoString NoClient::identifier() const
+{
+    return d->identifier;
+}
+bool NoClient::hasNamesX() const
+{
+    return d->hasNamesX;
+}
+bool NoClient::hasUhNames() const
+{
+    return d->hasUhNames;
+}
+bool NoClient::isAway() const
+{
+    return d->away;
+}
+bool NoClient::hasServerTime() const
+{
+    return d->hasServerTime;
+}
+bool NoClient::hasBatch() const
+{
+    return d->hasBatch;
+}
+bool NoClient::hasSelfMessage() const
+{
+    return d->hasSelfMessage;
+}
 
 bool NoClient::isValidIdentifier(const NoString& sIdentifier)
 {
@@ -896,7 +981,10 @@ bool NoClient::isValidIdentifier(const NoString& sIdentifier)
     return true;
 }
 
-void NoClient::respondCap(const NoString& sResponse) { putClient(":irc.znc.in CAP " + nick() + " " + sResponse); }
+void NoClient::respondCap(const NoString& sResponse)
+{
+    putClient(":irc.znc.in CAP " + nick() + " " + sResponse);
+}
 
 void NoClient::handleCap(const NoString& sLine)
 {
@@ -929,7 +1017,8 @@ void NoClient::handleCap(const NoString& sLine)
         for (const NoString& sToken : vsTokens) {
             bool bVal = true;
             NoString sCap = sToken;
-            if (sCap.trimPrefix("-")) bVal = false;
+            if (sCap.trimPrefix("-"))
+                bVal = false;
 
             bool bAccepted = ("multi-prefix" == sCap) || ("userhost-in-names" == sCap) || ("znc.in/server-time-iso" == sCap) ||
                              ("znc.in/batch" == sCap) || ("znc.in/self-message" == sCap);
@@ -946,7 +1035,8 @@ void NoClient::handleCap(const NoString& sLine)
         for (const NoString& sToken : vsTokens) {
             bool bVal = true;
             NoString sCap = sToken;
-            if (sCap.trimPrefix("-")) bVal = false;
+            if (sCap.trimPrefix("-"))
+                bVal = false;
 
             if ("multi-prefix" == sCap) {
                 d->hasNamesX = bVal;

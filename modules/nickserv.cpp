@@ -40,7 +40,10 @@ public:
         putModule("Password set");
     }
 
-    void ClearCommand(const NoString& sLine) { NoRegistry(this).remove("Password"); }
+    void ClearCommand(const NoString& sLine)
+    {
+        NoRegistry(this).remove("Password");
+    }
 
     void SetNSNameCommand(const NoString& sLine)
     {
@@ -49,9 +52,15 @@ public:
         putModule("NickServ name set");
     }
 
-    void ClearNSNameCommand(const NoString& sLine) { NoRegistry(this).remove("NickServName"); }
+    void ClearNSNameCommand(const NoString& sLine)
+    {
+        NoRegistry(this).remove("NickServName");
+    }
 
-    void ViewCommandsCommand(const NoString& sLine) { putModule("IDENTIFY " + NoRegistry(this).value("IdentifyCmd")); }
+    void ViewCommandsCommand(const NoString& sLine)
+    {
+        putModule("IDENTIFY " + NoRegistry(this).value("IdentifyCmd"));
+    }
 
     void SetCommandCommand(const NoString& sLine)
     {
@@ -87,7 +96,10 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::ViewCommandsCommand),
                    "",
                    "Show patterns for lines, which are being sent to NickServ");
-        addCommand("SetCommand", static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetCommandCommand), "cmd new-pattern", "Set pattern for commands");
+        addCommand("SetCommand",
+                   static_cast<NoModuleCommand::ModCmdFunc>(&NoNickServ::SetCommandCommand),
+                   "cmd new-pattern",
+                   "Set pattern for commands");
     }
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
@@ -108,11 +120,11 @@ public:
     void HandleMessage(NoNick& Nick, const NoString& sMessage)
     {
         NoRegistry registry(this);
-        NoString sNickServName = (!registry.value("NickServName").empty()) ? registry.value("NickServName") : "NickServ";
+        NoString sNickServName =
+        (!registry.value("NickServName").empty()) ? registry.value("NickServName") : "NickServ";
         if (!registry.value("Password").empty() && Nick.equals(sNickServName) &&
             (sMessage.contains("msg") || sMessage.contains("authenticate") ||
-             sMessage.contains("choose a different nickname") ||
-             sMessage.contains("please choose a different nick") ||
+             sMessage.contains("choose a different nickname") || sMessage.contains("please choose a different nick") ||
              sMessage.contains("If this is your nick, identify yourself with") ||
              sMessage.contains("If this is your nick, type") ||
              sMessage.contains("This is a registered nickname, please identify") ||
@@ -138,7 +150,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoNickServ>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoNickServ>(NoModuleInfo& Info)
 {
     Info.setWikiPage("nickserv");
     Info.setHasArgs(true);

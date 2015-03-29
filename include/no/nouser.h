@@ -38,12 +38,7 @@ public:
     bool parseConfig(NoSettings* Config, NoString& sError);
 
     // TODO refactor this
-    enum HashType {
-        HashNone,
-        HashMd5,
-        HashSha256,
-        HashDefault = HashSha256
-    };
+    enum HashType { HashNone, HashMd5, HashSha256, HashDefault = HashSha256 };
 
     // If you change the default hash here and in HASH_DEFAULT,
     // don't forget No::sDefaultHash!

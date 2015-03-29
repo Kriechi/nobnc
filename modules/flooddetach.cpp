@@ -58,15 +58,20 @@ public:
             m_iThresholdSecs = registry.value("secs").toUInt();
         }
 
-        if (m_iThresholdSecs == 0) m_iThresholdSecs = 2;
-        if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 5;
+        if (m_iThresholdSecs == 0)
+            m_iThresholdSecs = 2;
+        if (m_iThresholdMsgs == 0)
+            m_iThresholdMsgs = 5;
 
         Save();
 
         return true;
     }
 
-    void onIrcDisconnected() override { m_chans.clear(); }
+    void onIrcDisconnected() override
+    {
+        m_chans.clear();
+    }
 
     void Cleanup()
     {
@@ -75,7 +80,8 @@ public:
 
         for (it = m_chans.begin(); it != m_chans.end(); ++it) {
             // The timeout for this channel did not expire yet?
-            if (it->second.first + (time_t)m_iThresholdSecs >= now) continue;
+            if (it->second.first + (time_t)m_iThresholdSecs >= now)
+                continue;
 
             NoChannel* pChan = network()->findChannel(it->first);
             if (it->second.second >= m_iThresholdMsgs && pChan && pChan->isDetached()) {
@@ -88,7 +94,7 @@ public:
                 NoRegistry registry(this);
                 if (!registry.value("silent").toBool()) {
                     putModule("Flood in [" + pChan->name() + "] is over, "
-                                                                "re-attaching...");
+                                                             "re-attaching...");
                 }
                 // No buffer playback, makes sense, doesn't it?
                 pChan->clearBuffer();
@@ -99,7 +105,8 @@ public:
             m_chans.erase(it2);
 
             // Without this Bad Things (tm) could happen
-            if (it == m_chans.end()) break;
+            if (it == m_chans.end())
+                break;
         }
     }
 
@@ -115,7 +122,8 @@ public:
 
         if (it == m_chans.end()) {
             // We don't track detached channels
-            if (Channel.isDetached()) return;
+            if (Channel.isDetached())
+                return;
 
             // This is the first message for this channel, start a
             // new timeout.
@@ -137,7 +145,8 @@ public:
 
         it->second.second++;
 
-        if (it->second.second < m_iThresholdMsgs) return;
+        if (it->second.second < m_iThresholdMsgs)
+            return;
 
         // The channel hit the limit, reset the timeout so that we keep
         // it detached for longer.
@@ -148,7 +157,7 @@ public:
         NoRegistry registry(this);
         if (!registry.value("silent").toBool()) {
             putModule("Channel [" + Channel.name() + "] was "
-                                                        "flooded, you've been detached");
+                                                     "flooded, you've been detached");
         }
     }
 
@@ -180,7 +189,7 @@ public:
     void ShowCommand(const NoString& sLine)
     {
         putModule("Current limit is " + NoString(m_iThresholdMsgs) + " lines "
-                                                                    "in " +
+                                                                     "in " +
                   NoString(m_iThresholdSecs) + " secs.");
     }
 
@@ -192,7 +201,8 @@ public:
             putModule("Seconds limit is [" + NoString(m_iThresholdSecs) + "]");
         } else {
             m_iThresholdSecs = sArg.toUInt();
-            if (m_iThresholdSecs == 0) m_iThresholdSecs = 1;
+            if (m_iThresholdSecs == 0)
+                m_iThresholdSecs = 1;
 
             putModule("Set seconds limit to [" + NoString(m_iThresholdSecs) + "]");
             Save();
@@ -207,7 +217,8 @@ public:
             putModule("Lines limit is [" + NoString(m_iThresholdMsgs) + "]");
         } else {
             m_iThresholdMsgs = sArg.toUInt();
-            if (m_iThresholdMsgs == 0) m_iThresholdMsgs = 2;
+            if (m_iThresholdMsgs == 0)
+                m_iThresholdMsgs = 2;
 
             putModule("Set lines limit to [" + NoString(m_iThresholdMsgs) + "]");
             Save();
@@ -237,7 +248,8 @@ private:
     uint m_iThresholdMsgs;
 };
 
-template <> void no_moduleInfo<NoFloodDetachMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoFloodDetachMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("flooddetach");
     Info.setHasArgs(true);

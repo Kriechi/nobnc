@@ -41,9 +41,14 @@ protected:
 class NoAutoOpUser
 {
 public:
-    NoAutoOpUser() {}
+    NoAutoOpUser()
+    {
+    }
 
-    NoAutoOpUser(const NoString& sLine) { FromString(sLine); }
+    NoAutoOpUser(const NoString& sLine)
+    {
+        FromString(sLine);
+    }
 
     NoAutoOpUser(const NoString& sUsername, const NoString& sUserKey, const NoString& sHostmasks, const NoString& sChannels)
         : m_sUsername(sUsername), m_sUserKey(sUserKey)
@@ -52,8 +57,14 @@ public:
         addChannels(sChannels);
     }
 
-    const NoString& GetUsername() const { return m_sUsername; }
-    const NoString& GetUserKey() const { return m_sUserKey; }
+    const NoString& GetUsername() const
+    {
+        return m_sUsername;
+    }
+    const NoString& GetUserKey() const
+    {
+        return m_sUserKey;
+    }
 
     bool ChannelMatches(const NoString& sChan) const
     {
@@ -76,9 +87,15 @@ public:
         return false;
     }
 
-    NoString GetHostmasks() const { return NoString(",").join(m_ssHostmasks.begin(), m_ssHostmasks.end()); }
+    NoString GetHostmasks() const
+    {
+        return NoString(",").join(m_ssHostmasks.begin(), m_ssHostmasks.end());
+    }
 
-    NoString GetChannels() const { return NoString(" ").join(m_ssChans.begin(), m_ssChans.end()); }
+    NoString GetChannels() const
+    {
+        return NoString(" ").join(m_ssChans.begin(), m_ssChans.end());
+    }
 
     bool DelHostmasks(const NoString& sHostmasks)
     {
@@ -118,7 +135,10 @@ public:
         }
     }
 
-    NoString ToString() const { return m_sUsername + "\t" + GetHostmasks() + "\t" + m_sUserKey + "\t" + GetChannels(); }
+    NoString ToString() const
+    {
+        return m_sUsername + "\t" + GetHostmasks() + "\t" + m_sUserKey + "\t" + GetChannels();
+    }
 
     bool FromString(const NoString& sLine)
     {
@@ -648,6 +668,10 @@ void NoAutoOpTimer::run()
     static_cast<NoAutoOpMod*>(module())->ProcessQueue();
 }
 
-template <> void no_moduleInfo<NoAutoOpMod>(NoModuleInfo& Info) { Info.setWikiPage("autoop"); }
+template <>
+void no_moduleInfo<NoAutoOpMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("autoop");
+}
 
 NETWORKMODULEDEFS(NoAutoOpMod, "Auto op the good people")

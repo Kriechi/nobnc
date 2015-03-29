@@ -26,21 +26,21 @@
 // Copypasted from https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28default.29 at 22 Dec
 // 2014
 const char* ZNC_DefaultCipher =
-           "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-"
-           "GCM-SHA384:"
-           "DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-"
-           "SHA256:"
-           "ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-"
-           "AES256-SHA:"
-           "ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-"
-           "SHA256:"
-           "DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:"
-           "AES128-SHA:"
-           "AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-"
-           "SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA";
+"ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-"
+"GCM-SHA384:"
+"DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-"
+"SHA256:"
+"ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-"
+"AES256-SHA:"
+"ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-"
+"SHA256:"
+"DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:"
+"AES128-SHA:"
+"AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-"
+"SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA";
 #endif
 
-NoSocketImpl::NoSocketImpl(NoSocket *q, const NoString& host, u_short port)
+NoSocketImpl::NoSocketImpl(NoSocket* q, const NoString& host, u_short port)
     : Csock(host, port), q(q), allowControlCodes(false)
 {
 #ifdef HAVE_LIBSSL
@@ -75,7 +75,8 @@ NoSocket::~NoSocket()
 int NoSocketImpl::ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const
 {
     int ret = Csock::ConvertAddress(pAddr, iAddrLen, sIP, piPort);
-    if (ret == 0) sIP.trimPrefix("::ffff:");
+    if (ret == 0)
+        sIP.trimPrefix("::ffff:");
     return ret;
 }
 
@@ -175,7 +176,11 @@ void NoSocket::SetEncoding(const NoString& sEncoding)
 #endif
 }
 #ifdef HAVE_ICU
-void NoSocketImpl::IcuExtToUCallback(UConverterToUnicodeArgs* toArgs, const char* codeUnits, int32_t length, UConverterCallbackReason reason, UErrorCode* err )
+void NoSocketImpl::IcuExtToUCallback(UConverterToUnicodeArgs* toArgs,
+                                     const char* codeUnits,
+                                     int32_t length,
+                                     UConverterCallbackReason reason,
+                                     UErrorCode* err)
 {
     // From http://www.mirc.com/colors.html
     // The Control+O key combination in mIRC inserts ascii character 15,
@@ -201,7 +206,12 @@ void NoSocketImpl::IcuExtToUCallback(UConverterToUnicodeArgs* toArgs, const char
     }
     Csock::IcuExtToUCallback(toArgs, codeUnits, length, reason, err);
 }
-void NoSocketImpl::IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs, const UChar* codeUnits, int32_t length, UChar32 codePoint, UConverterCallbackReason reason, UErrorCode* err )
+void NoSocketImpl::IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs,
+                                       const UChar* codeUnits,
+                                       int32_t length,
+                                       UChar32 codePoint,
+                                       UConverterCallbackReason reason,
+                                       UErrorCode* err)
 {
     // See comment in NoSocketImpl::IcuExtToUCallback
     static const std::set<UChar32> scAllowedChars = { 0x02, 0x03, 0x04, 0x0F, 0x12, 0x16, 0x1D, 0x1F };
@@ -214,57 +224,177 @@ void NoSocketImpl::IcuExtFromUCallback(UConverterFromUnicodeArgs* fromArgs, cons
     Csock::IcuExtFromUCallback(fromArgs, codeUnits, length, codePoint, reason, err);
 }
 #endif
-NoString NoSocket::GetRemoteIP() const { return d->impl->GetRemoteIP(); }
+NoString NoSocket::GetRemoteIP() const
+{
+    return d->impl->GetRemoteIP();
+}
 
-void NoSocket::SetPemLocation( const NoString & sPemFile ) { d->impl->SetPemLocation(sPemFile); }
-bool NoSocket::Write( const char *data, size_t len ) { return d->impl->Write(data, len); }
-bool NoSocket::Write( const NoString & sData ) { return d->impl->Write(sData); }
-time_t NoSocket::GetTimeSinceLastDataTransaction( time_t iNow ) const { return d->impl->GetTimeSinceLastDataTransaction(iNow); }
-NoString NoSocket::GetSockName() const { return d->impl->GetSockName(); }
-NoString NoSocket::bindHost() const { return d->impl->GetBindHost(); }
-void NoSocket::SetSockName( const NoString & sName ) { d->impl->SetSockName(sName); }
-bool NoSocket::IsListener() const { return d->impl->GetType() == Csock::LISTENER; }
-bool NoSocket::IsOutbound() const { return d->impl->GetType() == Csock::OUTBOUND; }
-bool NoSocket::IsInbound() const { return d->impl->GetType() == Csock::INBOUND; }
-bool NoSocket::IsConnected() const { return d->impl->IsConnected(); }
-uint16_t NoSocket::GetPort() const { return d->impl->GetPort(); }
-NoString NoSocket::GetHostName() const { return d->impl->GetHostName(); }
-uint16_t NoSocket::GetLocalPort() const { return d->impl->GetLocalPort(); }
-uint16_t NoSocket::GetRemotePort() const { return d->impl->GetRemotePort(); }
-bool NoSocket::GetSSL() const { return d->impl->GetSSL(); }
-void NoSocket::PauseRead() { d->impl->PauseRead(); }
-void NoSocket::UnPauseRead() { d->impl->UnPauseRead(); }
-NoString NoSocket::GetLocalIP() const { return d->impl->GetLocalIP(); }
+void NoSocket::SetPemLocation(const NoString& sPemFile)
+{
+    d->impl->SetPemLocation(sPemFile);
+}
+bool NoSocket::Write(const char* data, size_t len)
+{
+    return d->impl->Write(data, len);
+}
+bool NoSocket::Write(const NoString& sData)
+{
+    return d->impl->Write(sData);
+}
+time_t NoSocket::GetTimeSinceLastDataTransaction(time_t iNow) const
+{
+    return d->impl->GetTimeSinceLastDataTransaction(iNow);
+}
+NoString NoSocket::GetSockName() const
+{
+    return d->impl->GetSockName();
+}
+NoString NoSocket::bindHost() const
+{
+    return d->impl->GetBindHost();
+}
+void NoSocket::SetSockName(const NoString& sName)
+{
+    d->impl->SetSockName(sName);
+}
+bool NoSocket::IsListener() const
+{
+    return d->impl->GetType() == Csock::LISTENER;
+}
+bool NoSocket::IsOutbound() const
+{
+    return d->impl->GetType() == Csock::OUTBOUND;
+}
+bool NoSocket::IsInbound() const
+{
+    return d->impl->GetType() == Csock::INBOUND;
+}
+bool NoSocket::IsConnected() const
+{
+    return d->impl->IsConnected();
+}
+uint16_t NoSocket::GetPort() const
+{
+    return d->impl->GetPort();
+}
+NoString NoSocket::GetHostName() const
+{
+    return d->impl->GetHostName();
+}
+uint16_t NoSocket::GetLocalPort() const
+{
+    return d->impl->GetLocalPort();
+}
+uint16_t NoSocket::GetRemotePort() const
+{
+    return d->impl->GetRemotePort();
+}
+bool NoSocket::GetSSL() const
+{
+    return d->impl->GetSSL();
+}
+void NoSocket::PauseRead()
+{
+    d->impl->PauseRead();
+}
+void NoSocket::UnPauseRead()
+{
+    d->impl->UnPauseRead();
+}
+NoString NoSocket::GetLocalIP() const
+{
+    return d->impl->GetLocalIP();
+}
 #ifdef HAVE_LIBSSL
-void NoSocket::SetCipher( const NoString & sCipher ) { d->impl->SetCipher(sCipher); }
-long NoSocket::GetPeerFingerprint( NoString & sFP ) const { return d->impl->GetPeerFingerprint(sFP); }
-void NoSocket::SetRequireClientCertFlags( uint32_t iRequireClientCertFlags ) { d->impl->SetRequireClientCertFlags(iRequireClientCertFlags); }
-SSL_SESSION * NoSocket::GetSSLSession() const { return d->impl->GetSSLSession(); }
+void NoSocket::SetCipher(const NoString& sCipher)
+{
+    d->impl->SetCipher(sCipher);
+}
+long NoSocket::GetPeerFingerprint(NoString& sFP) const
+{
+    return d->impl->GetPeerFingerprint(sFP);
+}
+void NoSocket::SetRequireClientCertFlags(uint32_t iRequireClientCertFlags)
+{
+    d->impl->SetRequireClientCertFlags(iRequireClientCertFlags);
+}
+SSL_SESSION* NoSocket::GetSSLSession() const
+{
+    return d->impl->GetSSLSession();
+}
 #endif
-uint64_t NoSocket::GetBytesRead() const { return d->impl->GetBytesRead(); }
-void NoSocket::ResetBytesRead() { d->impl->ResetBytesRead(); }
-uint64_t NoSocket::GetBytesWritten() const { return d->impl->GetBytesWritten(); }
-void NoSocket::ResetBytesWritten() { d->impl->ResetBytesWritten(); }
-double NoSocket::GetAvgRead( uint64_t iSample ) const { return d->impl->GetAvgRead(iSample); }
-double NoSocket::GetAvgWrite( uint64_t iSample ) const { return d->impl->GetAvgWrite(iSample); }
-uint64_t NoSocket::GetStartTime() const { return d->impl->GetStartTime(); }
-bool NoSocket::Connect() { return d->impl->Connect(); }
-bool NoSocket::Listen( uint16_t iPort, int iMaxConns, const NoString & sBindHost, uint32_t iTimeout, bool bDetach )
+uint64_t NoSocket::GetBytesRead() const
+{
+    return d->impl->GetBytesRead();
+}
+void NoSocket::ResetBytesRead()
+{
+    d->impl->ResetBytesRead();
+}
+uint64_t NoSocket::GetBytesWritten() const
+{
+    return d->impl->GetBytesWritten();
+}
+void NoSocket::ResetBytesWritten()
+{
+    d->impl->ResetBytesWritten();
+}
+double NoSocket::GetAvgRead(uint64_t iSample) const
+{
+    return d->impl->GetAvgRead(iSample);
+}
+double NoSocket::GetAvgWrite(uint64_t iSample) const
+{
+    return d->impl->GetAvgWrite(iSample);
+}
+uint64_t NoSocket::GetStartTime() const
+{
+    return d->impl->GetStartTime();
+}
+bool NoSocket::Connect()
+{
+    return d->impl->Connect();
+}
+bool NoSocket::Listen(uint16_t iPort, int iMaxConns, const NoString& sBindHost, uint32_t iTimeout, bool bDetach)
 {
     return d->impl->Listen(iPort, iMaxConns, sBindHost, iTimeout, bDetach);
 }
-void NoSocket::EnableReadLine() { d->impl->EnableReadLine(); }
-void NoSocket::DisableReadLine() { d->impl->DisableReadLine(); }
-void NoSocket::SetMaxBufferThreshold( uint32_t iThreshold ) { d->impl->SetMaxBufferThreshold(iThreshold); }
-cs_sock_t & NoSocket::GetRSock() { return d->impl->GetRSock(); }
-void NoSocket::SetRSock( cs_sock_t iSock ) { d->impl->SetRSock(iSock); }
-cs_sock_t & NoSocket::GetWSock() { return d->impl->GetWSock(); }
-void NoSocket::SetWSock( cs_sock_t iSock ) { d->impl->SetWSock(iSock); }
-bool NoSocket::ConnectFD( int iReadFD, int iWriteFD, const CS_STRING & sName, bool bIsSSL)
+void NoSocket::EnableReadLine()
+{
+    d->impl->EnableReadLine();
+}
+void NoSocket::DisableReadLine()
+{
+    d->impl->DisableReadLine();
+}
+void NoSocket::SetMaxBufferThreshold(uint32_t iThreshold)
+{
+    d->impl->SetMaxBufferThreshold(iThreshold);
+}
+cs_sock_t& NoSocket::GetRSock()
+{
+    return d->impl->GetRSock();
+}
+void NoSocket::SetRSock(cs_sock_t iSock)
+{
+    d->impl->SetRSock(iSock);
+}
+cs_sock_t& NoSocket::GetWSock()
+{
+    return d->impl->GetWSock();
+}
+void NoSocket::SetWSock(cs_sock_t iSock)
+{
+    d->impl->SetWSock(iSock);
+}
+bool NoSocket::ConnectFD(int iReadFD, int iWriteFD, const CS_STRING& sName, bool bIsSSL)
 {
     return d->impl->ConnectFD(iReadFD, iWriteFD, sName, bIsSSL, Csock::INBOUND);
 }
-void NoSocket::SetTimeout( int iTimeout, uint32_t iTimeoutType ) { d->impl->SetTimeout(iTimeout, iTimeoutType); }
+void NoSocket::SetTimeout(int iTimeout, uint32_t iTimeoutType)
+{
+    d->impl->SetTimeout(iTimeout, iTimeoutType);
+}
 
 Csock* NoSocketImpl::GetSockObj(const NoString& sHost, ushort uPort)
 {
@@ -273,30 +403,93 @@ Csock* NoSocketImpl::GetSockObj(const NoString& sHost, ushort uPort)
         return NoSocketPrivate::get(sockObj);
     return Csock::GetSockObj(sHost, uPort);
 }
-NoSocket* NoSocket::GetSockObjImpl(const NoString& sHost, ushort uPort) { return nullptr; }
+NoSocket* NoSocket::GetSockObjImpl(const NoString& sHost, ushort uPort)
+{
+    return nullptr;
+}
 
-NoSocket::CloseType NoSocket::GetCloseType() const { return static_cast<CloseType>(d->impl->GetCloseType()); }
-void NoSocket::Close(CloseType type) { d->impl->Close(static_cast<Csock::ECloseType>(type)); }
-NoString & NoSocket::GetInternalReadBuffer() { return d->impl->GetInternalReadBuffer(); }
-NoString & NoSocket::GetInternalWriteBuffer() { return d->impl->GetInternalWriteBuffer(); }
+NoSocket::CloseType NoSocket::GetCloseType() const
+{
+    return static_cast<CloseType>(d->impl->GetCloseType());
+}
+void NoSocket::Close(CloseType type)
+{
+    d->impl->Close(static_cast<Csock::ECloseType>(type));
+}
+NoString& NoSocket::GetInternalReadBuffer()
+{
+    return d->impl->GetInternalReadBuffer();
+}
+NoString& NoSocket::GetInternalWriteBuffer()
+{
+    return d->impl->GetInternalWriteBuffer();
+}
 
-void NoSocketImpl::ReadLine(const NoString & sLine) { q->ReadLineImpl(sLine); }
-void NoSocket::ReadLineImpl(const NoString & sLine) { d->impl->Csock::ReadLine(sLine); }
+void NoSocketImpl::ReadLine(const NoString& sLine)
+{
+    q->ReadLineImpl(sLine);
+}
+void NoSocket::ReadLineImpl(const NoString& sLine)
+{
+    d->impl->Csock::ReadLine(sLine);
+}
 
-void NoSocketImpl::ReadData(const char *data, size_t len) { q->ReadDataImpl(data, len); }
-void NoSocket::ReadDataImpl(const char* data, size_t len) { return d->impl->Csock::ReadData(data, len); }
+void NoSocketImpl::ReadData(const char* data, size_t len)
+{
+    q->ReadDataImpl(data, len);
+}
+void NoSocket::ReadDataImpl(const char* data, size_t len)
+{
+    return d->impl->Csock::ReadData(data, len);
+}
 
-void NoSocketImpl::PushBuff(const char *data, size_t len, bool bStartAtZero) { q->PushBuffImpl(data, len, bStartAtZero); }
-void NoSocket::PushBuffImpl( const char *data, size_t len, bool bStartAtZero ) { d->impl->Csock::PushBuff(data, len, bStartAtZero); }
+void NoSocketImpl::PushBuff(const char* data, size_t len, bool bStartAtZero)
+{
+    q->PushBuffImpl(data, len, bStartAtZero);
+}
+void NoSocket::PushBuffImpl(const char* data, size_t len, bool bStartAtZero)
+{
+    d->impl->Csock::PushBuff(data, len, bStartAtZero);
+}
 
-bool NoSocket::StartTLS() { return d->impl->StartTLS(); }
-bool NoSocket::IsConOK() const { return d->impl->GetConState() == Csock::CST_OK; }
+bool NoSocket::StartTLS()
+{
+    return d->impl->StartTLS();
+}
+bool NoSocket::IsConOK() const
+{
+    return d->impl->GetConState() == Csock::CST_OK;
+}
 
-void NoSocket::ConnectedImpl() { d->impl->Csock::Connected(); }
-void NoSocket::TimeoutImpl() { d->impl->Csock::Timeout(); }
-void NoSocket::DisconnectedImpl() { d->impl->Csock::Disconnected(); }
-void NoSocket::ConnectionRefusedImpl() { d->impl->Csock::ConnectionRefused(); }
-void NoSocket::ReadPausedImpl() { d->impl->Csock::ReadPaused(); }
-void NoSocket::ReachedMaxBufferImpl() { d->impl->Csock::ReachedMaxBuffer(); }
-void NoSocket::SockErrorImpl(int iErrno, const NoString& sDescription) { d->impl->Csock::SockError(iErrno, sDescription); }
-bool NoSocket::ConnectionFromImpl(const NoString& sHost, ushort uPort) { return d->impl->Csock::ConnectionFrom(sHost, uPort); }
+void NoSocket::ConnectedImpl()
+{
+    d->impl->Csock::Connected();
+}
+void NoSocket::TimeoutImpl()
+{
+    d->impl->Csock::Timeout();
+}
+void NoSocket::DisconnectedImpl()
+{
+    d->impl->Csock::Disconnected();
+}
+void NoSocket::ConnectionRefusedImpl()
+{
+    d->impl->Csock::ConnectionRefused();
+}
+void NoSocket::ReadPausedImpl()
+{
+    d->impl->Csock::ReadPaused();
+}
+void NoSocket::ReachedMaxBufferImpl()
+{
+    d->impl->Csock::ReachedMaxBuffer();
+}
+void NoSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
+{
+    d->impl->Csock::SockError(iErrno, sDescription);
+}
+bool NoSocket::ConnectionFromImpl(const NoString& sHost, ushort uPort)
+{
+    return d->impl->Csock::ConnectionFrom(sHost, uPort);
+}

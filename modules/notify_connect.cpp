@@ -24,7 +24,9 @@
 class NoNotifyConnectMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoNotifyConnectMod) {}
+    MODCONSTRUCTOR(NoNotifyConnectMod)
+    {
+    }
 
     void onClientLogin() override
     {
@@ -37,9 +39,16 @@ public:
     }
 
 private:
-    void SendAdmins(const NoString& msg) { NoApp::Get().Broadcast(msg, true, nullptr, client()); }
+    void SendAdmins(const NoString& msg)
+    {
+        NoApp::Get().Broadcast(msg, true, nullptr, client());
+    }
 };
 
-template <> void no_moduleInfo<NoNotifyConnectMod>(NoModuleInfo& Info) { Info.setWikiPage("notify_connect"); }
+template <>
+void no_moduleInfo<NoNotifyConnectMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("notify_connect");
+}
 
 GLOBALMODULEDEFS(NoNotifyConnectMod, "Notifies all admin users when a client connects or disconnects.")

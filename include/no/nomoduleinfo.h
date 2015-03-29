@@ -31,7 +31,12 @@ typedef void* NoModuleHandle;
 class NO_EXPORT NoModuleInfo
 {
 public:
-    typedef NoModule* (*NoModuleLoader)(NoModuleHandle p, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType);
+    typedef NoModule* (*NoModuleLoader)(NoModuleHandle p,
+                                        NoUser* pUser,
+                                        NoNetwork* pNetwork,
+                                        const NoString& sModName,
+                                        const NoString& sModPath,
+                                        No::ModuleType eType);
 
     NoModuleInfo();
     NoModuleInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType);
@@ -80,7 +85,8 @@ void no_moduleInfo(NoModuleInfo& info)
 }
 
 template <class T>
-NoModule* no_loadModule(NoModuleHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& path, No::ModuleType type)
+NoModule*
+no_loadModule(NoModuleHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& path, No::ModuleType type)
 {
     return new T(handle, user, network, name, path, type);
 }

@@ -27,19 +27,29 @@ struct ConfigStackEntry
     NoString sName;
     NoSettings Config;
 
-    ConfigStackEntry(const NoString& Tag, const NoString Name) : sTag(Tag), sName(Name), Config() {}
+    ConfigStackEntry(const NoString& Tag, const NoString Name) : sTag(Tag), sName(Name), Config()
+    {
+    }
 };
 
-NoSettingsEntry::NoSettingsEntry() : m_subConfig(nullptr) {}
+NoSettingsEntry::NoSettingsEntry() : m_subConfig(nullptr)
+{
+}
 
-NoSettingsEntry::NoSettingsEntry(const NoSettings& Config) : m_subConfig(new NoSettings(Config)) {}
+NoSettingsEntry::NoSettingsEntry(const NoSettings& Config) : m_subConfig(new NoSettings(Config))
+{
+}
 
 NoSettingsEntry::NoSettingsEntry(const NoSettingsEntry& other) : m_subConfig(nullptr)
 {
-    if (other.m_subConfig) m_subConfig = new NoSettings(*other.m_subConfig);
+    if (other.m_subConfig)
+        m_subConfig = new NoSettings(*other.m_subConfig);
 }
 
-NoSettingsEntry::~NoSettingsEntry() { delete m_subConfig; }
+NoSettingsEntry::~NoSettingsEntry()
+{
+    delete m_subConfig;
+}
 
 NoSettingsEntry& NoSettingsEntry::operator=(const NoSettingsEntry& other)
 {
@@ -51,15 +61,29 @@ NoSettingsEntry& NoSettingsEntry::operator=(const NoSettingsEntry& other)
     return *this;
 }
 
-NoSettings::NoSettings() : m_entries(), m_subConfigs() {}
+NoSettings::NoSettings() : m_entries(), m_subConfigs()
+{
+}
 
-NoSettings::EntryMapIterator NoSettings::BeginEntries() const { return m_entries.begin(); }
+NoSettings::EntryMapIterator NoSettings::BeginEntries() const
+{
+    return m_entries.begin();
+}
 
-NoSettings::EntryMapIterator NoSettings::EndEntries() const { return m_entries.end(); }
+NoSettings::EntryMapIterator NoSettings::EndEntries() const
+{
+    return m_entries.end();
+}
 
-NoSettings::SubConfigMapIterator NoSettings::BeginSubConfigs() const { return m_subConfigs.begin(); }
+NoSettings::SubConfigMapIterator NoSettings::BeginSubConfigs() const
+{
+    return m_subConfigs.begin();
+}
 
-NoSettings::SubConfigMapIterator NoSettings::EndSubConfigs() const { return m_subConfigs.end(); }
+NoSettings::SubConfigMapIterator NoSettings::EndSubConfigs() const
+{
+    return m_subConfigs.end();
+}
 
 void NoSettings::AddKeyValuePair(const NoString& sName, const NoString& sValue)
 {
@@ -87,7 +111,8 @@ bool NoSettings::FindStringVector(const NoString& sName, NoStringVector& vsList,
 {
     EntryMap::iterator it = m_entries.find(sName);
     vsList.clear();
-    if (it == m_entries.end()) return false;
+    if (it == m_entries.end())
+        return false;
     vsList = it->second;
 
     if (bErase) {
@@ -101,10 +126,12 @@ bool NoSettings::FindStringEntry(const NoString& sName, NoString& sRes, const No
 {
     EntryMap::iterator it = m_entries.find(sName);
     sRes = sDefault;
-    if (it == m_entries.end() || it->second.empty()) return false;
+    if (it == m_entries.end() || it->second.empty())
+        return false;
     sRes = it->second.front();
     it->second.erase(it->second.begin());
-    if (it->second.empty()) m_entries.erase(it);
+    if (it->second.empty())
+        m_entries.erase(it);
     return true;
 }
 
@@ -168,7 +195,10 @@ bool NoSettings::FindSubConfig(const NoString& sName, NoSettings::SubConfig& Con
     return true;
 }
 
-bool NoSettings::empty() const { return m_entries.empty() && m_subConfigs.empty(); }
+bool NoSettings::empty() const
+{
+    return m_entries.empty() && m_subConfigs.empty();
+}
 
 bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 {
@@ -192,7 +222,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
         stream << "Error on line " << uLineNum << ": " << arg; \
         sErrorMsg = stream.str();                              \
         m_subConfigs.clear();                                  \
-        m_entries.clear();                               \
+        m_entries.clear();                                     \
         return false;                                          \
     } while (0)
 
@@ -225,14 +255,17 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
             if (sTag.left(1) == "/") {
                 sTag = sTag.substr(1);
 
-                if (!sValue.empty()) ERROR("Malformated closing tag. Expected \"</" << sTag << ">\".");
-                if (ConfigStack.empty()) ERROR("Closing tag \"" << sTag << "\" which is not open.");
+                if (!sValue.empty())
+                    ERROR("Malformated closing tag. Expected \"</" << sTag << ">\".");
+                if (ConfigStack.empty())
+                    ERROR("Closing tag \"" << sTag << "\" which is not open.");
 
                 const struct ConfigStackEntry& entry = ConfigStack.top();
                 NoSettings myConfig(entry.Config);
                 NoString sName(entry.sName);
 
-                if (!sTag.equals(entry.sTag)) ERROR("Closing tag \"" << sTag << "\" which is not open.");
+                if (!sTag.equals(entry.sTag))
+                    ERROR("Closing tag \"" << sTag << "\" which is not open.");
 
                 // This breaks entry
                 ConfigStack.pop();
@@ -245,11 +278,13 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
                 SubConfig& conf = pActiveConfig->m_subConfigs[sTag.toLower()];
                 SubConfig::const_iterator it = conf.find(sName);
 
-                if (it != conf.end()) ERROR("Duplicate entry for tag \"" << sTag << "\" name \"" << sName << "\".");
+                if (it != conf.end())
+                    ERROR("Duplicate entry for tag \"" << sTag << "\" name \"" << sName << "\".");
 
                 conf[sName] = NoSettingsEntry(myConfig);
             } else {
-                if (sValue.empty()) ERROR("Empty block name at begin of block.");
+                if (sValue.empty())
+                    ERROR("Empty block name at begin of block.");
                 ConfigStack.push(ConfigStackEntry(sTag.toLower(), sValue));
                 pActiveConfig = &ConfigStack.top().Config;
             }
@@ -263,19 +298,22 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 
         // Only remove the first space, people might want
         // leading spaces (e.g. in the MOTD).
-        if (sValue.left(1) == " ") sValue.leftChomp(1);
+        if (sValue.left(1) == " ")
+            sValue.leftChomp(1);
 
         // We don't have any names with spaces, trim all
         // leading/trailing spaces.
         sName.trim();
 
-        if (sName.empty() || sValue.empty()) ERROR("Malformed line");
+        if (sName.empty() || sValue.empty())
+            ERROR("Malformed line");
 
         NoString sNameLower = sName.toLower();
         pActiveConfig->m_entries[sNameLower].push_back(sValue);
     }
 
-    if (bCommented) ERROR("Comment not closed at end of file.");
+    if (bCommented)
+        ERROR("Comment not closed at end of file.");
 
     if (!ConfigStack.empty()) {
         const NoString& sTag = ConfigStack.top().sTag;

@@ -27,7 +27,8 @@ class NoImapAuthMod;
 class NoImapSock : public NoModuleSocket
 {
 public:
-    NoImapSock(NoImapAuthMod* pModule, std::shared_ptr<NoAuthenticator> Auth) : NoModuleSocket((NoModule*)pModule), m_spAuth(Auth)
+    NoImapSock(NoImapAuthMod* pModule, std::shared_ptr<NoAuthenticator> Auth)
+        : NoModuleSocket((NoModule*)pModule), m_spAuth(Auth)
     {
         m_pIMAPMod = pModule;
         m_bSentReply = false;
@@ -64,7 +65,10 @@ public:
         m_bSSL = false;
     }
 
-    bool onBoot() override { return true; }
+    bool onBoot() override
+    {
+        return true;
+    }
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
@@ -111,12 +115,20 @@ public:
         return HALT;
     }
 
-    void onModCommand(const NoString& sLine) override {}
+    void onModCommand(const NoString& sLine) override
+    {
+    }
 
-    void CacheLogin(const NoString& sLogin) { m_Cache.insert(sLogin); }
+    void CacheLogin(const NoString& sLogin)
+    {
+        m_Cache.insert(sLogin);
+    }
 
     // Getters
-    const NoString& GetUserFormat() const { return m_sUserFormat; }
+    const NoString& GetUserFormat() const
+    {
+        return m_sUserFormat;
+    }
     // !Getters
 private:
     // Settings
@@ -164,7 +176,8 @@ void NoImapSock::ReadLineImpl(const NoString& sLine)
     }
 }
 
-template <> void no_moduleInfo<NoImapAuthMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoImapAuthMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("imapauth");
     Info.setHasArgs(true);

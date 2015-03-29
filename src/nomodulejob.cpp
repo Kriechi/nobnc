@@ -25,12 +25,24 @@ NoModuleJob::NoModuleJob(NoModule* pModule, const NoString& sName, const NoStrin
 {
 }
 
-NoModuleJob::~NoModuleJob() { m_module->unlinkJob(this); }
+NoModuleJob::~NoModuleJob()
+{
+    m_module->unlinkJob(this);
+}
 
-NoString NoModuleJob::description() const { return m_description; }
+NoString NoModuleJob::description() const
+{
+    return m_description;
+}
 
-NoString NoModuleJob::name() const { return m_name; }
+NoString NoModuleJob::name() const
+{
+    return m_name;
+}
 
-NoModule* NoModuleJob::module() const { return m_module; }
+NoModule* NoModuleJob::module() const
+{
+    return m_module;
+}
 
 #endif // HAVE_PTHREAD

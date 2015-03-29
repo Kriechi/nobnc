@@ -71,22 +71,31 @@ NoChannel::NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig,
 
     if (pConfig) {
         NoString sValue;
-        if (pConfig->FindStringEntry("buffer", sValue)) setBufferCount(sValue.toUInt(), true);
-        if (pConfig->FindStringEntry("autoclearchanbuffer", sValue)) setAutoClearChanBuffer(sValue.toBool());
+        if (pConfig->FindStringEntry("buffer", sValue))
+            setBufferCount(sValue.toUInt(), true);
+        if (pConfig->FindStringEntry("autoclearchanbuffer", sValue))
+            setAutoClearChanBuffer(sValue.toBool());
         if (pConfig->FindStringEntry("keepbuffer", sValue))
             setAutoClearChanBuffer(!sValue.toBool()); // XXX Compatibility crap, added in 0.207
-        if (pConfig->FindStringEntry("detached", sValue)) setDetached(sValue.toBool());
+        if (pConfig->FindStringEntry("detached", sValue))
+            setDetached(sValue.toBool());
         if (pConfig->FindStringEntry("disabled", sValue))
-            if (sValue.toBool()) disable();
+            if (sValue.toBool())
+                disable();
         if (pConfig->FindStringEntry("autocycle", sValue))
             if (sValue.equals("true"))
                 No::printError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle " + sName);
-        if (pConfig->FindStringEntry("key", sValue)) setKey(sValue);
-        if (pConfig->FindStringEntry("modes", sValue)) setDefaultModes(sValue);
+        if (pConfig->FindStringEntry("key", sValue))
+            setKey(sValue);
+        if (pConfig->FindStringEntry("modes", sValue))
+            setDefaultModes(sValue);
     }
 }
 
-NoChannel::~NoChannel() { clearNicks(); }
+NoChannel::~NoChannel()
+{
+    clearNicks();
+}
 
 void NoChannel::reset()
 {
@@ -106,12 +115,18 @@ NoSettings NoChannel::toConfig() const
 {
     NoSettings config;
 
-    if (d->hasBufferCountSet) config.AddKeyValuePair("Buffer", NoString(bufferCount()));
-    if (d->hasAutoClearChanBufferSet) config.AddKeyValuePair("AutoClearChanBuffer", NoString(autoClearChanBuffer()));
-    if (isDetached()) config.AddKeyValuePair("Detached", "true");
-    if (isDisabled()) config.AddKeyValuePair("Disabled", "true");
-    if (!key().empty()) config.AddKeyValuePair("Key", key());
-    if (!defaultModes().empty()) config.AddKeyValuePair("Modes", defaultModes());
+    if (d->hasBufferCountSet)
+        config.AddKeyValuePair("Buffer", NoString(bufferCount()));
+    if (d->hasAutoClearChanBufferSet)
+        config.AddKeyValuePair("AutoClearChanBuffer", NoString(autoClearChanBuffer()));
+    if (isDetached())
+        config.AddKeyValuePair("Detached", "true");
+    if (isDisabled())
+        config.AddKeyValuePair("Disabled", "true");
+    if (!key().empty())
+        config.AddKeyValuePair("Key", key());
+    if (!defaultModes().empty())
+        config.AddKeyValuePair("Modes", defaultModes());
 
     return config;
 }
@@ -139,7 +154,10 @@ void NoChannel::clone(NoChannel& chan)
     }
 }
 
-void NoChannel::cycle() const { d->network->putIrc("PART " + name() + "\r\nJOIN " + name() + " " + key()); }
+void NoChannel::cycle() const
+{
+    d->network->putIrc("PART " + name() + "\r\nJOIN " + name() + " " + key());
+}
 
 void NoChannel::joinUser(const NoString& sKey)
 {
@@ -154,16 +172,16 @@ void NoChannel::attachUser(NoClient* pClient)
     d->network->putUser(":" + d->network->ircNick().nickMask() + " JOIN :" + name(), pClient);
 
     if (!topic().empty()) {
-        d->network->putUser(":" + d->network->ircServer() + " 332 " + d->network->ircNick().nick() + " " +
-                            name() + " :" + topic(),
+        d->network->putUser(":" + d->network->ircServer() + " 332 " + d->network->ircNick().nick() + " " + name() +
+                            " :" + topic(),
                             pClient);
-        d->network->putUser(":" + d->network->ircServer() + " 333 " + d->network->ircNick().nick() + " " +
-                            name() + " " + topicOwner() + " " + NoString(topicDate()),
+        d->network->putUser(":" + d->network->ircServer() + " 333 " + d->network->ircNick().nick() + " " + name() +
+                            " " + topicOwner() + " " + NoString(topicDate()),
                             pClient);
     }
 
-    NoString sPre = ":" + d->network->ircServer() + " 353 " + d->network->ircNick().nick() + " " +
-                   modeForNames() + " " + name() + " :";
+    NoString sPre =
+    ":" + d->network->ircServer() + " 353 " + d->network->ircNick().nick() + " " + modeForNames() + " " + name() + " :";
     NoString sLine = sPre;
     NoString sPerm, sNick;
 
@@ -205,7 +223,8 @@ void NoChannel::attachUser(NoClient* pClient)
             break;
     }
 
-    d->network->putUser(":" + d->network->ircServer() + " 366 " + d->network->ircNick().nick() + " " + name() + " :End of /NAMES list.",
+    d->network->putUser(":" + d->network->ircServer() + " 366 " + d->network->ircNick().nick() + " " + name() +
+                        " :End of /NAMES list.",
                         pClient);
     d->detached = false;
 
@@ -299,7 +318,8 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
         NoNick* OpNick = findNick(pOpNick->nick());
         /* If nothing was found, use the original pOpNick, else use the
          * NoNick* from FindNick() */
-        if (OpNick) pOpNick = OpNick;
+        if (OpNick)
+            pOpNick = OpNick;
     }
 
     NETWORKMODULECALL(onRawMode2(pOpNick, *this, sModeArg, sArgs), d->network->user(), d->network, nullptr, NOTHING);
@@ -433,7 +453,10 @@ NoString NoChannel::modeArg(uchar uMode) const
     return "";
 }
 
-bool NoChannel::hasMode(uchar uMode) const { return (uMode && d->modes.find(uMode) != d->modes.end()); }
+bool NoChannel::hasMode(uchar uMode) const
+{
+    return (uMode && d->modes.find(uMode) != d->modes.end());
+}
 
 bool NoChannel::addMode(uchar uMode, const NoString& sArg)
 {
@@ -458,7 +481,10 @@ NoString NoChannel::modeArg(NoString& sArgs) const
     return sRet;
 }
 
-void NoChannel::clearNicks() { d->nicks.clear(); }
+void NoChannel::clearNicks()
+{
+    d->nicks.clear();
+}
 
 int NoChannel::addNicks(const NoString& sNicks)
 {
@@ -503,8 +529,10 @@ bool NoChannel::addNick(const NoString& sNick)
         pNick->setNetwork(d->network);
     }
 
-    if (!sIdent.empty()) pNick->setIdent(sIdent);
-    if (!sHost.empty()) pNick->setHost(sHost);
+    if (!sIdent.empty())
+        pNick->setIdent(sIdent);
+    if (!sHost.empty())
+        pNick->setHost(sHost);
 
     for (NoString::size_type i = 0; i < sPrefix.length(); i++) {
         pNick->addPerm(sPrefix[i]);
@@ -581,8 +609,14 @@ NoNick* NoChannel::findNick(const NoString& sNick)
     return (it != d->nicks.end()) ? &it->second : nullptr;
 }
 
-const NoBuffer& NoChannel::buffer() const { return d->buffer; }
-uint NoChannel::bufferCount() const { return d->buffer.limit(); }
+const NoBuffer& NoChannel::buffer() const
+{
+    return d->buffer;
+}
+uint NoChannel::bufferCount() const
+{
+    return d->buffer.limit();
+}
 bool NoChannel::setBufferCount(uint u, bool bForce)
 {
     d->hasBufferCountSet = true;
@@ -590,13 +624,17 @@ bool NoChannel::setBufferCount(uint u, bool bForce)
 }
 void NoChannel::inheritBufferCount(uint u, bool bForce)
 {
-    if (!d->hasBufferCountSet) d->buffer.setLimit(u, bForce);
+    if (!d->hasBufferCountSet)
+        d->buffer.setLimit(u, bForce);
 }
 size_t NoChannel::addBuffer(const NoString& sFormat, const NoString& sText, const timeval* ts)
 {
     return d->buffer.addMessage(sFormat, sText, ts);
 }
-void NoChannel::clearBuffer() { d->buffer.clear(); }
+void NoChannel::clearBuffer()
+{
+    d->buffer.clear();
+}
 
 void NoChannel::sendBuffer(NoClient* pClient)
 {
@@ -660,7 +698,8 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                                       d->network,
                                       nullptr,
                                       &bNotShowThisLine);
-                    if (bNotShowThisLine) continue;
+                    if (bNotShowThisLine)
+                        continue;
                     d->network->putUser(sLine, pUseClient);
                 }
 
@@ -676,19 +715,38 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
 
                 pUseClient->setPlaybackActive(bWasPlaybackActive);
 
-                if (pClient) break;
+                if (pClient)
+                    break;
             }
         }
     }
 }
 
-NoString NoChannel::permStr() const { return d->nick.perms(); }
-bool NoChannel::hasPerm(uchar uPerm) const { return d->nick.hasPerm(uPerm); }
-void NoChannel::addPerm(uchar uPerm) { d->nick.addPerm(uPerm); }
-void NoChannel::remPerm(uchar uPerm) { d->nick.removePerm(uPerm); }
+NoString NoChannel::permStr() const
+{
+    return d->nick.perms();
+}
+bool NoChannel::hasPerm(uchar uPerm) const
+{
+    return d->nick.hasPerm(uPerm);
+}
+void NoChannel::addPerm(uchar uPerm)
+{
+    d->nick.addPerm(uPerm);
+}
+void NoChannel::remPerm(uchar uPerm)
+{
+    d->nick.removePerm(uPerm);
+}
 
-bool NoChannel::isModeKnown() const { return d->modeKnown; }
-void NoChannel::setModeKnown(bool b) { d->modeKnown = b; }
+bool NoChannel::isModeKnown() const
+{
+    return d->modeKnown;
+}
+void NoChannel::setModeKnown(bool b)
+{
+    d->modeKnown = b;
+}
 void NoChannel::setIsOn(bool b)
 {
     d->isOn = b;
@@ -707,14 +765,35 @@ void NoChannel::setKey(const NoString& s)
     }
 }
 
-void NoChannel::setTopic(const NoString& s) { d->topic = s; }
-void NoChannel::setTopicOwner(const NoString& s) { d->topicOwner = s; }
-void NoChannel::setTopicDate(ulong u) { d->topicDate = u; }
-void NoChannel::setDefaultModes(const NoString& s) { d->defaultModes = s; }
-void NoChannel::setDetached(bool b) { d->detached = b; }
+void NoChannel::setTopic(const NoString& s)
+{
+    d->topic = s;
+}
+void NoChannel::setTopicOwner(const NoString& s)
+{
+    d->topicOwner = s;
+}
+void NoChannel::setTopicDate(ulong u)
+{
+    d->topicDate = u;
+}
+void NoChannel::setDefaultModes(const NoString& s)
+{
+    d->defaultModes = s;
+}
+void NoChannel::setDetached(bool b)
+{
+    d->detached = b;
+}
 
-void NoChannel::setCreationDate(ulong u) { d->creationDate = u; }
-void NoChannel::disable() { d->disabled = true; }
+void NoChannel::setCreationDate(ulong u)
+{
+    d->creationDate = u;
+}
+void NoChannel::disable()
+{
+    d->disabled = true;
+}
 
 void NoChannel::enable()
 {
@@ -722,8 +801,14 @@ void NoChannel::enable()
     d->disabled = false;
 }
 
-void NoChannel::incJoinTries() { d->joinTries++; }
-void NoChannel::resetJoinTries() { d->joinTries = 0; }
+void NoChannel::incJoinTries()
+{
+    d->joinTries++;
+}
+void NoChannel::resetJoinTries()
+{
+    d->joinTries = 0;
+}
 
 void NoChannel::setInConfig(bool b)
 {
@@ -735,21 +820,75 @@ void NoChannel::setInConfig(bool b)
     }
 }
 
-bool NoChannel::isOn() const { return d->isOn; }
-NoString NoChannel::name() const { return d->name; }
-std::map<uchar, NoString> NoChannel::modes() const { return d->modes; }
-NoString NoChannel::key() const { return d->key; }
-NoString NoChannel::topic() const { return d->topic; }
-NoString NoChannel::topicOwner() const { return d->topicOwner; }
-ulong NoChannel::topicDate() const { return d->topicDate; }
-NoString NoChannel::defaultModes() const { return d->defaultModes; }
-std::map<NoString, NoNick> NoChannel::nicks() const { return d->nicks; }
-size_t NoChannel::nickCount() const { return d->nicks.size(); }
-bool NoChannel::autoClearChanBuffer() const { return d->autoClearChanBuffer; }
-bool NoChannel::isDetached() const { return d->detached; }
-bool NoChannel::inConfig() const { return d->inConfig; }
-ulong NoChannel::creationDate() const { return d->creationDate; }
-bool NoChannel::isDisabled() const { return d->disabled; }
-uint NoChannel::joinTries() const { return d->joinTries; }
-bool NoChannel::hasBufferCountSet() const { return d->hasBufferCountSet; }
-bool NoChannel::hasAutoClearChanBufferSet() const { return d->hasAutoClearChanBufferSet; }
+bool NoChannel::isOn() const
+{
+    return d->isOn;
+}
+NoString NoChannel::name() const
+{
+    return d->name;
+}
+std::map<uchar, NoString> NoChannel::modes() const
+{
+    return d->modes;
+}
+NoString NoChannel::key() const
+{
+    return d->key;
+}
+NoString NoChannel::topic() const
+{
+    return d->topic;
+}
+NoString NoChannel::topicOwner() const
+{
+    return d->topicOwner;
+}
+ulong NoChannel::topicDate() const
+{
+    return d->topicDate;
+}
+NoString NoChannel::defaultModes() const
+{
+    return d->defaultModes;
+}
+std::map<NoString, NoNick> NoChannel::nicks() const
+{
+    return d->nicks;
+}
+size_t NoChannel::nickCount() const
+{
+    return d->nicks.size();
+}
+bool NoChannel::autoClearChanBuffer() const
+{
+    return d->autoClearChanBuffer;
+}
+bool NoChannel::isDetached() const
+{
+    return d->detached;
+}
+bool NoChannel::inConfig() const
+{
+    return d->inConfig;
+}
+ulong NoChannel::creationDate() const
+{
+    return d->creationDate;
+}
+bool NoChannel::isDisabled() const
+{
+    return d->disabled;
+}
+uint NoChannel::joinTries() const
+{
+    return d->joinTries;
+}
+bool NoChannel::hasBufferCountSet() const
+{
+    return d->hasBufferCountSet;
+}
+bool NoChannel::hasAutoClearChanBufferSet() const
+{
+    return d->hasAutoClearChanBufferSet;
+}

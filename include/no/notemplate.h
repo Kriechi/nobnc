@@ -30,7 +30,9 @@ class NoTemplateLoopContext;
 class NO_EXPORT NoTemplateTagHandler
 {
 public:
-    virtual ~NoTemplateTagHandler() {}
+    virtual ~NoTemplateTagHandler()
+    {
+    }
 
     virtual bool handleVar(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
     {
@@ -47,7 +49,10 @@ public:
         return handleVar(Tmpl, sName, sArgs, sOutput);
     }
 
-    virtual bool handleValue(NoTemplate& Tmpl, NoString& sValue, const NoStringMap& msOptions) { return false; }
+    virtual bool handleValue(NoTemplate& Tmpl, NoString& sValue, const NoStringMap& msOptions)
+    {
+        return false;
+    }
 };
 
 class NO_EXPORT NoTemplate : public NoStringMap

@@ -20,7 +20,9 @@
 class NoAwayNickMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoAwayNickMod) {}
+    MODCONSTRUCTOR(NoAwayNickMod)
+    {
+    }
 
     bool onLoad(const NoString&, NoString& sMessage) override
     {
@@ -29,6 +31,10 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoAwayNickMod>(NoModuleInfo& Info) { Info.setWikiPage("awaynick"); }
+template <>
+void no_moduleInfo<NoAwayNickMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("awaynick");
+}
 
 NETWORKMODULEDEFS(NoAwayNickMod, "retired module - see http://wiki.znc.in/awaynick")

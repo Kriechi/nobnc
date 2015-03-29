@@ -32,17 +32,37 @@
 class NoLogRule
 {
 public:
-    NoLogRule(const NoString& sRule, bool bEnabled = true) : m_sRule(sRule), m_bEnabled(bEnabled) {}
+    NoLogRule(const NoString& sRule, bool bEnabled = true) : m_sRule(sRule), m_bEnabled(bEnabled)
+    {
+    }
 
-    const NoString& GetRule() const { return m_sRule; }
-    bool IsEnabled() const { return m_bEnabled; }
-    void SetEnabled(bool bEnabled) { m_bEnabled = bEnabled; }
+    const NoString& GetRule() const
+    {
+        return m_sRule;
+    }
+    bool IsEnabled() const
+    {
+        return m_bEnabled;
+    }
+    void SetEnabled(bool bEnabled)
+    {
+        m_bEnabled = bEnabled;
+    }
 
-    bool Compare(const NoString& sTarget) const { return No::wildCmp(sTarget, m_sRule, No::CaseInsensitive); }
+    bool Compare(const NoString& sTarget) const
+    {
+        return No::wildCmp(sTarget, m_sRule, No::CaseInsensitive);
+    }
 
-    bool operator==(const NoLogRule& sOther) const { return m_sRule == sOther.GetRule(); }
+    bool operator==(const NoLogRule& sOther) const
+    {
+        return m_sRule == sOther.GetRule();
+    }
 
-    NoString ToString() const { return (m_bEnabled ? "" : "!") + m_sRule; }
+    NoString ToString() const
+    {
+        return (m_bEnabled ? "" : "!") + m_sRule;
+    }
 
 private:
     NoString m_sRule;
@@ -241,7 +261,8 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
     NoString sLogDir = LogFile.GetDir();
     struct stat ModDirInfo;
     NoFile::GetInfo(savePath(), ModDirInfo);
-    if (!NoFile::Exists(sLogDir)) NoDir::mkpath(sLogDir, ModDirInfo.st_mode);
+    if (!NoFile::Exists(sLogDir))
+        NoDir::mkpath(sLogDir, ModDirInfo.st_mode);
     if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT)) {
         LogFile.Write(No::formatTime(curtime, "[%H:%M:%S] ", user()->timezone()) +
                       (m_bSanitize ? No::stripControls(sLine) : sLine) + "\n");
@@ -249,18 +270,26 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
         NO_DEBUG("Could not open log file [" << sPath << "]: " << strerror(errno));
 }
 
-void NoLogMod::PutLog(const NoString& sLine, const NoChannel& Channel) { PutLog(sLine, Channel.name()); }
+void NoLogMod::PutLog(const NoString& sLine, const NoChannel& Channel)
+{
+    PutLog(sLine, Channel.name());
+}
 
-void NoLogMod::PutLog(const NoString& sLine, const NoNick& Nick) { PutLog(sLine, Nick.nick()); }
+void NoLogMod::PutLog(const NoString& sLine, const NoNick& Nick)
+{
+    PutLog(sLine, Nick.nick());
+}
 
 NoString NoLogMod::GetServer()
 {
     NoServerInfo* pServer = network()->currentServer();
     NoString sSSL;
 
-    if (!pServer) return "(no server)";
+    if (!pServer)
+        return "(no server)";
 
-    if (pServer->isSsl()) sSSL = "+";
+    if (pServer->isSsl())
+        sSSL = "+";
     return pServer->host() + " " + sSSL + NoString(pServer->port());
 }
 
@@ -291,8 +320,8 @@ bool NoLogMod::onLoad(const NoString& sArgs, NoString& sMessage)
             m_sLogPath += "$WINDOW/%Y-%m-%d.log";
         }
     } else {
-        if (m_sLogPath.right(1) == "/" || !m_sLogPath.contains("$USER") ||
-            !m_sLogPath.contains("$WINDOW") || !m_sLogPath.contains("$NETWORK")) {
+        if (m_sLogPath.right(1) == "/" || !m_sLogPath.contains("$USER") || !m_sLogPath.contains("$WINDOW") ||
+            !m_sLogPath.contains("$NETWORK")) {
             if (!m_sLogPath.empty()) {
                 m_sLogPath += "/";
             }
@@ -318,9 +347,15 @@ bool NoLogMod::onLoad(const NoString& sArgs, NoString& sMessage)
 }
 
 
-void NoLogMod::onIrcConnected() { PutLog("Connected to IRC (" + GetServer() + ")"); }
+void NoLogMod::onIrcConnected()
+{
+    PutLog("Connected to IRC (" + GetServer() + ")");
+}
 
-void NoLogMod::onIrcDisconnected() { PutLog("Disconnected from IRC (" + GetServer() + ")"); }
+void NoLogMod::onIrcDisconnected()
+{
+    PutLog("Disconnected from IRC (" + GetServer() + ")");
+}
 
 NoModule::ModRet NoLogMod::onBroadcast(NoString& sMessage)
 {
@@ -436,7 +471,8 @@ NoModule::ModRet NoLogMod::onChanMsg(NoNick& Nick, NoChannel& Channel, NoString&
     return CONTINUE;
 }
 
-template <> void no_moduleInfo<NoLogMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoLogMod>(NoModuleInfo& Info)
 {
     Info.addType(No::NetworkModule);
     Info.addType(No::GlobalModule);

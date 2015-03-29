@@ -23,9 +23,14 @@
 class NoAutoVoiceUser
 {
 public:
-    NoAutoVoiceUser() {}
+    NoAutoVoiceUser()
+    {
+    }
 
-    NoAutoVoiceUser(const NoString& sLine) { FromString(sLine); }
+    NoAutoVoiceUser(const NoString& sLine)
+    {
+        FromString(sLine);
+    }
 
     NoAutoVoiceUser(const NoString& sUsername, const NoString& sHostmask, const NoString& sChannels)
         : m_sUsername(sUsername), m_sHostmask(sHostmask)
@@ -33,8 +38,14 @@ public:
         addChannels(sChannels);
     }
 
-    const NoString& GetUsername() const { return m_sUsername; }
-    const NoString& GetHostmask() const { return m_sHostmask; }
+    const NoString& GetUsername() const
+    {
+        return m_sUsername;
+    }
+    const NoString& GetHostmask() const
+    {
+        return m_sHostmask;
+    }
 
     bool ChannelMatches(const NoString& sChan) const
     {
@@ -47,7 +58,10 @@ public:
         return false;
     }
 
-    bool HostMatches(const NoString& sHostmask) { return No::wildCmp(sHostmask, m_sHostmask, No::CaseInsensitive); }
+    bool HostMatches(const NoString& sHostmask)
+    {
+        return No::wildCmp(sHostmask, m_sHostmask, No::CaseInsensitive);
+    }
 
     NoString GetChannels() const
     {
@@ -346,7 +360,8 @@ private:
     std::map<NoString, NoAutoVoiceUser*> m_msUsers;
 };
 
-template <> void no_moduleInfo<NoAutoVoiceMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoAutoVoiceMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("autovoice");
     Info.setHasArgs(true);

@@ -20,12 +20,18 @@
 class NoMissingMotd : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoMissingMotd) {}
+    MODCONSTRUCTOR(NoMissingMotd)
+    {
+    }
 
-    void onClientLogin() override { putUser(":irc.znc.in 422 :MOTD File is missing"); }
+    void onClientLogin() override
+    {
+        putUser(":irc.znc.in 422 :MOTD File is missing");
+    }
 };
 
-template <> void no_moduleInfo<NoMissingMotd>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoMissingMotd>(NoModuleInfo& Info)
 {
     Info.setWikiPage("missingmotd");
     Info.setHasArgs(false);

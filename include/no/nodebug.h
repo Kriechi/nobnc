@@ -34,21 +34,33 @@
  *  @param f The expression you want to display.
  */
 #define NO_DEBUG(f)                 \
-    do {                         \
-        if (NoDebug::isEnabled()) {   \
-            NoDebugStream sDebug; \
-            sDebug << f;         \
-        }                        \
+    do {                            \
+        if (NoDebug::isEnabled()) { \
+            NoDebugStream sDebug;   \
+            sDebug << f;            \
+        }                           \
     } while (0)
 
 class NO_EXPORT NoDebug
 {
 public:
-    static bool isEnabled() { return enabled; }
-    static void setEnabled(bool b) { enabled = b; }
+    static bool isEnabled()
+    {
+        return enabled;
+    }
+    static void setEnabled(bool b)
+    {
+        enabled = b;
+    }
 
-    static bool isFormatted() { return formatted; }
-    static void setFormatted(bool b) { formatted = b; }
+    static bool isFormatted()
+    {
+        return formatted;
+    }
+    static void setFormatted(bool b)
+    {
+        formatted = b;
+    }
 
 private:
     static bool enabled;

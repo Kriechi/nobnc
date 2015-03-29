@@ -28,14 +28,8 @@ public:
     MODCONSTRUCTOR(NoStickyChan)
     {
         addHelpCommand();
-        addCommand("Stick",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnStickCommand),
-                   "<#channel> [key]",
-                   "Sticks a channel");
-        addCommand("Unstick",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnUnstickCommand),
-                   "<#channel>",
-                   "Unsticks a channel");
+        addCommand("Stick", static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnStickCommand), "<#channel> [key]", "Sticks a channel");
+        addCommand("Unstick", static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnUnstickCommand), "<#channel>", "Unsticks a channel");
         addCommand("List",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnListCommand),
                    "",
@@ -115,7 +109,10 @@ public:
         putModule(" -- End of List");
     }
 
-    NoString webMenuTitle() override { return "Sticky Chans"; }
+    NoString webMenuTitle() override
+    {
+        return "Sticky Chans";
+    }
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
@@ -237,7 +234,8 @@ bool NoStickyChan::onLoad(const NoString& sArgs, NoString& sMessage)
     return (true);
 }
 
-template <> void no_moduleInfo<NoStickyChan>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoStickyChan>(NoModuleInfo& Info)
 {
     Info.setWikiPage("stickychan");
     Info.setHasArgs(true);

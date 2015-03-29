@@ -32,7 +32,9 @@
 class NoQModule : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoQModule) {}
+    MODCONSTRUCTOR(NoQModule)
+    {
+    }
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
@@ -63,7 +65,8 @@ public:
         if (isIrcConnected()) {
             // check for usermode +x if we are already connected
             std::set<uchar> scUserModes = network()->ircSocket()->GetUserModes();
-            if (scUserModes.find('x') != scUserModes.end()) m_bCloaked = true;
+            if (scUserModes.find('x') != scUserModes.end())
+                m_bCloaked = true;
 
             // This will only happen once, and only if the user loads the module after connecting to IRC.
             // Also don't notify the user in case he already had mode +x set.
@@ -98,7 +101,8 @@ public:
 
     void onIrcConnected() override
     {
-        if (m_bUseCloakedHost) Cloak();
+        if (m_bUseCloakedHost)
+            Cloak();
         WhoAmI();
     }
 
@@ -152,7 +156,7 @@ public:
             Table2.setValue("Setting", "UseChallenge");
             Table2.setValue("Type", "Boolean");
             Table2.setValue("Description",
-                           "Whether to use the CHALLENGEAUTH mechanism to avoid sending passwords in cleartext.");
+                            "Whether to use the CHALLENGEAUTH mechanism to avoid sending passwords in cleartext.");
             Table2.addRow();
             Table2.setValue("Setting", "RequestPerms");
             Table2.setValue("Type", "Boolean");
@@ -276,42 +280,57 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
+    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
+    {
+        return HandleMessage(Nick, sMessage);
+    }
 
-    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override { return HandleMessage(Nick, sMessage); }
+    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
+    {
+        return HandleMessage(Nick, sMessage);
+    }
 
     ModRet onJoining(NoChannel& Channel) override
     {
         // Halt if are not already cloaked, but the user requres that we delay
         // channel join till after we are cloaked.
-        if (!m_bCloaked && m_bUseCloakedHost && m_bJoinAfterCloaked) return HALT;
+        if (!m_bCloaked && m_bUseCloakedHost && m_bJoinAfterCloaked)
+            return HALT;
 
         return CONTINUE;
     }
 
     void onJoin(const NoNick& Nick, NoChannel& Channel) override
     {
-        if (m_bRequestPerms && IsSelf(Nick)) HandleNeed(Channel, "ov");
+        if (m_bRequestPerms && IsSelf(Nick))
+            HandleNeed(Channel, "ov");
     }
 
     void onDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick))) HandleNeed(Channel, "o");
+        if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick)))
+            HandleNeed(Channel, "o");
     }
 
     void onDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
     {
-        if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick))) HandleNeed(Channel, "v");
+        if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick)))
+            HandleNeed(Channel, "v");
     }
 
     ModRet onInvite(const NoNick& Nick, const NoString& sChan) override
     {
-        if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org")) return CONTINUE;
-        if (m_bJoinonInvite) network()->addChannel(sChan, false);
+        if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org"))
+            return CONTINUE;
+        if (m_bJoinonInvite)
+            network()->addChannel(sChan, false);
         return CONTINUE;
     }
 
-    NoString webMenuTitle() override { return "Q"; }
+    NoString webMenuTitle() override
+    {
+        return "Q";
+    }
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
@@ -320,10 +339,12 @@ public:
 
             if (bSubmitted) {
                 NoString FormUsername = WebSock.GetParam("user");
-                if (!FormUsername.empty()) SetUsername(FormUsername);
+                if (!FormUsername.empty())
+                    SetUsername(FormUsername);
 
                 NoString FormPassword = WebSock.GetParam("password");
-                if (!FormPassword.empty()) SetPassword(FormPassword);
+                if (!FormPassword.empty())
+                    SetPassword(FormPassword);
 
                 SetUseCloakedHost(WebSock.GetParam("usecloakedhost").toBool());
                 SetUseChallenge(WebSock.GetParam("usechallenge").toBool());
@@ -392,7 +413,8 @@ private:
 
     void Cloak()
     {
-        if (m_bCloaked) return;
+        if (m_bCloaked)
+            return;
 
         putModule("Cloak: Trying to cloak your hostname, setting +x...");
         putIrc("MODE " + network()->ircSocket()->GetNick() + " +x");
@@ -406,10 +428,13 @@ private:
 
     void Auth(const NoString& sUsername = "", const NoString& sPassword = "")
     {
-        if (m_bAuthed) return;
+        if (m_bAuthed)
+            return;
 
-        if (!sUsername.empty()) SetUsername(sUsername);
-        if (!sPassword.empty()) SetPassword(sPassword);
+        if (!sUsername.empty())
+            SetUsername(sUsername);
+        if (!sPassword.empty())
+            SetPassword(sPassword);
 
         if (m_sUsername.empty() || m_sPassword.empty()) {
             putModule("You have to set a username and password to use this module! See 'help' for details.");
@@ -428,7 +453,8 @@ private:
 
     void ChallengeAuth(NoString sChallenge)
     {
-        if (m_bAuthed) return;
+        if (m_bAuthed)
+            return;
 
         NoString sUsername = m_sUsername.toLower().replace_n("[", "{").replace_n("]", "}").replace_n("\\", "|");
         NoString sPasswordHash = No::sha256(m_sPassword.left(10));
@@ -441,7 +467,8 @@ private:
 
     ModRet HandleMessage(const NoNick& Nick, NoString sMessage)
     {
-        if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org")) return CONTINUE;
+        if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org"))
+            return CONTINUE;
 
         sMessage.trim();
 
@@ -503,7 +530,8 @@ private:
     void HandleNeed(const NoChannel& Channel, const NoString& sPerms)
     {
         NoStringMap::iterator it = m_msChanModes.find(Channel.name());
-        if (it == m_msChanModes.end()) return;
+        if (it == m_msChanModes.end())
+            return;
         NoString sModes = it->second;
 
         bool bMaster = sModes.contains("m") || sModes.contains("n");
@@ -541,11 +569,15 @@ private:
         return pIRCSock && pIRCSock->IsAuthed();
     }
 
-    bool IsSelf(const NoNick& Nick) { return Nick.equals(network()->currentNick()); }
+    bool IsSelf(const NoNick& Nick)
+    {
+        return Nick.equals(network()->currentNick());
+    }
 
     bool PackHex(const NoString& sHex, NoString& sPackedHex)
     {
-        if (sHex.length() % 2) return false;
+        if (sHex.length() % 2)
+            return false;
 
         sPackedHex.clear();
 
@@ -553,7 +585,8 @@ private:
         for (NoString::size_type i = 0; i < len; i++) {
             uint value;
             int n = sscanf(&sHex[i * 2], "%02x", &value);
-            if (n != 1 || value > 0xff) return false;
+            if (n != 1 || value > 0xff)
+                return false;
             sPackedHex += (uchar)value;
         }
 
@@ -610,7 +643,8 @@ private:
         registry.setValue("UseCloakedHost", NoString(bUseCloakedHost));
         m_bUseCloakedHost = bUseCloakedHost;
 
-        if (!m_bCloaked && m_bUseCloakedHost && isIrcConnected()) Cloak();
+        if (!m_bCloaked && m_bUseCloakedHost && isIrcConnected())
+            Cloak();
     }
 
     void SetUseChallenge(const bool bUseChallenge)
@@ -642,7 +676,8 @@ private:
     }
 };
 
-template <> void no_moduleInfo<NoQModule>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoQModule>(NoModuleInfo& Info)
 {
     Info.setWikiPage("Q");
     Info.setHasArgs(true);

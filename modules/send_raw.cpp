@@ -78,8 +78,14 @@ public:
         return true;
     }
 
-    NoString webMenuTitle() override { return "Send Raw"; }
-    bool webRequiresAdmin() override { return true; }
+    NoString webMenuTitle() override
+    {
+        return "Send Raw";
+    }
+    bool webRequiresAdmin() override
+    {
+        return true;
+    }
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
@@ -150,6 +156,10 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoSendRawMod>(NoModuleInfo& Info) { Info.setWikiPage("send_raw"); }
+template <>
+void no_moduleInfo<NoSendRawMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("send_raw");
+}
 
 USERMODULEDEFS(NoSendRawMod, "Lets you send some raw IRC lines as/to someone else")

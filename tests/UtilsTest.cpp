@@ -124,19 +124,19 @@ TEST(UtilsTest, QuoteSplit)
 {
     NoStringVector expected;
 
-    expected = NoStringVector{"\"a  b  c\""};
+    expected = NoStringVector{ "\"a  b  c\"" };
     EXPECT_EQ(expected, No::quoteSplit("  \"a  b  c\"  "));
 
-    expected = NoStringVector{"\"a b\"", "\"c d\""};
+    expected = NoStringVector{ "\"a b\"", "\"c d\"" };
     EXPECT_EQ(expected, No::quoteSplit("\"a b\" \"c d\""));
 
-    expected = NoStringVector{"a", "\"b c\"", "d"};
+    expected = NoStringVector{ "a", "\"b c\"", "d" };
     EXPECT_EQ(expected, No::quoteSplit("a \"b c\" d"));
 
-    expected = NoStringVector{"\" a \"", "\" b \""};
+    expected = NoStringVector{ "\" a \"", "\" b \"" };
     EXPECT_EQ(expected, No::quoteSplit("\" a \" \" b \""));
 
-    expected = NoStringVector{"\" \""};
+    expected = NoStringVector{ "\" \"" };
     EXPECT_EQ(expected, No::quoteSplit("\" \""));
 
     expected = NoStringVector{ "\"\"" };
@@ -184,6 +184,6 @@ TEST(UtilsTest, Token)
     EXPECT_EQ("c", No::token("a  c", 1, "  "));
     EXPECT_EQ(" c", No::token("a   c", 1, "  "));
     EXPECT_EQ("c", No::token("a    c", 1, "  "));
-//    EXPECT_EQ("(b c)", No::token("a (b c) d", 1, " ", "(", ")"));
-//    EXPECT_EQ("d", No::token("a (b c) d", 2, " ", "(", ")"));
+    //    EXPECT_EQ("(b c)", No::token("a (b c) d", 1, " ", "(", ")"));
+    //    EXPECT_EQ("d", No::token("a (b c) d", 2, " ", "(", ")"));
 }

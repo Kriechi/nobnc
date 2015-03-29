@@ -17,7 +17,8 @@
 
 #include "noescape.h"
 
-namespace No {
+namespace No
+{
 
 static uchar* strnchr(const uchar* src, uchar c, uint max, uchar* fill, uint* count)
 {
@@ -341,5 +342,4 @@ NoString escape(const NoString& str, No::EscapeFormat from, No::EscapeFormat to)
 
     return ret;
 }
-
 }

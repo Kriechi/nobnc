@@ -65,7 +65,7 @@ NoString NoServerInfo::host() const
     return d->host;
 }
 
-void NoServerInfo::setHost(const NoString &host)
+void NoServerInfo::setHost(const NoString& host)
 {
     d->host = host;
 }

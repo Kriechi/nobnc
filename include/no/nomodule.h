@@ -61,19 +61,19 @@ class NoModulePrivate;
 #define MODULE_EXPORT
 #endif
 
-#define MODCOMMONDEFS(CLASS, DESCRIPTION, TYPE)                              \
-    extern "C" {                                                             \
-        MODULE_EXPORT bool no_moduleInfo(double version, NoModuleInfo& info) \
-        {                                                                    \
-            if (version != NO_VERSION)                                       \
-                return false;                                                \
-            info.setDescription(DESCRIPTION);                                \
-            info.setDefaultType(TYPE);                                       \
-            info.addType(TYPE);                                              \
-            info.setLoader(no_loadModule<CLASS>);                            \
-            no_moduleInfo<CLASS>(info);                                      \
-            return true;                                                     \
-        }                                                                    \
+#define MODCOMMONDEFS(CLASS, DESCRIPTION, TYPE)                          \
+    extern "C" {                                                         \
+    MODULE_EXPORT bool no_moduleInfo(double version, NoModuleInfo& info) \
+    {                                                                    \
+        if (version != NO_VERSION)                                       \
+            return false;                                                \
+        info.setDescription(DESCRIPTION);                                \
+        info.setDefaultType(TYPE);                                       \
+        info.addType(TYPE);                                              \
+        info.setLoader(no_loadModule<CLASS>);                            \
+        no_moduleInfo<CLASS>(info);                                      \
+        return true;                                                     \
+    }                                                                    \
     }
 
 /** Instead of writing a constructor, you should call this macro. It accepts all
@@ -91,7 +91,7 @@ class NoModulePrivate;
  *
  *  @param CLASS The name of your module's class.
  */
-#define MODCONSTRUCTOR(CLASS)                                                                                                                 \
+#define MODCONSTRUCTOR(CLASS)                                                                                                                \
     CLASS(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType) \
         : NoModule(pDLL, pUser, pNetwork, sModName, sModPath, eType)
 
@@ -137,11 +137,11 @@ class NO_EXPORT NoModule
 {
 public:
     NoModule(NoModuleHandle pDLL,
-            NoUser* pUser,
-            NoNetwork* pNetwork,
-            const NoString& sModName,
-            const NoString& sDataDir,
-            No::ModuleType eType = No::NetworkModule); // TODO: remove default value in ZNC 2.x
+             NoUser* pUser,
+             NoNetwork* pNetwork,
+             const NoString& sModName,
+             const NoString& sDataDir,
+             No::ModuleType eType = No::NetworkModule); // TODO: remove default value in ZNC 2.x
     virtual ~NoModule();
 
     NoModule(const NoModule&) = delete;
@@ -296,8 +296,7 @@ public:
      *  @see NoIrcSock::GetModeType() for converting uMode into a mode (e.g.
      *       'o' for op).
      */
-    virtual void
-    onChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
+    virtual void onChanPermission2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
     virtual void onChanPermission(const NoNick& OpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange);
     /** Called when a nick is opped on a channel */
     virtual void onOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange);

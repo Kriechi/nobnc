@@ -158,6 +158,11 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoClientNotifyMod>(NoModuleInfo& Info) { Info.setWikiPage("clientnotify"); }
+template <>
+void no_moduleInfo<NoClientNotifyMod>(NoModuleInfo& Info)
+{
+    Info.setWikiPage("clientnotify");
+}
 
-USERMODULEDEFS(NoClientNotifyMod, "Notifies you when another IRC client logs into or out of your account. Configurable.")
+USERMODULEDEFS(NoClientNotifyMod,
+               "Notifies you when another IRC client logs into or out of your account. Configurable.")

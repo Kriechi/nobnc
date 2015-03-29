@@ -34,7 +34,10 @@ extern const char* ZNC_DefaultCipher;
 class NoDnsMonitorFD : public CSMonitorFD
 {
 public:
-    NoDnsMonitorFD() { Add(NoThreadPrivate::get()->getReadFD(), CSocketManager::ECT_Read); }
+    NoDnsMonitorFD()
+    {
+        Add(NoThreadPrivate::get()->getReadFD(), CSocketManager::ECT_Read);
+    }
 
     bool FDsThatTriggered(const std::map<int, short>& miiReadyFds) override
     {
@@ -50,8 +53,17 @@ public:
 struct NoDnsTask
 {
     NoDnsTask()
-        : sHostname(""), iPort(0), sSockName(""), iTimeout(0), bSSL(false), sBindhost(""), pcSock(nullptr),
-          bDoneTarget(false), bDoneBind(false), aiTarget(nullptr), aiBind(nullptr)
+        : sHostname(""),
+          iPort(0),
+          sSockName(""),
+          iTimeout(0),
+          bSSL(false),
+          sBindhost(""),
+          pcSock(nullptr),
+          bDoneTarget(false),
+          bDoneBind(false),
+          aiTarget(nullptr),
+          aiBind(nullptr)
     {
     }
 
@@ -74,7 +86,9 @@ struct NoDnsTask
 class NoDnsJob : public NoJob
 {
 public:
-    NoDnsJob() : sHostname(""), task(nullptr), pManager(nullptr), bBind(false), iRes(0), aiResult(nullptr) {}
+    NoDnsJob() : sHostname(""), task(nullptr), pManager(nullptr), bBind(false), iRes(0), aiResult(nullptr)
+    {
+    }
 
     NoDnsJob(const NoDnsJob&) = delete;
     NoDnsJob& operator=(const NoDnsJob&) = delete;
@@ -93,7 +107,14 @@ public:
 
 static void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind);
 static void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind, addrinfo* aiResult);
-static void FinishConnect(NoSocketManager* manager, const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoSocket* pcSock);
+static void FinishConnect(NoSocketManager* manager,
+                          const NoString& sHostname,
+                          u_short iPort,
+                          const NoString& sSockName,
+                          int iTimeout,
+                          bool bSSL,
+                          const NoString& sBindHost,
+                          NoSocket* pcSock);
 #endif
 
 NoSocketManager::NoSocketManager() : m_instance(new CSocketManager)
@@ -108,13 +129,13 @@ NoSocketManager::~NoSocketManager()
 }
 
 bool NoSocketManager::ListenHost(u_short iPort,
-                const NoString& sSockName,
-                const NoString& sBindHost,
-                bool bSSL,
-                int iMaxConns,
-                NoSocket* pcSock,
-                u_int iTimeout,
-                No::AddressType eAddr)
+                                 const NoString& sSockName,
+                                 const NoString& sBindHost,
+                                 bool bSSL,
+                                 int iMaxConns,
+                                 NoSocket* pcSock,
+                                 u_int iTimeout,
+                                 No::AddressType eAddr)
 {
     CSListener L(iPort, sBindHost);
 
@@ -140,24 +161,18 @@ bool NoSocketManager::ListenHost(u_short iPort,
     return m_instance->Listen(L, NoSocketPrivate::get(pcSock));
 }
 
-bool NoSocketManager::ListenAll(u_short iPort,
-               const NoString& sSockName,
-               bool bSSL,
-               int iMaxConns,
-               NoSocket* pcSock,
-               u_int iTimeout,
-               No::AddressType eAddr)
+bool NoSocketManager::ListenAll(u_short iPort, const NoString& sSockName, bool bSSL, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
 {
     return ListenHost(iPort, sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
 }
 
 u_short NoSocketManager::ListenRand(const NoString& sSockName,
-                   const NoString& sBindHost,
-                   bool bSSL,
-                   int iMaxConns,
-                   NoSocket* pcSock,
-                   u_int iTimeout,
-                   No::AddressType eAddr)
+                                    const NoString& sBindHost,
+                                    bool bSSL,
+                                    int iMaxConns,
+                                    NoSocket* pcSock,
+                                    u_int iTimeout,
+                                    No::AddressType eAddr)
 {
     ushort uPort = 0;
     CSListener L(0, sBindHost);
@@ -186,17 +201,18 @@ u_short NoSocketManager::ListenRand(const NoString& sSockName,
     return uPort;
 }
 
-u_short NoSocketManager::ListenAllRand(const NoString& sSockName,
-                      bool bSSL,
-                      int iMaxConns,
-                      NoSocket* pcSock,
-                      u_int iTimeout,
-                      No::AddressType eAddr)
+u_short NoSocketManager::ListenAllRand(const NoString& sSockName, bool bSSL, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
 {
     return ListenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
 }
 
-void NoSocketManager::Connect(const NoString& sHostname, u_short iPort, const NoString& sSockName, int iTimeout, bool bSSL, const NoString& sBindHost, NoSocket* pcSock)
+void NoSocketManager::Connect(const NoString& sHostname,
+                              u_short iPort,
+                              const NoString& sSockName,
+                              int iTimeout,
+                              bool bSSL,
+                              const NoString& sBindHost,
+                              NoSocket* pcSock)
 {
     if (pcSock) {
         pcSock->SetHostToVerifySSL(sHostname);
@@ -356,7 +372,8 @@ static NoString RandomFromSet(const NoStringSet& sSet, std::default_random_engin
     return *it;
 }
 
-static std::tuple<NoString, bool> RandomFrom2SetsWithBias(const NoStringSet& ss4, const NoStringSet& ss6, std::default_random_engine& gen)
+static std::tuple<NoString, bool>
+RandomFrom2SetsWithBias(const NoStringSet& ss4, const NoStringSet& ss6, std::default_random_engine& gen)
 {
     // It's not quite what RFC says how to choose between IPv4 and IPv6, but proper way is harder to implement.
     // It would require to maintain some state between Csock objects.
@@ -422,8 +439,10 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
 #endif
         }
     }
-    if (task->aiTarget) freeaddrinfo(task->aiTarget);
-    if (task->aiBind) freeaddrinfo(task->aiBind);
+    if (task->aiTarget)
+        freeaddrinfo(task->aiTarget);
+    if (task->aiBind)
+        freeaddrinfo(task->aiBind);
 
     NoString sBindhost;
     NoString sTargetHost;
@@ -476,13 +495,14 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
 }
 #endif // HAVE_THREADED_DNS
 
-void FinishConnect(NoSocketManager* manager, const NoString& sHostname,
-                                 u_short iPort,
-                                 const NoString& sSockName,
-                                 int iTimeout,
-                                 bool bSSL,
-                                 const NoString& sBindHost,
-                                 NoSocket* pcSock)
+void FinishConnect(NoSocketManager* manager,
+                   const NoString& sHostname,
+                   u_short iPort,
+                   const NoString& sSockName,
+                   int iTimeout,
+                   bool bSSL,
+                   const NoString& sBindHost,
+                   NoSocket* pcSock)
 {
     CSConnection C(sHostname, iPort, iTimeout);
 

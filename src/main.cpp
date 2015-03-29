@@ -41,7 +41,10 @@ static void locking_callback(int mode, int type, const char* file, int line)
     }
 }
 
-static ulong thread_id_callback() { return (ulong)pthread_self(); }
+static ulong thread_id_callback()
+{
+    return (ulong)pthread_self();
+}
 
 static CRYPTO_dynlock_value* dyn_create_callback(const char* file, int line)
 {
@@ -70,7 +73,8 @@ static void thread_setup()
 {
     lock_cs.resize(CRYPTO_num_locks());
 
-    for (std::unique_ptr<NoMutex>& mtx : lock_cs) mtx = std::unique_ptr<NoMutex>(new NoMutex());
+    for (std::unique_ptr<NoMutex>& mtx : lock_cs)
+        mtx = std::unique_ptr<NoMutex>(new NoMutex());
 
     CRYPTO_set_id_callback(&thread_id_callback);
     CRYPTO_set_locking_callback(&locking_callback);
@@ -439,8 +443,10 @@ int main(int argc, char** argv)
                 args[pos++] = strdup("--debug");
             else if (bForeground)
                 args[pos++] = strdup("--foreground");
-            if (!NoDebug::isFormatted()) args[pos++] = strdup("--no-color");
-            if (bAllowRoot) args[pos++] = strdup("--allow-root");
+            if (!NoDebug::isFormatted())
+                args[pos++] = strdup("--no-color");
+            if (bAllowRoot)
+                args[pos++] = strdup("--allow-root");
             // The above code adds 3 entries to args tops
             // which means the array should be big enough
 

@@ -33,7 +33,10 @@ private:
 
 public:
     // getters/setters
-    const NoString& GetName() const { return name; }
+    const NoString& GetName() const
+    {
+        return name;
+    }
 
     // name should be a single, all uppercase word
     void SetName(const NoString& newname)
@@ -42,7 +45,10 @@ public:
     }
 
     // combined getter/setter for command list
-    NoStringVector& AliasCmds() { return alias_cmds; }
+    NoStringVector& AliasCmds()
+    {
+        return alias_cmds;
+    }
 
     // check registry if alias exists
     static bool AliasExists(NoModule* module, NoString alias_name)
@@ -65,16 +71,25 @@ public:
     }
 
     // constructors
-    NoAlias() : parent(nullptr) {}
-    NoAlias(NoModule* new_parent, const NoString& new_name) : parent(new_parent) { SetName(new_name); }
+    NoAlias() : parent(nullptr)
+    {
+    }
+    NoAlias(NoModule* new_parent, const NoString& new_name) : parent(new_parent)
+    {
+        SetName(new_name);
+    }
 
     // produce a command string from this alias' command list
-    NoString GetCommands() const { return NoString("\n").join(alias_cmds.begin(), alias_cmds.end()); }
+    NoString GetCommands() const
+    {
+        return NoString("\n").join(alias_cmds.begin(), alias_cmds.end());
+    }
 
     // write this alias to registry
     void Commit() const
     {
-        if (!parent) return;
+        if (!parent)
+            return;
         NoRegistry registry(parent);
         registry.setValue(name, GetCommands());
     }
@@ -82,7 +97,8 @@ public:
     // delete this alias from regisrty
     void Delete() const
     {
-        if (!parent) return;
+        if (!parent)
+            return;
         NoRegistry registry(parent);
         registry.remove(name);
     }
@@ -153,7 +169,8 @@ public:
         while (true) {
             // if (found >= (int) alias_data.length()) break; 		// shouldn't be possible.
             size_t found = alias_data.find("%", lastfound + skip);
-            if (found == NoString::npos) break; // if we found nothing, break
+            if (found == NoString::npos)
+                break; // if we found nothing, break
             output.append(alias_data.substr(lastfound, found - lastfound)); // capture everything between the last
             // stopping point and here
             ParseToken(alias_data, line, output, found, skip); // attempt to read a token, updates indices based on
@@ -302,10 +319,7 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::InsertCommand),
                    "<name> <pos> <action ...>",
                    "Inserts a line into an existing alias.");
-        addCommand("Remove",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::RemoveCommand),
-                   "<name> <linenum>",
-                   "Removes a line from an existing alias.");
+        addCommand("Remove", static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::RemoveCommand), "<name> <linenum>", "Removes a line from an existing alias.");
         addCommand("Clear",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::ClearCommand),
                    "<name>",
@@ -324,7 +338,8 @@ public:
     {
         NoAlias current_alias;
 
-        if (sending_lines) return CONTINUE;
+        if (sending_lines)
+            return CONTINUE;
 
         try {
             if (sLine.equals("ZNC-CLEAR-ALL-ALIASES!")) {
@@ -346,7 +361,8 @@ public:
             }
         } catch (std::exception& e) {
             NoString my_nick = (network() == nullptr ? "" : network()->currentNick());
-            if (my_nick.empty()) my_nick = "*";
+            if (my_nick.empty())
+                my_nick = "*";
             putUser(NoString(":znc.in 461 " + my_nick + " " + current_alias.GetName() + " :ZNC alias error: ") + e.what());
             return HALTCORE;
         }
@@ -355,7 +371,8 @@ public:
     }
 };
 
-template <> void no_moduleInfo<NoAliasMod>(NoModuleInfo& Info)
+template <>
+void no_moduleInfo<NoAliasMod>(NoModuleInfo& Info)
 {
     Info.setWikiPage("alias");
     Info.addType(No::NetworkModule);
