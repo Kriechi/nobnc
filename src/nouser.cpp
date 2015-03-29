@@ -1148,7 +1148,7 @@ bool NoUser::loadModule(const NoString& sModName, const NoString& sArgs, const N
             if (fNVFile.Exists()) {
                 NoString sNetworkModPath = pNetwork->networkPath() + "/moddata/" + sModName;
                 if (!NoFile::Exists(sNetworkModPath)) {
-                    NoDir::MakeDir(sNetworkModPath);
+                    NoDir::mkpath(sNetworkModPath);
                 }
 
                 fNVFile.Copy(sNetworkModPath + "/.registry");
@@ -1334,7 +1334,7 @@ uint NoUser::maxQueryBuffers() const { return d->maxQueryBuffers; }
 NoString NoUser::userPath() const
 {
     if (!NoFile::Exists(d->userPath)) {
-        NoDir::MakeDir(d->userPath);
+        NoDir::mkpath(d->userPath);
     }
     return d->userPath;
 }

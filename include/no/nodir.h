@@ -20,45 +20,32 @@
 
 #include <no/noglobal.h>
 #include <no/nostring.h>
-#include <no/nofile.h>
+#include <memory>
+
+class NoFile;
+class NoDirPrivate;
 
 class NO_EXPORT NoDir
 {
 public:
-    NoDir(const NoString& sDir = "");
+    NoDir(const NoString& path = ".");
     ~NoDir();
 
-    std::vector<NoFile*> files() const;
+    static NoDir home();
+    static NoDir current();
 
-    void CleanUp();
+    std::vector<NoFile*> files(const NoString& wildcard = "*") const;
 
-    size_t Fill(const NoString& sDir);
+    static bool mkpath(const NoString& path, mode_t mode = 0700);
 
-    size_t FillByWildcard(const NoString& sDir, const NoString& sWildcard);
+    uint remove();
+    uint chmod(mode_t mode);
 
-    static uint Chmod(mode_t mode, const NoString& sWildcard, const NoString& sDir = ".");
-
-    uint Chmod(mode_t mode);
-
-    static uint Delete(const NoString& sWildcard, const NoString& sDir = ".");
-
-    uint Delete();
-
-    NoFile::Attribute GetSortAttr() const;
-    bool IsDescending() const;
-
-    // Check if sPath + "/" + sAdd (~/ is handled) is an absolute path which
-    // resides under sPath. Returns absolute path on success, else "".
-    static NoString CheckPathPrefix(const NoString& sPath, const NoString& sAdd, const NoString& sHomeDir = "");
-    static NoString ChangeDir(const NoString& sPath, const NoString& sAdd, const NoString& sHomeDir = "");
-    static bool MakeDir(const NoString& sPath, mode_t iMode = 0700);
-
-    static NoString GetCWD();
+    bool isParent(const NoString& filePath) const;
+    NoString filePath(const NoString& fileName) const;
 
 private:
-    bool m_desc;
-    NoFile::Attribute m_sort;
-    std::vector<NoFile*> m_files;
+    std::shared_ptr<NoDirPrivate> d;
 };
 
 #endif // NODIR_H

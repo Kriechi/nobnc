@@ -17,6 +17,7 @@
 
 #include "nomodule.h"
 #include "nomodule_p.h"
+#include "nofile.h"
 #include "nodir.h"
 #include "notemplate.h"
 #include "nouser.h"
@@ -109,7 +110,7 @@ NoSocketManager* NoModule::manager() const { return d->manager; }
 const NoString& NoModule::savePath() const
 {
     if (!NoFile::Exists(d->savePath)) {
-        NoDir::MakeDir(d->savePath);
+        NoDir::mkpath(d->savePath);
     }
     return d->savePath;
 }

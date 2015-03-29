@@ -361,7 +361,7 @@ NoString NoWebSocket::FindTmpl(NoModule* pModule, const NoString& sName)
     NoStringVector vsDirs = GetDirs(pModule, true);
     NoString sFile = pModule->moduleName() + "_" + sName;
     for (const NoString& sDir : vsDirs) {
-        if (NoFile::Exists(NoDir::ChangeDir(sDir, sFile))) {
+        if (NoFile::Exists(NoDir(sDir).filePath(sFile))) {
             m_template.appendPath(sDir);
             return sFile;
         }

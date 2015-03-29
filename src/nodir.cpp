@@ -16,6 +16,7 @@
  */
 
 #include "nodir.h"
+#include "nofile.h"
 #include "noutils.h"
 #include <fcntl.h>
 #include <pwd.h>
@@ -27,202 +28,205 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-NoString NoDir::ChangeDir(const NoString& sPath, const NoString& sAdd, const NoString& sHome)
+class NoDirPrivate
 {
-    NoString sHomeDir(sHome);
+public:
+    ~NoDirPrivate();
 
-    if (sHomeDir.empty()) {
-        sHomeDir = NoFile::GetHomePath();
-    }
+    void init();
 
-    if (sAdd == "~") {
-        return sHomeDir;
-    }
+    NoString path;
+    mutable std::vector<NoFile*> files;
+};
 
-    NoString sAddDir(sAdd);
-
-    if (sAddDir.left(2) == "~/") {
-        sAddDir.leftChomp(1);
-        sAddDir = sHomeDir + sAddDir;
-    }
-
-    NoString sRet = ((sAddDir.size()) && (sAddDir[0] == '/')) ? "" : sPath;
-    sAddDir += "/";
-    NoString sCurDir;
-
-    if (sRet.right(1) == "/") {
-        sRet.rightChomp(1);
-    }
-
-    for (uint a = 0; a < sAddDir.size(); a++) {
-        switch (sAddDir[a]) {
-        case '/':
-            if (sCurDir == "..") {
-                sRet = sRet.substr(0, sRet.rfind('/'));
-            } else if ((sCurDir != "") && (sCurDir != ".")) {
-                sRet += "/" + sCurDir;
-            }
-
-            sCurDir = "";
-            break;
-        default:
-            sCurDir += sAddDir[a];
-            break;
-        }
-    }
-
-    return (sRet.empty()) ? "/" : sRet;
-}
-
-NoDir::NoDir(const NoString& sDir) : m_desc(false), m_sort(NoFile::Name)
+NoDirPrivate::~NoDirPrivate()
 {
-    if (!sDir.empty())
-        Fill(sDir);
-}
-
-NoDir::~NoDir() { CleanUp(); }
-
-std::vector<NoFile*> NoDir::files() const
-{
-    return m_files;
-}
-
-void NoDir::CleanUp()
-{
-    for (NoFile* file : m_files) {
+    for (NoFile* file : files)
         delete file;
-    }
-
-    m_files.clear();
+    files.clear();
 }
 
-size_t NoDir::Fill(const NoString& sDir) { return FillByWildcard(sDir, "*"); }
-
-size_t NoDir::FillByWildcard(const NoString& sDir, const NoString& sWildcard)
+void NoDirPrivate::init()
 {
-    CleanUp();
-    DIR* dir = opendir((sDir.empty()) ? "." : sDir.c_str());
+    if (!files.empty())
+        return;
 
-    if (!dir) {
-        return 0;
-    }
+    DIR* dir = opendir(path.empty() ? "." : path.c_str());
+    if (!dir)
+        return;
 
-    struct dirent* de;
-
+    dirent* de;
     while ((de = readdir(dir)) != nullptr) {
-        if ((strcmp(de->d_name, ".") == 0) || (strcmp(de->d_name, "..") == 0)) {
+        if (strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0)
             continue;
-        }
-        if ((!sWildcard.empty()) && (!No::wildCmp(NoString(de->d_name), sWildcard))) {
-            continue;
-        }
 
-        NoFile* file =
-                new NoFile(sDir.trimSuffix_n("/") + "/" +
-                           de->d_name /*, this*/); // @todo need to pass pointer to 'this' if we want to do Sort()
-        m_files.push_back(file);
+        NoFile* file = new NoFile(path.trimSuffix_n("/") + "/" +
+                                  de->d_name /*, this*/); // @todo need to pass pointer to 'this' if we want to do Sort()
+        files.push_back(file);
     }
 
     closedir(dir);
-    return m_files.size();
 }
 
-uint NoDir::Chmod(mode_t mode, const NoString& sWildcard, const NoString& sDir)
+NoDir::NoDir(const NoString& path) : d(new NoDirPrivate)
 {
-    NoDir cDir;
-    cDir.FillByWildcard(sDir, sWildcard);
-    return cDir.Chmod(mode);
+    d->path = path;
 }
 
-uint NoDir::Chmod(mode_t mode)
+NoDir::~NoDir()
 {
-    uint uRet = 0;
-    for (NoFile* file : m_files) {
-        if (file->Chmod(mode)) {
-            uRet++;
+}
+
+static NoString no_home()
+{
+    static NoString path;
+    if (path.empty()) {
+        const char* env = getenv("HOME");
+        if (env)
+            path = env;
+
+        if (path.empty()) {
+            const passwd* info = getpwuid(getuid());
+            if (info)
+                path = info->pw_dir;
+        }
+
+        if (path.empty())
+            return "./";
+    }
+    return path;
+}
+
+NoDir NoDir::home()
+{
+    static NoDir dir(no_home());
+    return dir;
+}
+
+static NoString no_cwd()
+{
+    static NoString path;
+    if (path.empty()) {
+        char* cwd = getcwd(nullptr, 0);
+        if (cwd) {
+            path = cwd;
+            free(cwd);
         }
     }
-
-    return uRet;
+    return path;
 }
 
-uint NoDir::Delete(const NoString& sWildcard, const NoString& sDir)
+NoDir NoDir::current()
 {
-    NoDir cDir;
-    cDir.FillByWildcard(sDir, sWildcard);
-    return cDir.Delete();
+    static NoDir dir(no_cwd());
+    return dir;
 }
 
-uint NoDir::Delete()
+std::vector<NoFile*> NoDir::files(const NoString& wildcard) const
 {
-    uint uRet = 0;
-    for (NoFile* file : m_files) {
-        if (file->Delete()) {
-            uRet++;
-        }
+    const_cast<NoDir*>(this)->d->init();
+
+    if (wildcard.empty() || wildcard.equals("*"))
+        return d->files;
+
+    std::vector<NoFile*> files;
+    for (NoFile* file : d->files) {
+        if (No::wildCmp(file->GetShortName(), wildcard))
+            files.push_back(file);
     }
-
-    return uRet;
+    return files;
 }
 
-NoFile::Attribute NoDir::GetSortAttr() const { return m_sort; }
-
-bool NoDir::IsDescending() const { return m_desc; }
-
-NoString NoDir::CheckPathPrefix(const NoString& sPath, const NoString& sAdd, const NoString& sHomeDir)
+bool NoDir::mkpath(const NoString& path, mode_t mode)
 {
-    NoString sPrefix = sPath.replace_n("//", "/").trimRight_n("/") + "/";
-    NoString sAbsolutePath = ChangeDir(sPrefix, sAdd, sHomeDir);
-
-    if (sAbsolutePath.left(sPrefix.length()) != sPrefix) return "";
-    return sAbsolutePath;
-}
-
-bool NoDir::MakeDir(const NoString& sPath, mode_t iMode)
-{
-    NoString sDir;
-    NoStringVector::iterator it;
-
-    // Just in case someone tries this...
-    if (sPath.empty()) {
+    if (path.empty()) {
         errno = ENOENT;
         return false;
     }
 
-    // If this is an absolute path, we need to handle this now!
-    if (sPath.left(1) == "/") sDir = "/";
+    NoString fullPath;
+    if (path.startsWith("/"))
+        fullPath = "/";
 
-    // For every single subpath, do...
-    NoStringVector dirs = sPath.split("/", No::SkipEmptyParts);
-    for (it = dirs.begin(); it != dirs.end(); ++it) {
-        // Add this to the path we already created
-        sDir += *it;
+    for (const NoString& part : path.split("/", No::SkipEmptyParts)) {
+        fullPath += part;
 
-        int i = mkdir(sDir.c_str(), iMode);
+        int i = mkdir(fullPath.c_str(), mode);
+        if (i != 0 && (errno != EEXIST || !NoFile::IsDir(fullPath)))
+            return false;
 
-        if (i != 0) {
-            // All errors except EEXIST are fatal
-            if (errno != EEXIST) return false;
-
-            // If it's EEXIST we have to make sure it's a dir
-            if (!NoFile::IsDir(sDir)) return false;
-        }
-
-        sDir += "/";
+        fullPath += "/";
     }
-
-    // All went well
     return true;
 }
 
-NoString NoDir::GetCWD()
+uint NoDir::remove()
 {
-    NoString sRet;
-    char* pszCurDir = getcwd(nullptr, 0);
-    if (pszCurDir) {
-        sRet = pszCurDir;
-        free(pszCurDir);
+    d->init();
+
+    uint count = 0;
+    for (NoFile* file : d->files) {
+        if (file->Delete())
+            ++count;
+    }
+    return count;
+}
+
+uint NoDir::chmod(mode_t mode)
+{
+    d->init();
+
+    uint count = 0;
+    for (NoFile* file : d->files) {
+        if (file->Chmod(mode))
+            ++count;
+    }
+    return count;
+}
+
+bool NoDir::isParent(const NoString& filePath) const
+{
+    NoString prefix = d->path.replace_n("//", "/").trimRight_n("/") + "/";
+    NoString absolutePath = NoDir(prefix).filePath(filePath);
+    return absolutePath.startsWith(prefix);
+}
+
+NoString NoDir::filePath(const NoString& fileName) const
+{
+    if (fileName == "~")
+        return no_home();
+
+    NoString filePath = fileName;
+    if (filePath.startsWith("~/")) {
+        filePath.leftChomp(1);
+        filePath = no_home() + fileName;
     }
 
-    return sRet;
+    NoString ret = "";
+    if (filePath.empty() || !filePath.startsWith("/"))
+        ret = d->path;
+
+    filePath += "/";
+
+    if (ret.endsWith("/"))
+        ret.rightChomp(1);
+
+    NoString tmp;
+    for (char c : filePath) {
+        switch (c) {
+        case '/':
+            if (tmp == "..")
+                ret = ret.substr(0, ret.rfind('/'));
+            else if (tmp != "" && tmp != ".")
+                ret += "/" + tmp;
+            tmp = "";
+            break;
+
+        default:
+            tmp += c;
+            break;
+        }
+    }
+
+    return ret.empty() ? "/" : ret;
 }

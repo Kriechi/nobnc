@@ -88,8 +88,7 @@ public:
         NoString sCommand = No::token(sLine, 0);
         if (sCommand.equals("cd")) {
             NoString sArg = No::tokens(sLine, 1);
-            NoString sPath =
-            NoDir::ChangeDir(m_sPath, (sArg.empty() ? NoString(NoApp::Get().GetHomePath()) : sArg), NoApp::Get().GetHomePath());
+            NoString sPath = NoDir(m_sPath).filePath(sArg.empty() ? NoString(NoApp::Get().GetHomePath()) : sArg);
             NoFile Dir(sPath);
 
             if (Dir.IsDir()) {

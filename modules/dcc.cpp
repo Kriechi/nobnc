@@ -108,7 +108,7 @@ public:
 
     bool SendFile(const NoString& sRemoteNick, const NoString& sFileName)
     {
-        NoString sFullPath = NoDir::ChangeDir(savePath(), sFileName, NoApp::Get().GetHomePath());
+        NoString sFullPath = NoDir(savePath()).filePath(sFileName);
         NoDccSock* pSock = new NoDccSock(this, sRemoteNick, sFullPath);
 
         NoFile* pFile = pSock->OpenFile(false);
@@ -158,17 +158,13 @@ public:
     {
         NoString sToNick = No::token(sLine, 1);
         NoString sFile = No::token(sLine, 2);
-        NoString sAllowedPath = savePath();
-        NoString sAbsolutePath;
 
         if ((sToNick.empty()) || (sFile.empty())) {
             putModule("Usage: Send <nick> <file>");
             return;
         }
 
-        sAbsolutePath = NoDir::CheckPathPrefix(sAllowedPath, sFile);
-
-        if (sAbsolutePath.empty()) {
+        if (!NoDir(savePath()).isParent(sFile)) {
             putStatus("Illegal path.");
             return;
         }
@@ -179,17 +175,13 @@ public:
     void GetCommand(const NoString& sLine)
     {
         NoString sFile = No::token(sLine, 1);
-        NoString sAllowedPath = savePath();
-        NoString sAbsolutePath;
 
         if (sFile.empty()) {
             putModule("Usage: Get <file>");
             return;
         }
 
-        sAbsolutePath = NoDir::CheckPathPrefix(sAllowedPath, sFile);
-
-        if (sAbsolutePath.empty()) {
+        if (!NoDir(savePath()).isParent(sFile)) {
             putModule("Illegal path.");
             return;
         }
@@ -253,13 +245,15 @@ public:
                 }
             }
         } else if (sMessage.startsWith("DCC SEND ")) {
-            NoString sLocalFile = NoDir::CheckPathPrefix(savePath(), No::token(sMessage, 2));
-            if (sLocalFile.empty()) {
+            NoDir saveDir(savePath());
+            NoString sFile = No::token(sMessage, 2);
+            if (!saveDir.isParent(sFile)) {
                 putModule("Bad DCC file: " + No::token(sMessage, 2));
             }
             ulong uLongIP = No::token(sMessage, 3).toULong();
             ushort uPort = No::token(sMessage, 4).toUShort();
             ulong uFileSize = No::token(sMessage, 5).toULong();
+            NoString sLocalFile = saveDir.filePath(sFile);
             GetFile(client()->nick(), No::formatIp(uLongIP), uPort, sLocalFile, uFileSize);
         }
     }

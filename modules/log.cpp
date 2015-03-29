@@ -231,17 +231,17 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
     sPath.replace("$WINDOW", NoString(sWindow.replace_n("/", "-").replace_n("\\", "-")).toLower());
 
     // Check if it's allowed to write in this specific path
-    sPath = NoDir::CheckPathPrefix(savePath(), sPath);
-    if (sPath.empty()) {
+    NoDir saveDir(savePath());
+    if (!saveDir.isParent(sPath)) {
         NO_DEBUG("Invalid log path [" << m_sLogPath << "].");
         return;
     }
 
-    NoFile LogFile(sPath);
+    NoFile LogFile(saveDir.filePath(sPath));
     NoString sLogDir = LogFile.GetDir();
     struct stat ModDirInfo;
     NoFile::GetInfo(savePath(), ModDirInfo);
-    if (!NoFile::Exists(sLogDir)) NoDir::MakeDir(sLogDir, ModDirInfo.st_mode);
+    if (!NoFile::Exists(sLogDir)) NoDir::mkpath(sLogDir, ModDirInfo.st_mode);
     if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT)) {
         LogFile.Write(No::formatTime(curtime, "[%H:%M:%S] ", user()->timezone()) +
                       (m_bSanitize ? No::stripControls(sLine) : sLine) + "\n");
@@ -306,11 +306,12 @@ bool NoLogMod::onLoad(const NoString& sArgs, NoString& sMessage)
     SetRules(vsRules);
 
     // Check if it's allowed to write in this path in general
-    m_sLogPath = NoDir::CheckPathPrefix(savePath(), m_sLogPath);
-    if (m_sLogPath.empty()) {
+    NoDir saveDir(savePath());
+    if (!saveDir.isParent(m_sLogPath)) {
         sMessage = "Invalid log path [" + m_sLogPath + "].";
         return false;
     } else {
+        m_sLogPath = saveDir.filePath(m_sLogPath);
         sMessage = "Logging to [" + m_sLogPath + "].";
         return true;
     }

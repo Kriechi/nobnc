@@ -69,7 +69,7 @@ bool NoRegistry::copy(const NoString& path)
     NoString oldPath = d->module->savePath();
     if (oldPath != path) {
         NoFile file(oldPath + "/.registry");
-        if (!file.Exists() || (!NoFile::Exists(path) && !NoDir::MakeDir(path)))
+        if (!file.Exists() || (!NoFile::Exists(path) && !NoDir::mkpath(path)))
             return false;
         return file.Copy(path + "/.registry");
     }

@@ -454,7 +454,7 @@ void NoApp::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
     if (uPos == NoString::npos)
         m_curPath = "./";
     else
-        m_curPath = NoDir::ChangeDir("./", sArgvPath.left(uPos), "");
+        m_curPath = NoDir("./").filePath(sArgvPath.left(uPos));
 
     // Try to set the user's home dir, default to binpath on failure
     NoFile::InitHomePath(m_curPath);
@@ -472,7 +472,7 @@ NoString NoApp::GetConfPath(bool bAllowMkDir) const
 {
     NoString sConfPath = m_appPath + "/configs";
     if (bAllowMkDir && !NoFile::Exists(sConfPath)) {
-        NoDir::MakeDir(sConfPath);
+        NoDir::mkpath(sConfPath);
     }
 
     return sConfPath;
@@ -482,7 +482,7 @@ NoString NoApp::GetUserPath() const
 {
     NoString sUserPath = m_appPath + "/users";
     if (!NoFile::Exists(sUserPath)) {
-        NoDir::MakeDir(sUserPath);
+        NoDir::mkpath(sUserPath);
     }
 
     return sUserPath;
@@ -498,7 +498,7 @@ NoString NoApp::GetModPath() const
 const NoString& NoApp::GetCurPath() const
 {
     if (!NoFile::Exists(m_curPath)) {
-        NoDir::MakeDir(m_curPath);
+        NoDir::mkpath(m_curPath);
     }
     return m_curPath;
 }
@@ -508,12 +508,12 @@ const NoString& NoApp::GetHomePath() const { return NoFile::GetHomePath(); }
 const NoString& NoApp::GetZNCPath() const
 {
     if (!NoFile::Exists(m_appPath)) {
-        NoDir::MakeDir(m_appPath);
+        NoDir::mkpath(m_appPath);
     }
     return m_appPath;
 }
 
-NoString NoApp::GetPemLocation() const { return NoDir::ChangeDir("", m_sslCertFile); }
+NoString NoApp::GetPemLocation() const { return NoDir("").filePath(m_sslCertFile); }
 
 const NoString&NoApp::GetConfigFile() const { return m_configFile; }
 
@@ -1005,7 +1005,7 @@ void NoApp::BackupConfigOnce(const NoString& sSuffix)
 
     No::printAction("Creating a config backup");
 
-    NoString sBackup = NoDir::ChangeDir(m_configFile, "../znc.conf." + sSuffix);
+    NoString sBackup = NoDir(m_configFile).filePath("../znc.conf." + sSuffix);
     if (NoFile::Copy(m_configFile, sBackup))
         No::printStatus(true, sBackup);
     else

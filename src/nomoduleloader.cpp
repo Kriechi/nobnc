@@ -16,6 +16,7 @@
  */
 
 #include "nomoduleloader.h"
+#include "nofile.h"
 #include "nodir.h"
 #include "noapp.h"
 #include <dlfcn.h>
@@ -554,7 +555,7 @@ bool NoModuleLoader::loadModule(const NoString& sModule, const NoString& sArgs, 
     NoModule* pModule = Info.loader()(p, pUser, pNetwork, sModule, sDataPath, eType);
     pModule->setDescription(Info.description());
     pModule->setArgs(sArgs);
-    pModule->setModulePath(NoDir::ChangeDir(NoApp::Get().GetCurPath(), sModPath));
+    pModule->setModulePath(NoDir::current().filePath(sModPath));
     d->modules.push_back(pModule);
 
     bool bLoaded;
@@ -692,16 +693,13 @@ void NoModuleLoader::availableModules(std::set<NoModuleInfo>& ssMods, No::Module
 {
     ssMods.clear();
 
-    uint a = 0;
-    NoDir Dir;
-
     NoModDirList dirs = moduleDirs();
 
     while (!dirs.empty()) {
-        Dir.FillByWildcard(dirs.front().first, "*.so");
+        NoDir Dir(dirs.front().first);
         dirs.pop();
 
-        for (NoFile* file : Dir.files()) {
+        for (NoFile* file : Dir.files("*.so")) {
             NoString sName = file->GetShortName();
             NoString sPath = file->GetLongName();
             NoModuleInfo ModInfo;

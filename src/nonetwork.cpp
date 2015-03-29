@@ -17,6 +17,7 @@
 
 #include "nonetwork.h"
 #include "nouser.h"
+#include "nofile.h"
 #include "nodir.h"
 #include "nosettings.h"
 #include "noircsocket.h"
@@ -352,7 +353,7 @@ NoString NoNetwork::networkPath() const
     NoString sNetworkPath = d->user->userPath() + "/networks/" + d->name;
 
     if (!NoFile::Exists(sNetworkPath)) {
-        NoDir::MakeDir(sNetworkPath);
+        NoDir::mkpath(sNetworkPath);
     }
 
     return sNetworkPath;

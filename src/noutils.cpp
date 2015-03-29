@@ -481,8 +481,7 @@ namespace
 {
 void FillTimezones(const NoString& sPath, NoStringSet& result, const NoString& sPrefix)
 {
-    NoDir Dir;
-    Dir.Fill(sPath);
+    NoDir Dir(sPath);
     for (NoFile* pFile : Dir.files()) {
         NoString sName = pFile->GetShortName();
         NoString sFile = pFile->GetLongName();

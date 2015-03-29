@@ -281,7 +281,7 @@ NoString NoTemplate::expandFile(const NoString& sFilename, bool bFromInc)
 
     for (auto& it : d->paths) {
         NoString& sRoot = it.first;
-        NoString sFilePath(NoDir::ChangeDir(sRoot, sFile));
+        NoString sFilePath = NoDir(sRoot).filePath(sFile);
 
         // Make sure path ends with a slash because "/foo/pub*" matches "/foo/public_keep_out/" but "/foo/pub/*" doesn't
         if (!sRoot.empty() && sRoot.right(1) != "/") {
@@ -328,7 +328,7 @@ void NoTemplate::setPath(const NoString& sPaths)
 
 NoString NoTemplate::makePath(const NoString& sPath) const
 {
-    NoString sRet(NoDir::ChangeDir("./", sPath + "/"));
+    NoString sRet = NoDir("./").filePath(sPath + "/");
 
     if (!sRet.empty() && sRet.right(1) != "/") {
         sRet += "/";
@@ -351,7 +351,7 @@ void NoTemplate::appendPath(const NoString& sPath, bool bIncludesOnly)
 
 void NoTemplate::removePath(const NoString& sPath)
 {
-    NO_DEBUG("NoTemplate::RemovePath(" + sPath + ") == [" + NoDir::ChangeDir("./", sPath + "/") + "]");
+    NO_DEBUG("NoTemplate::RemovePath(" + sPath + ") == [" + NoDir("./").filePath(sPath + "/") + "]");
 
     for (const auto& it : d->paths) {
         if (it.first == sPath) {

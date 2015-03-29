@@ -18,6 +18,7 @@
 #include "noclient.h"
 #include "noclient_p.h"
 #include "nochannel.h"
+#include "nofile.h"
 #include "nodir.h"
 #include "nonetwork.h"
 #include "noircsocket.h"
