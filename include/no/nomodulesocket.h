@@ -55,12 +55,12 @@ public:
     using NoSocket::Listen;
 
     //! This defaults to closing the socket, feel free to override
-    void ReachedMaxBufferImpl() override;
-    void SockErrorImpl(int iErrno, const NoString& sDescription) override;
+    void onReachedMaxBuffer() override;
+    void onSocketError(int iErrno, const NoString& sDescription) override;
 
     //! This limits the global connections from this IP to defeat DoS attacks, feel free to override. The ACL used is
     // provided by the main interface @see NoApp::AllowConnectionFrom
-    bool ConnectionFromImpl(const NoString& sHost, ushort uPort) override;
+    bool onConnectionFrom(const NoString& sHost, ushort uPort) override;
 
     //! Ease of use Connect, assigns to the manager and is subsequently tracked
     bool Connect(const NoString& sHostname, ushort uPort, bool bSSL = false, uint uTimeout = 60);

@@ -398,12 +398,12 @@ void NoSocket::SetTimeout(int iTimeout, uint32_t iTimeoutType)
 
 Csock* NoSocketImpl::GetSockObj(const NoString& sHost, ushort uPort)
 {
-    NoSocket* sockObj = q->GetSockObjImpl(sHost, uPort);
+    NoSocket* sockObj = q->createSocket(sHost, uPort);
     if (sockObj)
         return NoSocketPrivate::get(sockObj);
     return Csock::GetSockObj(sHost, uPort);
 }
-NoSocket* NoSocket::GetSockObjImpl(const NoString& sHost, ushort uPort)
+NoSocket* NoSocket::createSocket(const NoString& sHost, ushort uPort)
 {
     return nullptr;
 }
@@ -427,27 +427,27 @@ NoString& NoSocket::GetInternalWriteBuffer()
 
 void NoSocketImpl::ReadLine(const NoString& sLine)
 {
-    q->ReadLineImpl(sLine);
+    q->readLine(sLine);
 }
-void NoSocket::ReadLineImpl(const NoString& sLine)
+void NoSocket::readLine(const NoString& sLine)
 {
     d->impl->Csock::ReadLine(sLine);
 }
 
 void NoSocketImpl::ReadData(const char* data, size_t len)
 {
-    q->ReadDataImpl(data, len);
+    q->readData(data, len);
 }
-void NoSocket::ReadDataImpl(const char* data, size_t len)
+void NoSocket::readData(const char* data, size_t len)
 {
     return d->impl->Csock::ReadData(data, len);
 }
 
 void NoSocketImpl::PushBuff(const char* data, size_t len, bool bStartAtZero)
 {
-    q->PushBuffImpl(data, len, bStartAtZero);
+    q->pushBuffer(data, len, bStartAtZero);
 }
-void NoSocket::PushBuffImpl(const char* data, size_t len, bool bStartAtZero)
+void NoSocket::pushBuffer(const char* data, size_t len, bool bStartAtZero)
 {
     d->impl->Csock::PushBuff(data, len, bStartAtZero);
 }
@@ -461,35 +461,35 @@ bool NoSocket::IsConOK() const
     return d->impl->GetConState() == Csock::CST_OK;
 }
 
-void NoSocket::ConnectedImpl()
+void NoSocket::onConnected()
 {
     d->impl->Csock::Connected();
 }
-void NoSocket::TimeoutImpl()
+void NoSocket::onTimeout()
 {
     d->impl->Csock::Timeout();
 }
-void NoSocket::DisconnectedImpl()
+void NoSocket::onDisconnected()
 {
     d->impl->Csock::Disconnected();
 }
-void NoSocket::ConnectionRefusedImpl()
+void NoSocket::onConnectionRefused()
 {
     d->impl->Csock::ConnectionRefused();
 }
-void NoSocket::ReadPausedImpl()
+void NoSocket::onReadPaused()
 {
     d->impl->Csock::ReadPaused();
 }
-void NoSocket::ReachedMaxBufferImpl()
+void NoSocket::onReachedMaxBuffer()
 {
     d->impl->Csock::ReachedMaxBuffer();
 }
-void NoSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
+void NoSocket::onSocketError(int iErrno, const NoString& sDescription)
 {
     d->impl->Csock::SockError(iErrno, sDescription);
 }
-bool NoSocket::ConnectionFromImpl(const NoString& sHost, ushort uPort)
+bool NoSocket::onConnectionFrom(const NoString& sHost, ushort uPort)
 {
     return d->impl->Csock::ConnectionFrom(sHost, uPort);
 }

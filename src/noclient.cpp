@@ -88,24 +88,24 @@ public:
         SetMaxBufferThreshold(1024);
     }
 
-    void ReadLineImpl(const NoString& sData) override
+    void readLine(const NoString& sData) override
     {
         m_pClient->readLine(sData);
     }
-    void TimeoutImpl() override
+    void onTimeout() override
     {
         m_pClient->putClient("ERROR :Closing link [Timeout]");
     }
-    void ConnectedImpl() override
+    void onConnected() override
     {
         NO_DEBUG(GetSockName() << " == Connected();");
     }
-    void ConnectionRefusedImpl() override
+    void onConnectionRefused() override
     {
         NO_DEBUG(GetSockName() << " == ConnectionRefused()");
     }
 
-    void DisconnectedImpl() override
+    void onDisconnected() override
     {
         NO_DEBUG(GetSockName() << " == Disconnected()");
         NoNetwork* pNetwork = m_pClient->network();
@@ -116,7 +116,7 @@ public:
             NETWORKMODULECALL(onClientDisconnect(), pUser, pNetwork, m_pClient, NOTHING);
     }
 
-    void ReachedMaxBufferImpl() override
+    void onReachedMaxBuffer() override
     {
         NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
         if (m_pClient->isAttached()) {

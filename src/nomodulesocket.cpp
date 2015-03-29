@@ -60,7 +60,7 @@ NoModuleSocket::~NoModuleSocket()
     }
 }
 
-void NoModuleSocket::ReachedMaxBufferImpl()
+void NoModuleSocket::onReachedMaxBuffer()
 {
     NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
     if (m_module)
@@ -68,7 +68,7 @@ void NoModuleSocket::ReachedMaxBufferImpl()
     Close();
 }
 
-void NoModuleSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
+void NoModuleSocket::onSocketError(int iErrno, const NoString& sDescription)
 {
     NO_DEBUG(GetSockName() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
     if (iErrno == EMFILE) {
@@ -77,7 +77,7 @@ void NoModuleSocket::SockErrorImpl(int iErrno, const NoString& sDescription)
     }
 }
 
-bool NoModuleSocket::ConnectionFromImpl(const NoString& sHost, ushort uPort)
+bool NoModuleSocket::onConnectionFrom(const NoString& sHost, ushort uPort)
 {
     return NoApp::Get().AllowConnectionFrom(sHost);
 }

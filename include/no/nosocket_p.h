@@ -64,37 +64,37 @@ public:
 
     void SockError(int iErrno, const NoString& sDescription) override
     {
-        q->SockErrorImpl(iErrno, sDescription);
+        q->onSocketError(iErrno, sDescription);
     }
 
     void Connected() override
     {
-        q->ConnectedImpl();
+        q->onConnected();
     }
     void Timeout() override
     {
-        q->TimeoutImpl();
+        q->onTimeout();
     }
     void Disconnected() override
     {
-        q->DisconnectedImpl();
+        q->onDisconnected();
     }
     void ConnectionRefused() override
     {
-        q->ConnectionRefusedImpl();
+        q->onConnectionRefused();
     }
 
     void ReadPaused() override
     {
-        q->ReadPausedImpl();
+        q->onReadPaused();
     }
     void ReachedMaxBuffer() override
     {
-        q->ReachedMaxBufferImpl();
+        q->onReachedMaxBuffer();
     }
     bool ConnectionFrom(const NoString& sHost, ushort uPort) override
     {
-        return q->ConnectionFromImpl(sHost, uPort);
+        return q->onConnectionFrom(sHost, uPort);
     }
 
     NoSocket* q;

@@ -100,28 +100,30 @@ public:
     bool ConnectFD(int iReadFD, int iWriteFD, const NoString& sName, bool bIsSSL = false);
     enum { TMO_READ = 1, TMO_WRITE = 2, TMO_ACCEPT = 4, TMO_ALL = TMO_READ | TMO_WRITE | TMO_ACCEPT };
     void SetTimeout(int iTimeout, uint32_t iTimeoutType = TMO_ALL);
-    virtual NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort);
     enum CloseType { CLT_DONT, CLT_NOW, CLT_AFTERWRITE, CLT_DEREFERENCE };
     CloseType GetCloseType() const;
     void Close(CloseType type = CLT_NOW);
     NoString& GetInternalReadBuffer();
     NoString& GetInternalWriteBuffer();
-    virtual void ReadLineImpl(const NoString& sLine);
-    virtual void ReadDataImpl(const char* data, size_t len);
-    virtual void PushBuffImpl(const char* data, size_t len, bool bStartAtZero = false);
     bool StartTLS();
     bool IsConOK() const;
 
-protected:
-    virtual void ConnectedImpl();
-    virtual void TimeoutImpl();
-    virtual void DisconnectedImpl();
-    virtual void ConnectionRefusedImpl();
+    virtual void readLine(const NoString& sLine);
+    virtual void readData(const char* data, size_t len);
+    virtual void pushBuffer(const char* data, size_t len, bool bStartAtZero = false);
 
-    virtual void ReadPausedImpl();
-    virtual void ReachedMaxBufferImpl();
-    virtual void SockErrorImpl(int iErrno, const NoString& sDescription);
-    virtual bool ConnectionFromImpl(const NoString& sHost, ushort uPort);
+protected:
+    virtual void onConnected();
+    virtual void onTimeout();
+    virtual void onDisconnected();
+    virtual void onConnectionRefused();
+
+    virtual void onReadPaused();
+    virtual void onReachedMaxBuffer();
+    virtual void onSocketError(int iErrno, const NoString& sDescription);
+    virtual bool onConnectionFrom(const NoString& sHost, ushort uPort);
+
+    virtual NoSocket* createSocket(const NoString& sHost, ushort uPort);
 
 private:
     NoSocket(const NoSocket&) = delete;

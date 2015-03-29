@@ -985,7 +985,7 @@ bool NoWebSocket::OnLogin(const NoString& sUser, const NoString& sPass, bool bBa
     return IsLoggedIn();
 }
 
-NoSocket* NoWebSocket::GetSockObjImpl(const NoString& sHost, ushort uPort)
+NoSocket* NoWebSocket::createSocket(const NoString& sHost, ushort uPort)
 {
     // All listening is done by NoListener, thus NoWebSocket should never have
     // to listen, but since GetSockObj() is pure virtual...

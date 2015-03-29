@@ -49,9 +49,9 @@ public:
         m_listener->socket = nullptr;
     }
 
-    bool ConnectionFromImpl(const NoString& host, ushort port) override;
-    NoSocket* GetSockObjImpl(const NoString& host, ushort port) override;
-    void SockErrorImpl(int iErrno, const NoString& description) override;
+    bool onConnectionFrom(const NoString& host, ushort port) override;
+    NoSocket* createSocket(const NoString& host, ushort port) override;
+    void onSocketError(int iErrno, const NoString& description) override;
 
 private:
     NoListenerPrivate* m_listener;
@@ -62,14 +62,14 @@ class NoPeerSocket : public NoSocket
 public:
     NoPeerSocket(const NoString& host, ushort port, NoListenerPrivate* listener);
 
-    void ReadLineImpl(const NoString& data) override;
-    void ReachedMaxBufferImpl() override;
+    void readLine(const NoString& data) override;
+    void onReachedMaxBuffer() override;
 
 private:
     NoListenerPrivate* m_listener;
 };
 
-bool NoListenerSocket::ConnectionFromImpl(const NoString& host, ushort port)
+bool NoListenerSocket::onConnectionFrom(const NoString& host, ushort port)
 {
     bool allowed = NoApp::Get().IsHostAllowed(host);
     if (allowed)
@@ -79,7 +79,7 @@ bool NoListenerSocket::ConnectionFromImpl(const NoString& host, ushort port)
     return allowed;
 }
 
-NoSocket* NoListenerSocket::GetSockObjImpl(const NoString& host, ushort port)
+NoSocket* NoListenerSocket::createSocket(const NoString& host, ushort port)
 {
     NoPeerSocket* socket = new NoPeerSocket(host, port, m_listener);
     if (NoApp::Get().AllowConnectionFrom(host)) {
@@ -92,7 +92,7 @@ NoSocket* NoListenerSocket::GetSockObjImpl(const NoString& host, ushort port)
     return socket;
 }
 
-void NoListenerSocket::SockErrorImpl(int error, const NoString& description)
+void NoListenerSocket::onSocketError(int error, const NoString& description)
 {
     NO_DEBUG("Error " << GetSockName() << " " << description << " (" << strerror(error) << ")");
     if (error == EMFILE) {
@@ -116,7 +116,7 @@ NoPeerSocket::NoPeerSocket(const NoString& host, ushort port, NoListenerPrivate*
     EnableReadLine();
 }
 
-void NoPeerSocket::ReachedMaxBufferImpl()
+void NoPeerSocket::onReachedMaxBuffer()
 {
     if (GetCloseType() != CLT_DONT)
         return; // Already closing
@@ -130,7 +130,7 @@ void NoPeerSocket::ReachedMaxBufferImpl()
     Close();
 }
 
-void NoPeerSocket::ReadLineImpl(const NoString& line)
+void NoPeerSocket::readLine(const NoString& line)
 {
     NoSocket* socket = nullptr;
     bool isHttp = No::wildCmp(line, "GET * HTTP/1.?\r\n") || No::wildCmp(line, "POST * HTTP/1.?\r\n");
@@ -163,8 +163,8 @@ void NoPeerSocket::ReadLineImpl(const NoString& line)
     }
 
     // TODO can we somehow get rid of this?
-    socket->ReadLineImpl(line);
-    socket->PushBuffImpl("", 0, true);
+    socket->readLine(line);
+    socket->pushBuffer("", 0, true);
 }
 
 NoListener::NoListener(const NoString& host, ushort port) : d(new NoListenerPrivate(host, port))

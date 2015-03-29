@@ -49,16 +49,16 @@ public:
     static ushort
     DCCRequest(const NoString& sNick, ulong uLongIP, ushort uPort, const NoString& sFileName, bool bIsChat, NoBounceDccMod* pMod, const NoString& sRemoteIP);
 
-    void ReadLineImpl(const NoString& sData) override;
-    void ReadDataImpl(const char* data, size_t len) override;
-    void ReadPausedImpl() override;
-    void TimeoutImpl() override;
-    void ConnectionRefusedImpl() override;
-    void ReachedMaxBufferImpl() override;
-    void SockErrorImpl(int iErrno, const NoString& sDescription) override;
-    void ConnectedImpl() override;
-    void DisconnectedImpl() override;
-    NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
+    void readLine(const NoString& sData) override;
+    void readData(const char* data, size_t len) override;
+    void onReadPaused() override;
+    void onTimeout() override;
+    void onConnectionRefused() override;
+    void onReachedMaxBuffer() override;
+    void onSocketError(int iErrno, const NoString& sDescription) override;
+    void onConnected() override;
+    void onDisconnected() override;
+    NoSocket* createSocket(const NoString& sHost, ushort uPort) override;
     void Shutdown();
     void PutServ(const NoString& sLine);
     void PutPeer(const NoString& sLine);
@@ -403,7 +403,7 @@ NoDccBounce::~NoDccBounce()
     m_module->RemoveSocket(this);
 }
 
-void NoDccBounce::ReadLineImpl(const NoString& sData)
+void NoDccBounce::readLine(const NoString& sData)
 {
     NoString sLine = sData.trimRight_n("\r\n");
 
@@ -412,7 +412,7 @@ void NoDccBounce::ReadLineImpl(const NoString& sData)
     PutPeer(sLine);
 }
 
-void NoDccBounce::ReachedMaxBufferImpl()
+void NoDccBounce::onReachedMaxBuffer()
 {
     NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
 
@@ -422,7 +422,7 @@ void NoDccBounce::ReachedMaxBufferImpl()
     Close();
 }
 
-void NoDccBounce::ReadDataImpl(const char* data, size_t len)
+void NoDccBounce::readData(const char* data, size_t len)
 {
     if (m_pPeer) {
         m_pPeer->Write(data, len);
@@ -437,13 +437,13 @@ void NoDccBounce::ReadDataImpl(const char* data, size_t len)
     }
 }
 
-void NoDccBounce::ReadPausedImpl()
+void NoDccBounce::onReadPaused()
 {
     if (!m_pPeer || m_pPeer->GetInternalWriteBuffer().length() <= m_uiMinDCCBuffer)
         UnPauseRead();
 }
 
-void NoDccBounce::TimeoutImpl()
+void NoDccBounce::onTimeout()
 {
     NO_DEBUG(GetSockName() << " == Timeout()");
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
@@ -464,7 +464,7 @@ void NoDccBounce::TimeoutImpl()
     }
 }
 
-void NoDccBounce::ConnectionRefusedImpl()
+void NoDccBounce::onConnectionRefused()
 {
     NO_DEBUG(GetSockName() << " == ConnectionRefused()");
 
@@ -479,7 +479,7 @@ void NoDccBounce::ConnectionRefusedImpl()
     m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Connection Refused while connecting" + sHost);
 }
 
-void NoDccBounce::SockErrorImpl(int iErrno, const NoString& sDescription)
+void NoDccBounce::onSocketError(int iErrno, const NoString& sDescription)
 {
     NO_DEBUG(GetSockName() << " == SockError(" << iErrno << ")");
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
@@ -497,13 +497,13 @@ void NoDccBounce::SockErrorImpl(int iErrno, const NoString& sDescription)
     }
 }
 
-void NoDccBounce::ConnectedImpl()
+void NoDccBounce::onConnected()
 {
     SetTimeout(0);
     NO_DEBUG(GetSockName() << " == Connected()");
 }
 
-void NoDccBounce::DisconnectedImpl()
+void NoDccBounce::onDisconnected()
 {
     NO_DEBUG(GetSockName() << " == Disconnected()");
 }
@@ -515,7 +515,7 @@ void NoDccBounce::Shutdown()
     Close();
 }
 
-NoSocket* NoDccBounce::GetSockObjImpl(const NoString& sHost, ushort uPort)
+NoSocket* NoDccBounce::createSocket(const NoString& sHost, ushort uPort)
 {
     Close();
 

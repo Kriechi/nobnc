@@ -72,7 +72,7 @@ NoHttpSocket::~NoHttpSocket()
 {
 }
 
-void NoHttpSocket::ReadDataImpl(const char* data, size_t len)
+void NoHttpSocket::readData(const char* data, size_t len)
 {
     if (!m_done && m_gotHeader && m_post) {
         m_postData.append(data, len);
@@ -108,7 +108,7 @@ void NoHttpSocket::CheckPost()
     }
 }
 
-void NoHttpSocket::ReadLineImpl(const NoString& sData)
+void NoHttpSocket::readLine(const NoString& sData)
 {
     if (m_gotHeader) {
         return;
@@ -784,7 +784,7 @@ bool NoHttpSocket::Redirect(const NoString& sURL)
     }
 }
 
-void NoHttpSocket::ConnectedImpl()
+void NoHttpSocket::onConnected()
 {
     SetTimeout(120);
 }

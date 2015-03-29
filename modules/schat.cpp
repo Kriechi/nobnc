@@ -57,20 +57,20 @@ public:
     NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort);
     ~NoSChatSock();
 
-    NoSocket* GetSockObjImpl(const NoString& sHostname, u_short iPort) override
+    NoSocket* createSocket(const NoString& sHostname, u_short iPort) override
     {
         NoSChatSock* p = new NoSChatSock(m_module, m_sChatNick, sHostname, iPort);
         return (p);
     }
 
-    bool ConnectionFromImpl(const NoString& sHost, u_short iPort) override
+    bool onConnectionFrom(const NoString& sHost, u_short iPort) override
     {
         Close(); // close the listener after the first connection
         return (true);
     }
 
-    void ConnectedImpl() override;
-    void TimeoutImpl() override;
+    void onConnected() override;
+    void onTimeout() override;
 
     const NoString& GetChatNick() const
     {
@@ -79,8 +79,8 @@ public:
 
     void PutQuery(const NoString& sText);
 
-    void ReadLineImpl(const NoString& sLine) override;
-    void DisconnectedImpl() override;
+    void readLine(const NoString& sLine) override;
+    void onDisconnected() override;
 
     void AddLine(const NoString& sLine)
     {
@@ -94,12 +94,12 @@ public:
         if (m_vBuffer.empty()) {
             // Always show a message to the user, so he knows
             // this schat still exists.
-            ReadLineImpl("*** Reattached.");
+            readLine("*** Reattached.");
         } else {
             // Buffer playback
             std::vector<NoString>::reverse_iterator it = m_vBuffer.rbegin();
             for (; it != m_vBuffer.rend(); ++it)
-                ReadLineImpl(*it);
+                readLine(*it);
 
             m_vBuffer.clear();
         }
@@ -429,7 +429,7 @@ void NoSChatSock::PutQuery(const NoString& sText)
     m_module->SendToUser(m_sChatNick + "!" + m_sChatNick + "@" + GetRemoteIP(), sText);
 }
 
-void NoSChatSock::ReadLineImpl(const NoString& sLine)
+void NoSChatSock::readLine(const NoString& sLine)
 {
     if (m_module) {
         NoString sText = sLine;
@@ -443,20 +443,20 @@ void NoSChatSock::ReadLineImpl(const NoString& sLine)
     }
 }
 
-void NoSChatSock::DisconnectedImpl()
+void NoSChatSock::onDisconnected()
 {
     if (m_module)
         PutQuery("*** Disconnected.");
 }
 
-void NoSChatSock::ConnectedImpl()
+void NoSChatSock::onConnected()
 {
     SetTimeout(0);
     if (m_module)
         PutQuery("*** Connected.");
 }
 
-void NoSChatSock::TimeoutImpl()
+void NoSChatSock::onTimeout()
 {
     if (m_module) {
         if (IsListener())

@@ -51,13 +51,13 @@ public:
     bool onChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage);
     bool onServerCapAvailable(const NoString& sCap);
 
-    void ReadLineImpl(const NoString& sData) override;
-    void ConnectedImpl() override;
-    void DisconnectedImpl() override;
-    void ConnectionRefusedImpl() override;
-    void SockErrorImpl(int iErrno, const NoString& sDescription) override;
-    void TimeoutImpl() override;
-    void ReachedMaxBufferImpl() override;
+    void readLine(const NoString& sData) override;
+    void onConnected() override;
+    void onDisconnected() override;
+    void onConnectionRefused() override;
+    void onSocketError(int iErrno, const NoString& sDescription) override;
+    void onTimeout() override;
+    void onReachedMaxBuffer() override;
 
     void putIrc(const NoString& sLine);
     void putIrcQuick(const NoString& sLine); //!< Should be used for PONG only

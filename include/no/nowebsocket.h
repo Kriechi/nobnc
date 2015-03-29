@@ -52,7 +52,7 @@ public:
 
     std::shared_ptr<NoWebSession> GetSession();
 
-    NoSocket* GetSockObjImpl(const NoString& sHost, ushort uPort) override;
+    NoSocket* createSocket(const NoString& sHost, ushort uPort) override;
     static NoString GetSkinPath(const NoString& sSkinName);
     void GetAvailSkins(NoStringVector& vRet) const;
     NoString GetSkinName();
