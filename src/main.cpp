@@ -197,7 +197,7 @@ int main(int argc, char** argv)
     thread_setup();
 
     seedPRNG();
-    NoDebug::SetStdoutIsTTY(isatty(1));
+    NoDebug::setFormatted(isatty(1));
 
     int iArg, iOptIndex = -1;
     bool bMakeConf = false;
@@ -222,7 +222,7 @@ int main(int argc, char** argv)
             std::cout << NoApp::GetCompileOptionsString() << std::endl;
             return 0;
         case 'n':
-            NoDebug::SetStdoutIsTTY(false);
+            NoDebug::setFormatted(false);
             break;
         case 'r':
             bAllowRoot = true;
@@ -249,7 +249,7 @@ int main(int argc, char** argv)
             break;
         case 'D':
             bForeground = true;
-            NoDebug::SetDebug(true);
+            NoDebug::setEnabled(true);
             break;
         case '?':
         default:
@@ -393,7 +393,7 @@ int main(int argc, char** argv)
         close(2);
         open("/dev/null", O_WRONLY);
 
-        NoDebug::SetStdoutIsTTY(false);
+        NoDebug::setFormatted(false);
 
         // We are the child. There is no way we can be a process group
         // leader, thus setsid() must succeed.
@@ -435,11 +435,11 @@ int main(int argc, char** argv)
             char* args[] = { strdup(argv[0]), strdup("--datadir"), strdup(pZNC->GetZNCPath().c_str()), nullptr,
                              nullptr,         nullptr,             nullptr };
             int pos = 3;
-            if (NoDebug::Debug())
+            if (NoDebug::isEnabled())
                 args[pos++] = strdup("--debug");
             else if (bForeground)
                 args[pos++] = strdup("--foreground");
-            if (!NoDebug::StdoutIsTTY()) args[pos++] = strdup("--no-color");
+            if (!NoDebug::isFormatted()) args[pos++] = strdup("--no-color");
             if (bAllowRoot) args[pos++] = strdup("--allow-root");
             // The above code adds 3 entries to args tops
             // which means the array should be big enough

@@ -21,11 +21,11 @@
 #include <sys/time.h>
 #include <stdio.h>
 
-bool NoDebug::stdoutIsTTY = true;
+bool NoDebug::formatted = true;
 #ifndef NDEBUG
-bool NoDebug::debug = true;
+bool NoDebug::enabled = true;
 #else
-bool NoDebug::debug = false;
+bool NoDebug::enabled = false;
 #endif
 
 NoDebugStream::~NoDebugStream()

@@ -35,7 +35,7 @@
  */
 #define NO_DEBUG(f)                 \
     do {                         \
-        if (NoDebug::Debug()) {   \
+        if (NoDebug::isEnabled()) {   \
             NoDebugStream sDebug; \
             sDebug << f;         \
         }                        \
@@ -44,14 +44,15 @@
 class NO_EXPORT NoDebug
 {
 public:
-    static void SetStdoutIsTTY(bool b) { stdoutIsTTY = b; }
-    static bool StdoutIsTTY() { return stdoutIsTTY; }
-    static void SetDebug(bool b) { debug = b; }
-    static bool Debug() { return debug; }
+    static bool isEnabled() { return enabled; }
+    static void setEnabled(bool b) { enabled = b; }
+
+    static bool isFormatted() { return formatted; }
+    static void setFormatted(bool b) { formatted = b; }
 
 private:
-    static bool stdoutIsTTY;
-    static bool debug;
+    static bool enabled;
+    static bool formatted;
 };
 
 class NO_EXPORT NoDebugStream : public std::ostringstream

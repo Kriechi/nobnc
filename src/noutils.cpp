@@ -309,7 +309,7 @@ bool No::getInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefa
 
 void No::printError(const NoString& sMessage)
 {
-    if (NoDebug::StdoutIsTTY())
+    if (NoDebug::isFormatted())
         fprintf(stdout, BOLD BLU "[" RED " ** " BLU "]" DFL NORM " %s\n", sMessage.c_str());
     else
         fprintf(stdout, "%s\n", sMessage.c_str());
@@ -318,7 +318,7 @@ void No::printError(const NoString& sMessage)
 
 void No::printPrompt(const NoString& sMessage)
 {
-    if (NoDebug::StdoutIsTTY())
+    if (NoDebug::isFormatted())
         fprintf(stdout, BOLD BLU "[" YEL " ?? " BLU "]" DFL NORM " %s: ", sMessage.c_str());
     else
         fprintf(stdout, "[ ?? ] %s: ", sMessage.c_str());
@@ -327,7 +327,7 @@ void No::printPrompt(const NoString& sMessage)
 
 void No::printMessage(const NoString& sMessage, bool bStrong)
 {
-    if (NoDebug::StdoutIsTTY()) {
+    if (NoDebug::isFormatted()) {
         if (bStrong)
             fprintf(stdout, BOLD BLU "[" YEL " ** " BLU "]" DFL BOLD " %s" NORM "\n", sMessage.c_str());
         else
@@ -340,7 +340,7 @@ void No::printMessage(const NoString& sMessage, bool bStrong)
 
 void No::printAction(const NoString& sMessage)
 {
-    if (NoDebug::StdoutIsTTY())
+    if (NoDebug::isFormatted())
         fprintf(stdout, BOLD BLU "[ .. " BLU "]" DFL NORM " %s...\n", sMessage.c_str());
     else
         fprintf(stdout, "%s... ", sMessage.c_str());
@@ -349,7 +349,7 @@ void No::printAction(const NoString& sMessage)
 
 void No::printStatus(bool bSuccess, const NoString& sMessage)
 {
-    if (NoDebug::StdoutIsTTY()) {
+    if (NoDebug::isFormatted()) {
         if (bSuccess) {
             fprintf(stdout, BOLD BLU "[" GRN " >> " BLU "]" DFL NORM);
             fprintf(stdout, " %s\n", sMessage.empty() ? "ok" : sMessage.c_str());
