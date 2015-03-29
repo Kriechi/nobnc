@@ -30,7 +30,7 @@
 template <typename K, typename V = bool> class NoCacheMap
 {
 public:
-    NoCacheMap(uint expiration = 5000) : m_items(), m_expiration(expiration) { }
+    NoCacheMap(uint expiration = 5000) : m_expiration(expiration) { }
 
     uint expiration() const { return m_expiration; }
     void setExpiration(uint expiration) { m_expiration = expiration; }
