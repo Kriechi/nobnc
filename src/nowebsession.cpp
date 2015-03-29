@@ -292,14 +292,14 @@ void NoWebSocket::GetAvailSkins(NoStringVector& vRet) const
     if (!sRoot.empty() && NoFile::IsDir(sRoot)) {
         NoDir Dir(sRoot);
 
-        for (const NoFile* pSubDir : Dir) {
+        for (const NoFile* pSubDir : Dir.files()) {
             if (pSubDir->IsDir() && pSubDir->GetShortName() == "_default_") {
                 vRet.push_back(pSubDir->GetShortName());
                 break;
             }
         }
 
-        for (const NoFile* pSubDir : Dir) {
+        for (const NoFile* pSubDir : Dir.files()) {
             if (pSubDir->IsDir() && pSubDir->GetShortName() != "_default_" && pSubDir->GetShortName() != ".svn") {
                 vRet.push_back(pSubDir->GetShortName());
             }

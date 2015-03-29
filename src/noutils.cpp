@@ -483,7 +483,7 @@ void FillTimezones(const NoString& sPath, NoStringSet& result, const NoString& s
 {
     NoDir Dir;
     Dir.Fill(sPath);
-    for (NoFile* pFile : Dir) {
+    for (NoFile* pFile : Dir.files()) {
         NoString sName = pFile->GetShortName();
         NoString sFile = pFile->GetLongName();
         if (sName == "posix" || sName == "right") continue; // these 2 dirs contain the same filenames

@@ -22,11 +22,13 @@
 #include <no/nostring.h>
 #include <no/nofile.h>
 
-class NO_EXPORT NoDir : public std::vector<NoFile*>
+class NO_EXPORT NoDir
 {
 public:
     NoDir(const NoString& sDir = "");
     ~NoDir();
+
+    std::vector<NoFile*> files() const;
 
     void CleanUp();
 
@@ -54,8 +56,9 @@ public:
     static NoString GetCWD();
 
 private:
-    NoFile::Attribute m_sort;
     bool m_desc;
+    NoFile::Attribute m_sort;
+    std::vector<NoFile*> m_files;
 };
 
 #endif // NODIR_H

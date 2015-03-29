@@ -109,7 +109,7 @@ public:
     bool onBoot() override
     {
         NoDir saveDir(savePath());
-        for (NoFile* pFile : saveDir) {
+        for (NoFile* pFile : saveDir.files()) {
             NoString sName;
             NoString sBuffer;
 
@@ -214,7 +214,7 @@ public:
 
             // cleanup leftovers ie. cleared buffers
             NoDir saveDir(savePath());
-            for (NoFile* pFile : saveDir) {
+            for (NoFile* pFile : saveDir.files()) {
                 if (ssPaths.count(pFile->GetLongName()) == 0) {
                     pFile->Delete();
                 }

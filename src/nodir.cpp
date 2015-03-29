@@ -74,7 +74,7 @@ NoString NoDir::ChangeDir(const NoString& sPath, const NoString& sAdd, const NoS
     return (sRet.empty()) ? "/" : sRet;
 }
 
-NoDir::NoDir(const NoString& sDir) : m_sort(NoFile::Name), m_desc(false)
+NoDir::NoDir(const NoString& sDir) : m_desc(false), m_sort(NoFile::Name)
 {
     if (!sDir.empty())
         Fill(sDir);
@@ -82,13 +82,18 @@ NoDir::NoDir(const NoString& sDir) : m_sort(NoFile::Name), m_desc(false)
 
 NoDir::~NoDir() { CleanUp(); }
 
+std::vector<NoFile*> NoDir::files() const
+{
+    return m_files;
+}
+
 void NoDir::CleanUp()
 {
-    for (uint a = 0; a < size(); a++) {
-        delete (*this)[a];
+    for (NoFile* file : m_files) {
+        delete file;
     }
 
-    clear();
+    m_files.clear();
 }
 
 size_t NoDir::Fill(const NoString& sDir) { return FillByWildcard(sDir, "*"); }
@@ -115,11 +120,11 @@ size_t NoDir::FillByWildcard(const NoString& sDir, const NoString& sWildcard)
         NoFile* file =
                 new NoFile(sDir.trimSuffix_n("/") + "/" +
                            de->d_name /*, this*/); // @todo need to pass pointer to 'this' if we want to do Sort()
-        push_back(file);
+        m_files.push_back(file);
     }
 
     closedir(dir);
-    return size();
+    return m_files.size();
 }
 
 uint NoDir::Chmod(mode_t mode, const NoString& sWildcard, const NoString& sDir)
@@ -132,8 +137,8 @@ uint NoDir::Chmod(mode_t mode, const NoString& sWildcard, const NoString& sDir)
 uint NoDir::Chmod(mode_t mode)
 {
     uint uRet = 0;
-    for (uint a = 0; a < size(); a++) {
-        if ((*this)[a]->Chmod(mode)) {
+    for (NoFile* file : m_files) {
+        if (file->Chmod(mode)) {
             uRet++;
         }
     }
@@ -151,8 +156,8 @@ uint NoDir::Delete(const NoString& sWildcard, const NoString& sDir)
 uint NoDir::Delete()
 {
     uint uRet = 0;
-    for (uint a = 0; a < size(); a++) {
-        if ((*this)[a]->Delete()) {
+    for (NoFile* file : m_files) {
+        if (file->Delete()) {
             uRet++;
         }
     }

@@ -684,7 +684,7 @@ void NoClient::userCommand(NoString& sLine)
             NoString sNewModPath = pNewUser->userPath() + "/networks/" + sNewNetwork + "/moddata/" + pMod->moduleName();
 
             NoDir oldDir(sOldModPath);
-            for (NoFile* pFile : oldDir) {
+            for (NoFile* pFile : oldDir.files()) {
                 if (pFile->GetShortName() != ".registry") {
                     putStatus("Some files seem to be in [" + sOldModPath + "]. You might want to move them to [" + sNewModPath + "]");
                     break;

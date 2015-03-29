@@ -701,10 +701,9 @@ void NoModuleLoader::availableModules(std::set<NoModuleInfo>& ssMods, No::Module
         Dir.FillByWildcard(dirs.front().first, "*.so");
         dirs.pop();
 
-        for (a = 0; a < Dir.size(); a++) {
-            NoFile& File = *Dir[a];
-            NoString sName = File.GetShortName();
-            NoString sPath = File.GetLongName();
+        for (NoFile* file : Dir.files()) {
+            NoString sName = file->GetShortName();
+            NoString sPath = file->GetLongName();
             NoModuleInfo ModInfo;
             sName.rightChomp(3);
 
