@@ -19,9 +19,9 @@
 #include <no/nodir.h>
 #include <no/nofile.h>
 #include <no/nouser.h>
-#include <no/noapp.h>
 #include <no/noprocess.h>
 #include <no/noclient.h>
+#include <no/nosocketmanager.h>
 
 // Forward Declaration
 class NoShellMod;
@@ -60,7 +60,7 @@ private:
 class NoShellMod : public NoModule
 {
 public:
-    MODCONSTRUCTOR(NoShellMod) { m_sPath = NoApp::Get().GetHomePath(); }
+    MODCONSTRUCTOR(NoShellMod) { m_sPath = NoDir::home().path(); }
 
     virtual ~NoShellMod()
     {
@@ -88,7 +88,7 @@ public:
         NoString sCommand = No::token(sLine, 0);
         if (sCommand.equals("cd")) {
             NoString sArg = No::tokens(sLine, 1);
-            NoString sPath = NoDir(m_sPath).filePath(sArg.empty() ? NoString(NoApp::Get().GetHomePath()) : sArg);
+            NoString sPath = NoDir(m_sPath).filePath(sArg.empty() ? NoString(NoDir::home().path()) : sArg);
             NoFile Dir(sPath);
 
             if (Dir.IsDir()) {
