@@ -45,15 +45,15 @@ NoString NoModuleInfo::moduleTypeToString(No::ModuleType eType)
     }
 }
 
-const NoString& NoModuleInfo::name() const { return m_name; }
+NoString NoModuleInfo::name() const { return m_name; }
 
-const NoString& NoModuleInfo::path() const { return m_path; }
+NoString NoModuleInfo::path() const { return m_path; }
 
-const NoString& NoModuleInfo::description() const { return m_description; }
+NoString NoModuleInfo::description() const { return m_description; }
 
-const NoString& NoModuleInfo::wikiPage() const { return m_wikiPage; }
+NoString NoModuleInfo::wikiPage() const { return m_wikiPage; }
 
-const NoString& NoModuleInfo::argsHelpText() const { return m_argsHelpText; }
+NoString NoModuleInfo::argsHelpText() const { return m_argsHelpText; }
 
 bool NoModuleInfo::hasArgs() const { return m_hasArgs; }
 

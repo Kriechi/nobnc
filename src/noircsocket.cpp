@@ -1412,21 +1412,21 @@ uchar NoIrcSocket::GetPermFromMode(uchar uMode) const
     return 0;
 }
 
-const std::map<uchar, NoIrcSocket::ChanModeArgs>&NoIrcSocket::GetChanModes() const { return d->chanModes; }
+std::map<uchar, NoIrcSocket::ChanModeArgs> NoIrcSocket::GetChanModes() const { return d->chanModes; }
 
 bool NoIrcSocket::IsPermChar(const char c) const { return (c != '\0' && GetPerms().contains(c)); }
 
 bool NoIrcSocket::IsPermMode(const char c) const { return (c != '\0' && GetPermModes().contains(c)); }
 
-const NoString& NoIrcSocket::GetPerms() const { return d->perms; }
+NoString NoIrcSocket::GetPerms() const { return d->perms; }
 
-const NoString& NoIrcSocket::GetPermModes() const { return d->permModes; }
+NoString NoIrcSocket::GetPermModes() const { return d->permModes; }
 
 NoString NoIrcSocket::GetNickMask() const { return d->nick.nickMask(); }
 
 NoString NoIrcSocket::GetNick() const { return d->nick.nick(); }
 
-const NoString& NoIrcSocket::GetPass() const { return d->password; }
+NoString NoIrcSocket::GetPass() const { return d->password; }
 
 NoNetwork*NoIrcSocket::network() const { return d->network; }
 
@@ -1434,13 +1434,13 @@ bool NoIrcSocket::HasNamesx() const { return d->hasNamesX; }
 
 bool NoIrcSocket::HasUHNames() const { return d->hasUhNames; }
 
-const std::set<uchar>&NoIrcSocket::GetUserModes() const { return d->userModes; }
+std::set<uchar> NoIrcSocket::GetUserModes() const { return d->userModes; }
 
 bool NoIrcSocket::IsAuthed() const { return d->authed; }
 
 bool NoIrcSocket::IsCapAccepted(const NoString& sCap) { return 1 == d->acceptedCaps.count(sCap); }
 
-const NoStringMap&NoIrcSocket::GetISupport() const { return d->iSupport; }
+NoStringMap NoIrcSocket::GetISupport() const { return d->iSupport; }
 
 NoIrcSocket::ChanModeArgs NoIrcSocket::GetModeType(uchar uMode) const
 {

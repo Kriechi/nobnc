@@ -946,7 +946,7 @@ NoTemplate* NoTemplate::currentTemplate()
     return pContext->GetCurRow();
 }
 
-const NoString& NoTemplate::fileName() const { return d->fileName; }
+NoString NoTemplate::fileName() const { return d->fileName; }
 
 NoString NoTemplate::resolveLiteral(const NoString& sString)
 {

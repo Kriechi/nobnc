@@ -468,15 +468,15 @@ void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStr
 
 void NoHttpSocket::SetLoggedIn(bool b) { m_loggedIn = b; }
 
-const NoString& NoHttpSocket::user() const { return m_username; }
+NoString NoHttpSocket::user() const { return m_username; }
 
-const NoString& NoHttpSocket::GetPass() const { return m_password; }
+NoString NoHttpSocket::GetPass() const { return m_password; }
 
-const NoString& NoHttpSocket::GetContentType() const { return m_contentType; }
+NoString NoHttpSocket::GetContentType() const { return m_contentType; }
 
-const NoString& NoHttpSocket::GetParamString() const { return m_postData; }
+NoString NoHttpSocket::GetParamString() const { return m_postData; }
 
-const NoString& NoHttpSocket::GetURIPrefix() const { return m_uriPrefix; }
+NoString NoHttpSocket::GetURIPrefix() const { return m_uriPrefix; }
 
 bool NoHttpSocket::HasParam(const NoString& sName, bool bPost) const
 {

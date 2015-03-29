@@ -27,9 +27,9 @@ NoModuleJob::NoModuleJob(NoModule* pModule, const NoString& sName, const NoStrin
 
 NoModuleJob::~NoModuleJob() { m_module->unlinkJob(this); }
 
-const NoString& NoModuleJob::description() const { return m_description; }
+NoString NoModuleJob::description() const { return m_description; }
 
-const NoString& NoModuleJob::name() const { return m_name; }
+NoString NoModuleJob::name() const { return m_name; }
 
 NoModule* NoModuleJob::module() const { return m_module; }
 

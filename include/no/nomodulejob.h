@@ -38,8 +38,8 @@ public:
     NoModuleJob& operator=(const NoModuleJob&) = delete;
 
     NoModule* module() const;
-    const NoString& name() const;
-    const NoString& description() const;
+    NoString name() const;
+    NoString description() const;
 
 private:
     NoModule* m_module;

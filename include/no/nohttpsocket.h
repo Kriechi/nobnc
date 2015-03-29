@@ -63,11 +63,11 @@ public:
 
     NoString GetPath() const;
     bool IsLoggedIn() const;
-    const NoString& user() const;
-    const NoString& GetPass() const;
-    const NoString& GetParamString() const;
-    const NoString& GetContentType() const;
-    const NoString& GetURIPrefix() const;
+    NoString user() const;
+    NoString GetPass() const;
+    NoString GetParamString() const;
+    NoString GetContentType() const;
+    NoString GetURIPrefix() const;
     bool IsPost() const;
 
     NoString GetParam(const NoString& sName, bool bPost = true, const NoString& sFilter = "\r\n") const;

@@ -392,11 +392,11 @@ bool NoApp::WritePemFile()
 #endif
 }
 
-const NoStringVector&NoApp::bindHosts() const { return m_bindHosts; }
+NoStringVector NoApp::bindHosts() const { return m_bindHosts; }
 
-const NoStringVector&NoApp::GetTrustedProxies() const { return m_trustedProxies; }
+NoStringVector NoApp::GetTrustedProxies() const { return m_trustedProxies; }
 
-const std::vector<NoListener*>&NoApp::GetListeners() const { return m_listeners; }
+std::vector<NoListener*> NoApp::GetListeners() const { return m_listeners; }
 
 time_t NoApp::TimeStarted() const { return m_startTime; }
 
@@ -492,7 +492,7 @@ NoString NoApp::GetModPath() const
     return sModPath;
 }
 
-const NoString& NoApp::GetCurPath() const
+NoString NoApp::GetCurPath() const
 {
     if (!NoFile::Exists(m_curPath)) {
         NoDir::mkpath(m_curPath);
@@ -500,7 +500,7 @@ const NoString& NoApp::GetCurPath() const
     return m_curPath;
 }
 
-const NoString& NoApp::GetZNCPath() const
+NoString NoApp::GetZNCPath() const
 {
     if (!NoFile::Exists(m_appPath)) {
         NoDir::mkpath(m_appPath);
@@ -510,7 +510,7 @@ const NoString& NoApp::GetZNCPath() const
 
 NoString NoApp::GetPemLocation() const { return NoDir("").filePath(m_sslCertFile); }
 
-const NoString&NoApp::GetConfigFile() const { return m_configFile; }
+NoString NoApp::GetConfigFile() const { return m_configFile; }
 
 NoString NoApp::ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir)
 {
@@ -1646,7 +1646,7 @@ bool NoApp::AddUser(NoUser* pUser, NoString& sErrorRet)
     return true;
 }
 
-const std::map<NoString, NoUser*>&NoApp::GetUserMap() const { return (m_users); }
+std::map<NoString, NoUser*> NoApp::GetUserMap() const { return (m_users); }
 
 NoListener* NoApp::FindListener(u_short uPort, const NoString& sHost, No::AddressType eAddr)
 {
@@ -1900,7 +1900,7 @@ void NoApp::AddMotd(const NoString& sMessage)
 
 void NoApp::ClearMotd() { m_motd.clear(); }
 
-const NoStringVector&NoApp::GetMotd() const { return m_motd; }
+NoStringVector NoApp::GetMotd() const { return m_motd; }
 
 void NoApp::AddServerThrottle(NoString sName) { m_connectThrottle.insert(sName, true); }
 
@@ -2093,7 +2093,7 @@ NoModuleLoader* NoApp::GetLoader() const { return m_modules; }
 
 NoString NoApp::GetSkinName() const { return m_skinName; }
 
-const NoString&NoApp::GetStatusPrefix() const { return m_statusPrefix; }
+NoString NoApp::GetStatusPrefix() const { return m_statusPrefix; }
 
 void NoApp::EnableConnectQueue()
 {

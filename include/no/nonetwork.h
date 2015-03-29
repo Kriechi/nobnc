@@ -122,7 +122,7 @@ public:
 
     NoIrcSocket* ircSocket() const;
     NoString ircServer() const;
-    const NoNick& ircNick() const;
+    NoNick ircNick() const;
     void setIrcNick(const NoNick& n);
     NoString currentNick() const;
     bool isIrcAway() const;

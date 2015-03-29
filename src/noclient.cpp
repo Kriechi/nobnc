@@ -685,7 +685,7 @@ void NoClient::statusCtcp(const NoString& sLine)
 
 bool NoClient::sendMotd()
 {
-    const NoStringVector& vsMotd = NoApp::Get().GetMotd();
+    NoStringVector vsMotd = NoApp::Get().GetMotd();
 
     if (!vsMotd.size()) {
         return false;

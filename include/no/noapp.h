@@ -103,18 +103,18 @@ public:
     const NoSocketManager& manager() const;
     NoModuleLoader* GetLoader() const;
     NoString GetSkinName() const;
-    const NoString& GetStatusPrefix() const;
-    const NoString& GetCurPath() const;
-    const NoString& GetZNCPath() const;
+    NoString GetStatusPrefix() const;
+    NoString GetCurPath() const;
+    NoString GetZNCPath() const;
     NoString GetConfPath(bool bAllowMkDir = true) const;
     NoString GetUserPath() const;
     NoString GetModPath() const;
     NoString GetPemLocation() const;
-    const NoString& GetConfigFile() const;
+    NoString GetConfigFile() const;
     bool WritePemFile();
-    const NoStringVector& bindHosts() const;
-    const NoStringVector& GetTrustedProxies() const;
-    const std::vector<NoListener*>& GetListeners() const;
+    NoStringVector bindHosts() const;
+    NoStringVector GetTrustedProxies() const;
+    std::vector<NoListener*> GetListeners() const;
     time_t TimeStarted() const;
     uint GetMaxBufferSize() const;
     uint GetAnonIPLimit() const;
@@ -143,7 +143,7 @@ public:
 
     bool DeleteUser(const NoString& sUsername);
     bool AddUser(NoUser* pUser, NoString& sErrorRet);
-    const std::map<NoString, NoUser*>& GetUserMap() const;
+    std::map<NoString, NoUser*> GetUserMap() const;
 
     NoListener* FindListener(u_short uPort, const NoString& sHost, No::AddressType eAddr);
     bool AddListener(NoListener*);
@@ -159,7 +159,7 @@ public:
     void SetMotd(const NoString& sMessage);
     void AddMotd(const NoString& sMessage);
     void ClearMotd();
-    const NoStringVector& GetMotd() const;
+    NoStringVector GetMotd() const;
 
     void AddServerThrottle(NoString sName);
     bool GetServerThrottle(NoString sName);

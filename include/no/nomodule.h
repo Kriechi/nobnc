@@ -674,7 +674,7 @@ public:
     virtual bool putModuleNotice(const NoString& sLine);
 
     /** @returns The name of the module. */
-    const NoString& moduleName() const;
+    NoString moduleName() const;
 
     /** @returns The nick of the module. This is just the module name
      *           prefixed by the status prefix.
@@ -685,7 +685,7 @@ public:
      *  Modules can be accompanied by static data, e.g. skins for webadmin.
      *  These function will return the path to that data.
      */
-    const NoString& moduleDataDir() const;
+    NoString moduleDataDir() const;
 
     NoTimer* findTimer(const NoString& sLabel) const;
     virtual void listTimers();
@@ -726,7 +726,7 @@ public:
      */
     void handleHelpCommand(const NoString& sLine = "");
 
-    const NoString& savePath() const;
+    NoString savePath() const;
     NoString expandString(const NoString& sStr) const;
     NoString& expandString(const NoString& sStr, NoString& sRet) const;
 
@@ -736,9 +736,9 @@ public:
     void setArgs(const NoString& s);
 
     No::ModuleType type() const;
-    const NoString& description() const;
-    const NoString& args() const;
-    const NoString& modulePath() const;
+    NoString description() const;
+    NoString args() const;
+    NoString modulePath() const;
 
     /** @returns For user modules this returns the user for which this
      *           module was loaded. For global modules this returns nullptr,

@@ -92,7 +92,7 @@ public:
     NoTemplateLoopContext* currentLoopContext();
     NoTemplate* currentTemplate();
 
-    const NoString& fileName() const;
+    NoString fileName() const;
 
 private:
     NoTemplate(const NoTemplate& other) = delete;

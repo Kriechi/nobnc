@@ -93,11 +93,11 @@ void NoModule::setArgs(const NoString& s) { d->args = s; }
 
 No::ModuleType NoModule::type() const { return d->type; }
 
-const NoString& NoModule::description() const { return d->description; }
+NoString NoModule::description() const { return d->description; }
 
-const NoString& NoModule::args() const { return d->args; }
+NoString NoModule::args() const { return d->args; }
 
-const NoString& NoModule::modulePath() const { return d->path; }
+NoString NoModule::modulePath() const { return d->path; }
 
 NoUser* NoModule::user() const { return d->user; }
 
@@ -107,7 +107,7 @@ NoClient* NoModule::client() const { return d->client; }
 
 NoSocketManager* NoModule::manager() const { return d->manager; }
 
-const NoString& NoModule::savePath() const
+NoString NoModule::savePath() const
 {
     if (!NoFile::Exists(d->savePath)) {
         NoDir::mkpath(d->savePath);
@@ -333,7 +333,7 @@ void NoModule::handleHelpCommand(const NoString& sLine)
 
 NoString NoModule::moduleNick() const { return (d->user ? d->user->statusPrefix() : "*") + d->name; }
 
-const NoString& NoModule::moduleDataDir() const { return d->dataDir; }
+NoString NoModule::moduleDataDir() const { return d->dataDir; }
 
 // Webmods
 bool NoModule::onWebPreRequest(NoWebSocket& WebSock, const NoString& sPageName) { return false; }
@@ -528,7 +528,7 @@ bool NoModule::putModuleNotice(const NoString& sLine)
     return d->user->putModuleNotice(moduleName(), sLine);
 }
 
-const NoString& NoModule::moduleName() const { return d->name; }
+NoString NoModule::moduleName() const { return d->name; }
 
 ///////////////////
 // Global Module //

@@ -44,11 +44,11 @@ public:
 
     static NoString moduleTypeToString(No::ModuleType eType);
 
-    const NoString& name() const;
-    const NoString& path() const;
-    const NoString& description() const;
-    const NoString& wikiPage() const;
-    const NoString& argsHelpText() const;
+    NoString name() const;
+    NoString path() const;
+    NoString description() const;
+    NoString wikiPage() const;
+    NoString argsHelpText() const;
     bool hasArgs() const;
     NoModuleLoader loader() const;
     No::ModuleType defaultType() const;

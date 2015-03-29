@@ -61,10 +61,10 @@ void NoModuleCommand::addHelp(NoTable& Table) const
 
 void NoModuleCommand::call(const NoString& sLine) const { m_func(sLine); }
 
-const NoString& NoModuleCommand::description() const { return m_desc; }
+NoString NoModuleCommand::description() const { return m_desc; }
 
-const NoString& NoModuleCommand::args() const { return m_args; }
+NoString NoModuleCommand::args() const { return m_args; }
 
 NoModuleCommand::CmdFunc NoModuleCommand::function() const { return m_func; }
 
-const NoString& NoModuleCommand::command() const { return m_cmd; }
+NoString NoModuleCommand::command() const { return m_cmd; }

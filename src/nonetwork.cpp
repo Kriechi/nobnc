@@ -1199,7 +1199,7 @@ void NoNetwork::removeTrustedFingerprint(const NoString& sFP) { d->trustedFinger
 
 NoIrcSocket* NoNetwork::ircSocket() const { return d->socket; }
 NoString NoNetwork::ircServer() const { return d->server; }
-const NoNick& NoNetwork::ircNick() const { return d->ircNick; }
+NoNick NoNetwork::ircNick() const { return d->ircNick; }
 
 void NoNetwork::setIrcNick(const NoNick& n)
 {

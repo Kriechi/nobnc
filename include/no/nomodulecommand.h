@@ -66,10 +66,10 @@ public:
      */
     void addHelp(NoTable& Table) const;
 
-    const NoString& command() const;
+    NoString command() const;
     CmdFunc function() const;
-    const NoString& args() const;
-    const NoString& description() const;
+    NoString args() const;
+    NoString description() const;
 
     void call(const NoString& sLine) const;
 
