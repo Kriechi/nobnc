@@ -60,15 +60,15 @@ public:
     bool Write( const char *data, size_t len );
     bool Write( const NoString & sData );
     time_t GetTimeSinceLastDataTransaction( time_t iNow = 0 ) const;
-    const NoString & GetSockName() const;
-    const NoString & bindHost() const;
+    NoString GetSockName() const;
+    NoString bindHost() const;
     void SetSockName( const NoString & sName );
     bool IsListener() const;
     bool IsOutbound() const;
     bool IsInbound() const;
     bool IsConnected() const;
     uint16_t GetPort() const;
-    const NoString & GetHostName() const;
+    NoString GetHostName() const;
     uint16_t GetLocalPort() const;
     uint16_t GetRemotePort() const;
     bool GetSSL() const;

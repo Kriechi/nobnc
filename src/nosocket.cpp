@@ -220,15 +220,15 @@ void NoSocket::SetPemLocation( const NoString & sPemFile ) { d->impl->SetPemLoca
 bool NoSocket::Write( const char *data, size_t len ) { return d->impl->Write(data, len); }
 bool NoSocket::Write( const NoString & sData ) { return d->impl->Write(sData); }
 time_t NoSocket::GetTimeSinceLastDataTransaction( time_t iNow ) const { return d->impl->GetTimeSinceLastDataTransaction(iNow); }
-const NoString & NoSocket::GetSockName() const { return d->impl->GetSockName(); }
-const NoString & NoSocket::bindHost() const { return d->impl->GetBindHost(); }
+NoString NoSocket::GetSockName() const { return d->impl->GetSockName(); }
+NoString NoSocket::bindHost() const { return d->impl->GetBindHost(); }
 void NoSocket::SetSockName( const NoString & sName ) { d->impl->SetSockName(sName); }
 bool NoSocket::IsListener() const { return d->impl->GetType() == Csock::LISTENER; }
 bool NoSocket::IsOutbound() const { return d->impl->GetType() == Csock::OUTBOUND; }
 bool NoSocket::IsInbound() const { return d->impl->GetType() == Csock::INBOUND; }
 bool NoSocket::IsConnected() const { return d->impl->IsConnected(); }
 uint16_t NoSocket::GetPort() const { return d->impl->GetPort(); }
-const NoString & NoSocket::GetHostName() const { return d->impl->GetHostName(); }
+NoString NoSocket::GetHostName() const { return d->impl->GetHostName(); }
 uint16_t NoSocket::GetLocalPort() const { return d->impl->GetLocalPort(); }
 uint16_t NoSocket::GetRemotePort() const { return d->impl->GetRemotePort(); }
 bool NoSocket::GetSSL() const { return d->impl->GetSSL(); }
