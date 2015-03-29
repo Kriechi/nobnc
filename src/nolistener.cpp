@@ -73,9 +73,9 @@ bool NoListenerSocket::onConnectionFrom(const NoString& host, ushort port)
 {
     bool allowed = NoApp::Get().IsHostAllowed(host);
     if (allowed)
-        NO_DEBUG("Connection " << GetSockName() << " from " << host << ":" << port << " allowed");
+        NO_DEBUG("Connection " << name() << " from " << host << ":" << port << " allowed");
     else
-        NO_DEBUG("Connection " << GetSockName() << " from " << host << ":" << port << " NOT allowed");
+        NO_DEBUG("Connection " << name() << " from " << host << ":" << port << " NOT allowed");
     return allowed;
 }
 
@@ -85,8 +85,8 @@ NoSocket* NoListenerSocket::createSocket(const NoString& host, ushort port)
     if (NoApp::Get().AllowConnectionFrom(host)) {
         GLOBALMODULECALL(onClientConnect(socket, host, port), NOTHING);
     } else {
-        socket->Write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
-        socket->Close(NoSocket::CLT_AFTERWRITE);
+        socket->write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
+        socket->close(NoSocket::CloseAfterWrite);
         GLOBALMODULECALL(onFailedLogin("", host), NOTHING);
     }
     return socket;
@@ -94,14 +94,14 @@ NoSocket* NoListenerSocket::createSocket(const NoString& host, ushort port)
 
 void NoListenerSocket::onSocketError(int error, const NoString& description)
 {
-    NO_DEBUG("Error " << GetSockName() << " " << description << " (" << strerror(error) << ")");
+    NO_DEBUG("Error " << name() << " " << description << " (" << strerror(error) << ")");
     if (error == EMFILE) {
         // Too many open FDs, close the listening port to be able to continue
         // to work, next rehash will (try to) re-open it.
         NoApp::Get().Broadcast("The limit of file descriptors has been reached");
-        NoApp::Get().Broadcast("Closing listening socket on " + GetLocalIP() + ":" + NoString(GetLocalPort()));
+        NoApp::Get().Broadcast("Closing listening socket on " + localAddress() + ":" + NoString(localPort()));
         NoApp::Get().Broadcast("An admin has to rehash to re-open the listening port");
-        Close();
+        close();
     }
 }
 
@@ -110,24 +110,24 @@ NoPeerSocket::NoPeerSocket(const NoString& host, ushort port, NoListenerPrivate*
 {
     // The socket will time out in 120 secs, no matter what.
     // This has to be fixed up later, if desired.
-    SetTimeout(120, 0);
+    setTimeout(120);
 
-    SetEncoding("UTF-8");
-    EnableReadLine();
+    setEncoding("UTF-8");
+    enableReadLine();
 }
 
 void NoPeerSocket::onReachedMaxBuffer()
 {
-    if (GetCloseType() != CLT_DONT)
+    if (closeType() != NoClose)
         return; // Already closing
 
     // We don't actually SetMaxBufferThreshold() because that would be
     // inherited by sockets after SwapSockByAddr().
-    if (GetInternalReadBuffer().length() <= 4096)
+    if (internalReadBuffer().length() <= 4096)
         return;
 
     // We should never get here with legitimate requests :/
-    Close();
+    close();
 }
 
 void NoPeerSocket::readLine(const NoString& line)
@@ -137,8 +137,8 @@ void NoPeerSocket::readLine(const NoString& line)
 
     if (!isHttp) {
         if (!(m_listener->acceptType & No::AcceptIrc)) {
-            Write("ERROR :Access Denied. IRC access is not enabled.\r\n");
-            Close(CLT_AFTERWRITE);
+            write("ERROR :Access Denied. IRC access is not enabled.\r\n");
+            close(CloseAfterWrite);
             NO_DEBUG("Refused IRC connection to non IRC port");
         } else {
             NoClient* client = new NoClient;
@@ -146,19 +146,19 @@ void NoPeerSocket::readLine(const NoString& line)
             NoApp::Get().manager().swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout
-            socket->SetSockName("USR::???");
+            socket->setName("USR::???");
         }
     } else {
         if (!(m_listener->acceptType & No::AcceptHttp)) {
-            Write("HTTP/1.0 403 Access Denied\r\n\r\nWeb access is not enabled.\r\n");
-            Close(CLT_AFTERWRITE);
+            write("HTTP/1.0 403 Access Denied\r\n\r\nWeb access is not enabled.\r\n");
+            close(CloseAfterWrite);
             NO_DEBUG("Refused HTTP connection to non HTTP port");
         } else {
             socket = new NoWebSocket(m_listener->uriPrefix);
             NoApp::Get().manager().swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout
-            socket->SetSockName("WebMod::Client");
+            socket->setName("WebMod::Client");
         }
     }
 
@@ -260,7 +260,7 @@ bool NoListener::listen()
 #ifdef HAVE_LIBSSL
     if (isSsl()) {
         ssl = true;
-        d->socket->SetPemLocation(NoApp::Get().GetPemLocation());
+        d->socket->setPemFile(NoApp::Get().GetPemLocation());
     }
 #endif
 

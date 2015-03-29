@@ -215,7 +215,7 @@ void NoSocketManager::connect(const NoString& sHostname,
                               NoSocket* pcSock)
 {
     if (pcSock) {
-        pcSock->SetHostToVerifySSL(sHostname);
+        pcSock->setHostToVerifySsl(sHostname);
     }
 #ifdef HAVE_THREADED_DNS
     NO_DEBUG("TDNS: initiating resolving of [" << sHostname << "] and bindhost [" << sBindHost << "]");
@@ -248,7 +248,7 @@ std::vector<NoSocket*> NoSocketManager::findSockets(const NoString& sName)
 {
     std::vector<NoSocket*> sockets;
     for (NoSocket* socket : m_sockets) {
-        if (socket->GetSockName() == sName)
+        if (socket->name() == sName)
             sockets.push_back(socket);
     }
     return sockets;
@@ -486,7 +486,7 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
         FinishConnect(manager, sTargetHost, task->iPort, task->sSockName, task->iTimeout, task->bSSL, sBindhost, task->pcSock);
     } catch (const char* s) {
         NO_DEBUG(task->sSockName << ", dns resolving error: " << s);
-        task->pcSock->SetSockName(task->sSockName);
+        task->pcSock->setName(task->sSockName);
         NoSocketPrivate::get(task->pcSock)->SockError(-1, s);
         delete task->pcSock;
     }

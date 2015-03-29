@@ -16,6 +16,7 @@
  */
 
 #include "noprocess.h"
+#include "nosocket_p.h"
 #include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
@@ -36,9 +37,9 @@ NoProcess::NoProcess() : NoSocket(0), d(new NoProcessPrivate)
 
 NoProcess::~NoProcess()
 {
-    no_close(d->pid, GetRSock(), GetWSock());
-    SetRSock(-1);
-    SetWSock(-1);
+    no_close(d->pid, readDescriptor(), writeDescriptor());
+    setReadDescriptor(-1);
+    setWriteDescriptor(-1);
 }
 
 int NoProcess::processId() const
@@ -57,7 +58,7 @@ bool NoProcess::execute(const NoString& command)
     d->command = command;
     d->pid = no_popen(rfd, wfd, command);
     if (d->pid != -1)
-        ConnectFD(rfd, wfd, "0.0.0.0:0");
+        NoSocketPrivate::get(this)->ConnectFD(rfd, wfd, "0.0.0.0:0");
     return d->pid != -1;
 }
 
@@ -66,7 +67,7 @@ void NoProcess::kill()
     ::kill(d->pid, SIGKILL);
     d->command = "";
     d->pid = -1;
-    Close();
+    close();
 }
 
 int no_popen(int& rfd, int& wfd, const NoString& command)

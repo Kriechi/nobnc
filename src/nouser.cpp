@@ -45,7 +45,7 @@ protected:
         const std::vector<NoClient*>& vUserClients = m_pUser->userClients();
 
         for (NoClient* pUserClient : vUserClients) {
-            if (pUserClient->socket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
+            if (pUserClient->socket()->timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
                 pUserClient->putClient("PING :ZNC");
             }
         }
@@ -747,10 +747,10 @@ bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
 
     for (NoClient* pClient : d->clients) {
         NoSocket* pSock = pClient->socket();
-        if (!isHostAllowed(pSock->GetRemoteIP())) {
+        if (!isHostAllowed(pSock->remoteAddress())) {
             pClient->putStatusNotice(
             "You are being disconnected because your IP is no longer allowed to connect to this user");
-            pSock->Close();
+            pSock->close();
         }
     }
 
@@ -1036,12 +1036,12 @@ NoString NoUser::localDccIp() const
     for (NoNetwork* pNetwork : d->networks) {
         NoIrcSocket* pIRCSock = pNetwork->ircSocket();
         if (pIRCSock) {
-            return pIRCSock->GetLocalIP();
+            return pIRCSock->localAddress();
         }
     }
 
     if (!allClients().empty()) {
-        return allClients()[0]->socket()->GetLocalIP();
+        return allClients()[0]->socket()->localAddress();
     }
 
     return "";

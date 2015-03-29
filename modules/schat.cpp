@@ -65,7 +65,7 @@ public:
 
     bool onConnectionFrom(const NoString& sHost, u_short iPort) override
     {
-        Close(); // close the listener after the first connection
+        close(); // close the listener after the first connection
         return (true);
     }
 
@@ -137,7 +137,7 @@ public:
     void onClientLogin() override
     {
         for (NoSChatSock* p : m_sockets) {
-            if (!p->IsListener())
+            if (!p->isListener())
                 p->DumpBuffer();
         }
     }
@@ -172,11 +172,11 @@ public:
             }
 
             NoSChatSock* pSock = new NoSChatSock(this, sNick);
-            pSock->SetCipher("HIGH");
-            pSock->SetPemLocation(m_sPemFile);
+            pSock->setCipher("HIGH");
+            pSock->setPemFile(m_sPemFile);
 
             u_short iPort =
-            manager()->listenRand(pSock->GetSockName() + "::LISTENER", user()->localDccIp(), true, SOMAXCONN, pSock, 60);
+            manager()->listenRand(pSock->name() + "::LISTENER", user()->localDccIp(), true, SOMAXCONN, pSock, 60);
 
             if (iPort == 0) {
                 putModule("Failed to start chat!");
@@ -203,7 +203,7 @@ public:
             for (NoSChatSock* pSock : m_sockets) {
                 Table.addRow();
                 Table.setValue("Nick", pSock->GetChatNick());
-                ulonglong iStartTime = pSock->GetStartTime();
+                ulonglong iStartTime = pSock->startTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
@@ -212,17 +212,17 @@ public:
                     Table.setValue("Created", sTime);
                 }
 
-                if (!pSock->IsListener()) {
+                if (!pSock->isListener()) {
                     Table.setValue("Status", "Established");
-                    Table.setValue("Host", pSock->GetRemoteIP());
-                    Table.setValue("Port", NoString(pSock->GetRemotePort()));
-                    SSL_SESSION* pSession = pSock->GetSSLSession();
+                    Table.setValue("Host", pSock->remoteAddress());
+                    Table.setValue("Port", NoString(pSock->remotePort()));
+                    SSL_SESSION* pSession = pSock->sslSession();
                     if (pSession && pSession->cipher && pSession->cipher->name)
                         Table.setValue("Cipher", pSession->cipher->name);
 
                 } else {
                     Table.setValue("Status", "Waiting");
-                    Table.setValue("Port", NoString(pSock->GetLocalPort()));
+                    Table.setValue("Port", NoString(pSock->localPort()));
                 }
             }
             if (Table.size()) {
@@ -236,7 +236,7 @@ public:
 
             for (NoSChatSock* pSock : m_sockets) {
                 if (sArgs.equals(pSock->GetChatNick())) {
-                    pSock->Close();
+                    pSock->close();
                     return;
                 }
             }
@@ -252,8 +252,8 @@ public:
 
             for (NoSChatSock* pSock : m_sockets) {
                 Table.addRow();
-                Table.setValue("SockName", pSock->GetSockName());
-                ulonglong iStartTime = pSock->GetStartTime();
+                Table.setValue("SockName", pSock->name());
+                ulonglong iStartTime = pSock->startTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
@@ -262,14 +262,14 @@ public:
                     Table.setValue("Created", sTime);
                 }
 
-                if (!pSock->IsListener()) {
-                    if (pSock->IsOutbound())
+                if (!pSock->isListener()) {
+                    if (pSock->isOutbound())
                         Table.setValue("Type", "Outbound");
                     else
                         Table.setValue("Type", "Inbound");
-                    Table.setValue("LocalIP:Port", pSock->GetLocalIP() + ":" + NoString(pSock->GetLocalPort()));
-                    Table.setValue("RemoteIP:Port", pSock->GetRemoteIP() + ":" + NoString(pSock->GetRemotePort()));
-                    SSL_SESSION* pSession = pSock->GetSSLSession();
+                    Table.setValue("LocalIP:Port", pSock->localAddress() + ":" + NoString(pSock->localPort()));
+                    Table.setValue("RemoteIP:Port", pSock->remoteAddress() + ":" + NoString(pSock->remotePort()));
+                    SSL_SESSION* pSession = pSock->sslSession();
                     if (pSession && pSession->cipher && pSession->cipher->name)
                         Table.setValue("Cipher", pSession->cipher->name);
                     else
@@ -277,7 +277,7 @@ public:
 
                 } else {
                     Table.setValue("Type", "Listener");
-                    Table.setValue("LocalIP:Port", pSock->GetLocalIP() + ":" + NoString(pSock->GetLocalPort()));
+                    Table.setValue("LocalIP:Port", pSock->localAddress() + ":" + NoString(pSock->localPort()));
                     Table.setValue("RemoteIP:Port", "0.0.0.0:0");
                 }
             }
@@ -332,7 +332,7 @@ public:
     void AcceptSDCC(const NoString& sNick, u_long iIP, u_short iPort)
     {
         NoSChatSock* p = new NoSChatSock(this, sNick, No::formatIp(iIP), iPort);
-        manager()->connect(No::formatIp(iIP), iPort, p->GetSockName(), 60, true, user()->localDccIp(), p);
+        manager()->connect(No::formatIp(iIP), iPort, p->name(), 60, true, user()->localDccIp(), p);
         delete findTimer("Remove " + sNick); // delete any associated timer to this nick
     }
 
@@ -357,7 +357,7 @@ public:
                 }
                 putModule("No such SCHAT to [" + sTarget + "]");
             } else
-                p->Write(sMessage + "\n");
+                p->write(sMessage + "\n");
 
             return (HALT);
         }
@@ -405,7 +405,7 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoModuleSoc
 {
     m_module = pMod;
     m_sChatNick = sChatNick;
-    SetSockName(pMod->moduleName().toUpper() + "::" + m_sChatNick);
+    setName(pMod->moduleName().toUpper() + "::" + m_sChatNick);
     pMod->AddSocket(this);
 }
 
@@ -413,9 +413,9 @@ NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoStrin
     : NoModuleSocket(pMod, sHost, iPort)
 {
     m_module = pMod;
-    EnableReadLine();
+    enableReadLine();
     m_sChatNick = sChatNick;
-    SetSockName(pMod->moduleName().toUpper() + "::" + m_sChatNick);
+    setName(pMod->moduleName().toUpper() + "::" + m_sChatNick);
     pMod->AddSocket(this);
 }
 
@@ -426,7 +426,7 @@ NoSChatSock::~NoSChatSock()
 
 void NoSChatSock::PutQuery(const NoString& sText)
 {
-    m_module->SendToUser(m_sChatNick + "!" + m_sChatNick + "@" + GetRemoteIP(), sText);
+    m_module->SendToUser(m_sChatNick + "!" + m_sChatNick + "@" + remoteAddress(), sText);
 }
 
 void NoSChatSock::readLine(const NoString& sLine)
@@ -451,7 +451,7 @@ void NoSChatSock::onDisconnected()
 
 void NoSChatSock::onConnected()
 {
-    SetTimeout(0);
+    setTimeout(0);
     if (m_module)
         PutQuery("*** Connected.");
 }
@@ -459,7 +459,7 @@ void NoSChatSock::onConnected()
 void NoSChatSock::onTimeout()
 {
     if (m_module) {
-        if (IsListener())
+        if (isListener())
             m_module->putModule("Timeout while waiting for [" + m_sChatNick + "]");
         else
             PutQuery("*** Connection Timed out.");

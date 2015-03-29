@@ -82,8 +82,8 @@ public:
         // refresh their ban
         Add(sHost, *pCount);
 
-        pClient->Write("ERROR :Closing link [Please try again later - reconnecting too fast]\r\n");
-        pClient->Close(NoSocket::CLT_AFTERWRITE);
+        pClient->write("ERROR :Closing link [Please try again later - reconnecting too fast]\r\n");
+        pClient->close(NoSocket::CloseAfterWrite);
     }
 
     void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
@@ -98,7 +98,7 @@ public:
     ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         // e.g. webadmin ends up here
-        const NoString& sRemoteIP = Auth->socket()->GetRemoteIP();
+        const NoString& sRemoteIP = Auth->socket()->remoteAddress();
 
         if (sRemoteIP.empty())
             return CONTINUE;

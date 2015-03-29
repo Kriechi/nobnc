@@ -105,10 +105,10 @@ NoIrcSocket::NoIrcSocket(NoNetwork* pNetwork) : d(new NoIrcSocketPrivate)
     d->floodProtection = IsFloodProtected(pNetwork->floodRate());
 
     NoSocketPrivate::get(this)->allowControlCodes = true;
-    EnableReadLine();
+    enableReadLine();
     d->nick.setIdent(d->network->ident());
     d->nick.setHost(d->network->bindHost());
-    SetEncoding(d->network->encoding());
+    setEncoding(d->network->encoding());
 
     d->chanModes['b'] = ListArg;
     d->chanModes['e'] = ListArg;
@@ -124,7 +124,7 @@ NoIrcSocket::NoIrcSocket(NoNetwork* pNetwork) : d(new NoIrcSocketPrivate)
     pNetwork->setIrcSocket(this);
 
     // RFC says a line can have 512 chars max, but we don't care ;)
-    SetMaxBufferThreshold(1024);
+    setMaxBufferThreshold(1024);
     if (d->floodProtection) {
         NoSocketPrivate::get(this)->AddCron(new NoIrcFloodTimer(this));
     }
@@ -149,14 +149,14 @@ NoIrcSocket::~NoIrcSocket()
 
     Quit();
     d->chans.clear();
-    d->network->user()->addBytesRead(GetBytesRead());
-    d->network->user()->addBytesWritten(GetBytesWritten());
+    d->network->user()->addBytesRead(bytesRead());
+    d->network->user()->addBytesWritten(bytesWritten());
 }
 
 void NoIrcSocket::Quit(const NoString& sQuitMsg)
 {
     if (!d->authed) {
-        Close(CLT_NOW);
+        close(CloseImmediately);
         return;
     }
     if (!sQuitMsg.empty()) {
@@ -164,7 +164,7 @@ void NoIrcSocket::Quit(const NoString& sQuitMsg)
     } else {
         putIrc("QUIT :" + d->network->expandString(d->network->quitMsg()));
     }
-    Close(CLT_AFTERWRITE);
+    close(CloseAfterWrite);
 }
 
 void NoIrcSocket::readLine(const NoString& sData)
@@ -215,7 +215,7 @@ void NoIrcSocket::readLine(const NoString& sData)
             }
 
             d->network->setIrcServer(sServer);
-            SetTimeout(NoNetwork::NoTrafficTimeout, TMO_READ); // Now that we are connected, let nature take its course
+            setTimeout(NoNetwork::NoTrafficTimeout, ReadTimeout); // Now that we are connected, let nature take its course
             putIrc("WHO " + sNick);
 
             d->authed = true;
@@ -521,8 +521,8 @@ void NoIrcSocket::readLine(const NoString& sData)
             // :hydra.sector5d.org 670 kylef :STARTTLS successful, go ahead with TLS handshake
             // 670 is a response to `STARTTLS` telling the client to switch to TLS
 
-            if (!GetSSL()) {
-                StartTLS();
+            if (!isSsl()) {
+                startTls();
                 d->network->putStatus("Switched to SSL (STARTTLS)");
             }
 
@@ -1123,7 +1123,7 @@ void NoIrcSocket::TrySend()
         if (!bSkip) {
             ;
             NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << sLine << "]");
-            Write(sLine + "\r\n");
+            write(sLine + "\r\n");
         }
         d->sendQueue.pop_front();
     }
@@ -1137,7 +1137,7 @@ void NoIrcSocket::SetNick(const NoString& sNick)
 
 void NoIrcSocket::onConnected()
 {
-    NO_DEBUG(GetSockName() << " == Connected()");
+    NO_DEBUG(name() << " == Connected()");
 
     NoString sPass = d->password;
     NoString sNick = d->network->nick();
@@ -1166,7 +1166,7 @@ void NoIrcSocket::onDisconnected()
 {
     IRCSOCKMODULECALL(onIrcDisconnected(), NOTHING);
 
-    NO_DEBUG(GetSockName() << " == Disconnected()");
+    NO_DEBUG(name() << " == Disconnected()");
     if (!d->network->user()->isBeingDeleted() && d->network->isEnabled() && d->network->servers().size() != 0) {
         d->network->putStatus("Disconnected from IRC. Reconnecting...");
     }
@@ -1194,9 +1194,9 @@ void NoIrcSocket::onSocketError(int iErrno, const NoString& sDescription)
 {
     NoString sError = sDescription;
 
-    NO_DEBUG(GetSockName() << " == SockError(" << iErrno << " " << sError << ")");
+    NO_DEBUG(name() << " == SockError(" << iErrno << " " << sError << ")");
     if (!d->network->user()->isBeingDeleted()) {
-        if (IsConOK()) {
+        if (isReady()) {
             d->network->putStatus("Cannot connect to IRC (" + sError + "). Retrying...");
         } else {
             d->network->putStatus("Disconnected from IRC (" + sError + "). Reconnecting...");
@@ -1220,9 +1220,9 @@ void NoIrcSocket::onSocketError(int iErrno, const NoString& sDescription)
                     d->network->putStatus("|" + No::escape(s, No::DebugFormat));
                 }
                 NoString sSHA1;
-                if (GetPeerFingerprint(sSHA1))
+                if (peerFingerprint(sSHA1))
                     d->network->putStatus("SHA1: " + No::escape(sSHA1, No::HexColonFormat, No::HexColonFormat));
-                NoString sSHA256 = GetSSLPeerFingerprint();
+                NoString sSHA256 = fingerprint();
                 d->network->putStatus("SHA-256: " + sSHA256);
                 d->network->putStatus("If you trust this certificate, do /znc AddTrustedServerFingerprint " + sSHA256);
             }
@@ -1238,7 +1238,7 @@ void NoIrcSocket::onSocketError(int iErrno, const NoString& sDescription)
 
 void NoIrcSocket::onTimeout()
 {
-    NO_DEBUG(GetSockName() << " == Timeout()");
+    NO_DEBUG(name() << " == Timeout()");
     if (!d->network->user()->isBeingDeleted()) {
         d->network->putStatus("IRC connection timed out.  Reconnecting...");
     }
@@ -1251,7 +1251,7 @@ void NoIrcSocket::onTimeout()
 
 void NoIrcSocket::onConnectionRefused()
 {
-    NO_DEBUG(GetSockName() << " == ConnectionRefused()");
+    NO_DEBUG(name() << " == ConnectionRefused()");
     if (!d->network->user()->isBeingDeleted()) {
         d->network->putStatus("Connection Refused.  Reconnecting...");
     }
@@ -1261,7 +1261,7 @@ void NoIrcSocket::onConnectionRefused()
 
 void NoIrcSocket::onReachedMaxBuffer()
 {
-    NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
+    NO_DEBUG(name() << " == ReachedMaxBuffer()");
     d->network->putStatus("Received a too long line from the IRC server!");
     Quit();
 }

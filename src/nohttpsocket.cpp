@@ -64,8 +64,8 @@ NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoS
 
 void NoHttpSocket::Init()
 {
-    EnableReadLine();
-    SetMaxBufferThreshold(10240);
+    enableReadLine();
+    setMaxBufferThreshold(10240);
 }
 
 NoHttpSocket::~NoHttpSocket()
@@ -149,7 +149,7 @@ void NoHttpSocket::readLine(const NoString& sData)
         // X-Forwarded-For: client, proxy1, proxy2
         if (m_forwardedIp.empty()) {
             const NoStringVector& vsTrustedProxies = NoApp::Get().GetTrustedProxies();
-            NoString sIP = GetRemoteIP();
+            NoString sIP = remoteAddress();
 
             NoStringVector vsIPs = No::tokens(sLine, 1).split(",", No::SkipEmptyParts);
 
@@ -190,23 +190,23 @@ void NoHttpSocket::readLine(const NoString& sData)
         m_gotHeader = true;
 
         if (m_post) {
-            m_postData = GetInternalReadBuffer();
+            m_postData = internalReadBuffer();
             CheckPost();
         } else {
             GetPage();
         }
 
-        DisableReadLine();
+        disableReadLine();
     }
 }
 
-NoString NoHttpSocket::GetRemoteIP() const
+NoString NoHttpSocket::remoteAddress() const
 {
     if (!m_forwardedIp.empty()) {
         return m_forwardedIp;
     }
 
-    return NoModuleSocket::GetRemoteIP();
+    return NoModuleSocket::remoteAddress();
 }
 
 NoString NoHttpSocket::GetDate(time_t stamp)
@@ -286,11 +286,11 @@ void NoHttpSocket::PrintPage(const NoString& sPage)
                 zStatus = deflate(&zStrm, zFlush);
 
                 if ((zStatus == Z_OK || zStatus == Z_STREAM_END) && zStrm.avail_out < sizeof(szBuf)) {
-                    Write(szBuf, sizeof(szBuf) - zStrm.avail_out);
+                    write(szBuf, sizeof(szBuf) - zStrm.avail_out);
                 }
             } while (zStatus == Z_OK);
 
-            Close(NoSocket::CLT_AFTERWRITE);
+            close(NoSocket::CloseAfterWrite);
             deflateEnd(&zStrm);
             return;
         }
@@ -303,8 +303,8 @@ void NoHttpSocket::PrintPage(const NoString& sPage)
         NO_DEBUG("PrintPage(): Header was already sent");
     }
 
-    Write(sPage);
-    Close(NoSocket::CLT_AFTERWRITE);
+    write(sPage);
+    close(NoSocket::CloseAfterWrite);
 }
 
 bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
@@ -387,7 +387,7 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
 
     NO_DEBUG("- ETag: [" << sETag << "] / If-None-Match [" << m_ifNoneMatch << "]");
 
-    Close(NoSocket::CLT_AFTERWRITE);
+    close(NoSocket::CloseAfterWrite);
 
     return true;
 }
@@ -401,7 +401,7 @@ void NoHttpSocket::WriteFileUncompressed(NoFile& File)
 
     // while we haven't reached iSize and read() succeeds...
     while (iLen < iSize && (i = File.Read(szBuf, sizeof(szBuf))) > 0) {
-        Write(szBuf, i);
+        write(szBuf, i);
         iLen += i;
     }
 
@@ -457,7 +457,7 @@ void NoHttpSocket::WriteFileGzipped(NoFile& File)
 
         if ((zStatus == Z_OK || zStatus == Z_STREAM_END) && zStrm.avail_out < sizeof(szBufOut)) {
             // there's data in the buffer:
-            Write(szBufOut, sizeof(szBufOut) - zStrm.avail_out);
+            write(szBufOut, sizeof(szBufOut) - zStrm.avail_out);
         }
 
     } while (zStatus == Z_OK);
@@ -671,14 +671,14 @@ bool NoHttpSocket::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, co
                      No::escape(sMessage, No::HtmlFormat) + "</p>\r\n"
                                                             "<hr/>\r\n"
                                                             "<address>" +
-                     NoApp::GetTag(false, /* bHTML = */ true) + " at " + No::escape(GetLocalIP(), No::HtmlFormat) +
-                     " Port " + NoString(GetLocalPort()) + "</address>\r\n"
+                     NoApp::GetTag(false, /* bHTML = */ true) + " at " + No::escape(localAddress(), No::HtmlFormat) +
+                     " Port " + NoString(localPort()) + "</address>\r\n"
                                                            "</body>\r\n"
                                                            "</html>\r\n";
 
     PrintHeader(sPage.length(), "text/html; charset=utf-8", uStatusId, sStatusMsg);
-    Write(sPage);
-    Close(NoSocket::CLT_AFTERWRITE);
+    write(sPage);
+    close(NoSocket::CloseAfterWrite);
 
     return true;
 }
@@ -727,26 +727,26 @@ bool NoHttpSocket::PrintHeader(off_t uContentLength, const NoString& sContentTyp
 
     NO_DEBUG("- " << uStatusId << " (" << sStatusMsg << ") [" << m_contentType << "]");
 
-    Write("HTTP/" + NoString(m_http10Client ? "1.0 " : "1.1 ") + NoString(uStatusId) + " " + sStatusMsg + "\r\n");
-    Write("Date: " + GetDate() + "\r\n");
-    Write("Server: " + NoApp::GetTag(false) + "\r\n");
+    write("HTTP/" + NoString(m_http10Client ? "1.0 " : "1.1 ") + NoString(uStatusId) + " " + sStatusMsg + "\r\n");
+    write("Date: " + GetDate() + "\r\n");
+    write("Server: " + NoApp::GetTag(false) + "\r\n");
     if (uContentLength > 0) {
-        Write("Content-Length: " + NoString(uContentLength) + "\r\n");
+        write("Content-Length: " + NoString(uContentLength) + "\r\n");
     }
-    Write("Content-Type: " + m_contentType + "\r\n");
+    write("Content-Type: " + m_contentType + "\r\n");
 
     for (const auto& it : m_responseCookies) {
-        Write("Set-Cookie: " + No::escape(it.first, No::UrlFormat) + "=" + No::escape(it.second, No::UrlFormat) +
-              "; path=/;" + (GetSSL() ? "Secure;" : "") + "\r\n");
+        write("Set-Cookie: " + No::escape(it.first, No::UrlFormat) + "=" + No::escape(it.second, No::UrlFormat) +
+              "; path=/;" + (isSsl() ? "Secure;" : "") + "\r\n");
     }
 
     for (const auto& it : m_headers) {
-        Write(it.first + ": " + it.second + "\r\n");
+        write(it.first + ": " + it.second + "\r\n");
     }
 
-    Write("Connection: Close\r\n");
+    write("Connection: Close\r\n");
 
-    Write("\r\n");
+    write("\r\n");
     m_sentHeader = true;
 
     return true;
@@ -786,5 +786,5 @@ bool NoHttpSocket::Redirect(const NoString& sURL)
 
 void NoHttpSocket::onConnected()
 {
-    SetTimeout(120);
+    setTimeout(120);
 }

@@ -16,6 +16,7 @@
  */
 
 #include "nowebsession.h"
+#include "nosocket_p.h"
 #include "nowebsocket.h"
 #include "nomodule_p.h"
 #include "nocachemap.h"
@@ -242,7 +243,7 @@ void NoWebAuth::loginAccepted(NoUser* user)
         spSession->setUser(user);
 
         m_pWebSock->SetLoggedIn(true);
-        m_pWebSock->UnPauseRead();
+        m_pWebSock->resumeRead();
         if (!m_bBasic) {
             m_pWebSock->Redirect("/?cookie_check=true");
         }
@@ -260,7 +261,7 @@ void NoWebAuth::loginRefused(NoUser* user, const NoString& reason)
         spSession->setUser(nullptr);
 
         m_pWebSock->SetLoggedIn(false);
-        m_pWebSock->UnPauseRead();
+        m_pWebSock->resumeRead();
         m_pWebSock->Redirect("/?cookie_check=true");
 
         NO_DEBUG("UNSUCCESSFUL login attempt ==> REASON [" + reason + "] ==> SESSION [" + spSession->identifier() + "]");
@@ -289,16 +290,16 @@ NoWebSocket::~NoWebSocket()
     // not have a valid NoModule* pointer.
     NoUser* pUser = GetSession()->user();
     if (pUser) {
-        pUser->addBytesWritten(GetBytesWritten());
-        pUser->addBytesRead(GetBytesRead());
+        pUser->addBytesWritten(bytesWritten());
+        pUser->addBytesRead(bytesRead());
     } else {
-        NoApp::Get().AddBytesWritten(GetBytesWritten());
-        NoApp::Get().AddBytesRead(GetBytesRead());
+        NoApp::Get().AddBytesWritten(bytesWritten());
+        NoApp::Get().AddBytesRead(bytesRead());
     }
 
     // bytes have been accounted for, so make sure they don't get again:
-    ResetBytesWritten();
-    ResetBytesRead();
+    NoSocketPrivate::get(this)->ResetBytesWritten();
+    NoSocketPrivate::get(this)->ResetBytesRead();
 }
 
 void NoWebSocket::FinishUserSessions(const NoUser& User)
@@ -415,7 +416,7 @@ void NoWebSocket::SetPaths(NoModule* pModule, bool bIsTemplate)
 void NoWebSocket::SetVars()
 {
     m_template["SessionUser"] = user();
-    m_template["SessionIP"] = GetRemoteIP();
+    m_template["SessionIP"] = remoteAddress();
     m_template["Tag"] = NoApp::GetTag(GetSession()->user() != nullptr, true);
     m_template["Version"] = NoApp::GetVersion();
     m_template["SkinName"] = GetSkinName();
@@ -622,7 +623,7 @@ bool NoWebSocket::ForceLogin()
 
 NoString NoWebSocket::GetRequestCookie(const NoString& sKey)
 {
-    const NoString sPrefixedKey = NoString(GetLocalPort()) + "-" + sKey;
+    const NoString sPrefixedKey = NoString(localPort()) + "-" + sKey;
     NoString sRet;
 
     if (!m_modName.empty()) {
@@ -638,7 +639,7 @@ NoString NoWebSocket::GetRequestCookie(const NoString& sKey)
 
 bool NoWebSocket::SendCookie(const NoString& sKey, const NoString& sValue)
 {
-    const NoString sPrefixedKey = NoString(GetLocalPort()) + "-" + sKey;
+    const NoString sPrefixedKey = NoString(localPort()) + "-" + sKey;
 
     if (!m_modName.empty()) {
         return NoHttpSocket::SendCookie("Mod-" + m_modName + "-" + sPrefixedKey, sValue);
@@ -661,7 +662,7 @@ void NoWebSocket::OnPageRequest(const NoString& sURI)
     case Done:
         // Redirect or something like that, it's done, just make sure
         // the connection will be closed
-        Close(CLT_AFTERWRITE);
+        close(CloseAfterWrite);
         break;
     case NotFound:
     default:
@@ -678,9 +679,9 @@ NoWebSocket::PageRequest NoWebSocket::OnPageRequestInternal(const NoString& sURI
     //
     // When their IP is wrong, we give them an invalid cookie. This makes
     // sure that they will get a new cookie on their next request.
-    if (NoApp::Get().GetProtectWebSessions() && GetSession()->host() != GetRemoteIP()) {
+    if (NoApp::Get().GetProtectWebSessions() && GetSession()->host() != remoteAddress()) {
         NO_DEBUG("Expected IP: " << GetSession()->host());
-        NO_DEBUG("Remote IP:   " << GetRemoteIP());
+        NO_DEBUG("Remote IP:   " << remoteAddress());
         SendCookie("SessionId", "WRONG_IP_FOR_SESSION");
         PrintErrorPage(403, "Access denied", "This session does not belong to your IP.");
         return Done;
@@ -939,25 +940,25 @@ std::shared_ptr<NoWebSession> NoWebSocket::GetSession()
         return *pSession;
     }
 
-    if (Sessions.m_mIPSessions.count(GetRemoteIP()) > m_maxSessions) {
-        std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(GetRemoteIP());
+    if (Sessions.m_mIPSessions.count(remoteAddress()) > m_maxSessions) {
+        std::pair<mIPSessionsIterator, mIPSessionsIterator> p = Sessions.m_mIPSessions.equal_range(remoteAddress());
         mIPSessionsIterator it = std::min_element(p.first, p.second, compareLastActive);
-        NO_DEBUG("Remote IP:   " << GetRemoteIP() << "; discarding session [" << it->second->identifier() << "]");
+        NO_DEBUG("Remote IP:   " << remoteAddress() << "; discarding session [" << it->second->identifier() << "]");
         Sessions.m_mspSessions.remove(it->second->identifier());
     }
 
     NoString sSessionID;
     do {
         sSessionID = No::randomString(32);
-        sSessionID += ":" + GetRemoteIP() + ":" + NoString(GetRemotePort());
-        sSessionID += ":" + GetLocalIP() + ":" + NoString(GetLocalPort());
+        sSessionID += ":" + remoteAddress() + ":" + NoString(remotePort());
+        sSessionID += ":" + localAddress() + ":" + NoString(localPort());
         sSessionID += ":" + NoString(time(nullptr));
         sSessionID = No::sha256(sSessionID);
 
         NO_DEBUG("Auto generated session: [" + sSessionID + "]");
     } while (Sessions.m_mspSessions.contains(sSessionID));
 
-    std::shared_ptr<NoWebSession> spSession(new NoWebSession(sSessionID, GetRemoteIP()));
+    std::shared_ptr<NoWebSession> spSession(new NoWebSession(sSessionID, remoteAddress()));
     Sessions.m_mspSessions.insert(spSession->identifier(), spSession);
 
     m_session = spSession;
@@ -978,7 +979,7 @@ bool NoWebSocket::OnLogin(const NoString& sUser, const NoString& sPass, bool bBa
 
     // Some authentication module could need some time, block this socket
     // until then. CWebAuth will UnPauseRead().
-    PauseRead();
+    pauseRead();
     NoApp::Get().AuthUser(m_authenticator);
 
     // If CWebAuth already set this, don't change it.

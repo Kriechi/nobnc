@@ -1787,7 +1787,7 @@ public:
                 // simple protection for user from shooting his own foot
                 // TODO check also for hosts/families
                 // such check is only here, user still can forge HTTP request to delete web port
-                l["SuggestDeletion"] = NoString(pListener->port() != WebSock.GetLocalPort());
+                l["SuggestDeletion"] = NoString(pListener->port() != WebSock.localPort());
 
 #ifdef HAVE_LIBSSL
                 if (pListener->isSsl()) {

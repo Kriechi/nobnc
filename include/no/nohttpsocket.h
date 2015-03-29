@@ -54,7 +54,7 @@ public:
     void ParseURI();
     void GetPage();
     static NoString GetDate(time_t tm = 0);
-    NoString GetRemoteIP() const override;
+    NoString remoteAddress() const override;
 
     NoString GetRequestCookie(const NoString& sKey) const;
     bool SendCookie(const NoString& sKey, const NoString& sValue);

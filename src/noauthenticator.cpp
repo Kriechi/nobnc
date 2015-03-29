@@ -74,12 +74,12 @@ void NoAuthenticator::refuseLogin(const NoString& reason)
     // login. Use reason because there are other reasons than "wrong
     // password" for a login to be rejected (e.g. fail2ban).
     if (user) {
-        user->putStatus("A client from [" + d->socket->GetRemoteIP() + "] attempted "
+        user->putStatus("A client from [" + d->socket->remoteAddress() + "] attempted "
                                                                        "to login as you, but was rejected [" +
                         reason + "].");
     }
 
-    GLOBALMODULECALL(onFailedLogin(d->username, d->socket->GetRemoteIP()), NOTHING);
+    GLOBALMODULECALL(onFailedLogin(d->username, d->socket->remoteAddress()), NOTHING);
     loginRefused(user, reason);
     invalidate();
 }

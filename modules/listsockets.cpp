@@ -35,16 +35,16 @@ public:
         // return true: other is first
 
         // Listeners go to the top
-        if (m_pSock->IsListener() != other.m_pSock->IsListener()) {
-            if (m_pSock->IsListener())
+        if (m_pSock->isListener() != other.m_pSock->isListener()) {
+            if (m_pSock->isListener())
                 return false;
-            if (other.m_pSock->IsListener())
+            if (other.m_pSock->isListener())
                 return true;
         }
-        const NoString& sMyName = m_pSock->GetSockName();
+        const NoString& sMyName = m_pSock->name();
         const NoString& sMyName2 = No::tokens(sMyName, 1, "::");
         bool bMyEmpty = sMyName2.empty();
-        const NoString& sHisName = other.GetSock()->GetSockName();
+        const NoString& sHisName = other.GetSock()->name();
         const NoString& sHisName2 = No::tokens(sHisName, 1, "::");
         bool bHisEmpty = sHisName2.empty();
 
@@ -102,15 +102,8 @@ public:
         NoSocketManager& m = NoApp::Get().manager();
         std::priority_queue<NoSocketSorter> ret;
 
-        for (NoSocket* pSock : m.sockets()) {
-            // These sockets went through SwapSockByAddr. That means
-            // another socket took over the connection from this
-            // socket. So ignore this to avoid listing the
-            // connection twice.
-            if (pSock->GetCloseType() == NoSocket::CLT_DEREFERENCE)
-                continue;
+        for (NoSocket* pSock : m.sockets())
             ret.push(pSock);
-        }
 
         return ret;
     }
@@ -138,14 +131,14 @@ public:
                 socks.pop();
 
                 NoTemplate& Row = Tmpl.addRow("SocketsLoop");
-                Row["Name"] = pSocket->GetSockName();
+                Row["Name"] = pSocket->name();
                 Row["Created"] = GetCreatedTime(pSocket);
                 Row["State"] = GetSocketState(pSocket);
-                Row["SSL"] = pSocket->GetSSL() ? "Yes" : "No";
+                Row["SSL"] = pSocket->isSsl() ? "Yes" : "No";
                 Row["Local"] = GetLocalHost(pSocket, true);
                 Row["Remote"] = GetRemoteHost(pSocket, true);
-                Row["In"] = No::toByteStr(pSocket->GetBytesRead());
-                Row["Out"] = No::toByteStr(pSocket->GetBytesWritten());
+                Row["In"] = No::toByteStr(pSocket->bytesRead());
+                Row["Out"] = No::toByteStr(pSocket->bytesWritten());
             }
 
             return true;
@@ -167,12 +160,12 @@ public:
 
     NoString GetSocketState(NoSocket* pSocket)
     {
-        if (pSocket->IsListener())
+        if (pSocket->isListener())
             return "Listener";
-        if (pSocket->IsInbound())
+        if (pSocket->isInbound())
             return "Inbound";
-        if (pSocket->IsOutbound()) {
-            if (pSocket->IsConnected())
+        if (pSocket->isOutbound()) {
+            if (pSocket->isConnected())
                 return "Outbound";
             else
                 return "Connecting";
@@ -183,7 +176,7 @@ public:
 
     NoString GetCreatedTime(NoSocket* pSocket)
     {
-        ulonglong iStartTime = pSocket->GetStartTime();
+        ulonglong iStartTime = pSocket->startTime();
         time_t iTime = iStartTime / 1000;
         return No::formatTime(iTime, "%Y-%m-%d %H:%M:%S", user()->timezone());
     }
@@ -197,10 +190,10 @@ public:
         }
 
         if (sBindHost.empty()) {
-            sBindHost = pSocket->GetLocalIP();
+            sBindHost = pSocket->localAddress();
         }
 
-        return sBindHost + " " + NoString(pSocket->GetLocalPort());
+        return sBindHost + " " + NoString(pSocket->localPort());
     }
 
     NoString GetRemoteHost(NoSocket* pSocket, bool bShowHosts)
@@ -209,19 +202,19 @@ public:
         u_short uPort;
 
         if (!bShowHosts) {
-            sHost = pSocket->GetRemoteIP();
+            sHost = pSocket->remoteAddress();
         }
 
         // While connecting, there might be no ip available
         if (sHost.empty()) {
-            sHost = pSocket->GetHostName();
+            sHost = pSocket->host();
         }
 
         // While connecting, GetRemotePort() would return 0
-        if (pSocket->IsOutbound()) {
-            uPort = pSocket->GetPort();
+        if (pSocket->isOutbound()) {
+            uPort = pSocket->port();
         } else {
-            uPort = pSocket->GetRemotePort();
+            uPort = pSocket->remotePort();
         }
 
         if (uPort != 0) {
@@ -257,18 +250,18 @@ public:
             socks.pop();
 
             Table.addRow();
-            Table.setValue("Name", pSocket->GetSockName());
+            Table.setValue("Name", pSocket->name());
             Table.setValue("Created", GetCreatedTime(pSocket));
             Table.setValue("State", GetSocketState(pSocket));
 
 #ifdef HAVE_LIBSSL
-            Table.setValue("SSL", pSocket->GetSSL() ? "Yes" : "No");
+            Table.setValue("SSL", pSocket->isSsl() ? "Yes" : "No");
 #endif
 
             Table.setValue("Local", GetLocalHost(pSocket, bShowHosts));
             Table.setValue("Remote", GetRemoteHost(pSocket, bShowHosts));
-            Table.setValue("In", No::toByteStr(pSocket->GetBytesRead()));
-            Table.setValue("Out", No::toByteStr(pSocket->GetBytesWritten()));
+            Table.setValue("In", No::toByteStr(pSocket->bytesRead()));
+            Table.setValue("Out", No::toByteStr(pSocket->bytesWritten()));
         }
 
         putModule(Table);

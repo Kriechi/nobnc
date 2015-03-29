@@ -27,8 +27,8 @@ NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_module(pModule
 {
     if (pModule)
         NoModulePrivate::get(pModule)->addSocket(this);
-    EnableReadLine();
-    SetMaxBufferThreshold(10240);
+    enableReadLine();
+    setMaxBufferThreshold(10240);
 }
 
 NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort)
@@ -36,8 +36,8 @@ NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ush
 {
     if (pModule)
         NoModulePrivate::get(pModule)->addSocket(this);
-    EnableReadLine();
-    SetMaxBufferThreshold(10240);
+    enableReadLine();
+    setMaxBufferThreshold(10240);
 }
 
 NoModuleSocket::~NoModuleSocket()
@@ -52,28 +52,28 @@ NoModuleSocket::~NoModuleSocket()
     }
 
     if (pUser && m_module && m_module->type() != No::GlobalModule) {
-        pUser->addBytesWritten(GetBytesWritten());
-        pUser->addBytesRead(GetBytesRead());
+        pUser->addBytesWritten(bytesWritten());
+        pUser->addBytesRead(bytesRead());
     } else {
-        NoApp::Get().AddBytesWritten(GetBytesWritten());
-        NoApp::Get().AddBytesRead(GetBytesRead());
+        NoApp::Get().AddBytesWritten(bytesWritten());
+        NoApp::Get().AddBytesRead(bytesRead());
     }
 }
 
 void NoModuleSocket::onReachedMaxBuffer()
 {
-    NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
+    NO_DEBUG(name() << " == ReachedMaxBuffer()");
     if (m_module)
         m_module->putModule("Some socket reached its max buffer limit and was closed!");
-    Close();
+    close();
 }
 
 void NoModuleSocket::onSocketError(int iErrno, const NoString& sDescription)
 {
-    NO_DEBUG(GetSockName() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
+    NO_DEBUG(name() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
     if (iErrno == EMFILE) {
         // We have too many open fds, this can cause a busy loop.
-        Close();
+        close();
     }
 }
 
@@ -82,7 +82,7 @@ bool NoModuleSocket::onConnectionFrom(const NoString& sHost, ushort uPort)
     return NoApp::Get().AllowConnectionFrom(sHost);
 }
 
-bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL, uint uTimeout)
+bool NoModuleSocket::connect(const NoString& sHostname, ushort uPort, bool bSSL, uint uTimeout)
 {
     if (!m_module) {
         NO_DEBUG("ERROR: NoSocket::Connect called on instance without m_pModule handle!");
@@ -104,15 +104,15 @@ bool NoModuleSocket::Connect(const NoString& sHostname, ushort uPort, bool bSSL,
     }
 
     // Don't overwrite the socket name if one is already set
-    if (!GetSockName().empty()) {
-        sSockName = GetSockName();
+    if (!name().empty()) {
+        sSockName = name();
     }
 
     m_module->manager()->connect(sHostname, uPort, sSockName, uTimeout, bSSL, sBindHost, this);
     return true;
 }
 
-bool NoModuleSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
+bool NoModuleSocket::listen(ushort uPort, bool bSSL, uint uTimeout)
 {
     if (!m_module) {
         NO_DEBUG("ERROR: NoSocket::Listen called on instance without m_pModule handle!");
@@ -126,8 +126,8 @@ bool NoModuleSocket::Listen(ushort uPort, bool bSSL, uint uTimeout)
         sSockName += "::" + pUser->userName();
     }
     // Don't overwrite the socket name if one is already set
-    if (!GetSockName().empty()) {
-        sSockName = GetSockName();
+    if (!name().empty()) {
+        sSockName = name();
     }
 
     return m_module->manager()->listenAll(uPort, sSockName, bSSL, SOMAXCONN, this);

@@ -2074,20 +2074,20 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
 
     for (NoSocket* pSock : m_manager.sockets()) {
         NoUser* pUser = nullptr;
-        if (pSock->GetSockName().left(5) == "IRC::") {
+        if (pSock->name().left(5) == "IRC::") {
             pUser = ((NoIrcSocket*)pSock)->network()->user();
-        } else if (pSock->GetSockName().left(5) == "USR::") {
+        } else if (pSock->name().left(5) == "USR::") {
             pUser = ((NoClient*)pSock)->user();
         }
 
         if (pUser) {
-            ret[pUser->userName()].first += pSock->GetBytesRead();
-            ret[pUser->userName()].second += pSock->GetBytesWritten();
-            uiUsers_in += pSock->GetBytesRead();
-            uiUsers_out += pSock->GetBytesWritten();
+            ret[pUser->userName()].first += pSock->bytesRead();
+            ret[pUser->userName()].second += pSock->bytesWritten();
+            uiUsers_in += pSock->bytesRead();
+            uiUsers_out += pSock->bytesWritten();
         } else {
-            uiZNC_in += pSock->GetBytesRead();
-            uiZNC_out += pSock->GetBytesWritten();
+            uiZNC_in += pSock->bytesRead();
+            uiZNC_out += pSock->bytesWritten();
         }
     }
 
@@ -2116,7 +2116,7 @@ void NoApp::AuthUser(std::shared_ptr<NoAuthenticator> AuthClass)
     NoString sHost;
     NoSocket* pSock = AuthClass->socket();
     if (pSock)
-        sHost = pSock->GetRemoteIP();
+        sHost = pSock->remoteAddress();
 
     if (!pUser->isHostAllowed(sHost)) {
         AuthClass->refuseLogin("Your host [" + sHost + "] is not allowed");

@@ -98,12 +98,12 @@ public:
 
     void onClientLogin() override
     {
-        Log("[" + user()->userName() + "] connected to ZNC from " + client()->socket()->GetRemoteIP());
+        Log("[" + user()->userName() + "] connected to ZNC from " + client()->socket()->remoteAddress());
     }
 
     void onClientDisconnect() override
     {
-        Log("[" + user()->userName() + "] disconnected from ZNC from " + client()->socket()->GetRemoteIP());
+        Log("[" + user()->userName() + "] disconnected from ZNC from " + client()->socket()->remoteAddress());
     }
 
     void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override

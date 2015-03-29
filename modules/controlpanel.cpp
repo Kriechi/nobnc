@@ -1126,8 +1126,8 @@ class NoAdminMod : public NoModule
 
         NoIrcSocket* pIRCSock = pNetwork->ircSocket();
         // cancel connection attempt:
-        if (pIRCSock && !pIRCSock->IsConnected()) {
-            pIRCSock->Close();
+        if (pIRCSock && !pIRCSock->isConnected()) {
+            pIRCSock->close();
         }
         // or close existing connection:
         else if (pIRCSock) {

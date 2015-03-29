@@ -51,8 +51,8 @@ public:
     NoModuleSocket(const NoModuleSocket&) = delete;
     NoModuleSocket& operator=(const NoModuleSocket&) = delete;
 
-    using NoSocket::Connect;
-    using NoSocket::Listen;
+    using NoSocket::connect;
+    using NoSocket::listen;
 
     //! This defaults to closing the socket, feel free to override
     void onReachedMaxBuffer() override;
@@ -63,9 +63,9 @@ public:
     bool onConnectionFrom(const NoString& sHost, ushort uPort) override;
 
     //! Ease of use Connect, assigns to the manager and is subsequently tracked
-    bool Connect(const NoString& sHostname, ushort uPort, bool bSSL = false, uint uTimeout = 60);
+    bool connect(const NoString& sHostname, ushort uPort, bool bSSL = false, uint uTimeout = 60);
     //! Ease of use Listen, assigned to the manager and is subsequently tracked
-    bool Listen(ushort uPort, bool bSSL, uint uTimeout = 0);
+    bool listen(ushort uPort, bool bSSL, uint uTimeout = 0);
 
     NoModule* GetModule() const;
 

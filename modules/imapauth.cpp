@@ -33,7 +33,7 @@ public:
         m_pIMAPMod = pModule;
         m_bSentReply = false;
         m_bSentLogin = false;
-        EnableReadLine();
+        enableReadLine();
     }
 
     virtual ~NoImapSock()
@@ -110,7 +110,7 @@ public:
         }
 
         NoImapSock* pSock = new NoImapSock(this, Auth);
-        pSock->Connect(m_sServer, m_uPort, m_bSSL, 20);
+        pSock->connect(m_sServer, m_uPort, m_bSSL, 20);
 
         return HALT;
     }
@@ -157,7 +157,7 @@ void NoImapSock::readLine(const NoString& sLine)
             }
         }
 
-        Write("AUTH LOGIN " + sUsername + " " + m_spAuth->password() + "\r\n");
+        write("AUTH LOGIN " + sUsername + " " + m_spAuth->password() + "\r\n");
     } else if (sLine.left(5) == "AUTH ") {
         NoUser* pUser = NoApp::Get().FindUser(m_spAuth->username());
 
@@ -172,7 +172,7 @@ void NoImapSock::readLine(const NoString& sLine)
         }
 
         m_bSentReply = true;
-        Close();
+        close();
     }
 }
 

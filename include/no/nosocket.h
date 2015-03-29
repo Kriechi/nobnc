@@ -34,83 +34,98 @@ typedef int no_sock_t;
 
 typedef struct ssl_session_st SSL_SESSION;
 
-// All existing errno codes seem to be in range 1-300
-enum {
-    errnoBadSSLCert = 12569 // TODO
-};
-
 class NO_EXPORT NoSocket
 {
 public:
     NoSocket(const NoString& sHost = "", u_short port = 0);
     virtual ~NoSocket();
 
-    NoString GetHostToVerifySSL() const;
-    void SetHostToVerifySSL(const NoString& sHost);
+    bool isSsl() const;
+    uint16_t port() const;
+    NoString host() const;
 
-    NoString GetSSLPeerFingerprint() const;
+    NoString name() const;
+    void setName(const NoString& name);
 
-    NoStringSet GetSSLTrustedPeerFingerprints() const;
-    void SetSSLTrustedPeerFingerprints(const NoStringSet& ssFPs);
+    bool isListener() const;
+    bool isOutbound() const;
+    bool isInbound() const;
+    bool isConnected() const;
+    bool isReady() const;
 
-    void SetEncoding(const NoString& sEncoding);
-    virtual NoString GetRemoteIP() const;
+    uint16_t localPort() const;
+    NoString localAddress() const;
 
-    void SetPemLocation(const NoString& sPemFile);
-    bool Write(const char* data, size_t len);
-    bool Write(const NoString& sData);
-    time_t GetTimeSinceLastDataTransaction(time_t iNow = 0) const;
-    NoString GetSockName() const;
+    uint16_t remotePort() const;
+    virtual NoString remoteAddress() const;
+
     NoString bindHost() const;
-    void SetSockName(const NoString& sName);
-    bool IsListener() const;
-    bool IsOutbound() const;
-    bool IsInbound() const;
-    bool IsConnected() const;
-    uint16_t GetPort() const;
-    NoString GetHostName() const;
-    uint16_t GetLocalPort() const;
-    uint16_t GetRemotePort() const;
-    bool GetSSL() const;
-    void PauseRead();
-    void UnPauseRead();
-    NoString GetLocalIP() const;
 
-    void SetCipher(const NoString& sCipher);
-    long GetPeerFingerprint(NoString& sFP) const;
-    void SetRequireClientCertFlags(uint32_t iRequireClientCertFlags);
-    SSL_SESSION* GetSSLSession() const;
+    NoString hostToVerifySsl() const;
+    void setHostToVerifySsl(const NoString& host);
 
-    uint64_t GetBytesRead() const;
-    void ResetBytesRead();
-    uint64_t GetBytesWritten() const;
-    void ResetBytesWritten();
-    double GetAvgRead(uint64_t iSample = 1000) const;
-    double GetAvgWrite(uint64_t iSample = 1000) const;
-    uint64_t GetStartTime() const;
-    bool Connect();
-    bool Listen(uint16_t iPort, int iMaxConns = SOMAXCONN, const NoString& sBindHost = "", uint32_t iTimeout = 0, bool bDetach = false);
-    void EnableReadLine();
-    void DisableReadLine();
-    void SetMaxBufferThreshold(uint32_t iThreshold);
-    no_sock_t& GetRSock();
-    void SetRSock(no_sock_t iSock);
-    no_sock_t& GetWSock();
-    void SetWSock(no_sock_t iSock);
-    bool ConnectFD(int iReadFD, int iWriteFD, const NoString& sName, bool bIsSSL = false);
-    enum { TMO_READ = 1, TMO_WRITE = 2, TMO_ACCEPT = 4, TMO_ALL = TMO_READ | TMO_WRITE | TMO_ACCEPT };
-    void SetTimeout(int iTimeout, uint32_t iTimeoutType = TMO_ALL);
-    enum CloseType { CLT_DONT, CLT_NOW, CLT_AFTERWRITE, CLT_DEREFERENCE };
-    CloseType GetCloseType() const;
-    void Close(CloseType type = CLT_NOW);
-    NoString& GetInternalReadBuffer();
-    NoString& GetInternalWriteBuffer();
-    bool StartTLS();
-    bool IsConOK() const;
+    NoString fingerprint() const;
+    long peerFingerprint(NoString& fingerprint) const; // TODO
 
-    virtual void readLine(const NoString& sLine);
+    NoStringSet trustedFingerprints() const;
+    void setTrustedFingerprints(const NoStringSet& fingerprints);
+
+    void setEncoding(const NoString& encoding);
+
+    NoString pemFile() const;
+    void setPemFile(const NoString& filePath);
+
+    bool write(const char* data, size_t len);
+    bool write(const NoString& sData);
+
+    void pauseRead();
+    void resumeRead();
+
+    uint64_t startTime() const;
+    time_t timeSinceLastDataTransaction(time_t now = 0) const;
+
+    NoString cipher() const;
+    void setCipher(const NoString& cipher);
+
+    uint32_t requireClientCertFlags() const;
+    void setRequireClientCertFlags(uint32_t flags);
+
+    SSL_SESSION* sslSession() const;
+
+    uint64_t bytesRead() const;
+    uint64_t bytesWritten() const;
+
+    double averageReadSpeed() const;
+    double averageWriteSpeed() const;
+
+    bool connect();
+    bool listen(uint16_t port, int maxConns = SOMAXCONN, const NoString& bindHost = "", uint32_t timeout = 0, bool detach = false);
+
+    void enableReadLine();
+    void disableReadLine();
+
+    uint32_t maxBufferThreshold() const;
+    void setMaxBufferThreshold(uint32_t threshold);
+
+    no_sock_t& readDescriptor() const;
+    void setReadDescriptor(no_sock_t descriptor);
+
+    no_sock_t& writeDescriptor() const;
+    void setWriteDescriptor(no_sock_t descriptor);
+
+    enum TimeoutType { ReadTimeout = 1, WriteTimeout = 2, AcceptTimeout = 4, AnyTimeout = ReadTimeout | WriteTimeout | AcceptTimeout };
+    int timeout() const;
+    void setTimeout(int timeout, TimeoutType type = AnyTimeout);
+
+    enum CloseType { NoClose, CloseImmediately, CloseAfterWrite };
+    CloseType closeType() const;
+    void close(CloseType type = CloseImmediately);
+
+    bool startTls();
+
+    virtual void readLine(const NoString& line);
     virtual void readData(const char* data, size_t len);
-    virtual void pushBuffer(const char* data, size_t len, bool bStartAtZero = false);
+    virtual void pushBuffer(const char* data, size_t len, bool startAtZero = false);
 
 protected:
     virtual void onConnected();
@@ -120,10 +135,13 @@ protected:
 
     virtual void onReadPaused();
     virtual void onReachedMaxBuffer();
-    virtual void onSocketError(int iErrno, const NoString& sDescription);
-    virtual bool onConnectionFrom(const NoString& sHost, ushort uPort);
+    virtual void onSocketError(int error, const NoString& description);
+    virtual bool onConnectionFrom(const NoString& host, ushort port);
 
-    virtual NoSocket* createSocket(const NoString& sHost, ushort uPort);
+    virtual NoSocket* createSocket(const NoString& host, ushort port);
+
+    NoString& internalReadBuffer();
+    NoString& internalWriteBuffer();
 
 private:
     NoSocket(const NoSocket&) = delete;

@@ -232,7 +232,7 @@ void NoModule::listTimers()
 NoModuleSocket* NoModule::findSocket(const NoString& sName) const
 {
     for (NoModuleSocket* pSocket : d->sockets) {
-        if (pSocket->GetSockName().equals(sName)) {
+        if (pSocket->name().equals(sName)) {
             return pSocket;
         }
     }
@@ -257,18 +257,18 @@ void NoModule::listSockets()
 
     for (const NoModuleSocket* pSocket : d->sockets) {
         Table.addRow();
-        Table.setValue("Name", pSocket->GetSockName());
+        Table.setValue("Name", pSocket->name());
 
-        if (pSocket->IsListener()) {
+        if (pSocket->isListener()) {
             Table.setValue("State", "Listening");
         } else {
-            Table.setValue("State", (pSocket->IsConnected() ? "Connected" : ""));
+            Table.setValue("State", (pSocket->isConnected() ? "Connected" : ""));
         }
 
-        Table.setValue("LocalPort", NoString(pSocket->GetLocalPort()));
-        Table.setValue("SSL", (pSocket->GetSSL() ? "yes" : "no"));
-        Table.setValue("RemoteIP", pSocket->GetRemoteIP());
-        Table.setValue("RemotePort", (pSocket->GetRemotePort()) ? NoString(pSocket->GetRemotePort()) : NoString(""));
+        Table.setValue("LocalPort", NoString(pSocket->localPort()));
+        Table.setValue("SSL", (pSocket->isSsl() ? "yes" : "no"));
+        Table.setValue("RemoteIP", pSocket->remoteAddress());
+        Table.setValue("RemotePort", (pSocket->remotePort()) ? NoString(pSocket->remotePort()) : NoString(""));
     }
 
     putModule(Table);

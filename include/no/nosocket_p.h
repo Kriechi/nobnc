@@ -30,6 +30,11 @@
 #include <unicode/ucnv_cb.h>
 #endif
 
+// All existing errno codes seem to be in range 1-300
+enum {
+    errnoBadSSLCert = 12569 // TODO
+};
+
 class NoSocketImpl : public Csock
 {
 public:

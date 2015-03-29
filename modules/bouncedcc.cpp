@@ -64,7 +64,7 @@ public:
     void PutPeer(const NoString& sLine);
     bool IsPeerConnected()
     {
-        return (m_pPeer) ? m_pPeer->IsConnected() : false;
+        return (m_pPeer) ? m_pPeer->isConnected() : false;
     }
 
     // Setters
@@ -152,7 +152,7 @@ public:
         Table.addColumn("File");
 
         for (NoDccBounce* pSock : m_sockets) {
-            NoString sSockName = pSock->GetSockName();
+            NoString sSockName = pSock->name();
 
             if (!(pSock->IsRemote())) {
                 Table.addRow();
@@ -167,9 +167,9 @@ public:
                 }
 
                 NoString sState = "Waiting";
-                if ((pSock->IsConnected()) || (pSock->IsPeerConnected())) {
+                if ((pSock->isConnected()) || (pSock->IsPeerConnected())) {
                     sState = "Halfway";
-                    if ((pSock->IsConnected()) && (pSock->IsPeerConnected())) {
+                    if ((pSock->isConnected()) && (pSock->IsPeerConnected())) {
                         sState = "Connected";
                     }
                 }
@@ -229,7 +229,7 @@ public:
             NoString sIP = GetLocalDCCIP();
 
             if (!UseClientIP()) {
-                uLongIP = No::formatLongIp(client()->socket()->GetRemoteIP());
+                uLongIP = No::formatLongIp(client()->socket()->remoteAddress());
             }
 
             if (sType.equals("CHAT")) {
@@ -250,7 +250,7 @@ public:
                 ushort uResumePort = No::token(sMessage, 3).toUShort();
 
                 for (NoDccBounce* pSock : m_sockets) {
-                    if (pSock->GetLocalPort() == uResumePort) {
+                    if (pSock->localPort() == uResumePort) {
                         putIrc("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
                                NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
@@ -261,7 +261,7 @@ public:
                 for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
                         putIrc("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
-                               NoString(pSock->GetLocalPort()) + " " + No::token(sMessage, 4) + "\001");
+                               NoString(pSock->localPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
             }
@@ -306,7 +306,7 @@ public:
                 ushort uResumePort = No::token(sMessage, 3).toUShort();
 
                 for (NoDccBounce* pSock : m_sockets) {
-                    if (pSock->GetLocalPort() == uResumePort) {
+                    if (pSock->localPort() == uResumePort) {
                         putUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC " + sType + " " +
                                 sFile + " " + NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
@@ -316,7 +316,7 @@ public:
                 for (NoDccBounce* pSock : m_sockets) {
                     if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
                         putUser(":" + Nick.nickMask() + " PRIVMSG " + pNetwork->currentNick() + " :\001DCC " + sType + " " +
-                                sFile + " " + NoString(pSock->GetLocalPort()) + " " + No::token(sMessage, 4) + "\001");
+                                sFile + " " + NoString(pSock->localPort()) + " " + No::token(sMessage, 4) + "\001");
                     }
                 }
             }
@@ -360,9 +360,9 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
     m_bIsRemote = false;
 
     if (bIsChat) {
-        EnableReadLine();
+        enableReadLine();
     } else {
-        DisableReadLine();
+        disableReadLine();
     }
     pMod->AddSocket(this);
 }
@@ -385,11 +385,11 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* pMod,
     m_sRemoteIP = sRemoteIP;
     m_bIsRemote = false;
 
-    SetMaxBufferThreshold(10240);
+    setMaxBufferThreshold(10240);
     if (bIsChat) {
-        EnableReadLine();
+        enableReadLine();
     } else {
-        DisableReadLine();
+        disableReadLine();
     }
     pMod->AddSocket(this);
 }
@@ -407,51 +407,51 @@ void NoDccBounce::readLine(const NoString& sData)
 {
     NoString sLine = sData.trimRight_n("\r\n");
 
-    NO_DEBUG(GetSockName() << " <- [" << sLine << "]");
+    NO_DEBUG(name() << " <- [" << sLine << "]");
 
     PutPeer(sLine);
 }
 
 void NoDccBounce::onReachedMaxBuffer()
 {
-    NO_DEBUG(GetSockName() << " == ReachedMaxBuffer()");
+    NO_DEBUG(name() << " == ReachedMaxBuffer()");
 
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
     m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Too long line received");
-    Close();
+    close();
 }
 
 void NoDccBounce::readData(const char* data, size_t len)
 {
     if (m_pPeer) {
-        m_pPeer->Write(data, len);
+        m_pPeer->write(data, len);
 
-        size_t BufLen = m_pPeer->GetInternalWriteBuffer().length();
+        size_t BufLen = m_pPeer->internalWriteBuffer().length();
 
         if (BufLen >= m_uiMaxDCCBuffer) {
-            NO_DEBUG(GetSockName() << " The send buffer is over the "
+            NO_DEBUG(name() << " The send buffer is over the "
                                       "limit (" << BufLen << "), throttling");
-            PauseRead();
+            pauseRead();
         }
     }
 }
 
 void NoDccBounce::onReadPaused()
 {
-    if (!m_pPeer || m_pPeer->GetInternalWriteBuffer().length() <= m_uiMinDCCBuffer)
-        UnPauseRead();
+    if (!m_pPeer || m_pPeer->internalWriteBuffer().length() <= m_uiMinDCCBuffer)
+        resumeRead();
 }
 
 void NoDccBounce::onTimeout()
 {
-    NO_DEBUG(GetSockName() << " == Timeout()");
+    NO_DEBUG(name() << " == Timeout()");
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
     if (IsRemote()) {
-        NoString sHost = NoSocket::GetHostName();
+        NoString sHost = NoSocket::host();
         if (!sHost.empty()) {
-            sHost = " to [" + sHost + " " + NoString(NoSocket::GetPort()) + "]";
+            sHost = " to [" + sHost + " " + NoString(NoSocket::port()) + "]";
         } else {
             sHost = ".";
         }
@@ -459,19 +459,19 @@ void NoDccBounce::onTimeout()
         m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Timeout while connecting" + sHost);
     } else {
         m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick +
-                            "): Timeout waiting for incoming connection [" + NoSocket::GetLocalIP() + ":" +
-                            NoString(NoSocket::GetLocalPort()) + "]");
+                            "): Timeout waiting for incoming connection [" + NoSocket::localAddress() + ":" +
+                            NoString(NoSocket::localPort()) + "]");
     }
 }
 
 void NoDccBounce::onConnectionRefused()
 {
-    NO_DEBUG(GetSockName() << " == ConnectionRefused()");
+    NO_DEBUG(name() << " == ConnectionRefused()");
 
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
-    NoString sHost = NoSocket::GetHostName();
+    NoString sHost = NoSocket::host();
     if (!sHost.empty()) {
-        sHost = " to [" + sHost + " " + NoString(NoSocket::GetPort()) + "]";
+        sHost = " to [" + sHost + " " + NoString(NoSocket::port()) + "]";
     } else {
         sHost = ".";
     }
@@ -481,43 +481,43 @@ void NoDccBounce::onConnectionRefused()
 
 void NoDccBounce::onSocketError(int iErrno, const NoString& sDescription)
 {
-    NO_DEBUG(GetSockName() << " == SockError(" << iErrno << ")");
+    NO_DEBUG(name() << " == SockError(" << iErrno << ")");
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
 
     if (IsRemote()) {
-        NoString sHost = NoSocket::GetHostName();
+        NoString sHost = NoSocket::host();
         if (!sHost.empty()) {
-            sHost = "[" + sHost + " " + NoString(NoSocket::GetPort()) + "]";
+            sHost = "[" + sHost + " " + NoString(NoSocket::port()) + "]";
         }
 
         m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "]" + sHost);
     } else {
         m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "] [" +
-                            NoSocket::GetLocalIP() + ":" + NoString(NoSocket::GetLocalPort()) + "]");
+                            NoSocket::localAddress() + ":" + NoString(NoSocket::localPort()) + "]");
     }
 }
 
 void NoDccBounce::onConnected()
 {
-    SetTimeout(0);
-    NO_DEBUG(GetSockName() << " == Connected()");
+    setTimeout(0);
+    NO_DEBUG(name() << " == Connected()");
 }
 
 void NoDccBounce::onDisconnected()
 {
-    NO_DEBUG(GetSockName() << " == Disconnected()");
+    NO_DEBUG(name() << " == Disconnected()");
 }
 
 void NoDccBounce::Shutdown()
 {
     m_pPeer = nullptr;
-    NO_DEBUG(GetSockName() << " == Close(); because my peer told me to");
-    Close();
+    NO_DEBUG(name() << " == Close(); because my peer told me to");
+    close();
 }
 
 NoSocket* NoDccBounce::createSocket(const NoString& sHost, ushort uPort)
 {
-    Close();
+    close();
 
     if (m_sRemoteIP.empty()) {
         m_sRemoteIP = sHost;
@@ -538,14 +538,14 @@ NoSocket* NoDccBounce::createSocket(const NoString& sHost, ushort uPort)
                                    m_sLocalIP,
                                    pRemoteSock);
 
-    pSock->SetSockName(GetSockName());
+    pSock->setName(name());
     return pSock;
 }
 
 void NoDccBounce::PutServ(const NoString& sLine)
 {
-    NO_DEBUG(GetSockName() << " -> [" << sLine << "]");
-    Write(sLine + "\r\n");
+    NO_DEBUG(name() << " -> [" << sLine << "]");
+    write(sLine + "\r\n");
 }
 
 void NoDccBounce::PutPeer(const NoString& sLine)

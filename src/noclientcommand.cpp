@@ -200,7 +200,7 @@ void NoClient::userCommand(NoString& sLine)
 
         for (const NoClient* pClient : vClients) {
             Table.addRow();
-            Table.setValue("Host", pClient->socket()->GetRemoteIP());
+            Table.setValue("Host", pClient->socket()->remoteAddress());
             if (pClient->network()) {
                 Table.setValue("Network", pClient->network()->name());
             }
@@ -333,8 +333,8 @@ void NoClient::userCommand(NoString& sLine)
             // If we are already connecting to some server,
             // we have to abort that attempt
             NoSocket* pIRCSock = ircSocket();
-            if (pIRCSock && !pIRCSock->IsConnected()) {
-                pIRCSock->Close();
+            if (pIRCSock && !pIRCSock->isConnected()) {
+                pIRCSock->close();
             }
         }
 

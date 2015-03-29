@@ -31,7 +31,7 @@ class NoShellSock : public NoProcess
 public:
     NoShellSock(NoShellMod* pShellMod, NoClient* pClient, const NoString& sExec) : NoProcess()
     {
-        EnableReadLine();
+        enableReadLine();
         m_pParent = pShellMod;
         m_pClient = pClient;
 
@@ -44,8 +44,8 @@ public:
 
         // Get rid of that write fd, we aren't going to use it
         // (And clients expecting input will fail this way).
-        close(GetWSock());
-        SetWSock(open("/dev/null", O_WRONLY));
+        ::close(writeDescriptor());
+        setWriteDescriptor(open("/dev/null", O_WRONLY));
     }
     // These next two function's bodies are at the bottom of the file since they reference NoShellMod
     void readLine(const NoString& sData) override;
@@ -143,7 +143,7 @@ void NoShellSock::onDisconnected()
 {
     // If there is some incomplete line in the buffer, read it
     // (e.g. echo echo -n "hi" triggered this)
-    NoString& sBuffer = GetInternalReadBuffer();
+    NoString& sBuffer = internalReadBuffer();
     if (!sBuffer.empty())
         readLine(sBuffer);
 

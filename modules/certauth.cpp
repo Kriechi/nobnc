@@ -58,7 +58,7 @@ public:
         // We need the SSL_VERIFY_PEER flag on all listeners, or else
         // the client doesn't send a ssl cert
         for (it = vListeners.begin(); it != vListeners.end(); ++it)
-            (*it)->socket()->SetRequireClientCertFlags(SSL_VERIFY_PEER);
+            (*it)->socket()->setRequireClientCertFlags(SSL_VERIFY_PEER);
 
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
@@ -241,7 +241,7 @@ public:
     NoString GetKey(NoSocket* pSock)
     {
         NoString sRes;
-        long int res = pSock->GetPeerFingerprint(sRes);
+        long int res = pSock->peerFingerprint(sRes);
 
         NO_DEBUG("GetKey() returned status " << res << " with key " << sRes);
 

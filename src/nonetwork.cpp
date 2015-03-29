@@ -51,13 +51,13 @@ protected:
     {
         NoIrcSocket* pIRCSock = m_pNetwork->ircSocket();
 
-        if (pIRCSock && pIRCSock->GetTimeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
+        if (pIRCSock && pIRCSock->timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
             pIRCSock->putIrc("PING :ZNC");
         }
 
         const std::vector<NoClient*>& vClients = m_pNetwork->clients();
         for (NoClient* pClient : vClients) {
-            if (pClient->socket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
+            if (pClient->socket()->timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
                 pClient->putClient("PING :ZNC");
             }
         }
@@ -1344,7 +1344,7 @@ bool NoNetwork::connect()
 
     NoIrcSocket* pIRCSock = new NoIrcSocket(this);
     pIRCSock->SetPass(pServer->password());
-    pIRCSock->SetSSLTrustedPeerFingerprints(d->trustedFingerprints);
+    pIRCSock->setTrustedFingerprints(d->trustedFingerprints);
 
     NO_DEBUG("Connecting user/network [" << d->user->userName() << "/" << d->name << "]");
 
@@ -1407,10 +1407,10 @@ void NoNetwork::setEnabled(bool b)
     if (d->enabled) {
         checkIrcConnect();
     } else if (ircSocket()) {
-        if (ircSocket()->IsConnected()) {
+        if (ircSocket()->isConnected()) {
             ircSocket()->Quit();
         } else {
-            ircSocket()->Close();
+            ircSocket()->close();
         }
     }
 }

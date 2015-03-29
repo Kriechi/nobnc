@@ -71,7 +71,7 @@ public:
     ModRet onIrcConnecting(NoIrcSocket* pIRCSock) override
     {
         if (HasPemFile()) {
-            pIRCSock->SetPemLocation(PemFile());
+            pIRCSock->setPemFile(PemFile());
         }
 
         return CONTINUE;
