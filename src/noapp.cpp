@@ -523,7 +523,7 @@ void NoApp::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
         m_curPath = NoDir("./").filePath(sArgvPath.left(uPos));
 
     if (sDataDir.empty()) {
-        m_appPath = NoDir::home().filePath("/.znc");
+        m_appPath = NoDir::home().filePath(".znc");
     } else {
         m_appPath = sDataDir;
     }
