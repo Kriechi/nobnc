@@ -128,7 +128,7 @@ NoSocketManager::~NoSocketManager()
 {
 }
 
-bool NoSocketManager::ListenHost(u_short iPort,
+bool NoSocketManager::listenHost(u_short iPort,
                                  const NoString& sSockName,
                                  const NoString& sBindHost,
                                  bool bSSL,
@@ -161,12 +161,12 @@ bool NoSocketManager::ListenHost(u_short iPort,
     return m_instance->Listen(L, NoSocketPrivate::get(pcSock));
 }
 
-bool NoSocketManager::ListenAll(u_short iPort, const NoString& sSockName, bool bSSL, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
+bool NoSocketManager::listenAll(u_short iPort, const NoString& sSockName, bool bSSL, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
 {
-    return ListenHost(iPort, sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
+    return listenHost(iPort, sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
 }
 
-u_short NoSocketManager::ListenRand(const NoString& sSockName,
+u_short NoSocketManager::listenRand(const NoString& sSockName,
                                     const NoString& sBindHost,
                                     bool bSSL,
                                     int iMaxConns,
@@ -201,12 +201,12 @@ u_short NoSocketManager::ListenRand(const NoString& sSockName,
     return uPort;
 }
 
-u_short NoSocketManager::ListenAllRand(const NoString& sSockName, bool bSSL, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
+u_short NoSocketManager::listenAllRand(const NoString& sSockName, bool bSSL, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
 {
-    return ListenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
+    return listenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
 }
 
-void NoSocketManager::Connect(const NoString& sHostname,
+void NoSocketManager::connect(const NoString& sHostname,
                               u_short iPort,
                               const NoString& sSockName,
                               int iTimeout,
@@ -239,12 +239,12 @@ void NoSocketManager::Connect(const NoString& sHostname,
 #endif
 }
 
-std::vector<NoSocket*> NoSocketManager::GetSockets() const
+std::vector<NoSocket*> NoSocketManager::sockets() const
 {
     return m_sockets;
 }
 
-std::vector<NoSocket*> NoSocketManager::FindSocksByName(const NoString& sName)
+std::vector<NoSocket*> NoSocketManager::findSockets(const NoString& sName)
 {
     std::vector<NoSocket*> sockets;
     for (NoSocket* socket : m_sockets) {
@@ -254,7 +254,7 @@ std::vector<NoSocket*> NoSocketManager::FindSocksByName(const NoString& sName)
     return sockets;
 }
 
-uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
+uint NoSocketManager::anonConnectionCount(const NoString& sIP) const
 {
     uint ret = 0;
 
@@ -271,23 +271,23 @@ uint NoSocketManager::GetAnonConnectionCount(const NoString& sIP) const
     return ret;
 }
 
-void NoSocketManager::Cleanup()
+void NoSocketManager::cleanup()
 {
     m_instance->Cleanup();
 }
 
-void NoSocketManager::DynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution)
+void NoSocketManager::dynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution)
 {
     m_instance->DynamicSelectLoop(iLowerBounds, iUpperBounds, iMaxResolution);
 }
 
-void NoSocketManager::AddSock(NoSocket* pcSock, const NoString& sSockName)
+void NoSocketManager::addSocket(NoSocket* pcSock, const NoString& sSockName)
 {
     m_sockets.push_back(pcSock);
     m_instance->AddSock(NoSocketPrivate::get(pcSock), sSockName);
 }
 
-void NoSocketManager::DelSockByAddr(NoSocket* socket)
+void NoSocketManager::removeSocket(NoSocket* socket)
 {
     auto it = std::find(m_sockets.begin(), m_sockets.end(), socket);
     if (it != m_sockets.end())
@@ -295,22 +295,22 @@ void NoSocketManager::DelSockByAddr(NoSocket* socket)
     m_instance->DelSockByAddr(NoSocketPrivate::get(socket));
 }
 
-bool NoSocketManager::SwapSockByAddr(Csock* newSocket, Csock* originalSocket)
+bool NoSocketManager::swapSocket(Csock* newSocket, Csock* originalSocket)
 {
     return m_instance->SwapSockByAddr(newSocket, originalSocket);
 }
 
-void NoSocketManager::AddCron(CCron* cron)
+void NoSocketManager::addCron(CCron* cron)
 {
     m_instance->AddCron(cron);
 }
 
-void NoSocketManager::DelCronByAddr(CCron* cron)
+void NoSocketManager::removeCron(CCron* cron)
 {
     m_instance->DelCronByAddr(cron);
 }
 
-void NoSocketManager::DoConnect(const CSConnection& cCon, Csock* pcSock)
+void NoSocketManager::doConnect(const CSConnection& cCon, Csock* pcSock)
 {
     m_instance->Connect(cCon, pcSock);
 }
@@ -517,5 +517,5 @@ void FinishConnect(NoSocketManager* manager,
     C.SetCipher(sCipher);
 #endif
 
-    manager->DoConnect(C, NoSocketPrivate::get(pcSock));
+    manager->doConnect(C, NoSocketPrivate::get(pcSock));
 }

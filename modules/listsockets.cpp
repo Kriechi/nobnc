@@ -102,7 +102,7 @@ public:
         NoSocketManager& m = NoApp::Get().manager();
         std::priority_queue<NoSocketSorter> ret;
 
-        for (NoSocket* pSock : m.GetSockets()) {
+        for (NoSocket* pSock : m.sockets()) {
             // These sockets went through SwapSockByAddr. That means
             // another socket took over the connection from this
             // socket. So ignore this to avoid listing the
@@ -127,7 +127,7 @@ public:
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            if (NoApp::Get().manager().GetSockets().empty()) {
+            if (NoApp::Get().manager().sockets().empty()) {
                 return false;
             }
 
@@ -233,7 +233,7 @@ public:
 
     void ShowSocks(bool bShowHosts)
     {
-        if (NoApp::Get().manager().GetSockets().empty()) {
+        if (NoApp::Get().manager().sockets().empty()) {
             putStatus("You have no open sockets.");
             return;
         }

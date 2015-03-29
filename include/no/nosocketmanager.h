@@ -34,7 +34,7 @@ public:
     NoSocketManager();
     ~NoSocketManager();
 
-    bool ListenHost(ushort iPort,
+    bool listenHost(ushort iPort,
                     const NoString& sSockName,
                     const NoString& sBindHost,
                     bool bSSL = false,
@@ -43,7 +43,7 @@ public:
                     u_int iTimeout = 0,
                     No::AddressType eAddr = No::Ipv4AndIpv6Address);
 
-    bool ListenAll(ushort iPort,
+    bool listenAll(ushort iPort,
                    const NoString& sSockName,
                    bool bSSL = false,
                    int iMaxConns = SOMAXCONN,
@@ -51,7 +51,7 @@ public:
                    u_int iTimeout = 0,
                    No::AddressType eAddr = No::Ipv4AndIpv6Address);
 
-    u_short ListenRand(const NoString& sSockName,
+    u_short listenRand(const NoString& sSockName,
                        const NoString& sBindHost,
                        bool bSSL = false,
                        int iMaxConns = SOMAXCONN,
@@ -59,14 +59,14 @@ public:
                        u_int iTimeout = 0,
                        No::AddressType eAddr = No::Ipv4AndIpv6Address);
 
-    u_short ListenAllRand(const NoString& sSockName,
+    u_short listenAllRand(const NoString& sSockName,
                           bool bSSL = false,
                           int iMaxConns = SOMAXCONN,
                           NoSocket* pcSock = nullptr,
                           u_int iTimeout = 0,
                           No::AddressType eAddr = No::Ipv4AndIpv6Address);
 
-    void Connect(const NoString& sHostname,
+    void connect(const NoString& sHostname,
                  ushort iPort,
                  const NoString& sSockName,
                  int iTimeout = 60,
@@ -74,18 +74,18 @@ public:
                  const NoString& sBindHost = "",
                  NoSocket* pcSock = nullptr);
 
-    std::vector<NoSocket*> GetSockets() const;
-    std::vector<NoSocket*> FindSocksByName(const NoString& sName);
-    uint GetAnonConnectionCount(const NoString& sIP) const;
+    std::vector<NoSocket*> sockets() const;
+    std::vector<NoSocket*> findSockets(const NoString& sName);
+    uint anonConnectionCount(const NoString& sIP) const;
 
-    void Cleanup();
-    void DynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution = 3600);
-    void AddSock(NoSocket* pcSock, const NoString& sSockName);
-    void DelSockByAddr(NoSocket* socket);
-    bool SwapSockByAddr(Csock* newSocket, Csock* originalSocket);
-    void AddCron(CCron* cron);
-    void DelCronByAddr(CCron* cron);
-    void DoConnect(const CSConnection& cCon, Csock* pcSock = NULL);
+    void cleanup();
+    void dynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution = 3600);
+    void addSocket(NoSocket* pcSock, const NoString& sSockName);
+    void removeSocket(NoSocket* socket);
+    bool swapSocket(Csock* newSocket, Csock* originalSocket);
+    void addCron(CCron* cron);
+    void removeCron(CCron* cron);
+    void doConnect(const CSConnection& cCon, Csock* pcSock = NULL);
 
 private:
     CSocketManager* m_instance;

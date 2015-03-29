@@ -115,7 +115,7 @@ NoUser::NoUser(const NoString& sUserName) : d(new NoUserPrivate)
     d->userPath = NoApp::Get().GetUserPath() + "/" + sUserName;
     d->modules = new NoModuleLoader;
     d->userTimer = new NoUserTimer(this);
-    NoApp::Get().manager().AddCron(d->userTimer);
+    NoApp::Get().manager().addCron(d->userTimer);
 }
 
 NoUser::~NoUser()
@@ -127,7 +127,7 @@ NoUser::~NoUser()
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::Get().manager().DelSockByAddr(d->clients[0]->socket());
+        NoApp::Get().manager().removeSocket(d->clients[0]->socket());
     }
     d->clients.clear();
 
@@ -135,7 +135,7 @@ NoUser::~NoUser()
     delete d->modules;
     d->modules = nullptr;
 
-    NoApp::Get().manager().DelCronByAddr(d->userTimer);
+    NoApp::Get().manager().removeCron(d->userTimer);
 
     NoApp::Get().AddBytesRead(bytesRead());
     NoApp::Get().AddBytesWritten(bytesWritten());

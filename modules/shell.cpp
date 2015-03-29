@@ -67,10 +67,10 @@ public:
 
     virtual ~NoShellMod()
     {
-        std::vector<NoSocket*> vSocks = manager()->FindSocksByName("SHELL");
+        std::vector<NoSocket*> vSocks = manager()->findSockets("SHELL");
 
         for (uint a = 0; a < vSocks.size(); a++) {
-            manager()->DelSockByAddr(vSocks[a]);
+            manager()->removeSocket(vSocks[a]);
         }
     }
 
@@ -120,7 +120,7 @@ public:
     {
         // TODO: who deletes the instance?
         NoShellSock* sock = new NoShellSock(this, client(), "cd " + m_sPath + " && " + sCommand);
-        manager()->AddSock(sock, "SHELL");
+        manager()->addSocket(sock, "SHELL");
     }
 
 private:

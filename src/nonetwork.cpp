@@ -182,10 +182,10 @@ NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName) : d(new NoNetworkPriv
     d->noticeBuffer.setLimit(250, true);
 
     d->pingTimer = new NoNetworkPingTimer(this);
-    NoApp::Get().manager().AddCron(d->pingTimer);
+    NoApp::Get().manager().addCron(d->pingTimer);
 
     d->joinTimer = new NoNetworkJoinTimer(this);
-    NoApp::Get().manager().AddCron(d->joinTimer);
+    NoApp::Get().manager().addCron(d->joinTimer);
 
     setEnabled(true);
 }
@@ -305,13 +305,13 @@ void NoNetwork::clone(const NoNetwork& Network, bool bCloneName)
 NoNetwork::~NoNetwork()
 {
     if (d->socket) {
-        NoApp::Get().manager().DelSockByAddr(d->socket);
+        NoApp::Get().manager().removeSocket(d->socket);
         d->socket = nullptr;
     }
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::Get().manager().DelSockByAddr(d->clients[0]->socket());
+        NoApp::Get().manager().removeSocket(d->clients[0]->socket());
     }
     d->clients.clear();
 
@@ -339,8 +339,8 @@ NoNetwork::~NoNetwork()
     // Make sure we are not in the connection queue
     NoApp::Get().GetConnectionQueue().remove(this);
 
-    NoApp::Get().manager().DelCronByAddr(d->pingTimer);
-    NoApp::Get().manager().DelCronByAddr(d->joinTimer);
+    NoApp::Get().manager().removeCron(d->pingTimer);
+    NoApp::Get().manager().removeCron(d->joinTimer);
 }
 
 void NoNetwork::delServers()
@@ -1359,7 +1359,7 @@ bool NoNetwork::connect()
     }
 
     NoString sSockName = "IRC::" + d->user->userName() + "::" + d->name;
-    NoApp::Get().manager().Connect(pServer->host(), pServer->port(), sSockName, 120, bSSL, bindHost(), pIRCSock);
+    NoApp::Get().manager().connect(pServer->host(), pServer->port(), sSockName, 120, bSSL, bindHost(), pIRCSock);
 
     return true;
 }

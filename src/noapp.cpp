@@ -106,7 +106,7 @@ NoApp::~NoApp()
 
     m_connectQueueTimer = nullptr;
     // This deletes m_pConnectQueueTimer
-    m_manager.Cleanup();
+    m_manager.cleanup();
     DeleteUsers();
 
     delete m_modules;
@@ -244,7 +244,7 @@ void NoApp::Loop()
 
         // Csocket wants micro seconds
         // 100 msec to 600 sec
-        m_manager.DynamicSelectLoop(100 * 1000, 600 * 1000 * 1000);
+        m_manager.dynamicSelectLoop(100 * 1000, 600 * 1000 * 1000);
     }
 }
 
@@ -510,7 +510,7 @@ bool NoApp::AllowConnectionFrom(const NoString& sIP) const
 {
     if (m_anonIpLimit == 0)
         return true;
-    return (manager().GetAnonConnectionCount(sIP) < m_anonIpLimit);
+    return (manager().anonConnectionCount(sIP) < m_anonIpLimit);
 }
 
 void NoApp::InitDirs(const NoString& sArgvPath, const NoString& sDataDir)
@@ -2072,7 +2072,7 @@ NoApp::TrafficStatsMap NoApp::GetTrafficStats(TrafficStatsPair& Users, TrafficSt
         uiUsers_out += it.second->bytesWritten();
     }
 
-    for (NoSocket* pSock : m_manager.GetSockets()) {
+    for (NoSocket* pSock : m_manager.sockets()) {
         NoUser* pUser = nullptr;
         if (pSock->GetSockName().left(5) == "IRC::") {
             pUser = ((NoIrcSocket*)pSock)->network()->user();
@@ -2272,7 +2272,7 @@ void NoApp::EnableConnectQueue()
 {
     if (!m_connectQueueTimer && !m_connectPaused && !m_connectQueue.empty()) {
         m_connectQueueTimer = new NoConnectQueueTimer(m_connectDelay);
-        manager().AddCron(m_connectQueueTimer);
+        manager().addCron(m_connectQueueTimer);
     }
 }
 
