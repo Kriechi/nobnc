@@ -32,7 +32,7 @@
 #include "nonick.h"
 #include "nobuffer.h"
 
-void NoClient::UserCommand(NoString& sLine)
+void NoClient::userCommand(NoString& sLine)
 {
     if (!d->user) {
         return;
@@ -49,7 +49,7 @@ void NoClient::UserCommand(NoString& sLine)
     const NoString sCommand = No::token(sLine, 0);
 
     if (sCommand.equals("HELP")) {
-        HelpUser(No::token(sLine, 1));
+        helpUser(No::token(sLine, 1));
     } else if (sCommand.equals("LISTNICKS")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
@@ -148,7 +148,7 @@ void NoClient::UserCommand(NoString& sLine)
         putStatus(NoApp::GetTag());
         putStatus(NoApp::GetCompileOptionsString());
     } else if (sCommand.equals("MOTD") || sCommand.equals("ShowMOTD")) {
-        if (!SendMotd()) {
+        if (!sendMotd()) {
             putStatus("There is no MOTD set.");
         }
     } else if (d->user->isAdmin() && sCommand.equals("Rehash")) {
@@ -197,11 +197,11 @@ void NoClient::UserCommand(NoString& sLine)
 
         for (const NoClient* pClient : vClients) {
             Table.addRow();
-            Table.setValue("Host", pClient->GetSocket()->GetRemoteIP());
+            Table.setValue("Host", pClient->socket()->GetRemoteIP());
             if (pClient->network()) {
                 Table.setValue("Network", pClient->network()->name());
             }
-            Table.setValue("Identifier", pClient->GetIdentifier());
+            Table.setValue("Identifier", pClient->identifier());
         }
 
         putStatus(Table);
@@ -585,7 +585,7 @@ void NoClient::UserCommand(NoString& sLine)
         }
 
         if (d->network && d->network->name().equals(sNetwork)) {
-            SetNetwork(nullptr);
+            setNetwork(nullptr);
         }
 
         if (d->user->deleteNetwork(sNetwork)) {
@@ -706,7 +706,7 @@ void NoClient::UserCommand(NoString& sLine)
         pNewNetwork->clone(*pOldNetwork, false);
 
         if (d->network && d->network->name().equals(sOldNetwork) && d->user == pOldUser) {
-            SetNetwork(nullptr);
+            setNetwork(nullptr);
         }
 
         if (pOldUser->deleteNetwork(sOldNetwork)) {
@@ -730,7 +730,7 @@ void NoClient::UserCommand(NoString& sLine)
         NoNetwork* pNetwork = d->user->findNetwork(sNetwork);
         if (pNetwork) {
             putStatus("Switched to " + sNetwork);
-            SetNetwork(pNetwork);
+            setNetwork(pNetwork);
         } else {
             putStatus("You don't have a network named " + sNetwork);
         }
@@ -1529,13 +1529,13 @@ void NoClient::UserCommand(NoString& sLine)
         putStatus("Running for " + NoApp::Get().GetUptime());
     } else if (d->user->isAdmin() &&
                (sCommand.equals("LISTPORTS") || sCommand.equals("ADDPORT") || sCommand.equals("DELPORT"))) {
-        UserPortCommand(sLine);
+        yserPortCommand(sLine);
     } else {
         putStatus("Unknown command [" + sCommand + "] try 'Help'");
     }
 }
 
-void NoClient::UserPortCommand(NoString& sLine)
+void NoClient::yserPortCommand(NoString& sLine)
 {
     const NoString sCommand = No::token(sLine, 0);
 
@@ -1653,7 +1653,7 @@ static void addCommandHelp(NoTable& Table, const NoString& sCmd, const NoString&
     }
 }
 
-void NoClient::HelpUser(const NoString& sFilter)
+void NoClient::helpUser(const NoString& sFilter)
 {
     NoTable Table;
     Table.addColumn("Command");

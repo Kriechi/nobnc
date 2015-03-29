@@ -64,7 +64,7 @@ class NoSendRawMod : public NoModule
     void CurrentClient(const NoString& sLine)
     {
         NoString sData = No::tokens(sLine, 1);
-        client()->PutClient(sData);
+        client()->putClient(sData);
     }
 
 public:

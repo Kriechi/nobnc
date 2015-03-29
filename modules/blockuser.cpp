@@ -194,7 +194,7 @@ private:
         std::vector<NoClient*>::iterator it;
         for (it = vpClients.begin(); it != vpClients.end(); ++it) {
             (*it)->putStatusNotice(MESSAGE);
-            (*it)->GetSocket()->Close(NoSocket::CLT_AFTERWRITE);
+            (*it)->socket()->Close(NoSocket::CLT_AFTERWRITE);
         }
 
         // Disconnect all networks from irc

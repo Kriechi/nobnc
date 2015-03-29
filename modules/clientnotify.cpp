@@ -89,7 +89,7 @@ public:
 
     void onClientLogin() override
     {
-        NoString sRemoteIP = client()->GetSocket()->GetRemoteIP();
+        NoString sRemoteIP = client()->socket()->GetRemoteIP();
         if (!m_bNewOnly || m_sClientsSeen.find(sRemoteIP) == m_sClientsSeen.end()) {
             SendNotification("Another client authenticated as your user. "
                              "Use the 'ListClients' command to see all " +

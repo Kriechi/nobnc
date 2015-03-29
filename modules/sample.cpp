@@ -273,7 +273,7 @@ public:
 
     ModRet onUserTopic(NoString& sTarget, NoString& sTopic) override
     {
-        putModule("* " + client()->GetNick() + " changed topic on " + sTarget + " to '" + sTopic + "'");
+        putModule("* " + client()->nick() + " changed topic on " + sTarget + " to '" + sTopic + "'");
 
         return CONTINUE;
     }

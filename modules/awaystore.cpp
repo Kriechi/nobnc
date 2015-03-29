@@ -87,7 +87,7 @@ class NoAway : public NoModule
 
     void ReplayCommand(const NoString& sCommand)
     {
-        NoString nick = client()->GetNick();
+        NoString nick = client()->nick();
         for (u_int a = 0; a < m_vMessages.size(); a++) {
             NoString sWhom = No::token(m_vMessages[a], 1, ":");
             NoString sMessage = No::tokens(m_vMessages[a], 2, ":");

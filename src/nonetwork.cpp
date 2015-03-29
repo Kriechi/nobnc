@@ -56,8 +56,8 @@ protected:
 
         const std::vector<NoClient*>& vClients = m_pNetwork->clients();
         for (NoClient* pClient : vClients) {
-            if (pClient->GetSocket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
-                pClient->PutClient("PING :ZNC");
+            if (pClient->socket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
+                pClient->putClient("PING :ZNC");
             }
         }
     }
@@ -307,7 +307,7 @@ NoNetwork::~NoNetwork()
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::Get().manager().DelSockByAddr(d->clients[0]->GetSocket());
+        NoApp::Get().manager().DelSockByAddr(d->clients[0]->socket());
     }
     d->clients.clear();
 
@@ -571,7 +571,7 @@ NoSettings NoNetwork::toConfig() const
 void NoNetwork::bounceAllClients()
 {
     for (NoClient* pClient : d->clients) {
-        pClient->BouncedOff();
+        pClient->bouncedOff();
     }
 
     d->clients.clear();
@@ -582,7 +582,7 @@ bool NoNetwork::isUserAttached() const { return !d->clients.empty(); }
 bool NoNetwork::isUserOnline() const
 {
     for (NoClient* pClient : d->clients) {
-        if (!pClient->IsAway()) {
+        if (!pClient->isAway()) {
             return true;
         }
     }
@@ -600,24 +600,24 @@ void NoNetwork::clientConnected(NoClient* pClient)
 
     size_t uIdx, uSize;
 
-    pClient->SetPlaybackActive(true);
+    pClient->setPlaybackActive(true);
 
     if (d->rawBuffer.isEmpty()) {
-        pClient->PutClient(":irc.znc.in 001 " + pClient->GetNick() + " :- Welcome to ZNC -");
+        pClient->putClient(":irc.znc.in 001 " + pClient->nick() + " :- Welcome to ZNC -");
     } else {
-        const NoString& sClientNick = pClient->GetNick(false);
+        const NoString& sClientNick = pClient->nick(false);
         NoStringMap msParams;
         msParams["target"] = sClientNick;
 
         uSize = d->rawBuffer.size();
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            pClient->PutClient(d->rawBuffer.message(uIdx, *pClient, msParams));
+            pClient->putClient(d->rawBuffer.message(uIdx, *pClient, msParams));
         }
 
         const NoNick& Nick = ircNick();
         if (sClientNick != Nick.nick()) { // case-sensitive match
-            pClient->PutClient(":" + sClientNick + "!" + Nick.ident() + "@" + Nick.host() + " NICK :" + Nick.nick());
-            pClient->SetNick(Nick.nick());
+            pClient->putClient(":" + sClientNick + "!" + Nick.ident() + "@" + Nick.host() + " NICK :" + Nick.nick());
+            pClient->setNick(Nick.nick());
         }
     }
 
@@ -628,7 +628,7 @@ void NoNetwork::clientConnected(NoClient* pClient)
     uSize = d->motdBuffer.size();
     if (uSize > 0) {
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            pClient->PutClient(d->motdBuffer.message(uIdx, *pClient, msParams));
+            pClient->putClient(d->motdBuffer.message(uIdx, *pClient, msParams));
         }
     }
 
@@ -639,14 +639,14 @@ void NoNetwork::clientConnected(NoClient* pClient)
             sUserMode += cMode;
         }
         if (!sUserMode.empty()) {
-            pClient->PutClient(":" + ircNick().nickMask() + " MODE " + ircNick().nick() + " :+" + sUserMode);
+            pClient->putClient(":" + ircNick().nickMask() + " MODE " + ircNick().nick() + " :+" + sUserMode);
         }
     }
 
     if (d->away) {
         // If they want to know their away reason they'll have to whois
         // themselves. At least we can tell them their away status...
-        pClient->PutClient(":irc.znc.in 306 " + ircNick().nick() + " :You have been marked as being away");
+        pClient->putClient(":irc.znc.in 306 " + ircNick().nick() + " :You have been marked as being away");
     }
 
     const std::vector<NoChannel*>& vChans = channels();
@@ -674,11 +674,11 @@ void NoNetwork::clientConnected(NoClient* pClient)
         bool bContinue = false;
         NETWORKMODULECALL(onPrivBufferPlayLine2(*pClient, sLine, BufLine.timestamp()), d->user, this, nullptr, &bContinue);
         if (bContinue) continue;
-        pClient->PutClient(sLine);
+        pClient->putClient(sLine);
     }
     d->noticeBuffer.clear();
 
-    pClient->SetPlaybackActive(false);
+    pClient->setPlaybackActive(false);
 
     // Tell them why they won't connect
     if (!isEnabled())
@@ -705,7 +705,7 @@ std::vector<NoClient*> NoNetwork::findClients(const NoString& sIdentifier) const
 {
     std::vector<NoClient*> vClients;
     for (NoClient* pClient : d->clients) {
-        if (pClient->GetIdentifier().equals(sIdentifier)) {
+        if (pClient->identifier().equals(sIdentifier)) {
             vClients.push_back(pClient);
         }
     }
@@ -717,7 +717,7 @@ void NoNetwork::setUser(NoUser* pUser)
 {
     for (NoClient* pClient : d->clients) {
         pClient->putStatus("This network is being deleted or moved to another user.");
-        pClient->SetNetwork(nullptr);
+        pClient->setNetwork(nullptr);
     }
 
     d->clients.clear();
@@ -748,7 +748,7 @@ bool NoNetwork::putUser(const NoString& sLine, NoClient* pClient, NoClient* pSki
 {
     for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
-            pEachClient->PutClient(sLine);
+            pEachClient->putClient(sLine);
 
             if (pClient) {
                 return true;
@@ -1205,7 +1205,7 @@ void NoNetwork::setIrcNick(const NoNick& n)
     d->ircNick = n;
 
     for (NoClient* pClient : d->clients) {
-        pClient->SetNick(n.nick());
+        pClient->setNick(n.nick());
     }
 }
 
@@ -1218,7 +1218,7 @@ NoString NoNetwork::currentNick() const
     }
 
     if (!d->clients.empty()) {
-        return d->clients[0]->GetNick();
+        return d->clients[0]->nick();
     }
 
     return "";

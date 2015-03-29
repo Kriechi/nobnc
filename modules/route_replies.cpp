@@ -385,7 +385,7 @@ private:
         if (bIsRaw353)
             network()->ircSocket()->ForwardRaw353(sLine, m_pDoing);
         else
-            m_pDoing->PutClient(sLine);
+            m_pDoing->putClient(sLine);
 
         if (bFinished) {
             // Stop the timeout

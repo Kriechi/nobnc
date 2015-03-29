@@ -218,12 +218,12 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
             const std::vector<NoClient*>& vClients = d->network->clients();
 
             for (NoClient* pClient : vClients) {
-                NoString sClientNick = pClient->GetNick(false);
+                NoString sClientNick = pClient->nick(false);
 
                 if (!sClientNick.equals(sNick)) {
                     // If they connected with a nick that doesn't match the one we got on irc, then we need to update
                     // them
-                    pClient->PutClient(":" + sClientNick + "!" + d->nick.ident() + "@" + d->nick.host() +
+                    pClient->putClient(":" + sClientNick + "!" + d->nick.ident() + "@" + d->nick.host() +
                                        " NICK :" + sNick);
                 }
             }
@@ -389,7 +389,7 @@ void NoIrcSocket::ReadLineImpl(const NoString& sData)
 
                 const std::vector<NoClient*>& vClients = d->network->clients();
                 for (NoClient* pClient : vClients) {
-                    if (pClient->HasNamesx()) {
+                    if (pClient->hasNamesX()) {
                         d->network->putUser(sLine, pClient);
                     } else {
                         // The client doesn't support multi-prefix so we need to remove
@@ -1313,7 +1313,7 @@ void NoIrcSocket::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
 {
     NoString sNicks = No::tokens(sLine, 5).trimPrefix_n();
 
-    if ((!d->hasNamesX || pClient->HasNamesx()) && (!d->hasUhNames || pClient->HasUHNames())) {
+    if ((!d->hasNamesX || pClient->hasNamesX()) && (!d->hasUhNames || pClient->hasUhNames())) {
         // Client and server have both the same UHNames and Namesx stuff enabled
         d->network->putUser(sLine, pClient);
     } else {
@@ -1325,7 +1325,7 @@ void NoIrcSocket::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
         for (NoString sNick : vsNicks) {
             if (sNick.empty()) break;
 
-            if (d->hasNamesX && !pClient->HasNamesx() && IsPermChar(sNick[0])) {
+            if (d->hasNamesX && !pClient->hasNamesX() && IsPermChar(sNick[0])) {
                 // Server has, client doesn't have NAMESX, so we just use the first perm char
                 size_t pos = sNick.find_first_not_of(GetPerms());
                 if (pos >= 2 && pos != NoString::npos) {
@@ -1333,7 +1333,7 @@ void NoIrcSocket::ForwardRaw353(const NoString& sLine, NoClient* pClient) const
                 }
             }
 
-            if (d->hasUhNames && !pClient->HasUHNames()) {
+            if (d->hasUhNames && !pClient->hasUhNames()) {
                 // Server has, client hasnt UHNAMES,
                 // so we strip away ident and host.
                 sNick = No::token(sNick, 0, "!");

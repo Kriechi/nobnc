@@ -89,12 +89,12 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                 NoClient* useClient = (client ? client : eachClient);
 
                 NoStringMap params;
-                params["target"] = useClient->GetNick();
+                params["target"] = useClient->nick();
 
-                bool wasPlaybackActive = useClient->IsPlaybackActive();
-                useClient->SetPlaybackActive(true);
+                bool wasPlaybackActive = useClient->isPlaybackActive();
+                useClient->setPlaybackActive(true);
 
-                bool batch = useClient->HasBatch();
+                bool batch = useClient->hasBatch();
                 NoString batchName = No::md5(d->name);
 
                 if (batch) {
@@ -105,9 +105,9 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                 for (size_t uIdx = 0; uIdx < size; uIdx++) {
                     const NoMessage& message = buffer.message(uIdx);
 
-                    if (!useClient->HasSelfMessage()) {
+                    if (!useClient->hasSelfMessage()) {
                         NoNick sender(No::token(message.format(), 0));
-                        if (sender.equals(useClient->GetNick())) {
+                        if (sender.equals(useClient->nick())) {
                             continue;
                         }
                     }
@@ -132,7 +132,7 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                     d->network->putUser(":znc.in BATCH -" + batchName, useClient);
                 }
 
-                useClient->SetPlaybackActive(wasPlaybackActive);
+                useClient->setPlaybackActive(wasPlaybackActive);
 
                 if (client) break;
             }

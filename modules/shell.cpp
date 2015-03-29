@@ -110,8 +110,8 @@ public:
     {
         NoString sPath = m_sPath.replace_n(" ", "_");
         NoString sSource = ":" + moduleNick() + "!shell@" + sPath;
-        NoString sLine = sSource + " PRIVMSG " + client()->GetNick() + " :" + sMsg;
-        client()->PutClient(sLine);
+        NoString sLine = sSource + " PRIVMSG " + client()->nick() + " :" + sMsg;
+        client()->putClient(sLine);
     }
 
     void RunCommand(const NoString& sCommand)

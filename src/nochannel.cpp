@@ -176,7 +176,7 @@ void NoChannel::attachUser(NoClient* pClient)
             pThisClient = pClient;
 
         for (std::map<NoString, NoNick>::iterator a = d->nicks.begin(); a != d->nicks.end(); ++a) {
-            if (pThisClient->HasNamesx()) {
+            if (pThisClient->hasNamesX()) {
                 sPerm = a->second.perms();
             } else {
                 char c = a->second.perm();
@@ -185,7 +185,7 @@ void NoChannel::attachUser(NoClient* pClient)
                     sPerm += c;
                 }
             }
-            if (pThisClient->HasUHNames() && !a->second.ident().empty() && !a->second.host().empty()) {
+            if (pThisClient->hasUhNames() && !a->second.ident().empty() && !a->second.host().empty()) {
                 sNick = a->first + "!" + a->second.ident() + "@" + a->second.host();
             } else {
                 sNick = a->first;
@@ -628,17 +628,17 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
             for (NoClient* pEachClient : vClients) {
                 NoClient* pUseClient = (pClient ? pClient : pEachClient);
 
-                bool bWasPlaybackActive = pUseClient->IsPlaybackActive();
-                pUseClient->SetPlaybackActive(true);
+                bool bWasPlaybackActive = pUseClient->isPlaybackActive();
+                pUseClient->setPlaybackActive(true);
 
-                bool bSkipStatusMsg = pUseClient->HasServerTime();
+                bool bSkipStatusMsg = pUseClient->hasServerTime();
                 NETWORKMODULECALL(onChanBufferStarting(*this, *pUseClient), d->network->user(), d->network, nullptr, &bSkipStatusMsg);
 
                 if (!bSkipStatusMsg) {
                     d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Buffer Playback...", pUseClient);
                 }
 
-                bool bBatch = pUseClient->HasBatch();
+                bool bBatch = pUseClient->hasBatch();
                 NoString sBatchName = No::md5(name());
 
                 if (bBatch) {
@@ -664,7 +664,7 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                     d->network->putUser(sLine, pUseClient);
                 }
 
-                bSkipStatusMsg = pUseClient->HasServerTime();
+                bSkipStatusMsg = pUseClient->hasServerTime();
                 NETWORKMODULECALL(onChanBufferEnding(*this, *pUseClient), d->network->user(), d->network, nullptr, &bSkipStatusMsg);
                 if (!bSkipStatusMsg) {
                     d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Playback Complete.", pUseClient);
@@ -674,7 +674,7 @@ void NoChannel::sendBuffer(NoClient* pClient, const NoBuffer& Buffer)
                     d->network->putUser(":znc.in BATCH -" + sBatchName, pUseClient);
                 }
 
-                pUseClient->SetPlaybackActive(bWasPlaybackActive);
+                pUseClient->setPlaybackActive(bWasPlaybackActive);
 
                 if (pClient) break;
             }

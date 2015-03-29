@@ -149,7 +149,7 @@ public:
 
     void HandleShowCommand(const NoString& sLine)
     {
-        const NoString sPubKey = GetKey(client()->GetSocket());
+        const NoString sPubKey = GetKey(client()->socket());
 
         if (sPubKey.empty()) {
             putModule("You are not connected with any valid public key");
@@ -163,7 +163,7 @@ public:
         NoString sPubKey = No::token(sLine, 1);
 
         if (sPubKey.empty()) {
-            sPubKey = GetKey(client()->GetSocket());
+            sPubKey = GetKey(client()->socket());
         }
 
         if (sPubKey.empty()) {

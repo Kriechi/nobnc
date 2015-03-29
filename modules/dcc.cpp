@@ -260,7 +260,7 @@ public:
             ulong uLongIP = No::token(sMessage, 3).toULong();
             ushort uPort = No::token(sMessage, 4).toUShort();
             ulong uFileSize = No::token(sMessage, 5).toULong();
-            GetFile(client()->GetNick(), No::formatIp(uLongIP), uPort, sLocalFile, uFileSize);
+            GetFile(client()->nick(), No::formatIp(uLongIP), uPort, sLocalFile, uFileSize);
         }
     }
     void AddSocket(NoDccSock* socket) { m_sockets.insert(socket); }

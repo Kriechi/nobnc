@@ -45,8 +45,8 @@ protected:
         const std::vector<NoClient*>& vUserClients = m_pUser->userClients();
 
         for (NoClient* pUserClient : vUserClients) {
-            if (pUserClient->GetSocket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
-                pUserClient->PutClient("PING :ZNC");
+            if (pUserClient->socket()->GetTimeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
+                pUserClient->putClient("PING :ZNC");
             }
         }
     }
@@ -127,7 +127,7 @@ NoUser::~NoUser()
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::Get().manager().DelSockByAddr(d->clients[0]->GetSocket());
+        NoApp::Get().manager().DelSockByAddr(d->clients[0]->socket());
     }
     d->clients.clear();
 
@@ -624,7 +624,7 @@ NoString NoUser::addTimestamp(time_t tm, const NoString& sStr) const
 void NoUser::bounceAllClients()
 {
     for (NoClient* pClient : d->clients) {
-        pClient->BouncedOff();
+        pClient->bouncedOff();
     }
 
     d->clients.clear();
@@ -638,7 +638,7 @@ void NoUser::userConnected(NoClient* pClient)
         bounceAllClients();
     }
 
-    pClient->PutClient(":irc.znc.in 001 " + pClient->GetNick() + " :- Welcome to ZNC -");
+    pClient->putClient(":irc.znc.in 001 " + pClient->nick() + " :- Welcome to ZNC -");
 
     d->clients.push_back(pClient);
 }
@@ -683,7 +683,7 @@ void NoUser::cloneNetworks(const NoUser& User)
             NoClient* pClient = vClients.front();
             // This line will remove pClient from vClients,
             // because it's a reference to the internal Network's vector.
-            pClient->SetNetwork(nullptr);
+            pClient->setNetwork(nullptr);
         }
 
         deleteNetwork(sNetwork);
@@ -734,7 +734,7 @@ bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     }
 
     for (NoClient* pClient : d->clients) {
-        NoSocket* pSock = pClient->GetSocket();
+        NoSocket* pSock = pClient->socket();
         if (!isHostAllowed(pSock->GetRemoteIP())) {
             pClient->putStatusNotice(
             "You are being disconnected because your IP is no longer allowed to connect to this user");
@@ -1009,7 +1009,7 @@ NoString NoUser::localDccIp() const
     }
 
     if (!allClients().empty()) {
-        return allClients()[0]->GetSocket()->GetLocalIP();
+        return allClients()[0]->socket()->GetLocalIP();
     }
 
     return "";
@@ -1019,7 +1019,7 @@ bool NoUser::putUser(const NoString& sLine, NoClient* pClient, NoClient* pSkipCl
 {
     for (NoClient* pEachClient : d->clients) {
         if ((!pClient || pClient == pEachClient) && pSkipClient != pEachClient) {
-            pEachClient->PutClient(sLine);
+            pEachClient->putClient(sLine);
 
             if (pClient) {
                 return true;

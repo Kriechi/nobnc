@@ -135,7 +135,7 @@ void NoPeerSocket::ReadLineImpl(const NoString& line)
             NO_DEBUG("Refused IRC connection to non IRC port");
         } else {
             NoClient* client = new NoClient;
-            socket = client->GetSocket();
+            socket = client->socket();
             NoApp::Get().manager().SwapSockByAddr(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout

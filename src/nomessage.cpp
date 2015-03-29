@@ -68,7 +68,7 @@ NoString NoMessage::formatted(const NoClient& client, const NoStringMap& params)
 {
     NoStringMap copy = params;
 
-    if (client.HasServerTime()) {
+    if (client.hasServerTime()) {
         copy["text"] = d->text;
         NoString str = No::namedFormat(d->format, copy);
         return "@time=" + No::formatServerTime(d->ts) + " " + str;

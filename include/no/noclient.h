@@ -35,64 +35,64 @@ public:
     NoClient();
     ~NoClient();
 
-    NoSocket* GetSocket() const;
+    NoSocket* socket() const;
 
-    void SendRequiredPasswordNotice();
-    void AcceptLogin(NoUser& User);
-    void RefuseLogin(const NoString& sReason);
+    void sendRequiredPasswordNotice();
+    void acceptLogin(NoUser& User);
+    void refuseLogin(const NoString& sReason);
 
-    NoString GetNick(bool bAllowIRCNick = true) const;
-    NoString GetNickMask() const;
-    NoString GetIdentifier() const;
-    bool HasNamesx() const;
-    bool HasUHNames() const;
-    bool IsAway() const;
-    bool HasServerTime() const;
-    bool HasBatch() const;
-    bool HasSelfMessage() const;
+    NoString nick(bool bAllowIRCNick = true) const;
+    NoString nickMask() const;
+    NoString identifier() const;
+    bool hasNamesX() const;
+    bool hasUhNames() const;
+    bool isAway() const;
+    bool hasServerTime() const;
+    bool hasBatch() const;
+    bool hasSelfMessage() const;
 
-    static bool IsValidIdentifier(const NoString& sIdentifier);
+    static bool isValidIdentifier(const NoString& sIdentifier);
 
-    void UserCommand(NoString& sLine);
-    void UserPortCommand(NoString& sLine);
-    void StatusCTCP(const NoString& sCommand);
-    void BouncedOff();
-    bool IsAttached() const;
+    void userCommand(NoString& sLine);
+    void yserPortCommand(NoString& sLine);
+    void statusCtcp(const NoString& sCommand);
+    void bouncedOff();
+    bool isAttached() const;
 
-    bool IsPlaybackActive() const;
-    void SetPlaybackActive(bool bActive);
+    bool isPlaybackActive() const;
+    void setPlaybackActive(bool bActive);
 
     void putIrc(const NoString& sLine);
-    void PutClient(const NoString& sLine);
+    void putClient(const NoString& sLine);
     uint putStatus(const NoTable& table);
     void putStatus(const NoString& sLine);
     void putStatusNotice(const NoString& sLine);
     void putModule(const NoString& sModule, const NoString& sLine);
     void putModuleNotice(const NoString& sModule, const NoString& sLine);
 
-    bool IsCapEnabled(const NoString& sCap) const;
+    bool isCapEnabled(const NoString& sCap) const;
 
-    bool SendMotd();
-    void HelpUser(const NoString& sFilter = "");
-    void AuthUser();
+    bool sendMotd();
+    void helpUser(const NoString& sFilter = "");
+    void authUser();
 
-    void SetNick(const NoString& s);
-    void SetAway(bool bAway);
+    void setNick(const NoString& s);
+    void setAway(bool bAway);
     NoUser* user() const;
-    void SetNetwork(NoNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
+    void setNetwork(NoNetwork* pNetwork, bool bDisconnect = true, bool bReconnect = true);
     NoNetwork* network() const;
     std::vector<NoClient*> clients() const;
     NoIrcSocket* ircSocket() const;
-    NoString GetFullName() const;
+    NoString fullName() const;
 
-    void ReadLine(const NoString& sData);
+    void readLine(const NoString& sData);
 
 private:
-    void HandleCap(const NoString& sLine);
-    void RespondCap(const NoString& sResponse);
-    void ParsePass(const NoString& sAuthLine);
-    void ParseUser(const NoString& sAuthLine);
-    void ParseIdentifier(const NoString& sAuthLine);
+    void handleCap(const NoString& sLine);
+    void respondCap(const NoString& sResponse);
+    void parsePass(const NoString& sAuthLine);
+    void parseUser(const NoString& sAuthLine);
+    void parseIdentifier(const NoString& sAuthLine);
 
 private:
     NoClient(const NoClient&) = delete;
