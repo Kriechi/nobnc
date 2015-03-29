@@ -1059,7 +1059,7 @@ bool NoApp::DoRehash(NoString& sError)
         return false;
     }
 
-    if (!NoFile::IsReg(m_configFile)) {
+    if (!NoFile(m_configFile).IsReg()) {
         sError = "Not a file";
         No::printStatus(false, sError);
         return false;

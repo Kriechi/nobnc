@@ -27,20 +27,12 @@
 class NO_EXPORT NoFile
 {
 public:
-    NoFile();
-    NoFile(const NoString& sLongName);
+    NoFile(const NoString& sLongName = "");
     ~NoFile();
 
     enum FileType { Regular, Directory, Character, Block, Fifo, Link, Socket };
 
     void SetFileName(const NoString& sLongName);
-    static bool IsReg(const NoString& sLongName, bool bUseLstat = false);
-    static bool IsDir(const NoString& sLongName, bool bUseLstat = false);
-    static bool IsChr(const NoString& sLongName, bool bUseLstat = false);
-    static bool IsBlk(const NoString& sLongName, bool bUseLstat = false);
-    static bool IsFifo(const NoString& sLongName, bool bUseLstat = false);
-    static bool IsLnk(const NoString& sLongName, bool bUseLstat = true);
-    static bool IsSock(const NoString& sLongName, bool bUseLstat = false);
 
     bool IsReg(bool bUseLstat = false) const;
     bool IsDir(bool bUseLstat = false) const;

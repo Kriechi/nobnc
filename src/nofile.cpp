@@ -39,8 +39,6 @@ static inline void SetFdCloseOnExec(int fd)
 
 NoString NoFile::m_homePath;
 
-NoFile::NoFile() : NoFile("") {}
-
 NoFile::NoFile(const NoString& sLongName) : m_buffer(""), m_fd(-1), m_hadError(false), m_longName(""), m_shortName("")
 {
     SetFileName(sLongName);
@@ -64,28 +62,21 @@ void NoFile::SetFileName(const NoString& sLongName)
     }
 }
 
-bool NoFile::IsDir(const NoString& sLongName, bool bUseLstat)
+bool NoFile::IsDir(bool bUseLstat) const
 {
-    if (sLongName.equals("/")) return NoFile::FType(sLongName, Directory, bUseLstat);
+    if (m_longName.equals("/"))
+        return NoFile::FType(m_longName, Directory, bUseLstat);
 
     // Some OS don't like trailing slashes for directories
-    return NoFile::FType(sLongName.trimRight_n("/"), Directory, bUseLstat);
+    return NoFile::FType(m_longName.trimRight_n("/"), Directory, bUseLstat);
 }
 
-bool NoFile::IsReg(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Regular, bUseLstat); }
-bool NoFile::IsChr(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Character, bUseLstat); }
-bool NoFile::IsBlk(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Block, bUseLstat); }
-bool NoFile::IsFifo(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Fifo, bUseLstat); }
-bool NoFile::IsLnk(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Link, bUseLstat); }
-bool NoFile::IsSock(const NoString& sLongName, bool bUseLstat) { return NoFile::FType(sLongName, Socket, bUseLstat); }
-
-bool NoFile::IsReg(bool bUseLstat) const { return NoFile::IsReg(m_longName, bUseLstat); }
-bool NoFile::IsDir(bool bUseLstat) const { return NoFile::IsDir(m_longName, bUseLstat); }
-bool NoFile::IsChr(bool bUseLstat) const { return NoFile::IsChr(m_longName, bUseLstat); }
-bool NoFile::IsBlk(bool bUseLstat) const { return NoFile::IsBlk(m_longName, bUseLstat); }
-bool NoFile::IsFifo(bool bUseLstat) const { return NoFile::IsFifo(m_longName, bUseLstat); }
-bool NoFile::IsLnk(bool bUseLstat) const { return NoFile::IsLnk(m_longName, bUseLstat); }
-bool NoFile::IsSock(bool bUseLstat) const { return NoFile::IsSock(m_longName, bUseLstat); }
+bool NoFile::IsReg(bool bUseLstat) const { return NoFile::FType(m_longName, Regular, bUseLstat); }
+bool NoFile::IsChr(bool bUseLstat) const { return NoFile::FType(m_longName, Character, bUseLstat); }
+bool NoFile::IsBlk(bool bUseLstat) const { return NoFile::FType(m_longName, Block, bUseLstat); }
+bool NoFile::IsFifo(bool bUseLstat) const { return NoFile::FType(m_longName, Fifo, bUseLstat); }
+bool NoFile::IsLnk(bool bUseLstat) const { return NoFile::FType(m_longName, Link, bUseLstat); }
+bool NoFile::IsSock(bool bUseLstat) const { return NoFile::FType(m_longName, Socket, bUseLstat); }
 
 // for gettin file types, using fstat instead
 bool NoFile::FType(const NoString& sFileName, FileType eType, bool bUseLstat)

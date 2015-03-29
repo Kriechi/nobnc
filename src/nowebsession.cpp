@@ -289,7 +289,7 @@ void NoWebSocket::GetAvailSkins(NoStringVector& vRet) const
         sRoot += "/";
     }
 
-    if (!sRoot.empty() && NoFile::IsDir(sRoot)) {
+    if (!sRoot.empty() && NoFile(sRoot).IsDir()) {
         NoDir Dir(sRoot);
 
         for (const NoFile* pSubDir : Dir.files()) {
@@ -567,10 +567,10 @@ NoString NoWebSocket::GetSkinPath(const NoString& sSkinName)
 {
     NoString sRet = NoApp::Get().GetZNCPath() + "/webskins/" + sSkinName;
 
-    if (!NoFile::IsDir(sRet)) {
+    if (!NoFile(sRet).IsDir()) {
         sRet = NoApp::Get().GetCurPath() + "/webskins/" + sSkinName;
 
-        if (!NoFile::IsDir(sRet)) {
+        if (!NoFile(sRet).IsDir()) {
             sRet = NoString(_SKINDIR_) + "/" + sSkinName;
         }
     }

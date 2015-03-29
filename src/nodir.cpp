@@ -152,7 +152,7 @@ bool NoDir::mkpath(const NoString& path, mode_t mode)
         fullPath += part;
 
         int i = mkdir(fullPath.c_str(), mode);
-        if (i != 0 && (errno != EEXIST || !NoFile::IsDir(fullPath)))
+        if (i != 0 && (errno != EEXIST || !NoFile(fullPath).IsDir()))
             return false;
 
         fullPath += "/";
