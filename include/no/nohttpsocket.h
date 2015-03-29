@@ -59,12 +59,10 @@ public:
     NoString GetRequestCookie(const NoString& sKey) const;
     bool SendCookie(const NoString& sKey, const NoString& sValue);
 
-    void SetDocRoot(const NoString& s);
     void SetLoggedIn(bool b);
 
     NoString GetPath() const;
     bool IsLoggedIn() const;
-    const NoString& GetDocRoot() const;
     const NoString& user() const;
     const NoString& GetPass() const;
     const NoString& GetParamString() const;
@@ -105,7 +103,6 @@ protected:
     NoString m_username;
     NoString m_password;
     NoString m_contentType;
-    NoString m_docRoot;
     NoString m_forwardedIp;
     std::map<NoString, NoStringVector> m_postParams;
     std::map<NoString, NoStringVector> m_getParams;

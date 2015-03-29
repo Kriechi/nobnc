@@ -35,7 +35,7 @@ NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix) : NoHttpS
 NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort)
     : NoModuleSocket(pMod, sHostname, uPort), m_sentHeader(false), m_gotHeader(false), m_loggedIn(false), m_post(false),
       m_done(false), m_postLen(0), m_postData(""), m_uri(""), m_username(""), m_password(""), m_contentType(""),
-      m_docRoot(""), m_forwardedIp(""), m_postParams(), m_getParams(), m_headers(), m_http10Client(false),
+      m_forwardedIp(""), m_postParams(), m_getParams(), m_headers(), m_http10Client(false),
       m_ifNoneMatch(""), m_acceptGzip(false), m_requestCookies(), m_responseCookies(), m_uriPrefix(sURIPrefix)
 {
     Init();
@@ -286,20 +286,6 @@ void NoHttpSocket::PrintPage(const NoString& sPage)
 bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
 {
     NoString sFilePath = sFileName;
-
-    if (!m_docRoot.empty()) {
-        sFilePath.trimLeft("/");
-
-        sFilePath = NoDir::CheckPathPrefix(m_docRoot, sFilePath, m_docRoot);
-
-        if (sFilePath.empty()) {
-            PrintErrorPage(403, "Forbidden", "You don't have permission to access that file on this server.");
-            NO_DEBUG("THIS FILE:     [" << sFilePath << "] does not live in ...");
-            NO_DEBUG("DOCUMENT ROOT: [" << m_docRoot << "]");
-            return false;
-        }
-    }
-
     NoFile File(sFilePath);
 
     if (!File.Open()) {
@@ -480,15 +466,7 @@ void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStr
     }
 }
 
-void NoHttpSocket::SetDocRoot(const NoString& s)
-{
-    m_docRoot = s + "/";
-    m_docRoot.replace("//", "/");
-}
-
 void NoHttpSocket::SetLoggedIn(bool b) { m_loggedIn = b; }
-
-const NoString& NoHttpSocket::GetDocRoot() const { return m_docRoot; }
 
 const NoString& NoHttpSocket::user() const { return m_username; }
 
