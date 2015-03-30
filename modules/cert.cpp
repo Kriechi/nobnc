@@ -91,15 +91,15 @@ public:
             NoFile fPemFile(PemFile());
 
             if (fPemFile.Open(O_WRONLY | O_TRUNC | O_CREAT)) {
-                fPemFile.Write(WebSock.GetParam("cert", true, ""));
+                fPemFile.Write(WebSock.param("cert", true, ""));
                 fPemFile.Close();
             }
 
-            WebSock.Redirect(webPath());
+            WebSock.redirect(webPath());
             return true;
         } else if (sPageName == "delete") {
             NoFile::Delete(PemFile());
-            WebSock.Redirect(webPath());
+            WebSock.redirect(webPath());
             return true;
         }
 

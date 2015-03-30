@@ -154,19 +154,19 @@ public:
                 Tmpl["Self"] = NoString(Tmpl["Username"].equals(WebSock.GetSession()->user()->userName()));
                 return true;
             }
-            if (sAction == "change" && WebSock.GetParam("embed_blockuser_presented").toBool()) {
+            if (sAction == "change" && WebSock.param("embed_blockuser_presented").toBool()) {
                 if (Tmpl["Username"].equals(WebSock.GetSession()->user()->userName()) &&
-                    WebSock.GetParam("embed_blockuser_block").toBool()) {
+                    WebSock.param("embed_blockuser_block").toBool()) {
                     WebSock.GetSession()->addError("You can't block yourself");
-                } else if (WebSock.GetParam("embed_blockuser_block").toBool()) {
-                    if (!WebSock.GetParam("embed_blockuser_old").toBool()) {
+                } else if (WebSock.param("embed_blockuser_block").toBool()) {
+                    if (!WebSock.param("embed_blockuser_old").toBool()) {
                         if (Block(Tmpl["Username"])) {
                             WebSock.GetSession()->addSuccess("Blocked [" + Tmpl["Username"] + "]");
                         } else {
                             WebSock.GetSession()->addError("Couldn't block [" + Tmpl["Username"] + "]");
                         }
                     }
-                } else if (WebSock.GetParam("embed_blockuser_old").toBool()) {
+                } else if (WebSock.param("embed_blockuser_old").toBool()) {
                     NoRegistry registry(this);
                     if (registry.contains(Tmpl["Username"])) {
                         registry.remove(Tmpl["Username"]);

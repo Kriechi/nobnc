@@ -277,13 +277,13 @@ public:
 
             return true;
         } else if (sPageName == "add") {
-            AddKey(pUser, WebSock.GetParam("key"));
-            WebSock.Redirect(webPath());
+            AddKey(pUser, WebSock.param("key"));
+            WebSock.redirect(webPath());
             return true;
         } else if (sPageName == "delete") {
             MNoStringSet::iterator it = m_PubKeys.find(pUser->userName());
             if (it != m_PubKeys.end()) {
-                if (it->second.erase(WebSock.GetParam("key", false))) {
+                if (it->second.erase(WebSock.param("key", false))) {
                     if (it->second.size() == 0) {
                         m_PubKeys.erase(it);
                     }
@@ -292,7 +292,7 @@ public:
                 }
             }
 
-            WebSock.Redirect(webPath());
+            WebSock.redirect(webPath());
             return true;
         }
 

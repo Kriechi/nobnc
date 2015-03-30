@@ -32,7 +32,7 @@
 
 NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSocket(pMod, sURIPrefix, "", 0)
 {
-    Init();
+    init();
 }
 
 NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort)
@@ -59,10 +59,10 @@ NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoS
       m_responseCookies(),
       m_uriPrefix(sURIPrefix)
 {
-    Init();
+    init();
 }
 
-void NoHttpSocket::Init()
+void NoHttpSocket::init()
 {
     enableReadLine();
     setMaxBufferThreshold(10240);
@@ -76,11 +76,11 @@ void NoHttpSocket::readData(const char* data, size_t len)
 {
     if (!m_done && m_gotHeader && m_post) {
         m_postData.append(data, len);
-        CheckPost();
+        checkPost();
     }
 }
 
-bool NoHttpSocket::SendCookie(const NoString& sKey, const NoString& sValue)
+bool NoHttpSocket::sendCookie(const NoString& sKey, const NoString& sValue)
 {
     if (!sKey.empty() && !sValue.empty()) {
         // only queue a Set-Cookie to be sent if the client didn't send a Cookie header of the same name+value.
@@ -91,18 +91,18 @@ bool NoHttpSocket::SendCookie(const NoString& sKey, const NoString& sValue)
     return false;
 }
 
-NoString NoHttpSocket::GetRequestCookie(const NoString& sKey) const
+NoString NoHttpSocket::requestCookie(const NoString& sKey) const
 {
     NoStringMap::const_iterator it = m_requestCookies.find(sKey);
 
     return it != m_requestCookies.end() ? it->second : "";
 }
 
-void NoHttpSocket::CheckPost()
+void NoHttpSocket::checkPost()
 {
     if (m_postData.size() >= m_postLen) {
-        ParseParams(m_postData.left(m_postLen), m_postParams);
-        GetPage();
+        parseParams(m_postData.left(m_postLen), m_postParams);
+        requestPage();
         m_postData.clear();
         m_done = true;
     }
@@ -123,11 +123,11 @@ void NoHttpSocket::readLine(const NoString& sData)
         m_post = false;
         m_uri = No::token(sLine, 1);
         m_http10Client = No::token(sLine, 2).equals("HTTP/1.0");
-        ParseURI();
+        parseUri();
     } else if (sName.equals("POST")) {
         m_post = true;
         m_uri = No::token(sLine, 1);
-        ParseURI();
+        parseUri();
     } else if (sName.equals("Cookie:")) {
         NoStringVector vsNV = No::tokens(sLine, 1).split(";", No::SkipEmptyParts);
 
@@ -140,11 +140,11 @@ void NoHttpSocket::readLine(const NoString& sData)
         NoString sUnhashed = NoString::fromBase64(No::token(sLine, 2));
         m_username = No::token(sUnhashed, 0, ":");
         m_password = No::tokens(sUnhashed, 1, ":");
-        m_loggedIn = OnLogin(m_username, m_password, true);
+        m_loggedIn = onLogin(m_username, m_password, true);
     } else if (sName.equals("Content-Length:")) {
         m_postLen = No::token(sLine, 1).toULong();
         if (m_postLen > MAX_POST_SIZE)
-            PrintErrorPage(413, "Request Entity Too Large", "The request you sent was too large.");
+            printErrorPage(413, "Request Entity Too Large", "The request you sent was too large.");
     } else if (sName.equals("X-Forwarded-For:")) {
         // X-Forwarded-For: client, proxy1, proxy2
         if (m_forwardedIp.empty()) {
@@ -191,9 +191,9 @@ void NoHttpSocket::readLine(const NoString& sData)
 
         if (m_post) {
             m_postData = internalReadBuffer();
-            CheckPost();
+            checkPost();
         } else {
-            GetPage();
+            requestPage();
         }
 
         disableReadLine();
@@ -209,7 +209,7 @@ NoString NoHttpSocket::remoteAddress() const
     return NoModuleSocket::remoteAddress();
 }
 
-NoString NoHttpSocket::GetDate(time_t stamp)
+NoString NoHttpSocket::formatDate(time_t stamp)
 {
     struct tm tm;
     std::stringstream stream;
@@ -231,7 +231,7 @@ NoString NoHttpSocket::GetDate(time_t stamp)
     return stream.str();
 }
 
-void NoHttpSocket::GetPage()
+void NoHttpSocket::requestPage()
 {
     NO_DEBUG("Page Request [" << m_uri << "] ");
 
@@ -240,9 +240,9 @@ void NoHttpSocket::GetPage()
         NO_DEBUG("INVALID path => Does not start with prefix [" + m_uriPrefix + "]");
         NO_DEBUG("Expected prefix:   " << m_uriPrefix);
         NO_DEBUG("Requested path:    " << m_uri);
-        Redirect("/");
+        redirect("/");
     } else {
-        OnPageRequest(m_uri);
+        onPageRequest(m_uri);
     }
 }
 
@@ -261,18 +261,18 @@ static bool InitZlibStream(z_stream* zStrm, const char* buf)
 }
 #endif
 
-void NoHttpSocket::PrintPage(const NoString& sPage)
+void NoHttpSocket::printPage(const NoString& sPage)
 {
 #ifdef HAVE_ZLIB
-    if (m_acceptGzip && !SentHeader()) {
+    if (m_acceptGzip && !sentHeader()) {
         char szBuf[4096];
         z_stream zStrm;
         int zStatus, zFlush = Z_NO_FLUSH;
 
         if (InitZlibStream(&zStrm, sPage.c_str())) {
             NO_DEBUG("- Sending gzip-compressed.");
-            AddHeader("Content-Encoding", "gzip");
-            PrintHeader(0); // we do not know the compressed data's length
+            addHeader("Content-Encoding", "gzip");
+            printHeader(0); // we do not know the compressed data's length
 
             zStrm.avail_in = sPage.size();
             do {
@@ -297,8 +297,8 @@ void NoHttpSocket::PrintPage(const NoString& sPage)
 
     } // else: fall through
 #endif
-    if (!SentHeader()) {
-        PrintHeader(sPage.length());
+    if (!sentHeader()) {
+        printHeader(sPage.length());
     } else {
         NO_DEBUG("PrintPage(): Header was already sent");
     }
@@ -307,13 +307,13 @@ void NoHttpSocket::PrintPage(const NoString& sPage)
     close(NoSocket::CloseAfterWrite);
 }
 
-bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
+bool NoHttpSocket::printFile(const NoString& sFileName, NoString sContentType)
 {
     NoString sFilePath = sFileName;
     NoFile File(sFilePath);
 
     if (!File.Open()) {
-        PrintNotFound();
+        printNotFound();
         return false;
     }
 
@@ -346,9 +346,9 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
     if (iMTime > 0 && !m_http10Client) {
         sETag = "-" + NoString(iMTime); // lighttpd style ETag
 
-        AddHeader("Last-Modified", GetDate(iMTime));
-        AddHeader("ETag", "\"" + sETag + "\"");
-        AddHeader("Cache-Control", "public");
+        addHeader("Last-Modified", formatDate(iMTime));
+        addHeader("ETag", "\"" + sETag + "\"");
+        addHeader("Cache-Control", "public");
 
         if (!m_ifNoneMatch.empty()) {
             m_ifNoneMatch.trim("\\\"'");
@@ -357,7 +357,7 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
     }
 
     if (bNotModified) {
-        PrintHeader(0, sContentType, 304, "Not Modified");
+        printHeader(0, sContentType, 304, "Not Modified");
     } else {
         off_t iSize = File.GetSize();
 
@@ -365,7 +365,7 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
         // the whole process and use huge amounts of memory.
         if (iSize > 16 * 1024 * 1024) {
             NO_DEBUG("- Abort: File is over 16 MiB big: " << iSize);
-            PrintErrorPage(500, "Internal Server Error", "File too big");
+            printErrorPage(500, "Internal Server Error", "File too big");
             return true;
         }
 
@@ -374,14 +374,14 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
 
         if (bGzip) {
             NO_DEBUG("- Sending gzip-compressed.");
-            AddHeader("Content-Encoding", "gzip");
-            PrintHeader(0, sContentType); // we do not know the compressed data's length
-            WriteFileGzipped(File);
+            addHeader("Content-Encoding", "gzip");
+            printHeader(0, sContentType); // we do not know the compressed data's length
+            writeCompressedFile(File);
         } else
 #endif
         {
-            PrintHeader(iSize, sContentType);
-            WriteFileUncompressed(File);
+            printHeader(iSize, sContentType);
+            writeUncompressedFile(File);
         }
     }
 
@@ -392,7 +392,7 @@ bool NoHttpSocket::PrintFile(const NoString& sFileName, NoString sContentType)
     return true;
 }
 
-void NoHttpSocket::WriteFileUncompressed(NoFile& File)
+void NoHttpSocket::writeUncompressedFile(NoFile& File)
 {
     char szBuf[4096];
     off_t iLen = 0;
@@ -411,7 +411,7 @@ void NoHttpSocket::WriteFileUncompressed(NoFile& File)
 }
 
 #ifdef HAVE_ZLIB
-void NoHttpSocket::WriteFileGzipped(NoFile& File)
+void NoHttpSocket::writeCompressedFile(NoFile& File)
 {
     char szBufIn[8192];
     char szBufOut[8192];
@@ -466,23 +466,23 @@ void NoHttpSocket::WriteFileGzipped(NoFile& File)
 }
 #endif
 
-void NoHttpSocket::ParseURI()
+void NoHttpSocket::parseUri()
 {
-    ParseParams(No::tokens(m_uri, 1, "?"), m_getParams);
+    parseParams(No::tokens(m_uri, 1, "?"), m_getParams);
     m_uri = No::token(m_uri, 0, "?");
 }
 
-NoString NoHttpSocket::GetPath() const
+NoString NoHttpSocket::path() const
 {
     return No::token(m_uri, 0, "?");
 }
 
-bool NoHttpSocket::IsLoggedIn() const
+bool NoHttpSocket::isLoggedIn() const
 {
     return m_loggedIn;
 }
 
-void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams)
+void NoHttpSocket::parseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams)
 {
     msvsParams.clear();
 
@@ -496,51 +496,51 @@ void NoHttpSocket::ParseParams(const NoString& sParams, std::map<NoString, NoStr
     }
 }
 
-void NoHttpSocket::SetLoggedIn(bool b)
+void NoHttpSocket::setLoggedIn(bool b)
 {
     m_loggedIn = b;
 }
 
-NoString NoHttpSocket::user() const
+NoString NoHttpSocket::username() const
 {
     return m_username;
 }
 
-NoString NoHttpSocket::GetPass() const
+NoString NoHttpSocket::password() const
 {
     return m_password;
 }
 
-NoString NoHttpSocket::GetContentType() const
+NoString NoHttpSocket::contentType() const
 {
     return m_contentType;
 }
 
-NoString NoHttpSocket::GetParamString() const
+NoString NoHttpSocket::paramString() const
 {
     return m_postData;
 }
 
-NoString NoHttpSocket::GetURIPrefix() const
+NoString NoHttpSocket::uriPrefix() const
 {
     return m_uriPrefix;
 }
 
-bool NoHttpSocket::HasParam(const NoString& sName, bool bPost) const
+bool NoHttpSocket::hasParam(const NoString& sName, bool bPost) const
 {
     if (bPost)
         return (m_postParams.find(sName) != m_postParams.end());
     return (m_getParams.find(sName) != m_getParams.end());
 }
 
-NoString NoHttpSocket::GetRawParam(const NoString& sName, bool bPost) const
+NoString NoHttpSocket::rawParam(const NoString& sName, bool bPost) const
 {
     if (bPost)
-        return GetRawParam(sName, m_postParams);
-    return GetRawParam(sName, m_getParams);
+        return rawParam(sName, m_postParams);
+    return rawParam(sName, m_getParams);
 }
 
-NoString NoHttpSocket::GetRawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams)
+NoString NoHttpSocket::rawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams)
 {
     NoString sRet;
 
@@ -553,16 +553,16 @@ NoString NoHttpSocket::GetRawParam(const NoString& sName, const std::map<NoStrin
     return sRet;
 }
 
-NoString NoHttpSocket::GetParam(const NoString& sName, bool bPost, const NoString& sFilter) const
+NoString NoHttpSocket::param(const NoString& sName, bool bPost, const NoString& sFilter) const
 {
     if (bPost)
-        return GetParam(sName, m_postParams, sFilter);
-    return GetParam(sName, m_getParams, sFilter);
+        return param(sName, m_postParams, sFilter);
+    return param(sName, m_getParams, sFilter);
 }
 
-NoString NoHttpSocket::GetParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+NoString NoHttpSocket::param(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
 {
-    NoString sRet = GetRawParam(sName, msvsParams);
+    NoString sRet = rawParam(sName, msvsParams);
     sRet.trim();
 
     for (size_t i = 0; i < sFilter.length(); i++) {
@@ -572,14 +572,14 @@ NoString NoHttpSocket::GetParam(const NoString& sName, const std::map<NoString, 
     return sRet;
 }
 
-size_t NoHttpSocket::GetParamValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost, const NoString& sFilter) const
+size_t NoHttpSocket::paramValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost, const NoString& sFilter) const
 {
     if (bPost)
-        return GetParamValues(sName, ssRet, m_postParams, sFilter);
-    return GetParamValues(sName, ssRet, m_getParams, sFilter);
+        return paramValues(sName, ssRet, m_postParams, sFilter);
+    return paramValues(sName, ssRet, m_getParams, sFilter);
 }
 
-size_t NoHttpSocket::GetParamValues(const NoString& sName,
+size_t NoHttpSocket::paramValues(const NoString& sName,
                                     std::set<NoString>& ssRet,
                                     const std::map<NoString, NoStringVector>& msvsParams,
                                     const NoString& sFilter)
@@ -602,14 +602,14 @@ size_t NoHttpSocket::GetParamValues(const NoString& sName,
     return ssRet.size();
 }
 
-size_t NoHttpSocket::GetParamValues(const NoString& sName, NoStringVector& vsRet, bool bPost, const NoString& sFilter) const
+size_t NoHttpSocket::paramValues(const NoString& sName, NoStringVector& vsRet, bool bPost, const NoString& sFilter) const
 {
     if (bPost)
-        return GetParamValues(sName, vsRet, m_postParams, sFilter);
-    return GetParamValues(sName, vsRet, m_getParams, sFilter);
+        return paramValues(sName, vsRet, m_postParams, sFilter);
+    return paramValues(sName, vsRet, m_getParams, sFilter);
 }
 
-size_t NoHttpSocket::GetParamValues(const NoString& sName,
+size_t NoHttpSocket::paramValues(const NoString& sName,
                                     NoStringVector& vsRet,
                                     const std::map<NoString, NoStringVector>& msvsParams,
                                     const NoString& sFilter)
@@ -632,26 +632,26 @@ size_t NoHttpSocket::GetParamValues(const NoString& sName,
     return vsRet.size();
 }
 
-const std::map<NoString, NoStringVector>& NoHttpSocket::GetParams(bool bPost) const
+const std::map<NoString, NoStringVector>& NoHttpSocket::params(bool bPost) const
 {
     if (bPost)
         return m_postParams;
     return m_getParams;
 }
 
-bool NoHttpSocket::IsPost() const
+bool NoHttpSocket::isPost() const
 {
     return m_post;
 }
 
-bool NoHttpSocket::PrintNotFound()
+bool NoHttpSocket::printNotFound()
 {
-    return PrintErrorPage(404, "Not Found", "The requested URL was not found on this server.");
+    return printErrorPage(404, "Not Found", "The requested URL was not found on this server.");
 }
 
-bool NoHttpSocket::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage)
+bool NoHttpSocket::printErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage)
 {
-    if (SentHeader()) {
+    if (sentHeader()) {
         NO_DEBUG("PrintErrorPage(): Header was already sent");
         return false;
     }
@@ -676,43 +676,43 @@ bool NoHttpSocket::PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, co
                                                            "</body>\r\n"
                                                            "</html>\r\n";
 
-    PrintHeader(sPage.length(), "text/html; charset=utf-8", uStatusId, sStatusMsg);
+    printHeader(sPage.length(), "text/html; charset=utf-8", uStatusId, sStatusMsg);
     write(sPage);
     close(NoSocket::CloseAfterWrite);
 
     return true;
 }
 
-bool NoHttpSocket::ForceLogin()
+bool NoHttpSocket::forceLogin()
 {
     if (m_loggedIn) {
         return true;
     }
 
-    if (SentHeader()) {
+    if (sentHeader()) {
         NO_DEBUG("ForceLogin(): Header was already sent!");
         return false;
     }
 
-    AddHeader("WWW-Authenticate", "Basic realm=\"" + NoApp::GetTag(false) + "\"");
-    PrintErrorPage(401, "Unauthorized", "You need to login to view this page.");
+    addHeader("WWW-Authenticate", "Basic realm=\"" + NoApp::GetTag(false) + "\"");
+    printErrorPage(401, "Unauthorized", "You need to login to view this page.");
 
     return false;
 }
 
-bool NoHttpSocket::OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic)
+bool NoHttpSocket::onLogin(const NoString& sUser, const NoString& sPass, bool bBasic)
 {
     return false;
 }
 
-bool NoHttpSocket::SentHeader() const
+bool NoHttpSocket::sentHeader() const
 {
     return m_sentHeader;
 }
 
-bool NoHttpSocket::PrintHeader(off_t uContentLength, const NoString& sContentType, uint uStatusId, const NoString& sStatusMsg)
+bool NoHttpSocket::printHeader(off_t uContentLength, const NoString& sContentType, uint uStatusId, const NoString& sStatusMsg)
 {
-    if (SentHeader()) {
+    if (sentHeader()) {
         NO_DEBUG("PrintHeader(): Header was already sent!");
         return false;
     }
@@ -728,7 +728,7 @@ bool NoHttpSocket::PrintHeader(off_t uContentLength, const NoString& sContentTyp
     NO_DEBUG("- " << uStatusId << " (" << sStatusMsg << ") [" << m_contentType << "]");
 
     write("HTTP/" + NoString(m_http10Client ? "1.0 " : "1.1 ") + NoString(uStatusId) + " " + sStatusMsg + "\r\n");
-    write("Date: " + GetDate() + "\r\n");
+    write("Date: " + formatDate() + "\r\n");
     write("Server: " + NoApp::GetTag(false) + "\r\n");
     if (uContentLength > 0) {
         write("Content-Length: " + NoString(uContentLength) + "\r\n");
@@ -752,19 +752,19 @@ bool NoHttpSocket::PrintHeader(off_t uContentLength, const NoString& sContentTyp
     return true;
 }
 
-void NoHttpSocket::SetContentType(const NoString& sContentType)
+void NoHttpSocket::setContentType(const NoString& sContentType)
 {
     m_contentType = sContentType;
 }
 
-void NoHttpSocket::AddHeader(const NoString& sName, const NoString& sValue)
+void NoHttpSocket::addHeader(const NoString& sName, const NoString& sValue)
 {
     m_headers[sName] = sValue;
 }
 
-bool NoHttpSocket::Redirect(const NoString& sURL)
+bool NoHttpSocket::redirect(const NoString& sURL)
 {
-    if (SentHeader()) {
+    if (sentHeader()) {
         NO_DEBUG("Redirect() - Header was already sent");
         return false;
     } else if (!sURL.startsWith("/")) {
@@ -775,8 +775,8 @@ bool NoHttpSocket::Redirect(const NoString& sURL)
         NoString location = m_uriPrefix + sURL;
 
         NO_DEBUG("- Redirect to [" << location << "] with prefix [" + m_uriPrefix + "]");
-        AddHeader("Location", location);
-        PrintErrorPage(302,
+        addHeader("Location", location);
+        printErrorPage(302,
                        "Found",
                        "The document has moved <a href=\"" + No::escape(location, No::HtmlFormat) + "\">here</a>.");
 

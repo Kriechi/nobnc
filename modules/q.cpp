@@ -335,22 +335,22 @@ public:
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            bool bSubmitted = (WebSock.GetParam("submitted").toInt() != 0);
+            bool bSubmitted = (WebSock.param("submitted").toInt() != 0);
 
             if (bSubmitted) {
-                NoString FormUsername = WebSock.GetParam("user");
+                NoString FormUsername = WebSock.param("user");
                 if (!FormUsername.empty())
                     SetUsername(FormUsername);
 
-                NoString FormPassword = WebSock.GetParam("password");
+                NoString FormPassword = WebSock.param("password");
                 if (!FormPassword.empty())
                     SetPassword(FormPassword);
 
-                SetUseCloakedHost(WebSock.GetParam("usecloakedhost").toBool());
-                SetUseChallenge(WebSock.GetParam("usechallenge").toBool());
-                SetRequestPerms(WebSock.GetParam("requestperms").toBool());
-                SetJoinonInvite(WebSock.GetParam("joinoninvite").toBool());
-                SetJoinAfterCloaked(WebSock.GetParam("joinaftercloaked").toBool());
+                SetUseCloakedHost(WebSock.param("usecloakedhost").toBool());
+                SetUseChallenge(WebSock.param("usechallenge").toBool());
+                SetRequestPerms(WebSock.param("requestperms").toBool());
+                SetJoinonInvite(WebSock.param("joinoninvite").toBool());
+                SetJoinAfterCloaked(WebSock.param("joinaftercloaked").toBool());
             }
 
             Tmpl["Username"] = m_sUsername;

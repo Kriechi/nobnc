@@ -39,16 +39,16 @@ public:
     NoWebSocket(const NoString& sURIPrefix);
     virtual ~NoWebSocket();
 
-    bool ForceLogin() override;
-    bool OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic) override;
-    void OnPageRequest(const NoString& sURI) override;
+    bool forceLogin() override;
+    bool onLogin(const NoString& sUser, const NoString& sPass, bool bBasic) override;
+    void onPageRequest(const NoString& sURI) override;
 
     PageRequest PrintTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule = nullptr);
     PageRequest PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule = nullptr);
 
     NoString FindTmpl(NoModule* pModule, const NoString& sName);
 
-    void PrintErrorPage(const NoString& sMessage);
+    void printErrorPage(const NoString& sMessage);
 
     std::shared_ptr<NoWebSession> GetSession();
 
@@ -57,13 +57,13 @@ public:
     void GetAvailSkins(NoStringVector& vRet) const;
     NoString GetSkinName();
 
-    NoString GetRequestCookie(const NoString& sKey);
-    bool SendCookie(const NoString& sKey, const NoString& sValue);
+    NoString requestCookie(const NoString& sKey);
+    bool sendCookie(const NoString& sKey, const NoString& sValue);
 
     static void FinishUserSessions(const NoUser& User);
 
 protected:
-    using NoHttpSocket::PrintErrorPage;
+    using NoHttpSocket::printErrorPage;
 
     bool AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemplate* pTemplate = nullptr);
     NoStringVector GetDirs(NoModule* pModule, bool bIsTemplate);

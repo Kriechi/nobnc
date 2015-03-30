@@ -117,7 +117,7 @@ public:
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            bool bSubmitted = (WebSock.GetParam("submitted").toInt() != 0);
+            bool bSubmitted = (WebSock.param("submitted").toInt() != 0);
 
             NoRegistry registry(this);
             const std::vector<NoChannel*>& Channels = network()->channels();
@@ -126,7 +126,7 @@ public:
                 bool bStick = registry.contains(sChan);
 
                 if (bSubmitted) {
-                    bool bNewStick = WebSock.GetParam("stick_" + sChan).toBool();
+                    bool bNewStick = WebSock.param("stick_" + sChan).toBool();
                     if (bNewStick && !bStick)
                         registry.setValue(sChan, ""); // no password support for now unless chansaver is active too
                     else if (!bNewStick && bStick) {
@@ -158,8 +158,8 @@ public:
             bool bStick = registry.contains(sChan);
             if (Tmpl["WebadminAction"].equals("display")) {
                 Tmpl["Sticky"] = NoString(bStick);
-            } else if (WebSock.GetParam("embed_stickychan_presented").toBool()) {
-                bool bNewStick = WebSock.GetParam("embed_stickychan_sticky").toBool();
+            } else if (WebSock.param("embed_stickychan_presented").toBool()) {
+                bool bNewStick = WebSock.param("embed_stickychan_sticky").toBool();
                 if (bNewStick && !bStick) {
                     registry.setValue(sChan, ""); // no password support for now unless chansaver is active too
                     WebSock.GetSession()->addSuccess("Channel become sticky!");

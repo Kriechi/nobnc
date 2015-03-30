@@ -164,14 +164,14 @@ public:
     NoUser* GetNewUser(NoWebSocket& WebSock, NoUser* pUser)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
-        NoString sUsername = WebSock.GetParam("newuser");
+        NoString sUsername = WebSock.param("newuser");
 
         if (sUsername.empty()) {
-            sUsername = WebSock.GetParam("user");
+            sUsername = WebSock.param("user");
         }
 
         if (sUsername.empty()) {
-            WebSock.PrintErrorPage("Invalid Submission [Username is required]");
+            WebSock.printErrorPage("Invalid Submission [Username is required]");
             return nullptr;
         }
 
@@ -180,10 +180,10 @@ public:
             sUsername = pUser->userName();
         }
 
-        NoString sArg = WebSock.GetParam("password");
+        NoString sArg = WebSock.param("password");
 
-        if (sArg != WebSock.GetParam("password2")) {
-            WebSock.PrintErrorPage("Invalid Submission [Passwords do not match]");
+        if (sArg != WebSock.param("password2")) {
+            WebSock.printErrorPage("Invalid Submission [Passwords do not match]");
             return nullptr;
         }
 
@@ -195,7 +195,7 @@ public:
             pNewUser->setPassword(sHash, NoUser::HashDefault, sSalt);
         }
 
-        NoStringVector vsArgs = WebSock.GetRawParam("allowedips").split("\n");
+        NoStringVector vsArgs = WebSock.rawParam("allowedips").split("\n");
         uint a = 0;
 
         if (vsArgs.size()) {
@@ -206,49 +206,49 @@ public:
             pNewUser->addAllowedHost("*");
         }
 
-        vsArgs = WebSock.GetRawParam("ctcpreplies").split("\n");
+        vsArgs = WebSock.rawParam("ctcpreplies").split("\n");
         for (a = 0; a < vsArgs.size(); a++) {
             NoString sReply = vsArgs[a].trimRight_n("\r");
             pNewUser->addCtcpReply(No::token(sReply, 0).trim_n(), No::tokens(sReply, 1).trim_n());
         }
 
-        sArg = WebSock.GetParam("nick");
+        sArg = WebSock.param("nick");
         if (!sArg.empty()) {
             pNewUser->setNick(sArg);
         }
-        sArg = WebSock.GetParam("altnick");
+        sArg = WebSock.param("altnick");
         if (!sArg.empty()) {
             pNewUser->setAltNick(sArg);
         }
-        sArg = WebSock.GetParam("statusprefix");
+        sArg = WebSock.param("statusprefix");
         if (!sArg.empty()) {
             pNewUser->setStatusPrefix(sArg);
         }
-        sArg = WebSock.GetParam("ident");
+        sArg = WebSock.param("ident");
         if (!sArg.empty()) {
             pNewUser->setIdent(sArg);
         }
-        sArg = WebSock.GetParam("realname");
+        sArg = WebSock.param("realname");
         if (!sArg.empty()) {
             pNewUser->setRealName(sArg);
         }
-        sArg = WebSock.GetParam("quitmsg");
+        sArg = WebSock.param("quitmsg");
         if (!sArg.empty()) {
             pNewUser->setQuitMsg(sArg);
         }
-        sArg = WebSock.GetParam("chanmodes");
+        sArg = WebSock.param("chanmodes");
         if (!sArg.empty()) {
             pNewUser->setDefaultChanModes(sArg);
         }
-        sArg = WebSock.GetParam("timestampformat");
+        sArg = WebSock.param("timestampformat");
         if (!sArg.empty()) {
             pNewUser->setTimestampFormat(sArg);
         }
 
-        sArg = WebSock.GetParam("bindhost");
+        sArg = WebSock.param("bindhost");
         // To change BindHosts be admin or don't have DenysetBindHost
         if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
-            NoString sArg2 = WebSock.GetParam("dccbindhost");
+            NoString sArg2 = WebSock.param("dccbindhost");
             if (!sArg.empty()) {
                 pNewUser->setBindHost(sArg);
             }
@@ -283,7 +283,7 @@ public:
             pNewUser->setDccBindHost(pUser->dccBindHost());
         }
 
-        sArg = WebSock.GetParam("bufsize");
+        sArg = WebSock.param("bufsize");
         if (!sArg.empty())
             pNewUser->setBufferCount(sArg.toUInt(), spSession->isAdmin());
         if (!sArg.empty()) {
@@ -293,23 +293,23 @@ public:
             pNewUser->setBufferCount(sArg.toUInt(), spSession->isAdmin());
         }
 
-        pNewUser->setSkinName(WebSock.GetParam("skin"));
-        pNewUser->setAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").toBool());
-        pNewUser->setMultiClients(WebSock.GetParam("multiclients").toBool());
-        pNewUser->setTimestampAppend(WebSock.GetParam("appendtimestamp").toBool());
-        pNewUser->setTimestampPrepend(WebSock.GetParam("prependtimestamp").toBool());
-        pNewUser->setTimezone(WebSock.GetParam("timezone"));
-        pNewUser->setJoinTries(WebSock.GetParam("jointries").toUInt());
-        pNewUser->setMaxJoins(WebSock.GetParam("maxjoins").toUInt());
-        pNewUser->setAutoclearQueryBuffer(WebSock.GetParam("autoclearquerybuffer").toBool());
-        pNewUser->setMaxQueryBuffers(WebSock.GetParam("maxquerybuffers").toUInt());
+        pNewUser->setSkinName(WebSock.param("skin"));
+        pNewUser->setAutoClearChanBuffer(WebSock.param("autoclearchanbuffer").toBool());
+        pNewUser->setMultiClients(WebSock.param("multiclients").toBool());
+        pNewUser->setTimestampAppend(WebSock.param("appendtimestamp").toBool());
+        pNewUser->setTimestampPrepend(WebSock.param("prependtimestamp").toBool());
+        pNewUser->setTimezone(WebSock.param("timezone"));
+        pNewUser->setJoinTries(WebSock.param("jointries").toUInt());
+        pNewUser->setMaxJoins(WebSock.param("maxjoins").toUInt());
+        pNewUser->setAutoclearQueryBuffer(WebSock.param("autoclearquerybuffer").toBool());
+        pNewUser->setMaxQueryBuffers(WebSock.param("maxquerybuffers").toUInt());
 
 #ifdef HAVE_ICU
-        NoString sEncodingUtf = WebSock.GetParam("encoding_utf");
+        NoString sEncodingUtf = WebSock.param("encoding_utf");
         if (sEncodingUtf == "legacy") {
             pNewUser->setClientEncoding("");
         }
-        NoString sEncoding = WebSock.GetParam("encoding");
+        NoString sEncoding = WebSock.param("encoding");
         if (sEncoding.empty()) {
             sEncoding = "UTF-8";
         }
@@ -323,9 +323,9 @@ public:
 #endif
 
         if (spSession->isAdmin()) {
-            pNewUser->setDenyLoadMod(WebSock.GetParam("denyloadmod").toBool());
-            pNewUser->setDenysetBindHost(WebSock.GetParam("denysetbindhost").toBool());
-            sArg = WebSock.GetParam("maxnetworks");
+            pNewUser->setDenyLoadMod(WebSock.param("denyloadmod").toBool());
+            pNewUser->setDenysetBindHost(WebSock.param("denysetbindhost").toBool());
+            sArg = WebSock.param("maxnetworks");
             if (!sArg.empty())
                 pNewUser->setMaxNetworks(sArg.toUInt());
         } else if (pUser) {
@@ -336,17 +336,17 @@ public:
 
         // If pUser is not nullptr, we are editing an existing user.
         // Users must not be able to change their own admin flag.
-        if (pUser != NoApp::Get().FindUser(WebSock.user())) {
-            pNewUser->setAdmin(WebSock.GetParam("isadmin").toBool());
+        if (pUser != NoApp::Get().FindUser(WebSock.username())) {
+            pNewUser->setAdmin(WebSock.param("isadmin").toBool());
         } else if (pUser) {
             pNewUser->setAdmin(pUser->isAdmin());
         }
 
         if (spSession->isAdmin() || (pUser && !pUser->denyLoadMod())) {
-            WebSock.GetParamValues("loadmod", vsArgs);
+            WebSock.paramValues("loadmod", vsArgs);
 
             // disallow unload webadmin from itself
-            if (No::UserModule == type() && pUser == NoApp::Get().FindUser(WebSock.user())) {
+            if (No::UserModule == type() && pUser == NoApp::Get().FindUser(WebSock.username())) {
                 bool bLoadedWebadmin = false;
                 for (a = 0; a < vsArgs.size(); ++a) {
                     NoString sModName = vsArgs[a].trimRight_n("\r");
@@ -366,7 +366,7 @@ public:
                 NoString sModLoadError;
 
                 if (!sModName.empty()) {
-                    NoString sArgs = WebSock.GetParam("modargs_" + sModName);
+                    NoString sArgs = WebSock.param("modargs_" + sModName);
 
                     try {
                         if (!pNewUser->loader()->loadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
@@ -411,22 +411,22 @@ public:
 
     NoString SafeGetUserNameParam(NoWebSocket& WebSock)
     {
-        NoString sUserName = WebSock.GetParam("user"); // check for POST param
-        if (sUserName.empty() && !WebSock.IsPost()) {
+        NoString sUserName = WebSock.param("user"); // check for POST param
+        if (sUserName.empty() && !WebSock.isPost()) {
             // if no POST param named user has been given and we are not
             // saving this form, fall back to using the GET parameter.
-            sUserName = WebSock.GetParam("user", false);
+            sUserName = WebSock.param("user", false);
         }
         return sUserName;
     }
 
     NoString SafeGetNetworkParam(NoWebSocket& WebSock)
     {
-        NoString sNetwork = WebSock.GetParam("network"); // check for POST param
-        if (sNetwork.empty() && !WebSock.IsPost()) {
+        NoString sNetwork = WebSock.param("network"); // check for POST param
+        if (sNetwork.empty() && !WebSock.isPost()) {
             // if no POST param named user has been given and we are not
             // saving this form, fall back to using the GET parameter.
-            sNetwork = WebSock.GetParam("network", false);
+            sNetwork = WebSock.param("network", false);
         }
         return sNetwork;
     }
@@ -482,7 +482,7 @@ public:
                 return NetworkPage(WebSock, Tmpl, pUser);
             }
 
-            WebSock.PrintErrorPage("No such username");
+            WebSock.printErrorPage("No such username");
             return true;
         } else if (sPageName == "editnetwork") {
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
@@ -493,16 +493,16 @@ public:
             }
 
             if (!pNetwork) {
-                WebSock.PrintErrorPage("No such username or network");
+                WebSock.printErrorPage("No such username or network");
                 return true;
             }
 
             return NetworkPage(WebSock, Tmpl, pNetwork->user(), pNetwork);
 
         } else if (sPageName == "delnetwork") {
-            NoString sUser = WebSock.GetParam("user");
-            if (sUser.empty() && !WebSock.IsPost()) {
-                sUser = WebSock.GetParam("user", false);
+            NoString sUser = WebSock.param("user");
+            if (sUser.empty() && !WebSock.isPost()) {
+                sUser = WebSock.param("user", false);
             }
 
             NoUser* pUser = NoApp::Get().FindUser(sUser);
@@ -522,17 +522,17 @@ public:
             }
 
             if (!pNetwork) {
-                WebSock.PrintErrorPage("No such username or network");
+                WebSock.printErrorPage("No such username or network");
                 return true;
             }
 
-            NoString sChan = WebSock.GetParam("name");
-            if (sChan.empty() && !WebSock.IsPost()) {
-                sChan = WebSock.GetParam("name", false);
+            NoString sChan = WebSock.param("name");
+            if (sChan.empty() && !WebSock.isPost()) {
+                sChan = WebSock.param("name", false);
             }
             NoChannel* pChan = pNetwork->findChannel(sChan);
             if (!pChan) {
-                WebSock.PrintErrorPage("No such channel");
+                WebSock.printErrorPage("No such channel");
                 return true;
             }
 
@@ -549,7 +549,7 @@ public:
                 return ChanPage(WebSock, Tmpl, pNetwork);
             }
 
-            WebSock.PrintErrorPage("No such username or network");
+            WebSock.printErrorPage("No such username or network");
             return true;
         } else if (sPageName == "delchan") {
             NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
@@ -563,21 +563,21 @@ public:
                 return removeChannel(WebSock, pNetwork);
             }
 
-            WebSock.PrintErrorPage("No such username or network");
+            WebSock.printErrorPage("No such username or network");
             return true;
         } else if (sPageName == "deluser") {
             if (!spSession->isAdmin()) {
                 return false;
             }
 
-            if (!WebSock.IsPost()) {
+            if (!WebSock.isPost()) {
                 // Show the "Are you sure?" page:
 
-                NoString sUser = WebSock.GetParam("user", false);
+                NoString sUser = WebSock.param("user", false);
                 NoUser* pUser = NoApp::Get().FindUser(sUser);
 
                 if (!pUser) {
-                    WebSock.PrintErrorPage("No such username");
+                    WebSock.printErrorPage("No such username");
                     return true;
                 }
 
@@ -589,18 +589,18 @@ public:
             // The "Are you sure?" page has been submitted with "Yes",
             // so we actually delete the user now:
 
-            NoString sUser = WebSock.GetParam("user");
+            NoString sUser = WebSock.param("user");
             NoUser* pUser = NoApp::Get().FindUser(sUser);
 
             if (pUser && pUser == spSession->user()) {
-                WebSock.PrintErrorPage("Please don't delete yourself, suicide is not the answer!");
+                WebSock.printErrorPage("Please don't delete yourself, suicide is not the answer!");
                 return true;
             } else if (NoApp::Get().DeleteUser(sUser)) {
-                WebSock.Redirect(webPath() + "listusers");
+                WebSock.redirect(webPath() + "listusers");
                 return true;
             }
 
-            WebSock.PrintErrorPage("No such username");
+            WebSock.printErrorPage("No such username");
             return true;
         } else if (sPageName == "edituser") {
             NoString sUserName = SafeGetUserNameParam(WebSock);
@@ -621,7 +621,7 @@ public:
                 return UserPage(WebSock, Tmpl, pUser);
             }
 
-            WebSock.PrintErrorPage("No such username");
+            WebSock.printErrorPage("No such username");
             return true;
         } else if (sPageName == "listusers" && spSession->isAdmin()) {
             return ListUsersPage(WebSock, Tmpl);
@@ -655,11 +655,11 @@ public:
         NoUser* pUser = pNetwork->user();
 
         if (!pUser) {
-            WebSock.PrintErrorPage("That user doesn't exist");
+            WebSock.printErrorPage("That user doesn't exist");
             return true;
         }
 
-        if (!WebSock.GetParam("submitted").toUInt()) {
+        if (!WebSock.param("submitted").toUInt()) {
             Tmpl["User"] = pUser->userName();
             Tmpl["Network"] = pNetwork->name();
 
@@ -721,11 +721,11 @@ public:
             return true;
         }
 
-        NoString sChanName = WebSock.GetParam("name").trim_n();
+        NoString sChanName = WebSock.param("name").trim_n();
 
         if (!pChan) {
             if (sChanName.empty()) {
-                WebSock.PrintErrorPage("Channel name is a required argument");
+                WebSock.printErrorPage("Channel name is a required argument");
                 return true;
             }
 
@@ -733,30 +733,30 @@ public:
             pChan = new NoChannel(sChanName, pNetwork, true);
 
             if (pNetwork->findChannel(pChan->name())) {
-                WebSock.PrintErrorPage("Channel [" + pChan->name() + "] already exists");
+                WebSock.printErrorPage("Channel [" + pChan->name() + "] already exists");
                 delete pChan;
                 return true;
             }
 
             if (!pNetwork->addChannel(pChan)) {
-                WebSock.PrintErrorPage("Could not add channel [" + pChan->name() + "]");
+                WebSock.printErrorPage("Could not add channel [" + pChan->name() + "]");
                 return true;
             }
         }
 
-        uint uBufferCount = WebSock.GetParam("buffercount").toUInt();
+        uint uBufferCount = WebSock.param("buffercount").toUInt();
         if (pChan->bufferCount() != uBufferCount) {
             pChan->setBufferCount(uBufferCount, spSession->isAdmin());
         }
-        pChan->setDefaultModes(WebSock.GetParam("defmodes"));
-        pChan->setInConfig(WebSock.GetParam("save").toBool());
-        bool bAutoClearChanBuffer = WebSock.GetParam("autoclearchanbuffer").toBool();
+        pChan->setDefaultModes(WebSock.param("defmodes"));
+        pChan->setInConfig(WebSock.param("save").toBool());
+        bool bAutoClearChanBuffer = WebSock.param("autoclearchanbuffer").toBool();
         if (pChan->autoClearChanBuffer() != bAutoClearChanBuffer) {
-            pChan->setAutoClearChanBuffer(WebSock.GetParam("autoclearchanbuffer").toBool());
+            pChan->setAutoClearChanBuffer(WebSock.param("autoclearchanbuffer").toBool());
         }
-        pChan->setKey(WebSock.GetParam("key"));
+        pChan->setKey(WebSock.param("key"));
 
-        bool bDetached = WebSock.GetParam("detached").toBool();
+        bool bDetached = WebSock.param("detached").toBool();
         if (pChan->isDetached() != bDetached) {
             if (bDetached) {
                 pChan->detachUser();
@@ -765,7 +765,7 @@ public:
             }
         }
 
-        bool bDisabled = WebSock.GetParam("disabled").toBool();
+        bool bDisabled = WebSock.param("disabled").toBool();
         if (bDisabled)
             pChan->disable();
         else
@@ -780,15 +780,15 @@ public:
         }
 
         if (!NoApp::Get().WriteConfig()) {
-            WebSock.PrintErrorPage("Channel added/modified, but config was not written");
+            WebSock.printErrorPage("Channel added/modified, but config was not written");
             return true;
         }
 
-        if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(webPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
+        if (WebSock.hasParam("submit_return")) {
+            WebSock.redirect(webPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         } else {
-            WebSock.Redirect(webPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) + "&network=" +
+            WebSock.redirect(webPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) + "&network=" +
                              No::escape(pNetwork->name(), No::UrlFormat) + "&name=" + No::escape(pChan->name(), No::UrlFormat));
         }
         return true;
@@ -799,7 +799,7 @@ public:
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.setFile("add_edit_network.tmpl");
 
-        if (!WebSock.GetParam("submitted").toUInt()) {
+        if (!WebSock.param("submitted").toUInt()) {
             Tmpl["Username"] = pUser->userName();
 
             std::set<NoModuleInfo> ssNetworkMods;
@@ -922,7 +922,7 @@ public:
                 }
             } else {
                 if (!spSession->isAdmin() && !pUser->hasSpaceForNewNetwork()) {
-                    WebSock.PrintErrorPage("Network number limit reached. Ask an admin to increase the limit for you, "
+                    WebSock.printErrorPage("Network number limit reached. Ask an admin to increase the limit for you, "
                                            "or delete unneeded networks from Your Settings.");
                     return true;
                 }
@@ -972,13 +972,13 @@ public:
             return true;
         }
 
-        NoString sName = WebSock.GetParam("name").trim_n();
+        NoString sName = WebSock.param("name").trim_n();
         if (sName.empty()) {
-            WebSock.PrintErrorPage("Network name is a required argument");
+            WebSock.printErrorPage("Network name is a required argument");
             return true;
         }
         if (!pNetwork && !spSession->isAdmin() && !pUser->hasSpaceForNewNetwork()) {
-            WebSock.PrintErrorPage("Network number limit reached. Ask an admin to increase the limit for you, or "
+            WebSock.printErrorPage("Network number limit reached. Ask an admin to increase the limit for you, or "
                                    "delete few old ones from Your Settings");
             return true;
         }
@@ -987,7 +987,7 @@ public:
             NoNetwork* pOldNetwork = pNetwork;
             pNetwork = pUser->addNetwork(sName, sNetworkAddError);
             if (!pNetwork) {
-                WebSock.PrintErrorPage(sNetworkAddError);
+                WebSock.printErrorPage(sNetworkAddError);
                 return true;
             }
             if (pOldNetwork) {
@@ -1003,19 +1003,19 @@ public:
 
         NoString sArg;
 
-        pNetwork->setNick(WebSock.GetParam("nick"));
-        pNetwork->setAltNick(WebSock.GetParam("altnick"));
-        pNetwork->setIdent(WebSock.GetParam("ident"));
-        pNetwork->setRealName(WebSock.GetParam("realname"));
+        pNetwork->setNick(WebSock.param("nick"));
+        pNetwork->setAltNick(WebSock.param("altnick"));
+        pNetwork->setIdent(WebSock.param("ident"));
+        pNetwork->setRealName(WebSock.param("realname"));
 
-        pNetwork->setQuitMsg(WebSock.GetParam("quitmsg"));
+        pNetwork->setQuitMsg(WebSock.param("quitmsg"));
 
-        pNetwork->setEnabled(WebSock.GetParam("doconnect").toBool());
+        pNetwork->setEnabled(WebSock.param("doconnect").toBool());
 
-        sArg = WebSock.GetParam("bindhost");
+        sArg = WebSock.param("bindhost");
         // To change BindHosts be admin or don't have DenysetBindHost
         if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
-            NoString sHost = WebSock.GetParam("bindhost");
+            NoString sHost = WebSock.param("bindhost");
             const NoStringVector& vsHosts = NoApp::Get().bindHosts();
             if (!spSession->isAdmin() && !vsHosts.empty()) {
                 NoStringVector::const_iterator it;
@@ -1035,21 +1035,21 @@ public:
             pNetwork->setBindHost(sHost);
         }
 
-        if (WebSock.GetParam("floodprotection").toBool()) {
-            pNetwork->setFloodRate(WebSock.GetParam("floodrate").toDouble());
-            pNetwork->setFloodBurst(WebSock.GetParam("floodburst").toUShort());
+        if (WebSock.param("floodprotection").toBool()) {
+            pNetwork->setFloodRate(WebSock.param("floodrate").toDouble());
+            pNetwork->setFloodBurst(WebSock.param("floodburst").toUShort());
         } else {
             pNetwork->setFloodRate(-1);
         }
 
-        pNetwork->setJoinDelay(WebSock.GetParam("joindelay").toUShort());
+        pNetwork->setJoinDelay(WebSock.param("joindelay").toUShort());
 
 #ifdef HAVE_ICU
-        NoString sEncodingUtf = WebSock.GetParam("encoding_utf");
+        NoString sEncodingUtf = WebSock.param("encoding_utf");
         if (sEncodingUtf == "legacy") {
             pNetwork->setEncoding("");
         }
-        NoString sEncoding = WebSock.GetParam("encoding");
+        NoString sEncoding = WebSock.param("encoding");
         if (sEncoding.empty()) {
             sEncoding = "UTF-8";
         }
@@ -1063,12 +1063,12 @@ public:
 #endif
 
         pNetwork->delServers();
-        NoStringVector vsArgs = WebSock.GetRawParam("servers").split("\n");
+        NoStringVector vsArgs = WebSock.rawParam("servers").split("\n");
         for (uint a = 0; a < vsArgs.size(); a++) {
             pNetwork->addServer(vsArgs[a].trim_n());
         }
 
-        vsArgs = WebSock.GetRawParam("fingerprints").split("\n");
+        vsArgs = WebSock.rawParam("fingerprints").split("\n");
         while (!pNetwork->trustedFingerprints().empty()) {
             pNetwork->removeTrustedFingerprint(*pNetwork->trustedFingerprints().begin());
         }
@@ -1076,17 +1076,17 @@ public:
             pNetwork->addTrustedFingerprint(sFP);
         }
 
-        WebSock.GetParamValues("channel", vsArgs);
+        WebSock.paramValues("channel", vsArgs);
         for (uint a = 0; a < vsArgs.size(); a++) {
             const NoString& sChan = vsArgs[a];
             NoChannel* pChan = pNetwork->findChannel(sChan.trimRight_n("\r"));
             if (pChan) {
-                pChan->setInConfig(WebSock.GetParam("save_" + sChan).toBool());
+                pChan->setInConfig(WebSock.param("save_" + sChan).toBool());
             }
         }
 
         std::set<NoString> ssArgs;
-        WebSock.GetParamValues("loadmod", ssArgs);
+        WebSock.paramValues("loadmod", ssArgs);
         if (spSession->isAdmin() || !pUser->denyLoadMod()) {
             for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
                 NoString sModRet;
@@ -1094,7 +1094,7 @@ public:
                 NoString sModLoadError;
 
                 if (!sModName.empty()) {
-                    NoString sArgs = WebSock.GetParam("modargs_" + sModName);
+                    NoString sArgs = WebSock.param("modargs_" + sModName);
 
                     NoModule* pMod = pNetwork->loader()->findModule(sModName);
 
@@ -1138,14 +1138,14 @@ public:
         }
 
         if (!NoApp::Get().WriteConfig()) {
-            WebSock.PrintErrorPage("Network added/modified, but config was not written");
+            WebSock.printErrorPage("Network added/modified, but config was not written");
             return true;
         }
 
-        if (WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(webPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
+        if (WebSock.hasParam("submit_return")) {
+            WebSock.redirect(webPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
         } else {
-            WebSock.Redirect(webPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
+            WebSock.redirect(webPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
                              "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         }
         return true;
@@ -1153,22 +1153,22 @@ public:
 
     bool DelNetwork(NoWebSocket& WebSock, NoUser* pUser, NoTemplate& Tmpl)
     {
-        NoString sNetwork = WebSock.GetParam("name");
-        if (sNetwork.empty() && !WebSock.IsPost()) {
-            sNetwork = WebSock.GetParam("name", false);
+        NoString sNetwork = WebSock.param("name");
+        if (sNetwork.empty() && !WebSock.isPost()) {
+            sNetwork = WebSock.param("name", false);
         }
 
         if (!pUser) {
-            WebSock.PrintErrorPage("That user doesn't exist");
+            WebSock.printErrorPage("That user doesn't exist");
             return true;
         }
 
         if (sNetwork.empty()) {
-            WebSock.PrintErrorPage("That network doesn't exist for this user");
+            WebSock.printErrorPage("That network doesn't exist for this user");
             return true;
         }
 
-        if (!WebSock.IsPost()) {
+        if (!WebSock.isPost()) {
             // Show the "Are you sure?" page:
 
             Tmpl.setFile("del_network.tmpl");
@@ -1180,20 +1180,20 @@ public:
         pUser->deleteNetwork(sNetwork);
 
         if (!NoApp::Get().WriteConfig()) {
-            WebSock.PrintErrorPage("Network deleted, but config was not written");
+            WebSock.printErrorPage("Network deleted, but config was not written");
             return true;
         }
 
-        WebSock.Redirect(webPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
+        WebSock.redirect(webPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
         return false;
     }
 
     bool removeChannel(NoWebSocket& WebSock, NoNetwork* pNetwork)
     {
-        NoString sChan = WebSock.GetParam("name", false);
+        NoString sChan = WebSock.param("name", false);
 
         if (sChan.empty()) {
-            WebSock.PrintErrorPage("That channel doesn't exist for this user");
+            WebSock.printErrorPage("That channel doesn't exist for this user");
             return true;
         }
 
@@ -1201,11 +1201,11 @@ public:
         pNetwork->putIrc("PART " + sChan);
 
         if (!NoApp::Get().WriteConfig()) {
-            WebSock.PrintErrorPage("Channel deleted, but config was not written");
+            WebSock.printErrorPage("Channel deleted, but config was not written");
             return true;
         }
 
-        WebSock.Redirect(webPath() + "editnetwork?user=" + No::escape(pNetwork->user()->userName(), No::UrlFormat) +
+        WebSock.redirect(webPath() + "editnetwork?user=" + No::escape(pNetwork->user()->userName(), No::UrlFormat) +
                          "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
         return false;
     }
@@ -1215,13 +1215,13 @@ public:
         std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
         Tmpl.setFile("add_edit_user.tmpl");
 
-        if (!WebSock.GetParam("submitted").toUInt()) {
+        if (!WebSock.param("submitted").toUInt()) {
             if (pUser) {
                 Tmpl["Action"] = "edituser";
                 Tmpl["Title"] = "Edit User [" + pUser->userName() + "]";
                 Tmpl["Edit"] = "true";
             } else {
-                NoString sUsername = WebSock.GetParam("clone", false);
+                NoString sUsername = WebSock.param("clone", false);
                 pUser = NoApp::Get().FindUser(sUsername);
 
                 if (pUser) {
@@ -1460,7 +1460,7 @@ public:
                 if (pUser && pUser->isAdmin()) {
                     o10["Checked"] = "true";
                 }
-                if (pUser && pUser == NoApp::Get().FindUser(WebSock.user())) {
+                if (pUser && pUser == NoApp::Get().FindUser(WebSock.username())) {
                     o10["Disabled"] = "true";
                 }
 
@@ -1495,15 +1495,15 @@ public:
 
         /* If pUser is nullptr, we are adding a user, else we are editing this one */
 
-        NoString sUsername = WebSock.GetParam("user");
+        NoString sUsername = WebSock.param("user");
         if (!pUser && NoApp::Get().FindUser(sUsername)) {
-            WebSock.PrintErrorPage("Invalid Submission [User " + sUsername + " already exists]");
+            WebSock.printErrorPage("Invalid Submission [User " + sUsername + " already exists]");
             return true;
         }
 
         NoUser* pNewUser = GetNewUser(WebSock, pUser);
         if (!pNewUser) {
-            WebSock.PrintErrorPage("Invalid user settings");
+            WebSock.printErrorPage("Invalid user settings");
             return true;
         }
 
@@ -1511,7 +1511,7 @@ public:
         NoString sAction;
 
         if (!pUser) {
-            NoString sClone = WebSock.GetParam("clone");
+            NoString sClone = WebSock.param("clone");
             if (NoUser* pCloneUser = NoApp::Get().FindUser(sClone)) {
                 pNewUser->cloneNetworks(*pCloneUser);
             }
@@ -1519,7 +1519,7 @@ public:
             // Add User Submission
             if (!NoApp::Get().AddUser(pNewUser, sErr)) {
                 delete pNewUser;
-                WebSock.PrintErrorPage("Invalid submission [" + sErr + "]");
+                WebSock.printErrorPage("Invalid submission [" + sErr + "]");
                 return true;
             }
 
@@ -1529,7 +1529,7 @@ public:
             // Edit User Submission
             if (!pUser->clone(*pNewUser, sErr, false)) {
                 delete pNewUser;
-                WebSock.PrintErrorPage("Invalid Submission [" + sErr + "]");
+                WebSock.printErrorPage("Invalid Submission [" + sErr + "]");
                 return true;
             }
 
@@ -1545,14 +1545,14 @@ public:
         }
 
         if (!NoApp::Get().WriteConfig()) {
-            WebSock.PrintErrorPage("User " + sAction + ", but config was not written");
+            WebSock.printErrorPage("User " + sAction + ", but config was not written");
             return true;
         }
 
-        if (spSession->isAdmin() && WebSock.HasParam("submit_return")) {
-            WebSock.Redirect(webPath() + "listusers");
+        if (spSession->isAdmin() && WebSock.hasParam("submit_return")) {
+            WebSock.redirect(webPath() + "listusers");
         } else {
-            WebSock.Redirect(webPath() + "edituser?user=" + pUser->userName());
+            WebSock.redirect(webPath() + "edituser?user=" + pUser->userName());
         }
 
         /* we don't want the template to be printed while we redirect */
@@ -1651,16 +1651,16 @@ public:
 
     bool AddListener(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
-        ushort uPort = WebSock.GetParam("port").toUShort();
-        NoString sHost = WebSock.GetParam("host");
-        NoString sURIPrefix = WebSock.GetParam("uriprefix");
+        ushort uPort = WebSock.param("port").toUShort();
+        NoString sHost = WebSock.param("host");
+        NoString sURIPrefix = WebSock.param("uriprefix");
         if (sHost == "*")
             sHost = "";
-        bool bSSL = WebSock.GetParam("ssl").toBool();
-        bool bIPv4 = WebSock.GetParam("ipv4").toBool();
-        bool bIPv6 = WebSock.GetParam("ipv6").toBool();
-        bool bIRC = WebSock.GetParam("irc").toBool();
-        bool bWeb = WebSock.GetParam("web").toBool();
+        bool bSSL = WebSock.param("ssl").toBool();
+        bool bIPv4 = WebSock.param("ipv4").toBool();
+        bool bIPv6 = WebSock.param("ipv6").toBool();
+        bool bIRC = WebSock.param("irc").toBool();
+        bool bWeb = WebSock.param("web").toBool();
 
         No::AddressType eAddr = No::Ipv4AndIpv6Address;
         if (bIPv4) {
@@ -1711,10 +1711,10 @@ public:
 
     bool DelListener(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
-        ushort uPort = WebSock.GetParam("port").toUShort();
-        NoString sHost = WebSock.GetParam("host");
-        bool bIPv4 = WebSock.GetParam("ipv4").toBool();
-        bool bIPv6 = WebSock.GetParam("ipv6").toBool();
+        ushort uPort = WebSock.param("port").toUShort();
+        NoString sHost = WebSock.param("host");
+        bool bIPv4 = WebSock.param("ipv4").toBool();
+        bool bIPv6 = WebSock.param("ipv6").toBool();
 
         No::AddressType eAddr = No::Ipv4AndIpv6Address;
         if (bIPv4) {
@@ -1748,7 +1748,7 @@ public:
     bool SettingsPage(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
         Tmpl.setFile("settings.tmpl");
-        if (!WebSock.GetParam("submitted").toUInt()) {
+        if (!WebSock.param("submitted").toUInt()) {
             Tmpl["Action"] = "settings";
             Tmpl["Title"] = "Settings";
             Tmpl["StatusPrefix"] = NoApp::Get().GetStatusPrefix();
@@ -1884,22 +1884,22 @@ public:
         }
 
         NoString sArg;
-        sArg = WebSock.GetParam("statusprefix");
+        sArg = WebSock.param("statusprefix");
         NoApp::Get().SetStatusPrefix(sArg);
-        sArg = WebSock.GetParam("maxbufsize");
+        sArg = WebSock.param("maxbufsize");
         NoApp::Get().SetMaxBufferSize(sArg.toUInt());
-        sArg = WebSock.GetParam("connectdelay");
+        sArg = WebSock.param("connectdelay");
         NoApp::Get().SetConnectDelay(sArg.toUInt());
-        sArg = WebSock.GetParam("serverthrottle");
+        sArg = WebSock.param("serverthrottle");
         NoApp::Get().SetServerThrottle(sArg.toUInt());
-        sArg = WebSock.GetParam("anoniplimit");
+        sArg = WebSock.param("anoniplimit");
         NoApp::Get().SetAnonIPLimit(sArg.toUInt());
-        sArg = WebSock.GetParam("protectwebsessions");
+        sArg = WebSock.param("protectwebsessions");
         NoApp::Get().SetProtectWebSessions(sArg.toBool());
-        sArg = WebSock.GetParam("hideversion");
+        sArg = WebSock.param("hideversion");
         NoApp::Get().SetHideVersion(sArg.toBool());
 
-        NoStringVector vsArgs = WebSock.GetRawParam("motd").split("\n");
+        NoStringVector vsArgs = WebSock.rawParam("motd").split("\n");
         NoApp::Get().ClearMotd();
 
         uint a = 0;
@@ -1907,17 +1907,17 @@ public:
             NoApp::Get().AddMotd(vsArgs[a].trimRight_n());
         }
 
-        vsArgs = WebSock.GetRawParam("bindhosts").split("\n");
+        vsArgs = WebSock.rawParam("bindhosts").split("\n");
         NoApp::Get().ClearBindHosts();
 
         for (a = 0; a < vsArgs.size(); a++) {
             NoApp::Get().AddBindHost(vsArgs[a].trim_n());
         }
 
-        NoApp::Get().SetSkinName(WebSock.GetParam("skin"));
+        NoApp::Get().SetSkinName(WebSock.param("skin"));
 
         std::set<NoString> ssArgs;
-        WebSock.GetParamValues("loadmod", ssArgs);
+        WebSock.paramValues("loadmod", ssArgs);
 
         for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
             NoString sModRet;
@@ -1925,7 +1925,7 @@ public:
             NoString sModLoadError;
 
             if (!sModName.empty()) {
-                NoString sArgs = WebSock.GetParam("modargs_" + sModName);
+                NoString sArgs = WebSock.param("modargs_" + sModName);
 
                 NoModule* pMod = NoApp::Get().GetLoader()->findModule(sModName);
                 if (!pMod) {
@@ -1963,7 +1963,7 @@ public:
             WebSock.GetSession()->addError("Settings changed, but config was not written");
         }
 
-        WebSock.Redirect(webPath() + "settings");
+        WebSock.redirect(webPath() + "settings");
         /* we don't want the template to be printed while we redirect */
         return false;
     }

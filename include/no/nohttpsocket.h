@@ -36,65 +36,65 @@ public:
     void onConnected() override;
     NoSocket* createSocket(const NoString& sHost, ushort uPort) override = 0;
 
-    virtual bool ForceLogin();
-    virtual bool OnLogin(const NoString& sUser, const NoString& sPass, bool bBasic);
-    virtual void OnPageRequest(const NoString& sURI) = 0;
-    virtual bool PrintFile(const NoString& sFileName, NoString sContentType = "");
+    virtual bool forceLogin();
+    virtual bool onLogin(const NoString& sUser, const NoString& sPass, bool bBasic);
+    virtual void onPageRequest(const NoString& sURI) = 0;
+    virtual bool printFile(const NoString& sFileName, NoString sContentType = "");
 
-    void CheckPost();
-    bool SentHeader() const;
-    bool PrintHeader(off_t uContentLength, const NoString& sContentType = "", uint uStatusId = 200, const NoString& sStatusMsg = "OK");
-    void AddHeader(const NoString& sName, const NoString& sValue);
-    void SetContentType(const NoString& sContentType);
+    void checkPost();
+    bool sentHeader() const;
+    bool printHeader(off_t uContentLength, const NoString& sContentType = "", uint uStatusId = 200, const NoString& sStatusMsg = "OK");
+    void addHeader(const NoString& sName, const NoString& sValue);
+    void setContentType(const NoString& sContentType);
 
-    bool PrintNotFound();
-    bool Redirect(const NoString& sURL);
-    bool PrintErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage);
-    static void ParseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams);
-    void ParseURI();
-    void GetPage();
-    static NoString GetDate(time_t tm = 0);
+    bool printNotFound();
+    bool redirect(const NoString& sURL);
+    bool printErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage);
+    static void parseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams);
+    void parseUri();
+    void requestPage();
+    static NoString formatDate(time_t tm = 0);
     NoString remoteAddress() const override;
 
-    NoString GetRequestCookie(const NoString& sKey) const;
-    bool SendCookie(const NoString& sKey, const NoString& sValue);
+    NoString requestCookie(const NoString& sKey) const;
+    bool sendCookie(const NoString& sKey, const NoString& sValue);
 
-    void SetLoggedIn(bool b);
+    void setLoggedIn(bool b);
 
-    NoString GetPath() const;
-    bool IsLoggedIn() const;
-    NoString user() const;
-    NoString GetPass() const;
-    NoString GetParamString() const;
-    NoString GetContentType() const;
-    NoString GetURIPrefix() const;
-    bool IsPost() const;
+    NoString path() const;
+    bool isLoggedIn() const;
+    NoString username() const;
+    NoString password() const;
+    NoString paramString() const;
+    NoString contentType() const;
+    NoString uriPrefix() const;
+    bool isPost() const;
 
-    NoString GetParam(const NoString& sName, bool bPost = true, const NoString& sFilter = "\r\n") const;
-    NoString GetRawParam(const NoString& sName, bool bPost = true) const;
-    bool HasParam(const NoString& sName, bool bPost = true) const;
-    const std::map<NoString, NoStringVector>& GetParams(bool bPost = true) const;
-    size_t GetParamValues(const NoString& sName, NoStringVector& vsRet, bool bPost = true, const NoString& sFilter = "\r\n") const;
-    size_t GetParamValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost = true, const NoString& sFilter = "\r\n") const;
+    NoString param(const NoString& sName, bool bPost = true, const NoString& sFilter = "\r\n") const;
+    NoString rawParam(const NoString& sName, bool bPost = true) const;
+    bool hasParam(const NoString& sName, bool bPost = true) const;
+    const std::map<NoString, NoStringVector>& params(bool bPost = true) const;
+    size_t paramValues(const NoString& sName, NoStringVector& vsRet, bool bPost = true, const NoString& sFilter = "\r\n") const;
+    size_t paramValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost = true, const NoString& sFilter = "\r\n") const;
 
 private:
-    static NoString GetRawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams);
-    static NoString GetParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter);
-    static size_t GetParamValues(const NoString& sName,
+    static NoString rawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams);
+    static NoString param(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter);
+    static size_t paramValues(const NoString& sName,
                                  NoStringVector& vsRet,
                                  const std::map<NoString, NoStringVector>& msvsParams,
                                  const NoString& sFilter);
-    static size_t GetParamValues(const NoString& sName,
+    static size_t paramValues(const NoString& sName,
                                  std::set<NoString>& ssRet,
                                  const std::map<NoString, NoStringVector>& msvsParams,
                                  const NoString& sFilter);
 
-    void WriteFileUncompressed(NoFile& File);
-    void WriteFileGzipped(NoFile& File);
+    void writeUncompressedFile(NoFile& File);
+    void writeCompressedFile(NoFile& File);
 
 protected:
-    void PrintPage(const NoString& sPage);
-    void Init();
+    void printPage(const NoString& sPage);
+    void init();
 
     bool m_sentHeader;
     bool m_gotHeader;

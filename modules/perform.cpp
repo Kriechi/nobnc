@@ -151,8 +151,8 @@ public:
             return false;
         }
 
-        if (WebSock.IsPost()) {
-            NoStringVector vsPerf = WebSock.GetRawParam("perform", true).split("\n", No::SkipEmptyParts);
+        if (WebSock.isPost()) {
+            NoStringVector vsPerf = WebSock.rawParam("perform", true).split("\n", No::SkipEmptyParts);
             m_vPerform.clear();
 
             for (NoStringVector::const_iterator it = vsPerf.begin(); it != vsPerf.end(); ++it)
