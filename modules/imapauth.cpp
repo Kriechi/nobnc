@@ -96,7 +96,7 @@ public:
 
     ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
-        NoUser* pUser = NoApp::Get().FindUser(Auth->username());
+        NoUser* pUser = NoApp::instance().findUser(Auth->username());
 
         if (!pUser) { // @todo Will want to do some sort of && !m_bAllowCreate in the future
             Auth->refuseLogin("Invalid User - Halting IMAP Lookup");
@@ -159,7 +159,7 @@ void NoImapSock::readLine(const NoString& sLine)
 
         write("AUTH LOGIN " + sUsername + " " + m_spAuth->password() + "\r\n");
     } else if (sLine.left(5) == "AUTH ") {
-        NoUser* pUser = NoApp::Get().FindUser(m_spAuth->username());
+        NoUser* pUser = NoApp::instance().findUser(m_spAuth->username());
 
         if (pUser && sLine.startsWith("AUTH OK")) {
             m_spAuth->acceptLogin(pUser);

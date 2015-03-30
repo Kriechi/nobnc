@@ -968,7 +968,7 @@ bool NoIrcSocket::OnGeneralCTCP(NoNick& Nick, NoString& sMessage)
 
     if (!bHaveReply && !d->network->isUserAttached()) {
         if (sQuery == "VERSION") {
-            sReply = NoApp::GetTag(false);
+            sReply = NoApp::tag(false);
         } else if (sQuery == "PING") {
             sReply = No::tokens(sMessage, 1);
         }

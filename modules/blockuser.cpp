@@ -189,7 +189,7 @@ private:
 
     bool Block(const NoString& sUser)
     {
-        NoUser* pUser = NoApp::Get().FindUser(sUser);
+        NoUser* pUser = NoApp::instance().findUser(sUser);
 
         if (!pUser)
             return false;

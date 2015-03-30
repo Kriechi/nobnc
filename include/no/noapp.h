@@ -45,37 +45,37 @@ public:
 
     enum ConfigState { ConfigNothing, ConfigNeedRehash, ConfigNeedWrite, ConfigNeedVerboseWrite };
 
-    void DeleteUsers();
-    void Loop();
-    bool WritePidFile(int iPid);
-    bool DeletePidFile();
-    bool WaitForChildLock();
-    bool IsHostAllowed(const NoString& sHostMask) const;
+    void deleteUsers();
+    void loop();
+    bool writePidFile(int iPid);
+    bool deletePidFile();
+    bool waitForChildLock();
+    bool isHostAllowed(const NoString& sHostMask) const;
     // This returns false if there are too many anonymous connections from this ip
-    bool AllowConnectionFrom(const NoString& sIP) const;
-    void InitDirs(const NoString& sArgvPath, const NoString& sDataDir);
+    bool allowConnectionFrom(const NoString& sIP) const;
+    void initDirs(const NoString& sArgvPath, const NoString& sDataDir);
     bool onBoot();
-    NoString ExpandConfigPath(const NoString& sConfigFile, bool bAllowMkDir = true);
-    bool WriteNewConfig(const NoString& sConfigFile);
-    bool WriteConfig();
-    bool ParseConfig(const NoString& sConfig, NoString& sError);
-    bool RehashConfig(NoString& sError);
-    void BackupConfigOnce(const NoString& sSuffix);
-    static NoString GetVersion();
-    static NoString GetTag(bool bIncludeVersion = true, bool bHTML = false);
-    static NoString GetCompileOptionsString();
-    NoString GetUptime() const;
-    void ClearBindHosts();
-    bool AddBindHost(const NoString& sHost);
-    bool RemBindHost(const NoString& sHost);
-    void ClearTrustedProxies();
-    bool AddTrustedProxy(const NoString& sHost);
-    bool RemTrustedProxy(const NoString& sHost);
-    void Broadcast(const NoString& sMessage, bool bAdminOnly = false, NoUser* pSkipUser = nullptr, NoClient* pSkipClient = nullptr);
-    void AddBytesRead(ulonglong u);
-    void AddBytesWritten(ulonglong u);
-    ulonglong BytesRead() const;
-    ulonglong BytesWritten() const;
+    NoString expandConfigPath(const NoString& sConfigFile, bool bAllowMkDir = true);
+    bool writeNewConfig(const NoString& sConfigFile);
+    bool writeConfig();
+    bool parseConfig(const NoString& sConfig, NoString& sError);
+    bool rehashConfig(NoString& sError);
+    void backupConfigOnce(const NoString& sSuffix);
+    static NoString version();
+    static NoString tag(bool bIncludeVersion = true, bool bHTML = false);
+    static NoString compileOptionsString();
+    NoString uptime() const;
+    void clearBindHosts();
+    bool addBindHost(const NoString& sHost);
+    bool removeBindHost(const NoString& sHost);
+    void clearTrustedProxies();
+    bool addTrustedProxy(const NoString& sHost);
+    bool removeTrustedProxy(const NoString& sHost);
+    void broadcast(const NoString& sMessage, bool bAdminOnly = false, NoUser* pSkipUser = nullptr, NoClient* pSkipClient = nullptr);
+    void addBytesRead(ulonglong u);
+    void addBytesWritten(ulonglong u);
+    ulonglong bytesRead() const;
+    ulonglong bytesWritten() const;
 
     typedef std::pair<ulonglong, ulonglong> TrafficStatsPair;
     typedef std::map<NoString, TrafficStatsPair> TrafficStatsMap;
@@ -83,54 +83,55 @@ public:
     // while also providing the traffic of all users together, traffic which
     // couldn't be accounted to any particular user and the total traffic
     // generated through ZNC.
-    TrafficStatsMap GetTrafficStats(TrafficStatsPair& Users, TrafficStatsPair& ZNC, TrafficStatsPair& Total);
+    TrafficStatsMap trafficStats(TrafficStatsPair& Users, TrafficStatsPair& ZNC, TrafficStatsPair& Total);
 
     // The result is passed back via callbacks to NoAuthenticator.
-    void AuthUser(std::shared_ptr<NoAuthenticator> AuthClass);
+    void authUser(std::shared_ptr<NoAuthenticator> AuthClass);
 
-    void SetConfigState(ConfigState e);
-    void SetSkinName(const NoString& s);
-    void SetStatusPrefix(const NoString& s);
-    void SetMaxBufferSize(uint i);
-    void SetAnonIPLimit(uint i);
-    void SetServerThrottle(uint i);
-    void SetProtectWebSessions(bool b);
-    void SetHideVersion(bool b);
-    void SetConnectDelay(uint i);
+    void setConfigState(ConfigState e);
+    void setSkinName(const NoString& s);
+    void setStatusPrefix(const NoString& s);
+    void setMaxBufferSize(uint i);
+    void setAnonIpLimit(uint i);
+    void setServerThrottle(uint i);
+    void setProtectWebSessions(bool b);
+    void setHideVersion(bool b);
+    void setConnectDelay(uint i);
 
-    ConfigState GetConfigState() const;
+    ConfigState configState() const;
     NoSocketManager& manager();
     const NoSocketManager& manager() const;
-    NoModuleLoader* GetLoader() const;
-    NoString GetSkinName() const;
-    NoString GetStatusPrefix() const;
-    NoString GetCurPath() const;
-    NoString GetZNCPath() const;
-    NoString GetConfPath(bool bAllowMkDir = true) const;
-    NoString GetUserPath() const;
-    NoString GetModPath() const;
-    NoString GetPemLocation() const;
-    NoString GetConfigFile() const;
-    bool WritePemFile();
+    NoModuleLoader* loader() const;
+    NoString skinName() const;
+    NoString statusPrefix() const;
+    NoString currentPath() const;
+    NoString appPath() const;
+    NoString confPath(bool bAllowMkDir = true) const;
+    NoString userPath() const;
+    NoString modulePath() const;
+    NoString pemLocation() const;
+    NoString configFile() const;
+    bool writePemFile();
     NoStringVector bindHosts() const;
-    NoStringVector GetTrustedProxies() const;
-    std::vector<NoListener*> GetListeners() const;
-    time_t TimeStarted() const;
-    uint GetMaxBufferSize() const;
-    uint GetAnonIPLimit() const;
-    uint GetServerThrottle() const;
-    uint GetConnectDelay() const;
-    bool GetProtectWebSessions() const;
-    bool GetHideVersion() const;
-    NoString GetSSLCiphers() const;
-    uint GetDisabledSSLProtocols() const;
+    NoStringVector trustedProxies() const;
+    std::vector<NoListener*> listeners() const;
+    time_t timeStarted() const;
+    uint maxBufferSize() const;
+    uint anonIpLimit() const;
+    uint serverThrottle() const;
+    uint connectDelay() const;
+    bool protectWebSessions() const;
+    bool hideVersion() const;
+    NoString sslCiphers() const;
+    uint disabledSslProtocols() const;
 
-    static void CreateInstance();
-    static NoApp& Get();
-    static void DestroyInstance();
-    NoUser* FindUser(const NoString& sUsername);
-    NoModule* FindModule(const NoString& sModName, const NoString& sUsername);
-    NoModule* FindModule(const NoString& sModName, NoUser* pUser);
+    static void createInstance();
+    static NoApp& instance();
+    static void destroyInstance();
+
+    NoUser* findUser(const NoString& sUsername);
+    NoModule* findModule(const NoString& sModName, const NoString& sUsername);
+    NoModule* findModule(const NoString& sModName, NoUser* pUser);
 
     /** Reload a module everywhere
      *
@@ -139,53 +140,53 @@ public:
      *
      * @param sModule The name of the module to reload
      */
-    bool UpdateModule(const NoString& sModule);
+    bool updateModule(const NoString& sModule);
 
-    bool DeleteUser(const NoString& sUsername);
-    bool AddUser(NoUser* pUser, NoString& sErrorRet);
-    std::map<NoString, NoUser*> GetUserMap() const;
+    bool deleteUser(const NoString& sUsername);
+    bool addUser(NoUser* pUser, NoString& sErrorRet);
+    std::map<NoString, NoUser*> userMap() const;
 
-    NoListener* FindListener(u_short uPort, const NoString& sHost, No::AddressType eAddr);
-    bool AddListener(NoListener*);
-    bool AddListener(ushort uPort,
+    NoListener* findListener(u_short uPort, const NoString& sHost, No::AddressType eAddr);
+    bool addListener(NoListener*);
+    bool addListener(ushort uPort,
                      const NoString& sBindHost,
                      const NoString& sURIPrefix,
                      bool bSSL,
                      No::AddressType eAddr,
                      No::AcceptType eAccept,
                      NoString& sError);
-    bool DelListener(NoListener*);
+    bool removeListener(NoListener*);
 
-    void SetMotd(const NoString& sMessage);
-    void AddMotd(const NoString& sMessage);
-    void ClearMotd();
-    NoStringVector GetMotd() const;
+    void setMotd(const NoString& sMessage);
+    void addMotd(const NoString& sMessage);
+    void clearMotd();
+    NoStringVector motd() const;
 
-    void AddServerThrottle(NoString sName);
-    bool GetServerThrottle(NoString sName);
+    void addServerThrottle(NoString sName);
+    bool serverThrottle(NoString sName);
 
-    void AddNetworkToQueue(NoNetwork* pNetwork);
-    std::list<NoNetwork*>& GetConnectionQueue();
+    void addNetworkToQueue(NoNetwork* pNetwork);
+    std::list<NoNetwork*>& connectionQueue();
 
-    void EnableConnectQueue();
-    void DisableConnectQueue();
+    void enableConnectQueue();
+    void disableConnectQueue();
 
-    void PauseConnectQueue();
-    void ResumeConnectQueue();
+    void pauseConnectQueue();
+    void resumeConnectQueue();
 
     // Never call this unless you are NoConnectQueueTimer::~NoConnectQueueTimer()
-    void LeakConnectQueueTimer(NoConnectQueueTimer* pTimer);
+    void leakConnectQueueTimer(NoConnectQueueTimer* pTimer);
 
-    static void DumpConfig(const NoSettings* Config);
+    static void dumpConfig(const NoSettings* Config);
 
 private:
-    NoFile* InitPidFile();
-    bool DoRehash(NoString& sError);
+    NoFile* initPidFile();
+    bool doRehash(NoString& sError);
     // Returns true if something was done
-    bool HandleUserDeletion();
-    NoString MakeConfigHeader();
-    bool AddListener(const NoString& sLine, NoString& sError);
-    bool AddListener(NoSettings* pConfig, NoString& sError);
+    bool handleUserDeletion();
+    NoString makeConfigHeader();
+    bool addListener(const NoString& sLine, NoString& sError);
+    bool addListener(NoSettings* pConfig, NoString& sError);
 
     time_t m_startTime;
 

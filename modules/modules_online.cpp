@@ -36,7 +36,7 @@ public:
 
         NoString sModNick = sNick.substr(sPrefix.length());
         if (sModNick.equals("status") || network()->loader()->findModule(sModNick) ||
-            user()->loader()->findModule(sModNick) || NoApp::Get().GetLoader()->findModule(sModNick))
+            user()->loader()->findModule(sModNick) || NoApp::instance().loader()->findModule(sModNick))
             return true;
         return false;
     }

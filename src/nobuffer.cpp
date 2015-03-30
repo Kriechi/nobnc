@@ -107,7 +107,7 @@ uint NoBuffer::limit() const
 
 bool NoBuffer::setLimit(uint limit, bool force)
 {
-    if (!force && limit > NoApp::Get().GetMaxBufferSize())
+    if (!force && limit > NoApp::instance().maxBufferSize())
         return false;
 
     d->limit = limit;

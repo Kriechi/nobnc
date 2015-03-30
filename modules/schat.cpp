@@ -123,7 +123,7 @@ public:
         m_sPemFile = sArgs;
 
         if (m_sPemFile.empty()) {
-            m_sPemFile = NoApp::Get().GetPemLocation();
+            m_sPemFile = NoApp::instance().pemLocation();
         }
 
         if (!NoFile::Exists(m_sPemFile)) {

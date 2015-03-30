@@ -56,7 +56,7 @@
                     (USER)->loader()->unloadModule(MOD);                    \
                 }                                                           \
             }                                                               \
-        } else if ((pModule = NoApp::Get().GetLoader()->findModule(MOD))) { \
+        } else if ((pModule = NoApp::instance().loader()->findModule(MOD))) { \
             try {                                                           \
                 pModule->setClient(CLIENT);                                 \
                 pModule->setNetwork(NETWORK);                               \
@@ -67,7 +67,7 @@
                 pModule->setUser(nullptr);                                  \
             } catch (const NoModule::ModException& e) {                     \
                 if (e == NoModule::UNLOAD) {                                \
-                    NoApp::Get().GetLoader()->unloadModule(MOD);            \
+                    NoApp::instance().loader()->unloadModule(MOD);            \
                 }                                                           \
             }                                                               \
         } else {                                                            \
@@ -342,7 +342,7 @@ void NoClient::readLine(const NoString& sData)
                 sCTCP.rightChomp(1);
 
                 if (No::token(sCTCP, 0) == "VERSION") {
-                    sCTCP += " via " + NoApp::GetTag(false);
+                    sCTCP += " via " + NoApp::tag(false);
                 }
 
                 NETWORKMODULECALL(onUserCtcpReply(sTarget, sCTCP), d->user, d->network, this, &bContinue);
@@ -718,13 +718,13 @@ void NoClient::statusCtcp(const NoString& sLine)
     if (sCommand.equals("PING")) {
         putStatusNotice("\001PING " + No::tokens(sLine, 1) + "\001");
     } else if (sCommand.equals("VERSION")) {
-        putStatusNotice("\001VERSION " + NoApp::GetTag() + "\001");
+        putStatusNotice("\001VERSION " + NoApp::tag() + "\001");
     }
 }
 
 bool NoClient::sendMotd()
 {
-    NoStringVector vsMotd = NoApp::Get().GetMotd();
+    NoStringVector vsMotd = NoApp::instance().motd();
 
     if (!vsMotd.size()) {
         return false;
@@ -748,7 +748,7 @@ void NoClient::authUser()
 
     d->authenticator = std::make_shared<NoClientAuth>(this, d->username, d->password);
 
-    NoApp::Get().AuthUser(d->authenticator);
+    NoApp::instance().authUser(d->authenticator);
 }
 
 void NoClient::refuseLogin(const NoString& sReason)

@@ -27,7 +27,7 @@ class NoSendRawMod : public NoModule
 {
     void SendClient(const NoString& sLine)
     {
-        NoUser* pUser = NoApp::Get().FindUser(No::token(sLine, 1));
+        NoUser* pUser = NoApp::instance().findUser(No::token(sLine, 1));
 
         if (pUser) {
             NoNetwork* pNetwork = pUser->findNetwork(No::token(sLine, 2));
@@ -45,7 +45,7 @@ class NoSendRawMod : public NoModule
 
     void SendServer(const NoString& sLine)
     {
-        NoUser* pUser = NoApp::Get().FindUser(No::token(sLine, 1));
+        NoUser* pUser = NoApp::instance().findUser(No::token(sLine, 1));
 
         if (pUser) {
             NoNetwork* pNetwork = pUser->findNetwork(No::token(sLine, 2));
@@ -91,7 +91,7 @@ public:
     {
         if (sPageName == "index") {
             if (WebSock.isPost()) {
-                NoUser* pUser = NoApp::Get().FindUser(No::token(WebSock.param("network"), 0, "/"));
+                NoUser* pUser = NoApp::instance().findUser(No::token(WebSock.param("network"), 0, "/"));
                 if (!pUser) {
                     WebSock.session()->addError("User not found");
                     return true;
@@ -119,7 +119,7 @@ public:
                 WebSock.session()->addSuccess("Line sent");
             }
 
-            const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+            const std::map<NoString, NoUser*>& msUsers = NoApp::instance().userMap();
             for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
                 NoTemplate& l = Tmpl.addRow("UserLoop");
                 l["Username"] = (*it->second).userName();

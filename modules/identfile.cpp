@@ -99,13 +99,13 @@ public:
     void SetIRCSock(NoIrcSocket* pIRCSock)
     {
         if (m_pIRCSock) {
-            NoApp::Get().ResumeConnectQueue();
+            NoApp::instance().resumeConnectQueue();
         }
 
         m_pIRCSock = pIRCSock;
 
         if (m_pIRCSock) {
-            NoApp::Get().PauseConnectQueue();
+            NoApp::instance().pauseConnectQueue();
         }
     }
 

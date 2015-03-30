@@ -35,7 +35,7 @@ template <typename T>
 static std::vector<NoModule*> allModules(T* p)
 {
     std::vector<NoModule*> allMods;
-    std::vector<NoModule*> globalMods = NoApp::Get().GetLoader()->modules();
+    std::vector<NoModule*> globalMods = NoApp::instance().loader()->modules();
     std::vector<NoModule*> typeMods = p->loader()->modules();
     allMods.reserve(globalMods.size() + typeMods.size());
     allMods.insert(allMods.end(), globalMods.begin(), globalMods.end());
@@ -137,7 +137,7 @@ public:
 
         if (!bShareIRCPorts) {
             // Make all existing listeners IRC-only
-            const std::vector<NoListener*>& vListeners = NoApp::Get().GetListeners();
+            const std::vector<NoListener*>& vListeners = NoApp::instance().listeners();
             std::vector<NoListener*>::const_iterator it;
             for (it = vListeners.begin(); it != vListeners.end(); ++it) {
                 (*it)->setAcceptType(No::AcceptIrc);
@@ -155,7 +155,7 @@ public:
             sMessage = "Failed to add backwards-compatible listener";
             return false;
         }
-        NoApp::Get().AddListener(pListener);
+        NoApp::instance().addListener(pListener);
 
         setArgs("");
         return true;
@@ -256,7 +256,7 @@ public:
                 pNewUser->setDccBindHost(sArg2);
             }
 
-            const NoStringVector& vsHosts = NoApp::Get().bindHosts();
+            const NoStringVector& vsHosts = NoApp::instance().bindHosts();
             if (!spSession->isAdmin() && !vsHosts.empty()) {
                 NoStringVector::const_iterator it;
                 bool bFound = false;
@@ -336,7 +336,7 @@ public:
 
         // If pUser is not nullptr, we are editing an existing user.
         // Users must not be able to change their own admin flag.
-        if (pUser != NoApp::Get().FindUser(WebSock.username())) {
+        if (pUser != NoApp::instance().findUser(WebSock.username())) {
             pNewUser->setAdmin(WebSock.param("isadmin").toBool());
         } else if (pUser) {
             pNewUser->setAdmin(pUser->isAdmin());
@@ -346,7 +346,7 @@ public:
             WebSock.paramValues("loadmod", vsArgs);
 
             // disallow unload webadmin from itself
-            if (No::UserModule == type() && pUser == NoApp::Get().FindUser(WebSock.username())) {
+            if (No::UserModule == type() && pUser == NoApp::instance().findUser(WebSock.username())) {
                 bool bLoadedWebadmin = false;
                 for (a = 0; a < vsArgs.size(); ++a) {
                     NoString sModName = vsArgs[a].trimRight_n("\r");
@@ -433,12 +433,12 @@ public:
 
     NoUser* SafeGetUserFromParam(NoWebSocket& WebSock)
     {
-        return NoApp::Get().FindUser(SafeGetUserNameParam(WebSock));
+        return NoApp::instance().findUser(SafeGetUserNameParam(WebSock));
     }
 
     NoNetwork* SafeGetNetworkFromParam(NoWebSocket& WebSock)
     {
-        NoUser* pUser = NoApp::Get().FindUser(SafeGetUserNameParam(WebSock));
+        NoUser* pUser = NoApp::instance().findUser(SafeGetUserNameParam(WebSock));
         NoNetwork* pNetwork = nullptr;
 
         if (pUser) {
@@ -505,7 +505,7 @@ public:
                 sUser = WebSock.param("user", false);
             }
 
-            NoUser* pUser = NoApp::Get().FindUser(sUser);
+            NoUser* pUser = NoApp::instance().findUser(sUser);
 
             // Admin||Self Check
             if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != pUser)) {
@@ -574,7 +574,7 @@ public:
                 // Show the "Are you sure?" page:
 
                 NoString sUser = WebSock.param("user", false);
-                NoUser* pUser = NoApp::Get().FindUser(sUser);
+                NoUser* pUser = NoApp::instance().findUser(sUser);
 
                 if (!pUser) {
                     WebSock.printErrorPage("No such username");
@@ -590,12 +590,12 @@ public:
             // so we actually delete the user now:
 
             NoString sUser = WebSock.param("user");
-            NoUser* pUser = NoApp::Get().FindUser(sUser);
+            NoUser* pUser = NoApp::instance().findUser(sUser);
 
             if (pUser && pUser == spSession->user()) {
                 WebSock.printErrorPage("Please don't delete yourself, suicide is not the answer!");
                 return true;
-            } else if (NoApp::Get().DeleteUser(sUser)) {
+            } else if (NoApp::instance().deleteUser(sUser)) {
                 WebSock.redirect(webPath() + "listusers");
                 return true;
             }
@@ -604,7 +604,7 @@ public:
             return true;
         } else if (sPageName == "edituser") {
             NoString sUserName = SafeGetUserNameParam(WebSock);
-            NoUser* pUser = NoApp::Get().FindUser(sUserName);
+            NoUser* pUser = NoApp::instance().findUser(sUserName);
 
             if (!pUser) {
                 if (sUserName.empty()) {
@@ -779,7 +779,7 @@ public:
             pMod->onEmbeddedWebRequest(WebSock, "webadmin/channel", TmplMod);
         }
 
-        if (!NoApp::Get().WriteConfig()) {
+        if (!NoApp::instance().writeConfig()) {
             WebSock.printErrorPage("Channel added/modified, but config was not written");
             return true;
         }
@@ -803,7 +803,7 @@ public:
             Tmpl["Username"] = pUser->userName();
 
             std::set<NoModuleInfo> ssNetworkMods;
-            NoApp::Get().GetLoader()->availableModules(ssNetworkMods, No::NetworkModule);
+            NoApp::instance().loader()->availableModules(ssNetworkMods, No::NetworkModule);
             for (std::set<NoModuleInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.addRow("ModuleLoop");
@@ -824,7 +824,7 @@ public:
 
                 // Check if module is loaded globally
                 l["CanBeLoadedGlobally"] = NoString(Info.supportsType(No::GlobalModule));
-                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.name()) != nullptr);
+                l["LoadedGlobally"] = NoString(NoApp::instance().loader()->findModule(Info.name()) != nullptr);
 
                 // Check if module is loaded by user
                 l["CanBeLoadedByUser"] = NoString(Info.supportsType(No::UserModule));
@@ -838,7 +838,7 @@ public:
             // To change BindHosts be admin or don't have DenysetBindHost
             if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
-                const NoStringVector& vsBindHosts = NoApp::Get().bindHosts();
+                const NoStringVector& vsBindHosts = NoApp::instance().bindHosts();
                 if (vsBindHosts.empty()) {
                     if (pNetwork) {
                         Tmpl["BindHost"] = pNetwork->bindHost();
@@ -1016,7 +1016,7 @@ public:
         // To change BindHosts be admin or don't have DenysetBindHost
         if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
             NoString sHost = WebSock.param("bindhost");
-            const NoStringVector& vsHosts = NoApp::Get().bindHosts();
+            const NoStringVector& vsHosts = NoApp::instance().bindHosts();
             if (!spSession->isAdmin() && !vsHosts.empty()) {
                 NoStringVector::const_iterator it;
                 bool bFound = false;
@@ -1137,7 +1137,7 @@ public:
             pMod->onEmbeddedWebRequest(WebSock, "webadmin/network", TmplMod);
         }
 
-        if (!NoApp::Get().WriteConfig()) {
+        if (!NoApp::instance().writeConfig()) {
             WebSock.printErrorPage("Network added/modified, but config was not written");
             return true;
         }
@@ -1179,7 +1179,7 @@ public:
 
         pUser->deleteNetwork(sNetwork);
 
-        if (!NoApp::Get().WriteConfig()) {
+        if (!NoApp::instance().writeConfig()) {
             WebSock.printErrorPage("Network deleted, but config was not written");
             return true;
         }
@@ -1200,7 +1200,7 @@ public:
         pNetwork->removeChannel(sChan);
         pNetwork->putIrc("PART " + sChan);
 
-        if (!NoApp::Get().WriteConfig()) {
+        if (!NoApp::instance().writeConfig()) {
             WebSock.printErrorPage("Channel deleted, but config was not written");
             return true;
         }
@@ -1222,7 +1222,7 @@ public:
                 Tmpl["Edit"] = "true";
             } else {
                 NoString sUsername = WebSock.param("clone", false);
-                pUser = NoApp::Get().FindUser(sUsername);
+                pUser = NoApp::instance().findUser(sUsername);
 
                 if (pUser) {
                     Tmpl["Title"] = "Clone User [" + pUser->userName() + "]";
@@ -1312,7 +1312,7 @@ public:
             // To change BindHosts be admin or don't have DenysetBindHost
             if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
                 Tmpl["BindHostEdit"] = "true";
-                const NoStringVector& vsBindHosts = NoApp::Get().bindHosts();
+                const NoStringVector& vsBindHosts = NoApp::instance().bindHosts();
                 if (vsBindHosts.empty()) {
                     if (pUser) {
                         Tmpl["BindHost"] = pUser->bindHost();
@@ -1370,7 +1370,7 @@ public:
             }
 
             std::set<NoModuleInfo> ssUserMods;
-            NoApp::Get().GetLoader()->availableModules(ssUserMods);
+            NoApp::instance().loader()->availableModules(ssUserMods);
 
             for (std::set<NoModuleInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
@@ -1408,7 +1408,7 @@ public:
                 }
                 l["CanBeLoadedGlobally"] = NoString(Info.supportsType(No::GlobalModule));
                 // Check if module is loaded globally
-                l["LoadedGlobally"] = NoString(NoApp::Get().GetLoader()->findModule(Info.name()) != nullptr);
+                l["LoadedGlobally"] = NoString(NoApp::instance().loader()->findModule(Info.name()) != nullptr);
 
                 if (!spSession->isAdmin() && pUser && pUser->denyLoadMod()) {
                     l["Disabled"] = "true";
@@ -1460,7 +1460,7 @@ public:
                 if (pUser && pUser->isAdmin()) {
                     o10["Checked"] = "true";
                 }
-                if (pUser && pUser == NoApp::Get().FindUser(WebSock.username())) {
+                if (pUser && pUser == NoApp::instance().findUser(WebSock.username())) {
                     o10["Disabled"] = "true";
                 }
 
@@ -1496,7 +1496,7 @@ public:
         /* If pUser is nullptr, we are adding a user, else we are editing this one */
 
         NoString sUsername = WebSock.param("user");
-        if (!pUser && NoApp::Get().FindUser(sUsername)) {
+        if (!pUser && NoApp::instance().findUser(sUsername)) {
             WebSock.printErrorPage("Invalid Submission [User " + sUsername + " already exists]");
             return true;
         }
@@ -1512,12 +1512,12 @@ public:
 
         if (!pUser) {
             NoString sClone = WebSock.param("clone");
-            if (NoUser* pCloneUser = NoApp::Get().FindUser(sClone)) {
+            if (NoUser* pCloneUser = NoApp::instance().findUser(sClone)) {
                 pNewUser->cloneNetworks(*pCloneUser);
             }
 
             // Add User Submission
-            if (!NoApp::Get().AddUser(pNewUser, sErr)) {
+            if (!NoApp::instance().addUser(pNewUser, sErr)) {
                 delete pNewUser;
                 WebSock.printErrorPage("Invalid submission [" + sErr + "]");
                 return true;
@@ -1544,7 +1544,7 @@ public:
             pMod->onEmbeddedWebRequest(WebSock, "webadmin/user", TmplMod);
         }
 
-        if (!NoApp::Get().WriteConfig()) {
+        if (!NoApp::instance().writeConfig()) {
             WebSock.printErrorPage("User " + sAction + ", but config was not written");
             return true;
         }
@@ -1562,7 +1562,7 @@ public:
     bool ListUsersPage(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.session();
-        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::instance().userMap();
         Tmpl["Title"] = "Manage Users";
         Tmpl["Action"] = "listusers";
 
@@ -1587,9 +1587,9 @@ public:
     bool TrafficPage(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
         Tmpl["Title"] = "Traffic Info";
-        Tmpl["Uptime"] = NoApp::Get().GetUptime();
+        Tmpl["Uptime"] = NoApp::instance().uptime();
 
-        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::instance().userMap();
         Tmpl["TotalUsers"] = NoString(msUsers.size());
 
         size_t uiNetworks = 0, uiAttached = 0, uiClients = 0, uiServers = 0;
@@ -1622,7 +1622,7 @@ public:
         Tmpl["TotalIRCConnections"] = NoString(uiServers);
 
         NoApp::TrafficStatsPair Users, ZNC, Total;
-        NoApp::TrafficStatsMap traffic = NoApp::Get().GetTrafficStats(Users, ZNC, Total);
+        NoApp::TrafficStatsMap traffic = NoApp::instance().trafficStats(Users, ZNC, Total);
         NoApp::TrafficStatsMap::const_iterator it;
 
         for (it = traffic.begin(); it != traffic.end(); ++it) {
@@ -1695,11 +1695,11 @@ public:
         }
 
         NoString sMessage;
-        if (NoApp::Get().AddListener(uPort, sHost, sURIPrefix, bSSL, eAddr, eAccept, sMessage)) {
+        if (NoApp::instance().addListener(uPort, sHost, sURIPrefix, bSSL, eAddr, eAccept, sMessage)) {
             if (!sMessage.empty()) {
                 WebSock.session()->addSuccess(sMessage);
             }
-            if (!NoApp::Get().WriteConfig()) {
+            if (!NoApp::instance().writeConfig()) {
                 WebSock.session()->addError("Port changed, but config was not written");
             }
         } else {
@@ -1732,10 +1732,10 @@ public:
             }
         }
 
-        NoListener* pListener = NoApp::Get().FindListener(uPort, sHost, eAddr);
+        NoListener* pListener = NoApp::instance().findListener(uPort, sHost, eAddr);
         if (pListener) {
-            NoApp::Get().DelListener(pListener);
-            if (!NoApp::Get().WriteConfig()) {
+            NoApp::instance().removeListener(pListener);
+            if (!NoApp::instance().writeConfig()) {
                 WebSock.session()->addError("Port changed, but config was not written");
             }
         } else {
@@ -1751,27 +1751,27 @@ public:
         if (!WebSock.param("submitted").toUInt()) {
             Tmpl["Action"] = "settings";
             Tmpl["Title"] = "Settings";
-            Tmpl["StatusPrefix"] = NoApp::Get().GetStatusPrefix();
-            Tmpl["MaxBufferSize"] = NoString(NoApp::Get().GetMaxBufferSize());
-            Tmpl["ConnectDelay"] = NoString(NoApp::Get().GetConnectDelay());
-            Tmpl["ServerThrottle"] = NoString(NoApp::Get().GetServerThrottle());
-            Tmpl["AnonIPLimit"] = NoString(NoApp::Get().GetAnonIPLimit());
-            Tmpl["ProtectWebSessions"] = NoString(NoApp::Get().GetProtectWebSessions());
-            Tmpl["HideVersion"] = NoString(NoApp::Get().GetHideVersion());
+            Tmpl["StatusPrefix"] = NoApp::instance().statusPrefix();
+            Tmpl["MaxBufferSize"] = NoString(NoApp::instance().maxBufferSize());
+            Tmpl["ConnectDelay"] = NoString(NoApp::instance().connectDelay());
+            Tmpl["ServerThrottle"] = NoString(NoApp::instance().serverThrottle());
+            Tmpl["AnonIPLimit"] = NoString(NoApp::instance().anonIpLimit());
+            Tmpl["ProtectWebSessions"] = NoString(NoApp::instance().protectWebSessions());
+            Tmpl["HideVersion"] = NoString(NoApp::instance().hideVersion());
 
-            const NoStringVector& vsBindHosts = NoApp::Get().bindHosts();
+            const NoStringVector& vsBindHosts = NoApp::instance().bindHosts();
             for (uint a = 0; a < vsBindHosts.size(); a++) {
                 NoTemplate& l = Tmpl.addRow("BindHostLoop");
                 l["BindHost"] = vsBindHosts[a];
             }
 
-            const NoStringVector& vsMotd = NoApp::Get().GetMotd();
+            const NoStringVector& vsMotd = NoApp::instance().motd();
             for (uint b = 0; b < vsMotd.size(); b++) {
                 NoTemplate& l = Tmpl.addRow("MOTDLoop");
                 l["Line"] = vsMotd[b];
             }
 
-            const std::vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
+            const std::vector<NoListener*>& vpListeners = NoApp::instance().listeners();
             for (uint c = 0; c < vpListeners.size(); c++) {
                 NoListener* pListener = vpListeners[c];
                 NoTemplate& l = Tmpl.addRow("ListenLoop");
@@ -1821,19 +1821,19 @@ public:
                 NoTemplate& l = Tmpl.addRow("SkinLoop");
                 l["Name"] = SubDir;
 
-                if (SubDir == NoApp::Get().GetSkinName()) {
+                if (SubDir == NoApp::instance().skinName()) {
                     l["Checked"] = "true";
                 }
             }
 
             std::set<NoModuleInfo> ssGlobalMods;
-            NoApp::Get().GetLoader()->availableModules(ssGlobalMods, No::GlobalModule);
+            NoApp::instance().loader()->availableModules(ssGlobalMods, No::GlobalModule);
 
             for (std::set<NoModuleInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
                 const NoModuleInfo& Info = *it;
                 NoTemplate& l = Tmpl.addRow("ModuleLoop");
 
-                NoModule* pModule = NoApp::Get().GetLoader()->findModule(Info.name());
+                NoModule* pModule = NoApp::instance().loader()->findModule(Info.name());
                 if (pModule) {
                     l["Checked"] = "true";
                     l["Args"] = pModule->args();
@@ -1852,7 +1852,7 @@ public:
                 uint usersWithRenderedModuleCount = 0;
                 uint networksWithRenderedModuleCount = 0;
                 uint networksCount = 0;
-                const std::map<NoString, NoUser*>& allUsers = NoApp::Get().GetUserMap();
+                const std::map<NoString, NoUser*>& allUsers = NoApp::instance().userMap();
                 for (std::map<NoString, NoUser*>::const_iterator usersIt = allUsers.begin(); usersIt != allUsers.end(); ++usersIt) {
                     const NoUser& User = *usersIt->second;
 
@@ -1885,36 +1885,36 @@ public:
 
         NoString sArg;
         sArg = WebSock.param("statusprefix");
-        NoApp::Get().SetStatusPrefix(sArg);
+        NoApp::instance().setStatusPrefix(sArg);
         sArg = WebSock.param("maxbufsize");
-        NoApp::Get().SetMaxBufferSize(sArg.toUInt());
+        NoApp::instance().setMaxBufferSize(sArg.toUInt());
         sArg = WebSock.param("connectdelay");
-        NoApp::Get().SetConnectDelay(sArg.toUInt());
+        NoApp::instance().setConnectDelay(sArg.toUInt());
         sArg = WebSock.param("serverthrottle");
-        NoApp::Get().SetServerThrottle(sArg.toUInt());
+        NoApp::instance().setServerThrottle(sArg.toUInt());
         sArg = WebSock.param("anoniplimit");
-        NoApp::Get().SetAnonIPLimit(sArg.toUInt());
+        NoApp::instance().setAnonIpLimit(sArg.toUInt());
         sArg = WebSock.param("protectwebsessions");
-        NoApp::Get().SetProtectWebSessions(sArg.toBool());
+        NoApp::instance().setProtectWebSessions(sArg.toBool());
         sArg = WebSock.param("hideversion");
-        NoApp::Get().SetHideVersion(sArg.toBool());
+        NoApp::instance().setHideVersion(sArg.toBool());
 
         NoStringVector vsArgs = WebSock.rawParam("motd").split("\n");
-        NoApp::Get().ClearMotd();
+        NoApp::instance().clearMotd();
 
         uint a = 0;
         for (a = 0; a < vsArgs.size(); a++) {
-            NoApp::Get().AddMotd(vsArgs[a].trimRight_n());
+            NoApp::instance().addMotd(vsArgs[a].trimRight_n());
         }
 
         vsArgs = WebSock.rawParam("bindhosts").split("\n");
-        NoApp::Get().ClearBindHosts();
+        NoApp::instance().clearBindHosts();
 
         for (a = 0; a < vsArgs.size(); a++) {
-            NoApp::Get().AddBindHost(vsArgs[a].trim_n());
+            NoApp::instance().addBindHost(vsArgs[a].trim_n());
         }
 
-        NoApp::Get().SetSkinName(WebSock.param("skin"));
+        NoApp::instance().setSkinName(WebSock.param("skin"));
 
         std::set<NoString> ssArgs;
         WebSock.paramValues("loadmod", ssArgs);
@@ -1927,13 +1927,13 @@ public:
             if (!sModName.empty()) {
                 NoString sArgs = WebSock.param("modargs_" + sModName);
 
-                NoModule* pMod = NoApp::Get().GetLoader()->findModule(sModName);
+                NoModule* pMod = NoApp::instance().loader()->findModule(sModName);
                 if (!pMod) {
-                    if (!NoApp::Get().GetLoader()->loadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet)) {
+                    if (!NoApp::instance().loader()->loadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } else if (pMod->args() != sArgs) {
-                    if (!NoApp::Get().GetLoader()->reloadModule(sModName, sArgs, nullptr, nullptr, sModRet)) {
+                    if (!NoApp::instance().loader()->reloadModule(sModName, sArgs, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                     }
                 }
@@ -1945,7 +1945,7 @@ public:
             }
         }
 
-        const NoModuleLoader* vCurMods = NoApp::Get().GetLoader();
+        const NoModuleLoader* vCurMods = NoApp::instance().loader();
         std::set<NoString> ssUnloadMods;
 
         for (NoModule* pCurMod : vCurMods->modules()) {
@@ -1956,10 +1956,10 @@ public:
         }
 
         for (std::set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
-            NoApp::Get().GetLoader()->unloadModule(*it2);
+            NoApp::instance().loader()->unloadModule(*it2);
         }
 
-        if (!NoApp::Get().WriteConfig()) {
+        if (!NoApp::instance().writeConfig()) {
             WebSock.session()->addError("Settings changed, but config was not written");
         }
 

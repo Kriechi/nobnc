@@ -71,7 +71,7 @@ private:
 
 bool NoListenerSocket::onConnectionFrom(const NoString& host, ushort port)
 {
-    bool allowed = NoApp::Get().IsHostAllowed(host);
+    bool allowed = NoApp::instance().isHostAllowed(host);
     if (allowed)
         NO_DEBUG("Connection " << name() << " from " << host << ":" << port << " allowed");
     else
@@ -82,7 +82,7 @@ bool NoListenerSocket::onConnectionFrom(const NoString& host, ushort port)
 NoSocket* NoListenerSocket::createSocket(const NoString& host, ushort port)
 {
     NoPeerSocket* socket = new NoPeerSocket(host, port, m_listener);
-    if (NoApp::Get().AllowConnectionFrom(host)) {
+    if (NoApp::instance().allowConnectionFrom(host)) {
         GLOBALMODULECALL(onClientConnect(socket, host, port), NOTHING);
     } else {
         socket->write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
@@ -98,9 +98,9 @@ void NoListenerSocket::onSocketError(int error, const NoString& description)
     if (error == EMFILE) {
         // Too many open FDs, close the listening port to be able to continue
         // to work, next rehash will (try to) re-open it.
-        NoApp::Get().Broadcast("The limit of file descriptors has been reached");
-        NoApp::Get().Broadcast("Closing listening socket on " + localAddress() + ":" + NoString(localPort()));
-        NoApp::Get().Broadcast("An admin has to rehash to re-open the listening port");
+        NoApp::instance().broadcast("The limit of file descriptors has been reached");
+        NoApp::instance().broadcast("Closing listening socket on " + localAddress() + ":" + NoString(localPort()));
+        NoApp::instance().broadcast("An admin has to rehash to re-open the listening port");
         close();
     }
 }
@@ -143,7 +143,7 @@ void NoPeerSocket::readLine(const NoString& line)
         } else {
             NoClient* client = new NoClient;
             socket = client->socket();
-            NoApp::Get().manager().swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
+            NoApp::instance().manager().swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout
             socket->setName("USR::???");
@@ -155,7 +155,7 @@ void NoPeerSocket::readLine(const NoString& line)
             NO_DEBUG("Refused HTTP connection to non HTTP port");
         } else {
             socket = new NoWebSocket(m_listener->uriPrefix);
-            NoApp::Get().manager().swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
+            NoApp::instance().manager().swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout
             socket->setName("WebMod::Client");
@@ -174,7 +174,7 @@ NoListener::NoListener(const NoString& host, ushort port) : d(new NoListenerPriv
 NoListener::~NoListener()
 {
     if (d->socket)
-        NoApp::Get().manager().removeSocket(d->socket);
+        NoApp::instance().manager().removeSocket(d->socket);
 }
 
 bool NoListener::isSsl() const
@@ -260,7 +260,7 @@ bool NoListener::listen()
 #ifdef HAVE_LIBSSL
     if (isSsl()) {
         ssl = true;
-        d->socket->setPemFile(NoApp::Get().GetPemLocation());
+        d->socket->setPemFile(NoApp::instance().pemLocation());
     }
 #endif
 
@@ -268,5 +268,5 @@ bool NoListener::listen()
     // Make sure there is a consistent error message, not something random
     // which might even be "Error: Success".
     errno = EINVAL;
-    return NoApp::Get().manager().listenHost(d->port, "_LISTENER", d->host, ssl, SOMAXCONN, d->socket, 0, d->addressType);
+    return NoApp::instance().manager().listenHost(d->port, "_LISTENER", d->host, ssl, SOMAXCONN, d->socket, 0, d->addressType);
 }

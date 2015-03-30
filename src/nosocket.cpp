@@ -46,8 +46,8 @@ NoSocketImpl::NoSocketImpl(NoSocket* q, const NoString& host, u_short port)
 #ifdef HAVE_LIBSSL
     DisableSSLCompression();
     FollowSSLCipherServerPreference();
-    DisableSSLProtocols(NoApp::Get().GetDisabledSSLProtocols());
-    NoString sCipher = NoApp::Get().GetSSLCiphers();
+    DisableSSLProtocols(NoApp::instance().disabledSslProtocols());
+    NoString sCipher = NoApp::instance().sslCiphers();
     if (sCipher.empty()) {
         sCipher = ZNC_DefaultCipher;
     }

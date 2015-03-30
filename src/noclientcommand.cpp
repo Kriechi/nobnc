@@ -148,8 +148,8 @@ void NoClient::userCommand(NoString& sLine)
         putStatus("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
         putStatus("Detached [" + NoString(uDetached) + "] channels");
     } else if (sCommand.equals("VERSION")) {
-        putStatus(NoApp::GetTag());
-        putStatus(NoApp::GetCompileOptionsString());
+        putStatus(NoApp::tag());
+        putStatus(NoApp::compileOptionsString());
     } else if (sCommand.equals("MOTD") || sCommand.equals("ShowMOTD")) {
         if (!sendMotd()) {
             putStatus("There is no MOTD set.");
@@ -157,14 +157,14 @@ void NoClient::userCommand(NoString& sLine)
     } else if (d->user->isAdmin() && sCommand.equals("Rehash")) {
         NoString sRet;
 
-        if (NoApp::Get().RehashConfig(sRet)) {
+        if (NoApp::instance().rehashConfig(sRet)) {
             putStatus("Rehashing succeeded!");
         } else {
             putStatus("Rehashing failed: " + sRet);
         }
     } else if (d->user->isAdmin() && sCommand.equals("SaveConfig")) {
-        if (NoApp::Get().WriteConfig()) {
-            putStatus("Wrote config to [" + NoApp::Get().GetConfigFile() + "]");
+        if (NoApp::instance().writeConfig()) {
+            putStatus("Wrote config to [" + NoApp::instance().configFile() + "]");
         } else {
             putStatus("Error while trying to write config.");
         }
@@ -178,7 +178,7 @@ void NoClient::userCommand(NoString& sLine)
                 return;
             }
 
-            pUser = NoApp::Get().FindUser(sNick);
+            pUser = NoApp::instance().findUser(sNick);
 
             if (!pUser) {
                 putStatus("No such user [" + sNick + "]");
@@ -209,7 +209,7 @@ void NoClient::userCommand(NoString& sLine)
 
         putStatus(Table);
     } else if (d->user->isAdmin() && sCommand.equals("LISTUSERS")) {
-        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::instance().userMap();
         NoTable Table;
         Table.addColumn("Username");
         Table.addColumn("Networks");
@@ -224,7 +224,7 @@ void NoClient::userCommand(NoString& sLine)
 
         putStatus(Table);
     } else if (d->user->isAdmin() && sCommand.equals("LISTALLUSERNETWORKS")) {
-        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::instance().userMap();
         NoTable Table;
         Table.addColumn("Username");
         Table.addColumn("Network");
@@ -269,7 +269,7 @@ void NoClient::userCommand(NoString& sLine)
         if (sMessage.empty()) {
             putStatus("Usage: SetMOTD <message>");
         } else {
-            NoApp::Get().SetMotd(sMessage);
+            NoApp::instance().setMotd(sMessage);
             putStatus("MOTD set to [" + sMessage + "]");
         }
     } else if (d->user->isAdmin() && sCommand.equals("AddMOTD")) {
@@ -278,14 +278,14 @@ void NoClient::userCommand(NoString& sLine)
         if (sMessage.empty()) {
             putStatus("Usage: AddMOTD <message>");
         } else {
-            NoApp::Get().AddMotd(sMessage);
+            NoApp::instance().addMotd(sMessage);
             putStatus("Added [" + sMessage + "] to MOTD");
         }
     } else if (d->user->isAdmin() && sCommand.equals("ClearMOTD")) {
-        NoApp::Get().ClearMotd();
+        NoApp::instance().clearMotd();
         putStatus("Cleared MOTD");
     } else if (d->user->isAdmin() && sCommand.equals("BROADCAST")) {
-        NoApp::Get().Broadcast(No::tokens(sLine, 1));
+        NoApp::instance().broadcast(No::tokens(sLine, 1));
     } else if (d->user->isAdmin() && (sCommand.equals("SHUTDOWN") || sCommand.equals("RESTART"))) {
         bool bRestart = sCommand.equals("RESTART");
         NoString sMessage = No::tokens(sLine, 1);
@@ -300,11 +300,11 @@ void NoClient::userCommand(NoString& sLine)
             sMessage = (bRestart ? "ZNC is being restarted NOW!" : "ZNC is being shut down NOW!");
         }
 
-        if (!NoApp::Get().WriteConfig() && !bForce) {
+        if (!NoApp::instance().writeConfig() && !bForce) {
             putStatus("ERROR: Writing config file to disk failed! Aborting. Use " + sCommand.toUpper() +
                       " FORCE to ignore.");
         } else {
-            NoApp::Get().Broadcast(sMessage);
+            NoApp::instance().broadcast(sMessage);
             throw NoException(bRestart ? NoException::Restart : NoException::Shutdown);
         }
     } else if (sCommand.equals("JUMP") || sCommand.equals("CONNECT")) {
@@ -512,7 +512,7 @@ void NoClient::userCommand(NoString& sLine)
                 return;
             }
 
-            NoUser* pUser = NoApp::Get().FindUser(sNick);
+            NoUser* pUser = NoApp::instance().findUser(sNick);
 
             if (!pUser) {
                 putStatus("No such user [" + sNick + "]");
@@ -605,7 +605,7 @@ void NoClient::userCommand(NoString& sLine)
         NoUser* pUser = d->user;
 
         if (d->user->isAdmin() && !No::token(sLine, 1).empty()) {
-            pUser = NoApp::Get().FindUser(No::token(sLine, 1));
+            pUser = NoApp::instance().findUser(No::token(sLine, 1));
 
             if (!pUser) {
                 putStatus("User not found " + No::token(sLine, 1));
@@ -657,7 +657,7 @@ void NoClient::userCommand(NoString& sLine)
             sNewNetwork = sOldNetwork;
         }
 
-        NoUser* pOldUser = NoApp::Get().FindUser(sOldUser);
+        NoUser* pOldUser = NoApp::instance().findUser(sOldUser);
         if (!pOldUser) {
             putStatus("Old user [" + sOldUser + "] not found.");
             return;
@@ -669,7 +669,7 @@ void NoClient::userCommand(NoString& sLine)
             return;
         }
 
-        NoUser* pNewUser = NoApp::Get().FindUser(sNewUser);
+        NoUser* pNewUser = NoApp::instance().findUser(sNewUser);
         if (!pNewUser) {
             putStatus("New user [" + sOldUser + "] not found.");
             return;
@@ -872,7 +872,7 @@ void NoClient::userCommand(NoString& sLine)
         putStatus(Table);
     } else if (sCommand.equals("LISTMODS") || sCommand.equals("LISTMODULES")) {
         if (d->user->isAdmin()) {
-            NoModuleLoader* GModules = NoApp::Get().GetLoader();
+            NoModuleLoader* GModules = NoApp::instance().loader();
 
             if (GModules->isEmpty()) {
                 putStatus("No global modules loaded.");
@@ -940,7 +940,7 @@ void NoClient::userCommand(NoString& sLine)
 
         if (d->user->isAdmin()) {
             std::set<NoModuleInfo> ssGlobalMods;
-            NoApp::Get().GetLoader()->availableModules(ssGlobalMods, No::GlobalModule);
+            NoApp::instance().loader()->availableModules(ssGlobalMods, No::GlobalModule);
 
             if (ssGlobalMods.empty()) {
                 putStatus("No global modules available.");
@@ -952,7 +952,7 @@ void NoClient::userCommand(NoString& sLine)
 
                 for (const NoModuleInfo& Info : ssGlobalMods) {
                     GTable.addRow();
-                    GTable.setValue("Name", (NoApp::Get().GetLoader()->findModule(Info.name()) ? "*" : " ") + Info.name());
+                    GTable.setValue("Name", (NoApp::instance().loader()->findModule(Info.name()) ? "*" : " ") + Info.name());
                     GTable.setValue("Description", No::ellipsize(Info.description(), 128));
                 }
 
@@ -961,7 +961,7 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         std::set<NoModuleInfo> ssUserMods;
-        NoApp::Get().GetLoader()->availableModules(ssUserMods);
+        NoApp::instance().loader()->availableModules(ssUserMods);
 
         if (ssUserMods.empty()) {
             putStatus("No user modules available.");
@@ -981,7 +981,7 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         std::set<NoModuleInfo> ssNetworkMods;
-        NoApp::Get().GetLoader()->availableModules(ssNetworkMods, No::NetworkModule);
+        NoApp::instance().loader()->availableModules(ssNetworkMods, No::NetworkModule);
 
         if (ssNetworkMods.empty()) {
             putStatus("No network modules available.");
@@ -1033,7 +1033,7 @@ void NoClient::userCommand(NoString& sLine)
 
         NoModuleInfo ModInfo;
         NoString sRetMsg;
-        if (!NoApp::Get().GetLoader()->moduleInfo(ModInfo, sMod, sRetMsg)) {
+        if (!NoApp::instance().loader()->moduleInfo(ModInfo, sMod, sRetMsg)) {
             putStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
             return;
         }
@@ -1057,7 +1057,7 @@ void NoClient::userCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            b = NoApp::Get().GetLoader()->loadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
+            b = NoApp::instance().loader()->loadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
             b = d->user->loader()->loadModule(sMod, sArgs, eType, d->user, nullptr, sModRet);
@@ -1104,7 +1104,7 @@ void NoClient::userCommand(NoString& sLine)
         if (sType.equals("default")) {
             NoModuleInfo ModInfo;
             NoString sRetMsg;
-            if (!NoApp::Get().GetLoader()->moduleInfo(ModInfo, sMod, sRetMsg)) {
+            if (!NoApp::instance().loader()->moduleInfo(ModInfo, sMod, sRetMsg)) {
                 putStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
                 return;
             }
@@ -1126,7 +1126,7 @@ void NoClient::userCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            NoApp::Get().GetLoader()->unloadModule(sMod, sModRet);
+            NoApp::instance().loader()->unloadModule(sMod, sModRet);
             break;
         case No::UserModule:
             d->user->loader()->unloadModule(sMod, sModRet);
@@ -1174,7 +1174,7 @@ void NoClient::userCommand(NoString& sLine)
         if (sType.equals("default")) {
             NoModuleInfo ModInfo;
             NoString sRetMsg;
-            if (!NoApp::Get().GetLoader()->moduleInfo(ModInfo, sMod, sRetMsg)) {
+            if (!NoApp::instance().loader()->moduleInfo(ModInfo, sMod, sRetMsg)) {
                 putStatus("Unable to find modinfo for [" + sMod + "] [" + sRetMsg + "]");
                 return;
             }
@@ -1196,7 +1196,7 @@ void NoClient::userCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            NoApp::Get().GetLoader()->reloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
+            NoApp::instance().loader()->reloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
             d->user->loader()->reloadModule(sMod, sArgs, d->user, nullptr, sModRet);
@@ -1219,7 +1219,7 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         putStatus("Reloading [" + sMod + "] everywhere");
-        if (NoApp::Get().UpdateModule(sMod)) {
+        if (NoApp::instance().updateModule(sMod)) {
             putStatus("Done");
         } else {
             putStatus("Done, but there were errors, [" + sMod + "] could not be loaded everywhere.");
@@ -1232,7 +1232,7 @@ void NoClient::userCommand(NoString& sLine)
             return;
         }
 
-        if (NoApp::Get().AddBindHost(sHost)) {
+        if (NoApp::instance().addBindHost(sHost)) {
             putStatus("Done");
         } else {
             putStatus("The host [" + sHost + "] is already in the list");
@@ -1247,14 +1247,14 @@ void NoClient::userCommand(NoString& sLine)
             return;
         }
 
-        if (NoApp::Get().RemBindHost(sHost)) {
+        if (NoApp::instance().removeBindHost(sHost)) {
             putStatus("Done");
         } else {
             putStatus("The host [" + sHost + "] is not in the list");
         }
     } else if ((sCommand.equals("LISTBINDHOSTS") || sCommand.equals("LISTVHOSTS")) &&
                (d->user->isAdmin() || !d->user->denysetBindHost())) {
-        const NoStringVector& vsHosts = NoApp::Get().bindHosts();
+        const NoStringVector& vsHosts = NoApp::instance().bindHosts();
 
         if (vsHosts.empty()) {
             putStatus("No bind hosts configured");
@@ -1287,7 +1287,7 @@ void NoClient::userCommand(NoString& sLine)
             return;
         }
 
-        const NoStringVector& vsHosts = NoApp::Get().bindHosts();
+        const NoStringVector& vsHosts = NoApp::instance().bindHosts();
         if (!d->user->isAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
@@ -1319,7 +1319,7 @@ void NoClient::userCommand(NoString& sLine)
             return;
         }
 
-        const NoStringVector& vsHosts = NoApp::Get().bindHosts();
+        const NoStringVector& vsHosts = NoApp::instance().bindHosts();
         if (!d->user->isAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
@@ -1495,11 +1495,11 @@ void NoClient::userCommand(NoString& sLine)
         if (uFail > 0) {
             putStatus("Setting BufferCount failed for [" + NoString(uFail) + "] buffers, "
                                                                              "max buffer count is " +
-                      NoString(NoApp::Get().GetMaxBufferSize()));
+                      NoString(NoApp::instance().maxBufferSize()));
         }
     } else if (d->user->isAdmin() && sCommand.equals("TRAFFIC")) {
         NoApp::TrafficStatsPair Users, ZNC, Total;
-        NoApp::TrafficStatsMap traffic = NoApp::Get().GetTrafficStats(Users, ZNC, Total);
+        NoApp::TrafficStatsMap traffic = NoApp::instance().trafficStats(Users, ZNC, Total);
 
         NoTable Table;
         Table.addColumn("Username");
@@ -1535,7 +1535,7 @@ void NoClient::userCommand(NoString& sLine)
 
         putStatus(Table);
     } else if (sCommand.equals("UPTIME")) {
-        putStatus("Running for " + NoApp::Get().GetUptime());
+        putStatus("Running for " + NoApp::instance().uptime());
     } else if (d->user->isAdmin() &&
                (sCommand.equals("LISTPORTS") || sCommand.equals("ADDPORT") || sCommand.equals("DELPORT"))) {
         yserPortCommand(sLine);
@@ -1558,7 +1558,7 @@ void NoClient::yserPortCommand(NoString& sLine)
         Table.addColumn("URIPrefix");
 
         std::vector<NoListener*>::const_iterator it;
-        const std::vector<NoListener*>& vpListeners = NoApp::Get().GetListeners();
+        const std::vector<NoListener*>& vpListeners = NoApp::instance().listeners();
 
         for (const NoListener* pListener : vpListeners) {
             Table.addRow();
@@ -1627,7 +1627,7 @@ void NoClient::yserPortCommand(NoString& sLine)
                 delete pListener;
                 putStatus("Unable to bind [" + NoString(strerror(errno)) + "]");
             } else {
-                if (NoApp::Get().AddListener(pListener))
+                if (NoApp::instance().addListener(pListener))
                     putStatus("Port Added");
                 else
                     putStatus("Error?!");
@@ -1639,10 +1639,10 @@ void NoClient::yserPortCommand(NoString& sLine)
         } else {
             const NoString sBindHost = No::token(sLine, 3);
 
-            NoListener* pListener = NoApp::Get().FindListener(uPort, sBindHost, eAddr);
+            NoListener* pListener = NoApp::instance().findListener(uPort, sBindHost, eAddr);
 
             if (pListener) {
-                NoApp::Get().DelListener(pListener);
+                NoApp::instance().removeListener(pListener);
                 putStatus("Deleted Port");
             } else {
                 putStatus("Unable to find a matching port");

@@ -105,7 +105,7 @@ public:
     {
         const NoString& sUsername = Auth->username();
         const NoString& sPassword = Auth->password();
-        NoUser* pUser(NoApp::Get().FindUser(sUsername));
+        NoUser* pUser(NoApp::instance().findUser(sUsername));
         sasl_conn_t* sasl_conn(nullptr);
         bool bSuccess = false;
 
@@ -134,7 +134,7 @@ public:
                 pUser = new NoUser(sUsername);
 
                 if (ShouldCloneUser()) {
-                    NoUser* pBaseUser = NoApp::Get().FindUser(CloneUser());
+                    NoUser* pBaseUser = NoApp::instance().findUser(CloneUser());
 
                     if (!pBaseUser) {
                         NO_DEBUG("saslauth: Clone User [" << CloneUser() << "] User not found");
@@ -154,7 +154,7 @@ public:
                     pUser->setPassword("::", NoUser::HashMd5, "::");
                 }
 
-                if (pUser && !NoApp::Get().AddUser(pUser, sErr)) {
+                if (pUser && !NoApp::instance().addUser(pUser, sErr)) {
                     NO_DEBUG("saslauth: Add user [" << sUsername << "] failed: " << sErr);
                     delete pUser;
                     pUser = nullptr;

@@ -112,10 +112,10 @@ NoUser::NoUser(const NoString& sUserName) : d(new NoUserPrivate)
     d->cleanUserName = makeCleanUserName(sUserName);
     d->ident = d->cleanUserName;
     d->realName = sUserName;
-    d->userPath = NoApp::Get().GetUserPath() + "/" + sUserName;
+    d->userPath = NoApp::instance().userPath() + "/" + sUserName;
     d->modules = new NoModuleLoader;
     d->userTimer = new NoUserTimer(this);
-    NoApp::Get().manager().addCron(d->userTimer);
+    NoApp::instance().manager().addCron(d->userTimer);
 }
 
 NoUser::~NoUser()
@@ -127,7 +127,7 @@ NoUser::~NoUser()
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::Get().manager().removeSocket(d->clients[0]->socket());
+        NoApp::instance().manager().removeSocket(d->clients[0]->socket());
     }
     d->clients.clear();
 
@@ -135,10 +135,10 @@ NoUser::~NoUser()
     delete d->modules;
     d->modules = nullptr;
 
-    NoApp::Get().manager().removeCron(d->userTimer);
+    NoApp::instance().manager().removeCron(d->userTimer);
 
-    NoApp::Get().AddBytesRead(bytesRead());
-    NoApp::Get().AddBytesWritten(bytesWritten());
+    NoApp::instance().addBytesRead(bytesRead());
+    NoApp::instance().addBytesWritten(bytesWritten());
 }
 
 template <class T>
@@ -344,7 +344,7 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& sError)
             sError = "Unhandled lines in config!";
             No::printError(sError);
 
-            NoApp::DumpConfig(pSubConf);
+            NoApp::dumpConfig(pSubConf);
             return false;
         }
         ++subIt;
@@ -572,9 +572,9 @@ NoString& NoUser::expandString(const NoString& sStr, NoString& sRet) const
     sRet.replace("%realname%", realName());
     sRet.replace("%vhost%", bindHost());
     sRet.replace("%bindhost%", bindHost());
-    sRet.replace("%version%", NoApp::GetVersion());
+    sRet.replace("%version%", NoApp::version());
     sRet.replace("%time%", sTime);
-    sRet.replace("%uptime%", NoApp::Get().GetUptime());
+    sRet.replace("%uptime%", NoApp::instance().uptime());
     // The following lines do not exist. You must be on DrUgS!
     sRet.replace("%znc%", "All your IRC are belong to ZNC");
     // Chosen by fair zocchihedron dice roll by SilverLeo
@@ -942,7 +942,7 @@ NoSettings NoUser::toConfig() const
     config.AddKeyValuePair("BindHost", bindHost());
     config.AddKeyValuePair("DCCBindHost", dccBindHost());
     config.AddKeyValuePair("QuitMsg", quitMsg());
-    if (NoApp::Get().GetStatusPrefix() != statusPrefix())
+    if (NoApp::instance().statusPrefix() != statusPrefix())
         config.AddKeyValuePair("StatusPrefix", statusPrefix());
     config.AddKeyValuePair("Skin", skinName());
     config.AddKeyValuePair("ChanModes", defaultChanModes());
@@ -1013,7 +1013,7 @@ bool NoUser::checkPass(const NoString& sPass) const
 
 /*NoClient* NoUser::client() {
     // Todo: optimize this by saving a pointer to the sock
-    NoSocketManager& Manager = NoApp::Get().manager();
+    NoSocketManager& Manager = NoApp::instance().manager();
     NoString sSockName = "USR::" + d->sUserName;
 
     for (uint a = 0; a < Manager.size(); a++) {
@@ -1025,7 +1025,7 @@ bool NoUser::checkPass(const NoString& sPass) const
         }
     }
 
-    return (NoClient*) NoApp::Get().manager().FindSockByName(sSockName);
+    return (NoClient*) NoApp::instance().manager().FindSockByName(sSockName);
 }*/
 
 NoString NoUser::localDccIp() const
@@ -1168,7 +1168,7 @@ bool NoUser::loadModule(const NoString& sModName, const NoString& sArgs, const N
     NoString sModRet;
 
     NoModuleInfo ModInfo;
-    if (!NoApp::Get().GetLoader()->moduleInfo(ModInfo, sModName, sModRet)) {
+    if (!NoApp::instance().loader()->moduleInfo(ModInfo, sModName, sModRet)) {
         sError = "Unable to find modinfo [" + sModName + "] [" + sModRet + "]";
         return false;
     }
@@ -1337,7 +1337,7 @@ std::vector<NoClient*> NoUser::userClients() const
 
 bool NoUser::setBufferCount(uint u, bool bForce)
 {
-    if (!bForce && u > NoApp::Get().GetMaxBufferSize())
+    if (!bForce && u > NoApp::instance().maxBufferSize())
         return false;
     for (NoNetwork* pNetwork : d->networks) {
         for (NoChannel* pChan : pNetwork->channels()) {
@@ -1475,7 +1475,7 @@ bool NoUser::hasSpaceForNewNetwork() const
 
 NoString NoUser::quitMsg() const
 {
-    return (!d->quitMsg.trim_n().empty()) ? d->quitMsg : NoApp::GetTag(false);
+    return (!d->quitMsg.trim_n().empty()) ? d->quitMsg : NoApp::tag(false);
 }
 NoStringMap NoUser::ctcpReplies() const
 {
@@ -1523,7 +1523,7 @@ uint NoUser::maxJoins() const
 {
     return d->maxJoins;
 }
-// NoString NoUser::GetSkinName() const { return (!d->sSkinName.empty()) ? d->sSkinName : NoApp::Get().GetSkinName(); }
+// NoString NoUser::GetSkinName() const { return (!d->sSkinName.empty()) ? d->sSkinName : NoApp::instance().GetSkinName(); }
 NoString NoUser::skinName() const
 {
     return d->skinName;

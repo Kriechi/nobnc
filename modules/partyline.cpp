@@ -118,7 +118,7 @@ public:
             std::set<NoString> ssNicks = (*it)->GetNicks();
 
             for (std::set<NoString>::const_iterator it2 = ssNicks.begin(); it2 != ssNicks.end(); ++it2) {
-                NoUser* pUser = NoApp::Get().FindUser(*it2);
+                NoUser* pUser = NoApp::instance().findUser(*it2);
                 std::vector<NoClient*> vClients = pUser->allClients();
 
                 for (std::vector<NoClient*>::const_iterator it3 = vClients.begin(); it3 != vClients.end(); ++it3) {
@@ -145,7 +145,7 @@ public:
 
     bool onLoad(const NoString& sArgs, NoString& sMessage) override
     {
-        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::instance().userMap();
 
         for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
             NoUser* pUser = it->second;
@@ -554,7 +554,7 @@ public:
                     false);
         } else {
             NoString sNick = sTarget.leftChomp_n(1);
-            NoUser* pTargetUser = NoApp::Get().FindUser(sNick);
+            NoUser* pTargetUser = NoApp::instance().findUser(sNick);
 
             if (pTargetUser) {
                 std::vector<NoClient*> vClients = pTargetUser->allClients();
@@ -641,7 +641,7 @@ public:
                  NoUser* pUser = nullptr,
                  NoClient* pClient = nullptr)
     {
-        const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
+        const std::map<NoString, NoUser*>& msUsers = NoApp::instance().userMap();
 
         if (!pUser)
             pUser = user();
@@ -675,7 +675,7 @@ public:
         NoString sNickList;
 
         for (std::set<NoString>::const_iterator it = ssNicks.begin(); it != ssNicks.end(); ++it) {
-            NoUser* pChanUser = NoApp::Get().FindUser(*it);
+            NoUser* pChanUser = NoApp::instance().findUser(*it);
 
             if (pChanUser == pUser) {
                 continue;

@@ -148,7 +148,7 @@ void NoHttpSocket::readLine(const NoString& sData)
     } else if (sName.equals("X-Forwarded-For:")) {
         // X-Forwarded-For: client, proxy1, proxy2
         if (m_forwardedIp.empty()) {
-            const NoStringVector& vsTrustedProxies = NoApp::Get().GetTrustedProxies();
+            const NoStringVector& vsTrustedProxies = NoApp::instance().trustedProxies();
             NoString sIP = remoteAddress();
 
             NoStringVector vsIPs = No::tokens(sLine, 1).split(",", No::SkipEmptyParts);
@@ -671,7 +671,7 @@ bool NoHttpSocket::printErrorPage(uint uStatusId, const NoString& sStatusMsg, co
                      No::escape(sMessage, No::HtmlFormat) + "</p>\r\n"
                                                             "<hr/>\r\n"
                                                             "<address>" +
-                     NoApp::GetTag(false, /* bHTML = */ true) + " at " + No::escape(localAddress(), No::HtmlFormat) +
+                     NoApp::tag(false, /* bHTML = */ true) + " at " + No::escape(localAddress(), No::HtmlFormat) +
                      " Port " + NoString(localPort()) + "</address>\r\n"
                                                            "</body>\r\n"
                                                            "</html>\r\n";
@@ -694,7 +694,7 @@ bool NoHttpSocket::forceLogin()
         return false;
     }
 
-    addHeader("WWW-Authenticate", "Basic realm=\"" + NoApp::GetTag(false) + "\"");
+    addHeader("WWW-Authenticate", "Basic realm=\"" + NoApp::tag(false) + "\"");
     printErrorPage(401, "Unauthorized", "You need to login to view this page.");
 
     return false;
@@ -729,7 +729,7 @@ bool NoHttpSocket::printHeader(off_t uContentLength, const NoString& sContentTyp
 
     write("HTTP/" + NoString(m_http10Client ? "1.0 " : "1.1 ") + NoString(uStatusId) + " " + sStatusMsg + "\r\n");
     write("Date: " + formatDate() + "\r\n");
-    write("Server: " + NoApp::GetTag(false) + "\r\n");
+    write("Server: " + NoApp::tag(false) + "\r\n");
     if (uContentLength > 0) {
         write("Content-Length: " + NoString(uContentLength) + "\r\n");
     }

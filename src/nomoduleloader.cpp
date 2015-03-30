@@ -907,7 +907,7 @@ NoModDirList moduleDirs()
     NoString sDir;
 
     // ~/.znc/modules
-    sDir = NoApp::Get().GetModPath() + "/";
+    sDir = NoApp::instance().modulePath() + "/";
     ret.push(std::make_pair(sDir, sDir));
 
     // <moduledir> and <datadir> (<prefix>/lib/znc)

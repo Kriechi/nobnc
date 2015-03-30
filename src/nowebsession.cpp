@@ -89,7 +89,7 @@ public:
     bool handleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override
     {
         if (sName.equals("URLPARAM")) {
-            // sOutput = NoApp::Get()
+            // sOutput = NoApp::instance()
             sOutput = m_WebSock.param(No::token(sArgs, 0), false);
             return true;
         }
@@ -293,8 +293,8 @@ NoWebSocket::~NoWebSocket()
         pUser->addBytesWritten(bytesWritten());
         pUser->addBytesRead(bytesRead());
     } else {
-        NoApp::Get().AddBytesWritten(bytesWritten());
-        NoApp::Get().AddBytesRead(bytesRead());
+        NoApp::instance().addBytesWritten(bytesWritten());
+        NoApp::instance().addBytesRead(bytesRead());
     }
 
     // bytes have been accounted for, so make sure they don't get again:
@@ -341,7 +341,7 @@ void NoWebSocket::availableSkins(NoStringVector& vRet) const
 
 NoStringVector NoWebSocket::directories(NoModule* pModule, bool bIsTemplate)
 {
-    NoString sHomeSkinsDir(NoApp::Get().GetZNCPath() + "/webskins/");
+    NoString sHomeSkinsDir(NoApp::instance().appPath() + "/webskins/");
     NoString sSkinName(skinName());
     NoStringVector vsResult;
 
@@ -417,8 +417,8 @@ void NoWebSocket::setVars()
 {
     m_template["SessionUser"] = username();
     m_template["SessionIP"] = remoteAddress();
-    m_template["Tag"] = NoApp::GetTag(session()->user() != nullptr, true);
-    m_template["Version"] = NoApp::GetVersion();
+    m_template["Tag"] = NoApp::tag(session()->user() != nullptr, true);
+    m_template["Version"] = NoApp::version();
     m_template["SkinName"] = skinName();
     m_template["_CSRF_Check"] = csrfCheck();
     m_template["URIPrefix"] = uriPrefix();
@@ -431,7 +431,7 @@ void NoWebSocket::setVars()
     session()->clearMessageLoops();
 
     // Global Mods
-    NoModuleLoader* vgMods = NoApp::Get().GetLoader();
+    NoModuleLoader* vgMods = NoApp::instance().loader();
     for (NoModule* pgMod : vgMods->modules()) {
         addModuleLoop("GlobalModLoop", *pgMod);
     }
@@ -597,10 +597,10 @@ NoWebSocket::PageRequest NoWebSocket::printTemplate(const NoString& sPageName, N
 
 NoString NoWebSocket::skinPath(const NoString& sSkinName)
 {
-    NoString sRet = NoApp::Get().GetZNCPath() + "/webskins/" + sSkinName;
+    NoString sRet = NoApp::instance().appPath() + "/webskins/" + sSkinName;
 
     if (!NoFile(sRet).IsDir()) {
-        sRet = NoApp::Get().GetCurPath() + "/webskins/" + sSkinName;
+        sRet = NoApp::instance().currentPath() + "/webskins/" + sSkinName;
 
         if (!NoFile(sRet).IsDir()) {
             sRet = NoString(_SKINDIR_) + "/" + sSkinName;
@@ -679,7 +679,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
     //
     // When their IP is wrong, we give them an invalid cookie. This makes
     // sure that they will get a new cookie on their next request.
-    if (NoApp::Get().GetProtectWebSessions() && session()->host() != remoteAddress()) {
+    if (NoApp::instance().protectWebSessions() && session()->host() != remoteAddress()) {
         NO_DEBUG("Expected IP: " << session()->host());
         NO_DEBUG("Remote IP:   " << remoteAddress());
         sendCookie("SessionId", "WRONG_IP_FOR_SESSION");
@@ -817,7 +817,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
 
         switch (eModType) {
         case No::GlobalModule:
-            pModule = NoApp::Get().GetLoader()->findModule(m_modName);
+            pModule = NoApp::instance().loader()->findModule(m_modName);
             break;
         case No::UserModule:
             pModule = session()->user()->loader()->findModule(m_modName);
@@ -980,7 +980,7 @@ bool NoWebSocket::onLogin(const NoString& sUser, const NoString& sPass, bool bBa
     // Some authentication module could need some time, block this socket
     // until then. CWebAuth will UnPauseRead().
     pauseRead();
-    NoApp::Get().AuthUser(m_authenticator);
+    NoApp::instance().authUser(m_authenticator);
 
     // If CWebAuth already set this, don't change it.
     return isLoggedIn();
@@ -1002,5 +1002,5 @@ NoString NoWebSocket::skinName()
         return spSession->user()->skinName();
     }
 
-    return NoApp::Get().GetSkinName();
+    return NoApp::instance().skinName();
 }
