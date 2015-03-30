@@ -43,36 +43,36 @@ public:
     bool onLogin(const NoString& sUser, const NoString& sPass, bool bBasic) override;
     void onPageRequest(const NoString& sURI) override;
 
-    PageRequest PrintTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule = nullptr);
-    PageRequest PrintStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule = nullptr);
+    PageRequest printTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule = nullptr);
+    PageRequest printStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule = nullptr);
 
-    NoString FindTmpl(NoModule* pModule, const NoString& sName);
+    NoString findTemplate(NoModule* pModule, const NoString& sName);
 
     void printErrorPage(const NoString& sMessage);
 
-    std::shared_ptr<NoWebSession> GetSession();
+    std::shared_ptr<NoWebSession> session();
 
     NoSocket* createSocket(const NoString& sHost, ushort uPort) override;
-    static NoString GetSkinPath(const NoString& sSkinName);
-    void GetAvailSkins(NoStringVector& vRet) const;
-    NoString GetSkinName();
+    static NoString skinPath(const NoString& sSkinName);
+    void availableSkins(NoStringVector& vRet) const;
+    NoString skinName();
 
     NoString requestCookie(const NoString& sKey);
     bool sendCookie(const NoString& sKey, const NoString& sValue);
 
-    static void FinishUserSessions(const NoUser& User);
+    static void finishUserSessions(const NoUser& User);
 
 protected:
     using NoHttpSocket::printErrorPage;
 
-    bool AddModLoop(const NoString& sLoopName, NoModule& Module, NoTemplate* pTemplate = nullptr);
-    NoStringVector GetDirs(NoModule* pModule, bool bIsTemplate);
-    void SetPaths(NoModule* pModule, bool bIsTemplate = false);
-    void SetVars();
-    NoString GetCSRFCheck();
+    bool addModuleLoop(const NoString& sLoopName, NoModule& Module, NoTemplate* pTemplate = nullptr);
+    NoStringVector directories(NoModule* pModule, bool bIsTemplate);
+    void setPaths(NoModule* pModule, bool bIsTemplate = false);
+    void setVars();
+    NoString csrfCheck(); // TODO: wat?
 
 private:
-    PageRequest OnPageRequestInternal(const NoString& sURI, NoString& sPageRet);
+    PageRequest onPageRequestInternal(const NoString& sURI, NoString& sPageRet);
 
     bool m_pathsSet;
     NoTemplate m_template;

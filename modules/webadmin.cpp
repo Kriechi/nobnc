@@ -163,7 +163,7 @@ public:
 
     NoUser* GetNewUser(NoWebSocket& WebSock, NoUser* pUser)
     {
-        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.session();
         NoString sUsername = WebSock.param("newuser");
 
         if (sUsername.empty()) {
@@ -454,7 +454,7 @@ public:
     }
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
-        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.session();
 
         if (sPageName == "settings") {
             // Admin Check
@@ -650,7 +650,7 @@ public:
 
     bool ChanPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoNetwork* pNetwork, NoChannel* pChan = nullptr)
     {
-        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.session();
         Tmpl.setFile("add_edit_chan.tmpl");
         NoUser* pUser = pNetwork->user();
 
@@ -713,7 +713,7 @@ public:
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
                 if (pMod->onEmbeddedWebRequest(WebSock, "webadmin/channel", mod)) {
-                    mod["Embed"] = WebSock.FindTmpl(pMod, "WebadminChan.tmpl");
+                    mod["Embed"] = WebSock.findTemplate(pMod, "WebadminChan.tmpl");
                     mod["ModName"] = pMod->moduleName();
                 }
             }
@@ -796,7 +796,7 @@ public:
 
     bool NetworkPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* pUser, NoNetwork* pNetwork = nullptr)
     {
-        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.session();
         Tmpl.setFile("add_edit_network.tmpl");
 
         if (!WebSock.param("submitted").toUInt()) {
@@ -941,7 +941,7 @@ public:
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
                 if (pMod->onEmbeddedWebRequest(WebSock, "webadmin/network", mod)) {
-                    mod["Embed"] = WebSock.FindTmpl(pMod, "WebadminNetwork.tmpl");
+                    mod["Embed"] = WebSock.findTemplate(pMod, "WebadminNetwork.tmpl");
                     mod["ModName"] = pMod->moduleName();
                 }
             }
@@ -1110,7 +1110,7 @@ public:
 
                     if (!sModLoadError.empty()) {
                         NO_DEBUG(sModLoadError);
-                        WebSock.GetSession()->addError(sModLoadError);
+                        WebSock.session()->addError(sModLoadError);
                     }
                 }
             }
@@ -1212,7 +1212,7 @@ public:
 
     bool UserPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* pUser = nullptr)
     {
-        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.session();
         Tmpl.setFile("add_edit_user.tmpl");
 
         if (!WebSock.param("submitted").toUInt()) {
@@ -1357,7 +1357,7 @@ public:
             }
 
             std::vector<NoString> vDirs;
-            WebSock.GetAvailSkins(vDirs);
+            WebSock.availableSkins(vDirs);
 
             for (uint d = 0; d < vDirs.size(); d++) {
                 const NoString& SubDir = vDirs[d];
@@ -1485,7 +1485,7 @@ public:
                 mod.insert(Tmpl.begin(), Tmpl.end());
                 mod["WebadminAction"] = "display";
                 if (pMod->onEmbeddedWebRequest(WebSock, "webadmin/user", mod)) {
-                    mod["Embed"] = WebSock.FindTmpl(pMod, "WebadminUser.tmpl");
+                    mod["Embed"] = WebSock.findTemplate(pMod, "WebadminUser.tmpl");
                     mod["ModName"] = pMod->moduleName();
                 }
             }
@@ -1561,7 +1561,7 @@ public:
 
     bool ListUsersPage(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
-        std::shared_ptr<NoWebSession> spSession = WebSock.GetSession();
+        std::shared_ptr<NoWebSession> spSession = WebSock.session();
         const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();
         Tmpl["Title"] = "Manage Users";
         Tmpl["Action"] = "listusers";
@@ -1673,7 +1673,7 @@ public:
             if (bIPv6) {
                 eAddr = No::Ipv6Address;
             } else {
-                WebSock.GetSession()->addError("Choose either IPv4 or IPv6 or both.");
+                WebSock.session()->addError("Choose either IPv4 or IPv6 or both.");
                 return SettingsPage(WebSock, Tmpl);
             }
         }
@@ -1689,7 +1689,7 @@ public:
             if (bWeb) {
                 eAccept = No::AcceptHttp;
             } else {
-                WebSock.GetSession()->addError("Choose either IRC or Web or both.");
+                WebSock.session()->addError("Choose either IRC or Web or both.");
                 return SettingsPage(WebSock, Tmpl);
             }
         }
@@ -1697,13 +1697,13 @@ public:
         NoString sMessage;
         if (NoApp::Get().AddListener(uPort, sHost, sURIPrefix, bSSL, eAddr, eAccept, sMessage)) {
             if (!sMessage.empty()) {
-                WebSock.GetSession()->addSuccess(sMessage);
+                WebSock.session()->addSuccess(sMessage);
             }
             if (!NoApp::Get().WriteConfig()) {
-                WebSock.GetSession()->addError("Port changed, but config was not written");
+                WebSock.session()->addError("Port changed, but config was not written");
             }
         } else {
-            WebSock.GetSession()->addError(sMessage);
+            WebSock.session()->addError(sMessage);
         }
 
         return SettingsPage(WebSock, Tmpl);
@@ -1727,7 +1727,7 @@ public:
             if (bIPv6) {
                 eAddr = No::Ipv6Address;
             } else {
-                WebSock.GetSession()->addError("Invalid request.");
+                WebSock.session()->addError("Invalid request.");
                 return SettingsPage(WebSock, Tmpl);
             }
         }
@@ -1736,10 +1736,10 @@ public:
         if (pListener) {
             NoApp::Get().DelListener(pListener);
             if (!NoApp::Get().WriteConfig()) {
-                WebSock.GetSession()->addError("Port changed, but config was not written");
+                WebSock.session()->addError("Port changed, but config was not written");
             }
         } else {
-            WebSock.GetSession()->addError("The specified listener was not found.");
+            WebSock.session()->addError("The specified listener was not found.");
         }
 
         return SettingsPage(WebSock, Tmpl);
@@ -1814,7 +1814,7 @@ public:
             }
 
             std::vector<NoString> vDirs;
-            WebSock.GetAvailSkins(vDirs);
+            WebSock.availableSkins(vDirs);
 
             for (uint d = 0; d < vDirs.size(); d++) {
                 const NoString& SubDir = vDirs[d];
@@ -1940,7 +1940,7 @@ public:
 
                 if (!sModLoadError.empty()) {
                     NO_DEBUG(sModLoadError);
-                    WebSock.GetSession()->addError(sModLoadError);
+                    WebSock.session()->addError(sModLoadError);
                 }
             }
         }
@@ -1960,7 +1960,7 @@ public:
         }
 
         if (!NoApp::Get().WriteConfig()) {
-            WebSock.GetSession()->addError("Settings changed, but config was not written");
+            WebSock.session()->addError("Settings changed, but config was not written");
         }
 
         WebSock.redirect(webPath() + "settings");

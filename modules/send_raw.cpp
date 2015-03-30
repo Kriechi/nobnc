@@ -93,13 +93,13 @@ public:
             if (WebSock.isPost()) {
                 NoUser* pUser = NoApp::Get().FindUser(No::token(WebSock.param("network"), 0, "/"));
                 if (!pUser) {
-                    WebSock.GetSession()->addError("User not found");
+                    WebSock.session()->addError("User not found");
                     return true;
                 }
 
                 NoNetwork* pNetwork = pUser->findNetwork(No::token(WebSock.param("network"), 1, "/"));
                 if (!pNetwork) {
-                    WebSock.GetSession()->addError("Network not found");
+                    WebSock.session()->addError("Network not found");
                     return true;
                 }
 
@@ -116,7 +116,7 @@ public:
                     pNetwork->putUser(sLine);
                 }
 
-                WebSock.GetSession()->addSuccess("Line sent");
+                WebSock.session()->addSuccess("Line sent");
             }
 
             const std::map<NoString, NoUser*>& msUsers = NoApp::Get().GetUserMap();

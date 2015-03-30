@@ -264,7 +264,7 @@ public:
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
-        NoUser* pUser = WebSock.GetSession()->user();
+        NoUser* pUser = WebSock.session()->user();
 
         if (sPageName == "index") {
             MNoStringSet::const_iterator it = m_PubKeys.find(pUser->userName());

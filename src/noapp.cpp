@@ -196,7 +196,7 @@ bool NoApp::HandleUserDeletion()
             continue;
         }
         m_users.erase(pUser->userName());
-        NoWebSocket::FinishUserSessions(*pUser);
+        NoWebSocket::finishUserSessions(*pUser);
         delete pUser;
     }
 

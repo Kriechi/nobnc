@@ -386,7 +386,7 @@ public:
             o5["Checked"] = NoString(m_bJoinAfterCloaked);
 
             if (bSubmitted) {
-                WebSock.GetSession()->addSuccess("Changes have been saved!");
+                WebSock.session()->addSuccess("Changes have been saved!");
             }
 
             return true;
