@@ -15,12 +15,12 @@ include(DefineVersion)
 
 ### SUB MODULES
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.h")
-    message(FATAL_ERROR "Run 'git submodule update --init' (third_party/Csocket missing).")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/3rdparty/Csocket/Csocket.h")
+    message(FATAL_ERROR "Run 'git submodule update --init' (src/3rdparty/Csocket missing).")
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/third_party/sha2/sha2.h")
-    message(FATAL_ERROR "Run 'git submodule update --init' (third_party/sha2 missing).")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/3rdparty/sha2/sha2.h")
+    message(FATAL_ERROR "Run 'git submodule update --init' (src/3rdparty/sha2 missing).")
 endif()
 
 ### SOURCES
@@ -76,9 +76,9 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nowebpage.h
                        include/no/nowebsession.h
                        include/no/nowebsocket.h
-                       third_party/md5/md5.h
-                       third_party/sha2/sha2.h
-                       third_party/Csocket/Csocket.h
+                       src/3rdparty/md5/md5.h
+                       src/3rdparty/sha2/sha2.h
+                       src/3rdparty/Csocket/Csocket.h
                        ${PROJECT_BINARY_DIR}/include/no/noglobal.h
 )
 
@@ -122,16 +122,16 @@ list(APPEND NO_SOURCES src/noapp.cpp
                        src/noutils.cpp
                        src/nowebpage.cpp
                        src/nowebsession.cpp
-                       third_party/md5/md5.cpp
-                       third_party/sha2/sha2.c
-                       third_party/Csocket/Csocket.cc
+                       src/3rdparty/md5/md5.cpp
+                       src/3rdparty/sha2/sha2.c
+                       src/3rdparty/Csocket/Csocket.cc
                        ${PROJECT_BINARY_DIR}/src/noglobal.cpp
 )
 
 ### TARGETS
 
 add_library(libno SHARED ${NO_SOURCES} ${NO_HEADERS})
-include_directories(${NO_INCLUDEDIRS} third_party)
+include_directories(${NO_INCLUDEDIRS} src/3rdparty)
 include_directories(${PROJECT_SOURCE_DIR}/include/no) ### TODO: cleanup
 include_directories(${PROJECT_BINARY_DIR}/include/no) ### TODO: cleanup
 target_link_libraries(libno ${NO_LIBRARIES})

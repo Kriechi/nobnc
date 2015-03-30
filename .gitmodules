@@ -1,6 +1,6 @@
-[submodule "Csocket"]
-	path = third_party/Csocket
+[submodule "src/3rdparty/Csocket"]
+	path = src/3rdparty/Csocket
 	url = https://github.com/jpnurmi/Csocket.git
-[submodule "third_party/sha2"]
-	path = third_party/sha2
+[submodule "src/3rdparty/sha2"]
+	path = src/3rdparty/sha2
 	url = https://github.com/ogay/sha2.git
