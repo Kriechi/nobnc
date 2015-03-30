@@ -67,7 +67,7 @@ public:
     //! Ease of use Listen, assigned to the manager and is subsequently tracked
     bool listen(ushort uPort, bool bSSL, uint uTimeout = 0);
 
-    NoModule* GetModule() const;
+    NoModule* module() const;
 
 private:
     NoModule* m_module; //!< pointer to the module that this sock instance belongs to

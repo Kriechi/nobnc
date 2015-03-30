@@ -133,7 +133,7 @@ bool NoModuleSocket::listen(ushort uPort, bool bSSL, uint uTimeout)
     return m_module->manager()->listenAll(uPort, sSockName, bSSL, SOMAXCONN, this);
 }
 
-NoModule* NoModuleSocket::GetModule() const
+NoModule* NoModuleSocket::module() const
 {
     return m_module;
 }
