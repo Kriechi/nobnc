@@ -19,11 +19,10 @@
 #define NODEFINES_H
 
 #include <no/noglobal.h>
-
-// This header file is just for Csocket
-
 #include <no/nodebug.h>
 #include <no/nostring.h>
+
+// The only reason this header exists is Csocket
 
 #define CS_STRING NoString
 #define _NO_CSOCKET_NS
@@ -32,7 +31,6 @@
 #define __DEBUG__
 #endif
 
-// Redefine some Csocket debugging mechanisms to use ZNC's
 #define CS_DEBUG(f) NO_DEBUG(__FILE__ << ":" << __LINE__ << " " << f)
 #define PERROR(f) NO_DEBUG(__FILE__ << ":" << __LINE__ << " " << f << ": " << strerror(GetSockError()))
 

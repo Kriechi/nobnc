@@ -25,8 +25,7 @@ endif()
 
 ### SOURCES
 
-list(APPEND NO_HEADERS include/no/defines.h
-                       include/no/noapp.h
+list(APPEND NO_HEADERS include/no/noapp.h
                        include/no/noauthenticator.h
                        include/no/nobuffer.h
                        include/no/nocachemap.h
@@ -76,6 +75,7 @@ list(APPEND NO_HEADERS include/no/defines.h
                        include/no/nowebpage.h
                        include/no/nowebsession.h
                        include/no/nowebsocket.h
+                       src/3rdparty/defines.h
                        src/3rdparty/md5/md5.h
                        src/3rdparty/sha2/sha2.h
                        src/3rdparty/Csocket/Csocket.h
