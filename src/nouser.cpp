@@ -115,7 +115,7 @@ NoUser::NoUser(const NoString& sUserName) : d(new NoUserPrivate)
     d->userPath = NoApp::instance().userPath() + "/" + sUserName;
     d->modules = new NoModuleLoader;
     d->userTimer = new NoUserTimer(this);
-    NoApp::instance().manager().addCron(d->userTimer);
+    NoApp::instance().manager()->addCron(d->userTimer);
 }
 
 NoUser::~NoUser()
@@ -127,7 +127,7 @@ NoUser::~NoUser()
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::instance().manager().removeSocket(d->clients[0]->socket());
+        NoApp::instance().manager()->removeSocket(d->clients[0]->socket());
     }
     d->clients.clear();
 
@@ -135,7 +135,7 @@ NoUser::~NoUser()
     delete d->modules;
     d->modules = nullptr;
 
-    NoApp::instance().manager().removeCron(d->userTimer);
+    NoApp::instance().manager()->removeCron(d->userTimer);
 
     NoApp::instance().addBytesRead(bytesRead());
     NoApp::instance().addBytesWritten(bytesWritten());
@@ -1025,7 +1025,7 @@ bool NoUser::checkPass(const NoString& sPass) const
         }
     }
 
-    return (NoClient*) NoApp::instance().manager().FindSockByName(sSockName);
+    return (NoClient*) NoApp::instance().manager()->FindSockByName(sSockName);
 }*/
 
 NoString NoUser::localDccIp() const

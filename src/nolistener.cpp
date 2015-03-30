@@ -143,7 +143,7 @@ void NoPeerSocket::readLine(const NoString& line)
         } else {
             NoClient* client = new NoClient;
             socket = client->socket();
-            NoApp::instance().manager().swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
+            NoApp::instance().manager()->swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout
             socket->setName("USR::???");
@@ -155,7 +155,7 @@ void NoPeerSocket::readLine(const NoString& line)
             NO_DEBUG("Refused HTTP connection to non HTTP port");
         } else {
             socket = new NoWebSocket(m_listener->uriPrefix);
-            NoApp::instance().manager().swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
+            NoApp::instance().manager()->swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout
             socket->setName("WebMod::Client");
@@ -174,7 +174,7 @@ NoListener::NoListener(const NoString& host, ushort port) : d(new NoListenerPriv
 NoListener::~NoListener()
 {
     if (d->socket)
-        NoApp::instance().manager().removeSocket(d->socket);
+        NoApp::instance().manager()->removeSocket(d->socket);
 }
 
 bool NoListener::isSsl() const
@@ -268,5 +268,5 @@ bool NoListener::listen()
     // Make sure there is a consistent error message, not something random
     // which might even be "Error: Success".
     errno = EINVAL;
-    return NoApp::instance().manager().listenHost(d->port, "_LISTENER", d->host, ssl, SOMAXCONN, d->socket, 0, d->addressType);
+    return NoApp::instance().manager()->listenHost(d->port, "_LISTENER", d->host, ssl, SOMAXCONN, d->socket, 0, d->addressType);
 }

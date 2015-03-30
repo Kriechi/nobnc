@@ -98,8 +98,7 @@ public:
     void setConnectDelay(uint i);
 
     ConfigState configState() const;
-    NoSocketManager& manager();
-    const NoSocketManager& manager() const;
+    NoSocketManager* manager() const;
     NoModuleLoader* loader() const;
     NoString skinName() const;
     NoString statusPrefix() const;

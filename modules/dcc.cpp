@@ -150,7 +150,7 @@ public:
 
         NoString sLocalDCCIP = user()->localDccIp();
         ushort uPort =
-        NoApp::instance().manager().listenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
+        NoApp::instance().manager()->listenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
 
         if (user()->nick().equals(sRemoteNick)) {
             putUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
@@ -178,7 +178,7 @@ public:
             return false;
         }
 
-        NoApp::instance().manager().connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, user()->localDccIp(), pSock);
+        NoApp::instance().manager()->connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, user()->localDccIp(), pSock);
 
         putModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - Attempting to connect to [" + sRemoteIP + "]");
         return true;

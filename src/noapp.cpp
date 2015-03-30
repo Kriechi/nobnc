@@ -482,7 +482,7 @@ bool NoApp::allowConnectionFrom(const NoString& sIP) const
 {
     if (d->anonIpLimit == 0)
         return true;
-    return (manager().anonConnectionCount(sIP) < d->anonIpLimit);
+    return (manager()->anonConnectionCount(sIP) < d->anonIpLimit);
 }
 
 void NoApp::initDirs(const NoString& sArgvPath, const NoString& sDataDir)
@@ -2215,14 +2215,9 @@ NoApp::ConfigState NoApp::configState() const
     return d->configState;
 }
 
-NoSocketManager& NoApp::manager()
+NoSocketManager* NoApp::manager() const
 {
-    return d->manager;
-}
-
-const NoSocketManager& NoApp::manager() const
-{
-    return d->manager;
+    return &d->manager;
 }
 
 NoModuleLoader* NoApp::loader() const
@@ -2244,7 +2239,7 @@ void NoApp::enableConnectQueue()
 {
     if (!d->connectQueueTimer && !d->connectPaused && !d->connectQueue.empty()) {
         d->connectQueueTimer = new NoConnectQueueTimer(d->connectDelay);
-        manager().addCron(d->connectQueueTimer);
+        d->manager.addCron(d->connectQueueTimer);
     }
 }
 
