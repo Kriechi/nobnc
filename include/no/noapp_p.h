@@ -19,10 +19,36 @@
 #define NOAPP_P_H
 
 #include "noapp.h"
+#include <list>
 
 class NoAppPrivate
 {
 public:
+    static NoAppPrivate* get(NoApp* app)
+    {
+        return app->d.get();
+    }
+
+    NoFile* initPidFile();
+    bool deletePidFile();
+
+    NoString expandConfigPath(const NoString& sConfigFile, bool bAllowMkDir = true);
+    void backupConfigOnce(const NoString& sSuffix);
+
+    void deleteUsers();
+    void enableConnectQueue();
+    void disableConnectQueue();
+
+    // Never call this unless you are NoConnectQueueTimer::~NoConnectQueueTimer()
+    void leakConnectQueueTimer(NoConnectQueueTimer* pTimer);
+
+    bool doRehash(NoString& sError);
+    // Returns true if something was done
+    bool handleUserDeletion();
+    NoString makeConfigHeader();
+    bool addListener(const NoString& sLine, NoString& sError);
+    bool addListener(NoSettings* pConfig, NoString& sError);
+
     time_t startTime;
 
     NoApp::ConfigState configState = NoApp::ConfigNothing;

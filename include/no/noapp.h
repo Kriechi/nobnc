@@ -24,7 +24,6 @@
 #include <no/nomoduleloader.h>
 #include <no/nocachemap.h>
 #include <memory>
-#include <list>
 
 class NoClient;
 class NoAuthenticator;
@@ -44,22 +43,18 @@ public:
 
     enum ConfigState { ConfigNothing, ConfigNeedRehash, ConfigNeedWrite, ConfigNeedVerboseWrite };
 
-    void deleteUsers();
     void loop();
     bool writePidFile(int iPid);
-    bool deletePidFile();
     bool waitForChildLock();
     bool isHostAllowed(const NoString& sHostMask) const;
     // This returns false if there are too many anonymous connections from this ip
     bool allowConnectionFrom(const NoString& sIP) const;
     void initDirs(const NoString& sArgvPath, const NoString& sDataDir);
     bool onBoot();
-    NoString expandConfigPath(const NoString& sConfigFile, bool bAllowMkDir = true);
     bool writeNewConfig(const NoString& sConfigFile);
     bool writeConfig();
     bool parseConfig(const NoString& sConfig, NoString& sError);
     bool rehashConfig(NoString& sError);
-    void backupConfigOnce(const NoString& sSuffix);
     static NoString version();
     static NoString tag(bool bIncludeVersion = true, bool bHTML = false);
     static NoString compileOptionsString();
@@ -164,32 +159,17 @@ public:
     bool serverThrottle(NoString sName);
 
     void addNetworkToQueue(NoNetwork* pNetwork);
-    std::list<NoNetwork*>& connectionQueue();
-
-    void enableConnectQueue();
-    void disableConnectQueue();
 
     void pauseConnectQueue();
     void resumeConnectQueue();
 
-    // Never call this unless you are NoConnectQueueTimer::~NoConnectQueueTimer()
-    void leakConnectQueueTimer(NoConnectQueueTimer* pTimer);
-
     static void dumpConfig(const NoSettings* Config);
-
-private:
-    NoFile* initPidFile();
-    bool doRehash(NoString& sError);
-    // Returns true if something was done
-    bool handleUserDeletion();
-    NoString makeConfigHeader();
-    bool addListener(const NoString& sLine, NoString& sError);
-    bool addListener(NoSettings* pConfig, NoString& sError);
 
 private:
     NoApp(const NoApp&) = delete;
     NoApp& operator=(const NoApp&) = delete;
     std::unique_ptr<NoAppPrivate> d;
+    friend class NoAppPrivate;
 };
 
 #endif // NOAPP_H

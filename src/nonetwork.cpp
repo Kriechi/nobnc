@@ -28,6 +28,7 @@
 #include "noescape.h"
 #include "noclient.h"
 #include "noapp.h"
+#include "noapp_p.h"
 #include "nonick.h"
 #include "nobuffer.h"
 #include "Csocket/Csocket.h"
@@ -337,7 +338,7 @@ NoNetwork::~NoNetwork()
     setUser(nullptr);
 
     // Make sure we are not in the connection queue
-    NoApp::instance().connectionQueue().remove(this);
+    NoAppPrivate::get(&NoApp::instance())->connectQueue.remove(this);
 
     NoApp::instance().manager()->removeCron(d->pingTimer);
     NoApp::instance().manager()->removeCron(d->joinTimer);
