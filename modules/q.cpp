@@ -64,7 +64,7 @@ public:
 
         if (isIrcConnected()) {
             // check for usermode +x if we are already connected
-            std::set<uchar> scUserModes = network()->ircSocket()->GetUserModes();
+            std::set<uchar> scUserModes = network()->ircSocket()->userModes();
             if (scUserModes.find('x') != scUserModes.end())
                 m_bCloaked = true;
 
@@ -417,7 +417,7 @@ private:
             return;
 
         putModule("Cloak: Trying to cloak your hostname, setting +x...");
-        putIrc("MODE " + network()->ircSocket()->GetNick() + " +x");
+        putIrc("MODE " + network()->ircSocket()->nick() + " +x");
     }
 
     void WhoAmI()
@@ -566,7 +566,7 @@ private:
     bool isIrcConnected()
     {
         NoIrcSocket* pIRCSock = network()->ircSocket();
-        return pIRCSock && pIRCSock->IsAuthed();
+        return pIRCSock && pIRCSock->isAuthed();
     }
 
     bool IsSelf(const NoNick& Nick)

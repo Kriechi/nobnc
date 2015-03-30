@@ -71,7 +71,7 @@ public:
         if (!pIRCSock)
             // WTF?
             return;
-        if (sNick == pIRCSock->GetNick())
+        if (sNick == pIRCSock->nick())
             return;
         if (m_Messaged.contains(sNick))
             return;

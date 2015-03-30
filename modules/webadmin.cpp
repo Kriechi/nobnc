@@ -880,7 +880,7 @@ public:
 
                 Tmpl["QuitMsg"] = pNetwork->quitMsg();
 
-                Tmpl["FloodProtection"] = NoString(NoIrcSocket::IsFloodProtected(pNetwork->floodRate()));
+                Tmpl["FloodProtection"] = NoString(NoIrcSocket::isFloodProtected(pNetwork->floodRate()));
                 Tmpl["FloodRate"] = NoString(pNetwork->floodRate());
                 Tmpl["FloodBurst"] = NoString(pNetwork->floodBurst());
 

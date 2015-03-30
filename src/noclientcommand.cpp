@@ -79,7 +79,7 @@ void NoClient::userCommand(NoString& sLine)
 
         const std::map<NoString, NoNick>& msNicks = pChan->nicks();
         NoIrcSocket* pIRCSock = d->network->ircSocket();
-        const NoString& sPerms = (pIRCSock) ? pIRCSock->GetPerms() : "";
+        const NoString& sPerms = (pIRCSock) ? pIRCSock->perms() : "";
 
         if (msNicks.empty()) {
             putStatus("No nicks on [" + sChan + "]");
@@ -339,7 +339,7 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         if (ircSocket()) {
-            ircSocket()->Quit();
+            ircSocket()->quit();
             if (pServer)
                 putStatus("Connecting to [" + pServer->host() + "]...");
             else
@@ -361,7 +361,7 @@ void NoClient::userCommand(NoString& sLine)
 
         if (ircSocket()) {
             NoString sQuitMsg = No::tokens(sLine, 1);
-            ircSocket()->Quit(sQuitMsg);
+            ircSocket()->quit(sQuitMsg);
         }
 
         d->network->setEnabled(false);
@@ -486,7 +486,7 @@ void NoClient::userCommand(NoString& sLine)
             vsUsers.push_back("All: " + NoString(pChan->nickCount()));
 
             NoIrcSocket* pIRCSock = d->network->ircSocket();
-            const NoString& sPerms = pIRCSock ? pIRCSock->GetPerms() : "";
+            const NoString& sPerms = pIRCSock ? pIRCSock->perms() : "";
             std::map<char, uint> mPerms = pChan->permCounts();
             for (char cPerm : sPerms) {
                 vsUsers.push_back(NoString(cPerm) + ": " + NoString(mPerms[cPerm]));

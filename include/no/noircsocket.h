@@ -61,56 +61,56 @@ public:
 
     void putIrc(const NoString& sLine);
     void putIrcQuick(const NoString& sLine); //!< Should be used for PONG only
-    void ResetChans();
-    void Quit(const NoString& sQuitMsg = "");
+    void resetChans();
+    void quit(const NoString& sQuitMsg = "");
 
     /** You can call this from NoModule::onServerCapResult to suspend
      *  sending other CAP requests and CAP END for a while. Each
      *  call to PauseCap should be balanced with a call to ResumeCap.
      */
-    void PauseCap();
+    void pauseCap();
     /** If you used PauseCap, call this when CAP negotiation and logging in
      *  should be resumed again.
      */
-    void ResumeCap();
+    void resumeCap();
 
-    void SetPass(const NoString& s);
+    void setPassword(const NoString& s);
 
-    uint GetMaxNickLen() const;
-    ChanModeArgs GetModeType(uchar uMode) const;
-    uchar GetPermFromMode(uchar uMode) const;
-    std::map<uchar, ChanModeArgs> GetChanModes() const;
-    bool IsPermChar(const char c) const;
-    bool IsPermMode(const char c) const;
-    NoString GetPerms() const;
-    NoString GetPermModes() const;
-    NoString GetNickMask() const;
-    NoString GetNick() const;
-    NoString GetPass() const;
+    uint maxNickLen() const;
+    ChanModeArgs modeType(uchar uMode) const;
+    uchar permFromMode(uchar uMode) const;
+    std::map<uchar, ChanModeArgs> chanModes() const;
+    bool isPermChar(const char c) const;
+    bool isPermMode(const char c) const;
+    NoString perms() const;
+    NoString permModes() const;
+    NoString nickMask() const;
+    NoString nick() const;
+    NoString password() const;
     NoNetwork* network() const;
-    bool HasNamesx() const;
-    bool HasUHNames() const;
-    std::set<uchar> GetUserModes() const;
+    bool hasNamesX() const;
+    bool hasUhNames() const;
+    std::set<uchar> userModes() const;
     // This is true if we are past raw 001
-    bool IsAuthed() const;
-    bool IsCapAccepted(const NoString& sCap);
-    NoStringMap GetISupport() const;
-    NoString GetISupport(const NoString& sKey, const NoString& sDefault = "") const;
+    bool isAuthed() const;
+    bool isCapAccepted(const NoString& sCap);
+    NoStringMap isupport() const;
+    NoString isupport(const NoString& sKey, const NoString& sDefault = "") const;
 
     // This handles NAMESX and UHNAMES in a raw 353 reply
-    void ForwardRaw353(const NoString& sLine) const;
-    void ForwardRaw353(const NoString& sLine, NoClient* pClient) const;
+    void forwardRaw353(const NoString& sLine) const;
+    void forwardRaw353(const NoString& sLine, NoClient* pClient) const;
 
     // TODO move this function to NoNetwork and make it non-static?
-    static bool IsFloodProtected(double fRate);
+    static bool isFloodProtected(double fRate);
 
 private:
-    void SetNick(const NoString& sNick);
-    void ParseISupport(const NoString& sLine);
+    void setNick(const NoString& sNick);
+    void parseISupport(const NoString& sLine);
     // This is called when we connect and the nick we want is already taken
-    void SendAltNick(const NoString& sBadNick);
-    void SendNextCap();
-    void TrySend();
+    void sendAltNick(const NoString& sBadNick);
+    void sendNextCap();
+    void trySend();
 
     friend class NoIrcFloodTimer;
 

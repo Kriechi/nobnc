@@ -392,7 +392,7 @@ private:
 
         // 353 needs special treatment due to NAMESX and UHNAMES
         if (bIsRaw353)
-            network()->ircSocket()->ForwardRaw353(sLine, m_pDoing);
+            network()->ircSocket()->forwardRaw353(sLine, m_pDoing);
         else
             m_pDoing->putClient(sLine);
 

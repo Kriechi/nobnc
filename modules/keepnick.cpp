@@ -71,7 +71,7 @@ public:
             return;
 
         // Do we already have the nick we want?
-        if (pIRCSock->GetNick().equals(GetNick()))
+        if (pIRCSock->nick().equals(GetNick()))
             return;
 
         putIrc("NICK " + GetNick());
@@ -83,14 +83,14 @@ public:
         NoIrcSocket* pIRCSock = network()->ircSocket();
 
         if (pIRCSock)
-            sConfNick = sConfNick.left(pIRCSock->GetMaxNickLen());
+            sConfNick = sConfNick.left(pIRCSock->maxNickLen());
 
         return sConfNick;
     }
 
     void onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
     {
-        if (sNewNick == network()->ircSocket()->GetNick()) {
+        if (sNewNick == network()->ircSocket()->nick()) {
             // We are changing our own nick
             if (Nick.equals(GetNick())) {
                 // We are changing our nick away from the conf setting.
@@ -127,7 +127,7 @@ public:
 
     void onIrcConnected() override
     {
-        if (!network()->ircSocket()->GetNick().equals(GetNick())) {
+        if (!network()->ircSocket()->nick().equals(GetNick())) {
             // We don't have the nick we want, try to get it
             Enable();
         }

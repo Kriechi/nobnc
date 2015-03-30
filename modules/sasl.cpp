@@ -243,7 +243,7 @@ public:
                     return;
                 }
 
-                network()->ircSocket()->PauseCap();
+                network()->ircSocket()->pauseCap();
 
                 m_Mechanisms.SetIndex(0);
                 putIrc("AUTHENTICATE " + m_Mechanisms.GetCurrent());
@@ -259,7 +259,7 @@ public:
             Authenticate(No::tokens(sLine, 1));
         } else if (No::token(sLine, 1).equals("903")) {
             /* SASL success! */
-            network()->ircSocket()->ResumeCap();
+            network()->ircSocket()->resumeCap();
             m_bAuthenticated = true;
             NO_DEBUG("sasl: Authenticated with mechanism [" << m_Mechanisms.GetCurrent() << "]");
         } else if (No::token(sLine, 1).equals("904") || No::token(sLine, 1).equals("905")) {
@@ -271,7 +271,7 @@ public:
                 putIrc("AUTHENTICATE " + m_Mechanisms.GetCurrent());
             } else {
                 CheckRequireAuth();
-                network()->ircSocket()->ResumeCap();
+                network()->ircSocket()->resumeCap();
             }
         } else if (No::token(sLine, 1).equals("906")) {
             /* CAP wasn't paused? */
@@ -279,7 +279,7 @@ public:
             CheckRequireAuth();
         } else if (No::token(sLine, 1).equals("907")) {
             m_bAuthenticated = true;
-            network()->ircSocket()->ResumeCap();
+            network()->ircSocket()->resumeCap();
             NO_DEBUG("sasl: Received 907 -- We are already registered");
         } else {
             return CONTINUE;

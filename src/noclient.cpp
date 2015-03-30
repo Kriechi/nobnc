@@ -911,8 +911,8 @@ NoString NoClient::nick(bool bAllowIRCNick) const
     NoString sRet;
 
     const NoIrcSocket* pSock = ircSocket();
-    if (bAllowIRCNick && pSock && pSock->IsAuthed()) {
-        sRet = pSock->GetNick();
+    if (bAllowIRCNick && pSock && pSock->isAuthed()) {
+        sRet = pSock->nick();
     }
 
     return (sRet.empty()) ? d->nickname : sRet;
@@ -920,8 +920,8 @@ NoString NoClient::nick(bool bAllowIRCNick) const
 
 NoString NoClient::nickMask() const
 {
-    if (ircSocket() && ircSocket()->IsAuthed()) {
-        return ircSocket()->GetNickMask();
+    if (ircSocket() && ircSocket()->isAuthed()) {
+        return ircSocket()->nickMask();
     }
 
     NoString sHost = d->network ? d->network->bindHost() : d->user->bindHost();

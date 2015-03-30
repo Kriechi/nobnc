@@ -1131,7 +1131,7 @@ class NoAdminMod : public NoModule
         }
         // or close existing connection:
         else if (pIRCSock) {
-            pIRCSock->Quit();
+            pIRCSock->quit();
         }
 
         // then reconnect

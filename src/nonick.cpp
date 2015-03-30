@@ -172,7 +172,7 @@ static NoString availablePerms(NoNetwork* network)
     if (network) {
         NoIrcSocket* socket = network->ircSocket();
         if (socket)
-            perms = socket->GetPerms();
+            perms = socket->perms();
     }
     return perms;
 }

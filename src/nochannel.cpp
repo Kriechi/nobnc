@@ -331,11 +331,11 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
             bAdd = true;
         } else if (uMode == '-') {
             bAdd = false;
-        } else if (d->network->ircSocket()->IsPermMode(uMode)) {
+        } else if (d->network->ircSocket()->isPermMode(uMode)) {
             NoString sArg = modeArg(sArgs);
             NoNick* pNick = findNick(sArg);
             if (pNick) {
-                uchar uPerm = d->network->ircSocket()->GetPermFromMode(uMode);
+                uchar uPerm = d->network->ircSocket()->permFromMode(uMode);
 
                 if (uPerm) {
                     bool bNoChange = (pNick->hasPerm(uPerm) == bAdd);
@@ -379,7 +379,7 @@ void NoChannel::modeChange(const NoString& sModes, const NoNick* pOpNick)
             bool bList = false;
             NoString sArg;
 
-            switch (d->network->ircSocket()->GetModeType(uMode)) {
+            switch (d->network->ircSocket()->modeType(uMode)) {
             case NoIrcSocket::ListArg:
                 bList = true;
                 sArg = modeArg(sArgs);
@@ -505,7 +505,7 @@ bool NoChannel::addNick(const NoString& sNick)
     const char* p = sNick.c_str();
     NoString sPrefix, sTmp, sIdent, sHost;
 
-    while (d->network->ircSocket()->IsPermChar(*p)) {
+    while (d->network->ircSocket()->isPermChar(*p)) {
         sPrefix += *p;
 
         if (!*++p) {

@@ -242,7 +242,7 @@ void NoNetwork::clone(const NoNetwork& Network, bool bCloneName)
 
         if (pSock) {
             putStatus("Jumping servers because this server is no longer in the list");
-            pSock->Quit();
+            pSock->quit();
         }
     }
     // !Servers
@@ -646,7 +646,7 @@ void NoNetwork::clientConnected(NoClient* pClient)
 
     if (ircSocket() != nullptr) {
         NoString sUserMode("");
-        const std::set<uchar>& scUserModes = ircSocket()->GetUserModes();
+        const std::set<uchar>& scUserModes = ircSocket()->userModes();
         for (uchar cMode : scUserModes) {
             sUserMode += cMode;
         }
@@ -828,7 +828,7 @@ NoChannel* NoNetwork::findChannel(NoString sName) const
 {
     if (ircSocket()) {
         // See https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.16
-        sName.trimLeft(ircSocket()->GetISupport("STATUSMSG", ""));
+        sName.trimLeft(ircSocket()->isupport("STATUSMSG", ""));
     }
 
     for (NoChannel* pChan : d->channels) {
@@ -1125,7 +1125,7 @@ bool NoNetwork::removeServer(const NoString& sName, ushort uPort, const NoString
             }
 
             if (pIRCSock) {
-                pIRCSock->Quit();
+                pIRCSock->quit();
                 putStatus("Your current server was removed, jumping...");
             }
         } else if (!bSawCurrentServer) {
@@ -1297,7 +1297,7 @@ NoString NoNetwork::currentNick() const
     const NoIrcSocket* pIRCSock = ircSocket();
 
     if (pIRCSock) {
-        return pIRCSock->GetNick();
+        return pIRCSock->nick();
     }
 
     if (!d->clients.empty()) {
@@ -1343,7 +1343,7 @@ bool NoNetwork::connect()
 #endif
 
     NoIrcSocket* pIRCSock = new NoIrcSocket(this);
-    pIRCSock->SetPass(pServer->password());
+    pIRCSock->setPassword(pServer->password());
     pIRCSock->setTrustedFingerprints(d->trustedFingerprints);
 
     NO_DEBUG("Connecting user/network [" << d->user->userName() << "/" << d->name << "]");
@@ -1367,7 +1367,7 @@ bool NoNetwork::connect()
 bool NoNetwork::isIrcConnected() const
 {
     const NoIrcSocket* pSock = ircSocket();
-    return (pSock && pSock->IsAuthed());
+    return (pSock && pSock->isAuthed());
 }
 
 void NoNetwork::setIrcSocket(NoIrcSocket* pIRCSock)
@@ -1408,7 +1408,7 @@ void NoNetwork::setEnabled(bool b)
         checkIrcConnect();
     } else if (ircSocket()) {
         if (ircSocket()->isConnected()) {
-            ircSocket()->Quit();
+            ircSocket()->quit();
         } else {
             ircSocket()->close();
         }
