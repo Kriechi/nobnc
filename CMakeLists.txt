@@ -26,6 +26,7 @@ endif()
 ### SOURCES
 
 list(APPEND NO_HEADERS include/no/noapp.h
+                       include/no/noapp_p.h
                        include/no/noauthenticator.h
                        include/no/nobuffer.h
                        include/no/nocachemap.h

@@ -23,6 +23,7 @@
 #include <no/nosocketmanager.h>
 #include <no/nomoduleloader.h>
 #include <no/nocachemap.h>
+#include <memory>
 #include <list>
 
 class NoClient;
@@ -33,15 +34,13 @@ class NoConnectQueueTimer;
 class NoSettings;
 class NoFile;
 class NoListener;
+class NoAppPrivate;
 
 class NO_EXPORT NoApp
 {
 public:
     NoApp();
     ~NoApp();
-
-    NoApp(const NoApp&) = delete;
-    NoApp& operator=(const NoApp&) = delete;
 
     enum ConfigState { ConfigNothing, ConfigNeedRehash, ConfigNeedWrite, ConfigNeedVerboseWrite };
 
@@ -188,41 +187,10 @@ private:
     bool addListener(const NoString& sLine, NoString& sError);
     bool addListener(NoSettings* pConfig, NoString& sError);
 
-    time_t m_startTime;
-
-    ConfigState m_configState;
-    std::vector<NoListener*> m_listeners;
-    std::map<NoString, NoUser*> m_users;
-    std::map<NoString, NoUser*> m_delUsers;
-    NoSocketManager m_manager;
-
-    NoString m_curPath;
-    NoString m_appPath;
-
-    NoString m_configFile;
-    NoString m_skinName;
-    NoString m_statusPrefix;
-    NoString m_pidFile;
-    NoString m_sslCertFile;
-    NoString m_sslCiphers;
-    NoString m_sslProtocols;
-    NoStringVector m_bindHosts;
-    NoStringVector m_trustedProxies;
-    NoStringVector m_motd;
-    NoFile* m_lockFile;
-    uint m_connectDelay;
-    uint m_anonIpLimit;
-    uint m_maxBufferSize;
-    uint m_disabledSslProtocols;
-    NoModuleLoader* m_modules;
-    ulonglong m_bytesRead;
-    ulonglong m_bytesWritten;
-    std::list<NoNetwork*> m_connectQueue;
-    NoConnectQueueTimer* m_connectQueueTimer;
-    uint m_connectPaused;
-    NoCacheMap<NoString> m_connectThrottle;
-    bool m_protectWebSessions;
-    bool m_hideVersion;
+private:
+    NoApp(const NoApp&) = delete;
+    NoApp& operator=(const NoApp&) = delete;
+    std::unique_ptr<NoAppPrivate> d;
 };
 
 #endif // NOAPP_H
