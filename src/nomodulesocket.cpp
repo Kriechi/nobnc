@@ -55,8 +55,8 @@ NoModuleSocket::~NoModuleSocket()
         pUser->addBytesWritten(bytesWritten());
         pUser->addBytesRead(bytesRead());
     } else {
-        NoApp::instance().addBytesWritten(bytesWritten());
-        NoApp::instance().addBytesRead(bytesRead());
+        noApp->addBytesWritten(bytesWritten());
+        noApp->addBytesRead(bytesRead());
     }
 }
 
@@ -79,7 +79,7 @@ void NoModuleSocket::onSocketError(int iErrno, const NoString& sDescription)
 
 bool NoModuleSocket::onConnectionFrom(const NoString& sHost, ushort uPort)
 {
-    return NoApp::instance().allowConnectionFrom(sHost);
+    return noApp->allowConnectionFrom(sHost);
 }
 
 bool NoModuleSocket::connect(const NoString& sHostname, ushort uPort, bool bSSL, uint uTimeout)

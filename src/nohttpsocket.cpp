@@ -148,7 +148,7 @@ void NoHttpSocket::readLine(const NoString& sData)
     } else if (sName.equals("X-Forwarded-For:")) {
         // X-Forwarded-For: client, proxy1, proxy2
         if (m_forwardedIp.empty()) {
-            const NoStringVector& vsTrustedProxies = NoApp::instance().trustedProxies();
+            const NoStringVector& vsTrustedProxies = noApp->trustedProxies();
             NoString sIP = remoteAddress();
 
             NoStringVector vsIPs = No::tokens(sLine, 1).split(",", No::SkipEmptyParts);

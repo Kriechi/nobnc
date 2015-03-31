@@ -95,7 +95,7 @@ NoString NoApp::version()
 
 NoString NoApp::tag(bool bIncludeVersion, bool bHTML)
 {
-    if (!instance().d->hideVersion) {
+    if (!instance()->d->hideVersion) {
         bIncludeVersion = true;
     }
     NoString sAddress = bHTML ? "<a href=\"http://znc.in\">http://znc.in</a>" : "http://znc.in";
@@ -163,7 +163,7 @@ bool NoAppPrivate::handleUserDeletion()
         NoUser* pUser = it.second;
         pUser->setBeingDeleted(true);
 
-        if (NoApp::instance().loader()->onDeleteUser(*pUser)) {
+        if (noApp->loader()->onDeleteUser(*pUser)) {
             pUser->setBeingDeleted(false);
             continue;
         }
@@ -227,7 +227,7 @@ NoFile* NoAppPrivate::initPidFile()
 
         // absolute path or relative to the data dir?
         if (pidFile[0] != '/')
-            sFile = NoApp::instance().appPath() + "/" + pidFile;
+            sFile = noApp->appPath() + "/" + pidFile;
         else
             sFile = pidFile;
 
@@ -561,12 +561,12 @@ NoString NoAppPrivate::expandConfigPath(const NoString& sConfigFile, bool bAllow
     NoString sRetPath;
 
     if (sConfigFile.empty()) {
-        sRetPath = NoApp::instance().confPath(bAllowMkDir) + "/znc.conf";
+        sRetPath = noApp->confPath(bAllowMkDir) + "/znc.conf";
     } else {
         if (sConfigFile.left(2) == "./" || sConfigFile.left(3) == "../") {
-            sRetPath = NoApp::instance().currentPath() + "/" + sConfigFile;
+            sRetPath = noApp->currentPath() + "/" + sConfigFile;
         } else if (sConfigFile.left(1) != "/") {
-            sRetPath = NoApp::instance().confPath(bAllowMkDir) + "/" + sConfigFile;
+            sRetPath = noApp->confPath(bAllowMkDir) + "/" + sConfigFile;
         } else {
             sRetPath = sConfigFile;
         }
@@ -1151,7 +1151,7 @@ bool NoAppPrivate::doRehash(NoString& sError)
         No::printMessage("Found old config from ZNC " + sSavedVersion + ". Saving a backup of it.");
         backupConfigOnce("pre-" + NoString(NO_VERSION_STR));
     } else if (tSavedVersion > tCurrentVersion) {
-        No::printError("Config was saved from ZNC " + sSavedVersion + ". It may or may not work with current ZNC " + NoApp::instance().version());
+        No::printError("Config was saved from ZNC " + sSavedVersion + ". It may or may not work with current ZNC " + noApp->version());
     }
 
     bindHosts.clear();
@@ -1186,11 +1186,11 @@ bool NoAppPrivate::doRehash(NoString& sError)
         NoString sModRet;
         NoModule* pOldMod;
 
-        pOldMod = NoApp::instance().loader()->findModule(sModName);
+        pOldMod = noApp->loader()->findModule(sModName);
         if (!pOldMod) {
             No::printAction("Loading global module [" + sModName + "]");
 
-            bool bModRet = NoApp::instance().loader()->loadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet);
+            bool bModRet = noApp->loader()->loadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1200,7 +1200,7 @@ bool NoAppPrivate::doRehash(NoString& sError)
         } else if (pOldMod->args() != sArgs) {
             No::printAction("Reloading global module [" + sModName + "]");
 
-            bool bModRet = NoApp::instance().loader()->reloadModule(sModName, sArgs, nullptr, nullptr, sModRet);
+            bool bModRet = noApp->loader()->reloadModule(sModName, sArgs, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1217,12 +1217,12 @@ bool NoAppPrivate::doRehash(NoString& sError)
     config.FindStringEntry("ispoofformat", sISpoofFormat);
     config.FindStringEntry("ispooffile", sISpoofFile);
     if (!sISpoofFormat.empty() || !sISpoofFile.empty()) {
-        NoModule* pIdentFileMod = NoApp::instance().loader()->findModule("identfile");
+        NoModule* pIdentFileMod = noApp->loader()->findModule("identfile");
         if (!pIdentFileMod) {
             No::printAction("Loading global Module [identfile]");
 
             NoString sModRet;
-            bool bModRet = NoApp::instance().loader()->loadModule("identfile", "", No::GlobalModule, nullptr, nullptr, sModRet);
+            bool bModRet = noApp->loader()->loadModule("identfile", "", No::GlobalModule, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1230,7 +1230,7 @@ bool NoAppPrivate::doRehash(NoString& sError)
                 return false;
             }
 
-            pIdentFileMod = NoApp::instance().loader()->findModule("identfile");
+            pIdentFileMod = noApp->loader()->findModule("identfile");
             msModules["identfile"] = "";
         }
 
@@ -1241,22 +1241,22 @@ bool NoAppPrivate::doRehash(NoString& sError)
 
     config.FindStringVector("motd", vsList);
     for (const NoString& sMotd : vsList) {
-        NoApp::instance().addMotd(sMotd);
+        noApp->addMotd(sMotd);
     }
 
     config.FindStringVector("bindhost", vsList);
     for (const NoString& sHost : vsList) {
-        NoApp::instance().addBindHost(sHost);
+        noApp->addBindHost(sHost);
     }
 
     config.FindStringVector("trustedproxy", vsList);
     for (const NoString& sProxy : vsList) {
-        NoApp::instance().addTrustedProxy(sProxy);
+        noApp->addTrustedProxy(sProxy);
     }
 
     config.FindStringVector("vhost", vsList);
     for (const NoString& sHost : vsList) {
-        NoApp::instance().addBindHost(sHost);
+        noApp->addBindHost(sHost);
     }
 
     NoString sVal;
@@ -1271,7 +1271,7 @@ bool NoAppPrivate::doRehash(NoString& sError)
     if (config.FindStringEntry("skin", sVal))
         skinName = sVal;
     if (config.FindStringEntry("connectdelay", sVal))
-        NoApp::instance().setConnectDelay(sVal.toUInt());
+        noApp->setConnectDelay(sVal.toUInt());
     if (config.FindStringEntry("serverthrottle", sVal))
         connectThrottle.setExpiration(sVal.toUInt() * 1000);
     if (config.FindStringEntry("anoniplimit", sVal))
@@ -1387,20 +1387,20 @@ bool NoAppPrivate::doRehash(NoString& sError)
             sError = "Unhandled lines in config for User [" + sUserName + "]!";
             No::printError(sError);
 
-            NoApp::instance().dumpConfig(pSubConf);
+            noApp->dumpConfig(pSubConf);
             return false;
         }
 
         NoString sErr;
         if (pRealUser) {
-            if (!pRealUser->clone(*pUser, sErr) || !NoApp::instance().addUser(pRealUser, sErr)) {
+            if (!pRealUser->clone(*pUser, sErr) || !noApp->addUser(pRealUser, sErr)) {
                 sError = "Invalid user [" + pUser->userName() + "] " + sErr;
                 NO_DEBUG("NoUser::Clone() failed in rehash");
             }
             pUser->setBeingDeleted(true);
             delete pUser;
             pUser = nullptr;
-        } else if (!NoApp::instance().addUser(pUser, sErr)) {
+        } else if (!noApp->addUser(pUser, sErr)) {
             sError = "Invalid user [" + pUser->userName() + "] " + sErr;
         }
 
@@ -1422,20 +1422,20 @@ bool NoAppPrivate::doRehash(NoString& sError)
         sError = "Unhandled lines in config!";
         No::printError(sError);
 
-        NoApp::instance().dumpConfig(&config);
+        noApp->dumpConfig(&config);
         return false;
     }
 
 
     // Unload modules which are no longer in the config
     std::set<NoString> ssUnload;
-    for (NoModule* pCurMod : NoApp::instance().loader()->modules()) {
+    for (NoModule* pCurMod : noApp->loader()->modules()) {
         if (msModules.find(pCurMod->moduleName()) == msModules.end())
             ssUnload.insert(pCurMod->moduleName());
     }
 
     for (const NoString& sMod : ssUnload) {
-        if (NoApp::instance().loader()->unloadModule(sMod))
+        if (noApp->loader()->unloadModule(sMod))
             No::printMessage("Unloaded global module [" + sMod + "]");
         else
             No::printMessage("Could not unload [" + sMod + "]");
@@ -1591,7 +1591,7 @@ ulonglong NoApp::bytesWritten() const
 NoModule* NoApp::findModule(const NoString& sModName, const NoString& sUsername)
 {
     if (sUsername.empty()) {
-        return NoApp::instance().loader()->findModule(sModName);
+        return noApp->loader()->findModule(sModName);
     }
 
     NoUser* pUser = findUser(sUsername);
@@ -1605,7 +1605,7 @@ NoModule* NoApp::findModule(const NoString& sModName, NoUser* pUser)
         return pUser->loader()->findModule(sModName);
     }
 
-    return NoApp::instance().loader()->findModule(sModName);
+    return noApp->loader()->findModule(sModName);
 }
 
 bool NoApp::updateModule(const NoString& sModule)
@@ -1790,7 +1790,7 @@ bool NoAppPrivate::addListener(const NoString& sLine, NoString& sError)
     // No support for URIPrefix for old-style configs.
     NoString sURIPrefix;
     ushort uPort = sPort.toUShort();
-    return NoApp::instance().addListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
+    return noApp->addListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
 }
 
 bool NoApp::addListener(ushort uPort,
@@ -1944,7 +1944,7 @@ bool NoAppPrivate::addListener(NoSettings* pConfig, NoString& sError)
         return false;
     }
 
-    return NoApp::instance().addListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
+    return noApp->addListener(uPort, sBindHost, sURIPrefix, bSSL, eAddr, eAccept, sError);
 }
 
 bool NoApp::addListener(NoListener* pListener)
@@ -2017,9 +2017,9 @@ void NoApp::createInstance()
     s_pZNC = new NoApp();
 }
 
-NoApp& NoApp::instance()
+NoApp* NoApp::instance()
 {
-    return *s_pZNC;
+    return s_pZNC;
 }
 
 void NoApp::destroyInstance()
@@ -2032,7 +2032,7 @@ NoApp::TrafficStatsMap NoApp::trafficStats(TrafficStatsPair& Users, TrafficStats
 {
     TrafficStatsMap ret;
     ulonglong uiUsers_in, uiUsers_out, uiZNC_in, uiZNC_out;
-    const std::map<NoString, NoUser*>& msUsers = NoApp::instance().userMap();
+    const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
 
     uiUsers_in = uiUsers_out = 0;
     uiZNC_in = bytesRead();
@@ -2159,14 +2159,14 @@ public:
         // dangling pointer to this timer which can crash later on.
         //
         // Unlikely but possible ;)
-        NoAppPrivate::get(&NoApp::instance())->leakConnectQueueTimer(this);
+        NoAppPrivate::get(NoApp::instance())->leakConnectQueueTimer(this);
     }
 
 protected:
     void RunJob() override
     {
         std::list<NoNetwork*> ConnectionQueue;
-        std::list<NoNetwork*>& RealConnectionQueue = NoAppPrivate::get(&NoApp::instance())->connectQueue;
+        std::list<NoNetwork*>& RealConnectionQueue = NoAppPrivate::get(NoApp::instance())->connectQueue;
 
         // Problem: If a network can't connect right now because e.g. it
         // is throttled, it will re-insert itself into the connection
@@ -2193,7 +2193,7 @@ protected:
 
         if (RealConnectionQueue.empty()) {
             NO_DEBUG("ConnectQueueTimer done");
-            NoAppPrivate::get(&NoApp::instance())->disableConnectQueue();
+            NoAppPrivate::get(NoApp::instance())->disableConnectQueue();
         }
     }
 };

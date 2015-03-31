@@ -27,7 +27,7 @@ public:
     NoModulePrivate(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
         : type(eType),
           handle(pDLL),
-          manager(NoApp::instance().manager()),
+          manager(noApp->manager()),
           user(pUser),
           network(pNetwork),
           client(nullptr),

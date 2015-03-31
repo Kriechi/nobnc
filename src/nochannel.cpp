@@ -760,7 +760,7 @@ void NoChannel::setKey(const NoString& s)
     if (d->key != s) {
         d->key = s;
         if (d->inConfig) {
-            NoApp::instance().setConfigState(NoApp::ConfigNeedWrite);
+            noApp->setConfigState(NoApp::ConfigNeedWrite);
         }
     }
 }
@@ -815,7 +815,7 @@ void NoChannel::setInConfig(bool b)
     if (d->inConfig != b) {
         d->inConfig = b;
         if (d->inConfig) {
-            NoApp::instance().setConfigState(NoApp::ConfigNeedWrite);
+            noApp->setConfigState(NoApp::ConfigNeedWrite);
         }
     }
 }

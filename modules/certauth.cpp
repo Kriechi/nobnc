@@ -52,7 +52,7 @@ public:
 
     bool onBoot() override
     {
-        const std::vector<NoListener*>& vListeners = NoApp::instance().listeners();
+        const std::vector<NoListener*>& vListeners = noApp->listeners();
         std::vector<NoListener*>::const_iterator it;
 
         // We need the SSL_VERIFY_PEER flag on all listeners, or else
@@ -62,7 +62,7 @@ public:
 
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
-            if (NoApp::instance().findUser(key) == nullptr) {
+            if (noApp->findUser(key) == nullptr) {
                 NO_DEBUG("Unknown user in saved data [" + key + "]");
                 continue;
             }
@@ -120,7 +120,7 @@ public:
     {
         const NoString sUser = Auth->username();
         NoSocket* pSock = Auth->socket();
-        NoUser* pUser = NoApp::instance().findUser(sUser);
+        NoUser* pUser = noApp->findUser(sUser);
 
         if (pSock == nullptr || pUser == nullptr)
             return CONTINUE;

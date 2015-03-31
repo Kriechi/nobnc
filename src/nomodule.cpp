@@ -37,7 +37,7 @@ NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, cons
     } else if (pUser) {
         d->savePath = pUser->userPath() + "/moddata/" + sModName;
     } else {
-        d->savePath = NoApp::instance().appPath() + "/moddata/" + sModName;
+        d->savePath = noApp->appPath() + "/moddata/" + sModName;
     }
 }
 

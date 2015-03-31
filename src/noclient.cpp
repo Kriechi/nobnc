@@ -56,7 +56,7 @@
                     (USER)->loader()->unloadModule(MOD);                    \
                 }                                                           \
             }                                                               \
-        } else if ((pModule = NoApp::instance().loader()->findModule(MOD))) { \
+        } else if ((pModule = noApp->loader()->findModule(MOD))) { \
             try {                                                           \
                 pModule->setClient(CLIENT);                                 \
                 pModule->setNetwork(NETWORK);                               \
@@ -67,7 +67,7 @@
                 pModule->setUser(nullptr);                                  \
             } catch (const NoModule::ModException& e) {                     \
                 if (e == NoModule::UNLOAD) {                                \
-                    NoApp::instance().loader()->unloadModule(MOD);            \
+                    noApp->loader()->unloadModule(MOD);            \
                 }                                                           \
             }                                                               \
         } else {                                                            \
@@ -724,7 +724,7 @@ void NoClient::statusCtcp(const NoString& sLine)
 
 bool NoClient::sendMotd()
 {
-    NoStringVector vsMotd = NoApp::instance().motd();
+    NoStringVector vsMotd = noApp->motd();
 
     if (!vsMotd.size()) {
         return false;
@@ -748,7 +748,7 @@ void NoClient::authUser()
 
     d->authenticator = std::make_shared<NoClientAuth>(this, d->username, d->password);
 
-    NoApp::instance().authUser(d->authenticator);
+    noApp->authUser(d->authenticator);
 }
 
 void NoClient::refuseLogin(const NoString& sReason)

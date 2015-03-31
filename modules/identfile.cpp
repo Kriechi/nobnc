@@ -99,13 +99,13 @@ public:
     void SetIRCSock(NoIrcSocket* pIRCSock)
     {
         if (m_pIRCSock) {
-            NoApp::instance().resumeConnectQueue();
+            noApp->resumeConnectQueue();
         }
 
         m_pIRCSock = pIRCSock;
 
         if (m_pIRCSock) {
-            NoApp::instance().pauseConnectQueue();
+            noApp->pauseConnectQueue();
         }
     }
 

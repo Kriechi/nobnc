@@ -510,7 +510,7 @@ void FinishConnect(NoSocketManager* manager,
     C.SetIsSSL(bSSL);
     C.SetBindHost(sBindHost);
 #ifdef HAVE_LIBSSL
-    NoString sCipher = NoApp::instance().sslCiphers();
+    NoString sCipher = noApp->sslCiphers();
     if (sCipher.empty()) {
         sCipher = ZNC_DefaultCipher;
     }

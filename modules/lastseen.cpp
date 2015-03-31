@@ -58,7 +58,7 @@ private:
             return;
         }
 
-        const MUsers& mUsers = NoApp::instance().userMap();
+        const MUsers& mUsers = noApp->userMap();
         MUsers::const_iterator it;
         NoTable Table;
 
@@ -114,11 +114,11 @@ public:
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            NoModuleLoader* GModules = NoApp::instance().loader();
+            NoModuleLoader* GModules = noApp->loader();
             Tmpl["WebAdminLoaded"] = NoString(GModules->findModule("webadmin") != nullptr);
 
             MTimeMulti mmSorted;
-            const MUsers& mUsers = NoApp::instance().userMap();
+            const MUsers& mUsers = noApp->userMap();
 
             for (MUsers::const_iterator uit = mUsers.begin(); uit != mUsers.end(); ++uit) {
                 mmSorted.insert(std::pair<time_t, NoUser*>(GetTime(uit->second), uit->second));
@@ -142,7 +142,7 @@ public:
     bool onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/user" && WebSock.session()->isAdmin()) {
-            NoUser* pUser = NoApp::instance().findUser(Tmpl["Username"]);
+            NoUser* pUser = noApp->findUser(Tmpl["Username"]);
             if (pUser) {
                 Tmpl["LastSeen"] = FormatLastSeen(pUser);
             }

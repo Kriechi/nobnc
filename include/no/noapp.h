@@ -35,6 +35,8 @@ class NoFile;
 class NoListener;
 class NoAppPrivate;
 
+#define noApp NoApp::instance()
+
 class NO_EXPORT NoApp
 {
 public:
@@ -119,7 +121,7 @@ public:
     uint disabledSslProtocols() const;
 
     static void createInstance();
-    static NoApp& instance();
+    static NoApp* instance();
     static void destroyInstance();
 
     NoUser* findUser(const NoString& sUsername);

@@ -154,11 +154,11 @@ static void signalHandler(int sig)
     switch (sig) {
     case SIGHUP:
         No::printMessage("Caught SIGHUP");
-        NoApp::instance().setConfigState(NoApp::ConfigNeedRehash);
+        noApp->setConfigState(NoApp::ConfigNeedRehash);
         break;
     case SIGUSR1:
         No::printMessage("Caught SIGUSR1");
-        NoApp::instance().setConfigState(NoApp::ConfigNeedVerboseWrite);
+        noApp->setConfigState(NoApp::ConfigNeedVerboseWrite);
         break;
     default:
         No::printMessage("WTF? Signal handler called for a signal it doesn't know?");
@@ -268,7 +268,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    NoApp* pZNC = &NoApp::instance();
+    NoApp* pZNC = NoApp::instance();
     pZNC->initDirs(((argc) ? argv[0] : ""), sDataDir);
 
 #ifdef HAVE_LIBSSL

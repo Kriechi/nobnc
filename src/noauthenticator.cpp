@@ -68,7 +68,7 @@ void NoAuthenticator::refuseLogin(const NoString& reason)
     if (!d->socket)
         return;
 
-    NoUser* user = NoApp::instance().findUser(d->username);
+    NoUser* user = noApp->findUser(d->username);
 
     // If the username is valid, notify that user that someone tried to
     // login. Use reason because there are other reasons than "wrong

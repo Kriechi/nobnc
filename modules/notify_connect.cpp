@@ -41,7 +41,7 @@ public:
 private:
     void SendAdmins(const NoString& msg)
     {
-        NoApp::instance().broadcast(msg, true, nullptr, client());
+        noApp->broadcast(msg, true, nullptr, client());
     }
 };
 

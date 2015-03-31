@@ -293,8 +293,8 @@ NoWebSocket::~NoWebSocket()
         pUser->addBytesWritten(bytesWritten());
         pUser->addBytesRead(bytesRead());
     } else {
-        NoApp::instance().addBytesWritten(bytesWritten());
-        NoApp::instance().addBytesRead(bytesRead());
+        noApp->addBytesWritten(bytesWritten());
+        noApp->addBytesRead(bytesRead());
     }
 
     // bytes have been accounted for, so make sure they don't get again:
@@ -341,7 +341,7 @@ void NoWebSocket::availableSkins(NoStringVector& vRet) const
 
 NoStringVector NoWebSocket::directories(NoModule* pModule, bool bIsTemplate)
 {
-    NoString sHomeSkinsDir(NoApp::instance().appPath() + "/webskins/");
+    NoString sHomeSkinsDir(noApp->appPath() + "/webskins/");
     NoString sSkinName(skinName());
     NoStringVector vsResult;
 
@@ -431,7 +431,7 @@ void NoWebSocket::setVars()
     session()->clearMessageLoops();
 
     // Global Mods
-    NoModuleLoader* vgMods = NoApp::instance().loader();
+    NoModuleLoader* vgMods = noApp->loader();
     for (NoModule* pgMod : vgMods->modules()) {
         addModuleLoop("GlobalModLoop", *pgMod);
     }
@@ -597,10 +597,10 @@ NoWebSocket::PageRequest NoWebSocket::printTemplate(const NoString& sPageName, N
 
 NoString NoWebSocket::skinPath(const NoString& sSkinName)
 {
-    NoString sRet = NoApp::instance().appPath() + "/webskins/" + sSkinName;
+    NoString sRet = noApp->appPath() + "/webskins/" + sSkinName;
 
     if (!NoFile(sRet).IsDir()) {
-        sRet = NoApp::instance().currentPath() + "/webskins/" + sSkinName;
+        sRet = noApp->currentPath() + "/webskins/" + sSkinName;
 
         if (!NoFile(sRet).IsDir()) {
             sRet = NoString(_SKINDIR_) + "/" + sSkinName;
@@ -679,7 +679,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
     //
     // When their IP is wrong, we give them an invalid cookie. This makes
     // sure that they will get a new cookie on their next request.
-    if (NoApp::instance().protectWebSessions() && session()->host() != remoteAddress()) {
+    if (noApp->protectWebSessions() && session()->host() != remoteAddress()) {
         NO_DEBUG("Expected IP: " << session()->host());
         NO_DEBUG("Remote IP:   " << remoteAddress());
         sendCookie("SessionId", "WRONG_IP_FOR_SESSION");
@@ -817,7 +817,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
 
         switch (eModType) {
         case No::GlobalModule:
-            pModule = NoApp::instance().loader()->findModule(m_modName);
+            pModule = noApp->loader()->findModule(m_modName);
             break;
         case No::UserModule:
             pModule = session()->user()->loader()->findModule(m_modName);
@@ -980,7 +980,7 @@ bool NoWebSocket::onLogin(const NoString& sUser, const NoString& sPass, bool bBa
     // Some authentication module could need some time, block this socket
     // until then. CWebAuth will UnPauseRead().
     pauseRead();
-    NoApp::instance().authUser(m_authenticator);
+    noApp->authUser(m_authenticator);
 
     // If CWebAuth already set this, don't change it.
     return isLoggedIn();
@@ -1002,5 +1002,5 @@ NoString NoWebSocket::skinName()
         return spSession->user()->skinName();
     }
 
-    return NoApp::instance().skinName();
+    return noApp->skinName();
 }

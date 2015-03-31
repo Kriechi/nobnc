@@ -47,7 +47,7 @@ public:
 
     void LoadUsers()
     {
-        const std::map<NoString, NoUser*>& vUsers = NoApp::instance().userMap();
+        const std::map<NoString, NoUser*>& vUsers = noApp->userMap();
         for (const auto& user : vUsers) {
             LoadUser(user.second);
         }

@@ -159,7 +159,7 @@ class NoAdminMod : public NoModule
     {
         if (sUsername.equals("$me") || sUsername.equals("$user"))
             return user();
-        NoUser* pUser = NoApp::instance().findUser(sUsername);
+        NoUser* pUser = noApp->findUser(sUsername);
         if (!pUser) {
             putModule("Error: User [" + sUsername + "] not found.");
             return nullptr;
@@ -300,7 +300,7 @@ class NoAdminMod : public NoModule
                     return;
                 }
 
-                const NoStringVector& vsHosts = NoApp::instance().bindHosts();
+                const NoStringVector& vsHosts = noApp->bindHosts();
                 if (!user()->isAdmin() && !vsHosts.empty()) {
                     NoStringVector::const_iterator it;
                     bool bFound = false;
@@ -356,7 +356,7 @@ class NoAdminMod : public NoModule
             if (pUser->setBufferCount(i, user()->isAdmin())) {
                 putModule("BufferCount = " + sValue);
             } else {
-                putModule("Setting failed, limit is " + NoString(NoApp::instance().maxBufferSize()));
+                putModule("Setting failed, limit is " + NoString(noApp->maxBufferSize()));
             }
         } else if (sVar == "keepbuffer") { // XXX compatibility crap, added in 0.207
             bool b = !sValue.toBool();
@@ -545,7 +545,7 @@ class NoAdminMod : public NoModule
                     return;
                 }
 
-                const NoStringVector& vsHosts = NoApp::instance().bindHosts();
+                const NoStringVector& vsHosts = noApp->bindHosts();
                 if (!user()->isAdmin() && !vsHosts.empty()) {
                     NoStringVector::const_iterator it;
                     bool bFound = false;
@@ -757,7 +757,7 @@ class NoAdminMod : public NoModule
                 if (pChan->setBufferCount(i, user()->isAdmin())) {
                     putModule(pChan->name() + ": Buffer = " + sValue);
                 } else {
-                    putModule("Setting failed, limit is " + NoString(NoApp::instance().maxBufferSize()));
+                    putModule("Setting failed, limit is " + NoString(noApp->maxBufferSize()));
                     return;
                 }
             } else if (sVar == "inconfig") {
@@ -796,7 +796,7 @@ class NoAdminMod : public NoModule
         if (!user()->isAdmin())
             return;
 
-        const std::map<NoString, NoUser*>& msUsers = NoApp::instance().userMap();
+        const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
         NoTable Table;
         Table.addColumn("Username");
         Table.addColumn("Realname");
@@ -836,7 +836,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (NoApp::instance().findUser(sUsername)) {
+        if (noApp->findUser(sUsername)) {
             putModule("Error: User [" + sUsername + "] already exists!");
             return;
         }
@@ -846,7 +846,7 @@ class NoAdminMod : public NoModule
         pNewUser->setPassword(NoUser::saltedHash(sPassword, sSalt), NoUser::HashDefault, sSalt);
 
         NoString sErr;
-        if (!NoApp::instance().addUser(pNewUser, sErr)) {
+        if (!noApp->addUser(pNewUser, sErr)) {
             delete pNewUser;
             putModule("Error: User not added! [" + sErr + "]");
             return;
@@ -869,7 +869,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* pUser = NoApp::instance().findUser(sUsername);
+        NoUser* pUser = noApp->findUser(sUsername);
 
         if (!pUser) {
             putModule("Error: User [" + sUsername + "] does not exist!");
@@ -881,7 +881,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (!NoApp::instance().deleteUser(pUser->userName())) {
+        if (!noApp->deleteUser(pUser->userName())) {
             // This can't happen, because we got the user from FindUser()
             putModule("Error: Internal error!");
             return;
@@ -905,7 +905,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* pOldUser = NoApp::instance().findUser(sOldUsername);
+        NoUser* pOldUser = noApp->findUser(sOldUsername);
 
         if (!pOldUser) {
             putModule("Error: User [" + sOldUsername + "] not found!");
@@ -920,7 +920,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (!NoApp::instance().addUser(pNewUser, sError)) {
+        if (!noApp->addUser(pNewUser, sError)) {
             delete pNewUser;
             putModule("Error: User not added! [" + sError + "]");
             return;

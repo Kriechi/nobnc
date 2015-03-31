@@ -183,10 +183,10 @@ NoNetwork::NoNetwork(NoUser* pUser, const NoString& sName) : d(new NoNetworkPriv
     d->noticeBuffer.setLimit(250, true);
 
     d->pingTimer = new NoNetworkPingTimer(this);
-    NoApp::instance().manager()->addCron(d->pingTimer);
+    noApp->manager()->addCron(d->pingTimer);
 
     d->joinTimer = new NoNetworkJoinTimer(this);
-    NoApp::instance().manager()->addCron(d->joinTimer);
+    noApp->manager()->addCron(d->joinTimer);
 
     setEnabled(true);
 }
@@ -306,13 +306,13 @@ void NoNetwork::clone(const NoNetwork& Network, bool bCloneName)
 NoNetwork::~NoNetwork()
 {
     if (d->socket) {
-        NoApp::instance().manager()->removeSocket(d->socket);
+        noApp->manager()->removeSocket(d->socket);
         d->socket = nullptr;
     }
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::instance().manager()->removeSocket(d->clients[0]->socket());
+        noApp->manager()->removeSocket(d->clients[0]->socket());
     }
     d->clients.clear();
 
@@ -338,10 +338,10 @@ NoNetwork::~NoNetwork()
     setUser(nullptr);
 
     // Make sure we are not in the connection queue
-    NoAppPrivate::get(&NoApp::instance())->connectQueue.remove(this);
+    NoAppPrivate::get(NoApp::instance())->connectQueue.remove(this);
 
-    NoApp::instance().manager()->removeCron(d->pingTimer);
-    NoApp::instance().manager()->removeCron(d->joinTimer);
+    noApp->manager()->removeCron(d->pingTimer);
+    noApp->manager()->removeCron(d->joinTimer);
 }
 
 void NoNetwork::delServers()
@@ -1326,19 +1326,19 @@ bool NoNetwork::connect()
     if (!pServer)
         return false;
 
-    if (NoApp::instance().serverThrottle(pServer->host())) {
+    if (noApp->serverThrottle(pServer->host())) {
         // Can't connect right now, schedule retry later
-        NoApp::instance().addNetworkToQueue(this);
+        noApp->addNetworkToQueue(this);
         return false;
     }
 
-    NoApp::instance().addServerThrottle(pServer->host());
+    noApp->addServerThrottle(pServer->host());
 
     bool bSSL = pServer->isSsl();
 #ifndef HAVE_LIBSSL
     if (bSSL) {
         putStatus("Cannot connect to [" + pServer->GetString(false) + "], ZNC is not compiled with SSL.");
-        NoApp::instance().AddNetworkToQueue(this);
+        noApp->AddNetworkToQueue(this);
         return false;
     }
 #endif
@@ -1355,12 +1355,12 @@ bool NoNetwork::connect()
         NO_DEBUG("Some module aborted the connection attempt");
         putStatus("Some module aborted the connection attempt");
         delete pIRCSock;
-        NoApp::instance().addNetworkToQueue(this);
+        noApp->addNetworkToQueue(this);
         return false;
     }
 
     NoString sSockName = "IRC::" + d->user->userName() + "::" + d->name;
-    NoApp::instance().manager()->connect(pServer->host(), pServer->port(), sSockName, 120, bSSL, bindHost(), pIRCSock);
+    noApp->manager()->connect(pServer->host(), pServer->port(), sSockName, 120, bSSL, bindHost(), pIRCSock);
 
     return true;
 }
@@ -1420,7 +1420,7 @@ void NoNetwork::checkIrcConnect()
 {
     // Do we want to connect?
     if (isEnabled() && ircSocket() == nullptr)
-        NoApp::instance().addNetworkToQueue(this);
+        noApp->addNetworkToQueue(this);
 }
 
 bool NoNetwork::putIrc(const NoString& sLine)

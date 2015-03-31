@@ -99,7 +99,7 @@ public:
 
     std::priority_queue<NoSocketSorter> GetSockets()
     {
-        NoSocketManager* m = NoApp::instance().manager();
+        NoSocketManager* m = noApp->manager();
         std::priority_queue<NoSocketSorter> ret;
 
         for (NoSocket* pSock : m->sockets())
@@ -120,7 +120,7 @@ public:
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "index") {
-            if (NoApp::instance().manager()->sockets().empty()) {
+            if (noApp->manager()->sockets().empty()) {
                 return false;
             }
 
@@ -226,7 +226,7 @@ public:
 
     void ShowSocks(bool bShowHosts)
     {
-        if (NoApp::instance().manager()->sockets().empty()) {
+        if (noApp->manager()->sockets().empty()) {
             putStatus("You have no open sockets.");
             return;
         }

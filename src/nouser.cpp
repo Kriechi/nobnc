@@ -112,10 +112,10 @@ NoUser::NoUser(const NoString& sUserName) : d(new NoUserPrivate)
     d->cleanUserName = makeCleanUserName(sUserName);
     d->ident = d->cleanUserName;
     d->realName = sUserName;
-    d->userPath = NoApp::instance().userPath() + "/" + sUserName;
+    d->userPath = noApp->userPath() + "/" + sUserName;
     d->modules = new NoModuleLoader;
     d->userTimer = new NoUserTimer(this);
-    NoApp::instance().manager()->addCron(d->userTimer);
+    noApp->manager()->addCron(d->userTimer);
 }
 
 NoUser::~NoUser()
@@ -127,7 +127,7 @@ NoUser::~NoUser()
 
     // Delete clients
     while (!d->clients.empty()) {
-        NoApp::instance().manager()->removeSocket(d->clients[0]->socket());
+        noApp->manager()->removeSocket(d->clients[0]->socket());
     }
     d->clients.clear();
 
@@ -135,10 +135,10 @@ NoUser::~NoUser()
     delete d->modules;
     d->modules = nullptr;
 
-    NoApp::instance().manager()->removeCron(d->userTimer);
+    noApp->manager()->removeCron(d->userTimer);
 
-    NoApp::instance().addBytesRead(bytesRead());
-    NoApp::instance().addBytesWritten(bytesWritten());
+    noApp->addBytesRead(bytesRead());
+    noApp->addBytesWritten(bytesWritten());
 }
 
 template <class T>
@@ -574,7 +574,7 @@ NoString& NoUser::expandString(const NoString& sStr, NoString& sRet) const
     sRet.replace("%bindhost%", bindHost());
     sRet.replace("%version%", NoApp::version());
     sRet.replace("%time%", sTime);
-    sRet.replace("%uptime%", NoApp::instance().uptime());
+    sRet.replace("%uptime%", noApp->uptime());
     // The following lines do not exist. You must be on DrUgS!
     sRet.replace("%znc%", "All your IRC are belong to ZNC");
     // Chosen by fair zocchihedron dice roll by SilverLeo
@@ -942,7 +942,7 @@ NoSettings NoUser::toConfig() const
     config.AddKeyValuePair("BindHost", bindHost());
     config.AddKeyValuePair("DCCBindHost", dccBindHost());
     config.AddKeyValuePair("QuitMsg", quitMsg());
-    if (NoApp::instance().statusPrefix() != statusPrefix())
+    if (noApp->statusPrefix() != statusPrefix())
         config.AddKeyValuePair("StatusPrefix", statusPrefix());
     config.AddKeyValuePair("Skin", skinName());
     config.AddKeyValuePair("ChanModes", defaultChanModes());
@@ -1013,7 +1013,7 @@ bool NoUser::checkPass(const NoString& sPass) const
 
 /*NoClient* NoUser::client() {
     // Todo: optimize this by saving a pointer to the sock
-    NoSocketManager& Manager = NoApp::instance().manager();
+    NoSocketManager& Manager = noApp->manager();
     NoString sSockName = "USR::" + d->sUserName;
 
     for (uint a = 0; a < Manager.size(); a++) {
@@ -1025,7 +1025,7 @@ bool NoUser::checkPass(const NoString& sPass) const
         }
     }
 
-    return (NoClient*) NoApp::instance().manager()->FindSockByName(sSockName);
+    return (NoClient*) noApp->manager()->FindSockByName(sSockName);
 }*/
 
 NoString NoUser::localDccIp() const
@@ -1168,7 +1168,7 @@ bool NoUser::loadModule(const NoString& sModName, const NoString& sArgs, const N
     NoString sModRet;
 
     NoModuleInfo ModInfo;
-    if (!NoApp::instance().loader()->moduleInfo(ModInfo, sModName, sModRet)) {
+    if (!noApp->loader()->moduleInfo(ModInfo, sModName, sModRet)) {
         sError = "Unable to find modinfo [" + sModName + "] [" + sModRet + "]";
         return false;
     }
@@ -1337,7 +1337,7 @@ std::vector<NoClient*> NoUser::userClients() const
 
 bool NoUser::setBufferCount(uint u, bool bForce)
 {
-    if (!bForce && u > NoApp::instance().maxBufferSize())
+    if (!bForce && u > noApp->maxBufferSize())
         return false;
     for (NoNetwork* pNetwork : d->networks) {
         for (NoChannel* pChan : pNetwork->channels()) {
@@ -1523,7 +1523,7 @@ uint NoUser::maxJoins() const
 {
     return d->maxJoins;
 }
-// NoString NoUser::GetSkinName() const { return (!d->sSkinName.empty()) ? d->sSkinName : NoApp::instance().GetSkinName(); }
+// NoString NoUser::GetSkinName() const { return (!d->sSkinName.empty()) ? d->sSkinName : noApp->GetSkinName(); }
 NoString NoUser::skinName() const
 {
     return d->skinName;
