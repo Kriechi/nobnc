@@ -85,7 +85,7 @@ public:
                    "Show the list of active sockets. Pass -n to show IP addresses");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
 #ifndef MOD_LISTSOCKETS_ALLOW_EVERYONE
         if (!user()->isAdmin()) {
@@ -147,12 +147,12 @@ public:
         return false;
     }
 
-    void OnListCommand(const NoString& sLine)
+    void OnListCommand(const NoString& line)
     {
-        NoString sArg = No::tokens(sLine, 1);
+        NoString arg = No::tokens(line, 1);
 
         bool bShowHosts = true;
-        if (sArg.equals("-n")) {
+        if (arg.equals("-n")) {
             bShowHosts = false;
         }
         ShowSocks(bShowHosts);
@@ -198,30 +198,30 @@ public:
 
     NoString GetRemoteHost(NoSocket* pSocket, bool bShowHosts)
     {
-        NoString sHost;
-        u_short uPort;
+        NoString host;
+        u_short port;
 
         if (!bShowHosts) {
-            sHost = pSocket->remoteAddress();
+            host = pSocket->remoteAddress();
         }
 
         // While connecting, there might be no ip available
-        if (sHost.empty()) {
-            sHost = pSocket->host();
+        if (host.empty()) {
+            host = pSocket->host();
         }
 
         // While connecting, GetRemotePort() would return 0
         if (pSocket->isOutbound()) {
-            uPort = pSocket->port();
+            port = pSocket->port();
         } else {
-            uPort = pSocket->remotePort();
+            port = pSocket->remotePort();
         }
 
-        if (uPort != 0) {
-            return sHost + " " + NoString(uPort);
+        if (port != 0) {
+            return host + " " + NoString(port);
         }
 
-        return sHost;
+        return host;
     }
 
     void ShowSocks(bool bShowHosts)

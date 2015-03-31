@@ -29,13 +29,13 @@
 #include "nomodulesocket.h"
 #include <dlfcn.h>
 
-NoModule::NoModule(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
-    : d(new NoModulePrivate(pDLL, pUser, pNetwork, sModName, sDataDir, eType))
+NoModule::NoModule(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
+    : d(new NoModulePrivate(pDLL, user, network, sModName, sDataDir, eType))
 {
-    if (pNetwork) {
-        d->savePath = pNetwork->networkPath() + "/moddata/" + sModName;
-    } else if (pUser) {
-        d->savePath = pUser->userPath() + "/moddata/" + sModName;
+    if (network) {
+        d->savePath = network->networkPath() + "/moddata/" + sModName;
+    } else if (user) {
+        d->savePath = user->userPath() + "/moddata/" + sModName;
     } else {
         d->savePath = noApp->appPath() + "/moddata/" + sModName;
     }
@@ -56,17 +56,17 @@ NoModule::~NoModule()
 #endif
 }
 
-void NoModule::setUser(NoUser* pUser)
+void NoModule::setUser(NoUser* user)
 {
-    d->user = pUser;
+    d->user = user;
 }
-void NoModule::setNetwork(NoNetwork* pNetwork)
+void NoModule::setNetwork(NoNetwork* network)
 {
-    d->network = pNetwork;
+    d->network = network;
 }
-void NoModule::setClient(NoClient* pClient)
+void NoModule::setClient(NoClient* client)
 {
-    d->client = pClient;
+    d->client = client;
 }
 
 void NoModule::unload()
@@ -74,25 +74,25 @@ void NoModule::unload()
     throw UNLOAD;
 }
 
-NoString NoModule::expandString(const NoString& sStr) const
+NoString NoModule::expandString(const NoString& str) const
 {
-    NoString sRet;
-    return expandString(sStr, sRet);
+    NoString ret;
+    return expandString(str, ret);
 }
 
-NoString& NoModule::expandString(const NoString& sStr, NoString& sRet) const
+NoString& NoModule::expandString(const NoString& str, NoString& ret) const
 {
-    sRet = sStr;
+    ret = str;
 
     if (d->network) {
-        return d->network->expandString(sRet, sRet);
+        return d->network->expandString(ret, ret);
     }
 
     if (d->user) {
-        return d->user->expandString(sRet, sRet);
+        return d->user->expandString(ret, ret);
     }
 
-    return sRet;
+    return ret;
 }
 
 void NoModule::setType(No::ModuleType eType)
@@ -229,10 +229,10 @@ void NoModule::listTimers()
     putModule(Table);
 }
 
-NoModuleSocket* NoModule::findSocket(const NoString& sName) const
+NoModuleSocket* NoModule::findSocket(const NoString& name) const
 {
     for (NoModuleSocket* pSocket : d->sockets) {
-        if (pSocket->name().equals(sName)) {
+        if (pSocket->name().equals(name)) {
             return pSocket;
         }
     }
@@ -327,16 +327,14 @@ bool NoModule::addCommand(const NoModuleCommand& Command)
     return true;
 }
 
-bool NoModule::addCommand(const NoString& sCmd, NoModuleCommand::ModCmdFunc func, const NoString& sArgs, const NoString& sDesc)
+bool NoModule::addCommand(const NoString& cmd, NoModuleCommand::ModCmdFunc func, const NoString& args, const NoString& desc)
 {
-    NoModuleCommand cmd(sCmd, this, func, sArgs, sDesc);
-    return addCommand(cmd);
+    return addCommand(NoModuleCommand(cmd, this, func, args, desc));
 }
 
-bool NoModule::addCommand(const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, std::function<void(const NoString& sLine)> func)
+bool NoModule::addCommand(const NoString& cmd, const NoString& args, const NoString& desc, std::function<void(const NoString& line)> func)
 {
-    NoModuleCommand cmd(sCmd, std::move(func), sArgs, sDesc);
-    return addCommand(std::move(cmd));
+    return addCommand(std::move(NoModuleCommand(cmd, std::move(func), args, desc)));
 }
 
 void NoModule::addHelpCommand()
@@ -344,50 +342,50 @@ void NoModule::addHelpCommand()
     addCommand("Help", &NoModule::handleHelpCommand, "search", "Generate this output");
 }
 
-bool NoModule::removeCommand(const NoString& sCmd)
+bool NoModule::removeCommand(const NoString& cmd)
 {
-    return d->commands.erase(sCmd) > 0;
+    return d->commands.erase(cmd) > 0;
 }
 
-const NoModuleCommand* NoModule::findCommand(const NoString& sCmd) const
+const NoModuleCommand* NoModule::findCommand(const NoString& cmd) const
 {
     for (const auto& it : d->commands) {
-        if (!it.first.equals(sCmd))
+        if (!it.first.equals(cmd))
             continue;
         return &it.second;
     }
     return nullptr;
 }
 
-bool NoModule::handleCommand(const NoString& sLine)
+bool NoModule::handleCommand(const NoString& line)
 {
-    const NoString& sCmd = No::token(sLine, 0);
-    const NoModuleCommand* pCmd = findCommand(sCmd);
+    const NoString& cmd = No::token(line, 0);
+    const NoModuleCommand* pCmd = findCommand(cmd);
 
     if (pCmd) {
-        pCmd->call(sLine);
+        pCmd->call(line);
         return true;
     }
 
-    onUnknownModCommand(sLine);
+    onUnknownModCommand(line);
 
     return false;
 }
 
-void NoModule::handleHelpCommand(const NoString& sLine)
+void NoModule::handleHelpCommand(const NoString& line)
 {
-    NoString sFilter = No::token(sLine, 1).toLower();
+    NoString filter = No::token(line, 1).toLower();
     NoTable Table;
 
     NoModuleCommand::initHelp(Table);
     for (const auto& it : d->commands) {
-        NoString sCmd = it.second.command().toLower();
-        if (sFilter.empty() || (sCmd.startsWith(sFilter, No::CaseSensitive)) || No::wildCmp(sCmd, sFilter)) {
+        NoString cmd = it.second.command().toLower();
+        if (filter.empty() || (cmd.startsWith(filter, No::CaseSensitive)) || No::wildCmp(cmd, filter)) {
             it.second.addHelp(Table);
         }
     }
     if (Table.isEmpty()) {
-        putModule("No matches for '" + sFilter + "'");
+        putModule("No matches for '" + filter + "'");
     } else {
         putModule(Table);
     }
@@ -424,7 +422,7 @@ bool NoModule::onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageN
 }
 // !Webmods
 
-bool NoModule::onLoad(const NoString& sArgs, NoString& sMessage)
+bool NoModule::onLoad(const NoString& args, NoString& sMessage)
 {
     sMessage = "";
     return true;
@@ -467,7 +465,7 @@ NoModule::ModRet NoModule::onIrcConnecting(NoIrcSocket* IRCSock)
 void NoModule::onIrcConnectionError(NoIrcSocket* IRCSock)
 {
 }
-NoModule::ModRet NoModule::onIrcRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName)
+NoModule::ModRet NoModule::onIrcRegistration(NoString& pass, NoString& nick, NoString& ident, NoString& sRealName)
 {
     return CONTINUE;
 }
@@ -501,15 +499,15 @@ void NoModule::onDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& 
     if (pOpNick)
         onDevoice(*pOpNick, Nick, Channel, bNoChange);
 }
-void NoModule::onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs)
+void NoModule::onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& args)
 {
     if (pOpNick)
-        onRawMode(*pOpNick, Channel, sModes, sArgs);
+        onRawMode(*pOpNick, Channel, sModes, args);
 }
-void NoModule::onMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange)
+void NoModule::onMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, const NoString& arg, bool bAdded, bool bNoChange)
 {
     if (pOpNick)
-        onMode(*pOpNick, Channel, uMode, sArg, bAdded, bNoChange);
+        onMode(*pOpNick, Channel, uMode, arg, bAdded, bNoChange);
 }
 
 void NoModule::onChanPermission(const NoNick& pOpNick, const NoNick& Nick, NoChannel& Channel, uchar uMode, bool bAdded, bool bNoChange)
@@ -527,19 +525,19 @@ void NoModule::onVoice(const NoNick& pOpNick, const NoNick& Nick, NoChannel& Cha
 void NoModule::onDevoice(const NoNick& pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange)
 {
 }
-void NoModule::onRawMode(const NoNick& pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs)
+void NoModule::onRawMode(const NoNick& pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& args)
 {
 }
-void NoModule::onMode(const NoNick& pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange)
+void NoModule::onMode(const NoNick& pOpNick, NoChannel& Channel, char uMode, const NoString& arg, bool bAdded, bool bNoChange)
 {
 }
 
-NoModule::ModRet NoModule::onRaw(NoString& sLine)
+NoModule::ModRet NoModule::onRaw(NoString& line)
 {
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onStatusCommand(NoString& sCommand)
+NoModule::ModRet NoModule::onStatusCommand(NoString& command)
 {
     return CONTINUE;
 }
@@ -550,11 +548,11 @@ void NoModule::onModCTCP(const NoString& sMessage)
 {
 }
 
-void NoModule::onModCommand(const NoString& sCommand)
+void NoModule::onModCommand(const NoString& command)
 {
-    handleCommand(sCommand);
+    handleCommand(command);
 }
-void NoModule::onUnknownModCommand(const NoString& sLine)
+void NoModule::onUnknownModCommand(const NoString& line)
 {
     if (d->commands.empty())
         // This function is only called if onModCommand wasn't
@@ -565,10 +563,10 @@ void NoModule::onUnknownModCommand(const NoString& sLine)
         putModule("Unknown command!");
 }
 
-void NoModule::onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans)
+void NoModule::onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels)
 {
 }
-void NoModule::onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans)
+void NoModule::onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& channels)
 {
 }
 void NoModule::onKick(const NoNick& Nick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage)
@@ -597,22 +595,22 @@ NoModule::ModRet NoModule::onChanBufferEnding(NoChannel& Chan, NoClient& Client)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine)
+NoModule::ModRet NoModule::onChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& line)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivBufferPlayLine(NoClient& Client, NoString& sLine)
+NoModule::ModRet NoModule::onPrivBufferPlayLine(NoClient& Client, NoString& line)
 {
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv)
+NoModule::ModRet NoModule::onChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& line, const timeval& tv)
 {
-    return onChanBufferPlayLine(Chan, Client, sLine);
+    return onChanBufferPlayLine(Chan, Client, line);
 }
-NoModule::ModRet NoModule::onPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv)
+NoModule::ModRet NoModule::onPrivBufferPlayLine2(NoClient& Client, NoString& line, const timeval& tv)
 {
-    return onPrivBufferPlayLine(Client, sLine);
+    return onPrivBufferPlayLine(Client, line);
 }
 
 void NoModule::onClientLogin()
@@ -621,7 +619,7 @@ void NoModule::onClientLogin()
 void NoModule::onClientDisconnect()
 {
 }
-NoModule::ModRet NoModule::onUserRaw(NoString& sLine)
+NoModule::ModRet NoModule::onUserRaw(NoString& line)
 {
     return CONTINUE;
 }
@@ -719,11 +717,11 @@ NoModule::ModRet NoModule::onDeleteNetwork(NoNetwork& Network)
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onSendToClient(NoString& sLine, NoClient& Client)
+NoModule::ModRet NoModule::onSendToClient(NoString& line, NoClient& Client)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onSendToIrc(NoString& sLine)
+NoModule::ModRet NoModule::onSendToIrc(NoString& line)
 {
     return CONTINUE;
 }
@@ -738,25 +736,25 @@ double NoModule::GetCoreVersion()
     return NO_VERSION;
 }
 
-bool NoModule::onServerCapAvailable(const NoString& sCap)
+bool NoModule::onServerCapAvailable(const NoString& cap)
 {
     return false;
 }
-void NoModule::onServerCapResult(const NoString& sCap, bool bSuccess)
+void NoModule::onServerCapResult(const NoString& cap, bool bSuccess)
 {
 }
 
-bool NoModule::putIrc(const NoString& sLine)
+bool NoModule::putIrc(const NoString& line)
 {
-    return (d->network) ? d->network->putIrc(sLine) : false;
+    return (d->network) ? d->network->putIrc(line) : false;
 }
-bool NoModule::putUser(const NoString& sLine)
+bool NoModule::putUser(const NoString& line)
 {
-    return (d->network) ? d->network->putUser(sLine, d->client) : false;
+    return (d->network) ? d->network->putUser(line, d->client) : false;
 }
-bool NoModule::putStatus(const NoString& sLine)
+bool NoModule::putStatus(const NoString& line)
 {
-    return (d->network) ? d->network->putStatus(sLine, d->client) : false;
+    return (d->network) ? d->network->putStatus(line, d->client) : false;
 }
 uint NoModule::putModule(const NoTable& table)
 {
@@ -768,34 +766,34 @@ uint NoModule::putModule(const NoTable& table)
         putModule(line);
     return lines.size() - 1;
 }
-bool NoModule::putModule(const NoString& sLine)
+bool NoModule::putModule(const NoString& line)
 {
     if (d->client) {
-        d->client->putModule(moduleName(), sLine);
+        d->client->putModule(moduleName(), line);
         return true;
     }
 
     if (d->network) {
-        return d->network->putModule(moduleName(), sLine);
+        return d->network->putModule(moduleName(), line);
     }
 
     if (d->user) {
-        return d->user->putModule(moduleName(), sLine);
+        return d->user->putModule(moduleName(), line);
     }
 
     return false;
 }
-bool NoModule::putModuleNotice(const NoString& sLine)
+bool NoModule::putModuleNotice(const NoString& line)
 {
     if (!d->user)
         return false;
 
     if (d->client) {
-        d->client->putModuleNotice(moduleName(), sLine);
+        d->client->putModuleNotice(moduleName(), line);
         return true;
     }
 
-    return d->user->putModuleNotice(moduleName(), sLine);
+    return d->user->putModuleNotice(moduleName(), line);
 }
 
 NoString NoModule::moduleName() const
@@ -814,7 +812,7 @@ NoModule::ModRet NoModule::onDeleteUser(NoUser& User)
 {
     return CONTINUE;
 }
-void NoModule::onClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort)
+void NoModule::onClientConnect(NoSocket* client, const NoString& host, ushort port)
 {
 }
 NoModule::ModRet NoModule::onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth)
@@ -824,22 +822,22 @@ NoModule::ModRet NoModule::onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth)
 void NoModule::onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP)
 {
 }
-NoModule::ModRet NoModule::onUnknownUserRaw(NoClient* pClient, NoString& sLine)
+NoModule::ModRet NoModule::onUnknownUserRaw(NoClient* client, NoString& line)
 {
     return CONTINUE;
 }
-void NoModule::onClientCapLs(NoClient* pClient, NoStringSet& ssCaps)
+void NoModule::onClientCapLs(NoClient* client, NoStringSet& ssCaps)
 {
 }
-bool NoModule::isClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState)
+bool NoModule::isClientCapSupported(NoClient* client, const NoString& cap, bool bState)
 {
     return false;
 }
-void NoModule::onClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState)
+void NoModule::onClientCapRequest(NoClient* client, const NoString& cap, bool bState)
 {
 }
 NoModule::ModRet
-NoModule::onModuleLoading(const NoString& sModName, const NoString& sArgs, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg)
+NoModule::onModuleLoading(const NoString& sModName, const NoString& args, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg)
 {
     return CONTINUE;
 }
@@ -847,7 +845,7 @@ NoModule::ModRet NoModule::onModuleUnloading(NoModule* pModule, bool& bSuccess, 
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onGetModuleInfo(NoModuleInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg)
+NoModule::ModRet NoModule::onGetModuleInfo(NoModuleInfo& ModInfo, const NoString& module, bool& bSuccess, NoString& sRetMsg)
 {
     return CONTINUE;
 }

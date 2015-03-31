@@ -40,10 +40,10 @@ public:
         m_Messaged.setExpiration(1000 * 120);
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        if (!sArgs.empty()) {
-            SetReply(sArgs);
+        if (!args.empty()) {
+            SetReply(args);
         }
 
         return true;
@@ -65,22 +65,22 @@ public:
         return expandString(sReply);
     }
 
-    void Handle(const NoString& sNick)
+    void Handle(const NoString& nick)
     {
         NoIrcSocket* pIRCSock = network()->ircSocket();
         if (!pIRCSock)
             // WTF?
             return;
-        if (sNick == pIRCSock->nick())
+        if (nick == pIRCSock->nick())
             return;
-        if (m_Messaged.contains(sNick))
+        if (m_Messaged.contains(nick))
             return;
 
         if (network()->isUserAttached())
             return;
 
-        m_Messaged.insert(sNick);
-        putIrc("NOTICE " + sNick + " :" + GetReply());
+        m_Messaged.insert(nick);
+        putIrc("NOTICE " + nick + " :" + GetReply());
     }
 
     ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
@@ -89,14 +89,14 @@ public:
         return CONTINUE;
     }
 
-    void OnShowCommand(const NoString& sCommand)
+    void OnShowCommand(const NoString& command)
     {
         putModule("Current reply is: " + NoRegistry(this).value("Reply") + " (" + GetReply() + ")");
     }
 
-    void OnSetCommand(const NoString& sCommand)
+    void OnSetCommand(const NoString& command)
     {
-        SetReply(No::tokens(sCommand, 1));
+        SetReply(No::tokens(command, 1));
         putModule("New reply set");
     }
 

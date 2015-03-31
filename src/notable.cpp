@@ -23,7 +23,7 @@ class NoTablePrivate
 {
 public:
     uint GetColumnWidth(uint uIdx) const;
-    uint GetColumnIndex(const NoString& sName) const;
+    uint GetColumnIndex(const NoString& name) const;
     NoStringVector Render() const;
     static NoStringVector WrapWords(const NoString& s, uint uWidth);
 
@@ -80,18 +80,18 @@ bool NoTable::isEmpty() const
     return d->rows.empty();
 }
 
-bool NoTable::addColumn(const NoString& sName, bool bWrappable)
+bool NoTable::addColumn(const NoString& name, bool bWrappable)
 {
     for (const NoString& sHeader : d->headers) {
-        if (sHeader.equals(sName)) {
+        if (sHeader.equals(name)) {
             return false;
         }
     }
 
-    d->headers.push_back(sName);
-    d->maxWidths.push_back(sName.size());
+    d->headers.push_back(name);
+    d->maxWidths.push_back(name.size());
     // TODO: Maybe headers can be wrapped too?
-    d->minWidths.push_back(sName.size());
+    d->minWidths.push_back(name.size());
     d->wrappable.push_back(bWrappable);
 
     return true;
@@ -227,10 +227,10 @@ NoStringVector NoTablePrivate::Render() const
             std::ostringstream ssLine;
             ssLine << "|";
             for (uint iCol = 0; iCol < vvsColumns.size(); ++iCol) {
-                const NoString& sData = uCurrentLine < vvsColumns[iCol].size() ? vvsColumns[iCol][uCurrentLine] : sEmpty;
+                const NoString& data = uCurrentLine < vvsColumns[iCol].size() ? vvsColumns[iCol][uCurrentLine] : sEmpty;
                 ssLine << " ";
                 ssLine << std::setw(vuWidth[iCol]) << std::left;
-                ssLine << sData << " |";
+                ssLine << data << " |";
             }
             vsOutput.emplace_back(ssLine.str());
         }
@@ -263,14 +263,14 @@ NoStringVector NoTablePrivate::WrapWords(const NoString& s, uint uWidth)
     return vsResult;
 }
 
-uint NoTablePrivate::GetColumnIndex(const NoString& sName) const
+uint NoTablePrivate::GetColumnIndex(const NoString& name) const
 {
     for (uint i = 0; i < headers.size(); i++) {
-        if (headers[i] == sName)
+        if (headers[i] == name)
             return i;
     }
 
-    NO_DEBUG("NoTable::GetColumnIndex(" + sName + ") failed");
+    NO_DEBUG("NoTable::GetColumnIndex(" + name + ") failed");
 
     return (uint)-1;
 }

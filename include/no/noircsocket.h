@@ -30,7 +30,7 @@ class NoIrcSocketPrivate;
 class NO_EXPORT NoIrcSocket : public NoSocket
 {
 public:
-    NoIrcSocket(NoNetwork* pNetwork);
+    NoIrcSocket(NoNetwork* network);
     virtual ~NoIrcSocket();
 
     enum ChanModeArgs {
@@ -49,9 +49,9 @@ public:
     bool onChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage);
     bool onPrivNotice(NoNick& Nick, NoString& sMessage);
     bool onChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage);
-    bool onServerCapAvailable(const NoString& sCap);
+    bool onServerCapAvailable(const NoString& cap);
 
-    void readLine(const NoString& sData) override;
+    void readLine(const NoString& data) override;
     void onConnected() override;
     void onDisconnected() override;
     void onConnectionRefused() override;
@@ -59,8 +59,8 @@ public:
     void onTimeout() override;
     void onReachedMaxBuffer() override;
 
-    void putIrc(const NoString& sLine);
-    void putIrcQuick(const NoString& sLine); //!< Should be used for PONG only
+    void putIrc(const NoString& line);
+    void putIrcQuick(const NoString& line); //!< Should be used for PONG only
     void resetChans();
     void quit(const NoString& sQuitMsg = "");
 
@@ -93,20 +93,20 @@ public:
     std::set<uchar> userModes() const;
     // This is true if we are past raw 001
     bool isAuthed() const;
-    bool isCapAccepted(const NoString& sCap);
+    bool isCapAccepted(const NoString& cap);
     NoStringMap isupport() const;
     NoString isupport(const NoString& sKey, const NoString& sDefault = "") const;
 
     // This handles NAMESX and UHNAMES in a raw 353 reply
-    void forwardRaw353(const NoString& sLine) const;
-    void forwardRaw353(const NoString& sLine, NoClient* pClient) const;
+    void forwardRaw353(const NoString& line) const;
+    void forwardRaw353(const NoString& line, NoClient* client) const;
 
     // TODO move this function to NoNetwork and make it non-static?
     static bool isFloodProtected(double fRate);
 
 private:
-    void setNick(const NoString& sNick);
-    void parseISupport(const NoString& sLine);
+    void setNick(const NoString& nick);
+    void parseISupport(const NoString& line);
     // This is called when we connect and the nick we want is already taken
     void sendAltNick(const NoString& sBadNick);
     void sendNextCap();

@@ -413,7 +413,7 @@ ssize_t NoFile::Read(char* pszBuffer, int iBytes)
     return res;
 }
 
-bool NoFile::ReadLine(NoString& sData, const NoString& sDelimiter)
+bool NoFile::ReadLine(NoString& data, const NoString& sDelimiter)
 {
     char buff[4096];
     ssize_t iBytes;
@@ -427,7 +427,7 @@ bool NoFile::ReadLine(NoString& sData, const NoString& sDelimiter)
         NoString::size_type iFind = m_buffer.find(sDelimiter);
         if (iFind != NoString::npos) {
             // We found a line, return it
-            sData = m_buffer.substr(0, iFind + sDelimiter.length());
+            data = m_buffer.substr(0, iFind + sDelimiter.length());
             m_buffer.erase(0, iFind + sDelimiter.length());
             return true;
         }
@@ -443,7 +443,7 @@ bool NoFile::ReadLine(NoString& sData, const NoString& sDelimiter)
 
     if (!m_buffer.empty()) {
         // ..but there is still some partial line in the buffer
-        sData = m_buffer;
+        data = m_buffer;
         m_buffer.clear();
         return true;
     }
@@ -452,12 +452,12 @@ bool NoFile::ReadLine(NoString& sData, const NoString& sDelimiter)
     return false;
 }
 
-bool NoFile::ReadFile(NoString& sData, size_t iMaxSize)
+bool NoFile::ReadFile(NoString& data, size_t iMaxSize)
 {
     char buff[4096];
     size_t iBytesRead = 0;
 
-    sData.clear();
+    data.clear();
 
     while (iBytesRead < iMaxSize) {
         ssize_t iBytes = Read(buff, sizeof(buff));
@@ -470,7 +470,7 @@ bool NoFile::ReadFile(NoString& sData, size_t iMaxSize)
             // EOF
             return true;
 
-        sData.append(buff, iBytes);
+        data.append(buff, iBytes);
         iBytesRead += iBytes;
     }
 
@@ -491,9 +491,9 @@ ssize_t NoFile::Write(const char* pszBuffer, size_t iBytes)
     return res;
 }
 
-ssize_t NoFile::Write(const NoString& sData)
+ssize_t NoFile::Write(const NoString& data)
 {
-    return Write(sData.data(), sData.size());
+    return Write(data.data(), data.size());
 }
 void NoFile::Close()
 {

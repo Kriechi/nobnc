@@ -92,8 +92,8 @@ class NoModulePrivate;
  *  @param CLASS The name of your module's class.
  */
 #define MODCONSTRUCTOR(CLASS)                                                                                                                \
-    CLASS(NoModuleHandle pDLL, NoUser* pUser, NoNetwork* pNetwork, const NoString& sModName, const NoString& sModPath, No::ModuleType eType) \
-        : NoModule(pDLL, pUser, pNetwork, sModName, sModPath, eType)
+    CLASS(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& sModName, const NoString& sModPath, No::ModuleType eType) \
+        : NoModule(pDLL, user, network, sModName, sModPath, eType)
 
 /** This works exactly like MODULEDEFS, but for user modules. */
 #define USERMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, No::UserModule)
@@ -137,8 +137,8 @@ class NO_EXPORT NoModule
 {
 public:
     NoModule(NoModuleHandle pDLL,
-             NoUser* pUser,
-             NoNetwork* pNetwork,
+             NoUser* user,
+             NoNetwork* network,
              const NoString& sModName,
              const NoString& sDataDir,
              No::ModuleType eType = No::NetworkModule); // TODO: remove default value in ZNC 2.x
@@ -178,9 +178,9 @@ public:
         UNLOAD
     };
 
-    void setUser(NoUser* pUser);
-    void setNetwork(NoNetwork* pNetwork);
-    void setClient(NoClient* pClient);
+    void setUser(NoUser* user);
+    void setNetwork(NoNetwork* network);
+    void setClient(NoClient* client);
 
     /** This function throws NoModule::UNLOAD which causes this module to be unloaded.
      */
@@ -271,14 +271,14 @@ public:
     /** This module hook is called before loging in to the IRC server. The
      *  low-level connection is established at this point, but SSL
      *  handshakes didn't necessarily finish yet.
-     *  @param sPass The server password that will be used.
-     *  @param sNick The nick that will be used.
-     *  @param sIdent The protocol identity that will be used. This is not
+     *  @param pass The server password that will be used.
+     *  @param nick The nick that will be used.
+     *  @param ident The protocol identity that will be used. This is not
      *                the ident string that is transfered via e.g. oidentd!
      *  @param sRealName The real name that will be used.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onIrcRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName);
+    virtual ModRet onIrcRegistration(NoString& pass, NoString& nick, NoString& ident, NoString& sRealName);
     /** This module hook is called when a message is broadcasted to all users.
      *  @param sMessage The message that is broadcasted.
      *  @return see NoModule::ModRet
@@ -314,44 +314,44 @@ public:
      *  @param pOpNick The nick who changes the channel mode, or nullptr if set by server.
      *  @param Channel The channel whose mode is changed.
      *  @param uMode The mode character that is changed.
-     *  @param sArg The argument to the mode character, if any.
+     *  @param arg The argument to the mode character, if any.
      *  @param bAdded True if this mode is added ("+"), else false.
      *  @param bNoChange True if this mode was already effective before.
      */
-    virtual void onMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange);
-    virtual void onMode(const NoNick& OpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange);
+    virtual void onMode2(const NoNick* pOpNick, NoChannel& Channel, char uMode, const NoString& arg, bool bAdded, bool bNoChange);
+    virtual void onMode(const NoNick& OpNick, NoChannel& Channel, char uMode, const NoString& arg, bool bAdded, bool bNoChange);
     /** Called on any channel mode change. This is called before the more
      *  detailed mode hooks like e.g. onOp() and onMode().
      *  @param pOpNick The nick who changes the channel mode, or nullptr if set by server.
      *  @param Channel The channel whose mode is changed.
      *  @param sModes The raw mode change, e.g. "+s-io".
-     *  @param sArgs All arguments to the mode change from sModes.
+     *  @param args All arguments to the mode change from sModes.
      */
-    virtual void onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs);
-    virtual void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs);
+    virtual void onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& args);
+    virtual void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& args);
 
     /** Called on any raw IRC line received from the <em>IRC server</em>.
-     *  @param sLine The line read from the server.
+     *  @param line The line read from the server.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onRaw(NoString& sLine);
+    virtual ModRet onRaw(NoString& line);
 
     /** Called when a command to *status is sent.
-     *  @param sCommand The command sent.
+     *  @param command The command sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onStatusCommand(NoString& sCommand);
+    virtual ModRet onStatusCommand(NoString& command);
     /** Called when a command to your module is sent, e.g. query to *modname.
-     *  @param sCommand The command that was sent.
+     *  @param command The command that was sent.
      */
-    virtual void onModCommand(const NoString& sCommand);
+    virtual void onModCommand(const NoString& command);
     /** This is similar to onModCommand(), but it is only called if
      * handleCommand didn't find any that wants to handle this. This is only
      * called if handleCommand() is called, which practically means that
      * this is only called if you don't overload onModCommand().
-     *  @param sCommand The command that was sent.
+     *  @param command The command that was sent.
      */
-    virtual void onUnknownModCommand(const NoString& sCommand);
+    virtual void onUnknownModCommand(const NoString& command);
     /** Called when a your module nick was sent a notice.
      *  @param sMessage The message which was sent.
      */
@@ -365,16 +365,16 @@ public:
     /** Called when a nick quit from IRC.
      *  @param Nick The nick which quit.
      *  @param sMessage The quit message.
-     *  @param vChans List of channels which you and nick share.
+     *  @param channels List of channels which you and nick share.
      */
-    virtual void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans);
+    virtual void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels);
     /** Called when a nickname change occurs. If we are changing our nick,
      *  sNewNick will equal m_pIRCSock->GetNick().
      *  @param Nick The nick which changed its nickname
      *  @param sNewNick The new nickname.
-     *  @param vChans Channels which we and nick share.
+     *  @param channels Channels which we and nick share.
      */
-    virtual void onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans);
+    virtual void onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& channels);
     /** Called when a nick is kicked from a channel.
      *  @param OpNick The nick which generated the kick.
      *  @param sKickedNick The nick which was kicked.
@@ -420,31 +420,31 @@ public:
     /** Called when for each line during a channel's buffer play back.
      *  @param Chan The channel this playback is from.
      *  @param Client The client the buffer is played back to.
-     *  @param sLine The current line of buffer playback. This is a raw IRC
+     *  @param line The current line of buffer playback. This is a raw IRC
      *               traffic line!
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& sLine, const timeval& tv);
-    virtual ModRet onChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& sLine);
+    virtual ModRet onChanBufferPlayLine2(NoChannel& Chan, NoClient& Client, NoString& line, const timeval& tv);
+    virtual ModRet onChanBufferPlayLine(NoChannel& Chan, NoClient& Client, NoString& line);
     /** Called when a line from the query buffer is played back.
      *  @param Client The client this line will go to.
-     *  @param sLine The raw IRC traffic line from the buffer.
+     *  @param line The raw IRC traffic line from the buffer.
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivBufferPlayLine2(NoClient& Client, NoString& sLine, const timeval& tv);
-    virtual ModRet onPrivBufferPlayLine(NoClient& Client, NoString& sLine);
+    virtual ModRet onPrivBufferPlayLine2(NoClient& Client, NoString& line, const timeval& tv);
+    virtual ModRet onPrivBufferPlayLine(NoClient& Client, NoString& line);
 
     /** Called when a client successfully logged in to ZNC. */
     virtual void onClientLogin();
     /** Called when a client disconnected from ZNC. */
     virtual void onClientDisconnect();
     /** This module hook is called when a client sends a raw traffic line to ZNC.
-     *  @param sLine The raw traffic line sent.
+     *  @param line The raw traffic line sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onUserRaw(NoString& sLine);
+    virtual ModRet onUserRaw(NoString& line);
     /** This module hook is called when a client sends a CTCP reply.
      *  @param sTarget The target for the CTCP reply. Could be a channel
      *                 name or a nick name.
@@ -581,17 +581,17 @@ public:
     virtual ModRet onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic);
 
     /** Called for every CAP received via CAP LS from server.
-     *  @param sCap capability supported by server.
+     *  @param cap capability supported by server.
      *  @return true if your module supports this CAP and
      *          needs to turn it on with CAP REQ.
      */
-    virtual bool onServerCapAvailable(const NoString& sCap);
+    virtual bool onServerCapAvailable(const NoString& cap);
     /** Called for every CAP accepted or rejected by server
      *  (with CAP ACK or CAP NAK after our CAP REQ).
-     *  @param sCap capability accepted/rejected by server.
+     *  @param cap capability accepted/rejected by server.
      *  @param bSuccess true if capability was accepted, false if rejected.
      */
-    virtual void onServerCapResult(const NoString& sCap, bool bSuccess);
+    virtual void onServerCapResult(const NoString& cap, bool bSuccess);
 
     /** This module hook is called just before ZNC tries to join a channel
      *  by itself because it's in the config but wasn't joined yet.
@@ -614,50 +614,50 @@ public:
     virtual ModRet onDeleteNetwork(NoNetwork& Network);
 
     /** Called when ZNC sends a raw traffic line to a client.
-     *  @param sLine The raw traffic line sent.
+     *  @param line The raw traffic line sent.
      *  @param Client The client this line is sent to.
      *  @warning Calling putUser() from within this hook leads to infinite recursion.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onSendToClient(NoString& sLine, NoClient& Client);
+    virtual ModRet onSendToClient(NoString& line, NoClient& Client);
     /** Called when ZNC sends a raw traffic line to the IRC server.
-     *  @param sLine The raw traffic line sent.
+     *  @param line The raw traffic line sent.
      *  @warning Calling putIrc() from within this hook leads to infinite recursion.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onSendToIrc(NoString& sLine);
+    virtual ModRet onSendToIrc(NoString& line);
 
     NoModuleHandle GetDLL();
     static double GetCoreVersion();
 
     /** This function sends a given raw IRC line to the IRC server, if we
      *  are connected to one. Else this line is discarded.
-     *  @param sLine The line which should be sent.
+     *  @param line The line which should be sent.
      *  @return true if the line was queued for sending.
      */
-    virtual bool putIrc(const NoString& sLine);
+    virtual bool putIrc(const NoString& line);
     /** This function sends a given raw IRC line to a client.
      *  If we are in a module hook which is called for a specific client,
      *  only that client will get the line, else all connected clients will
      *  receive this line.
-     *  @param sLine The line which should be sent.
+     *  @param line The line which should be sent.
      *  @return true if the line was sent to at least one client.
      */
-    virtual bool putUser(const NoString& sLine);
+    virtual bool putUser(const NoString& line);
     /** This function generates a query from *status. If we are in a module
      *  hook for a specific client, only that client gets this message, else
      *  all connected clients will receive it.
-     *  @param sLine The message which should be sent from *status.
+     *  @param line The message which should be sent from *status.
      *  @return true if the line was sent to at least one client.
      */
-    virtual bool putStatus(const NoString& sLine);
+    virtual bool putStatus(const NoString& line);
     /** This function sends a query from your module nick. If we are in a
      *  module hook for a specific client, only that client gets this
      *  message, else all connected clients will receive it.
-     *  @param sLine The message which should be sent.
+     *  @param line The message which should be sent.
      *  @return true if the line was sent to at least one client.
      */
-    virtual bool putModule(const NoString& sLine);
+    virtual bool putModule(const NoString& line);
     /** This function calls NoModule::putModule(const NoString&, const
      *  NoString&, const NoString&) for each line in the table.
      *  @param table The table which should be send.
@@ -667,10 +667,10 @@ public:
     /** Send a notice from your module nick. If we are in a module hook for
      *  a specific client, only that client gets this notice, else all
      *  clients will receive it.
-     *  @param sLine The line which should be sent.
+     *  @param line The line which should be sent.
      *  @return true if the line was sent to at least one client.
      */
-    virtual bool putModuleNotice(const NoString& sLine);
+    virtual bool putModuleNotice(const NoString& line);
 
     /** @returns The name of the module. */
     NoString moduleName() const;
@@ -689,7 +689,7 @@ public:
     NoTimer* findTimer(const NoString& sLabel) const;
     virtual void listTimers();
 
-    NoModuleSocket* findSocket(const NoString& sName) const;
+    NoModuleSocket* findSocket(const NoString& name) const;
     virtual void listSockets();
 
 #ifdef HAVE_PTHREAD
@@ -705,29 +705,29 @@ public:
     /// @return True if the command was successfully added.
     bool addCommand(const NoModuleCommand& Command);
     /// @return True if the command was successfully added.
-    bool addCommand(const NoString& sCmd, NoModuleCommand::ModCmdFunc func, const NoString& sArgs = "", const NoString& sDesc = "");
+    bool addCommand(const NoString& cmd, NoModuleCommand::ModCmdFunc func, const NoString& args = "", const NoString& desc = "");
     /// @return True if the command was successfully added.
-    bool addCommand(const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, std::function<void(const NoString& sLine)> func);
+    bool addCommand(const NoString& cmd, const NoString& args, const NoString& desc, std::function<void(const NoString& line)> func);
     /// @return True if the command was successfully removed.
-    bool removeCommand(const NoString& sCmd);
+    bool removeCommand(const NoString& cmd);
     /// @return The NoModuleCommand instance or nullptr if none was found.
-    const NoModuleCommand* findCommand(const NoString& sCmd) const;
+    const NoModuleCommand* findCommand(const NoString& cmd) const;
     /** This function tries to dispatch the given command via the correct
      * instance of NoModuleCommand. Before this can be called, commands have to
      * be added via addCommand(). If no matching commands are found then
      * OnUnknownModCommand will be called.
-     * @param sLine The command line to handle.
+     * @param line The command line to handle.
      * @return True if something was done, else false.
      */
-    bool handleCommand(const NoString& sLine);
+    bool handleCommand(const NoString& line);
     /** Send a description of all registered commands via putModule().
-     * @param sLine The help command that is being asked for.
+     * @param line The help command that is being asked for.
      */
-    void handleHelpCommand(const NoString& sLine = "");
+    void handleHelpCommand(const NoString& line = "");
 
     NoString savePath() const;
-    NoString expandString(const NoString& sStr) const;
-    NoString& expandString(const NoString& sStr, NoString& sRet) const;
+    NoString expandString(const NoString& str) const;
+    NoString& expandString(const NoString& str, NoString& ret) const;
 
     void setType(No::ModuleType eType);
     void setDescription(const NoString& s);
@@ -767,10 +767,10 @@ public:
     /** This module hook is called when there is an incoming connection on
      *  any of ZNC's listening sockets.
      *  @param pSock The incoming client socket.
-     *  @param sHost The IP the client is connecting from.
-     *  @param uPort The port the client is connecting from.
+     *  @param host The IP the client is connecting from.
+     *  @param port The port the client is connecting from.
      */
-    virtual void onClientConnect(NoSocket* pSock, const NoString& sHost, ushort uPort);
+    virtual void onClientConnect(NoSocket* pSock, const NoString& host, ushort port);
     /** This module hook is called when a client tries to login. If your
      *  module wants to handle the login attempt, it must return
      *  NoModule::ModRet::HALT;
@@ -786,42 +786,42 @@ public:
     /** This function behaves like NoModule::onUserRaw(), but is also called
      *  before the client successfully logged in to ZNC. You should always
      *  prefer to use NoModule::onUserRaw() if possible.
-     *  @param pClient The client which send this line.
-     *  @param sLine The raw traffic line which the client sent.
+     *  @param client The client which send this line.
+     *  @param line The raw traffic line which the client sent.
      */
-    virtual ModRet onUnknownUserRaw(NoClient* pClient, NoString& sLine);
+    virtual ModRet onUnknownUserRaw(NoClient* client, NoString& line);
 
     /** Called when a client told us CAP LS. Use ssCaps.insert("cap-name")
      *  for announcing capabilities which your module supports.
-     *  @param pClient The client which requested the list.
+     *  @param client The client which requested the list.
      *  @param ssCaps set of caps which will be sent to client.
      */
-    virtual void onClientCapLs(NoClient* pClient, NoStringSet& ssCaps);
+    virtual void onClientCapLs(NoClient* client, NoStringSet& ssCaps);
     /** Called only to check if your module supports turning on/off named capability.
-     *  @param pClient The client which wants to enable/disable a capability.
-     *  @param sCap name of capability.
+     *  @param client The client which wants to enable/disable a capability.
+     *  @param cap name of capability.
      *  @param bState On or off, depending on which case is interesting for client.
      *  @return true if your module supports this capability in the specified state.
      */
-    virtual bool isClientCapSupported(NoClient* pClient, const NoString& sCap, bool bState);
+    virtual bool isClientCapSupported(NoClient* client, const NoString& cap, bool bState);
     /** Called when we actually need to turn a capability on or off for a client.
-     *  @param pClient The client which requested the capability.
-     *  @param sCap name of wanted capability.
+     *  @param client The client which requested the capability.
+     *  @param cap name of wanted capability.
      *  @param bState On or off, depending on which case client needs.
      */
-    virtual void onClientCapRequest(NoClient* pClient, const NoString& sCap, bool bState);
+    virtual void onClientCapRequest(NoClient* client, const NoString& cap, bool bState);
 
     /** Called when a module is going to be loaded.
      *  @param sModName name of the module.
      *  @param eType wanted type of the module (user/global).
-     *  @param sArgs arguments of the module.
+     *  @param args arguments of the module.
      *  @param[out] bSuccess the module was loaded successfully
      *                       as result of this module hook?
      *  @param[out] sRetMsg text about loading of the module.
      *  @return See NoModule::ModRet.
      */
     virtual ModRet
-    onModuleLoading(const NoString& sModName, const NoString& sArgs, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg);
+    onModuleLoading(const NoString& sModName, const NoString& args, No::ModuleType eType, bool& bSuccess, NoString& sRetMsg);
     /** Called when a module is going to be unloaded.
      *  @param pModule the module.
      *  @param[out] bSuccess the module was unloaded successfully
@@ -832,12 +832,12 @@ public:
     virtual ModRet onModuleUnloading(NoModule* pModule, bool& bSuccess, NoString& sRetMsg);
     /** Called when info about a module is needed.
      *  @param[out] ModInfo put result here, if your module knows it.
-     *  @param sModule name of the module.
+     *  @param module name of the module.
      *  @param bSuccess this module provided info about the module.
      *  @param sRetMsg text describing possible issues.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onGetModuleInfo(NoModuleInfo& ModInfo, const NoString& sModule, bool& bSuccess, NoString& sRetMsg);
+    virtual ModRet onGetModuleInfo(NoModuleInfo& ModInfo, const NoString& module, bool& bSuccess, NoString& sRetMsg);
     /** Called when list of available mods is requested.
      *  @param ssMods put new modules here.
      *  @param bGlobal true if global modules are needed.

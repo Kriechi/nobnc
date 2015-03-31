@@ -31,7 +31,7 @@ class NoModule;
 class NO_EXPORT NoModuleJob : public NoJob
 {
 public:
-    NoModuleJob(NoModule* pModule, const NoString& sName, const NoString& sDesc);
+    NoModuleJob(NoModule* pModule, const NoString& name, const NoString& desc);
     virtual ~NoModuleJob();
 
     NoModuleJob(const NoModuleJob&) = delete;

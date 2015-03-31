@@ -88,9 +88,9 @@ public:
         }
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        if (sArgs == CRYPT_ASK_PASS) {
+        if (args == CRYPT_ASK_PASS) {
             char* pPass = getpass("Enter pass for savebuff: ");
             if (pPass)
                 m_sPassword = No::md5(pPass);
@@ -98,10 +98,10 @@ public:
                 m_bBootError = true;
                 sMessage = "Nothing retrieved from console. aborting";
             }
-        } else if (sArgs.empty())
+        } else if (args.empty())
             m_sPassword = No::md5(CRYPT_LAME_PASS);
         else
-            m_sPassword = No::md5(sArgs);
+            m_sPassword = No::md5(args);
 
         NoSaveBuffJob* timer = new NoSaveBuffJob(this);
         timer->start(60);
@@ -113,27 +113,27 @@ public:
     {
         NoDir saveDir(savePath());
         for (NoFile* pFile : saveDir.files()) {
-            NoString sName;
+            NoString name;
             NoString sBuffer;
 
-            BufferType eType = DecryptBuffer(pFile->GetLongName(), sBuffer, sName);
+            BufferType eType = DecryptBuffer(pFile->GetLongName(), sBuffer, name);
             switch (eType) {
             case InvalidBuffer:
                 m_sPassword = "";
                 No::printError("[" + moduleName() + ".so] Failed to Decrypt [" + pFile->GetLongName() + "]");
-                if (!sName.empty()) {
-                    putUser(":***!znc@znc.in PRIVMSG " + sName +
+                if (!name.empty()) {
+                    putUser(":***!znc@znc.in PRIVMSG " + name +
                             " :Failed to decrypt this buffer, did you change the encryption pass?");
                 }
                 break;
             case ChanBuffer:
-                if (NoChannel* pChan = network()->findChannel(sName)) {
-                    BootStrap(pChan, sBuffer);
+                if (NoChannel* channel = network()->findChannel(name)) {
+                    BootStrap(channel, sBuffer);
                 }
                 break;
             case QueryBuffer:
-                if (NoQuery* pQuery = network()->addQuery(sName)) {
-                    BootStrap(pQuery, sBuffer);
+                if (NoQuery* query = network()->addQuery(name)) {
+                    BootStrap(query, sBuffer);
                 }
                 break;
             default:
@@ -154,24 +154,24 @@ public:
         NoStringVector vsLines = sContent.split("\n");
 
         for (it = vsLines.begin(); it != vsLines.end(); ++it) {
-            NoString sLine(*it);
-            sLine.trim();
-            if (sLine[0] == '@' && it + 1 != vsLines.end()) {
-                NoString sTimestamp = No::token(sLine, 0);
+            NoString line(*it);
+            line.trim();
+            if (line[0] == '@' && it + 1 != vsLines.end()) {
+                NoString sTimestamp = No::token(line, 0);
                 sTimestamp.trimLeft("@");
                 timeval ts;
                 ts.tv_sec = No::token(sTimestamp, 0, ",").toLongLong();
                 ts.tv_usec = No::token(sTimestamp, 1, ",").toLong();
 
-                NoString sFormat = No::tokens(sLine, 1);
+                NoString format = No::tokens(line, 1);
 
-                NoString sText(*++it);
-                sText.trim();
+                NoString text(*++it);
+                text.trim();
 
-                pTarget->addBuffer(sFormat, sText, &ts);
+                pTarget->addBuffer(format, text, &ts);
             } else {
                 // Old format, escape the line and use as is.
-                pTarget->addBuffer(_NAMEDFMT(sLine));
+                pTarget->addBuffer(_NAMEDFMT(line));
             }
         }
     }
@@ -202,17 +202,17 @@ public:
         if (!m_sPassword.empty()) {
             std::set<NoString> ssPaths;
 
-            const std::vector<NoChannel*>& vChans = network()->channels();
-            for (NoChannel* pChan : vChans) {
-                NoString sPath = GetPath(pChan->name());
-                SaveBufferToDisk(pChan->buffer(), sPath, CHAN_VERIFICATION_TOKEN + pChan->name());
+            const std::vector<NoChannel*>& channels = network()->channels();
+            for (NoChannel* channel : channels) {
+                NoString sPath = GetPath(channel->name());
+                SaveBufferToDisk(channel->buffer(), sPath, CHAN_VERIFICATION_TOKEN + channel->name());
                 ssPaths.insert(sPath);
             }
 
             const std::vector<NoQuery*>& vQueries = network()->queries();
-            for (NoQuery* pQuery : vQueries) {
-                NoString sPath = GetPath(pQuery->name());
-                SaveBufferToDisk(pQuery->buffer(), sPath, QUERY_VERIFICATION_TOKEN + pQuery->name());
+            for (NoQuery* query : vQueries) {
+                NoString sPath = GetPath(query->name());
+                SaveBufferToDisk(query->buffer(), sPath, QUERY_VERIFICATION_TOKEN + query->name());
                 ssPaths.insert(sPath);
             }
 
@@ -231,35 +231,35 @@ public:
 
     void OnSetPassCommand(const NoString& sCmdLine)
     {
-        NoString sArgs = No::tokens(sCmdLine, 1);
+        NoString args = No::tokens(sCmdLine, 1);
 
-        if (sArgs.empty())
-            sArgs = CRYPT_LAME_PASS;
+        if (args.empty())
+            args = CRYPT_LAME_PASS;
 
-        putModule("Password set to [" + sArgs + "]");
-        m_sPassword = No::md5(sArgs);
+        putModule("Password set to [" + args + "]");
+        m_sPassword = No::md5(args);
     }
 
     void onModCommand(const NoString& sCmdLine) override
     {
-        NoString sCommand = No::token(sCmdLine, 0);
-        NoString sArgs = No::tokens(sCmdLine, 1);
+        NoString command = No::token(sCmdLine, 0);
+        NoString args = No::tokens(sCmdLine, 1);
 
-        if (sCommand.equals("dumpbuff")) {
+        if (command.equals("dumpbuff")) {
             // for testing purposes - hidden from help
             NoString sFile;
-            NoString sName;
-            if (DecryptBuffer(GetPath(sArgs), sFile, sName)) {
+            NoString name;
+            if (DecryptBuffer(GetPath(args), sFile, name)) {
                 NoStringVector vsLines = sFile.split("\n");
                 NoStringVector::iterator it;
 
                 for (it = vsLines.begin(); it != vsLines.end(); ++it) {
-                    NoString sLine(*it);
-                    sLine.trim();
-                    putModule("[" + sLine + "]");
+                    NoString line(*it);
+                    line.trim();
+                    putModule("[" + line + "]");
                 }
             }
-            putModule("//!-- EOF " + sArgs);
+            putModule("//!-- EOF " + args);
         } else {
             handleCommand(sCmdLine);
         }
@@ -267,10 +267,10 @@ public:
 
     void OnReplayCommand(const NoString& sCmdLine)
     {
-        NoString sArgs = No::tokens(sCmdLine, 1);
+        NoString args = No::tokens(sCmdLine, 1);
 
-        Replay(sArgs);
-        putModule("Replayed " + sArgs);
+        Replay(args);
+        putModule("Replayed " + args);
     }
 
     void OnSaveCommand(const NoString& sCmdLine)
@@ -282,16 +282,16 @@ public:
     void Replay(const NoString& sBuffer)
     {
         NoString sFile;
-        NoString sName;
+        NoString name;
         putUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Buffer Playback...");
-        if (DecryptBuffer(GetPath(sBuffer), sFile, sName)) {
+        if (DecryptBuffer(GetPath(sBuffer), sFile, name)) {
             NoStringVector vsLines = sFile.split("\n");
             NoStringVector::iterator it;
 
             for (it = vsLines.begin(); it != vsLines.end(); ++it) {
-                NoString sLine(*it);
-                sLine.trim();
-                putUser(sLine);
+                NoString line(*it);
+                line.trim();
+                putUser(line);
             }
         }
         putUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Playback Complete.");
@@ -300,18 +300,18 @@ public:
     NoString GetPath(const NoString& sTarget) const
     {
         NoString sBuffer = user()->userName() + sTarget.toLower();
-        NoString sRet = savePath();
-        sRet += "/" + No::md5(sBuffer);
-        return (sRet);
+        NoString ret = savePath();
+        ret += "/" + No::md5(sBuffer);
+        return (ret);
     }
 
     NoString FindLegacyBufferName(const NoString& sPath) const
     {
-        const std::vector<NoChannel*>& vChans = network()->channels();
-        for (NoChannel* pChan : vChans) {
-            const NoString& sName = pChan->name();
-            if (GetPath(sName).equals(sPath)) {
-                return sName;
+        const std::vector<NoChannel*>& channels = network()->channels();
+        for (NoChannel* channel : channels) {
+            const NoString& name = channel->name();
+            if (GetPath(name).equals(sPath)) {
+                return name;
             }
         }
         return NoString();
@@ -324,31 +324,31 @@ public:
         return (sReturn);
     }
 
-    void AddBuffer(NoChannel& chan, const NoString& sLine)
+    void AddBuffer(NoChannel& chan, const NoString& line)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
         if (chan.AutoClearChanBuffer() && network()->isUserAttached())
             return;
-        chan.AddBuffer(sLine);
+        chan.AddBuffer(line);
     }
 
-    void onRawMode(const NoNick& cOpNick, NoChannel& cChannel, const NoString& sModes, const NoString& sArgs) override
+    void onRawMode(const NoNick& cOpNick, NoChannel& cChannel, const NoString& sModes, const NoString& args) override
     {
-        AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cOpNick.GetNickMask() + " MODE " + sModes + " " + sArgs));
+        AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cOpNick.GetNickMask() + " MODE " + sModes + " " + args));
     }
-    void onQuit(const NoNick& cNick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& cNick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
     {
-        for (size_t a = 0; a < vChans.size(); a++) {
-            AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " QUIT " + sMessage));
+        for (size_t a = 0; a < channels.size(); a++) {
+            AddBuffer(*channels[a], SpoofChanMsg(channels[a]->GetName(), cNick.GetNickMask() + " QUIT " + sMessage));
         }
         if (cNick.NickEquals(user()->nick()))
             SaveBuffersToDisk(); // need to force a save here to see this!
     }
 
-    void onNick(const NoNick& cNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
+    void onNick(const NoNick& cNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
     {
-        for (size_t a = 0; a < vChans.size(); a++) {
-            AddBuffer(*vChans[a], SpoofChanMsg(vChans[a]->GetName(), cNick.GetNickMask() + " NICK " + sNewNick));
+        for (size_t a = 0; a < channels.size(); a++) {
+            AddBuffer(*channels[a], SpoofChanMsg(channels[a]->GetName(), cNick.GetNickMask() + " NICK " + sNewNick));
         }
     }
     void onKick(const NoNick& cNick, const NoString& sOpNick, NoChannel& cChannel, const NoString& sMessage) override
@@ -378,7 +378,7 @@ private:
 
     enum BufferType { InvalidBuffer = 0, EmptyBuffer, ChanBuffer, QueryBuffer };
 
-    BufferType DecryptBuffer(const NoString& sPath, NoString& sBuffer, NoString& sName)
+    BufferType DecryptBuffer(const NoString& sPath, NoString& sBuffer, NoString& name)
     {
         NoString sContent;
         sBuffer = "";
@@ -394,15 +394,15 @@ private:
             sBuffer = No::decrypt(sContent, m_sPassword);
 
             if (sBuffer.trimPrefix(LEGACY_VERIFICATION_TOKEN)) {
-                sName = FindLegacyBufferName(sPath);
+                name = FindLegacyBufferName(sPath);
                 return ChanBuffer;
             } else if (sBuffer.trimPrefix(CHAN_VERIFICATION_TOKEN)) {
-                sName = No::firstLine(sBuffer);
-                if (sBuffer.trimLeft(sName + "\n"))
+                name = No::firstLine(sBuffer);
+                if (sBuffer.trimLeft(name + "\n"))
                     return ChanBuffer;
             } else if (sBuffer.trimPrefix(QUERY_VERIFICATION_TOKEN)) {
-                sName = No::firstLine(sBuffer);
-                if (sBuffer.trimLeft(sName + "\n"))
+                name = No::firstLine(sBuffer);
+                if (sBuffer.trimLeft(name + "\n"))
                     return QueryBuffer;
             }
 

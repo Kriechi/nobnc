@@ -27,24 +27,24 @@ class NoModule;
 class NO_EXPORT NoHttpSocket : public NoModuleSocket
 {
 public:
-    NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix);
-    NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort);
+    NoHttpSocket(NoModule* mod, const NoString& sURIPrefix);
+    NoHttpSocket(NoModule* mod, const NoString& sURIPrefix, const NoString& sHostname, ushort port);
     virtual ~NoHttpSocket();
 
     void readData(const char* data, size_t len) override;
-    void readLine(const NoString& sData) override;
+    void readLine(const NoString& data) override;
     void onConnected() override;
-    NoSocket* createSocket(const NoString& sHost, ushort uPort) override = 0;
+    NoSocket* createSocket(const NoString& host, ushort port) override = 0;
 
     virtual bool forceLogin();
-    virtual bool onLogin(const NoString& sUser, const NoString& sPass, bool bBasic);
+    virtual bool onLogin(const NoString& sUser, const NoString& pass, bool bBasic);
     virtual void onPageRequest(const NoString& sURI) = 0;
     virtual bool printFile(const NoString& sFileName, NoString sContentType = "");
 
     void checkPost();
     bool sentHeader() const;
     bool printHeader(off_t uContentLength, const NoString& sContentType = "", uint uStatusId = 200, const NoString& sStatusMsg = "OK");
-    void addHeader(const NoString& sName, const NoString& sValue);
+    void addHeader(const NoString& name, const NoString& sValue);
     void setContentType(const NoString& sContentType);
 
     bool printNotFound();
@@ -70,24 +70,24 @@ public:
     NoString uriPrefix() const;
     bool isPost() const;
 
-    NoString param(const NoString& sName, bool bPost = true, const NoString& sFilter = "\r\n") const;
-    NoString rawParam(const NoString& sName, bool bPost = true) const;
-    bool hasParam(const NoString& sName, bool bPost = true) const;
+    NoString param(const NoString& name, bool bPost = true, const NoString& filter = "\r\n") const;
+    NoString rawParam(const NoString& name, bool bPost = true) const;
+    bool hasParam(const NoString& name, bool bPost = true) const;
     const std::map<NoString, NoStringVector>& params(bool bPost = true) const;
-    size_t paramValues(const NoString& sName, NoStringVector& vsRet, bool bPost = true, const NoString& sFilter = "\r\n") const;
-    size_t paramValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost = true, const NoString& sFilter = "\r\n") const;
+    size_t paramValues(const NoString& name, NoStringVector& vsRet, bool bPost = true, const NoString& filter = "\r\n") const;
+    size_t paramValues(const NoString& name, std::set<NoString>& ssRet, bool bPost = true, const NoString& filter = "\r\n") const;
 
 private:
-    static NoString rawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams);
-    static NoString param(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter);
-    static size_t paramValues(const NoString& sName,
+    static NoString rawParam(const NoString& name, const std::map<NoString, NoStringVector>& msvsParams);
+    static NoString param(const NoString& name, const std::map<NoString, NoStringVector>& msvsParams, const NoString& filter);
+    static size_t paramValues(const NoString& name,
                                  NoStringVector& vsRet,
                                  const std::map<NoString, NoStringVector>& msvsParams,
-                                 const NoString& sFilter);
-    static size_t paramValues(const NoString& sName,
+                                 const NoString& filter);
+    static size_t paramValues(const NoString& name,
                                  std::set<NoString>& ssRet,
                                  const std::map<NoString, NoStringVector>& msvsParams,
-                                 const NoString& sFilter);
+                                 const NoString& filter);
 
     void writeUncompressedFile(NoFile& File);
     void writeCompressedFile(NoFile& File);

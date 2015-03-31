@@ -21,10 +21,10 @@ NoModuleInfo::NoModuleInfo() : NoModuleInfo("", "", No::NetworkModule)
 {
 }
 
-NoModuleInfo::NoModuleInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType)
+NoModuleInfo::NoModuleInfo(const NoString& name, const NoString& sPath, No::ModuleType eType)
     : m_types(),
       m_defaultType(eType),
-      m_name(sName),
+      m_name(name),
       m_path(sPath),
       m_description(""),
       m_wikiPage(""),

@@ -88,18 +88,18 @@ public:
         // compatibility we have to do some magic here.
         sMessage = "Arguments converted to new syntax";
 
-        bool bSSL = false;
+        bool ssl = false;
         bool bIPv6 = false;
         bool bShareIRCPorts = true;
-        ushort uPort = 8080;
-        NoString sArgs(sArgStr);
+        ushort port = 8080;
+        NoString args(sArgStr);
         NoString sPort;
         NoString sListenHost;
         NoString sURIPrefix;
 
-        while (sArgs.left(1) == "-") {
-            NoString sOpt = No::token(sArgs, 0);
-            sArgs = No::tokens(sArgs, 1);
+        while (args.left(1) == "-") {
+            NoString sOpt = No::token(args, 0);
+            args = No::tokens(args, 1);
 
             if (sOpt.equals("-IPV6")) {
                 bIPv6 = true;
@@ -116,23 +116,23 @@ public:
         }
 
         // No arguments left: Only port sharing
-        if (sArgs.empty() && bShareIRCPorts)
+        if (args.empty() && bShareIRCPorts)
             return true;
 
-        if (sArgs.contains(" ")) {
-            sListenHost = No::token(sArgs, 0);
-            sPort = No::tokens(sArgs, 1);
+        if (args.contains(" ")) {
+            sListenHost = No::token(args, 0);
+            sPort = No::tokens(args, 1);
         } else {
-            sPort = sArgs;
+            sPort = args;
         }
 
         if (sPort.left(1) == "+") {
             sPort.trimLeft("+");
-            bSSL = true;
+            ssl = true;
         }
 
         if (!sPort.empty()) {
-            uPort = sPort.toUShort();
+            port = sPort.toUShort();
         }
 
         if (!bShareIRCPorts) {
@@ -145,9 +145,9 @@ public:
         }
 
         // Now turn that into a listener instance
-        NoListener* pListener = new NoListener(sListenHost, uPort);
+        NoListener* pListener = new NoListener(sListenHost, port);
         pListener->setUriPrefix(sURIPrefix);
-        pListener->setSsl(bSSL);
+        pListener->setSsl(ssl);
         pListener->setAddressType(!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address);
         pListener->setAcceptType(No::AcceptHttp);
 
@@ -161,7 +161,7 @@ public:
         return true;
     }
 
-    NoUser* GetNewUser(NoWebSocket& WebSock, NoUser* pUser)
+    NoUser* GetNewUser(NoWebSocket& WebSock, NoUser* user)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.session();
         NoString sUsername = WebSock.param("newuser");
@@ -175,24 +175,24 @@ public:
             return nullptr;
         }
 
-        if (pUser) {
+        if (user) {
             /* If we are editing a user we must not change the user name */
-            sUsername = pUser->userName();
+            sUsername = user->userName();
         }
 
-        NoString sArg = WebSock.param("password");
+        NoString arg = WebSock.param("password");
 
-        if (sArg != WebSock.param("password2")) {
+        if (arg != WebSock.param("password2")) {
             WebSock.printErrorPage("Invalid Submission [Passwords do not match]");
             return nullptr;
         }
 
         NoUser* pNewUser = new NoUser(sUsername);
 
-        if (!sArg.empty()) {
-            NoString sSalt = No::salt();
-            NoString sHash = NoUser::saltedHash(sArg, sSalt);
-            pNewUser->setPassword(sHash, NoUser::HashDefault, sSalt);
+        if (!arg.empty()) {
+            NoString salt = No::salt();
+            NoString sHash = NoUser::saltedHash(arg, salt);
+            pNewUser->setPassword(sHash, NoUser::HashDefault, salt);
         }
 
         NoStringVector vsArgs = WebSock.rawParam("allowedips").split("\n");
@@ -212,45 +212,45 @@ public:
             pNewUser->addCtcpReply(No::token(sReply, 0).trim_n(), No::tokens(sReply, 1).trim_n());
         }
 
-        sArg = WebSock.param("nick");
-        if (!sArg.empty()) {
-            pNewUser->setNick(sArg);
+        arg = WebSock.param("nick");
+        if (!arg.empty()) {
+            pNewUser->setNick(arg);
         }
-        sArg = WebSock.param("altnick");
-        if (!sArg.empty()) {
-            pNewUser->setAltNick(sArg);
+        arg = WebSock.param("altnick");
+        if (!arg.empty()) {
+            pNewUser->setAltNick(arg);
         }
-        sArg = WebSock.param("statusprefix");
-        if (!sArg.empty()) {
-            pNewUser->setStatusPrefix(sArg);
+        arg = WebSock.param("statusprefix");
+        if (!arg.empty()) {
+            pNewUser->setStatusPrefix(arg);
         }
-        sArg = WebSock.param("ident");
-        if (!sArg.empty()) {
-            pNewUser->setIdent(sArg);
+        arg = WebSock.param("ident");
+        if (!arg.empty()) {
+            pNewUser->setIdent(arg);
         }
-        sArg = WebSock.param("realname");
-        if (!sArg.empty()) {
-            pNewUser->setRealName(sArg);
+        arg = WebSock.param("realname");
+        if (!arg.empty()) {
+            pNewUser->setRealName(arg);
         }
-        sArg = WebSock.param("quitmsg");
-        if (!sArg.empty()) {
-            pNewUser->setQuitMsg(sArg);
+        arg = WebSock.param("quitmsg");
+        if (!arg.empty()) {
+            pNewUser->setQuitMsg(arg);
         }
-        sArg = WebSock.param("chanmodes");
-        if (!sArg.empty()) {
-            pNewUser->setDefaultChanModes(sArg);
+        arg = WebSock.param("chanmodes");
+        if (!arg.empty()) {
+            pNewUser->setDefaultChanModes(arg);
         }
-        sArg = WebSock.param("timestampformat");
-        if (!sArg.empty()) {
-            pNewUser->setTimestampFormat(sArg);
+        arg = WebSock.param("timestampformat");
+        if (!arg.empty()) {
+            pNewUser->setTimestampFormat(arg);
         }
 
-        sArg = WebSock.param("bindhost");
+        arg = WebSock.param("bindhost");
         // To change BindHosts be admin or don't have DenysetBindHost
         if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
             NoString sArg2 = WebSock.param("dccbindhost");
-            if (!sArg.empty()) {
-                pNewUser->setBindHost(sArg);
+            if (!arg.empty()) {
+                pNewUser->setBindHost(arg);
             }
             if (!sArg2.empty()) {
                 pNewUser->setDccBindHost(sArg2);
@@ -263,7 +263,7 @@ public:
                 bool bFoundDCC = false;
 
                 for (it = vsHosts.begin(); it != vsHosts.end(); ++it) {
-                    if (sArg.equals(*it)) {
+                    if (arg.equals(*it)) {
                         bFound = true;
                     }
                     if (sArg2.equals(*it)) {
@@ -272,25 +272,25 @@ public:
                 }
 
                 if (!bFound) {
-                    pNewUser->setBindHost(pUser ? pUser->bindHost() : "");
+                    pNewUser->setBindHost(user ? user->bindHost() : "");
                 }
                 if (!bFoundDCC) {
-                    pNewUser->setDccBindHost(pUser ? pUser->dccBindHost() : "");
+                    pNewUser->setDccBindHost(user ? user->dccBindHost() : "");
                 }
             }
-        } else if (pUser) {
-            pNewUser->setBindHost(pUser->bindHost());
-            pNewUser->setDccBindHost(pUser->dccBindHost());
+        } else if (user) {
+            pNewUser->setBindHost(user->bindHost());
+            pNewUser->setDccBindHost(user->dccBindHost());
         }
 
-        sArg = WebSock.param("bufsize");
-        if (!sArg.empty())
-            pNewUser->setBufferCount(sArg.toUInt(), spSession->isAdmin());
-        if (!sArg.empty()) {
+        arg = WebSock.param("bufsize");
+        if (!arg.empty())
+            pNewUser->setBufferCount(arg.toUInt(), spSession->isAdmin());
+        if (!arg.empty()) {
             // First apply the old limit in case the new one is too high
-            if (pUser)
-                pNewUser->setBufferCount(pUser->bufferCount(), true);
-            pNewUser->setBufferCount(sArg.toUInt(), spSession->isAdmin());
+            if (user)
+                pNewUser->setBufferCount(user->bufferCount(), true);
+            pNewUser->setBufferCount(arg.toUInt(), spSession->isAdmin());
         }
 
         pNewUser->setSkinName(WebSock.param("skin"));
@@ -325,28 +325,28 @@ public:
         if (spSession->isAdmin()) {
             pNewUser->setDenyLoadMod(WebSock.param("denyloadmod").toBool());
             pNewUser->setDenysetBindHost(WebSock.param("denysetbindhost").toBool());
-            sArg = WebSock.param("maxnetworks");
-            if (!sArg.empty())
-                pNewUser->setMaxNetworks(sArg.toUInt());
-        } else if (pUser) {
-            pNewUser->setDenyLoadMod(pUser->denyLoadMod());
-            pNewUser->setDenysetBindHost(pUser->denysetBindHost());
-            pNewUser->setMaxNetworks(pUser->maxNetworks());
+            arg = WebSock.param("maxnetworks");
+            if (!arg.empty())
+                pNewUser->setMaxNetworks(arg.toUInt());
+        } else if (user) {
+            pNewUser->setDenyLoadMod(user->denyLoadMod());
+            pNewUser->setDenysetBindHost(user->denysetBindHost());
+            pNewUser->setMaxNetworks(user->maxNetworks());
         }
 
-        // If pUser is not nullptr, we are editing an existing user.
+        // If user is not nullptr, we are editing an existing user.
         // Users must not be able to change their own admin flag.
-        if (pUser != noApp->findUser(WebSock.username())) {
+        if (user != noApp->findUser(WebSock.username())) {
             pNewUser->setAdmin(WebSock.param("isadmin").toBool());
-        } else if (pUser) {
-            pNewUser->setAdmin(pUser->isAdmin());
+        } else if (user) {
+            pNewUser->setAdmin(user->isAdmin());
         }
 
-        if (spSession->isAdmin() || (pUser && !pUser->denyLoadMod())) {
+        if (spSession->isAdmin() || (user && !user->denyLoadMod())) {
             WebSock.paramValues("loadmod", vsArgs);
 
             // disallow unload webadmin from itself
-            if (No::UserModule == type() && pUser == noApp->findUser(WebSock.username())) {
+            if (No::UserModule == type() && user == noApp->findUser(WebSock.username())) {
                 bool bLoadedWebadmin = false;
                 for (a = 0; a < vsArgs.size(); ++a) {
                     NoString sModName = vsArgs[a].trimRight_n("\r");
@@ -366,14 +366,14 @@ public:
                 NoString sModLoadError;
 
                 if (!sModName.empty()) {
-                    NoString sArgs = WebSock.param("modargs_" + sModName);
+                    NoString args = WebSock.param("modargs_" + sModName);
 
                     try {
-                        if (!pNewUser->loader()->loadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
+                        if (!pNewUser->loader()->loadModule(sModName, args, No::UserModule, pNewUser, nullptr, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
                     } catch (...) {
-                        sModLoadError = "Unable to load module [" + sModName + "] [" + sArgs + "]";
+                        sModLoadError = "Unable to load module [" + sModName + "] [" + args + "]";
                     }
 
                     if (!sModLoadError.empty()) {
@@ -382,17 +382,17 @@ public:
                     }
                 }
             }
-        } else if (pUser) {
-            NoModuleLoader* Modules = pUser->loader();
+        } else if (user) {
+            NoModuleLoader* Modules = user->loader();
 
-            for (NoModule* pMod : Modules->modules()) {
-                NoString sModName = pMod->moduleName();
-                NoString sArgs = pMod->args();
+            for (NoModule* mod : Modules->modules()) {
+                NoString sModName = mod->moduleName();
+                NoString args = mod->args();
                 NoString sModRet;
                 NoString sModLoadError;
 
                 try {
-                    if (!pNewUser->loader()->loadModule(sModName, sArgs, No::UserModule, pNewUser, nullptr, sModRet)) {
+                    if (!pNewUser->loader()->loadModule(sModName, args, No::UserModule, pNewUser, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
                 } catch (...) {
@@ -411,13 +411,13 @@ public:
 
     NoString SafeGetUserNameParam(NoWebSocket& WebSock)
     {
-        NoString sUserName = WebSock.param("user"); // check for POST param
-        if (sUserName.empty() && !WebSock.isPost()) {
+        NoString userName = WebSock.param("user"); // check for POST param
+        if (userName.empty() && !WebSock.isPost()) {
             // if no POST param named user has been given and we are not
             // saving this form, fall back to using the GET parameter.
-            sUserName = WebSock.param("user", false);
+            userName = WebSock.param("user", false);
         }
-        return sUserName;
+        return userName;
     }
 
     NoString SafeGetNetworkParam(NoWebSocket& WebSock)
@@ -438,14 +438,14 @@ public:
 
     NoNetwork* SafeGetNetworkFromParam(NoWebSocket& WebSock)
     {
-        NoUser* pUser = noApp->findUser(SafeGetUserNameParam(WebSock));
-        NoNetwork* pNetwork = nullptr;
+        NoUser* user = noApp->findUser(SafeGetUserNameParam(WebSock));
+        NoNetwork* network = nullptr;
 
-        if (pUser) {
-            pNetwork = pUser->findNetwork(SafeGetNetworkParam(WebSock));
+        if (user) {
+            network = user->findNetwork(SafeGetNetworkParam(WebSock));
         }
 
-        return pNetwork;
+        return network;
     }
 
     NoString webMenuTitle() override
@@ -471,33 +471,33 @@ public:
 
             return UserPage(WebSock, Tmpl);
         } else if (sPageName == "addnetwork") {
-            NoUser* pUser = SafeGetUserFromParam(WebSock);
+            NoUser* user = SafeGetUserFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != pUser)) {
+            if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != user)) {
                 return false;
             }
 
-            if (pUser) {
-                return NetworkPage(WebSock, Tmpl, pUser);
+            if (user) {
+                return NetworkPage(WebSock, Tmpl, user);
             }
 
             WebSock.printErrorPage("No such username");
             return true;
         } else if (sPageName == "editnetwork") {
-            NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            NoNetwork* network = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->isAdmin() && (!spSession->user() || !pNetwork || spSession->user() != pNetwork->user())) {
+            if (!spSession->isAdmin() && (!spSession->user() || !network || spSession->user() != network->user())) {
                 return false;
             }
 
-            if (!pNetwork) {
+            if (!network) {
                 WebSock.printErrorPage("No such username or network");
                 return true;
             }
 
-            return NetworkPage(WebSock, Tmpl, pNetwork->user(), pNetwork);
+            return NetworkPage(WebSock, Tmpl, network->user(), network);
 
         } else if (sPageName == "delnetwork") {
             NoString sUser = WebSock.param("user");
@@ -505,23 +505,23 @@ public:
                 sUser = WebSock.param("user", false);
             }
 
-            NoUser* pUser = noApp->findUser(sUser);
+            NoUser* user = noApp->findUser(sUser);
 
             // Admin||Self Check
-            if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != pUser)) {
+            if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != user)) {
                 return false;
             }
 
-            return DelNetwork(WebSock, pUser, Tmpl);
+            return DelNetwork(WebSock, user, Tmpl);
         } else if (sPageName == "editchan") {
-            NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            NoNetwork* network = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->isAdmin() && (!spSession->user() || !pNetwork || spSession->user() != pNetwork->user())) {
+            if (!spSession->isAdmin() && (!spSession->user() || !network || spSession->user() != network->user())) {
                 return false;
             }
 
-            if (!pNetwork) {
+            if (!network) {
                 WebSock.printErrorPage("No such username or network");
                 return true;
             }
@@ -530,37 +530,37 @@ public:
             if (sChan.empty() && !WebSock.isPost()) {
                 sChan = WebSock.param("name", false);
             }
-            NoChannel* pChan = pNetwork->findChannel(sChan);
-            if (!pChan) {
+            NoChannel* channel = network->findChannel(sChan);
+            if (!channel) {
                 WebSock.printErrorPage("No such channel");
                 return true;
             }
 
-            return ChanPage(WebSock, Tmpl, pNetwork, pChan);
+            return ChanPage(WebSock, Tmpl, network, channel);
         } else if (sPageName == "addchan") {
-            NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            NoNetwork* network = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->isAdmin() && (!spSession->user() || !pNetwork || spSession->user() != pNetwork->user())) {
+            if (!spSession->isAdmin() && (!spSession->user() || !network || spSession->user() != network->user())) {
                 return false;
             }
 
-            if (pNetwork) {
-                return ChanPage(WebSock, Tmpl, pNetwork);
+            if (network) {
+                return ChanPage(WebSock, Tmpl, network);
             }
 
             WebSock.printErrorPage("No such username or network");
             return true;
         } else if (sPageName == "delchan") {
-            NoNetwork* pNetwork = SafeGetNetworkFromParam(WebSock);
+            NoNetwork* network = SafeGetNetworkFromParam(WebSock);
 
             // Admin||Self Check
-            if (!spSession->isAdmin() && (!spSession->user() || !pNetwork || spSession->user() != pNetwork->user())) {
+            if (!spSession->isAdmin() && (!spSession->user() || !network || spSession->user() != network->user())) {
                 return false;
             }
 
-            if (pNetwork) {
-                return removeChannel(WebSock, pNetwork);
+            if (network) {
+                return removeChannel(WebSock, network);
             }
 
             WebSock.printErrorPage("No such username or network");
@@ -574,9 +574,9 @@ public:
                 // Show the "Are you sure?" page:
 
                 NoString sUser = WebSock.param("user", false);
-                NoUser* pUser = noApp->findUser(sUser);
+                NoUser* user = noApp->findUser(sUser);
 
-                if (!pUser) {
+                if (!user) {
                     WebSock.printErrorPage("No such username");
                     return true;
                 }
@@ -590,9 +590,9 @@ public:
             // so we actually delete the user now:
 
             NoString sUser = WebSock.param("user");
-            NoUser* pUser = noApp->findUser(sUser);
+            NoUser* user = noApp->findUser(sUser);
 
-            if (pUser && pUser == spSession->user()) {
+            if (user && user == spSession->user()) {
                 WebSock.printErrorPage("Please don't delete yourself, suicide is not the answer!");
                 return true;
             } else if (noApp->deleteUser(sUser)) {
@@ -603,22 +603,22 @@ public:
             WebSock.printErrorPage("No such username");
             return true;
         } else if (sPageName == "edituser") {
-            NoString sUserName = SafeGetUserNameParam(WebSock);
-            NoUser* pUser = noApp->findUser(sUserName);
+            NoString userName = SafeGetUserNameParam(WebSock);
+            NoUser* user = noApp->findUser(userName);
 
-            if (!pUser) {
-                if (sUserName.empty()) {
-                    pUser = spSession->user();
+            if (!user) {
+                if (userName.empty()) {
+                    user = spSession->user();
                 } // else: the "no such user" message will be printed.
             }
 
             // Admin||Self Check
-            if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != pUser)) {
+            if (!spSession->isAdmin() && (!spSession->user() || spSession->user() != user)) {
                 return false;
             }
 
-            if (pUser) {
-                return UserPage(WebSock, Tmpl, pUser);
+            if (user) {
+                return UserPage(WebSock, Tmpl, user);
             }
 
             WebSock.printErrorPage("No such username");
@@ -648,39 +648,39 @@ public:
         return false;
     }
 
-    bool ChanPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoNetwork* pNetwork, NoChannel* pChan = nullptr)
+    bool ChanPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoNetwork* network, NoChannel* channel = nullptr)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.session();
         Tmpl.setFile("add_edit_chan.tmpl");
-        NoUser* pUser = pNetwork->user();
+        NoUser* user = network->user();
 
-        if (!pUser) {
+        if (!user) {
             WebSock.printErrorPage("That user doesn't exist");
             return true;
         }
 
         if (!WebSock.param("submitted").toUInt()) {
-            Tmpl["User"] = pUser->userName();
-            Tmpl["Network"] = pNetwork->name();
+            Tmpl["User"] = user->userName();
+            Tmpl["Network"] = network->name();
 
-            if (pChan) {
+            if (channel) {
                 Tmpl["Action"] = "editchan";
                 Tmpl["Edit"] = "true";
-                Tmpl["Title"] = "Edit Channel" + NoString(" [" + pChan->name() + "]") + " of Network [" +
-                                pNetwork->name() + "] of User [" + pNetwork->user()->userName() + "]";
-                Tmpl["ChanName"] = pChan->name();
-                Tmpl["BufferCount"] = NoString(pChan->bufferCount());
-                Tmpl["DefModes"] = pChan->defaultModes();
-                Tmpl["Key"] = pChan->key();
+                Tmpl["Title"] = "Edit Channel" + NoString(" [" + channel->name() + "]") + " of Network [" +
+                                network->name() + "] of User [" + network->user()->userName() + "]";
+                Tmpl["ChanName"] = channel->name();
+                Tmpl["BufferCount"] = NoString(channel->bufferCount());
+                Tmpl["DefModes"] = channel->defaultModes();
+                Tmpl["Key"] = channel->key();
 
-                if (pChan->inConfig()) {
+                if (channel->inConfig()) {
                     Tmpl["InConfig"] = "true";
                 }
             } else {
                 Tmpl["Action"] = "addchan";
-                Tmpl["Title"] = "Add Channel" + NoString(" for User [" + pUser->userName() + "]");
-                Tmpl["BufferCount"] = NoString(pUser->bufferCount());
-                Tmpl["DefModes"] = NoString(pUser->defaultChanModes());
+                Tmpl["Title"] = "Add Channel" + NoString(" for User [" + user->userName() + "]");
+                Tmpl["BufferCount"] = NoString(user->bufferCount());
+                Tmpl["DefModes"] = NoString(user->defaultChanModes());
                 Tmpl["InConfig"] = "true";
             }
 
@@ -690,31 +690,31 @@ public:
             o2["Name"] = "autoclearchanbuffer";
             o2["DisplayName"] = "Auto Clear Chan Buffer";
             o2["Tooltip"] = "Automatically Clear Channel Buffer After Playback";
-            if ((pChan && pChan->autoClearChanBuffer()) || (!pChan && pUser->autoClearChanBuffer())) {
+            if ((channel && channel->autoClearChanBuffer()) || (!channel && user->autoClearChanBuffer())) {
                 o2["Checked"] = "true";
             }
 
             NoTemplate& o3 = Tmpl.addRow("OptionLoop");
             o3["Name"] = "detached";
             o3["DisplayName"] = "Detached";
-            if (pChan && pChan->isDetached()) {
+            if (channel && channel->isDetached()) {
                 o3["Checked"] = "true";
             }
 
             NoTemplate& o4 = Tmpl.addRow("OptionLoop");
             o4["Name"] = "disabled";
             o4["DisplayName"] = "Disabled";
-            if (pChan && pChan->isDisabled()) {
+            if (channel && channel->isDisabled()) {
                 o4["Checked"] = "true";
             }
 
-            for (NoModule* pMod : allModules(pNetwork)) {
-                NoTemplate& mod = Tmpl.addRow("EmbeddedModuleLoop");
-                mod.insert(Tmpl.begin(), Tmpl.end());
-                mod["WebadminAction"] = "display";
-                if (pMod->onEmbeddedWebRequest(WebSock, "webadmin/channel", mod)) {
-                    mod["Embed"] = WebSock.findTemplate(pMod, "WebadminChan.tmpl");
-                    mod["ModName"] = pMod->moduleName();
+            for (NoModule* mod : allModules(network)) {
+                NoTemplate& modrow = Tmpl.addRow("EmbeddedModuleLoop");
+                modrow.insert(Tmpl.begin(), Tmpl.end());
+                modrow["WebadminAction"] = "display";
+                if (mod->onEmbeddedWebRequest(WebSock, "webadmin/channel", modrow)) {
+                    modrow["Embed"] = WebSock.findTemplate(mod, "WebadminChan.tmpl");
+                    modrow["ModName"] = mod->moduleName();
                 }
             }
 
@@ -723,60 +723,60 @@ public:
 
         NoString sChanName = WebSock.param("name").trim_n();
 
-        if (!pChan) {
+        if (!channel) {
             if (sChanName.empty()) {
                 WebSock.printErrorPage("Channel name is a required argument");
                 return true;
             }
 
             // This could change the channel name and e.g. add a "#" prefix
-            pChan = new NoChannel(sChanName, pNetwork, true);
+            channel = new NoChannel(sChanName, network, true);
 
-            if (pNetwork->findChannel(pChan->name())) {
-                WebSock.printErrorPage("Channel [" + pChan->name() + "] already exists");
-                delete pChan;
+            if (network->findChannel(channel->name())) {
+                WebSock.printErrorPage("Channel [" + channel->name() + "] already exists");
+                delete channel;
                 return true;
             }
 
-            if (!pNetwork->addChannel(pChan)) {
-                WebSock.printErrorPage("Could not add channel [" + pChan->name() + "]");
+            if (!network->addChannel(channel)) {
+                WebSock.printErrorPage("Could not add channel [" + channel->name() + "]");
                 return true;
             }
         }
 
         uint uBufferCount = WebSock.param("buffercount").toUInt();
-        if (pChan->bufferCount() != uBufferCount) {
-            pChan->setBufferCount(uBufferCount, spSession->isAdmin());
+        if (channel->bufferCount() != uBufferCount) {
+            channel->setBufferCount(uBufferCount, spSession->isAdmin());
         }
-        pChan->setDefaultModes(WebSock.param("defmodes"));
-        pChan->setInConfig(WebSock.param("save").toBool());
+        channel->setDefaultModes(WebSock.param("defmodes"));
+        channel->setInConfig(WebSock.param("save").toBool());
         bool bAutoClearChanBuffer = WebSock.param("autoclearchanbuffer").toBool();
-        if (pChan->autoClearChanBuffer() != bAutoClearChanBuffer) {
-            pChan->setAutoClearChanBuffer(WebSock.param("autoclearchanbuffer").toBool());
+        if (channel->autoClearChanBuffer() != bAutoClearChanBuffer) {
+            channel->setAutoClearChanBuffer(WebSock.param("autoclearchanbuffer").toBool());
         }
-        pChan->setKey(WebSock.param("key"));
+        channel->setKey(WebSock.param("key"));
 
         bool bDetached = WebSock.param("detached").toBool();
-        if (pChan->isDetached() != bDetached) {
+        if (channel->isDetached() != bDetached) {
             if (bDetached) {
-                pChan->detachUser();
+                channel->detachUser();
             } else {
-                pChan->attachUser();
+                channel->attachUser();
             }
         }
 
         bool bDisabled = WebSock.param("disabled").toBool();
         if (bDisabled)
-            pChan->disable();
+            channel->disable();
         else
-            pChan->enable();
+            channel->enable();
 
         NoTemplate TmplMod;
-        TmplMod["User"] = pUser->userName();
-        TmplMod["ChanName"] = pChan->name();
+        TmplMod["User"] = user->userName();
+        TmplMod["ChanName"] = channel->name();
         TmplMod["WebadminAction"] = "change";
-        for (NoModule* pMod : allModules(pNetwork)) {
-            pMod->onEmbeddedWebRequest(WebSock, "webadmin/channel", TmplMod);
+        for (NoModule* mod : allModules(network)) {
+            mod->onEmbeddedWebRequest(WebSock, "webadmin/channel", TmplMod);
         }
 
         if (!noApp->writeConfig()) {
@@ -785,22 +785,22 @@ public:
         }
 
         if (WebSock.hasParam("submit_return")) {
-            WebSock.redirect(webPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
-                             "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
+            WebSock.redirect(webPath() + "editnetwork?user=" + No::escape(user->userName(), No::UrlFormat) +
+                             "&network=" + No::escape(network->name(), No::UrlFormat));
         } else {
-            WebSock.redirect(webPath() + "editchan?user=" + No::escape(pUser->userName(), No::UrlFormat) + "&network=" +
-                             No::escape(pNetwork->name(), No::UrlFormat) + "&name=" + No::escape(pChan->name(), No::UrlFormat));
+            WebSock.redirect(webPath() + "editchan?user=" + No::escape(user->userName(), No::UrlFormat) + "&network=" +
+                             No::escape(network->name(), No::UrlFormat) + "&name=" + No::escape(channel->name(), No::UrlFormat));
         }
         return true;
     }
 
-    bool NetworkPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* pUser, NoNetwork* pNetwork = nullptr)
+    bool NetworkPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* user, NoNetwork* network = nullptr)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.session();
         Tmpl.setFile("add_edit_network.tmpl");
 
         if (!WebSock.param("submitted").toUInt()) {
-            Tmpl["Username"] = pUser->userName();
+            Tmpl["Username"] = user->userName();
 
             std::set<NoModuleInfo> ssNetworkMods;
             noApp->loader()->availableModules(ssNetworkMods, No::NetworkModule);
@@ -814,8 +814,8 @@ public:
                 l["HasArgs"] = NoString(Info.hasArgs());
                 l["ArgsHelpText"] = Info.argsHelpText();
 
-                if (pNetwork) {
-                    NoModule* pModule = pNetwork->loader()->findModule(Info.name());
+                if (network) {
+                    NoModule* pModule = network->loader()->findModule(Info.name());
                     if (pModule) {
                         l["Checked"] = "true";
                         l["Args"] = pModule->args();
@@ -828,9 +828,9 @@ public:
 
                 // Check if module is loaded by user
                 l["CanBeLoadedByUser"] = NoString(Info.supportsType(No::UserModule));
-                l["LoadedByUser"] = NoString(pUser->loader()->findModule(Info.name()) != nullptr);
+                l["LoadedByUser"] = NoString(user->loader()->findModule(Info.name()) != nullptr);
 
-                if (!spSession->isAdmin() && pUser->denyLoadMod()) {
+                if (!spSession->isAdmin() && user->denyLoadMod()) {
                     l["Disabled"] = "true";
                 }
             }
@@ -840,8 +840,8 @@ public:
                 Tmpl["BindHostEdit"] = "true";
                 const NoStringVector& vsBindHosts = noApp->bindHosts();
                 if (vsBindHosts.empty()) {
-                    if (pNetwork) {
-                        Tmpl["BindHost"] = pNetwork->bindHost();
+                    if (network) {
+                        Tmpl["BindHost"] = network->bindHost();
                     }
                 } else {
                     bool bFoundBindHost = false;
@@ -851,84 +851,84 @@ public:
 
                         l["BindHost"] = sBindHost;
 
-                        if (pNetwork && pNetwork->bindHost() == sBindHost) {
+                        if (network && network->bindHost() == sBindHost) {
                             l["Checked"] = "true";
                             bFoundBindHost = true;
                         }
                     }
 
                     // If our current bindhost is not in the global list...
-                    if (pNetwork && !bFoundBindHost && !pNetwork->bindHost().empty()) {
+                    if (network && !bFoundBindHost && !network->bindHost().empty()) {
                         NoTemplate& l = Tmpl.addRow("BindHostLoop");
 
-                        l["BindHost"] = pNetwork->bindHost();
+                        l["BindHost"] = network->bindHost();
                         l["Checked"] = "true";
                     }
                 }
             }
 
-            if (pNetwork) {
+            if (network) {
                 Tmpl["Action"] = "editnetwork";
                 Tmpl["Edit"] = "true";
-                Tmpl["Title"] = "Edit Network" + NoString(" [" + pNetwork->name() + "]") + " of User [" + pUser->userName() + "]";
-                Tmpl["Name"] = pNetwork->name();
+                Tmpl["Title"] = "Edit Network" + NoString(" [" + network->name() + "]") + " of User [" + user->userName() + "]";
+                Tmpl["Name"] = network->name();
 
-                Tmpl["Nick"] = pNetwork->nick();
-                Tmpl["AltNick"] = pNetwork->altNick();
-                Tmpl["Ident"] = pNetwork->ident();
-                Tmpl["RealName"] = pNetwork->realName();
+                Tmpl["Nick"] = network->nick();
+                Tmpl["AltNick"] = network->altNick();
+                Tmpl["Ident"] = network->ident();
+                Tmpl["RealName"] = network->realName();
 
-                Tmpl["QuitMsg"] = pNetwork->quitMsg();
+                Tmpl["QuitMsg"] = network->quitMsg();
 
-                Tmpl["FloodProtection"] = NoString(NoIrcSocket::isFloodProtected(pNetwork->floodRate()));
-                Tmpl["FloodRate"] = NoString(pNetwork->floodRate());
-                Tmpl["FloodBurst"] = NoString(pNetwork->floodBurst());
+                Tmpl["FloodProtection"] = NoString(NoIrcSocket::isFloodProtected(network->floodRate()));
+                Tmpl["FloodRate"] = NoString(network->floodRate());
+                Tmpl["FloodBurst"] = NoString(network->floodBurst());
 
-                Tmpl["JoinDelay"] = NoString(pNetwork->joinDelay());
+                Tmpl["JoinDelay"] = NoString(network->joinDelay());
 
-                Tmpl["IRCConnectEnabled"] = NoString(pNetwork->isEnabled());
+                Tmpl["IRCConnectEnabled"] = NoString(network->isEnabled());
 
-                const std::vector<NoServerInfo*>& vServers = pNetwork->servers();
+                const std::vector<NoServerInfo*>& vServers = network->servers();
                 for (uint a = 0; a < vServers.size(); a++) {
                     NoTemplate& l = Tmpl.addRow("ServerLoop");
                     l["Server"] = vServers[a]->toString();
                 }
 
-                const std::vector<NoChannel*>& Channels = pNetwork->channels();
+                const std::vector<NoChannel*>& Channels = network->channels();
                 for (uint c = 0; c < Channels.size(); c++) {
-                    NoChannel* pChan = Channels[c];
+                    NoChannel* channel = Channels[c];
                     NoTemplate& l = Tmpl.addRow("ChannelLoop");
 
-                    l["Network"] = pNetwork->name();
-                    l["Username"] = pUser->userName();
-                    l["Name"] = pChan->name();
-                    l["Perms"] = pChan->permStr();
-                    l["CurModes"] = pChan->modeString();
-                    l["DefModes"] = pChan->defaultModes();
-                    if (pChan->hasBufferCountSet()) {
-                        l["BufferCount"] = NoString(pChan->bufferCount());
+                    l["Network"] = network->name();
+                    l["Username"] = user->userName();
+                    l["Name"] = channel->name();
+                    l["Perms"] = channel->permStr();
+                    l["CurModes"] = channel->modeString();
+                    l["DefModes"] = channel->defaultModes();
+                    if (channel->hasBufferCountSet()) {
+                        l["BufferCount"] = NoString(channel->bufferCount());
                     } else {
-                        l["BufferCount"] = NoString(pChan->bufferCount()) + " (default)";
+                        l["BufferCount"] = NoString(channel->bufferCount()) + " (default)";
                     }
-                    l["Options"] = pChan->options();
+                    l["Options"] = channel->options();
 
-                    if (pChan->inConfig()) {
+                    if (channel->inConfig()) {
                         l["InConfig"] = "true";
                     }
                 }
-                for (const NoString& sFP : pNetwork->trustedFingerprints()) {
+                for (const NoString& sFP : network->trustedFingerprints()) {
                     NoTemplate& l = Tmpl.addRow("TrustedFingerprints");
                     l["FP"] = sFP;
                 }
             } else {
-                if (!spSession->isAdmin() && !pUser->hasSpaceForNewNetwork()) {
+                if (!spSession->isAdmin() && !user->hasSpaceForNewNetwork()) {
                     WebSock.printErrorPage("Network number limit reached. Ask an admin to increase the limit for you, "
                                            "or delete unneeded networks from Your Settings.");
                     return true;
                 }
 
                 Tmpl["Action"] = "addnetwork";
-                Tmpl["Title"] = "Add Network for User [" + pUser->userName() + "]";
+                Tmpl["Title"] = "Add Network for User [" + user->userName() + "]";
                 Tmpl["IRCConnectEnabled"] = "true";
                 Tmpl["FloodProtection"] = "true";
                 Tmpl["FloodRate"] = "1.0";
@@ -936,13 +936,13 @@ public:
                 Tmpl["JoinDelay"] = "0";
             }
 
-            for (NoModule* pMod : allModules(pUser, pNetwork)) {
-                NoTemplate& mod = Tmpl.addRow("EmbeddedModuleLoop");
-                mod.insert(Tmpl.begin(), Tmpl.end());
-                mod["WebadminAction"] = "display";
-                if (pMod->onEmbeddedWebRequest(WebSock, "webadmin/network", mod)) {
-                    mod["Embed"] = WebSock.findTemplate(pMod, "WebadminNetwork.tmpl");
-                    mod["ModName"] = pMod->moduleName();
+            for (NoModule* mod : allModules(user, network)) {
+                NoTemplate& modrow = Tmpl.addRow("EmbeddedModuleLoop");
+                modrow.insert(Tmpl.begin(), Tmpl.end());
+                modrow["WebadminAction"] = "display";
+                if (mod->onEmbeddedWebRequest(WebSock, "webadmin/network", modrow)) {
+                    modrow["Embed"] = WebSock.findTemplate(mod, "WebadminNetwork.tmpl");
+                    modrow["ModName"] = mod->moduleName();
                 }
             }
 
@@ -951,7 +951,7 @@ public:
                 NoTemplate& l = Tmpl.addRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
-            const NoString sEncoding = pNetwork ? pNetwork->encoding() : "^UTF-8";
+            const NoString sEncoding = network ? network->encoding() : "^UTF-8";
             if (sEncoding.empty()) {
                 Tmpl["EncodingUtf"] = "legacy";
             } else if (sEncoding[0] == '*') {
@@ -972,138 +972,138 @@ public:
             return true;
         }
 
-        NoString sName = WebSock.param("name").trim_n();
-        if (sName.empty()) {
+        NoString name = WebSock.param("name").trim_n();
+        if (name.empty()) {
             WebSock.printErrorPage("Network name is a required argument");
             return true;
         }
-        if (!pNetwork && !spSession->isAdmin() && !pUser->hasSpaceForNewNetwork()) {
+        if (!network && !spSession->isAdmin() && !user->hasSpaceForNewNetwork()) {
             WebSock.printErrorPage("Network number limit reached. Ask an admin to increase the limit for you, or "
                                    "delete few old ones from Your Settings");
             return true;
         }
-        if (!pNetwork || pNetwork->name() != sName) {
+        if (!network || network->name() != name) {
             NoString sNetworkAddError;
-            NoNetwork* pOldNetwork = pNetwork;
-            pNetwork = pUser->addNetwork(sName, sNetworkAddError);
-            if (!pNetwork) {
+            NoNetwork* pOldNetwork = network;
+            network = user->addNetwork(name, sNetworkAddError);
+            if (!network) {
                 WebSock.printErrorPage(sNetworkAddError);
                 return true;
             }
             if (pOldNetwork) {
                 for (NoModule* pModule : pOldNetwork->loader()->modules()) {
-                    NoString sPath = pUser->userPath() + "/networks/" + sName + "/moddata/" + pModule->moduleName();
+                    NoString sPath = user->userPath() + "/networks/" + name + "/moddata/" + pModule->moduleName();
                     NoRegistry registry(pModule);
                     registry.copy(sPath);
                 }
-                pNetwork->clone(*pOldNetwork, false);
-                pUser->deleteNetwork(pOldNetwork->name());
+                network->clone(*pOldNetwork, false);
+                user->deleteNetwork(pOldNetwork->name());
             }
         }
 
-        NoString sArg;
+        NoString arg;
 
-        pNetwork->setNick(WebSock.param("nick"));
-        pNetwork->setAltNick(WebSock.param("altnick"));
-        pNetwork->setIdent(WebSock.param("ident"));
-        pNetwork->setRealName(WebSock.param("realname"));
+        network->setNick(WebSock.param("nick"));
+        network->setAltNick(WebSock.param("altnick"));
+        network->setIdent(WebSock.param("ident"));
+        network->setRealName(WebSock.param("realname"));
 
-        pNetwork->setQuitMsg(WebSock.param("quitmsg"));
+        network->setQuitMsg(WebSock.param("quitmsg"));
 
-        pNetwork->setEnabled(WebSock.param("doconnect").toBool());
+        network->setEnabled(WebSock.param("doconnect").toBool());
 
-        sArg = WebSock.param("bindhost");
+        arg = WebSock.param("bindhost");
         // To change BindHosts be admin or don't have DenysetBindHost
         if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
-            NoString sHost = WebSock.param("bindhost");
+            NoString host = WebSock.param("bindhost");
             const NoStringVector& vsHosts = noApp->bindHosts();
             if (!spSession->isAdmin() && !vsHosts.empty()) {
                 NoStringVector::const_iterator it;
                 bool bFound = false;
 
                 for (it = vsHosts.begin(); it != vsHosts.end(); ++it) {
-                    if (sHost.equals(*it)) {
+                    if (host.equals(*it)) {
                         bFound = true;
                         break;
                     }
                 }
 
                 if (!bFound) {
-                    sHost = pNetwork->bindHost();
+                    host = network->bindHost();
                 }
             }
-            pNetwork->setBindHost(sHost);
+            network->setBindHost(host);
         }
 
         if (WebSock.param("floodprotection").toBool()) {
-            pNetwork->setFloodRate(WebSock.param("floodrate").toDouble());
-            pNetwork->setFloodBurst(WebSock.param("floodburst").toUShort());
+            network->setFloodRate(WebSock.param("floodrate").toDouble());
+            network->setFloodBurst(WebSock.param("floodburst").toUShort());
         } else {
-            pNetwork->setFloodRate(-1);
+            network->setFloodRate(-1);
         }
 
-        pNetwork->setJoinDelay(WebSock.param("joindelay").toUShort());
+        network->setJoinDelay(WebSock.param("joindelay").toUShort());
 
 #ifdef HAVE_ICU
         NoString sEncodingUtf = WebSock.param("encoding_utf");
         if (sEncodingUtf == "legacy") {
-            pNetwork->setEncoding("");
+            network->setEncoding("");
         }
         NoString sEncoding = WebSock.param("encoding");
         if (sEncoding.empty()) {
             sEncoding = "UTF-8";
         }
         if (sEncodingUtf == "send") {
-            pNetwork->setEncoding("^" + sEncoding);
+            network->setEncoding("^" + sEncoding);
         } else if (sEncodingUtf == "receive") {
-            pNetwork->setEncoding("*" + sEncoding);
+            network->setEncoding("*" + sEncoding);
         } else if (sEncodingUtf == "simple") {
-            pNetwork->setEncoding(sEncoding);
+            network->setEncoding(sEncoding);
         }
 #endif
 
-        pNetwork->delServers();
+        network->delServers();
         NoStringVector vsArgs = WebSock.rawParam("servers").split("\n");
         for (uint a = 0; a < vsArgs.size(); a++) {
-            pNetwork->addServer(vsArgs[a].trim_n());
+            network->addServer(vsArgs[a].trim_n());
         }
 
         vsArgs = WebSock.rawParam("fingerprints").split("\n");
-        while (!pNetwork->trustedFingerprints().empty()) {
-            pNetwork->removeTrustedFingerprint(*pNetwork->trustedFingerprints().begin());
+        while (!network->trustedFingerprints().empty()) {
+            network->removeTrustedFingerprint(*network->trustedFingerprints().begin());
         }
         for (const NoString& sFP : vsArgs) {
-            pNetwork->addTrustedFingerprint(sFP);
+            network->addTrustedFingerprint(sFP);
         }
 
         WebSock.paramValues("channel", vsArgs);
         for (uint a = 0; a < vsArgs.size(); a++) {
             const NoString& sChan = vsArgs[a];
-            NoChannel* pChan = pNetwork->findChannel(sChan.trimRight_n("\r"));
-            if (pChan) {
-                pChan->setInConfig(WebSock.param("save_" + sChan).toBool());
+            NoChannel* channel = network->findChannel(sChan.trimRight_n("\r"));
+            if (channel) {
+                channel->setInConfig(WebSock.param("save_" + sChan).toBool());
             }
         }
 
         std::set<NoString> ssArgs;
         WebSock.paramValues("loadmod", ssArgs);
-        if (spSession->isAdmin() || !pUser->denyLoadMod()) {
+        if (spSession->isAdmin() || !user->denyLoadMod()) {
             for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
                 NoString sModRet;
                 NoString sModName = (*it).trimRight_n("\r");
                 NoString sModLoadError;
 
                 if (!sModName.empty()) {
-                    NoString sArgs = WebSock.param("modargs_" + sModName);
+                    NoString args = WebSock.param("modargs_" + sModName);
 
-                    NoModule* pMod = pNetwork->loader()->findModule(sModName);
+                    NoModule* mod = network->loader()->findModule(sModName);
 
-                    if (!pMod) {
-                        if (!pNetwork->loader()->loadModule(sModName, sArgs, No::NetworkModule, pUser, pNetwork, sModRet)) {
+                    if (!mod) {
+                        if (!network->loader()->loadModule(sModName, args, No::NetworkModule, user, network, sModRet)) {
                             sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                         }
-                    } else if (pMod->args() != sArgs) {
-                        if (!pNetwork->loader()->reloadModule(sModName, sArgs, pUser, pNetwork, sModRet)) {
+                    } else if (mod->args() != args) {
+                        if (!network->loader()->reloadModule(sModName, args, user, network, sModRet)) {
                             sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                         }
                     }
@@ -1116,7 +1116,7 @@ public:
             }
         }
 
-        const NoModuleLoader* vCurMods = pNetwork->loader();
+        const NoModuleLoader* vCurMods = network->loader();
         std::set<NoString> ssUnloadMods;
 
         for (NoModule* pCurMod : vCurMods->modules()) {
@@ -1126,15 +1126,15 @@ public:
         }
 
         for (std::set<NoString>::iterator it2 = ssUnloadMods.begin(); it2 != ssUnloadMods.end(); ++it2) {
-            pNetwork->loader()->unloadModule(*it2);
+            network->loader()->unloadModule(*it2);
         }
 
         NoTemplate TmplMod;
-        TmplMod["Username"] = pUser->userName();
-        TmplMod["Name"] = pNetwork->name();
+        TmplMod["Username"] = user->userName();
+        TmplMod["Name"] = network->name();
         TmplMod["WebadminAction"] = "change";
-        for (NoModule* pMod : allModules(pUser, pNetwork)) {
-            pMod->onEmbeddedWebRequest(WebSock, "webadmin/network", TmplMod);
+        for (NoModule* mod : allModules(user, network)) {
+            mod->onEmbeddedWebRequest(WebSock, "webadmin/network", TmplMod);
         }
 
         if (!noApp->writeConfig()) {
@@ -1143,22 +1143,22 @@ public:
         }
 
         if (WebSock.hasParam("submit_return")) {
-            WebSock.redirect(webPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
+            WebSock.redirect(webPath() + "edituser?user=" + No::escape(user->userName(), No::UrlFormat));
         } else {
-            WebSock.redirect(webPath() + "editnetwork?user=" + No::escape(pUser->userName(), No::UrlFormat) +
-                             "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
+            WebSock.redirect(webPath() + "editnetwork?user=" + No::escape(user->userName(), No::UrlFormat) +
+                             "&network=" + No::escape(network->name(), No::UrlFormat));
         }
         return true;
     }
 
-    bool DelNetwork(NoWebSocket& WebSock, NoUser* pUser, NoTemplate& Tmpl)
+    bool DelNetwork(NoWebSocket& WebSock, NoUser* user, NoTemplate& Tmpl)
     {
         NoString sNetwork = WebSock.param("name");
         if (sNetwork.empty() && !WebSock.isPost()) {
             sNetwork = WebSock.param("name", false);
         }
 
-        if (!pUser) {
+        if (!user) {
             WebSock.printErrorPage("That user doesn't exist");
             return true;
         }
@@ -1172,23 +1172,23 @@ public:
             // Show the "Are you sure?" page:
 
             Tmpl.setFile("del_network.tmpl");
-            Tmpl["Username"] = pUser->userName();
+            Tmpl["Username"] = user->userName();
             Tmpl["Network"] = sNetwork;
             return true;
         }
 
-        pUser->deleteNetwork(sNetwork);
+        user->deleteNetwork(sNetwork);
 
         if (!noApp->writeConfig()) {
             WebSock.printErrorPage("Network deleted, but config was not written");
             return true;
         }
 
-        WebSock.redirect(webPath() + "edituser?user=" + No::escape(pUser->userName(), No::UrlFormat));
+        WebSock.redirect(webPath() + "edituser?user=" + No::escape(user->userName(), No::UrlFormat));
         return false;
     }
 
-    bool removeChannel(NoWebSocket& WebSock, NoNetwork* pNetwork)
+    bool removeChannel(NoWebSocket& WebSock, NoNetwork* network)
     {
         NoString sChan = WebSock.param("name", false);
 
@@ -1197,79 +1197,79 @@ public:
             return true;
         }
 
-        pNetwork->removeChannel(sChan);
-        pNetwork->putIrc("PART " + sChan);
+        network->removeChannel(sChan);
+        network->putIrc("PART " + sChan);
 
         if (!noApp->writeConfig()) {
             WebSock.printErrorPage("Channel deleted, but config was not written");
             return true;
         }
 
-        WebSock.redirect(webPath() + "editnetwork?user=" + No::escape(pNetwork->user()->userName(), No::UrlFormat) +
-                         "&network=" + No::escape(pNetwork->name(), No::UrlFormat));
+        WebSock.redirect(webPath() + "editnetwork?user=" + No::escape(network->user()->userName(), No::UrlFormat) +
+                         "&network=" + No::escape(network->name(), No::UrlFormat));
         return false;
     }
 
-    bool UserPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* pUser = nullptr)
+    bool UserPage(NoWebSocket& WebSock, NoTemplate& Tmpl, NoUser* user = nullptr)
     {
         std::shared_ptr<NoWebSession> spSession = WebSock.session();
         Tmpl.setFile("add_edit_user.tmpl");
 
         if (!WebSock.param("submitted").toUInt()) {
-            if (pUser) {
+            if (user) {
                 Tmpl["Action"] = "edituser";
-                Tmpl["Title"] = "Edit User [" + pUser->userName() + "]";
+                Tmpl["Title"] = "Edit User [" + user->userName() + "]";
                 Tmpl["Edit"] = "true";
             } else {
                 NoString sUsername = WebSock.param("clone", false);
-                pUser = noApp->findUser(sUsername);
+                user = noApp->findUser(sUsername);
 
-                if (pUser) {
-                    Tmpl["Title"] = "Clone User [" + pUser->userName() + "]";
+                if (user) {
+                    Tmpl["Title"] = "Clone User [" + user->userName() + "]";
                     Tmpl["Clone"] = "true";
-                    Tmpl["CloneUsername"] = pUser->userName();
+                    Tmpl["CloneUsername"] = user->userName();
                 }
             }
 
             Tmpl["ImAdmin"] = NoString(spSession->isAdmin());
 
-            if (pUser) {
-                Tmpl["Username"] = pUser->userName();
-                Tmpl["Nick"] = pUser->nick();
-                Tmpl["AltNick"] = pUser->altNick();
-                Tmpl["StatusPrefix"] = pUser->statusPrefix();
-                Tmpl["Ident"] = pUser->ident();
-                Tmpl["RealName"] = pUser->realName();
-                Tmpl["QuitMsg"] = pUser->quitMsg();
-                Tmpl["DefaultChanModes"] = pUser->defaultChanModes();
-                Tmpl["BufferCount"] = NoString(pUser->bufferCount());
-                Tmpl["TimestampFormat"] = pUser->timestampFormat();
-                Tmpl["Timezone"] = pUser->timezone();
-                Tmpl["JoinTries"] = NoString(pUser->joinTries());
-                Tmpl["MaxNetworks"] = NoString(pUser->maxNetworks());
-                Tmpl["MaxJoins"] = NoString(pUser->maxJoins());
-                Tmpl["MaxQueryBuffers"] = NoString(pUser->maxQueryBuffers());
+            if (user) {
+                Tmpl["Username"] = user->userName();
+                Tmpl["Nick"] = user->nick();
+                Tmpl["AltNick"] = user->altNick();
+                Tmpl["StatusPrefix"] = user->statusPrefix();
+                Tmpl["Ident"] = user->ident();
+                Tmpl["RealName"] = user->realName();
+                Tmpl["QuitMsg"] = user->quitMsg();
+                Tmpl["DefaultChanModes"] = user->defaultChanModes();
+                Tmpl["BufferCount"] = NoString(user->bufferCount());
+                Tmpl["TimestampFormat"] = user->timestampFormat();
+                Tmpl["Timezone"] = user->timezone();
+                Tmpl["JoinTries"] = NoString(user->joinTries());
+                Tmpl["MaxNetworks"] = NoString(user->maxNetworks());
+                Tmpl["MaxJoins"] = NoString(user->maxJoins());
+                Tmpl["MaxQueryBuffers"] = NoString(user->maxQueryBuffers());
 
-                const std::set<NoString>& ssAllowedHosts = pUser->allowedHosts();
+                const std::set<NoString>& ssAllowedHosts = user->allowedHosts();
                 for (std::set<NoString>::const_iterator it = ssAllowedHosts.begin(); it != ssAllowedHosts.end(); ++it) {
                     NoTemplate& l = Tmpl.addRow("AllowedHostLoop");
                     l["Host"] = *it;
                 }
 
-                const std::vector<NoNetwork*>& vNetworks = pUser->networks();
+                const std::vector<NoNetwork*>& vNetworks = user->networks();
                 for (uint a = 0; a < vNetworks.size(); a++) {
                     NoTemplate& l = Tmpl.addRow("NetworkLoop");
                     l["Name"] = vNetworks[a]->name();
-                    l["Username"] = pUser->userName();
+                    l["Username"] = user->userName();
                     l["Clients"] = NoString(vNetworks[a]->clients().size());
                     l["IRCNick"] = vNetworks[a]->ircNick().nick();
-                    NoServerInfo* pServer = vNetworks[a]->currentServer();
-                    if (pServer) {
-                        l["Server"] = pServer->host() + ":" + (pServer->isSsl() ? "+" : "") + NoString(pServer->port());
+                    NoServerInfo* server = vNetworks[a]->currentServer();
+                    if (server) {
+                        l["Server"] = server->host() + ":" + (server->isSsl() ? "+" : "") + NoString(server->port());
                     }
                 }
 
-                const NoStringMap& msCTCPReplies = pUser->ctcpReplies();
+                const NoStringMap& msCTCPReplies = user->ctcpReplies();
                 for (NoStringMap::const_iterator it2 = msCTCPReplies.begin(); it2 != msCTCPReplies.end(); ++it2) {
                     NoTemplate& l = Tmpl.addRow("CTCPLoop");
                     l["CTCP"] = it2->first + " " + it2->second;
@@ -1291,7 +1291,7 @@ public:
                 NoTemplate& l = Tmpl.addRow("EncodingLoop");
                 l["Encoding"] = sEncoding;
             }
-            const NoString sEncoding = pUser ? pUser->clientEncoding() : "^UTF-8";
+            const NoString sEncoding = user ? user->clientEncoding() : "^UTF-8";
             if (sEncoding.empty()) {
                 Tmpl["EncodingUtf"] = "legacy";
             } else if (sEncoding[0] == '*') {
@@ -1314,9 +1314,9 @@ public:
                 Tmpl["BindHostEdit"] = "true";
                 const NoStringVector& vsBindHosts = noApp->bindHosts();
                 if (vsBindHosts.empty()) {
-                    if (pUser) {
-                        Tmpl["BindHost"] = pUser->bindHost();
-                        Tmpl["DCCBindHost"] = pUser->dccBindHost();
+                    if (user) {
+                        Tmpl["BindHost"] = user->bindHost();
+                        Tmpl["DCCBindHost"] = user->dccBindHost();
                     }
                 } else {
                     bool bFoundBindHost = false;
@@ -1329,28 +1329,28 @@ public:
                         l["BindHost"] = sBindHost;
                         k["BindHost"] = sBindHost;
 
-                        if (pUser && pUser->bindHost() == sBindHost) {
+                        if (user && user->bindHost() == sBindHost) {
                             l["Checked"] = "true";
                             bFoundBindHost = true;
                         }
 
-                        if (pUser && pUser->dccBindHost() == sBindHost) {
+                        if (user && user->dccBindHost() == sBindHost) {
                             k["Checked"] = "true";
                             bFoundDCCBindHost = true;
                         }
                     }
 
                     // If our current bindhost is not in the global list...
-                    if (pUser && !bFoundBindHost && !pUser->bindHost().empty()) {
+                    if (user && !bFoundBindHost && !user->bindHost().empty()) {
                         NoTemplate& l = Tmpl.addRow("BindHostLoop");
 
-                        l["BindHost"] = pUser->bindHost();
+                        l["BindHost"] = user->bindHost();
                         l["Checked"] = "true";
                     }
-                    if (pUser && !bFoundDCCBindHost && !pUser->dccBindHost().empty()) {
+                    if (user && !bFoundDCCBindHost && !user->dccBindHost().empty()) {
                         NoTemplate& l = Tmpl.addRow("DCCBindHostLoop");
 
-                        l["BindHost"] = pUser->dccBindHost();
+                        l["BindHost"] = user->dccBindHost();
                         l["Checked"] = "true";
                     }
                 }
@@ -1364,7 +1364,7 @@ public:
                 NoTemplate& l = Tmpl.addRow("SkinLoop");
                 l["Name"] = SubDir;
 
-                if (pUser && SubDir == pUser->skinName()) {
+                if (user && SubDir == user->skinName()) {
                     l["Checked"] = "true";
                 }
             }
@@ -1383,10 +1383,10 @@ public:
                 l["ArgsHelpText"] = Info.argsHelpText();
 
                 NoModule* pModule = nullptr;
-                if (pUser) {
-                    pModule = pUser->loader()->findModule(Info.name());
+                if (user) {
+                    pModule = user->loader()->findModule(Info.name());
                     // Check if module is loaded by all or some networks
-                    const std::vector<NoNetwork*>& userNetworks = pUser->networks();
+                    const std::vector<NoNetwork*>& userNetworks = user->networks();
                     uint networksWithRenderedModuleCount = 0;
                     for (uint networkIndex = 0; networkIndex < userNetworks.size(); ++networkIndex) {
                         const NoNetwork* pCurrentNetwork = userNetworks[networkIndex];
@@ -1410,7 +1410,7 @@ public:
                 // Check if module is loaded globally
                 l["LoadedGlobally"] = NoString(noApp->loader()->findModule(Info.name()) != nullptr);
 
-                if (!spSession->isAdmin() && pUser && pUser->denyLoadMod()) {
+                if (!spSession->isAdmin() && user && user->denyLoadMod()) {
                     l["Disabled"] = "true";
                 }
             }
@@ -1419,7 +1419,7 @@ public:
             o1["Name"] = "autoclearchanbuffer";
             o1["DisplayName"] = "Auto Clear Chan Buffer";
             o1["Tooltip"] = "Automatically Clear Channel Buffer After Playback (the default value for new channels)";
-            if (!pUser || pUser->autoClearChanBuffer()) {
+            if (!user || user->autoClearChanBuffer()) {
                 o1["Checked"] = "true";
             }
 
@@ -1428,21 +1428,21 @@ public:
             NoTemplate& o4 = Tmpl.addRow("OptionLoop");
             o4["Name"] = "multiclients";
             o4["DisplayName"] = "Multi Clients";
-            if (!pUser || pUser->multiClients()) {
+            if (!user || user->multiClients()) {
                 o4["Checked"] = "true";
             }
 
             NoTemplate& o7 = Tmpl.addRow("OptionLoop");
             o7["Name"] = "appendtimestamp";
             o7["DisplayName"] = "Append Timestamps";
-            if (pUser && pUser->timestampAppend()) {
+            if (user && user->timestampAppend()) {
                 o7["Checked"] = "true";
             }
 
             NoTemplate& o8 = Tmpl.addRow("OptionLoop");
             o8["Name"] = "prependtimestamp";
             o8["DisplayName"] = "Prepend Timestamps";
-            if (pUser && pUser->timestampPrepend()) {
+            if (user && user->timestampPrepend()) {
                 o8["Checked"] = "true";
             }
 
@@ -1450,24 +1450,24 @@ public:
                 NoTemplate& o9 = Tmpl.addRow("OptionLoop");
                 o9["Name"] = "denyloadmod";
                 o9["DisplayName"] = "Deny LoadMod";
-                if (pUser && pUser->denyLoadMod()) {
+                if (user && user->denyLoadMod()) {
                     o9["Checked"] = "true";
                 }
 
                 NoTemplate& o10 = Tmpl.addRow("OptionLoop");
                 o10["Name"] = "isadmin";
                 o10["DisplayName"] = "Admin";
-                if (pUser && pUser->isAdmin()) {
+                if (user && user->isAdmin()) {
                     o10["Checked"] = "true";
                 }
-                if (pUser && pUser == noApp->findUser(WebSock.username())) {
+                if (user && user == noApp->findUser(WebSock.username())) {
                     o10["Disabled"] = "true";
                 }
 
                 NoTemplate& o11 = Tmpl.addRow("OptionLoop");
                 o11["Name"] = "denysetbindhost";
                 o11["DisplayName"] = "Deny setBindHost";
-                if (pUser && pUser->denysetBindHost()) {
+                if (user && user->denysetBindHost()) {
                     o11["Checked"] = "true";
                 }
             }
@@ -1476,32 +1476,32 @@ public:
             o12["Name"] = "autoclearquerybuffer";
             o12["DisplayName"] = "Auto Clear Query Buffer";
             o12["Tooltip"] = "Automatically Clear Query Buffer After Playback";
-            if (!pUser || pUser->autoclearQueryBuffer()) {
+            if (!user || user->autoclearQueryBuffer()) {
                 o12["Checked"] = "true";
             }
 
-            for (NoModule* pMod : allModules(pUser)) {
-                NoTemplate& mod = Tmpl.addRow("EmbeddedModuleLoop");
-                mod.insert(Tmpl.begin(), Tmpl.end());
-                mod["WebadminAction"] = "display";
-                if (pMod->onEmbeddedWebRequest(WebSock, "webadmin/user", mod)) {
-                    mod["Embed"] = WebSock.findTemplate(pMod, "WebadminUser.tmpl");
-                    mod["ModName"] = pMod->moduleName();
+            for (NoModule* mod : allModules(user)) {
+                NoTemplate& modrow = Tmpl.addRow("EmbeddedModuleLoop");
+                modrow.insert(Tmpl.begin(), Tmpl.end());
+                modrow["WebadminAction"] = "display";
+                if (mod->onEmbeddedWebRequest(WebSock, "webadmin/user", modrow)) {
+                    modrow["Embed"] = WebSock.findTemplate(mod, "WebadminUser.tmpl");
+                    modrow["ModName"] = mod->moduleName();
                 }
             }
 
             return true;
         }
 
-        /* If pUser is nullptr, we are adding a user, else we are editing this one */
+        /* If user is nullptr, we are adding a user, else we are editing this one */
 
         NoString sUsername = WebSock.param("user");
-        if (!pUser && noApp->findUser(sUsername)) {
+        if (!user && noApp->findUser(sUsername)) {
             WebSock.printErrorPage("Invalid Submission [User " + sUsername + " already exists]");
             return true;
         }
 
-        NoUser* pNewUser = GetNewUser(WebSock, pUser);
+        NoUser* pNewUser = GetNewUser(WebSock, user);
         if (!pNewUser) {
             WebSock.printErrorPage("Invalid user settings");
             return true;
@@ -1510,7 +1510,7 @@ public:
         NoString sErr;
         NoString sAction;
 
-        if (!pUser) {
+        if (!user) {
             NoString sClone = WebSock.param("clone");
             if (NoUser* pCloneUser = noApp->findUser(sClone)) {
                 pNewUser->cloneNetworks(*pCloneUser);
@@ -1523,11 +1523,11 @@ public:
                 return true;
             }
 
-            pUser = pNewUser;
+            user = pNewUser;
             sAction = "added";
         } else {
             // Edit User Submission
-            if (!pUser->clone(*pNewUser, sErr, false)) {
+            if (!user->clone(*pNewUser, sErr, false)) {
                 delete pNewUser;
                 WebSock.printErrorPage("Invalid Submission [" + sErr + "]");
                 return true;
@@ -1540,8 +1540,8 @@ public:
         NoTemplate TmplMod;
         TmplMod["Username"] = sUsername;
         TmplMod["WebadminAction"] = "change";
-        for (NoModule* pMod : allModules(pUser)) {
-            pMod->onEmbeddedWebRequest(WebSock, "webadmin/user", TmplMod);
+        for (NoModule* mod : allModules(user)) {
+            mod->onEmbeddedWebRequest(WebSock, "webadmin/user", TmplMod);
         }
 
         if (!noApp->writeConfig()) {
@@ -1552,7 +1552,7 @@ public:
         if (spSession->isAdmin() && WebSock.hasParam("submit_return")) {
             WebSock.redirect(webPath() + "listusers");
         } else {
-            WebSock.redirect(webPath() + "edituser?user=" + pUser->userName());
+            WebSock.redirect(webPath() + "edituser?user=" + user->userName());
         }
 
         /* we don't want the template to be printed while we redirect */
@@ -1599,18 +1599,18 @@ public:
             std::vector<NoNetwork*> vNetworks = User.networks();
 
             for (std::vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
-                NoNetwork* pNetwork = *it2;
+                NoNetwork* network = *it2;
                 uiNetworks++;
 
-                if (pNetwork->isIrcConnected()) {
+                if (network->isIrcConnected()) {
                     uiServers++;
                 }
 
-                if (pNetwork->isNetworkAttached()) {
+                if (network->isNetworkAttached()) {
                     uiAttached++;
                 }
 
-                uiClients += pNetwork->clients().size();
+                uiClients += network->clients().size();
             }
 
             uiClients += User.userClients().size();
@@ -1651,12 +1651,12 @@ public:
 
     bool AddListener(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
-        ushort uPort = WebSock.param("port").toUShort();
-        NoString sHost = WebSock.param("host");
+        ushort port = WebSock.param("port").toUShort();
+        NoString host = WebSock.param("host");
         NoString sURIPrefix = WebSock.param("uriprefix");
-        if (sHost == "*")
-            sHost = "";
-        bool bSSL = WebSock.param("ssl").toBool();
+        if (host == "*")
+            host = "";
+        bool ssl = WebSock.param("ssl").toBool();
         bool bIPv4 = WebSock.param("ipv4").toBool();
         bool bIPv6 = WebSock.param("ipv6").toBool();
         bool bIRC = WebSock.param("irc").toBool();
@@ -1695,7 +1695,7 @@ public:
         }
 
         NoString sMessage;
-        if (noApp->addListener(uPort, sHost, sURIPrefix, bSSL, eAddr, eAccept, sMessage)) {
+        if (noApp->addListener(port, host, sURIPrefix, ssl, eAddr, eAccept, sMessage)) {
             if (!sMessage.empty()) {
                 WebSock.session()->addSuccess(sMessage);
             }
@@ -1711,8 +1711,8 @@ public:
 
     bool DelListener(NoWebSocket& WebSock, NoTemplate& Tmpl)
     {
-        ushort uPort = WebSock.param("port").toUShort();
-        NoString sHost = WebSock.param("host");
+        ushort port = WebSock.param("port").toUShort();
+        NoString host = WebSock.param("host");
         bool bIPv4 = WebSock.param("ipv4").toBool();
         bool bIPv6 = WebSock.param("ipv6").toBool();
 
@@ -1732,7 +1732,7 @@ public:
             }
         }
 
-        NoListener* pListener = noApp->findListener(uPort, sHost, eAddr);
+        NoListener* pListener = noApp->findListener(port, host, eAddr);
         if (pListener) {
             noApp->removeListener(pListener);
             if (!noApp->writeConfig()) {
@@ -1883,21 +1883,21 @@ public:
             return true;
         }
 
-        NoString sArg;
-        sArg = WebSock.param("statusprefix");
-        noApp->setStatusPrefix(sArg);
-        sArg = WebSock.param("maxbufsize");
-        noApp->setMaxBufferSize(sArg.toUInt());
-        sArg = WebSock.param("connectdelay");
-        noApp->setConnectDelay(sArg.toUInt());
-        sArg = WebSock.param("serverthrottle");
-        noApp->setServerThrottle(sArg.toUInt());
-        sArg = WebSock.param("anoniplimit");
-        noApp->setAnonIpLimit(sArg.toUInt());
-        sArg = WebSock.param("protectwebsessions");
-        noApp->setProtectWebSessions(sArg.toBool());
-        sArg = WebSock.param("hideversion");
-        noApp->setHideVersion(sArg.toBool());
+        NoString arg;
+        arg = WebSock.param("statusprefix");
+        noApp->setStatusPrefix(arg);
+        arg = WebSock.param("maxbufsize");
+        noApp->setMaxBufferSize(arg.toUInt());
+        arg = WebSock.param("connectdelay");
+        noApp->setConnectDelay(arg.toUInt());
+        arg = WebSock.param("serverthrottle");
+        noApp->setServerThrottle(arg.toUInt());
+        arg = WebSock.param("anoniplimit");
+        noApp->setAnonIpLimit(arg.toUInt());
+        arg = WebSock.param("protectwebsessions");
+        noApp->setProtectWebSessions(arg.toBool());
+        arg = WebSock.param("hideversion");
+        noApp->setHideVersion(arg.toBool());
 
         NoStringVector vsArgs = WebSock.rawParam("motd").split("\n");
         noApp->clearMotd();
@@ -1925,15 +1925,15 @@ public:
             NoString sModLoadError;
 
             if (!sModName.empty()) {
-                NoString sArgs = WebSock.param("modargs_" + sModName);
+                NoString args = WebSock.param("modargs_" + sModName);
 
-                NoModule* pMod = noApp->loader()->findModule(sModName);
-                if (!pMod) {
-                    if (!noApp->loader()->loadModule(sModName, sArgs, No::GlobalModule, nullptr, nullptr, sModRet)) {
+                NoModule* mod = noApp->loader()->findModule(sModName);
+                if (!mod) {
+                    if (!noApp->loader()->loadModule(sModName, args, No::GlobalModule, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to load module [" + sModName + "] [" + sModRet + "]";
                     }
-                } else if (pMod->args() != sArgs) {
-                    if (!noApp->loader()->reloadModule(sModName, sArgs, nullptr, nullptr, sModRet)) {
+                } else if (mod->args() != args) {
+                    if (!noApp->loader()->reloadModule(sModName, args, nullptr, nullptr, sModRet)) {
                         sModLoadError = "Unable to reload module [" + sModName + "] [" + sModRet + "]";
                     }
                 }

@@ -96,13 +96,13 @@ bool NoIrcSocket::isFloodProtected(double fRate)
     return fRate > FLOOD_MINIMAL_RATE;
 }
 
-NoIrcSocket::NoIrcSocket(NoNetwork* pNetwork) : d(new NoIrcSocketPrivate)
+NoIrcSocket::NoIrcSocket(NoNetwork* network) : d(new NoIrcSocketPrivate)
 {
-    d->network = pNetwork;
-    d->sendsAllowed = pNetwork->floodBurst();
-    d->floodBurst = pNetwork->floodBurst();
-    d->floodRate = pNetwork->floodRate();
-    d->floodProtection = isFloodProtected(pNetwork->floodRate());
+    d->network = network;
+    d->sendsAllowed = network->floodBurst();
+    d->floodBurst = network->floodBurst();
+    d->floodRate = network->floodRate();
+    d->floodProtection = isFloodProtected(network->floodRate());
 
     NoSocketPrivate::get(this)->allowControlCodes = true;
     enableReadLine();
@@ -121,7 +121,7 @@ NoIrcSocket::NoIrcSocket(NoNetwork* pNetwork) : d(new NoIrcSocketPrivate)
     d->chanModes['i'] = NoArg;
     d->chanModes['n'] = NoArg;
 
-    pNetwork->setIrcSocket(this);
+    network->setIrcSocket(this);
 
     // RFC says a line can have 512 chars max, but we don't care ;)
     setMaxBufferThreshold(1024);
@@ -136,9 +136,9 @@ NoIrcSocket::~NoIrcSocket()
         IRCSOCKMODULECALL(onIrcConnectionError(this), NOTHING);
     }
 
-    const std::vector<NoChannel*>& vChans = d->network->channels();
-    for (NoChannel* pChan : vChans) {
-        pChan->reset();
+    const std::vector<NoChannel*>& channels = d->network->channels();
+    for (NoChannel* channel : channels) {
+        channel->reset();
     }
 
     d->network->ircDisconnected();
@@ -167,42 +167,42 @@ void NoIrcSocket::quit(const NoString& sQuitMsg)
     close(CloseAfterWrite);
 }
 
-void NoIrcSocket::readLine(const NoString& sData)
+void NoIrcSocket::readLine(const NoString& data)
 {
-    NoString sLine = sData;
+    NoString line = data;
 
-    sLine.trimRight("\n\r");
+    line.trimRight("\n\r");
 
-    NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") IRC -> ZNC [" << sLine << "]");
+    NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") IRC -> ZNC [" << line << "]");
 
     bool bReturn = false;
-    IRCSOCKMODULECALL(onRaw(sLine), &bReturn);
+    IRCSOCKMODULECALL(onRaw(line), &bReturn);
     if (bReturn)
         return;
 
-    if (sLine.startsWith("PING ")) {
+    if (line.startsWith("PING ")) {
         // Generate a reply and don't forward this to any user,
         // we don't want any PING forwarded
-        putIrcQuick("PONG " + sLine.substr(5));
+        putIrcQuick("PONG " + line.substr(5));
         return;
-    } else if (No::token(sLine, 1).equals("PONG")) {
+    } else if (No::token(line, 1).equals("PONG")) {
         // Block PONGs, we already responded to the pings
         return;
-    } else if (sLine.startsWith("ERROR ")) {
+    } else if (line.startsWith("ERROR ")) {
         // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
-        NoString sError(sLine.substr(6));
-        sError.trimPrefix();
-        d->network->putStatus("Error from Server [" + sError + "]");
+        NoString error(line.substr(6));
+        error.trimPrefix();
+        d->network->putStatus("Error from Server [" + error + "]");
         return;
     }
 
-    NoString sCmd = No::token(sLine, 1);
+    NoString cmd = No::token(line, 1);
 
-    if ((sCmd.length() == 3) && (isdigit(sCmd[0])) && (isdigit(sCmd[1])) && (isdigit(sCmd[2]))) {
-        NoString sServer = No::token(sLine, 0).leftChomp_n(1);
-        uint uRaw = sCmd.toUInt();
-        NoString sNick = No::token(sLine, 2);
-        NoString sRest = No::tokens(sLine, 3);
+    if ((cmd.length() == 3) && (isdigit(cmd[0])) && (isdigit(cmd[1])) && (isdigit(cmd[2]))) {
+        NoString sServer = No::token(line, 0).leftChomp_n(1);
+        uint uRaw = cmd.toUInt();
+        NoString nick = No::token(line, 2);
+        NoString sRest = No::tokens(line, 3);
         NoString sTmp;
 
         switch (uRaw) {
@@ -216,29 +216,29 @@ void NoIrcSocket::readLine(const NoString& sData)
 
             d->network->setIrcServer(sServer);
             setTimeout(NoNetwork::NoTrafficTimeout, ReadTimeout); // Now that we are connected, let nature take its course
-            putIrc("WHO " + sNick);
+            putIrc("WHO " + nick);
 
             d->authed = true;
             d->network->putStatus("Connected!");
 
             const std::vector<NoClient*>& vClients = d->network->clients();
 
-            for (NoClient* pClient : vClients) {
-                NoString sClientNick = pClient->nick(false);
+            for (NoClient* client : vClients) {
+                NoString sClientNick = client->nick(false);
 
-                if (!sClientNick.equals(sNick)) {
+                if (!sClientNick.equals(nick)) {
                     // If they connected with a nick that doesn't match the one we got on irc, then we need to update
                     // them
-                    pClient->putClient(":" + sClientNick + "!" + d->nick.ident() + "@" + d->nick.host() + " NICK :" + sNick);
+                    client->putClient(":" + sClientNick + "!" + d->nick.ident() + "@" + d->nick.host() + " NICK :" + nick);
                 }
             }
 
-            setNick(sNick);
+            setNick(nick);
 
             IRCSOCKMODULECALL(onIrcConnected(), NOTHING);
 
             d->network->clearRawBuffer();
-            d->network->addRawBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
+            d->network->addRawBuffer(":" + _NAMEDFMT(sServer) + " " + cmd + " {target} " + _NAMEDFMT(sRest));
 
             d->network->ircConnected();
 
@@ -246,15 +246,15 @@ void NoIrcSocket::readLine(const NoString& sData)
         }
         case 5:
             parseISupport(sRest);
-            d->network->updateExactRawBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
+            d->network->updateExactRawBuffer(":" + _NAMEDFMT(sServer) + " " + cmd + " {target} " + _NAMEDFMT(sRest));
             break;
         case 10: { // :irc.server.com 010 nick <hostname> <port> :<info>
-            NoString sHost = No::token(sRest, 0);
+            NoString host = No::token(sRest, 0);
             NoString sPort = No::token(sRest, 1);
             NoString sInfo = No::tokens(sRest, 2).trimPrefix_n();
             NoServerInfo server = NoServerInfo(*d->network->currentServer()); // TODO: store NoServerInfo by value
             server.setPassword("");
-            d->network->putStatus("Server [" + server.toString() + "] redirects us to [" + sHost + ":" + sPort +
+            d->network->putStatus("Server [" + server.toString() + "] redirects us to [" + host + ":" + sPort +
                                   "] with reason [" + sInfo + "]");
             d->network->putStatus("Perhaps you want to add it as a new server.");
             // Don't send server redirects to the client
@@ -270,7 +270,7 @@ void NoIrcSocket::readLine(const NoString& sData)
         case 255: // client count
         case 265: // local users
         case 266: // global users
-            sTmp = ":" + _NAMEDFMT(sServer) + " " + sCmd;
+            sTmp = ":" + _NAMEDFMT(sServer) + " " + cmd;
             d->network->updateRawBuffer(sTmp, sTmp + " {target} " + _NAMEDFMT(sRest));
             break;
         case 305:
@@ -281,51 +281,51 @@ void NoIrcSocket::readLine(const NoString& sData)
             break;
         case 324: { // MODE
             sRest.trim();
-            NoChannel* pChan = d->network->findChannel(No::token(sRest, 0));
+            NoChannel* channel = d->network->findChannel(No::token(sRest, 0));
 
-            if (pChan) {
-                pChan->setModes(No::tokens(sRest, 1));
+            if (channel) {
+                channel->setModes(No::tokens(sRest, 1));
 
                 // We don't SetModeKnown(true) here,
                 // because a 329 will follow
-                if (!pChan->isModeKnown()) {
+                if (!channel->isModeKnown()) {
                     // When we JOIN, we send a MODE
                     // request. This makes sure the
                     // reply isn't forwarded.
                     return;
                 }
-                if (pChan->isDetached()) {
+                if (channel->isDetached()) {
                     return;
                 }
             }
         } break;
         case 329: {
             sRest.trim();
-            NoChannel* pChan = d->network->findChannel(No::token(sRest, 0));
+            NoChannel* channel = d->network->findChannel(No::token(sRest, 0));
 
-            if (pChan) {
-                ulong ulDate = No::token(sLine, 4).toULong();
-                pChan->setCreationDate(ulDate);
+            if (channel) {
+                ulong ulDate = No::token(line, 4).toULong();
+                channel->setCreationDate(ulDate);
 
-                if (!pChan->isModeKnown()) {
-                    pChan->setModeKnown(true);
+                if (!channel->isModeKnown()) {
+                    channel->setModeKnown(true);
                     // When we JOIN, we send a MODE
                     // request. This makes sure the
                     // reply isn't forwarded.
                     return;
                 }
-                if (pChan->isDetached()) {
+                if (channel->isDetached()) {
                     return;
                 }
             }
         } break;
         case 331: {
             // :irc.server.com 331 yournick #chan :No topic is set.
-            NoChannel* pChan = d->network->findChannel(No::token(sLine, 3));
+            NoChannel* channel = d->network->findChannel(No::token(line, 3));
 
-            if (pChan) {
-                pChan->setTopic("");
-                if (pChan->isDetached()) {
+            if (channel) {
+                channel->setTopic("");
+                if (channel->isDetached()) {
                     return;
                 }
             }
@@ -334,13 +334,13 @@ void NoIrcSocket::readLine(const NoString& sData)
         }
         case 332: {
             // :irc.server.com 332 yournick #chan :This is a topic
-            NoChannel* pChan = d->network->findChannel(No::token(sLine, 3));
+            NoChannel* channel = d->network->findChannel(No::token(line, 3));
 
-            if (pChan) {
-                NoString sTopic = No::tokens(sLine, 4);
+            if (channel) {
+                NoString sTopic = No::tokens(line, 4);
                 sTopic.leftChomp(1);
-                pChan->setTopic(sTopic);
-                if (pChan->isDetached()) {
+                channel->setTopic(sTopic);
+                if (channel->isDetached()) {
                     return;
                 }
             }
@@ -349,16 +349,16 @@ void NoIrcSocket::readLine(const NoString& sData)
         }
         case 333: {
             // :irc.server.com 333 yournick #chan setternick 1112320796
-            NoChannel* pChan = d->network->findChannel(No::token(sLine, 3));
+            NoChannel* channel = d->network->findChannel(No::token(line, 3));
 
-            if (pChan) {
-                sNick = No::token(sLine, 4);
-                ulong ulDate = No::token(sLine, 5).toULong();
+            if (channel) {
+                nick = No::token(line, 4);
+                ulong ulDate = No::token(line, 5).toULong();
 
-                pChan->setTopicOwner(sNick);
-                pChan->setTopicDate(ulDate);
+                channel->setTopicOwner(nick);
+                channel->setTopicDate(ulDate);
 
-                if (pChan->isDetached()) {
+                if (channel->isDetached()) {
                     return;
                 }
             }
@@ -367,55 +367,55 @@ void NoIrcSocket::readLine(const NoString& sData)
         }
         case 352: { // WHO
             // :irc.yourserver.com 352 yournick #chan ident theirhost.com irc.theirserver.com theirnick H :0 Real Name
-            sServer = No::token(sLine, 0);
-            sNick = No::token(sLine, 7);
-            NoString sChan = No::token(sLine, 3);
-            NoString sIdent = No::token(sLine, 4);
-            NoString sHost = No::token(sLine, 5);
+            sServer = No::token(line, 0);
+            nick = No::token(line, 7);
+            NoString sChan = No::token(line, 3);
+            NoString ident = No::token(line, 4);
+            NoString host = No::token(line, 5);
 
             sServer.leftChomp(1);
 
-            if (sNick.equals(nick())) {
-                d->nick.setIdent(sIdent);
-                d->nick.setHost(sHost);
+            if (nick.equals(d->nick.nick())) {
+                d->nick.setIdent(ident);
+                d->nick.setHost(host);
             }
 
             d->network->setIrcNick(d->nick);
             d->network->setIrcServer(sServer);
 
-            const std::vector<NoChannel*>& vChans = d->network->channels();
+            const std::vector<NoChannel*>& channels = d->network->channels();
 
-            for (NoChannel* pChan : vChans) {
-                pChan->onWho(sNick, sIdent, sHost);
+            for (NoChannel* channel : channels) {
+                channel->onWho(nick, ident, host);
             }
 
-            if (d->hasNamesX && (sNick.size() > 1) && isPermChar(sNick[1])) {
-                // sLine uses multi-prefix
+            if (d->hasNamesX && (nick.size() > 1) && isPermChar(nick[1])) {
+                // line uses multi-prefix
 
                 const std::vector<NoClient*>& vClients = d->network->clients();
-                for (NoClient* pClient : vClients) {
-                    if (pClient->hasNamesX()) {
-                        d->network->putUser(sLine, pClient);
+                for (NoClient* client : vClients) {
+                    if (client->hasNamesX()) {
+                        d->network->putUser(line, client);
                     } else {
                         // The client doesn't support multi-prefix so we need to remove
                         // the other prefixes.
 
-                        NoString sNewNick = sNick;
-                        size_t pos = sNick.find_first_not_of(perms());
+                        NoString sNewNick = nick;
+                        size_t pos = nick.find_first_not_of(perms());
                         if (pos >= 2 && pos != NoString::npos) {
-                            sNewNick = sNick[0] + sNick.substr(pos);
+                            sNewNick = nick[0] + nick.substr(pos);
                         }
-                        NoString sNewLine = sServer + " 352 " + No::token(sLine, 2) + " " + sChan + " " + sIdent + " " +
-                                            sHost + " " + No::token(sLine, 6) + " " + sNewNick + " " + No::tokens(sLine, 8);
-                        d->network->putUser(sNewLine, pClient);
+                        NoString sNewLine = sServer + " 352 " + No::token(line, 2) + " " + sChan + " " + ident + " " +
+                                            host + " " + No::token(line, 6) + " " + sNewNick + " " + No::tokens(line, 8);
+                        d->network->putUser(sNewLine, client);
                     }
                 }
 
                 return;
             }
 
-            NoChannel* pChan = d->network->findChannel(sChan);
-            if (pChan && pChan->isDetached()) {
+            NoChannel* channel = d->network->findChannel(sChan);
+            if (channel && channel->isDetached()) {
                 return;
             }
 
@@ -424,42 +424,42 @@ void NoIrcSocket::readLine(const NoString& sData)
         case 353: { // NAMES
             sRest.trim();
             // Todo: allow for non @+= server msgs
-            NoChannel* pChan = d->network->findChannel(No::token(sRest, 1));
+            NoChannel* channel = d->network->findChannel(No::token(sRest, 1));
             // If we don't know that channel, some client might have
             // requested a /names for it and we really should forward this.
-            if (pChan) {
+            if (channel) {
                 NoString sNicks = No::tokens(sRest, 2).trimPrefix_n();
-                pChan->addNicks(sNicks);
-                if (pChan->isDetached()) {
+                channel->addNicks(sNicks);
+                if (channel->isDetached()) {
                     return;
                 }
             }
 
-            forwardRaw353(sLine);
+            forwardRaw353(line);
 
             // We forwarded it already, so return
             return;
         }
         case 366: { // end of names list
             // :irc.server.com 366 nick #chan :End of /NAMES list.
-            NoChannel* pChan = d->network->findChannel(No::token(sRest, 0));
+            NoChannel* channel = d->network->findChannel(No::token(sRest, 0));
 
-            if (pChan) {
-                if (pChan->isOn()) {
+            if (channel) {
+                if (channel->isOn()) {
                     // If we are the only one in the chan, set our default modes
-                    if (pChan->nickCount() == 1) {
-                        NoString sModes = pChan->defaultModes();
+                    if (channel->nickCount() == 1) {
+                        NoString sModes = channel->defaultModes();
 
                         if (sModes.empty()) {
                             sModes = d->network->user()->defaultChanModes();
                         }
 
                         if (!sModes.empty()) {
-                            putIrc("MODE " + pChan->name() + " " + sModes);
+                            putIrc("MODE " + channel->name() + " " + sModes);
                         }
                     }
                 }
-                if (pChan->isDetached()) {
+                if (channel->isDetached()) {
                     // don't put it to clients
                     return;
                 }
@@ -475,14 +475,14 @@ void NoIrcSocket::readLine(const NoString& sData)
         case 372: // motd
         case 376: // end motd
             if (d->network->ircServer().equals(sServer)) {
-                d->network->addMotdBuffer(":" + _NAMEDFMT(sServer) + " " + sCmd + " {target} " + _NAMEDFMT(sRest));
+                d->network->addMotdBuffer(":" + _NAMEDFMT(sServer) + " " + cmd + " {target} " + _NAMEDFMT(sRest));
             }
             break;
         case 437:
             // :irc.server.net 437 * badnick :Nick/channel is temporarily unavailable
             // :irc.server.net 437 mynick badnick :Nick/channel is temporarily unavailable
             // :irc.server.net 437 mynick badnick :Cannot change nickname while banned on channel
-            if (d->network->isChannel(No::token(sRest, 0)) || sNick != "*")
+            if (d->network->isChannel(No::token(sRest, 0)) || nick != "*")
                 break;
         case 432: // :irc.server.com 432 * nick :Erroneous Nickname: Illegal characters
         case 433: {
@@ -497,7 +497,7 @@ void NoIrcSocket::readLine(const NoString& sData)
         case 451:
             // :irc.server.com 451 CAP :You have not registered
             // Servers that dont support CAP will give us this error, dont send it to the client
-            if (sNick.equals("CAP"))
+            if (nick.equals("CAP"))
                 return;
         case 470: {
             // :irc.unreal.net 470 mynick [Link] #chan1 has become full, so you are automatically being transferred to
@@ -505,14 +505,14 @@ void NoIrcSocket::readLine(const NoString& sData)
             // :mccaffrey.freenode.net 470 mynick #electronics ##electronics :Forwarding to another channel
 
             // freenode style numeric
-            NoChannel* pChan = d->network->findChannel(No::token(sRest, 0));
-            if (!pChan) {
+            NoChannel* channel = d->network->findChannel(No::token(sRest, 0));
+            if (!channel) {
                 // unreal style numeric
-                pChan = d->network->findChannel(No::token(sRest, 1));
+                channel = d->network->findChannel(No::token(sRest, 1));
             }
-            if (pChan) {
-                pChan->disable();
-                d->network->putStatus("Channel [" + pChan->name() + "] is linked to "
+            if (channel) {
+                channel->disable();
+                d->network->putStatus("Channel [" + channel->name() + "] is linked to "
                                                                     "another channel and was thus disabled.");
             }
             break;
@@ -529,22 +529,22 @@ void NoIrcSocket::readLine(const NoString& sData)
             return;
         }
     } else {
-        NoNick Nick(No::token(sLine, 0).trimPrefix_n());
-        sCmd = No::token(sLine, 1);
-        NoString sRest = No::tokens(sLine, 2);
+        NoNick Nick(No::token(line, 0).trimPrefix_n());
+        cmd = No::token(line, 1);
+        NoString sRest = No::tokens(line, 2);
 
-        if (sCmd.equals("NICK")) {
+        if (cmd.equals("NICK")) {
             NoString sNewNick = sRest.trimPrefix_n();
             bool bIsVisible = false;
 
             std::vector<NoChannel*> vFoundChans;
-            const std::vector<NoChannel*>& vChans = d->network->channels();
+            const std::vector<NoChannel*>& channels = d->network->channels();
 
-            for (NoChannel* pChan : vChans) {
-                if (pChan->changeNick(Nick.nick(), sNewNick)) {
-                    vFoundChans.push_back(pChan);
+            for (NoChannel* channel : channels) {
+                if (channel->changeNick(Nick.nick(), sNewNick)) {
+                    vFoundChans.push_back(channel);
 
-                    if (!pChan->isDetached()) {
+                    if (!channel->isDetached()) {
                         bIsVisible = true;
                     }
                 }
@@ -554,7 +554,7 @@ void NoIrcSocket::readLine(const NoString& sData)
                 // We are changing our own nick, the clients always must see this!
                 bIsVisible = false;
                 setNick(sNewNick);
-                d->network->putUser(sLine);
+                d->network->putUser(line);
             }
 
             IRCSOCKMODULECALL(onNick(Nick, sNewNick, vFoundChans), NOTHING);
@@ -562,7 +562,7 @@ void NoIrcSocket::readLine(const NoString& sData)
             if (!bIsVisible) {
                 return;
             }
-        } else if (sCmd.equals("QUIT")) {
+        } else if (cmd.equals("QUIT")) {
             NoString sMessage = sRest.trimPrefix_n();
             bool bIsVisible = false;
 
@@ -577,13 +577,13 @@ void NoIrcSocket::readLine(const NoString& sData)
             }
 
             std::vector<NoChannel*> vFoundChans;
-            const std::vector<NoChannel*>& vChans = d->network->channels();
+            const std::vector<NoChannel*>& channels = d->network->channels();
 
-            for (NoChannel* pChan : vChans) {
-                if (pChan->remNick(Nick.nick())) {
-                    vFoundChans.push_back(pChan);
+            for (NoChannel* channel : channels) {
+                if (channel->remNick(Nick.nick())) {
+                    vFoundChans.push_back(channel);
 
-                    if (!pChan->isDetached()) {
+                    if (!channel->isDetached()) {
                         bIsVisible = true;
                     }
                 }
@@ -594,41 +594,41 @@ void NoIrcSocket::readLine(const NoString& sData)
             if (!bIsVisible) {
                 return;
             }
-        } else if (sCmd.equals("JOIN")) {
+        } else if (cmd.equals("JOIN")) {
             NoString sChan = No::token(sRest, 0).trimPrefix_n();
-            NoChannel* pChan;
+            NoChannel* channel;
 
             if (Nick.equals(nick())) {
                 d->network->addChannel(sChan, false);
-                pChan = d->network->findChannel(sChan);
-                if (pChan) {
-                    pChan->enable();
-                    pChan->setIsOn(true);
+                channel = d->network->findChannel(sChan);
+                if (channel) {
+                    channel->enable();
+                    channel->setIsOn(true);
                     putIrc("MODE " + sChan);
                 }
             } else {
-                pChan = d->network->findChannel(sChan);
+                channel = d->network->findChannel(sChan);
             }
 
-            if (pChan) {
-                pChan->addNick(Nick.nickMask());
-                IRCSOCKMODULECALL(onJoin(Nick.nickMask(), *pChan), NOTHING);
+            if (channel) {
+                channel->addNick(Nick.nickMask());
+                IRCSOCKMODULECALL(onJoin(Nick.nickMask(), *channel), NOTHING);
 
-                if (pChan->isDetached()) {
+                if (channel->isDetached()) {
                     return;
                 }
             }
-        } else if (sCmd.equals("PART")) {
+        } else if (cmd.equals("PART")) {
             NoString sChan = No::token(sRest, 0).trimPrefix_n();
             NoString sMsg = No::tokens(sRest, 1).trimPrefix_n();
 
-            NoChannel* pChan = d->network->findChannel(sChan);
+            NoChannel* channel = d->network->findChannel(sChan);
             bool bDetached = false;
-            if (pChan) {
-                pChan->remNick(Nick.nick());
-                IRCSOCKMODULECALL(onPart(Nick.nickMask(), *pChan, sMsg), NOTHING);
+            if (channel) {
+                channel->remNick(Nick.nick());
+                IRCSOCKMODULECALL(onPart(Nick.nickMask(), *channel, sMsg), NOTHING);
 
-                if (pChan->isDetached())
+                if (channel->isDetached())
                     bDetached = true;
             }
 
@@ -638,31 +638,31 @@ void NoIrcSocket::readLine(const NoString& sData)
 
             /*
              * We use this boolean because
-             * d->pNetwork->removeChannel() will delete this channel
+             * d->network->removeChannel() will delete this channel
              * and thus we would dereference an
              * already-freed pointer!
              */
             if (bDetached) {
                 return;
             }
-        } else if (sCmd.equals("MODE")) {
+        } else if (cmd.equals("MODE")) {
             NoString sTarget = No::token(sRest, 0);
             NoString sModes = No::tokens(sRest, 1);
             if (sModes.left(1) == ":")
                 sModes = sModes.substr(1);
 
-            NoChannel* pChan = d->network->findChannel(sTarget);
-            if (pChan) {
-                pChan->modeChange(sModes, &Nick);
+            NoChannel* channel = d->network->findChannel(sTarget);
+            if (channel) {
+                channel->modeChange(sModes, &Nick);
 
-                if (pChan->isDetached()) {
+                if (channel->isDetached()) {
                     return;
                 }
             } else if (sTarget == d->nick.nick()) {
                 NoString sModeArg = No::token(sModes, 0);
                 bool bAdd = true;
                 /* no module call defined (yet?)
-                                MODULECALL(onRawUserMode(*pOpNick, *this, sModeArg, sArgs), d->pNetwork->user(),
+                                MODULECALL(onRawUserMode(*pOpNick, *this, sModeArg, args), d->network->user(),
                    nullptr, );
                 */
                 for (uint a = 0; a < sModeArg.size(); a++) {
@@ -681,33 +681,33 @@ void NoIrcSocket::readLine(const NoString& sData)
                     }
                 }
             }
-        } else if (sCmd.equals("KICK")) {
+        } else if (cmd.equals("KICK")) {
             // :opnick!ident@host.com KICK #chan nick :msg
             NoString sChan = No::token(sRest, 0);
             NoString sKickedNick = No::token(sRest, 1);
             NoString sMsg = No::tokens(sRest, 2);
             sMsg.leftChomp(1);
 
-            NoChannel* pChan = d->network->findChannel(sChan);
+            NoChannel* channel = d->network->findChannel(sChan);
 
-            if (pChan) {
-                IRCSOCKMODULECALL(onKick(Nick, sKickedNick, *pChan, sMsg), NOTHING);
+            if (channel) {
+                IRCSOCKMODULECALL(onKick(Nick, sKickedNick, *channel, sMsg), NOTHING);
                 // do not remove the nick till after the onKick call, so modules
                 // can do Chan.FindNick or something to get more info.
-                pChan->remNick(sKickedNick);
+                channel->remNick(sKickedNick);
             }
 
-            if (nick().equals(sKickedNick) && pChan) {
-                pChan->setIsOn(false);
+            if (nick().equals(sKickedNick) && channel) {
+                channel->setIsOn(false);
 
                 // Don't try to rejoin!
-                pChan->disable();
+                channel->disable();
             }
 
-            if ((pChan) && (pChan->isDetached())) {
+            if ((channel) && (channel->isDetached())) {
                 return;
             }
-        } else if (sCmd.equals("NOTICE")) {
+        } else if (cmd.equals("NOTICE")) {
             // :nick!ident@host.com NOTICE #chan :Message
             NoString sTarget = No::token(sRest, 0);
             NoString sMsg = No::tokens(sRest, 1);
@@ -744,29 +744,29 @@ void NoIrcSocket::readLine(const NoString& sData)
             }
 
             return;
-        } else if (sCmd.equals("TOPIC")) {
+        } else if (cmd.equals("TOPIC")) {
             // :nick!ident@host.com TOPIC #chan :This is a topic
-            NoChannel* pChan = d->network->findChannel(No::token(sLine, 2));
+            NoChannel* channel = d->network->findChannel(No::token(line, 2));
 
-            if (pChan) {
-                NoString sTopic = No::tokens(sLine, 3);
+            if (channel) {
+                NoString sTopic = No::tokens(line, 3);
                 sTopic.leftChomp(1);
 
-                IRCSOCKMODULECALL(onTopic(Nick, *pChan, sTopic), &bReturn);
+                IRCSOCKMODULECALL(onTopic(Nick, *channel, sTopic), &bReturn);
                 if (bReturn)
                     return;
 
-                pChan->setTopicOwner(Nick.nick());
-                pChan->setTopicDate((ulong)time(nullptr));
-                pChan->setTopic(sTopic);
+                channel->setTopicOwner(Nick.nick());
+                channel->setTopicDate((ulong)time(nullptr));
+                channel->setTopic(sTopic);
 
-                if (pChan->isDetached()) {
+                if (channel->isDetached()) {
                     return; // Don't forward this
                 }
 
-                sLine = ":" + Nick.nickMask() + " TOPIC " + pChan->name() + " :" + sTopic;
+                line = ":" + Nick.nickMask() + " TOPIC " + channel->name() + " :" + sTopic;
             }
-        } else if (sCmd.equals("PRIVMSG")) {
+        } else if (cmd.equals("PRIVMSG")) {
             // :nick!ident@host.com PRIVMSG #chan :Message
             NoString sTarget = No::token(sRest, 0);
             NoString sMsg = No::tokens(sRest, 1).trimPrefix_n();
@@ -801,14 +801,14 @@ void NoIrcSocket::readLine(const NoString& sData)
                 d->network->putUser(":" + Nick.nickMask() + " PRIVMSG " + sTarget + " :" + sMsg);
                 return;
             }
-        } else if (sCmd.equals("WALLOPS")) {
+        } else if (cmd.equals("WALLOPS")) {
             // :blub!dummy@rox-8DBEFE92 WALLOPS :this is a test
             NoString sMsg = No::tokens(sRest, 0).trimPrefix_n();
 
             if (!d->network->isUserOnline()) {
                 d->network->addNoticeBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " WALLOPS :{text}", sMsg);
             }
-        } else if (sCmd.equals("CAP")) {
+        } else if (cmd.equals("CAP")) {
             // CAPs are supported only before authorization.
             if (!d->authed) {
                 // No::token(sRest, 0) is most likely "*". No idea why, the
@@ -827,49 +827,49 @@ void NoIrcSocket::readLine(const NoString& sData)
                 // actions until all ACK lines are received and
                 // to recognize past request of NAK by 100 chars
                 // of this reply.
-                NoString sArgs;
+                NoString args;
                 if (No::token(sRest, 2) == "*") {
-                    sArgs = No::tokens(sRest, 3).trimPrefix_n();
+                    args = No::tokens(sRest, 3).trimPrefix_n();
                 } else {
-                    sArgs = No::tokens(sRest, 2).trimPrefix_n();
+                    args = No::tokens(sRest, 2).trimPrefix_n();
                 }
 
                 if (sSubCmd == "LS") {
-                    NoStringVector vsTokens = sArgs.split(" ", No::SkipEmptyParts);
+                    NoStringVector vsTokens = args.split(" ", No::SkipEmptyParts);
 
-                    for (const NoString& sCap : vsTokens) {
-                        if (onServerCapAvailable(sCap) || sCap == "multi-prefix" || sCap == "userhost-in-names") {
-                            d->pendingCaps.insert(sCap);
+                    for (const NoString& cap : vsTokens) {
+                        if (onServerCapAvailable(cap) || cap == "multi-prefix" || cap == "userhost-in-names") {
+                            d->pendingCaps.insert(cap);
                         }
                     }
                 } else if (sSubCmd == "ACK") {
-                    sArgs.trim();
-                    IRCSOCKMODULECALL(onServerCapResult(sArgs, true), NOTHING);
-                    if ("multi-prefix" == sArgs) {
+                    args.trim();
+                    IRCSOCKMODULECALL(onServerCapResult(args, true), NOTHING);
+                    if ("multi-prefix" == args) {
                         d->hasNamesX = true;
-                    } else if ("userhost-in-names" == sArgs) {
+                    } else if ("userhost-in-names" == args) {
                         d->hasUhNames = true;
                     }
-                    d->acceptedCaps.insert(sArgs);
+                    d->acceptedCaps.insert(args);
                 } else if (sSubCmd == "NAK") {
                     // This should work because there's no [known]
                     // capability with length of name more than 100 characters.
-                    sArgs.trim();
-                    IRCSOCKMODULECALL(onServerCapResult(sArgs, false), NOTHING);
+                    args.trim();
+                    IRCSOCKMODULECALL(onServerCapResult(args, false), NOTHING);
                 }
 
                 sendNextCap();
             }
             // Don't forward any CAP stuff to the client
             return;
-        } else if (sCmd.equals("INVITE")) {
-            IRCSOCKMODULECALL(onInvite(Nick, No::token(sLine, 3).trimPrefix_n(":")), &bReturn);
+        } else if (cmd.equals("INVITE")) {
+            IRCSOCKMODULECALL(onInvite(Nick, No::token(line, 3).trimPrefix_n(":")), &bReturn);
             if (bReturn)
                 return;
         }
     }
 
-    d->network->putUser(sLine);
+    d->network->putUser(line);
 }
 
 void NoIrcSocket::sendNextCap()
@@ -879,9 +879,9 @@ void NoIrcSocket::sendNextCap()
             // We already got all needed ACK/NAK replies.
             putIrc("CAP END");
         } else {
-            NoString sCap = *d->pendingCaps.begin();
+            NoString cap = *d->pendingCaps.begin();
             d->pendingCaps.erase(d->pendingCaps.begin());
-            putIrc("CAP REQ :" + sCap);
+            putIrc("CAP REQ :" + cap);
         }
     }
 }
@@ -907,10 +907,10 @@ uint NoIrcSocket::maxNickLen() const
     return d->maxNickLen;
 }
 
-bool NoIrcSocket::onServerCapAvailable(const NoString& sCap)
+bool NoIrcSocket::onServerCapAvailable(const NoString& cap)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(onServerCapAvailable(sCap), &bResult);
+    IRCSOCKMODULECALL(onServerCapAvailable(cap), &bResult);
     return bResult;
 }
 
@@ -936,9 +936,9 @@ bool NoIrcSocket::onPrivCtcp(NoNick& Nick, NoString& sMessage)
             return true;
 
         if (!d->network->isUserOnline() || !d->network->user()->autoclearQueryBuffer()) {
-            NoQuery* pQuery = d->network->addQuery(Nick.nick());
-            if (pQuery) {
-                pQuery->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG {target} :\001ACTION {text}\001", sMessage);
+            NoQuery* query = d->network->addQuery(Nick.nick());
+            if (query) {
+                query->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG {target} :\001ACTION {text}\001", sMessage);
             }
         }
 
@@ -1017,9 +1017,9 @@ bool NoIrcSocket::onPrivMsg(NoNick& Nick, NoString& sMessage)
         return true;
 
     if (!d->network->isUserOnline() || !d->network->user()->autoclearQueryBuffer()) {
-        NoQuery* pQuery = d->network->addQuery(Nick.nick());
-        if (pQuery) {
-            pQuery->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG {target} :{text}", sMessage);
+        NoQuery* query = d->network->addQuery(Nick.nick());
+        if (query) {
+            query->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG {target} :{text}", sMessage);
         }
     }
 
@@ -1028,21 +1028,21 @@ bool NoIrcSocket::onPrivMsg(NoNick& Nick, NoString& sMessage)
 
 bool NoIrcSocket::onChanCtcp(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
-    NoChannel* pChan = d->network->findChannel(sChan);
-    if (pChan) {
+    NoChannel* channel = d->network->findChannel(sChan);
+    if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChanCtcp(Nick, *pChan, sMessage), &bResult);
+        IRCSOCKMODULECALL(onChanCtcp(Nick, *channel, sMessage), &bResult);
         if (bResult)
             return true;
 
         // Record a /me
         if (sMessage.trimPrefix("ACTION ")) {
             bResult = false;
-            IRCSOCKMODULECALL(onChanAction(Nick, *pChan, sMessage), &bResult);
+            IRCSOCKMODULECALL(onChanAction(Nick, *channel, sMessage), &bResult);
             if (bResult)
                 return true;
-            if (!pChan->autoClearChanBuffer() || !d->network->isUserOnline() || pChan->isDetached()) {
-                pChan->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) +
+            if (!channel->autoClearChanBuffer() || !d->network->isUserOnline() || channel->isDetached()) {
+                channel->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) +
                                  " :\001ACTION {text}\001",
                                  sMessage);
             }
@@ -1053,62 +1053,62 @@ bool NoIrcSocket::onChanCtcp(NoNick& Nick, const NoString& sChan, NoString& sMes
     if (OnGeneralCTCP(Nick, sMessage))
         return true;
 
-    return (pChan && pChan->isDetached());
+    return (channel && channel->isDetached());
 }
 
 bool NoIrcSocket::onChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
-    NoChannel* pChan = d->network->findChannel(sChan);
-    if (pChan) {
+    NoChannel* channel = d->network->findChannel(sChan);
+    if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChanNotice(Nick, *pChan, sMessage), &bResult);
+        IRCSOCKMODULECALL(onChanNotice(Nick, *channel, sMessage), &bResult);
         if (bResult)
             return true;
 
-        if (!pChan->autoClearChanBuffer() || !d->network->isUserOnline() || pChan->isDetached()) {
-            pChan->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " NOTICE " + _NAMEDFMT(sChan) + " :{text}", sMessage);
+        if (!channel->autoClearChanBuffer() || !d->network->isUserOnline() || channel->isDetached()) {
+            channel->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " NOTICE " + _NAMEDFMT(sChan) + " :{text}", sMessage);
         }
     }
 
-    return ((pChan) && (pChan->isDetached()));
+    return ((channel) && (channel->isDetached()));
 }
 
 bool NoIrcSocket::onChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage)
 {
-    NoChannel* pChan = d->network->findChannel(sChan);
-    if (pChan) {
+    NoChannel* channel = d->network->findChannel(sChan);
+    if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChanMsg(Nick, *pChan, sMessage), &bResult);
+        IRCSOCKMODULECALL(onChanMsg(Nick, *channel, sMessage), &bResult);
         if (bResult)
             return true;
 
-        if (!pChan->autoClearChanBuffer() || !d->network->isUserOnline() || pChan->isDetached()) {
-            pChan->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) + " :{text}", sMessage);
+        if (!channel->autoClearChanBuffer() || !d->network->isUserOnline() || channel->isDetached()) {
+            channel->addBuffer(":" + _NAMEDFMT(Nick.nickMask()) + " PRIVMSG " + _NAMEDFMT(sChan) + " :{text}", sMessage);
         }
     }
 
-    return ((pChan) && (pChan->isDetached()));
+    return ((channel) && (channel->isDetached()));
 }
 
-void NoIrcSocket::putIrc(const NoString& sLine)
+void NoIrcSocket::putIrc(const NoString& line)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (d->floodProtection && d->sendsAllowed <= 0) {
-        NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << sLine
+        NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << line
                      << "] (queued)");
     }
-    d->sendQueue.push_back(sLine);
+    d->sendQueue.push_back(line);
     trySend();
 }
 
-void NoIrcSocket::putIrcQuick(const NoString& sLine)
+void NoIrcSocket::putIrcQuick(const NoString& line)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (d->floodProtection && d->sendsAllowed <= 0) {
-        NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << sLine
+        NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << line
                      << "] (queued to front)");
     }
-    d->sendQueue.push_front(sLine);
+    d->sendQueue.push_front(line);
     trySend();
 }
 
@@ -1118,20 +1118,20 @@ void NoIrcSocket::trySend()
     while (!d->sendQueue.empty() && (!d->floodProtection || d->sendsAllowed > 0)) {
         d->sendsAllowed--;
         bool bSkip = false;
-        NoString& sLine = d->sendQueue.front();
-        IRCSOCKMODULECALL(onSendToIrc(sLine), &bSkip);
+        NoString& line = d->sendQueue.front();
+        IRCSOCKMODULECALL(onSendToIrc(line), &bSkip);
         if (!bSkip) {
             ;
-            NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << sLine << "]");
-            write(sLine + "\r\n");
+            NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << line << "]");
+            write(line + "\r\n");
         }
         d->sendQueue.pop_front();
     }
 }
 
-void NoIrcSocket::setNick(const NoString& sNick)
+void NoIrcSocket::setNick(const NoString& nick)
 {
-    d->nick.setNick(sNick);
+    d->nick.setNick(nick);
     d->network->setIrcNick(d->nick);
 }
 
@@ -1139,27 +1139,27 @@ void NoIrcSocket::onConnected()
 {
     NO_DEBUG(name() << " == Connected()");
 
-    NoString sPass = d->password;
-    NoString sNick = d->network->nick();
-    NoString sIdent = d->network->ident();
+    NoString pass = d->password;
+    NoString nick = d->network->nick();
+    NoString ident = d->network->ident();
     NoString sRealName = d->network->realName();
 
     bool bReturn = false;
-    IRCSOCKMODULECALL(onIrcRegistration(sPass, sNick, sIdent, sRealName), &bReturn);
+    IRCSOCKMODULECALL(onIrcRegistration(pass, nick, ident, sRealName), &bReturn);
     if (bReturn)
         return;
 
     putIrc("CAP LS");
 
-    if (!sPass.empty()) {
-        putIrc("PASS " + sPass);
+    if (!pass.empty()) {
+        putIrc("PASS " + pass);
     }
 
-    putIrc("NICK " + sNick);
-    putIrc("USER " + sIdent + " \"" + sIdent + "\" \"" + sIdent + "\" :" + sRealName);
+    putIrc("NICK " + nick);
+    putIrc("USER " + ident + " \"" + ident + "\" \"" + ident + "\" :" + sRealName);
 
     // SendAltNick() needs this
-    d->nick.setNick(sNick);
+    d->nick.setNick(nick);
 }
 
 void NoIrcSocket::onDisconnected()
@@ -1192,14 +1192,14 @@ void NoIrcSocket::onDisconnected()
 
 void NoIrcSocket::onSocketError(int iErrno, const NoString& sDescription)
 {
-    NoString sError = sDescription;
+    NoString error = sDescription;
 
-    NO_DEBUG(name() << " == SockError(" << iErrno << " " << sError << ")");
+    NO_DEBUG(name() << " == SockError(" << iErrno << " " << error << ")");
     if (!d->network->user()->isBeingDeleted()) {
         if (isReady()) {
-            d->network->putStatus("Cannot connect to IRC (" + sError + "). Retrying...");
+            d->network->putStatus("Cannot connect to IRC (" + error + "). Retrying...");
         } else {
-            d->network->putStatus("Disconnected from IRC (" + sError + "). Reconnecting...");
+            d->network->putStatus("Disconnected from IRC (" + error + "). Reconnecting...");
         }
 #ifdef HAVE_LIBSSL
         if (iErrno == errnoBadSSLCert) {
@@ -1266,21 +1266,21 @@ void NoIrcSocket::onReachedMaxBuffer()
     quit();
 }
 
-void NoIrcSocket::parseISupport(const NoString& sLine)
+void NoIrcSocket::parseISupport(const NoString& line)
 {
-    NoStringVector vsTokens = sLine.split(" ", No::SkipEmptyParts);
+    NoStringVector vsTokens = line.split(" ", No::SkipEmptyParts);
 
     for (const NoString& sToken : vsTokens) {
-        NoString sName = No::token(sToken, 0, "=");
+        NoString name = No::token(sToken, 0, "=");
         NoString sValue = No::tokens(sToken, 1, "=");
 
-        if (0 < sName.length() && ':' == sName[0]) {
+        if (0 < name.length() && ':' == name[0]) {
             break;
         }
 
-        d->iSupport[sName] = sValue;
+        d->iSupport[name] = sValue;
 
-        if (sName.equals("PREFIX")) {
+        if (name.equals("PREFIX")) {
             NoString sPrefixes = No::token(sValue, 1, ")");
             NoString sPermModes = No::token(sValue, 0, ")");
             sPermModes.trimLeft("(");
@@ -1289,15 +1289,15 @@ void NoIrcSocket::parseISupport(const NoString& sLine)
                 d->perms = sPrefixes;
                 d->permModes = sPermModes;
             }
-        } else if (sName.equals("CHANTYPES")) {
+        } else if (name.equals("CHANTYPES")) {
             d->network->setChannelPrefixes(sValue);
-        } else if (sName.equals("NICKLEN")) {
+        } else if (name.equals("NICKLEN")) {
             uint uMax = sValue.toUInt();
 
             if (uMax) {
                 d->maxNickLen = uMax;
             }
-        } else if (sName.equals("CHANMODES")) {
+        } else if (name.equals("CHANMODES")) {
             if (!sValue.empty()) {
                 d->chanModes.clear();
 
@@ -1309,12 +1309,12 @@ void NoIrcSocket::parseISupport(const NoString& sLine)
                     }
                 }
             }
-        } else if (sName.equals("NAMESX")) {
+        } else if (name.equals("NAMESX")) {
             if (d->hasNamesX)
                 continue;
             d->hasNamesX = true;
             putIrc("PROTOCTL NAMESX");
-        } else if (sName.equals("UHNAMES")) {
+        } else if (name.equals("UHNAMES")) {
             if (d->hasUhNames)
                 continue;
             d->hasUhNames = true;
@@ -1333,51 +1333,51 @@ NoString NoIrcSocket::isupport(const NoString& sKey, const NoString& sDefault) c
     }
 }
 
-void NoIrcSocket::forwardRaw353(const NoString& sLine) const
+void NoIrcSocket::forwardRaw353(const NoString& line) const
 {
     const std::vector<NoClient*>& vClients = d->network->clients();
 
-    for (NoClient* pClient : vClients) {
-        forwardRaw353(sLine, pClient);
+    for (NoClient* client : vClients) {
+        forwardRaw353(line, client);
     }
 }
 
-void NoIrcSocket::forwardRaw353(const NoString& sLine, NoClient* pClient) const
+void NoIrcSocket::forwardRaw353(const NoString& line, NoClient* client) const
 {
-    NoString sNicks = No::tokens(sLine, 5).trimPrefix_n();
+    NoString sNicks = No::tokens(line, 5).trimPrefix_n();
 
-    if ((!d->hasNamesX || pClient->hasNamesX()) && (!d->hasUhNames || pClient->hasUhNames())) {
+    if ((!d->hasNamesX || client->hasNamesX()) && (!d->hasUhNames || client->hasUhNames())) {
         // Client and server have both the same UHNames and Namesx stuff enabled
-        d->network->putUser(sLine, pClient);
+        d->network->putUser(line, client);
     } else {
         // Get everything except the actual user list
-        NoString sTmp = No::token(sLine, 0, " :") + " :";
+        NoString sTmp = No::token(line, 0, " :") + " :";
 
         // This loop runs once for every nick on the channel
         NoStringVector vsNicks = sNicks.split(" ", No::SkipEmptyParts);
-        for (NoString sNick : vsNicks) {
-            if (sNick.empty())
+        for (NoString nick : vsNicks) {
+            if (nick.empty())
                 break;
 
-            if (d->hasNamesX && !pClient->hasNamesX() && isPermChar(sNick[0])) {
+            if (d->hasNamesX && !client->hasNamesX() && isPermChar(nick[0])) {
                 // Server has, client doesn't have NAMESX, so we just use the first perm char
-                size_t pos = sNick.find_first_not_of(perms());
+                size_t pos = nick.find_first_not_of(perms());
                 if (pos >= 2 && pos != NoString::npos) {
-                    sNick = sNick[0] + sNick.substr(pos);
+                    nick = nick[0] + nick.substr(pos);
                 }
             }
 
-            if (d->hasUhNames && !pClient->hasUhNames()) {
+            if (d->hasUhNames && !client->hasUhNames()) {
                 // Server has, client hasnt UHNAMES,
                 // so we strip away ident and host.
-                sNick = No::token(sNick, 0, "!");
+                nick = No::token(nick, 0, "!");
             }
 
-            sTmp += sNick + " ";
+            sTmp += nick + " ";
         }
         // Strip away the spaces we inserted at the end
         sTmp.trimRight(" ");
-        d->network->putUser(sTmp, pClient);
+        d->network->putUser(sTmp, client);
     }
 }
 
@@ -1513,9 +1513,9 @@ bool NoIrcSocket::isAuthed() const
     return d->authed;
 }
 
-bool NoIrcSocket::isCapAccepted(const NoString& sCap)
+bool NoIrcSocket::isCapAccepted(const NoString& cap)
 {
-    return 1 == d->acceptedCaps.count(sCap);
+    return 1 == d->acceptedCaps.count(cap);
 }
 
 NoStringMap NoIrcSocket::isupport() const

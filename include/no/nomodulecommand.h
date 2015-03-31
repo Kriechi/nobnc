@@ -30,20 +30,20 @@ class NO_EXPORT NoModuleCommand
 {
 public:
     /// Type for the callback function that handles the actual command.
-    typedef void (NoModule::*ModCmdFunc)(const NoString& sLine);
-    typedef std::function<void(const NoString& sLine)> CmdFunc;
+    typedef void (NoModule::*ModCmdFunc)(const NoString& line);
+    typedef std::function<void(const NoString& line)> CmdFunc;
 
     /// Default constructor, needed so that this can be saved in a std::map.
     NoModuleCommand();
 
     /** Construct a new NoModuleCommand.
-     * @param sCmd The name of the command.
+     * @param cmd The name of the command.
      * @param func The command's callback function.
-     * @param sArgs Help text describing the arguments to this command.
-     * @param sDesc Help text describing what this command does.
+     * @param args Help text describing the arguments to this command.
+     * @param desc Help text describing what this command does.
      */
-    NoModuleCommand(const NoString& sCmd, NoModule* pMod, ModCmdFunc func, const NoString& sArgs, const NoString& sDesc);
-    NoModuleCommand(const NoString& sCmd, CmdFunc func, const NoString& sArgs, const NoString& sDesc);
+    NoModuleCommand(const NoString& cmd, NoModule* mod, ModCmdFunc func, const NoString& args, const NoString& desc);
+    NoModuleCommand(const NoString& cmd, CmdFunc func, const NoString& args, const NoString& desc);
 
     /** Copy constructor, needed so that this can be saved in a std::map.
      * @param other Object to copy from.
@@ -71,7 +71,7 @@ public:
     NoString args() const;
     NoString description() const;
 
-    void call(const NoString& sLine) const;
+    void call(const NoString& line) const;
 
 private:
     NoString m_cmd;

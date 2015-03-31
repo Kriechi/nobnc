@@ -30,9 +30,9 @@ public:
 protected:
     NoFile& WriteFile(const NoString& sConfig)
     {
-        char sName[] = "./temp-XXXXXX";
-        int fd = mkstemp(sName);
-        m_File.Open(sName, O_RDWR);
+        char name[] = "./temp-XXXXXX";
+        int fd = mkstemp(name);
+        m_File.Open(name, O_RDWR);
         close(fd);
 
         m_File.Write(sConfig);
@@ -52,10 +52,10 @@ public:
         NoFile& File = WriteFile(sConfig);
 
         NoSettings conf;
-        NoString sError;
-        EXPECT_FALSE(conf.Parse(File, sError));
+        NoString error;
+        EXPECT_FALSE(conf.Parse(File, error));
 
-        EXPECT_EQ(sExpectError, sError);
+        EXPECT_EQ(sExpectError, error);
     }
 };
 
@@ -69,9 +69,9 @@ public:
         File.Seek(12);
 
         NoSettings conf;
-        NoString sError;
-        EXPECT_TRUE(conf.Parse(File, sError)) << sError;
-        EXPECT_TRUE(sError.empty()) << "Non-empty error string!";
+        NoString error;
+        EXPECT_TRUE(conf.Parse(File, error)) << error;
+        EXPECT_TRUE(error.empty()) << "Non-empty error string!";
 
         NoString sOutput;
         ToString(sOutput, conf);

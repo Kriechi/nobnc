@@ -39,14 +39,14 @@ NO_EXPORT NoString decrypt(const NoString& data, const NoString& password);
 
 NO_EXPORT NoString salt();
 NO_EXPORT NoString defaultHash();
-NO_EXPORT NoString md5(const NoString& sStr);
-NO_EXPORT NoString sha256(const NoString& sStr);
-NO_EXPORT NoString saltedMd5(const NoString& sPass, const NoString& sSalt);
-NO_EXPORT NoString saltedSha256(const NoString& sPass, const NoString& sSalt);
+NO_EXPORT NoString md5(const NoString& str);
+NO_EXPORT NoString sha256(const NoString& str);
+NO_EXPORT NoString saltedMd5(const NoString& pass, const NoString& salt);
+NO_EXPORT NoString saltedSha256(const NoString& pass, const NoString& salt);
 
 NO_EXPORT NoString getPass(const NoString& sPrompt);
-NO_EXPORT NoString getSaltedHashPass(NoString& sSalt);
-NO_EXPORT bool getInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefault = "", const NoString& sHint = "");
+NO_EXPORT NoString getSaltedHashPass(NoString& salt);
+NO_EXPORT bool getInput(const NoString& sPrompt, NoString& ret, const NoString& sDefault = "", const NoString& sHint = "");
 NO_EXPORT bool getBoolInput(const NoString& sPrompt, bool bDefault);
 NO_EXPORT bool getBoolInput(const NoString& sPrompt, bool* pbDefault = nullptr);
 NO_EXPORT bool getNumInput(const NoString& sPrompt, uint& uRet, uint uMin = 0, uint uMax = ~0, uint uDefault = ~0);
@@ -54,13 +54,13 @@ NO_EXPORT bool getNumInput(const NoString& sPrompt, uint& uRet, uint uMin = 0, u
 NO_EXPORT ulonglong millTime();
 
 NO_EXPORT NoString cTime(time_t t, const NoString& sTZ);
-NO_EXPORT NoString formatTime(time_t t, const NoString& sFormat, const NoString& sTZ);
+NO_EXPORT NoString formatTime(time_t t, const NoString& format, const NoString& sTZ);
 NO_EXPORT NoString formatServerTime(const timeval& tv);
 NO_EXPORT NoStringSet timezones();
 NO_EXPORT NoStringSet encodings();
 
-NO_EXPORT NoStringMap messageTags(const NoString& sLine);
-NO_EXPORT void setMessageTags(NoString& sLine, const NoStringMap& mssTags);
+NO_EXPORT NoStringMap messageTags(const NoString& line);
+NO_EXPORT void setMessageTags(NoString& line, const NoStringMap& mssTags);
 
 /** Status codes that can be returned by WriteToDisk() and
  * ReadFromDisk(). */
@@ -120,11 +120,11 @@ NO_EXPORT NoString randomString(uint uLength);
  * The format specification can contain simple named parameters that match
  * keys in the given map. For example in the string "a {b} c", the key "b"
  * is looked up in the map, and inserted for "{b}".
- * @param sFormat The format specification.
+ * @param format The format specification.
  * @param msValues A map of named parameters to their values.
  * @return The string with named parameters replaced.
  */
-NO_EXPORT NoString namedFormat(const NoString& sFormat, const NoStringMap& msValues);
+NO_EXPORT NoString namedFormat(const NoString& format, const NoStringMap& msValues);
 
 /** Ellipsize the current string.
  * For example, ellipsizing "Hello, I'm Bob" to the length 9 would
@@ -141,20 +141,20 @@ NO_EXPORT NoStringVector quoteSplit(const NoString& str);
  * Do a wildcard comparison on this string.
  * For example, the following returns true:
  * <code>WildCmp("*!?bar@foo", "I_am!~bar@foo");</code>
- * @param sWild The wildcards used to for the comparison.
+ * @param wild The wildcards used to for the comparison.
  * @param cs CaseSensitive (default) if you want the comparison
  *           to be case sensitive, CaseInsensitive otherwise.
  * @todo Make cs CaseInsensitive by default.
- * @return The result of <code>this->WildCmp(sWild, *this);</code>.
+ * @return The result of <code>this->WildCmp(wild, *this);</code>.
  */
-NO_EXPORT bool wildCmp(const NoString& sStr, const NoString& sWild, No::CaseSensitivity cs = No::CaseSensitive);
+NO_EXPORT bool wildCmp(const NoString& str, const NoString& wild, No::CaseSensitivity cs = No::CaseSensitive);
 
 /** Get a token out of this string. For example in the string "a bc d  e",
  *  each of "a", "bc", "d" and "e" are tokens.
  * @param uPos The number of the token you are interested. The first
  *             token has a position of 0.
  * @param sSep Seperator between tokens.
- * @param bAllowEmpty If this is true, empty tokens are allowed. In the
+ * @param allowEmpty If this is true, empty tokens are allowed. In the
  *                    example from above this means that there is a
  *                    token "" before the "e" token.
  * @return The token you asked for and, if bRest is true, everything
@@ -168,7 +168,7 @@ NO_EXPORT NoString token(const NoString& str, size_t uPos, const NoString& sSep 
  * @param uPos The number of the token you are interested. The first
  *             token has a position of 0.
  * @param sSep Seperator between tokens.
- * @param bAllowEmpty If this is true, empty tokens are allowed. In the
+ * @param allowEmpty If this is true, empty tokens are allowed. In the
  *                    example from above this means that there is a
  *                    token "" before the "e" token.
  * @return The token you asked for and, if bRest is true, everything

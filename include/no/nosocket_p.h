@@ -61,9 +61,9 @@ public:
                              UErrorCode* err) override;
 #endif
 
-    Csock* GetSockObj(const NoString& sHost, ushort uPort) override;
+    Csock* GetSockObj(const NoString& host, ushort port) override;
 
-    void ReadLine(const NoString& sLine) override;
+    void ReadLine(const NoString& line) override;
     void ReadData(const char* data, size_t len) override;
     void PushBuff(const char* data, size_t len, bool bStartAtZero = false) override;
 
@@ -97,9 +97,9 @@ public:
     {
         q->onReachedMaxBuffer();
     }
-    bool ConnectionFrom(const NoString& sHost, ushort uPort) override
+    bool ConnectionFrom(const NoString& host, ushort port) override
     {
-        return q->onConnectionFrom(sHost, uPort);
+        return q->onConnectionFrom(host, port);
     }
 
     NoSocket* q;

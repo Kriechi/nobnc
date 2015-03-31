@@ -23,50 +23,50 @@
 
 class NoNickServ : public NoModule
 {
-    void DoNickCommand(const NoString& sCmd, const NoString& sNick)
+    void DoNickCommand(const NoString& cmd, const NoString& nick)
     {
         NoStringMap msValues;
-        msValues["nickname"] = sNick;
+        msValues["nickname"] = nick;
         NoRegistry registry(this);
         msValues["password"] = registry.value("Password");
-        putIrc(No::namedFormat(registry.value(sCmd), msValues));
+        putIrc(No::namedFormat(registry.value(cmd), msValues));
     }
 
 public:
-    void SetCommand(const NoString& sLine)
+    void SetCommand(const NoString& line)
     {
         NoRegistry registry(this);
-        registry.setValue("Password", No::tokens(sLine, 1));
+        registry.setValue("Password", No::tokens(line, 1));
         putModule("Password set");
     }
 
-    void ClearCommand(const NoString& sLine)
+    void ClearCommand(const NoString& line)
     {
         NoRegistry(this).remove("Password");
     }
 
-    void SetNSNameCommand(const NoString& sLine)
+    void SetNSNameCommand(const NoString& line)
     {
         NoRegistry registry(this);
-        registry.setValue("NickServName", No::tokens(sLine, 1));
+        registry.setValue("NickServName", No::tokens(line, 1));
         putModule("NickServ name set");
     }
 
-    void ClearNSNameCommand(const NoString& sLine)
+    void ClearNSNameCommand(const NoString& line)
     {
         NoRegistry(this).remove("NickServName");
     }
 
-    void ViewCommandsCommand(const NoString& sLine)
+    void ViewCommandsCommand(const NoString& line)
     {
         putModule("IDENTIFY " + NoRegistry(this).value("IdentifyCmd"));
     }
 
-    void SetCommandCommand(const NoString& sLine)
+    void SetCommandCommand(const NoString& line)
     {
-        NoString sCmd = No::token(sLine, 1);
-        NoString sNewCmd = No::tokens(sLine, 2);
-        if (sCmd.equals("IDENTIFY")) {
+        NoString cmd = No::token(line, 1);
+        NoString sNewCmd = No::tokens(line, 2);
+        if (cmd.equals("IDENTIFY")) {
             NoRegistry registry(this);
             registry.setValue("IdentifyCmd", sNewCmd);
         } else {
@@ -102,11 +102,11 @@ public:
                    "Set pattern for commands");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         NoRegistry registry(this);
-        if (!sArgs.empty() && sArgs != "<hidden>") {
-            registry.setValue("Password", sArgs);
+        if (!args.empty() && args != "<hidden>") {
+            registry.setValue("Password", args);
             setArgs("<hidden>");
         }
 

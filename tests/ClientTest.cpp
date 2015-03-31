@@ -30,22 +30,22 @@ protected:
     {
         NoApp::DestroyInstance();
     }
-    void testPass(const NoString& sInput, const NoString& sUser, const NoString& sIdentifier, const NoString& sNetwork, const NoString& sPass) const
+    void testPass(const NoString& sInput, const NoString& sUser, const NoString& identifier, const NoString& sNetwork, const NoString& pass) const
     {
         NoClient client;
         client.ParsePass(sInput);
         EXPECT_EQ(sUser, client.m_sUser);
-        EXPECT_EQ(sIdentifier, client.m_sIdentifier);
+        EXPECT_EQ(identifier, client.m_sIdentifier);
         EXPECT_EQ(sNetwork, client.m_sNetwork);
-        EXPECT_EQ(sPass, client.m_sPass);
+        EXPECT_EQ(pass, client.m_sPass);
     }
 
-    void testUser(const NoString& sInput, const NoString& sUser, const NoString& sIdentifier, const NoString& sNetwork) const
+    void testUser(const NoString& sInput, const NoString& sUser, const NoString& identifier, const NoString& sNetwork) const
     {
         NoClient client;
         client.ParseUser(sInput);
         EXPECT_EQ(sUser, client.m_sUser);
-        EXPECT_EQ(sIdentifier, client.m_sIdentifier);
+        EXPECT_EQ(identifier, client.m_sIdentifier);
         EXPECT_EQ(sNetwork, client.m_sNetwork);
     }
 };

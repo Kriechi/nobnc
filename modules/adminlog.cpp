@@ -52,7 +52,7 @@ public:
         closelog();
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         NoRegistry registry(this);
         NoString sTarget = registry.value("target");
@@ -81,16 +81,16 @@ public:
         Log("[" + user()->userName() + "/" + network()->name() + "] disconnected from IRC");
     }
 
-    ModRet onRaw(NoString& sLine) override
+    ModRet onRaw(NoString& line) override
     {
-        if (sLine.startsWith("ERROR ")) {
+        if (line.startsWith("ERROR ")) {
             // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
             // ERROR :Closing Link: nick[24.24.24.24] Killer (Local kill by Killer (reason))
-            NoString sError(sLine.substr(6));
-            if (sError.left(1) == ":")
-                sError.leftChomp(1);
+            NoString error(line.substr(6));
+            if (error.left(1) == ":")
+                error.leftChomp(1);
             Log("[" + user()->userName() + "/" + network()->name() + "] disconnected from IRC: " +
-                network()->currentServer()->host() + " [" + sError + "]",
+                network()->currentServer()->host() + " [" + error + "]",
                 LOG_NOTICE);
         }
         return CONTINUE;
@@ -111,10 +111,10 @@ public:
         Log("[" + sUsername + "] failed to login from " + sRemoteIP, LOG_WARNING);
     }
 
-    void Log(NoString sLine, int iPrio = LOG_INFO)
+    void Log(NoString line, int iPrio = LOG_INFO)
     {
         if (m_eLogMode & LOG_TO_SYSLOG)
-            syslog(iPrio, "%s", sLine.c_str());
+            syslog(iPrio, "%s", line.c_str());
 
         if (m_eLogMode & LOG_TO_FILE) {
             time_t curtime;
@@ -128,42 +128,42 @@ public:
             NoFile LogFile(m_sLogFile);
 
             if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT))
-                LogFile.Write(buf + sLine + "\n");
+                LogFile.Write(buf + line + "\n");
             else
                 NO_DEBUG("Failed to write to [" << m_sLogFile << "]: " << strerror(errno));
         }
     }
 
-    void onModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& command) override
     {
         if (!user()->isAdmin()) {
             putModule("Access denied");
         } else {
-            handleCommand(sCommand);
+            handleCommand(command);
         }
     }
 
-    void OnTargetCommand(const NoString& sCommand)
+    void OnTargetCommand(const NoString& command)
     {
-        NoString sArg = No::tokens(sCommand, 1);
+        NoString arg = No::tokens(command, 1);
         NoString sTarget;
         NoString sMessage;
         LogMode mode;
 
-        if (sArg.equals("file")) {
+        if (arg.equals("file")) {
             sTarget = "file";
             sMessage = "Now only logging to file";
             mode = LOG_TO_FILE;
-        } else if (sArg.equals("syslog")) {
+        } else if (arg.equals("syslog")) {
             sTarget = "syslog";
             sMessage = "Now only logging to syslog";
             mode = LOG_TO_SYSLOG;
-        } else if (sArg.equals("both")) {
+        } else if (arg.equals("both")) {
             sTarget = "both";
             sMessage = "Now logging to file and syslog";
             mode = LOG_TO_BOTH;
         } else {
-            if (sArg.empty()) {
+            if (arg.empty()) {
                 putModule("Usage: Target <file|syslog|both>");
             } else {
                 putModule("Unknown target");
@@ -178,7 +178,7 @@ public:
         putModule(sMessage);
     }
 
-    void OnShowCommand(const NoString& sCommand)
+    void OnShowCommand(const NoString& command)
     {
         NoString sTarget;
 

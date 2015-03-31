@@ -26,19 +26,19 @@
 class NoLastSeenMod : public NoModule
 {
 private:
-    time_t GetTime(const NoUser* pUser)
+    time_t GetTime(const NoUser* user)
     {
-        return NoRegistry(this).value(pUser->userName()).toULong();
+        return NoRegistry(this).value(user->userName()).toULong();
     }
 
-    void SetTime(const NoUser* pUser)
+    void SetTime(const NoUser* user)
     {
-        NoRegistry(this).setValue(pUser->userName(), NoString(time(nullptr)));
+        NoRegistry(this).setValue(user->userName(), NoString(time(nullptr)));
     }
 
-    const NoString FormatLastSeen(const NoUser* pUser, const char* sDefault = "")
+    const NoString FormatLastSeen(const NoUser* user, const char* sDefault = "")
     {
-        time_t last = GetTime(pUser);
+        time_t last = GetTime(user);
         if (last < 1) {
             return sDefault;
         } else {
@@ -51,7 +51,7 @@ private:
     typedef std::multimap<time_t, NoUser*> MTimeMulti;
     typedef std::map<NoString, NoUser*> MUsers;
 
-    void ShowCommand(const NoString& sLine)
+    void ShowCommand(const NoString& line)
     {
         if (!user()->isAdmin()) {
             putModule("Access denied");
@@ -125,12 +125,12 @@ public:
             }
 
             for (MTimeMulti::const_iterator it = mmSorted.begin(); it != mmSorted.end(); ++it) {
-                NoUser* pUser = it->second;
+                NoUser* user = it->second;
                 NoTemplate& Row = Tmpl.addRow("UserLoop");
 
-                Row["Username"] = pUser->userName();
-                Row["IsSelf"] = NoString(pUser == WebSock.session()->user());
-                Row["LastSeen"] = FormatLastSeen(pUser, "never");
+                Row["Username"] = user->userName();
+                Row["IsSelf"] = NoString(user == WebSock.session()->user());
+                Row["LastSeen"] = FormatLastSeen(user, "never");
             }
 
             return true;
@@ -142,9 +142,9 @@ public:
     bool onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
         if (sPageName == "webadmin/user" && WebSock.session()->isAdmin()) {
-            NoUser* pUser = noApp->findUser(Tmpl["Username"]);
-            if (pUser) {
-                Tmpl["LastSeen"] = FormatLastSeen(pUser);
+            NoUser* user = noApp->findUser(Tmpl["Username"]);
+            if (user) {
+                Tmpl["LastSeen"] = FormatLastSeen(user);
             }
             return true;
         }

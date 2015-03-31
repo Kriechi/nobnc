@@ -31,8 +31,8 @@ NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_module(pModule
     setMaxBufferThreshold(10240);
 }
 
-NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort)
-    : NoSocket(sHostname, uPort), m_module(pModule)
+NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort port)
+    : NoSocket(sHostname, port), m_module(pModule)
 {
     if (pModule)
         NoModulePrivate::get(pModule)->addSocket(this);
@@ -42,18 +42,18 @@ NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ush
 
 NoModuleSocket::~NoModuleSocket()
 {
-    NoUser* pUser = nullptr;
+    NoUser* user = nullptr;
 
     // NoWebSocket could cause us to have a nullptr pointer here
     if (m_module) {
-        pUser = m_module->user();
+        user = m_module->user();
         NoModulePrivate::get(m_module)->removeSocket(this);
         m_module->manager()->removeSocket(this);
     }
 
-    if (pUser && m_module && m_module->type() != No::GlobalModule) {
-        pUser->addBytesWritten(bytesWritten());
-        pUser->addBytesRead(bytesRead());
+    if (user && m_module && m_module->type() != No::GlobalModule) {
+        user->addBytesWritten(bytesWritten());
+        user->addBytesRead(bytesRead());
     } else {
         noApp->addBytesWritten(bytesWritten());
         noApp->addBytesRead(bytesRead());
@@ -77,29 +77,29 @@ void NoModuleSocket::onSocketError(int iErrno, const NoString& sDescription)
     }
 }
 
-bool NoModuleSocket::onConnectionFrom(const NoString& sHost, ushort uPort)
+bool NoModuleSocket::onConnectionFrom(const NoString& host, ushort port)
 {
-    return noApp->allowConnectionFrom(sHost);
+    return noApp->allowConnectionFrom(host);
 }
 
-bool NoModuleSocket::connect(const NoString& sHostname, ushort uPort, bool bSSL, uint uTimeout)
+bool NoModuleSocket::connect(const NoString& sHostname, ushort port, bool ssl, uint uTimeout)
 {
     if (!m_module) {
         NO_DEBUG("ERROR: NoSocket::Connect called on instance without m_pModule handle!");
         return false;
     }
 
-    NoUser* pUser = m_module->user();
+    NoUser* user = m_module->user();
     NoString sSockName = "MOD::C::" + m_module->moduleName();
     NoString sBindHost;
 
-    if (pUser) {
-        sSockName += "::" + pUser->userName();
-        sBindHost = pUser->bindHost();
-        NoNetwork* pNetwork = m_module->network();
-        if (pNetwork) {
-            sSockName += "::" + pNetwork->name();
-            sBindHost = pNetwork->bindHost();
+    if (user) {
+        sSockName += "::" + user->userName();
+        sBindHost = user->bindHost();
+        NoNetwork* network = m_module->network();
+        if (network) {
+            sSockName += "::" + network->name();
+            sBindHost = network->bindHost();
         }
     }
 
@@ -108,29 +108,29 @@ bool NoModuleSocket::connect(const NoString& sHostname, ushort uPort, bool bSSL,
         sSockName = name();
     }
 
-    m_module->manager()->connect(sHostname, uPort, sSockName, uTimeout, bSSL, sBindHost, this);
+    m_module->manager()->connect(sHostname, port, sSockName, uTimeout, ssl, sBindHost, this);
     return true;
 }
 
-bool NoModuleSocket::listen(ushort uPort, bool bSSL, uint uTimeout)
+bool NoModuleSocket::listen(ushort port, bool ssl, uint uTimeout)
 {
     if (!m_module) {
         NO_DEBUG("ERROR: NoSocket::Listen called on instance without m_pModule handle!");
         return false;
     }
 
-    NoUser* pUser = m_module->user();
+    NoUser* user = m_module->user();
     NoString sSockName = "MOD::L::" + m_module->moduleName();
 
-    if (pUser) {
-        sSockName += "::" + pUser->userName();
+    if (user) {
+        sSockName += "::" + user->userName();
     }
     // Don't overwrite the socket name if one is already set
     if (!name().empty()) {
         sSockName = name();
     }
 
-    return m_module->manager()->listenAll(uPort, sSockName, bSSL, SOMAXCONN, this);
+    return m_module->manager()->listenAll(port, sSockName, ssl, SOMAXCONN, this);
 }
 
 NoModule* NoModuleSocket::module() const

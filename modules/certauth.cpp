@@ -81,7 +81,7 @@ public:
         onBoot();
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         onBoot();
 
@@ -105,9 +105,9 @@ public:
         return registry.save();
     }
 
-    bool AddKey(NoUser* pUser, const NoString& sKey)
+    bool AddKey(NoUser* user, const NoString& sKey)
     {
-        const std::pair<NoStringSet::const_iterator, bool> pair = m_PubKeys[pUser->userName()].insert(sKey.toLower());
+        const std::pair<NoStringSet::const_iterator, bool> pair = m_PubKeys[user->userName()].insert(sKey.toLower());
 
         if (pair.second) {
             Save();
@@ -120,9 +120,9 @@ public:
     {
         const NoString sUser = Auth->username();
         NoSocket* pSock = Auth->socket();
-        NoUser* pUser = noApp->findUser(sUser);
+        NoUser* user = noApp->findUser(sUser);
 
-        if (pSock == nullptr || pUser == nullptr)
+        if (pSock == nullptr || user == nullptr)
             return CONTINUE;
 
         const NoString sPubKey = GetKey(pSock);
@@ -147,12 +147,12 @@ public:
 
         // This client uses a valid pubkey for this user, let them in
         NO_DEBUG("Accepted pubkey auth");
-        Auth->acceptLogin(pUser);
+        Auth->acceptLogin(user);
 
         return HALT;
     }
 
-    void HandleShowCommand(const NoString& sLine)
+    void HandleShowCommand(const NoString& line)
     {
         const NoString sPubKey = GetKey(client()->socket());
 
@@ -163,9 +163,9 @@ public:
         }
     }
 
-    void HandleaddCommand(const NoString& sLine)
+    void HandleaddCommand(const NoString& line)
     {
-        NoString sPubKey = No::token(sLine, 1);
+        NoString sPubKey = No::token(line, 1);
 
         if (sPubKey.empty()) {
             sPubKey = GetKey(client()->socket());
@@ -182,7 +182,7 @@ public:
         }
     }
 
-    void HandleListCommand(const NoString& sLine)
+    void HandleListCommand(const NoString& line)
     {
         NoTable Table;
 
@@ -209,9 +209,9 @@ public:
         }
     }
 
-    void HandleDelCommand(const NoString& sLine)
+    void HandleDelCommand(const NoString& line)
     {
-        uint id = No::tokens(sLine, 1).toUInt();
+        uint id = No::tokens(line, 1).toUInt();
         MNoStringSet::iterator it = m_PubKeys.find(user()->userName());
 
         if (it == m_PubKeys.end()) {
@@ -264,10 +264,10 @@ public:
 
     bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
     {
-        NoUser* pUser = WebSock.session()->user();
+        NoUser* user = WebSock.session()->user();
 
         if (sPageName == "index") {
-            MNoStringSet::const_iterator it = m_PubKeys.find(pUser->userName());
+            MNoStringSet::const_iterator it = m_PubKeys.find(user->userName());
             if (it != m_PubKeys.end()) {
                 for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
                     NoTemplate& row = Tmpl.addRow("KeyLoop");
@@ -277,11 +277,11 @@ public:
 
             return true;
         } else if (sPageName == "add") {
-            AddKey(pUser, WebSock.param("key"));
+            AddKey(user, WebSock.param("key"));
             WebSock.redirect(webPath());
             return true;
         } else if (sPageName == "delete") {
-            MNoStringSet::iterator it = m_PubKeys.find(pUser->userName());
+            MNoStringSet::iterator it = m_PubKeys.find(user->userName());
             if (it != m_PubKeys.end()) {
                 if (it->second.erase(WebSock.param("key", false))) {
                     if (it->second.size() == 0) {

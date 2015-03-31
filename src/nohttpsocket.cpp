@@ -30,13 +30,13 @@
 
 #define MAX_POST_SIZE 1024 * 1024
 
-NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix) : NoHttpSocket(pMod, sURIPrefix, "", 0)
+NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& sURIPrefix) : NoHttpSocket(mod, sURIPrefix, "", 0)
 {
     init();
 }
 
-NoHttpSocket::NoHttpSocket(NoModule* pMod, const NoString& sURIPrefix, const NoString& sHostname, ushort uPort)
-    : NoModuleSocket(pMod, sHostname, uPort),
+NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& sURIPrefix, const NoString& sHostname, ushort port)
+    : NoModuleSocket(mod, sHostname, port),
       m_sentHeader(false),
       m_gotHeader(false),
       m_loggedIn(false),
@@ -108,50 +108,50 @@ void NoHttpSocket::checkPost()
     }
 }
 
-void NoHttpSocket::readLine(const NoString& sData)
+void NoHttpSocket::readLine(const NoString& data)
 {
     if (m_gotHeader) {
         return;
     }
 
-    NoString sLine = sData;
-    sLine.trimRight("\r\n");
+    NoString line = data;
+    line.trimRight("\r\n");
 
-    NoString sName = No::token(sLine, 0);
+    NoString name = No::token(line, 0);
 
-    if (sName.equals("GET")) {
+    if (name.equals("GET")) {
         m_post = false;
-        m_uri = No::token(sLine, 1);
-        m_http10Client = No::token(sLine, 2).equals("HTTP/1.0");
+        m_uri = No::token(line, 1);
+        m_http10Client = No::token(line, 2).equals("HTTP/1.0");
         parseUri();
-    } else if (sName.equals("POST")) {
+    } else if (name.equals("POST")) {
         m_post = true;
-        m_uri = No::token(sLine, 1);
+        m_uri = No::token(line, 1);
         parseUri();
-    } else if (sName.equals("Cookie:")) {
-        NoStringVector vsNV = No::tokens(sLine, 1).split(";", No::SkipEmptyParts);
+    } else if (name.equals("Cookie:")) {
+        NoStringVector vsNV = No::tokens(line, 1).split(";", No::SkipEmptyParts);
 
         for (NoString& s : vsNV) {
             s.trim();
             m_requestCookies[No::escape(No::token(s, 0, "="), No::UrlFormat, No::AsciiFormat)] =
             No::escape(No::tokens(s, 1, "="), No::UrlFormat, No::AsciiFormat);
         }
-    } else if (sName.equals("Authorization:")) {
-        NoString sUnhashed = NoString::fromBase64(No::token(sLine, 2));
+    } else if (name.equals("Authorization:")) {
+        NoString sUnhashed = NoString::fromBase64(No::token(line, 2));
         m_username = No::token(sUnhashed, 0, ":");
         m_password = No::tokens(sUnhashed, 1, ":");
         m_loggedIn = onLogin(m_username, m_password, true);
-    } else if (sName.equals("Content-Length:")) {
-        m_postLen = No::token(sLine, 1).toULong();
+    } else if (name.equals("Content-Length:")) {
+        m_postLen = No::token(line, 1).toULong();
         if (m_postLen > MAX_POST_SIZE)
             printErrorPage(413, "Request Entity Too Large", "The request you sent was too large.");
-    } else if (sName.equals("X-Forwarded-For:")) {
+    } else if (name.equals("X-Forwarded-For:")) {
         // X-Forwarded-For: client, proxy1, proxy2
         if (m_forwardedIp.empty()) {
             const NoStringVector& vsTrustedProxies = noApp->trustedProxies();
             NoString sIP = remoteAddress();
 
-            NoStringVector vsIPs = No::tokens(sLine, 1).split(",", No::SkipEmptyParts);
+            NoStringVector vsIPs = No::tokens(line, 1).split(",", No::SkipEmptyParts);
 
             while (!vsIPs.empty()) {
                 // sIP told us that it got connection from vsIPs.back()
@@ -176,17 +176,17 @@ void NoHttpSocket::readLine(const NoString& sData)
             // in both cases use it as the endpoind
             m_forwardedIp = sIP;
         }
-    } else if (sName.equals("If-None-Match:")) {
+    } else if (name.equals("If-None-Match:")) {
         // this is for proper client cache support (HTTP 304) on static files:
-        m_ifNoneMatch = No::tokens(sLine, 1);
-    } else if (sName.equals("Accept-Encoding:") && !m_http10Client) {
+        m_ifNoneMatch = No::tokens(line, 1);
+    } else if (name.equals("Accept-Encoding:") && !m_http10Client) {
         // trimming whitespace from the tokens is important:
-        NoStringVector vsEncodings = No::tokens(sLine, 1).split(",", No::SkipEmptyParts);
+        NoStringVector vsEncodings = No::tokens(line, 1).split(",", No::SkipEmptyParts);
         for (NoString& sEncoding : vsEncodings) {
             if (sEncoding.trim_n().equals("gzip"))
                 m_acceptGzip = true;
         }
-    } else if (sLine.empty()) {
+    } else if (line.empty()) {
         m_gotHeader = true;
 
         if (m_post) {
@@ -489,10 +489,10 @@ void NoHttpSocket::parseParams(const NoString& sParams, std::map<NoString, NoStr
     NoStringVector vsPairs = sParams.split("&");
 
     for (const NoString& sPair : vsPairs) {
-        NoString sName = No::escape(No::token(sPair, 0, "="), No::UrlFormat, No::AsciiFormat);
+        NoString name = No::escape(No::token(sPair, 0, "="), No::UrlFormat, No::AsciiFormat);
         NoString sValue = No::escape(No::tokens(sPair, 1, "="), No::UrlFormat, No::AsciiFormat);
 
-        msvsParams[sName].push_back(sValue);
+        msvsParams[name].push_back(sValue);
     }
 }
 
@@ -526,74 +526,74 @@ NoString NoHttpSocket::uriPrefix() const
     return m_uriPrefix;
 }
 
-bool NoHttpSocket::hasParam(const NoString& sName, bool bPost) const
+bool NoHttpSocket::hasParam(const NoString& name, bool bPost) const
 {
     if (bPost)
-        return (m_postParams.find(sName) != m_postParams.end());
-    return (m_getParams.find(sName) != m_getParams.end());
+        return (m_postParams.find(name) != m_postParams.end());
+    return (m_getParams.find(name) != m_getParams.end());
 }
 
-NoString NoHttpSocket::rawParam(const NoString& sName, bool bPost) const
+NoString NoHttpSocket::rawParam(const NoString& name, bool bPost) const
 {
     if (bPost)
-        return rawParam(sName, m_postParams);
-    return rawParam(sName, m_getParams);
+        return rawParam(name, m_postParams);
+    return rawParam(name, m_getParams);
 }
 
-NoString NoHttpSocket::rawParam(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams)
+NoString NoHttpSocket::rawParam(const NoString& name, const std::map<NoString, NoStringVector>& msvsParams)
 {
-    NoString sRet;
+    NoString ret;
 
-    std::map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
+    std::map<NoString, NoStringVector>::const_iterator it = msvsParams.find(name);
 
     if (it != msvsParams.end() && it->second.size() > 0) {
-        sRet = it->second[0];
+        ret = it->second[0];
     }
 
-    return sRet;
+    return ret;
 }
 
-NoString NoHttpSocket::param(const NoString& sName, bool bPost, const NoString& sFilter) const
+NoString NoHttpSocket::param(const NoString& name, bool bPost, const NoString& filter) const
 {
     if (bPost)
-        return param(sName, m_postParams, sFilter);
-    return param(sName, m_getParams, sFilter);
+        return param(name, m_postParams, filter);
+    return param(name, m_getParams, filter);
 }
 
-NoString NoHttpSocket::param(const NoString& sName, const std::map<NoString, NoStringVector>& msvsParams, const NoString& sFilter)
+NoString NoHttpSocket::param(const NoString& name, const std::map<NoString, NoStringVector>& msvsParams, const NoString& filter)
 {
-    NoString sRet = rawParam(sName, msvsParams);
-    sRet.trim();
+    NoString ret = rawParam(name, msvsParams);
+    ret.trim();
 
-    for (size_t i = 0; i < sFilter.length(); i++) {
-        sRet.replace(NoString(sFilter.at(i)), "");
+    for (size_t i = 0; i < filter.length(); i++) {
+        ret.replace(NoString(filter.at(i)), "");
     }
 
-    return sRet;
+    return ret;
 }
 
-size_t NoHttpSocket::paramValues(const NoString& sName, std::set<NoString>& ssRet, bool bPost, const NoString& sFilter) const
+size_t NoHttpSocket::paramValues(const NoString& name, std::set<NoString>& ssRet, bool bPost, const NoString& filter) const
 {
     if (bPost)
-        return paramValues(sName, ssRet, m_postParams, sFilter);
-    return paramValues(sName, ssRet, m_getParams, sFilter);
+        return paramValues(name, ssRet, m_postParams, filter);
+    return paramValues(name, ssRet, m_getParams, filter);
 }
 
-size_t NoHttpSocket::paramValues(const NoString& sName,
+size_t NoHttpSocket::paramValues(const NoString& name,
                                     std::set<NoString>& ssRet,
                                     const std::map<NoString, NoStringVector>& msvsParams,
-                                    const NoString& sFilter)
+                                    const NoString& filter)
 {
     ssRet.clear();
 
-    std::map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
+    std::map<NoString, NoStringVector>::const_iterator it = msvsParams.find(name);
 
     if (it != msvsParams.end()) {
         for (NoString sParam : it->second) {
             sParam.trim();
 
-            for (size_t i = 0; i < sFilter.length(); i++) {
-                sParam.replace(NoString(sFilter.at(i)), "");
+            for (size_t i = 0; i < filter.length(); i++) {
+                sParam.replace(NoString(filter.at(i)), "");
             }
             ssRet.insert(sParam);
         }
@@ -602,28 +602,28 @@ size_t NoHttpSocket::paramValues(const NoString& sName,
     return ssRet.size();
 }
 
-size_t NoHttpSocket::paramValues(const NoString& sName, NoStringVector& vsRet, bool bPost, const NoString& sFilter) const
+size_t NoHttpSocket::paramValues(const NoString& name, NoStringVector& vsRet, bool bPost, const NoString& filter) const
 {
     if (bPost)
-        return paramValues(sName, vsRet, m_postParams, sFilter);
-    return paramValues(sName, vsRet, m_getParams, sFilter);
+        return paramValues(name, vsRet, m_postParams, filter);
+    return paramValues(name, vsRet, m_getParams, filter);
 }
 
-size_t NoHttpSocket::paramValues(const NoString& sName,
+size_t NoHttpSocket::paramValues(const NoString& name,
                                     NoStringVector& vsRet,
                                     const std::map<NoString, NoStringVector>& msvsParams,
-                                    const NoString& sFilter)
+                                    const NoString& filter)
 {
     vsRet.clear();
 
-    std::map<NoString, NoStringVector>::const_iterator it = msvsParams.find(sName);
+    std::map<NoString, NoStringVector>::const_iterator it = msvsParams.find(name);
 
     if (it != msvsParams.end()) {
         for (NoString sParam : it->second) {
             sParam.trim();
 
-            for (size_t i = 0; i < sFilter.length(); i++) {
-                sParam.replace(NoString(sFilter.at(i)), "");
+            for (size_t i = 0; i < filter.length(); i++) {
+                sParam.replace(NoString(filter.at(i)), "");
             }
             vsRet.push_back(sParam);
         }
@@ -700,7 +700,7 @@ bool NoHttpSocket::forceLogin()
     return false;
 }
 
-bool NoHttpSocket::onLogin(const NoString& sUser, const NoString& sPass, bool bBasic)
+bool NoHttpSocket::onLogin(const NoString& sUser, const NoString& pass, bool bBasic)
 {
     return false;
 }
@@ -757,9 +757,9 @@ void NoHttpSocket::setContentType(const NoString& sContentType)
     m_contentType = sContentType;
 }
 
-void NoHttpSocket::addHeader(const NoString& sName, const NoString& sValue)
+void NoHttpSocket::addHeader(const NoString& name, const NoString& sValue)
 {
-    m_headers[sName] = sValue;
+    m_headers[name] = sValue;
 }
 
 bool NoHttpSocket::redirect(const NoString& sURL)

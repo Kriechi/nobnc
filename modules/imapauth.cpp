@@ -43,7 +43,7 @@ public:
         }
     }
 
-    void readLine(const NoString& sLine) override;
+    void readLine(const NoString& line) override;
 
 private:
 protected:
@@ -70,25 +70,25 @@ public:
         return true;
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        if (sArgs.trim_n().empty()) {
+        if (args.trim_n().empty()) {
             return true; // use defaults
         }
 
-        m_sServer = No::token(sArgs, 0);
-        NoString sPort = No::token(sArgs, 1);
-        m_sUserFormat = No::token(sArgs, 2);
+        m_sServer = No::token(args, 0);
+        NoString sPort = No::token(args, 1);
+        m_sUserFormat = No::token(args, 2);
 
         if (sPort.left(1) == "+") {
             m_bSSL = true;
             sPort.leftChomp(1);
         }
 
-        ushort uPort = sPort.toUShort();
+        ushort port = sPort.toUShort();
 
-        if (uPort) {
-            m_uPort = uPort;
+        if (port) {
+            m_uPort = port;
         }
 
         return true;
@@ -96,16 +96,16 @@ public:
 
     ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
-        NoUser* pUser = noApp->findUser(Auth->username());
+        NoUser* user = noApp->findUser(Auth->username());
 
-        if (!pUser) { // @todo Will want to do some sort of && !m_bAllowCreate in the future
+        if (!user) { // @todo Will want to do some sort of && !m_bAllowCreate in the future
             Auth->refuseLogin("Invalid User - Halting IMAP Lookup");
             return HALT;
         }
 
-        if (pUser && m_Cache.contains(No::md5(Auth->username() + ":" + Auth->password()))) {
+        if (user && m_Cache.contains(No::md5(Auth->username() + ":" + Auth->password()))) {
             NO_DEBUG("+++ Found in cache");
-            Auth->acceptLogin(pUser);
+            Auth->acceptLogin(user);
             return HALT;
         }
 
@@ -115,7 +115,7 @@ public:
         return HALT;
     }
 
-    void onModCommand(const NoString& sLine) override
+    void onModCommand(const NoString& line) override
     {
     }
 
@@ -141,28 +141,28 @@ private:
     NoCacheMap<NoString> m_Cache;
 };
 
-void NoImapSock::readLine(const NoString& sLine)
+void NoImapSock::readLine(const NoString& line)
 {
     if (!m_bSentLogin) {
         NoString sUsername = m_spAuth->username();
         m_bSentLogin = true;
 
-        const NoString& sFormat = m_pIMAPMod->GetUserFormat();
+        const NoString& format = m_pIMAPMod->GetUserFormat();
 
-        if (!sFormat.empty()) {
-            if (sFormat.contains('%')) {
-                sUsername = sFormat.replace_n("%", sUsername);
+        if (!format.empty()) {
+            if (format.contains('%')) {
+                sUsername = format.replace_n("%", sUsername);
             } else {
-                sUsername += sFormat;
+                sUsername += format;
             }
         }
 
         write("AUTH LOGIN " + sUsername + " " + m_spAuth->password() + "\r\n");
-    } else if (sLine.left(5) == "AUTH ") {
-        NoUser* pUser = noApp->findUser(m_spAuth->username());
+    } else if (line.left(5) == "AUTH ") {
+        NoUser* user = noApp->findUser(m_spAuth->username());
 
-        if (pUser && sLine.startsWith("AUTH OK")) {
-            m_spAuth->acceptLogin(pUser);
+        if (user && line.startsWith("AUTH OK")) {
+            m_spAuth->acceptLogin(user);
             // Use MD5 so passes don't sit in memory in plain text
             m_pIMAPMod->CacheLogin(No::md5(m_spAuth->username() + ":" + m_spAuth->password()));
             NO_DEBUG("+++ Successful IMAP lookup");

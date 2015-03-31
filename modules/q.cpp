@@ -36,12 +36,12 @@ public:
     {
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         NoRegistry registry(this);
-        if (!sArgs.empty()) {
-            SetUsername(No::token(sArgs, 0));
-            SetPassword(No::token(sArgs, 1));
+        if (!args.empty()) {
+            SetUsername(No::token(args, 0));
+            SetPassword(No::token(args, 1));
         } else {
             m_sUsername = registry.value("Username");
             m_sPassword = registry.value("Password");
@@ -106,11 +106,11 @@ public:
         WhoAmI();
     }
 
-    void onModCommand(const NoString& sLine) override
+    void onModCommand(const NoString& line) override
     {
-        NoString sCommand = No::token(sLine, 0).toLower();
+        NoString command = No::token(line, 0).toLower();
 
-        if (sCommand == "help") {
+        if (command == "help") {
             putModule("The following commands are available:");
             NoTable Table;
             Table.addColumn("Command");
@@ -174,9 +174,9 @@ public:
             putModule("This module takes 2 optional parameters: <username> <password>");
             putModule("Module settings are stored between restarts.");
 
-        } else if (sCommand == "set") {
-            NoString sSetting = No::token(sLine, 1).toLower();
-            NoString sValue = No::token(sLine, 2);
+        } else if (command == "set") {
+            NoString sSetting = No::token(line, 1).toLower();
+            NoString sValue = No::token(line, 2);
             if (sSetting.empty() || sValue.empty()) {
                 putModule("Syntax: Set <setting> <value>");
             } else if (sSetting == "username") {
@@ -203,7 +203,7 @@ public:
             } else
                 putModule("Unknown setting: " + sSetting);
 
-        } else if (sCommand == "get" || sCommand == "list") {
+        } else if (command == "get" || command == "list") {
             NoTable Table;
             Table.addColumn("Setting");
             Table.addColumn("Value");
@@ -230,7 +230,7 @@ public:
             Table.setValue("Value", NoString(m_bJoinAfterCloaked));
             putModule(Table);
 
-        } else if (sCommand == "status") {
+        } else if (command == "status") {
             putModule("Connected: " + NoString(isIrcConnected() ? "yes" : "no"));
             putModule("Cloaked: " + NoString(m_bCloaked ? "yes" : "no"));
             putModule("Authed: " + NoString(m_bAuthed ? "yes" : "no"));
@@ -242,19 +242,19 @@ public:
                 return;
             }
 
-            if (sCommand == "cloak") {
+            if (command == "cloak") {
                 if (!m_bCloaked)
                     Cloak();
                 else
                     putModule("Error: You are already cloaked!");
 
-            } else if (sCommand == "auth") {
+            } else if (command == "auth") {
                 if (!m_bAuthed)
-                    Auth(No::token(sLine, 1), No::token(sLine, 2));
+                    Auth(No::token(line, 1), No::token(line, 2));
                 else
                     putModule("Error: You are already authed!");
 
-            } else if (sCommand == "update") {
+            } else if (command == "update") {
                 WhoAmI();
                 putModule("Update requested.");
 
@@ -264,10 +264,10 @@ public:
         }
     }
 
-    ModRet onRaw(NoString& sLine) override
+    ModRet onRaw(NoString& line) override
     {
         // use onRaw because OnUserMode is not defined (yet?)
-        if (No::token(sLine, 1) == "396" && No::token(sLine, 3).contains("users.quakenet.org")) {
+        if (No::token(line, 1) == "396" && No::token(line, 3).contains("users.quakenet.org")) {
             m_bCloaked = true;
             putModule("Cloak successful: Your hostname is now cloaked.");
 
@@ -459,10 +459,10 @@ private:
         NoString sUsername = m_sUsername.toLower().replace_n("[", "{").replace_n("]", "}").replace_n("\\", "|");
         NoString sPasswordHash = No::sha256(m_sPassword.left(10));
         NoString sKey = No::sha256(sUsername + ":" + sPasswordHash);
-        NoString sResponse = HMAC_SHA256(sKey, sChallenge);
+        NoString response = HMAC_SHA256(sKey, sChallenge);
 
         putModule("Auth: Received challenge, sending CHALLENGEAUTH request...");
-        PutQ("CHALLENGEAUTH " + m_sUsername + " " + sResponse + " HMAC-SHA-256");
+        PutQ("CHALLENGEAUTH " + m_sUsername + " " + response + " HMAC-SHA-256");
     }
 
     ModRet HandleMessage(const NoNick& Nick, NoString sMessage)
@@ -593,7 +593,7 @@ private:
         return true;
     }
 
-    NoString HMAC_SHA256(const NoString& sKey, const NoString& sData)
+    NoString HMAC_SHA256(const NoString& sKey, const NoString& data)
     {
         NoString sRealKey;
         if (sKey.length() > 64)
@@ -610,7 +610,7 @@ private:
         }
 
         NoString sInnerHash;
-        PackHex(No::sha256(sInnerKey + sData), sInnerHash);
+        PackHex(No::sha256(sInnerKey + data), sInnerHash);
         return No::sha256(sOuterKey + sInnerHash);
     }
 

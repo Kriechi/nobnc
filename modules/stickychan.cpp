@@ -36,17 +36,17 @@ public:
                    "Lists sticky channels");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override;
+    bool onLoad(const NoString& args, NoString& sMessage) override;
 
     ModRet onUserPart(NoString& sChannel, NoString& sMessage) override
     {
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
             if (sChannel.equals(key)) {
-                NoChannel* pChan = network()->findChannel(sChannel);
+                NoChannel* channel = network()->findChannel(sChannel);
 
-                if (pChan) {
-                    pChan->joinUser();
+                if (channel) {
+                    channel->joinUser();
                     return HALT;
                 }
             }
@@ -55,14 +55,14 @@ public:
         return CONTINUE;
     }
 
-    virtual void onMode(const NoNick& pOpNick, NoChannel& Channel, char uMode, const NoString& sArg, bool bAdded, bool bNoChange) override
+    virtual void onMode(const NoNick& pOpNick, NoChannel& Channel, char uMode, const NoString& arg, bool bAdded, bool bNoChange) override
     {
         if (uMode == NoChannel::M_Key) {
             if (bAdded) {
                 // We ignore channel key "*" because of some broken nets.
-                if (sArg != "*") {
+                if (arg != "*") {
                     NoRegistry registry(this);
-                    registry.setValue(Channel.name(), sArg);
+                    registry.setValue(Channel.name(), arg);
                 }
             } else {
                 NoRegistry registry(this);
@@ -71,21 +71,21 @@ public:
         }
     }
 
-    void OnStickCommand(const NoString& sCommand)
+    void OnStickCommand(const NoString& command)
     {
-        NoString sChannel = No::token(sCommand, 1).toLower();
+        NoString sChannel = No::token(command, 1).toLower();
         if (sChannel.empty()) {
             putModule("Usage: Stick <#channel> [key]");
             return;
         }
         NoRegistry registry(this);
-        registry.setValue(sChannel, No::token(sCommand, 2));
+        registry.setValue(sChannel, No::token(command, 2));
         putModule("Stuck " + sChannel);
     }
 
-    void OnUnstickCommand(const NoString& sCommand)
+    void OnUnstickCommand(const NoString& command)
     {
-        NoString sChannel = No::token(sCommand, 1);
+        NoString sChannel = No::token(command, 1);
         if (sChannel.empty()) {
             putModule("Usage: Unstick <#channel>");
             return;
@@ -95,7 +95,7 @@ public:
         putModule("Unstuck " + sChannel);
     }
 
-    void OnListCommand(const NoString& sCommand)
+    void OnListCommand(const NoString& command)
     {
         int i = 1;
         NoRegistry registry(this);
@@ -189,34 +189,34 @@ protected:
         if (!mod)
             return;
 
-        NoNetwork* pNetwork = mod->network();
-        if (!pNetwork->ircSocket())
+        NoNetwork* network = mod->network();
+        if (!network->ircSocket())
             return;
 
         NoRegistry registry(module());
         for (const NoString& key : registry.keys()) {
-            NoChannel* pChan = pNetwork->findChannel(key);
-            if (!pChan) {
-                pChan = new NoChannel(key, pNetwork, true);
+            NoChannel* channel = network->findChannel(key);
+            if (!channel) {
+                channel = new NoChannel(key, network, true);
                 if (!registry.value(key).empty())
-                    pChan->setKey(registry.value(key));
-                if (!pNetwork->addChannel(pChan)) {
+                    channel->setKey(registry.value(key));
+                if (!network->addChannel(channel)) {
                     /* addChannel() deleted that channel */
                     mod->putModule("Could not join [" + key + "] (# prefix missing?)");
                     continue;
                 }
             }
-            if (!pChan->isOn() && pNetwork->isIrcConnected()) {
-                mod->putModule("Joining [" + pChan->name() + "]");
-                mod->putIrc("JOIN " + pChan->name() + (pChan->key().empty() ? "" : " " + pChan->key()));
+            if (!channel->isOn() && network->isIrcConnected()) {
+                mod->putModule("Joining [" + channel->name() + "]");
+                mod->putIrc("JOIN " + channel->name() + (channel->key().empty() ? "" : " " + channel->key()));
             }
         }
     }
 };
 
-bool NoStickyChan::onLoad(const NoString& sArgs, NoString& sMessage)
+bool NoStickyChan::onLoad(const NoString& args, NoString& sMessage)
 {
-    NoStringVector vsChans = sArgs.split(",", No::SkipEmptyParts);
+    NoStringVector vsChans = args.split(",", No::SkipEmptyParts);
     NoStringVector::iterator it;
 
     for (it = vsChans.begin(); it != vsChans.end(); ++it) {

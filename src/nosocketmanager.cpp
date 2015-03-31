@@ -57,7 +57,7 @@ struct NoDnsTask
           iPort(0),
           sSockName(""),
           iTimeout(0),
-          bSSL(false),
+          ssl(false),
           sBindhost(""),
           pcSock(nullptr),
           bDoneTarget(false),
@@ -74,7 +74,7 @@ struct NoDnsTask
     u_short iPort;
     NoString sSockName;
     int iTimeout;
-    bool bSSL;
+    bool ssl;
     NoString sBindhost;
     NoSocket* pcSock;
 
@@ -112,7 +112,7 @@ static void FinishConnect(NoSocketManager* manager,
                           u_short iPort,
                           const NoString& sSockName,
                           int iTimeout,
-                          bool bSSL,
+                          bool ssl,
                           const NoString& sBindHost,
                           NoSocket* pcSock);
 #endif
@@ -131,7 +131,7 @@ NoSocketManager::~NoSocketManager()
 bool NoSocketManager::listenHost(u_short iPort,
                                  const NoString& sSockName,
                                  const NoString& sBindHost,
-                                 bool bSSL,
+                                 bool ssl,
                                  int iMaxConns,
                                  NoSocket* pcSock,
                                  u_int iTimeout,
@@ -140,7 +140,7 @@ bool NoSocketManager::listenHost(u_short iPort,
     CSListener L(iPort, sBindHost);
 
     L.SetSockName(sSockName);
-    L.SetIsSSL(bSSL);
+    L.SetIsSSL(ssl);
     L.SetTimeout(iTimeout);
     L.SetMaxConns(iMaxConns);
 
@@ -161,24 +161,24 @@ bool NoSocketManager::listenHost(u_short iPort,
     return m_instance->Listen(L, NoSocketPrivate::get(pcSock));
 }
 
-bool NoSocketManager::listenAll(u_short iPort, const NoString& sSockName, bool bSSL, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
+bool NoSocketManager::listenAll(u_short iPort, const NoString& sSockName, bool ssl, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
 {
-    return listenHost(iPort, sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
+    return listenHost(iPort, sSockName, "", ssl, iMaxConns, pcSock, iTimeout, eAddr);
 }
 
 u_short NoSocketManager::listenRand(const NoString& sSockName,
                                     const NoString& sBindHost,
-                                    bool bSSL,
+                                    bool ssl,
                                     int iMaxConns,
                                     NoSocket* pcSock,
                                     u_int iTimeout,
                                     No::AddressType eAddr)
 {
-    ushort uPort = 0;
+    ushort port = 0;
     CSListener L(0, sBindHost);
 
     L.SetSockName(sSockName);
-    L.SetIsSSL(bSSL);
+    L.SetIsSSL(ssl);
     L.SetTimeout(iTimeout);
     L.SetMaxConns(iMaxConns);
 
@@ -196,21 +196,21 @@ u_short NoSocketManager::listenRand(const NoString& sSockName,
     }
 #endif
 
-    m_instance->Listen(L, NoSocketPrivate::get(pcSock), &uPort);
+    m_instance->Listen(L, NoSocketPrivate::get(pcSock), &port);
 
-    return uPort;
+    return port;
 }
 
-u_short NoSocketManager::listenAllRand(const NoString& sSockName, bool bSSL, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
+u_short NoSocketManager::listenAllRand(const NoString& sSockName, bool ssl, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
 {
-    return listenRand(sSockName, "", bSSL, iMaxConns, pcSock, iTimeout, eAddr);
+    return listenRand(sSockName, "", ssl, iMaxConns, pcSock, iTimeout, eAddr);
 }
 
 void NoSocketManager::connect(const NoString& sHostname,
                               u_short iPort,
                               const NoString& sSockName,
                               int iTimeout,
-                              bool bSSL,
+                              bool ssl,
                               const NoString& sBindHost,
                               NoSocket* pcSock)
 {
@@ -224,7 +224,7 @@ void NoSocketManager::connect(const NoString& sHostname,
     task->iPort = iPort;
     task->sSockName = sSockName;
     task->iTimeout = iTimeout;
-    task->bSSL = bSSL;
+    task->ssl = ssl;
     task->sBindhost = sBindHost;
     task->pcSock = pcSock;
     if (sBindHost.empty()) {
@@ -235,7 +235,7 @@ void NoSocketManager::connect(const NoString& sHostname,
     StartTDNSThread(this, task, false);
 #else // HAVE_THREADED_DNS
     // Just let Csocket handle DNS itself
-    FinishConnect(this, sHostname, iPort, sSockName, iTimeout, bSSL, sBindHost, pcSock);
+    FinishConnect(this, sHostname, iPort, sSockName, iTimeout, ssl, sBindHost, pcSock);
 #endif
 }
 
@@ -244,11 +244,11 @@ std::vector<NoSocket*> NoSocketManager::sockets() const
     return m_sockets;
 }
 
-std::vector<NoSocket*> NoSocketManager::findSockets(const NoString& sName)
+std::vector<NoSocket*> NoSocketManager::findSockets(const NoString& name)
 {
     std::vector<NoSocket*> sockets;
     for (NoSocket* socket : m_sockets) {
-        if (socket->name() == sName)
+        if (socket->name() == name)
             sockets.push_back(socket);
     }
     return sockets;
@@ -483,7 +483,7 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
         }
 
         NO_DEBUG("TDNS: " << task->sSockName << ", connecting to [" << sTargetHost << "] using bindhost [" << sBindhost << "]");
-        FinishConnect(manager, sTargetHost, task->iPort, task->sSockName, task->iTimeout, task->bSSL, sBindhost, task->pcSock);
+        FinishConnect(manager, sTargetHost, task->iPort, task->sSockName, task->iTimeout, task->ssl, sBindhost, task->pcSock);
     } catch (const char* s) {
         NO_DEBUG(task->sSockName << ", dns resolving error: " << s);
         task->pcSock->setName(task->sSockName);
@@ -500,14 +500,14 @@ void FinishConnect(NoSocketManager* manager,
                    u_short iPort,
                    const NoString& sSockName,
                    int iTimeout,
-                   bool bSSL,
+                   bool ssl,
                    const NoString& sBindHost,
                    NoSocket* pcSock)
 {
     CSConnection C(sHostname, iPort, iTimeout);
 
     C.SetSockName(sSockName);
-    C.SetIsSSL(bSSL);
+    C.SetIsSSL(ssl);
     C.SetBindHost(sBindHost);
 #ifdef HAVE_LIBSSL
     NoString sCipher = noApp->sslCiphers();

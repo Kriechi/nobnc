@@ -25,50 +25,50 @@
 
 class NoSendRawMod : public NoModule
 {
-    void SendClient(const NoString& sLine)
+    void SendClient(const NoString& line)
     {
-        NoUser* pUser = noApp->findUser(No::token(sLine, 1));
+        NoUser* user = noApp->findUser(No::token(line, 1));
 
-        if (pUser) {
-            NoNetwork* pNetwork = pUser->findNetwork(No::token(sLine, 2));
+        if (user) {
+            NoNetwork* network = user->findNetwork(No::token(line, 2));
 
-            if (pNetwork) {
-                pNetwork->putUser(No::tokens(sLine, 3));
-                putModule("Sent [" + No::tokens(sLine, 3) + "] to " + pUser->userName() + "/" + pNetwork->name());
+            if (network) {
+                network->putUser(No::tokens(line, 3));
+                putModule("Sent [" + No::tokens(line, 3) + "] to " + user->userName() + "/" + network->name());
             } else {
-                putModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
+                putModule("Network [" + No::token(line, 2) + "] not found for user [" + No::token(line, 1) + "]");
             }
         } else {
-            putModule("User [" + No::token(sLine, 1) + "] not found");
+            putModule("User [" + No::token(line, 1) + "] not found");
         }
     }
 
-    void SendServer(const NoString& sLine)
+    void SendServer(const NoString& line)
     {
-        NoUser* pUser = noApp->findUser(No::token(sLine, 1));
+        NoUser* user = noApp->findUser(No::token(line, 1));
 
-        if (pUser) {
-            NoNetwork* pNetwork = pUser->findNetwork(No::token(sLine, 2));
+        if (user) {
+            NoNetwork* network = user->findNetwork(No::token(line, 2));
 
-            if (pNetwork) {
-                pNetwork->putIrc(No::tokens(sLine, 3));
-                putModule("Sent [" + No::tokens(sLine, 3) + "] to IRC Server of " + pUser->userName() + "/" + pNetwork->name());
+            if (network) {
+                network->putIrc(No::tokens(line, 3));
+                putModule("Sent [" + No::tokens(line, 3) + "] to IRC Server of " + user->userName() + "/" + network->name());
             } else {
-                putModule("Network [" + No::token(sLine, 2) + "] not found for user [" + No::token(sLine, 1) + "]");
+                putModule("Network [" + No::token(line, 2) + "] not found for user [" + No::token(line, 1) + "]");
             }
         } else {
-            putModule("User [" + No::token(sLine, 1) + "] not found");
+            putModule("User [" + No::token(line, 1) + "] not found");
         }
     }
 
-    void CurrentClient(const NoString& sLine)
+    void CurrentClient(const NoString& line)
     {
-        NoString sData = No::tokens(sLine, 1);
-        client()->putClient(sData);
+        NoString data = No::tokens(line, 1);
+        client()->putClient(data);
     }
 
 public:
-    bool onLoad(const NoString& sArgs, NoString& sErrorMsg) override
+    bool onLoad(const NoString& args, NoString& sErrorMsg) override
     {
         if (!user()->isAdmin()) {
             sErrorMsg = "You must have admin privileges to load this module";
@@ -91,29 +91,29 @@ public:
     {
         if (sPageName == "index") {
             if (WebSock.isPost()) {
-                NoUser* pUser = noApp->findUser(No::token(WebSock.param("network"), 0, "/"));
-                if (!pUser) {
+                NoUser* user = noApp->findUser(No::token(WebSock.param("network"), 0, "/"));
+                if (!user) {
                     WebSock.session()->addError("User not found");
                     return true;
                 }
 
-                NoNetwork* pNetwork = pUser->findNetwork(No::token(WebSock.param("network"), 1, "/"));
-                if (!pNetwork) {
+                NoNetwork* network = user->findNetwork(No::token(WebSock.param("network"), 1, "/"));
+                if (!network) {
                     WebSock.session()->addError("Network not found");
                     return true;
                 }
 
                 bool bToServer = WebSock.param("send_to") == "server";
-                const NoString sLine = WebSock.param("line");
+                const NoString line = WebSock.param("line");
 
-                Tmpl["user"] = pUser->userName();
+                Tmpl["user"] = user->userName();
                 Tmpl[bToServer ? "to_server" : "to_client"] = "true";
-                Tmpl["line"] = sLine;
+                Tmpl["line"] = line;
 
                 if (bToServer) {
-                    pNetwork->putIrc(sLine);
+                    network->putIrc(line);
                 } else {
-                    pNetwork->putUser(sLine);
+                    network->putUser(line);
                 }
 
                 WebSock.session()->addSuccess("Line sent");

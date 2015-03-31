@@ -200,7 +200,7 @@ protected:
 
 struct queued_req
 {
-    NoString sLine;
+    NoString line;
     const struct reply* reply;
 };
 
@@ -226,7 +226,7 @@ public:
             it = m_vsPending.begin();
 
             while (!it->second.empty()) {
-                putIrc(it->second[0].sLine);
+                putIrc(it->second[0].line);
                 it->second.erase(it->second.begin());
             }
 
@@ -269,30 +269,30 @@ public:
         SendRequest();
     }
 
-    ModRet onRaw(NoString& sLine) override
+    ModRet onRaw(NoString& line) override
     {
-        NoString sCmd = No::token(sLine, 1).toUpper();
+        NoString cmd = No::token(line, 1).toUpper();
         size_t i = 0;
 
         if (!m_pReplies)
             return CONTINUE;
 
         // Is this a "not enough arguments" error?
-        if (sCmd == "461") {
+        if (cmd == "461") {
             // :server 461 nick WHO :Not enough parameters
-            NoString sOrigCmd = No::token(sLine, 3);
+            NoString sOrigCmd = No::token(line, 3);
 
             if (No::token(m_sLastRequest, 0).equals(sOrigCmd)) {
                 // This is the reply to the last request
-                if (RouteReply(sLine, true))
+                if (RouteReply(line, true))
                     return HALTCORE;
                 return CONTINUE;
             }
         }
 
         while (m_pReplies[i].szReply != nullptr) {
-            if (m_pReplies[i].szReply == sCmd) {
-                if (RouteReply(sLine, m_pReplies[i].bLastResponse, sCmd == "353"))
+            if (m_pReplies[i].szReply == cmd) {
+                if (RouteReply(line, m_pReplies[i].bLastResponse, cmd == "353"))
                     return HALTCORE;
                 return CONTINUE;
             }
@@ -305,23 +305,23 @@ public:
         return CONTINUE;
     }
 
-    ModRet onUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& line) override
     {
-        NoString sCmd = No::token(sLine, 0).toUpper();
+        NoString cmd = No::token(line, 0).toUpper();
 
         if (!network()->ircSocket())
             return CONTINUE;
 
-        if (sCmd.equals("MODE")) {
+        if (cmd.equals("MODE")) {
             // Check if this is a mode request that needs to be handled
 
             // If there are arguments to a mode change,
             // we must not route it.
-            if (!No::tokens(sLine, 3).empty())
+            if (!No::tokens(line, 3).empty())
                 return CONTINUE;
 
             // Grab the mode change parameter
-            NoString sMode = No::token(sLine, 2);
+            NoString sMode = No::token(line, 2);
 
             // If this is a channel mode request, znc core replies to it
             if (sMode.empty())
@@ -348,8 +348,8 @@ public:
         }
 
         for (size_t i = 0; vRouteReplies[i].szRequest != nullptr; i++) {
-            if (vRouteReplies[i].szRequest == sCmd) {
-                struct queued_req req = { sLine, vRouteReplies[i].vReplies };
+            if (vRouteReplies[i].szRequest == cmd) {
+                struct queued_req req = { line, vRouteReplies[i].vReplies };
                 m_vsPending[client()].push_back(req);
                 SendRequest();
 
@@ -385,16 +385,16 @@ public:
     }
 
 private:
-    bool RouteReply(const NoString& sLine, bool bFinished = false, bool bIsRaw353 = false)
+    bool RouteReply(const NoString& line, bool bFinished = false, bool bIsRaw353 = false)
     {
         if (!m_pDoing)
             return false;
 
         // 353 needs special treatment due to NAMESX and UHNAMES
         if (bIsRaw353)
-            network()->ircSocket()->forwardRaw353(sLine, m_pDoing);
+            network()->ircSocket()->forwardRaw353(line, m_pDoing);
         else
-            m_pDoing->putClient(sLine);
+            m_pDoing->putClient(line);
 
         if (bFinished) {
             // Stop the timeout
@@ -437,14 +437,14 @@ private:
 
         m_pDoing = it->first;
         m_pReplies = it->second[0].reply;
-        m_sLastRequest = it->second[0].sLine;
-        putIrc(it->second[0].sLine);
+        m_sLastRequest = it->second[0].line;
+        putIrc(it->second[0].line);
         it->second.erase(it->second.begin());
     }
 
-    void SilentCommand(const NoString& sLine)
+    void SilentCommand(const NoString& line)
     {
-        const NoString sValue = No::token(sLine, 1);
+        const NoString sValue = No::token(line, 1);
 
         NoRegistry registry(this);
         if (!sValue.empty()) {

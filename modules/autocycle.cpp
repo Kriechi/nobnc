@@ -43,9 +43,9 @@ public:
         m_recentlyCycled.setExpiration(15 * 1000);
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        NoStringVector vsChans = sArgs.split(" ", No::SkipEmptyParts);
+        NoStringVector vsChans = args.split(" ", No::SkipEmptyParts);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             if (!Add(*it)) {
@@ -65,9 +65,9 @@ public:
         return true;
     }
 
-    void OnaddCommand(const NoString& sLine)
+    void OnaddCommand(const NoString& line)
     {
-        NoString sChan = No::token(sLine, 1);
+        NoString sChan = No::token(line, 1);
 
         if (AlreadyAdded(sChan)) {
             putModule(sChan + " is already added");
@@ -78,9 +78,9 @@ public:
         }
     }
 
-    void OnDelCommand(const NoString& sLine)
+    void OnDelCommand(const NoString& line)
     {
-        NoString sChan = No::token(sLine, 1);
+        NoString sChan = No::token(line, 1);
 
         if (Del(sChan))
             putModule("Removed " + sChan + " from list");
@@ -88,7 +88,7 @@ public:
             putModule("Usage: Del [!]<#chan>");
     }
 
-    void OnListCommand(const NoString& sLine)
+    void OnListCommand(const NoString& line)
     {
         NoTable Table;
         Table.addColumn("Chan");
@@ -115,10 +115,10 @@ public:
         AutoCycle(Channel);
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
     {
-        for (uint i = 0; i < vChans.size(); i++)
-            AutoCycle(*vChans[i]);
+        for (uint i = 0; i < channels.size(); i++)
+            AutoCycle(*channels[i]);
     }
 
     void onKick(const NoNick& Nick, const NoString& sOpNick, NoChannel& Channel, const NoString& sMessage) override

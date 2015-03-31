@@ -37,7 +37,7 @@ public:
     bool listenHost(ushort iPort,
                     const NoString& sSockName,
                     const NoString& sBindHost,
-                    bool bSSL = false,
+                    bool ssl = false,
                     int iMaxConns = SOMAXCONN,
                     NoSocket* pcSock = nullptr,
                     u_int iTimeout = 0,
@@ -45,7 +45,7 @@ public:
 
     bool listenAll(ushort iPort,
                    const NoString& sSockName,
-                   bool bSSL = false,
+                   bool ssl = false,
                    int iMaxConns = SOMAXCONN,
                    NoSocket* pcSock = nullptr,
                    u_int iTimeout = 0,
@@ -53,14 +53,14 @@ public:
 
     u_short listenRand(const NoString& sSockName,
                        const NoString& sBindHost,
-                       bool bSSL = false,
+                       bool ssl = false,
                        int iMaxConns = SOMAXCONN,
                        NoSocket* pcSock = nullptr,
                        u_int iTimeout = 0,
                        No::AddressType eAddr = No::Ipv4AndIpv6Address);
 
     u_short listenAllRand(const NoString& sSockName,
-                          bool bSSL = false,
+                          bool ssl = false,
                           int iMaxConns = SOMAXCONN,
                           NoSocket* pcSock = nullptr,
                           u_int iTimeout = 0,
@@ -70,12 +70,12 @@ public:
                  ushort iPort,
                  const NoString& sSockName,
                  int iTimeout = 60,
-                 bool bSSL = false,
+                 bool ssl = false,
                  const NoString& sBindHost = "",
                  NoSocket* pcSock = nullptr);
 
     std::vector<NoSocket*> sockets() const;
-    std::vector<NoSocket*> findSockets(const NoString& sName);
+    std::vector<NoSocket*> findSockets(const NoString& name);
     uint anonConnectionCount(const NoString& sIP) const;
 
     void cleanup();

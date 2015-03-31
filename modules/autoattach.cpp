@@ -39,9 +39,9 @@ public:
             m_sHostmaskWildcard = "*!*@*";
     }
 
-    bool IsMatch(const NoString& sChan, const NoString& sHost, const NoString& sMessage) const
+    bool IsMatch(const NoString& sChan, const NoString& host, const NoString& sMessage) const
     {
-        if (!No::wildCmp(sHost, m_sHostmaskWildcard, No::CaseInsensitive))
+        if (!No::wildCmp(host, m_sHostmaskWildcard, No::CaseInsensitive))
             return false;
         if (!No::wildCmp(sChan, m_sChannelWildcard, No::CaseInsensitive))
             return false;
@@ -98,21 +98,21 @@ public:
     typedef VAttachMatch::iterator VAttachIter;
 
 private:
-    void HandleAdd(const NoString& sLine)
+    void HandleAdd(const NoString& line)
     {
-        NoString sMsg = No::tokens(sLine, 1);
+        NoString sMsg = No::tokens(line, 1);
         bool bHelp = false;
         bool bNegated = sMsg.trimPrefix("!");
         NoString sChan = No::token(sMsg, 0);
         NoString sSearch = No::token(sMsg, 1);
-        NoString sHost = No::token(sMsg, 2);
+        NoString host = No::token(sMsg, 2);
 
         if (sChan.empty()) {
             bHelp = true;
-        } else if (Add(bNegated, sChan, sSearch, sHost)) {
+        } else if (Add(bNegated, sChan, sSearch, host)) {
             putModule("Added to list");
         } else {
-            putModule(No::tokens(sLine, 1) + " is already added");
+            putModule(No::tokens(line, 1) + " is already added");
             bHelp = true;
         }
         if (bHelp) {
@@ -121,22 +121,22 @@ private:
         }
     }
 
-    void HandleDel(const NoString& sLine)
+    void HandleDel(const NoString& line)
     {
-        NoString sMsg = No::tokens(sLine, 1);
+        NoString sMsg = No::tokens(line, 1);
         bool bNegated = sMsg.trimPrefix("!");
         NoString sChan = No::token(sMsg, 0);
         NoString sSearch = No::token(sMsg, 1);
-        NoString sHost = No::token(sMsg, 2);
+        NoString host = No::token(sMsg, 2);
 
-        if (Del(bNegated, sChan, sSearch, sHost)) {
+        if (Del(bNegated, sChan, sSearch, host)) {
             putModule("Removed " + sChan + " from list");
         } else {
             putModule("Usage: Del [!]<#chan> <search> <host>");
         }
     }
 
-    void HandleList(const NoString& sLine)
+    void HandleList(const NoString& line)
     {
         NoTable Table;
         Table.addColumn("Neg");
@@ -178,18 +178,18 @@ public:
                    "List all entries");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        NoStringVector vsChans = sArgs.split(" ", No::SkipEmptyParts);
+        NoStringVector vsChans = args.split(" ", No::SkipEmptyParts);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
             NoString sAdd = *it;
             bool bNegated = sAdd.trimPrefix("!");
             NoString sChan = No::token(sAdd, 0);
             NoString sSearch = No::token(sAdd, 1);
-            NoString sHost = No::tokens(sAdd, 2);
+            NoString host = No::tokens(sAdd, 2);
 
-            if (!Add(bNegated, sChan, sSearch, sHost)) {
+            if (!Add(bNegated, sChan, sSearch, host)) {
                 putModule("Unable to add [" + *it + "]");
             }
         }
@@ -201,9 +201,9 @@ public:
             bool bNegated = str.trimPrefix("!");
             NoString sChan = No::token(str, 0);
             NoString sSearch = No::token(str, 1);
-            NoString sHost = No::tokens(str, 2);
+            NoString host = No::tokens(str, 2);
 
-            Add(bNegated, sChan, sSearch, sHost);
+            Add(bNegated, sChan, sSearch, host);
         }
 
         return true;
@@ -212,7 +212,7 @@ public:
     void TryAttach(const NoNick& Nick, NoChannel& Channel, NoString& Message)
     {
         const NoString& sChan = Channel.name();
-        const NoString& sHost = Nick.hostMask();
+        const NoString& host = Nick.hostMask();
         const NoString& sMessage = Message;
         VAttachIter it;
 
@@ -221,13 +221,13 @@ public:
 
         // Any negated match?
         for (it = m_vMatches.begin(); it != m_vMatches.end(); ++it) {
-            if (it->IsNegated() && it->IsMatch(sChan, sHost, sMessage))
+            if (it->IsNegated() && it->IsMatch(sChan, host, sMessage))
                 return;
         }
 
         // Now check for a positive match
         for (it = m_vMatches.begin(); it != m_vMatches.end(); ++it) {
-            if (!it->IsNegated() && it->IsMatch(sChan, sHost, sMessage)) {
+            if (!it->IsNegated() && it->IsMatch(sChan, host, sMessage)) {
                 Channel.attachUser();
                 return;
             }
@@ -252,11 +252,11 @@ public:
         return CONTINUE;
     }
 
-    VAttachIter FindEntry(const NoString& sChan, const NoString& sSearch, const NoString& sHost)
+    VAttachIter FindEntry(const NoString& sChan, const NoString& sSearch, const NoString& host)
     {
         VAttachIter it = m_vMatches.begin();
         for (; it != m_vMatches.end(); ++it) {
-            if (sHost.empty() || it->GetHostMask() != sHost)
+            if (host.empty() || it->GetHostMask() != host)
                 continue;
             if (sSearch.empty() || it->GetSearch() != sSearch)
                 continue;
@@ -267,9 +267,9 @@ public:
         return m_vMatches.end();
     }
 
-    bool Add(bool bNegated, const NoString& sChan, const NoString& sSearch, const NoString& sHost)
+    bool Add(bool bNegated, const NoString& sChan, const NoString& sSearch, const NoString& host)
     {
-        NoAttachMatch attach(this, sChan, sSearch, sHost, bNegated);
+        NoAttachMatch attach(this, sChan, sSearch, host, bNegated);
 
         // Check for duplicates
         VAttachIter it = m_vMatches.begin();
@@ -288,9 +288,9 @@ public:
         return true;
     }
 
-    bool Del(bool bNegated, const NoString& sChan, const NoString& sSearch, const NoString& sHost)
+    bool Del(bool bNegated, const NoString& sChan, const NoString& sSearch, const NoString& host)
     {
-        VAttachIter it = FindEntry(sChan, sSearch, sHost);
+        VAttachIter it = FindEntry(sChan, sSearch, host);
         if (it == m_vMatches.end() || it->IsNegated() != bNegated)
             return false;
 

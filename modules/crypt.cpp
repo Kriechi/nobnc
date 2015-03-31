@@ -82,11 +82,11 @@ public:
 
         NoRegistry registry(this);
         if (registry.contains(sTarget.toLower())) {
-            NoChannel* pChan = network()->findChannel(sTarget);
+            NoChannel* channel = network()->findChannel(sTarget);
             NoString sNickMask = network()->ircNick().nickMask();
-            if (pChan) {
-                if (!pChan->autoClearChanBuffer())
-                    pChan->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +
+            if (channel) {
+                if (!channel->autoClearChanBuffer())
+                    channel->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +
                                      " :{text}",
                                      sMessage);
                 user()->putUser(":" + NickPrefix() + sNickMask + " PRIVMSG " + sTarget + " :" + sMessage, nullptr, client());
@@ -131,9 +131,9 @@ public:
         }
     }
 
-    void OnDelKeyCommand(const NoString& sCommand)
+    void OnDelKeyCommand(const NoString& command)
     {
-        NoString sTarget = No::token(sCommand, 1);
+        NoString sTarget = No::token(command, 1);
 
         if (!sTarget.empty()) {
             NoRegistry registry(this);
@@ -148,10 +148,10 @@ public:
         }
     }
 
-    void OnSetKeyCommand(const NoString& sCommand)
+    void OnSetKeyCommand(const NoString& command)
     {
-        NoString sTarget = No::token(sCommand, 1);
-        NoString sKey = No::tokens(sCommand, 2);
+        NoString sTarget = No::token(command, 1);
+        NoString sKey = No::tokens(command, 2);
 
         // Strip "cbc:" from beginning of string incase someone pastes directly from mircryption
         sKey.trimPrefix("cbc:");
@@ -165,7 +165,7 @@ public:
         }
     }
 
-    void OnListKeysCommand(const NoString& sCommand)
+    void OnListKeysCommand(const NoString& command)
     {
         NoRegistry registry(this);
         if (registry.isEmpty()) {
@@ -194,14 +194,14 @@ public:
 
     NoString MakeIvec()
     {
-        NoString sRet;
+        NoString ret;
         time_t t;
         time(&t);
         int r = rand();
-        sRet.append((char*)&t, 4);
-        sRet.append((char*)&r, 4);
+        ret.append((char*)&t, 4);
+        ret.append((char*)&r, 4);
 
-        return sRet;
+        return ret;
     }
 };
 

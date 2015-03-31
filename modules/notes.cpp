@@ -26,15 +26,15 @@ class NoNotesMod : public NoModule
 {
     bool bShowNotesOnLogin;
 
-    void ListCommand(const NoString& sLine)
+    void ListCommand(const NoString& line)
     {
         ListNotes();
     }
 
-    void AddNoteCommand(const NoString& sLine)
+    void AddNoteCommand(const NoString& line)
     {
-        NoString sKey(No::token(sLine, 1));
-        NoString sValue(No::tokens(sLine, 2));
+        NoString sKey(No::token(line, 1));
+        NoString sValue(No::tokens(line, 2));
 
         NoRegistry registry(this);
         if (!registry.value(sKey).empty()) {
@@ -46,10 +46,10 @@ class NoNotesMod : public NoModule
         }
     }
 
-    void ModCommand(const NoString& sLine)
+    void ModCommand(const NoString& line)
     {
-        NoString sKey(No::token(sLine, 1));
-        NoString sValue(No::tokens(sLine, 2));
+        NoString sKey(No::token(line, 1));
+        NoString sValue(No::tokens(line, 2));
 
         if (AddNote(sKey, sValue)) {
             putModule("Set note for [" + sKey + "]");
@@ -58,10 +58,10 @@ class NoNotesMod : public NoModule
         }
     }
 
-    void GetCommand(const NoString& sLine)
+    void GetCommand(const NoString& line)
     {
         NoRegistry registry(this);
-        NoString sNote = registry.value(No::tokens(sLine, 1));
+        NoString sNote = registry.value(No::tokens(line, 1));
 
         if (sNote.empty()) {
             putModule("This note doesn't exist.");
@@ -70,9 +70,9 @@ class NoNotesMod : public NoModule
         }
     }
 
-    void DelCommand(const NoString& sLine)
+    void DelCommand(const NoString& line)
     {
-        NoString sKey(No::token(sLine, 1));
+        NoString sKey(No::token(line, 1));
 
         if (DelNote(sKey)) {
             putModule("Deleted note [" + sKey + "]");
@@ -90,12 +90,12 @@ public:
         addCommand("Add", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::AddNoteCommand), "<key> <note>");
         addCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::DelCommand), "<key>", "Delete a note");
         addCommand("Mod", "<key> <note>", "Modify a note", std::bind(&NoNotesMod::ModCommand, this, _1));
-        addCommand("Get", "<key>", "", [this](const NoString& sLine) { GetCommand(sLine); });
+        addCommand("Get", "<key>", "", [this](const NoString& line) { GetCommand(line); });
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        bShowNotesOnLogin = !sArgs.equals("-disableNotesOnLogin");
+        bShowNotesOnLogin = !args.equals("-disableNotesOnLogin");
         return true;
     }
 
@@ -111,34 +111,34 @@ public:
         }
     }
 
-    ModRet onUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& line) override
     {
-        if (sLine.left(1) != "#") {
+        if (line.left(1) != "#") {
             return CONTINUE;
         }
 
         NoString sKey;
         bool bOverwrite = false;
 
-        if (sLine == "#?") {
+        if (line == "#?") {
             ListNotes(true);
             return HALT;
-        } else if (sLine.left(2) == "#-") {
-            sKey = No::token(sLine, 0).leftChomp_n(2);
+        } else if (line.left(2) == "#-") {
+            sKey = No::token(line, 0).leftChomp_n(2);
             if (DelNote(sKey)) {
                 putModuleNotice("Deleted note [" + sKey + "]");
             } else {
                 putModuleNotice("Unable to delete note [" + sKey + "]");
             }
             return HALT;
-        } else if (sLine.left(2) == "#+") {
-            sKey = No::token(sLine, 0).leftChomp_n(2);
+        } else if (line.left(2) == "#+") {
+            sKey = No::token(line, 0).leftChomp_n(2);
             bOverwrite = true;
-        } else if (sLine.left(1) == "#") {
-            sKey = No::token(sLine, 0).leftChomp_n(1);
+        } else if (line.left(1) == "#") {
+            sKey = No::token(line, 0).leftChomp_n(1);
         }
 
-        NoString sValue(No::tokens(sLine, 1));
+        NoString sValue(No::tokens(line, 1));
 
         if (!sKey.empty()) {
             if (!bOverwrite && NoRegistry(this).contains(sKey)) {
@@ -180,9 +180,9 @@ public:
 
     void ListNotes(bool bNotice = false)
     {
-        NoClient* pClient = client();
+        NoClient* client = NoModule::client();
 
-        if (pClient) {
+        if (client) {
             NoTable Table;
             Table.addColumn("Key");
             Table.addColumn("Note");
@@ -197,9 +197,9 @@ public:
             if (!Table.isEmpty()) {
                 for (const NoString& line : Table.toString()) {
                     if (bNotice)
-                        pClient->putModuleNotice(moduleName(), line);
+                        client->putModuleNotice(moduleName(), line);
                     else
-                        pClient->putModule(moduleName(), line);
+                        client->putModule(moduleName(), line);
                 }
             } else {
                 if (bNotice) {

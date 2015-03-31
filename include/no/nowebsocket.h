@@ -40,19 +40,19 @@ public:
     virtual ~NoWebSocket();
 
     bool forceLogin() override;
-    bool onLogin(const NoString& sUser, const NoString& sPass, bool bBasic) override;
+    bool onLogin(const NoString& sUser, const NoString& pass, bool bBasic) override;
     void onPageRequest(const NoString& sURI) override;
 
     PageRequest printTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule = nullptr);
     PageRequest printStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule = nullptr);
 
-    NoString findTemplate(NoModule* pModule, const NoString& sName);
+    NoString findTemplate(NoModule* pModule, const NoString& name);
 
     void printErrorPage(const NoString& sMessage);
 
     std::shared_ptr<NoWebSession> session();
 
-    NoSocket* createSocket(const NoString& sHost, ushort uPort) override;
+    NoSocket* createSocket(const NoString& host, ushort port) override;
     static NoString skinPath(const NoString& sSkinName);
     void availableSkins(NoStringVector& vRet) const;
     NoString skinName();

@@ -49,34 +49,34 @@ public:
         ReleaseISpoof();
     }
 
-    void GetFile(const NoString& sLine)
+    void GetFile(const NoString& line)
     {
         putModule("File is set to: " + NoRegistry(this).value("File"));
     }
 
-    void SetFile(const NoString& sLine)
+    void SetFile(const NoString& line)
     {
         NoRegistry registry(this);
-        registry.setValue("File", No::tokens(sLine, 1));
+        registry.setValue("File", No::tokens(line, 1));
         putModule("File has been set to: " + registry.value("File"));
     }
 
-    void SetFormat(const NoString& sLine)
+    void SetFormat(const NoString& line)
     {
         NoRegistry registry(this);
-        registry.setValue("Format", No::tokens(sLine, 1));
+        registry.setValue("Format", No::tokens(line, 1));
         putModule("Format has been set to: " + registry.value("Format"));
         putModule("Format would be expanded to: " + expandString(registry.value("Format")));
     }
 
-    void GetFormat(const NoString& sLine)
+    void GetFormat(const NoString& line)
     {
         NoRegistry registry(this);
         putModule("Format is set to: " + registry.value("Format"));
         putModule("Format would be expanded to: " + expandString(registry.value("Format")));
     }
 
-    void Show(const NoString& sLine)
+    void Show(const NoString& line)
     {
         putModule("m_pISpoofLockFile = " + NoString((long long)m_pISpoofLockFile));
         putModule("m_pIRCSock = " + NoString((long long)m_pIRCSock));
@@ -87,10 +87,10 @@ public:
         }
     }
 
-    void onModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& command) override
     {
         if (user()->isAdmin()) {
-            handleCommand(sCommand);
+            handleCommand(command);
         } else {
             putModule("Access denied");
         }
@@ -135,18 +135,18 @@ public:
             return false;
         }
 
-        NoString sData = expandString(registry.value("Format"));
+        NoString data = expandString(registry.value("Format"));
 
         // If the format doesn't contain anything expandable, we'll
         // assume this is an "old"-style format string.
-        if (sData == registry.value("Format")) {
-            sData.replace("%", user()->ident());
+        if (data == registry.value("Format")) {
+            data.replace("%", user()->ident());
         }
 
-        NO_DEBUG("Writing [" + sData + "] to ident spoof file [" + m_pISpoofLockFile->GetLongName() +
+        NO_DEBUG("Writing [" + data + "] to ident spoof file [" + m_pISpoofLockFile->GetLongName() +
                  "] for user/network [" + user()->userName() + "/" + network()->name() + "]");
 
-        m_pISpoofLockFile->Write(sData + "\n");
+        m_pISpoofLockFile->Write(data + "\n");
 
         return true;
     }
@@ -170,7 +170,7 @@ public:
         }
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         m_pISpoofLockFile = nullptr;
         m_pIRCSock = nullptr;

@@ -53,23 +53,23 @@ public:
     SubConfigMapIterator BeginSubConfigs() const;
     SubConfigMapIterator EndSubConfigs() const;
 
-    void AddKeyValuePair(const NoString& sName, const NoString& sValue);
+    void AddKeyValuePair(const NoString& name, const NoString& sValue);
 
-    bool AddSubConfig(const NoString& sTag, const NoString& sName, NoSettings Config);
+    bool AddSubConfig(const NoString& sTag, const NoString& name, NoSettings Config);
 
-    bool FindStringVector(const NoString& sName, NoStringVector& vsList, bool bErase = true);
+    bool FindStringVector(const NoString& name, NoStringVector& vsList, bool bErase = true);
 
-    bool FindStringEntry(const NoString& sName, NoString& sRes, const NoString& sDefault = "");
+    bool FindStringEntry(const NoString& name, NoString& sRes, const NoString& sDefault = "");
 
-    bool FindBoolEntry(const NoString& sName, bool& bRes, bool bDefault = false);
+    bool FindBoolEntry(const NoString& name, bool& bRes, bool bDefault = false);
 
-    bool FindUIntEntry(const NoString& sName, uint& uRes, uint uDefault = 0);
+    bool FindUIntEntry(const NoString& name, uint& uRes, uint uDefault = 0);
 
-    bool FindUShortEntry(const NoString& sName, ushort& uRes, ushort uDefault = 0);
+    bool FindUShortEntry(const NoString& name, ushort& uRes, ushort uDefault = 0);
 
-    bool FindDoubleEntry(const NoString& sName, double& fRes, double fDefault = 0);
+    bool FindDoubleEntry(const NoString& name, double& fRes, double fDefault = 0);
 
-    bool FindSubConfig(const NoString& sName, SubConfig& Config, bool bErase = true);
+    bool FindSubConfig(const NoString& name, SubConfig& Config, bool bErase = true);
 
     bool empty() const;
 

@@ -28,10 +28,10 @@ public:
     {
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        NoString sTimeout = No::token(sArgs, 0);
-        NoString sAttempts = No::token(sArgs, 1);
+        NoString sTimeout = No::token(args, 0);
+        NoString sAttempts = No::token(args, 1);
         uint timeout = sTimeout.toUInt();
 
         if (sAttempts.empty())
@@ -40,9 +40,9 @@ public:
             m_uiAllowedFailed = sAttempts.toUInt();
         ;
 
-        if (sArgs.empty()) {
+        if (args.empty()) {
             timeout = 1;
-        } else if (timeout == 0 || m_uiAllowedFailed == 0 || !No::tokens(sArgs, 2).empty()) {
+        } else if (timeout == 0 || m_uiAllowedFailed == 0 || !No::tokens(args, 2).empty()) {
             sMessage = "Invalid argument, must be the number of minutes "
                        "IPs are blocked after a failed login and can be "
                        "followed by number of allowed failed login attempts";
@@ -60,30 +60,30 @@ public:
         m_Cache.clear();
     }
 
-    void Add(const NoString& sHost, uint count)
+    void Add(const NoString& host, uint count)
     {
-        m_Cache.insert(sHost, count);
+        m_Cache.insert(host, count);
     }
 
-    void onModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& command) override
     {
         putModule("This module can only be configured through its arguments.");
         putModule("The module argument is the number of minutes an IP");
         putModule("is blocked after a failed login.");
     }
 
-    void onClientConnect(NoSocket* pClient, const NoString& sHost, ushort uPort) override
+    void onClientConnect(NoSocket* client, const NoString& host, ushort port) override
     {
-        uint* pCount = m_Cache.value(sHost);
-        if (sHost.empty() || pCount == nullptr || *pCount < m_uiAllowedFailed) {
+        uint* pCount = m_Cache.value(host);
+        if (host.empty() || pCount == nullptr || *pCount < m_uiAllowedFailed) {
             return;
         }
 
         // refresh their ban
-        Add(sHost, *pCount);
+        Add(host, *pCount);
 
-        pClient->write("ERROR :Closing link [Please try again later - reconnecting too fast]\r\n");
-        pClient->close(NoSocket::CloseAfterWrite);
+        client->write("ERROR :Closing link [Please try again later - reconnecting too fast]\r\n");
+        client->close(NoSocket::CloseAfterWrite);
     }
 
     void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override

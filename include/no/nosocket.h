@@ -37,7 +37,7 @@ typedef struct ssl_session_st SSL_SESSION;
 class NO_EXPORT NoSocket
 {
 public:
-    NoSocket(const NoString& sHost = "", u_short port = 0);
+    NoSocket(const NoString& host = "", u_short port = 0);
     virtual ~NoSocket();
 
     bool isSsl() const;
@@ -76,7 +76,7 @@ public:
     void setPemFile(const NoString& filePath);
 
     bool write(const char* data, size_t len);
-    bool write(const NoString& sData);
+    bool write(const NoString& data);
 
     void pauseRead();
     void resumeRead();

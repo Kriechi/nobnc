@@ -56,14 +56,14 @@ protected:
 class NoWatchEntry
 {
 public:
-    NoWatchEntry(const NoString& sHostMask, const NoString& sTarget, const NoString& sPattern)
+    NoWatchEntry(const NoString& hostMask, const NoString& sTarget, const NoString& sPattern)
     {
         m_bDisabled = false;
         m_bDetachedClientOnly = false;
         m_bDetachedChannelOnly = false;
         m_sPattern = (sPattern.size()) ? sPattern : "*";
 
-        NoNick Nick(sHostMask);
+        NoNick Nick(hostMask);
 
         m_sHostMask = (Nick.nick().size()) ? Nick.nick() : "*";
         m_sHostMask += "!";
@@ -79,7 +79,7 @@ public:
         }
     }
 
-    bool IsMatch(const NoNick& Nick, const NoString& sText, const NoString& sSource, const NoNetwork* pNetwork)
+    bool IsMatch(const NoNick& Nick, const NoString& text, const NoString& sSource, const NoNetwork* network)
     {
         if (IsDisabled()) {
             return false;
@@ -107,7 +107,7 @@ public:
             return false;
         if (!No::wildCmp(Nick.hostMask(), m_sHostMask, No::CaseInsensitive))
             return false;
-        return (No::wildCmp(sText, pNetwork->expandString(m_sPattern), No::CaseInsensitive));
+        return (No::wildCmp(text, network->expandString(m_sPattern), No::CaseInsensitive));
     }
 
     bool operator==(const NoWatchEntry& WatchEntry)
@@ -147,23 +147,23 @@ public:
     }
     NoString GetSourcesStr() const
     {
-        NoString sRet;
+        NoString ret;
 
         for (uint a = 0; a < m_vsSources.size(); a++) {
             const NoWatchSource& WatchSource = m_vsSources[a];
 
             if (a) {
-                sRet += " ";
+                ret += " ";
             }
 
             if (WatchSource.IsNegated()) {
-                sRet += "!";
+                ret += "!";
             }
 
-            sRet += WatchSource.GetSource();
+            ret += WatchSource.GetSource();
         }
 
-        return sRet;
+        return ret;
     }
     // !Getters
 
@@ -228,9 +228,9 @@ public:
         Load();
     }
 
-    void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
+    void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& args) override
     {
-        Process(OpNick, "* " + OpNick.nick() + " sets mode: " + sModes + " " + sArgs + " on " + Channel.name(), Channel.name());
+        Process(OpNick, "* " + OpNick.nick() + " sets mode: " + sModes + " " + args + " on " + Channel.name(), Channel.name());
     }
 
     void onClientLogin() override
@@ -252,7 +252,7 @@ public:
                 Channel.name());
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
     {
         Process(Nick,
                 "* Quits: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") "
@@ -273,7 +273,7 @@ public:
                 Channel.name());
     }
 
-    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
+    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
     {
         Process(OldNick, "* " + OldNick.nick() + " is now known as " + sNewNick, "");
     }
@@ -324,11 +324,11 @@ public:
         return CONTINUE;
     }
 
-    void onModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& command) override
     {
-        NoString sCmdName = No::token(sCommand, 0);
+        NoString sCmdName = No::token(command, 0);
         if (sCmdName.equals("ADD") || sCmdName.equals("WATCH")) {
-            Watch(No::token(sCommand, 1), No::token(sCommand, 2), No::tokens(sCommand, 3));
+            Watch(No::token(command, 1), No::token(command, 2), No::tokens(command, 3));
         } else if (sCmdName.equals("HELP")) {
             Help();
         } else if (sCmdName.equals("LIST")) {
@@ -336,7 +336,7 @@ public:
         } else if (sCmdName.equals("DUMP")) {
             Dump();
         } else if (sCmdName.equals("ENABLE")) {
-            NoString sTok = No::token(sCommand, 1);
+            NoString sTok = No::token(command, 1);
 
             if (sTok == "*") {
                 SetDisabled(~0, false);
@@ -344,7 +344,7 @@ public:
                 SetDisabled(sTok.toUInt(), false);
             }
         } else if (sCmdName.equals("DISABLE")) {
-            NoString sTok = No::token(sCommand, 1);
+            NoString sTok = No::token(command, 1);
 
             if (sTok == "*") {
                 SetDisabled(~0, true);
@@ -352,8 +352,8 @@ public:
                 SetDisabled(sTok.toUInt(), true);
             }
         } else if (sCmdName.equals("SETDETACHEDCLIENTONLY")) {
-            NoString sTok = No::token(sCommand, 1);
-            bool bDetachedClientOnly = No::token(sCommand, 2).toBool();
+            NoString sTok = No::token(command, 1);
+            bool bDetachedClientOnly = No::token(command, 2).toBool();
 
             if (sTok == "*") {
                 SetDetachedClientOnly(~0, bDetachedClientOnly);
@@ -361,8 +361,8 @@ public:
                 SetDetachedClientOnly(sTok.toUInt(), bDetachedClientOnly);
             }
         } else if (sCmdName.equals("SETDETACHEDCHANNELONLY")) {
-            NoString sTok = No::token(sCommand, 1);
-            bool bDetachedchannelOnly = No::token(sCommand, 2).toBool();
+            NoString sTok = No::token(command, 1);
+            bool bDetachedchannelOnly = No::token(command, 2).toBool();
 
             if (sTok == "*") {
                 SetDetachedChannelOnly(~0, bDetachedchannelOnly);
@@ -370,13 +370,13 @@ public:
                 SetDetachedChannelOnly(sTok.toUInt(), bDetachedchannelOnly);
             }
         } else if (sCmdName.equals("SETSOURCES")) {
-            SetSources(No::token(sCommand, 1).toUInt(), No::tokens(sCommand, 2));
+            SetSources(No::token(command, 1).toUInt(), No::tokens(command, 2));
         } else if (sCmdName.equals("CLEAR")) {
             m_lsWatchers.clear();
             putModule("All entries cleared.");
             Save();
         } else if (sCmdName.equals("BUFFER")) {
-            NoString sCount = No::token(sCommand, 1);
+            NoString sCount = No::token(command, 1);
 
             if (sCount.size()) {
                 m_Buffer.setLimit(sCount.toUInt());
@@ -384,7 +384,7 @@ public:
 
             putModule("Buffer count is set to [" + NoString(m_Buffer.limit()) + "]");
         } else if (sCmdName.equals("DEL")) {
-            Remove(No::token(sCommand, 1).toUInt());
+            Remove(No::token(command, 1).toUInt());
         } else {
             putModule("Unknown command: [" + sCmdName + "]");
         }
@@ -394,13 +394,13 @@ private:
     void Process(const NoNick& Nick, const NoString& sMessage, const NoString& sSource)
     {
         std::set<NoString> sHandledTargets;
-        NoNetwork* pNetwork = network();
-        NoChannel* pChannel = pNetwork->findChannel(sSource);
+        NoNetwork* network = NoModule::network();
+        NoChannel* pChannel = network->findChannel(sSource);
 
         for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
             NoWatchEntry& WatchEntry = *it;
 
-            if (pNetwork->isUserAttached() && WatchEntry.IsDetachedClientOnly()) {
+            if (network->isUserAttached() && WatchEntry.IsDetachedClientOnly()) {
                 continue;
             }
 
@@ -408,10 +408,10 @@ private:
                 continue;
             }
 
-            if (WatchEntry.IsMatch(Nick, sMessage, sSource, pNetwork) && sHandledTargets.count(WatchEntry.GetTarget()) < 1) {
-                if (pNetwork->isUserAttached()) {
-                    pNetwork->putUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " +
-                                      pNetwork->currentNick() + " :" + sMessage);
+            if (WatchEntry.IsMatch(Nick, sMessage, sSource, network) && sHandledTargets.count(WatchEntry.GetTarget()) < 1) {
+                if (network->isUserAttached()) {
+                    network->putUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " +
+                                      network->currentNick() + " :" + sMessage);
                 } else {
                     m_Buffer.addMessage(":" + _NAMEDFMT(WatchEntry.GetTarget()) +
                                         "!watch@znc.in PRIVMSG {target} :{text}",
@@ -669,12 +669,12 @@ private:
         putModule(Table);
     }
 
-    void Watch(const NoString& sHostMask, const NoString& sTarget, const NoString& sPattern, bool bNotice = false)
+    void Watch(const NoString& hostMask, const NoString& sTarget, const NoString& sPattern, bool bNotice = false)
     {
         NoString sMessage;
 
-        if (sHostMask.size()) {
-            NoWatchEntry WatchEntry(sHostMask, sTarget, sPattern);
+        if (hostMask.size()) {
+            NoWatchEntry WatchEntry(hostMask, sTarget, sPattern);
 
             bool bExists = false;
             for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {

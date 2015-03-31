@@ -22,13 +22,13 @@ NoModuleCommand::NoModuleCommand() : m_cmd(), m_func(nullptr), m_args(), m_desc(
 {
 }
 
-NoModuleCommand::NoModuleCommand(const NoString& sCmd, NoModule* pMod, ModCmdFunc func, const NoString& sArgs, const NoString& sDesc)
-    : m_cmd(sCmd), m_func([pMod, func](const NoString& sLine) { (pMod->*func)(sLine); }), m_args(sArgs), m_desc(sDesc)
+NoModuleCommand::NoModuleCommand(const NoString& cmd, NoModule* mod, ModCmdFunc func, const NoString& args, const NoString& desc)
+    : m_cmd(cmd), m_func([mod, func](const NoString& line) { (mod->*func)(line); }), m_args(args), m_desc(desc)
 {
 }
 
-NoModuleCommand::NoModuleCommand(const NoString& sCmd, CmdFunc func, const NoString& sArgs, const NoString& sDesc)
-    : m_cmd(sCmd), m_func(std::move(func)), m_args(sArgs), m_desc(sDesc)
+NoModuleCommand::NoModuleCommand(const NoString& cmd, CmdFunc func, const NoString& args, const NoString& desc)
+    : m_cmd(cmd), m_func(std::move(func)), m_args(args), m_desc(desc)
 {
 }
 
@@ -61,9 +61,9 @@ void NoModuleCommand::addHelp(NoTable& Table) const
     Table.setValue("Description", description());
 }
 
-void NoModuleCommand::call(const NoString& sLine) const
+void NoModuleCommand::call(const NoString& line) const
 {
-    m_func(sLine);
+    m_func(line);
 }
 
 NoString NoModuleCommand::description() const

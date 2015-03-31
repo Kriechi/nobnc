@@ -90,30 +90,30 @@ public:
                    "List all logging rules");
     }
 
-    void SetRulesCmd(const NoString& sLine);
-    void ClearRulesCmd(const NoString& sLine);
-    void ListRulesCmd(const NoString& sLine = "");
+    void SetRulesCmd(const NoString& line);
+    void ClearRulesCmd(const NoString& line);
+    void ListRulesCmd(const NoString& line = "");
     void SetRules(const NoStringVector& vsRules);
     NoStringVector SplitRules(const NoString& sRules) const;
     NoString JoinRules(const NoString& sSeparator) const;
     bool TestRules(const NoString& sTarget) const;
 
-    void PutLog(const NoString& sLine, const NoString& sWindow = "status");
-    void PutLog(const NoString& sLine, const NoChannel& Channel);
-    void PutLog(const NoString& sLine, const NoNick& Nick);
+    void PutLog(const NoString& line, const NoString& sWindow = "status");
+    void PutLog(const NoString& line, const NoChannel& Channel);
+    void PutLog(const NoString& line, const NoNick& Nick);
     NoString GetServer();
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override;
+    bool onLoad(const NoString& args, NoString& sMessage) override;
     void onIrcConnected() override;
     void onIrcDisconnected() override;
     ModRet onBroadcast(NoString& sMessage) override;
 
-    void onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override;
+    void onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& args) override;
     void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override;
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override;
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override;
     void onJoin(const NoNick& Nick, NoChannel& Channel) override;
     void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override;
-    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override;
+    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override;
     ModRet onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override;
 
     /* notices */
@@ -137,9 +137,9 @@ private:
     std::vector<NoLogRule> m_vRules;
 };
 
-void NoLogMod::SetRulesCmd(const NoString& sLine)
+void NoLogMod::SetRulesCmd(const NoString& line)
 {
-    NoStringVector vsRules = SplitRules(No::tokens(sLine, 1));
+    NoStringVector vsRules = SplitRules(No::tokens(line, 1));
 
     if (vsRules.empty()) {
         putModule("Usage: SetRules <rules>");
@@ -152,7 +152,7 @@ void NoLogMod::SetRulesCmd(const NoString& sLine)
     }
 }
 
-void NoLogMod::ClearRulesCmd(const NoString& sLine)
+void NoLogMod::ClearRulesCmd(const NoString& line)
 {
     size_t uCount = m_vRules.size();
 
@@ -167,7 +167,7 @@ void NoLogMod::ClearRulesCmd(const NoString& sLine)
     }
 }
 
-void NoLogMod::ListRulesCmd(const NoString& sLine)
+void NoLogMod::ListRulesCmd(const NoString& line)
 {
     NoTable Table;
     Table.addColumn("Rule");
@@ -227,7 +227,7 @@ bool NoLogMod::TestRules(const NoString& sTarget) const
     return true;
 }
 
-void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status"*/)
+void NoLogMod::PutLog(const NoString& line, const NoString& sWindow /*= "Status"*/)
 {
     if (!TestRules(sWindow)) {
         return;
@@ -265,44 +265,44 @@ void NoLogMod::PutLog(const NoString& sLine, const NoString& sWindow /*= "Status
         NoDir::mkpath(sLogDir, ModDirInfo.st_mode);
     if (LogFile.Open(O_WRONLY | O_APPEND | O_CREAT)) {
         LogFile.Write(No::formatTime(curtime, "[%H:%M:%S] ", user()->timezone()) +
-                      (m_bSanitize ? No::stripControls(sLine) : sLine) + "\n");
+                      (m_bSanitize ? No::stripControls(line) : line) + "\n");
     } else
         NO_DEBUG("Could not open log file [" << sPath << "]: " << strerror(errno));
 }
 
-void NoLogMod::PutLog(const NoString& sLine, const NoChannel& Channel)
+void NoLogMod::PutLog(const NoString& line, const NoChannel& Channel)
 {
-    PutLog(sLine, Channel.name());
+    PutLog(line, Channel.name());
 }
 
-void NoLogMod::PutLog(const NoString& sLine, const NoNick& Nick)
+void NoLogMod::PutLog(const NoString& line, const NoNick& Nick)
 {
-    PutLog(sLine, Nick.nick());
+    PutLog(line, Nick.nick());
 }
 
 NoString NoLogMod::GetServer()
 {
-    NoServerInfo* pServer = network()->currentServer();
+    NoServerInfo* server = network()->currentServer();
     NoString sSSL;
 
-    if (!pServer)
+    if (!server)
         return "(no server)";
 
-    if (pServer->isSsl())
+    if (server->isSsl())
         sSSL = "+";
-    return pServer->host() + " " + sSSL + NoString(pServer->port());
+    return server->host() + " " + sSSL + NoString(server->port());
 }
 
-bool NoLogMod::onLoad(const NoString& sArgs, NoString& sMessage)
+bool NoLogMod::onLoad(const NoString& args, NoString& sMessage)
 {
     size_t uIndex = 0;
-    if (No::token(sArgs, 0).equals("-sanitize")) {
+    if (No::token(args, 0).equals("-sanitize")) {
         m_bSanitize = true;
         ++uIndex;
     }
 
     // Use load parameter as save path
-    m_sLogPath = No::token(sArgs, uIndex);
+    m_sLogPath = No::token(args, uIndex);
 
     // Add default filename to path if it's a folder
     if (type() == No::UserModule) {
@@ -363,10 +363,10 @@ NoModule::ModRet NoLogMod::onBroadcast(NoString& sMessage)
     return CONTINUE;
 }
 
-void NoLogMod::onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs)
+void NoLogMod::onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& args)
 {
-    const NoString sNick = pOpNick ? pOpNick->nick() : "Server";
-    PutLog("*** " + sNick + " sets mode: " + sModes + " " + sArgs, Channel);
+    const NoString nick = pOpNick ? pOpNick->nick() : "Server";
+    PutLog("*** " + nick + " sets mode: " + sModes + " " + args, Channel);
 }
 
 void NoLogMod::onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage)
@@ -374,10 +374,10 @@ void NoLogMod::onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChann
     PutLog("*** " + sKickedNick + " was kicked by " + OpNick.nick() + " (" + sMessage + ")", Channel);
 }
 
-void NoLogMod::onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans)
+void NoLogMod::onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels)
 {
-    for (std::vector<NoChannel*>::const_iterator pChan = vChans.begin(); pChan != vChans.end(); ++pChan)
-        PutLog("*** Quits: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") (" + sMessage + ")", **pChan);
+    for (std::vector<NoChannel*>::const_iterator channel = channels.begin(); channel != channels.end(); ++channel)
+        PutLog("*** Quits: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") (" + sMessage + ")", **channel);
 }
 
 void NoLogMod::onJoin(const NoNick& Nick, NoChannel& Channel)
@@ -390,10 +390,10 @@ void NoLogMod::onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sM
     PutLog("*** Parts: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") (" + sMessage + ")", Channel);
 }
 
-void NoLogMod::onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans)
+void NoLogMod::onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels)
 {
-    for (std::vector<NoChannel*>::const_iterator pChan = vChans.begin(); pChan != vChans.end(); ++pChan)
-        PutLog("*** " + OldNick.nick() + " is now known as " + sNewNick, **pChan);
+    for (std::vector<NoChannel*>::const_iterator channel = channels.begin(); channel != channels.end(); ++channel)
+        PutLog("*** " + OldNick.nick() + " is now known as " + sNewNick, **channel);
 }
 
 NoModule::ModRet NoLogMod::onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic)
@@ -405,9 +405,9 @@ NoModule::ModRet NoLogMod::onTopic(NoNick& Nick, NoChannel& Channel, NoString& s
 /* notices */
 NoModule::ModRet NoLogMod::onUserNotice(NoString& sTarget, NoString& sMessage)
 {
-    NoNetwork* pNetwork = network();
-    if (pNetwork) {
-        PutLog("-" + pNetwork->currentNick() + "- " + sMessage, sTarget);
+    NoNetwork* network = NoModule::network();
+    if (network) {
+        PutLog("-" + network->currentNick() + "- " + sMessage, sTarget);
     }
 
     return CONTINUE;
@@ -428,9 +428,9 @@ NoModule::ModRet NoLogMod::onChanNotice(NoNick& Nick, NoChannel& Channel, NoStri
 /* actions */
 NoModule::ModRet NoLogMod::onUserAction(NoString& sTarget, NoString& sMessage)
 {
-    NoNetwork* pNetwork = network();
-    if (pNetwork) {
-        PutLog("* " + pNetwork->currentNick() + " " + sMessage, sTarget);
+    NoNetwork* network = NoModule::network();
+    if (network) {
+        PutLog("* " + network->currentNick() + " " + sMessage, sTarget);
     }
 
     return CONTINUE;
@@ -451,9 +451,9 @@ NoModule::ModRet NoLogMod::onChanAction(NoNick& Nick, NoChannel& Channel, NoStri
 /* msgs */
 NoModule::ModRet NoLogMod::onUserMsg(NoString& sTarget, NoString& sMessage)
 {
-    NoNetwork* pNetwork = network();
-    if (pNetwork) {
-        PutLog("<" + pNetwork->currentNick() + "> " + sMessage, sTarget);
+    NoNetwork* network = NoModule::network();
+    if (network) {
+        PutLog("<" + network->currentNick() + "> " + sMessage, sTarget);
     }
 
     return CONTINUE;

@@ -39,10 +39,10 @@ public:
                           sMessage);
     }
 
-    void onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
+    void onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& args) override
     {
         const NoString sNickMask = pOpNick ? pOpNick->nickMask() : "Server";
-        AddBuffer(Channel, sNickMask + " set mode: " + sModes + " " + sArgs);
+        AddBuffer(Channel, sNickMask + " set mode: " + sModes + " " + args);
     }
 
     void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
@@ -50,11 +50,11 @@ public:
         AddBuffer(Channel, OpNick.nickMask() + " kicked " + sKickedNick + " Reason: [" + sMessage + "]");
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
     {
         std::vector<NoChannel*>::const_iterator it;
         NoString sMsg = Nick.nickMask() + " quit with message: [" + sMessage + "]";
-        for (it = vChans.begin(); it != vChans.end(); ++it) {
+        for (it = channels.begin(); it != channels.end(); ++it) {
             AddBuffer(**it, sMsg);
         }
     }
@@ -69,11 +69,11 @@ public:
         AddBuffer(Channel, Nick.nickMask() + " parted with message: [" + sMessage + "]");
     }
 
-    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
+    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
     {
         std::vector<NoChannel*>::const_iterator it;
         NoString sMsg = OldNick.nickMask() + " is now known as " + sNewNick;
-        for (it = vChans.begin(); it != vChans.end(); ++it) {
+        for (it = channels.begin(); it != channels.end(); ++it) {
             AddBuffer(**it, sMsg);
         }
     }

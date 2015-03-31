@@ -71,24 +71,24 @@ TEST(UtilsTest, GetMessageTags)
 
 TEST(UtilsTest, SetMessageTags)
 {
-    NoString sLine;
+    NoString line;
 
-    sLine = ":rest";
-    No::setMessageTags(sLine, NoStringMap());
-    EXPECT_EQ(":rest", sLine);
+    line = ":rest";
+    No::setMessageTags(line, NoStringMap());
+    EXPECT_EQ(":rest", line);
 
     NoStringMap tags;
     tags["a"] = "b";
-    No::setMessageTags(sLine, tags);
-    EXPECT_EQ("@a=b :rest", sLine);
+    No::setMessageTags(line, tags);
+    EXPECT_EQ("@a=b :rest", line);
 
     tags["c"] = "d";
-    No::setMessageTags(sLine, tags);
-    EXPECT_EQ("@a=b;c=d :rest", sLine);
+    No::setMessageTags(line, tags);
+    EXPECT_EQ("@a=b;c=d :rest", line);
 
     tags["e"] = "";
-    No::setMessageTags(sLine, tags);
-    EXPECT_EQ("@a=b;c=d;e :rest", sLine);
+    No::setMessageTags(line, tags);
+    EXPECT_EQ("@a=b;c=d;e :rest", line);
     tags.clear();
 
     tags["semi-colon"] += ';';
@@ -97,13 +97,13 @@ TEST(UtilsTest, SetMessageTags)
     tags["backslash"] += '\\';
     tags["CR"] += '\r';
     tags["LF"] += '\n';
-    No::setMessageTags(sLine, tags);
-    EXPECT_EQ(R"(@CR=\r;LF=\n;NUL=\0;backslash=\\;semi-colon=\:;space=\s :rest)", sLine);
+    No::setMessageTags(line, tags);
+    EXPECT_EQ(R"(@CR=\r;LF=\n;NUL=\0;backslash=\\;semi-colon=\:;space=\s :rest)", line);
     tags.clear();
 
     tags["a"] = "; \\\r\n";
-    No::setMessageTags(sLine, tags);
-    EXPECT_EQ(R"(@a=\:\s\\\r\n :rest)", sLine);
+    No::setMessageTags(line, tags);
+    EXPECT_EQ(R"(@a=\:\s\\\r\n :rest)", line);
 }
 
 TEST(UtilsTest, NamedFormat)

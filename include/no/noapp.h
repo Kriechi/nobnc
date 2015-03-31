@@ -48,25 +48,25 @@ public:
     void loop();
     bool writePidFile(int iPid);
     bool waitForChildLock();
-    bool isHostAllowed(const NoString& sHostMask) const;
+    bool isHostAllowed(const NoString& hostMask) const;
     // This returns false if there are too many anonymous connections from this ip
     bool allowConnectionFrom(const NoString& sIP) const;
     void initDirs(const NoString& sArgvPath, const NoString& sDataDir);
     bool onBoot();
     bool writeNewConfig(const NoString& sConfigFile);
     bool writeConfig();
-    bool parseConfig(const NoString& sConfig, NoString& sError);
-    bool rehashConfig(NoString& sError);
+    bool parseConfig(const NoString& sConfig, NoString& error);
+    bool rehashConfig(NoString& error);
     static NoString version();
     static NoString tag(bool bIncludeVersion = true, bool bHTML = false);
     static NoString compileOptionsString();
     NoString uptime() const;
     void clearBindHosts();
-    bool addBindHost(const NoString& sHost);
-    bool removeBindHost(const NoString& sHost);
+    bool addBindHost(const NoString& host);
+    bool removeBindHost(const NoString& host);
     void clearTrustedProxies();
-    bool addTrustedProxy(const NoString& sHost);
-    bool removeTrustedProxy(const NoString& sHost);
+    bool addTrustedProxy(const NoString& host);
+    bool removeTrustedProxy(const NoString& host);
     void broadcast(const NoString& sMessage, bool bAdminOnly = false, NoUser* pSkipUser = nullptr, NoClient* pSkipClient = nullptr);
     void addBytesRead(ulonglong u);
     void addBytesWritten(ulonglong u);
@@ -101,7 +101,7 @@ public:
     NoString statusPrefix() const;
     NoString currentPath() const;
     NoString appPath() const;
-    NoString confPath(bool bAllowMkDir = true) const;
+    NoString confPath(bool allowMkDir = true) const;
     NoString userPath() const;
     NoString modulePath() const;
     NoString pemLocation() const;
@@ -126,30 +126,30 @@ public:
 
     NoUser* findUser(const NoString& sUsername);
     NoModule* findModule(const NoString& sModName, const NoString& sUsername);
-    NoModule* findModule(const NoString& sModName, NoUser* pUser);
+    NoModule* findModule(const NoString& sModName, NoUser* user);
 
     /** Reload a module everywhere
      *
      * This method will unload a module globally, for a user and for each
      * network. It will then reload them all again.
      *
-     * @param sModule The name of the module to reload
+     * @param module The name of the module to reload
      */
-    bool updateModule(const NoString& sModule);
+    bool updateModule(const NoString& module);
 
     bool deleteUser(const NoString& sUsername);
-    bool addUser(NoUser* pUser, NoString& sErrorRet);
+    bool addUser(NoUser* user, NoString& sErrorRet);
     std::map<NoString, NoUser*> userMap() const;
 
-    NoListener* findListener(u_short uPort, const NoString& sHost, No::AddressType eAddr);
+    NoListener* findListener(u_short port, const NoString& host, No::AddressType eAddr);
     bool addListener(NoListener*);
-    bool addListener(ushort uPort,
+    bool addListener(ushort port,
                      const NoString& sBindHost,
                      const NoString& sURIPrefix,
-                     bool bSSL,
+                     bool ssl,
                      No::AddressType eAddr,
                      No::AcceptType eAccept,
-                     NoString& sError);
+                     NoString& error);
     bool removeListener(NoListener*);
 
     void setMotd(const NoString& sMessage);
@@ -157,10 +157,10 @@ public:
     void clearMotd();
     NoStringVector motd() const;
 
-    void addServerThrottle(NoString sName);
-    bool serverThrottle(NoString sName);
+    void addServerThrottle(NoString name);
+    bool serverThrottle(NoString name);
 
-    void addNetworkToQueue(NoNetwork* pNetwork);
+    void addNetworkToQueue(NoNetwork* network);
 
     void pauseConnectQueue();
     void resumeConnectQueue();

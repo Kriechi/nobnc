@@ -111,9 +111,9 @@ NoString No::decrypt(const NoString& data, const NoString& password)
 }
 #endif // HAVE_LIBSSL
 
-NoString No::getSaltedHashPass(NoString& sSalt)
+NoString No::getSaltedHashPass(NoString& salt)
 {
-    sSalt = salt();
+    salt = No::salt();
 
     while (true) {
         NoString pass1;
@@ -127,7 +127,7 @@ NoString No::getSaltedHashPass(NoString& sSalt)
             No::printError("The supplied passwords did not match");
         } else {
             // Construct the salted pass
-            return saltedSha256(pass1, sSalt);
+            return saltedSha256(pass1, salt);
         }
     }
 }
@@ -145,18 +145,18 @@ NoString No::defaultHash()
     return "sha256";
 }
 
-NoString No::md5(const NoString& sStr)
+NoString No::md5(const NoString& str)
 {
-    return MD5::md5(sStr);
+    return MD5::md5(str);
 }
 
-NoString No::sha256(const NoString& sStr)
+NoString No::sha256(const NoString& str)
 {
     uchar digest[SHA256_DIGEST_SIZE];
     char digest_hex[SHA256_DIGEST_SIZE * 2 + 1];
-    const uchar* message = (const uchar*)sStr.c_str();
+    const uchar* message = (const uchar*)str.c_str();
 
-    ::sha256(message, sStr.length(), digest);
+    ::sha256(message, str.length(), digest);
 
     snprintf(digest_hex,
              sizeof(digest_hex),
@@ -200,14 +200,14 @@ NoString No::sha256(const NoString& sStr)
     return digest_hex;
 }
 
-NoString No::saltedMd5(const NoString& sPass, const NoString& sSalt)
+NoString No::saltedMd5(const NoString& pass, const NoString& salt)
 {
-    return md5(sPass + sSalt);
+    return md5(pass + salt);
 }
 
-NoString No::saltedSha256(const NoString& sPass, const NoString& sSalt)
+NoString No::saltedSha256(const NoString& pass, const NoString& salt)
 {
-    return sha256(sPass + sSalt);
+    return sha256(pass + salt);
 }
 
 NoString No::getPass(const NoString& sPrompt)
@@ -227,18 +227,18 @@ bool No::getBoolInput(const NoString& sPrompt, bool bDefault)
 
 bool No::getBoolInput(const NoString& sPrompt, bool* pbDefault)
 {
-    NoString sRet, sDefault;
+    NoString ret, sDefault;
 
     if (pbDefault) {
         sDefault = (*pbDefault) ? "yes" : "no";
     }
 
     while (true) {
-        getInput(sPrompt, sRet, sDefault, "yes/no");
+        getInput(sPrompt, ret, sDefault, "yes/no");
 
-        if (sRet.equals("y") || sRet.equals("yes")) {
+        if (ret.equals("y") || ret.equals("yes")) {
             return true;
-        } else if (sRet.equals("n") || sRet.equals("no")) {
+        } else if (ret.equals("n") || ret.equals("no")) {
             return false;
         }
     }
@@ -287,7 +287,7 @@ ulonglong No::millTime()
     return iTime;
 }
 
-bool No::getInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefault, const NoString& sHint)
+bool No::getInput(const NoString& sPrompt, NoString& ret, const NoString& sDefault, const NoString& sHint)
 {
     NoString sExtra;
     NoString sInput;
@@ -309,12 +309,12 @@ bool No::getInput(const NoString& sPrompt, NoString& sRet, const NoString& sDefa
     }
 
     if (sInput.empty()) {
-        sRet = sDefault;
+        ret = sDefault;
     } else {
-        sRet = sInput;
+        ret = sInput;
     }
 
-    return !sRet.empty();
+    return !ret.empty();
 }
 
 #define BOLD "\033[1m"
@@ -447,13 +447,13 @@ NoString No::cTime(time_t t, const NoString& sTimezone)
     return NoString(s).trim_n();
 }
 
-NoString No::formatTime(time_t t, const NoString& sFormat, const NoString& sTimezone)
+NoString No::formatTime(time_t t, const NoString& format, const NoString& sTimezone)
 {
     char s[1024] = {};
     tm m;
     if (sTimezone.empty()) {
         localtime_r(&t, &m);
-        strftime(s, sizeof(s), sFormat.c_str(), &m);
+        strftime(s, sizeof(s), format.c_str(), &m);
         return s;
     }
     NoString sTZ = FixGMT(sTimezone);
@@ -466,7 +466,7 @@ NoString No::formatTime(time_t t, const NoString& sFormat, const NoString& sTime
     tzset();
 
     localtime_r(&t, &m);
-    strftime(s, sizeof(s), sFormat.c_str(), &m);
+    strftime(s, sizeof(s), format.c_str(), &m);
 
     // restore old value
     if (oldTZ) {
@@ -504,20 +504,20 @@ void FillTimezones(const NoString& sPath, NoStringSet& result, const NoString& s
 {
     NoDir Dir(sPath);
     for (NoFile* pFile : Dir.files()) {
-        NoString sName = pFile->GetShortName();
+        NoString name = pFile->GetShortName();
         NoString sFile = pFile->GetLongName();
-        if (sName == "posix" || sName == "right")
+        if (name == "posix" || name == "right")
             continue; // these 2 dirs contain the same filenames
-        if (sName.right(4) == ".tab" || sName == "posixrules" || sName == "localtime")
+        if (name.right(4) == ".tab" || name == "posixrules" || name == "localtime")
             continue;
         if (pFile->IsDir()) {
-            if (sName == "Etc") {
+            if (name == "Etc") {
                 FillTimezones(sFile, result, sPrefix);
             } else {
-                FillTimezones(sFile, result, sPrefix + sName + "/");
+                FillTimezones(sFile, result, sPrefix + name + "/");
             }
         } else {
-            result.insert(sPrefix + sName);
+            result.insert(sPrefix + name);
         }
     }
 }
@@ -554,10 +554,10 @@ NoStringSet No::encodings()
     return ssResult;
 }
 
-NoStringMap No::messageTags(const NoString& sLine)
+NoStringMap No::messageTags(const NoString& line)
 {
-    if (sLine.startsWith("@")) {
-        NoStringVector vsTags = No::token(sLine, 0).trimPrefix_n("@").split(";", No::SkipEmptyParts);
+    if (line.startsWith("@")) {
+        NoStringVector vsTags = No::token(line, 0).trimPrefix_n("@").split(";", No::SkipEmptyParts);
 
         NoStringMap mssTags;
         for (const NoString& sTag : vsTags) {
@@ -575,10 +575,10 @@ NoStringMap No::messageTags(const NoString& sLine)
     return NoStringMap();
 }
 
-void No::setMessageTags(NoString& sLine, const NoStringMap& mssTags)
+void No::setMessageTags(NoString& line, const NoStringMap& mssTags)
 {
-    if (sLine.startsWith("@")) {
-        sLine.leftChomp(No::token(sLine, 0).length() + 1);
+    if (line.startsWith("@")) {
+        line.leftChomp(No::token(line, 0).length() + 1);
     }
 
     if (!mssTags.empty()) {
@@ -591,7 +591,7 @@ void No::setMessageTags(NoString& sLine, const NoStringMap& mssTags)
             if (!it.second.empty())
                 sTags += "=" + No::escape(it.second, No::MsgTagFormat);
         }
-        sLine = "@" + sTags + " " + sLine;
+        line = "@" + sTags + " " + line;
     }
 }
 
@@ -721,11 +721,11 @@ NoString No::toTimeStr(ulong s)
     const ulong d = h * 24;
     const ulong w = d * 7;
     const ulong y = d * 365;
-    NoString sRet;
+    NoString ret;
 
 #define TIMESPAN(time, str)                   \
     if (s >= time) {                          \
-        sRet += NoString(s / time) + str " "; \
+        ret += NoString(s / time) + str " "; \
         s = s % time;                         \
     }
     TIMESPAN(y, "y");
@@ -735,10 +735,10 @@ NoString No::toTimeStr(ulong s)
     TIMESPAN(m, "m");
     TIMESPAN(1, "s");
 
-    if (sRet.empty())
+    if (ret.empty())
         return "0s";
 
-    return sRet.rightChomp_n(1);
+    return ret.rightChomp_n(1);
 }
 
 NoString No::toPercent(double d)
@@ -750,11 +750,11 @@ NoString No::toPercent(double d)
 
 NoString No::stripControls(const NoString& str)
 {
-    NoString sRet;
+    NoString ret;
     const uchar* pStart = (const uchar*)str.data();
     uchar ch = *pStart;
     ulong iLength = str.length();
-    sRet.reserve(iLength);
+    ret.reserve(iLength);
     bool colorCode = false;
     uint digits = 0;
     bool comma = false;
@@ -781,20 +781,20 @@ NoString No::stripControls(const NoString& str)
             colorCode = false;
 
             if (digits == 0 && comma) { // There was a ',' which wasn't followed by digits, we should print it.
-                sRet += ',';
+                ret += ',';
             }
         }
         // CO controls codes
         if (ch < 0x20 || ch == 0x7F)
             continue;
-        sRet += ch;
+        ret += ch;
     }
     if (colorCode && digits == 0 && comma) {
-        sRet += ',';
+        ret += ',';
     }
 
-    sRet.reserve(0);
-    return sRet;
+    ret.reserve(0);
+    return ret;
 }
 
 NoString No::randomString(uint uLength)
@@ -805,29 +805,29 @@ NoString No::randomString(uint uLength)
     // -1 because sizeof() includes the trailing '\0' byte
     const size_t len = sizeof(chars) / sizeof(chars[0]) - 1;
     size_t p;
-    NoString sRet;
+    NoString ret;
 
     for (uint a = 0; a < uLength; a++) {
         p = (size_t)(len * (rand() / (RAND_MAX + 1.0)));
-        sRet += chars[p];
+        ret += chars[p];
     }
 
-    return sRet;
+    return ret;
 }
 
-NoString No::namedFormat(const NoString& sFormat, const NoStringMap& msValues)
+NoString No::namedFormat(const NoString& format, const NoStringMap& msValues)
 {
-    NoString sRet;
+    NoString ret;
 
     NoString sKey;
     bool bEscape = false;
     bool bParam = false;
-    const char* p = sFormat.c_str();
+    const char* p = format.c_str();
 
     while (*p) {
         if (!bParam) {
             if (bEscape) {
-                sRet += *p;
+                ret += *p;
                 bEscape = false;
             } else if (*p == '\\') {
                 bEscape = true;
@@ -835,7 +835,7 @@ NoString No::namedFormat(const NoString& sFormat, const NoStringMap& msValues)
                 bParam = true;
                 sKey.clear();
             } else {
-                sRet += *p;
+                ret += *p;
             }
 
         } else {
@@ -848,7 +848,7 @@ NoString No::namedFormat(const NoString& sFormat, const NoStringMap& msValues)
                 bParam = false;
                 NoStringMap::const_iterator it = msValues.find(sKey);
                 if (it != msValues.end()) {
-                    sRet += (*it).second;
+                    ret += (*it).second;
                 }
             } else {
                 sKey += *p;
@@ -858,7 +858,7 @@ NoString No::namedFormat(const NoString& sFormat, const NoStringMap& msValues)
         p++;
     }
 
-    return sRet;
+    return ret;
 }
 
 NoString No::ellipsize(const NoString& str, uint uLen)
@@ -867,20 +867,20 @@ NoString No::ellipsize(const NoString& str, uint uLen)
         return str;
     }
 
-    NoString sRet;
+    NoString ret;
 
     // @todo this looks suspect
     if (uLen < 4) {
         for (uint a = 0; a < uLen; a++) {
-            sRet += ".";
+            ret += ".";
         }
 
-        return sRet;
+        return ret;
     }
 
-    sRet = str.substr(0, uLen - 3) + "...";
+    ret = str.substr(0, uLen - 3) + "...";
 
-    return sRet;
+    return ret;
 }
 
 NoStringVector
@@ -1008,21 +1008,21 @@ NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoStri
 {
     NoStringVector vsTokens = Split_helper(str, sSep, No::SkipEmptyParts, sLeft, sRight, false);
     if (vsTokens.size() > uPos) {
-        NoString sRet;
+        NoString ret;
 
         for (size_t a = uPos; a < vsTokens.size(); a++) {
             if (a > uPos) {
-                sRet += sSep;
+                ret += sSep;
             }
 
-            sRet += vsTokens[a];
+            ret += vsTokens[a];
 
             if (!bRest) {
                 break;
             }
         }
 
-        return sRet;
+        return ret;
     }
 
     return Token_impl(str, uPos, bRest, sSep);
@@ -1030,19 +1030,19 @@ NoString Token_helper(const NoString& str, size_t uPos, bool bRest, const NoStri
 
 NoStringMap No::optionSplit(const NoString& str)
 {
-    NoString sName;
+    NoString name;
     NoString sCopy(str);
     NoStringMap msRet;
 
     while (!sCopy.empty()) {
-        sName = Token_helper(sCopy, 0, false, "=", "\"", "\"").trim_n();
+        name = Token_helper(sCopy, 0, false, "=", "\"", "\"").trim_n();
         sCopy = Token_helper(sCopy, 1, true, "=", "\"", "\"").trimLeft_n();
 
-        if (sName.empty()) {
+        if (name.empty()) {
             continue;
         }
 
-        NoStringVector vsNames = Split_helper(sName, " ", No::SkipEmptyParts, "\"", "\"", true);
+        NoStringVector vsNames = Split_helper(name, " ", No::SkipEmptyParts, "\"", "\"", true);
 
         for (uint a = 0; a < vsNames.size(); a++) {
             NoString sKeyName = vsNames[a];
@@ -1064,49 +1064,49 @@ NoStringVector No::quoteSplit(const NoString& str)
     return Split_helper(str, " ", No::SkipEmptyParts, "\"", "\"", false);
 }
 
-bool No::wildCmp(const NoString& sString, const NoString& sWild, No::CaseSensitivity cs)
+bool No::wildCmp(const NoString& sString, const NoString& wild, No::CaseSensitivity cs)
 {
     // avoid a copy when cs == No::CaseSensitive (C++ deliberately specifies that binding
     // a temporary object to a reference to const on the stack lengthens the lifetime
     // of the temporary to the lifetime of the reference itself)
-    const NoString& sWld = (cs == No::CaseSensitive ? sWild : sWild.toLower());
-    const NoString& sStr = (cs == No::CaseSensitive ? sString : sString.toLower());
+    const NoString& wld = (cs == No::CaseSensitive ? wild : wild.toLower());
+    const NoString& str = (cs == No::CaseSensitive ? sString : sString.toLower());
 
     // Written by Jack Handy - jakkhandy@hotmail.com
-    const char* wild = sWld.c_str(), *NoString = sStr.c_str();
+    const char* wd = wld.c_str(), *ns = str.c_str();
     const char* cp = nullptr, *mp = nullptr;
 
-    while ((*NoString) && (*wild != '*')) {
-        if ((*wild != *NoString) && (*wild != '?')) {
+    while ((*ns) && (*wd != '*')) {
+        if ((*wd != *ns) && (*wd != '?')) {
             return false;
         }
 
-        wild++;
-        NoString++;
+        wd++;
+        ns++;
     }
 
-    while (*NoString) {
-        if (*wild == '*') {
-            if (!*++wild) {
+    while (*ns) {
+        if (*wd == '*') {
+            if (!*++wd) {
                 return true;
             }
 
-            mp = wild;
-            cp = NoString + 1;
-        } else if ((*wild == *NoString) || (*wild == '?')) {
-            wild++;
-            NoString++;
+            mp = wd;
+            cp = ns + 1;
+        } else if ((*wd == *ns) || (*wd == '?')) {
+            wd++;
+            ns++;
         } else {
-            wild = mp;
-            NoString = cp++;
+            wd = mp;
+            ns = cp++;
         }
     }
 
-    while (*wild == '*') {
-        wild++;
+    while (*wd == '*') {
+        wd++;
     }
 
-    return (*wild == 0);
+    return (*wd == 0);
 }
 
 NoString No::token(const NoString& str, size_t uPos, const NoString& sSep)

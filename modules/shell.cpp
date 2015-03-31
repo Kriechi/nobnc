@@ -29,11 +29,11 @@ class NoShellMod;
 class NoShellSock : public NoProcess
 {
 public:
-    NoShellSock(NoShellMod* pShellMod, NoClient* pClient, const NoString& sExec) : NoProcess()
+    NoShellSock(NoShellMod* pShellMod, NoClient* client, const NoString& sExec) : NoProcess()
     {
         enableReadLine();
         m_pParent = pShellMod;
-        m_pClient = pClient;
+        m_pClient = client;
 
         if (!execute(sExec)) {
             NoString s = "Failed to execute: ";
@@ -48,7 +48,7 @@ public:
         setWriteDescriptor(open("/dev/null", O_WRONLY));
     }
     // These next two function's bodies are at the bottom of the file since they reference NoShellMod
-    void readLine(const NoString& sData) override;
+    void readLine(const NoString& data) override;
     void onDisconnected() override;
 
     NoShellMod* m_pParent;
@@ -74,7 +74,7 @@ public:
         }
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
 #ifndef MOD_SHELL_ALLOW_EVERYONE
         if (!user()->isAdmin()) {
@@ -86,12 +86,12 @@ public:
         return true;
     }
 
-    void onModCommand(const NoString& sLine) override
+    void onModCommand(const NoString& line) override
     {
-        NoString sCommand = No::token(sLine, 0);
-        if (sCommand.equals("cd")) {
-            NoString sArg = No::tokens(sLine, 1);
-            NoString sPath = NoDir(m_sPath).filePath(sArg.empty() ? NoString(NoDir::home().path()) : sArg);
+        NoString command = No::token(line, 0);
+        if (command.equals("cd")) {
+            NoString arg = No::tokens(line, 1);
+            NoString sPath = NoDir(m_sPath).filePath(arg.empty() ? NoString(NoDir::home().path()) : arg);
             NoFile Dir(sPath);
 
             if (Dir.IsDir()) {
@@ -104,7 +104,7 @@ public:
 
             PutShell("znc$");
         } else {
-            RunCommand(sLine);
+            RunCommand(line);
         }
     }
 
@@ -112,14 +112,14 @@ public:
     {
         NoString sPath = m_sPath.replace_n(" ", "_");
         NoString sSource = ":" + moduleNick() + "!shell@" + sPath;
-        NoString sLine = sSource + " PRIVMSG " + client()->nick() + " :" + sMsg;
-        client()->putClient(sLine);
+        NoString line = sSource + " PRIVMSG " + client()->nick() + " :" + sMsg;
+        client()->putClient(line);
     }
 
-    void RunCommand(const NoString& sCommand)
+    void RunCommand(const NoString& command)
     {
         // TODO: who deletes the instance?
-        NoShellSock* sock = new NoShellSock(this, client(), "cd " + m_sPath + " && " + sCommand);
+        NoShellSock* sock = new NoShellSock(this, client(), "cd " + m_sPath + " && " + command);
         manager()->addSocket(sock, "SHELL");
     }
 
@@ -127,15 +127,15 @@ private:
     NoString m_sPath;
 };
 
-void NoShellSock::readLine(const NoString& sData)
+void NoShellSock::readLine(const NoString& data)
 {
-    NoString sLine = sData;
+    NoString line = data;
 
-    sLine.trimRight("\r\n");
-    sLine.replace("\t", "    ");
+    line.trimRight("\r\n");
+    line.replace("\t", "    ");
 
     m_pParent->setClient(m_pClient);
-    m_pParent->PutShell(sLine);
+    m_pParent->PutShell(line);
     m_pParent->setClient(nullptr);
 }
 

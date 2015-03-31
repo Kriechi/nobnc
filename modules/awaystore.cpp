@@ -57,37 +57,37 @@ protected:
 
 class NoAway : public NoModule
 {
-    void AwayCommand(const NoString& sCommand)
+    void AwayCommand(const NoString& command)
     {
-        NoString sReason;
+        NoString reason;
         time_t curtime;
         time(&curtime);
 
-        if (No::token(sCommand, 1) != "-quiet") {
-            sReason = No::formatTime(curtime, No::tokens(sCommand, 1), user()->timezone());
+        if (No::token(command, 1) != "-quiet") {
+            reason = No::formatTime(curtime, No::tokens(command, 1), user()->timezone());
             putModuleNotice("You have been marked as away");
         } else {
-            sReason = No::formatTime(curtime, No::tokens(sCommand, 2), user()->timezone());
+            reason = No::formatTime(curtime, No::tokens(command, 2), user()->timezone());
         }
 
-        Away(false, sReason);
+        Away(false, reason);
     }
 
-    void BackCommand(const NoString& sCommand)
+    void BackCommand(const NoString& command)
     {
-        if ((m_vMessages.empty()) && (No::token(sCommand, 1) != "-quiet"))
+        if ((m_vMessages.empty()) && (No::token(command, 1) != "-quiet"))
             putModuleNotice("Welcome Back!");
         Ping();
         Back();
     }
 
-    void MessagesCommand(const NoString& sCommand)
+    void MessagesCommand(const NoString& command)
     {
         for (u_int a = 0; a < m_vMessages.size(); a++)
             putModule(m_vMessages[a]);
     }
 
-    void ReplayCommand(const NoString& sCommand)
+    void ReplayCommand(const NoString& command)
     {
         NoString nick = client()->nick();
         for (u_int a = 0; a < m_vMessages.size(); a++) {
@@ -97,9 +97,9 @@ class NoAway : public NoModule
         }
     }
 
-    void DeleteCommand(const NoString& sCommand)
+    void DeleteCommand(const NoString& command)
     {
-        NoString sWhich = No::token(sCommand, 1);
+        NoString sWhich = No::token(command, 1);
         if (sWhich == "all") {
             putModuleNotice("Deleted " + NoString(m_vMessages.size()) + " Messages.");
             for (u_int a = 0; a < m_vMessages.size(); a++)
@@ -120,7 +120,7 @@ class NoAway : public NoModule
         }
     }
 
-    void SaveCommand(const NoString& sCommand)
+    void SaveCommand(const NoString& command)
     {
         if (m_saveMessages) {
             SaveBufferToDisk();
@@ -130,20 +130,20 @@ class NoAway : public NoModule
         }
     }
 
-    void PingCommand(const NoString& sCommand)
+    void PingCommand(const NoString& command)
     {
         Ping();
         if (m_bIsAway)
             Back();
     }
 
-    void PassCommand(const NoString& sCommand)
+    void PassCommand(const NoString& command)
     {
-        m_sPassword = No::token(sCommand, 1);
+        m_sPassword = No::token(command, 1);
         putModuleNotice("Password Updated to [" + m_sPassword + "]");
     }
 
-    void ShowCommand(const NoString& sCommand)
+    void ShowCommand(const NoString& command)
     {
         std::map<NoString, std::vector<NoString>> msvOutput;
         for (u_int a = 0; a < m_vMessages.size(); a++) {
@@ -186,21 +186,21 @@ class NoAway : public NoModule
         putModule("#--- End Messages");
     }
 
-    void EnableTimerCommand(const NoString& sCommand)
+    void EnableTimerCommand(const NoString& command)
     {
         SetAwayTime(300);
         putModule("Timer set to 300 seconds");
     }
 
-    void DisableTimerCommand(const NoString& sCommand)
+    void DisableTimerCommand(const NoString& command)
     {
         SetAwayTime(0);
         putModule("Timer disabled");
     }
 
-    void SetTimerCommand(const NoString& sCommand)
+    void SetTimerCommand(const NoString& command)
     {
-        int iSetting = No::token(sCommand, 1).toInt();
+        int iSetting = No::token(command, 1).toInt();
 
         SetAwayTime(iSetting);
 
@@ -210,7 +210,7 @@ class NoAway : public NoModule
             putModule("Timer set to " + NoString(iSetting) + " seconds");
     }
 
-    void TimerCommand(const NoString& sCommand)
+    void TimerCommand(const NoString& command)
     {
         putModule("Current timer setting: " + NoString(GetAwayTime()) + " seconds");
     }
@@ -248,9 +248,9 @@ public:
             SaveBufferToDisk();
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        NoString sMyArgs = sArgs;
+        NoString sMyArgs = args;
         size_t uIndex = 0;
         if (No::token(sMyArgs, 0) == "-nostore") {
             uIndex++;
@@ -299,9 +299,9 @@ public:
             NoStringVector vsLines = sFile.split("\n");
 
             for (it = vsLines.begin(); it != vsLines.end(); ++it) {
-                NoString sLine(*it);
-                sLine.trim();
-                AddMessage(sLine);
+                NoString line(*it);
+                line.trim();
+                AddMessage(line);
             }
         } else {
             m_sPassword = "";
@@ -345,18 +345,18 @@ public:
     NoString GetPath()
     {
         NoString sBuffer = user()->userName();
-        NoString sRet = savePath();
-        sRet += "/.znc-away-" + No::md5(sBuffer);
-        return (sRet);
+        NoString ret = savePath();
+        ret += "/.znc-away-" + No::md5(sBuffer);
+        return (ret);
     }
 
-    void Away(bool bForce = false, const NoString& sReason = "")
+    void Away(bool bForce = false, const NoString& reason = "")
     {
         if ((!m_bIsAway) || (bForce)) {
             if (!bForce)
-                m_sReason = sReason;
-            else if (!sReason.empty())
-                m_sReason = sReason;
+                m_sReason = reason;
+            else if (!reason.empty())
+                m_sReason = reason;
 
             time_t iTime = time(nullptr);
             char* pTime = ctime(&iTime);
@@ -490,10 +490,10 @@ private:
         AddMessage(NoString(iTime) + " " + Nick.nickMask() + " " + sMessage);
     }
 
-    void AddMessage(const NoString& sText)
+    void AddMessage(const NoString& text)
     {
         if (m_saveMessages) {
-            m_vMessages.push_back(sText);
+            m_vMessages.push_back(text);
         }
     }
 

@@ -189,9 +189,9 @@ private:
     bool sending_lines;
 
 public:
-    void CreateCommand(const NoString& sLine)
+    void CreateCommand(const NoString& line)
     {
-        NoString name = No::token(sLine, 1, " ");
+        NoString name = No::token(line, 1, " ");
         if (!NoAlias::AliasExists(this, name)) {
             NoAlias na(this, name);
             na.Commit();
@@ -200,9 +200,9 @@ public:
             putModule("Alias already exists.");
     }
 
-    void DeleteCommand(const NoString& sLine)
+    void DeleteCommand(const NoString& line)
     {
-        NoString name = No::token(sLine, 1, " ");
+        NoString name = No::token(line, 1, " ");
         NoAlias delete_alias;
         if (NoAlias::AliasGet(delete_alias, this, name)) {
             putModule("Deleted alias: " + delete_alias.GetName());
@@ -211,44 +211,44 @@ public:
             putModule("Alias does not exist.");
     }
 
-    void AddCmd(const NoString& sLine)
+    void AddCmd(const NoString& line)
     {
-        NoString name = No::token(sLine, 1, " ");
+        NoString name = No::token(line, 1, " ");
         NoAlias add_alias;
         if (NoAlias::AliasGet(add_alias, this, name)) {
-            add_alias.AliasCmds().push_back(No::tokens(sLine, 2, " "));
+            add_alias.AliasCmds().push_back(No::tokens(line, 2, " "));
             add_alias.Commit();
             putModule("Modified alias.");
         } else
             putModule("Alias does not exist.");
     }
 
-    void InsertCommand(const NoString& sLine)
+    void InsertCommand(const NoString& line)
     {
-        NoString name = No::token(sLine, 1, " ");
+        NoString name = No::token(line, 1, " ");
         NoAlias insert_alias;
         int index;
         if (NoAlias::AliasGet(insert_alias, this, name)) {
             // if Convert succeeds, then i has been successfully read from user input
-            if (!No::token(sLine, 2, " ").convert(&index) || index < 0 || index > (int)insert_alias.AliasCmds().size()) {
+            if (!No::token(line, 2, " ").convert(&index) || index < 0 || index > (int)insert_alias.AliasCmds().size()) {
                 putModule("Invalid index.");
                 return;
             }
 
-            insert_alias.AliasCmds().insert(insert_alias.AliasCmds().begin() + index, No::tokens(sLine, 3, " "));
+            insert_alias.AliasCmds().insert(insert_alias.AliasCmds().begin() + index, No::tokens(line, 3, " "));
             insert_alias.Commit();
             putModule("Modified alias.");
         } else
             putModule("Alias does not exist.");
     }
 
-    void RemoveCommand(const NoString& sLine)
+    void RemoveCommand(const NoString& line)
     {
-        NoString name = No::token(sLine, 1, " ");
+        NoString name = No::token(line, 1, " ");
         NoAlias remove_alias;
         int index;
         if (NoAlias::AliasGet(remove_alias, this, name)) {
-            if (!No::token(sLine, 2, " ").convert(&index) || index < 0 || index > (int)remove_alias.AliasCmds().size() - 1) {
+            if (!No::token(line, 2, " ").convert(&index) || index < 0 || index > (int)remove_alias.AliasCmds().size() - 1) {
                 putModule("Invalid index.");
                 return;
             }
@@ -260,9 +260,9 @@ public:
             putModule("Alias does not exist.");
     }
 
-    void ClearCommand(const NoString& sLine)
+    void ClearCommand(const NoString& line)
     {
-        NoString name = No::token(sLine, 1, " ");
+        NoString name = No::token(line, 1, " ");
         NoAlias clear_alias;
         if (NoAlias::AliasGet(clear_alias, this, name)) {
             clear_alias.AliasCmds().clear();
@@ -272,7 +272,7 @@ public:
             putModule("Alias does not exist.");
     }
 
-    void ListCommand(const NoString& sLine)
+    void ListCommand(const NoString& line)
     {
         NoString output = "The following aliases exist:";
         NoRegistry registry(this);
@@ -284,9 +284,9 @@ public:
         putModule(output);
     }
 
-    void InfoCommand(const NoString& sLine)
+    void InfoCommand(const NoString& line)
     {
-        NoString name = No::token(sLine, 1, " ");
+        NoString name = No::token(line, 1, " ");
         NoAlias info_alias;
         if (NoAlias::AliasGet(info_alias, this, name)) {
             putModule("Actions for alias " + info_alias.GetName() + ":");
@@ -334,7 +334,7 @@ public:
                    "Reports the actions performed by an alias.");
     }
 
-    ModRet onUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& line) override
     {
         NoAlias current_alias;
 
@@ -342,14 +342,14 @@ public:
             return CONTINUE;
 
         try {
-            if (sLine.equals("ZNC-CLEAR-ALL-ALIASES!")) {
+            if (line.equals("ZNC-CLEAR-ALL-ALIASES!")) {
                 ListCommand("");
                 putModule("Clearing all of them!");
                 NoRegistry registry(this);
                 registry.clear();
                 return HALT;
-            } else if (NoAlias::AliasGet(current_alias, this, sLine)) {
-                NoStringVector rawLines = current_alias.Imprint(sLine).split("\n", No::SkipEmptyParts);
+            } else if (NoAlias::AliasGet(current_alias, this, line)) {
+                NoStringVector rawLines = current_alias.Imprint(line).split("\n", No::SkipEmptyParts);
                 sending_lines = true;
 
                 for (size_t i = 0; i < rawLines.size(); ++i) {

@@ -55,10 +55,10 @@ public:
         setArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        m_iThresholdMsgs = No::token(sArgs, 0).toUInt();
-        m_iThresholdSecs = No::token(sArgs, 1).toUInt();
+        m_iThresholdMsgs = No::token(args, 0).toUInt();
+        m_iThresholdSecs = No::token(args, 1).toUInt();
 
         if (m_iThresholdMsgs == 0 || m_iThresholdSecs == 0) {
             NoRegistry registry(this);
@@ -110,16 +110,16 @@ public:
         return Message(Nick, sMessage);
     }
 
-    void OnSecsCommand(const NoString& sCommand)
+    void OnSecsCommand(const NoString& command)
     {
-        const NoString& sArg = No::tokens(sCommand, 1);
+        const NoString& arg = No::tokens(command, 1);
 
-        if (sArg.empty()) {
+        if (arg.empty()) {
             putModule("Usage: Secs <limit>");
             return;
         }
 
-        m_iThresholdSecs = sArg.toUInt();
+        m_iThresholdSecs = arg.toUInt();
         if (m_iThresholdSecs == 0)
             m_iThresholdSecs = 1;
 
@@ -127,16 +127,16 @@ public:
         Save();
     }
 
-    void OnLinesCommand(const NoString& sCommand)
+    void OnLinesCommand(const NoString& command)
     {
-        const NoString& sArg = No::tokens(sCommand, 1);
+        const NoString& arg = No::tokens(command, 1);
 
-        if (sArg.empty()) {
+        if (arg.empty()) {
             putModule("Usage: Lines <limit>");
             return;
         }
 
-        m_iThresholdMsgs = sArg.toUInt();
+        m_iThresholdMsgs = arg.toUInt();
         if (m_iThresholdMsgs == 0)
             m_iThresholdMsgs = 2;
 
@@ -144,7 +144,7 @@ public:
         Save();
     }
 
-    void OnShowCommand(const NoString& sCommand)
+    void OnShowCommand(const NoString& command)
     {
         putModule("Current limit is " + NoString(m_iThresholdMsgs) + " CTCPs "
                                                                      "in " +

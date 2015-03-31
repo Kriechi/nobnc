@@ -23,7 +23,7 @@
 class NoKeepNickTimer : public NoTimer
 {
 public:
-    NoKeepNickTimer(NoModule* pMod);
+    NoKeepNickTimer(NoModule* mod);
 
     void run() override;
 };
@@ -48,7 +48,7 @@ public:
                    "Show the current state");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         m_pTimer = nullptr;
 
@@ -88,7 +88,7 @@ public:
         return sConfNick;
     }
 
-    void onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
+    void onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
     {
         if (sNewNick == network()->ircSocket()->nick()) {
             // We are changing our own nick
@@ -111,7 +111,7 @@ public:
         }
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
     {
         // If someone with the nick we want quits, be fast and get the nick
         if (Nick.equals(GetNick())) {
@@ -152,56 +152,56 @@ public:
         m_pTimer = nullptr;
     }
 
-    ModRet onUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& line) override
     {
         // We dont care if we are not connected to IRC
         if (!network()->isIrcConnected())
             return CONTINUE;
 
         // We are trying to get the config nick and this is a /nick?
-        if (!m_pTimer || !No::token(sLine, 0).equals("NICK"))
+        if (!m_pTimer || !No::token(line, 0).equals("NICK"))
             return CONTINUE;
 
         // Is the nick change for the nick we are trying to get?
-        NoString sNick = No::token(sLine, 1);
+        NoString nick = No::token(line, 1);
 
         // Don't even think of using spaces in your nick!
-        if (sNick.left(1) == ":")
-            sNick.leftChomp(1);
+        if (nick.left(1) == ":")
+            nick.leftChomp(1);
 
-        if (!sNick.equals(GetNick()))
+        if (!nick.equals(GetNick()))
             return CONTINUE;
 
         // Indeed trying to change to this nick, generate a 433 for it.
         // This way we can *always* block incoming 433s from the server.
-        putUser(":" + network()->ircServer() + " 433 " + network()->ircNick().nick() + " " + sNick +
+        putUser(":" + network()->ircServer() + " 433 " + network()->ircNick().nick() + " " + nick +
                 " :ZNC is already trying to get this nickname");
         return CONTINUE;
     }
 
-    ModRet onRaw(NoString& sLine) override
+    ModRet onRaw(NoString& line) override
     {
         // Are we trying to get our primary nick and we caused this error?
         // :irc.server.net 433 mynick badnick :Nickname is already in use.
-        if (m_pTimer && No::token(sLine, 1) == "433" && No::token(sLine, 3).equals(GetNick()))
+        if (m_pTimer && No::token(line, 1) == "433" && No::token(line, 3).equals(GetNick()))
             return HALT;
 
         return CONTINUE;
     }
 
-    void OnEnableCommand(const NoString& sCommand)
+    void OnEnableCommand(const NoString& command)
     {
         Enable();
         putModule("Trying to get your primary nick");
     }
 
-    void OnDisableCommand(const NoString& sCommand)
+    void OnDisableCommand(const NoString& command)
     {
         Disable();
         putModule("No longer trying to get your primary nick");
     }
 
-    void OnStateCommand(const NoString& sCommand)
+    void OnStateCommand(const NoString& command)
     {
         if (m_pTimer)
             putModule("Currently trying to get your primary nick");
@@ -214,7 +214,7 @@ private:
     NoKeepNickTimer* m_pTimer;
 };
 
-NoKeepNickTimer::NoKeepNickTimer(NoModule* pMod) : NoTimer(pMod)
+NoKeepNickTimer::NoKeepNickTimer(NoModule* mod) : NoTimer(mod)
 {
     setName("KeepNickTimer");
     setDescription("Tries to acquire this user's primary nick");

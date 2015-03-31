@@ -40,12 +40,12 @@ public:
 protected:
     void run() override
     {
-        NoNetwork* pNetwork = module()->network();
-        NoChannel* pChan = pNetwork->findChannel(No::tokens(name(), 1));
+        NoNetwork* network = module()->network();
+        NoChannel* channel = network->findChannel(No::tokens(name(), 1));
 
-        if (pChan) {
-            pChan->enable();
-            module()->putIrc("JOIN " + pChan->name() + " " + pChan->key());
+        if (channel) {
+            channel->enable();
+            module()->putIrc("JOIN " + channel->name() + " " + channel->key());
         }
     }
 };
@@ -69,9 +69,9 @@ public:
                    "Show the rejoin delay");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sErrorMsg) override
+    bool onLoad(const NoString& args, NoString& sErrorMsg) override
     {
-        if (sArgs.empty()) {
+        if (args.empty()) {
             NoRegistry registry(this);
             NoString sDelay = registry.value("delay");
 
@@ -80,8 +80,8 @@ public:
             else
                 delay = sDelay.toUInt();
         } else {
-            int i = sArgs.toInt();
-            if ((i == 0 && sArgs == "0") || i > 0)
+            int i = args.toInt();
+            if ((i == 0 && args == "0") || i > 0)
                 delay = i;
             else {
                 sErrorMsg = "Illegal argument, "
@@ -93,10 +93,10 @@ public:
         return true;
     }
 
-    void OnSetDelayCommand(const NoString& sCommand)
+    void OnSetDelayCommand(const NoString& command)
     {
         int i;
-        i = No::token(sCommand, 1).toInt();
+        i = No::token(command, 1).toInt();
 
         if (i < 0) {
             putModule("Negative delays don't make any sense!");
@@ -113,7 +113,7 @@ public:
             putModule("Rejoin delay disabled");
     }
 
-    void OnShowDelayCommand(const NoString& sCommand)
+    void OnShowDelayCommand(const NoString& command)
     {
         if (delay)
             putModule("Rejoin delay enabled, " + NoString(delay) + " seconds");
@@ -121,15 +121,15 @@ public:
             putModule("Rejoin delay disabled");
     }
 
-    void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& pChan, const NoString& sMessage) override
+    void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& channel, const NoString& sMessage) override
     {
         if (network()->currentNick().equals(sKickedNick)) {
             if (!delay) {
-                putIrc("JOIN " + pChan.name() + " " + pChan.key());
-                pChan.enable();
+                putIrc("JOIN " + channel.name() + " " + channel.key());
+                channel.enable();
                 return;
             }
-            NoRejoinJob* timer = new NoRejoinJob(this, pChan.name());
+            NoRejoinJob* timer = new NoRejoinJob(this, channel.name());
             timer->setSingleShot(true);
             timer->start(delay);
         }

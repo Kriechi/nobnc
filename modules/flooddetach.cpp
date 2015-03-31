@@ -47,10 +47,10 @@ public:
         setArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        m_iThresholdMsgs = No::token(sArgs, 0).toUInt();
-        m_iThresholdSecs = No::token(sArgs, 1).toUInt();
+        m_iThresholdMsgs = No::token(args, 0).toUInt();
+        m_iThresholdSecs = No::token(args, 1).toUInt();
 
         if (m_iThresholdMsgs == 0 || m_iThresholdSecs == 0) {
             NoRegistry registry(this);
@@ -83,8 +83,8 @@ public:
             if (it->second.first + (time_t)m_iThresholdSecs >= now)
                 continue;
 
-            NoChannel* pChan = network()->findChannel(it->first);
-            if (it->second.second >= m_iThresholdMsgs && pChan && pChan->isDetached()) {
+            NoChannel* channel = network()->findChannel(it->first);
+            if (it->second.second >= m_iThresholdMsgs && channel && channel->isDetached()) {
                 // The channel is detached and it is over the
                 // messages limit. Since we only track those
                 // limits for non-detached channels or for
@@ -93,12 +93,12 @@ public:
 
                 NoRegistry registry(this);
                 if (!registry.value("silent").toBool()) {
-                    putModule("Flood in [" + pChan->name() + "] is over, "
+                    putModule("Flood in [" + channel->name() + "] is over, "
                                                              "re-attaching...");
                 }
                 // No buffer playback, makes sense, doesn't it?
-                pChan->clearBuffer();
-                pChan->attachUser();
+                channel->clearBuffer();
+                channel->attachUser();
             }
 
             Limits::iterator it2 = it++;
@@ -186,21 +186,21 @@ public:
         return CONTINUE;
     }
 
-    void ShowCommand(const NoString& sLine)
+    void ShowCommand(const NoString& line)
     {
         putModule("Current limit is " + NoString(m_iThresholdMsgs) + " lines "
                                                                      "in " +
                   NoString(m_iThresholdSecs) + " secs.");
     }
 
-    void SecsCommand(const NoString& sLine)
+    void SecsCommand(const NoString& line)
     {
-        const NoString sArg = No::tokens(sLine, 1);
+        const NoString arg = No::tokens(line, 1);
 
-        if (sArg.empty()) {
+        if (arg.empty()) {
             putModule("Seconds limit is [" + NoString(m_iThresholdSecs) + "]");
         } else {
-            m_iThresholdSecs = sArg.toUInt();
+            m_iThresholdSecs = arg.toUInt();
             if (m_iThresholdSecs == 0)
                 m_iThresholdSecs = 1;
 
@@ -209,14 +209,14 @@ public:
         }
     }
 
-    void LinesCommand(const NoString& sLine)
+    void LinesCommand(const NoString& line)
     {
-        const NoString sArg = No::tokens(sLine, 1);
+        const NoString arg = No::tokens(line, 1);
 
-        if (sArg.empty()) {
+        if (arg.empty()) {
             putModule("Lines limit is [" + NoString(m_iThresholdMsgs) + "]");
         } else {
-            m_iThresholdMsgs = sArg.toUInt();
+            m_iThresholdMsgs = arg.toUInt();
             if (m_iThresholdMsgs == 0)
                 m_iThresholdMsgs = 2;
 
@@ -225,13 +225,13 @@ public:
         }
     }
 
-    void SilentCommand(const NoString& sLine)
+    void SilentCommand(const NoString& line)
     {
-        const NoString sArg = No::tokens(sLine, 1);
+        const NoString arg = No::tokens(line, 1);
 
         NoRegistry registry(this);
-        if (!sArg.empty()) {
-            registry.setValue("silent", NoString(sArg.toBool()));
+        if (!arg.empty()) {
+            registry.setValue("silent", NoString(arg.toBool()));
         }
 
         if (registry.value("silent").toBool()) {

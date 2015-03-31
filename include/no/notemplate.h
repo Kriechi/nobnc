@@ -34,19 +34,19 @@ public:
     {
     }
 
-    virtual bool handleVar(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
+    virtual bool handleVar(NoTemplate& Tmpl, const NoString& name, const NoString& args, NoString& sOutput)
     {
         return false;
     }
 
-    virtual bool handleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
+    virtual bool handleTag(NoTemplate& Tmpl, const NoString& name, const NoString& args, NoString& sOutput)
     {
         return false;
     }
 
-    virtual bool handleIf(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput)
+    virtual bool handleIf(NoTemplate& Tmpl, const NoString& name, const NoString& args, NoString& sOutput)
     {
-        return handleVar(Tmpl, sName, sArgs, sOutput);
+        return handleVar(Tmpl, name, args, sOutput);
     }
 
     virtual bool handleValue(NoTemplate& Tmpl, NoString& sValue, const NoStringMap& msOptions)
@@ -82,17 +82,17 @@ public:
     void appendPath(const NoString& sPath, bool bIncludesOnly = false);
     void removePath(const NoString& sPath);
     void clearPaths();
-    bool printString(NoString& sRet);
+    bool printString(NoString& ret);
     bool print(std::ostream& oOut);
     bool print(const NoString& sFileName, std::ostream& oOut);
-    bool validIf(const NoString& sArgs);
+    bool validIf(const NoString& args);
     bool validExpr(const NoString& sExpr);
-    bool isTrue(const NoString& sName);
-    bool hasLoop(const NoString& sName);
-    NoString value(const NoString& sName, bool bFromIf = false);
-    NoTemplate& addRow(const NoString& sName);
-    NoTemplate* row(const NoString& sName, uint uIndex);
-    std::vector<NoTemplate*>* loop(const NoString& sName);
+    bool isTrue(const NoString& name);
+    bool hasLoop(const NoString& name);
+    NoString value(const NoString& name, bool bFromIf = false);
+    NoTemplate& addRow(const NoString& name);
+    NoTemplate* row(const NoString& name, uint uIndex);
+    std::vector<NoTemplate*>* loop(const NoString& name);
     void deleteCurLoopContext();
     NoTemplateLoopContext* currentLoopContext();
     NoTemplate* currentTemplate();

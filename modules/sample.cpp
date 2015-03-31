@@ -86,9 +86,9 @@ public:
     {
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        putModule("I'm being loaded with the arguments: [" + sArgs + "]");
+        putModule("I'm being loaded with the arguments: [" + args + "]");
 // AddTimer(new NoSampleTimer(this, 300, 0, "Sample", "Sample timer for sample things."));
 // AddTimer(new NoSampleTimer(this, 5, 20, "Another", "Another sample timer."));
 // AddTimer(new NoSampleTimer(this, 25000, 5, "Third", "A third sample timer."));
@@ -119,7 +119,7 @@ public:
         putModule("You got disconnected BoyOh.");
     }
 
-    ModRet onIrcRegistration(NoString& sPass, NoString& sNick, NoString& sIdent, NoString& sRealName) override
+    ModRet onIrcRegistration(NoString& pass, NoString& nick, NoString& ident, NoString& sRealName) override
     {
         sRealName += " - ZNC";
         return CONTINUE;
@@ -158,20 +158,20 @@ public:
         putModule(((bNoChange) ? "[0] [" : "[1] [") + OpNick.nick() + "] devoiced [" + Nick.nick() + "] on [" + Channel.name() + "]");
     }
 
-    void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& sArgs) override
+    void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& args) override
     {
-        putModule("* " + OpNick.nick() + " sets mode: " + sModes + " " + sArgs + " (" + Channel.name() + ")");
+        putModule("* " + OpNick.nick() + " sets mode: " + sModes + " " + args + " (" + Channel.name() + ")");
     }
 
-    ModRet onRaw(NoString& sLine) override
+    ModRet onRaw(NoString& line) override
     {
-        // putModule("onRaw() [" + sLine + "]");
+        // putModule("onRaw() [" + line + "]");
         return CONTINUE;
     }
 
-    ModRet onUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& line) override
     {
-        // putModule("UserRaw() [" + sLine + "]");
+        // putModule("UserRaw() [" + line + "]");
         return CONTINUE;
     }
 
@@ -180,7 +180,7 @@ public:
         putModule("[" + OpNick.nick() + "] kicked [" + sKickedNick + "] from [" + Channel.name() + "] with the msg [" + sMessage + "]");
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& vChans) override
+    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
     {
         putModule("* Quits: " + Nick.nick() + " (" + Nick.ident() + "!" + Nick.host() + ") (" + sMessage + ")");
     }
@@ -212,7 +212,7 @@ public:
         return CONTINUE;
     }
 
-    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& vChans) override
+    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
     {
         putModule("* " + OldNick.nick() + " is now known as " + sNewNick);
     }
@@ -322,16 +322,16 @@ public:
         return CONTINUE;
     }
 
-    void onModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& command) override
     {
-        if (sCommand.equals("TIMERS")) {
+        if (command.equals("TIMERS")) {
             listTimers();
         }
     }
 
-    ModRet onStatusCommand(NoString& sCommand) override
+    ModRet onStatusCommand(NoString& command) override
     {
-        if (sCommand.equals("SAMPLE")) {
+        if (command.equals("SAMPLE")) {
             putModule("Hi, I'm your friendly sample module.");
             return HALT;
         }

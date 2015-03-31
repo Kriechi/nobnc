@@ -32,7 +32,7 @@ public:
     NoFile* initPidFile();
     bool deletePidFile();
 
-    NoString expandConfigPath(const NoString& sConfigFile, bool bAllowMkDir = true);
+    NoString expandConfigPath(const NoString& sConfigFile, bool allowMkDir = true);
     void backupConfigOnce(const NoString& sSuffix);
 
     void deleteUsers();
@@ -42,12 +42,12 @@ public:
     // Never call this unless you are NoConnectQueueTimer::~NoConnectQueueTimer()
     void leakConnectQueueTimer(NoConnectQueueTimer* pTimer);
 
-    bool doRehash(NoString& sError);
+    bool doRehash(NoString& error);
     // Returns true if something was done
     bool handleUserDeletion();
     NoString makeConfigHeader();
-    bool addListener(const NoString& sLine, NoString& sError);
-    bool addListener(NoSettings* pConfig, NoString& sError);
+    bool addListener(const NoString& line, NoString& error);
+    bool addListener(NoSettings* pConfig, NoString& error);
 
     time_t startTime;
 

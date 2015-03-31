@@ -28,27 +28,27 @@ public:
     {
     }
 
-    bool IsOnlineModNick(const NoString& sNick)
+    bool IsOnlineModNick(const NoString& nick)
     {
         const NoString& sPrefix = user()->statusPrefix();
-        if (!sNick.startsWith(sPrefix))
+        if (!nick.startsWith(sPrefix))
             return false;
 
-        NoString sModNick = sNick.substr(sPrefix.length());
+        NoString sModNick = nick.substr(sPrefix.length());
         if (sModNick.equals("status") || network()->loader()->findModule(sModNick) ||
             user()->loader()->findModule(sModNick) || noApp->loader()->findModule(sModNick))
             return true;
         return false;
     }
 
-    ModRet onUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& line) override
     {
         // Handle ISON
-        if (No::token(sLine, 0).equals("ison")) {
+        if (No::token(line, 0).equals("ison")) {
             NoStringVector::const_iterator it;
 
             // Get the list of nicks which are being asked for
-            NoStringVector vsNicks = No::tokens(sLine, 1).trimLeft_n(":").split(" ", No::SkipEmptyParts);
+            NoStringVector vsNicks = No::tokens(line, 1).trimLeft_n(":").split(" ", No::SkipEmptyParts);
 
             NoString sBNNoNicks;
             for (it = vsNicks.begin(); it != vsNicks.end(); ++it) {
@@ -71,14 +71,14 @@ public:
         }
 
         // Handle WHOIS
-        if (No::token(sLine, 0).equals("whois")) {
-            NoString sNick = No::token(sLine, 1);
+        if (No::token(line, 0).equals("whois")) {
+            NoString nick = No::token(line, 1);
 
-            if (IsOnlineModNick(sNick)) {
-                NoNetwork* pNetwork = network();
-                putUser(":znc.in 311 " + pNetwork->currentNick() + " " + sNick + " " + sNick + " znc.in * :" + sNick);
-                putUser(":znc.in 312 " + pNetwork->currentNick() + " " + sNick + " *.znc.in :Bouncer");
-                putUser(":znc.in 318 " + pNetwork->currentNick() + " " + sNick + " :End of /WHOIS list.");
+            if (IsOnlineModNick(nick)) {
+                NoNetwork* network = NoModule::network();
+                putUser(":znc.in 311 " + network->currentNick() + " " + nick + " " + nick + " znc.in * :" + nick);
+                putUser(":znc.in 312 " + network->currentNick() + " " + nick + " *.znc.in :Bouncer");
+                putUser(":znc.in 318 " + network->currentNick() + " " + nick + " :End of /WHOIS list.");
 
                 return HALT;
             }
@@ -87,21 +87,21 @@ public:
         return CONTINUE;
     }
 
-    ModRet onRaw(NoString& sLine) override
+    ModRet onRaw(NoString& line) override
     {
         // Handle 303 reply if m_Requests is not empty
-        if (No::token(sLine, 1) == "303" && !m_ISONRequests.empty()) {
+        if (No::token(line, 1) == "303" && !m_ISONRequests.empty()) {
             NoStringVector::iterator it = m_ISONRequests.begin();
 
-            sLine.trim();
+            line.trim();
 
             // Only append a space if this isn't an empty reply
-            if (sLine.right(1) != ":") {
-                sLine += " ";
+            if (line.right(1) != ":") {
+                line += " ";
             }
 
             // add BNC nicks to the reply
-            sLine += *it;
+            line += *it;
             m_ISONRequests.erase(it);
         }
 

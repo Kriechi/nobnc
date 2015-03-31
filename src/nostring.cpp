@@ -159,29 +159,29 @@ bool NoString::equals(const NoString& s, No::CaseSensitivity cs) const
 
 NoString NoString::toUpper() const
 {
-    NoString sRet = *this;
-    for (char& c : sRet) {
+    NoString ret = *this;
+    for (char& c : ret) {
         // TODO use unicode
         c = (char)toupper(c);
     }
-    return sRet;
+    return ret;
 }
 
 NoString NoString::toLower() const
 {
-    NoString sRet = *this;
-    for (char& c : sRet) {
+    NoString ret = *this;
+    for (char& c : ret) {
         // TODO use unicode
         c = (char)tolower(c);
     }
-    return sRet;
+    return ret;
 }
 
 NoString NoString::replace_n(const NoString& sReplace, const NoString& sWith) const
 {
-    NoString sRet = *this;
-    sRet.replace(sReplace, sWith);
-    return sRet;
+    NoString ret = *this;
+    ret.replace(sReplace, sWith);
+    return ret;
 }
 
 uint NoString::replace(const NoString& sReplace, const NoString& sWith)
@@ -231,7 +231,7 @@ NoStringVector NoString::split(const NoString& separator, No::SplitBehavior beha
 NoString NoString::toBase64(uint uWrap) const
 {
     const char b64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    NoString sRet;
+    NoString ret;
     size_t len = size();
     const uchar* input = (const uchar*)c_str();
     uchar* output, *p;
@@ -246,7 +246,7 @@ NoString NoString::toBase64(uint uWrap) const
     }
 
     if (toalloc < len) {
-        return sRet;
+        return ret;
     }
 
     p = output = new uchar[toalloc];
@@ -284,9 +284,9 @@ NoString NoString::toBase64(uint uWrap) const
     }
 
     *p = 0;
-    sRet = (char*)output;
+    ret = (char*)output;
     delete[] output;
-    return sRet;
+    return ret;
 }
 
 NoString NoString::fromBase64(const NoString& base64)
@@ -325,11 +325,11 @@ NoString NoString::fromBase64(const NoString& base64)
 
     *p = '\0';
     ulong uRet = p - out;
-    NoString sRet;
-    sRet.append(out, uRet);
+    NoString ret;
+    ret.append(out, uRet);
     delete[] out;
 
-    return sRet;
+    return ret;
 }
 
 bool NoString::toBool() const
@@ -422,23 +422,23 @@ bool NoString::trimRight(const NoString& s)
 
 NoString NoString::trim_n(const NoString& s) const
 {
-    NoString sRet = *this;
-    sRet.trim(s);
-    return sRet;
+    NoString ret = *this;
+    ret.trim(s);
+    return ret;
 }
 
 NoString NoString::trimLeft_n(const NoString& s) const
 {
-    NoString sRet = *this;
-    sRet.trimLeft(s);
-    return sRet;
+    NoString ret = *this;
+    ret.trimLeft(s);
+    return ret;
 }
 
 NoString NoString::trimRight_n(const NoString& s) const
 {
-    NoString sRet = *this;
-    sRet.trimRight(s);
-    return sRet;
+    NoString ret = *this;
+    ret.trimRight(s);
+    return ret;
 }
 
 bool NoString::trimPrefix(const NoString& sPrefix)
@@ -502,30 +502,30 @@ bool NoString::contains(const NoString& s, No::CaseSensitivity cs) const
 
 NoString NoString::trimPrefix_n(const NoString& sPrefix) const
 {
-    NoString sRet = *this;
-    sRet.trimPrefix(sPrefix);
-    return sRet;
+    NoString ret = *this;
+    ret.trimPrefix(sPrefix);
+    return ret;
 }
 
 NoString NoString::trimSuffix_n(const NoString& sSuffix) const
 {
-    NoString sRet = *this;
-    sRet.trimSuffix(sSuffix);
-    return sRet;
+    NoString ret = *this;
+    ret.trimSuffix(sSuffix);
+    return ret;
 }
 
 NoString NoString::leftChomp_n(uint uLen) const
 {
-    NoString sRet = *this;
-    sRet.leftChomp(uLen);
-    return sRet;
+    NoString ret = *this;
+    ret.leftChomp(uLen);
+    return ret;
 }
 
 NoString NoString::rightChomp_n(uint uLen) const
 {
-    NoString sRet = *this;
-    sRet.rightChomp(uLen);
-    return sRet;
+    NoString ret = *this;
+    ret.rightChomp(uLen);
+    return ret;
 }
 
 bool NoString::leftChomp(uint uLen)

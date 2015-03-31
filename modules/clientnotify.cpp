@@ -70,7 +70,7 @@ public:
                    "Show the current settings");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         NoRegistry registry(this);
         m_sMethod = registry.value("method");
@@ -109,49 +109,49 @@ public:
         }
     }
 
-    void OnMethodCommand(const NoString& sCommand)
+    void OnMethodCommand(const NoString& command)
     {
-        const NoString& sArg = No::tokens(sCommand, 1).toLower();
+        const NoString& arg = No::tokens(command, 1).toLower();
 
-        if (sArg != "notice" && sArg != "message" && sArg != "off") {
+        if (arg != "notice" && arg != "message" && arg != "off") {
             putModule("Usage: Method <message|notice|off>");
             return;
         }
 
-        m_sMethod = sArg;
+        m_sMethod = arg;
         SaveSettings();
         putModule("Saved.");
     }
 
-    void OnNewOnlyCommand(const NoString& sCommand)
+    void OnNewOnlyCommand(const NoString& command)
     {
-        const NoString& sArg = No::tokens(sCommand, 1).toLower();
+        const NoString& arg = No::tokens(command, 1).toLower();
 
-        if (sArg.empty()) {
+        if (arg.empty()) {
             putModule("Usage: NewOnly <on|off>");
             return;
         }
 
-        m_bNewOnly = sArg.toBool();
+        m_bNewOnly = arg.toBool();
         SaveSettings();
         putModule("Saved.");
     }
 
-    void OnDisconnectCommand(const NoString& sCommand)
+    void OnDisconnectCommand(const NoString& command)
     {
-        const NoString& sArg = No::tokens(sCommand, 1).toLower();
+        const NoString& arg = No::tokens(command, 1).toLower();
 
-        if (sArg.empty()) {
+        if (arg.empty()) {
             putModule("Usage: OnDisconnect <on|off>");
             return;
         }
 
-        m_bOnDisconnect = sArg.toBool();
+        m_bOnDisconnect = arg.toBool();
         SaveSettings();
         putModule("Saved.");
     }
 
-    void OnShowCommand(const NoString& sLine)
+    void OnShowCommand(const NoString& line)
     {
         putModule("Current settings: Method: " + m_sMethod + ", for unseen IP addresses only: " + NoString(m_bNewOnly) +
                   ", notify on disconnecting clients: " + NoString(m_bOnDisconnect));

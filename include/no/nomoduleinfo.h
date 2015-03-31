@@ -32,14 +32,14 @@ class NO_EXPORT NoModuleInfo
 {
 public:
     typedef NoModule* (*NoModuleLoader)(NoModuleHandle p,
-                                        NoUser* pUser,
-                                        NoNetwork* pNetwork,
+                                        NoUser* user,
+                                        NoNetwork* network,
                                         const NoString& sModName,
                                         const NoString& sModPath,
                                         No::ModuleType eType);
 
     NoModuleInfo();
-    NoModuleInfo(const NoString& sName, const NoString& sPath, No::ModuleType eType);
+    NoModuleInfo(const NoString& name, const NoString& sPath, No::ModuleType eType);
 
     bool operator<(const NoModuleInfo& Info) const;
 

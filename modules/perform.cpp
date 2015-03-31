@@ -22,9 +22,9 @@
 
 class NoPerform : public NoModule
 {
-    void Add(const NoString& sCommand)
+    void Add(const NoString& command)
     {
-        NoString sPerf = No::tokens(sCommand, 1);
+        NoString sPerf = No::tokens(command, 1);
 
         if (sPerf.empty()) {
             putModule("Usage: add <command>");
@@ -36,9 +36,9 @@ class NoPerform : public NoModule
         Save();
     }
 
-    void Del(const NoString& sCommand)
+    void Del(const NoString& command)
     {
-        u_int iNum = No::tokens(sCommand, 1).toUInt();
+        u_int iNum = No::tokens(command, 1).toUInt();
 
         if (iNum > m_vPerform.size() || iNum <= 0) {
             putModule("Illegal # Requested");
@@ -50,7 +50,7 @@ class NoPerform : public NoModule
         Save();
     }
 
-    void List(const NoString& sCommand)
+    void List(const NoString& command)
     {
         NoTable Table;
         uint index = 1;
@@ -76,16 +76,16 @@ class NoPerform : public NoModule
         }
     }
 
-    void Execute(const NoString& sCommand)
+    void Execute(const NoString& command)
     {
         onIrcConnected();
         putModule("perform commands sent");
     }
 
-    void Swap(const NoString& sCommand)
+    void Swap(const NoString& command)
     {
-        u_int iNumA = No::token(sCommand, 1).toUInt();
-        u_int iNumB = No::token(sCommand, 2).toUInt();
+        u_int iNumA = No::token(command, 1).toUInt();
+        u_int iNumB = No::token(command, 2).toUInt();
 
         if (iNumA > m_vPerform.size() || iNumA <= 0 || iNumB > m_vPerform.size() || iNumB <= 0) {
             putModule("Illegal # Requested");
@@ -107,9 +107,9 @@ public:
         addCommand("Swap", static_cast<NoModuleCommand::ModCmdFunc>(&NoPerform::Swap), "<nr> <nr>");
     }
 
-    NoString ParsePerform(const NoString& sArg) const
+    NoString ParsePerform(const NoString& arg) const
     {
-        NoString sPerf = sArg;
+        NoString sPerf = arg;
 
         if (sPerf.left(1) == "/")
             sPerf.leftChomp(1);
@@ -125,7 +125,7 @@ public:
         return sPerf;
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         m_vPerform = NoRegistry(this).value("Perform").split("\n", No::SkipEmptyParts);
 

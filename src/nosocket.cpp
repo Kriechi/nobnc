@@ -129,9 +129,9 @@ NoString NoSocket::hostToVerifySsl() const
     return d->impl->hostToVerifySSL;
 }
 
-void NoSocket::setHostToVerifySsl(const NoString& sHost)
+void NoSocket::setHostToVerifySsl(const NoString& host)
 {
-    d->impl->hostToVerifySSL = sHost;
+    d->impl->hostToVerifySSL = host;
 }
 
 NoString NoSocket::fingerprint() const
@@ -243,9 +243,9 @@ bool NoSocket::write(const char* data, size_t len)
 {
     return d->impl->Write(data, len);
 }
-bool NoSocket::write(const NoString& sData)
+bool NoSocket::write(const NoString& data)
 {
-    return d->impl->Write(sData);
+    return d->impl->Write(data);
 }
 time_t NoSocket::timeSinceLastDataTransaction(time_t iNow) const
 {
@@ -259,9 +259,9 @@ NoString NoSocket::bindHost() const
 {
     return d->impl->GetBindHost();
 }
-void NoSocket::setName(const NoString& sName)
+void NoSocket::setName(const NoString& name)
 {
-    d->impl->SetSockName(sName);
+    d->impl->SetSockName(name);
 }
 bool NoSocket::isListener() const
 {
@@ -406,14 +406,14 @@ void NoSocket::setTimeout(int iTimeout, TimeoutType type)
     d->impl->SetTimeout(iTimeout, type);
 }
 
-Csock* NoSocketImpl::GetSockObj(const NoString& sHost, ushort uPort)
+Csock* NoSocketImpl::GetSockObj(const NoString& host, ushort port)
 {
-    NoSocket* sockObj = q->createSocket(sHost, uPort);
+    NoSocket* sockObj = q->createSocket(host, port);
     if (sockObj)
         return NoSocketPrivate::get(sockObj);
-    return Csock::GetSockObj(sHost, uPort);
+    return Csock::GetSockObj(host, port);
 }
-NoSocket* NoSocket::createSocket(const NoString& sHost, ushort uPort)
+NoSocket* NoSocket::createSocket(const NoString& host, ushort port)
 {
     return nullptr;
 }
@@ -435,13 +435,13 @@ NoString& NoSocket::internalWriteBuffer()
     return d->impl->GetInternalWriteBuffer();
 }
 
-void NoSocketImpl::ReadLine(const NoString& sLine)
+void NoSocketImpl::ReadLine(const NoString& line)
 {
-    q->readLine(sLine);
+    q->readLine(line);
 }
-void NoSocket::readLine(const NoString& sLine)
+void NoSocket::readLine(const NoString& line)
 {
-    d->impl->Csock::ReadLine(sLine);
+    d->impl->Csock::ReadLine(line);
 }
 
 void NoSocketImpl::ReadData(const char* data, size_t len)
@@ -499,7 +499,7 @@ void NoSocket::onSocketError(int iErrno, const NoString& sDescription)
 {
     d->impl->Csock::SockError(iErrno, sDescription);
 }
-bool NoSocket::onConnectionFrom(const NoString& sHost, ushort uPort)
+bool NoSocket::onConnectionFrom(const NoString& host, ushort port)
 {
-    return d->impl->Csock::ConnectionFrom(sHost, uPort);
+    return d->impl->Csock::ConnectionFrom(host, port);
 }

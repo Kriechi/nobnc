@@ -44,26 +44,26 @@ public:
 
     void ClearAllBuffers()
     {
-        NoNetwork* pNetwork = network();
+        NoNetwork* network = NoModule::network();
 
-        if (pNetwork) {
-            const std::vector<NoChannel*>& vChans = pNetwork->channels();
+        if (network) {
+            const std::vector<NoChannel*>& channels = network->channels();
 
-            for (NoChannel* pChan : vChans) {
+            for (NoChannel* channel : channels) {
                 // Skip detached channels, they weren't read yet
-                if (pChan->isDetached())
+                if (channel->isDetached())
                     continue;
 
-                pChan->clearBuffer();
+                channel->clearBuffer();
                 // We deny AutoClearChanBuffer on all channels since this module
                 // doesn't make any sense with it
-                pChan->setAutoClearChanBuffer(false);
+                channel->setAutoClearChanBuffer(false);
             }
 
-            std::vector<NoQuery*> VQueries = pNetwork->queries();
+            std::vector<NoQuery*> VQueries = network->queries();
 
-            for (NoQuery* pQuery : VQueries) {
-                pNetwork->removeQuery(pQuery->name());
+            for (NoQuery* query : VQueries) {
+                network->removeQuery(query->name());
             }
 
             // We deny autoclearQueryBuffer since this module
@@ -131,7 +131,7 @@ public:
     {
         static const struct
         {
-            NoString sName;
+            NoString name;
             int Index;
         } Names[RULE_MAX] = {
               { "msg", RULE_MSG },
@@ -147,15 +147,15 @@ public:
             SetAllRules(bVal);
         } else {
             for (int i = 0; i < RULE_MAX; i++) {
-                if (sOpt.equals(Names[i].sName))
+                if (sOpt.equals(Names[i].name))
                     m_bRules[Names[i].Index] = bVal;
             }
         }
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        NoStringVector vsOpts = sArgs.split(" ", No::SkipEmptyParts);
+        NoStringVector vsOpts = args.split(" ", No::SkipEmptyParts);
 
         for (NoString& sOpt : vsOpts) {
             if (sOpt.startsWith("!"))

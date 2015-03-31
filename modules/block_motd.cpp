@@ -24,16 +24,16 @@ public:
     {
     }
 
-    ModRet onRaw(NoString& sLine) override
+    ModRet onRaw(NoString& line) override
     {
-        const NoString sCmd = No::token(sLine, 1);
+        const NoString cmd = No::token(line, 1);
 
-        if (sCmd == "375" /* begin of MOTD */
+        if (cmd == "375" /* begin of MOTD */
             ||
-            sCmd == "372" /* MOTD */)
+            cmd == "372" /* MOTD */)
             return HALT;
-        if (sCmd == "376" /* End of MOTD */) {
-            sLine = No::token(sLine, 0) + " 422 " + No::token(sLine, 2) + " :MOTD blocked by ZNC";
+        if (cmd == "376" /* End of MOTD */) {
+            line = No::token(line, 0) + " 422 " + No::token(line, 2) + " :MOTD blocked by ZNC";
         }
         return CONTINUE;
     }

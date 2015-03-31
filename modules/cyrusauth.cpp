@@ -56,19 +56,19 @@ public:
         sasl_done();
     }
 
-    void onModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& command) override
     {
         if (user()->isAdmin()) {
-            handleCommand(sCommand);
+            handleCommand(command);
         } else {
             putModule("Access denied");
         }
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         NoStringVector::const_iterator it;
-        NoStringVector vsArgs = sArgs.split(" ", No::SkipEmptyParts);
+        NoStringVector vsArgs = args.split(" ", No::SkipEmptyParts);
 
         for (it = vsArgs.begin(); it != vsArgs.end(); ++it) {
             if (it->equals("saslauthd") || it->equals("auxprop")) {
@@ -105,11 +105,11 @@ public:
     {
         const NoString& sUsername = Auth->username();
         const NoString& sPassword = Auth->password();
-        NoUser* pUser(noApp->findUser(sUsername));
+        NoUser* user(noApp->findUser(sUsername));
         sasl_conn_t* sasl_conn(nullptr);
         bool bSuccess = false;
 
-        if (!pUser && !CreateUser()) {
+        if (!user && !CreateUser()) {
             return CONTINUE;
         }
 
@@ -129,40 +129,40 @@ public:
         sasl_dispose(&sasl_conn);
 
         if (bSuccess) {
-            if (!pUser) {
+            if (!user) {
                 NoString sErr;
-                pUser = new NoUser(sUsername);
+                user = new NoUser(sUsername);
 
                 if (ShouldCloneUser()) {
                     NoUser* pBaseUser = noApp->findUser(CloneUser());
 
                     if (!pBaseUser) {
                         NO_DEBUG("saslauth: Clone User [" << CloneUser() << "] User not found");
-                        delete pUser;
-                        pUser = nullptr;
+                        delete user;
+                        user = nullptr;
                     }
 
-                    if (pUser && !pUser->clone(*pBaseUser, sErr)) {
+                    if (user && !user->clone(*pBaseUser, sErr)) {
                         NO_DEBUG("saslauth: Clone User [" << CloneUser() << "] failed: " << sErr);
-                        delete pUser;
-                        pUser = nullptr;
+                        delete user;
+                        user = nullptr;
                     }
                 }
 
-                if (pUser) {
+                if (user) {
                     // "::" is an invalid MD5 hash, so user won't be able to login by usual method
-                    pUser->setPassword("::", NoUser::HashMd5, "::");
+                    user->setPassword("::", NoUser::HashMd5, "::");
                 }
 
-                if (pUser && !noApp->addUser(pUser, sErr)) {
+                if (user && !noApp->addUser(user, sErr)) {
                     NO_DEBUG("saslauth: Add user [" << sUsername << "] failed: " << sErr);
-                    delete pUser;
-                    pUser = nullptr;
+                    delete user;
+                    user = nullptr;
                 }
             }
 
-            if (pUser) {
-                Auth->acceptLogin(pUser);
+            if (user) {
+                Auth->acceptLogin(user);
                 return HALT;
             }
         }
@@ -175,9 +175,9 @@ public:
         return m_sMethod;
     }
 
-    void CreateUserCommand(const NoString& sLine)
+    void CreateUserCommand(const NoString& line)
     {
-        NoString sCreate = No::token(sLine, 1);
+        NoString sCreate = No::token(line, 1);
 
         if (!sCreate.empty()) {
             NoRegistry registry(this);
@@ -191,9 +191,9 @@ public:
         }
     }
 
-    void CloneUserCommand(const NoString& sLine)
+    void CloneUserCommand(const NoString& line)
     {
-        NoString sUsername = No::token(sLine, 1);
+        NoString sUsername = No::token(line, 1);
 
         if (!sUsername.empty()) {
             NoRegistry registry(this);
@@ -207,7 +207,7 @@ public:
         }
     }
 
-    void DisableCloneUserCommand(const NoString& sLine)
+    void DisableCloneUserCommand(const NoString& line)
     {
         NoRegistry registry(this);
         registry.remove("CloneUser");

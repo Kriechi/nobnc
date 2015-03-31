@@ -43,9 +43,9 @@ public:
      * @brief ctor
      * @param pModule the module this sock instance is associated to
      * @param sHostname the hostname being connected to
-     * @param uPort the port being connected to
+     * @param port the port being connected to
      */
-    NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort uPort);
+    NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort port);
     virtual ~NoModuleSocket();
 
     NoModuleSocket(const NoModuleSocket&) = delete;
@@ -60,12 +60,12 @@ public:
 
     //! This limits the global connections from this IP to defeat DoS attacks, feel free to override. The ACL used is
     // provided by the main interface @see NoApp::AllowConnectionFrom
-    bool onConnectionFrom(const NoString& sHost, ushort uPort) override;
+    bool onConnectionFrom(const NoString& host, ushort port) override;
 
     //! Ease of use Connect, assigns to the manager and is subsequently tracked
-    bool connect(const NoString& sHostname, ushort uPort, bool bSSL = false, uint uTimeout = 60);
+    bool connect(const NoString& sHostname, ushort port, bool ssl = false, uint uTimeout = 60);
     //! Ease of use Listen, assigned to the manager and is subsequently tracked
-    bool listen(ushort uPort, bool bSSL, uint uTimeout = 0);
+    bool listen(ushort port, bool ssl, uint uTimeout = 0);
 
     NoModule* module() const;
 

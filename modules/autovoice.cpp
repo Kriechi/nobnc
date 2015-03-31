@@ -27,9 +27,9 @@ public:
     {
     }
 
-    NoAutoVoiceUser(const NoString& sLine)
+    NoAutoVoiceUser(const NoString& line)
     {
-        FromString(sLine);
+        FromString(line);
     }
 
     NoAutoVoiceUser(const NoString& sUsername, const NoString& sHostmask, const NoString& sChannels)
@@ -65,17 +65,17 @@ public:
 
     NoString GetChannels() const
     {
-        NoString sRet;
+        NoString ret;
 
         for (std::set<NoString>::const_iterator it = m_ssChans.begin(); it != m_ssChans.end(); ++it) {
-            if (!sRet.empty()) {
-                sRet += " ";
+            if (!ret.empty()) {
+                ret += " ";
             }
 
-            sRet += *it;
+            ret += *it;
         }
 
-        return sRet;
+        return ret;
     }
 
     void removeChannels(const NoString& sChans)
@@ -111,12 +111,12 @@ public:
         return m_sUsername + "\t" + m_sHostmask + "\t" + sChans;
     }
 
-    bool FromString(const NoString& sLine)
+    bool FromString(const NoString& line)
     {
-        m_sUsername = No::token(sLine, 0, "\t");
-        m_sHostmask = No::token(sLine, 1, "\t");
+        m_sUsername = No::token(line, 0, "\t");
+        m_sHostmask = No::token(line, 1, "\t");
 
-        NoStringVector vsChans = No::token(sLine, 2, "\t").split(" ");
+        NoStringVector vsChans = No::token(line, 2, "\t").split(" ");
         m_ssChans = NoStringSet(vsChans.begin(), vsChans.end());
 
         return !m_sHostmask.empty();
@@ -157,28 +157,28 @@ public:
                    "Removes a user");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         // Load the chans from the command line
         uint a = 0;
-        NoStringVector vsChans = sArgs.split(" ", No::SkipEmptyParts);
+        NoStringVector vsChans = args.split(" ", No::SkipEmptyParts);
 
         for (NoStringVector::const_iterator it = vsChans.begin(); it != vsChans.end(); ++it) {
-            NoString sName = "Args";
-            sName += NoString(a);
-            AddUser(sName, "*", *it);
+            NoString name = "Args";
+            name += NoString(a);
+            AddUser(name, "*", *it);
         }
 
         // Load the saved users
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
-            const NoString& sLine = registry.value(key);
-            NoAutoVoiceUser* pUser = new NoAutoVoiceUser;
+            const NoString& line = registry.value(key);
+            NoAutoVoiceUser* user = new NoAutoVoiceUser;
 
-            if (!pUser->FromString(sLine) || FindUser(pUser->GetUsername().toLower())) {
-                delete pUser;
+            if (!user->FromString(line) || FindUser(user->GetUsername().toLower())) {
+                delete user;
             } else {
-                m_msUsers[pUser->GetUsername().toLower()] = pUser;
+                m_msUsers[user->GetUsername().toLower()] = user;
             }
         }
 
@@ -208,26 +208,26 @@ public:
         }
     }
 
-    void onAddUserCommand(const NoString& sLine)
+    void onAddUserCommand(const NoString& line)
     {
-        NoString sUser = No::token(sLine, 1);
-        NoString sHost = No::token(sLine, 2);
+        NoString sUser = No::token(line, 1);
+        NoString host = No::token(line, 2);
 
-        if (sHost.empty()) {
+        if (host.empty()) {
             putModule("Usage: AddUser <user> <hostmask> [channels]");
         } else {
-            NoAutoVoiceUser* pUser = AddUser(sUser, sHost, No::tokens(sLine, 3));
+            NoAutoVoiceUser* user = AddUser(sUser, host, No::tokens(line, 3));
 
-            if (pUser) {
+            if (user) {
                 NoRegistry registry(this);
-                registry.setValue(sUser, pUser->ToString());
+                registry.setValue(sUser, user->ToString());
             }
         }
     }
 
-    void OnDelUserCommand(const NoString& sLine)
+    void OnDelUserCommand(const NoString& line)
     {
-        NoString sUser = No::token(sLine, 1);
+        NoString sUser = No::token(line, 1);
 
         if (sUser.empty()) {
             putModule("Usage: DelUser <user>");
@@ -238,7 +238,7 @@ public:
         }
     }
 
-    void OnListUsersCommand(const NoString& sLine)
+    void OnListUsersCommand(const NoString& line)
     {
         if (m_msUsers.empty()) {
             putModule("There are no users defined");
@@ -261,52 +261,52 @@ public:
         putModule(Table);
     }
 
-    void OnaddChannelsCommand(const NoString& sLine)
+    void OnaddChannelsCommand(const NoString& line)
     {
-        NoString sUser = No::token(sLine, 1);
-        NoString sChans = No::tokens(sLine, 2);
+        NoString sUser = No::token(line, 1);
+        NoString sChans = No::tokens(line, 2);
 
         if (sChans.empty()) {
             putModule("Usage: addChannels <user> <channel> [channel] ...");
             return;
         }
 
-        NoAutoVoiceUser* pUser = FindUser(sUser);
+        NoAutoVoiceUser* user = FindUser(sUser);
 
-        if (!pUser) {
+        if (!user) {
             putModule("No such user");
             return;
         }
 
-        pUser->addChannels(sChans);
-        putModule("Channel(s) added to user [" + pUser->GetUsername() + "]");
+        user->addChannels(sChans);
+        putModule("Channel(s) added to user [" + user->GetUsername() + "]");
 
         NoRegistry registry(this);
-        registry.setValue(pUser->GetUsername(), pUser->ToString());
+        registry.setValue(user->GetUsername(), user->ToString());
     }
 
-    void OnremoveChannelsCommand(const NoString& sLine)
+    void OnremoveChannelsCommand(const NoString& line)
     {
-        NoString sUser = No::token(sLine, 1);
-        NoString sChans = No::tokens(sLine, 2);
+        NoString sUser = No::token(line, 1);
+        NoString sChans = No::tokens(line, 2);
 
         if (sChans.empty()) {
             putModule("Usage: removeChannels <user> <channel> [channel] ...");
             return;
         }
 
-        NoAutoVoiceUser* pUser = FindUser(sUser);
+        NoAutoVoiceUser* user = FindUser(sUser);
 
-        if (!pUser) {
+        if (!user) {
             putModule("No such user");
             return;
         }
 
-        pUser->removeChannels(sChans);
-        putModule("Channel(s) Removed from user [" + pUser->GetUsername() + "]");
+        user->removeChannels(sChans);
+        putModule("Channel(s) Removed from user [" + user->GetUsername() + "]");
 
         NoRegistry registry(this);
-        registry.setValue(pUser->GetUsername(), pUser->ToString());
+        registry.setValue(user->GetUsername(), user->ToString());
     }
 
     NoAutoVoiceUser* FindUser(const NoString& sUser)
@@ -319,10 +319,10 @@ public:
     NoAutoVoiceUser* FindUserByHost(const NoString& sHostmask, const NoString& sChannel = "")
     {
         for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
-            NoAutoVoiceUser* pUser = it->second;
+            NoAutoVoiceUser* user = it->second;
 
-            if (pUser->HostMatches(sHostmask) && (sChannel.empty() || pUser->ChannelMatches(sChannel))) {
-                return pUser;
+            if (user->HostMatches(sHostmask) && (sChannel.empty() || user->ChannelMatches(sChannel))) {
+                return user;
             }
         }
 
@@ -343,17 +343,17 @@ public:
         putModule("User [" + sUser + "] removed");
     }
 
-    NoAutoVoiceUser* AddUser(const NoString& sUser, const NoString& sHost, const NoString& sChans)
+    NoAutoVoiceUser* AddUser(const NoString& sUser, const NoString& host, const NoString& sChans)
     {
         if (m_msUsers.find(sUser) != m_msUsers.end()) {
             putModule("That user already exists");
             return nullptr;
         }
 
-        NoAutoVoiceUser* pUser = new NoAutoVoiceUser(sUser, sHost, sChans);
-        m_msUsers[sUser.toLower()] = pUser;
-        putModule("User [" + sUser + "] added with hostmask [" + sHost + "]");
-        return pUser;
+        NoAutoVoiceUser* user = new NoAutoVoiceUser(sUser, host, sChans);
+        m_msUsers[sUser.toLower()] = user;
+        putModule("User [" + sUser + "] added with hostmask [" + host + "]");
+        return user;
     }
 
 private:

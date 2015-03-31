@@ -47,7 +47,7 @@ public:
                    "Unblock a user");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         NoStringVector::iterator it;
 
@@ -59,7 +59,7 @@ public:
         }
 
         // Parse arguments, each argument is a user name to block
-        NoStringVector vArgs = sArgs.split(" ", No::SkipEmptyParts);
+        NoStringVector vArgs = args.split(" ", No::SkipEmptyParts);
 
         for (it = vArgs.begin(); it != vArgs.end(); ++it) {
             if (!Block(*it)) {
@@ -81,16 +81,16 @@ public:
         return CONTINUE;
     }
 
-    void onModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& command) override
     {
         if (!user()->isAdmin()) {
             putModule("Access denied");
         } else {
-            handleCommand(sCommand);
+            handleCommand(command);
         }
     }
 
-    void OnListCommand(const NoString& sCommand)
+    void OnListCommand(const NoString& command)
     {
         NoTable Table;
         NoStringMap::iterator it;
@@ -107,9 +107,9 @@ public:
             putModule("No users blocked");
     }
 
-    void OnBlockCommand(const NoString& sCommand)
+    void OnBlockCommand(const NoString& command)
     {
-        NoString sUser = No::tokens(sCommand, 1);
+        NoString sUser = No::tokens(command, 1);
 
         if (sUser.empty()) {
             putModule("Usage: Block <user>");
@@ -127,9 +127,9 @@ public:
             putModule("Could not block [" + sUser + "] (misspelled?)");
     }
 
-    void OnUnblockCommand(const NoString& sCommand)
+    void OnUnblockCommand(const NoString& command)
     {
-        NoString sUser = No::tokens(sCommand, 1);
+        NoString sUser = No::tokens(command, 1);
 
         if (sUser.empty()) {
             putModule("Usage: Unblock <user>");
@@ -189,13 +189,13 @@ private:
 
     bool Block(const NoString& sUser)
     {
-        NoUser* pUser = noApp->findUser(sUser);
+        NoUser* user = noApp->findUser(sUser);
 
-        if (!pUser)
+        if (!user)
             return false;
 
         // Disconnect all clients
-        std::vector<NoClient*> vpClients = pUser->allClients();
+        std::vector<NoClient*> vpClients = user->allClients();
         std::vector<NoClient*>::iterator it;
         for (it = vpClients.begin(); it != vpClients.end(); ++it) {
             (*it)->putStatusNotice(MESSAGE);
@@ -203,13 +203,13 @@ private:
         }
 
         // Disconnect all networks from irc
-        std::vector<NoNetwork*> vNetworks = pUser->networks();
+        std::vector<NoNetwork*> vNetworks = user->networks();
         for (std::vector<NoNetwork*>::iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
             (*it2)->setEnabled(false);
         }
 
         NoRegistry registry(this);
-        registry.setValue(pUser->userName(), "");
+        registry.setValue(user->userName(), "");
         return true;
     }
 };

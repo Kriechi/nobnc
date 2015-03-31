@@ -86,11 +86,11 @@ public:
     {
     }
 
-    bool handleTag(NoTemplate& Tmpl, const NoString& sName, const NoString& sArgs, NoString& sOutput) override
+    bool handleTag(NoTemplate& Tmpl, const NoString& name, const NoString& args, NoString& sOutput) override
     {
-        if (sName.equals("URLPARAM")) {
+        if (name.equals("URLPARAM")) {
             // sOutput = NoApp::instance()
-            sOutput = m_WebSock.param(No::token(sArgs, 0), false);
+            sOutput = m_WebSock.param(No::token(args, 0), false);
             return true;
         }
         return false;
@@ -288,10 +288,10 @@ NoWebSocket::~NoWebSocket()
 
     // we have to account for traffic here because NoSocket does
     // not have a valid NoModule* pointer.
-    NoUser* pUser = session()->user();
-    if (pUser) {
-        pUser->addBytesWritten(bytesWritten());
-        pUser->addBytesRead(bytesRead());
+    NoUser* user = session()->user();
+    if (user) {
+        user->addBytesWritten(bytesWritten());
+        user->addBytesRead(bytesRead());
     } else {
         noApp->addBytesWritten(bytesWritten());
         noApp->addBytesRead(bytesRead());
@@ -388,17 +388,17 @@ NoStringVector NoWebSocket::directories(NoModule* pModule, bool bIsTemplate)
     return vsResult;
 }
 
-NoString NoWebSocket::findTemplate(NoModule* pModule, const NoString& sName)
+NoString NoWebSocket::findTemplate(NoModule* pModule, const NoString& name)
 {
     NoStringVector vsDirs = directories(pModule, true);
-    NoString sFile = pModule->moduleName() + "_" + sName;
+    NoString sFile = pModule->moduleName() + "_" + name;
     for (const NoString& sDir : vsDirs) {
         if (NoFile::Exists(NoDir(sDir).filePath(sFile))) {
             m_template.appendPath(sDir);
             return sFile;
         }
     }
-    return sName;
+    return name;
 }
 
 void NoWebSocket::setPaths(NoModule* pModule, bool bIsTemplate)
@@ -440,16 +440,16 @@ void NoWebSocket::setVars()
     if (isLoggedIn()) {
         NoModuleLoader* vMods = session()->user()->loader();
 
-        for (NoModule* pMod : vMods->modules()) {
-            addModuleLoop("UserModLoop", *pMod);
+        for (NoModule* mod : vMods->modules()) {
+            addModuleLoop("UserModLoop", *mod);
         }
 
         std::vector<NoNetwork*> vNetworks = session()->user()->networks();
-        for (NoNetwork* pNetwork : vNetworks) {
-            NoModuleLoader* vnMods = pNetwork->loader();
+        for (NoNetwork* network : vNetworks) {
+            NoModuleLoader* vnMods = network->loader();
 
             NoTemplate& Row = m_template.addRow("NetworkModLoop");
-            Row["NetworkName"] = pNetwork->name();
+            Row["NetworkName"] = network->name();
 
             for (NoModule* pnMod : vnMods->modules()) {
                 addModuleLoop("ModLoop", *pnMod, &Row);
@@ -507,8 +507,8 @@ bool NoWebSocket::addModuleLoop(const NoString& sLoopName, NoModule& Module, NoT
         }
 
         for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(&Module)->subPages) {
-            // bActive is whether or not the current url matches this subpage (params will be checked below)
-            bool bActive = (m_modName == Module.moduleName() && m_page == SubPage->name() && bActiveModule);
+            // active is whether or not the current url matches this subpage (params will be checked below)
+            bool active = (m_modName == Module.moduleName() && m_page == SubPage->name() && bActiveModule);
 
             if ((SubPage->flags() & NoWebPage::Admin) && !session()->isAdmin()) {
                 continue; // Don't add admin-only subpages to requests from non-admin users
@@ -536,13 +536,13 @@ bool NoWebSocket::addModuleLoop(const NoString& sLoopName, NoModule& Module, NoT
                         sParams += No::escape(ssNV.second, No::UrlFormat);
                     }
 
-                    if (bActive && param(ssNV.first, false) != ssNV.second) {
-                        bActive = false;
+                    if (active && param(ssNV.first, false) != ssNV.second) {
+                        active = false;
                     }
                 }
             }
 
-            if (bActive) {
+            if (active) {
                 SubRow["Active"] = "true";
             }
         }
@@ -571,8 +571,8 @@ NoWebSocket::PageRequest NoWebSocket::printTemplate(const NoString& sPageName, N
     m_template["PageName"] = sPageName;
 
     if (pModule) {
-        NoUser* pUser = pModule->user();
-        m_template["ModUser"] = pUser ? pUser->userName() : "";
+        NoUser* user = pModule->user();
+        m_template["ModUser"] = user ? user->userName() : "";
         m_template["ModName"] = pModule->moduleName();
 
         if (m_template.find("Title") == m_template.end()) {
@@ -597,17 +597,17 @@ NoWebSocket::PageRequest NoWebSocket::printTemplate(const NoString& sPageName, N
 
 NoString NoWebSocket::skinPath(const NoString& sSkinName)
 {
-    NoString sRet = noApp->appPath() + "/webskins/" + sSkinName;
+    NoString ret = noApp->appPath() + "/webskins/" + sSkinName;
 
-    if (!NoFile(sRet).IsDir()) {
-        sRet = noApp->currentPath() + "/webskins/" + sSkinName;
+    if (!NoFile(ret).IsDir()) {
+        ret = noApp->currentPath() + "/webskins/" + sSkinName;
 
-        if (!NoFile(sRet).IsDir()) {
-            sRet = NoString(_SKINDIR_) + "/" + sSkinName;
+        if (!NoFile(ret).IsDir()) {
+            ret = NoString(_SKINDIR_) + "/" + sSkinName;
         }
     }
 
-    return sRet + "/";
+    return ret + "/";
 }
 
 bool NoWebSocket::forceLogin()
@@ -624,17 +624,17 @@ bool NoWebSocket::forceLogin()
 NoString NoWebSocket::requestCookie(const NoString& sKey)
 {
     const NoString sPrefixedKey = NoString(localPort()) + "-" + sKey;
-    NoString sRet;
+    NoString ret;
 
     if (!m_modName.empty()) {
-        sRet = NoHttpSocket::requestCookie("Mod-" + m_modName + "-" + sPrefixedKey);
+        ret = NoHttpSocket::requestCookie("Mod-" + m_modName + "-" + sPrefixedKey);
     }
 
-    if (sRet.empty()) {
+    if (ret.empty()) {
         return NoHttpSocket::requestCookie(sPrefixedKey);
     }
 
-    return sRet;
+    return ret;
 }
 
 bool NoWebSocket::sendCookie(const NoString& sKey, const NoString& sValue)
@@ -791,14 +791,14 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
             return Done;
         }
 
-        NoNetwork* pNetwork = nullptr;
+        NoNetwork* network = nullptr;
         if (eModType == No::NetworkModule) {
             NoString sNetwork = No::token(m_path, 0, "/");
             m_path = No::tokens(m_path, 1, "/");
 
-            pNetwork = session()->user()->findNetwork(sNetwork);
+            network = session()->user()->findNetwork(sNetwork);
 
-            if (!pNetwork) {
+            if (!network) {
                 printErrorPage(404, "Not Found", "Network [" + sNetwork + "] not found.");
                 return Done;
             }
@@ -823,7 +823,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
             pModule = session()->user()->loader()->findModule(m_modName);
             break;
         case No::NetworkModule:
-            pModule = pNetwork->loader()->findModule(m_modName);
+            pModule = network->loader()->findModule(m_modName);
             break;
         }
 
@@ -848,9 +848,9 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
         }
 
         for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(pModule)->subPages) {
-            bool bActive = (m_modName == pModule->moduleName() && m_page == SubPage->name());
+            bool active = (m_modName == pModule->moduleName() && m_page == SubPage->name());
 
-            if (bActive && (SubPage->flags() & NoWebPage::Admin) && !session()->isAdmin()) {
+            if (active && (SubPage->flags() & NoWebPage::Admin) && !session()->isAdmin()) {
                 printErrorPage(403, "Forbidden", "You need to be an admin to access this page");
                 return Done;
             }
@@ -972,10 +972,10 @@ NoString NoWebSocket::csrfCheck()
     return No::md5(pSession->identifier());
 }
 
-bool NoWebSocket::onLogin(const NoString& sUser, const NoString& sPass, bool bBasic)
+bool NoWebSocket::onLogin(const NoString& sUser, const NoString& pass, bool bBasic)
 {
     NO_DEBUG("=================== NoWebSocket::OnLogin(), basic auth? " << std::boolalpha << bBasic);
-    m_authenticator = std::make_shared<NoWebAuth>(this, sUser, sPass, bBasic);
+    m_authenticator = std::make_shared<NoWebAuth>(this, sUser, pass, bBasic);
 
     // Some authentication module could need some time, block this socket
     // until then. CWebAuth will UnPauseRead().
@@ -986,7 +986,7 @@ bool NoWebSocket::onLogin(const NoString& sUser, const NoString& sPass, bool bBa
     return isLoggedIn();
 }
 
-NoSocket* NoWebSocket::createSocket(const NoString& sHost, ushort uPort)
+NoSocket* NoWebSocket::createSocket(const NoString& host, ushort port)
 {
     // All listening is done by NoListener, thus NoWebSocket should never have
     // to listen, but since GetSockObj() is pure virtual...

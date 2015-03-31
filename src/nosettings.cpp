@@ -24,10 +24,10 @@
 struct ConfigStackEntry
 {
     NoString sTag;
-    NoString sName;
+    NoString name;
     NoSettings Config;
 
-    ConfigStackEntry(const NoString& Tag, const NoString Name) : sTag(Tag), sName(Name), Config()
+    ConfigStackEntry(const NoString& Tag, const NoString Name) : sTag(Tag), name(Name), Config()
     {
     }
 };
@@ -85,31 +85,31 @@ NoSettings::SubConfigMapIterator NoSettings::EndSubConfigs() const
     return m_subConfigs.end();
 }
 
-void NoSettings::AddKeyValuePair(const NoString& sName, const NoString& sValue)
+void NoSettings::AddKeyValuePair(const NoString& name, const NoString& sValue)
 {
-    if (sName.empty() || sValue.empty()) {
+    if (name.empty() || sValue.empty()) {
         return;
     }
 
-    m_entries[sName].push_back(sValue);
+    m_entries[name].push_back(sValue);
 }
 
-bool NoSettings::AddSubConfig(const NoString& sTag, const NoString& sName, NoSettings Config)
+bool NoSettings::AddSubConfig(const NoString& sTag, const NoString& name, NoSettings Config)
 {
     SubConfig& conf = m_subConfigs[sTag];
-    SubConfig::const_iterator it = conf.find(sName);
+    SubConfig::const_iterator it = conf.find(name);
 
     if (it != conf.end()) {
         return false;
     }
 
-    conf[sName] = Config;
+    conf[name] = Config;
     return true;
 }
 
-bool NoSettings::FindStringVector(const NoString& sName, NoStringVector& vsList, bool bErase)
+bool NoSettings::FindStringVector(const NoString& name, NoStringVector& vsList, bool bErase)
 {
-    EntryMap::iterator it = m_entries.find(sName);
+    EntryMap::iterator it = m_entries.find(name);
     vsList.clear();
     if (it == m_entries.end())
         return false;
@@ -122,9 +122,9 @@ bool NoSettings::FindStringVector(const NoString& sName, NoStringVector& vsList,
     return true;
 }
 
-bool NoSettings::FindStringEntry(const NoString& sName, NoString& sRes, const NoString& sDefault)
+bool NoSettings::FindStringEntry(const NoString& name, NoString& sRes, const NoString& sDefault)
 {
-    EntryMap::iterator it = m_entries.find(sName);
+    EntryMap::iterator it = m_entries.find(name);
     sRes = sDefault;
     if (it == m_entries.end() || it->second.empty())
         return false;
@@ -135,10 +135,10 @@ bool NoSettings::FindStringEntry(const NoString& sName, NoString& sRes, const No
     return true;
 }
 
-bool NoSettings::FindBoolEntry(const NoString& sName, bool& bRes, bool bDefault)
+bool NoSettings::FindBoolEntry(const NoString& name, bool& bRes, bool bDefault)
 {
     NoString s;
-    if (FindStringEntry(sName, s)) {
+    if (FindStringEntry(name, s)) {
         bRes = s.toBool();
         return true;
     }
@@ -146,10 +146,10 @@ bool NoSettings::FindBoolEntry(const NoString& sName, bool& bRes, bool bDefault)
     return false;
 }
 
-bool NoSettings::FindUIntEntry(const NoString& sName, uint& uRes, uint uDefault)
+bool NoSettings::FindUIntEntry(const NoString& name, uint& uRes, uint uDefault)
 {
     NoString s;
-    if (FindStringEntry(sName, s)) {
+    if (FindStringEntry(name, s)) {
         uRes = s.toUInt();
         return true;
     }
@@ -157,10 +157,10 @@ bool NoSettings::FindUIntEntry(const NoString& sName, uint& uRes, uint uDefault)
     return false;
 }
 
-bool NoSettings::FindUShortEntry(const NoString& sName, ushort& uRes, ushort uDefault)
+bool NoSettings::FindUShortEntry(const NoString& name, ushort& uRes, ushort uDefault)
 {
     NoString s;
-    if (FindStringEntry(sName, s)) {
+    if (FindStringEntry(name, s)) {
         uRes = s.toUShort();
         return true;
     }
@@ -168,10 +168,10 @@ bool NoSettings::FindUShortEntry(const NoString& sName, ushort& uRes, ushort uDe
     return false;
 }
 
-bool NoSettings::FindDoubleEntry(const NoString& sName, double& fRes, double fDefault)
+bool NoSettings::FindDoubleEntry(const NoString& name, double& fRes, double fDefault)
 {
     NoString s;
-    if (FindStringEntry(sName, s)) {
+    if (FindStringEntry(name, s)) {
         fRes = s.toDouble();
         return true;
     }
@@ -179,9 +179,9 @@ bool NoSettings::FindDoubleEntry(const NoString& sName, double& fRes, double fDe
     return false;
 }
 
-bool NoSettings::FindSubConfig(const NoString& sName, NoSettings::SubConfig& Config, bool bErase)
+bool NoSettings::FindSubConfig(const NoString& name, NoSettings::SubConfig& Config, bool bErase)
 {
-    SubConfigMap::iterator it = m_subConfigs.find(sName);
+    SubConfigMap::iterator it = m_subConfigs.find(name);
     if (it == m_subConfigs.end()) {
         Config.clear();
         return false;
@@ -202,7 +202,7 @@ bool NoSettings::empty() const
 
 bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 {
-    NoString sLine;
+    NoString line;
     uint uLineNum = 0;
     NoSettings* pActiveConfig = this;
     std::stack<ConfigStackEntry> ConfigStack;
@@ -213,7 +213,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
         return false;
     }
 
-    while (file.ReadLine(sLine)) {
+    while (file.ReadLine(line)) {
         uLineNum++;
 
 #define ERROR(arg)                                             \
@@ -227,27 +227,27 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
     } while (0)
 
         // Remove all leading spaces and trailing line endings
-        sLine.trimLeft();
-        sLine.trimRight("\r\n");
+        line.trimLeft();
+        line.trimRight("\r\n");
 
-        if (bCommented || sLine.left(2) == "/*") {
+        if (bCommented || line.left(2) == "/*") {
             /* Does this comment end on the same line again? */
-            bCommented = (sLine.right(2) != "*/");
+            bCommented = (line.right(2) != "*/");
 
             continue;
         }
 
-        if ((sLine.empty()) || (sLine[0] == '#') || (sLine.left(2) == "//")) {
+        if ((line.empty()) || (line[0] == '#') || (line.left(2) == "//")) {
             continue;
         }
 
-        if ((sLine.left(1) == "<") && (sLine.right(1) == ">")) {
-            sLine.leftChomp(1);
-            sLine.rightChomp(1);
-            sLine.trim();
+        if ((line.left(1) == "<") && (line.right(1) == ">")) {
+            line.leftChomp(1);
+            line.rightChomp(1);
+            line.trim();
 
-            NoString sTag = No::token(sLine, 0);
-            NoString sValue = No::tokens(sLine, 1);
+            NoString sTag = No::token(line, 0);
+            NoString sValue = No::tokens(line, 1);
 
             sTag.trim();
             sValue.trim();
@@ -262,7 +262,7 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 
                 const struct ConfigStackEntry& entry = ConfigStack.top();
                 NoSettings myConfig(entry.Config);
-                NoString sName(entry.sName);
+                NoString name(entry.name);
 
                 if (!sTag.equals(entry.sTag))
                     ERROR("Closing tag \"" << sTag << "\" which is not open.");
@@ -276,12 +276,12 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
                     pActiveConfig = &ConfigStack.top().Config;
 
                 SubConfig& conf = pActiveConfig->m_subConfigs[sTag.toLower()];
-                SubConfig::const_iterator it = conf.find(sName);
+                SubConfig::const_iterator it = conf.find(name);
 
                 if (it != conf.end())
-                    ERROR("Duplicate entry for tag \"" << sTag << "\" name \"" << sName << "\".");
+                    ERROR("Duplicate entry for tag \"" << sTag << "\" name \"" << name << "\".");
 
-                conf[sName] = NoSettingsEntry(myConfig);
+                conf[name] = NoSettingsEntry(myConfig);
             } else {
                 if (sValue.empty())
                     ERROR("Empty block name at begin of block.");
@@ -293,8 +293,8 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
         }
 
         // If we have a regular line, figure out where it goes
-        NoString sName = No::token(sLine, 0, "=");
-        NoString sValue = No::tokens(sLine, 1, "=");
+        NoString name = No::token(line, 0, "=");
+        NoString sValue = No::tokens(line, 1, "=");
 
         // Only remove the first space, people might want
         // leading spaces (e.g. in the MOTD).
@@ -303,12 +303,12 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 
         // We don't have any names with spaces, trim all
         // leading/trailing spaces.
-        sName.trim();
+        name.trim();
 
-        if (sName.empty() || sValue.empty())
+        if (name.empty() || sValue.empty())
             ERROR("Malformed line");
 
-        NoString sNameLower = sName.toLower();
+        NoString sNameLower = name.toLower();
         pActiveConfig->m_entries[sNameLower].push_back(sValue);
     }
 

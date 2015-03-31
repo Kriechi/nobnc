@@ -53,22 +53,22 @@ public:
         }
     }
 
-    void LoadUser(NoUser* pUser)
+    void LoadUser(NoUser* user)
     {
-        const std::vector<NoNetwork*>& vNetworks = pUser->networks();
-        for (const NoNetwork* pNetwork : vNetworks) {
-            LoadNetwork(pNetwork);
+        const std::vector<NoNetwork*>& vNetworks = user->networks();
+        for (const NoNetwork* network : vNetworks) {
+            LoadNetwork(network);
         }
     }
 
-    void LoadNetwork(const NoNetwork* pNetwork)
+    void LoadNetwork(const NoNetwork* network)
     {
-        const std::vector<NoChannel*>& vChans = pNetwork->channels();
-        for (NoChannel* pChan : vChans) {
+        const std::vector<NoChannel*>& channels = network->channels();
+        for (NoChannel* channel : channels) {
             // If that channel isn't yet in the config,
             // we'll have to add it...
-            if (!pChan->inConfig()) {
-                pChan->setInConfig(true);
+            if (!channel->inConfig()) {
+                channel->setInConfig(true);
             }
         }
     }

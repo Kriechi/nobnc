@@ -20,8 +20,8 @@
 
 #ifdef HAVE_PTHREAD
 
-NoModuleJob::NoModuleJob(NoModule* pModule, const NoString& sName, const NoString& sDesc)
-    : NoJob(), m_module(pModule), m_name(sName), m_description(sDesc)
+NoModuleJob::NoModuleJob(NoModule* pModule, const NoString& name, const NoString& desc)
+    : NoJob(), m_module(pModule), m_name(name), m_description(desc)
 {
 }
 

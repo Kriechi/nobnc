@@ -24,20 +24,20 @@ public:
     {
     }
 
-    ModRet onRaw(NoString& sLine) override
+    ModRet onRaw(NoString& line) override
     {
-        putModule("IRC -> [" + sLine + "]");
+        putModule("IRC -> [" + line + "]");
         return CONTINUE;
     }
 
-    void onModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& command) override
     {
-        putIrc(sCommand);
+        putIrc(command);
     }
 
-    ModRet onUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& line) override
     {
-        putModule("YOU -> [" + sLine + "]");
+        putModule("YOU -> [" + line + "]");
         return CONTINUE;
     }
 };

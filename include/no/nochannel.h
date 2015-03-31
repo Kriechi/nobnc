@@ -49,7 +49,7 @@ public:
         M_Except = 'e'
     };
 
-    NoChannel(const NoString& sName, NoNetwork* pNetwork, bool bInConfig, NoSettings* pConfig = nullptr);
+    NoChannel(const NoString& name, NoNetwork* network, bool bInConfig, NoSettings* pConfig = nullptr);
     ~NoChannel();
 
     void reset();
@@ -57,35 +57,35 @@ public:
     void clone(NoChannel& chan);
     void cycle() const;
     void joinUser(const NoString& sKey = "");
-    void attachUser(NoClient* pClient = nullptr);
+    void attachUser(NoClient* client = nullptr);
     void detachUser();
 
-    void onWho(const NoString& sNick, const NoString& sIdent, const NoString& sHost);
+    void onWho(const NoString& nick, const NoString& ident, const NoString& host);
 
     void setModes(const NoString& s);
     void modeChange(const NoString& sModes, const NoNick* OpNick = nullptr);
-    bool addMode(uchar uMode, const NoString& sArg);
+    bool addMode(uchar uMode, const NoString& arg);
     bool remMode(uchar uMode);
     NoString modeString() const;
-    NoString modeArg(NoString& sArgs) const;
+    NoString modeArg(NoString& args) const;
     NoString modeForNames() const;
 
     void clearNicks();
-    const NoNick* findNick(const NoString& sNick) const;
-    NoNick* findNick(const NoString& sNick);
+    const NoNick* findNick(const NoString& nick) const;
+    NoNick* findNick(const NoString& nick);
     int addNicks(const NoString& sNicks);
-    bool addNick(const NoString& sNick);
-    bool remNick(const NoString& sNick);
+    bool addNick(const NoString& nick);
+    bool remNick(const NoString& nick);
     bool changeNick(const NoString& sOldNick, const NoString& sNewNick);
 
     const NoBuffer& buffer() const;
     uint bufferCount() const;
     bool setBufferCount(uint u, bool bForce = false);
     void inheritBufferCount(uint u, bool bForce = false);
-    size_t addBuffer(const NoString& sFormat, const NoString& sText = "", const timeval* ts = nullptr);
+    size_t addBuffer(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
     void clearBuffer();
-    void sendBuffer(NoClient* pClient);
-    void sendBuffer(NoClient* pClient, const NoBuffer& Buffer);
+    void sendBuffer(NoClient* client);
+    void sendBuffer(NoClient* client, const NoBuffer& Buffer);
 
     NoString permStr() const;
     bool hasPerm(uchar uPerm) const;

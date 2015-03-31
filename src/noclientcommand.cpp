@@ -33,51 +33,51 @@
 #include "nonick.h"
 #include "nobuffer.h"
 
-void NoClient::userCommand(NoString& sLine)
+void NoClient::userCommand(NoString& line)
 {
     if (!d->user) {
         return;
     }
 
-    if (sLine.empty()) {
+    if (line.empty()) {
         return;
     }
 
     bool bReturn = false;
-    NETWORKMODULECALL(onStatusCommand(sLine), d->user, d->network, this, &bReturn);
+    NETWORKMODULECALL(onStatusCommand(line), d->user, d->network, this, &bReturn);
     if (bReturn)
         return;
 
-    const NoString sCommand = No::token(sLine, 0);
+    const NoString command = No::token(line, 0);
 
-    if (sCommand.equals("HELP")) {
-        helpUser(No::token(sLine, 1));
-    } else if (sCommand.equals("LISTNICKS")) {
+    if (command.equals("HELP")) {
+        helpUser(No::token(line, 1));
+    } else if (command.equals("LISTNICKS")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sChan = No::token(sLine, 1);
+        NoString sChan = No::token(line, 1);
 
         if (sChan.empty()) {
             putStatus("Usage: ListNicks <#chan>");
             return;
         }
 
-        NoChannel* pChan = d->network->findChannel(sChan);
+        NoChannel* channel = d->network->findChannel(sChan);
 
-        if (!pChan) {
+        if (!channel) {
             putStatus("You are not on [" + sChan + "]");
             return;
         }
 
-        if (!pChan->isOn()) {
+        if (!channel->isOn()) {
             putStatus("You are not on [" + sChan + "] [trying]");
             return;
         }
 
-        const std::map<NoString, NoNick>& msNicks = pChan->nicks();
+        const std::map<NoString, NoNick>& msNicks = channel->nicks();
         NoIrcSocket* pIRCSock = d->network->ircSocket();
         const NoString& sPerms = (pIRCSock) ? pIRCSock->perms() : "";
 
@@ -115,13 +115,13 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         putStatus(Table);
-    } else if (sCommand.equals("DETACH")) {
+    } else if (command.equals("DETACH")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sPatterns = No::tokens(sLine, 1);
+        NoString sPatterns = No::tokens(line, 1);
 
         if (sPatterns.empty()) {
             putStatus("Usage: Detach <#chans>");
@@ -133,60 +133,60 @@ void NoClient::userCommand(NoString& sLine)
 
         std::set<NoChannel*> sChans;
         for (const NoString& sChan : vsChans) {
-            std::vector<NoChannel*> vChans = d->network->findChannels(sChan);
-            sChans.insert(vChans.begin(), vChans.end());
+            std::vector<NoChannel*> channels = d->network->findChannels(sChan);
+            sChans.insert(channels.begin(), channels.end());
         }
 
         uint uDetached = 0;
-        for (NoChannel* pChan : sChans) {
-            if (pChan->isDetached())
+        for (NoChannel* channel : sChans) {
+            if (channel->isDetached())
                 continue;
             uDetached++;
-            pChan->detachUser();
+            channel->detachUser();
         }
 
         putStatus("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
         putStatus("Detached [" + NoString(uDetached) + "] channels");
-    } else if (sCommand.equals("VERSION")) {
+    } else if (command.equals("VERSION")) {
         putStatus(NoApp::tag());
         putStatus(NoApp::compileOptionsString());
-    } else if (sCommand.equals("MOTD") || sCommand.equals("ShowMOTD")) {
+    } else if (command.equals("MOTD") || command.equals("ShowMOTD")) {
         if (!sendMotd()) {
             putStatus("There is no MOTD set.");
         }
-    } else if (d->user->isAdmin() && sCommand.equals("Rehash")) {
-        NoString sRet;
+    } else if (d->user->isAdmin() && command.equals("Rehash")) {
+        NoString ret;
 
-        if (noApp->rehashConfig(sRet)) {
+        if (noApp->rehashConfig(ret)) {
             putStatus("Rehashing succeeded!");
         } else {
-            putStatus("Rehashing failed: " + sRet);
+            putStatus("Rehashing failed: " + ret);
         }
-    } else if (d->user->isAdmin() && sCommand.equals("SaveConfig")) {
+    } else if (d->user->isAdmin() && command.equals("SaveConfig")) {
         if (noApp->writeConfig()) {
             putStatus("Wrote config to [" + noApp->configFile() + "]");
         } else {
             putStatus("Error while trying to write config.");
         }
-    } else if (sCommand.equals("LISTCLIENTS")) {
-        NoUser* pUser = d->user;
-        NoString sNick = No::token(sLine, 1);
+    } else if (command.equals("LISTCLIENTS")) {
+        NoUser* user = d->user;
+        NoString nick = No::token(line, 1);
 
-        if (!sNick.empty()) {
+        if (!nick.empty()) {
             if (!d->user->isAdmin()) {
                 putStatus("Usage: ListClients");
                 return;
             }
 
-            pUser = noApp->findUser(sNick);
+            user = noApp->findUser(nick);
 
-            if (!pUser) {
-                putStatus("No such user [" + sNick + "]");
+            if (!user) {
+                putStatus("No such user [" + nick + "]");
                 return;
             }
         }
 
-        std::vector<NoClient*> vClients = pUser->allClients();
+        std::vector<NoClient*> vClients = user->allClients();
 
         if (vClients.empty()) {
             putStatus("No clients are connected");
@@ -198,17 +198,17 @@ void NoClient::userCommand(NoString& sLine)
         Table.addColumn("Network");
         Table.addColumn("Identifier");
 
-        for (const NoClient* pClient : vClients) {
+        for (const NoClient* client : vClients) {
             Table.addRow();
-            Table.setValue("Host", pClient->socket()->remoteAddress());
-            if (pClient->network()) {
-                Table.setValue("Network", pClient->network()->name());
+            Table.setValue("Host", client->socket()->remoteAddress());
+            if (client->network()) {
+                Table.setValue("Network", client->network()->name());
             }
-            Table.setValue("Identifier", pClient->identifier());
+            Table.setValue("Identifier", client->identifier());
         }
 
         putStatus(Table);
-    } else if (d->user->isAdmin() && sCommand.equals("LISTUSERS")) {
+    } else if (d->user->isAdmin() && command.equals("LISTUSERS")) {
         const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
         NoTable Table;
         Table.addColumn("Username");
@@ -223,7 +223,7 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         putStatus(Table);
-    } else if (d->user->isAdmin() && sCommand.equals("LISTALLUSERNETWORKS")) {
+    } else if (d->user->isAdmin() && command.equals("LISTALLUSERNETWORKS")) {
         const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
         NoTable Table;
         Table.addColumn("Username");
@@ -242,20 +242,20 @@ void NoClient::userCommand(NoString& sLine)
 
             const std::vector<NoNetwork*>& vNetworks = it.second->networks();
 
-            for (const NoNetwork* pNetwork : vNetworks) {
+            for (const NoNetwork* network : vNetworks) {
                 Table.addRow();
-                if (pNetwork == vNetworks.back()) {
+                if (network == vNetworks.back()) {
                     Table.setValue("Username", "`-");
                 } else {
                     Table.setValue("Username", "|-");
                 }
-                Table.setValue("Network", pNetwork->name());
-                Table.setValue("Clients", NoString(pNetwork->clients().size()));
-                if (pNetwork->isIrcConnected()) {
+                Table.setValue("Network", network->name());
+                Table.setValue("Clients", NoString(network->clients().size()));
+                if (network->isIrcConnected()) {
                     Table.setValue("OnIRC", "Yes");
-                    Table.setValue("IRC Server", pNetwork->ircServer());
-                    Table.setValue("IRC User", pNetwork->ircNick().nickMask());
-                    Table.setValue("Channels", NoString(pNetwork->channels().size()));
+                    Table.setValue("IRC Server", network->ircServer());
+                    Table.setValue("IRC User", network->ircNick().nickMask());
+                    Table.setValue("Channels", NoString(network->channels().size()));
                 } else {
                     Table.setValue("OnIRC", "No");
                 }
@@ -263,8 +263,8 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         putStatus(Table);
-    } else if (d->user->isAdmin() && sCommand.equals("SetMOTD")) {
-        NoString sMessage = No::tokens(sLine, 1);
+    } else if (d->user->isAdmin() && command.equals("SetMOTD")) {
+        NoString sMessage = No::tokens(line, 1);
 
         if (sMessage.empty()) {
             putStatus("Usage: SetMOTD <message>");
@@ -272,8 +272,8 @@ void NoClient::userCommand(NoString& sLine)
             noApp->setMotd(sMessage);
             putStatus("MOTD set to [" + sMessage + "]");
         }
-    } else if (d->user->isAdmin() && sCommand.equals("AddMOTD")) {
-        NoString sMessage = No::tokens(sLine, 1);
+    } else if (d->user->isAdmin() && command.equals("AddMOTD")) {
+        NoString sMessage = No::tokens(line, 1);
 
         if (sMessage.empty()) {
             putStatus("Usage: AddMOTD <message>");
@@ -281,14 +281,14 @@ void NoClient::userCommand(NoString& sLine)
             noApp->addMotd(sMessage);
             putStatus("Added [" + sMessage + "] to MOTD");
         }
-    } else if (d->user->isAdmin() && sCommand.equals("ClearMOTD")) {
+    } else if (d->user->isAdmin() && command.equals("ClearMOTD")) {
         noApp->clearMotd();
         putStatus("Cleared MOTD");
-    } else if (d->user->isAdmin() && sCommand.equals("BROADCAST")) {
-        noApp->broadcast(No::tokens(sLine, 1));
-    } else if (d->user->isAdmin() && (sCommand.equals("SHUTDOWN") || sCommand.equals("RESTART"))) {
-        bool bRestart = sCommand.equals("RESTART");
-        NoString sMessage = No::tokens(sLine, 1);
+    } else if (d->user->isAdmin() && command.equals("BROADCAST")) {
+        noApp->broadcast(No::tokens(line, 1));
+    } else if (d->user->isAdmin() && (command.equals("SHUTDOWN") || command.equals("RESTART"))) {
+        bool bRestart = command.equals("RESTART");
+        NoString sMessage = No::tokens(line, 1);
         bool bForce = false;
 
         if (No::token(sMessage, 0).equals("FORCE")) {
@@ -301,13 +301,13 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         if (!noApp->writeConfig() && !bForce) {
-            putStatus("ERROR: Writing config file to disk failed! Aborting. Use " + sCommand.toUpper() +
+            putStatus("ERROR: Writing config file to disk failed! Aborting. Use " + command.toUpper() +
                       " FORCE to ignore.");
         } else {
             noApp->broadcast(sMessage);
             throw NoException(bRestart ? NoException::Restart : NoException::Shutdown);
         }
-    } else if (sCommand.equals("JUMP") || sCommand.equals("CONNECT")) {
+    } else if (command.equals("JUMP") || command.equals("CONNECT")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
@@ -318,17 +318,17 @@ void NoClient::userCommand(NoString& sLine)
             return;
         }
 
-        NoString sArgs = No::tokens(sLine, 1);
-        sArgs.trim();
-        NoServerInfo* pServer = nullptr;
+        NoString args = No::tokens(line, 1);
+        args.trim();
+        NoServerInfo* server = nullptr;
 
-        if (!sArgs.empty()) {
-            pServer = d->network->findServer(sArgs);
-            if (!pServer) {
-                putStatus("Server [" + sArgs + "] not found");
+        if (!args.empty()) {
+            server = d->network->findServer(args);
+            if (!server) {
+                putStatus("Server [" + args + "] not found");
                 return;
             }
-            d->network->setNextServer(pServer);
+            d->network->setNextServer(server);
 
             // If we are already connecting to some server,
             // we have to abort that attempt
@@ -340,40 +340,40 @@ void NoClient::userCommand(NoString& sLine)
 
         if (ircSocket()) {
             ircSocket()->quit();
-            if (pServer)
-                putStatus("Connecting to [" + pServer->host() + "]...");
+            if (server)
+                putStatus("Connecting to [" + server->host() + "]...");
             else
                 putStatus("Jumping to the next server in the list...");
         } else {
-            if (pServer)
-                putStatus("Connecting to [" + pServer->host() + "]...");
+            if (server)
+                putStatus("Connecting to [" + server->host() + "]...");
             else
                 putStatus("Connecting...");
         }
 
         d->network->setEnabled(true);
         return;
-    } else if (sCommand.equals("DISCONNECT")) {
+    } else if (command.equals("DISCONNECT")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
         if (ircSocket()) {
-            NoString sQuitMsg = No::tokens(sLine, 1);
+            NoString sQuitMsg = No::tokens(line, 1);
             ircSocket()->quit(sQuitMsg);
         }
 
         d->network->setEnabled(false);
         putStatus("Disconnected from IRC. Use 'connect' to reconnect.");
         return;
-    } else if (sCommand.equals("ENABLECHAN")) {
+    } else if (command.equals("ENABLECHAN")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sPatterns = No::tokens(sLine, 1);
+        NoString sPatterns = No::tokens(line, 1);
 
         if (sPatterns.empty()) {
             putStatus("Usage: EnableChan <#chans>");
@@ -383,28 +383,28 @@ void NoClient::userCommand(NoString& sLine)
 
             std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {
-                std::vector<NoChannel*> vChans = d->network->findChannels(sChan);
-                sChans.insert(vChans.begin(), vChans.end());
+                std::vector<NoChannel*> channels = d->network->findChannels(sChan);
+                sChans.insert(channels.begin(), channels.end());
             }
 
             uint uEnabled = 0;
-            for (NoChannel* pChan : sChans) {
-                if (!pChan->isDisabled())
+            for (NoChannel* channel : sChans) {
+                if (!channel->isDisabled())
                     continue;
                 uEnabled++;
-                pChan->enable();
+                channel->enable();
             }
 
             putStatus("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
             putStatus("Enabled [" + NoString(uEnabled) + "] channels");
         }
-    } else if (sCommand.equals("DISABLECHAN")) {
+    } else if (command.equals("DISABLECHAN")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sPatterns = No::tokens(sLine, 1);
+        NoString sPatterns = No::tokens(line, 1);
 
         if (sPatterns.empty()) {
             putStatus("Usage: DisableChan <#chans>");
@@ -414,41 +414,41 @@ void NoClient::userCommand(NoString& sLine)
 
             std::set<NoChannel*> sChans;
             for (const NoString& sChan : vsChans) {
-                std::vector<NoChannel*> vChans = d->network->findChannels(sChan);
-                sChans.insert(vChans.begin(), vChans.end());
+                std::vector<NoChannel*> channels = d->network->findChannels(sChan);
+                sChans.insert(channels.begin(), channels.end());
             }
 
             uint uDisabled = 0;
-            for (NoChannel* pChan : sChans) {
-                if (pChan->isDisabled())
+            for (NoChannel* channel : sChans) {
+                if (channel->isDisabled())
                     continue;
                 uDisabled++;
-                pChan->disable();
+                channel->disable();
             }
 
             putStatus("There were [" + NoString(sChans.size()) + "] channels matching [" + sPatterns + "]");
             putStatus("Disabled [" + NoString(uDisabled) + "] channels");
         }
-    } else if (sCommand.equals("SHOWCHAN")) {
+    } else if (command.equals("SHOWCHAN")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sChan = No::tokens(sLine, 1);
+        NoString sChan = No::tokens(line, 1);
         if (sChan.empty()) {
             putStatus("Usage: ShowChan <#chan>");
             return;
         }
 
-        NoChannel* pChan = d->network->findChannel(sChan);
-        if (!pChan) {
+        NoChannel* channel = d->network->findChannel(sChan);
+        if (!channel) {
             putStatus("No such channel [" + sChan + "]");
             return;
         }
-        sChan = pChan->permStr() + pChan->name();
+        sChan = channel->permStr() + channel->name();
         NoString sStatus =
-        pChan->isOn() ? (pChan->isDetached() ? "Detached" : "Joined") : (pChan->isDisabled() ? "Disabled" : "Trying");
+        channel->isOn() ? (channel->isDetached() ? "Detached" : "Joined") : (channel->isDisabled() ? "Disabled" : "Trying");
 
         NoTable Table;
         Table.addColumn(sChan, false);
@@ -456,38 +456,38 @@ void NoClient::userCommand(NoString& sLine)
 
         Table.addRow();
         Table.setValue(sChan, "InConfig");
-        Table.setValue(sStatus, NoString(pChan->inConfig() ? "yes" : "no"));
+        Table.setValue(sStatus, NoString(channel->inConfig() ? "yes" : "no"));
 
         Table.addRow();
         Table.setValue(sChan, "Buffer");
         Table.setValue(sStatus,
-                       NoString(pChan->buffer().size()) + "/" + NoString(pChan->bufferCount()) +
-                       NoString(pChan->hasBufferCountSet() ? "" : " (default)"));
+                       NoString(channel->buffer().size()) + "/" + NoString(channel->bufferCount()) +
+                       NoString(channel->hasBufferCountSet() ? "" : " (default)"));
 
         Table.addRow();
         Table.setValue(sChan, "AutoClearChanBuffer");
         Table.setValue(sStatus,
-                       NoString(pChan->autoClearChanBuffer() ? "yes" : "no") +
-                       NoString(pChan->hasAutoClearChanBufferSet() ? "" : " (default)"));
+                       NoString(channel->autoClearChanBuffer() ? "yes" : "no") +
+                       NoString(channel->hasAutoClearChanBufferSet() ? "" : " (default)"));
 
-        if (pChan->isOn()) {
+        if (channel->isOn()) {
             Table.addRow();
             Table.setValue(sChan, "Topic");
-            Table.setValue(sStatus, pChan->topic());
+            Table.setValue(sStatus, channel->topic());
 
             Table.addRow();
             Table.setValue(sChan, "Modes");
-            Table.setValue(sStatus, pChan->modeString());
+            Table.setValue(sStatus, channel->modeString());
 
             Table.addRow();
             Table.setValue(sChan, "Users");
 
             NoStringVector vsUsers;
-            vsUsers.push_back("All: " + NoString(pChan->nickCount()));
+            vsUsers.push_back("All: " + NoString(channel->nickCount()));
 
             NoIrcSocket* pIRCSock = d->network->ircSocket();
             const NoString& sPerms = pIRCSock ? pIRCSock->perms() : "";
-            std::map<char, uint> mPerms = pChan->permCounts();
+            std::map<char, uint> mPerms = channel->permCounts();
             for (char cPerm : sPerms) {
                 vsUsers.push_back(NoString(cPerm) + ": " + NoString(mPerms[cPerm]));
             }
@@ -495,40 +495,40 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         putStatus(Table);
-    } else if (sCommand.equals("LISTCHANS")) {
+    } else if (command.equals("LISTCHANS")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoNetwork* pNetwork = d->network;
+        NoNetwork* network = d->network;
 
-        const NoString sNick = No::token(sLine, 1);
-        const NoString sNetwork = No::token(sLine, 2);
+        const NoString nick = No::token(line, 1);
+        const NoString sNetwork = No::token(line, 2);
 
-        if (!sNick.empty()) {
+        if (!nick.empty()) {
             if (!d->user->isAdmin()) {
                 putStatus("Usage: ListChans");
                 return;
             }
 
-            NoUser* pUser = noApp->findUser(sNick);
+            NoUser* user = noApp->findUser(nick);
 
-            if (!pUser) {
-                putStatus("No such user [" + sNick + "]");
+            if (!user) {
+                putStatus("No such user [" + nick + "]");
                 return;
             }
 
-            pNetwork = pUser->findNetwork(sNetwork);
-            if (!pNetwork) {
+            network = user->findNetwork(sNetwork);
+            if (!network) {
                 putStatus("No such network for user [" + sNetwork + "]");
                 return;
             }
         }
 
-        const std::vector<NoChannel*>& vChans = pNetwork->channels();
+        const std::vector<NoChannel*>& channels = network->channels();
 
-        if (vChans.empty()) {
+        if (channels.empty()) {
             putStatus("There are no channels defined.");
             return;
         }
@@ -539,32 +539,32 @@ void NoClient::userCommand(NoString& sLine)
 
         uint uNumDetached = 0, uNumDisabled = 0, uNumJoined = 0;
 
-        for (const NoChannel* pChan : vChans) {
+        for (const NoChannel* channel : channels) {
             Table.addRow();
-            Table.setValue("Name", pChan->permStr() + pChan->name());
+            Table.setValue("Name", channel->permStr() + channel->name());
             Table.setValue("Status",
-                           ((pChan->isOn()) ? ((pChan->isDetached()) ? "Detached" : "Joined") :
-                                              ((pChan->isDisabled()) ? "Disabled" : "Trying")));
+                           ((channel->isOn()) ? ((channel->isDetached()) ? "Detached" : "Joined") :
+                                              ((channel->isDisabled()) ? "Disabled" : "Trying")));
 
-            if (pChan->isDetached())
+            if (channel->isDetached())
                 uNumDetached++;
-            if (pChan->isOn())
+            if (channel->isOn())
                 uNumJoined++;
-            if (pChan->isDisabled())
+            if (channel->isDisabled())
                 uNumDisabled++;
         }
 
         putStatus(Table);
-        putStatus("Total: " + NoString(vChans.size()) + " - Joined: " + NoString(uNumJoined) + " - Detached: " +
+        putStatus("Total: " + NoString(channels.size()) + " - Joined: " + NoString(uNumJoined) + " - Detached: " +
                   NoString(uNumDetached) + " - Disabled: " + NoString(uNumDisabled));
-    } else if (sCommand.equals("ADDNETWORK")) {
+    } else if (command.equals("ADDNETWORK")) {
         if (!d->user->isAdmin() && !d->user->hasSpaceForNewNetwork()) {
             putStatus("Network number limit reached. Ask an admin to increase the limit for you, or delete unneeded "
                       "networks using /znc DelNetwork <name>");
             return;
         }
 
-        NoString sNetwork = No::token(sLine, 1);
+        NoString sNetwork = No::token(line, 1);
 
         if (sNetwork.empty()) {
             putStatus("Usage: AddNetwork <name>");
@@ -583,8 +583,8 @@ void NoClient::userCommand(NoString& sLine)
             putStatus("Unable to add that network");
             putStatus(sNetworkAddError);
         }
-    } else if (sCommand.equals("DELNETWORK")) {
-        NoString sNetwork = No::token(sLine, 1);
+    } else if (command.equals("DELNETWORK")) {
+        NoString sNetwork = No::token(line, 1);
 
         if (sNetwork.empty()) {
             putStatus("Usage: DelNetwork <name>");
@@ -601,19 +601,19 @@ void NoClient::userCommand(NoString& sLine)
             putStatus("Failed to delete network");
             putStatus("Perhaps this network doesn't exist");
         }
-    } else if (sCommand.equals("LISTNETWORKS")) {
-        NoUser* pUser = d->user;
+    } else if (command.equals("LISTNETWORKS")) {
+        NoUser* user = d->user;
 
-        if (d->user->isAdmin() && !No::token(sLine, 1).empty()) {
-            pUser = noApp->findUser(No::token(sLine, 1));
+        if (d->user->isAdmin() && !No::token(line, 1).empty()) {
+            user = noApp->findUser(No::token(line, 1));
 
-            if (!pUser) {
-                putStatus("User not found " + No::token(sLine, 1));
+            if (!user) {
+                putStatus("User not found " + No::token(line, 1));
                 return;
             }
         }
 
-        const std::vector<NoNetwork*>& vNetworks = pUser->networks();
+        const std::vector<NoNetwork*>& vNetworks = user->networks();
 
         NoTable Table;
         Table.addColumn("Network");
@@ -622,14 +622,14 @@ void NoClient::userCommand(NoString& sLine)
         Table.addColumn("IRC User");
         Table.addColumn("Channels");
 
-        for (const NoNetwork* pNetwork : vNetworks) {
+        for (const NoNetwork* network : vNetworks) {
             Table.addRow();
-            Table.setValue("Network", pNetwork->name());
-            if (pNetwork->isIrcConnected()) {
+            Table.setValue("Network", network->name());
+            if (network->isIrcConnected()) {
                 Table.setValue("OnIRC", "Yes");
-                Table.setValue("IRC Server", pNetwork->ircServer());
-                Table.setValue("IRC User", pNetwork->ircNick().nickMask());
-                Table.setValue("Channels", NoString(pNetwork->channels().size()));
+                Table.setValue("IRC Server", network->ircServer());
+                Table.setValue("IRC User", network->ircNick().nickMask());
+                Table.setValue("Channels", NoString(network->channels().size()));
             } else {
                 Table.setValue("OnIRC", "No");
             }
@@ -638,16 +638,16 @@ void NoClient::userCommand(NoString& sLine)
         if (putStatus(Table) == 0) {
             putStatus("No networks");
         }
-    } else if (sCommand.equals("MOVENETWORK")) {
+    } else if (command.equals("MOVENETWORK")) {
         if (!d->user->isAdmin()) {
             putStatus("Access Denied.");
             return;
         }
 
-        NoString sOldUser = No::token(sLine, 1);
-        NoString sOldNetwork = No::token(sLine, 2);
-        NoString sNewUser = No::token(sLine, 3);
-        NoString sNewNetwork = No::token(sLine, 4);
+        NoString sOldUser = No::token(line, 1);
+        NoString sOldNetwork = No::token(line, 2);
+        NoString sNewUser = No::token(line, 3);
+        NoString sNewNetwork = No::token(line, 4);
 
         if (sOldUser.empty() || sOldNetwork.empty() || sNewUser.empty()) {
             putStatus("Usage: MoveNetwork <old user> <old network> <new user> [new network]");
@@ -686,9 +686,9 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         std::vector<NoModule*> vMods = pOldNetwork->loader()->modules();
-        for (NoModule* pMod : vMods) {
-            NoString sOldModPath = pOldNetwork->networkPath() + "/moddata/" + pMod->moduleName();
-            NoString sNewModPath = pNewUser->userPath() + "/networks/" + sNewNetwork + "/moddata/" + pMod->moduleName();
+        for (NoModule* mod : vMods) {
+            NoString sOldModPath = pOldNetwork->networkPath() + "/moddata/" + mod->moduleName();
+            NoString sNewModPath = pNewUser->userPath() + "/networks/" + sNewNetwork + "/moddata/" + mod->moduleName();
 
             NoDir oldDir(sOldModPath);
             for (NoFile* pFile : oldDir.files()) {
@@ -698,7 +698,7 @@ void NoClient::userCommand(NoString& sLine)
                 }
             }
 
-            NoRegistry registry(pMod);
+            NoRegistry registry(mod);
             registry.copy(sNewModPath);
         }
 
@@ -721,8 +721,8 @@ void NoClient::userCommand(NoString& sLine)
         } else {
             putStatus("Copied the network to new user, but failed to delete old network");
         }
-    } else if (sCommand.equals("JUMPNETWORK")) {
-        NoString sNetwork = No::token(sLine, 1);
+    } else if (command.equals("JUMPNETWORK")) {
+        NoString sNetwork = No::token(line, 1);
 
         if (sNetwork.empty()) {
             putStatus("No network supplied.");
@@ -734,15 +734,15 @@ void NoClient::userCommand(NoString& sLine)
             return;
         }
 
-        NoNetwork* pNetwork = d->user->findNetwork(sNetwork);
-        if (pNetwork) {
+        NoNetwork* network = d->user->findNetwork(sNetwork);
+        if (network) {
             putStatus("Switched to " + sNetwork);
-            setNetwork(pNetwork);
+            setNetwork(network);
         } else {
             putStatus("You don't have a network named " + sNetwork);
         }
-    } else if (sCommand.equals("ADDSERVER")) {
-        NoString sServer = No::token(sLine, 1);
+    } else if (command.equals("ADDSERVER")) {
+        NoString sServer = No::token(line, 1);
 
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
@@ -754,21 +754,21 @@ void NoClient::userCommand(NoString& sLine)
             return;
         }
 
-        if (d->network->addServer(No::tokens(sLine, 1))) {
+        if (d->network->addServer(No::tokens(line, 1))) {
             putStatus("Server added");
         } else {
             putStatus("Unable to add that server");
             putStatus("Perhaps the server is already added or openssl is disabled?");
         }
-    } else if (sCommand.equals("REMSERVER") || sCommand.equals("DELSERVER")) {
+    } else if (command.equals("REMSERVER") || command.equals("DELSERVER")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sServer = No::token(sLine, 1);
-        ushort uPort = No::token(sLine, 2).toUShort();
-        NoString sPass = No::token(sLine, 3);
+        NoString sServer = No::token(line, 1);
+        ushort port = No::token(line, 2).toUShort();
+        NoString pass = No::token(line, 3);
 
         if (sServer.empty()) {
             putStatus("Usage: removeServer <host> [port] [pass]");
@@ -780,12 +780,12 @@ void NoClient::userCommand(NoString& sLine)
             return;
         }
 
-        if (d->network->removeServer(sServer, uPort, sPass)) {
+        if (d->network->removeServer(sServer, port, pass)) {
             putStatus("Server removed");
         } else {
             putStatus("No such server");
         }
-    } else if (sCommand.equals("LISTSERVERS")) {
+    } else if (command.equals("LISTSERVERS")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
@@ -800,43 +800,43 @@ void NoClient::userCommand(NoString& sLine)
             Table.addColumn("SSL");
             Table.addColumn("Pass");
 
-            for (const NoServerInfo* pServer : vServers) {
+            for (const NoServerInfo* server : vServers) {
                 Table.addRow();
-                Table.setValue("Host", pServer->host() + (pServer == pCurServ ? "*" : ""));
-                Table.setValue("Port", NoString(pServer->port()));
-                Table.setValue("SSL", (pServer->isSsl()) ? "SSL" : "");
-                Table.setValue("Pass", pServer->password());
+                Table.setValue("Host", server->host() + (server == pCurServ ? "*" : ""));
+                Table.setValue("Port", NoString(server->port()));
+                Table.setValue("SSL", (server->isSsl()) ? "SSL" : "");
+                Table.setValue("Pass", server->password());
             }
 
             putStatus(Table);
         } else {
             putStatus("You don't have any servers added.");
         }
-    } else if (sCommand.equals("AddTrustedServerFingerprint")) {
+    } else if (command.equals("AddTrustedServerFingerprint")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
-        NoString sFP = No::token(sLine, 1);
+        NoString sFP = No::token(line, 1);
         if (sFP.empty()) {
             putStatus("Usage: AddTrustedServerFingerprint <fi:ng:er>");
             return;
         }
         d->network->addTrustedFingerprint(sFP);
         putStatus("Done.");
-    } else if (sCommand.equals("DelTrustedServerFingerprint")) {
+    } else if (command.equals("DelTrustedServerFingerprint")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
-        NoString sFP = No::token(sLine, 1);
+        NoString sFP = No::token(line, 1);
         if (sFP.empty()) {
             putStatus("Usage: DelTrustedServerFingerprint <fi:ng:er>");
             return;
         }
         d->network->removeTrustedFingerprint(sFP);
         putStatus("Done.");
-    } else if (sCommand.equals("ListTrustedServerFingerprints")) {
+    } else if (command.equals("ListTrustedServerFingerprints")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
@@ -850,27 +850,27 @@ void NoClient::userCommand(NoString& sLine)
                 putStatus(NoString(++k) + ". " + sFP);
             }
         }
-    } else if (sCommand.equals("TOPICS")) {
+    } else if (command.equals("TOPICS")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        const std::vector<NoChannel*>& vChans = d->network->channels();
+        const std::vector<NoChannel*>& channels = d->network->channels();
         NoTable Table;
         Table.addColumn("Name");
         Table.addColumn("Set By");
         Table.addColumn("Topic");
 
-        for (const NoChannel* pChan : vChans) {
+        for (const NoChannel* channel : channels) {
             Table.addRow();
-            Table.setValue("Name", pChan->name());
-            Table.setValue("Set By", pChan->topicOwner());
-            Table.setValue("Topic", pChan->topic());
+            Table.setValue("Name", channel->name());
+            Table.setValue("Set By", channel->topicOwner());
+            Table.setValue("Topic", channel->topic());
         }
 
         putStatus(Table);
-    } else if (sCommand.equals("LISTMODS") || sCommand.equals("LISTMODULES")) {
+    } else if (command.equals("LISTMODS") || command.equals("LISTMODULES")) {
         if (d->user->isAdmin()) {
             NoModuleLoader* GModules = noApp->loader();
 
@@ -882,10 +882,10 @@ void NoClient::userCommand(NoString& sLine)
                 GTable.addColumn("Name");
                 GTable.addColumn("Arguments");
 
-                for (const NoModule* pMod : GModules->modules()) {
+                for (const NoModule* mod : GModules->modules()) {
                     GTable.addRow();
-                    GTable.setValue("Name", pMod->moduleName());
-                    GTable.setValue("Arguments", pMod->args());
+                    GTable.setValue("Name", mod->moduleName());
+                    GTable.setValue("Arguments", mod->args());
                 }
 
                 putStatus(GTable);
@@ -902,10 +902,10 @@ void NoClient::userCommand(NoString& sLine)
             Table.addColumn("Name");
             Table.addColumn("Arguments");
 
-            for (const NoModule* pMod : Modules->modules()) {
+            for (const NoModule* mod : Modules->modules()) {
                 Table.addRow();
-                Table.setValue("Name", pMod->moduleName());
-                Table.setValue("Arguments", pMod->args());
+                Table.setValue("Name", mod->moduleName());
+                Table.setValue("Arguments", mod->args());
             }
 
             putStatus(Table);
@@ -921,10 +921,10 @@ void NoClient::userCommand(NoString& sLine)
                 Table.addColumn("Name");
                 Table.addColumn("Arguments");
 
-                for (const NoModule* pMod : NetworkModules->modules()) {
+                for (const NoModule* mod : NetworkModules->modules()) {
                     Table.addRow();
-                    Table.setValue("Name", pMod->moduleName());
-                    Table.setValue("Arguments", pMod->args());
+                    Table.setValue("Name", mod->moduleName());
+                    Table.setValue("Arguments", mod->args());
                 }
 
                 putStatus(Table);
@@ -932,7 +932,7 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         return;
-    } else if (sCommand.equals("LISTAVAILMODS") || sCommand.equals("LISTAVAILABLEMODULES")) {
+    } else if (command.equals("LISTAVAILMODS") || command.equals("LISTAVAILABLEMODULES")) {
         if (d->user->denyLoadMod()) {
             putStatus("Access Denied.");
             return;
@@ -1000,11 +1000,11 @@ void NoClient::userCommand(NoString& sLine)
             putStatus(Table);
         }
         return;
-    } else if (sCommand.equals("LOADMOD") || sCommand.equals("LOADMODULE")) {
+    } else if (command.equals("LOADMOD") || command.equals("LOADMODULE")) {
         No::ModuleType eType;
-        NoString sType = No::token(sLine, 1);
-        NoString sMod = No::token(sLine, 2);
-        NoString sArgs = No::tokens(sLine, 3);
+        NoString sType = No::token(line, 1);
+        NoString sMod = No::token(line, 2);
+        NoString args = No::tokens(line, 3);
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
@@ -1015,7 +1015,7 @@ void NoClient::userCommand(NoString& sLine)
             eType = No::NetworkModule;
         } else {
             sMod = sType;
-            sArgs = No::tokens(sLine, 2);
+            args = No::tokens(line, 2);
             sType = "default";
             // Will be set correctly later
             eType = No::UserModule;
@@ -1057,13 +1057,13 @@ void NoClient::userCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            b = noApp->loader()->loadModule(sMod, sArgs, eType, nullptr, nullptr, sModRet);
+            b = noApp->loader()->loadModule(sMod, args, eType, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
-            b = d->user->loader()->loadModule(sMod, sArgs, eType, d->user, nullptr, sModRet);
+            b = d->user->loader()->loadModule(sMod, args, eType, d->user, nullptr, sModRet);
             break;
         case No::NetworkModule:
-            b = d->network->loader()->loadModule(sMod, sArgs, eType, d->user, d->network, sModRet);
+            b = d->network->loader()->loadModule(sMod, args, eType, d->user, d->network, sModRet);
             break;
         default:
             sModRet = "Unable to load module [" + sMod + "]: Unknown module type";
@@ -1074,10 +1074,10 @@ void NoClient::userCommand(NoString& sLine)
 
         putStatus(sModRet);
         return;
-    } else if (sCommand.equals("UNLOADMOD") || sCommand.equals("UNLOADMODULE")) {
+    } else if (command.equals("UNLOADMOD") || command.equals("UNLOADMODULE")) {
         No::ModuleType eType = No::UserModule;
-        NoString sType = No::token(sLine, 1);
-        NoString sMod = No::token(sLine, 2);
+        NoString sType = No::token(line, 1);
+        NoString sMod = No::token(line, 2);
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
@@ -1140,11 +1140,11 @@ void NoClient::userCommand(NoString& sLine)
 
         putStatus(sModRet);
         return;
-    } else if (sCommand.equals("RELOADMOD") || sCommand.equals("RELOADMODULE")) {
+    } else if (command.equals("RELOADMOD") || command.equals("RELOADMODULE")) {
         No::ModuleType eType;
-        NoString sType = No::token(sLine, 1);
-        NoString sMod = No::token(sLine, 2);
-        NoString sArgs = No::tokens(sLine, 3);
+        NoString sType = No::token(line, 1);
+        NoString sMod = No::token(line, 2);
+        NoString args = No::tokens(line, 3);
 
         if (d->user->denyLoadMod()) {
             putStatus("Unable to reload modules. Access Denied.");
@@ -1160,7 +1160,7 @@ void NoClient::userCommand(NoString& sLine)
             eType = No::NetworkModule;
         } else {
             sMod = sType;
-            sArgs = No::tokens(sLine, 2);
+            args = No::tokens(line, 2);
             sType = "default";
             // Will be set correctly later
             eType = No::UserModule;
@@ -1196,13 +1196,13 @@ void NoClient::userCommand(NoString& sLine)
 
         switch (eType) {
         case No::GlobalModule:
-            noApp->loader()->reloadModule(sMod, sArgs, nullptr, nullptr, sModRet);
+            noApp->loader()->reloadModule(sMod, args, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
-            d->user->loader()->reloadModule(sMod, sArgs, d->user, nullptr, sModRet);
+            d->user->loader()->reloadModule(sMod, args, d->user, nullptr, sModRet);
             break;
         case No::NetworkModule:
-            d->network->loader()->reloadModule(sMod, sArgs, d->user, d->network, sModRet);
+            d->network->loader()->reloadModule(sMod, args, d->user, d->network, sModRet);
             break;
         default:
             sModRet = "Unable to reload module [" + sMod + "]: Unknown module type";
@@ -1210,8 +1210,8 @@ void NoClient::userCommand(NoString& sLine)
 
         putStatus(sModRet);
         return;
-    } else if ((sCommand.equals("UPDATEMOD") || sCommand.equals("UPDATEMODULE")) && d->user->isAdmin()) {
-        NoString sMod = No::token(sLine, 1);
+    } else if ((command.equals("UPDATEMOD") || command.equals("UPDATEMODULE")) && d->user->isAdmin()) {
+        NoString sMod = No::token(line, 1);
 
         if (sMod.empty()) {
             putStatus("Usage: UpdateMod <module>");
@@ -1224,35 +1224,35 @@ void NoClient::userCommand(NoString& sLine)
         } else {
             putStatus("Done, but there were errors, [" + sMod + "] could not be loaded everywhere.");
         }
-    } else if ((sCommand.equals("ADDBINDHOST") || sCommand.equals("ADDVHOST")) && d->user->isAdmin()) {
-        NoString sHost = No::token(sLine, 1);
+    } else if ((command.equals("ADDBINDHOST") || command.equals("ADDVHOST")) && d->user->isAdmin()) {
+        NoString host = No::token(line, 1);
 
-        if (sHost.empty()) {
+        if (host.empty()) {
             putStatus("Usage: AddBindHost <host>");
             return;
         }
 
-        if (noApp->addBindHost(sHost)) {
+        if (noApp->addBindHost(host)) {
             putStatus("Done");
         } else {
-            putStatus("The host [" + sHost + "] is already in the list");
+            putStatus("The host [" + host + "] is already in the list");
         }
-    } else if ((sCommand.equals("REMBINDHOST") || sCommand.equals("DELBINDHOST") || sCommand.equals("REMVHOST") ||
-                sCommand.equals("DELVHOST")) &&
+    } else if ((command.equals("REMBINDHOST") || command.equals("DELBINDHOST") || command.equals("REMVHOST") ||
+                command.equals("DELVHOST")) &&
                d->user->isAdmin()) {
-        NoString sHost = No::token(sLine, 1);
+        NoString host = No::token(line, 1);
 
-        if (sHost.empty()) {
+        if (host.empty()) {
             putStatus("Usage: DelBindHost <host>");
             return;
         }
 
-        if (noApp->removeBindHost(sHost)) {
+        if (noApp->removeBindHost(host)) {
             putStatus("Done");
         } else {
-            putStatus("The host [" + sHost + "] is not in the list");
+            putStatus("The host [" + host + "] is not in the list");
         }
-    } else if ((sCommand.equals("LISTBINDHOSTS") || sCommand.equals("LISTVHOSTS")) &&
+    } else if ((command.equals("LISTBINDHOSTS") || command.equals("LISTVHOSTS")) &&
                (d->user->isAdmin() || !d->user->denysetBindHost())) {
         const NoStringVector& vsHosts = noApp->bindHosts();
 
@@ -1264,25 +1264,25 @@ void NoClient::userCommand(NoString& sLine)
         NoTable Table;
         Table.addColumn("Host");
 
-        for (const NoString& sHost : vsHosts) {
+        for (const NoString& host : vsHosts) {
             Table.addRow();
-            Table.setValue("Host", sHost);
+            Table.setValue("Host", host);
         }
         putStatus(Table);
-    } else if ((sCommand.equals("SETBINDHOST") || sCommand.equals("SETVHOST")) &&
+    } else if ((command.equals("SETBINDHOST") || command.equals("SETVHOST")) &&
                (d->user->isAdmin() || !d->user->denysetBindHost())) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command. Try SetUserBindHost instead");
             return;
         }
-        NoString sArg = No::token(sLine, 1);
+        NoString arg = No::token(line, 1);
 
-        if (sArg.empty()) {
+        if (arg.empty()) {
             putStatus("Usage: setBindHost <host>");
             return;
         }
 
-        if (sArg.equals(d->network->bindHost())) {
+        if (arg.equals(d->network->bindHost())) {
             putStatus("You already have this bind host!");
             return;
         }
@@ -1291,8 +1291,8 @@ void NoClient::userCommand(NoString& sLine)
         if (!d->user->isAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
-            for (const NoString& sHost : vsHosts) {
-                if (sArg.equals(sHost)) {
+            for (const NoString& host : vsHosts) {
+                if (arg.equals(host)) {
                     bFound = true;
                     break;
                 }
@@ -1304,17 +1304,17 @@ void NoClient::userCommand(NoString& sLine)
             }
         }
 
-        d->network->setBindHost(sArg);
+        d->network->setBindHost(arg);
         putStatus("Set bind host for network [" + d->network->name() + "] to [" + d->network->bindHost() + "]");
-    } else if (sCommand.equals("SETUSERBINDHOST") && (d->user->isAdmin() || !d->user->denysetBindHost())) {
-        NoString sArg = No::token(sLine, 1);
+    } else if (command.equals("SETUSERBINDHOST") && (d->user->isAdmin() || !d->user->denysetBindHost())) {
+        NoString arg = No::token(line, 1);
 
-        if (sArg.empty()) {
+        if (arg.empty()) {
             putStatus("Usage: SetUserBindHost <host>");
             return;
         }
 
-        if (sArg.equals(d->user->bindHost())) {
+        if (arg.equals(d->user->bindHost())) {
             putStatus("You already have this bind host!");
             return;
         }
@@ -1323,8 +1323,8 @@ void NoClient::userCommand(NoString& sLine)
         if (!d->user->isAdmin() && !vsHosts.empty()) {
             bool bFound = false;
 
-            for (const NoString& sHost : vsHosts) {
-                if (sArg.equals(sHost)) {
+            for (const NoString& host : vsHosts) {
+                if (arg.equals(host)) {
                     bFound = true;
                     break;
                 }
@@ -1336,9 +1336,9 @@ void NoClient::userCommand(NoString& sLine)
             }
         }
 
-        d->user->setBindHost(sArg);
+        d->user->setBindHost(arg);
         putStatus("Set bind host to [" + d->user->bindHost() + "]");
-    } else if ((sCommand.equals("CLEARBINDHOST") || sCommand.equals("CLEARVHOST")) &&
+    } else if ((command.equals("CLEARBINDHOST") || command.equals("CLEARVHOST")) &&
                (d->user->isAdmin() || !d->user->denysetBindHost())) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command. Try ClearUserBindHost instead");
@@ -1346,22 +1346,22 @@ void NoClient::userCommand(NoString& sLine)
         }
         d->network->setBindHost("");
         putStatus("Bind host cleared for this network.");
-    } else if (sCommand.equals("CLEARUSERBINDHOST") && (d->user->isAdmin() || !d->user->denysetBindHost())) {
+    } else if (command.equals("CLEARUSERBINDHOST") && (d->user->isAdmin() || !d->user->denysetBindHost())) {
         d->user->setBindHost("");
         putStatus("Bind host cleared for your user.");
-    } else if (sCommand.equals("SHOWBINDHOST")) {
+    } else if (command.equals("SHOWBINDHOST")) {
         putStatus("This user's default bind host " + (d->user->bindHost().empty() ? "not set" : "is [" + d->user->bindHost() + "]"));
         if (d->network) {
             putStatus("This network's bind host " +
                       (d->network->bindHost().empty() ? "not set" : "is [" + d->network->bindHost() + "]"));
         }
-    } else if (sCommand.equals("PLAYBUFFER")) {
+    } else if (command.equals("PLAYBUFFER")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sBuffer = No::token(sLine, 1);
+        NoString sBuffer = No::token(line, 1);
 
         if (sBuffer.empty()) {
             putStatus("Usage: PlayBuffer <#chan|query>");
@@ -1369,46 +1369,46 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         if (d->network->isChannel(sBuffer)) {
-            NoChannel* pChan = d->network->findChannel(sBuffer);
+            NoChannel* channel = d->network->findChannel(sBuffer);
 
-            if (!pChan) {
+            if (!channel) {
                 putStatus("You are not on [" + sBuffer + "]");
                 return;
             }
 
-            if (!pChan->isOn()) {
+            if (!channel->isOn()) {
                 putStatus("You are not on [" + sBuffer + "] [trying]");
                 return;
             }
 
-            if (pChan->buffer().isEmpty()) {
+            if (channel->buffer().isEmpty()) {
                 putStatus("The buffer for [" + sBuffer + "] is empty");
                 return;
             }
 
-            pChan->sendBuffer(this);
+            channel->sendBuffer(this);
         } else {
-            NoQuery* pQuery = d->network->findQuery(sBuffer);
+            NoQuery* query = d->network->findQuery(sBuffer);
 
-            if (!pQuery) {
+            if (!query) {
                 putStatus("No active query with [" + sBuffer + "]");
                 return;
             }
 
-            if (pQuery->buffer().isEmpty()) {
+            if (query->buffer().isEmpty()) {
                 putStatus("The buffer for [" + sBuffer + "] is empty");
                 return;
             }
 
-            pQuery->sendBuffer(this);
+            query->sendBuffer(this);
         }
-    } else if (sCommand.equals("CLEARBUFFER")) {
+    } else if (command.equals("CLEARBUFFER")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sBuffer = No::token(sLine, 1);
+        NoString sBuffer = No::token(line, 1);
 
         if (sBuffer.empty()) {
             putStatus("Usage: ClearBuffer <#chan|query>");
@@ -1416,32 +1416,32 @@ void NoClient::userCommand(NoString& sLine)
         }
 
         uint uMatches = 0;
-        std::vector<NoChannel*> vChans = d->network->findChannels(sBuffer);
-        for (NoChannel* pChan : vChans) {
+        std::vector<NoChannel*> channels = d->network->findChannels(sBuffer);
+        for (NoChannel* channel : channels) {
             uMatches++;
 
-            pChan->clearBuffer();
+            channel->clearBuffer();
         }
 
         std::vector<NoQuery*> vQueries = d->network->findQueries(sBuffer);
-        for (NoQuery* pQuery : vQueries) {
+        for (NoQuery* query : vQueries) {
             uMatches++;
 
-            d->network->removeQuery(pQuery->name());
+            d->network->removeQuery(query->name());
         }
 
         putStatus("[" + NoString(uMatches) + "] buffers matching [" + sBuffer + "] have been cleared");
-    } else if (sCommand.equals("CLEARALLCHANNELBUFFERS")) {
+    } else if (command.equals("CLEARALLCHANNELBUFFERS")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        for (NoChannel* pChan : d->network->channels()) {
-            pChan->clearBuffer();
+        for (NoChannel* channel : d->network->channels()) {
+            channel->clearBuffer();
         }
         putStatus("All channel buffers have been cleared");
-    } else if (sCommand.equals("CLEARALLQUERYBUFFERS")) {
+    } else if (command.equals("CLEARALLQUERYBUFFERS")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
@@ -1449,45 +1449,45 @@ void NoClient::userCommand(NoString& sLine)
 
         d->network->clearQueryBuffer();
         putStatus("All query buffers have been cleared");
-    } else if (sCommand.equals("CLEARALLBUFFERS")) {
+    } else if (command.equals("CLEARALLBUFFERS")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        for (NoChannel* pChan : d->network->channels()) {
-            pChan->clearBuffer();
+        for (NoChannel* channel : d->network->channels()) {
+            channel->clearBuffer();
         }
         d->network->clearQueryBuffer();
         putStatus("All buffers have been cleared");
-    } else if (sCommand.equals("SETBUFFER")) {
+    } else if (command.equals("SETBUFFER")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
 
-        NoString sBuffer = No::token(sLine, 1);
+        NoString sBuffer = No::token(line, 1);
 
         if (sBuffer.empty()) {
             putStatus("Usage: SetBuffer <#chan|query> [linecount]");
             return;
         }
 
-        uint uLineCount = No::token(sLine, 2).toUInt();
+        uint uLineCount = No::token(line, 2).toUInt();
         uint uMatches = 0, uFail = 0;
-        std::vector<NoChannel*> vChans = d->network->findChannels(sBuffer);
-        for (NoChannel* pChan : vChans) {
+        std::vector<NoChannel*> channels = d->network->findChannels(sBuffer);
+        for (NoChannel* channel : channels) {
             uMatches++;
 
-            if (!pChan->setBufferCount(uLineCount))
+            if (!channel->setBufferCount(uLineCount))
                 uFail++;
         }
 
         std::vector<NoQuery*> vQueries = d->network->findQueries(sBuffer);
-        for (NoQuery* pQuery : vQueries) {
+        for (NoQuery* query : vQueries) {
             uMatches++;
 
-            if (!pQuery->setBufferCount(uLineCount))
+            if (!query->setBufferCount(uLineCount))
                 uFail++;
         }
 
@@ -1497,7 +1497,7 @@ void NoClient::userCommand(NoString& sLine)
                                                                              "max buffer count is " +
                       NoString(noApp->maxBufferSize()));
         }
-    } else if (d->user->isAdmin() && sCommand.equals("TRAFFIC")) {
+    } else if (d->user->isAdmin() && command.equals("TRAFFIC")) {
         NoApp::TrafficStatsPair Users, ZNC, Total;
         NoApp::TrafficStatsMap traffic = noApp->trafficStats(Users, ZNC, Total);
 
@@ -1534,21 +1534,21 @@ void NoClient::userCommand(NoString& sLine)
         Table.setValue("Total", No::toByteStr(Total.first + Total.second));
 
         putStatus(Table);
-    } else if (sCommand.equals("UPTIME")) {
+    } else if (command.equals("UPTIME")) {
         putStatus("Running for " + noApp->uptime());
     } else if (d->user->isAdmin() &&
-               (sCommand.equals("LISTPORTS") || sCommand.equals("ADDPORT") || sCommand.equals("DELPORT"))) {
-        yserPortCommand(sLine);
+               (command.equals("LISTPORTS") || command.equals("ADDPORT") || command.equals("DELPORT"))) {
+        yserPortCommand(line);
     } else {
-        putStatus("Unknown command [" + sCommand + "] try 'Help'");
+        putStatus("Unknown command [" + command + "] try 'Help'");
     }
 }
 
-void NoClient::yserPortCommand(NoString& sLine)
+void NoClient::yserPortCommand(NoString& line)
 {
-    const NoString sCommand = No::token(sLine, 0);
+    const NoString command = No::token(line, 0);
 
-    if (sCommand.equals("LISTPORTS")) {
+    if (command.equals("LISTPORTS")) {
         NoTable Table;
         Table.addColumn("Port");
         Table.addColumn("BindHost");
@@ -1580,8 +1580,8 @@ void NoClient::yserPortCommand(NoString& sLine)
         return;
     }
 
-    NoString sPort = No::token(sLine, 1);
-    NoString sAddr = No::token(sLine, 2);
+    NoString sPort = No::token(line, 1);
+    NoString sAddr = No::token(line, 2);
     No::AddressType eAddr = No::Ipv4AndIpv6Address;
 
     if (sAddr.equals("IPV4")) {
@@ -1594,11 +1594,11 @@ void NoClient::yserPortCommand(NoString& sLine)
         sAddr.clear();
     }
 
-    ushort uPort = sPort.toUShort();
+    ushort port = sPort.toUShort();
 
-    if (sCommand.equals("ADDPORT")) {
+    if (command.equals("ADDPORT")) {
         No::AcceptType eAccept = No::AcceptAll;
-        NoString sAccept = No::token(sLine, 3);
+        NoString sAccept = No::token(line, 3);
 
         if (sAccept.equals("WEB")) {
             eAccept = No::AcceptHttp;
@@ -1613,13 +1613,13 @@ void NoClient::yserPortCommand(NoString& sLine)
         if (sPort.empty() || sAddr.empty() || sAccept.empty()) {
             putStatus("Usage: AddPort <[+]port> <ipv4|ipv6|all> <web|irc|all> [bindhost [uriprefix]]");
         } else {
-            bool bSSL = (sPort.left(1).equals("+"));
-            const NoString sHost = No::token(sLine, 4);
-            const NoString sURIPrefix = No::token(sLine, 5);
+            bool ssl = (sPort.left(1).equals("+"));
+            const NoString host = No::token(line, 4);
+            const NoString sURIPrefix = No::token(line, 5);
 
-            NoListener* pListener = new NoListener(sHost, uPort);
+            NoListener* pListener = new NoListener(host, port);
             pListener->setUriPrefix(sURIPrefix);
-            pListener->setSsl(bSSL);
+            pListener->setSsl(ssl);
             pListener->setAddressType(eAddr);
             pListener->setAcceptType(eAccept);
 
@@ -1633,13 +1633,13 @@ void NoClient::yserPortCommand(NoString& sLine)
                     putStatus("Error?!");
             }
         }
-    } else if (sCommand.equals("DELPORT")) {
+    } else if (command.equals("DELPORT")) {
         if (sPort.empty() || sAddr.empty()) {
             putStatus("Usage: DelPort <port> <ipv4|ipv6|all> [bindhost]");
         } else {
-            const NoString sBindHost = No::token(sLine, 3);
+            const NoString sBindHost = No::token(line, 3);
 
-            NoListener* pListener = noApp->findListener(uPort, sBindHost, eAddr);
+            NoListener* pListener = noApp->findListener(port, sBindHost, eAddr);
 
             if (pListener) {
                 noApp->removeListener(pListener);
@@ -1652,150 +1652,150 @@ void NoClient::yserPortCommand(NoString& sLine)
 }
 
 static void
-addCommandHelp(NoTable& Table, const NoString& sCmd, const NoString& sArgs, const NoString& sDesc, const NoString& sFilter = "")
+addCommandHelp(NoTable& Table, const NoString& cmd, const NoString& args, const NoString& desc, const NoString& filter = "")
 {
-    if (sFilter.empty() || sCmd.startsWith(sFilter) || wildCmp(sCmd, sFilter, No::CaseInsensitive)) {
+    if (filter.empty() || cmd.startsWith(filter) || wildCmp(cmd, filter, No::CaseInsensitive)) {
         Table.addRow();
-        Table.setValue("Command", sCmd);
-        Table.setValue("Arguments", sArgs);
-        Table.setValue("Description", sDesc);
+        Table.setValue("Command", cmd);
+        Table.setValue("Arguments", args);
+        Table.setValue("Description", desc);
     }
 }
 
-void NoClient::helpUser(const NoString& sFilter)
+void NoClient::helpUser(const NoString& filter)
 {
     NoTable Table;
     Table.addColumn("Command");
     Table.addColumn("Arguments");
     Table.addColumn("Description");
 
-    if (sFilter.empty()) {
+    if (filter.empty()) {
         putStatus("In the following list all occurrences of <#chan> support wildcards (* and ?)");
         putStatus("(Except ListNicks)");
     }
 
-    addCommandHelp(Table, "Version", "", "Print which version of ZNC this is", sFilter);
+    addCommandHelp(Table, "Version", "", "Print which version of ZNC this is", filter);
 
-    addCommandHelp(Table, "ListMods", "", "List all loaded modules", sFilter);
-    addCommandHelp(Table, "ListAvailMods", "", "List all available modules", sFilter);
+    addCommandHelp(Table, "ListMods", "", "List all loaded modules", filter);
+    addCommandHelp(Table, "ListAvailMods", "", "List all available modules", filter);
     if (!d->user->isAdmin()) { // If they are an admin we will add this command below with an argument
-        addCommandHelp(Table, "ListChans", "", "List all channels", sFilter);
+        addCommandHelp(Table, "ListChans", "", "List all channels", filter);
     }
-    addCommandHelp(Table, "ListNicks", "<#chan>", "List all nicks on a channel", sFilter);
+    addCommandHelp(Table, "ListNicks", "<#chan>", "List all nicks on a channel", filter);
     if (!d->user->isAdmin()) {
-        addCommandHelp(Table, "ListClients", "", "List all clients connected to your ZNC user", sFilter);
+        addCommandHelp(Table, "ListClients", "", "List all clients connected to your ZNC user", filter);
     }
-    addCommandHelp(Table, "ListServers", "", "List all servers of current IRC network", sFilter);
+    addCommandHelp(Table, "ListServers", "", "List all servers of current IRC network", filter);
 
-    addCommandHelp(Table, "AddNetwork", "<name>", "Add a network to your user", sFilter);
-    addCommandHelp(Table, "DelNetwork", "<name>", "Delete a network from your user", sFilter);
-    addCommandHelp(Table, "ListNetworks", "", "List all networks", sFilter);
+    addCommandHelp(Table, "AddNetwork", "<name>", "Add a network to your user", filter);
+    addCommandHelp(Table, "DelNetwork", "<name>", "Delete a network from your user", filter);
+    addCommandHelp(Table, "ListNetworks", "", "List all networks", filter);
     if (d->user->isAdmin()) {
         addCommandHelp(Table,
                        "MoveNetwork",
                        "<old user> <old network> <new user> [new network]",
                        "Move an IRC network from one user to another",
-                       sFilter);
+                       filter);
     }
     addCommandHelp(Table,
                    "JumpNetwork",
                    "<network>",
                    "Jump to another network (Alternatively, you can connect to ZNC several times, using "
                    "`user/network` as username)",
-                   sFilter);
+                   filter);
 
     addCommandHelp(Table,
                    "AddServer",
                    "<host> [[+]port] [pass]",
                    "Add a server to the list of alternate/backup servers of current IRC network.",
-                   sFilter);
+                   filter);
     addCommandHelp(Table,
                    "removeServer",
                    "<host> [port] [pass]",
                    "Remove a server from the list of alternate/backup servers of current IRC network",
-                   sFilter);
+                   filter);
 
     addCommandHelp(Table,
                    "AddTrustedServerFingerprint",
                    "<fi:ng:er>",
                    "Add a trusted server SSL certificate fingerprint (SHA-256) to current IRC network.",
-                   sFilter);
+                   filter);
     addCommandHelp(Table,
                    "DelTrustedServerFingerprint",
                    "<fi:ng:er>",
                    "Delete a trusted server SSL certificate from current IRC network.",
-                   sFilter);
+                   filter);
     addCommandHelp(
-    Table, "ListTrustedServerFingerprints", "", "List all trusted server SSL certificates of current IRC network.", sFilter);
+    Table, "ListTrustedServerFingerprints", "", "List all trusted server SSL certificates of current IRC network.", filter);
 
-    addCommandHelp(Table, "ShowChan", "<#chan>", "Show channel details", sFilter);
-    addCommandHelp(Table, "EnableChan", "<#chans>", "Enable channels", sFilter);
-    addCommandHelp(Table, "DisableChan", "<#chans>", "Disable channels", sFilter);
-    addCommandHelp(Table, "Detach", "<#chans>", "Detach from channels", sFilter);
-    addCommandHelp(Table, "Topics", "", "Show topics in all your channels", sFilter);
+    addCommandHelp(Table, "ShowChan", "<#chan>", "Show channel details", filter);
+    addCommandHelp(Table, "EnableChan", "<#chans>", "Enable channels", filter);
+    addCommandHelp(Table, "DisableChan", "<#chans>", "Disable channels", filter);
+    addCommandHelp(Table, "Detach", "<#chans>", "Detach from channels", filter);
+    addCommandHelp(Table, "Topics", "", "Show topics in all your channels", filter);
 
-    addCommandHelp(Table, "PlayBuffer", "<#chan|query>", "Play back the specified buffer", sFilter);
-    addCommandHelp(Table, "ClearBuffer", "<#chan|query>", "Clear the specified buffer", sFilter);
-    addCommandHelp(Table, "ClearAllBuffers", "", "Clear all channel and query buffers", sFilter);
-    addCommandHelp(Table, "ClearAllChannelBuffers", "", "Clear the channel buffers", sFilter);
-    addCommandHelp(Table, "ClearAllQueryBuffers", "", "Clear the query buffers", sFilter);
-    addCommandHelp(Table, "SetBuffer", "<#chan|query> [linecount]", "Set the buffer count", sFilter);
+    addCommandHelp(Table, "PlayBuffer", "<#chan|query>", "Play back the specified buffer", filter);
+    addCommandHelp(Table, "ClearBuffer", "<#chan|query>", "Clear the specified buffer", filter);
+    addCommandHelp(Table, "ClearAllBuffers", "", "Clear all channel and query buffers", filter);
+    addCommandHelp(Table, "ClearAllChannelBuffers", "", "Clear the channel buffers", filter);
+    addCommandHelp(Table, "ClearAllQueryBuffers", "", "Clear the query buffers", filter);
+    addCommandHelp(Table, "SetBuffer", "<#chan|query> [linecount]", "Set the buffer count", filter);
 
     if (d->user->isAdmin()) {
-        addCommandHelp(Table, "AddBindHost", "<host (IP preferred)>", "Adds a bind host for normal users to use", sFilter);
-        addCommandHelp(Table, "DelBindHost", "<host>", "Removes a bind host from the list", sFilter);
+        addCommandHelp(Table, "AddBindHost", "<host (IP preferred)>", "Adds a bind host for normal users to use", filter);
+        addCommandHelp(Table, "DelBindHost", "<host>", "Removes a bind host from the list", filter);
     }
 
     if (d->user->isAdmin() || !d->user->denysetBindHost()) {
-        addCommandHelp(Table, "ListBindHosts", "", "Shows the configured list of bind hosts", sFilter);
-        addCommandHelp(Table, "setBindHost", "<host (IP preferred)>", "Set the bind host for this connection", sFilter);
-        addCommandHelp(Table, "SetUserBindHost", "<host (IP preferred)>", "Set the default bind host for this user", sFilter);
-        addCommandHelp(Table, "ClearBindHost", "", "Clear the bind host for this connection", sFilter);
-        addCommandHelp(Table, "ClearUserBindHost", "", "Clear the default bind host for this user", sFilter);
+        addCommandHelp(Table, "ListBindHosts", "", "Shows the configured list of bind hosts", filter);
+        addCommandHelp(Table, "setBindHost", "<host (IP preferred)>", "Set the bind host for this connection", filter);
+        addCommandHelp(Table, "SetUserBindHost", "<host (IP preferred)>", "Set the default bind host for this user", filter);
+        addCommandHelp(Table, "ClearBindHost", "", "Clear the bind host for this connection", filter);
+        addCommandHelp(Table, "ClearUserBindHost", "", "Clear the default bind host for this user", filter);
     }
 
-    addCommandHelp(Table, "ShowBindHost", "", "Show currently selected bind host", sFilter);
-    addCommandHelp(Table, "Jump", "[server]", "Jump to the next or the specified server", sFilter);
-    addCommandHelp(Table, "Disconnect", "[message]", "Disconnect from IRC", sFilter);
-    addCommandHelp(Table, "Connect", "", "Reconnect to IRC", sFilter);
-    addCommandHelp(Table, "Uptime", "", "Show for how long ZNC has been running", sFilter);
+    addCommandHelp(Table, "ShowBindHost", "", "Show currently selected bind host", filter);
+    addCommandHelp(Table, "Jump", "[server]", "Jump to the next or the specified server", filter);
+    addCommandHelp(Table, "Disconnect", "[message]", "Disconnect from IRC", filter);
+    addCommandHelp(Table, "Connect", "", "Reconnect to IRC", filter);
+    addCommandHelp(Table, "Uptime", "", "Show for how long ZNC has been running", filter);
 
     if (!d->user->denyLoadMod()) {
-        addCommandHelp(Table, "LoadMod", "[--type=global|user|network] <module>", "Load a module", sFilter);
-        addCommandHelp(Table, "UnloadMod", "[--type=global|user|network] <module>", "Unload a module", sFilter);
-        addCommandHelp(Table, "ReloadMod", "[--type=global|user|network] <module>", "Reload a module", sFilter);
+        addCommandHelp(Table, "LoadMod", "[--type=global|user|network] <module>", "Load a module", filter);
+        addCommandHelp(Table, "UnloadMod", "[--type=global|user|network] <module>", "Unload a module", filter);
+        addCommandHelp(Table, "ReloadMod", "[--type=global|user|network] <module>", "Reload a module", filter);
         if (d->user->isAdmin()) {
-            addCommandHelp(Table, "UpdateMod", "<module>", "Reload a module everywhere", sFilter);
+            addCommandHelp(Table, "UpdateMod", "<module>", "Reload a module everywhere", filter);
         }
     }
 
-    addCommandHelp(Table, "ShowMOTD", "", "Show ZNC's message of the day", sFilter);
+    addCommandHelp(Table, "ShowMOTD", "", "Show ZNC's message of the day", filter);
 
     if (d->user->isAdmin()) {
-        addCommandHelp(Table, "SetMOTD", "<message>", "Set ZNC's message of the day", sFilter);
-        addCommandHelp(Table, "AddMOTD", "<message>", "Append <message> to ZNC's MOTD", sFilter);
-        addCommandHelp(Table, "ClearMOTD", "", "Clear ZNC's MOTD", sFilter);
-        addCommandHelp(Table, "ListPorts", "", "Show all active listeners", sFilter);
+        addCommandHelp(Table, "SetMOTD", "<message>", "Set ZNC's message of the day", filter);
+        addCommandHelp(Table, "AddMOTD", "<message>", "Append <message> to ZNC's MOTD", filter);
+        addCommandHelp(Table, "ClearMOTD", "", "Clear ZNC's MOTD", filter);
+        addCommandHelp(Table, "ListPorts", "", "Show all active listeners", filter);
         addCommandHelp(Table,
                        "AddPort",
                        "<[+]port> <ipv4|ipv6|all> <web|irc|all> [bindhost [uriprefix]]",
                        "Add another port for ZNC to listen on",
-                       sFilter);
-        addCommandHelp(Table, "DelPort", "<port> <ipv4|ipv6|all> [bindhost]", "Remove a port from ZNC", sFilter);
-        addCommandHelp(Table, "Rehash", "", "Reload znc.conf from disk", sFilter);
-        addCommandHelp(Table, "SaveConfig", "", "Save the current settings to disk", sFilter);
-        addCommandHelp(Table, "ListUsers", "", "List all ZNC users and their connection status", sFilter);
-        addCommandHelp(Table, "ListAllUserNetworks", "", "List all ZNC users and their networks", sFilter);
-        addCommandHelp(Table, "ListChans", "[user <network>]", "List all channels", sFilter);
-        addCommandHelp(Table, "ListClients", "[user]", "List all connected clients", sFilter);
-        addCommandHelp(Table, "Traffic", "", "Show basic traffic stats for all ZNC users", sFilter);
-        addCommandHelp(Table, "Broadcast", "[message]", "Broadcast a message to all ZNC users", sFilter);
-        addCommandHelp(Table, "Shutdown", "[message]", "Shut down ZNC completely", sFilter);
-        addCommandHelp(Table, "Restart", "[message]", "Restart ZNC", sFilter);
+                       filter);
+        addCommandHelp(Table, "DelPort", "<port> <ipv4|ipv6|all> [bindhost]", "Remove a port from ZNC", filter);
+        addCommandHelp(Table, "Rehash", "", "Reload znc.conf from disk", filter);
+        addCommandHelp(Table, "SaveConfig", "", "Save the current settings to disk", filter);
+        addCommandHelp(Table, "ListUsers", "", "List all ZNC users and their connection status", filter);
+        addCommandHelp(Table, "ListAllUserNetworks", "", "List all ZNC users and their networks", filter);
+        addCommandHelp(Table, "ListChans", "[user <network>]", "List all channels", filter);
+        addCommandHelp(Table, "ListClients", "[user]", "List all connected clients", filter);
+        addCommandHelp(Table, "Traffic", "", "Show basic traffic stats for all ZNC users", filter);
+        addCommandHelp(Table, "Broadcast", "[message]", "Broadcast a message to all ZNC users", filter);
+        addCommandHelp(Table, "Shutdown", "[message]", "Shut down ZNC completely", filter);
+        addCommandHelp(Table, "Restart", "[message]", "Restart ZNC", filter);
     }
 
     if (Table.isEmpty()) {
-        putStatus("No matches for '" + sFilter + "'");
+        putStatus("No matches for '" + filter + "'");
     } else {
         putStatus(Table);
     }

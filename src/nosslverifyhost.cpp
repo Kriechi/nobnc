@@ -418,25 +418,25 @@ static HostnameValidationResult validate_hostname(const char* hostname, const X5
 ///////////////////////////////////////////////////////////////////////////
 } // namespace ZNC_iSECPartners
 
-bool ZNC_SSLVerifyHost(const NoString& sHost, const X509* pCert, NoString& sError)
+bool ZNC_SSLVerifyHost(const NoString& host, const X509* pCert, NoString& error)
 {
-    NO_DEBUG("SSLVerifyHost: checking " << sHost);
-    ZNC_iSECPartners::HostnameValidationResult eResult = ZNC_iSECPartners::validate_hostname(sHost.c_str(), pCert);
+    NO_DEBUG("SSLVerifyHost: checking " << host);
+    ZNC_iSECPartners::HostnameValidationResult eResult = ZNC_iSECPartners::validate_hostname(host.c_str(), pCert);
     switch (eResult) {
     case ZNC_iSECPartners::MatchFound:
         NO_DEBUG("SSLVerifyHost: verified");
         return true;
     case ZNC_iSECPartners::MatchNotFound:
         NO_DEBUG("SSLVerifyHost: host doesn't match");
-        sError = "hostname doesn't match";
+        error = "hostname doesn't match";
         return false;
     case ZNC_iSECPartners::MalformedCertificate:
         NO_DEBUG("SSLVerifyHost: malformed cert");
-        sError = "malformed hostname in certificate";
+        error = "malformed hostname in certificate";
         return false;
     default:
         NO_DEBUG("SSLVerifyHost: error");
-        sError = "hostname verification error";
+        error = "hostname verification error";
         return false;
     }
 }

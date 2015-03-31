@@ -32,8 +32,8 @@ class NoDccMod;
 class NoDccSock : public NoModuleSocket
 {
 public:
-    NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize = 0, NoFile* pFile = nullptr);
-    NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sLocalFile, ulong uFileSize);
+    NoDccSock(NoDccMod* mod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize = 0, NoFile* pFile = nullptr);
+    NoDccSock(NoDccMod* mod, const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sLocalFile, ulong uFileSize);
     virtual ~NoDccSock();
 
     void readData(const char* data, size_t len) override;
@@ -43,7 +43,7 @@ public:
     void onConnected() override;
     void onDisconnected() override;
     void SendPacket();
-    NoSocket* createSocket(const NoString& sHost, ushort uPort) override;
+    NoSocket* createSocket(const NoString& host, ushort port) override;
     NoFile* OpenFile(bool bWrite = true);
     bool Seek(ulong uPos);
 
@@ -125,7 +125,7 @@ public:
     }
 
 #ifndef MOD_DCC_ALLOW_EVERYONE
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         if (!user()->isAdmin()) {
             sMessage = "You must be admin to use the DCC module";
@@ -149,15 +149,15 @@ public:
         }
 
         NoString sLocalDCCIP = user()->localDccIp();
-        ushort uPort =
+        ushort port =
         noApp->manager()->listenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
 
         if (user()->nick().equals(sRemoteNick)) {
             putUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
-                    NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
+                    NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(port) + " " + NoString(pFile->GetSize()) + "\001");
         } else {
             putIrc("PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
-                   NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(uPort) + " " + NoString(pFile->GetSize()) + "\001");
+                   NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(port) + " " + NoString(pFile->GetSize()) + "\001");
         }
 
         putModule("DCC -> [" + sRemoteNick + "][" + pFile->GetShortName() + "] - Attempting Send.");
@@ -184,10 +184,10 @@ public:
         return true;
     }
 
-    void SendCommand(const NoString& sLine)
+    void SendCommand(const NoString& line)
     {
-        NoString sToNick = No::token(sLine, 1);
-        NoString sFile = No::token(sLine, 2);
+        NoString sToNick = No::token(line, 1);
+        NoString sFile = No::token(line, 2);
 
         if ((sToNick.empty()) || (sFile.empty())) {
             putModule("Usage: Send <nick> <file>");
@@ -202,9 +202,9 @@ public:
         SendFile(sToNick, sFile);
     }
 
-    void GetCommand(const NoString& sLine)
+    void GetCommand(const NoString& line)
     {
-        NoString sFile = No::token(sLine, 1);
+        NoString sFile = No::token(line, 1);
 
         if (sFile.empty()) {
             putModule("Usage: Get <file>");
@@ -219,7 +219,7 @@ public:
         SendFile(user()->nick(), sFile);
     }
 
-    void ListTransfersCommand(const NoString& sLine)
+    void ListTransfersCommand(const NoString& line)
     {
         NoTable Table;
         Table.addColumn("Type");
@@ -281,10 +281,10 @@ public:
                 putModule("Bad DCC file: " + No::token(sMessage, 2));
             }
             ulong uLongIP = No::token(sMessage, 3).toULong();
-            ushort uPort = No::token(sMessage, 4).toUShort();
+            ushort port = No::token(sMessage, 4).toUShort();
             ulong uFileSize = No::token(sMessage, 5).toULong();
             NoString sLocalFile = saveDir.filePath(sFile);
-            GetFile(client()->nick(), No::formatIp(uLongIP), uPort, sLocalFile, uFileSize);
+            GetFile(client()->nick(), No::formatIp(uLongIP), port, sLocalFile, uFileSize);
         }
     }
     void AddSocket(NoDccSock* socket)
@@ -300,37 +300,37 @@ private:
     std::set<NoDccSock*> m_sockets;
 };
 
-NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize, NoFile* pFile)
-    : NoModuleSocket(pMod)
+NoDccSock::NoDccSock(NoDccMod* mod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize, NoFile* pFile)
+    : NoModuleSocket(mod)
 {
     m_sRemoteNick = sRemoteNick;
     m_uFileSize = uFileSize;
     m_uRemotePort = 0;
     m_uBytesSoFar = 0;
-    m_module = pMod;
+    m_module = mod;
     m_pFile = pFile;
     m_sLocalFile = sLocalFile;
     m_bSend = true;
     m_bNoDelFile = false;
     setMaxBufferThreshold(0);
-    pMod->AddSocket(this);
+    mod->AddSocket(this);
 }
 
-NoDccSock::NoDccSock(NoDccMod* pMod, const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sLocalFile, ulong uFileSize)
-    : NoModuleSocket(pMod)
+NoDccSock::NoDccSock(NoDccMod* mod, const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sLocalFile, ulong uFileSize)
+    : NoModuleSocket(mod)
 {
     m_sRemoteNick = sRemoteNick;
     m_sRemoteIP = sRemoteIP;
     m_uRemotePort = uRemotePort;
     m_uFileSize = uFileSize;
     m_uBytesSoFar = 0;
-    m_module = pMod;
+    m_module = mod;
     m_pFile = nullptr;
     m_sLocalFile = sLocalFile;
     m_bSend = false;
     m_bNoDelFile = false;
     setMaxBufferThreshold(0);
-    pMod->AddSocket(this);
+    mod->AddSocket(this);
 }
 
 NoDccSock::~NoDccSock()
@@ -468,7 +468,7 @@ void NoDccSock::SendPacket()
     }
 }
 
-NoSocket* NoDccSock::createSocket(const NoString& sHost, ushort uPort)
+NoSocket* NoDccSock::createSocket(const NoString& host, ushort port)
 {
     close();
 

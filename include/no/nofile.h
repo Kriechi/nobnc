@@ -79,10 +79,10 @@ public:
     bool Open(const NoString& sFileName, int iFlags = O_RDONLY, mode_t iMode = 0644);
     bool Open(int iFlags = O_RDONLY, mode_t iMode = 0644);
     ssize_t Read(char* pszBuffer, int iBytes);
-    bool ReadLine(NoString& sData, const NoString& sDelimiter = "\n");
-    bool ReadFile(NoString& sData, size_t iMaxSize = 512 * 1024);
+    bool ReadLine(NoString& data, const NoString& sDelimiter = "\n");
+    bool ReadFile(NoString& data, size_t iMaxSize = 512 * 1024);
     ssize_t Write(const char* pszBuffer, size_t iBytes);
-    ssize_t Write(const NoString& sData);
+    ssize_t Write(const NoString& data);
     void Close();
     void ClearBuffer();
 

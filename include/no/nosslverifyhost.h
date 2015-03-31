@@ -25,7 +25,7 @@
 
 #include <openssl/ssl.h>
 
-bool ZNC_SSLVerifyHost(const NoString& sHost, const X509* pCert, NoString& sError);
+bool ZNC_SSLVerifyHost(const NoString& host, const X509* pCert, NoString& error);
 
 #endif // HAVE_LIBSSL
 

@@ -39,9 +39,9 @@ class NoSChat;
 class NoRemMarkerJob : public NoTimer
 {
 public:
-    NoRemMarkerJob(NoModule* pModule, const NoString& sNick) : NoTimer(pModule), m_sNick(sNick)
+    NoRemMarkerJob(NoModule* pModule, const NoString& nick) : NoTimer(pModule), m_sNick(nick)
     {
-        setName("Remove (s)" + sNick);
+        setName("Remove (s)" + nick);
         setDescription("Removes this nicks entry for waiting DCC.");
     }
 
@@ -53,8 +53,8 @@ protected:
 class NoSChatSock : public NoModuleSocket
 {
 public:
-    NoSChatSock(NoSChat* pMod, const NoString& sChatNick);
-    NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort);
+    NoSChatSock(NoSChat* mod, const NoString& sChatNick);
+    NoSChatSock(NoSChat* mod, const NoString& sChatNick, const NoString& host, u_short iPort);
     ~NoSChatSock();
 
     NoSocket* createSocket(const NoString& sHostname, u_short iPort) override
@@ -63,7 +63,7 @@ public:
         return (p);
     }
 
-    bool onConnectionFrom(const NoString& sHost, u_short iPort) override
+    bool onConnectionFrom(const NoString& host, u_short iPort) override
     {
         close(); // close the listener after the first connection
         return (true);
@@ -77,14 +77,14 @@ public:
         return (m_sChatNick);
     }
 
-    void PutQuery(const NoString& sText);
+    void PutQuery(const NoString& text);
 
-    void readLine(const NoString& sLine) override;
+    void readLine(const NoString& line) override;
     void onDisconnected() override;
 
-    void AddLine(const NoString& sLine)
+    void AddLine(const NoString& line)
     {
-        m_vBuffer.insert(m_vBuffer.begin(), sLine);
+        m_vBuffer.insert(m_vBuffer.begin(), line);
         if (m_vBuffer.size() > 200)
             m_vBuffer.pop_back();
     }
@@ -118,9 +118,9 @@ public:
     {
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
-        m_sPemFile = sArgs;
+        m_sPemFile = args;
 
         if (m_sPemFile.empty()) {
             m_sPemFile = noApp->pemLocation();
@@ -142,13 +142,13 @@ public:
         }
     }
 
-    ModRet onUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& line) override
     {
-        if (sLine.startsWith("schat ")) {
-            onModCommand("chat " + sLine.substr(6));
+        if (line.startsWith("schat ")) {
+            onModCommand("chat " + line.substr(6));
             return (HALT);
 
-        } else if (sLine.equals("schat")) {
+        } else if (line.equals("schat")) {
             putModule("SChat User Area ...");
             onModCommand("help");
             return (HALT);
@@ -157,21 +157,21 @@ public:
         return (CONTINUE);
     }
 
-    void onModCommand(const NoString& sCommand) override
+    void onModCommand(const NoString& command) override
     {
-        NoString sCom = No::token(sCommand, 0);
-        NoString sArgs = No::tokens(sCommand, 1);
+        NoString sCom = No::token(command, 0);
+        NoString args = No::tokens(command, 1);
 
-        if (sCom.equals("chat") && !sArgs.empty()) {
-            NoString sNick = "(s)" + sArgs;
+        if (sCom.equals("chat") && !args.empty()) {
+            NoString nick = "(s)" + args;
             for (NoSChatSock* pSock : m_sockets) {
-                if (pSock->GetChatNick().equals(sNick)) {
-                    putModule("Already Connected to [" + sArgs + "]");
+                if (pSock->GetChatNick().equals(nick)) {
+                    putModule("Already Connected to [" + args + "]");
                     return;
                 }
             }
 
-            NoSChatSock* pSock = new NoSChatSock(this, sNick);
+            NoSChatSock* pSock = new NoSChatSock(this, nick);
             pSock->setCipher("HIGH");
             pSock->setPemFile(m_sPemFile);
 
@@ -184,7 +184,7 @@ public:
             }
 
             std::stringstream s;
-            s << "PRIVMSG " << sArgs << " :\001";
+            s << "PRIVMSG " << args << " :\001";
             s << "DCC SCHAT chat ";
             s << No::formatLongIp(user()->localDccIp());
             s << " " << iPort << "\001";
@@ -231,16 +231,16 @@ public:
                 putModule("No SDCCs currently in session");
 
         } else if (sCom.equals("close")) {
-            if (!sArgs.startsWith("(s)"))
-                sArgs = "(s)" + sArgs;
+            if (!args.startsWith("(s)"))
+                args = "(s)" + args;
 
             for (NoSChatSock* pSock : m_sockets) {
-                if (sArgs.equals(pSock->GetChatNick())) {
+                if (args.equals(pSock->GetChatNick())) {
                     pSock->close();
                     return;
                 }
             }
-            putModule("No Such Chat [" + sArgs + "]");
+            putModule("No Such Chat [" + args + "]");
         } else if (sCom.equals("showsocks") && user()->isAdmin()) {
             NoTable Table;
             Table.addColumn("SockName");
@@ -299,7 +299,7 @@ public:
         } else if (sCom.equals("timers"))
             listTimers();
         else
-            putModule("Unknown command [" + sCom + "] [" + sArgs + "]");
+            putModule("Unknown command [" + sCom + "] [" + args + "]");
     }
 
     ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
@@ -329,11 +329,11 @@ public:
         return (CONTINUE);
     }
 
-    void AcceptSDCC(const NoString& sNick, u_long iIP, u_short iPort)
+    void AcceptSDCC(const NoString& nick, u_long iIP, u_short iPort)
     {
-        NoSChatSock* p = new NoSChatSock(this, sNick, No::formatIp(iIP), iPort);
+        NoSChatSock* p = new NoSChatSock(this, nick, No::formatIp(iIP), iPort);
         manager()->connect(No::formatIp(iIP), iPort, p->name(), 60, true, user()->localDccIp(), p);
-        delete findTimer("Remove " + sNick); // delete any associated timer to this nick
+        delete findTimer("Remove " + nick); // delete any associated timer to this nick
     }
 
     ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
@@ -364,17 +364,17 @@ public:
         return (CONTINUE);
     }
 
-    void RemoveMarker(const NoString& sNick)
+    void RemoveMarker(const NoString& nick)
     {
-        std::map<NoString, std::pair<u_long, u_short>>::iterator it = m_siiWaitingChats.find(sNick);
+        std::map<NoString, std::pair<u_long, u_short>>::iterator it = m_siiWaitingChats.find(nick);
         if (it != m_siiWaitingChats.end())
             m_siiWaitingChats.erase(it);
     }
 
-    void SendToUser(const NoString& sFrom, const NoString& sText)
+    void SendToUser(const NoString& sFrom, const NoString& text)
     {
         //:*schat!znc@znc.in PRIVMSG Jim :
-        NoString sSend = ":" + sFrom + " PRIVMSG " + network()->currentNick() + " :" + sText;
+        NoString sSend = ":" + sFrom + " PRIVMSG " + network()->currentNick() + " :" + text;
         putUser(sSend);
     }
 
@@ -401,22 +401,22 @@ private:
 
 //////////////////// methods ////////////////
 
-NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick) : NoModuleSocket(pMod)
+NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick) : NoModuleSocket(mod)
 {
-    m_module = pMod;
+    m_module = mod;
     m_sChatNick = sChatNick;
-    setName(pMod->moduleName().toUpper() + "::" + m_sChatNick);
-    pMod->AddSocket(this);
+    setName(mod->moduleName().toUpper() + "::" + m_sChatNick);
+    mod->AddSocket(this);
 }
 
-NoSChatSock::NoSChatSock(NoSChat* pMod, const NoString& sChatNick, const NoString& sHost, u_short iPort)
-    : NoModuleSocket(pMod, sHost, iPort)
+NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick, const NoString& host, u_short iPort)
+    : NoModuleSocket(mod, host, iPort)
 {
-    m_module = pMod;
+    m_module = mod;
     enableReadLine();
     m_sChatNick = sChatNick;
-    setName(pMod->moduleName().toUpper() + "::" + m_sChatNick);
-    pMod->AddSocket(this);
+    setName(mod->moduleName().toUpper() + "::" + m_sChatNick);
+    mod->AddSocket(this);
 }
 
 NoSChatSock::~NoSChatSock()
@@ -424,22 +424,22 @@ NoSChatSock::~NoSChatSock()
     m_module->RemoveSocket(this);
 }
 
-void NoSChatSock::PutQuery(const NoString& sText)
+void NoSChatSock::PutQuery(const NoString& text)
 {
-    m_module->SendToUser(m_sChatNick + "!" + m_sChatNick + "@" + remoteAddress(), sText);
+    m_module->SendToUser(m_sChatNick + "!" + m_sChatNick + "@" + remoteAddress(), text);
 }
 
-void NoSChatSock::readLine(const NoString& sLine)
+void NoSChatSock::readLine(const NoString& line)
 {
     if (m_module) {
-        NoString sText = sLine;
+        NoString text = line;
 
-        sText.trimRight("\r\n");
+        text.trimRight("\r\n");
 
         if (m_module->IsAttached())
-            PutQuery(sText);
+            PutQuery(text);
         else
-            AddLine(m_module->user()->addTimestamp(sText));
+            AddLine(m_module->user()->addTimestamp(text));
     }
 }
 

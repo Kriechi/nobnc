@@ -74,23 +74,23 @@ public:
                    "Disables the wait time before setting you away");
     }
 
-    bool onLoad(const NoString& sArgs, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& sMessage) override
     {
         NoString sReasonArg;
 
         // Load AwayWait
-        NoString sFirstArg = No::token(sArgs, 0);
+        NoString sFirstArg = No::token(args, 0);
         if (sFirstArg.equals("-notimer")) {
             SetAwayWait(0);
-            sReasonArg = No::tokens(sArgs, 1);
+            sReasonArg = No::tokens(args, 1);
         } else if (sFirstArg.equals("-timer")) {
-            SetAwayWait(No::token(sArgs, 1).toUInt());
-            sReasonArg = No::tokens(sArgs, 2);
+            SetAwayWait(No::token(args, 1).toUInt());
+            sReasonArg = No::tokens(args, 2);
         } else {
             NoString sAwayWait = NoRegistry(this).value("awaywait");
             if (!sAwayWait.empty())
                 SetAwayWait(sAwayWait.toUInt(), false);
-            sReasonArg = sArgs;
+            sReasonArg = args;
         }
 
         // Load Reason
@@ -129,12 +129,12 @@ public:
             SetAway();
     }
 
-    void OnReasonCommand(const NoString& sLine)
+    void OnReasonCommand(const NoString& line)
     {
-        NoString sReason = No::tokens(sLine, 1);
+        NoString reason = No::tokens(line, 1);
 
-        if (!sReason.empty()) {
-            SetReason(sReason);
+        if (!reason.empty()) {
+            SetReason(reason);
             putModule("Away reason set");
         } else {
             putModule("Away reason: " + m_sReason);
@@ -142,14 +142,14 @@ public:
         }
     }
 
-    void OnTimerCommand(const NoString& sLine)
+    void OnTimerCommand(const NoString& line)
     {
         putModule("Current timer setting: " + NoString(m_iAwayWait) + " seconds");
     }
 
-    void OnSetTimerCommand(const NoString& sLine)
+    void OnSetTimerCommand(const NoString& line)
     {
-        SetAwayWait(No::token(sLine, 1).toUInt());
+        SetAwayWait(No::token(line, 1).toUInt());
 
         if (m_iAwayWait == 0)
             putModule("Timer disabled");
@@ -157,20 +157,20 @@ public:
             putModule("Timer set to " + NoString(m_iAwayWait) + " seconds");
     }
 
-    void OnDisableTimerCommand(const NoString& sLine)
+    void OnDisableTimerCommand(const NoString& line)
     {
         SetAwayWait(0);
         putModule("Timer disabled");
     }
 
-    ModRet onUserRaw(NoString& sLine) override
+    ModRet onUserRaw(NoString& line) override
     {
-        if (!No::token(sLine, 0).equals("AWAY"))
+        if (!No::token(line, 0).equals("AWAY"))
             return CONTINUE;
 
         // If a client set us away, we don't touch that away message
-        const NoString sArg = No::tokens(sLine, 1).trim_n(" ");
-        if (sArg.empty() || sArg == ":")
+        const NoString arg = No::tokens(line, 1).trim_n(" ");
+        if (arg.empty() || arg == ":")
             m_bClientSetAway = false;
         else
             m_bClientSetAway = true;
@@ -207,25 +207,25 @@ public:
 private:
     NoString ExpandReason()
     {
-        NoString sReason = m_sReason;
-        if (sReason.empty())
-            sReason = SIMPLE_AWAY_DEFAULT_REASON;
+        NoString reason = m_sReason;
+        if (reason.empty())
+            reason = SIMPLE_AWAY_DEFAULT_REASON;
 
         time_t iTime = time(nullptr);
         NoString sTime = No::cTime(iTime, user()->timezone());
-        sReason.replace("%s", sTime);
+        reason.replace("%s", sTime);
 
-        return sReason;
+        return reason;
     }
 
     /* Settings */
-    void SetReason(NoString& sReason, bool bSave = true)
+    void SetReason(NoString& reason, bool bSave = true)
     {
         if (bSave) {
             NoRegistry registry(this);
-            registry.setValue("reason", sReason);
+            registry.setValue("reason", reason);
         }
-        m_sReason = sReason;
+        m_sReason = reason;
     }
 
     void SetAwayWait(uint iAwayWait, bool bSave = true)

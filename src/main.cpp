@@ -206,7 +206,7 @@ int main(int argc, char** argv)
     int iArg, iOptIndex = -1;
     bool bMakeConf = false;
     bool bMakePass = false;
-    bool bAllowRoot = false;
+    bool allowRoot = false;
     bool bForeground = false;
 #ifdef ALWAYS_RUN_IN_FOREGROUND
     bForeground = true;
@@ -229,7 +229,7 @@ int main(int argc, char** argv)
             NoDebug::setFormatted(false);
             break;
         case 'r':
-            bAllowRoot = true;
+            allowRoot = true;
             break;
         case 'c':
             bMakeConf = true;
@@ -281,16 +281,16 @@ int main(int argc, char** argv)
 #endif // HAVE_LIBSSL
 
     if (bMakePass) {
-        NoString sSalt;
+        NoString salt;
         No::printMessage("Type your new password.");
-        NoString sHash = No::getSaltedHashPass(sSalt);
+        NoString sHash = No::getSaltedHashPass(salt);
         No::printMessage("Kill ZNC process, if it's running.");
         No::printMessage("Then replace password in the <User> section of your config with this:");
         // Not PrintMessage(), to remove [**] from the beginning, to ease copypasting
         std::cout << "<Pass password>" << std::endl;
         std::cout << "\tMethod = " << No::defaultHash() << std::endl;
         std::cout << "\tHash = " << sHash << std::endl;
-        std::cout << "\tSalt = " << sSalt << std::endl;
+        std::cout << "\tSalt = " << salt << std::endl;
         std::cout << "</Pass>" << std::endl;
         No::printMessage("After that start ZNC again, and you should be able to login with the new password.");
 
@@ -321,7 +321,7 @@ int main(int argc, char** argv)
     if (isRoot()) {
         No::printError("You are running ZNC as root! Don't do that! There are not many valid");
         No::printError("reasons for this and it can, in theory, cause great damage!");
-        if (!bAllowRoot) {
+        if (!allowRoot) {
             NoApp::destroyInstance();
             return 1;
         }
@@ -445,7 +445,7 @@ int main(int argc, char** argv)
                 args[pos++] = strdup("--foreground");
             if (!NoDebug::isFormatted())
                 args[pos++] = strdup("--no-color");
-            if (bAllowRoot)
+            if (allowRoot)
                 args[pos++] = strdup("--allow-root");
             // The above code adds 3 entries to args tops
             // which means the array should be big enough
