@@ -7,7 +7,8 @@ foreach(NO_MODULE ${NO_MODULES})
         add_library(${NO_MOD} MODULE ${NO_MODULE})
         target_link_libraries(${NO_MOD} ${NO_LIBRARIES} $ENV{${NO_MOD}_LDFLAGS})
         set_target_properties(${NO_MOD} PROPERTIES PREFIX "" SUFFIX .so
-                                        COMPILE_FLAGS "$ENV{${NO_MOD}_CXXFLAGS}")
+                                        COMPILE_FLAGS "$ENV{${NO_MOD}_CXXFLAGS}"
+                                        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
         if(NOT DEVELOPER)
             install(TARGETS ${NO_MOD} LIBRARY DESTINATION ${INSTALL_MODDIR})
         endif()

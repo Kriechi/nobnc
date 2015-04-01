@@ -23,156 +23,16 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/3rdparty/sha2/sha2.h")
     message(FATAL_ERROR "Run 'git submodule update --init' (src/3rdparty/sha2 missing).")
 endif()
 
-### SOURCES
+### SUBDIRS
 
-list(APPEND NO_HEADERS include/nobnc/noapp.h
-                       include/nobnc/noapp_p.h
-                       include/nobnc/noauthenticator.h
-                       include/nobnc/nobuffer.h
-                       include/nobnc/nocachemap.h
-                       include/nobnc/nochannel.h
-                       include/nobnc/noclient.h
-                       include/nobnc/noconditionvariable.h
-                       include/nobnc/nodebug.h
-                       include/nobnc/nodir.h
-                       include/nobnc/noescape.h
-                       include/nobnc/noexception.h
-                       include/nobnc/nofile.h
-                       include/nobnc/nohttpsocket.h
-                       include/nobnc/noircsocket.h
-                       include/nobnc/nojob.h
-                       include/nobnc/nolistener.h
-                       include/nobnc/nonamespace.h
-                       include/nobnc/nomessage.h
-                       include/nobnc/nomessage_p.h
-                       include/nobnc/nomodule.h
-                       include/nobnc/nomodule_p.h
-                       include/nobnc/nomodulecall.h
-                       include/nobnc/nomodulecommand.h
-                       include/nobnc/nomoduleinfo.h
-                       include/nobnc/nomodulejob.h
-                       include/nobnc/nomoduleloader.h
-                       include/nobnc/nomodulesocket.h
-                       include/nobnc/nomutex.h
-                       include/nobnc/nomutexlocker.h
-                       include/nobnc/nonetwork.h
-                       include/nobnc/nonick.h
-                       include/nobnc/noprocess.h
-                       include/nobnc/noquery.h
-                       include/nobnc/noregistry.h
-                       include/nobnc/noserverinfo.h
-                       include/nobnc/nosettings.h
-                       include/nobnc/nosocket.h
-                       include/nobnc/nosocketmanager.h
-                       include/nobnc/nosslverifyhost.h
-                       include/nobnc/nostring.h
-                       include/nobnc/notable.h
-                       include/nobnc/notemplate.h
-                       include/nobnc/nothread.h
-                       include/nobnc/nothread_p.h
-                       include/nobnc/notimer.h
-                       include/nobnc/nouser.h
-                       include/nobnc/noutils.h
-                       include/nobnc/nowebpage.h
-                       include/nobnc/nowebsession.h
-                       include/nobnc/nowebsocket.h
-                       src/3rdparty/defines.h
-                       src/3rdparty/md5/md5.h
-                       src/3rdparty/sha2/sha2.h
-                       src/3rdparty/Csocket/Csocket.h
-                       ${PROJECT_BINARY_DIR}/include/nobnc/noglobal.h
-)
-
-list(APPEND NO_SOURCES src/noapp.cpp
-                       src/noauthenticator.cpp
-                       src/nobuffer.cpp
-                       src/nochannel.cpp
-                       src/noclient.cpp
-                       src/noclientcommand.cpp
-                       src/nodebug.cpp
-                       src/nodir.cpp
-                       src/noescape.cpp
-                       src/noexception.cpp
-                       src/nofile.cpp
-                       src/nohttpsocket.cpp
-                       src/noircsocket.cpp
-                       src/nolistener.cpp
-                       src/nomessage.cpp
-                       src/nomodule.cpp
-                       src/nomodulecommand.cpp
-                       src/nomoduleinfo.cpp
-                       src/nomodulejob.cpp
-                       src/nomoduleloader.cpp
-                       src/nomodulesocket.cpp
-                       src/nonetwork.cpp
-                       src/nonick.cpp
-                       src/noprocess.cpp
-                       src/noquery.cpp
-                       src/noregistry.cpp
-                       src/noserverinfo.cpp
-                       src/nosettings.cpp
-                       src/nosocket.cpp
-                       src/nosocketmanager.cpp
-                       src/nosslverifyhost.cpp
-                       src/nostring.cpp
-                       src/notable.cpp
-                       src/notemplate.cpp
-                       src/nothread.cpp
-                       src/notimer.cpp
-                       src/nouser.cpp
-                       src/noutils.cpp
-                       src/nowebpage.cpp
-                       src/nowebsession.cpp
-                       src/3rdparty/md5/md5.cpp
-                       src/3rdparty/sha2/sha2.c
-                       src/3rdparty/Csocket/Csocket.cc
-                       ${PROJECT_BINARY_DIR}/src/noglobal.cpp
-)
-
-### TARGETS
-
-add_library(libnobnc SHARED ${NO_SOURCES} ${NO_HEADERS})
-include_directories(${NO_INCLUDEDIRS} src/3rdparty)
-include_directories(${PROJECT_SOURCE_DIR}/include/nobnc) ### TODO: cleanup
-include_directories(${PROJECT_BINARY_DIR}/include/nobnc) ### TODO: cleanup
-target_link_libraries(libnobnc ${NO_LIBRARIES})
-set_target_properties(libnobnc PROPERTIES OUTPUT_NAME nobnc DEFINE_SYMBOL EXPORT_NO)
-add_dependencies(libnobnc version)
-
+add_subdirectory(src/lib)
 list(APPEND NO_LIBRARIES libnobnc)
-
-add_executable(nobnc src/main.cpp)
-target_link_libraries(nobnc ${NO_LIBRARIES})
-
-add_subdirectory(modules)
+add_subdirectory(src/bnc)
+add_subdirectory(src/modules)
 add_subdirectory(share)
 add_subdirectory(tests)
 
-### INSTALLS
-
-if(NOT DEVELOPER)
-    install(TARGETS nobnc RUNTIME DESTINATION ${INSTALL_BINDIR})
-    install(TARGETS libnobnc LIBRARY DESTINATION ${INSTALL_LIBDIR}
-                             RUNTIME DESTINATION ${INSTALL_BINDIR}
-                             ARCHIVE DESTINATION ${INSTALL_LIBDIR})
-    install(DIRECTORY include/nobnc DESTINATION ${INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN *.h)
-endif()
-
-### GENERATED FILES
-
-configure_file("${PROJECT_SOURCE_DIR}/include/nobnc/noglobal.h.in"
-               "${PROJECT_BINARY_DIR}/include/nobnc/noglobal.h")
-configure_file("${PROJECT_SOURCE_DIR}/include/nobnc/noconfig.h.in"
-               "${PROJECT_BINARY_DIR}/include/nobnc/noconfig.h")
-configure_file("${PROJECT_SOURCE_DIR}/src/noglobal.cpp.in"
-               "${PROJECT_BINARY_DIR}/src/noglobal.cpp")
-
-if(NOT DEVELOPER)
-    install(FILES "${PROJECT_BINARY_DIR}/include/nobnc/noconfig.h"
-            DESTINATION ${INSTALL_INCLUDEDIR}/no)
-    install(FILES "${PROJECT_BINARY_DIR}/include/nobnc/noglobal.h"
-            DESTINATION ${INSTALL_INCLUDEDIR}/no)
-endif()
+### FLAGS
 
 process_definitions("${NO_DEFINITIONS}" NO_DEFINITION_FLAGS)
 process_includedirs("${NO_INCLUDEDIRS}" NO_INCLUDE_FLAGS)
@@ -188,6 +48,8 @@ endif()
 
 set(NO_CXXFLAGS "${CMAKE_SHARED_MODULE_CXX_FLAGS} ${CMAKE_CXX_FLAGS} ${NO_DEFINITION_FLAGS} ${NO_INCLUDE_FLAGS}")
 set(NO_LDFLAGS "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} ${NO_LIBRARY_FLAGS}")
+
+### GENERATED FILES
 
 configure_file("${PROJECT_SOURCE_DIR}/nobnc-buildmod.in"
                "${PROJECT_BINARY_DIR}/nobnc-buildmod" @ONLY)

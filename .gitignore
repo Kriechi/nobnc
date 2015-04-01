@@ -1,5 +1,6 @@
 # Binaries
-/nobnc
+/bin
+/lib
 *.dylib
 *.bundle
 *.dll
@@ -8,9 +9,9 @@
 *.a
 
 # Generated sources
-/include/no/noconfig.h
-/include/no/noglobal.h
-/src/noglobal.cpp
+/include/nobnc/noconfig.h
+/include/nobnc/noglobal.h
+/src/lib/noglobal.cpp
 
 # Genrated docs
 /share/man/*.gz
@@ -20,10 +21,6 @@
 /config.status
 /nobnc.pc
 /nobnc-buildmod
-
-# Generated from third_party/Csocket
-/src/Csocket.cpp
-/include/no/Csocket.h
 
 # tests
 /tests/unittest

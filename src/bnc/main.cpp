@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-#include "noapp.h"
-#include "nomodulecall.h"
-#include "noexception.h"
-#include "nodebug.h"
+#include <nobnc/noapp.h>
+#include <nobnc/nomodulecall.h>
+#include <nobnc/noexception.h>
+#include <nobnc/nodebug.h>
 #include <signal.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -26,7 +26,7 @@
 #include <iostream>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)
-#include "nomutex.h"
+#include <nobnc/nomutex.h>
 #include <openssl/crypto.h>
 #include <memory>
 
