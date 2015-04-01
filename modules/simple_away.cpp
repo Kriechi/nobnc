@@ -29,7 +29,7 @@ class NoSimpleAway;
 class NoSimpleAwayJob : public NoTimer
 {
 public:
-    NoSimpleAwayJob(NoModule* pModule) : NoTimer(pModule)
+    NoSimpleAwayJob(NoModule* module) : NoTimer(module)
     {
         setName("simple_away");
         setDescription("Sets you away after detach");
@@ -74,7 +74,7 @@ public:
                    "Disables the wait time before setting you away");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoString sReasonArg;
 
@@ -244,11 +244,11 @@ void NoSimpleAwayJob::run()
 }
 
 template <>
-void no_moduleInfo<NoSimpleAway>(NoModuleInfo& Info)
+void no_moduleInfo<NoSimpleAway>(NoModuleInfo& info)
 {
-    Info.setWikiPage("simple_away");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("You might enter up to 3 arguments, like -notimer awaymessage or -timer 5 awaymessage.");
+    info.setWikiPage("simple_away");
+    info.setHasArgs(true);
+    info.setArgsHelpText("You might enter up to 3 arguments, like -notimer awaymessage or -timer 5 awaymessage.");
 }
 
 NETWORKMODULEDEFS(NoSimpleAway,

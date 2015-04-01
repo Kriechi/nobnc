@@ -46,19 +46,19 @@ public:
     enum ConfigState { ConfigNothing, ConfigNeedRehash, ConfigNeedWrite, ConfigNeedVerboseWrite };
 
     void loop();
-    bool writePidFile(int iPid);
+    bool writePidFile(int pid);
     bool waitForChildLock();
     bool isHostAllowed(const NoString& hostMask) const;
     // This returns false if there are too many anonymous connections from this ip
-    bool allowConnectionFrom(const NoString& sIP) const;
-    void initDirs(const NoString& sArgvPath, const NoString& sDataDir);
+    bool allowConnectionFrom(const NoString& address) const;
+    void initDirs(const NoString& argvPath, const NoString& dataDir);
     bool onBoot();
-    bool writeNewConfig(const NoString& sConfigFile);
+    bool writeNewConfig(const NoString& configFile);
     bool writeConfig();
-    bool parseConfig(const NoString& sConfig, NoString& error);
+    bool parseConfig(const NoString& config, NoString& error);
     bool rehashConfig(NoString& error);
     static NoString version();
-    static NoString tag(bool bIncludeVersion = true, bool bHTML = false);
+    static NoString tag(bool includeVersion = true, bool bHTML = false);
     static NoString compileOptionsString();
     NoString uptime() const;
     void clearBindHosts();
@@ -67,7 +67,7 @@ public:
     void clearTrustedProxies();
     bool addTrustedProxy(const NoString& host);
     bool removeTrustedProxy(const NoString& host);
-    void broadcast(const NoString& sMessage, bool bAdminOnly = false, NoUser* pSkipUser = nullptr, NoClient* pSkipClient = nullptr);
+    void broadcast(const NoString& message, bool adminOnly = false, NoUser* skipUser = nullptr, NoClient* skipClient = nullptr);
     void addBytesRead(ulonglong u);
     void addBytesWritten(ulonglong u);
     ulonglong bytesRead() const;
@@ -124,9 +124,9 @@ public:
     static NoApp* instance();
     static void destroyInstance();
 
-    NoUser* findUser(const NoString& sUsername);
-    NoModule* findModule(const NoString& sModName, const NoString& sUsername);
-    NoModule* findModule(const NoString& sModName, NoUser* user);
+    NoUser* findUser(const NoString& username);
+    NoModule* findModule(const NoString& name, const NoString& username);
+    NoModule* findModule(const NoString& name, NoUser* user);
 
     /** Reload a module everywhere
      *
@@ -135,25 +135,25 @@ public:
      *
      * @param module The name of the module to reload
      */
-    bool updateModule(const NoString& module);
+    bool updateModule(const NoString& name);
 
-    bool deleteUser(const NoString& sUsername);
-    bool addUser(NoUser* user, NoString& sErrorRet);
+    bool deleteUser(const NoString& username);
+    bool addUser(NoUser* user, NoString& error);
     std::map<NoString, NoUser*> userMap() const;
 
-    NoListener* findListener(u_short port, const NoString& host, No::AddressType eAddr);
+    NoListener* findListener(u_short port, const NoString& host, No::AddressType addressType);
     bool addListener(NoListener*);
     bool addListener(ushort port,
-                     const NoString& sBindHost,
-                     const NoString& sURIPrefix,
+                     const NoString& bindHost,
+                     const NoString& uriPrefix,
                      bool ssl,
-                     No::AddressType eAddr,
-                     No::AcceptType eAccept,
+                     No::AddressType addressType,
+                     No::AcceptType acceptType,
                      NoString& error);
     bool removeListener(NoListener*);
 
-    void setMotd(const NoString& sMessage);
-    void addMotd(const NoString& sMessage);
+    void setMotd(const NoString& message);
+    void addMotd(const NoString& message);
     void clearMotd();
     NoStringVector motd() const;
 

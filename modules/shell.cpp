@@ -74,11 +74,11 @@ public:
         }
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
 #ifndef MOD_SHELL_ALLOW_EVERYONE
         if (!user()->isAdmin()) {
-            sMessage = "You must be admin to use the shell module";
+            message = "You must be admin to use the shell module";
             return false;
         }
 #endif
@@ -91,15 +91,15 @@ public:
         NoString command = No::token(line, 0);
         if (command.equals("cd")) {
             NoString arg = No::tokens(line, 1);
-            NoString sPath = NoDir(m_sPath).filePath(arg.empty() ? NoString(NoDir::home().path()) : arg);
-            NoFile Dir(sPath);
+            NoString path = NoDir(m_sPath).filePath(arg.empty() ? NoString(NoDir::home().path()) : arg);
+            NoFile Dir(path);
 
             if (Dir.IsDir()) {
-                m_sPath = sPath;
+                m_sPath = path;
             } else if (Dir.Exists()) {
-                PutShell("cd: not a directory [" + sPath + "]");
+                PutShell("cd: not a directory [" + path + "]");
             } else {
-                PutShell("cd: no such directory [" + sPath + "]");
+                PutShell("cd: no such directory [" + path + "]");
             }
 
             PutShell("znc$");
@@ -108,11 +108,11 @@ public:
         }
     }
 
-    void PutShell(const NoString& sMsg)
+    void PutShell(const NoString& msg)
     {
-        NoString sPath = m_sPath.replace_n(" ", "_");
-        NoString sSource = ":" + moduleNick() + "!shell@" + sPath;
-        NoString line = sSource + " PRIVMSG " + client()->nick() + " :" + sMsg;
+        NoString path = m_sPath.replace_n(" ", "_");
+        NoString sSource = ":" + moduleNick() + "!shell@" + path;
+        NoString line = sSource + " PRIVMSG " + client()->nick() + " :" + msg;
         client()->putClient(line);
     }
 
@@ -153,9 +153,9 @@ void NoShellSock::onDisconnected()
 }
 
 template <>
-void no_moduleInfo<NoShellMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoShellMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("shell");
+    info.setWikiPage("shell");
 }
 
 #ifdef MOD_SHELL_ALLOW_EVERYONE

@@ -21,11 +21,11 @@ NoModuleInfo::NoModuleInfo() : NoModuleInfo("", "", No::NetworkModule)
 {
 }
 
-NoModuleInfo::NoModuleInfo(const NoString& name, const NoString& sPath, No::ModuleType eType)
+NoModuleInfo::NoModuleInfo(const NoString& name, const NoString& path, No::ModuleType type)
     : m_types(),
-      m_defaultType(eType),
+      m_defaultType(type),
       m_name(name),
-      m_path(sPath),
+      m_path(path),
       m_description(""),
       m_wikiPage(""),
       m_argsHelpText(""),
@@ -34,30 +34,30 @@ NoModuleInfo::NoModuleInfo(const NoString& name, const NoString& sPath, No::Modu
 {
 }
 
-bool NoModuleInfo::operator<(const NoModuleInfo& Info) const
+bool NoModuleInfo::operator<(const NoModuleInfo& info) const
 {
-    return (name() < Info.name());
+    return (name() < info.name());
 }
 
-bool NoModuleInfo::supportsType(No::ModuleType eType) const
+bool NoModuleInfo::supportsType(No::ModuleType type) const
 {
-    return m_types.find(eType) != m_types.end();
+    return m_types.find(type) != m_types.end();
 }
 
-void NoModuleInfo::addType(No::ModuleType eType)
+void NoModuleInfo::addType(No::ModuleType type)
 {
-    m_types.insert(eType);
+    m_types.insert(type);
 }
 
-NoString NoModuleInfo::moduleTypeToString(No::ModuleType eType)
+NoString NoModuleInfo::moduleTypeToString(No::ModuleType type)
 {
-    switch (eType) {
+    switch (type) {
     case No::GlobalModule:
         return "Global";
     case No::UserModule:
         return "User";
     case No::NetworkModule:
-        return "Network";
+        return "network";
     default:
         return "UNKNOWN";
     }
@@ -138,7 +138,7 @@ void NoModuleInfo::setLoader(NoModuleInfo::NoModuleLoader fLoader)
     m_loader = fLoader;
 }
 
-void NoModuleInfo::setDefaultType(No::ModuleType eType)
+void NoModuleInfo::setDefaultType(No::ModuleType type)
 {
-    m_defaultType = eType;
+    m_defaultType = type;
 }

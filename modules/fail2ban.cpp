@@ -28,7 +28,7 @@ public:
     {
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoString sTimeout = No::token(args, 0);
         NoString sAttempts = No::token(args, 1);
@@ -43,7 +43,7 @@ public:
         if (args.empty()) {
             timeout = 1;
         } else if (timeout == 0 || m_uiAllowedFailed == 0 || !No::tokens(args, 2).empty()) {
-            sMessage = "Invalid argument, must be the number of minutes "
+            message = "Invalid argument, must be the number of minutes "
                        "IPs are blocked after a failed login and can be "
                        "followed by number of allowed failed login attempts";
             return false;
@@ -86,7 +86,7 @@ public:
         client->close(NoSocket::CloseAfterWrite);
     }
 
-    void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
+    void onFailedLogin(const NoString& username, const NoString& sRemoteIP) override
     {
         uint* pCount = m_Cache.value(sRemoteIP);
         if (pCount)
@@ -119,11 +119,11 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoFailToBanMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoFailToBanMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("fail2ban");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("You might enter the time in minutes for the IP banning and the number of failed logins "
+    info.setWikiPage("fail2ban");
+    info.setHasArgs(true);
+    info.setArgsHelpText("You might enter the time in minutes for the IP banning and the number of failed logins "
                          "before any action is taken.");
 }
 

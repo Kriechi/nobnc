@@ -24,17 +24,17 @@ public:
     {
     }
 
-    bool onLoad(const NoString&, NoString& sMessage) override
+    bool onLoad(const NoString&, NoString& message) override
     {
-        sMessage = "retired module - see http://wiki.znc.in/awaynick";
+        message = "retired module - see http://wiki.znc.in/awaynick";
         return false;
     }
 };
 
 template <>
-void no_moduleInfo<NoAwayNickMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoAwayNickMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("awaynick");
+    info.setWikiPage("awaynick");
 }
 
 NETWORKMODULEDEFS(NoAwayNickMod, "retired module - see http://wiki.znc.in/awaynick")

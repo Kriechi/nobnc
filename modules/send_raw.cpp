@@ -36,7 +36,7 @@ class NoSendRawMod : public NoModule
                 network->putUser(No::tokens(line, 3));
                 putModule("Sent [" + No::tokens(line, 3) + "] to " + user->userName() + "/" + network->name());
             } else {
-                putModule("Network [" + No::token(line, 2) + "] not found for user [" + No::token(line, 1) + "]");
+                putModule("network [" + No::token(line, 2) + "] not found for user [" + No::token(line, 1) + "]");
             }
         } else {
             putModule("User [" + No::token(line, 1) + "] not found");
@@ -54,7 +54,7 @@ class NoSendRawMod : public NoModule
                 network->putIrc(No::tokens(line, 3));
                 putModule("Sent [" + No::tokens(line, 3) + "] to IRC Server of " + user->userName() + "/" + network->name());
             } else {
-                putModule("Network [" + No::token(line, 2) + "] not found for user [" + No::token(line, 1) + "]");
+                putModule("network [" + No::token(line, 2) + "] not found for user [" + No::token(line, 1) + "]");
             }
         } else {
             putModule("User [" + No::token(line, 1) + "] not found");
@@ -87,28 +87,28 @@ public:
         return true;
     }
 
-    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "index") {
-            if (WebSock.isPost()) {
-                NoUser* user = noApp->findUser(No::token(WebSock.param("network"), 0, "/"));
+        if (page == "index") {
+            if (socket.isPost()) {
+                NoUser* user = noApp->findUser(No::token(socket.param("network"), 0, "/"));
                 if (!user) {
-                    WebSock.session()->addError("User not found");
+                    socket.session()->addError("User not found");
                     return true;
                 }
 
-                NoNetwork* network = user->findNetwork(No::token(WebSock.param("network"), 1, "/"));
+                NoNetwork* network = user->findNetwork(No::token(socket.param("network"), 1, "/"));
                 if (!network) {
-                    WebSock.session()->addError("Network not found");
+                    socket.session()->addError("network not found");
                     return true;
                 }
 
-                bool bToServer = WebSock.param("send_to") == "server";
-                const NoString line = WebSock.param("line");
+                bool bToServer = socket.param("send_to") == "server";
+                const NoString line = socket.param("line");
 
-                Tmpl["user"] = user->userName();
-                Tmpl[bToServer ? "to_server" : "to_client"] = "true";
-                Tmpl["line"] = line;
+                tmpl["user"] = user->userName();
+                tmpl[bToServer ? "to_server" : "to_client"] = "true";
+                tmpl["line"] = line;
 
                 if (bToServer) {
                     network->putIrc(line);
@@ -116,12 +116,12 @@ public:
                     network->putUser(line);
                 }
 
-                WebSock.session()->addSuccess("Line sent");
+                socket.session()->addSuccess("Line sent");
             }
 
             const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
             for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
-                NoTemplate& l = Tmpl.addRow("UserLoop");
+                NoTemplate& l = tmpl.addRow("UserLoop");
                 l["Username"] = (*it->second).userName();
 
                 std::vector<NoNetwork*> vNetworks = (*it->second).networks();
@@ -157,9 +157,9 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoSendRawMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoSendRawMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("send_raw");
+    info.setWikiPage("send_raw");
 }
 
 USERMODULEDEFS(NoSendRawMod, "Lets you send some raw IRC lines as/to someone else")

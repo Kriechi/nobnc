@@ -24,13 +24,13 @@
 namespace No
 {
 NO_EXPORT NoString formatIp(ulong addr);
-NO_EXPORT ulong formatLongIp(const NoString& sIP);
+NO_EXPORT ulong formatLongIp(const NoString& address);
 
-NO_EXPORT void printError(const NoString& sMessage);
-NO_EXPORT void printMessage(const NoString& sMessage, bool bStrong = false);
-NO_EXPORT void printPrompt(const NoString& sMessage);
-NO_EXPORT void printAction(const NoString& sMessage);
-NO_EXPORT void printStatus(bool bSuccess, const NoString& sMessage = "");
+NO_EXPORT void printError(const NoString& message);
+NO_EXPORT void printMessage(const NoString& message, bool bStrong = false);
+NO_EXPORT void printPrompt(const NoString& message);
+NO_EXPORT void printAction(const NoString& message);
+NO_EXPORT void printStatus(bool success, const NoString& message = "");
 
 #ifdef HAVE_LIBSSL
 NO_EXPORT NoString encrypt(const NoString& data, const NoString& password);
@@ -74,18 +74,18 @@ enum status_t {
 };
 
 /** Write a map to a file.
- * @param sPath The file name to write to.
+ * @param path The file name to write to.
  * @param iMode The mode for the file.
  * @return The result of the operation.
  * @see WriteFilter.
  */
-NO_EXPORT status_t writeToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode = 0644);
+NO_EXPORT status_t writeToDisk(const NoStringMap& values, const NoString& path, mode_t iMode = 0644);
 /** Read a map from a file.
- * @param sPath The file name to read from.
+ * @param path The file name to read from.
  * @return The result of the operation.
  * @see ReadFilter.
  */
-NO_EXPORT status_t readFromDisk(NoStringMap& values, const NoString& sPath);
+NO_EXPORT status_t readFromDisk(NoStringMap& values, const NoString& path);
 
 /** Pretty-print a number of bytes.
  * @param d The number of bytes.

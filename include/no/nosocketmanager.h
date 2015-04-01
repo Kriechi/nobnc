@@ -36,12 +36,12 @@ public:
 
     bool listenHost(ushort iPort,
                     const NoString& sSockName,
-                    const NoString& sBindHost,
+                    const NoString& bindHost,
                     bool ssl = false,
                     int iMaxConns = SOMAXCONN,
                     NoSocket* pcSock = nullptr,
                     u_int iTimeout = 0,
-                    No::AddressType eAddr = No::Ipv4AndIpv6Address);
+                    No::AddressType addressType = No::Ipv4AndIpv6Address);
 
     bool listenAll(ushort iPort,
                    const NoString& sSockName,
@@ -49,34 +49,34 @@ public:
                    int iMaxConns = SOMAXCONN,
                    NoSocket* pcSock = nullptr,
                    u_int iTimeout = 0,
-                   No::AddressType eAddr = No::Ipv4AndIpv6Address);
+                   No::AddressType addressType = No::Ipv4AndIpv6Address);
 
     u_short listenRand(const NoString& sSockName,
-                       const NoString& sBindHost,
+                       const NoString& bindHost,
                        bool ssl = false,
                        int iMaxConns = SOMAXCONN,
                        NoSocket* pcSock = nullptr,
                        u_int iTimeout = 0,
-                       No::AddressType eAddr = No::Ipv4AndIpv6Address);
+                       No::AddressType addressType = No::Ipv4AndIpv6Address);
 
     u_short listenAllRand(const NoString& sSockName,
                           bool ssl = false,
                           int iMaxConns = SOMAXCONN,
                           NoSocket* pcSock = nullptr,
                           u_int iTimeout = 0,
-                          No::AddressType eAddr = No::Ipv4AndIpv6Address);
+                          No::AddressType addressType = No::Ipv4AndIpv6Address);
 
-    void connect(const NoString& sHostname,
+    void connect(const NoString& hostname,
                  ushort iPort,
                  const NoString& sSockName,
                  int iTimeout = 60,
                  bool ssl = false,
-                 const NoString& sBindHost = "",
+                 const NoString& bindHost = "",
                  NoSocket* pcSock = nullptr);
 
     std::vector<NoSocket*> sockets() const;
     std::vector<NoSocket*> findSockets(const NoString& name);
-    uint anonConnectionCount(const NoString& sIP) const;
+    uint anonConnectionCount(const NoString& address) const;
 
     void cleanup();
     void dynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution = 3600);

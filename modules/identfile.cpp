@@ -96,13 +96,13 @@ public:
         }
     }
 
-    void SetIRCSock(NoIrcSocket* pIRCSock)
+    void SetIRCSock(NoIrcSocket* socket)
     {
         if (m_pIRCSock) {
             noApp->resumeConnectQueue();
         }
 
-        m_pIRCSock = pIRCSock;
+        m_pIRCSock = socket;
 
         if (m_pIRCSock) {
             noApp->pauseConnectQueue();
@@ -170,7 +170,7 @@ public:
         }
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         m_pISpoofLockFile = nullptr;
         m_pIRCSock = nullptr;
@@ -187,7 +187,7 @@ public:
         return true;
     }
 
-    ModRet onIrcConnecting(NoIrcSocket* pIRCSock) override
+    ModRet onIrcConnecting(NoIrcSocket* socket) override
     {
         if (m_pISpoofLockFile != nullptr) {
             NO_DEBUG("Aborting connection, ident spoof lock file exists");
@@ -203,7 +203,7 @@ public:
             return HALTCORE;
         }
 
-        SetIRCSock(pIRCSock);
+        SetIRCSock(socket);
         return CONTINUE;
     }
 
@@ -214,9 +214,9 @@ public:
         }
     }
 
-    void onIrcConnectionError(NoIrcSocket* pIRCSock) override
+    void onIrcConnectionError(NoIrcSocket* socket) override
     {
-        if (m_pIRCSock == pIRCSock) {
+        if (m_pIRCSock == socket) {
             ReleaseISpoof();
         }
     }
@@ -230,9 +230,9 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoIdentFileModule>(NoModuleInfo& Info)
+void no_moduleInfo<NoIdentFileModule>(NoModuleInfo& info)
 {
-    Info.setWikiPage("identfile");
+    info.setWikiPage("identfile");
 }
 
 GLOBALMODULEDEFS(NoIdentFileModule, "Write the ident of a user to a file when they are trying to connect.")

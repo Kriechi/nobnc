@@ -23,19 +23,19 @@
 #include "noapp.h"
 #include "nodebug.h"
 
-NoModuleSocket::NoModuleSocket(NoModule* pModule) : NoSocket(), m_module(pModule)
+NoModuleSocket::NoModuleSocket(NoModule* module) : NoSocket(), m_module(module)
 {
-    if (pModule)
-        NoModulePrivate::get(pModule)->addSocket(this);
+    if (module)
+        NoModulePrivate::get(module)->addSocket(this);
     enableReadLine();
     setMaxBufferThreshold(10240);
 }
 
-NoModuleSocket::NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort port)
-    : NoSocket(sHostname, port), m_module(pModule)
+NoModuleSocket::NoModuleSocket(NoModule* module, const NoString& hostname, ushort port)
+    : NoSocket(hostname, port), m_module(module)
 {
-    if (pModule)
-        NoModulePrivate::get(pModule)->addSocket(this);
+    if (module)
+        NoModulePrivate::get(module)->addSocket(this);
     enableReadLine();
     setMaxBufferThreshold(10240);
 }
@@ -68,9 +68,9 @@ void NoModuleSocket::onReachedMaxBuffer()
     close();
 }
 
-void NoModuleSocket::onSocketError(int iErrno, const NoString& sDescription)
+void NoModuleSocket::onSocketError(int iErrno, const NoString& description)
 {
-    NO_DEBUG(name() << " == SockError(" << sDescription << ", " << strerror(iErrno) << ")");
+    NO_DEBUG(name() << " == SockError(" << description << ", " << strerror(iErrno) << ")");
     if (iErrno == EMFILE) {
         // We have too many open fds, this can cause a busy loop.
         close();
@@ -82,7 +82,7 @@ bool NoModuleSocket::onConnectionFrom(const NoString& host, ushort port)
     return noApp->allowConnectionFrom(host);
 }
 
-bool NoModuleSocket::connect(const NoString& sHostname, ushort port, bool ssl, uint uTimeout)
+bool NoModuleSocket::connect(const NoString& hostname, ushort port, bool ssl, uint uTimeout)
 {
     if (!m_module) {
         NO_DEBUG("ERROR: NoSocket::Connect called on instance without m_pModule handle!");
@@ -91,15 +91,15 @@ bool NoModuleSocket::connect(const NoString& sHostname, ushort port, bool ssl, u
 
     NoUser* user = m_module->user();
     NoString sSockName = "MOD::C::" + m_module->moduleName();
-    NoString sBindHost;
+    NoString bindHost;
 
     if (user) {
         sSockName += "::" + user->userName();
-        sBindHost = user->bindHost();
+        bindHost = user->bindHost();
         NoNetwork* network = m_module->network();
         if (network) {
             sSockName += "::" + network->name();
-            sBindHost = network->bindHost();
+            bindHost = network->bindHost();
         }
     }
 
@@ -108,7 +108,7 @@ bool NoModuleSocket::connect(const NoString& sHostname, ushort port, bool ssl, u
         sSockName = name();
     }
 
-    m_module->manager()->connect(sHostname, port, sSockName, uTimeout, ssl, sBindHost, this);
+    m_module->manager()->connect(hostname, port, sSockName, uTimeout, ssl, bindHost, this);
     return true;
 }
 

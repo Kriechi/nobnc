@@ -45,7 +45,7 @@ class NoAway;
 class NoAwayJob : public NoTimer
 {
 public:
-    NoAwayJob(NoModule* pModule) : NoTimer(pModule)
+    NoAwayJob(NoModule* module) : NoTimer(module)
     {
         setName("AwayJob");
         setDescription("Checks for idle and saves messages every 1 minute");
@@ -92,8 +92,8 @@ class NoAway : public NoModule
         NoString nick = client()->nick();
         for (u_int a = 0; a < m_vMessages.size(); a++) {
             NoString sWhom = No::token(m_vMessages[a], 1, ":");
-            NoString sMessage = No::tokens(m_vMessages[a], 2, ":");
-            putUser(":" + sWhom + " PRIVMSG " + nick + " :" + sMessage);
+            NoString message = No::tokens(m_vMessages[a], 2, ":");
+            putUser(":" + sWhom + " PRIVMSG " + nick + " :" + message);
         }
     }
 
@@ -149,9 +149,9 @@ class NoAway : public NoModule
         for (u_int a = 0; a < m_vMessages.size(); a++) {
             NoString sTime = No::token(m_vMessages[a], 0);
             NoString sWhom = No::token(m_vMessages[a], 1);
-            NoString sMessage = No::tokens(m_vMessages[a], 2);
+            NoString message = No::tokens(m_vMessages[a], 2);
 
-            if ((sTime.empty()) || (sWhom.empty()) || (sMessage.empty())) {
+            if ((sTime.empty()) || (sWhom.empty()) || (message.empty())) {
                 // illegal format
                 putModule("Corrupt message! [" + m_vMessages[a] + "]");
                 m_vMessages.erase(m_vMessages.begin() + a--);
@@ -173,7 +173,7 @@ class NoAway : public NoModule
             NoString sTmp = "    " + NoString(a) + ") [";
             sTmp.append(szFormat, iCount);
             sTmp += "] ";
-            sTmp += sMessage;
+            sTmp += message;
             msvOutput[sWhom].push_back(sTmp);
         }
 
@@ -248,7 +248,7 @@ public:
             SaveBufferToDisk();
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoString sMyArgs = args;
         size_t uIndex = 0;
@@ -267,12 +267,12 @@ public:
             if (!sMyArgs.empty()) {
                 m_sPassword = No::md5(sMyArgs);
             } else {
-                sMessage = "This module needs as an argument a keyphrase used for encryption";
+                message = "This module needs as an argument a keyphrase used for encryption";
                 return false;
             }
 
             if (!BootStrap()) {
-                sMessage = "Failed to decrypt your saved messages - "
+                message = "Failed to decrypt your saved messages - "
                            "Did you give the right encryption key as an argument to this module?";
                 m_bBootError = true;
                 return false;
@@ -321,9 +321,9 @@ public:
                 sFile += m_vMessages[b] + "\n";
 
             sFile = No::encrypt(sFile, m_sPassword);
-            NoString sPath = GetPath();
-            if (!sPath.empty()) {
-                NoFile File(sPath);
+            NoString path = GetPath();
+            if (!path.empty()) {
+                NoFile File(path);
                 if (File.Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
                     File.Chmod(0600);
                     File.Write(sFile);
@@ -350,10 +350,10 @@ public:
         return (ret);
     }
 
-    void Away(bool bForce = false, const NoString& reason = "")
+    void Away(bool force = false, const NoString& reason = "")
     {
-        if ((!m_bIsAway) || (bForce)) {
-            if (!bForce)
+        if ((!m_bIsAway) || (force)) {
+            if (!force)
                 m_sReason = reason;
             else if (!reason.empty())
                 m_sReason = reason;
@@ -388,22 +388,22 @@ public:
         m_sReason = "";
     }
 
-    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& nick, NoString& message) override
     {
         if (m_bIsAway)
-            AddMessage(time(nullptr), Nick, sMessage);
+            AddMessage(time(nullptr), nick, message);
         return (CONTINUE);
     }
 
-    ModRet onPrivAction(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivAction(NoNick& nick, NoString& message) override
     {
         if (m_bIsAway) {
-            AddMessage(time(nullptr), Nick, "* " + sMessage);
+            AddMessage(time(nullptr), nick, "* " + message);
         }
         return (CONTINUE);
     }
 
-    ModRet onUserNotice(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserNotice(NoString& target, NoString& message) override
     {
         Ping();
         if (m_bIsAway)
@@ -412,7 +412,7 @@ public:
         return (CONTINUE);
     }
 
-    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserMsg(NoString& target, NoString& message) override
     {
         Ping();
         if (m_bIsAway)
@@ -421,7 +421,7 @@ public:
         return (CONTINUE);
     }
 
-    ModRet onUserAction(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserAction(NoString& target, NoString& message) override
     {
         Ping();
         if (m_bIsAway)
@@ -483,11 +483,11 @@ private:
         return (true);
     }
 
-    void AddMessage(time_t iTime, const NoNick& Nick, const NoString& sMessage)
+    void AddMessage(time_t iTime, const NoNick& nick, const NoString& message)
     {
-        if (Nick.nick() == network()->ircNick().nick())
+        if (nick.nick() == network()->ircNick().nick())
             return; // ignore messages from self
-        AddMessage(NoString(iTime) + " " + Nick.nickMask() + " " + sMessage);
+        AddMessage(NoString(iTime) + " " + nick.nickMask() + " " + message);
     }
 
     void AddMessage(const NoString& text)
@@ -520,11 +520,11 @@ void NoAwayJob::run()
 }
 
 template <>
-void no_moduleInfo<NoAway>(NoModuleInfo& Info)
+void no_moduleInfo<NoAway>(NoModuleInfo& info)
 {
-    Info.setWikiPage("awaystore");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("[ -notimer | -timer N ]  passw0rd . N is number of seconds, 600 by default.");
+    info.setWikiPage("awaystore");
+    info.setHasArgs(true);
+    info.setArgsHelpText("[ -notimer | -timer N ]  passw0rd . N is number of seconds, 600 by default.");
 }
 
 NETWORKMODULEDEFS(NoAway, "Adds auto-away with logging, useful when you use ZNC from different locations");

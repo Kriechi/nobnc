@@ -36,19 +36,19 @@ public:
         Done // all stuff has been done
     };
 
-    NoWebSocket(const NoString& sURIPrefix);
+    NoWebSocket(const NoString& uriPrefix);
     virtual ~NoWebSocket();
 
     bool forceLogin() override;
     bool onLogin(const NoString& sUser, const NoString& pass, bool bBasic) override;
     void onPageRequest(const NoString& sURI) override;
 
-    PageRequest printTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule = nullptr);
-    PageRequest printStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule = nullptr);
+    PageRequest printTemplate(const NoString& page, NoString& sPageRet, NoModule* module = nullptr);
+    PageRequest printStaticFile(const NoString& path, NoString& sPageRet, NoModule* module = nullptr);
 
-    NoString findTemplate(NoModule* pModule, const NoString& name);
+    NoString findTemplate(NoModule* module, const NoString& name);
 
-    void printErrorPage(const NoString& sMessage);
+    void printErrorPage(const NoString& message);
 
     std::shared_ptr<NoWebSession> session();
 
@@ -57,8 +57,8 @@ public:
     void availableSkins(NoStringVector& vRet) const;
     NoString skinName();
 
-    NoString requestCookie(const NoString& sKey);
-    bool sendCookie(const NoString& sKey, const NoString& sValue);
+    NoString requestCookie(const NoString& key);
+    bool sendCookie(const NoString& key, const NoString& value);
 
     static void finishUserSessions(const NoUser& User);
 
@@ -66,8 +66,8 @@ protected:
     using NoHttpSocket::printErrorPage;
 
     bool addModuleLoop(const NoString& sLoopName, NoModule& Module, NoTemplate* pTemplate = nullptr);
-    NoStringVector directories(NoModule* pModule, bool bIsTemplate);
-    void setPaths(NoModule* pModule, bool bIsTemplate = false);
+    NoStringVector directories(NoModule* module, bool bIsTemplate);
+    void setPaths(NoModule* module, bool bIsTemplate = false);
     void setVars();
     NoString csrfCheck(); // TODO: wat?
 

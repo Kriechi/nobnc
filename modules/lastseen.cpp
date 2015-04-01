@@ -111,11 +111,11 @@ public:
         return "Last Seen";
     }
 
-    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "index") {
+        if (page == "index") {
             NoModuleLoader* GModules = noApp->loader();
-            Tmpl["WebAdminLoaded"] = NoString(GModules->findModule("webadmin") != nullptr);
+            tmpl["WebAdminLoaded"] = NoString(GModules->findModule("webadmin") != nullptr);
 
             MTimeMulti mmSorted;
             const MUsers& mUsers = noApp->userMap();
@@ -126,10 +126,10 @@ public:
 
             for (MTimeMulti::const_iterator it = mmSorted.begin(); it != mmSorted.end(); ++it) {
                 NoUser* user = it->second;
-                NoTemplate& Row = Tmpl.addRow("UserLoop");
+                NoTemplate& Row = tmpl.addRow("UserLoop");
 
                 Row["Username"] = user->userName();
-                Row["IsSelf"] = NoString(user == WebSock.session()->user());
+                Row["IsSelf"] = NoString(user == socket.session()->user());
                 Row["LastSeen"] = FormatLastSeen(user, "never");
             }
 
@@ -139,12 +139,12 @@ public:
         return false;
     }
 
-    bool onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onEmbeddedWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "webadmin/user" && WebSock.session()->isAdmin()) {
-            NoUser* user = noApp->findUser(Tmpl["Username"]);
+        if (page == "webadmin/user" && socket.session()->isAdmin()) {
+            NoUser* user = noApp->findUser(tmpl["Username"]);
             if (user) {
-                Tmpl["LastSeen"] = FormatLastSeen(user);
+                tmpl["LastSeen"] = FormatLastSeen(user);
             }
             return true;
         }
@@ -154,9 +154,9 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoLastSeenMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoLastSeenMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("lastseen");
+    info.setWikiPage("lastseen");
 }
 
 GLOBALMODULEDEFS(NoLastSeenMod, "Collects data about when a user last logged in.")

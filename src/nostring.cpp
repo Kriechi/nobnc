@@ -441,20 +441,20 @@ NoString NoString::trimRight_n(const NoString& s) const
     return ret;
 }
 
-bool NoString::trimPrefix(const NoString& sPrefix)
+bool NoString::trimPrefix(const NoString& prefix)
 {
-    if (startsWith(sPrefix)) {
-        leftChomp(sPrefix.length());
+    if (startsWith(prefix)) {
+        leftChomp(prefix.length());
         return true;
     } else {
         return false;
     }
 }
 
-bool NoString::trimSuffix(const NoString& sSuffix)
+bool NoString::trimSuffix(const NoString& suffix)
 {
-    if (right(sSuffix.length()).equals(sSuffix)) {
-        rightChomp(sSuffix.length());
+    if (right(suffix.length()).equals(suffix)) {
+        rightChomp(suffix.length());
         return true;
     } else {
         return false;
@@ -480,14 +480,14 @@ ulong NoString::find(const NoString& s, uint pos, No::CaseSensitivity cs) const
     }
 }
 
-bool NoString::startsWith(const NoString& sPrefix, No::CaseSensitivity cs) const
+bool NoString::startsWith(const NoString& prefix, No::CaseSensitivity cs) const
 {
-    return left(sPrefix.length()).equals(sPrefix, cs);
+    return left(prefix.length()).equals(prefix, cs);
 }
 
-bool NoString::endsWith(const NoString& sSuffix, No::CaseSensitivity cs) const
+bool NoString::endsWith(const NoString& suffix, No::CaseSensitivity cs) const
 {
-    return right(sSuffix.length()).equals(sSuffix, cs);
+    return right(suffix.length()).equals(suffix, cs);
 }
 
 bool NoString::contains(char ch, No::CaseSensitivity cs) const
@@ -500,17 +500,17 @@ bool NoString::contains(const NoString& s, No::CaseSensitivity cs) const
     return find(s, cs) != npos;
 }
 
-NoString NoString::trimPrefix_n(const NoString& sPrefix) const
+NoString NoString::trimPrefix_n(const NoString& prefix) const
 {
     NoString ret = *this;
-    ret.trimPrefix(sPrefix);
+    ret.trimPrefix(prefix);
     return ret;
 }
 
-NoString NoString::trimSuffix_n(const NoString& sSuffix) const
+NoString NoString::trimSuffix_n(const NoString& suffix) const
 {
     NoString ret = *this;
-    ret.trimSuffix(sSuffix);
+    ret.trimSuffix(suffix);
     return ret;
 }
 

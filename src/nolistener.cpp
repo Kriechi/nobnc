@@ -158,7 +158,7 @@ void NoPeerSocket::readLine(const NoString& line)
             noApp->manager()->swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
             // And don't forget to give it some sane name / timeout
-            socket->setName("WebMod::Client");
+            socket->setName("WebMod::client");
         }
     }
 

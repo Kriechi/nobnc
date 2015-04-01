@@ -33,21 +33,21 @@ public:
     NoDccBounce(NoBounceDccMod* mod,
                 ulong uLongIP,
                 ushort port,
-                const NoString& sFileName,
+                const NoString& fileName,
                 const NoString& sRemoteNick,
                 const NoString& sRemoteIP,
                 bool bIsChat = false);
     NoDccBounce(NoBounceDccMod* mod,
-                const NoString& sHostname,
+                const NoString& hostname,
                 ushort port,
                 const NoString& sRemoteNick,
                 const NoString& sRemoteIP,
-                const NoString& sFileName,
+                const NoString& fileName,
                 bool bIsChat = false);
     virtual ~NoDccBounce();
 
     static ushort
-    DCCRequest(const NoString& nick, ulong uLongIP, ushort port, const NoString& sFileName, bool bIsChat, NoBounceDccMod* mod, const NoString& sRemoteIP);
+    DCCRequest(const NoString& nick, ulong uLongIP, ushort port, const NoString& fileName, bool bIsChat, NoBounceDccMod* mod, const NoString& sRemoteIP);
 
     void readLine(const NoString& data) override;
     void readData(const char* data, size_t len) override;
@@ -55,7 +55,7 @@ public:
     void onTimeout() override;
     void onConnectionRefused() override;
     void onReachedMaxBuffer() override;
-    void onSocketError(int iErrno, const NoString& sDescription) override;
+    void onSocketError(int iErrno, const NoString& description) override;
     void onConnected() override;
     void onDisconnected() override;
     NoSocket* createSocket(const NoString& host, ushort port) override;
@@ -151,25 +151,25 @@ public:
         Table.addColumn("IP");
         Table.addColumn("File");
 
-        for (NoDccBounce* pSock : m_sockets) {
-            NoString sSockName = pSock->name();
+        for (NoDccBounce* socket : m_sockets) {
+            NoString sSockName = socket->name();
 
-            if (!(pSock->IsRemote())) {
+            if (!(socket->IsRemote())) {
                 Table.addRow();
-                Table.setValue("Nick", pSock->GetRemoteNick());
-                Table.setValue("IP", pSock->GetRemoteAddr());
+                Table.setValue("Nick", socket->GetRemoteNick());
+                Table.setValue("IP", socket->GetRemoteAddr());
 
-                if (pSock->IsChat()) {
+                if (socket->IsChat()) {
                     Table.setValue("Type", "Chat");
                 } else {
                     Table.setValue("Type", "Xfer");
-                    Table.setValue("File", pSock->GetFileName());
+                    Table.setValue("File", socket->GetFileName());
                 }
 
                 NoString sState = "Waiting";
-                if ((pSock->isConnected()) || (pSock->IsPeerConnected())) {
+                if ((socket->isConnected()) || (socket->IsPeerConnected())) {
                     sState = "Halfway";
-                    if ((pSock->isConnected()) && (pSock->IsPeerConnected())) {
+                    if ((socket->isConnected()) && (socket->IsPeerConnected())) {
                         sState = "Connected";
                     }
                 }
@@ -184,11 +184,11 @@ public:
 
     void UseClientIPCommand(const NoString& line)
     {
-        NoString sValue = No::tokens(line, 1);
+        NoString value = No::tokens(line, 1);
 
         NoRegistry registry(this);
-        if (!sValue.empty()) {
-            registry.setValue("UseClientIP", sValue);
+        if (!value.empty()) {
+            registry.setValue("UseClientIP", value);
         }
 
         putModule("UseClientIP: " + NoString(registry.value("UseClientIP").toBool()));
@@ -216,52 +216,52 @@ public:
         return NoRegistry(this).value("UseClientIP").toBool();
     }
 
-    ModRet onUserCtcp(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserCtcp(NoString& target, NoString& message) override
     {
-        if (sMessage.startsWith("DCC ")) {
-            NoStringVector tokens = No::quoteSplit(sMessage);
+        if (message.startsWith("DCC ")) {
+            NoStringVector tokens = No::quoteSplit(message);
             tokens.resize(6);
             NoString sType = tokens.at(1).trim_n("\"");
             NoString sFile = tokens.at(2);
             ulong uLongIP = tokens.at(3).trim_n("\"").toULong();
             ushort port = tokens.at(4).trim_n("\"").toUShort();
             ulong uFileSize = tokens.at(5).trim_n("\"").toULong();
-            NoString sIP = GetLocalDCCIP();
+            NoString address = GetLocalDCCIP();
 
             if (!UseClientIP()) {
                 uLongIP = No::formatLongIp(client()->socket()->remoteAddress());
             }
 
             if (sType.equals("CHAT")) {
-                ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, port, "", true, this, "");
+                ushort uBNCPort = NoDccBounce::DCCRequest(target, uLongIP, port, "", true, this, "");
                 if (uBNCPort) {
-                    putIrc("PRIVMSG " + sTarget + " :\001DCC CHAT chat " + NoString(No::formatLongIp(sIP)) + " " +
+                    putIrc("PRIVMSG " + target + " :\001DCC CHAT chat " + NoString(No::formatLongIp(address)) + " " +
                            NoString(uBNCPort) + "\001");
                 }
             } else if (sType.equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
-                ushort uBNCPort = NoDccBounce::DCCRequest(sTarget, uLongIP, port, sFile, false, this, "");
+                ushort uBNCPort = NoDccBounce::DCCRequest(target, uLongIP, port, sFile, false, this, "");
                 if (uBNCPort) {
-                    putIrc("PRIVMSG " + sTarget + " :\001DCC SEND " + sFile + " " + NoString(No::formatLongIp(sIP)) +
+                    putIrc("PRIVMSG " + target + " :\001DCC SEND " + sFile + " " + NoString(No::formatLongIp(address)) +
                            " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.equals("RESUME")) {
                 // PRIVMSG user :DCC RESUME "znc.o" 58810 151552
-                ushort uResumePort = No::token(sMessage, 3).toUShort();
+                ushort uResumePort = No::token(message, 3).toUShort();
 
-                for (NoDccBounce* pSock : m_sockets) {
-                    if (pSock->localPort() == uResumePort) {
-                        putIrc("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
-                               NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
+                for (NoDccBounce* socket : m_sockets) {
+                    if (socket->localPort() == uResumePort) {
+                        putIrc("PRIVMSG " + target + " :\001DCC " + sType + " " + sFile + " " +
+                               NoString(socket->GetUserPort()) + " " + No::token(message, 4) + "\001");
                     }
                 }
             } else if (sType.equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
 
-                for (NoDccBounce* pSock : m_sockets) {
-                    if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
-                        putIrc("PRIVMSG " + sTarget + " :\001DCC " + sType + " " + sFile + " " +
-                               NoString(pSock->localPort()) + " " + No::token(sMessage, 4) + "\001");
+                for (NoDccBounce* socket : m_sockets) {
+                    if (socket->GetUserPort() == No::token(message, 3).toUShort()) {
+                        putIrc("PRIVMSG " + target + " :\001DCC " + sType + " " + sFile + " " +
+                               NoString(socket->localPort()) + " " + No::token(message, 4) + "\001");
                     }
                 }
             }
@@ -272,12 +272,12 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
     {
         NoNetwork* network = NoModule::network();
-        if (sMessage.startsWith("DCC ") && network->isUserAttached()) {
+        if (message.startsWith("DCC ") && network->isUserAttached()) {
             // DCC CHAT chat 2453612361 44592
-            NoStringVector tokens = No::quoteSplit(sMessage);
+            NoStringVector tokens = No::quoteSplit(message);
             tokens.resize(6);
             NoString sType = tokens.at(1).trim_n("\"");
             NoString sFile = tokens.at(2);
@@ -286,37 +286,37 @@ public:
             ulong uFileSize = tokens.at(5).trim_n("\"").toULong();
 
             if (sType.equals("CHAT")) {
-                NoNick FromNick(Nick.nickMask());
+                NoNick FromNick(nick.nickMask());
                 ushort uBNCPort = NoDccBounce::DCCRequest(FromNick.nick(), uLongIP, port, "", true, this, No::formatIp(uLongIP));
                 if (uBNCPort) {
-                    NoString sIP = GetLocalDCCIP();
-                    putUser(":" + Nick.nickMask() + " PRIVMSG " + network->currentNick() + " :\001DCC CHAT chat " +
-                            NoString(No::formatLongIp(sIP)) + " " + NoString(uBNCPort) + "\001");
+                    NoString address = GetLocalDCCIP();
+                    putUser(":" + nick.nickMask() + " PRIVMSG " + network->currentNick() + " :\001DCC CHAT chat " +
+                            NoString(No::formatLongIp(address)) + " " + NoString(uBNCPort) + "\001");
                 }
             } else if (sType.equals("SEND")) {
                 // DCC SEND readme.txt 403120438 5550 1104
-                ushort uBNCPort = NoDccBounce::DCCRequest(Nick.nick(), uLongIP, port, sFile, false, this, No::formatIp(uLongIP));
+                ushort uBNCPort = NoDccBounce::DCCRequest(nick.nick(), uLongIP, port, sFile, false, this, No::formatIp(uLongIP));
                 if (uBNCPort) {
-                    NoString sIP = GetLocalDCCIP();
-                    putUser(":" + Nick.nickMask() + " PRIVMSG " + network->currentNick() + " :\001DCC SEND " + sFile + " " +
-                            NoString(No::formatLongIp(sIP)) + " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
+                    NoString address = GetLocalDCCIP();
+                    putUser(":" + nick.nickMask() + " PRIVMSG " + network->currentNick() + " :\001DCC SEND " + sFile + " " +
+                            NoString(No::formatLongIp(address)) + " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.equals("RESUME")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
-                ushort uResumePort = No::token(sMessage, 3).toUShort();
+                ushort uResumePort = No::token(message, 3).toUShort();
 
-                for (NoDccBounce* pSock : m_sockets) {
-                    if (pSock->localPort() == uResumePort) {
-                        putUser(":" + Nick.nickMask() + " PRIVMSG " + network->currentNick() + " :\001DCC " + sType + " " +
-                                sFile + " " + NoString(pSock->GetUserPort()) + " " + No::token(sMessage, 4) + "\001");
+                for (NoDccBounce* socket : m_sockets) {
+                    if (socket->localPort() == uResumePort) {
+                        putUser(":" + nick.nickMask() + " PRIVMSG " + network->currentNick() + " :\001DCC " + sType + " " +
+                                sFile + " " + NoString(socket->GetUserPort()) + " " + No::token(message, 4) + "\001");
                     }
                 }
             } else if (sType.equals("ACCEPT")) {
                 // Need to lookup the connection by port, filter the port, and forward to the user
-                for (NoDccBounce* pSock : m_sockets) {
-                    if (pSock->GetUserPort() == No::token(sMessage, 3).toUShort()) {
-                        putUser(":" + Nick.nickMask() + " PRIVMSG " + network->currentNick() + " :\001DCC " + sType + " " +
-                                sFile + " " + NoString(pSock->localPort()) + " " + No::token(sMessage, 4) + "\001");
+                for (NoDccBounce* socket : m_sockets) {
+                    if (socket->GetUserPort() == No::token(message, 3).toUShort()) {
+                        putUser(":" + nick.nickMask() + " PRIVMSG " + network->currentNick() + " :\001DCC " + sType + " " +
+                                sFile + " " + NoString(socket->localPort()) + " " + No::token(message, 4) + "\001");
                     }
                 }
             }
@@ -342,7 +342,7 @@ private:
 NoDccBounce::NoDccBounce(NoBounceDccMod* mod,
                          ulong uLongIP,
                          ushort port,
-                         const NoString& sFileName,
+                         const NoString& fileName,
                          const NoString& sRemoteNick,
                          const NoString& sRemoteIP,
                          bool bIsChat)
@@ -351,7 +351,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* mod,
     m_uRemotePort = port;
     m_sConnectIP = No::formatIp(uLongIP);
     m_sRemoteIP = sRemoteIP;
-    m_sFileName = sFileName;
+    m_sFileName = fileName;
     m_sRemoteNick = sRemoteNick;
     m_module = mod;
     m_bIsChat = bIsChat;
@@ -368,20 +368,20 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* mod,
 }
 
 NoDccBounce::NoDccBounce(NoBounceDccMod* mod,
-                         const NoString& sHostname,
+                         const NoString& hostname,
                          ushort port,
                          const NoString& sRemoteNick,
                          const NoString& sRemoteIP,
-                         const NoString& sFileName,
+                         const NoString& fileName,
                          bool bIsChat)
-    : NoModuleSocket(mod, sHostname, port)
+    : NoModuleSocket(mod, hostname, port)
 {
     m_uRemotePort = 0;
     m_bIsChat = bIsChat;
     m_module = mod;
     m_pPeer = nullptr;
     m_sRemoteNick = sRemoteNick;
-    m_sFileName = sFileName;
+    m_sFileName = fileName;
     m_sRemoteIP = sRemoteIP;
     m_bIsRemote = false;
 
@@ -479,7 +479,7 @@ void NoDccBounce::onConnectionRefused()
     m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Connection Refused while connecting" + host);
 }
 
-void NoDccBounce::onSocketError(int iErrno, const NoString& sDescription)
+void NoDccBounce::onSocketError(int iErrno, const NoString& description)
 {
     NO_DEBUG(name() << " == SockError(" << iErrno << ")");
     NoString sType = (m_bIsChat) ? "Chat" : "Xfer";
@@ -490,9 +490,9 @@ void NoDccBounce::onSocketError(int iErrno, const NoString& sDescription)
             host = "[" + host + " " + NoString(NoSocket::port()) + "]";
         }
 
-        m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "]" + host);
+        m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + description + "]" + host);
     } else {
-        m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + sDescription + "] [" +
+        m_module->putModule("DCC " + sType + " Bounce (" + m_sRemoteNick + "): Socket error [" + description + "] [" +
                             NoSocket::localAddress() + ":" + NoString(NoSocket::localPort()) + "]");
     }
 }
@@ -523,12 +523,12 @@ NoSocket* NoDccBounce::createSocket(const NoString& host, ushort port)
         m_sRemoteIP = host;
     }
 
-    NoDccBounce* pSock = new NoDccBounce(m_module, host, port, m_sRemoteNick, m_sRemoteIP, m_sFileName, m_bIsChat);
+    NoDccBounce* socket = new NoDccBounce(m_module, host, port, m_sRemoteNick, m_sRemoteIP, m_sFileName, m_bIsChat);
     NoDccBounce* pRemoteSock = new NoDccBounce(m_module, host, port, m_sRemoteNick, m_sRemoteIP, m_sFileName, m_bIsChat);
-    pSock->SetPeer(pRemoteSock);
-    pRemoteSock->SetPeer(pSock);
+    socket->SetPeer(pRemoteSock);
+    pRemoteSock->SetPeer(socket);
     pRemoteSock->SetRemote(true);
-    pSock->SetRemote(false);
+    socket->SetRemote(false);
 
     noApp->manager()->connect(m_sConnectIP,
                                    m_uRemotePort,
@@ -538,8 +538,8 @@ NoSocket* NoDccBounce::createSocket(const NoString& host, ushort port)
                                    m_sLocalIP,
                                    pRemoteSock);
 
-    pSock->setName(name());
-    return pSock;
+    socket->setName(name());
+    return socket;
 }
 
 void NoDccBounce::PutServ(const NoString& line)
@@ -560,12 +560,12 @@ void NoDccBounce::PutPeer(const NoString& line)
 ushort NoDccBounce::DCCRequest(const NoString& nick,
                                ulong uLongIP,
                                ushort port,
-                               const NoString& sFileName,
+                               const NoString& fileName,
                                bool bIsChat,
                                NoBounceDccMod* mod,
                                const NoString& sRemoteIP)
 {
-    NoDccBounce* pDCCBounce = new NoDccBounce(mod, uLongIP, port, sFileName, nick, sRemoteIP, bIsChat);
+    NoDccBounce* pDCCBounce = new NoDccBounce(mod, uLongIP, port, fileName, nick, sRemoteIP, bIsChat);
     ushort uListenPort = noApp->manager()->listenRand(
     "DCC::" + NoString((bIsChat) ? "Chat" : "Xfer") + "::Local::" + nick, mod->GetLocalDCCIP(), false, SOMAXCONN, pDCCBounce, 120);
 
@@ -573,9 +573,9 @@ ushort NoDccBounce::DCCRequest(const NoString& nick,
 }
 
 template <>
-void no_moduleInfo<NoBounceDccMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoBounceDccMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("bouncedcc");
+    info.setWikiPage("bouncedcc");
 }
 
 USERMODULEDEFS(NoBounceDccMod, "Bounces DCC transfers through ZNC instead of sending them directly to the user. ")

@@ -78,8 +78,8 @@ void NoClient::userCommand(NoString& line)
         }
 
         const std::map<NoString, NoNick>& msNicks = channel->nicks();
-        NoIrcSocket* pIRCSock = d->network->ircSocket();
-        const NoString& sPerms = (pIRCSock) ? pIRCSock->perms() : "";
+        NoIrcSocket* socket = d->network->ircSocket();
+        const NoString& sPerms = (socket) ? socket->perms() : "";
 
         if (msNicks.empty()) {
             putStatus("No nicks on [" + sChan + "]");
@@ -264,22 +264,22 @@ void NoClient::userCommand(NoString& line)
 
         putStatus(Table);
     } else if (d->user->isAdmin() && command.equals("SetMOTD")) {
-        NoString sMessage = No::tokens(line, 1);
+        NoString message = No::tokens(line, 1);
 
-        if (sMessage.empty()) {
+        if (message.empty()) {
             putStatus("Usage: SetMOTD <message>");
         } else {
-            noApp->setMotd(sMessage);
-            putStatus("MOTD set to [" + sMessage + "]");
+            noApp->setMotd(message);
+            putStatus("MOTD set to [" + message + "]");
         }
     } else if (d->user->isAdmin() && command.equals("AddMOTD")) {
-        NoString sMessage = No::tokens(line, 1);
+        NoString message = No::tokens(line, 1);
 
-        if (sMessage.empty()) {
+        if (message.empty()) {
             putStatus("Usage: AddMOTD <message>");
         } else {
-            noApp->addMotd(sMessage);
-            putStatus("Added [" + sMessage + "] to MOTD");
+            noApp->addMotd(message);
+            putStatus("Added [" + message + "] to MOTD");
         }
     } else if (d->user->isAdmin() && command.equals("ClearMOTD")) {
         noApp->clearMotd();
@@ -288,23 +288,23 @@ void NoClient::userCommand(NoString& line)
         noApp->broadcast(No::tokens(line, 1));
     } else if (d->user->isAdmin() && (command.equals("SHUTDOWN") || command.equals("RESTART"))) {
         bool bRestart = command.equals("RESTART");
-        NoString sMessage = No::tokens(line, 1);
-        bool bForce = false;
+        NoString message = No::tokens(line, 1);
+        bool force = false;
 
-        if (No::token(sMessage, 0).equals("FORCE")) {
-            bForce = true;
-            sMessage = No::tokens(sMessage, 1);
+        if (No::token(message, 0).equals("FORCE")) {
+            force = true;
+            message = No::tokens(message, 1);
         }
 
-        if (sMessage.empty()) {
-            sMessage = (bRestart ? "ZNC is being restarted NOW!" : "ZNC is being shut down NOW!");
+        if (message.empty()) {
+            message = (bRestart ? "ZNC is being restarted NOW!" : "ZNC is being shut down NOW!");
         }
 
-        if (!noApp->writeConfig() && !bForce) {
+        if (!noApp->writeConfig() && !force) {
             putStatus("ERROR: Writing config file to disk failed! Aborting. Use " + command.toUpper() +
                       " FORCE to ignore.");
         } else {
-            noApp->broadcast(sMessage);
+            noApp->broadcast(message);
             throw NoException(bRestart ? NoException::Restart : NoException::Shutdown);
         }
     } else if (command.equals("JUMP") || command.equals("CONNECT")) {
@@ -332,9 +332,9 @@ void NoClient::userCommand(NoString& line)
 
             // If we are already connecting to some server,
             // we have to abort that attempt
-            NoSocket* pIRCSock = ircSocket();
-            if (pIRCSock && !pIRCSock->isConnected()) {
-                pIRCSock->close();
+            NoSocket* socket = ircSocket();
+            if (socket && !socket->isConnected()) {
+                socket->close();
             }
         }
 
@@ -485,8 +485,8 @@ void NoClient::userCommand(NoString& line)
             NoStringVector vsUsers;
             vsUsers.push_back("All: " + NoString(channel->nickCount()));
 
-            NoIrcSocket* pIRCSock = d->network->ircSocket();
-            const NoString& sPerms = pIRCSock ? pIRCSock->perms() : "";
+            NoIrcSocket* socket = d->network->ircSocket();
+            const NoString& sPerms = socket ? socket->perms() : "";
             std::map<char, uint> mPerms = channel->permCounts();
             for (char cPerm : sPerms) {
                 vsUsers.push_back(NoString(cPerm) + ": " + NoString(mPerms[cPerm]));
@@ -657,13 +657,13 @@ void NoClient::userCommand(NoString& line)
             sNewNetwork = sOldNetwork;
         }
 
-        NoUser* pOldUser = noApp->findUser(sOldUser);
-        if (!pOldUser) {
+        NoUser* oldUser = noApp->findUser(sOldUser);
+        if (!oldUser) {
             putStatus("Old user [" + sOldUser + "] not found.");
             return;
         }
 
-        NoNetwork* pOldNetwork = pOldUser->findNetwork(sOldNetwork);
+        NoNetwork* pOldNetwork = oldUser->findNetwork(sOldNetwork);
         if (!pOldNetwork) {
             putStatus("Old network [" + sOldNetwork + "] not found.");
             return;
@@ -712,11 +712,11 @@ void NoClient::userCommand(NoString& line)
 
         pNewNetwork->clone(*pOldNetwork, false);
 
-        if (d->network && d->network->name().equals(sOldNetwork) && d->user == pOldUser) {
+        if (d->network && d->network->name().equals(sOldNetwork) && d->user == oldUser) {
             setNetwork(nullptr);
         }
 
-        if (pOldUser->deleteNetwork(sOldNetwork)) {
+        if (oldUser->deleteNetwork(sOldNetwork)) {
             putStatus("Success.");
         } else {
             putStatus("Copied the network to new user, but failed to delete old network");
@@ -817,24 +817,24 @@ void NoClient::userCommand(NoString& line)
             putStatus("You must be connected with a network to use this command");
             return;
         }
-        NoString sFP = No::token(line, 1);
-        if (sFP.empty()) {
+        NoString fingerprint = No::token(line, 1);
+        if (fingerprint.empty()) {
             putStatus("Usage: AddTrustedServerFingerprint <fi:ng:er>");
             return;
         }
-        d->network->addTrustedFingerprint(sFP);
+        d->network->addTrustedFingerprint(fingerprint);
         putStatus("Done.");
     } else if (command.equals("DelTrustedServerFingerprint")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
             return;
         }
-        NoString sFP = No::token(line, 1);
-        if (sFP.empty()) {
+        NoString fingerprint = No::token(line, 1);
+        if (fingerprint.empty()) {
             putStatus("Usage: DelTrustedServerFingerprint <fi:ng:er>");
             return;
         }
-        d->network->removeTrustedFingerprint(sFP);
+        d->network->removeTrustedFingerprint(fingerprint);
         putStatus("Done.");
     } else if (command.equals("ListTrustedServerFingerprints")) {
         if (!d->network) {
@@ -846,8 +846,8 @@ void NoClient::userCommand(NoString& line)
             putStatus("No fingerprints added.");
         } else {
             int k = 0;
-            for (const NoString& sFP : ssFPs) {
-                putStatus(NoString(++k) + ". " + sFP);
+            for (const NoString& fingerprint : ssFPs) {
+                putStatus(NoString(++k) + ". " + fingerprint);
             }
         }
     } else if (command.equals("TOPICS")) {
@@ -950,10 +950,10 @@ void NoClient::userCommand(NoString& line)
                 GTable.addColumn("Name");
                 GTable.addColumn("Description");
 
-                for (const NoModuleInfo& Info : ssGlobalMods) {
+                for (const NoModuleInfo& info : ssGlobalMods) {
                     GTable.addRow();
-                    GTable.setValue("Name", (noApp->loader()->findModule(Info.name()) ? "*" : " ") + Info.name());
-                    GTable.setValue("Description", No::ellipsize(Info.description(), 128));
+                    GTable.setValue("Name", (noApp->loader()->findModule(info.name()) ? "*" : " ") + info.name());
+                    GTable.setValue("Description", No::ellipsize(info.description(), 128));
                 }
 
                 putStatus(GTable);
@@ -971,10 +971,10 @@ void NoClient::userCommand(NoString& line)
             Table.addColumn("Name");
             Table.addColumn("Description");
 
-            for (const NoModuleInfo& Info : ssUserMods) {
+            for (const NoModuleInfo& info : ssUserMods) {
                 Table.addRow();
-                Table.setValue("Name", (d->user->loader()->findModule(Info.name()) ? "*" : " ") + Info.name());
-                Table.setValue("Description", No::ellipsize(Info.description(), 128));
+                Table.setValue("Name", (d->user->loader()->findModule(info.name()) ? "*" : " ") + info.name());
+                Table.setValue("Description", No::ellipsize(info.description(), 128));
             }
 
             putStatus(Table);
@@ -991,34 +991,34 @@ void NoClient::userCommand(NoString& line)
             Table.addColumn("Name");
             Table.addColumn("Description");
 
-            for (const NoModuleInfo& Info : ssNetworkMods) {
+            for (const NoModuleInfo& info : ssNetworkMods) {
                 Table.addRow();
-                Table.setValue("Name", ((d->network && d->network->loader()->findModule(Info.name())) ? "*" : " ") + Info.name());
-                Table.setValue("Description", No::ellipsize(Info.description(), 128));
+                Table.setValue("Name", ((d->network && d->network->loader()->findModule(info.name())) ? "*" : " ") + info.name());
+                Table.setValue("Description", No::ellipsize(info.description(), 128));
             }
 
             putStatus(Table);
         }
         return;
     } else if (command.equals("LOADMOD") || command.equals("LOADMODULE")) {
-        No::ModuleType eType;
+        No::ModuleType type;
         NoString sType = No::token(line, 1);
         NoString sMod = No::token(line, 2);
         NoString args = No::tokens(line, 3);
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
-            eType = No::GlobalModule;
+            type = No::GlobalModule;
         } else if (sType.equals("--type=user")) {
-            eType = No::UserModule;
+            type = No::UserModule;
         } else if (sType.equals("--type=network")) {
-            eType = No::NetworkModule;
+            type = No::NetworkModule;
         } else {
             sMod = sType;
             args = No::tokens(line, 2);
             sType = "default";
             // Will be set correctly later
-            eType = No::UserModule;
+            type = No::UserModule;
         }
 
         if (d->user->denyLoadMod()) {
@@ -1031,23 +1031,23 @@ void NoClient::userCommand(NoString& line)
             return;
         }
 
-        NoModuleInfo ModInfo;
-        NoString sRetMsg;
-        if (!noApp->loader()->moduleInfo(ModInfo, sMod, sRetMsg)) {
-            putStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
+        NoModuleInfo info;
+        NoString message;
+        if (!noApp->loader()->moduleInfo(info, sMod, message)) {
+            putStatus("Unable to find modinfo [" + sMod + "] [" + message + "]");
             return;
         }
 
         if (sType.equals("default")) {
-            eType = ModInfo.defaultType();
+            type = info.defaultType();
         }
 
-        if (eType == No::GlobalModule && !d->user->isAdmin()) {
+        if (type == No::GlobalModule && !d->user->isAdmin()) {
             putStatus("Unable to load global module [" + sMod + "]: Access Denied.");
             return;
         }
 
-        if (eType == No::NetworkModule && !d->network) {
+        if (type == No::NetworkModule && !d->network) {
             putStatus("Unable to load network module [" + sMod + "] Not connected with a network.");
             return;
         }
@@ -1055,15 +1055,15 @@ void NoClient::userCommand(NoString& line)
         NoString sModRet;
         bool b = false;
 
-        switch (eType) {
+        switch (type) {
         case No::GlobalModule:
-            b = noApp->loader()->loadModule(sMod, args, eType, nullptr, nullptr, sModRet);
+            b = noApp->loader()->loadModule(sMod, args, type, nullptr, nullptr, sModRet);
             break;
         case No::UserModule:
-            b = d->user->loader()->loadModule(sMod, args, eType, d->user, nullptr, sModRet);
+            b = d->user->loader()->loadModule(sMod, args, type, d->user, nullptr, sModRet);
             break;
         case No::NetworkModule:
-            b = d->network->loader()->loadModule(sMod, args, eType, d->user, d->network, sModRet);
+            b = d->network->loader()->loadModule(sMod, args, type, d->user, d->network, sModRet);
             break;
         default:
             sModRet = "Unable to load module [" + sMod + "]: Unknown module type";
@@ -1075,17 +1075,17 @@ void NoClient::userCommand(NoString& line)
         putStatus(sModRet);
         return;
     } else if (command.equals("UNLOADMOD") || command.equals("UNLOADMODULE")) {
-        No::ModuleType eType = No::UserModule;
+        No::ModuleType type = No::UserModule;
         NoString sType = No::token(line, 1);
         NoString sMod = No::token(line, 2);
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
-            eType = No::GlobalModule;
+            type = No::GlobalModule;
         } else if (sType.equals("--type=user")) {
-            eType = No::UserModule;
+            type = No::UserModule;
         } else if (sType.equals("--type=network")) {
-            eType = No::NetworkModule;
+            type = No::NetworkModule;
         } else {
             sMod = sType;
             sType = "default";
@@ -1102,29 +1102,29 @@ void NoClient::userCommand(NoString& line)
         }
 
         if (sType.equals("default")) {
-            NoModuleInfo ModInfo;
-            NoString sRetMsg;
-            if (!noApp->loader()->moduleInfo(ModInfo, sMod, sRetMsg)) {
-                putStatus("Unable to find modinfo [" + sMod + "] [" + sRetMsg + "]");
+            NoModuleInfo info;
+            NoString message;
+            if (!noApp->loader()->moduleInfo(info, sMod, message)) {
+                putStatus("Unable to find modinfo [" + sMod + "] [" + message + "]");
                 return;
             }
 
-            eType = ModInfo.defaultType();
+            type = info.defaultType();
         }
 
-        if (eType == No::GlobalModule && !d->user->isAdmin()) {
+        if (type == No::GlobalModule && !d->user->isAdmin()) {
             putStatus("Unable to unload global module [" + sMod + "]: Access Denied.");
             return;
         }
 
-        if (eType == No::NetworkModule && !d->network) {
+        if (type == No::NetworkModule && !d->network) {
             putStatus("Unable to unload network module [" + sMod + "] Not connected with a network.");
             return;
         }
 
         NoString sModRet;
 
-        switch (eType) {
+        switch (type) {
         case No::GlobalModule:
             noApp->loader()->unloadModule(sMod, sModRet);
             break;
@@ -1141,7 +1141,7 @@ void NoClient::userCommand(NoString& line)
         putStatus(sModRet);
         return;
     } else if (command.equals("RELOADMOD") || command.equals("RELOADMODULE")) {
-        No::ModuleType eType;
+        No::ModuleType type;
         NoString sType = No::token(line, 1);
         NoString sMod = No::token(line, 2);
         NoString args = No::tokens(line, 3);
@@ -1153,17 +1153,17 @@ void NoClient::userCommand(NoString& line)
 
         // TODO use proper library for parsing arguments
         if (sType.equals("--type=global")) {
-            eType = No::GlobalModule;
+            type = No::GlobalModule;
         } else if (sType.equals("--type=user")) {
-            eType = No::UserModule;
+            type = No::UserModule;
         } else if (sType.equals("--type=network")) {
-            eType = No::NetworkModule;
+            type = No::NetworkModule;
         } else {
             sMod = sType;
             args = No::tokens(line, 2);
             sType = "default";
             // Will be set correctly later
-            eType = No::UserModule;
+            type = No::UserModule;
         }
 
         if (sMod.empty()) {
@@ -1172,29 +1172,29 @@ void NoClient::userCommand(NoString& line)
         }
 
         if (sType.equals("default")) {
-            NoModuleInfo ModInfo;
-            NoString sRetMsg;
-            if (!noApp->loader()->moduleInfo(ModInfo, sMod, sRetMsg)) {
-                putStatus("Unable to find modinfo for [" + sMod + "] [" + sRetMsg + "]");
+            NoModuleInfo info;
+            NoString message;
+            if (!noApp->loader()->moduleInfo(info, sMod, message)) {
+                putStatus("Unable to find modinfo for [" + sMod + "] [" + message + "]");
                 return;
             }
 
-            eType = ModInfo.defaultType();
+            type = info.defaultType();
         }
 
-        if (eType == No::GlobalModule && !d->user->isAdmin()) {
+        if (type == No::GlobalModule && !d->user->isAdmin()) {
             putStatus("Unable to reload global module [" + sMod + "]: Access Denied.");
             return;
         }
 
-        if (eType == No::NetworkModule && !d->network) {
+        if (type == No::NetworkModule && !d->network) {
             putStatus("Unable to load network module [" + sMod + "] Not connected with a network.");
             return;
         }
 
         NoString sModRet;
 
-        switch (eType) {
+        switch (type) {
         case No::GlobalModule:
             noApp->loader()->reloadModule(sMod, args, nullptr, nullptr, sModRet);
             break;
@@ -1566,12 +1566,12 @@ void NoClient::yserPortCommand(NoString& line)
             Table.setValue("BindHost", (pListener->host().empty() ? NoString("*") : pListener->host()));
             Table.setValue("SSL", NoString(pListener->isSsl()));
 
-            No::AddressType eAddr = pListener->addressType();
+            No::AddressType addressType = pListener->addressType();
             Table.setValue("Proto",
-                           (eAddr == No::Ipv4AndIpv6Address ? "All" : (eAddr == No::Ipv4Address ? "IPv4" : "IPv6")));
+                           (addressType == No::Ipv4AndIpv6Address ? "All" : (addressType == No::Ipv4Address ? "IPv4" : "IPv6")));
 
-            No::AcceptType eAccept = pListener->acceptType();
-            Table.setValue("IRC/Web", (eAccept == No::AcceptAll ? "All" : (eAccept == No::AcceptIrc ? "IRC" : "Web")));
+            No::AcceptType acceptType = pListener->acceptType();
+            Table.setValue("IRC/Web", (acceptType == No::AcceptAll ? "All" : (acceptType == No::AcceptIrc ? "IRC" : "Web")));
             Table.setValue("URIPrefix", pListener->uriPrefix() + "/");
         }
 
@@ -1582,14 +1582,14 @@ void NoClient::yserPortCommand(NoString& line)
 
     NoString sPort = No::token(line, 1);
     NoString sAddr = No::token(line, 2);
-    No::AddressType eAddr = No::Ipv4AndIpv6Address;
+    No::AddressType addressType = No::Ipv4AndIpv6Address;
 
     if (sAddr.equals("IPV4")) {
-        eAddr = No::Ipv4Address;
+        addressType = No::Ipv4Address;
     } else if (sAddr.equals("IPV6")) {
-        eAddr = No::Ipv6Address;
+        addressType = No::Ipv6Address;
     } else if (sAddr.equals("ALL")) {
-        eAddr = No::Ipv4AndIpv6Address;
+        addressType = No::Ipv4AndIpv6Address;
     } else {
         sAddr.clear();
     }
@@ -1597,15 +1597,15 @@ void NoClient::yserPortCommand(NoString& line)
     ushort port = sPort.toUShort();
 
     if (command.equals("ADDPORT")) {
-        No::AcceptType eAccept = No::AcceptAll;
+        No::AcceptType acceptType = No::AcceptAll;
         NoString sAccept = No::token(line, 3);
 
         if (sAccept.equals("WEB")) {
-            eAccept = No::AcceptHttp;
+            acceptType = No::AcceptHttp;
         } else if (sAccept.equals("IRC")) {
-            eAccept = No::AcceptIrc;
+            acceptType = No::AcceptIrc;
         } else if (sAccept.equals("ALL")) {
-            eAccept = No::AcceptAll;
+            acceptType = No::AcceptAll;
         } else {
             sAccept.clear();
         }
@@ -1615,13 +1615,13 @@ void NoClient::yserPortCommand(NoString& line)
         } else {
             bool ssl = (sPort.left(1).equals("+"));
             const NoString host = No::token(line, 4);
-            const NoString sURIPrefix = No::token(line, 5);
+            const NoString uriPrefix = No::token(line, 5);
 
             NoListener* pListener = new NoListener(host, port);
-            pListener->setUriPrefix(sURIPrefix);
+            pListener->setUriPrefix(uriPrefix);
             pListener->setSsl(ssl);
-            pListener->setAddressType(eAddr);
-            pListener->setAcceptType(eAccept);
+            pListener->setAddressType(addressType);
+            pListener->setAcceptType(acceptType);
 
             if (!pListener->listen()) {
                 delete pListener;
@@ -1637,9 +1637,9 @@ void NoClient::yserPortCommand(NoString& line)
         if (sPort.empty() || sAddr.empty()) {
             putStatus("Usage: DelPort <port> <ipv4|ipv6|all> [bindhost]");
         } else {
-            const NoString sBindHost = No::token(line, 3);
+            const NoString bindHost = No::token(line, 3);
 
-            NoListener* pListener = noApp->findListener(port, sBindHost, eAddr);
+            NoListener* pListener = noApp->findListener(port, bindHost, addressType);
 
             if (pListener) {
                 noApp->removeListener(pListener);

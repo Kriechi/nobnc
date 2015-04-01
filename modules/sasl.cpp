@@ -232,10 +232,10 @@ public:
         return cap.equals("sasl");
     }
 
-    void onServerCapResult(const NoString& cap, bool bSuccess) override
+    void onServerCapResult(const NoString& cap, bool success) override
     {
         if (cap.equals("sasl")) {
-            if (bSuccess) {
+            if (success) {
                 m_Mechanisms = GetMechanismsString().split(" ");
 
                 if (m_Mechanisms.empty()) {
@@ -307,9 +307,9 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoSaslMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoSaslMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("sasl");
+    info.setWikiPage("sasl");
 }
 
 NETWORKMODULEDEFS(NoSaslMod, "Adds support for sasl authentication capability to authenticate to an IRC server")

@@ -102,7 +102,7 @@ public:
                    "Set pattern for commands");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoRegistry registry(this);
         if (!args.empty() && args != "<hidden>") {
@@ -117,45 +117,45 @@ public:
         return true;
     }
 
-    void HandleMessage(NoNick& Nick, const NoString& sMessage)
+    void HandleMessage(NoNick& nick, const NoString& message)
     {
         NoRegistry registry(this);
         NoString sNickServName =
         (!registry.value("NickServName").empty()) ? registry.value("NickServName") : "NickServ";
-        if (!registry.value("Password").empty() && Nick.equals(sNickServName) &&
-            (sMessage.contains("msg") || sMessage.contains("authenticate") ||
-             sMessage.contains("choose a different nickname") || sMessage.contains("please choose a different nick") ||
-             sMessage.contains("If this is your nick, identify yourself with") ||
-             sMessage.contains("If this is your nick, type") ||
-             sMessage.contains("This is a registered nickname, please identify") ||
-             No::stripControls(sMessage).find("type /NickServ IDENTIFY password") ||
-             No::stripControls(sMessage).find("type /msg NickServ IDENTIFY password")) &&
-            sMessage.toUpper().contains("IDENTIFY") && sMessage.contains("help")) {
+        if (!registry.value("Password").empty() && nick.equals(sNickServName) &&
+            (message.contains("msg") || message.contains("authenticate") ||
+             message.contains("choose a different nickname") || message.contains("please choose a different nick") ||
+             message.contains("If this is your nick, identify yourself with") ||
+             message.contains("If this is your nick, type") ||
+             message.contains("This is a registered nickname, please identify") ||
+             No::stripControls(message).find("type /NickServ IDENTIFY password") ||
+             No::stripControls(message).find("type /msg NickServ IDENTIFY password")) &&
+            message.toUpper().contains("IDENTIFY") && message.contains("help")) {
             NoStringMap msValues;
             msValues["password"] = registry.value("Password");
             putIrc(No::namedFormat(registry.value("IdentifyCmd"), msValues));
         }
     }
 
-    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& nick, NoString& message) override
     {
-        HandleMessage(Nick, sMessage);
+        HandleMessage(nick, message);
         return CONTINUE;
     }
 
-    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivNotice(NoNick& nick, NoString& message) override
     {
-        HandleMessage(Nick, sMessage);
+        HandleMessage(nick, message);
         return CONTINUE;
     }
 };
 
 template <>
-void no_moduleInfo<NoNickServ>(NoModuleInfo& Info)
+void no_moduleInfo<NoNickServ>(NoModuleInfo& info)
 {
-    Info.setWikiPage("nickserv");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("Please enter your nickserv password.");
+    info.setWikiPage("nickserv");
+    info.setHasArgs(true);
+    info.setArgsHelpText("Please enter your nickserv password.");
 }
 
 NETWORKMODULEDEFS(NoNickServ, "Auths you with NickServ")

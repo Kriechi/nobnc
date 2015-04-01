@@ -40,7 +40,7 @@ public:
         m_Messaged.setExpiration(1000 * 120);
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         if (!args.empty()) {
             SetReply(args);
@@ -49,29 +49,29 @@ public:
         return true;
     }
 
-    void SetReply(const NoString& sReply)
+    void SetReply(const NoString& reply)
     {
-        NoRegistry(this).setValue("Reply", sReply);
+        NoRegistry(this).setValue("Reply", reply);
     }
 
     NoString GetReply()
     {
-        NoString sReply = NoRegistry(this).value("Reply");
-        if (sReply.empty()) {
-            sReply = "%nick% is currently away, try again later";
-            SetReply(sReply);
+        NoString reply = NoRegistry(this).value("Reply");
+        if (reply.empty()) {
+            reply = "%nick% is currently away, try again later";
+            SetReply(reply);
         }
 
-        return expandString(sReply);
+        return expandString(reply);
     }
 
     void Handle(const NoString& nick)
     {
-        NoIrcSocket* pIRCSock = network()->ircSocket();
-        if (!pIRCSock)
+        NoIrcSocket* socket = network()->ircSocket();
+        if (!socket)
             // WTF?
             return;
-        if (nick == pIRCSock->nick())
+        if (nick == socket->nick())
             return;
         if (m_Messaged.contains(nick))
             return;
@@ -83,9 +83,9 @@ public:
         putIrc("NOTICE " + nick + " :" + GetReply());
     }
 
-    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& nick, NoString& message) override
     {
-        Handle(Nick.nick());
+        Handle(nick.nick());
         return CONTINUE;
     }
 
@@ -105,12 +105,12 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoAutoReplyMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoAutoReplyMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("autoreply");
-    Info.addType(No::NetworkModule);
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("You might specify a reply text. It is used when automatically answering queries, if you are "
+    info.setWikiPage("autoreply");
+    info.addType(No::NetworkModule);
+    info.setHasArgs(true);
+    info.setArgsHelpText("You might specify a reply text. It is used when automatically answering queries, if you are "
                          "not connected to ZNC.");
 }
 

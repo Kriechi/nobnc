@@ -53,7 +53,7 @@ public:
     SubConfigMapIterator BeginSubConfigs() const;
     SubConfigMapIterator EndSubConfigs() const;
 
-    void AddKeyValuePair(const NoString& name, const NoString& sValue);
+    void AddKeyValuePair(const NoString& name, const NoString& value);
 
     bool AddSubConfig(const NoString& sTag, const NoString& name, NoSettings Config);
 

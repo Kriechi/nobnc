@@ -47,7 +47,7 @@ public:
                    "Unblock a user");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoStringVector::iterator it;
 
@@ -63,7 +63,7 @@ public:
 
         for (it = vArgs.begin(); it != vArgs.end(); ++it) {
             if (!Block(*it)) {
-                sMessage = "Could not block [" + *it + "]";
+                message = "Could not block [" + *it + "]";
                 return false;
             }
         }
@@ -145,34 +145,34 @@ public:
         }
     }
 
-    bool onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onEmbeddedWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "webadmin/user" && WebSock.session()->isAdmin()) {
-            NoString sAction = Tmpl["WebadminAction"];
-            if (sAction == "display") {
-                Tmpl["Blocked"] = NoString(IsBlocked(Tmpl["Username"]));
-                Tmpl["Self"] = NoString(Tmpl["Username"].equals(WebSock.session()->user()->userName()));
+        if (page == "webadmin/user" && socket.session()->isAdmin()) {
+            NoString action = tmpl["WebadminAction"];
+            if (action == "display") {
+                tmpl["Blocked"] = NoString(IsBlocked(tmpl["Username"]));
+                tmpl["Self"] = NoString(tmpl["Username"].equals(socket.session()->user()->userName()));
                 return true;
             }
-            if (sAction == "change" && WebSock.param("embed_blockuser_presented").toBool()) {
-                if (Tmpl["Username"].equals(WebSock.session()->user()->userName()) &&
-                    WebSock.param("embed_blockuser_block").toBool()) {
-                    WebSock.session()->addError("You can't block yourself");
-                } else if (WebSock.param("embed_blockuser_block").toBool()) {
-                    if (!WebSock.param("embed_blockuser_old").toBool()) {
-                        if (Block(Tmpl["Username"])) {
-                            WebSock.session()->addSuccess("Blocked [" + Tmpl["Username"] + "]");
+            if (action == "change" && socket.param("embed_blockuser_presented").toBool()) {
+                if (tmpl["Username"].equals(socket.session()->user()->userName()) &&
+                    socket.param("embed_blockuser_block").toBool()) {
+                    socket.session()->addError("You can't block yourself");
+                } else if (socket.param("embed_blockuser_block").toBool()) {
+                    if (!socket.param("embed_blockuser_old").toBool()) {
+                        if (Block(tmpl["Username"])) {
+                            socket.session()->addSuccess("Blocked [" + tmpl["Username"] + "]");
                         } else {
-                            WebSock.session()->addError("Couldn't block [" + Tmpl["Username"] + "]");
+                            socket.session()->addError("Couldn't block [" + tmpl["Username"] + "]");
                         }
                     }
-                } else if (WebSock.param("embed_blockuser_old").toBool()) {
+                } else if (socket.param("embed_blockuser_old").toBool()) {
                     NoRegistry registry(this);
-                    if (registry.contains(Tmpl["Username"])) {
-                        registry.remove(Tmpl["Username"]);
-                        WebSock.session()->addSuccess("Unblocked [" + Tmpl["Username"] + "]");
+                    if (registry.contains(tmpl["Username"])) {
+                        registry.remove(tmpl["Username"]);
+                        socket.session()->addSuccess("Unblocked [" + tmpl["Username"] + "]");
                     } else {
-                        WebSock.session()->addError("User [" + Tmpl["Username"] + "is not blocked");
+                        socket.session()->addError("User [" + tmpl["Username"] + "is not blocked");
                     }
                 }
                 return true;
@@ -215,11 +215,11 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoBlockUser>(NoModuleInfo& Info)
+void no_moduleInfo<NoBlockUser>(NoModuleInfo& info)
 {
-    Info.setWikiPage("blockuser");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("Enter one or more user names. Separate them by spaces.");
+    info.setWikiPage("blockuser");
+    info.setHasArgs(true);
+    info.setArgsHelpText("Enter one or more user names. Separate them by spaces.");
 }
 
 GLOBALMODULEDEFS(NoBlockUser, "Block certain users from logging in.")

@@ -85,11 +85,11 @@ public:
                    "Show the list of active sockets. Pass -n to show IP addresses");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
 #ifndef MOD_LISTSOCKETS_ALLOW_EVERYONE
         if (!user()->isAdmin()) {
-            sMessage = "You must be admin to use this module";
+            message = "You must be admin to use this module";
             return false;
         }
 #endif
@@ -102,8 +102,8 @@ public:
         NoSocketManager* m = noApp->manager();
         std::priority_queue<NoSocketSorter> ret;
 
-        for (NoSocket* pSock : m->sockets())
-            ret.push(pSock);
+        for (NoSocket* socket : m->sockets())
+            ret.push(socket);
 
         return ret;
     }
@@ -117,9 +117,9 @@ public:
         return "List sockets";
     }
 
-    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "index") {
+        if (page == "index") {
             if (noApp->manager()->sockets().empty()) {
                 return false;
             }
@@ -130,7 +130,7 @@ public:
                 NoSocket* pSocket = socks.top().GetSock();
                 socks.pop();
 
-                NoTemplate& Row = Tmpl.addRow("SocketsLoop");
+                NoTemplate& Row = tmpl.addRow("SocketsLoop");
                 Row["Name"] = pSocket->name();
                 Row["Created"] = GetCreatedTime(pSocket);
                 Row["State"] = GetSocketState(pSocket);
@@ -183,17 +183,17 @@ public:
 
     NoString GetLocalHost(NoSocket* pSocket, bool bShowHosts)
     {
-        NoString sBindHost;
+        NoString bindHost;
 
         if (bShowHosts) {
-            sBindHost = pSocket->bindHost();
+            bindHost = pSocket->bindHost();
         }
 
-        if (sBindHost.empty()) {
-            sBindHost = pSocket->localAddress();
+        if (bindHost.empty()) {
+            bindHost = pSocket->localAddress();
         }
 
-        return sBindHost + " " + NoString(pSocket->localPort());
+        return bindHost + " " + NoString(pSocket->localPort());
     }
 
     NoString GetRemoteHost(NoSocket* pSocket, bool bShowHosts)
@@ -270,9 +270,9 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoListSockets>(NoModuleInfo& Info)
+void no_moduleInfo<NoListSockets>(NoModuleInfo& info)
 {
-    Info.setWikiPage("listsockets");
+    info.setWikiPage("listsockets");
 }
 
 USERMODULEDEFS(NoListSockets, "List active sockets")

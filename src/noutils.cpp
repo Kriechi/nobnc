@@ -55,13 +55,13 @@ NoString No::formatIp(ulong addr)
     return szBuf;
 }
 
-ulong No::formatLongIp(const NoString& sIP)
+ulong No::formatLongIp(const NoString& address)
 {
     ulong ret;
     char ip[4][4];
     uint i;
 
-    i = sscanf(sIP.c_str(), "%3[0-9].%3[0-9].%3[0-9].%3[0-9]", ip[0], ip[1], ip[2], ip[3]);
+    i = sscanf(address.c_str(), "%3[0-9].%3[0-9].%3[0-9].%3[0-9]", ip[0], ip[1], ip[2], ip[3]);
     if (i != 4)
         return 0;
 
@@ -326,62 +326,62 @@ bool No::getInput(const NoString& sPrompt, NoString& ret, const NoString& sDefau
 #define BLU "\033[34m"
 #define DFL "\033[39m"
 
-void No::printError(const NoString& sMessage)
+void No::printError(const NoString& message)
 {
     if (NoDebug::isFormatted())
-        fprintf(stdout, BOLD BLU "[" RED " ** " BLU "]" DFL NORM " %s\n", sMessage.c_str());
+        fprintf(stdout, BOLD BLU "[" RED " ** " BLU "]" DFL NORM " %s\n", message.c_str());
     else
-        fprintf(stdout, "%s\n", sMessage.c_str());
+        fprintf(stdout, "%s\n", message.c_str());
     fflush(stdout);
 }
 
-void No::printPrompt(const NoString& sMessage)
+void No::printPrompt(const NoString& message)
 {
     if (NoDebug::isFormatted())
-        fprintf(stdout, BOLD BLU "[" YEL " ?? " BLU "]" DFL NORM " %s: ", sMessage.c_str());
+        fprintf(stdout, BOLD BLU "[" YEL " ?? " BLU "]" DFL NORM " %s: ", message.c_str());
     else
-        fprintf(stdout, "[ ?? ] %s: ", sMessage.c_str());
+        fprintf(stdout, "[ ?? ] %s: ", message.c_str());
     fflush(stdout);
 }
 
-void No::printMessage(const NoString& sMessage, bool bStrong)
+void No::printMessage(const NoString& message, bool bStrong)
 {
     if (NoDebug::isFormatted()) {
         if (bStrong)
-            fprintf(stdout, BOLD BLU "[" YEL " ** " BLU "]" DFL BOLD " %s" NORM "\n", sMessage.c_str());
+            fprintf(stdout, BOLD BLU "[" YEL " ** " BLU "]" DFL BOLD " %s" NORM "\n", message.c_str());
         else
-            fprintf(stdout, BOLD BLU "[" YEL " ** " BLU "]" DFL NORM " %s\n", sMessage.c_str());
+            fprintf(stdout, BOLD BLU "[" YEL " ** " BLU "]" DFL NORM " %s\n", message.c_str());
     } else
-        fprintf(stdout, "%s\n", sMessage.c_str());
+        fprintf(stdout, "%s\n", message.c_str());
 
     fflush(stdout);
 }
 
-void No::printAction(const NoString& sMessage)
+void No::printAction(const NoString& message)
 {
     if (NoDebug::isFormatted())
-        fprintf(stdout, BOLD BLU "[ .. " BLU "]" DFL NORM " %s...\n", sMessage.c_str());
+        fprintf(stdout, BOLD BLU "[ .. " BLU "]" DFL NORM " %s...\n", message.c_str());
     else
-        fprintf(stdout, "%s... ", sMessage.c_str());
+        fprintf(stdout, "%s... ", message.c_str());
     fflush(stdout);
 }
 
-void No::printStatus(bool bSuccess, const NoString& sMessage)
+void No::printStatus(bool success, const NoString& message)
 {
     if (NoDebug::isFormatted()) {
-        if (bSuccess) {
+        if (success) {
             fprintf(stdout, BOLD BLU "[" GRN " >> " BLU "]" DFL NORM);
-            fprintf(stdout, " %s\n", sMessage.empty() ? "ok" : sMessage.c_str());
+            fprintf(stdout, " %s\n", message.empty() ? "ok" : message.c_str());
         } else {
             fprintf(stdout, BOLD BLU "[" RED " !! " BLU "]" DFL NORM);
-            fprintf(stdout, BOLD RED " %s" DFL NORM "\n", sMessage.empty() ? "failed" : sMessage.c_str());
+            fprintf(stdout, BOLD RED " %s" DFL NORM "\n", message.empty() ? "failed" : message.c_str());
         }
     } else {
-        if (bSuccess) {
-            fprintf(stdout, "%s\n", sMessage.c_str());
+        if (success) {
+            fprintf(stdout, "%s\n", message.c_str());
         } else {
-            if (!sMessage.empty()) {
-                fprintf(stdout, "[ %s ]", sMessage.c_str());
+            if (!message.empty()) {
+                fprintf(stdout, "[ %s ]", message.c_str());
             }
 
             fprintf(stdout, "\n");
@@ -500,9 +500,9 @@ NoString No::formatServerTime(const timeval& tv)
 
 namespace
 {
-void FillTimezones(const NoString& sPath, NoStringSet& result, const NoString& sPrefix)
+void FillTimezones(const NoString& path, NoStringSet& result, const NoString& prefix)
 {
-    NoDir Dir(sPath);
+    NoDir Dir(path);
     for (NoFile* pFile : Dir.files()) {
         NoString name = pFile->GetShortName();
         NoString sFile = pFile->GetLongName();
@@ -512,12 +512,12 @@ void FillTimezones(const NoString& sPath, NoStringSet& result, const NoString& s
             continue;
         if (pFile->IsDir()) {
             if (name == "Etc") {
-                FillTimezones(sFile, result, sPrefix);
+                FillTimezones(sFile, result, prefix);
             } else {
-                FillTimezones(sFile, result, sPrefix + name + "/");
+                FillTimezones(sFile, result, prefix + name + "/");
             }
         } else {
-            result.insert(sPrefix + name);
+            result.insert(prefix + name);
         }
     }
 }
@@ -563,9 +563,9 @@ NoStringMap No::messageTags(const NoString& line)
         for (const NoString& sTag : vsTags) {
             size_t eq = sTag.find("=");
             if (eq != NoString::npos) {
-                NoString sKey = sTag.substr(0, eq);
-                NoString sValue = sTag.substr(eq + 1);
-                mssTags[sKey] = No::escape(sValue, No::MsgTagFormat, No::AsciiFormat);
+                NoString key = sTag.substr(0, eq);
+                NoString value = sTag.substr(eq + 1);
+                mssTags[key] = No::escape(value, No::MsgTagFormat, No::AsciiFormat);
             } else {
                 mssTags[sTag] = "";
             }
@@ -597,10 +597,10 @@ void No::setMessageTags(NoString& line, const NoStringMap& mssTags)
 
 static const char hexdigits[] = "0123456789abcdef";
 
-static NoString& Encode(NoString& sValue)
+static NoString& Encode(NoString& value)
 {
     NoString sTmp;
-    for (uchar c : sValue) {
+    for (uchar c : value) {
         // isalnum() needs uchar as argument and this code
         // assumes unsigned, too.
         if (isalnum(c)) {
@@ -612,13 +612,13 @@ static NoString& Encode(NoString& sValue)
             sTmp += ";";
         }
     }
-    sValue = sTmp;
-    return sValue;
+    value = sTmp;
+    return value;
 }
 
-No::status_t No::writeToDisk(const NoStringMap& values, const NoString& sPath, mode_t iMode)
+No::status_t No::writeToDisk(const NoStringMap& values, const NoString& path, mode_t iMode)
 {
-    NoFile cFile(sPath);
+    NoFile cFile(path);
 
     if (values.empty()) {
         if (!cFile.Exists())
@@ -631,14 +631,14 @@ No::status_t No::writeToDisk(const NoStringMap& values, const NoString& sPath, m
         return MCS_EOPEN;
 
     for (const auto& it : values) {
-        NoString sKey = it.first;
-        NoString sValue = it.second;
+        NoString key = it.first;
+        NoString value = it.second;
 
-        if (sKey.empty()) {
+        if (key.empty()) {
             continue;
         }
 
-        if (cFile.Write(Encode(sKey) + " " + Encode(sValue) + "\n") <= 0) {
+        if (cFile.Write(Encode(key) + " " + Encode(value) + "\n") <= 0) {
             return MCS_EWRITE;
         }
     }
@@ -648,9 +648,9 @@ No::status_t No::writeToDisk(const NoStringMap& values, const NoString& sPath, m
     return MCS_SUCCESS;
 }
 
-static NoString& Decode(NoString& sValue)
+static NoString& Decode(NoString& value)
 {
-    const char* pTmp = sValue.c_str();
+    const char* pTmp = value.c_str();
     char* endptr;
     NoString sTmp;
 
@@ -668,13 +668,13 @@ static NoString& Decode(NoString& sValue)
         }
     }
 
-    sValue = sTmp;
-    return sValue;
+    value = sTmp;
+    return value;
 }
 
-No::status_t No::readFromDisk(NoStringMap& values, const NoString& sPath)
+No::status_t No::readFromDisk(NoStringMap& values, const NoString& path)
 {
-    NoFile cFile(sPath);
+    NoFile cFile(path);
     if (!cFile.Open(O_RDONLY))
         return MCS_EOPEN;
 
@@ -682,12 +682,12 @@ No::status_t No::readFromDisk(NoStringMap& values, const NoString& sPath)
 
     while (cFile.ReadLine(sBuffer)) {
         sBuffer.trim();
-        NoString sKey = No::token(sBuffer, 0);
-        NoString sValue = No::token(sBuffer, 1);
-        Decode(sKey);
-        Decode(sValue);
+        NoString key = No::token(sBuffer, 0);
+        NoString value = No::token(sBuffer, 1);
+        Decode(key);
+        Decode(value);
 
-        values[sKey] = sValue;
+        values[key] = value;
     }
     cFile.Close();
 
@@ -819,7 +819,7 @@ NoString No::namedFormat(const NoString& format, const NoStringMap& msValues)
 {
     NoString ret;
 
-    NoString sKey;
+    NoString key;
     bool bEscape = false;
     bool bParam = false;
     const char* p = format.c_str();
@@ -833,25 +833,25 @@ NoString No::namedFormat(const NoString& format, const NoStringMap& msValues)
                 bEscape = true;
             } else if (*p == '{') {
                 bParam = true;
-                sKey.clear();
+                key.clear();
             } else {
                 ret += *p;
             }
 
         } else {
             if (bEscape) {
-                sKey += *p;
+                key += *p;
                 bEscape = false;
             } else if (*p == '\\') {
                 bEscape = true;
             } else if (*p == '}') {
                 bParam = false;
-                NoStringMap::const_iterator it = msValues.find(sKey);
+                NoStringMap::const_iterator it = msValues.find(key);
                 if (it != msValues.end()) {
                     ret += (*it).second;
                 }
             } else {
-                sKey += *p;
+                key += *p;
             }
         }
 

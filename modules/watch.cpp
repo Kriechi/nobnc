@@ -56,30 +56,30 @@ protected:
 class NoWatchEntry
 {
 public:
-    NoWatchEntry(const NoString& hostMask, const NoString& sTarget, const NoString& sPattern)
+    NoWatchEntry(const NoString& hostMask, const NoString& target, const NoString& sPattern)
     {
         m_bDisabled = false;
         m_bDetachedClientOnly = false;
         m_bDetachedChannelOnly = false;
         m_sPattern = (sPattern.size()) ? sPattern : "*";
 
-        NoNick Nick(hostMask);
+        NoNick nick(hostMask);
 
-        m_sHostMask = (Nick.nick().size()) ? Nick.nick() : "*";
+        m_sHostMask = (nick.nick().size()) ? nick.nick() : "*";
         m_sHostMask += "!";
-        m_sHostMask += (Nick.ident().size()) ? Nick.ident() : "*";
+        m_sHostMask += (nick.ident().size()) ? nick.ident() : "*";
         m_sHostMask += "@";
-        m_sHostMask += (Nick.host().size()) ? Nick.host() : "*";
+        m_sHostMask += (nick.host().size()) ? nick.host() : "*";
 
-        if (sTarget.size()) {
-            m_sTarget = sTarget;
+        if (target.size()) {
+            m_sTarget = target;
         } else {
             m_sTarget = "$";
-            m_sTarget += Nick.nick();
+            m_sTarget += nick.nick();
         }
     }
 
-    bool IsMatch(const NoNick& Nick, const NoString& text, const NoString& sSource, const NoNetwork* network)
+    bool IsMatch(const NoNick& nick, const NoString& text, const NoString& sSource, const NoNetwork* network)
     {
         if (IsDisabled()) {
             return false;
@@ -105,7 +105,7 @@ public:
 
         if (!bGoodSource)
             return false;
-        if (!No::wildCmp(Nick.hostMask(), m_sHostMask, No::CaseInsensitive))
+        if (!No::wildCmp(nick.hostMask(), m_sHostMask, No::CaseInsensitive))
             return false;
         return (No::wildCmp(text, network->expandString(m_sPattern), No::CaseInsensitive));
     }
@@ -228,9 +228,9 @@ public:
         Load();
     }
 
-    void onRawMode(const NoNick& OpNick, NoChannel& Channel, const NoString& sModes, const NoString& args) override
+    void onRawMode(const NoNick& opNick, NoChannel& channel, const NoString& modes, const NoString& args) override
     {
-        Process(OpNick, "* " + OpNick.nick() + " sets mode: " + sModes + " " + args + " on " + Channel.name(), Channel.name());
+        Process(opNick, "* " + opNick.nick() + " sets mode: " + modes + " " + args + " on " + channel.name(), channel.name());
     }
 
     void onClientLogin() override
@@ -245,82 +245,82 @@ public:
         m_Buffer.clear();
     }
 
-    void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
+    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel& channel, const NoString& message) override
     {
-        Process(OpNick,
-                "* " + OpNick.nick() + " kicked " + sKickedNick + " from " + Channel.name() + " because [" + sMessage + "]",
-                Channel.name());
+        Process(opNick,
+                "* " + opNick.nick() + " kicked " + sKickedNick + " from " + channel.name() + " because [" + message + "]",
+                channel.name());
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
     {
-        Process(Nick,
-                "* Quits: " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") "
+        Process(nick,
+                "* Quits: " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") "
                                                                                       "(" +
-                sMessage + ")",
+                message + ")",
                 "");
     }
 
-    void onJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& nick, NoChannel& channel) override
     {
-        Process(Nick, "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") joins " + Channel.name(), Channel.name());
+        Process(nick, "* " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") joins " + channel.name(), channel.name());
     }
 
-    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
+    void onPart(const NoNick& nick, NoChannel& channel, const NoString& message) override
     {
-        Process(Nick,
-                "* " + Nick.nick() + " (" + Nick.ident() + "@" + Nick.host() + ") parts " + Channel.name() + "(" + sMessage + ")",
-                Channel.name());
+        Process(nick,
+                "* " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") parts " + channel.name() + "(" + message + ")",
+                channel.name());
     }
 
-    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
     {
-        Process(OldNick, "* " + OldNick.nick() + " is now known as " + sNewNick, "");
+        Process(OldNick, "* " + OldNick.nick() + " is now known as " + newNick, "");
     }
 
-    ModRet onCtcpReply(NoNick& Nick, NoString& sMessage) override
+    ModRet onCtcpReply(NoNick& nick, NoString& message) override
     {
-        Process(Nick, "* CTCP: " + Nick.nick() + " reply [" + sMessage + "]", "priv");
+        Process(nick, "* CTCP: " + nick.nick() + " reply [" + message + "]", "priv");
         return CONTINUE;
     }
 
-    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
     {
-        Process(Nick, "* CTCP: " + Nick.nick() + " [" + sMessage + "]", "priv");
+        Process(nick, "* CTCP: " + nick.nick() + " [" + message + "]", "priv");
         return CONTINUE;
     }
 
-    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        Process(Nick,
-                "* CTCP: " + Nick.nick() + " [" + sMessage + "] to "
+        Process(nick,
+                "* CTCP: " + nick.nick() + " [" + message + "] to "
                                                              "[" +
-                Channel.name() + "]",
-                Channel.name());
+                channel.name() + "]",
+                channel.name());
         return CONTINUE;
     }
 
-    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivNotice(NoNick& nick, NoString& message) override
     {
-        Process(Nick, "-" + Nick.nick() + "- " + sMessage, "priv");
+        Process(nick, "-" + nick.nick() + "- " + message, "priv");
         return CONTINUE;
     }
 
-    ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        Process(Nick, "-" + Nick.nick() + ":" + Channel.name() + "- " + sMessage, Channel.name());
+        Process(nick, "-" + nick.nick() + ":" + channel.name() + "- " + message, channel.name());
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& nick, NoString& message) override
     {
-        Process(Nick, "<" + Nick.nick() + "> " + sMessage, "priv");
+        Process(nick, "<" + nick.nick() + "> " + message, "priv");
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        Process(Nick, "<" + Nick.nick() + ":" + Channel.name() + "> " + sMessage, Channel.name());
+        Process(nick, "<" + nick.nick() + ":" + channel.name() + "> " + message, channel.name());
         return CONTINUE;
     }
 
@@ -391,7 +391,7 @@ public:
     }
 
 private:
-    void Process(const NoNick& Nick, const NoString& sMessage, const NoString& sSource)
+    void Process(const NoNick& nick, const NoString& message, const NoString& sSource)
     {
         std::set<NoString> sHandledTargets;
         NoNetwork* network = NoModule::network();
@@ -408,14 +408,14 @@ private:
                 continue;
             }
 
-            if (WatchEntry.IsMatch(Nick, sMessage, sSource, network) && sHandledTargets.count(WatchEntry.GetTarget()) < 1) {
+            if (WatchEntry.IsMatch(nick, message, sSource, network) && sHandledTargets.count(WatchEntry.GetTarget()) < 1) {
                 if (network->isUserAttached()) {
                     network->putUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " +
-                                      network->currentNick() + " :" + sMessage);
+                                      network->currentNick() + " :" + message);
                 } else {
                     m_Buffer.addMessage(":" + _NAMEDFMT(WatchEntry.GetTarget()) +
                                         "!watch@znc.in PRIVMSG {target} :{text}",
-                                        sMessage);
+                                        message);
                 }
                 sHandledTargets.insert(WatchEntry.GetTarget());
             }
@@ -669,36 +669,36 @@ private:
         putModule(Table);
     }
 
-    void Watch(const NoString& hostMask, const NoString& sTarget, const NoString& sPattern, bool bNotice = false)
+    void Watch(const NoString& hostMask, const NoString& target, const NoString& sPattern, bool bNotice = false)
     {
-        NoString sMessage;
+        NoString message;
 
         if (hostMask.size()) {
-            NoWatchEntry WatchEntry(hostMask, sTarget, sPattern);
+            NoWatchEntry WatchEntry(hostMask, target, sPattern);
 
             bool bExists = false;
             for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it) {
                 if (*it == WatchEntry) {
-                    sMessage = "Entry for [" + WatchEntry.GetHostMask() + "] already exists.";
+                    message = "Entry for [" + WatchEntry.GetHostMask() + "] already exists.";
                     bExists = true;
                     break;
                 }
             }
 
             if (!bExists) {
-                sMessage = "Adding entry: [" + WatchEntry.GetHostMask() + "] watching for "
+                message = "Adding entry: [" + WatchEntry.GetHostMask() + "] watching for "
                                                                           "[" +
                            WatchEntry.GetPattern() + "] -> [" + WatchEntry.GetTarget() + "]";
                 m_lsWatchers.push_back(WatchEntry);
             }
         } else {
-            sMessage = "Watch: Not enough arguments.  Try Help";
+            message = "Watch: Not enough arguments.  Try Help";
         }
 
         if (bNotice) {
-            putModuleNotice(sMessage);
+            putModuleNotice(message);
         } else {
-            putModule(sMessage);
+            putModule(message);
         }
         Save();
     }
@@ -769,9 +769,9 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoWatcherMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoWatcherMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("watch");
+    info.setWikiPage("watch");
 }
 
 NETWORKMODULEDEFS(NoWatcherMod, "Copy activity from a specific user into a separate window")

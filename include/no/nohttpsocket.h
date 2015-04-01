@@ -27,8 +27,8 @@ class NoModule;
 class NO_EXPORT NoHttpSocket : public NoModuleSocket
 {
 public:
-    NoHttpSocket(NoModule* mod, const NoString& sURIPrefix);
-    NoHttpSocket(NoModule* mod, const NoString& sURIPrefix, const NoString& sHostname, ushort port);
+    NoHttpSocket(NoModule* mod, const NoString& uriPrefix);
+    NoHttpSocket(NoModule* mod, const NoString& uriPrefix, const NoString& hostname, ushort port);
     virtual ~NoHttpSocket();
 
     void readData(const char* data, size_t len) override;
@@ -39,25 +39,25 @@ public:
     virtual bool forceLogin();
     virtual bool onLogin(const NoString& sUser, const NoString& pass, bool bBasic);
     virtual void onPageRequest(const NoString& sURI) = 0;
-    virtual bool printFile(const NoString& sFileName, NoString sContentType = "");
+    virtual bool printFile(const NoString& fileName, NoString sContentType = "");
 
     void checkPost();
     bool sentHeader() const;
     bool printHeader(off_t uContentLength, const NoString& sContentType = "", uint uStatusId = 200, const NoString& sStatusMsg = "OK");
-    void addHeader(const NoString& name, const NoString& sValue);
+    void addHeader(const NoString& name, const NoString& value);
     void setContentType(const NoString& sContentType);
 
     bool printNotFound();
     bool redirect(const NoString& sURL);
-    bool printErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage);
+    bool printErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& message);
     static void parseParams(const NoString& sParams, std::map<NoString, NoStringVector>& msvsParams);
     void parseUri();
     void requestPage();
     static NoString formatDate(time_t tm = 0);
     NoString remoteAddress() const override;
 
-    NoString requestCookie(const NoString& sKey) const;
-    bool sendCookie(const NoString& sKey, const NoString& sValue);
+    NoString requestCookie(const NoString& key) const;
+    bool sendCookie(const NoString& key, const NoString& value);
 
     void setLoggedIn(bool b);
 

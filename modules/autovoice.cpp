@@ -32,8 +32,8 @@ public:
         FromString(line);
     }
 
-    NoAutoVoiceUser(const NoString& sUsername, const NoString& sHostmask, const NoString& sChannels)
-        : m_sUsername(sUsername), m_sHostmask(sHostmask)
+    NoAutoVoiceUser(const NoString& username, const NoString& sHostmask, const NoString& sChannels)
+        : m_sUsername(username), m_sHostmask(sHostmask)
     {
         addChannels(sChannels);
     }
@@ -157,7 +157,7 @@ public:
                    "Removes a user");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         // Load the chans from the command line
         uint a = 0;
@@ -194,14 +194,14 @@ public:
         m_msUsers.clear();
     }
 
-    void onJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& nick, NoChannel& channel) override
     {
         // If we have ops in this chan
-        if (Channel.hasPerm(NoChannel::Op) || Channel.hasPerm(NoChannel::HalfOp)) {
+        if (channel.hasPerm(NoChannel::Op) || channel.hasPerm(NoChannel::HalfOp)) {
             for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
                 // and the nick who joined is a valid user
-                if (it->second->HostMatches(Nick.hostMask()) && it->second->ChannelMatches(Channel.name())) {
-                    putIrc("MODE " + Channel.name() + " +v " + Nick.nick());
+                if (it->second->HostMatches(nick.hostMask()) && it->second->ChannelMatches(channel.name())) {
+                    putIrc("MODE " + channel.name() + " +v " + nick.nick());
                     break;
                 }
             }
@@ -279,7 +279,7 @@ public:
         }
 
         user->addChannels(sChans);
-        putModule("Channel(s) added to user [" + user->GetUsername() + "]");
+        putModule("channel(s) added to user [" + user->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(user->GetUsername(), user->ToString());
@@ -303,7 +303,7 @@ public:
         }
 
         user->removeChannels(sChans);
-        putModule("Channel(s) Removed from user [" + user->GetUsername() + "]");
+        putModule("channel(s) Removed from user [" + user->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(user->GetUsername(), user->ToString());
@@ -316,12 +316,12 @@ public:
         return (it != m_msUsers.end()) ? it->second : nullptr;
     }
 
-    NoAutoVoiceUser* FindUserByHost(const NoString& sHostmask, const NoString& sChannel = "")
+    NoAutoVoiceUser* FindUserByHost(const NoString& sHostmask, const NoString& channel = "")
     {
         for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             NoAutoVoiceUser* user = it->second;
 
-            if (user->HostMatches(sHostmask) && (sChannel.empty() || user->ChannelMatches(sChannel))) {
+            if (user->HostMatches(sHostmask) && (channel.empty() || user->ChannelMatches(channel))) {
                 return user;
             }
         }
@@ -361,11 +361,11 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoAutoVoiceMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoAutoVoiceMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("autovoice");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("Each argument is either a channel you want autovoice for (which can include wildcards) or, "
+    info.setWikiPage("autovoice");
+    info.setHasArgs(true);
+    info.setArgsHelpText("Each argument is either a channel you want autovoice for (which can include wildcards) or, "
                          "if it starts with !, it is an exception for autovoice.");
 }
 

@@ -30,13 +30,13 @@
 
 #define MAX_POST_SIZE 1024 * 1024
 
-NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& sURIPrefix) : NoHttpSocket(mod, sURIPrefix, "", 0)
+NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& uriPrefix) : NoHttpSocket(mod, uriPrefix, "", 0)
 {
     init();
 }
 
-NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& sURIPrefix, const NoString& sHostname, ushort port)
-    : NoModuleSocket(mod, sHostname, port),
+NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& uriPrefix, const NoString& hostname, ushort port)
+    : NoModuleSocket(mod, hostname, port),
       m_sentHeader(false),
       m_gotHeader(false),
       m_loggedIn(false),
@@ -57,7 +57,7 @@ NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& sURIPrefix, const NoSt
       m_acceptGzip(false),
       m_requestCookies(),
       m_responseCookies(),
-      m_uriPrefix(sURIPrefix)
+      m_uriPrefix(uriPrefix)
 {
     init();
 }
@@ -80,20 +80,20 @@ void NoHttpSocket::readData(const char* data, size_t len)
     }
 }
 
-bool NoHttpSocket::sendCookie(const NoString& sKey, const NoString& sValue)
+bool NoHttpSocket::sendCookie(const NoString& key, const NoString& value)
 {
-    if (!sKey.empty() && !sValue.empty()) {
+    if (!key.empty() && !value.empty()) {
         // only queue a Set-Cookie to be sent if the client didn't send a Cookie header of the same name+value.
-        m_responseCookies[sKey] = sValue;
+        m_responseCookies[key] = value;
         return true;
     }
 
     return false;
 }
 
-NoString NoHttpSocket::requestCookie(const NoString& sKey) const
+NoString NoHttpSocket::requestCookie(const NoString& key) const
 {
-    NoStringMap::const_iterator it = m_requestCookies.find(sKey);
+    NoStringMap::const_iterator it = m_requestCookies.find(key);
 
     return it != m_requestCookies.end() ? it->second : "";
 }
@@ -149,32 +149,32 @@ void NoHttpSocket::readLine(const NoString& data)
         // X-Forwarded-For: client, proxy1, proxy2
         if (m_forwardedIp.empty()) {
             const NoStringVector& vsTrustedProxies = noApp->trustedProxies();
-            NoString sIP = remoteAddress();
+            NoString address = remoteAddress();
 
             NoStringVector vsIPs = No::tokens(line, 1).split(",", No::SkipEmptyParts);
 
             while (!vsIPs.empty()) {
-                // sIP told us that it got connection from vsIPs.back()
-                // check if sIP is trusted proxy
+                // address told us that it got connection from vsIPs.back()
+                // check if address is trusted proxy
                 bool bTrusted = false;
                 for (const NoString& sTrustedProxy : vsTrustedProxies) {
-                    if (No::wildCmp(sIP, sTrustedProxy)) {
+                    if (No::wildCmp(address, sTrustedProxy)) {
                         bTrusted = true;
                         break;
                     }
                 }
                 if (bTrusted) {
-                    // sIP is trusted proxy, so use vsIPs.back() as new sIP
-                    sIP = vsIPs.back().trim_n();
+                    // address is trusted proxy, so use vsIPs.back() as new address
+                    address = vsIPs.back().trim_n();
                     vsIPs.pop_back();
                 } else {
                     break;
                 }
             }
 
-            // either sIP is not trusted proxy, or it's in the beginning of the X-Forwarded-For list
+            // either address is not trusted proxy, or it's in the beginning of the X-Forwarded-For list
             // in both cases use it as the endpoind
-            m_forwardedIp = sIP;
+            m_forwardedIp = address;
         }
     } else if (name.equals("If-None-Match:")) {
         // this is for proper client cache support (HTTP 304) on static files:
@@ -307,9 +307,9 @@ void NoHttpSocket::printPage(const NoString& sPage)
     close(NoSocket::CloseAfterWrite);
 }
 
-bool NoHttpSocket::printFile(const NoString& sFileName, NoString sContentType)
+bool NoHttpSocket::printFile(const NoString& fileName, NoString sContentType)
 {
-    NoString sFilePath = sFileName;
+    NoString sFilePath = fileName;
     NoFile File(sFilePath);
 
     if (!File.Open()) {
@@ -318,21 +318,21 @@ bool NoHttpSocket::printFile(const NoString& sFileName, NoString sContentType)
     }
 
     if (sContentType.empty()) {
-        if (sFileName.right(5).equals(".html") || sFileName.right(4).equals(".htm")) {
+        if (fileName.right(5).equals(".html") || fileName.right(4).equals(".htm")) {
             sContentType = "text/html; charset=utf-8";
-        } else if (sFileName.right(4).equals(".css")) {
+        } else if (fileName.right(4).equals(".css")) {
             sContentType = "text/css; charset=utf-8";
-        } else if (sFileName.right(3).equals(".js")) {
+        } else if (fileName.right(3).equals(".js")) {
             sContentType = "application/x-javascript; charset=utf-8";
-        } else if (sFileName.right(4).equals(".jpg")) {
+        } else if (fileName.right(4).equals(".jpg")) {
             sContentType = "image/jpeg";
-        } else if (sFileName.right(4).equals(".gif")) {
+        } else if (fileName.right(4).equals(".gif")) {
             sContentType = "image/gif";
-        } else if (sFileName.right(4).equals(".ico")) {
+        } else if (fileName.right(4).equals(".ico")) {
             sContentType = "image/x-icon";
-        } else if (sFileName.right(4).equals(".png")) {
+        } else if (fileName.right(4).equals(".png")) {
             sContentType = "image/png";
-        } else if (sFileName.right(4).equals(".bmp")) {
+        } else if (fileName.right(4).equals(".bmp")) {
             sContentType = "image/bmp";
         } else {
             sContentType = "text/plain; charset=utf-8";
@@ -370,7 +370,7 @@ bool NoHttpSocket::printFile(const NoString& sFileName, NoString sContentType)
         }
 
 #ifdef HAVE_ZLIB
-        bool bGzip = m_acceptGzip && (sContentType.left(5).equals("text/") || sFileName.right(3).equals(".js"));
+        bool bGzip = m_acceptGzip && (sContentType.left(5).equals("text/") || fileName.right(3).equals(".js"));
 
         if (bGzip) {
             NO_DEBUG("- Sending gzip-compressed.");
@@ -490,9 +490,9 @@ void NoHttpSocket::parseParams(const NoString& sParams, std::map<NoString, NoStr
 
     for (const NoString& sPair : vsPairs) {
         NoString name = No::escape(No::token(sPair, 0, "="), No::UrlFormat, No::AsciiFormat);
-        NoString sValue = No::escape(No::tokens(sPair, 1, "="), No::UrlFormat, No::AsciiFormat);
+        NoString value = No::escape(No::tokens(sPair, 1, "="), No::UrlFormat, No::AsciiFormat);
 
-        msvsParams[name].push_back(sValue);
+        msvsParams[name].push_back(value);
     }
 }
 
@@ -649,7 +649,7 @@ bool NoHttpSocket::printNotFound()
     return printErrorPage(404, "Not Found", "The requested URL was not found on this server.");
 }
 
-bool NoHttpSocket::printErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& sMessage)
+bool NoHttpSocket::printErrorPage(uint uStatusId, const NoString& sStatusMsg, const NoString& message)
 {
     if (sentHeader()) {
         NO_DEBUG("PrintErrorPage(): Header was already sent");
@@ -668,7 +668,7 @@ bool NoHttpSocket::printErrorPage(uint uStatusId, const NoString& sStatusMsg, co
                                                                                           "<h1>" +
                      No::escape(sStatusMsg, No::HtmlFormat) + "</h1>\r\n"
                                                               "<p>" +
-                     No::escape(sMessage, No::HtmlFormat) + "</p>\r\n"
+                     No::escape(message, No::HtmlFormat) + "</p>\r\n"
                                                             "<hr/>\r\n"
                                                             "<address>" +
                      NoApp::tag(false, /* bHTML = */ true) + " at " + No::escape(localAddress(), No::HtmlFormat) +
@@ -757,9 +757,9 @@ void NoHttpSocket::setContentType(const NoString& sContentType)
     m_contentType = sContentType;
 }
 
-void NoHttpSocket::addHeader(const NoString& name, const NoString& sValue)
+void NoHttpSocket::addHeader(const NoString& name, const NoString& value)
 {
-    m_headers[name] = sValue;
+    m_headers[name] = value;
 }
 
 bool NoHttpSocket::redirect(const NoString& sURL)

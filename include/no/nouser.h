@@ -52,26 +52,26 @@ public:
     bool checkPass(const NoString& pass) const;
     bool addAllowedHost(const NoString& hostMask);
     bool isHostAllowed(const NoString& hostMask) const;
-    bool isValid(NoString& sErrMsg, bool bSkipPass = false) const;
+    bool isValid(NoString& error, bool skipPass = false) const;
     static bool isValidUserName(const NoString& userName);
     static NoString makeCleanUserName(const NoString& userName);
 
     NoModuleLoader* loader() const;
 
-    NoNetwork* addNetwork(const NoString& sNetwork, NoString& sErrorRet);
-    bool deleteNetwork(const NoString& sNetwork);
+    NoNetwork* addNetwork(const NoString& name, NoString& error);
+    bool deleteNetwork(const NoString& name);
     bool addNetwork(NoNetwork* network);
     void removeNetwork(NoNetwork* network);
-    NoNetwork* findNetwork(const NoString& sNetwork) const;
+    NoNetwork* findNetwork(const NoString& name) const;
     std::vector<NoNetwork*> networks() const;
     bool hasSpaceForNewNetwork() const;
 
-    bool putUser(const NoString& line, NoClient* client = nullptr, NoClient* pSkipClient = nullptr);
-    bool putAllUser(const NoString& line, NoClient* client = nullptr, NoClient* pSkipClient = nullptr);
-    bool putStatus(const NoString& line, NoClient* client = nullptr, NoClient* pSkipClient = nullptr);
-    bool putStatusNotice(const NoString& line, NoClient* client = nullptr, NoClient* pSkipClient = nullptr);
-    bool putModule(const NoString& module, const NoString& line, NoClient* client = nullptr, NoClient* pSkipClient = nullptr);
-    bool putModuleNotice(const NoString& module, const NoString& line, NoClient* client = nullptr, NoClient* pSkipClient = nullptr);
+    bool putUser(const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
+    bool putAllUser(const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
+    bool putStatus(const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
+    bool putStatusNotice(const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
+    bool putModule(const NoString& module, const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
+    bool putModuleNotice(const NoString& module, const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
 
     bool isUserAttached() const;
     void userConnected(NoClient* client);
@@ -86,7 +86,7 @@ public:
     NoString addTimestamp(time_t tm, const NoString& str) const;
 
     void cloneNetworks(const NoUser& User);
-    bool clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks = true);
+    bool clone(const NoUser& User, NoString& error, bool cloneNetworks = true);
 
     void addBytesRead(ulonglong u);
     void addBytesWritten(ulonglong u);
@@ -97,7 +97,7 @@ public:
     void setRealName(const NoString& s);
     void setBindHost(const NoString& s);
     void setDccBindHost(const NoString& s);
-    void setPassword(const NoString& s, HashType eHash, const NoString& salt = "");
+    void setPassword(const NoString& s, HashType hash, const NoString& salt = "");
     void setMultiClients(bool b);
     void setDenyLoadMod(bool b);
     void setAdmin(bool b);
@@ -106,9 +106,9 @@ public:
     void setDefaultChanModes(const NoString& s);
     void setClientEncoding(const NoString& s);
     void setQuitMsg(const NoString& s);
-    bool addCtcpReply(const NoString& sCTCP, const NoString& sReply);
-    bool removeCtcpReply(const NoString& sCTCP);
-    bool setBufferCount(uint u, bool bForce = false);
+    bool addCtcpReply(const NoString& ctcp, const NoString& reply);
+    bool removeCtcpReply(const NoString& ctcp);
+    bool setBufferCount(uint u, bool force = false);
     void setAutoClearChanBuffer(bool b);
     void setAutoclearQueryBuffer(bool b);
 
@@ -169,7 +169,7 @@ public:
 private:
     void bounceAllClients();
     void setKeepBuffer(bool b); // XXX compatibility crap, added in 0.207
-    bool loadModule(const NoString& sModName, const NoString& args, const NoString& notice, NoString& error);
+    bool loadModule(const NoString& name, const NoString& args, const NoString& notice, NoString& error);
 
     NoUser(const NoUser&) = delete;
     NoUser& operator=(const NoUser&) = delete;

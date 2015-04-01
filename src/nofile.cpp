@@ -38,9 +38,9 @@ static inline void SetFdCloseOnExec(int fd)
     fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
 }
 
-NoFile::NoFile(const NoString& sLongName) : m_buffer(""), m_fd(-1), m_hadError(false), m_longName(""), m_shortName("")
+NoFile::NoFile(const NoString& filePath) : m_buffer(""), m_fd(-1), m_hadError(false), m_longName(""), m_shortName("")
 {
-    SetFileName(sLongName);
+    SetFileName(filePath);
 }
 
 NoFile::~NoFile()
@@ -48,14 +48,14 @@ NoFile::~NoFile()
     Close();
 }
 
-void NoFile::SetFileName(const NoString& sLongName)
+void NoFile::SetFileName(const NoString& filePath)
 {
-    if (sLongName.left(2) == "~/") {
-        m_longName = NoDir::home().path() + sLongName.substr(1);
+    if (filePath.left(2) == "~/") {
+        m_longName = NoDir::home().path() + filePath.substr(1);
     } else
-        m_longName = sLongName;
+        m_longName = filePath;
 
-    m_shortName = sLongName;
+    m_shortName = filePath;
     m_shortName.trimRight("/");
 
     NoString::size_type uPos = m_shortName.rfind('/');
@@ -99,21 +99,21 @@ bool NoFile::IsSock(bool bUseLstat) const
 }
 
 // for gettin file types, using fstat instead
-bool NoFile::FType(const NoString& sFileName, FileType eType, bool bUseLstat)
+bool NoFile::FType(const NoString& fileName, FileType type, bool bUseLstat)
 {
     struct stat st;
 
     if (!bUseLstat) {
-        if (stat(sFileName.c_str(), &st) != 0) {
+        if (stat(fileName.c_str(), &st) != 0) {
             return false;
         }
     } else {
-        if (lstat(sFileName.c_str(), &st) != 0) {
+        if (lstat(fileName.c_str(), &st) != 0) {
             return false;
         }
     }
 
-    switch (eType) {
+    switch (type) {
     case Regular:
         return S_ISREG(st.st_mode);
     case Directory:
@@ -242,9 +242,9 @@ bool NoFile::Copy(const NoString& sNewFileName, bool bOverwrite)
     return false;
 }
 
-bool NoFile::Delete(const NoString& sFileName)
+bool NoFile::Delete(const NoString& fileName)
 {
-    return (unlink(sFileName.c_str()) == 0) ? true : false;
+    return (unlink(fileName.c_str()) == 0) ? true : false;
 }
 
 bool NoFile::Move(const NoString& sOldFileName, const NoString& sNewFileName, bool bOverwrite)
@@ -367,9 +367,9 @@ bool NoFile::Sync()
     return false;
 }
 
-bool NoFile::Open(const NoString& sFileName, int iFlags, mode_t iMode)
+bool NoFile::Open(const NoString& fileName, int iFlags, mode_t iMode)
 {
-    SetFileName(sFileName);
+    SetFileName(fileName);
     return Open(iFlags, iMode);
 }
 

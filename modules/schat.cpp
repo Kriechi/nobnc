@@ -39,7 +39,7 @@ class NoSChat;
 class NoRemMarkerJob : public NoTimer
 {
 public:
-    NoRemMarkerJob(NoModule* pModule, const NoString& nick) : NoTimer(pModule), m_sNick(nick)
+    NoRemMarkerJob(NoModule* module, const NoString& nick) : NoTimer(module), m_sNick(nick)
     {
         setName("Remove (s)" + nick);
         setDescription("Removes this nicks entry for waiting DCC.");
@@ -57,9 +57,9 @@ public:
     NoSChatSock(NoSChat* mod, const NoString& sChatNick, const NoString& host, u_short iPort);
     ~NoSChatSock();
 
-    NoSocket* createSocket(const NoString& sHostname, u_short iPort) override
+    NoSocket* createSocket(const NoString& hostname, u_short iPort) override
     {
-        NoSChatSock* p = new NoSChatSock(m_module, m_sChatNick, sHostname, iPort);
+        NoSChatSock* p = new NoSChatSock(m_module, m_sChatNick, hostname, iPort);
         return (p);
     }
 
@@ -118,7 +118,7 @@ public:
     {
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         m_sPemFile = args;
 
@@ -127,7 +127,7 @@ public:
         }
 
         if (!NoFile::Exists(m_sPemFile)) {
-            sMessage = "Unable to load pem file [" + m_sPemFile + "]";
+            message = "Unable to load pem file [" + m_sPemFile + "]";
             return false;
         }
 
@@ -164,19 +164,19 @@ public:
 
         if (sCom.equals("chat") && !args.empty()) {
             NoString nick = "(s)" + args;
-            for (NoSChatSock* pSock : m_sockets) {
-                if (pSock->GetChatNick().equals(nick)) {
+            for (NoSChatSock* socket : m_sockets) {
+                if (socket->GetChatNick().equals(nick)) {
                     putModule("Already Connected to [" + args + "]");
                     return;
                 }
             }
 
-            NoSChatSock* pSock = new NoSChatSock(this, nick);
-            pSock->setCipher("HIGH");
-            pSock->setPemFile(m_sPemFile);
+            NoSChatSock* socket = new NoSChatSock(this, nick);
+            socket->setCipher("HIGH");
+            socket->setPemFile(m_sPemFile);
 
             u_short iPort =
-            manager()->listenRand(pSock->name() + "::LISTENER", user()->localDccIp(), true, SOMAXCONN, pSock, 60);
+            manager()->listenRand(socket->name() + "::LISTENER", user()->localDccIp(), true, SOMAXCONN, socket, 60);
 
             if (iPort == 0) {
                 putModule("Failed to start chat!");
@@ -200,10 +200,10 @@ public:
             Table.addColumn("Status");
             Table.addColumn("Cipher");
 
-            for (NoSChatSock* pSock : m_sockets) {
+            for (NoSChatSock* socket : m_sockets) {
                 Table.addRow();
-                Table.setValue("Nick", pSock->GetChatNick());
-                ulonglong iStartTime = pSock->startTime();
+                Table.setValue("Nick", socket->GetChatNick());
+                ulonglong iStartTime = socket->startTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
@@ -212,17 +212,17 @@ public:
                     Table.setValue("Created", sTime);
                 }
 
-                if (!pSock->isListener()) {
+                if (!socket->isListener()) {
                     Table.setValue("Status", "Established");
-                    Table.setValue("Host", pSock->remoteAddress());
-                    Table.setValue("Port", NoString(pSock->remotePort()));
-                    SSL_SESSION* pSession = pSock->sslSession();
+                    Table.setValue("Host", socket->remoteAddress());
+                    Table.setValue("Port", NoString(socket->remotePort()));
+                    SSL_SESSION* pSession = socket->sslSession();
                     if (pSession && pSession->cipher && pSession->cipher->name)
                         Table.setValue("Cipher", pSession->cipher->name);
 
                 } else {
                     Table.setValue("Status", "Waiting");
-                    Table.setValue("Port", NoString(pSock->localPort()));
+                    Table.setValue("Port", NoString(socket->localPort()));
                 }
             }
             if (Table.size()) {
@@ -234,9 +234,9 @@ public:
             if (!args.startsWith("(s)"))
                 args = "(s)" + args;
 
-            for (NoSChatSock* pSock : m_sockets) {
-                if (args.equals(pSock->GetChatNick())) {
-                    pSock->close();
+            for (NoSChatSock* socket : m_sockets) {
+                if (args.equals(socket->GetChatNick())) {
+                    socket->close();
                     return;
                 }
             }
@@ -250,10 +250,10 @@ public:
             Table.addColumn("Type");
             Table.addColumn("Cipher");
 
-            for (NoSChatSock* pSock : m_sockets) {
+            for (NoSChatSock* socket : m_sockets) {
                 Table.addRow();
-                Table.setValue("SockName", pSock->name());
-                ulonglong iStartTime = pSock->startTime();
+                Table.setValue("SockName", socket->name());
+                ulonglong iStartTime = socket->startTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
@@ -262,14 +262,14 @@ public:
                     Table.setValue("Created", sTime);
                 }
 
-                if (!pSock->isListener()) {
-                    if (pSock->isOutbound())
+                if (!socket->isListener()) {
+                    if (socket->isOutbound())
                         Table.setValue("Type", "Outbound");
                     else
                         Table.setValue("Type", "Inbound");
-                    Table.setValue("LocalIP:Port", pSock->localAddress() + ":" + NoString(pSock->localPort()));
-                    Table.setValue("RemoteIP:Port", pSock->remoteAddress() + ":" + NoString(pSock->remotePort()));
-                    SSL_SESSION* pSession = pSock->sslSession();
+                    Table.setValue("LocalIP:Port", socket->localAddress() + ":" + NoString(socket->localPort()));
+                    Table.setValue("RemoteIP:Port", socket->remoteAddress() + ":" + NoString(socket->remotePort()));
+                    SSL_SESSION* pSession = socket->sslSession();
                     if (pSession && pSession->cipher && pSession->cipher->name)
                         Table.setValue("Cipher", pSession->cipher->name);
                     else
@@ -277,7 +277,7 @@ public:
 
                 } else {
                     Table.setValue("Type", "Listener");
-                    Table.setValue("LocalIP:Port", pSock->localAddress() + ":" + NoString(pSock->localPort()));
+                    Table.setValue("LocalIP:Port", socket->localAddress() + ":" + NoString(socket->localPort()));
                     Table.setValue("RemoteIP:Port", "0.0.0.0:0");
                 }
             }
@@ -302,12 +302,12 @@ public:
             putModule("Unknown command [" + sCom + "] [" + args + "]");
     }
 
-    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
     {
-        if (sMessage.startsWith("DCC SCHAT ")) {
+        if (message.startsWith("DCC SCHAT ")) {
             // chat ip port
-            ulong iIP = No::token(sMessage, 3).toULong();
-            ushort iPort = No::token(sMessage, 4).toUShort();
+            ulong iIP = No::token(message, 3).toULong();
+            ushort iPort = No::token(message, 4).toUShort();
 
             if (iIP > 0 && iPort > 0) {
                 std::pair<u_long, u_short> pTmp;
@@ -315,11 +315,11 @@ public:
 
                 pTmp.first = iIP;
                 pTmp.second = iPort;
-                sMask = "(s)" + Nick.nick() + "!" + "(s)" + Nick.nick() + "@" + No::formatIp(iIP);
+                sMask = "(s)" + nick.nick() + "!" + "(s)" + nick.nick() + "@" + No::formatIp(iIP);
 
-                m_siiWaitingChats["(s)" + Nick.nick()] = pTmp;
+                m_siiWaitingChats["(s)" + nick.nick()] = pTmp;
                 SendToUser(sMask, "*** Incoming DCC SCHAT, Accept ? (yes/no)");
-                NoRemMarkerJob* p = new NoRemMarkerJob(this, Nick.nick());
+                NoRemMarkerJob* p = new NoRemMarkerJob(this, nick.nick());
                 p->setSingleShot(true);
                 p->start(60);
                 return (HALT);
@@ -336,28 +336,28 @@ public:
         delete findTimer("Remove " + nick); // delete any associated timer to this nick
     }
 
-    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserMsg(NoString& target, NoString& message) override
     {
-        if (sTarget.left(3) == "(s)") {
-            NoString sSockName = moduleName().toUpper() + "::" + sTarget;
+        if (target.left(3) == "(s)") {
+            NoString sSockName = moduleName().toUpper() + "::" + target;
             NoSChatSock* p = (NoSChatSock*)findSocket(sSockName);
             if (!p) {
                 std::map<NoString, std::pair<u_long, u_short>>::iterator it;
-                it = m_siiWaitingChats.find(sTarget);
+                it = m_siiWaitingChats.find(target);
 
                 if (it != m_siiWaitingChats.end()) {
-                    if (!sMessage.equals("yes"))
-                        SendToUser(sTarget + "!" + sTarget + "@" + No::formatIp(it->second.first),
+                    if (!message.equals("yes"))
+                        SendToUser(target + "!" + target + "@" + No::formatIp(it->second.first),
                                    "Refusing to accept DCC SCHAT!");
                     else
-                        AcceptSDCC(sTarget, it->second.first, it->second.second);
+                        AcceptSDCC(target, it->second.first, it->second.second);
 
                     m_siiWaitingChats.erase(it);
                     return (HALT);
                 }
-                putModule("No such SCHAT to [" + sTarget + "]");
+                putModule("No such SCHAT to [" + target + "]");
             } else
-                p->write(sMessage + "\n");
+                p->write(message + "\n");
 
             return (HALT);
         }
@@ -474,11 +474,11 @@ void NoRemMarkerJob::run()
 }
 
 template <>
-void no_moduleInfo<NoSChat>(NoModuleInfo& Info)
+void no_moduleInfo<NoSChat>(NoModuleInfo& info)
 {
-    Info.setWikiPage("schat");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("Path to .pem file, if differs from main ZNC's one");
+    info.setWikiPage("schat");
+    info.setHasArgs(true);
+    info.setArgsHelpText("Path to .pem file, if differs from main ZNC's one");
 }
 
 NETWORKMODULEDEFS(NoSChat, "Secure cross platform (:P) chat system")

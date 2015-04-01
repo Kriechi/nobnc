@@ -72,49 +72,49 @@ public:
         }
     }
 
-    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserMsg(NoString& target, NoString& message) override
     {
         if (m_bRules[RULE_MSG])
             ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet onUserCtcp(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserCtcp(NoString& target, NoString& message) override
     {
         if (m_bRules[RULE_CTCP])
             ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet onUserAction(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserAction(NoString& target, NoString& message) override
     {
         if (m_bRules[RULE_ACTION])
             ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet onUserNotice(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserNotice(NoString& target, NoString& message) override
     {
         if (m_bRules[RULE_NOTICE])
             ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet onUserPart(NoString& sChannel, NoString& sMessage) override
+    ModRet onUserPart(NoString& channel, NoString& message) override
     {
         if (m_bRules[RULE_PART])
             ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet onUserTopic(NoString& sChannel, NoString& sTopic) override
+    ModRet onUserTopic(NoString& channel, NoString& topic) override
     {
         if (m_bRules[RULE_TOPIC])
             ClearAllBuffers();
         return CONTINUE;
     }
 
-    ModRet onUserQuit(NoString& sMessage) override
+    ModRet onUserQuit(NoString& message) override
     {
         if (m_bRules[RULE_QUIT])
             ClearAllBuffers();
@@ -153,7 +153,7 @@ public:
         }
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoStringVector vsOpts = args.split(" ", No::SkipEmptyParts);
 
@@ -172,11 +172,11 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoClearBufferOnMsgMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoClearBufferOnMsgMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("clearbufferonmsg");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("[ [!]<msg|ctcp|action|notice|part|topic|quit|all> ]");
+    info.setWikiPage("clearbufferonmsg");
+    info.setHasArgs(true);
+    info.setArgsHelpText("[ [!]<msg|ctcp|action|notice|part|topic|quit|all> ]");
 }
 
 USERMODULEDEFS(NoClearBufferOnMsgMod, "Clear all channel and query buffers whenever the user does something")

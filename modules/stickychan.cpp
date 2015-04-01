@@ -36,17 +36,17 @@ public:
                    "Lists sticky channels");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override;
+    bool onLoad(const NoString& args, NoString& message) override;
 
-    ModRet onUserPart(NoString& sChannel, NoString& sMessage) override
+    ModRet onUserPart(NoString& channel, NoString& message) override
     {
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
-            if (sChannel.equals(key)) {
-                NoChannel* channel = network()->findChannel(sChannel);
+            if (channel.equals(key)) {
+                NoChannel* chan = network()->findChannel(channel);
 
-                if (channel) {
-                    channel->joinUser();
+                if (chan) {
+                    chan->joinUser();
                     return HALT;
                 }
             }
@@ -55,44 +55,44 @@ public:
         return CONTINUE;
     }
 
-    virtual void onMode(const NoNick& pOpNick, NoChannel& Channel, char uMode, const NoString& arg, bool bAdded, bool bNoChange) override
+    virtual void onMode(const NoNick& opNick, NoChannel& channel, char mode, const NoString& arg, bool added, bool noChange) override
     {
-        if (uMode == NoChannel::M_Key) {
-            if (bAdded) {
+        if (mode == NoChannel::M_Key) {
+            if (added) {
                 // We ignore channel key "*" because of some broken nets.
                 if (arg != "*") {
                     NoRegistry registry(this);
-                    registry.setValue(Channel.name(), arg);
+                    registry.setValue(channel.name(), arg);
                 }
             } else {
                 NoRegistry registry(this);
-                registry.setValue(Channel.name(), "");
+                registry.setValue(channel.name(), "");
             }
         }
     }
 
     void OnStickCommand(const NoString& command)
     {
-        NoString sChannel = No::token(command, 1).toLower();
-        if (sChannel.empty()) {
+        NoString channel = No::token(command, 1).toLower();
+        if (channel.empty()) {
             putModule("Usage: Stick <#channel> [key]");
             return;
         }
         NoRegistry registry(this);
-        registry.setValue(sChannel, No::token(command, 2));
-        putModule("Stuck " + sChannel);
+        registry.setValue(channel, No::token(command, 2));
+        putModule("Stuck " + channel);
     }
 
     void OnUnstickCommand(const NoString& command)
     {
-        NoString sChannel = No::token(command, 1);
-        if (sChannel.empty()) {
+        NoString channel = No::token(command, 1);
+        if (channel.empty()) {
             putModule("Usage: Unstick <#channel>");
             return;
         }
         NoRegistry registry(this);
-        registry.remove(sChannel);
-        putModule("Unstuck " + sChannel);
+        registry.remove(channel);
+        putModule("Unstuck " + channel);
     }
 
     void OnListCommand(const NoString& command)
@@ -114,10 +114,10 @@ public:
         return "Sticky Chans";
     }
 
-    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "index") {
-            bool bSubmitted = (WebSock.param("submitted").toInt() != 0);
+        if (page == "index") {
+            bool bSubmitted = (socket.param("submitted").toInt() != 0);
 
             NoRegistry registry(this);
             const std::vector<NoChannel*>& Channels = network()->channels();
@@ -126,7 +126,7 @@ public:
                 bool bStick = registry.contains(sChan);
 
                 if (bSubmitted) {
-                    bool bNewStick = WebSock.param("stick_" + sChan).toBool();
+                    bool bNewStick = socket.param("stick_" + sChan).toBool();
                     if (bNewStick && !bStick)
                         registry.setValue(sChan, ""); // no password support for now unless chansaver is active too
                     else if (!bNewStick && bStick) {
@@ -135,13 +135,13 @@ public:
                     bStick = bNewStick;
                 }
 
-                NoTemplate& Row = Tmpl.addRow("ChannelLoop");
+                NoTemplate& Row = tmpl.addRow("ChannelLoop");
                 Row["Name"] = sChan;
                 Row["Sticky"] = NoString(bStick);
             }
 
             if (bSubmitted) {
-                WebSock.session()->addSuccess("Changes have been saved!");
+                socket.session()->addSuccess("Changes have been saved!");
             }
 
             return true;
@@ -150,22 +150,22 @@ public:
         return false;
     }
 
-    bool onEmbeddedWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onEmbeddedWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "webadmin/channel") {
-            NoString sChan = Tmpl["ChanName"];
+        if (page == "webadmin/channel") {
+            NoString sChan = tmpl["ChanName"];
             NoRegistry registry(this);
             bool bStick = registry.contains(sChan);
-            if (Tmpl["WebadminAction"].equals("display")) {
-                Tmpl["Sticky"] = NoString(bStick);
-            } else if (WebSock.param("embed_stickychan_presented").toBool()) {
-                bool bNewStick = WebSock.param("embed_stickychan_sticky").toBool();
+            if (tmpl["WebadminAction"].equals("display")) {
+                tmpl["Sticky"] = NoString(bStick);
+            } else if (socket.param("embed_stickychan_presented").toBool()) {
+                bool bNewStick = socket.param("embed_stickychan_sticky").toBool();
                 if (bNewStick && !bStick) {
                     registry.setValue(sChan, ""); // no password support for now unless chansaver is active too
-                    WebSock.session()->addSuccess("Channel become sticky!");
+                    socket.session()->addSuccess("channel become sticky!");
                 } else if (!bNewStick && bStick) {
                     registry.remove(sChan);
-                    WebSock.session()->addSuccess("Channel stopped being sticky!");
+                    socket.session()->addSuccess("channel stopped being sticky!");
                 }
             }
             return true;
@@ -214,16 +214,16 @@ protected:
     }
 };
 
-bool NoStickyChan::onLoad(const NoString& args, NoString& sMessage)
+bool NoStickyChan::onLoad(const NoString& args, NoString& message)
 {
     NoStringVector vsChans = args.split(",", No::SkipEmptyParts);
     NoStringVector::iterator it;
 
     for (it = vsChans.begin(); it != vsChans.end(); ++it) {
         NoString sChan = No::token(*it, 0);
-        NoString sKey = No::tokens(*it, 1);
+        NoString key = No::tokens(*it, 1);
         NoRegistry registry(this);
-        registry.setValue(sChan, sKey);
+        registry.setValue(sChan, key);
     }
 
     // Since we now have these channels added, clear the argument list
@@ -235,11 +235,11 @@ bool NoStickyChan::onLoad(const NoString& args, NoString& sMessage)
 }
 
 template <>
-void no_moduleInfo<NoStickyChan>(NoModuleInfo& Info)
+void no_moduleInfo<NoStickyChan>(NoModuleInfo& info)
 {
-    Info.setWikiPage("stickychan");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("List of channels, separated by comma.");
+    info.setWikiPage("stickychan");
+    info.setHasArgs(true);
+    info.setArgsHelpText("List of channels, separated by comma.");
 }
 
 NETWORKMODULEDEFS(NoStickyChan, "configless sticky chans, keeps you there very stickily even")

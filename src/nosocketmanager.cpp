@@ -53,7 +53,7 @@ public:
 struct NoDnsTask
 {
     NoDnsTask()
-        : sHostname(""),
+        : hostname(""),
           iPort(0),
           sSockName(""),
           iTimeout(0),
@@ -70,7 +70,7 @@ struct NoDnsTask
     NoDnsTask(const NoDnsTask&) = delete;
     NoDnsTask& operator=(const NoDnsTask&) = delete;
 
-    NoString sHostname;
+    NoString hostname;
     u_short iPort;
     NoString sSockName;
     int iTimeout;
@@ -86,14 +86,14 @@ struct NoDnsTask
 class NoDnsJob : public NoJob
 {
 public:
-    NoDnsJob() : sHostname(""), task(nullptr), pManager(nullptr), bBind(false), iRes(0), aiResult(nullptr)
+    NoDnsJob() : hostname(""), task(nullptr), pManager(nullptr), bBind(false), iRes(0), aiResult(nullptr)
     {
     }
 
     NoDnsJob(const NoDnsJob&) = delete;
     NoDnsJob& operator=(const NoDnsJob&) = delete;
 
-    NoString sHostname;
+    NoString hostname;
     NoDnsTask* task;
     NoSocketManager* pManager;
     bool bBind;
@@ -108,12 +108,12 @@ public:
 static void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind);
 static void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind, addrinfo* aiResult);
 static void FinishConnect(NoSocketManager* manager,
-                          const NoString& sHostname,
+                          const NoString& hostname,
                           u_short iPort,
                           const NoString& sSockName,
                           int iTimeout,
                           bool ssl,
-                          const NoString& sBindHost,
+                          const NoString& bindHost,
                           NoSocket* pcSock);
 #endif
 
@@ -130,14 +130,14 @@ NoSocketManager::~NoSocketManager()
 
 bool NoSocketManager::listenHost(u_short iPort,
                                  const NoString& sSockName,
-                                 const NoString& sBindHost,
+                                 const NoString& bindHost,
                                  bool ssl,
                                  int iMaxConns,
                                  NoSocket* pcSock,
                                  u_int iTimeout,
-                                 No::AddressType eAddr)
+                                 No::AddressType addressType)
 {
-    CSListener L(iPort, sBindHost);
+    CSListener L(iPort, bindHost);
 
     L.SetSockName(sSockName);
     L.SetIsSSL(ssl);
@@ -145,7 +145,7 @@ bool NoSocketManager::listenHost(u_short iPort,
     L.SetMaxConns(iMaxConns);
 
 #ifdef HAVE_IPV6
-    switch (eAddr) {
+    switch (addressType) {
     case No::Ipv4Address:
         L.SetAFRequire(CSSockAddr::RAF_INET);
         break;
@@ -161,21 +161,21 @@ bool NoSocketManager::listenHost(u_short iPort,
     return m_instance->Listen(L, NoSocketPrivate::get(pcSock));
 }
 
-bool NoSocketManager::listenAll(u_short iPort, const NoString& sSockName, bool ssl, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
+bool NoSocketManager::listenAll(u_short iPort, const NoString& sSockName, bool ssl, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType addressType)
 {
-    return listenHost(iPort, sSockName, "", ssl, iMaxConns, pcSock, iTimeout, eAddr);
+    return listenHost(iPort, sSockName, "", ssl, iMaxConns, pcSock, iTimeout, addressType);
 }
 
 u_short NoSocketManager::listenRand(const NoString& sSockName,
-                                    const NoString& sBindHost,
+                                    const NoString& bindHost,
                                     bool ssl,
                                     int iMaxConns,
                                     NoSocket* pcSock,
                                     u_int iTimeout,
-                                    No::AddressType eAddr)
+                                    No::AddressType addressType)
 {
     ushort port = 0;
-    CSListener L(0, sBindHost);
+    CSListener L(0, bindHost);
 
     L.SetSockName(sSockName);
     L.SetIsSSL(ssl);
@@ -183,7 +183,7 @@ u_short NoSocketManager::listenRand(const NoString& sSockName,
     L.SetMaxConns(iMaxConns);
 
 #ifdef HAVE_IPV6
-    switch (eAddr) {
+    switch (addressType) {
     case No::Ipv4Address:
         L.SetAFRequire(CSSockAddr::RAF_INET);
         break;
@@ -201,33 +201,33 @@ u_short NoSocketManager::listenRand(const NoString& sSockName,
     return port;
 }
 
-u_short NoSocketManager::listenAllRand(const NoString& sSockName, bool ssl, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType eAddr)
+u_short NoSocketManager::listenAllRand(const NoString& sSockName, bool ssl, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType addressType)
 {
-    return listenRand(sSockName, "", ssl, iMaxConns, pcSock, iTimeout, eAddr);
+    return listenRand(sSockName, "", ssl, iMaxConns, pcSock, iTimeout, addressType);
 }
 
-void NoSocketManager::connect(const NoString& sHostname,
+void NoSocketManager::connect(const NoString& hostname,
                               u_short iPort,
                               const NoString& sSockName,
                               int iTimeout,
                               bool ssl,
-                              const NoString& sBindHost,
+                              const NoString& bindHost,
                               NoSocket* pcSock)
 {
     if (pcSock) {
-        pcSock->setHostToVerifySsl(sHostname);
+        pcSock->setHostToVerifySsl(hostname);
     }
 #ifdef HAVE_THREADED_DNS
-    NO_DEBUG("TDNS: initiating resolving of [" << sHostname << "] and bindhost [" << sBindHost << "]");
+    NO_DEBUG("TDNS: initiating resolving of [" << hostname << "] and bindhost [" << bindHost << "]");
     NoDnsTask* task = new NoDnsTask;
-    task->sHostname = sHostname;
+    task->hostname = hostname;
     task->iPort = iPort;
     task->sSockName = sSockName;
     task->iTimeout = iTimeout;
     task->ssl = ssl;
-    task->sBindhost = sBindHost;
+    task->sBindhost = bindHost;
     task->pcSock = pcSock;
-    if (sBindHost.empty()) {
+    if (bindHost.empty()) {
         task->bDoneBind = true;
     } else {
         StartTDNSThread(this, task, true);
@@ -235,7 +235,7 @@ void NoSocketManager::connect(const NoString& sHostname,
     StartTDNSThread(this, task, false);
 #else // HAVE_THREADED_DNS
     // Just let Csocket handle DNS itself
-    FinishConnect(this, sHostname, iPort, sSockName, iTimeout, ssl, sBindHost, pcSock);
+    FinishConnect(this, hostname, iPort, sSockName, iTimeout, ssl, bindHost, pcSock);
 #endif
 }
 
@@ -254,19 +254,19 @@ std::vector<NoSocket*> NoSocketManager::findSockets(const NoString& name)
     return sockets;
 }
 
-uint NoSocketManager::anonConnectionCount(const NoString& sIP) const
+uint NoSocketManager::anonConnectionCount(const NoString& address) const
 {
     uint ret = 0;
 
-    for (Csock* pSock : *m_instance) {
+    for (Csock* socket : *m_instance) {
         // Logged in NoClients have "USR::<username>" as their sockname
-        if (pSock->GetType() == Csock::INBOUND && pSock->GetRemoteIP() == sIP &&
-            pSock->GetSockName().left(5) != "USR::") {
+        if (socket->GetType() == Csock::INBOUND && socket->GetRemoteIP() == address &&
+            socket->GetSockName().left(5) != "USR::") {
             ret++;
         }
     }
 
-    NO_DEBUG("There are [" << ret << "] clients from [" << sIP << "]");
+    NO_DEBUG("There are [" << ret << "] clients from [" << address << "]");
 
     return ret;
 }
@@ -326,7 +326,7 @@ void NoDnsJob::run()
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_protocol = IPPROTO_TCP;
         hints.ai_flags = AI_ADDRCONFIG;
-        iRes = getaddrinfo(sHostname.c_str(), nullptr, &hints, &aiResult);
+        iRes = getaddrinfo(hostname.c_str(), nullptr, &hints, &aiResult);
         if (EAGAIN != iRes) {
             break;
         }
@@ -354,9 +354,9 @@ void NoDnsJob::finished()
 
 void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind)
 {
-    NoString sHostname = bBind ? task->sBindhost : task->sHostname;
+    NoString hostname = bBind ? task->sBindhost : task->hostname;
     NoDnsJob* arg = new NoDnsJob;
-    arg->sHostname = sHostname;
+    arg->hostname = hostname;
     arg->task = task;
     arg->bBind = bBind;
     arg->pManager = manager;
@@ -496,19 +496,19 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
 #endif // HAVE_THREADED_DNS
 
 void FinishConnect(NoSocketManager* manager,
-                   const NoString& sHostname,
+                   const NoString& hostname,
                    u_short iPort,
                    const NoString& sSockName,
                    int iTimeout,
                    bool ssl,
-                   const NoString& sBindHost,
+                   const NoString& bindHost,
                    NoSocket* pcSock)
 {
-    CSConnection C(sHostname, iPort, iTimeout);
+    CSConnection C(hostname, iPort, iTimeout);
 
     C.SetSockName(sSockName);
     C.SetIsSSL(ssl);
-    C.SetBindHost(sBindHost);
+    C.SetBindHost(bindHost);
 #ifdef HAVE_LIBSSL
     NoString sCipher = noApp->sslCiphers();
     if (sCipher.empty()) {

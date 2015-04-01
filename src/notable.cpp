@@ -103,7 +103,7 @@ void NoTable::addRow()
     d->rows.push_back(NoStringVector(d->headers.size()));
 }
 
-bool NoTable::setValue(const NoString& sColumn, const NoString& sValue)
+bool NoTable::setValue(const NoString& sColumn, const NoString& value)
 {
     uint uRowIdx = size() - 1;
     uint uColIdx = d->GetColumnIndex(sColumn);
@@ -111,14 +111,14 @@ bool NoTable::setValue(const NoString& sColumn, const NoString& sValue)
     if (uColIdx == (uint)-1)
         return false;
 
-    d->rows[uRowIdx][uColIdx] = sValue;
+    d->rows[uRowIdx][uColIdx] = value;
 
-    if (sValue.length() > d->maxWidths[uColIdx]) {
-        d->maxWidths[uColIdx] = sValue.length();
+    if (value.length() > d->maxWidths[uColIdx]) {
+        d->maxWidths[uColIdx] = value.length();
     }
 
     if (d->wrappable[uColIdx]) {
-        NoStringVector vsWords = sValue.split(" ");
+        NoStringVector vsWords = value.split(" ");
         uint uMaxWord = 0;
         for (const NoString& sWord : vsWords) {
             if (sWord.length() > uMaxWord) {

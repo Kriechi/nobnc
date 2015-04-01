@@ -31,7 +31,7 @@
 class NoRejoinJob : public NoTimer
 {
 public:
-    NoRejoinJob(NoModule* pModule, const NoString& sChan) : NoTimer(pModule)
+    NoRejoinJob(NoModule* module, const NoString& sChan) : NoTimer(module)
     {
         setName("Rejoin " + sChan);
         setDescription("Rejoin channel after a delay");
@@ -121,7 +121,7 @@ public:
             putModule("Rejoin delay disabled");
     }
 
-    void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& channel, const NoString& sMessage) override
+    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel& channel, const NoString& message) override
     {
         if (network()->currentNick().equals(sKickedNick)) {
             if (!delay) {
@@ -137,11 +137,11 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoRejoinMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoRejoinMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("kickrejoin");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("You might enter the number of seconds to wait before rejoining.");
+    info.setWikiPage("kickrejoin");
+    info.setHasArgs(true);
+    info.setArgsHelpText("You might enter the number of seconds to wait before rejoining.");
 }
 
 NETWORKMODULEDEFS(NoRejoinMod, "Autorejoin on kick")

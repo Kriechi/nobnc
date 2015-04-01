@@ -55,7 +55,7 @@ public:
         setArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         m_iThresholdMsgs = No::token(args, 0).toUInt();
         m_iThresholdSecs = No::token(args, 1).toUInt();
@@ -76,10 +76,10 @@ public:
         return true;
     }
 
-    ModRet Message(const NoNick& Nick, const NoString& sMessage)
+    ModRet Message(const NoNick& nick, const NoString& message)
     {
         // We never block /me, because it doesn't cause a reply
-        if (No::token(sMessage, 0).equals("ACTION"))
+        if (No::token(message, 0).equals("ACTION"))
             return CONTINUE;
 
         if (m_tLastCTCP + m_iThresholdSecs < time(nullptr)) {
@@ -92,7 +92,7 @@ public:
         if (m_iNumCTCP < m_iThresholdMsgs)
             return CONTINUE;
         else if (m_iNumCTCP == m_iThresholdMsgs)
-            putModule("Limit reached by [" + Nick.hostMask() + "], blocking all CTCP");
+            putModule("Limit reached by [" + nick.hostMask() + "], blocking all CTCP");
 
         // Reset the timeout so that we continue blocking messages
         m_tLastCTCP = time(nullptr);
@@ -100,14 +100,14 @@ public:
         return HALT;
     }
 
-    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
     {
-        return Message(Nick, sMessage);
+        return Message(nick, message);
     }
 
-    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        return Message(Nick, sMessage);
+        return Message(nick, message);
     }
 
     void OnSecsCommand(const NoString& command)
@@ -160,11 +160,11 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoCtcpFloodMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoCtcpFloodMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("ctcpflood");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("This user module takes none to two arguments. The first argument is the number of lines "
+    info.setWikiPage("ctcpflood");
+    info.setHasArgs(true);
+    info.setArgsHelpText("This user module takes none to two arguments. The first argument is the number of lines "
                          "after which the flood-protection is triggered. The second argument is the time (s) to in "
                          "which the number of lines is reached. The default setting is 4 CTCPs in 2 seconds");
 }

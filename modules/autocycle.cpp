@@ -43,7 +43,7 @@ public:
         m_recentlyCycled.setExpiration(15 * 1000);
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoStringVector vsChans = args.split(" ", No::SkipEmptyParts);
 
@@ -91,16 +91,16 @@ public:
     void OnListCommand(const NoString& line)
     {
         NoTable Table;
-        Table.addColumn("Chan");
+        Table.addColumn("Channel");
 
         for (uint a = 0; a < m_vsChans.size(); a++) {
             Table.addRow();
-            Table.setValue("Chan", m_vsChans[a]);
+            Table.setValue("Channel", m_vsChans[a]);
         }
 
         for (uint b = 0; b < m_vsNegChans.size(); b++) {
             Table.addRow();
-            Table.setValue("Chan", "!" + m_vsNegChans[b]);
+            Table.setValue("Channel", "!" + m_vsNegChans[b]);
         }
 
         if (Table.size()) {
@@ -110,41 +110,41 @@ public:
         }
     }
 
-    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
+    void onPart(const NoNick& nick, NoChannel& channel, const NoString& message) override
     {
-        AutoCycle(Channel);
+        AutoCycle(channel);
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
     {
         for (uint i = 0; i < channels.size(); i++)
             AutoCycle(*channels[i]);
     }
 
-    void onKick(const NoNick& Nick, const NoString& sOpNick, NoChannel& Channel, const NoString& sMessage) override
+    void onKick(const NoNick& nick, const NoString& opNick, NoChannel& channel, const NoString& message) override
     {
-        AutoCycle(Channel);
+        AutoCycle(channel);
     }
 
 protected:
-    void AutoCycle(NoChannel& Channel)
+    void AutoCycle(NoChannel& channel)
     {
-        if (!IsAutoCycle(Channel.name()))
+        if (!IsAutoCycle(channel.name()))
             return;
 
         // Did we recently annoy opers via cycling of an empty channel?
-        if (m_recentlyCycled.contains(Channel.name()))
+        if (m_recentlyCycled.contains(channel.name()))
             return;
 
         // Is there only one person left in the channel?
-        if (Channel.nickCount() != 1)
+        if (channel.nickCount() != 1)
             return;
 
         // Is that person us and we don't have op?
-        const NoNick& pNick = Channel.nicks().begin()->second;
+        const NoNick& pNick = channel.nicks().begin()->second;
         if (!pNick.hasPerm(NoChannel::Op) && pNick.equals(network()->currentNick())) {
-            Channel.cycle();
-            m_recentlyCycled.insert(Channel.name());
+            channel.cycle();
+            m_recentlyCycled.insert(channel.name());
         }
     }
 
@@ -250,11 +250,11 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoAutoCycleMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoAutoCycleMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("autocycle");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("List of channel masks and channel masks with ! before them.");
+    info.setWikiPage("autocycle");
+    info.setHasArgs(true);
+    info.setArgsHelpText("List of channel masks and channel masks with ! before them.");
 }
 
 NETWORKMODULEDEFS(NoAutoCycleMod, "Rejoins channels to gain Op if you're the only user left")

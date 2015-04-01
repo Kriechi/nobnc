@@ -41,7 +41,7 @@ public:
     NoSocketImpl(NoSocket* q, const NoString& host, u_short port);
     ~NoSocketImpl();
 
-    int ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const override;
+    int ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& address, u_short* piPort) const override;
 #ifdef HAVE_LIBSSL
     int VerifyPeerCertificate(int iPreVerify, X509_STORE_CTX* pStoreCTX) override;
     void SSLHandShakeFinished() override;
@@ -67,9 +67,9 @@ public:
     void ReadData(const char* data, size_t len) override;
     void PushBuff(const char* data, size_t len, bool bStartAtZero = false) override;
 
-    void SockError(int iErrno, const NoString& sDescription) override
+    void SockError(int iErrno, const NoString& description) override
     {
-        q->onSocketError(iErrno, sDescription);
+        q->onSocketError(iErrno, description);
     }
 
     void Connected() override

@@ -195,8 +195,8 @@ static void seedPRNG()
 
 int main(int argc, char** argv)
 {
-    NoString sConfig;
-    NoString sDataDir = "";
+    NoString config;
+    NoString dataDir = "";
 
     thread_setup();
 
@@ -246,7 +246,7 @@ int main(int argc, char** argv)
             return 1;
 #endif // HAVE_LIBSSL
         case 'd':
-            sDataDir = NoString(optarg);
+            dataDir = NoString(optarg);
             break;
         case 'f':
             bForeground = true;
@@ -269,7 +269,7 @@ int main(int argc, char** argv)
     }
 
     NoApp* pZNC = NoApp::instance();
-    pZNC->initDirs(((argc) ? argv[0] : ""), sDataDir);
+    pZNC->initDirs(((argc) ? argv[0] : ""), dataDir);
 
 #ifdef HAVE_LIBSSL
     if (bMakePem) {
@@ -332,15 +332,15 @@ int main(int argc, char** argv)
     }
 
     if (bMakeConf) {
-        if (!pZNC->writeNewConfig(sConfig)) {
+        if (!pZNC->writeNewConfig(config)) {
             NoApp::destroyInstance();
             return 0;
         }
         /* Fall through to normal bootup */
     }
 
-    NoString sConfigError;
-    if (!pZNC->parseConfig(sConfig, sConfigError)) {
+    NoString configError;
+    if (!pZNC->parseConfig(config, configError)) {
         No::printError("Unrecoverable config error.");
         NoApp::destroyInstance();
         return 1;
@@ -353,27 +353,27 @@ int main(int argc, char** argv)
     }
 
     if (bForeground) {
-        int iPid = getpid();
-        No::printMessage("Staying open for debugging [pid: " + NoString(iPid) + "]");
+        int pid = getpid();
+        No::printMessage("Staying open for debugging [pid: " + NoString(pid) + "]");
 
-        pZNC->writePidFile(iPid);
+        pZNC->writePidFile(pid);
         No::printMessage(NoApp::tag());
     } else {
         No::printAction("Forking into the background");
 
-        int iPid = fork();
+        int pid = fork();
 
-        if (iPid == -1) {
+        if (pid == -1) {
             No::printStatus(false, strerror(errno));
             NoApp::destroyInstance();
             return 1;
         }
 
-        if (iPid > 0) {
+        if (pid > 0) {
             // We are the parent. We are done and will go to bed.
-            No::printStatus(true, "[pid: " + NoString(iPid) + "]");
+            No::printStatus(true, "[pid: " + NoString(pid) + "]");
 
-            pZNC->writePidFile(iPid);
+            pZNC->writePidFile(pid);
             No::printMessage(NoApp::tag());
             /* Don't destroy pZNC here or it will delete the pid file. */
             return 0;

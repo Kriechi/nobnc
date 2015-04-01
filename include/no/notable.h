@@ -78,7 +78,7 @@ public:
 
     /** Sets a given cell in the table to a value.
      *  @param sColumn The name of the column you want to fill.
-     *  @param sValue The value to write into that column.
+     *  @param value The value to write into that column.
      *  @param uRowIdx The index of the row to use as returned by AddRow().
      *                 If this is not given, the last row will be used.
      *  @return True if setting the cell was successful.

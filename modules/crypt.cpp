@@ -59,11 +59,11 @@ public:
         addHelpCommand();
         addCommand("DelKey",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnDelKeyCommand),
-                   "<#chan|Nick>",
+                   "<#chan|nick>",
                    "Remove a key for nick or channel");
         addCommand("SetKey",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnSetKeyCommand),
-                   "<#chan|Nick> <Key>",
+                   "<#chan|nick> <Key>",
                    "Set a key for nick or channel");
         addCommand("ListKeys",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCryptMod::OnListKeysCommand),
@@ -71,97 +71,97 @@ public:
                    "List all keys");
     }
 
-    ModRet onUserMsg(NoString& sTarget, NoString& sMessage) override
+    ModRet onUserMsg(NoString& target, NoString& message) override
     {
-        sTarget.trimLeft(NickPrefix());
+        target.trimLeft(NickPrefix());
 
-        if (sMessage.left(2) == "``") {
-            sMessage.leftChomp(2);
+        if (message.left(2) == "``") {
+            message.leftChomp(2);
             return CONTINUE;
         }
 
         NoRegistry registry(this);
-        if (registry.contains(sTarget.toLower())) {
-            NoChannel* channel = network()->findChannel(sTarget);
+        if (registry.contains(target.toLower())) {
+            NoChannel* channel = network()->findChannel(target);
             NoString sNickMask = network()->ircNick().nickMask();
             if (channel) {
                 if (!channel->autoClearChanBuffer())
-                    channel->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(sTarget) +
+                    channel->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(target) +
                                      " :{text}",
-                                     sMessage);
-                user()->putUser(":" + NickPrefix() + sNickMask + " PRIVMSG " + sTarget + " :" + sMessage, nullptr, client());
+                                     message);
+                user()->putUser(":" + NickPrefix() + sNickMask + " PRIVMSG " + target + " :" + message, nullptr, client());
             }
 
-            NoString sMsg = MakeIvec() + sMessage;
-            sMsg = No::encrypt(sMsg, registry.value(sTarget.toLower()));
-            sMsg = sMsg.toBase64();
-            sMsg = "+OK *" + sMsg;
+            NoString msg = MakeIvec() + message;
+            msg = No::encrypt(msg, registry.value(target.toLower()));
+            msg = msg.toBase64();
+            msg = "+OK *" + msg;
 
-            putIrc("PRIVMSG " + sTarget + " :" + sMsg);
+            putIrc("PRIVMSG " + target + " :" + msg);
             return HALTCORE;
         }
 
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& nick, NoString& message) override
     {
-        FilterIncoming(Nick.nick(), Nick, sMessage);
+        FilterIncoming(nick.nick(), nick, message);
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        FilterIncoming(Channel.name(), Nick, sMessage);
+        FilterIncoming(channel.name(), nick, message);
         return CONTINUE;
     }
 
-    void FilterIncoming(const NoString& sTarget, NoNick& Nick, NoString& sMessage)
+    void FilterIncoming(const NoString& target, NoNick& nick, NoString& message)
     {
-        if (sMessage.left(5) == "+OK *") {
+        if (message.left(5) == "+OK *") {
             NoRegistry registry(this);
-            if (registry.contains(sTarget.toLower())) {
-                sMessage.leftChomp(5);
-                sMessage = NoString::fromBase64(sMessage);
-                sMessage = No::decrypt(sMessage, registry.value(sTarget.toLower()));
-                sMessage.leftChomp(8);
-                sMessage = sMessage.c_str();
-                Nick.setNick(NickPrefix() + Nick.nick());
+            if (registry.contains(target.toLower())) {
+                message.leftChomp(5);
+                message = NoString::fromBase64(message);
+                message = No::decrypt(message, registry.value(target.toLower()));
+                message.leftChomp(8);
+                message = message.c_str();
+                nick.setNick(NickPrefix() + nick.nick());
             }
         }
     }
 
     void OnDelKeyCommand(const NoString& command)
     {
-        NoString sTarget = No::token(command, 1);
+        NoString target = No::token(command, 1);
 
-        if (!sTarget.empty()) {
+        if (!target.empty()) {
             NoRegistry registry(this);
-            if (registry.contains(sTarget.toLower())) {
-                registry.remove(sTarget.toLower());
-                putModule("Target [" + sTarget + "] deleted");
+            if (registry.contains(target.toLower())) {
+                registry.remove(target.toLower());
+                putModule("Target [" + target + "] deleted");
             } else {
-                putModule("Target [" + sTarget + "] not found");
+                putModule("Target [" + target + "] not found");
             }
         } else {
-            putModule("Usage DelKey <#chan|Nick>");
+            putModule("Usage DelKey <#chan|nick>");
         }
     }
 
     void OnSetKeyCommand(const NoString& command)
     {
-        NoString sTarget = No::token(command, 1);
-        NoString sKey = No::tokens(command, 2);
+        NoString target = No::token(command, 1);
+        NoString key = No::tokens(command, 2);
 
         // Strip "cbc:" from beginning of string incase someone pastes directly from mircryption
-        sKey.trimPrefix("cbc:");
+        key.trimPrefix("cbc:");
 
-        if (!sKey.empty()) {
+        if (!key.empty()) {
             NoRegistry registry(this);
-            registry.setValue(sTarget.toLower(), sKey);
-            putModule("Set encryption key for [" + sTarget + "] to [" + sKey + "]");
+            registry.setValue(target.toLower(), key);
+            putModule("Set encryption key for [" + target + "] to [" + key + "]");
         } else {
-            putModule("Usage: SetKey <#chan|Nick> <Key>");
+            putModule("Usage: SetKey <#chan|nick> <Key>");
         }
     }
 
@@ -206,9 +206,9 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoCryptMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoCryptMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("crypt");
+    info.setWikiPage("crypt");
 }
 
 NETWORKMODULEDEFS(NoCryptMod, "Encryption for channel/private messages")

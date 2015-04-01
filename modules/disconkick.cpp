@@ -41,9 +41,9 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoKickClientOnIrcDisconnect>(NoModuleInfo& Info)
+void no_moduleInfo<NoKickClientOnIrcDisconnect>(NoModuleInfo& info)
 {
-    Info.setWikiPage("disconkick");
+    info.setWikiPage("disconkick");
 }
 
 USERMODULEDEFS(NoKickClientOnIrcDisconnect,

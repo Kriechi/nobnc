@@ -28,7 +28,7 @@ class NoAutoOpMod;
 class NoAutoOpTimer : public NoTimer
 {
 public:
-    NoAutoOpTimer(NoModule* pModule) : NoTimer(pModule)
+    NoAutoOpTimer(NoModule* module) : NoTimer(module)
     {
         setName("AutoOpChecker");
         setDescription("Check channels for auto op candidates");
@@ -50,8 +50,8 @@ public:
         FromString(line);
     }
 
-    NoAutoOpUser(const NoString& sUsername, const NoString& sUserKey, const NoString& sHostmasks, const NoString& sChannels)
-        : m_sUsername(sUsername), m_sUserKey(sUserKey)
+    NoAutoOpUser(const NoString& username, const NoString& sUserKey, const NoString& sHostmasks, const NoString& sChannels)
+        : m_sUsername(username), m_sUserKey(sUserKey)
     {
         AddHostmasks(sHostmasks);
         addChannels(sChannels);
@@ -198,7 +198,7 @@ public:
                    "Removes a user");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoAutoOpTimer* timer = new NoAutoOpTimer(this);
         timer->start(20);
@@ -227,59 +227,59 @@ public:
         m_msUsers.clear();
     }
 
-    void onJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& nick, NoChannel& channel) override
     {
         // If we have ops in this chan
-        if (Channel.hasPerm(NoChannel::Op)) {
-            CheckAutoOp(Nick, Channel);
+        if (channel.hasPerm(NoChannel::Op)) {
+            CheckAutoOp(nick, channel);
         }
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
     {
-        NoStringMap::iterator it = m_msQueue.find(Nick.nick().toLower());
+        NoStringMap::iterator it = m_msQueue.find(nick.nick().toLower());
 
         if (it != m_msQueue.end()) {
             m_msQueue.erase(it);
         }
     }
 
-    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
     {
         // Update the queue with nick changes
         NoStringMap::iterator it = m_msQueue.find(OldNick.nick().toLower());
 
         if (it != m_msQueue.end()) {
-            m_msQueue[sNewNick.toLower()] = it->second;
+            m_msQueue[newNick.toLower()] = it->second;
             m_msQueue.erase(it);
         }
     }
 
-    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivNotice(NoNick& nick, NoString& message) override
     {
-        if (!No::token(sMessage, 0).equals("!ZNCAO")) {
+        if (!No::token(message, 0).equals("!ZNCAO")) {
             return CONTINUE;
         }
 
-        NoString command = No::token(sMessage, 1);
+        NoString command = No::token(message, 1);
 
         if (command.equals("CHALLENGE")) {
-            ChallengeRespond(Nick, No::token(sMessage, 2));
+            ChallengeRespond(nick, No::token(message, 2));
         } else if (command.equals("RESPONSE")) {
-            VerifyResponse(Nick, No::token(sMessage, 2));
+            VerifyResponse(nick, No::token(message, 2));
         }
 
         return HALTCORE;
     }
 
-    void onOp2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
+    void onOp2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
     {
-        if (Nick.nick() == network()->ircNick().nick()) {
-            const std::map<NoString, NoNick>& msNicks = Channel.nicks();
+        if (nick.nick() == network()->ircNick().nick()) {
+            const std::map<NoString, NoNick>& msNicks = channel.nicks();
 
             for (std::map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
                 if (!it->second.hasPerm(NoChannel::Op)) {
-                    CheckAutoOp(it->second, Channel);
+                    CheckAutoOp(it->second, channel);
                 }
             }
         }
@@ -300,12 +300,12 @@ public:
     {
         NoString sUser = No::token(line, 1);
         NoString host = No::token(line, 2);
-        NoString sKey = No::token(line, 3);
+        NoString key = No::token(line, 3);
 
         if (host.empty()) {
             putModule("Usage: AddUser <user> <hostmask>[,<hostmasks>...] <key> [channels]");
         } else {
-            NoAutoOpUser* user = AddUser(sUser, sKey, host, No::tokens(line, 4));
+            NoAutoOpUser* user = AddUser(sUser, key, host, No::tokens(line, 4));
 
             if (user) {
                 NoRegistry registry(this);
@@ -379,7 +379,7 @@ public:
         }
 
         user->addChannels(sChans);
-        putModule("Channel(s) added to user [" + user->GetUsername() + "]");
+        putModule("channel(s) added to user [" + user->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(user->GetUsername(), user->ToString());
@@ -403,7 +403,7 @@ public:
         }
 
         user->removeChannels(sChans);
-        putModule("Channel(s) Removed from user [" + user->GetUsername() + "]");
+        putModule("channel(s) Removed from user [" + user->GetUsername() + "]");
 
         NoRegistry registry(this);
         registry.setValue(user->GetUsername(), user->ToString());
@@ -470,12 +470,12 @@ public:
         return (it != m_msUsers.end()) ? it->second : nullptr;
     }
 
-    NoAutoOpUser* FindUserByHost(const NoString& sHostmask, const NoString& sChannel = "")
+    NoAutoOpUser* FindUserByHost(const NoString& sHostmask, const NoString& channel = "")
     {
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             NoAutoOpUser* user = it->second;
 
-            if (user->HostMatches(sHostmask) && (sChannel.empty() || user->ChannelMatches(sChannel))) {
+            if (user->HostMatches(sHostmask) && (channel.empty() || user->ChannelMatches(channel))) {
                 return user;
             }
         }
@@ -483,21 +483,21 @@ public:
         return nullptr;
     }
 
-    bool CheckAutoOp(const NoNick& Nick, NoChannel& Channel)
+    bool CheckAutoOp(const NoNick& nick, NoChannel& channel)
     {
-        NoAutoOpUser* user = FindUserByHost(Nick.hostMask(), Channel.name());
+        NoAutoOpUser* user = FindUserByHost(nick.hostMask(), channel.name());
 
         if (!user) {
             return false;
         }
 
         if (user->GetUserKey().equals("__NOKEY__")) {
-            putIrc("MODE " + Channel.name() + " +o " + Nick.nick());
+            putIrc("MODE " + channel.name() + " +o " + nick.nick());
         } else {
             // then insert this nick into the queue, the timer does the rest
-            NoString nick = Nick.nick().toLower();
-            if (m_msQueue.find(nick) == m_msQueue.end()) {
-                m_msQueue[nick] = "";
+            NoString lower = nick.nick().toLower();
+            if (m_msQueue.find(lower) == m_msQueue.end()) {
+                m_msQueue[lower] = "";
             }
         }
 
@@ -518,20 +518,20 @@ public:
         putModule("User [" + sUser + "] removed");
     }
 
-    NoAutoOpUser* AddUser(const NoString& sUser, const NoString& sKey, const NoString& sHosts, const NoString& sChans)
+    NoAutoOpUser* AddUser(const NoString& sUser, const NoString& key, const NoString& sHosts, const NoString& sChans)
     {
         if (m_msUsers.find(sUser) != m_msUsers.end()) {
             putModule("That user already exists");
             return nullptr;
         }
 
-        NoAutoOpUser* user = new NoAutoOpUser(sUser, sKey, sHosts, sChans);
+        NoAutoOpUser* user = new NoAutoOpUser(sUser, key, sHosts, sChans);
         m_msUsers[sUser.toLower()] = user;
         putModule("User [" + sUser + "] added with hostmask(s) [" + sHosts + "]");
         return user;
     }
 
-    bool ChallengeRespond(const NoNick& Nick, const NoString& sChallenge)
+    bool ChallengeRespond(const NoNick& nick, const NoString& sChallenge)
     {
         // Validate before responding - don't blindly trust everyone
         bool bValid = false;
@@ -542,18 +542,18 @@ public:
             user = it->second;
 
             // First verify that the person who challenged us matches a user's host
-            if (user->HostMatches(Nick.hostMask())) {
+            if (user->HostMatches(nick.hostMask())) {
                 const std::vector<NoChannel*>& Chans = network()->channels();
                 bMatchedHost = true;
 
                 // Also verify that they are opped in at least one of the user's chans
                 for (size_t a = 0; a < Chans.size(); a++) {
-                    const NoChannel& Chan = *Chans[a];
+                    const NoChannel& channel = *Chans[a];
 
-                    const NoNick* pNick = Chan.findNick(Nick.nick());
+                    const NoNick* pNick = channel.findNick(nick.nick());
 
                     if (pNick) {
-                        if (pNick->hasPerm(NoChannel::Op) && user->ChannelMatches(Chan.name())) {
+                        if (pNick->hasPerm(NoChannel::Op) && user->ChannelMatches(channel.name())) {
                             bValid = true;
                             break;
                         }
@@ -568,31 +568,31 @@ public:
 
         if (!bValid) {
             if (bMatchedHost) {
-                putModule("[" + Nick.hostMask() +
+                putModule("[" + nick.hostMask() +
                           "] sent us a challenge but they are not opped in any defined channels.");
             } else {
-                putModule("[" + Nick.hostMask() + "] sent us a challenge but they do not match a defined user.");
+                putModule("[" + nick.hostMask() + "] sent us a challenge but they do not match a defined user.");
             }
 
             return false;
         }
 
         if (sChallenge.length() != AUTOOP_CHALLENGE_LENGTH) {
-            putModule("WARNING! [" + Nick.hostMask() + "] sent an invalid challenge.");
+            putModule("WARNING! [" + nick.hostMask() + "] sent an invalid challenge.");
             return false;
         }
 
         NoString response = user->GetUserKey() + "::" + sChallenge;
-        putIrc("NOTICE " + Nick.nick() + " :!ZNCAO RESPONSE " + No::md5(response));
+        putIrc("NOTICE " + nick.nick() + " :!ZNCAO RESPONSE " + No::md5(response));
         return false;
     }
 
-    bool VerifyResponse(const NoNick& Nick, const NoString& response)
+    bool VerifyResponse(const NoNick& nick, const NoString& response)
     {
-        NoStringMap::iterator itQueue = m_msQueue.find(Nick.nick().toLower());
+        NoStringMap::iterator itQueue = m_msQueue.find(nick.nick().toLower());
 
         if (itQueue == m_msQueue.end()) {
-            putModule("[" + Nick.hostMask() + "] sent an unchallenged response.  This could be due to lag.");
+            putModule("[" + nick.hostMask() + "] sent an unchallenged response.  This could be due to lag.");
             return false;
         }
 
@@ -600,19 +600,19 @@ public:
         m_msQueue.erase(itQueue);
 
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
-            if (it->second->HostMatches(Nick.hostMask())) {
+            if (it->second->HostMatches(nick.hostMask())) {
                 if (response == No::md5(it->second->GetUserKey() + "::" + sChallenge)) {
-                    OpUser(Nick, *it->second);
+                    OpUser(nick, *it->second);
                     return true;
                 } else {
-                    putModule("WARNING! [" + Nick.hostMask() +
+                    putModule("WARNING! [" + nick.hostMask() +
                               "] sent a bad response.  Please verify that you have their correct password.");
                     return false;
                 }
             }
         }
 
-        putModule("WARNING! [" + Nick.hostMask() + "] sent a response but did not match any defined users.");
+        putModule("WARNING! [" + nick.hostMask() + "] sent a response but did not match any defined users.");
         return false;
     }
 
@@ -641,18 +641,18 @@ public:
         }
     }
 
-    void OpUser(const NoNick& Nick, const NoAutoOpUser& User)
+    void OpUser(const NoNick& nick, const NoAutoOpUser& User)
     {
         const std::vector<NoChannel*>& Chans = network()->channels();
 
         for (size_t a = 0; a < Chans.size(); a++) {
-            const NoChannel& Chan = *Chans[a];
+            const NoChannel& channel = *Chans[a];
 
-            if (Chan.hasPerm(NoChannel::Op) && User.ChannelMatches(Chan.name())) {
-                const NoNick* pNick = Chan.findNick(Nick.nick());
+            if (channel.hasPerm(NoChannel::Op) && User.ChannelMatches(channel.name())) {
+                const NoNick* pNick = channel.findNick(nick.nick());
 
                 if (pNick && !pNick->hasPerm(NoChannel::Op)) {
-                    putIrc("MODE " + Chan.name() + " +o " + Nick.nick());
+                    putIrc("MODE " + channel.name() + " +o " + nick.nick());
                 }
             }
         }
@@ -669,9 +669,9 @@ void NoAutoOpTimer::run()
 }
 
 template <>
-void no_moduleInfo<NoAutoOpMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoAutoOpMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("autoop");
+    info.setWikiPage("autoop");
 }
 
 NETWORKMODULEDEFS(NoAutoOpMod, "Auto op the good people")

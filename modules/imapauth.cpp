@@ -27,10 +27,10 @@ class NoImapAuthMod;
 class NoImapSock : public NoModuleSocket
 {
 public:
-    NoImapSock(NoImapAuthMod* pModule, std::shared_ptr<NoAuthenticator> Auth)
-        : NoModuleSocket((NoModule*)pModule), m_spAuth(Auth)
+    NoImapSock(NoImapAuthMod* module, std::shared_ptr<NoAuthenticator> Auth)
+        : NoModuleSocket((NoModule*)module), m_spAuth(Auth)
     {
-        m_pIMAPMod = pModule;
+        m_pIMAPMod = module;
         m_bSentReply = false;
         m_bSentLogin = false;
         enableReadLine();
@@ -70,7 +70,7 @@ public:
         return true;
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         if (args.trim_n().empty()) {
             return true; // use defaults
@@ -109,8 +109,8 @@ public:
             return HALT;
         }
 
-        NoImapSock* pSock = new NoImapSock(this, Auth);
-        pSock->connect(m_sServer, m_uPort, m_bSSL, 20);
+        NoImapSock* socket = new NoImapSock(this, Auth);
+        socket->connect(m_sServer, m_uPort, m_bSSL, 20);
 
         return HALT;
     }
@@ -144,20 +144,20 @@ private:
 void NoImapSock::readLine(const NoString& line)
 {
     if (!m_bSentLogin) {
-        NoString sUsername = m_spAuth->username();
+        NoString username = m_spAuth->username();
         m_bSentLogin = true;
 
         const NoString& format = m_pIMAPMod->GetUserFormat();
 
         if (!format.empty()) {
             if (format.contains('%')) {
-                sUsername = format.replace_n("%", sUsername);
+                username = format.replace_n("%", username);
             } else {
-                sUsername += format;
+                username += format;
             }
         }
 
-        write("AUTH LOGIN " + sUsername + " " + m_spAuth->password() + "\r\n");
+        write("AUTH LOGIN " + username + " " + m_spAuth->password() + "\r\n");
     } else if (line.left(5) == "AUTH ") {
         NoUser* user = noApp->findUser(m_spAuth->username());
 
@@ -177,11 +177,11 @@ void NoImapSock::readLine(const NoString& line)
 }
 
 template <>
-void no_moduleInfo<NoImapAuthMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoImapAuthMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("imapauth");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("[ server [+]port [ UserFormatString ] ]");
+    info.setWikiPage("imapauth");
+    info.setHasArgs(true);
+    info.setArgsHelpText("[ server [+]port [ UserFormatString ] ]");
 }
 
 GLOBALMODULEDEFS(NoImapAuthMod, "Allow users to authenticate via IMAP.")

@@ -34,20 +34,20 @@ public:
     typedef NoModule* (*NoModuleLoader)(NoModuleHandle p,
                                         NoUser* user,
                                         NoNetwork* network,
-                                        const NoString& sModName,
-                                        const NoString& sModPath,
-                                        No::ModuleType eType);
+                                        const NoString& name,
+                                        const NoString& path,
+                                        No::ModuleType type);
 
     NoModuleInfo();
-    NoModuleInfo(const NoString& name, const NoString& sPath, No::ModuleType eType);
+    NoModuleInfo(const NoString& name, const NoString& path, No::ModuleType type);
 
-    bool operator<(const NoModuleInfo& Info) const;
+    bool operator<(const NoModuleInfo& info) const;
 
-    bool supportsType(No::ModuleType eType) const;
+    bool supportsType(No::ModuleType type) const;
 
-    void addType(No::ModuleType eType);
+    void addType(No::ModuleType type);
 
-    static NoString moduleTypeToString(No::ModuleType eType);
+    static NoString moduleTypeToString(No::ModuleType type);
 
     NoString name() const;
     NoString path() const;
@@ -65,7 +65,7 @@ public:
     void setArgsHelpText(const NoString& s);
     void setHasArgs(bool b = false);
     void setLoader(NoModuleLoader fLoader);
-    void setDefaultType(No::ModuleType eType);
+    void setDefaultType(No::ModuleType type);
 
 private:
     std::set<No::ModuleType> m_types;

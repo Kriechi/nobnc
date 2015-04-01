@@ -125,7 +125,7 @@ public:
         return sPerf;
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         m_vPerform = NoRegistry(this).value("Perform").split("\n", No::SkipEmptyParts);
 
@@ -144,15 +144,15 @@ public:
         return "Perform";
     }
 
-    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName != "index") {
+        if (page != "index") {
             // only accept requests to index
             return false;
         }
 
-        if (WebSock.isPost()) {
-            NoStringVector vsPerf = WebSock.rawParam("perform", true).split("\n", No::SkipEmptyParts);
+        if (socket.isPost()) {
+            NoStringVector vsPerf = socket.rawParam("perform", true).split("\n", No::SkipEmptyParts);
             m_vPerform.clear();
 
             for (NoStringVector::const_iterator it = vsPerf.begin(); it != vsPerf.end(); ++it)
@@ -162,7 +162,7 @@ public:
         }
 
         for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
-            NoTemplate& Row = Tmpl.addRow("PerformLoop");
+            NoTemplate& Row = tmpl.addRow("PerformLoop");
             Row["Perform"] = *it;
         }
 
@@ -185,10 +185,10 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoPerform>(NoModuleInfo& Info)
+void no_moduleInfo<NoPerform>(NoModuleInfo& info)
 {
-    Info.addType(No::UserModule);
-    Info.setWikiPage("perform");
+    info.addType(No::UserModule);
+    info.setWikiPage("perform");
 }
 
 NETWORKMODULEDEFS(NoPerform, "Keeps a list of commands to be executed when ZNC connects to IRC.")

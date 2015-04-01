@@ -36,16 +36,16 @@ class NO_EXPORT NoModuleSocket : public NoSocket
 public:
     /**
      * @brief ctor
-     * @param pModule the module this sock instance is associated to
+     * @param module the module this sock instance is associated to
      */
-    NoModuleSocket(NoModule* pModule);
+    NoModuleSocket(NoModule* module);
     /**
      * @brief ctor
-     * @param pModule the module this sock instance is associated to
-     * @param sHostname the hostname being connected to
+     * @param module the module this sock instance is associated to
+     * @param hostname the hostname being connected to
      * @param port the port being connected to
      */
-    NoModuleSocket(NoModule* pModule, const NoString& sHostname, ushort port);
+    NoModuleSocket(NoModule* module, const NoString& hostname, ushort port);
     virtual ~NoModuleSocket();
 
     NoModuleSocket(const NoModuleSocket&) = delete;
@@ -56,14 +56,14 @@ public:
 
     //! This defaults to closing the socket, feel free to override
     void onReachedMaxBuffer() override;
-    void onSocketError(int iErrno, const NoString& sDescription) override;
+    void onSocketError(int iErrno, const NoString& description) override;
 
     //! This limits the global connections from this IP to defeat DoS attacks, feel free to override. The ACL used is
     // provided by the main interface @see NoApp::AllowConnectionFrom
     bool onConnectionFrom(const NoString& host, ushort port) override;
 
     //! Ease of use Connect, assigns to the manager and is subsequently tracked
-    bool connect(const NoString& sHostname, ushort port, bool ssl = false, uint uTimeout = 60);
+    bool connect(const NoString& hostname, ushort port, bool ssl = false, uint uTimeout = 60);
     //! Ease of use Listen, assigned to the manager and is subsequently tracked
     bool listen(ushort port, bool ssl, uint uTimeout = 0);
 

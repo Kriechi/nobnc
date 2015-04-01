@@ -28,14 +28,14 @@ public:
     }
 
 protected:
-    NoFile& WriteFile(const NoString& sConfig)
+    NoFile& WriteFile(const NoString& config)
     {
         char name[] = "./temp-XXXXXX";
         int fd = mkstemp(name);
         m_File.Open(name, O_RDWR);
         close(fd);
 
-        m_File.Write(sConfig);
+        m_File.Write(config);
 
         return m_File;
     }
@@ -47,9 +47,9 @@ private:
 class NoSettingsErrorTest : public NoSettingsTest
 {
 public:
-    void TEST_ERROR(const NoString& sConfig, const NoString& sExpectError)
+    void TEST_ERROR(const NoString& config, const NoString& sExpectError)
     {
-        NoFile& File = WriteFile(sConfig);
+        NoFile& File = WriteFile(config);
 
         NoSettings conf;
         NoString error;
@@ -62,9 +62,9 @@ public:
 class NoSettingsSuccessTest : public NoSettingsTest
 {
 public:
-    void TEST_SUCCESS(const NoString& sConfig, const NoString& sExpectedOutput)
+    void TEST_SUCCESS(const NoString& config, const NoString& sExpectedOutput)
     {
-        NoFile& File = WriteFile(sConfig);
+        NoFile& File = WriteFile(config);
         // Verify that Parse() rewinds the file
         File.Seek(12);
 
@@ -83,14 +83,14 @@ public:
     {
         NoSettings::EntryMapIterator it = conf.BeginEntries();
         while (it != conf.EndEntries()) {
-            const NoString& sKey = it->first;
+            const NoString& key = it->first;
             const NoStringVector& vsEntries = it->second;
             NoStringVector::const_iterator i = vsEntries.begin();
             if (i == vsEntries.end())
-                sRes += sKey + " <- Error, empty list!\n";
+                sRes += key + " <- Error, empty list!\n";
             else
                 while (i != vsEntries.end()) {
-                    sRes += sKey + "=" + *i + "\n";
+                    sRes += key + "=" + *i + "\n";
                     ++i;
                 }
             ++it;

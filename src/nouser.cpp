@@ -148,7 +148,7 @@ struct TOption
     void (NoUser::*pSetter)(T);
 };
 
-bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
+bool NoUser::parseConfig(NoSettings* settings, NoString& error)
 {
     TOption<const NoString&> StringOptions[] = {
         { "nick", &NoUser::setNick },
@@ -185,37 +185,37 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
     };
 
     for (const auto& Option : StringOptions) {
-        NoString sValue;
-        if (pConfig->FindStringEntry(Option.name, sValue))
-            (this->*Option.pSetter)(sValue);
+        NoString value;
+        if (settings->FindStringEntry(Option.name, value))
+            (this->*Option.pSetter)(value);
     }
     for (const auto& Option : UIntOptions) {
-        NoString sValue;
-        if (pConfig->FindStringEntry(Option.name, sValue))
-            (this->*Option.pSetter)(sValue.toUInt());
+        NoString value;
+        if (settings->FindStringEntry(Option.name, value))
+            (this->*Option.pSetter)(value.toUInt());
     }
     for (const auto& Option : BoolOptions) {
-        NoString sValue;
-        if (pConfig->FindStringEntry(Option.name, sValue))
-            (this->*Option.pSetter)(sValue.toBool());
+        NoString value;
+        if (settings->FindStringEntry(Option.name, value))
+            (this->*Option.pSetter)(value.toBool());
     }
 
     NoStringVector vsList;
-    pConfig->FindStringVector("allow", vsList);
+    settings->FindStringVector("allow", vsList);
     for (const NoString& host : vsList) {
         addAllowedHost(host);
     }
-    pConfig->FindStringVector("ctcpreply", vsList);
-    for (const NoString& sReply : vsList) {
-        addCtcpReply(No::token(sReply, 0), No::tokens(sReply, 1));
+    settings->FindStringVector("ctcpreply", vsList);
+    for (const NoString& reply : vsList) {
+        addCtcpReply(No::token(reply, 0), No::tokens(reply, 1));
     }
 
-    NoString sValue;
+    NoString value;
 
     NoString sDCCLookupValue;
-    pConfig->FindStringEntry("dcclookupmethod", sDCCLookupValue);
-    if (pConfig->FindStringEntry("bouncedccs", sValue)) {
-        if (sValue.toBool()) {
+    settings->FindStringEntry("dcclookupmethod", sDCCLookupValue);
+    if (settings->FindStringEntry("bouncedccs", value)) {
+        if (value.toBool()) {
             No::printAction("Loading Module [bouncedcc]");
             NoString sModRet;
             bool bModRet = loader()->loadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
@@ -226,7 +226,7 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
                 return false;
             }
 
-            if (sDCCLookupValue.equals("Client")) {
+            if (sDCCLookupValue.equals("client")) {
                 NoModule* mod = loader()->findModule("bouncedcc");
                 if (mod) {
                     NoRegistry registry(mod);
@@ -235,51 +235,51 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
             }
         }
     }
-    if (pConfig->FindStringEntry("buffer", sValue))
-        setBufferCount(sValue.toUInt(), true);
-    if (pConfig->FindStringEntry("awaysuffix", sValue)) {
-        No::printMessage("WARNING: AwaySuffix has been deprecated, instead try -> LoadModule = awaynick %nick%_" + sValue);
+    if (settings->FindStringEntry("buffer", value))
+        setBufferCount(value.toUInt(), true);
+    if (settings->FindStringEntry("awaysuffix", value)) {
+        No::printMessage("WARNING: AwaySuffix has been deprecated, instead try -> LoadModule = awaynick %nick%_" + value);
     }
-    if (pConfig->FindStringEntry("autocycle", sValue)) {
-        if (sValue.equals("true"))
+    if (settings->FindStringEntry("autocycle", value)) {
+        if (value.equals("true"))
             No::printError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle");
     }
-    if (pConfig->FindStringEntry("keepnick", sValue)) {
-        if (sValue.equals("true"))
+    if (settings->FindStringEntry("keepnick", value)) {
+        if (value.equals("true"))
             No::printError("WARNING: KeepNick has been deprecated, instead try -> LoadModule = keepnick");
     }
-    if (pConfig->FindStringEntry("statusprefix", sValue)) {
-        if (!setStatusPrefix(sValue)) {
-            error = "Invalid StatusPrefix [" + sValue + "] Must be 1-5 chars, no spaces.";
+    if (settings->FindStringEntry("statusprefix", value)) {
+        if (!setStatusPrefix(value)) {
+            error = "Invalid StatusPrefix [" + value + "] Must be 1-5 chars, no spaces.";
             No::printError(error);
             return false;
         }
     }
-    if (pConfig->FindStringEntry("timezone", sValue)) {
-        setTimezone(sValue);
+    if (settings->FindStringEntry("timezone", value)) {
+        setTimezone(value);
     }
-    if (pConfig->FindStringEntry("timezoneoffset", sValue)) {
-        if (fabs(sValue.toDouble()) > 0.1) {
+    if (settings->FindStringEntry("timezoneoffset", value)) {
+        if (fabs(value.toDouble()) > 0.1) {
             No::printError("WARNING: TimezoneOffset has been deprecated, now you can set your timezone by name");
         }
     }
-    if (pConfig->FindStringEntry("timestamp", sValue)) {
-        if (!sValue.trim_n().equals("true")) {
-            if (sValue.trim_n().equals("append")) {
+    if (settings->FindStringEntry("timestamp", value)) {
+        if (!value.trim_n().equals("true")) {
+            if (value.trim_n().equals("append")) {
                 setTimestampAppend(true);
                 setTimestampPrepend(false);
-            } else if (sValue.trim_n().equals("prepend")) {
+            } else if (value.trim_n().equals("prepend")) {
                 setTimestampAppend(false);
                 setTimestampPrepend(true);
-            } else if (sValue.trim_n().equals("false")) {
+            } else if (value.trim_n().equals("false")) {
                 setTimestampAppend(false);
                 setTimestampPrepend(false);
             } else {
-                setTimestampFormat(sValue);
+                setTimestampFormat(value);
             }
         }
     }
-    pConfig->FindStringEntry("pass", sValue);
+    settings->FindStringEntry("pass", value);
     // There are different formats for this available:
     // Pass = <plain text>
     // Pass = <md5 hash> -
@@ -288,13 +288,13 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
     // Pass = <hash name>#<salted hash>#<salt>#
     // 'Salted hash' means hash of 'password' + 'salt'
     // Possible hashes are md5 and sha256
-    if (sValue.right(1) == "-") {
-        sValue.rightChomp(1);
-        sValue.trim();
-        setPassword(sValue, NoUser::HashMd5);
+    if (value.right(1) == "-") {
+        value.rightChomp(1);
+        value.trim();
+        setPassword(value, NoUser::HashMd5);
     } else {
-        NoString sMethod = No::token(sValue, 0, "#");
-        NoString pass = No::tokens(sValue, 1, "#");
+        NoString sMethod = No::token(value, 0, "#");
+        NoString pass = No::tokens(value, 1, "#");
         if (sMethod == "md5" || sMethod == "sha256") {
             NoUser::HashType type = NoUser::HashMd5;
             if (sMethod == "sha256")
@@ -306,13 +306,13 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
         } else if (sMethod == "plain") {
             setPassword(pass, NoUser::HashNone);
         } else {
-            setPassword(sValue, NoUser::HashNone);
+            setPassword(value, NoUser::HashNone);
         }
     }
     NoSettings::SubConfig subConf;
     NoSettings::SubConfig::const_iterator subIt;
-    pConfig->FindSubConfig("pass", subConf);
-    if (!sValue.empty() && !subConf.empty()) {
+    settings->FindSubConfig("pass", subConf);
+    if (!value.empty() && !subConf.empty()) {
         error = "Password defined more than once";
         No::printError(error);
         return false;
@@ -355,7 +355,7 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
         return false;
     }
 
-    pConfig->FindSubConfig("network", subConf);
+    settings->FindSubConfig("network", subConf);
     for (subIt = subConf.begin(); subIt != subConf.end(); ++subIt) {
         const NoString& sNetworkName = subIt->first;
 
@@ -372,8 +372,8 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
         }
     }
 
-    if (pConfig->FindStringVector("server", vsList, false) || pConfig->FindStringVector("chan", vsList, false) ||
-        pConfig->FindSubConfig("chan", subConf, false)) {
+    if (settings->FindStringVector("server", vsList, false) || settings->FindStringVector("chan", vsList, false) ||
+        settings->FindSubConfig("chan", subConf, false)) {
         NoNetwork* network = findNetwork("default");
         if (!network) {
             NoString sErrorDummy;
@@ -383,49 +383,49 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
         if (network) {
             No::printMessage("NOTICE: Found deprecated config, upgrading to a network");
 
-            if (!network->parseConfig(pConfig, error, true)) {
+            if (!network->parseConfig(settings, error, true)) {
                 return false;
             }
         }
     }
 
-    pConfig->FindStringVector("loadmodule", vsList);
+    settings->FindStringVector("loadmodule", vsList);
     for (const NoString& sMod : vsList) {
-        NoString sModName = No::token(sMod, 0);
-        NoString notice = "Loading user module [" + sModName + "]";
+        NoString name = No::token(sMod, 0);
+        NoString notice = "Loading user module [" + name + "]";
 
         // XXX Legacy crap, added in ZNC 0.089
-        if (sModName == "discon_kick") {
+        if (name == "discon_kick") {
             notice = "NOTICE: [discon_kick] was renamed, loading [disconkick] instead";
-            sModName = "disconkick";
+            name = "disconkick";
         }
 
         // XXX Legacy crap, added in ZNC 0.099
-        if (sModName == "fixfreenode") {
+        if (name == "fixfreenode") {
             notice = "NOTICE: [fixfreenode] doesn't do anything useful anymore, ignoring it";
             continue;
         }
 
         // XXX Legacy crap, added in ZNC 0.207
-        if (sModName == "admin") {
+        if (name == "admin") {
             notice = "NOTICE: [admin] module was renamed, loading [controlpanel] instead";
-            sModName = "controlpanel";
+            name = "controlpanel";
         }
 
         // XXX Legacy crap, should have been added ZNC 0.207, but added only in 1.1 :(
-        if (sModName == "away") {
+        if (name == "away") {
             notice = "NOTICE: [away] was renamed, loading [awaystore] instead";
-            sModName = "awaystore";
+            name = "awaystore";
         }
 
         // XXX Legacy crap, added in 1.1; fakeonline module was dropped in 1.0 and returned in 1.1
-        if (sModName == "fakeonline") {
+        if (name == "fakeonline") {
             notice = "NOTICE: [fakeonline] was renamed, loading [modules_online] instead";
-            sModName = "modules_online";
+            name = "modules_online";
         }
 
         // XXX Legacy crap, added in 1.3
-        if (sModName == "charset") {
+        if (name == "charset") {
             No::printAction("NOTICE: Charset support was moved to core, importing old charset module settings");
             size_t uIndex = 1;
             if (No::token(sMod, uIndex).equals("-force")) {
@@ -448,18 +448,18 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
         NoString sModRet;
         NoString args = No::tokens(sMod, 1);
 
-        bool bModRet = loadModule(sModName, args, notice, sModRet);
+        bool bModRet = loadModule(name, args, notice, sModRet);
 
         No::printStatus(bModRet, sModRet);
         if (!bModRet) {
             // XXX The awaynick module was retired in 1.6 (still available as external module)
-            if (sModName == "awaynick") {
+            if (name == "awaynick") {
                 // load simple_away instead, unless it's already on the list
                 if (std::find(vsList.begin(), vsList.end(), "simple_away") == vsList.end()) {
                     notice = "Loading [simple_away] module instead";
-                    sModName = "simple_away";
+                    name = "simple_away";
                     // not a fatal error if simple_away is not available
-                    loadModule(sModName, args, notice, sModRet);
+                    loadModule(name, args, notice, sModRet);
                 }
             } else {
                 error = sModRet;
@@ -470,29 +470,29 @@ bool NoUser::parseConfig(NoSettings* pConfig, NoString& error)
     }
 
     // Move ircconnectenabled to the networks
-    if (pConfig->FindStringEntry("ircconnectenabled", sValue)) {
+    if (settings->FindStringEntry("ircconnectenabled", value)) {
         for (NoNetwork* network : d->networks) {
-            network->setEnabled(sValue.toBool());
+            network->setEnabled(value.toBool());
         }
     }
 
     return true;
 }
 
-NoNetwork* NoUser::addNetwork(const NoString& sNetwork, NoString& sErrorRet)
+NoNetwork* NoUser::addNetwork(const NoString& name, NoString& error)
 {
-    if (!NoNetwork::isValidNetwork(sNetwork)) {
-        sErrorRet = "Invalid network name. It should be alphanumeric. Not to be confused with server name";
+    if (!NoNetwork::isValidNetwork(name)) {
+        error = "Invalid network name. It should be alphanumeric. Not to be confused with server name";
         return nullptr;
-    } else if (findNetwork(sNetwork)) {
-        sErrorRet = "Network [" + No::token(sNetwork, 0) + "] already exists";
+    } else if (findNetwork(name)) {
+        error = "network [" + No::token(name, 0) + "] already exists";
         return nullptr;
     }
 
-    NoNetwork* network = new NoNetwork(this, sNetwork);
+    NoNetwork* network = new NoNetwork(this, name);
 
     bool bCancel = false;
-    USERMODULECALL(onAddNetwork(*network, sErrorRet), this, nullptr, &bCancel);
+    USERMODULECALL(onAddNetwork(*network, error), this, nullptr, &bCancel);
     if (bCancel) {
         removeNetwork(network);
         delete network;
@@ -521,9 +521,9 @@ void NoUser::removeNetwork(NoNetwork* network)
     }
 }
 
-bool NoUser::deleteNetwork(const NoString& sNetwork)
+bool NoUser::deleteNetwork(const NoString& name)
 {
-    NoNetwork* network = findNetwork(sNetwork);
+    NoNetwork* network = findNetwork(name);
 
     if (network) {
         bool bCancel = false;
@@ -537,10 +537,10 @@ bool NoUser::deleteNetwork(const NoString& sNetwork)
     return false;
 }
 
-NoNetwork* NoUser::findNetwork(const NoString& sNetwork) const
+NoNetwork* NoUser::findNetwork(const NoString& name) const
 {
     for (NoNetwork* network : d->networks) {
-        if (network->name().equals(sNetwork)) {
+        if (network->name().equals(name)) {
             return network;
         }
     }
@@ -694,7 +694,7 @@ void NoUser::cloneNetworks(const NoUser& User)
         while (vClients.begin() != vClients.end()) {
             NoClient* client = vClients.front();
             // This line will remove client from vClients,
-            // because it's a reference to the internal Network's vector.
+            // because it's a reference to the internal network's vector.
             client->setNetwork(nullptr);
         }
 
@@ -702,11 +702,11 @@ void NoUser::cloneNetworks(const NoUser& User)
     }
 }
 
-bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
+bool NoUser::clone(const NoUser& User, NoString& error, bool cloneNetworks)
 {
-    sErrorRet.clear();
+    error.clear();
 
-    if (!User.isValid(sErrorRet, true)) {
+    if (!User.isValid(error, true)) {
         return false;
     }
 
@@ -746,19 +746,19 @@ bool NoUser::clone(const NoUser& User, NoString& sErrorRet, bool bCloneNetworks)
     }
 
     for (NoClient* client : d->clients) {
-        NoSocket* pSock = client->socket();
-        if (!isHostAllowed(pSock->remoteAddress())) {
+        NoSocket* socket = client->socket();
+        if (!isHostAllowed(socket->remoteAddress())) {
             client->putStatusNotice(
             "You are being disconnected because your IP is no longer allowed to connect to this user");
-            pSock->close();
+            socket->close();
         }
     }
 
     // !Allowed Hosts
 
     // Networks
-    if (bCloneNetworks) {
-        cloneNetworks(User);
+    if (cloneNetworks) {
+        NoUser::cloneNetworks(User);
     }
     // !Networks
 
@@ -891,22 +891,22 @@ bool NoUser::isValidUserName(const NoString& userName)
     return true;
 }
 
-bool NoUser::isValid(NoString& sErrMsg, bool bSkipPass) const
+bool NoUser::isValid(NoString& error, bool skipPass) const
 {
-    sErrMsg.clear();
+    error.clear();
 
-    if (!bSkipPass && d->password.empty()) {
-        sErrMsg = "Pass is empty";
+    if (!skipPass && d->password.empty()) {
+        error = "Pass is empty";
         return false;
     }
 
     if (d->userName.empty()) {
-        sErrMsg = "Username is empty";
+        error = "Username is empty";
         return false;
     }
 
     if (!NoUser::isValidUserName(d->userName)) {
-        sErrMsg = "Username is invalid";
+        error = "Username is invalid";
         return false;
     }
 
@@ -992,7 +992,7 @@ NoSettings NoUser::toConfig() const
 
     // Networks
     for (NoNetwork* network : d->networks) {
-        config.AddSubConfig("Network", network->name(), network->toConfig());
+        config.AddSubConfig("network", network->name(), network->toConfig());
     }
 
     return config;
@@ -1017,10 +1017,10 @@ bool NoUser::checkPass(const NoString& pass) const
     NoString sSockName = "USR::" + d->userName;
 
     for (uint a = 0; a < Manager.size(); a++) {
-        Csock* pSock = Manager[a];
-        if (pSock->GetSockName().equals(sSockName)) {
-            if (!pSock->IsClosed()) {
-                return (NoClient*) pSock;
+        Csock* socket = Manager[a];
+        if (socket->GetSockName().equals(sSockName)) {
+            if (!socket->IsClosed()) {
+                return (NoClient*) socket;
             }
         }
     }
@@ -1034,9 +1034,9 @@ NoString NoUser::localDccIp() const
         return dccBindHost();
 
     for (NoNetwork* network : d->networks) {
-        NoIrcSocket* pIRCSock = network->ircSocket();
-        if (pIRCSock) {
-            return pIRCSock->localAddress();
+        NoIrcSocket* socket = network->ircSocket();
+        if (socket) {
+            return socket->localAddress();
         }
     }
 
@@ -1047,10 +1047,10 @@ NoString NoUser::localDccIp() const
     return "";
 }
 
-bool NoUser::putUser(const NoString& line, NoClient* client, NoClient* pSkipClient)
+bool NoUser::putUser(const NoString& line, NoClient* client, NoClient* skipClient)
 {
     for (NoClient* pEachClient : d->clients) {
-        if ((!client || client == pEachClient) && pSkipClient != pEachClient) {
+        if ((!client || client == pEachClient) && skipClient != pEachClient) {
             pEachClient->putClient(line);
 
             if (client) {
@@ -1062,12 +1062,12 @@ bool NoUser::putUser(const NoString& line, NoClient* client, NoClient* pSkipClie
     return (client == nullptr);
 }
 
-bool NoUser::putAllUser(const NoString& line, NoClient* client, NoClient* pSkipClient)
+bool NoUser::putAllUser(const NoString& line, NoClient* client, NoClient* skipClient)
 {
-    putUser(line, client, pSkipClient);
+    putUser(line, client, skipClient);
 
     for (NoNetwork* network : d->networks) {
-        if (network->putUser(line, client, pSkipClient)) {
+        if (network->putUser(line, client, skipClient)) {
             return true;
         }
     }
@@ -1075,11 +1075,11 @@ bool NoUser::putAllUser(const NoString& line, NoClient* client, NoClient* pSkipC
     return (client == nullptr);
 }
 
-bool NoUser::putStatus(const NoString& line, NoClient* client, NoClient* pSkipClient)
+bool NoUser::putStatus(const NoString& line, NoClient* client, NoClient* skipClient)
 {
     std::vector<NoClient*> vClients = allClients();
     for (NoClient* pEachClient : vClients) {
-        if ((!client || client == pEachClient) && pSkipClient != pEachClient) {
+        if ((!client || client == pEachClient) && skipClient != pEachClient) {
             pEachClient->putStatus(line);
 
             if (client) {
@@ -1091,11 +1091,11 @@ bool NoUser::putStatus(const NoString& line, NoClient* client, NoClient* pSkipCl
     return (client == nullptr);
 }
 
-bool NoUser::putStatusNotice(const NoString& line, NoClient* client, NoClient* pSkipClient)
+bool NoUser::putStatusNotice(const NoString& line, NoClient* client, NoClient* skipClient)
 {
     std::vector<NoClient*> vClients = allClients();
     for (NoClient* pEachClient : vClients) {
-        if ((!client || client == pEachClient) && pSkipClient != pEachClient) {
+        if ((!client || client == pEachClient) && skipClient != pEachClient) {
             pEachClient->putStatusNotice(line);
 
             if (client) {
@@ -1107,10 +1107,10 @@ bool NoUser::putStatusNotice(const NoString& line, NoClient* client, NoClient* p
     return (client == nullptr);
 }
 
-bool NoUser::putModule(const NoString& module, const NoString& line, NoClient* client, NoClient* pSkipClient)
+bool NoUser::putModule(const NoString& module, const NoString& line, NoClient* client, NoClient* skipClient)
 {
     for (NoClient* pEachClient : d->clients) {
-        if ((!client || client == pEachClient) && pSkipClient != pEachClient) {
+        if ((!client || client == pEachClient) && skipClient != pEachClient) {
             pEachClient->putModule(module, line);
 
             if (client) {
@@ -1122,10 +1122,10 @@ bool NoUser::putModule(const NoString& module, const NoString& line, NoClient* c
     return (client == nullptr);
 }
 
-bool NoUser::putModuleNotice(const NoString& module, const NoString& line, NoClient* client, NoClient* pSkipClient)
+bool NoUser::putModuleNotice(const NoString& module, const NoString& line, NoClient* client, NoClient* skipClient)
 {
     for (NoClient* pEachClient : d->clients) {
-        if ((!client || client == pEachClient) && pSkipClient != pEachClient) {
+        if ((!client || client == pEachClient) && skipClient != pEachClient) {
             pEachClient->putModuleNotice(module, line);
 
             if (client) {
@@ -1162,29 +1162,29 @@ bool NoUser::isUserAttached() const
     return false;
 }
 
-bool NoUser::loadModule(const NoString& sModName, const NoString& args, const NoString& notice, NoString& error)
+bool NoUser::loadModule(const NoString& name, const NoString& args, const NoString& notice, NoString& error)
 {
     bool bModRet = true;
     NoString sModRet;
 
-    NoModuleInfo ModInfo;
-    if (!noApp->loader()->moduleInfo(ModInfo, sModName, sModRet)) {
-        error = "Unable to find modinfo [" + sModName + "] [" + sModRet + "]";
+    NoModuleInfo info;
+    if (!noApp->loader()->moduleInfo(info, name, sModRet)) {
+        error = "Unable to find modinfo [" + name + "] [" + sModRet + "]";
         return false;
     }
 
     No::printAction(notice);
 
-    if (!ModInfo.supportsType(No::UserModule) && ModInfo.supportsType(No::NetworkModule)) {
-        No::printMessage("NOTICE: Module [" + sModName +
+    if (!info.supportsType(No::UserModule) && info.supportsType(No::NetworkModule)) {
+        No::printMessage("NOTICE: Module [" + name +
                          "] is a network module, loading module for all networks in user.");
 
         // Do they have old NV?
-        NoFile fNVFile = NoFile(userPath() + "/moddata/" + sModName + "/.registry");
+        NoFile fNVFile = NoFile(userPath() + "/moddata/" + name + "/.registry");
 
         for (NoNetwork* network : d->networks) {
             if (fNVFile.Exists()) {
-                NoString sNetworkModPath = network->networkPath() + "/moddata/" + sModName;
+                NoString sNetworkModPath = network->networkPath() + "/moddata/" + name;
                 if (!NoFile::Exists(sNetworkModPath)) {
                     NoDir::mkpath(sNetworkModPath);
                 }
@@ -1192,13 +1192,13 @@ bool NoUser::loadModule(const NoString& sModName, const NoString& args, const No
                 fNVFile.Copy(sNetworkModPath + "/.registry");
             }
 
-            bModRet = network->loader()->loadModule(sModName, args, No::NetworkModule, this, network, sModRet);
+            bModRet = network->loader()->loadModule(name, args, No::NetworkModule, this, network, sModRet);
             if (!bModRet) {
                 break;
             }
         }
     } else {
-        bModRet = loader()->loadModule(sModName, args, No::UserModule, this, nullptr, sModRet);
+        bModRet = loader()->loadModule(name, args, No::UserModule, this, nullptr, sModRet);
     }
 
     if (!bModRet) {
@@ -1232,10 +1232,10 @@ void NoUser::setDccBindHost(const NoString& s)
 {
     d->dccBindHost = s;
 }
-void NoUser::setPassword(const NoString& s, HashType eHash, const NoString& salt)
+void NoUser::setPassword(const NoString& s, HashType hash, const NoString& salt)
 {
     d->password = s;
-    d->hashType = eHash;
+    d->hashType = hash;
     d->passwordSalt = salt;
 }
 void NoUser::setMultiClients(bool b)
@@ -1335,36 +1335,36 @@ std::vector<NoClient*> NoUser::userClients() const
     return d->clients;
 }
 
-bool NoUser::setBufferCount(uint u, bool bForce)
+bool NoUser::setBufferCount(uint u, bool force)
 {
-    if (!bForce && u > noApp->maxBufferSize())
+    if (!force && u > noApp->maxBufferSize())
         return false;
     for (NoNetwork* network : d->networks) {
         for (NoChannel* channel : network->channels()) {
-            channel->inheritBufferCount(u, bForce);
+            channel->inheritBufferCount(u, force);
         }
     }
     d->bufferCount = u;
     return true;
 }
 
-bool NoUser::addCtcpReply(const NoString& sCTCP, const NoString& sReply)
+bool NoUser::addCtcpReply(const NoString& ctcp, const NoString& reply)
 {
     // Reject CTCP requests containing spaces
-    if (sCTCP.find_first_of(' ') != NoString::npos) {
+    if (ctcp.find_first_of(' ') != NoString::npos) {
         return false;
     }
     // Reject empty CTCP requests
-    if (sCTCP.empty()) {
+    if (ctcp.empty()) {
         return false;
     }
-    d->ctcpReplies[sCTCP.toUpper()] = sReply;
+    d->ctcpReplies[ctcp.toUpper()] = reply;
     return true;
 }
 
-bool NoUser::removeCtcpReply(const NoString& sCTCP)
+bool NoUser::removeCtcpReply(const NoString& ctcp)
 {
-    return d->ctcpReplies.erase(sCTCP) > 0;
+    return d->ctcpReplies.erase(ctcp) > 0;
 }
 
 bool NoUser::setStatusPrefix(const NoString& s)

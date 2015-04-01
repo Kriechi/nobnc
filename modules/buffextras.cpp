@@ -28,69 +28,69 @@ public:
     {
     }
 
-    void AddBuffer(NoChannel& Channel, const NoString& sMessage)
+    void AddBuffer(NoChannel& channel, const NoString& message)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
-        if (Channel.autoClearChanBuffer() && network()->isUserOnline())
+        if (channel.autoClearChanBuffer() && network()->isUserOnline())
             return;
 
-        Channel.addBuffer(":" + moduleNick() + "!" + moduleName() + "@znc.in PRIVMSG " + _NAMEDFMT(Channel.name()) +
+        channel.addBuffer(":" + moduleNick() + "!" + moduleName() + "@znc.in PRIVMSG " + _NAMEDFMT(channel.name()) +
                           " :{text}",
-                          sMessage);
+                          message);
     }
 
-    void onRawMode2(const NoNick* pOpNick, NoChannel& Channel, const NoString& sModes, const NoString& args) override
+    void onRawMode2(const NoNick* opNick, NoChannel& channel, const NoString& modes, const NoString& args) override
     {
-        const NoString sNickMask = pOpNick ? pOpNick->nickMask() : "Server";
-        AddBuffer(Channel, sNickMask + " set mode: " + sModes + " " + args);
+        const NoString sNickMask = opNick ? opNick->nickMask() : "Server";
+        AddBuffer(channel, sNickMask + " set mode: " + modes + " " + args);
     }
 
-    void onKick(const NoNick& OpNick, const NoString& sKickedNick, NoChannel& Channel, const NoString& sMessage) override
+    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel& channel, const NoString& message) override
     {
-        AddBuffer(Channel, OpNick.nickMask() + " kicked " + sKickedNick + " Reason: [" + sMessage + "]");
+        AddBuffer(channel, opNick.nickMask() + " kicked " + sKickedNick + " Reason: [" + message + "]");
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
     {
         std::vector<NoChannel*>::const_iterator it;
-        NoString sMsg = Nick.nickMask() + " quit with message: [" + sMessage + "]";
+        NoString msg = nick.nickMask() + " quit with message: [" + message + "]";
         for (it = channels.begin(); it != channels.end(); ++it) {
-            AddBuffer(**it, sMsg);
+            AddBuffer(**it, msg);
         }
     }
 
-    void onJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& nick, NoChannel& channel) override
     {
-        AddBuffer(Channel, Nick.nickMask() + " joined");
+        AddBuffer(channel, nick.nickMask() + " joined");
     }
 
-    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
+    void onPart(const NoNick& nick, NoChannel& channel, const NoString& message) override
     {
-        AddBuffer(Channel, Nick.nickMask() + " parted with message: [" + sMessage + "]");
+        AddBuffer(channel, nick.nickMask() + " parted with message: [" + message + "]");
     }
 
-    void onNick(const NoNick& OldNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
     {
         std::vector<NoChannel*>::const_iterator it;
-        NoString sMsg = OldNick.nickMask() + " is now known as " + sNewNick;
+        NoString msg = OldNick.nickMask() + " is now known as " + newNick;
         for (it = channels.begin(); it != channels.end(); ++it) {
-            AddBuffer(**it, sMsg);
+            AddBuffer(**it, msg);
         }
     }
 
-    ModRet onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
+    ModRet onTopic(NoNick& nick, NoChannel& channel, NoString& topic) override
     {
-        AddBuffer(Channel, Nick.nickMask() + " changed the topic to: " + sTopic);
+        AddBuffer(channel, nick.nickMask() + " changed the topic to: " + topic);
 
         return CONTINUE;
     }
 };
 
 template <>
-void no_moduleInfo<NoBuffExtras>(NoModuleInfo& Info)
+void no_moduleInfo<NoBuffExtras>(NoModuleInfo& info)
 {
-    Info.setWikiPage("buffextras");
-    Info.addType(No::NetworkModule);
+    info.setWikiPage("buffextras");
+    info.addType(No::NetworkModule);
 }
 
 USERMODULEDEFS(NoBuffExtras, "Add joins, parts etc. to the playback buffer")

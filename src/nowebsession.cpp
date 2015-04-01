@@ -82,11 +82,11 @@ static NoWebSessionManager Sessions;
 class NoTagHandler : public NoTemplateTagHandler
 {
 public:
-    NoTagHandler(NoWebSocket& WebSock) : NoTemplateTagHandler(), m_WebSock(WebSock)
+    NoTagHandler(NoWebSocket& socket) : NoTemplateTagHandler(), m_WebSock(socket)
     {
     }
 
-    bool handleTag(NoTemplate& Tmpl, const NoString& name, const NoString& args, NoString& sOutput) override
+    bool handleTag(NoTemplate& tmpl, const NoString& name, const NoString& args, NoString& sOutput) override
     {
         if (name.equals("URLPARAM")) {
             // sOutput = NoApp::instance()
@@ -103,7 +103,7 @@ private:
 class NoWebAuth : public NoAuthenticator
 {
 public:
-    NoWebAuth(NoWebSocket* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic);
+    NoWebAuth(NoWebSocket* pWebSock, const NoString& username, const NoString& sPassword, bool bBasic);
 
     NoWebAuth(const NoWebAuth&) = delete;
     NoWebAuth& operator=(const NoWebAuth&) = delete;
@@ -134,11 +134,11 @@ public:
     time_t lastActive;
 };
 
-NoWebSession::NoWebSession(const NoString& sId, const NoString& sIP) : d(new NoWebSessionPrivate)
+NoWebSession::NoWebSession(const NoString& sId, const NoString& address) : d(new NoWebSessionPrivate)
 {
     d->id = sId;
-    d->ip = sIP;
-    Sessions.m_mIPSessions.insert(make_pair(sIP, this));
+    d->ip = address;
+    Sessions.m_mIPSessions.insert(make_pair(address, this));
     updateLastActive();
 }
 
@@ -205,33 +205,33 @@ void NoWebSession::clearMessageLoops()
     d->successMsgs.clear();
 }
 
-void NoWebSession::fillMessageLoops(NoTemplate& Tmpl)
+void NoWebSession::fillMessageLoops(NoTemplate& tmpl)
 {
-    for (const NoString& sMessage : d->errorMsgs) {
-        NoTemplate& Row = Tmpl.addRow("ErrorLoop");
-        Row["Message"] = sMessage;
+    for (const NoString& message : d->errorMsgs) {
+        NoTemplate& Row = tmpl.addRow("ErrorLoop");
+        Row["Message"] = message;
     }
 
-    for (const NoString& sMessage : d->successMsgs) {
-        NoTemplate& Row = Tmpl.addRow("SuccessLoop");
-        Row["Message"] = sMessage;
+    for (const NoString& message : d->successMsgs) {
+        NoTemplate& Row = tmpl.addRow("SuccessLoop");
+        Row["Message"] = message;
     }
 }
 
-size_t NoWebSession::addError(const NoString& sMessage)
+size_t NoWebSession::addError(const NoString& message)
 {
-    d->errorMsgs.push_back(sMessage);
+    d->errorMsgs.push_back(message);
     return d->errorMsgs.size();
 }
 
-size_t NoWebSession::addSuccess(const NoString& sMessage)
+size_t NoWebSession::addSuccess(const NoString& message)
 {
-    d->successMsgs.push_back(sMessage);
+    d->successMsgs.push_back(message);
     return d->successMsgs.size();
 }
 
-NoWebAuth::NoWebAuth(NoWebSocket* pWebSock, const NoString& sUsername, const NoString& sPassword, bool bBasic)
-    : NoAuthenticator(sUsername, sPassword, pWebSock), m_pWebSock(pWebSock), m_bBasic(bBasic)
+NoWebAuth::NoWebAuth(NoWebSocket* pWebSock, const NoString& username, const NoString& sPassword, bool bBasic)
+    : NoAuthenticator(username, sPassword, pWebSock), m_pWebSock(pWebSock), m_bBasic(bBasic)
 {
 }
 
@@ -274,8 +274,8 @@ void NoWebAuth::invalidate()
     m_pWebSock = nullptr;
 }
 
-NoWebSocket::NoWebSocket(const NoString& sURIPrefix)
-    : NoHttpSocket(nullptr, sURIPrefix), m_pathsSet(false), m_template(), m_authenticator(), m_modName(""), m_path(""), m_page(""), m_session()
+NoWebSocket::NoWebSocket(const NoString& uriPrefix)
+    : NoHttpSocket(nullptr, uriPrefix), m_pathsSet(false), m_template(), m_authenticator(), m_modName(""), m_path(""), m_page(""), m_session()
 {
     m_template.addTagHandler(std::make_shared<NoTagHandler>(*this));
 }
@@ -339,7 +339,7 @@ void NoWebSocket::availableSkins(NoStringVector& vRet) const
     }
 }
 
-NoStringVector NoWebSocket::directories(NoModule* pModule, bool bIsTemplate)
+NoStringVector NoWebSocket::directories(NoModule* module, bool bIsTemplate)
 {
     NoString sHomeSkinsDir(noApp->appPath() + "/webskins/");
     NoString sSkinName(skinName());
@@ -347,32 +347,32 @@ NoStringVector NoWebSocket::directories(NoModule* pModule, bool bIsTemplate)
 
     // Module specific paths
 
-    if (pModule) {
-        const NoString& sModName(pModule->moduleName());
+    if (module) {
+        const NoString& name(module->moduleName());
 
         // 1. ~/.znc/webskins/<user_skin_setting>/mods/<mod_name>/
         //
         if (!sSkinName.empty()) {
-            vsResult.push_back(skinPath(sSkinName) + "/mods/" + sModName + "/");
+            vsResult.push_back(skinPath(sSkinName) + "/mods/" + name + "/");
         }
 
         // 2. ~/.znc/webskins/_default_/mods/<mod_name>/
         //
-        vsResult.push_back(skinPath("_default_") + "/mods/" + sModName + "/");
+        vsResult.push_back(skinPath("_default_") + "/mods/" + name + "/");
 
         // 3. ./modules/<mod_name>/tmpl/
         //
-        vsResult.push_back(pModule->moduleDataDir() + "/tmpl/");
+        vsResult.push_back(module->moduleDataDir() + "/tmpl/");
 
         // 4. ~/.znc/webskins/<user_skin_setting>/mods/<mod_name>/
         //
         if (!sSkinName.empty()) {
-            vsResult.push_back(skinPath(sSkinName) + "/mods/" + sModName + "/");
+            vsResult.push_back(skinPath(sSkinName) + "/mods/" + name + "/");
         }
 
         // 5. ~/.znc/webskins/_default_/mods/<mod_name>/
         //
-        vsResult.push_back(skinPath("_default_") + "/mods/" + sModName + "/");
+        vsResult.push_back(skinPath("_default_") + "/mods/" + name + "/");
     }
 
     // 6. ~/.znc/webskins/<user_skin_setting>/
@@ -388,10 +388,10 @@ NoStringVector NoWebSocket::directories(NoModule* pModule, bool bIsTemplate)
     return vsResult;
 }
 
-NoString NoWebSocket::findTemplate(NoModule* pModule, const NoString& name)
+NoString NoWebSocket::findTemplate(NoModule* module, const NoString& name)
 {
-    NoStringVector vsDirs = directories(pModule, true);
-    NoString sFile = pModule->moduleName() + "_" + name;
+    NoStringVector vsDirs = directories(module, true);
+    NoString sFile = module->moduleName() + "_" + name;
     for (const NoString& sDir : vsDirs) {
         if (NoFile::Exists(NoDir(sDir).filePath(sFile))) {
             m_template.appendPath(sDir);
@@ -401,11 +401,11 @@ NoString NoWebSocket::findTemplate(NoModule* pModule, const NoString& name)
     return name;
 }
 
-void NoWebSocket::setPaths(NoModule* pModule, bool bIsTemplate)
+void NoWebSocket::setPaths(NoModule* module, bool bIsTemplate)
 {
     m_template.clearPaths();
 
-    NoStringVector vsDirs = directories(pModule, bIsTemplate);
+    NoStringVector vsDirs = directories(module, bIsTemplate);
     for (const NoString& sDir : vsDirs) {
         m_template.appendPath(sDir);
     }
@@ -486,10 +486,10 @@ bool NoWebSocket::addModuleLoop(const NoString& sLoopName, NoModule& Module, NoT
             } else if (sModuleType == "user" && Module.type() == No::UserModule) {
                 bActiveModule = true;
             } else if (sModuleType == "network" && Module.type() == No::NetworkModule) {
-                NoNetwork* Network = Module.network();
-                if (Network) {
+                NoNetwork* network = Module.network();
+                if (network) {
                     NoString sNetworkName = No::token(path(), 2, "/");
-                    if (sNetworkName == Network->name()) {
+                    if (sNetworkName == network->name()) {
                         bActiveModule = true;
                     }
                 } else {
@@ -553,10 +553,10 @@ bool NoWebSocket::addModuleLoop(const NoString& sLoopName, NoModule& Module, NoT
     return false;
 }
 
-NoWebSocket::PageRequest NoWebSocket::printStaticFile(const NoString& sPath, NoString& sPageRet, NoModule* pModule)
+NoWebSocket::PageRequest NoWebSocket::printStaticFile(const NoString& path, NoString& sPageRet, NoModule* module)
 {
-    setPaths(pModule);
-    NoString sFile = m_template.expandFile(sPath.trimLeft_n("/"));
+    setPaths(module);
+    NoString sFile = m_template.expandFile(path.trimLeft_n("/"));
     NO_DEBUG("About to print [" + sFile + "]");
     // Either PrintFile() fails and sends an error page or it suceeds and
     // sends a result. In both cases we don't have anything more to do.
@@ -564,27 +564,27 @@ NoWebSocket::PageRequest NoWebSocket::printStaticFile(const NoString& sPath, NoS
     return Done;
 }
 
-NoWebSocket::PageRequest NoWebSocket::printTemplate(const NoString& sPageName, NoString& sPageRet, NoModule* pModule)
+NoWebSocket::PageRequest NoWebSocket::printTemplate(const NoString& page, NoString& sPageRet, NoModule* module)
 {
     setVars();
 
-    m_template["PageName"] = sPageName;
+    m_template["PageName"] = page;
 
-    if (pModule) {
-        NoUser* user = pModule->user();
+    if (module) {
+        NoUser* user = module->user();
         m_template["ModUser"] = user ? user->userName() : "";
-        m_template["ModName"] = pModule->moduleName();
+        m_template["ModName"] = module->moduleName();
 
         if (m_template.find("Title") == m_template.end()) {
-            m_template["Title"] = pModule->webMenuTitle();
+            m_template["Title"] = module->webMenuTitle();
         }
     }
 
     if (!m_pathsSet) {
-        setPaths(pModule, true);
+        setPaths(module, true);
     }
 
-    if (m_template.fileName().empty() && !m_template.setFile(sPageName + ".tmpl")) {
+    if (m_template.fileName().empty() && !m_template.setFile(page + ".tmpl")) {
         return NotFound;
     }
 
@@ -621,9 +621,9 @@ bool NoWebSocket::forceLogin()
     return false;
 }
 
-NoString NoWebSocket::requestCookie(const NoString& sKey)
+NoString NoWebSocket::requestCookie(const NoString& key)
 {
-    const NoString sPrefixedKey = NoString(localPort()) + "-" + sKey;
+    const NoString sPrefixedKey = NoString(localPort()) + "-" + key;
     NoString ret;
 
     if (!m_modName.empty()) {
@@ -637,15 +637,15 @@ NoString NoWebSocket::requestCookie(const NoString& sKey)
     return ret;
 }
 
-bool NoWebSocket::sendCookie(const NoString& sKey, const NoString& sValue)
+bool NoWebSocket::sendCookie(const NoString& key, const NoString& value)
 {
-    const NoString sPrefixedKey = NoString(localPort()) + "-" + sKey;
+    const NoString sPrefixedKey = NoString(localPort()) + "-" + key;
 
     if (!m_modName.empty()) {
-        return NoHttpSocket::sendCookie("Mod-" + m_modName + "-" + sPrefixedKey, sValue);
+        return NoHttpSocket::sendCookie("Mod-" + m_modName + "-" + sPrefixedKey, value);
     }
 
-    return NoHttpSocket::sendCookie(sPrefixedKey, sValue);
+    return NoHttpSocket::sendCookie(sPrefixedKey, value);
 }
 
 void NoWebSocket::onPageRequest(const NoString& sURI)
@@ -799,7 +799,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
             network = session()->user()->findNetwork(sNetwork);
 
             if (!network) {
-                printErrorPage(404, "Not Found", "Network [" + sNetwork + "] not found.");
+                printErrorPage(404, "Not Found", "network [" + sNetwork + "] not found.");
                 return Done;
             }
         }
@@ -813,42 +813,42 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
 
         NO_DEBUG("Path [" + m_path + "], Module [" + m_modName + "], Page [" + m_page + "]");
 
-        NoModule* pModule = nullptr;
+        NoModule* module = nullptr;
 
         switch (eModType) {
         case No::GlobalModule:
-            pModule = noApp->loader()->findModule(m_modName);
+            module = noApp->loader()->findModule(m_modName);
             break;
         case No::UserModule:
-            pModule = session()->user()->loader()->findModule(m_modName);
+            module = session()->user()->loader()->findModule(m_modName);
             break;
         case No::NetworkModule:
-            pModule = network->loader()->findModule(m_modName);
+            module = network->loader()->findModule(m_modName);
             break;
         }
 
-        if (!pModule)
+        if (!module)
             return NotFound;
 
-        m_template["ModPath"] = pModule->webPath();
-        m_template["ModFilesPath"] = pModule->webFilesPath();
+        m_template["ModPath"] = module->webPath();
+        m_template["ModFilesPath"] = module->webFilesPath();
 
-        if (pModule->webRequiresLogin() && !forceLogin()) {
+        if (module->webRequiresLogin() && !forceLogin()) {
             return Print;
-        } else if (pModule->webRequiresAdmin() && !session()->isAdmin()) {
+        } else if (module->webRequiresAdmin() && !session()->isAdmin()) {
             printErrorPage(403, "Forbidden", "You need to be an admin to access this module");
             return Done;
-        } else if (pModule->type() != No::GlobalModule && pModule->user() != session()->user()) {
+        } else if (module->type() != No::GlobalModule && module->user() != session()->user()) {
             printErrorPage(403,
                            "Forbidden",
-                           "You must login as " + pModule->user()->userName() + " in order to view this page");
+                           "You must login as " + module->user()->userName() + " in order to view this page");
             return Done;
-        } else if (pModule->onWebPreRequest(*this, m_page)) {
+        } else if (module->onWebPreRequest(*this, m_page)) {
             return Deferred;
         }
 
-        for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(pModule)->subPages) {
-            bool active = (m_modName == pModule->moduleName() && m_page == SubPage->name());
+        for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(module)->subPages) {
+            bool active = (m_modName == module->moduleName() && m_page == SubPage->name());
 
             if (active && (SubPage->flags() & NoWebPage::Admin) && !session()->isAdmin()) {
                 printErrorPage(403, "Forbidden", "You need to be an admin to access this page");
@@ -856,13 +856,13 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
             }
         }
 
-        if (pModule && pModule->type() != No::GlobalModule && (!isLoggedIn() || pModule->user() != session()->user())) {
-            addModuleLoop("UserModLoop", *pModule);
+        if (module && module->type() != No::GlobalModule && (!isLoggedIn() || module->user() != session()->user())) {
+            addModuleLoop("UserModLoop", *module);
         }
 
         if (sURI.left(10) == "/modfiles/") {
             m_template.appendPath(skinPath(skinName()) + "/mods/" + m_modName + "/files/");
-            m_template.appendPath(pModule->moduleDataDir() + "/files/");
+            m_template.appendPath(module->moduleDataDir() + "/files/");
 
             if (printFile(m_template.expandFile(m_page.trimLeft_n("/")))) {
                 return Print;
@@ -870,17 +870,17 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
                 return NotFound;
             }
         } else {
-            setPaths(pModule, true);
+            setPaths(module, true);
 
             /* if a module returns false from OnWebRequest, it does not
                want the template to be printed, usually because it did a redirect. */
-            if (pModule->onWebRequest(*this, m_page, m_template)) {
+            if (module->onWebRequest(*this, m_page, m_template)) {
                 // If they already sent a reply, let's assume
                 // they did what they wanted to do.
                 if (sentHeader()) {
                     return Done;
                 }
-                return printTemplate(m_page, sPageRet, pModule);
+                return printTemplate(m_page, sPageRet, module);
             }
 
             if (!sentHeader()) {
@@ -906,13 +906,13 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
     return NotFound;
 }
 
-void NoWebSocket::printErrorPage(const NoString& sMessage)
+void NoWebSocket::printErrorPage(const NoString& message)
 {
     m_template.setFile("Error.tmpl");
 
     m_template["Action"] = "error";
     m_template["Title"] = "Error";
-    m_template["Error"] = sMessage;
+    m_template["Error"] = message;
 }
 
 static inline bool compareLastActive(const std::pair<const NoString, NoWebSession*>& first,

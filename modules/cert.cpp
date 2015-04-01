@@ -36,7 +36,7 @@ public:
         }
     }
 
-    void Info(const NoString& line)
+    void info(const NoString& line)
     {
         if (HasPemFile()) {
             putModule("You have a certificate in: " + PemFile());
@@ -55,7 +55,7 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoCertMod::Delete),
                    "",
                    "Delete the current certificate");
-        addCommand("info", static_cast<NoModuleCommand::ModCmdFunc>(&NoCertMod::Info));
+        addCommand("info", static_cast<NoModuleCommand::ModCmdFunc>(&NoCertMod::info));
     }
 
     NoString PemFile() const
@@ -68,10 +68,10 @@ public:
         return (NoFile::Exists(PemFile()));
     }
 
-    ModRet onIrcConnecting(NoIrcSocket* pIRCSock) override
+    ModRet onIrcConnecting(NoIrcSocket* socket) override
     {
         if (HasPemFile()) {
-            pIRCSock->setPemFile(PemFile());
+            socket->setPemFile(PemFile());
         }
 
         return CONTINUE;
@@ -82,24 +82,24 @@ public:
         return "Certificate";
     }
 
-    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "index") {
-            Tmpl["Cert"] = NoString(HasPemFile());
+        if (page == "index") {
+            tmpl["Cert"] = NoString(HasPemFile());
             return true;
-        } else if (sPageName == "update") {
+        } else if (page == "update") {
             NoFile fPemFile(PemFile());
 
             if (fPemFile.Open(O_WRONLY | O_TRUNC | O_CREAT)) {
-                fPemFile.Write(WebSock.param("cert", true, ""));
+                fPemFile.Write(socket.param("cert", true, ""));
                 fPemFile.Close();
             }
 
-            WebSock.redirect(webPath());
+            socket.redirect(webPath());
             return true;
-        } else if (sPageName == "delete") {
+        } else if (page == "delete") {
             NoFile::Delete(PemFile());
-            WebSock.redirect(webPath());
+            socket.redirect(webPath());
             return true;
         }
 
@@ -108,10 +108,10 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoCertMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoCertMod>(NoModuleInfo& info)
 {
-    Info.addType(No::UserModule);
-    Info.setWikiPage("cert");
+    info.addType(No::UserModule);
+    info.setWikiPage("cert");
 }
 
 NETWORKMODULEDEFS(NoCertMod, "Use a ssl certificate to connect to a server")

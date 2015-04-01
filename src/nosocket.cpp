@@ -72,11 +72,11 @@ NoSocket::~NoSocket()
 {
 }
 
-int NoSocketImpl::ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& sIP, u_short* piPort) const
+int NoSocketImpl::ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& address, u_short* piPort) const
 {
-    int ret = Csock::ConvertAddress(pAddr, iAddrLen, sIP, piPort);
+    int ret = Csock::ConvertAddress(pAddr, iAddrLen, address, piPort);
     if (ret == 0)
-        sIP.trimPrefix("::ffff:");
+        address.trimPrefix("::ffff:");
     return ret;
 }
 
@@ -111,9 +111,9 @@ void NoSocketImpl::SSLHandShakeFinished()
         NO_DEBUG(GetSockName() + ": Good cert");
         return;
     }
-    NoString sFP = q->fingerprint();
-    if (q->trustedFingerprints().count(sFP) != 0) {
-        NO_DEBUG(GetSockName() + ": Cert explicitly trusted by user: " << sFP);
+    NoString fingerprint = q->fingerprint();
+    if (q->trustedFingerprints().count(fingerprint) != 0) {
+        NO_DEBUG(GetSockName() + ": Cert explicitly trusted by user: " << fingerprint);
         return;
     }
     NO_DEBUG(GetSockName() + ": Bad cert");
@@ -320,9 +320,9 @@ void NoSocket::setCipher(const NoString& sCipher)
 {
     d->impl->SetCipher(sCipher);
 }
-long NoSocket::peerFingerprint(NoString& sFP) const
+long NoSocket::peerFingerprint(NoString& fingerprint) const
 {
-    return d->impl->GetPeerFingerprint(sFP);
+    return d->impl->GetPeerFingerprint(fingerprint);
 }
 uint32_t NoSocket::requireClientCertFlags() const
 {
@@ -361,9 +361,9 @@ bool NoSocket::connect()
 {
     return d->impl->Connect();
 }
-bool NoSocket::listen(uint16_t iPort, int iMaxConns, const NoString& sBindHost, uint32_t iTimeout, bool bDetach)
+bool NoSocket::listen(uint16_t iPort, int iMaxConns, const NoString& bindHost, uint32_t iTimeout, bool bDetach)
 {
-    return d->impl->Listen(iPort, iMaxConns, sBindHost, iTimeout, bDetach);
+    return d->impl->Listen(iPort, iMaxConns, bindHost, iTimeout, bDetach);
 }
 void NoSocket::enableReadLine()
 {
@@ -495,9 +495,9 @@ void NoSocket::onReachedMaxBuffer()
 {
     d->impl->Csock::ReachedMaxBuffer();
 }
-void NoSocket::onSocketError(int iErrno, const NoString& sDescription)
+void NoSocket::onSocketError(int iErrno, const NoString& description)
 {
-    d->impl->Csock::SockError(iErrno, sDescription);
+    d->impl->Csock::SockError(iErrno, description);
 }
 bool NoSocket::onConnectionFrom(const NoString& host, ushort port)
 {

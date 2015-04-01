@@ -328,7 +328,7 @@ public:
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::ListCommand),
                    "",
                    "Lists all aliases by name.");
-        addCommand("Info",
+        addCommand("info",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAliasMod::InfoCommand),
                    "<name>",
                    "Reports the actions performed by an alias.");
@@ -372,10 +372,10 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoAliasMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoAliasMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("alias");
-    Info.addType(No::NetworkModule);
+    info.setWikiPage("alias");
+    info.addType(No::NetworkModule);
 }
 
 USERMODULEDEFS(NoAliasMod, "Provides bouncer-side command alias support.")

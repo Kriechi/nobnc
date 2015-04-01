@@ -52,15 +52,15 @@ public:
         closelog();
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoRegistry registry(this);
-        NoString sTarget = registry.value("target");
-        if (sTarget.equals("syslog"))
+        NoString target = registry.value("target");
+        if (target.equals("syslog"))
             m_eLogMode = LOG_TO_SYSLOG;
-        else if (sTarget.equals("both"))
+        else if (target.equals("both"))
             m_eLogMode = LOG_TO_BOTH;
-        else if (sTarget.equals("file"))
+        else if (target.equals("file"))
             m_eLogMode = LOG_TO_FILE;
         else
             m_eLogMode = LOG_TO_FILE;
@@ -106,9 +106,9 @@ public:
         Log("[" + user()->userName() + "] disconnected from ZNC from " + client()->socket()->remoteAddress());
     }
 
-    void onFailedLogin(const NoString& sUsername, const NoString& sRemoteIP) override
+    void onFailedLogin(const NoString& username, const NoString& sRemoteIP) override
     {
-        Log("[" + sUsername + "] failed to login from " + sRemoteIP, LOG_WARNING);
+        Log("[" + username + "] failed to login from " + sRemoteIP, LOG_WARNING);
     }
 
     void Log(NoString line, int iPrio = LOG_INFO)
@@ -146,21 +146,21 @@ public:
     void OnTargetCommand(const NoString& command)
     {
         NoString arg = No::tokens(command, 1);
-        NoString sTarget;
-        NoString sMessage;
+        NoString target;
+        NoString message;
         LogMode mode;
 
         if (arg.equals("file")) {
-            sTarget = "file";
-            sMessage = "Now only logging to file";
+            target = "file";
+            message = "Now only logging to file";
             mode = LOG_TO_FILE;
         } else if (arg.equals("syslog")) {
-            sTarget = "syslog";
-            sMessage = "Now only logging to syslog";
+            target = "syslog";
+            message = "Now only logging to syslog";
             mode = LOG_TO_SYSLOG;
         } else if (arg.equals("both")) {
-            sTarget = "both";
-            sMessage = "Now logging to file and syslog";
+            target = "both";
+            message = "Now logging to file and syslog";
             mode = LOG_TO_BOTH;
         } else {
             if (arg.empty()) {
@@ -171,30 +171,30 @@ public:
             return;
         }
 
-        Log(sMessage);
+        Log(message);
         NoRegistry registry(this);
-        registry.setValue("target", sTarget);
+        registry.setValue("target", target);
         m_eLogMode = mode;
-        putModule(sMessage);
+        putModule(message);
     }
 
     void OnShowCommand(const NoString& command)
     {
-        NoString sTarget;
+        NoString target;
 
         switch (m_eLogMode) {
         case LOG_TO_FILE:
-            sTarget = "file";
+            target = "file";
             break;
         case LOG_TO_SYSLOG:
-            sTarget = "syslog";
+            target = "syslog";
             break;
         case LOG_TO_BOTH:
-            sTarget = "both, file and syslog";
+            target = "both, file and syslog";
             break;
         }
 
-        putModule("Logging is enabled for " + sTarget);
+        putModule("Logging is enabled for " + target);
         if (m_eLogMode != LOG_TO_SYSLOG)
             putModule("Log file will be written to [" + m_sLogFile + "]");
     }
@@ -206,9 +206,9 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoAdminLogMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoAdminLogMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("adminlog");
+    info.setWikiPage("adminlog");
 }
 
 GLOBALMODULEDEFS(NoAdminLogMod, "Log ZNC events to file and/or syslog.")

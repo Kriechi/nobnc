@@ -30,11 +30,11 @@ public:
 
     bool IsOnlineModNick(const NoString& nick)
     {
-        const NoString& sPrefix = user()->statusPrefix();
-        if (!nick.startsWith(sPrefix))
+        const NoString& prefix = user()->statusPrefix();
+        if (!nick.startsWith(prefix))
             return false;
 
-        NoString sModNick = nick.substr(sPrefix.length());
+        NoString sModNick = nick.substr(prefix.length());
         if (sModNick.equals("status") || network()->loader()->findModule(sModNick) ||
             user()->loader()->findModule(sModNick) || noApp->loader()->findModule(sModNick))
             return true;
@@ -113,9 +113,9 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoFakeOnlineModule>(NoModuleInfo& Info)
+void no_moduleInfo<NoFakeOnlineModule>(NoModuleInfo& info)
 {
-    Info.setWikiPage("modules_online");
+    info.setWikiPage("modules_online");
 }
 
 NETWORKMODULEDEFS(NoFakeOnlineModule, "Make ZNC's *modules to be \"online\".")

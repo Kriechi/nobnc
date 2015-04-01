@@ -93,14 +93,14 @@ NoString NoApp::version()
     return NoString(NO_VERSION_STR) + NoString(NO_VERSION_EXTRA);
 }
 
-NoString NoApp::tag(bool bIncludeVersion, bool bHTML)
+NoString NoApp::tag(bool includeVersion, bool bHTML)
 {
     if (!instance()->d->hideVersion) {
-        bIncludeVersion = true;
+        includeVersion = true;
     }
     NoString sAddress = bHTML ? "<a href=\"http://znc.in\">http://znc.in</a>" : "http://znc.in";
 
-    if (!bIncludeVersion) {
+    if (!includeVersion) {
         return "ZNC - " + sAddress;
     }
 
@@ -237,7 +237,7 @@ NoFile* NoAppPrivate::initPidFile()
     return nullptr;
 }
 
-bool NoApp::writePidFile(int iPid)
+bool NoApp::writePidFile(int pid)
 {
     NoFile* File = d->initPidFile();
     if (File == nullptr)
@@ -247,7 +247,7 @@ bool NoApp::writePidFile(int iPid)
 
     bool bRet = false;
     if (File->Open(O_WRONLY | O_TRUNC | O_CREAT)) {
-        File->Write(NoString(iPid) + "\n");
+        File->Write(NoString(pid) + "\n");
         File->Close();
         bRet = true;
     }
@@ -478,26 +478,26 @@ bool NoApp::isHostAllowed(const NoString& hostMask) const
     return false;
 }
 
-bool NoApp::allowConnectionFrom(const NoString& sIP) const
+bool NoApp::allowConnectionFrom(const NoString& address) const
 {
     if (d->anonIpLimit == 0)
         return true;
-    return (manager()->anonConnectionCount(sIP) < d->anonIpLimit);
+    return (manager()->anonConnectionCount(address) < d->anonIpLimit);
 }
 
-void NoApp::initDirs(const NoString& sArgvPath, const NoString& sDataDir)
+void NoApp::initDirs(const NoString& argvPath, const NoString& dataDir)
 {
     // If the bin was not ran from the current directory, we need to add that dir onto our cwd
-    NoString::size_type uPos = sArgvPath.rfind('/');
+    NoString::size_type uPos = argvPath.rfind('/');
     if (uPos == NoString::npos)
         d->curPath = "./";
     else
-        d->curPath = NoDir("./").filePath(sArgvPath.left(uPos));
+        d->curPath = NoDir("./").filePath(argvPath.left(uPos));
 
-    if (sDataDir.empty()) {
+    if (dataDir.empty()) {
         d->appPath = NoDir::home().filePath(".znc");
     } else {
-        d->appPath = sDataDir;
+        d->appPath = dataDir;
     }
 
     d->sslCertFile = d->appPath + "/znc.pem";
@@ -525,9 +525,9 @@ NoString NoApp::userPath() const
 
 NoString NoApp::modulePath() const
 {
-    NoString sModPath = d->appPath + "/modules";
+    NoString path = d->appPath + "/modules";
 
-    return sModPath;
+    return path;
 }
 
 NoString NoApp::currentPath() const
@@ -556,19 +556,19 @@ NoString NoApp::configFile() const
     return d->configFile;
 }
 
-NoString NoAppPrivate::expandConfigPath(const NoString& sConfigFile, bool allowMkDir)
+NoString NoAppPrivate::expandConfigPath(const NoString& configFile, bool allowMkDir)
 {
     NoString sRetPath;
 
-    if (sConfigFile.empty()) {
+    if (configFile.empty()) {
         sRetPath = noApp->confPath(allowMkDir) + "/znc.conf";
     } else {
-        if (sConfigFile.left(2) == "./" || sConfigFile.left(3) == "../") {
-            sRetPath = noApp->currentPath() + "/" + sConfigFile;
-        } else if (sConfigFile.left(1) != "/") {
-            sRetPath = noApp->confPath(allowMkDir) + "/" + sConfigFile;
+        if (configFile.left(2) == "./" || configFile.left(3) == "../") {
+            sRetPath = noApp->currentPath() + "/" + configFile;
+        } else if (configFile.left(1) != "/") {
+            sRetPath = noApp->confPath(allowMkDir) + "/" + configFile;
         } else {
-            sRetPath = sConfigFile;
+            sRetPath = configFile;
         }
     }
 
@@ -732,7 +732,7 @@ NoString NoAppPrivate::makeConfigHeader()
            "// Also check http://en.znc.in/wiki/Configuration\n";
 }
 
-bool NoApp::writeNewConfig(const NoString& sConfigFile)
+bool NoApp::writeNewConfig(const NoString& configFile)
 {
     NoString sAnswer, sUser, sNetwork;
     NoStringVector vsLines;
@@ -740,7 +740,7 @@ bool NoApp::writeNewConfig(const NoString& sConfigFile)
     vsLines.push_back(d->makeConfigHeader());
     vsLines.push_back("Version = " + NoString(NO_VERSION_STR));
 
-    d->configFile = d->expandConfigPath(sConfigFile);
+    d->configFile = d->expandConfigPath(configFile);
 
     if (NoFile::Exists(d->configFile)) {
         No::printStatus(false, "WARNING: config [" + d->configFile + "] already exists.");
@@ -757,13 +757,13 @@ bool NoApp::writeNewConfig(const NoString& sConfigFile)
     bool b6 = false;
 #endif
     NoString sListenHost;
-    NoString sURIPrefix;
+    NoString uriPrefix;
     bool bListenSSL = false;
     uint uListenPort = 0;
-    bool bSuccess;
+    bool success;
 
     do {
-        bSuccess = true;
+        success = true;
         while (true) {
             if (!No::getNumInput("Listen on port", uListenPort, 1025, 65534)) {
                 continue;
@@ -791,16 +791,16 @@ bool NoApp::writeNewConfig(const NoString& sConfigFile)
 
         No::printAction("Verifying the listener");
         NoListener* pListener = new NoListener(sListenHost, (ushort)uListenPort);
-        pListener->setUriPrefix(sURIPrefix);
+        pListener->setUriPrefix(uriPrefix);
         pListener->setSsl(bListenSSL);
         pListener->setAddressType(b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address);
         if (!pListener->listen()) {
             No::printStatus(false, FormatBindError());
-            bSuccess = false;
+            success = false;
         } else
             No::printStatus(true);
         delete pListener;
-    } while (!bSuccess);
+    } while (!success);
 
 #ifdef HAVE_LIBSSL
     NoString sPemFile = pemLocation();
@@ -824,9 +824,9 @@ bool NoApp::writeNewConfig(const NoString& sConfigFile)
     std::set<NoModuleInfo> ssGlobalMods;
     loader()->defaultModules(ssGlobalMods, No::GlobalModule);
     std::vector<NoString> vsGlobalModNames;
-    for (const NoModuleInfo& Info : ssGlobalMods) {
-        vsGlobalModNames.push_back(Info.name());
-        vsLines.push_back("LoadModule = " + Info.name());
+    for (const NoModuleInfo& info : ssGlobalMods) {
+        vsGlobalModNames.push_back(info.name());
+        vsLines.push_back("LoadModule = " + info.name());
     }
     No::printMessage("Enabled global modules [" + NoString(", ").join(vsGlobalModNames.begin(), vsGlobalModNames.end()) + "]");
 
@@ -866,9 +866,9 @@ bool NoApp::writeNewConfig(const NoString& sConfigFile)
     std::set<NoModuleInfo> ssUserMods;
     loader()->defaultModules(ssUserMods, No::UserModule);
     std::vector<NoString> vsUserModNames;
-    for (const NoModuleInfo& Info : ssUserMods) {
-        vsUserModNames.push_back(Info.name());
-        vsLines.push_back("\tLoadModule = " + Info.name());
+    for (const NoModuleInfo& info : ssUserMods) {
+        vsUserModNames.push_back(info.name());
+        vsLines.push_back("\tLoadModule = " + info.name());
     }
     No::printMessage("Enabled user modules [" + NoString(", ").join(vsUserModNames.begin(), vsUserModNames.end()) + "]");
 
@@ -877,21 +877,21 @@ bool NoApp::writeNewConfig(const NoString& sConfigFile)
         vsLines.push_back("");
 
         No::printMessage("");
-        No::printMessage("-- Network settings --");
+        No::printMessage("-- network settings --");
         No::printMessage("");
 
         do {
             No::getInput("Name", sNetwork, "freenode");
         } while (!NoNetwork::isValidNetwork(sNetwork));
 
-        vsLines.push_back("\t<Network " + sNetwork + ">");
+        vsLines.push_back("\t<network " + sNetwork + ">");
 
         std::set<NoModuleInfo> ssNetworkMods;
         loader()->defaultModules(ssNetworkMods, No::NetworkModule);
         std::vector<NoString> vsNetworkModNames;
-        for (const NoModuleInfo& Info : ssNetworkMods) {
-            vsNetworkModNames.push_back(Info.name());
-            vsLines.push_back("\t\tLoadModule = " + Info.name());
+        for (const NoModuleInfo& info : ssNetworkMods) {
+            vsNetworkModNames.push_back(info.name());
+            vsLines.push_back("\t\tLoadModule = " + info.name());
         }
 
         NoString host, pass, sHint;
@@ -925,14 +925,14 @@ bool NoApp::writeNewConfig(const NoString& sConfigFile)
             sChans.replace(";", " ");
             NoStringVector vsChans = sChans.split(" ", No::SkipEmptyParts);
             for (const NoString& sChan : vsChans) {
-                vsLines.push_back("\t\t<Chan " + sChan.trim_n() + ">");
-                vsLines.push_back("\t\t</Chan>");
+                vsLines.push_back("\t\t<channel " + sChan.trim_n() + ">");
+                vsLines.push_back("\t\t</channel>");
             }
         }
 
         No::printMessage("Enabled network modules [" + NoString(", ").join(vsNetworkModNames.begin(), vsNetworkModNames.end()) + "]");
 
-        vsLines.push_back("\t</Network>");
+        vsLines.push_back("\t</network>");
     }
 
     vsLines.push_back("</User>");
@@ -1040,7 +1040,7 @@ bool NoApp::writeNewConfig(const NoString& sConfigFile)
     return bFileOpen && No::getBoolInput("Launch ZNC now?", true);
 }
 
-void NoAppPrivate::backupConfigOnce(const NoString& sSuffix)
+void NoAppPrivate::backupConfigOnce(const NoString& suffix)
 {
     static bool didBackup = false;
     if (didBackup)
@@ -1049,16 +1049,16 @@ void NoAppPrivate::backupConfigOnce(const NoString& sSuffix)
 
     No::printAction("Creating a config backup");
 
-    NoString sBackup = NoDir(configFile).filePath("../znc.conf." + sSuffix);
+    NoString sBackup = NoDir(configFile).filePath("../znc.conf." + suffix);
     if (NoFile::Copy(configFile, sBackup))
         No::printStatus(true, sBackup);
     else
         No::printStatus(false, strerror(errno));
 }
 
-bool NoApp::parseConfig(const NoString& sConfig, NoString& error)
+bool NoApp::parseConfig(const NoString& config, NoString& error)
 {
-    d->configFile = d->expandConfigPath(sConfig, false);
+    d->configFile = d->expandConfigPath(config, false);
 
     return d->doRehash(error);
 }
@@ -1169,28 +1169,28 @@ bool NoAppPrivate::doRehash(NoString& error)
     NoStringVector vsList;
     config.FindStringVector("loadmodule", vsList);
     for (const NoString& sModLine : vsList) {
-        NoString sModName = No::token(sModLine, 0);
+        NoString name = No::token(sModLine, 0);
         NoString args = No::tokens(sModLine, 1);
 
-        if (sModName == "saslauth" && tSavedVersion < std::make_tuple(0, 207)) {
+        if (name == "saslauth" && tSavedVersion < std::make_tuple(0, 207)) {
             // XXX compatibility crap, added in 0.207
             No::printMessage("saslauth module was renamed to cyrusauth. Loading cyrusauth instead.");
-            sModName = "cyrusauth";
+            name = "cyrusauth";
         }
 
-        if (msModules.find(sModName) != msModules.end()) {
-            error = "Module [" + sModName + "] already loaded";
+        if (msModules.find(name) != msModules.end()) {
+            error = "Module [" + name + "] already loaded";
             No::printError(error);
             return false;
         }
         NoString sModRet;
         NoModule* pOldMod;
 
-        pOldMod = noApp->loader()->findModule(sModName);
+        pOldMod = noApp->loader()->findModule(name);
         if (!pOldMod) {
-            No::printAction("Loading global module [" + sModName + "]");
+            No::printAction("Loading global module [" + name + "]");
 
-            bool bModRet = noApp->loader()->loadModule(sModName, args, No::GlobalModule, nullptr, nullptr, sModRet);
+            bool bModRet = noApp->loader()->loadModule(name, args, No::GlobalModule, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1198,9 +1198,9 @@ bool NoAppPrivate::doRehash(NoString& error)
                 return false;
             }
         } else if (pOldMod->args() != args) {
-            No::printAction("Reloading global module [" + sModName + "]");
+            No::printAction("Reloading global module [" + name + "]");
 
-            bool bModRet = noApp->loader()->reloadModule(sModName, args, nullptr, nullptr, sModRet);
+            bool bModRet = noApp->loader()->reloadModule(name, args, nullptr, nullptr, sModRet);
 
             No::printStatus(bModRet, sModRet);
             if (!bModRet) {
@@ -1208,9 +1208,9 @@ bool NoAppPrivate::doRehash(NoString& error)
                 return false;
             }
         } else
-            No::printMessage("Module [" + sModName + "] already loaded.");
+            No::printMessage("Module [" + name + "] already loaded.");
 
-        msModules[sModName] = args;
+        msModules[name] = args;
     }
 
     NoString sISpoofFormat, sISpoofFile;
@@ -1456,26 +1456,26 @@ bool NoAppPrivate::doRehash(NoString& error)
     return true;
 }
 
-void NoApp::dumpConfig(const NoSettings* pConfig)
+void NoApp::dumpConfig(const NoSettings* settings)
 {
-    NoSettings::EntryMapIterator eit = pConfig->BeginEntries();
-    for (; eit != pConfig->EndEntries(); ++eit) {
-        const NoString& sKey = eit->first;
+    NoSettings::EntryMapIterator eit = settings->BeginEntries();
+    for (; eit != settings->EndEntries(); ++eit) {
+        const NoString& key = eit->first;
         const NoStringVector& vsList = eit->second;
         NoStringVector::const_iterator it = vsList.begin();
         for (; it != vsList.end(); ++it) {
-            No::printError(sKey + " = " + *it);
+            No::printError(key + " = " + *it);
         }
     }
 
-    NoSettings::SubConfigMapIterator sit = pConfig->BeginSubConfigs();
-    for (; sit != pConfig->EndSubConfigs(); ++sit) {
-        const NoString& sKey = sit->first;
+    NoSettings::SubConfigMapIterator sit = settings->BeginSubConfigs();
+    for (; sit != settings->EndSubConfigs(); ++sit) {
+        const NoString& key = sit->first;
         const NoSettings::SubConfig& sSub = sit->second;
         NoSettings::SubConfig::const_iterator it = sSub.begin();
 
         for (; it != sSub.end(); ++it) {
-            No::printError("SubConfig [" + sKey + " " + it->first + "]:");
+            No::printError("SubConfig [" + key + " " + it->first + "]:");
             dumpConfig(it->second.m_subConfig);
         }
     }
@@ -1492,8 +1492,8 @@ bool NoApp::addBindHost(const NoString& host)
         return false;
     }
 
-    for (const NoString& sBindHost : d->bindHosts) {
-        if (sBindHost.equals(host)) {
+    for (const NoString& bindHost : d->bindHosts) {
+        if (bindHost.equals(host)) {
             return false;
         }
     }
@@ -1549,21 +1549,21 @@ bool NoApp::removeTrustedProxy(const NoString& host)
     return false;
 }
 
-void NoApp::broadcast(const NoString& sMessage, bool bAdminOnly, NoUser* pSkipUser, NoClient* pSkipClient)
+void NoApp::broadcast(const NoString& message, bool adminOnly, NoUser* skipUser, NoClient* skipClient)
 {
     for (const auto& it : d->users) {
-        if (bAdminOnly && !it.second->isAdmin())
+        if (adminOnly && !it.second->isAdmin())
             continue;
 
-        if (it.second != pSkipUser) {
-            NoString sMsg = sMessage;
+        if (it.second != skipUser) {
+            NoString msg = message;
 
             bool bContinue = false;
-            USERMODULECALL(onBroadcast(sMsg), it.second, nullptr, &bContinue);
+            USERMODULECALL(onBroadcast(msg), it.second, nullptr, &bContinue);
             if (bContinue)
                 continue;
 
-            it.second->putStatusNotice("*** " + sMsg, nullptr, pSkipClient);
+            it.second->putStatusNotice("*** " + msg, nullptr, skipClient);
         }
     }
 }
@@ -1588,29 +1588,29 @@ ulonglong NoApp::bytesWritten() const
     return d->bytesWritten;
 }
 
-NoModule* NoApp::findModule(const NoString& sModName, const NoString& sUsername)
+NoModule* NoApp::findModule(const NoString& name, const NoString& username)
 {
-    if (sUsername.empty()) {
-        return noApp->loader()->findModule(sModName);
+    if (username.empty()) {
+        return noApp->loader()->findModule(name);
     }
 
-    NoUser* user = findUser(sUsername);
+    NoUser* user = findUser(username);
 
-    return (!user) ? nullptr : user->loader()->findModule(sModName);
+    return (!user) ? nullptr : user->loader()->findModule(name);
 }
 
-NoModule* NoApp::findModule(const NoString& sModName, NoUser* user)
+NoModule* NoApp::findModule(const NoString& name, NoUser* user)
 {
     if (user) {
-        return user->loader()->findModule(sModName);
+        return user->loader()->findModule(name);
     }
 
-    return noApp->loader()->findModule(sModName);
+    return noApp->loader()->findModule(name);
 }
 
-bool NoApp::updateModule(const NoString& module)
+bool NoApp::updateModule(const NoString& name)
 {
-    NoModule* pModule;
+    NoModule* module;
 
     std::map<NoUser*, NoString> musLoaded;
     std::map<NoNetwork*, NoString> mnsLoaded;
@@ -1619,19 +1619,19 @@ bool NoApp::updateModule(const NoString& module)
     for (const auto& it : d->users) {
         NoUser* user = it.second;
 
-        pModule = user->loader()->findModule(module);
-        if (pModule) {
-            musLoaded[user] = pModule->args();
-            user->loader()->unloadModule(module);
+        module = user->loader()->findModule(name);
+        if (module) {
+            musLoaded[user] = module->args();
+            user->loader()->unloadModule(name);
         }
 
         // See if the user has this module loaded to a network
         std::vector<NoNetwork*> vNetworks = user->networks();
         for (NoNetwork* network : vNetworks) {
-            pModule = network->loader()->findModule(module);
-            if (pModule) {
-                mnsLoaded[network] = pModule->args();
-                network->loader()->unloadModule(module);
+            module = network->loader()->findModule(name);
+            if (module) {
+                mnsLoaded[network] = module->args();
+                network->loader()->unloadModule(name);
             }
         }
     }
@@ -1640,11 +1640,11 @@ bool NoApp::updateModule(const NoString& module)
     bool bGlobal = false;
     NoString sGlobalArgs;
 
-    pModule = loader()->findModule(module);
-    if (pModule) {
+    module = loader()->findModule(name);
+    if (module) {
         bGlobal = true;
-        sGlobalArgs = pModule->args();
-        loader()->unloadModule(module);
+        sGlobalArgs = module->args();
+        loader()->unloadModule(name);
     }
 
     // Lets reload everything
@@ -1653,8 +1653,8 @@ bool NoApp::updateModule(const NoString& module)
 
     // Reload the global module
     if (bGlobal) {
-        if (!loader()->loadModule(module, sGlobalArgs, No::GlobalModule, nullptr, nullptr, sErr)) {
-            NO_DEBUG("Failed to reload [" << module << "] globally [" << sErr << "]");
+        if (!loader()->loadModule(name, sGlobalArgs, No::GlobalModule, nullptr, nullptr, sErr)) {
+            NO_DEBUG("Failed to reload [" << name << "] globally [" << sErr << "]");
             bError = true;
         }
     }
@@ -1664,8 +1664,8 @@ bool NoApp::updateModule(const NoString& module)
         NoUser* user = it.first;
         const NoString& args = it.second;
 
-        if (!user->loader()->loadModule(module, args, No::UserModule, user, nullptr, sErr)) {
-            NO_DEBUG("Failed to reload [" << module << "] for [" << user->userName() << "] [" << sErr << "]");
+        if (!user->loader()->loadModule(name, args, No::UserModule, user, nullptr, sErr)) {
+            NO_DEBUG("Failed to reload [" << name << "] for [" << user->userName() << "] [" << sErr << "]");
             bError = true;
         }
     }
@@ -1675,8 +1675,8 @@ bool NoApp::updateModule(const NoString& module)
         NoNetwork* network = it.first;
         const NoString& args = it.second;
 
-        if (!network->loader()->loadModule(module, args, No::NetworkModule, network->user(), network, sErr)) {
-            NO_DEBUG("Failed to reload [" << module << "] for [" << network->user()->userName() << "/"
+        if (!network->loader()->loadModule(name, args, No::NetworkModule, network->user(), network, sErr)) {
+            NO_DEBUG("Failed to reload [" << name << "] for [" << network->user()->userName() << "/"
                                           << network->name() << "] [" << sErr << "]");
             bError = true;
         }
@@ -1685,9 +1685,9 @@ bool NoApp::updateModule(const NoString& module)
     return !bError;
 }
 
-NoUser* NoApp::findUser(const NoString& sUsername)
+NoUser* NoApp::findUser(const NoString& username)
 {
-    std::map<NoString, NoUser*>::iterator it = d->users.find(sUsername);
+    std::map<NoString, NoUser*>::iterator it = d->users.find(username);
 
     if (it != d->users.end()) {
         return it->second;
@@ -1696,9 +1696,9 @@ NoUser* NoApp::findUser(const NoString& sUsername)
     return nullptr;
 }
 
-bool NoApp::deleteUser(const NoString& sUsername)
+bool NoApp::deleteUser(const NoString& username)
 {
-    NoUser* user = findUser(sUsername);
+    NoUser* user = findUser(username);
 
     if (!user) {
         return false;
@@ -1708,21 +1708,21 @@ bool NoApp::deleteUser(const NoString& sUsername)
     return true;
 }
 
-bool NoApp::addUser(NoUser* user, NoString& sErrorRet)
+bool NoApp::addUser(NoUser* user, NoString& error)
 {
     if (findUser(user->userName()) != nullptr) {
-        sErrorRet = "User already exists";
+        error = "User already exists";
         NO_DEBUG("User [" << user->userName() << "] - already exists");
         return false;
     }
-    if (!user->isValid(sErrorRet)) {
-        NO_DEBUG("Invalid user [" << user->userName() << "] - [" << sErrorRet << "]");
+    if (!user->isValid(error)) {
+        NO_DEBUG("Invalid user [" << user->userName() << "] - [" << error << "]");
         return false;
     }
     bool bFailed = false;
-    GLOBALMODULECALL(onAddUser(*user, sErrorRet), &bFailed);
+    GLOBALMODULECALL(onAddUser(*user, error), &bFailed);
     if (bFailed) {
-        NO_DEBUG("AddUser [" << user->userName() << "] aborted by a module [" << sErrorRet << "]");
+        NO_DEBUG("AddUser [" << user->userName() << "] aborted by a module [" << error << "]");
         return false;
     }
     d->users[user->userName()] = user;
@@ -1734,14 +1734,14 @@ std::map<NoString, NoUser*> NoApp::userMap() const
     return (d->users);
 }
 
-NoListener* NoApp::findListener(u_short port, const NoString& host, No::AddressType eAddr)
+NoListener* NoApp::findListener(u_short port, const NoString& host, No::AddressType addressType)
 {
     for (NoListener* pListener : d->listeners) {
         if (pListener->port() != port)
             continue;
         if (pListener->host() != host)
             continue;
-        if (pListener->addressType() != eAddr)
+        if (pListener->addressType() != addressType)
             continue;
         return pListener;
     }
@@ -1751,35 +1751,35 @@ NoListener* NoApp::findListener(u_short port, const NoString& host, No::AddressT
 bool NoAppPrivate::addListener(const NoString& line, NoString& error)
 {
     NoString name = No::token(line, 0);
-    NoString sValue = No::tokens(line, 1);
+    NoString value = No::tokens(line, 1);
 
-    No::AddressType eAddr = No::Ipv4AndIpv6Address;
+    No::AddressType addressType = No::Ipv4AndIpv6Address;
     if (name.equals("Listen4") || name.equals("Listen") || name.equals("Listener4")) {
-        eAddr = No::Ipv4Address;
+        addressType = No::Ipv4Address;
     }
     if (name.equals("Listener6")) {
-        eAddr = No::Ipv6Address;
+        addressType = No::Ipv6Address;
     }
 
-    No::AcceptType eAccept = No::AcceptAll;
-    if (sValue.trimPrefix("irc_only "))
-        eAccept = No::AcceptIrc;
-    else if (sValue.trimPrefix("web_only "))
-        eAccept = No::AcceptHttp;
+    No::AcceptType acceptType = No::AcceptAll;
+    if (value.trimPrefix("irc_only "))
+        acceptType = No::AcceptIrc;
+    else if (value.trimPrefix("web_only "))
+        acceptType = No::AcceptHttp;
 
     bool ssl = false;
     NoString sPort;
-    NoString sBindHost;
+    NoString bindHost;
 
-    if (No::Ipv4Address == eAddr) {
-        sValue.replace(":", " ");
+    if (No::Ipv4Address == addressType) {
+        value.replace(":", " ");
     }
 
-    if (sValue.contains(" ")) {
-        sBindHost = No::token(sValue, 0, " ");
-        sPort = No::tokens(sValue, 1, " ");
+    if (value.contains(" ")) {
+        bindHost = No::token(value, 0, " ");
+        sPort = No::tokens(value, 1, " ");
     } else {
-        sPort = sValue;
+        sPort = value;
     }
 
     if (sPort.left(1) == "+") {
@@ -1788,28 +1788,28 @@ bool NoAppPrivate::addListener(const NoString& line, NoString& error)
     }
 
     // No support for URIPrefix for old-style configs.
-    NoString sURIPrefix;
+    NoString uriPrefix;
     ushort port = sPort.toUShort();
-    return noApp->addListener(port, sBindHost, sURIPrefix, ssl, eAddr, eAccept, error);
+    return noApp->addListener(port, bindHost, uriPrefix, ssl, addressType, acceptType, error);
 }
 
 bool NoApp::addListener(ushort port,
-                        const NoString& sBindHost,
+                        const NoString& bindHost,
                         const NoString& sURIPrefixRaw,
                         bool ssl,
-                        No::AddressType eAddr,
-                        No::AcceptType eAccept,
+                        No::AddressType addressType,
+                        No::AcceptType acceptType,
                         NoString& error)
 {
     NoString sHostComment;
 
-    if (!sBindHost.empty()) {
-        sHostComment = " on host [" + sBindHost + "]";
+    if (!bindHost.empty()) {
+        sHostComment = " on host [" + bindHost + "]";
     }
 
     NoString sIPV6Comment;
 
-    switch (eAddr) {
+    switch (addressType) {
     case No::Ipv4AndIpv6Address:
         sIPV6Comment = "";
         break;
@@ -1823,7 +1823,7 @@ bool NoApp::addListener(ushort port,
     No::printAction("Binding to port [" + NoString((ssl) ? "+" : "") + NoString(port) + "]" + sHostComment + sIPV6Comment);
 
 #ifndef HAVE_IPV6
-    if (ADDR_IPV6ONLY == eAddr) {
+    if (ADDR_IPV6ONLY == addressType) {
         error = "IPV6 is not enabled";
         No::PrintStatus(false, error);
         return false;
@@ -1862,21 +1862,21 @@ bool NoApp::addListener(ushort port,
     }
 
     // URIPrefix must start with a slash and end without one.
-    NoString sURIPrefix = NoString(sURIPrefixRaw);
-    if (!sURIPrefix.empty()) {
-        if (!sURIPrefix.startsWith("/")) {
-            sURIPrefix = "/" + sURIPrefix;
+    NoString uriPrefix = NoString(sURIPrefixRaw);
+    if (!uriPrefix.empty()) {
+        if (!uriPrefix.startsWith("/")) {
+            uriPrefix = "/" + uriPrefix;
         }
-        if (sURIPrefix.endsWith("/")) {
-            sURIPrefix.trimRight("/");
+        if (uriPrefix.endsWith("/")) {
+            uriPrefix.trimRight("/");
         }
     }
 
-    NoListener* pListener = new NoListener(sBindHost, port);
-    pListener->setUriPrefix(sURIPrefix);
+    NoListener* pListener = new NoListener(bindHost, port);
+    pListener->setUriPrefix(uriPrefix);
     pListener->setSsl(ssl);
-    pListener->setAddressType(eAddr);
-    pListener->setAcceptType(eAccept);
+    pListener->setAddressType(addressType);
+    pListener->setAcceptType(acceptType);
 
     if (!pListener->listen()) {
         error = FormatBindError();
@@ -1891,10 +1891,10 @@ bool NoApp::addListener(ushort port,
     return true;
 }
 
-bool NoAppPrivate::addListener(NoSettings* pConfig, NoString& error)
+bool NoAppPrivate::addListener(NoSettings* settings, NoString& error)
 {
-    NoString sBindHost;
-    NoString sURIPrefix;
+    NoString bindHost;
+    NoString uriPrefix;
     bool ssl;
     bool b4;
 #ifdef HAVE_IPV6
@@ -1905,46 +1905,46 @@ bool NoAppPrivate::addListener(NoSettings* pConfig, NoString& error)
     bool bIRC;
     bool bWeb;
     ushort port;
-    if (!pConfig->FindUShortEntry("port", port)) {
+    if (!settings->FindUShortEntry("port", port)) {
         error = "No port given";
         No::printError(error);
         return false;
     }
-    pConfig->FindStringEntry("host", sBindHost);
-    pConfig->FindBoolEntry("ssl", ssl, false);
-    pConfig->FindBoolEntry("ipv4", b4, true);
-    pConfig->FindBoolEntry("ipv6", b6, b6);
-    pConfig->FindBoolEntry("allowirc", bIRC, true);
-    pConfig->FindBoolEntry("allowweb", bWeb, true);
-    pConfig->FindStringEntry("uriprefix", sURIPrefix);
+    settings->FindStringEntry("host", bindHost);
+    settings->FindBoolEntry("ssl", ssl, false);
+    settings->FindBoolEntry("ipv4", b4, true);
+    settings->FindBoolEntry("ipv6", b6, b6);
+    settings->FindBoolEntry("allowirc", bIRC, true);
+    settings->FindBoolEntry("allowweb", bWeb, true);
+    settings->FindStringEntry("uriprefix", uriPrefix);
 
-    No::AddressType eAddr;
+    No::AddressType addressType;
     if (b4 && b6) {
-        eAddr = No::Ipv4AndIpv6Address;
+        addressType = No::Ipv4AndIpv6Address;
     } else if (b4 && !b6) {
-        eAddr = No::Ipv4Address;
+        addressType = No::Ipv4Address;
     } else if (!b4 && b6) {
-        eAddr = No::Ipv6Address;
+        addressType = No::Ipv6Address;
     } else {
         error = "No address family given";
         No::printError(error);
         return false;
     }
 
-    No::AcceptType eAccept;
+    No::AcceptType acceptType;
     if (bIRC && bWeb) {
-        eAccept = No::AcceptAll;
+        acceptType = No::AcceptAll;
     } else if (bIRC && !bWeb) {
-        eAccept = No::AcceptIrc;
+        acceptType = No::AcceptIrc;
     } else if (!bIRC && bWeb) {
-        eAccept = No::AcceptHttp;
+        acceptType = No::AcceptHttp;
     } else {
         error = "Either Web or IRC or both should be selected";
         No::printError(error);
         return false;
     }
 
-    return noApp->addListener(port, sBindHost, sURIPrefix, ssl, eAddr, eAccept, error);
+    return noApp->addListener(port, bindHost, uriPrefix, ssl, addressType, acceptType, error);
 }
 
 bool NoApp::addListener(NoListener* pListener)
@@ -1974,16 +1974,16 @@ bool NoApp::removeListener(NoListener* pListener)
     return false;
 }
 
-void NoApp::setMotd(const NoString& sMessage)
+void NoApp::setMotd(const NoString& message)
 {
     clearMotd();
-    addMotd(sMessage);
+    addMotd(message);
 }
 
-void NoApp::addMotd(const NoString& sMessage)
+void NoApp::addMotd(const NoString& message)
 {
-    if (!sMessage.empty()) {
-        d->motd.push_back(sMessage);
+    if (!message.empty()) {
+        d->motd.push_back(message);
     }
 }
 
@@ -2044,22 +2044,22 @@ NoApp::TrafficStatsMap NoApp::trafficStats(TrafficStatsPair& Users, TrafficStats
         uiUsers_out += it.second->bytesWritten();
     }
 
-    for (NoSocket* pSock : d->manager.sockets()) {
+    for (NoSocket* socket : d->manager.sockets()) {
         NoUser* user = nullptr;
-        if (pSock->name().left(5) == "IRC::") {
-            user = ((NoIrcSocket*)pSock)->network()->user();
-        } else if (pSock->name().left(5) == "USR::") {
-            user = ((NoClient*)pSock)->user();
+        if (socket->name().left(5) == "IRC::") {
+            user = ((NoIrcSocket*)socket)->network()->user();
+        } else if (socket->name().left(5) == "USR::") {
+            user = ((NoClient*)socket)->user();
         }
 
         if (user) {
-            ret[user->userName()].first += pSock->bytesRead();
-            ret[user->userName()].second += pSock->bytesWritten();
-            uiUsers_in += pSock->bytesRead();
-            uiUsers_out += pSock->bytesWritten();
+            ret[user->userName()].first += socket->bytesRead();
+            ret[user->userName()].second += socket->bytesWritten();
+            uiUsers_in += socket->bytesRead();
+            uiUsers_out += socket->bytesWritten();
         } else {
-            uiZNC_in += pSock->bytesRead();
-            uiZNC_out += pSock->bytesWritten();
+            uiZNC_in += socket->bytesRead();
+            uiZNC_out += socket->bytesWritten();
         }
     }
 
@@ -2086,9 +2086,9 @@ void NoApp::authUser(std::shared_ptr<NoAuthenticator> AuthClass)
     }
 
     NoString host;
-    NoSocket* pSock = AuthClass->socket();
-    if (pSock)
-        host = pSock->remoteAddress();
+    NoSocket* socket = AuthClass->socket();
+    if (socket)
+        host = socket->remoteAddress();
 
     if (!user->isHostAllowed(host)) {
         AuthClass->refuseLogin("Your host [" + host + "] is not allowed");
@@ -2284,9 +2284,9 @@ void NoApp::addNetworkToQueue(NoNetwork* network)
     d->enableConnectQueue();
 }
 
-void NoAppPrivate::leakConnectQueueTimer(NoConnectQueueTimer* pTimer)
+void NoAppPrivate::leakConnectQueueTimer(NoConnectQueueTimer* timer)
 {
-    if (connectQueueTimer == pTimer)
+    if (connectQueueTimer == timer)
         connectQueueTimer = nullptr;
 }
 

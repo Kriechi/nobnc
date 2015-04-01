@@ -41,21 +41,21 @@ public:
         NoArg = 3
     };
 
-    bool onCtcpReply(NoNick& Nick, NoString& sMessage);
-    bool onPrivCtcp(NoNick& Nick, NoString& sMessage);
-    bool onChanCtcp(NoNick& Nick, const NoString& sChan, NoString& sMessage);
-    bool OnGeneralCTCP(NoNick& Nick, NoString& sMessage);
-    bool onPrivMsg(NoNick& Nick, NoString& sMessage);
-    bool onChanMsg(NoNick& Nick, const NoString& sChan, NoString& sMessage);
-    bool onPrivNotice(NoNick& Nick, NoString& sMessage);
-    bool onChanNotice(NoNick& Nick, const NoString& sChan, NoString& sMessage);
+    bool onCtcpReply(NoNick& nick, NoString& message);
+    bool onPrivCtcp(NoNick& nick, NoString& message);
+    bool onChanCtcp(NoNick& nick, const NoString& sChan, NoString& message);
+    bool OnGeneralCTCP(NoNick& nick, NoString& message);
+    bool onPrivMsg(NoNick& nick, NoString& message);
+    bool onChanMsg(NoNick& nick, const NoString& sChan, NoString& message);
+    bool onPrivNotice(NoNick& nick, NoString& message);
+    bool onChanNotice(NoNick& nick, const NoString& sChan, NoString& message);
     bool onServerCapAvailable(const NoString& cap);
 
     void readLine(const NoString& data) override;
     void onConnected() override;
     void onDisconnected() override;
     void onConnectionRefused() override;
-    void onSocketError(int iErrno, const NoString& sDescription) override;
+    void onSocketError(int iErrno, const NoString& description) override;
     void onTimeout() override;
     void onReachedMaxBuffer() override;
 
@@ -77,8 +77,8 @@ public:
     void setPassword(const NoString& s);
 
     uint maxNickLen() const;
-    ChanModeArgs modeType(uchar uMode) const;
-    uchar permFromMode(uchar uMode) const;
+    ChanModeArgs modeType(uchar mode) const;
+    uchar permFromMode(uchar mode) const;
     std::map<uchar, ChanModeArgs> chanModes() const;
     bool isPermChar(const char c) const;
     bool isPermMode(const char c) const;
@@ -95,7 +95,7 @@ public:
     bool isAuthed() const;
     bool isCapAccepted(const NoString& cap);
     NoStringMap isupport() const;
-    NoString isupport(const NoString& sKey, const NoString& sDefault = "") const;
+    NoString isupport(const NoString& key, const NoString& sDefault = "") const;
 
     // This handles NAMESX and UHNAMES in a raw 353 reply
     void forwardRaw353(const NoString& line) const;

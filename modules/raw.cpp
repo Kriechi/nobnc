@@ -43,10 +43,10 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoRawMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoRawMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("raw");
-    Info.addType(No::UserModule);
+    info.setWikiPage("raw");
+    info.addType(No::UserModule);
 }
 
 NETWORKMODULEDEFS(NoRawMod, "View all of the raw traffic")

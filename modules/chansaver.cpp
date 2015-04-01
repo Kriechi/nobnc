@@ -29,7 +29,7 @@ public:
     {
     }
 
-    bool onLoad(const NoString& sArgsi, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         switch (type()) {
         case No::GlobalModule:
@@ -73,27 +73,27 @@ public:
         }
     }
 
-    void onJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& nick, NoChannel& channel) override
     {
-        if (!Channel.inConfig() && network()->ircNick().equals(Nick.nick())) {
-            Channel.setInConfig(true);
+        if (!channel.inConfig() && network()->ircNick().equals(nick.nick())) {
+            channel.setInConfig(true);
         }
     }
 
-    void onPart(const NoNick& Nick, NoChannel& Channel, const NoString& sMessage) override
+    void onPart(const NoNick& nick, NoChannel& channel, const NoString& message) override
     {
-        if (Channel.inConfig() && network()->ircNick().equals(Nick.nick())) {
-            Channel.setInConfig(false);
+        if (channel.inConfig() && network()->ircNick().equals(nick.nick())) {
+            channel.setInConfig(false);
         }
     }
 };
 
 template <>
-void no_moduleInfo<NoChannelSaverMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoChannelSaverMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("chansaver");
-    Info.addType(No::NetworkModule);
-    Info.addType(No::GlobalModule);
+    info.setWikiPage("chansaver");
+    info.addType(No::NetworkModule);
+    info.addType(No::GlobalModule);
 }
 
 USERMODULEDEFS(NoChannelSaverMod, "Keep config up-to-date when user joins/parts.")

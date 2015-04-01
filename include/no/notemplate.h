@@ -34,22 +34,22 @@ public:
     {
     }
 
-    virtual bool handleVar(NoTemplate& Tmpl, const NoString& name, const NoString& args, NoString& sOutput)
+    virtual bool handleVar(NoTemplate& tmpl, const NoString& name, const NoString& args, NoString& sOutput)
     {
         return false;
     }
 
-    virtual bool handleTag(NoTemplate& Tmpl, const NoString& name, const NoString& args, NoString& sOutput)
+    virtual bool handleTag(NoTemplate& tmpl, const NoString& name, const NoString& args, NoString& sOutput)
     {
         return false;
     }
 
-    virtual bool handleIf(NoTemplate& Tmpl, const NoString& name, const NoString& args, NoString& sOutput)
+    virtual bool handleIf(NoTemplate& tmpl, const NoString& name, const NoString& args, NoString& sOutput)
     {
-        return handleVar(Tmpl, name, args, sOutput);
+        return handleVar(tmpl, name, args, sOutput);
     }
 
-    virtual bool handleValue(NoTemplate& Tmpl, NoString& sValue, const NoStringMap& msOptions)
+    virtual bool handleValue(NoTemplate& tmpl, NoString& value, const NoStringMap& msOptions)
     {
         return false;
     }
@@ -58,7 +58,7 @@ public:
 class NO_EXPORT NoTemplate : public NoStringMap
 {
 public:
-    NoTemplate(const NoString& sFileName = "");
+    NoTemplate(const NoString& fileName = "");
     NoTemplate(const std::shared_ptr<NoTemplateOptions>& Options, NoTemplate* pParent = nullptr);
     ~NoTemplate();
 
@@ -73,18 +73,18 @@ public:
 
     NoTemplate* parent(bool bRoot);
     NoString expandFile(const NoString& sFilename, bool bFromInc = false);
-    bool setFile(const NoString& sFileName);
+    bool setFile(const NoString& fileName);
 
-    void setPath(const NoString& sPath); // Sets the dir:dir:dir type path to look at for templates, as of right now no
+    void setPath(const NoString& path); // Sets the dir:dir:dir type path to look at for templates, as of right now no
     // ../../.. protection
-    NoString makePath(const NoString& sPath) const;
-    void prependPath(const NoString& sPath, bool bIncludesOnly = false);
-    void appendPath(const NoString& sPath, bool bIncludesOnly = false);
-    void removePath(const NoString& sPath);
+    NoString makePath(const NoString& path) const;
+    void prependPath(const NoString& path, bool includesOnly = false);
+    void appendPath(const NoString& path, bool includesOnly = false);
+    void removePath(const NoString& path);
     void clearPaths();
     bool printString(NoString& ret);
     bool print(std::ostream& oOut);
-    bool print(const NoString& sFileName, std::ostream& oOut);
+    bool print(const NoString& fileName, std::ostream& oOut);
     bool validIf(const NoString& args);
     bool validExpr(const NoString& sExpr);
     bool isTrue(const NoString& name);

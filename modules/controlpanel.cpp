@@ -44,7 +44,7 @@ class NoAdminMod : public NoModule
 {
     using NoModule::putModule;
 
-    void PrintVarsHelp(const NoString& filter, const char* vars[][2], uint uSize, const NoString& sDescription)
+    void PrintVarsHelp(const NoString& filter, const char* vars[][2], uint uSize, const NoString& description)
     {
         NoTable VarTable;
         VarTable.addColumn("Type");
@@ -62,7 +62,7 @@ class NoAdminMod : public NoModule
             VarTable.setValue("Variables", NoString(", ").join(i.second.cbegin(), i.second.cend()));
         }
         if (!VarTable.isEmpty()) {
-            putModule(sDescription);
+            putModule(description);
             putModule(VarTable);
         }
     }
@@ -155,13 +155,13 @@ class NoAdminMod : public NoModule
                       "user and network.");
     }
 
-    NoUser* FindUser(const NoString& sUsername)
+    NoUser* FindUser(const NoString& username)
     {
-        if (sUsername.equals("$me") || sUsername.equals("$user"))
+        if (username.equals("$me") || username.equals("$user"))
             return user();
-        NoUser* user = noApp->findUser(sUsername);
+        NoUser* user = noApp->findUser(username);
         if (!user) {
-            putModule("Error: User [" + sUsername + "] not found.");
+            putModule("Error: User [" + username + "] not found.");
             return nullptr;
         }
         if (user != NoModule::user() && !NoModule::user()->isAdmin()) {
@@ -190,7 +190,7 @@ class NoAdminMod : public NoModule
     void Get(const NoString& line)
     {
         const NoString sVar = No::token(line, 1).toLower();
-        NoString sUsername = No::tokens(line, 2);
+        NoString username = No::tokens(line, 2);
         NoUser* user;
 
         if (sVar.empty()) {
@@ -198,10 +198,10 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        if (sUsername.empty()) {
+        if (username.empty()) {
             user = NoModule::user();
         } else {
-            user = FindUser(sUsername);
+            user = FindUser(username);
         }
 
         if (!user)
@@ -270,9 +270,9 @@ class NoAdminMod : public NoModule
     {
         const NoString sVar = No::token(line, 1).toLower();
         NoString userName = No::token(line, 2);
-        NoString sValue = No::tokens(line, 3);
+        NoString value = No::tokens(line, 3);
 
-        if (sValue.empty()) {
+        if (value.empty()) {
             putModule("Usage: Set <variable> <username> <value>");
             return;
         }
@@ -282,20 +282,20 @@ class NoAdminMod : public NoModule
             return;
 
         if (sVar == "nick") {
-            user->setNick(sValue);
-            putModule("Nick = " + sValue);
+            user->setNick(value);
+            putModule("Nick = " + value);
         } else if (sVar == "altnick") {
-            user->setAltNick(sValue);
-            putModule("AltNick = " + sValue);
+            user->setAltNick(value);
+            putModule("AltNick = " + value);
         } else if (sVar == "ident") {
-            user->setIdent(sValue);
-            putModule("Ident = " + sValue);
+            user->setIdent(value);
+            putModule("Ident = " + value);
         } else if (sVar == "realname") {
-            user->setRealName(sValue);
-            putModule("RealName = " + sValue);
+            user->setRealName(value);
+            putModule("RealName = " + value);
         } else if (sVar == "bindhost") {
             if (!user->denysetBindHost() || NoModule::user()->isAdmin()) {
-                if (sValue.equals(NoModule::user()->bindHost())) {
+                if (value.equals(NoModule::user()->bindHost())) {
                     putModule("This bind host is already set!");
                     return;
                 }
@@ -306,7 +306,7 @@ class NoAdminMod : public NoModule
                     bool bFound = false;
 
                     for (it = vsHosts.begin(); it != vsHosts.end(); ++it) {
-                        if (sValue.equals(*it)) {
+                        if (value.equals(*it)) {
                             bFound = true;
                             break;
                         }
@@ -319,18 +319,18 @@ class NoAdminMod : public NoModule
                     }
                 }
 
-                user->setBindHost(sValue);
-                putModule("BindHost = " + sValue);
+                user->setBindHost(value);
+                putModule("BindHost = " + value);
             } else {
                 putModule("Access denied!");
             }
         } else if (sVar == "multiclients") {
-            bool b = sValue.toBool();
+            bool b = value.toBool();
             user->setMultiClients(b);
             putModule("MultiClients = " + NoString(b));
         } else if (sVar == "denyloadmod") {
             if (NoModule::user()->isAdmin()) {
-                bool b = sValue.toBool();
+                bool b = value.toBool();
                 user->setDenyLoadMod(b);
                 putModule("DenyLoadMod = " + NoString(b));
             } else {
@@ -338,104 +338,104 @@ class NoAdminMod : public NoModule
             }
         } else if (sVar == "denysetbindhost") {
             if (NoModule::user()->isAdmin()) {
-                bool b = sValue.toBool();
+                bool b = value.toBool();
                 user->setDenysetBindHost(b);
                 putModule("DenysetBindHost = " + NoString(b));
             } else {
                 putModule("Access denied!");
             }
         } else if (sVar == "defaultchanmodes") {
-            user->setDefaultChanModes(sValue);
-            putModule("DefaultChanModes = " + sValue);
+            user->setDefaultChanModes(value);
+            putModule("DefaultChanModes = " + value);
         } else if (sVar == "quitmsg") {
-            user->setQuitMsg(sValue);
-            putModule("QuitMsg = " + sValue);
+            user->setQuitMsg(value);
+            putModule("QuitMsg = " + value);
         } else if (sVar == "buffercount") {
-            uint i = sValue.toUInt();
+            uint i = value.toUInt();
             // Admins don't have to honour the buffer limit
             if (user->setBufferCount(i, NoModule::user()->isAdmin())) {
-                putModule("BufferCount = " + sValue);
+                putModule("BufferCount = " + value);
             } else {
                 putModule("Setting failed, limit is " + NoString(noApp->maxBufferSize()));
             }
         } else if (sVar == "keepbuffer") { // XXX compatibility crap, added in 0.207
-            bool b = !sValue.toBool();
+            bool b = !value.toBool();
             user->setAutoClearChanBuffer(b);
             putModule("AutoClearChanBuffer = " + NoString(b));
         } else if (sVar == "autoclearchanbuffer") {
-            bool b = sValue.toBool();
+            bool b = value.toBool();
             user->setAutoClearChanBuffer(b);
             putModule("AutoClearChanBuffer = " + NoString(b));
         } else if (sVar == "autoclearquerybuffer") {
-            bool b = sValue.toBool();
+            bool b = value.toBool();
             user->setAutoclearQueryBuffer(b);
             putModule("autoclearQueryBuffer = " + NoString(b));
         } else if (sVar == "password") {
             const NoString salt = No::salt();
-            const NoString sHash = NoUser::saltedHash(sValue, salt);
+            const NoString sHash = NoUser::saltedHash(value, salt);
             user->setPassword(sHash, NoUser::HashDefault, salt);
             putModule("Password has been changed!");
         } else if (sVar == "maxjoins") {
-            uint i = sValue.toUInt();
+            uint i = value.toUInt();
             user->setMaxJoins(i);
             putModule("MaxJoins = " + NoString(user->maxJoins()));
         } else if (sVar == "maxnetworks") {
             if (NoModule::user()->isAdmin()) {
-                uint i = sValue.toUInt();
+                uint i = value.toUInt();
                 user->setMaxNetworks(i);
-                putModule("MaxNetworks = " + sValue);
+                putModule("MaxNetworks = " + value);
             } else {
                 putModule("Access denied!");
             }
         } else if (sVar == "maxquerybuffers") {
-            uint i = sValue.toUInt();
+            uint i = value.toUInt();
             user->setMaxQueryBuffers(i);
-            putModule("MaxQueryBuffers = " + sValue);
+            putModule("MaxQueryBuffers = " + value);
         } else if (sVar == "jointries") {
-            uint i = sValue.toUInt();
+            uint i = value.toUInt();
             user->setJoinTries(i);
             putModule("JoinTries = " + NoString(user->joinTries()));
         } else if (sVar == "timezone") {
-            user->setTimezone(sValue);
+            user->setTimezone(value);
             putModule("Timezone = " + user->timezone());
         } else if (sVar == "admin") {
             if (NoModule::user()->isAdmin() && user != NoModule::user()) {
-                bool b = sValue.toBool();
+                bool b = value.toBool();
                 user->setAdmin(b);
                 putModule("Admin = " + NoString(user->isAdmin()));
             } else {
                 putModule("Access denied!");
             }
         } else if (sVar == "prependtimestamp") {
-            bool b = sValue.toBool();
+            bool b = value.toBool();
             user->setTimestampPrepend(b);
             putModule("PrependTimestamp = " + NoString(b));
         } else if (sVar == "appendtimestamp") {
-            bool b = sValue.toBool();
+            bool b = value.toBool();
             user->setTimestampAppend(b);
             putModule("AppendTimestamp = " + NoString(b));
         } else if (sVar == "timestampformat") {
-            user->setTimestampFormat(sValue);
-            putModule("TimestampFormat = " + sValue);
+            user->setTimestampFormat(value);
+            putModule("TimestampFormat = " + value);
         } else if (sVar == "dccbindhost") {
             if (!user->denysetBindHost() || NoModule::user()->isAdmin()) {
-                user->setDccBindHost(sValue);
-                putModule("DCCBindHost = " + sValue);
+                user->setDccBindHost(value);
+                putModule("DCCBindHost = " + value);
             } else {
                 putModule("Access denied!");
             }
         } else if (sVar == "statusprefix") {
             if (sVar.find_first_of(" \t\n") == NoString::npos) {
-                user->setStatusPrefix(sValue);
-                putModule("StatusPrefix = " + sValue);
+                user->setStatusPrefix(value);
+                putModule("StatusPrefix = " + value);
             } else {
                 putModule("That would be a bad idea!");
             }
         }
 #ifdef HAVE_ICU
         else if (sVar == "clientencoding") {
-            user->setClientEncoding(sValue);
-            putModule("ClientEncoding = " + sValue);
+            user->setClientEncoding(value);
+            putModule("ClientEncoding = " + value);
         }
 #endif
         else
@@ -445,15 +445,15 @@ class NoAdminMod : public NoModule
     void GetNetwork(const NoString& line)
     {
         const NoString sVar = No::token(line, 1).toLower();
-        const NoString sUsername = No::token(line, 2);
+        const NoString username = No::token(line, 2);
         const NoString sNetwork = No::token(line, 3);
 
         NoNetwork* network = nullptr;
 
-        if (sUsername.empty()) {
+        if (username.empty()) {
             network = NoModule::network();
         } else {
-            NoUser* user = FindUser(sUsername);
+            NoUser* user = FindUser(username);
             if (!user) {
                 return;
             }
@@ -499,18 +499,18 @@ class NoAdminMod : public NoModule
     void SetNetwork(const NoString& line)
     {
         const NoString sVar = No::token(line, 1).toLower();
-        const NoString sUsername = No::token(line, 2);
+        const NoString username = No::token(line, 2);
         const NoString sNetwork = No::token(line, 3);
-        const NoString sValue = No::tokens(line, 4);
+        const NoString value = No::tokens(line, 4);
 
         NoUser* user = nullptr;
         NoNetwork* network = nullptr;
 
-        if (sUsername.empty()) {
+        if (username.empty()) {
             user = NoModule::user();
             network = NoModule::network();
         } else {
-            user = FindUser(sUsername);
+            user = FindUser(username);
             if (!user) {
                 return;
             }
@@ -527,20 +527,20 @@ class NoAdminMod : public NoModule
         }
 
         if (sVar.equals("nick")) {
-            network->setNick(sValue);
+            network->setNick(value);
             putModule("Nick = " + network->nick());
         } else if (sVar.equals("altnick")) {
-            network->setAltNick(sValue);
+            network->setAltNick(value);
             putModule("AltNick = " + network->altNick());
         } else if (sVar.equals("ident")) {
-            network->setIdent(sValue);
+            network->setIdent(value);
             putModule("Ident = " + network->ident());
         } else if (sVar.equals("realname")) {
-            network->setRealName(sValue);
+            network->setRealName(value);
             putModule("RealName = " + network->realName());
         } else if (sVar.equals("bindhost")) {
             if (!user->denysetBindHost() || NoModule::user()->isAdmin()) {
-                if (sValue.equals(network->bindHost())) {
+                if (value.equals(network->bindHost())) {
                     putModule("This bind host is already set!");
                     return;
                 }
@@ -551,7 +551,7 @@ class NoAdminMod : public NoModule
                     bool bFound = false;
 
                     for (it = vsHosts.begin(); it != vsHosts.end(); ++it) {
-                        if (sValue.equals(*it)) {
+                        if (value.equals(*it)) {
                             bFound = true;
                             break;
                         }
@@ -564,27 +564,27 @@ class NoAdminMod : public NoModule
                     }
                 }
 
-                network->setBindHost(sValue);
-                putModule("BindHost = " + sValue);
+                network->setBindHost(value);
+                putModule("BindHost = " + value);
             } else {
                 putModule("Access denied!");
             }
         } else if (sVar.equals("floodrate")) {
-            network->setFloodRate(sValue.toDouble());
+            network->setFloodRate(value.toDouble());
             putModule("FloodRate = " + NoString(network->floodRate()));
         } else if (sVar.equals("floodburst")) {
-            network->setFloodBurst(sValue.toUShort());
+            network->setFloodBurst(value.toUShort());
             putModule("FloodBurst = " + NoString(network->floodBurst()));
         } else if (sVar.equals("joindelay")) {
-            network->setJoinDelay(sValue.toUShort());
+            network->setJoinDelay(value.toUShort());
             putModule("JoinDelay = " + NoString(network->joinDelay()));
 #ifdef HAVE_ICU
         } else if (sVar.equals("encoding")) {
-            network->setEncoding(sValue);
+            network->setEncoding(value);
             putModule("Encoding = " + network->encoding());
 #endif
         } else if (sVar.equals("quitmsg")) {
-            network->setQuitMsg(sValue);
+            network->setQuitMsg(value);
             putModule("QuitMsg = " + network->quitMsg());
         } else {
             putModule("Error: Unknown variable");
@@ -593,7 +593,7 @@ class NoAdminMod : public NoModule
 
     void addChannel(const NoString& line)
     {
-        const NoString sUsername = No::token(line, 1);
+        const NoString username = No::token(line, 1);
         const NoString sNetwork = No::token(line, 2);
         const NoString sChan = No::token(line, 3);
 
@@ -602,7 +602,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -612,20 +612,20 @@ class NoAdminMod : public NoModule
         }
 
         if (network->findChannel(sChan)) {
-            putModule("Error: [" + sUsername + "] already has a channel named [" + sChan + "].");
+            putModule("Error: [" + username + "] already has a channel named [" + sChan + "].");
             return;
         }
 
         NoChannel* channel = new NoChannel(sChan, network, true);
         if (network->addChannel(channel))
-            putModule("Channel [" + channel->name() + "] for user [" + sUsername + "] added.");
+            putModule("channel [" + channel->name() + "] for user [" + username + "] added.");
         else
-            putModule("Could not add channel [" + sChan + "] for user [" + sUsername + "], does it already exist?");
+            putModule("Could not add channel [" + sChan + "] for user [" + username + "], does it already exist?");
     }
 
     void removeChannel(const NoString& line)
     {
-        const NoString sUsername = No::token(line, 1);
+        const NoString username = No::token(line, 1);
         const NoString sNetwork = No::token(line, 2);
         const NoString sChan = No::token(line, 3);
 
@@ -634,7 +634,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -645,7 +645,7 @@ class NoAdminMod : public NoModule
 
         std::vector<NoChannel*> channels = network->findChannels(sChan);
         if (channels.empty()) {
-            putModule("Error: User [" + sUsername + "] does not have any channel matching [" + sChan + "].");
+            putModule("Error: User [" + username + "] does not have any channel matching [" + sChan + "].");
             return;
         }
 
@@ -657,14 +657,14 @@ class NoAdminMod : public NoModule
             network->removeChannel(name);
         }
 
-        putModule("Channel(s) [" + NoString(",").join(vsNames.begin(), vsNames.end()) + "] for user [" + sUsername +
+        putModule("channel(s) [" + NoString(",").join(vsNames.begin(), vsNames.end()) + "] for user [" + username +
                   "] deleted.");
     }
 
     void GetChan(const NoString& line)
     {
         const NoString sVar = No::token(line, 1).toLower();
-        NoString sUsername = No::token(line, 2);
+        NoString username = No::token(line, 2);
         NoString sNetwork = No::token(line, 3);
         NoString sChan = No::tokens(line, 4);
 
@@ -673,7 +673,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -692,22 +692,22 @@ class NoAdminMod : public NoModule
             if (sVar == "defmodes") {
                 putModule(channel->name() + ": DefModes = " + channel->defaultModes());
             } else if (sVar == "buffer") {
-                NoString sValue(channel->bufferCount());
+                NoString value(channel->bufferCount());
                 if (!channel->hasBufferCountSet()) {
-                    sValue += " (default)";
+                    value += " (default)";
                 }
-                putModule(channel->name() + ": Buffer = " + sValue);
+                putModule(channel->name() + ": Buffer = " + value);
             } else if (sVar == "inconfig") {
                 putModule(channel->name() + ": InConfig = " + NoString(channel->inConfig()));
             } else if (sVar == "keepbuffer") {
                 putModule(channel->name() + ": KeepBuffer = " +
                           NoString(!channel->autoClearChanBuffer())); // XXX compatibility crap, added in 0.207
             } else if (sVar == "autoclearchanbuffer") {
-                NoString sValue(channel->autoClearChanBuffer());
+                NoString value(channel->autoClearChanBuffer());
                 if (!channel->hasAutoClearChanBufferSet()) {
-                    sValue += " (default)";
+                    value += " (default)";
                 }
-                putModule(channel->name() + ": AutoClearChanBuffer = " + sValue);
+                putModule(channel->name() + ": AutoClearChanBuffer = " + value);
             } else if (sVar == "detached") {
                 putModule(channel->name() + ": Detached = " + NoString(channel->isDetached()));
             } else if (sVar == "key") {
@@ -722,17 +722,17 @@ class NoAdminMod : public NoModule
     void SetChan(const NoString& line)
     {
         const NoString sVar = No::token(line, 1).toLower();
-        NoString sUsername = No::token(line, 2);
+        NoString username = No::token(line, 2);
         NoString sNetwork = No::token(line, 3);
         NoString sChan = No::token(line, 4);
-        NoString sValue = No::tokens(line, 5);
+        NoString value = No::tokens(line, 5);
 
-        if (sValue.empty()) {
+        if (value.empty()) {
             putModule("Usage: SetChan <variable> <username> <network> <chan> <value>");
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -749,31 +749,31 @@ class NoAdminMod : public NoModule
 
         for (NoChannel* channel : channels) {
             if (sVar == "defmodes") {
-                channel->setDefaultModes(sValue);
-                putModule(channel->name() + ": DefModes = " + sValue);
+                channel->setDefaultModes(value);
+                putModule(channel->name() + ": DefModes = " + value);
             } else if (sVar == "buffer") {
-                uint i = sValue.toUInt();
+                uint i = value.toUInt();
                 // Admins don't have to honour the buffer limit
                 if (channel->setBufferCount(i, NoModule::user()->isAdmin())) {
-                    putModule(channel->name() + ": Buffer = " + sValue);
+                    putModule(channel->name() + ": Buffer = " + value);
                 } else {
                     putModule("Setting failed, limit is " + NoString(noApp->maxBufferSize()));
                     return;
                 }
             } else if (sVar == "inconfig") {
-                bool b = sValue.toBool();
+                bool b = value.toBool();
                 channel->setInConfig(b);
                 putModule(channel->name() + ": InConfig = " + NoString(b));
             } else if (sVar == "keepbuffer") { // XXX compatibility crap, added in 0.207
-                bool b = !sValue.toBool();
+                bool b = !value.toBool();
                 channel->setAutoClearChanBuffer(b);
                 putModule(channel->name() + ": AutoClearChanBuffer = " + NoString(b));
             } else if (sVar == "autoclearchanbuffer") {
-                bool b = sValue.toBool();
+                bool b = value.toBool();
                 channel->setAutoClearChanBuffer(b);
                 putModule(channel->name() + ": AutoClearChanBuffer = " + NoString(b));
             } else if (sVar == "detached") {
-                bool b = sValue.toBool();
+                bool b = value.toBool();
                 if (channel->isDetached() != b) {
                     if (b)
                         channel->detachUser();
@@ -782,8 +782,8 @@ class NoAdminMod : public NoModule
                 }
                 putModule(channel->name() + ": Detached = " + NoString(b));
             } else if (sVar == "key") {
-                channel->setKey(sValue);
-                putModule(channel->name() + ": Key = " + sValue);
+                channel->setKey(value);
+                putModule(channel->name() + ": Key = " + value);
             } else {
                 putModule("Error: Unknown variable");
                 return;
@@ -830,18 +830,18 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sUsername = No::token(line, 1), sPassword = No::token(line, 2);
+        const NoString username = No::token(line, 1), sPassword = No::token(line, 2);
         if (sPassword.empty()) {
             putModule("Usage: AddUser <username> <password>");
             return;
         }
 
-        if (noApp->findUser(sUsername)) {
-            putModule("Error: User [" + sUsername + "] already exists!");
+        if (noApp->findUser(username)) {
+            putModule("Error: User [" + username + "] already exists!");
             return;
         }
 
-        NoUser* pNewUser = new NoUser(sUsername);
+        NoUser* pNewUser = new NoUser(username);
         NoString salt = No::salt();
         pNewUser->setPassword(NoUser::saltedHash(sPassword, salt), NoUser::HashDefault, salt);
 
@@ -852,7 +852,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        putModule("User [" + sUsername + "] added!");
+        putModule("User [" + username + "] added!");
         return;
     }
 
@@ -863,16 +863,16 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        const NoString sUsername = No::tokens(line, 1);
-        if (sUsername.empty()) {
+        const NoString username = No::tokens(line, 1);
+        if (username.empty()) {
             putModule("Usage: DelUser <username>");
             return;
         }
 
-        NoUser* user = noApp->findUser(sUsername);
+        NoUser* user = noApp->findUser(username);
 
         if (!user) {
-            putModule("Error: User [" + sUsername + "] does not exist!");
+            putModule("Error: User [" + username + "] does not exist!");
             return;
         }
 
@@ -887,7 +887,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        putModule("User " + sUsername + " deleted!");
+        putModule("User " + username + " deleted!");
         return;
     }
 
@@ -905,16 +905,16 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* pOldUser = noApp->findUser(sOldUsername);
+        NoUser* oldUser = noApp->findUser(sOldUsername);
 
-        if (!pOldUser) {
+        if (!oldUser) {
             putModule("Error: User [" + sOldUsername + "] not found!");
             return;
         }
 
         NoUser* pNewUser = new NoUser(sNewUsername);
         NoString error;
-        if (!pNewUser->clone(*pOldUser, error)) {
+        if (!pNewUser->clone(*oldUser, error)) {
             delete pNewUser;
             putModule("Error: Cloning failed! [" + error + "]");
             return;
@@ -1049,7 +1049,7 @@ class NoAdminMod : public NoModule
 
     void AddServer(const NoString& line)
     {
-        NoString sUsername = No::token(line, 1);
+        NoString username = No::token(line, 1);
         NoString sNetwork = No::token(line, 2);
         NoString sServer = No::tokens(line, 3);
 
@@ -1058,7 +1058,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -1076,7 +1076,7 @@ class NoAdminMod : public NoModule
 
     void removeServer(const NoString& line)
     {
-        NoString sUsername = No::token(line, 1);
+        NoString username = No::token(line, 1);
         NoString sNetwork = No::token(line, 2);
         NoString sServer = No::tokens(line, 3);
         ushort port = No::token(line, 4).toUShort();
@@ -1087,7 +1087,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -1124,14 +1124,14 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoIrcSocket* pIRCSock = network->ircSocket();
+        NoIrcSocket* socket = network->ircSocket();
         // cancel connection attempt:
-        if (pIRCSock && !pIRCSock->isConnected()) {
-            pIRCSock->close();
+        if (socket && !socket->isConnected()) {
+            socket->close();
         }
         // or close existing connection:
-        else if (pIRCSock) {
-            pIRCSock->quit();
+        else if (socket) {
+            socket->quit();
         }
 
         // then reconnect
@@ -1246,7 +1246,7 @@ class NoAdminMod : public NoModule
             putModule("Error: [" + sCTCPRequest + "] not found for user [" + user->userName() + "]!");
     }
 
-    void LoadModuleFor(NoModuleLoader* Modules, const NoString& sModName, const NoString& args, No::ModuleType eType, NoUser* user, NoNetwork* network)
+    void LoadModuleFor(NoModuleLoader* Modules, const NoString& name, const NoString& args, No::ModuleType type, NoUser* user, NoNetwork* network)
     {
         if (user->denyLoadMod() && !NoModule::user()->isAdmin()) {
             putModule("Loading modules has been disabled.");
@@ -1254,55 +1254,55 @@ class NoAdminMod : public NoModule
         }
 
         NoString sModRet;
-        NoModule* mod = Modules->findModule(sModName);
+        NoModule* mod = Modules->findModule(name);
         if (!mod) {
-            if (!Modules->loadModule(sModName, args, eType, user, network, sModRet)) {
-                putModule("Unable to load module [" + sModName + "] [" + sModRet + "]");
+            if (!Modules->loadModule(name, args, type, user, network, sModRet)) {
+                putModule("Unable to load module [" + name + "] [" + sModRet + "]");
             } else {
-                putModule("Loaded module [" + sModName + "]");
+                putModule("Loaded module [" + name + "]");
             }
         } else if (mod->args() != args) {
-            if (!Modules->reloadModule(sModName, args, user, network, sModRet)) {
-                putModule("Unable to reload module [" + sModName + "] [" + sModRet + "]");
+            if (!Modules->reloadModule(name, args, user, network, sModRet)) {
+                putModule("Unable to reload module [" + name + "] [" + sModRet + "]");
             } else {
-                putModule("Reloaded module [" + sModName + "]");
+                putModule("Reloaded module [" + name + "]");
             }
         } else {
-            putModule("Unable to load module [" + sModName + "] because it is already loaded");
+            putModule("Unable to load module [" + name + "] because it is already loaded");
         }
     }
 
     void LoadModuleForUser(const NoString& line)
     {
-        NoString sUsername = No::token(line, 1);
-        NoString sModName = No::token(line, 2);
+        NoString username = No::token(line, 1);
+        NoString name = No::token(line, 2);
         NoString args = No::tokens(line, 3);
 
-        if (sModName.empty()) {
+        if (name.empty()) {
             putModule("Usage: LoadModule <username> <modulename> [args]");
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
-        LoadModuleFor(user->loader(), sModName, args, No::UserModule, user, nullptr);
+        LoadModuleFor(user->loader(), name, args, No::UserModule, user, nullptr);
     }
 
     void LoadModuleForNetwork(const NoString& line)
     {
-        NoString sUsername = No::token(line, 1);
+        NoString username = No::token(line, 1);
         NoString sNetwork = No::token(line, 2);
-        NoString sModName = No::token(line, 3);
+        NoString name = No::token(line, 3);
         NoString args = No::tokens(line, 4);
 
-        if (sModName.empty()) {
+        if (name.empty()) {
             putModule("Usage: LoadNetModule <username> <network> <modulename> [args]");
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -1311,58 +1311,58 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        LoadModuleFor(network->loader(), sModName, args, No::NetworkModule, user, network);
+        LoadModuleFor(network->loader(), name, args, No::NetworkModule, user, network);
     }
 
-    void UnLoadModuleFor(NoModuleLoader* Modules, const NoString& sModName, NoUser* user)
+    void UnLoadModuleFor(NoModuleLoader* Modules, const NoString& name, NoUser* user)
     {
         if (user->denyLoadMod() && !NoModule::user()->isAdmin()) {
             putModule("Loading modules has been disabled.");
             return;
         }
 
-        if (Modules->findModule(sModName) == this) {
-            putModule("Please use /znc unloadmod " + sModName);
+        if (Modules->findModule(name) == this) {
+            putModule("Please use /znc unloadmod " + name);
             return;
         }
 
         NoString sModRet;
-        if (!Modules->unloadModule(sModName, sModRet)) {
-            putModule("Unable to unload module [" + sModName + "] [" + sModRet + "]");
+        if (!Modules->unloadModule(name, sModRet)) {
+            putModule("Unable to unload module [" + name + "] [" + sModRet + "]");
         } else {
-            putModule("Unloaded module [" + sModName + "]");
+            putModule("Unloaded module [" + name + "]");
         }
     }
 
     void UnLoadModuleForUser(const NoString& line)
     {
-        NoString sUsername = No::token(line, 1);
-        NoString sModName = No::token(line, 2);
+        NoString username = No::token(line, 1);
+        NoString name = No::token(line, 2);
 
-        if (sModName.empty()) {
+        if (name.empty()) {
             putModule("Usage: UnloadModule <username> <modulename>");
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
-        UnLoadModuleFor(user->loader(), sModName, user);
+        UnLoadModuleFor(user->loader(), name, user);
     }
 
     void UnLoadModuleForNetwork(const NoString& line)
     {
-        NoString sUsername = No::token(line, 1);
+        NoString username = No::token(line, 1);
         NoString sNetwork = No::token(line, 2);
-        NoString sModName = No::token(line, 3);
+        NoString name = No::token(line, 3);
 
-        if (sModName.empty()) {
+        if (name.empty()) {
             putModule("Usage: UnloadNetModule <username> <network> <modulename>");
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -1371,7 +1371,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        UnLoadModuleFor(network->loader(), sModName, user);
+        UnLoadModuleFor(network->loader(), name, user);
     }
 
     void ListModulesFor(NoModuleLoader* Modules, const NoString& sWhere)
@@ -1396,14 +1396,14 @@ class NoAdminMod : public NoModule
 
     void ListModulesForUser(const NoString& line)
     {
-        NoString sUsername = No::token(line, 1);
+        NoString username = No::token(line, 1);
 
-        if (sUsername.empty()) {
+        if (username.empty()) {
             putModule("Usage: ListMods <username>");
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -1412,7 +1412,7 @@ class NoAdminMod : public NoModule
 
     void ListModulesForNetwork(const NoString& line)
     {
-        NoString sUsername = No::token(line, 1);
+        NoString username = No::token(line, 1);
         NoString sNetwork = No::token(line, 2);
 
         if (sNetwork.empty()) {
@@ -1420,7 +1420,7 @@ class NoAdminMod : public NoModule
             return;
         }
 
-        NoUser* user = FindUser(sUsername);
+        NoUser* user = FindUser(username);
         if (!user)
             return;
 
@@ -1528,7 +1528,7 @@ public:
                    "<username> <ctcp>",
                    "Remove a CTCP reply");
 
-        // Network commands
+        // network commands
         addCommand("AddNetwork",
                    static_cast<NoModuleCommand::ModCmdFunc>(&NoAdminMod::AddNetwork),
                    "[username] <network>",
@@ -1542,9 +1542,9 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoAdminMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoAdminMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("controlpanel");
+    info.setWikiPage("controlpanel");
 }
 
 USERMODULEDEFS(NoAdminMod, "Dynamic configuration through IRC. Allows editing only yourself if you're not ZNC admin.")

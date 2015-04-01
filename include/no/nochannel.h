@@ -49,23 +49,23 @@ public:
         M_Except = 'e'
     };
 
-    NoChannel(const NoString& name, NoNetwork* network, bool bInConfig, NoSettings* pConfig = nullptr);
+    NoChannel(const NoString& name, NoNetwork* network, bool bInConfig, NoSettings* settings = nullptr);
     ~NoChannel();
 
     void reset();
     NoSettings toConfig() const;
     void clone(NoChannel& chan);
     void cycle() const;
-    void joinUser(const NoString& sKey = "");
+    void joinUser(const NoString& key = "");
     void attachUser(NoClient* client = nullptr);
     void detachUser();
 
     void onWho(const NoString& nick, const NoString& ident, const NoString& host);
 
     void setModes(const NoString& s);
-    void modeChange(const NoString& sModes, const NoNick* OpNick = nullptr);
-    bool addMode(uchar uMode, const NoString& arg);
-    bool remMode(uchar uMode);
+    void modeChange(const NoString& modes, const NoNick* opNick = nullptr);
+    bool addMode(uchar mode, const NoString& arg);
+    bool remMode(uchar mode);
     NoString modeString() const;
     NoString modeArg(NoString& args) const;
     NoString modeForNames() const;
@@ -76,12 +76,12 @@ public:
     int addNicks(const NoString& sNicks);
     bool addNick(const NoString& nick);
     bool remNick(const NoString& nick);
-    bool changeNick(const NoString& sOldNick, const NoString& sNewNick);
+    bool changeNick(const NoString& sOldNick, const NoString& newNick);
 
     const NoBuffer& buffer() const;
     uint bufferCount() const;
-    bool setBufferCount(uint u, bool bForce = false);
-    void inheritBufferCount(uint u, bool bForce = false);
+    bool setBufferCount(uint u, bool force = false);
+    void inheritBufferCount(uint u, bool force = false);
     size_t addBuffer(const NoString& format, const NoString& text = "", const timeval* ts = nullptr);
     void clearBuffer();
     void sendBuffer(NoClient* client);
@@ -110,9 +110,9 @@ public:
     void resetJoinTries();
 
     bool isModeKnown() const;
-    bool hasMode(uchar uMode) const;
+    bool hasMode(uchar mode) const;
     NoString options() const;
-    NoString modeArg(uchar uMode) const;
+    NoString modeArg(uchar mode) const;
     std::map<char, uint> permCounts() const;
     bool isOn() const;
     NoString name() const;

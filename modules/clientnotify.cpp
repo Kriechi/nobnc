@@ -39,12 +39,12 @@ protected:
         registry.setValue("ondisconnect", m_bOnDisconnect ? "1" : "0");
     }
 
-    void SendNotification(const NoString& sMessage)
+    void SendNotification(const NoString& message)
     {
         if (m_sMethod == "message") {
-            user()->putStatus(sMessage, nullptr, client());
+            user()->putStatus(message, nullptr, client());
         } else if (m_sMethod == "notice") {
-            user()->putStatusNotice(sMessage, nullptr, client());
+            user()->putStatusNotice(message, nullptr, client());
         }
     }
 
@@ -70,7 +70,7 @@ public:
                    "Show the current settings");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoRegistry registry(this);
         m_sMethod = registry.value("method");
@@ -159,9 +159,9 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoClientNotifyMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoClientNotifyMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("clientnotify");
+    info.setWikiPage("clientnotify");
 }
 
 USERMODULEDEFS(NoClientNotifyMod,

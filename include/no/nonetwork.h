@@ -39,7 +39,7 @@ public:
     static bool isValidNetwork(const NoString& sNetwork);
 
     NoNetwork(NoUser* user, const NoString& name);
-    NoNetwork(NoUser* user, const NoNetwork& Network);
+    NoNetwork(NoUser* user, const NoNetwork& network);
     ~NoNetwork();
 
     enum {
@@ -54,13 +54,13 @@ public:
         NoTrafficTimeout = 540
     };
 
-    void clone(const NoNetwork& Network, bool bCloneName = true);
+    void clone(const NoNetwork& network, bool cloneName = true);
 
     NoString networkPath() const;
 
     void delServers();
 
-    bool parseConfig(NoSettings* pConfig, NoString& error, bool bUpgrade = false);
+    bool parseConfig(NoSettings* settings, NoString& error, bool bUpgrade = false);
     NoSettings toConfig() const;
 
     bool isUserAttached() const;
@@ -79,9 +79,9 @@ public:
 
     NoModuleLoader* loader() const;
 
-    bool putUser(const NoString& line, NoClient* client = nullptr, NoClient* pSkipClient = nullptr);
-    bool putStatus(const NoString& line, NoClient* client = nullptr, NoClient* pSkipClient = nullptr);
-    bool putModule(const NoString& module, const NoString& line, NoClient* client = nullptr, NoClient* pSkipClient = nullptr);
+    bool putUser(const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
+    bool putStatus(const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
+    bool putModule(const NoString& module, const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
 
     std::vector<NoChannel*> channels() const;
     NoChannel* findChannel(NoString name) const;
@@ -114,8 +114,8 @@ public:
     bool isLastServer() const;
 
     NoStringSet trustedFingerprints() const;
-    void addTrustedFingerprint(const NoString& sFP);
-    void removeTrustedFingerprint(const NoString& sFP);
+    void addTrustedFingerprint(const NoString& fingerprint);
+    void removeTrustedFingerprint(const NoString& fingerprint);
 
     void setEnabled(bool b);
     bool isEnabled() const;
@@ -130,7 +130,7 @@ public:
 
     bool connect();
     bool isIrcConnected() const;
-    void setIrcSocket(NoIrcSocket* pIRCSock);
+    void setIrcSocket(NoIrcSocket* socket);
     void ircConnected();
     void ircDisconnected();
     void checkIrcConnect();
@@ -183,7 +183,7 @@ private:
     void bounceAllClients();
     bool joinChan(NoChannel* channel);
     void joinChannels(std::set<NoChannel*>& sChans);
-    bool loadModule(const NoString& sModName, const NoString& args, const NoString& notice, NoString& error);
+    bool loadModule(const NoString& name, const NoString& args, const NoString& notice, NoString& error);
 
     NoNetwork(const NoNetwork&) = delete;
     NoNetwork& operator=(const NoNetwork&) = delete;

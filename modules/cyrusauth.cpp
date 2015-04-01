@@ -65,7 +65,7 @@ public:
         }
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoStringVector::const_iterator it;
         NoStringVector vsArgs = args.split(" ", No::SkipEmptyParts);
@@ -75,19 +75,19 @@ public:
                 m_sMethod += *it + " ";
             } else {
                 No::printError("Ignoring invalid SASL pwcheck method: " + *it);
-                sMessage = "Ignored invalid SASL pwcheck method";
+                message = "Ignored invalid SASL pwcheck method";
             }
         }
 
         m_sMethod.trimRight();
 
         if (m_sMethod.empty()) {
-            sMessage = "Need a pwcheck method as argument (saslauthd, auxprop)";
+            message = "Need a pwcheck method as argument (saslauthd, auxprop)";
             return false;
         }
 
         if (sasl_server_init(nullptr, nullptr) != SASL_OK) {
-            sMessage = "SASL Could Not Be Initialized - Halting Startup";
+            message = "SASL Could Not Be Initialized - Halting Startup";
             return false;
         }
 
@@ -103,35 +103,35 @@ public:
 
     ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
-        const NoString& sUsername = Auth->username();
+        const NoString& username = Auth->username();
         const NoString& sPassword = Auth->password();
-        NoUser* user(noApp->findUser(sUsername));
+        NoUser* user(noApp->findUser(username));
         sasl_conn_t* sasl_conn(nullptr);
-        bool bSuccess = false;
+        bool success = false;
 
         if (!user && !CreateUser()) {
             return CONTINUE;
         }
 
-        const NoString sCacheKey(No::md5(sUsername + ":" + sPassword));
+        const NoString sCacheKey(No::md5(username + ":" + sPassword));
         if (m_Cache.contains(sCacheKey)) {
-            bSuccess = true;
-            NO_DEBUG("saslauth: Found [" + sUsername + "] in cache");
+            success = true;
+            NO_DEBUG("saslauth: Found [" + username + "] in cache");
         } else if (sasl_server_new("znc", nullptr, nullptr, nullptr, nullptr, m_cbs, 0, &sasl_conn) == SASL_OK &&
-                   sasl_checkpass(sasl_conn, sUsername.c_str(), sUsername.size(), sPassword.c_str(), sPassword.size()) == SASL_OK) {
+                   sasl_checkpass(sasl_conn, username.c_str(), username.size(), sPassword.c_str(), sPassword.size()) == SASL_OK) {
             m_Cache.insert(sCacheKey);
 
-            NO_DEBUG("saslauth: Successful SASL authentication [" + sUsername + "]");
+            NO_DEBUG("saslauth: Successful SASL authentication [" + username + "]");
 
-            bSuccess = true;
+            success = true;
         }
 
         sasl_dispose(&sasl_conn);
 
-        if (bSuccess) {
+        if (success) {
             if (!user) {
                 NoString sErr;
-                user = new NoUser(sUsername);
+                user = new NoUser(username);
 
                 if (ShouldCloneUser()) {
                     NoUser* pBaseUser = noApp->findUser(CloneUser());
@@ -155,7 +155,7 @@ public:
                 }
 
                 if (user && !noApp->addUser(user, sErr)) {
-                    NO_DEBUG("saslauth: Add user [" << sUsername << "] failed: " << sErr);
+                    NO_DEBUG("saslauth: Add user [" << username << "] failed: " << sErr);
                     delete user;
                     user = nullptr;
                 }
@@ -193,11 +193,11 @@ public:
 
     void CloneUserCommand(const NoString& line)
     {
-        NoString sUsername = No::token(line, 1);
+        NoString username = No::token(line, 1);
 
-        if (!sUsername.empty()) {
+        if (!username.empty()) {
             NoRegistry registry(this);
-            registry.setValue("CloneUser", sUsername);
+            registry.setValue("CloneUser", username);
         }
 
         if (ShouldCloneUser()) {
@@ -247,11 +247,11 @@ protected:
 };
 
 template <>
-void no_moduleInfo<NoSaslAuthMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoSaslAuthMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("cyrusauth");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText(
+    info.setWikiPage("cyrusauth");
+    info.setHasArgs(true);
+    info.setArgsHelpText(
     "This global module takes up to two arguments - the methods of authentication - auxprop and saslauthd");
 }
 

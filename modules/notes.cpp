@@ -33,28 +33,28 @@ class NoNotesMod : public NoModule
 
     void AddNoteCommand(const NoString& line)
     {
-        NoString sKey(No::token(line, 1));
-        NoString sValue(No::tokens(line, 2));
+        NoString key(No::token(line, 1));
+        NoString value(No::tokens(line, 2));
 
         NoRegistry registry(this);
-        if (!registry.value(sKey).empty()) {
+        if (!registry.value(key).empty()) {
             putModule("That note already exists.  Use MOD <key> <note> to overwrite.");
-        } else if (AddNote(sKey, sValue)) {
-            putModule("Added note [" + sKey + "]");
+        } else if (AddNote(key, value)) {
+            putModule("Added note [" + key + "]");
         } else {
-            putModule("Unable to add note [" + sKey + "]");
+            putModule("Unable to add note [" + key + "]");
         }
     }
 
     void ModCommand(const NoString& line)
     {
-        NoString sKey(No::token(line, 1));
-        NoString sValue(No::tokens(line, 2));
+        NoString key(No::token(line, 1));
+        NoString value(No::tokens(line, 2));
 
-        if (AddNote(sKey, sValue)) {
-            putModule("Set note for [" + sKey + "]");
+        if (AddNote(key, value)) {
+            putModule("Set note for [" + key + "]");
         } else {
-            putModule("Unable to add note [" + sKey + "]");
+            putModule("Unable to add note [" + key + "]");
         }
     }
 
@@ -72,12 +72,12 @@ class NoNotesMod : public NoModule
 
     void DelCommand(const NoString& line)
     {
-        NoString sKey(No::token(line, 1));
+        NoString key(No::token(line, 1));
 
-        if (DelNote(sKey)) {
-            putModule("Deleted note [" + sKey + "]");
+        if (DelNote(key)) {
+            putModule("Deleted note [" + key + "]");
         } else {
-            putModule("Unable to delete note [" + sKey + "]");
+            putModule("Unable to delete note [" + key + "]");
         }
     }
 
@@ -93,7 +93,7 @@ public:
         addCommand("Get", "<key>", "", [this](const NoString& line) { GetCommand(line); });
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         bShowNotesOnLogin = !args.equals("-disableNotesOnLogin");
         return true;
@@ -117,64 +117,64 @@ public:
             return CONTINUE;
         }
 
-        NoString sKey;
+        NoString key;
         bool bOverwrite = false;
 
         if (line == "#?") {
             ListNotes(true);
             return HALT;
         } else if (line.left(2) == "#-") {
-            sKey = No::token(line, 0).leftChomp_n(2);
-            if (DelNote(sKey)) {
-                putModuleNotice("Deleted note [" + sKey + "]");
+            key = No::token(line, 0).leftChomp_n(2);
+            if (DelNote(key)) {
+                putModuleNotice("Deleted note [" + key + "]");
             } else {
-                putModuleNotice("Unable to delete note [" + sKey + "]");
+                putModuleNotice("Unable to delete note [" + key + "]");
             }
             return HALT;
         } else if (line.left(2) == "#+") {
-            sKey = No::token(line, 0).leftChomp_n(2);
+            key = No::token(line, 0).leftChomp_n(2);
             bOverwrite = true;
         } else if (line.left(1) == "#") {
-            sKey = No::token(line, 0).leftChomp_n(1);
+            key = No::token(line, 0).leftChomp_n(1);
         }
 
-        NoString sValue(No::tokens(line, 1));
+        NoString value(No::tokens(line, 1));
 
-        if (!sKey.empty()) {
-            if (!bOverwrite && NoRegistry(this).contains(sKey)) {
+        if (!key.empty()) {
+            if (!bOverwrite && NoRegistry(this).contains(key)) {
                 putModuleNotice("That note already exists.  Use /#+<key> <note> to overwrite.");
-            } else if (AddNote(sKey, sValue)) {
+            } else if (AddNote(key, value)) {
                 if (!bOverwrite) {
-                    putModuleNotice("Added note [" + sKey + "]");
+                    putModuleNotice("Added note [" + key + "]");
                 } else {
-                    putModuleNotice("Set note for [" + sKey + "]");
+                    putModuleNotice("Set note for [" + key + "]");
                 }
             } else {
-                putModuleNotice("Unable to add note [" + sKey + "]");
+                putModuleNotice("Unable to add note [" + key + "]");
             }
         }
 
         return HALT;
     }
 
-    bool DelNote(const NoString& sKey)
+    bool DelNote(const NoString& key)
     {
         NoRegistry registry(this);
-        if (registry.contains(sKey)) {
-            registry.remove(sKey);
+        if (registry.contains(key)) {
+            registry.remove(key);
             return true;
         }
         return false;
     }
 
-    bool AddNote(const NoString& sKey, const NoString& sNote)
+    bool AddNote(const NoString& key, const NoString& sNote)
     {
-        if (sKey.empty()) {
+        if (key.empty()) {
             return false;
         }
 
         NoRegistry registry(this);
-        registry.setValue(sKey, sNote);
+        registry.setValue(key, sNote);
         return true;
     }
 
@@ -211,25 +211,25 @@ public:
         }
     }
 
-    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "index") {
+        if (page == "index") {
             NoRegistry registry(this);
             for (const NoString& key : registry.keys()) {
-                NoTemplate& Row = Tmpl.addRow("NotesLoop");
+                NoTemplate& Row = tmpl.addRow("NotesLoop");
 
                 Row["Key"] = key;
                 Row["Note"] = registry.value(key);
             }
 
             return true;
-        } else if (sPageName == "delnote") {
-            DelNote(WebSock.param("key", false));
-            WebSock.redirect(webPath());
+        } else if (page == "delnote") {
+            DelNote(socket.param("key", false));
+            socket.redirect(webPath());
             return true;
-        } else if (sPageName == "addnote") {
-            AddNote(WebSock.param("key"), WebSock.param("note"));
-            WebSock.redirect(webPath());
+        } else if (page == "addnote") {
+            AddNote(socket.param("key"), socket.param("note"));
+            socket.redirect(webPath());
             return true;
         }
 
@@ -238,11 +238,11 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoNotesMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoNotesMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("notes");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText(
+    info.setWikiPage("notes");
+    info.setHasArgs(true);
+    info.setArgsHelpText(
     "This user module takes up to one arguments. It can be -disableNotesOnLogin not to show notes upon client login");
 }
 

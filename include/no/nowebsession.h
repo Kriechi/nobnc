@@ -29,7 +29,7 @@ class NoWebSessionPrivate;
 class NO_EXPORT NoWebSession
 {
 public:
-    NoWebSession(const NoString& sId, const NoString& sIP);
+    NoWebSession(const NoString& sId, const NoString& address);
     ~NoWebSession();
 
     NoString host() const;
@@ -43,9 +43,9 @@ public:
     NoUser* setUser(NoUser* p);
 
     void clearMessageLoops();
-    void fillMessageLoops(NoTemplate& Tmpl);
-    size_t addError(const NoString& sMessage);
-    size_t addSuccess(const NoString& sMessage);
+    void fillMessageLoops(NoTemplate& tmpl);
+    size_t addError(const NoString& message);
+    size_t addSuccess(const NoString& message);
 
 private:
     NoWebSession(const NoWebSession& other) = delete;

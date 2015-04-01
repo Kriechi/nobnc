@@ -25,48 +25,48 @@ public:
     {
     }
 
-    ModRet onPrivCtcp(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
     {
-        sMessage = No::stripControls(sMessage);
+        message = No::stripControls(message);
         return CONTINUE;
     }
 
-    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        sMessage = No::stripControls(sMessage);
+        message = No::stripControls(message);
         return CONTINUE;
     }
 
-    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivNotice(NoNick& nick, NoString& message) override
     {
-        sMessage = No::stripControls(sMessage);
+        message = No::stripControls(message);
         return CONTINUE;
     }
 
-    ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        sMessage = No::stripControls(sMessage);
+        message = No::stripControls(message);
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& nick, NoString& message) override
     {
-        sMessage = No::stripControls(sMessage);
+        message = No::stripControls(message);
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        sMessage = No::stripControls(sMessage);
+        message = No::stripControls(message);
         return CONTINUE;
     }
 };
 
 template <>
-void no_moduleInfo<NoStripControlsMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoStripControlsMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("stripcontrols");
-    Info.addType(No::UserModule);
+    info.setWikiPage("stripcontrols");
+    info.addType(No::UserModule);
 }
 
 NETWORKMODULEDEFS(NoStripControlsMod, "Strips control codes (Colors, Bold, ..) from channel and private messages.")

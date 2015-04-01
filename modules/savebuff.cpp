@@ -50,7 +50,7 @@ class NoSaveBuff;
 class NoSaveBuffJob : public NoTimer
 {
 public:
-    NoSaveBuffJob(NoModule* pModule) : NoTimer(pModule)
+    NoSaveBuffJob(NoModule* module) : NoTimer(module)
     {
         setName("SaveBuff");
         setDescription("Saves the current buffer to disk every 1 minute");
@@ -88,7 +88,7 @@ public:
         }
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         if (args == CRYPT_ASK_PASS) {
             char* pPass = getpass("Enter pass for savebuff: ");
@@ -96,7 +96,7 @@ public:
                 m_sPassword = No::md5(pPass);
             else {
                 m_bBootError = true;
-                sMessage = "Nothing retrieved from console. aborting";
+                message = "Nothing retrieved from console. aborting";
             }
         } else if (args.empty())
             m_sPassword = No::md5(CRYPT_LAME_PASS);
@@ -116,8 +116,8 @@ public:
             NoString name;
             NoString sBuffer;
 
-            BufferType eType = DecryptBuffer(pFile->GetLongName(), sBuffer, name);
-            switch (eType) {
+            BufferType type = DecryptBuffer(pFile->GetLongName(), sBuffer, name);
+            switch (type) {
             case InvalidBuffer:
                 m_sPassword = "";
                 No::printError("[" + moduleName() + ".so] Failed to Decrypt [" + pFile->GetLongName() + "]");
@@ -176,9 +176,9 @@ public:
         }
     }
 
-    void SaveBufferToDisk(const NoBuffer& Buffer, const NoString& sPath, const NoString& sHeader)
+    void SaveBufferToDisk(const NoBuffer& Buffer, const NoString& path, const NoString& sHeader)
     {
-        NoFile File(sPath);
+        NoFile File(path);
         NoString sContent = sHeader + "\n";
 
         size_t uSize = Buffer.size();
@@ -204,16 +204,16 @@ public:
 
             const std::vector<NoChannel*>& channels = network()->channels();
             for (NoChannel* channel : channels) {
-                NoString sPath = GetPath(channel->name());
-                SaveBufferToDisk(channel->buffer(), sPath, CHAN_VERIFICATION_TOKEN + channel->name());
-                ssPaths.insert(sPath);
+                NoString path = GetPath(channel->name());
+                SaveBufferToDisk(channel->buffer(), path, CHAN_VERIFICATION_TOKEN + channel->name());
+                ssPaths.insert(path);
             }
 
             const std::vector<NoQuery*>& vQueries = network()->queries();
             for (NoQuery* query : vQueries) {
-                NoString sPath = GetPath(query->name());
-                SaveBufferToDisk(query->buffer(), sPath, QUERY_VERIFICATION_TOKEN + query->name());
-                ssPaths.insert(sPath);
+                NoString path = GetPath(query->name());
+                SaveBufferToDisk(query->buffer(), path, QUERY_VERIFICATION_TOKEN + query->name());
+                ssPaths.insert(path);
             }
 
             // cleanup leftovers ie. cleared buffers
@@ -297,20 +297,20 @@ public:
         putUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Playback Complete.");
     }
 
-    NoString GetPath(const NoString& sTarget) const
+    NoString GetPath(const NoString& target) const
     {
-        NoString sBuffer = user()->userName() + sTarget.toLower();
+        NoString sBuffer = user()->userName() + target.toLower();
         NoString ret = savePath();
         ret += "/" + No::md5(sBuffer);
         return (ret);
     }
 
-    NoString FindLegacyBufferName(const NoString& sPath) const
+    NoString FindLegacyBufferName(const NoString& path) const
     {
         const std::vector<NoChannel*>& channels = network()->channels();
         for (NoChannel* channel : channels) {
             const NoString& name = channel->name();
-            if (GetPath(name).equals(sPath)) {
+            if (GetPath(name).equals(path)) {
                 return name;
             }
         }
@@ -318,9 +318,9 @@ public:
     }
 
 #ifdef LEGACY_SAVEBUFF /* event logging is deprecated now in savebuf. Use buffextras module along side of this */
-    NoString SpoofChanMsg(const NoString& sChannel, const NoString& sMesg)
+    NoString SpoofChanMsg(const NoString& channel, const NoString& sMesg)
     {
-        NoString sReturn = ":*" + moduleName() + "!znc@znc.in PRIVMSG " + sChannel + " :" + NoString(time(nullptr)) + " " + sMesg;
+        NoString sReturn = ":*" + moduleName() + "!znc@znc.in PRIVMSG " + channel + " :" + NoString(time(nullptr)) + " " + sMesg;
         return (sReturn);
     }
 
@@ -332,28 +332,28 @@ public:
         chan.AddBuffer(line);
     }
 
-    void onRawMode(const NoNick& cOpNick, NoChannel& cChannel, const NoString& sModes, const NoString& args) override
+    void onRawMode(const NoNick& cOpNick, NoChannel& cChannel, const NoString& modes, const NoString& args) override
     {
-        AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cOpNick.GetNickMask() + " MODE " + sModes + " " + args));
+        AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), cOpNick.GetNickMask() + " MODE " + modes + " " + args));
     }
-    void onQuit(const NoNick& cNick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& cNick, const NoString& message, const std::vector<NoChannel*>& channels) override
     {
         for (size_t a = 0; a < channels.size(); a++) {
-            AddBuffer(*channels[a], SpoofChanMsg(channels[a]->GetName(), cNick.GetNickMask() + " QUIT " + sMessage));
+            AddBuffer(*channels[a], SpoofChanMsg(channels[a]->GetName(), cNick.GetNickMask() + " QUIT " + message));
         }
         if (cNick.NickEquals(user()->nick()))
             SaveBuffersToDisk(); // need to force a save here to see this!
     }
 
-    void onNick(const NoNick& cNick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& cNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
     {
         for (size_t a = 0; a < channels.size(); a++) {
-            AddBuffer(*channels[a], SpoofChanMsg(channels[a]->GetName(), cNick.GetNickMask() + " NICK " + sNewNick));
+            AddBuffer(*channels[a], SpoofChanMsg(channels[a]->GetName(), cNick.GetNickMask() + " NICK " + newNick));
         }
     }
-    void onKick(const NoNick& cNick, const NoString& sOpNick, NoChannel& cChannel, const NoString& sMessage) override
+    void onKick(const NoNick& cNick, const NoString& opNick, NoChannel& cChannel, const NoString& message) override
     {
-        AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), sOpNick + " KICK " + cNick.GetNickMask() + " " + sMessage));
+        AddBuffer(cChannel, SpoofChanMsg(cChannel.GetName(), opNick + " KICK " + cNick.GetNickMask() + " " + message));
     }
     void onJoin(const NoNick& cNick, NoChannel& cChannel) override
     {
@@ -378,14 +378,14 @@ private:
 
     enum BufferType { InvalidBuffer = 0, EmptyBuffer, ChanBuffer, QueryBuffer };
 
-    BufferType DecryptBuffer(const NoString& sPath, NoString& sBuffer, NoString& name)
+    BufferType DecryptBuffer(const NoString& path, NoString& sBuffer, NoString& name)
     {
         NoString sContent;
         sBuffer = "";
 
-        NoFile File(sPath);
+        NoFile File(path);
 
-        if (sPath.empty() || !File.Open() || !File.ReadFile(sContent))
+        if (path.empty() || !File.Open() || !File.ReadFile(sContent))
             return EmptyBuffer;
 
         File.Close();
@@ -394,7 +394,7 @@ private:
             sBuffer = No::decrypt(sContent, m_sPassword);
 
             if (sBuffer.trimPrefix(LEGACY_VERIFICATION_TOKEN)) {
-                name = FindLegacyBufferName(sPath);
+                name = FindLegacyBufferName(path);
                 return ChanBuffer;
             } else if (sBuffer.trimPrefix(CHAN_VERIFICATION_TOKEN)) {
                 name = No::firstLine(sBuffer);
@@ -406,7 +406,7 @@ private:
                     return QueryBuffer;
             }
 
-            putModule("Unable to decode Encrypted file [" + sPath + "]");
+            putModule("Unable to decode Encrypted file [" + path + "]");
             return InvalidBuffer;
         }
         return EmptyBuffer;
@@ -420,11 +420,11 @@ void NoSaveBuffJob::run()
 }
 
 template <>
-void no_moduleInfo<NoSaveBuff>(NoModuleInfo& Info)
+void no_moduleInfo<NoSaveBuff>(NoModuleInfo& info)
 {
-    Info.setWikiPage("savebuff");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("This user module takes up to one arguments. Either --ask-pass or the password itself (which "
+    info.setWikiPage("savebuff");
+    info.setHasArgs(true);
+    info.setArgsHelpText("This user module takes up to one arguments. Either --ask-pass or the password itself (which "
                          "may contain spaces) or nothing");
 }
 

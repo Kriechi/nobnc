@@ -81,7 +81,7 @@ public:
         onBoot();
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         onBoot();
 
@@ -105,9 +105,9 @@ public:
         return registry.save();
     }
 
-    bool AddKey(NoUser* user, const NoString& sKey)
+    bool AddKey(NoUser* user, const NoString& key)
     {
-        const std::pair<NoStringSet::const_iterator, bool> pair = m_PubKeys[user->userName()].insert(sKey.toLower());
+        const std::pair<NoStringSet::const_iterator, bool> pair = m_PubKeys[user->userName()].insert(key.toLower());
 
         if (pair.second) {
             Save();
@@ -119,13 +119,13 @@ public:
     ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         const NoString sUser = Auth->username();
-        NoSocket* pSock = Auth->socket();
+        NoSocket* socket = Auth->socket();
         NoUser* user = noApp->findUser(sUser);
 
-        if (pSock == nullptr || user == nullptr)
+        if (socket == nullptr || user == nullptr)
             return CONTINUE;
 
-        const NoString sPubKey = GetKey(pSock);
+        const NoString sPubKey = GetKey(socket);
         NO_DEBUG("User: " << sUser << " Key: " << sPubKey);
 
         if (sPubKey.empty()) {
@@ -238,10 +238,10 @@ public:
         Save();
     }
 
-    NoString GetKey(NoSocket* pSock)
+    NoString GetKey(NoSocket* socket)
     {
         NoString sRes;
-        long int res = pSock->peerFingerprint(sRes);
+        long int res = socket->peerFingerprint(sRes);
 
         NO_DEBUG("GetKey() returned status " << res << " with key " << sRes);
 
@@ -262,28 +262,28 @@ public:
         return "certauth";
     }
 
-    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        NoUser* user = WebSock.session()->user();
+        NoUser* user = socket.session()->user();
 
-        if (sPageName == "index") {
+        if (page == "index") {
             MNoStringSet::const_iterator it = m_PubKeys.find(user->userName());
             if (it != m_PubKeys.end()) {
                 for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-                    NoTemplate& row = Tmpl.addRow("KeyLoop");
+                    NoTemplate& row = tmpl.addRow("KeyLoop");
                     row["Key"] = *it2;
                 }
             }
 
             return true;
-        } else if (sPageName == "add") {
-            AddKey(user, WebSock.param("key"));
-            WebSock.redirect(webPath());
+        } else if (page == "add") {
+            AddKey(user, socket.param("key"));
+            socket.redirect(webPath());
             return true;
-        } else if (sPageName == "delete") {
+        } else if (page == "delete") {
             MNoStringSet::iterator it = m_PubKeys.find(user->userName());
             if (it != m_PubKeys.end()) {
-                if (it->second.erase(WebSock.param("key", false))) {
+                if (it->second.erase(socket.param("key", false))) {
                     if (it->second.size() == 0) {
                         m_PubKeys.erase(it);
                     }
@@ -292,7 +292,7 @@ public:
                 }
             }
 
-            WebSock.redirect(webPath());
+            socket.redirect(webPath());
             return true;
         }
 
@@ -306,9 +306,9 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoSslClientCertMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoSslClientCertMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("certauth");
+    info.setWikiPage("certauth");
 }
 
 GLOBALMODULEDEFS(NoSslClientCertMod, "Allow users to authenticate via SSL client certificates.")

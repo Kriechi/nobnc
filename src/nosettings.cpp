@@ -85,13 +85,13 @@ NoSettings::SubConfigMapIterator NoSettings::EndSubConfigs() const
     return m_subConfigs.end();
 }
 
-void NoSettings::AddKeyValuePair(const NoString& name, const NoString& sValue)
+void NoSettings::AddKeyValuePair(const NoString& name, const NoString& value)
 {
-    if (name.empty() || sValue.empty()) {
+    if (name.empty() || value.empty()) {
         return;
     }
 
-    m_entries[name].push_back(sValue);
+    m_entries[name].push_back(value);
 }
 
 bool NoSettings::AddSubConfig(const NoString& sTag, const NoString& name, NoSettings Config)
@@ -247,15 +247,15 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
             line.trim();
 
             NoString sTag = No::token(line, 0);
-            NoString sValue = No::tokens(line, 1);
+            NoString value = No::tokens(line, 1);
 
             sTag.trim();
-            sValue.trim();
+            value.trim();
 
             if (sTag.left(1) == "/") {
                 sTag = sTag.substr(1);
 
-                if (!sValue.empty())
+                if (!value.empty())
                     ERROR("Malformated closing tag. Expected \"</" << sTag << ">\".");
                 if (ConfigStack.empty())
                     ERROR("Closing tag \"" << sTag << "\" which is not open.");
@@ -283,9 +283,9 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 
                 conf[name] = NoSettingsEntry(myConfig);
             } else {
-                if (sValue.empty())
+                if (value.empty())
                     ERROR("Empty block name at begin of block.");
-                ConfigStack.push(ConfigStackEntry(sTag.toLower(), sValue));
+                ConfigStack.push(ConfigStackEntry(sTag.toLower(), value));
                 pActiveConfig = &ConfigStack.top().Config;
             }
 
@@ -294,22 +294,22 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
 
         // If we have a regular line, figure out where it goes
         NoString name = No::token(line, 0, "=");
-        NoString sValue = No::tokens(line, 1, "=");
+        NoString value = No::tokens(line, 1, "=");
 
         // Only remove the first space, people might want
         // leading spaces (e.g. in the MOTD).
-        if (sValue.left(1) == " ")
-            sValue.leftChomp(1);
+        if (value.left(1) == " ")
+            value.leftChomp(1);
 
         // We don't have any names with spaces, trim all
         // leading/trailing spaces.
         name.trim();
 
-        if (name.empty() || sValue.empty())
+        if (name.empty() || value.empty())
             ERROR("Malformed line");
 
         NoString sNameLower = name.toLower();
-        pActiveConfig->m_entries[sNameLower].push_back(sValue);
+        pActiveConfig->m_entries[sNameLower].push_back(value);
     }
 
     if (bCommented)
@@ -328,8 +328,8 @@ void NoSettings::Write(NoFile& File, uint iIndentation)
     NoString sIndentation = NoString(iIndentation, '\t');
 
     for (const auto& it : m_entries) {
-        for (const NoString& sValue : it.second) {
-            File.Write(sIndentation + it.first + " = " + sValue + "\n");
+        for (const NoString& value : it.second) {
+            File.Write(sIndentation + it.first + " = " + value + "\n");
         }
     }
 

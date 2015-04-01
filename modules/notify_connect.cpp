@@ -46,9 +46,9 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoNotifyConnectMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoNotifyConnectMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("notify_connect");
+    info.setWikiPage("notify_connect");
 }
 
 GLOBALMODULEDEFS(NoNotifyConnectMod, "Notifies all admin users when a client connects or disconnects.")

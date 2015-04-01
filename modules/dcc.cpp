@@ -38,7 +38,7 @@ public:
 
     void readData(const char* data, size_t len) override;
     void onConnectionRefused() override;
-    void onSocketError(int iErrno, const NoString& sDescription) override;
+    void onSocketError(int iErrno, const NoString& description) override;
     void onTimeout() override;
     void onConnected() override;
     void onDisconnected() override;
@@ -125,10 +125,10 @@ public:
     }
 
 #ifndef MOD_DCC_ALLOW_EVERYONE
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         if (!user()->isAdmin()) {
-            sMessage = "You must be admin to use the DCC module";
+            message = "You must be admin to use the DCC module";
             return false;
         }
 
@@ -136,21 +136,21 @@ public:
     }
 #endif
 
-    bool SendFile(const NoString& sRemoteNick, const NoString& sFileName)
+    bool SendFile(const NoString& sRemoteNick, const NoString& fileName)
     {
-        NoString sFullPath = NoDir(savePath()).filePath(sFileName);
-        NoDccSock* pSock = new NoDccSock(this, sRemoteNick, sFullPath);
+        NoString sFullPath = NoDir(savePath()).filePath(fileName);
+        NoDccSock* socket = new NoDccSock(this, sRemoteNick, sFullPath);
 
-        NoFile* pFile = pSock->OpenFile(false);
+        NoFile* pFile = socket->OpenFile(false);
 
         if (!pFile) {
-            delete pSock;
+            delete socket;
             return false;
         }
 
         NoString sLocalDCCIP = user()->localDccIp();
         ushort port =
-        noApp->manager()->listenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, pSock, 120);
+        noApp->manager()->listenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, socket, 120);
 
         if (user()->nick().equals(sRemoteNick)) {
             putUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
@@ -164,23 +164,23 @@ public:
         return true;
     }
 
-    bool GetFile(const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sFileName, ulong uFileSize)
+    bool GetFile(const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& fileName, ulong uFileSize)
     {
-        if (NoFile::Exists(sFileName)) {
-            putModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - File already exists.");
+        if (NoFile::Exists(fileName)) {
+            putModule("DCC <- [" + sRemoteNick + "][" + fileName + "] - File already exists.");
             return false;
         }
 
-        NoDccSock* pSock = new NoDccSock(this, sRemoteNick, sRemoteIP, uRemotePort, sFileName, uFileSize);
+        NoDccSock* socket = new NoDccSock(this, sRemoteNick, sRemoteIP, uRemotePort, fileName, uFileSize);
 
-        if (!pSock->OpenFile()) {
-            delete pSock;
+        if (!socket->OpenFile()) {
+            delete socket;
             return false;
         }
 
-        noApp->manager()->connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, user()->localDccIp(), pSock);
+        noApp->manager()->connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, 60, false, user()->localDccIp(), socket);
 
-        putModule("DCC <- [" + sRemoteNick + "][" + sFileName + "] - Attempting to connect to [" + sRemoteIP + "]");
+        putModule("DCC <- [" + sRemoteNick + "][" + fileName + "] - Attempting to connect to [" + sRemoteIP + "]");
         return true;
     }
 
@@ -229,23 +229,23 @@ public:
         Table.addColumn("IP");
         Table.addColumn("File");
 
-        for (NoDccSock* pSock : m_sockets) {
+        for (NoDccSock* socket : m_sockets) {
             Table.addRow();
-            Table.setValue("Nick", pSock->GetRemoteNick());
-            Table.setValue("IP", pSock->remoteAddress());
-            Table.setValue("File", pSock->GetFileName());
+            Table.setValue("Nick", socket->GetRemoteNick());
+            Table.setValue("IP", socket->remoteAddress());
+            Table.setValue("File", socket->GetFileName());
 
-            if (pSock->IsSend()) {
+            if (socket->IsSend()) {
                 Table.setValue("Type", "Sending");
             } else {
                 Table.setValue("Type", "Getting");
             }
 
-            if (pSock->isListener()) {
+            if (socket->isListener()) {
                 Table.setValue("State", "Waiting");
             } else {
-                Table.setValue("State", No::toPercent(pSock->GetProgress()));
-                Table.setValue("Speed", NoString((int)(pSock->averageReadSpeed() / 1024.0)) + " KiB/s");
+                Table.setValue("State", No::toPercent(socket->GetProgress()));
+                Table.setValue("Speed", NoString((int)(socket->averageReadSpeed() / 1024.0)) + " KiB/s");
             }
         }
 
@@ -254,17 +254,17 @@ public:
         }
     }
 
-    void onModCTCP(const NoString& sMessage) override
+    void onModCTCP(const NoString& message) override
     {
-        if (sMessage.startsWith("DCC RESUME ")) {
-            NoString sFile = No::token(sMessage, 2);
-            ushort uResumePort = No::token(sMessage, 3).toUShort();
-            ulong uResumeSize = No::token(sMessage, 4).toULong();
+        if (message.startsWith("DCC RESUME ")) {
+            NoString sFile = No::token(message, 2);
+            ushort uResumePort = No::token(message, 3).toUShort();
+            ulong uResumeSize = No::token(message, 4).toULong();
 
-            for (NoDccSock* pSock : m_sockets) {
-                if (pSock->localPort() == uResumePort) {
-                    if (pSock->Seek(uResumeSize)) {
-                        putModule("DCC -> [" + pSock->GetRemoteNick() + "][" + pSock->GetFileName() +
+            for (NoDccSock* socket : m_sockets) {
+                if (socket->localPort() == uResumePort) {
+                    if (socket->Seek(uResumeSize)) {
+                        putModule("DCC -> [" + socket->GetRemoteNick() + "][" + socket->GetFileName() +
                                   "] - Attempting to resume from file position [" + NoString(uResumeSize) + "]");
                         putUser(":*dcc!znc@znc.in PRIVMSG " + user()->nick() + " :\001DCC ACCEPT " + sFile + " " +
                                 NoString(uResumePort) + " " + NoString(uResumeSize) + "\001");
@@ -274,15 +274,15 @@ public:
                     }
                 }
             }
-        } else if (sMessage.startsWith("DCC SEND ")) {
+        } else if (message.startsWith("DCC SEND ")) {
             NoDir saveDir(savePath());
-            NoString sFile = No::token(sMessage, 2);
+            NoString sFile = No::token(message, 2);
             if (!saveDir.isParent(sFile)) {
-                putModule("Bad DCC file: " + No::token(sMessage, 2));
+                putModule("Bad DCC file: " + No::token(message, 2));
             }
-            ulong uLongIP = No::token(sMessage, 3).toULong();
-            ushort port = No::token(sMessage, 4).toUShort();
-            ulong uFileSize = No::token(sMessage, 5).toULong();
+            ulong uLongIP = No::token(message, 3).toULong();
+            ushort port = No::token(message, 4).toUShort();
+            ulong uFileSize = No::token(message, 5).toULong();
             NoString sLocalFile = saveDir.filePath(sFile);
             GetFile(client()->nick(), No::formatIp(uLongIP), port, sLocalFile, uFileSize);
         }
@@ -394,11 +394,11 @@ void NoDccSock::onTimeout()
     m_module->putModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName + "] - Timed Out.");
 }
 
-void NoDccSock::onSocketError(int iErrno, const NoString& sDescription)
+void NoDccSock::onSocketError(int iErrno, const NoString& description)
 {
-    NO_DEBUG(name() << " == SockError(" << iErrno << ", " << sDescription << ")");
+    NO_DEBUG(name() << " == SockError(" << iErrno << ", " << description << ")");
     m_module->putModule(((m_bSend) ? "DCC -> [" : "DCC <- [") + m_sRemoteNick + "][" + m_sFileName +
-                        "] - Socket Error [" + sDescription + "]");
+                        "] - Socket Error [" + description + "]");
 }
 
 void NoDccSock::onConnected()
@@ -472,14 +472,14 @@ NoSocket* NoDccSock::createSocket(const NoString& host, ushort port)
 {
     close();
 
-    NoDccSock* pSock = new NoDccSock(m_module, m_sRemoteNick, m_sLocalFile, m_uFileSize, m_pFile);
-    pSock->setName("DCC::SEND::" + m_sRemoteNick);
-    pSock->setTimeout(120);
-    pSock->SetFileName(m_sFileName);
-    pSock->SetFileOffset(m_uBytesSoFar);
+    NoDccSock* socket = new NoDccSock(m_module, m_sRemoteNick, m_sLocalFile, m_uFileSize, m_pFile);
+    socket->setName("DCC::SEND::" + m_sRemoteNick);
+    socket->setTimeout(120);
+    socket->SetFileName(m_sFileName);
+    socket->SetFileOffset(m_uBytesSoFar);
     m_bNoDelFile = true;
 
-    return pSock;
+    return socket;
 }
 
 NoFile* NoDccSock::OpenFile(bool bWrite)
@@ -552,9 +552,9 @@ bool NoDccSock::Seek(ulong uPos)
 }
 
 template <>
-void no_moduleInfo<NoDccMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoDccMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("dcc");
+    info.setWikiPage("dcc");
 }
 
 USERMODULEDEFS(NoDccMod, "This module allows you to transfer files to and from ZNC")

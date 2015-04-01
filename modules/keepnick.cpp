@@ -48,7 +48,7 @@ public:
                    "Show the current state");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         m_pTimer = nullptr;
 
@@ -65,13 +65,13 @@ public:
             // No timer means we are turned off
             return;
 
-        NoIrcSocket* pIRCSock = network()->ircSocket();
+        NoIrcSocket* socket = network()->ircSocket();
 
-        if (!pIRCSock)
+        if (!socket)
             return;
 
         // Do we already have the nick we want?
-        if (pIRCSock->nick().equals(GetNick()))
+        if (socket->nick().equals(GetNick()))
             return;
 
         putIrc("NICK " + GetNick());
@@ -80,24 +80,24 @@ public:
     NoString GetNick()
     {
         NoString sConfNick = network()->nick();
-        NoIrcSocket* pIRCSock = network()->ircSocket();
+        NoIrcSocket* socket = network()->ircSocket();
 
-        if (pIRCSock)
-            sConfNick = sConfNick.left(pIRCSock->maxNickLen());
+        if (socket)
+            sConfNick = sConfNick.left(socket->maxNickLen());
 
         return sConfNick;
     }
 
-    void onNick(const NoNick& Nick, const NoString& sNewNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& nick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
     {
-        if (sNewNick == network()->ircSocket()->nick()) {
+        if (newNick == network()->ircSocket()->nick()) {
             // We are changing our own nick
-            if (Nick.equals(GetNick())) {
+            if (nick.equals(GetNick())) {
                 // We are changing our nick away from the conf setting.
                 // Let's assume the user wants this and disable
                 // this module (to avoid fighting nickserv).
                 Disable();
-            } else if (sNewNick.equals(GetNick())) {
+            } else if (newNick.equals(GetNick())) {
                 // We are changing our nick to the conf setting,
                 // so we don't need that timer anymore.
                 Disable();
@@ -106,15 +106,15 @@ public:
         }
 
         // If the nick we want is free now, be fast and get the nick
-        if (Nick.equals(GetNick())) {
+        if (nick.equals(GetNick())) {
             KeepNick();
         }
     }
 
-    void onQuit(const NoNick& Nick, const NoString& sMessage, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
     {
         // If someone with the nick we want quits, be fast and get the nick
-        if (Nick.equals(GetNick())) {
+        if (nick.equals(GetNick())) {
             KeepNick();
         }
     }
@@ -226,9 +226,9 @@ void NoKeepNickTimer::run()
 }
 
 template <>
-void no_moduleInfo<NoKeepNickMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoKeepNickMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("keepnick");
+    info.setWikiPage("keepnick");
 }
 
 NETWORKMODULEDEFS(NoKeepNickMod, "Keep trying for your primary nick")

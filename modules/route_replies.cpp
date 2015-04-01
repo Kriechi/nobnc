@@ -188,7 +188,7 @@ static const struct
 class NoRouteTimeout : public NoTimer
 {
 public:
-    NoRouteTimeout(NoModule* pModule) : NoTimer(pModule)
+    NoRouteTimeout(NoModule* module) : NoTimer(module)
     {
         setName("RouteTimeout");
         setDescription("Recover from missing / wrong server replies");
@@ -444,15 +444,15 @@ private:
 
     void SilentCommand(const NoString& line)
     {
-        const NoString sValue = No::token(line, 1);
+        const NoString value = No::token(line, 1);
 
         NoRegistry registry(this);
-        if (!sValue.empty()) {
-            registry.setValue("silent_timeouts", sValue);
+        if (!value.empty()) {
+            registry.setValue("silent_timeouts", value);
         }
 
-        NoString sPrefix = registry.value("silent_timeouts").toBool() ? "dis" : "en";
-        putModule("Timeout messages are " + sPrefix + "abled.");
+        NoString prefix = registry.value("silent_timeouts").toBool() ? "dis" : "en";
+        putModule("Timeout messages are " + prefix + "abled.");
     }
 
     NoClient* m_pDoing;
@@ -468,9 +468,9 @@ void NoRouteTimeout::run()
 }
 
 template <>
-void no_moduleInfo<NoRouteRepliesMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoRouteRepliesMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("route_replies");
+    info.setWikiPage("route_replies");
 }
 
 NETWORKMODULEDEFS(NoRouteRepliesMod, "Send replies (e.g. to /who) to the right client only")

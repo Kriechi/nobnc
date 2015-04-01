@@ -23,11 +23,11 @@
 class NoAttachMatch
 {
 public:
-    NoAttachMatch(NoModule* pModule, const NoString& sChannels, const NoString& sSearch, const NoString& sHostmasks, bool bNegated)
+    NoAttachMatch(NoModule* module, const NoString& sChannels, const NoString& search, const NoString& sHostmasks, bool bNegated)
     {
-        m_pModule = pModule;
+        m_pModule = module;
         m_sChannelWildcard = sChannels;
-        m_sSearchWildcard = sSearch;
+        m_sSearchWildcard = search;
         m_sHostmaskWildcard = sHostmasks;
         m_bNegated = bNegated;
 
@@ -39,13 +39,13 @@ public:
             m_sHostmaskWildcard = "*!*@*";
     }
 
-    bool IsMatch(const NoString& sChan, const NoString& host, const NoString& sMessage) const
+    bool IsMatch(const NoString& sChan, const NoString& host, const NoString& message) const
     {
         if (!No::wildCmp(host, m_sHostmaskWildcard, No::CaseInsensitive))
             return false;
         if (!No::wildCmp(sChan, m_sChannelWildcard, No::CaseInsensitive))
             return false;
-        if (!No::wildCmp(sMessage, m_pModule->expandString(m_sSearchWildcard), No::CaseInsensitive))
+        if (!No::wildCmp(message, m_pModule->expandString(m_sSearchWildcard), No::CaseInsensitive))
             return false;
         return true;
     }
@@ -100,16 +100,16 @@ public:
 private:
     void HandleAdd(const NoString& line)
     {
-        NoString sMsg = No::tokens(line, 1);
+        NoString msg = No::tokens(line, 1);
         bool bHelp = false;
-        bool bNegated = sMsg.trimPrefix("!");
-        NoString sChan = No::token(sMsg, 0);
-        NoString sSearch = No::token(sMsg, 1);
-        NoString host = No::token(sMsg, 2);
+        bool bNegated = msg.trimPrefix("!");
+        NoString sChan = No::token(msg, 0);
+        NoString search = No::token(msg, 1);
+        NoString host = No::token(msg, 2);
 
         if (sChan.empty()) {
             bHelp = true;
-        } else if (Add(bNegated, sChan, sSearch, host)) {
+        } else if (Add(bNegated, sChan, search, host)) {
             putModule("Added to list");
         } else {
             putModule(No::tokens(line, 1) + " is already added");
@@ -123,13 +123,13 @@ private:
 
     void HandleDel(const NoString& line)
     {
-        NoString sMsg = No::tokens(line, 1);
-        bool bNegated = sMsg.trimPrefix("!");
-        NoString sChan = No::token(sMsg, 0);
-        NoString sSearch = No::token(sMsg, 1);
-        NoString host = No::token(sMsg, 2);
+        NoString msg = No::tokens(line, 1);
+        bool bNegated = msg.trimPrefix("!");
+        NoString sChan = No::token(msg, 0);
+        NoString search = No::token(msg, 1);
+        NoString host = No::token(msg, 2);
 
-        if (Del(bNegated, sChan, sSearch, host)) {
+        if (Del(bNegated, sChan, search, host)) {
             putModule("Removed " + sChan + " from list");
         } else {
             putModule("Usage: Del [!]<#chan> <search> <host>");
@@ -140,7 +140,7 @@ private:
     {
         NoTable Table;
         Table.addColumn("Neg");
-        Table.addColumn("Chan");
+        Table.addColumn("Channel");
         Table.addColumn("Search");
         Table.addColumn("Host");
 
@@ -148,7 +148,7 @@ private:
         for (; it != m_vMatches.end(); ++it) {
             Table.addRow();
             Table.setValue("Neg", it->IsNegated() ? "!" : "");
-            Table.setValue("Chan", it->channels());
+            Table.setValue("Channel", it->channels());
             Table.setValue("Search", it->GetSearch());
             Table.setValue("Host", it->GetHostMask());
         }
@@ -178,7 +178,7 @@ public:
                    "List all entries");
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoStringVector vsChans = args.split(" ", No::SkipEmptyParts);
 
@@ -186,10 +186,10 @@ public:
             NoString sAdd = *it;
             bool bNegated = sAdd.trimPrefix("!");
             NoString sChan = No::token(sAdd, 0);
-            NoString sSearch = No::token(sAdd, 1);
+            NoString search = No::token(sAdd, 1);
             NoString host = No::tokens(sAdd, 2);
 
-            if (!Add(bNegated, sChan, sSearch, host)) {
+            if (!Add(bNegated, sChan, search, host)) {
                 putModule("Unable to add [" + *it + "]");
             }
         }
@@ -200,65 +200,65 @@ public:
             NoString str = key;
             bool bNegated = str.trimPrefix("!");
             NoString sChan = No::token(str, 0);
-            NoString sSearch = No::token(str, 1);
+            NoString search = No::token(str, 1);
             NoString host = No::tokens(str, 2);
 
-            Add(bNegated, sChan, sSearch, host);
+            Add(bNegated, sChan, search, host);
         }
 
         return true;
     }
 
-    void TryAttach(const NoNick& Nick, NoChannel& Channel, NoString& Message)
+    void TryAttach(const NoNick& nick, NoChannel& channel, NoString& Message)
     {
-        const NoString& sChan = Channel.name();
-        const NoString& host = Nick.hostMask();
-        const NoString& sMessage = Message;
+        const NoString& sChan = channel.name();
+        const NoString& host = nick.hostMask();
+        const NoString& message = Message;
         VAttachIter it;
 
-        if (!Channel.isDetached())
+        if (!channel.isDetached())
             return;
 
         // Any negated match?
         for (it = m_vMatches.begin(); it != m_vMatches.end(); ++it) {
-            if (it->IsNegated() && it->IsMatch(sChan, host, sMessage))
+            if (it->IsNegated() && it->IsMatch(sChan, host, message))
                 return;
         }
 
         // Now check for a positive match
         for (it = m_vMatches.begin(); it != m_vMatches.end(); ++it) {
-            if (!it->IsNegated() && it->IsMatch(sChan, host, sMessage)) {
-                Channel.attachUser();
+            if (!it->IsNegated() && it->IsMatch(sChan, host, message)) {
+                channel.attachUser();
                 return;
             }
         }
     }
 
-    ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        TryAttach(Nick, Channel, sMessage);
+        TryAttach(nick, channel, message);
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        TryAttach(Nick, Channel, sMessage);
+        TryAttach(nick, channel, message);
         return CONTINUE;
     }
 
-    ModRet onChanAction(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanAction(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        TryAttach(Nick, Channel, sMessage);
+        TryAttach(nick, channel, message);
         return CONTINUE;
     }
 
-    VAttachIter FindEntry(const NoString& sChan, const NoString& sSearch, const NoString& host)
+    VAttachIter FindEntry(const NoString& sChan, const NoString& search, const NoString& host)
     {
         VAttachIter it = m_vMatches.begin();
         for (; it != m_vMatches.end(); ++it) {
             if (host.empty() || it->GetHostMask() != host)
                 continue;
-            if (sSearch.empty() || it->GetSearch() != sSearch)
+            if (search.empty() || it->GetSearch() != search)
                 continue;
             if (sChan.empty() || it->channels() != sChan)
                 continue;
@@ -267,9 +267,9 @@ public:
         return m_vMatches.end();
     }
 
-    bool Add(bool bNegated, const NoString& sChan, const NoString& sSearch, const NoString& host)
+    bool Add(bool bNegated, const NoString& sChan, const NoString& search, const NoString& host)
     {
-        NoAttachMatch attach(this, sChan, sSearch, host, bNegated);
+        NoAttachMatch attach(this, sChan, search, host, bNegated);
 
         // Check for duplicates
         VAttachIter it = m_vMatches.begin();
@@ -288,9 +288,9 @@ public:
         return true;
     }
 
-    bool Del(bool bNegated, const NoString& sChan, const NoString& sSearch, const NoString& host)
+    bool Del(bool bNegated, const NoString& sChan, const NoString& search, const NoString& host)
     {
-        VAttachIter it = FindEntry(sChan, sSearch, host);
+        VAttachIter it = FindEntry(sChan, search, host);
         if (it == m_vMatches.end() || it->IsNegated() != bNegated)
             return false;
 
@@ -306,12 +306,12 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoChannelAttach>(NoModuleInfo& Info)
+void no_moduleInfo<NoChannelAttach>(NoModuleInfo& info)
 {
-    Info.addType(No::UserModule);
-    Info.setWikiPage("autoattach");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("List of channel masks and channel masks with ! before them.");
+    info.addType(No::UserModule);
+    info.setWikiPage("autoattach");
+    info.setHasArgs(true);
+    info.setArgsHelpText("List of channel masks and channel masks with ! before them.");
 }
 
 NETWORKMODULEDEFS(NoChannelAttach, "Reattaches you to channels on activity.")

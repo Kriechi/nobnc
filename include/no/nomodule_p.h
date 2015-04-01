@@ -24,15 +24,15 @@
 class NoModulePrivate
 {
 public:
-    NoModulePrivate(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& sModName, const NoString& sDataDir, No::ModuleType eType)
-        : type(eType),
+    NoModulePrivate(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
+        : type(type),
           handle(pDLL),
           manager(noApp->manager()),
           user(user),
           network(network),
           client(nullptr),
-          name(sModName),
-          dataDir(sDataDir)
+          name(name),
+          dataDir(dataDir)
     {
     }
 

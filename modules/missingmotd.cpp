@@ -31,10 +31,10 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoMissingMotd>(NoModuleInfo& Info)
+void no_moduleInfo<NoMissingMotd>(NoModuleInfo& info)
 {
-    Info.setWikiPage("missingmotd");
-    Info.setHasArgs(false);
+    info.setWikiPage("missingmotd");
+    info.setHasArgs(false);
 }
 
 USERMODULEDEFS(NoMissingMotd, "Sends 422 to clients when they login")

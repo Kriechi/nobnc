@@ -47,7 +47,7 @@ public:
         setArgs(NoString(m_iThresholdMsgs) + " " + NoString(m_iThresholdSecs));
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         m_iThresholdMsgs = No::token(args, 0).toUInt();
         m_iThresholdSecs = No::token(args, 1).toUInt();
@@ -110,7 +110,7 @@ public:
         }
     }
 
-    void Message(NoChannel& Channel)
+    void Message(NoChannel& channel)
     {
         Limits::iterator it;
         time_t now = time(nullptr);
@@ -118,17 +118,17 @@ public:
         // First: Clean up old entries and reattach where necessary
         Cleanup();
 
-        it = m_chans.find(Channel.name());
+        it = m_chans.find(channel.name());
 
         if (it == m_chans.end()) {
             // We don't track detached channels
-            if (Channel.isDetached())
+            if (channel.isDetached())
                 return;
 
             // This is the first message for this channel, start a
             // new timeout.
             std::pair<time_t, uint> tmp(now, 1);
-            m_chans[Channel.name()] = tmp;
+            m_chans[channel.name()] = tmp;
             return;
         }
 
@@ -152,37 +152,37 @@ public:
         // it detached for longer.
         it->second.first = now;
 
-        Channel.detachUser();
+        channel.detachUser();
 
         NoRegistry registry(this);
         if (!registry.value("silent").toBool()) {
-            putModule("Channel [" + Channel.name() + "] was "
+            putModule("channel [" + channel.name() + "] was "
                                                      "flooded, you've been detached");
         }
     }
 
-    ModRet onChanMsg(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        Message(Channel);
+        Message(channel);
         return CONTINUE;
     }
 
     // This also catches onChanAction()
-    ModRet onChanCtcp(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        Message(Channel);
+        Message(channel);
         return CONTINUE;
     }
 
-    ModRet onChanNotice(NoNick& Nick, NoChannel& Channel, NoString& sMessage) override
+    ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message) override
     {
-        Message(Channel);
+        Message(channel);
         return CONTINUE;
     }
 
-    ModRet onTopic(NoNick& Nick, NoChannel& Channel, NoString& sTopic) override
+    ModRet onTopic(NoNick& nick, NoChannel& channel, NoString& topic) override
     {
-        Message(Channel);
+        Message(channel);
         return CONTINUE;
     }
 
@@ -249,11 +249,11 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoFloodDetachMod>(NoModuleInfo& Info)
+void no_moduleInfo<NoFloodDetachMod>(NoModuleInfo& info)
 {
-    Info.setWikiPage("flooddetach");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("This user module takes up to two arguments. Arguments are msgs and secs numbers.");
+    info.setWikiPage("flooddetach");
+    info.setHasArgs(true);
+    info.setArgsHelpText("This user module takes up to two arguments. Arguments are msgs and secs numbers.");
 }
 
 USERMODULEDEFS(NoFloodDetachMod, "Detach channels when flooded")

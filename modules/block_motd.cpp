@@ -40,11 +40,11 @@ public:
 };
 
 template <>
-void no_moduleInfo<NoBlockMotd>(NoModuleInfo& Info)
+void no_moduleInfo<NoBlockMotd>(NoModuleInfo& info)
 {
-    Info.addType(No::NetworkModule);
-    Info.addType(No::GlobalModule);
-    Info.setWikiPage("block_motd");
+    info.addType(No::NetworkModule);
+    info.addType(No::GlobalModule);
+    info.setWikiPage("block_motd");
 }
 
 USERMODULEDEFS(NoBlockMotd, "Block the MOTD from IRC so it's not sent to your client(s).")

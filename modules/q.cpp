@@ -36,7 +36,7 @@ public:
     {
     }
 
-    bool onLoad(const NoString& args, NoString& sMessage) override
+    bool onLoad(const NoString& args, NoString& message) override
     {
         NoRegistry registry(this);
         if (!args.empty()) {
@@ -176,29 +176,29 @@ public:
 
         } else if (command == "set") {
             NoString sSetting = No::token(line, 1).toLower();
-            NoString sValue = No::token(line, 2);
-            if (sSetting.empty() || sValue.empty()) {
+            NoString value = No::token(line, 2);
+            if (sSetting.empty() || value.empty()) {
                 putModule("Syntax: Set <setting> <value>");
             } else if (sSetting == "username") {
-                SetUsername(sValue);
+                SetUsername(value);
                 putModule("Username set");
             } else if (sSetting == "password") {
-                SetPassword(sValue);
+                SetPassword(value);
                 putModule("Password set");
             } else if (sSetting == "usecloakedhost") {
-                SetUseCloakedHost(sValue.toBool());
+                SetUseCloakedHost(value.toBool());
                 putModule("UseCloakedHost set");
             } else if (sSetting == "usechallenge") {
-                SetUseChallenge(sValue.toBool());
+                SetUseChallenge(value.toBool());
                 putModule("UseChallenge set");
             } else if (sSetting == "requestperms") {
-                SetRequestPerms(sValue.toBool());
+                SetRequestPerms(value.toBool());
                 putModule("RequestPerms set");
             } else if (sSetting == "joinoninvite") {
-                SetJoinonInvite(sValue.toBool());
+                SetJoinonInvite(value.toBool());
                 putModule("JoinonInvite set");
             } else if (sSetting == "joinaftercloaked") {
-                SetJoinAfterCloaked(sValue.toBool());
+                SetJoinAfterCloaked(value.toBool());
                 putModule("JoinAfterCloaked set");
             } else
                 putModule("Unknown setting: " + sSetting);
@@ -280,17 +280,17 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivMsg(NoNick& nick, NoString& message) override
     {
-        return HandleMessage(Nick, sMessage);
+        return HandleMessage(nick, message);
     }
 
-    ModRet onPrivNotice(NoNick& Nick, NoString& sMessage) override
+    ModRet onPrivNotice(NoNick& nick, NoString& message) override
     {
-        return HandleMessage(Nick, sMessage);
+        return HandleMessage(nick, message);
     }
 
-    ModRet onJoining(NoChannel& Channel) override
+    ModRet onJoining(NoChannel& channel) override
     {
         // Halt if are not already cloaked, but the user requres that we delay
         // channel join till after we are cloaked.
@@ -300,27 +300,27 @@ public:
         return CONTINUE;
     }
 
-    void onJoin(const NoNick& Nick, NoChannel& Channel) override
+    void onJoin(const NoNick& nick, NoChannel& channel) override
     {
-        if (m_bRequestPerms && IsSelf(Nick))
-            HandleNeed(Channel, "ov");
+        if (m_bRequestPerms && IsSelf(nick))
+            HandleNeed(channel, "ov");
     }
 
-    void onDeop2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
+    void onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
     {
-        if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick)))
-            HandleNeed(Channel, "o");
+        if (m_bRequestPerms && IsSelf(nick) && (!opNick || !IsSelf(*opNick)))
+            HandleNeed(channel, "o");
     }
 
-    void onDevoice2(const NoNick* pOpNick, const NoNick& Nick, NoChannel& Channel, bool bNoChange) override
+    void onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
     {
-        if (m_bRequestPerms && IsSelf(Nick) && (!pOpNick || !IsSelf(*pOpNick)))
-            HandleNeed(Channel, "v");
+        if (m_bRequestPerms && IsSelf(nick) && (!opNick || !IsSelf(*opNick)))
+            HandleNeed(channel, "v");
     }
 
-    ModRet onInvite(const NoNick& Nick, const NoString& sChan) override
+    ModRet onInvite(const NoNick& nick, const NoString& sChan) override
     {
-        if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org"))
+        if (!nick.equals("Q") || !nick.host().equals("CServe.quakenet.org"))
             return CONTINUE;
         if (m_bJoinonInvite)
             network()->addChannel(sChan, false);
@@ -332,61 +332,61 @@ public:
         return "Q";
     }
 
-    bool onWebRequest(NoWebSocket& WebSock, const NoString& sPageName, NoTemplate& Tmpl) override
+    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (sPageName == "index") {
-            bool bSubmitted = (WebSock.param("submitted").toInt() != 0);
+        if (page == "index") {
+            bool bSubmitted = (socket.param("submitted").toInt() != 0);
 
             if (bSubmitted) {
-                NoString FormUsername = WebSock.param("user");
+                NoString FormUsername = socket.param("user");
                 if (!FormUsername.empty())
                     SetUsername(FormUsername);
 
-                NoString FormPassword = WebSock.param("password");
+                NoString FormPassword = socket.param("password");
                 if (!FormPassword.empty())
                     SetPassword(FormPassword);
 
-                SetUseCloakedHost(WebSock.param("usecloakedhost").toBool());
-                SetUseChallenge(WebSock.param("usechallenge").toBool());
-                SetRequestPerms(WebSock.param("requestperms").toBool());
-                SetJoinonInvite(WebSock.param("joinoninvite").toBool());
-                SetJoinAfterCloaked(WebSock.param("joinaftercloaked").toBool());
+                SetUseCloakedHost(socket.param("usecloakedhost").toBool());
+                SetUseChallenge(socket.param("usechallenge").toBool());
+                SetRequestPerms(socket.param("requestperms").toBool());
+                SetJoinonInvite(socket.param("joinoninvite").toBool());
+                SetJoinAfterCloaked(socket.param("joinaftercloaked").toBool());
             }
 
-            Tmpl["Username"] = m_sUsername;
+            tmpl["Username"] = m_sUsername;
 
-            NoTemplate& o1 = Tmpl.addRow("OptionLoop");
+            NoTemplate& o1 = tmpl.addRow("OptionLoop");
             o1["Name"] = "usecloakedhost";
             o1["DisplayName"] = "UseCloakedHost";
             o1["Tooltip"] = "Whether to cloak your hostname (+x) automatically on connect.";
             o1["Checked"] = NoString(m_bUseCloakedHost);
 
-            NoTemplate& o2 = Tmpl.addRow("OptionLoop");
+            NoTemplate& o2 = tmpl.addRow("OptionLoop");
             o2["Name"] = "usechallenge";
             o2["DisplayName"] = "UseChallenge";
             o2["Tooltip"] = "Whether to use the CHALLENGEAUTH mechanism to avoid sending passwords in cleartext.";
             o2["Checked"] = NoString(m_bUseChallenge);
 
-            NoTemplate& o3 = Tmpl.addRow("OptionLoop");
+            NoTemplate& o3 = tmpl.addRow("OptionLoop");
             o3["Name"] = "requestperms";
             o3["DisplayName"] = "RequestPerms";
             o3["Tooltip"] = "Whether to request voice/op from Q on join/devoice/deop.";
             o3["Checked"] = NoString(m_bRequestPerms);
 
-            NoTemplate& o4 = Tmpl.addRow("OptionLoop");
+            NoTemplate& o4 = tmpl.addRow("OptionLoop");
             o4["Name"] = "joinoninvite";
             o4["DisplayName"] = "JoinonInvite";
             o4["Tooltip"] = "Whether to join channels when Q invites you.";
             o4["Checked"] = NoString(m_bJoinonInvite);
 
-            NoTemplate& o5 = Tmpl.addRow("OptionLoop");
+            NoTemplate& o5 = tmpl.addRow("OptionLoop");
             o5["Name"] = "joinaftercloaked";
             o5["DisplayName"] = "JoinAfterCloaked";
             o5["Tooltip"] = "Whether to delay joining channels until after you are cloaked.";
             o5["Checked"] = NoString(m_bJoinAfterCloaked);
 
             if (bSubmitted) {
-                WebSock.session()->addSuccess("Changes have been saved!");
+                socket.session()->addSuccess("Changes have been saved!");
             }
 
             return true;
@@ -403,11 +403,11 @@ private:
     bool m_bCatchResponse;
     NoStringMap m_msChanModes;
 
-    void PutQ(const NoString& sMessage)
+    void PutQ(const NoString& message)
     {
-        putIrc("PRIVMSG Q@CServe.quakenet.org :" + sMessage);
+        putIrc("PRIVMSG Q@CServe.quakenet.org :" + message);
 #if Q_DEBUG_COMMUNICATION
-        putModule("[ZNC --> Q] " + sMessage);
+        putModule("[ZNC --> Q] " + message);
 #endif
     }
 
@@ -426,13 +426,13 @@ private:
         PutQ("WHOAMI");
     }
 
-    void Auth(const NoString& sUsername = "", const NoString& sPassword = "")
+    void Auth(const NoString& username = "", const NoString& sPassword = "")
     {
         if (m_bAuthed)
             return;
 
-        if (!sUsername.empty())
-            SetUsername(sUsername);
+        if (!username.empty())
+            SetUsername(username);
         if (!sPassword.empty())
             SetPassword(sPassword);
 
@@ -456,63 +456,63 @@ private:
         if (m_bAuthed)
             return;
 
-        NoString sUsername = m_sUsername.toLower().replace_n("[", "{").replace_n("]", "}").replace_n("\\", "|");
+        NoString username = m_sUsername.toLower().replace_n("[", "{").replace_n("]", "}").replace_n("\\", "|");
         NoString sPasswordHash = No::sha256(m_sPassword.left(10));
-        NoString sKey = No::sha256(sUsername + ":" + sPasswordHash);
-        NoString response = HMAC_SHA256(sKey, sChallenge);
+        NoString key = No::sha256(username + ":" + sPasswordHash);
+        NoString response = HMAC_SHA256(key, sChallenge);
 
         putModule("Auth: Received challenge, sending CHALLENGEAUTH request...");
         PutQ("CHALLENGEAUTH " + m_sUsername + " " + response + " HMAC-SHA-256");
     }
 
-    ModRet HandleMessage(const NoNick& Nick, NoString sMessage)
+    ModRet HandleMessage(const NoNick& nick, NoString message)
     {
-        if (!Nick.equals("Q") || !Nick.host().equals("CServe.quakenet.org"))
+        if (!nick.equals("Q") || !nick.host().equals("CServe.quakenet.org"))
             return CONTINUE;
 
-        sMessage.trim();
+        message.trim();
 
 #if Q_DEBUG_COMMUNICATION
-        putModule("[ZNC <-- Q] " + sMessage);
+        putModule("[ZNC <-- Q] " + message);
 #endif
 
         // WHOAMI
-        if (sMessage.contains("WHOAMI is only available to authed users")) {
+        if (message.contains("WHOAMI is only available to authed users")) {
             m_bAuthed = false;
             Auth();
             m_bCatchResponse = m_bRequestedWhoami;
-        } else if (sMessage.contains("Information for user")) {
+        } else if (message.contains("Information for user")) {
             m_bAuthed = true;
             m_msChanModes.clear();
             m_bCatchResponse = m_bRequestedWhoami;
             m_bRequestedWhoami = true;
-        } else if (m_bRequestedWhoami && No::wildCmp(sMessage, "#*")) {
-            NoString sChannel = No::token(sMessage, 0);
-            NoString sFlags = No::tokens(sMessage, 1).trim_n().trimLeft_n("+");
-            m_msChanModes[sChannel] = sFlags;
+        } else if (m_bRequestedWhoami && No::wildCmp(message, "#*")) {
+            NoString channel = No::token(message, 0);
+            NoString sFlags = No::tokens(message, 1).trim_n().trimLeft_n("+");
+            m_msChanModes[channel] = sFlags;
         } else if (m_bRequestedWhoami && m_bCatchResponse &&
-                   (sMessage.equals("End of list.") || sMessage.equals("account, or HELLO to create an account."))) {
+                   (message.equals("End of list.") || message.equals("account, or HELLO to create an account."))) {
             m_bRequestedWhoami = m_bCatchResponse = false;
             return HALT;
         }
 
         // AUTH
-        else if (sMessage.equals("Username or password incorrect.")) {
+        else if (message.equals("Username or password incorrect.")) {
             m_bAuthed = false;
-            putModule("Auth failed: " + sMessage);
+            putModule("Auth failed: " + message);
             return HALT;
-        } else if (No::wildCmp(sMessage, "You are now logged in as *.")) {
+        } else if (No::wildCmp(message, "You are now logged in as *.")) {
             m_bAuthed = true;
-            putModule("Auth successful: " + sMessage);
+            putModule("Auth successful: " + message);
             WhoAmI();
             return HALT;
-        } else if (m_bRequestedChallenge && No::token(sMessage, 0).equals("CHALLENGE")) {
+        } else if (m_bRequestedChallenge && No::token(message, 0).equals("CHALLENGE")) {
             m_bRequestedChallenge = false;
-            if (sMessage.contains("not available once you have authed")) {
+            if (message.contains("not available once you have authed")) {
                 m_bAuthed = true;
             } else {
-                if (sMessage.contains("HMAC-SHA-256")) {
-                    ChallengeAuth(No::token(sMessage, 1));
+                if (message.contains("HMAC-SHA-256")) {
+                    ChallengeAuth(No::token(message, 1));
                 } else {
                     putModule(
                     "Auth failed: Q does not support HMAC-SHA-256 for CHALLENGEAUTH, falling back to standard AUTH.");
@@ -527,34 +527,34 @@ private:
         return !m_bCatchResponse && user()->isUserAttached() ? CONTINUE : HALT;
     }
 
-    void HandleNeed(const NoChannel& Channel, const NoString& sPerms)
+    void HandleNeed(const NoChannel& channel, const NoString& sPerms)
     {
-        NoStringMap::iterator it = m_msChanModes.find(Channel.name());
+        NoStringMap::iterator it = m_msChanModes.find(channel.name());
         if (it == m_msChanModes.end())
             return;
-        NoString sModes = it->second;
+        NoString modes = it->second;
 
-        bool bMaster = sModes.contains("m") || sModes.contains("n");
+        bool bMaster = modes.contains("m") || modes.contains("n");
 
         if (sPerms.contains("o")) {
-            bool bOp = sModes.contains("o");
-            bool bAutoOp = sModes.contains("a");
+            bool bOp = modes.contains("o");
+            bool bAutoOp = modes.contains("a");
             if (bMaster || bOp) {
                 if (!bAutoOp) {
-                    putModule("RequestPerms: Requesting op on " + Channel.name());
-                    PutQ("OP " + Channel.name());
+                    putModule("RequestPerms: Requesting op on " + channel.name());
+                    PutQ("OP " + channel.name());
                 }
                 return;
             }
         }
 
         if (sPerms.contains("v")) {
-            bool bVoice = sModes.contains("v");
-            bool bAutoVoice = sModes.contains("g");
+            bool bVoice = modes.contains("v");
+            bool bAutoVoice = modes.contains("g");
             if (bMaster || bVoice) {
                 if (!bAutoVoice) {
-                    putModule("RequestPerms: Requesting voice on " + Channel.name());
-                    PutQ("VOICE " + Channel.name());
+                    putModule("RequestPerms: Requesting voice on " + channel.name());
+                    PutQ("VOICE " + channel.name());
                 }
                 return;
             }
@@ -565,13 +565,13 @@ private:
     /* Utility Functions */
     bool isIrcConnected()
     {
-        NoIrcSocket* pIRCSock = network()->ircSocket();
-        return pIRCSock && pIRCSock->isAuthed();
+        NoIrcSocket* socket = network()->ircSocket();
+        return socket && socket->isAuthed();
     }
 
-    bool IsSelf(const NoNick& Nick)
+    bool IsSelf(const NoNick& nick)
     {
-        return Nick.equals(network()->currentNick());
+        return nick.equals(network()->currentNick());
     }
 
     bool PackHex(const NoString& sHex, NoString& sPackedHex)
@@ -593,13 +593,13 @@ private:
         return true;
     }
 
-    NoString HMAC_SHA256(const NoString& sKey, const NoString& data)
+    NoString HMAC_SHA256(const NoString& key, const NoString& data)
     {
         NoString sRealKey;
-        if (sKey.length() > 64)
-            PackHex(No::sha256(sKey), sRealKey);
+        if (key.length() > 64)
+            PackHex(No::sha256(key), sRealKey);
         else
-            sRealKey = sKey;
+            sRealKey = key;
 
         NoString sOuterKey, sInnerKey;
         NoString::size_type iKeyLength = sRealKey.length();
@@ -623,11 +623,11 @@ private:
     bool m_bJoinonInvite;
     bool m_bJoinAfterCloaked;
 
-    void SetUsername(const NoString& sUsername)
+    void SetUsername(const NoString& username)
     {
         NoRegistry registry(this);
-        registry.setValue("Username", sUsername);
-        m_sUsername = sUsername;
+        registry.setValue("Username", username);
+        m_sUsername = username;
     }
 
     void SetPassword(const NoString& sPassword)
@@ -677,11 +677,11 @@ private:
 };
 
 template <>
-void no_moduleInfo<NoQModule>(NoModuleInfo& Info)
+void no_moduleInfo<NoQModule>(NoModuleInfo& info)
 {
-    Info.setWikiPage("Q");
-    Info.setHasArgs(true);
-    Info.setArgsHelpText("Please provide your username and password for Q.");
+    info.setWikiPage("Q");
+    info.setHasArgs(true);
+    info.setArgsHelpText("Please provide your username and password for Q.");
 }
 
 NETWORKMODULEDEFS(NoQModule, "Auths you with QuakeNet's Q bot.")

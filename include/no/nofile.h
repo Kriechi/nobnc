@@ -27,12 +27,12 @@
 class NO_EXPORT NoFile
 {
 public:
-    NoFile(const NoString& sLongName = "");
+    NoFile(const NoString& filePath = "");
     ~NoFile();
 
     enum FileType { Regular, Directory, Character, Block, Fifo, Link, Socket };
 
-    void SetFileName(const NoString& sLongName);
+    void SetFileName(const NoString& filePath);
 
     bool IsReg(bool bUseLstat = false) const;
     bool IsDir(bool bUseLstat = false) const;
@@ -43,7 +43,7 @@ public:
     bool IsSock(bool bUseLstat = false) const;
 
     // for gettin file types, using fstat instead
-    static bool FType(const NoString& sFileName, FileType eType, bool bUseLstat = false);
+    static bool FType(const NoString& fileName, FileType type, bool bUseLstat = false);
 
     enum Attribute { Name, Size, AccessTime, ModificationTime, CreationTime, Uid };
 
@@ -68,7 +68,7 @@ public:
     bool Move(const NoString& sNewFileName, bool bOverwrite = false);
     bool Copy(const NoString& sNewFileName, bool bOverwrite = false);
 
-    static bool Delete(const NoString& sFileName);
+    static bool Delete(const NoString& fileName);
     static bool Move(const NoString& sOldFileName, const NoString& sNewFileName, bool bOverwrite = false);
     static bool Copy(const NoString& sOldFileName, const NoString& sNewFileName, bool bOverwrite = false);
     bool Chmod(mode_t mode);
@@ -76,7 +76,7 @@ public:
     bool Seek(off_t uPos);
     bool Truncate();
     bool Sync();
-    bool Open(const NoString& sFileName, int iFlags = O_RDONLY, mode_t iMode = 0644);
+    bool Open(const NoString& fileName, int iFlags = O_RDONLY, mode_t iMode = 0644);
     bool Open(int iFlags = O_RDONLY, mode_t iMode = 0644);
     ssize_t Read(char* pszBuffer, int iBytes);
     bool ReadLine(NoString& data, const NoString& sDelimiter = "\n");
