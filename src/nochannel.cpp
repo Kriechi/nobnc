@@ -814,9 +814,7 @@ void NoChannel::setInConfig(bool b)
 {
     if (d->inConfig != b) {
         d->inConfig = b;
-        if (d->inConfig) {
-            noApp->setConfigState(NoApp::ConfigNeedWrite);
-        }
+        noApp->setConfigState(NoApp::ConfigNeedWrite);
     }
 }
 
