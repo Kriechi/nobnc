@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nodir.h>
-#include <no/nofile.h>
-#include <no/nouser.h>
-#include <no/noprocess.h>
-#include <no/noclient.h>
-#include <no/nosocketmanager.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nodir.h>
+#include <nobnc/nofile.h>
+#include <nobnc/nouser.h>
+#include <nobnc/noprocess.h>
+#include <nobnc/noclient.h>
+#include <nobnc/nosocketmanager.h>
 
 // Forward Declaration
 class NoShellMod;

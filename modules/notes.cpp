@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/noapp.h>
-#include <no/noclient.h>
-#include <no/notemplate.h>
-#include <no/nowebsocket.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/noapp.h>
+#include <nobnc/noclient.h>
+#include <nobnc/notemplate.h>
+#include <nobnc/nowebsocket.h>
+#include <nobnc/noregistry.h>
 
 class NoNotesMod : public NoModule
 {

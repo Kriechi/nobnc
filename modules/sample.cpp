@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/noclient.h>
-#include <no/nochannel.h>
-#include <no/nomodulejob.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/noclient.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/nomodulejob.h>
+#include <nobnc/nonick.h>
 #include <unistd.h>
 
 #ifdef HAVE_PTHREAD

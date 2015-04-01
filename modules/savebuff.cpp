@@ -25,17 +25,17 @@
 
 #define REQUIRESSL
 
-#include <no/nomodule.h>
-#include <no/nochannel.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/nofile.h>
-#include <no/nodir.h>
-#include <no/noquery.h>
-#include <no/noutils.h>
-#include <no/noescape.h>
-#include <no/nomessage.h>
-#include <no/nobuffer.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nofile.h>
+#include <nobnc/nodir.h>
+#include <nobnc/noquery.h>
+#include <nobnc/noutils.h>
+#include <nobnc/noescape.h>
+#include <nobnc/nomessage.h>
+#include <nobnc/nobuffer.h>
 
 #define LEGACY_VERIFICATION_TOKEN "::__:SAVEBUFF:__::"
 #define CHAN_VERIFICATION_TOKEN "::__:CHANBUFF:__::"

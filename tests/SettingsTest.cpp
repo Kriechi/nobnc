@@ -16,8 +16,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <no/nofile.h>
-#include <no/nosettings.h>
+#include <nobnc/nofile.h>
+#include <nobnc/nosettings.h>
 
 class NoSettingsTest : public ::testing::Test
 {

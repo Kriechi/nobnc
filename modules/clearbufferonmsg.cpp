@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nonetwork.h>
-#include <no/nouser.h>
-#include <no/nochannel.h>
-#include <no/noquery.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/noquery.h>
 
 enum {
     RULE_MSG,

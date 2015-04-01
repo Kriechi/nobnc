@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nochannel.h>
-#include <no/nonetwork.h>
-#include <no/noescape.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noescape.h>
+#include <nobnc/nonick.h>
 
 class NoBuffExtras : public NoModule
 {

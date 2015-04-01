@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/noclient.h>
-#include <no/nochannel.h>
-#include <no/nonetwork.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/noclient.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noregistry.h>
 
 #include <sstream>
 #include <stdexcept>

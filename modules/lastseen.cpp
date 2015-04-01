@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nouser.h>
-#include <no/noapp.h>
-#include <no/notemplate.h>
-#include <no/nowebsocket.h>
-#include <no/nowebsession.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nouser.h>
+#include <nobnc/noapp.h>
+#include <nobnc/notemplate.h>
+#include <nobnc/nowebsocket.h>
+#include <nobnc/nowebsession.h>
+#include <nobnc/noregistry.h>
 
 class NoLastSeenMod : public NoModule
 {

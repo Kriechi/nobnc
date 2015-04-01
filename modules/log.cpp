@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nodir.h>
-#include <no/nofile.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/nochannel.h>
-#include <no/noserverinfo.h>
-#include <no/nodebug.h>
-#include <no/noregistry.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nodir.h>
+#include <nobnc/nofile.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/noserverinfo.h>
+#include <nobnc/nodebug.h>
+#include <nobnc/noregistry.h>
+#include <nobnc/nonick.h>
 
 #include <algorithm>
 

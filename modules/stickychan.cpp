@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nochannel.h>
-#include <no/nonetwork.h>
-#include <no/nowebsocket.h>
-#include <no/nowebsession.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nowebsocket.h>
+#include <nobnc/nowebsession.h>
+#include <nobnc/noregistry.h>
 
 class NoStickyChan : public NoModule
 {

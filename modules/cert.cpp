@@ -17,12 +17,12 @@
 
 #define REQUIRESSL
 
-#include <no/nomodule.h>
-#include <no/nofile.h>
-#include <no/nouser.h>
-#include <no/noircsocket.h>
-#include <no/notemplate.h>
-#include <no/nowebsocket.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nofile.h>
+#include <nobnc/nouser.h>
+#include <nobnc/noircsocket.h>
+#include <nobnc/notemplate.h>
+#include <nobnc/nowebsocket.h>
 
 class NoCertMod : public NoModule
 {

@@ -16,8 +16,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <no/noclient.h>
-#include <no/noapp.h>
+#include <nobnc/noclient.h>
+#include <nobnc/noapp.h>
 
 class ClientTest : public ::testing::Test
 {

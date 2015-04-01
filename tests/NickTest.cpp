@@ -16,7 +16,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <no/nonick.h>
+#include <nobnc/nonick.h>
 
 TEST(NickTest, Parse)
 {

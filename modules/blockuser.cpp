@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/noclient.h>
-#include <no/noapp.h>
-#include <no/noauthenticator.h>
-#include <no/nowebsocket.h>
-#include <no/nowebsession.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noclient.h>
+#include <nobnc/noapp.h>
+#include <nobnc/noauthenticator.h>
+#include <nobnc/nowebsocket.h>
+#include <nobnc/nowebsession.h>
+#include <nobnc/noregistry.h>
 
 #define MESSAGE "Your account has been disabled. Contact your administrator."
 

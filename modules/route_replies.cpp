@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nonetwork.h>
-#include <no/noircsocket.h>
-#include <no/noclient.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noircsocket.h>
+#include <nobnc/noclient.h>
+#include <nobnc/noregistry.h>
 
 struct reply
 {

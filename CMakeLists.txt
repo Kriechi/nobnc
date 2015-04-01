@@ -25,62 +25,62 @@ endif()
 
 ### SOURCES
 
-list(APPEND NO_HEADERS include/no/noapp.h
-                       include/no/noapp_p.h
-                       include/no/noauthenticator.h
-                       include/no/nobuffer.h
-                       include/no/nocachemap.h
-                       include/no/nochannel.h
-                       include/no/noclient.h
-                       include/no/noconditionvariable.h
-                       include/no/nodebug.h
-                       include/no/nodir.h
-                       include/no/noescape.h
-                       include/no/noexception.h
-                       include/no/nofile.h
-                       include/no/nohttpsocket.h
-                       include/no/noircsocket.h
-                       include/no/nojob.h
-                       include/no/nolistener.h
-                       include/no/nonamespace.h
-                       include/no/nomessage.h
-                       include/no/nomessage_p.h
-                       include/no/nomodule.h
-                       include/no/nomodule_p.h
-                       include/no/nomodulecall.h
-                       include/no/nomodulecommand.h
-                       include/no/nomoduleinfo.h
-                       include/no/nomodulejob.h
-                       include/no/nomoduleloader.h
-                       include/no/nomodulesocket.h
-                       include/no/nomutex.h
-                       include/no/nomutexlocker.h
-                       include/no/nonetwork.h
-                       include/no/nonick.h
-                       include/no/noprocess.h
-                       include/no/noquery.h
-                       include/no/noregistry.h
-                       include/no/noserverinfo.h
-                       include/no/nosettings.h
-                       include/no/nosocket.h
-                       include/no/nosocketmanager.h
-                       include/no/nosslverifyhost.h
-                       include/no/nostring.h
-                       include/no/notable.h
-                       include/no/notemplate.h
-                       include/no/nothread.h
-                       include/no/nothread_p.h
-                       include/no/notimer.h
-                       include/no/nouser.h
-                       include/no/noutils.h
-                       include/no/nowebpage.h
-                       include/no/nowebsession.h
-                       include/no/nowebsocket.h
+list(APPEND NO_HEADERS include/nobnc/noapp.h
+                       include/nobnc/noapp_p.h
+                       include/nobnc/noauthenticator.h
+                       include/nobnc/nobuffer.h
+                       include/nobnc/nocachemap.h
+                       include/nobnc/nochannel.h
+                       include/nobnc/noclient.h
+                       include/nobnc/noconditionvariable.h
+                       include/nobnc/nodebug.h
+                       include/nobnc/nodir.h
+                       include/nobnc/noescape.h
+                       include/nobnc/noexception.h
+                       include/nobnc/nofile.h
+                       include/nobnc/nohttpsocket.h
+                       include/nobnc/noircsocket.h
+                       include/nobnc/nojob.h
+                       include/nobnc/nolistener.h
+                       include/nobnc/nonamespace.h
+                       include/nobnc/nomessage.h
+                       include/nobnc/nomessage_p.h
+                       include/nobnc/nomodule.h
+                       include/nobnc/nomodule_p.h
+                       include/nobnc/nomodulecall.h
+                       include/nobnc/nomodulecommand.h
+                       include/nobnc/nomoduleinfo.h
+                       include/nobnc/nomodulejob.h
+                       include/nobnc/nomoduleloader.h
+                       include/nobnc/nomodulesocket.h
+                       include/nobnc/nomutex.h
+                       include/nobnc/nomutexlocker.h
+                       include/nobnc/nonetwork.h
+                       include/nobnc/nonick.h
+                       include/nobnc/noprocess.h
+                       include/nobnc/noquery.h
+                       include/nobnc/noregistry.h
+                       include/nobnc/noserverinfo.h
+                       include/nobnc/nosettings.h
+                       include/nobnc/nosocket.h
+                       include/nobnc/nosocketmanager.h
+                       include/nobnc/nosslverifyhost.h
+                       include/nobnc/nostring.h
+                       include/nobnc/notable.h
+                       include/nobnc/notemplate.h
+                       include/nobnc/nothread.h
+                       include/nobnc/nothread_p.h
+                       include/nobnc/notimer.h
+                       include/nobnc/nouser.h
+                       include/nobnc/noutils.h
+                       include/nobnc/nowebpage.h
+                       include/nobnc/nowebsession.h
+                       include/nobnc/nowebsocket.h
                        src/3rdparty/defines.h
                        src/3rdparty/md5/md5.h
                        src/3rdparty/sha2/sha2.h
                        src/3rdparty/Csocket/Csocket.h
-                       ${PROJECT_BINARY_DIR}/include/no/noglobal.h
+                       ${PROJECT_BINARY_DIR}/include/nobnc/noglobal.h
 )
 
 list(APPEND NO_SOURCES src/noapp.cpp
@@ -133,8 +133,8 @@ list(APPEND NO_SOURCES src/noapp.cpp
 
 add_library(libno SHARED ${NO_SOURCES} ${NO_HEADERS})
 include_directories(${NO_INCLUDEDIRS} src/3rdparty)
-include_directories(${PROJECT_SOURCE_DIR}/include/no) ### TODO: cleanup
-include_directories(${PROJECT_BINARY_DIR}/include/no) ### TODO: cleanup
+include_directories(${PROJECT_SOURCE_DIR}/include/nobnc) ### TODO: cleanup
+include_directories(${PROJECT_BINARY_DIR}/include/nobnc) ### TODO: cleanup
 target_link_libraries(libno ${NO_LIBRARIES})
 set_target_properties(libno PROPERTIES OUTPUT_NAME no DEFINE_SYMBOL EXPORT_NO)
 add_dependencies(libno version)
@@ -155,22 +155,22 @@ if(NOT DEVELOPER)
     install(TARGETS libno LIBRARY DESTINATION ${INSTALL_LIBDIR}
                           RUNTIME DESTINATION ${INSTALL_BINDIR}
                           ARCHIVE DESTINATION ${INSTALL_LIBDIR})
-    install(DIRECTORY include/no DESTINATION ${INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN *.h)
+    install(DIRECTORY include/nobnc DESTINATION ${INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN *.h)
 endif()
 
 ### GENERATED FILES
 
-configure_file("${PROJECT_SOURCE_DIR}/include/no/noglobal.h.in"
-               "${PROJECT_BINARY_DIR}/include/no/noglobal.h")
-configure_file("${PROJECT_SOURCE_DIR}/include/no/noconfig.h.in"
-               "${PROJECT_BINARY_DIR}/include/no/noconfig.h")
+configure_file("${PROJECT_SOURCE_DIR}/include/nobnc/noglobal.h.in"
+               "${PROJECT_BINARY_DIR}/include/nobnc/noglobal.h")
+configure_file("${PROJECT_SOURCE_DIR}/include/nobnc/noconfig.h.in"
+               "${PROJECT_BINARY_DIR}/include/nobnc/noconfig.h")
 configure_file("${PROJECT_SOURCE_DIR}/src/noglobal.cpp.in"
                "${PROJECT_BINARY_DIR}/src/noglobal.cpp")
 
 if(NOT DEVELOPER)
-    install(FILES "${PROJECT_BINARY_DIR}/include/no/noconfig.h"
+    install(FILES "${PROJECT_BINARY_DIR}/include/nobnc/noconfig.h"
             DESTINATION ${INSTALL_INCLUDEDIR}/no)
-    install(FILES "${PROJECT_BINARY_DIR}/include/no/noglobal.h"
+    install(FILES "${PROJECT_BINARY_DIR}/include/nobnc/noglobal.h"
             DESTINATION ${INSTALL_INCLUDEDIR}/no)
 endif()
 

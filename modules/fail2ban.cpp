@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/noapp.h>
-#include <no/noclient.h>
-#include <no/noauthenticator.h>
-#include <no/nosocket.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/noapp.h>
+#include <nobnc/noclient.h>
+#include <nobnc/noauthenticator.h>
+#include <nobnc/nosocket.h>
 
 class NoFailToBanMod : public NoModule
 {

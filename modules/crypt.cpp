@@ -32,13 +32,13 @@
 //       and gets sent to your client in plain text.
 //
 
-#include <no/nomodule.h>
-#include <no/nochannel.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/noescape.h>
-#include <no/noregistry.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noescape.h>
+#include <nobnc/noregistry.h>
+#include <nobnc/nonick.h>
 
 #define REQUIRESSL 1
 #define NICK_PREFIX_KEY "[nick-prefix]"

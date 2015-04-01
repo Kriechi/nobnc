@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nonetwork.h>
-#include <no/noircsocket.h>
-#include <no/nodebug.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noircsocket.h>
+#include <nobnc/nodebug.h>
+#include <nobnc/noregistry.h>
 
 static const struct
 {

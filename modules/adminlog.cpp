@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nofile.h>
-#include <no/noserverinfo.h>
-#include <no/nonetwork.h>
-#include <no/nouser.h>
-#include <no/nodebug.h>
-#include <no/noclient.h>
-#include <no/noregistry.h>
-#include <no/nosocket.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nofile.h>
+#include <nobnc/noserverinfo.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nodebug.h>
+#include <nobnc/noclient.h>
+#include <nobnc/noregistry.h>
+#include <nobnc/nosocket.h>
 
 #include <syslog.h>
 #include <unistd.h>

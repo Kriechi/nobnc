@@ -16,12 +16,12 @@
  */
 
 #include <gtest/gtest.h>
-#include <no/nothread.h>
-#include <no/nothread_p.h>
-#include <no/nomutex.h>
-#include <no/nomutexlocker.h>
-#include <no/noconditionvariable.h>
-#include <no/nojob.h>
+#include <nobnc/nothread.h>
+#include <nobnc/nothread_p.h>
+#include <nobnc/nomutex.h>
+#include <nobnc/nomutexlocker.h>
+#include <nobnc/noconditionvariable.h>
+#include <nobnc/nojob.h>
 
 class CWaitingJob : public NoJob
 {

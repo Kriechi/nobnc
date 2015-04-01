@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nochannel.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/noapp.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noapp.h>
+#include <nobnc/nonick.h>
 
 class NoChannelSaverMod : public NoModule
 {

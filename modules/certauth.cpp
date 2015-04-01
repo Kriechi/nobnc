@@ -17,16 +17,16 @@
 
 #define REQUIRESSL
 
-#include <no/nomodule.h>
-#include <no/nouser.h>
-#include <no/noapp.h>
-#include <no/nodebug.h>
-#include <no/noclient.h>
-#include <no/noauthenticator.h>
-#include <no/nowebsocket.h>
-#include <no/nowebsession.h>
-#include <no/nolistener.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nouser.h>
+#include <nobnc/noapp.h>
+#include <nobnc/nodebug.h>
+#include <nobnc/noclient.h>
+#include <nobnc/noauthenticator.h>
+#include <nobnc/nowebsocket.h>
+#include <nobnc/nowebsession.h>
+#include <nobnc/nolistener.h>
+#include <nobnc/noregistry.h>
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>

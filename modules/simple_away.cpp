@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noregistry.h>
 
 #define SIMPLE_AWAY_DEFAULT_REASON "Auto away at %s"
 #define SIMPLE_AWAY_DEFAULT_TIME 60

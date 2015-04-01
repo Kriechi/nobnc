@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nouser.h>
-#include <no/noapp.h>
-#include <no/nosocket.h>
-#include <no/notemplate.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nouser.h>
+#include <nobnc/noapp.h>
+#include <nobnc/nosocket.h>
+#include <nobnc/notemplate.h>
 
 class NoSocketSorter
 {

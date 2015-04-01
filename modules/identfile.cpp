@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nofile.h>
-#include <no/noircsocket.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/nodebug.h>
-#include <no/noapp.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nofile.h>
+#include <nobnc/noircsocket.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nodebug.h>
+#include <nobnc/noapp.h>
+#include <nobnc/noregistry.h>
 
 class NoIdentFileModule : public NoModule
 {

@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/noircsocket.h>
-#include <no/nochannel.h>
-#include <no/nowebsocket.h>
-#include <no/nowebsession.h>
-#include <no/noregistry.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noircsocket.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/nowebsocket.h>
+#include <nobnc/nowebsession.h>
+#include <nobnc/noregistry.h>
+#include <nobnc/nonick.h>
 
 #ifndef Q_DEBUG_COMMUNICATION
 #define Q_DEBUG_COMMUNICATION 0

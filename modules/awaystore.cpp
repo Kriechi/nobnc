@@ -30,13 +30,13 @@
 
 #define REQUIRESSL
 
-#include <no/nomodule.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/nofile.h>
-#include <no/noutils.h>
-#include <no/noclient.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nofile.h>
+#include <nobnc/noutils.h>
+#include <nobnc/noclient.h>
+#include <nobnc/nonick.h>
 
 #define CRYPT_VERIFICATION_TOKEN "::__:AWAY:__::"
 

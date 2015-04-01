@@ -16,8 +16,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <no/nofile.h>
-#include <no/noutils.h>
+#include <nobnc/nofile.h>
+#include <nobnc/noutils.h>
 
 TEST(UtilsTest, Hash)
 {

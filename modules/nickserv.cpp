@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/noutils.h>
-#include <no/nouser.h>
-#include <no/nonick.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/noutils.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonick.h>
+#include <nobnc/noregistry.h>
 
 class NoNickServ : public NoModule
 {

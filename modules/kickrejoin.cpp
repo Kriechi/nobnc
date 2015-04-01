@@ -23,10 +23,10 @@
  *
  */
 
-#include <no/nomodule.h>
-#include <no/nochannel.h>
-#include <no/nonetwork.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noregistry.h>
 
 class NoRejoinJob : public NoTimer
 {

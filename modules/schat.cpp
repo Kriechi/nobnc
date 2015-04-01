@@ -22,13 +22,13 @@
 
 #define REQUIRESSL
 
-#include <no/nomodule.h>
-#include <no/nofile.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/noapp.h>
-#include <no/nomodulesocket.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nofile.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noapp.h>
+#include <nobnc/nomodulesocket.h>
+#include <nobnc/nonick.h>
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>

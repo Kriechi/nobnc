@@ -18,13 +18,13 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/nochannel.h>
-#include <no/noircsocket.h>
-#include <no/noapp.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/noircsocket.h>
+#include <nobnc/noapp.h>
+#include <nobnc/nonick.h>
 
 template <std::size_t N>
 struct array_size_helper

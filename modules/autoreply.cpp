@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nonetwork.h>
-#include <no/noircsocket.h>
-#include <no/nocachemap.h>
-#include <no/noregistry.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noircsocket.h>
+#include <nobnc/nocachemap.h>
+#include <nobnc/noregistry.h>
+#include <nobnc/nonick.h>
 
 class NoAutoReplyMod : public NoModule
 {

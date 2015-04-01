@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nonetwork.h>
-#include <no/noircsocket.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noircsocket.h>
+#include <nobnc/nonick.h>
 
 class NoKeepNickTimer : public NoTimer
 {

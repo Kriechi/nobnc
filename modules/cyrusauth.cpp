@@ -24,13 +24,13 @@
 
 #define REQUIRESASL
 
-#include <no/nomodule.h>
-#include <no/noapp.h>
-#include <no/nouser.h>
-#include <no/nodebug.h>
-#include <no/noclient.h>
-#include <no/noauthenticator.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/noapp.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nodebug.h>
+#include <nobnc/noclient.h>
+#include <nobnc/noauthenticator.h>
+#include <nobnc/noregistry.h>
 
 #include <sasl/sasl.h>
 

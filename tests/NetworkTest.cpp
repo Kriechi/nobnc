@@ -16,9 +16,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <no/nonetwork.h>
-#include <no/nouser.h>
-#include <no/noapp.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nouser.h>
+#include <nobnc/noapp.h>
 
 class NetworkTest : public ::testing::Test
 {

@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/nodebug.h>
-#include <no/noclient.h>
-#include <no/noapp.h>
-#include <no/nomodulesocket.h>
-#include <no/noregistry.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nodebug.h>
+#include <nobnc/noclient.h>
+#include <nobnc/noapp.h>
+#include <nobnc/nomodulesocket.h>
+#include <nobnc/noregistry.h>
+#include <nobnc/nonick.h>
 
 class NoBounceDccMod;
 

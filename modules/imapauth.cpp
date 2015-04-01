@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/noapp.h>
-#include <no/nodebug.h>
-#include <no/noclient.h>
-#include <no/noauthenticator.h>
-#include <no/nomodulesocket.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/noapp.h>
+#include <nobnc/nodebug.h>
+#include <nobnc/noclient.h>
+#include <nobnc/noauthenticator.h>
+#include <nobnc/nomodulesocket.h>
 
 class NoImapAuthMod;
 

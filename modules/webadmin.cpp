@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nomoduleloader.h>
-#include <no/nochannel.h>
-#include <no/noserverinfo.h>
-#include <no/nouser.h>
-#include <no/nonetwork.h>
-#include <no/noircsocket.h>
-#include <no/nodebug.h>
-#include <no/noapp.h>
-#include <no/nowebsocket.h>
-#include <no/nowebsession.h>
-#include <no/noescape.h>
-#include <no/nolistener.h>
-#include <no/noregistry.h>
-#include <no/nonick.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nomoduleloader.h>
+#include <nobnc/nochannel.h>
+#include <nobnc/noserverinfo.h>
+#include <nobnc/nouser.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/noircsocket.h>
+#include <nobnc/nodebug.h>
+#include <nobnc/noapp.h>
+#include <nobnc/nowebsocket.h>
+#include <nobnc/nowebsession.h>
+#include <nobnc/noescape.h>
+#include <nobnc/nolistener.h>
+#include <nobnc/noregistry.h>
+#include <nobnc/nonick.h>
 
 template <typename T>
 static std::vector<NoModule*> allModules(T* p)

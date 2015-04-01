@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/noutils.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/noutils.h>
 
 class NoStripControlsMod : public NoModule
 {

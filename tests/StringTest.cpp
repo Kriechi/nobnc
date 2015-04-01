@@ -16,8 +16,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <no/nostring.h>
-#include <no/noescape.h>
+#include <nobnc/nostring.h>
+#include <nobnc/noescape.h>
 
 // GTest uses this function to output objects
 static void PrintTo(const NoString& s, std::ostream* o)

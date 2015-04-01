@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-#include <no/nomodule.h>
-#include <no/nonetwork.h>
-#include <no/nowebsocket.h>
-#include <no/noregistry.h>
+#include <nobnc/nomodule.h>
+#include <nobnc/nonetwork.h>
+#include <nobnc/nowebsocket.h>
+#include <nobnc/noregistry.h>
 
 class NoPerform : public NoModule
 {
