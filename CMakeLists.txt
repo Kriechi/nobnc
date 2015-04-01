@@ -131,15 +131,15 @@ list(APPEND NO_SOURCES src/noapp.cpp
 
 ### TARGETS
 
-add_library(libno SHARED ${NO_SOURCES} ${NO_HEADERS})
+add_library(libnobnc SHARED ${NO_SOURCES} ${NO_HEADERS})
 include_directories(${NO_INCLUDEDIRS} src/3rdparty)
 include_directories(${PROJECT_SOURCE_DIR}/include/nobnc) ### TODO: cleanup
 include_directories(${PROJECT_BINARY_DIR}/include/nobnc) ### TODO: cleanup
-target_link_libraries(libno ${NO_LIBRARIES})
-set_target_properties(libno PROPERTIES OUTPUT_NAME no DEFINE_SYMBOL EXPORT_NO)
-add_dependencies(libno version)
+target_link_libraries(libnobnc ${NO_LIBRARIES})
+set_target_properties(libnobnc PROPERTIES OUTPUT_NAME nobnc DEFINE_SYMBOL EXPORT_NO)
+add_dependencies(libnobnc version)
 
-list(APPEND NO_LIBRARIES libno)
+list(APPEND NO_LIBRARIES libnobnc)
 
 add_executable(nobnc src/main.cpp)
 target_link_libraries(nobnc ${NO_LIBRARIES})
@@ -152,9 +152,9 @@ add_subdirectory(tests)
 
 if(NOT DEVELOPER)
     install(TARGETS nobnc RUNTIME DESTINATION ${INSTALL_BINDIR})
-    install(TARGETS libno LIBRARY DESTINATION ${INSTALL_LIBDIR}
-                          RUNTIME DESTINATION ${INSTALL_BINDIR}
-                          ARCHIVE DESTINATION ${INSTALL_LIBDIR})
+    install(TARGETS libnobnc LIBRARY DESTINATION ${INSTALL_LIBDIR}
+                             RUNTIME DESTINATION ${INSTALL_BINDIR}
+                             ARCHIVE DESTINATION ${INSTALL_LIBDIR})
     install(DIRECTORY include/nobnc DESTINATION ${INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN *.h)
 endif()
 
