@@ -176,7 +176,7 @@ bool NoAppPrivate::handleUserDeletion()
     return true;
 }
 
-void NoApp::loop()
+int NoApp::exec()
 {
     while (true) {
         NoString error;
@@ -217,6 +217,7 @@ void NoApp::loop()
         // 100 msec to 600 sec
         d->manager.dynamicSelectLoop(100 * 1000, 600 * 1000 * 1000);
     }
+    return 0;
 }
 
 #ifdef HAVE_LIBSSL

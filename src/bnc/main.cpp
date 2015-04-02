@@ -433,7 +433,7 @@ int main(int argc, char** argv)
     int iRet = 0;
 
     try {
-        pZNC->loop();
+        iRet = pZNC->exec();
     } catch (const NoException& e) {
         switch (e.type()) {
         case NoException::Shutdown:

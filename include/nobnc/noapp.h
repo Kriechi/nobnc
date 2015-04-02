@@ -43,9 +43,10 @@ public:
     NoApp();
     ~NoApp();
 
+    int exec();
+
     enum ConfigState { ConfigNothing, ConfigNeedRehash, ConfigNeedWrite, ConfigNeedVerboseWrite };
 
-    void loop();
     bool waitForChildLock();
     bool isHostAllowed(const NoString& hostMask) const;
     // This returns false if there are too many anonymous connections from this ip
