@@ -37,14 +37,57 @@
 #include <openssl/ssl.h>
 #endif // HAVE_LIBSSL
 
+NoAppPrivate::~NoAppPrivate()
+{
+    modules->unloadAllModules();
+
+    for (const auto& it : users) {
+        it.second->loader()->unloadAllModules();
+
+        const std::vector<NoNetwork*>& networks = it.second->networks();
+        for (NoNetwork* network : networks) {
+            network->loader()->unloadAllModules();
+        }
+    }
+
+    for (NoListener* pListener : listeners) {
+        delete pListener;
+    }
+
+    for (const auto& it : users) {
+        it.second->setBeingDeleted(true);
+    }
+
+    connectQueueTimer = nullptr;
+    // This deletes d->pConnectQueueTimer
+    manager.cleanup();
+
+    for (const auto& it : users) {
+        it.second->setBeingDeleted(true);
+        delete it.second;
+    }
+
+    users.clear();
+    disableConnectQueue();
+
+    delete modules;
+    delete lockFile;
+
+    ShutdownCsocket();
+}
+
 static inline NoString FormatBindError()
 {
     NoString error = (errno == 0 ? NoString("unknown error, check the host name") : NoString(strerror(errno)));
     return "Unable to bind [" + error + "]";
 }
 
+NoApp* NoAppPrivate::instance = nullptr;
+
 NoApp::NoApp() : d(new NoAppPrivate)
 {
+    NoAppPrivate::instance = this;
+
     if (!InitCsocket()) {
         No::printError("Could not initialize Csocket!");
         exit(-1);
@@ -57,34 +100,7 @@ NoApp::NoApp() : d(new NoAppPrivate)
 
 NoApp::~NoApp()
 {
-    d->modules->unloadAllModules();
-
-    for (const auto& it : d->users) {
-        it.second->loader()->unloadAllModules();
-
-        const std::vector<NoNetwork*>& networks = it.second->networks();
-        for (NoNetwork* network : networks) {
-            network->loader()->unloadAllModules();
-        }
-    }
-
-    for (NoListener* pListener : d->listeners) {
-        delete pListener;
-    }
-
-    for (const auto& it : d->users) {
-        it.second->setBeingDeleted(true);
-    }
-
-    d->connectQueueTimer = nullptr;
-    // This deletes d->pConnectQueueTimer
-    d->manager.cleanup();
-    d->deleteUsers();
-
-    delete d->modules;
-    delete d->lockFile;
-
-    ShutdownCsocket();
+    NoAppPrivate::instance = nullptr;
 }
 
 NoString NoApp::version()
@@ -402,17 +418,6 @@ NoString NoApp::sslCiphers() const
 uint NoApp::disabledSslProtocols() const
 {
     return d->disabledSslProtocols;
-}
-
-void NoAppPrivate::deleteUsers()
-{
-    for (const auto& it : users) {
-        it.second->setBeingDeleted(true);
-        delete it.second;
-    }
-
-    users.clear();
-    disableConnectQueue();
 }
 
 bool NoApp::isHostAllowed(const NoString& hostMask) const
@@ -1949,25 +1954,9 @@ bool NoApp::serverThrottle(NoString name)
     return d->connectThrottle.value(name);
 }
 
-static NoApp* s_pZNC = nullptr;
-
-void NoApp::createInstance()
-{
-    if (s_pZNC)
-        abort();
-
-    s_pZNC = new NoApp();
-}
-
 NoApp* NoApp::instance()
 {
-    return s_pZNC;
-}
-
-void NoApp::destroyInstance()
-{
-    delete s_pZNC;
-    s_pZNC = nullptr;
+    return NoAppPrivate::instance;
 }
 
 NoApp::TrafficStatsMap NoApp::trafficStats(TrafficStatsPair& Users, TrafficStatsPair& ZNC, TrafficStatsPair& Total)

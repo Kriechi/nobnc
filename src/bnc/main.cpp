@@ -16,7 +16,7 @@
  */
 
 #include "pidfile.h"
-#include <nobnc/noapp.h>
+#include <nobnc/noapp_p.h>
 #include <nobnc/nomodulecall.h>
 #include <nobnc/noexception.h>
 #include <nobnc/nodebug.h>
@@ -147,7 +147,8 @@ static void die(int sig)
 
     No::printMessage("Exiting on SIG [" + NoString(sig) + "]");
 
-    NoApp::destroyInstance();
+    delete NoAppPrivate::get(noApp);
+
     exit(sig);
 }
 
@@ -216,7 +217,7 @@ int main(int argc, char** argv)
 #ifdef HAVE_LIBSSL
     bool bMakePem = false;
 #endif
-    NoApp::createInstance();
+    NoApp app;
 
     while ((iArg = getopt_long(argc, argv, "hvnrcspd:Df", g_LongOpts, &iOptIndex)) != -1) {
         switch (iArg) {
@@ -270,14 +271,11 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    NoApp* pZNC = NoApp::instance();
-    pZNC->initDirs(((argc) ? argv[0] : ""), dataDir);
+    app.initDirs((argc ? argv[0] : ""), dataDir);
 
 #ifdef HAVE_LIBSSL
     if (bMakePem) {
-        pZNC->writePemFile();
-
-        NoApp::destroyInstance();
+        app.writePemFile();
         return 0;
     }
 #endif // HAVE_LIBSSL
@@ -295,8 +293,6 @@ int main(int argc, char** argv)
         std::cout << "\tSalt = " << salt << std::endl;
         std::cout << "</Pass>" << std::endl;
         No::printMessage("After that start ZNC again, and you should be able to login with the new password.");
-
-        NoApp::destroyInstance();
         return 0;
     }
 
@@ -305,15 +301,14 @@ int main(int argc, char** argv)
         std::set<NoModuleInfo> ssUserMods;
         std::set<NoModuleInfo> ssNetworkMods;
         No::printAction("Checking for list of available modules");
-        pZNC->loader()->availableModules(ssGlobalMods, No::GlobalModule);
-        pZNC->loader()->availableModules(ssUserMods, No::UserModule);
-        pZNC->loader()->availableModules(ssNetworkMods, No::NetworkModule);
+        app.loader()->availableModules(ssGlobalMods, No::GlobalModule);
+        app.loader()->availableModules(ssUserMods, No::UserModule);
+        app.loader()->availableModules(ssNetworkMods, No::NetworkModule);
         if (ssGlobalMods.empty() && ssUserMods.empty() && ssNetworkMods.empty()) {
             No::printStatus(false, "");
             No::printError("No modules found. Perhaps you didn't install ZNC properly?");
             No::printError("Read http://wiki.znc.in/Installation for instructions.");
             if (!No::getBoolInput("Do you really want to run ZNC without any modules?", false)) {
-                NoApp::destroyInstance();
                 return 1;
             }
         }
@@ -324,7 +319,6 @@ int main(int argc, char** argv)
         No::printError("You are running ZNC as root! Don't do that! There are not many valid");
         No::printError("reasons for this and it can, in theory, cause great damage!");
         if (!allowRoot) {
-            NoApp::destroyInstance();
             return 1;
         }
         No::printError("You have been warned.");
@@ -334,27 +328,24 @@ int main(int argc, char** argv)
     }
 
     if (bMakeConf) {
-        if (!pZNC->writeNewConfig(config)) {
-            NoApp::destroyInstance();
+        if (!app.writeNewConfig(config)) {
             return 0;
         }
         /* Fall through to normal bootup */
     }
 
     NoString configError;
-    if (!pZNC->parseConfig(config, configError)) {
+    if (!app.parseConfig(config, configError)) {
         No::printError("Unrecoverable config error.");
-        NoApp::destroyInstance();
         return 1;
     }
 
-    if (!pZNC->onBoot()) {
+    if (!app.onBoot()) {
         No::printError("Exiting due to module boot errors.");
-        NoApp::destroyInstance();
         return 1;
     }
 
-    // TODO: NoDir(pZNC->appPath()).filePath("znc.pid")
+    // TODO: NoDir(app.appPath()).filePath("znc.pid")
     PidFile pidFile("");
 
     if (bForeground) {
@@ -370,7 +361,6 @@ int main(int argc, char** argv)
 
         if (pid == -1) {
             No::printStatus(false, strerror(errno));
-            NoApp::destroyInstance();
             return 1;
         }
 
@@ -388,9 +378,8 @@ int main(int argc, char** argv)
          *   children.  Reacquire the lock here.  Use the blocking
          *   call to avoid race condition with parent exiting.
          */
-        if (!pZNC->waitForChildLock()) {
+        if (!app.waitForChildLock()) {
             No::printError("Child was unable to obtain lock on config file.");
-            NoApp::destroyInstance();
             return 1;
         }
 
@@ -433,7 +422,7 @@ int main(int argc, char** argv)
     int iRet = 0;
 
     try {
-        iRet = pZNC->exec();
+        iRet = app.exec();
     } catch (const NoException& e) {
         switch (e.type()) {
         case NoException::Shutdown:
@@ -441,7 +430,7 @@ int main(int argc, char** argv)
             break;
         case NoException::Restart: {
             // strdup() because GCC is stupid
-            char* args[] = { strdup(argv[0]), strdup("--datadir"), strdup(pZNC->appPath().c_str()), nullptr,
+            char* args[] = { strdup(argv[0]), strdup("--datadir"), strdup(app.appPath().c_str()), nullptr,
                              nullptr,         nullptr,             nullptr };
             int pos = 3;
             if (NoDebug::isEnabled())
@@ -455,7 +444,6 @@ int main(int argc, char** argv)
             // The above code adds 3 entries to args tops
             // which means the array should be big enough
 
-            NoApp::destroyInstance();
             execvp(args[0], args);
             No::printError("Unable to restart ZNC [" + NoString(strerror(errno)) + "]");
         } /* Fall through */
@@ -463,8 +451,6 @@ int main(int argc, char** argv)
             iRet = 1;
         }
     }
-
-    NoApp::destroyInstance();
 
     return iRet;
 }

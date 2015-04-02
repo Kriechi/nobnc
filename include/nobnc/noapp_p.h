@@ -24,15 +24,18 @@
 class NoAppPrivate
 {
 public:
+    NO_EXPORT ~NoAppPrivate(); // ### TODO: cleanup
+
     static NoAppPrivate* get(NoApp* app)
     {
         return app->d.get();
     }
 
+    static NoApp* instance;
+
     NoString expandConfigPath(const NoString& configFile, bool allowMkDir = true);
     void backupConfigOnce(const NoString& suffix);
 
-    void deleteUsers();
     void enableConnectQueue();
     void disableConnectQueue();
 

@@ -43,6 +43,8 @@ public:
     NoApp();
     ~NoApp();
 
+    static NoApp* instance();
+
     int exec();
 
     enum ConfigState { ConfigNothing, ConfigNeedRehash, ConfigNeedWrite, ConfigNeedVerboseWrite };
@@ -117,10 +119,6 @@ public:
     bool hideVersion() const;
     NoString sslCiphers() const;
     uint disabledSslProtocols() const;
-
-    static void createInstance();
-    static NoApp* instance();
-    static void destroyInstance();
 
     NoUser* findUser(const NoString& username);
     NoModule* findModule(const NoString& name, const NoString& username);
