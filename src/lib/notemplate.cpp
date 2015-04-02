@@ -274,7 +274,7 @@ NoTemplate::NoTemplate(const NoString& fileName) : d(new NoTemplatePrivate)
     d->options.reset(new NoTemplateOptions);
 }
 
-NoTemplate::NoTemplate(const std::shared_ptr<NoTemplateOptions>& options, NoTemplate* parent) : d(new NoTemplatePrivate)
+NoTemplate::NoTemplate(std::shared_ptr<NoTemplateOptions> options, NoTemplate* parent) : d(new NoTemplatePrivate)
 {
     d->options = options;
     d->parent = parent;

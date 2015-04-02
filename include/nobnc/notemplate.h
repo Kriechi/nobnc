@@ -59,7 +59,7 @@ class NO_EXPORT NoTemplate : public NoStringMap
 {
 public:
     NoTemplate(const NoString& fileName = "");
-    NoTemplate(const std::shared_ptr<NoTemplateOptions>& Options, NoTemplate* pParent = nullptr);
+    NoTemplate(std::shared_ptr<NoTemplateOptions> options, NoTemplate* pParent = nullptr);
     ~NoTemplate();
 
     //! Class for implementing custom tags in subclasses
