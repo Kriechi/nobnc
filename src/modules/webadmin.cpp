@@ -802,8 +802,7 @@ public:
         if (!socket.param("submitted").toUInt()) {
             tmpl["Username"] = user->userName();
 
-            std::set<NoModuleInfo> ssNetworkMods;
-            noApp->loader()->availableModules(ssNetworkMods, No::NetworkModule);
+            std::set<NoModuleInfo> ssNetworkMods = noApp->loader()->availableModules(No::NetworkModule);
             for (std::set<NoModuleInfo>::iterator it = ssNetworkMods.begin(); it != ssNetworkMods.end(); ++it) {
                 const NoModuleInfo& info = *it;
                 NoTemplate& l = tmpl.addRow("ModuleLoop");
@@ -1369,8 +1368,7 @@ public:
                 }
             }
 
-            std::set<NoModuleInfo> ssUserMods;
-            noApp->loader()->availableModules(ssUserMods);
+            std::set<NoModuleInfo> ssUserMods = noApp->loader()->availableModules(No::UserModule);
 
             for (std::set<NoModuleInfo>::iterator it = ssUserMods.begin(); it != ssUserMods.end(); ++it) {
                 const NoModuleInfo& info = *it;
@@ -1826,8 +1824,7 @@ public:
                 }
             }
 
-            std::set<NoModuleInfo> ssGlobalMods;
-            noApp->loader()->availableModules(ssGlobalMods, No::GlobalModule);
+            std::set<NoModuleInfo> ssGlobalMods = noApp->loader()->availableModules(No::GlobalModule);
 
             for (std::set<NoModuleInfo>::iterator it = ssGlobalMods.begin(); it != ssGlobalMods.end(); ++it) {
                 const NoModuleInfo& info = *it;

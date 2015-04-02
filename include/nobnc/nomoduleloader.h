@@ -57,8 +57,9 @@ public:
 
     static bool moduleInfo(NoModuleInfo& info, const NoString& name, NoString& message);
     static bool modulePath(NoModuleInfo& info, const NoString& name, const NoString& path, NoString& message);
-    static void availableModules(std::set<NoModuleInfo>& modules, No::ModuleType type = No::UserModule);
-    static void defaultModules(std::set<NoModuleInfo>& modules, No::ModuleType type = No::UserModule);
+
+    static std::set<NoModuleInfo> availableModules(No::ModuleType type);
+    static std::set<NoModuleInfo> defaultModules(No::ModuleType type);
 
     bool onBoot();
     bool onPreRehash();

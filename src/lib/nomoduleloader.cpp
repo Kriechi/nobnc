@@ -829,9 +829,9 @@ bool NoModuleLoader::modulePath(NoModuleInfo& info, const NoString& name, const 
     return true;
 }
 
-void NoModuleLoader::availableModules(std::set<NoModuleInfo>& modules, No::ModuleType type)
+std::set<NoModuleInfo> NoModuleLoader::availableModules(No::ModuleType type)
 {
-    modules.clear();
+    std::set<NoModuleInfo> modules;
 
     NoModDirList dirs = moduleDirs();
 
@@ -855,12 +855,13 @@ void NoModuleLoader::availableModules(std::set<NoModuleInfo>& modules, No::Modul
     }
 
     GLOBALMODULECALL(onGetAvailableModules(modules, type), NOTHING);
+
+    return modules;
 }
 
-void NoModuleLoader::defaultModules(std::set<NoModuleInfo>& modules, No::ModuleType type)
+std::set<NoModuleInfo> NoModuleLoader::defaultModules(No::ModuleType type)
 {
-
-    availableModules(modules, type);
+    std::set<NoModuleInfo> modules = availableModules(type);
 
     const std::map<NoString, No::ModuleType> ns = { { "chansaver", No::UserModule },
                                                     { "controlpanel", No::UserModule },
@@ -876,6 +877,7 @@ void NoModuleLoader::defaultModules(std::set<NoModuleInfo>& modules, No::ModuleT
             it = modules.erase(it);
         }
     }
+    return modules;
 }
 
 bool findModulePath(const NoString& name, NoString& path, NoString& sDataPath)

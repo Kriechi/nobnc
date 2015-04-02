@@ -939,8 +939,7 @@ void NoClient::userCommand(NoString& line)
         }
 
         if (d->user->isAdmin()) {
-            std::set<NoModuleInfo> ssGlobalMods;
-            noApp->loader()->availableModules(ssGlobalMods, No::GlobalModule);
+            std::set<NoModuleInfo> ssGlobalMods = noApp->loader()->availableModules(No::GlobalModule);
 
             if (ssGlobalMods.empty()) {
                 putStatus("No global modules available.");
@@ -960,8 +959,7 @@ void NoClient::userCommand(NoString& line)
             }
         }
 
-        std::set<NoModuleInfo> ssUserMods;
-        noApp->loader()->availableModules(ssUserMods);
+        std::set<NoModuleInfo> ssUserMods = noApp->loader()->availableModules(No::UserModule);
 
         if (ssUserMods.empty()) {
             putStatus("No user modules available.");
@@ -980,8 +978,7 @@ void NoClient::userCommand(NoString& line)
             putStatus(Table);
         }
 
-        std::set<NoModuleInfo> ssNetworkMods;
-        noApp->loader()->availableModules(ssNetworkMods, No::NetworkModule);
+        std::set<NoModuleInfo> ssNetworkMods = noApp->loader()->availableModules(No::NetworkModule);
 
         if (ssNetworkMods.empty()) {
             putStatus("No network modules available.");

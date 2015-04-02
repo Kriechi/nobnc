@@ -294,13 +294,10 @@ int main(int argc, char** argv)
     }
 
     {
-        std::set<NoModuleInfo> ssGlobalMods;
-        std::set<NoModuleInfo> ssUserMods;
-        std::set<NoModuleInfo> ssNetworkMods;
         No::printAction("Checking for list of available modules");
-        app.loader()->availableModules(ssGlobalMods, No::GlobalModule);
-        app.loader()->availableModules(ssUserMods, No::UserModule);
-        app.loader()->availableModules(ssNetworkMods, No::NetworkModule);
+        std::set<NoModuleInfo> ssGlobalMods = app.loader()->availableModules(No::GlobalModule);
+        std::set<NoModuleInfo> ssUserMods = app.loader()->availableModules(No::UserModule);
+        std::set<NoModuleInfo> ssNetworkMods = app.loader()->availableModules(No::NetworkModule);
         if (ssGlobalMods.empty() && ssUserMods.empty() && ssNetworkMods.empty()) {
             No::printStatus(false, "");
             No::printError("No modules found. Perhaps you didn't install ZNC properly?");
