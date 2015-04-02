@@ -28,7 +28,7 @@
 #include "nouser.h"
 #include "nonetwork.h"
 #include "nodebug.h"
-#include "noapp.h"
+#include "noapp_p.h"
 #include "noescape.h"
 #include <algorithm>
 
@@ -293,8 +293,8 @@ NoWebSocket::~NoWebSocket()
         user->addBytesWritten(bytesWritten());
         user->addBytesRead(bytesRead());
     } else {
-        noApp->addBytesWritten(bytesWritten());
-        noApp->addBytesRead(bytesRead());
+        NoAppPrivate::get(noApp)->addBytesWritten(bytesWritten());
+        NoAppPrivate::get(noApp)->addBytesRead(bytesRead());
     }
 
     // bytes have been accounted for, so make sure they don't get again:

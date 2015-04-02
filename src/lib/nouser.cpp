@@ -24,7 +24,7 @@
 #include "nochannel.h"
 #include "noclient.h"
 #include "nomodulecall.h"
-#include "noapp.h"
+#include "noapp_p.h"
 #include "noregistry.h"
 #include "Csocket/Csocket.h"
 #include <math.h>
@@ -137,8 +137,8 @@ NoUser::~NoUser()
 
     noApp->manager()->removeCron(d->userTimer);
 
-    noApp->addBytesRead(bytesRead());
-    noApp->addBytesWritten(bytesWritten());
+    NoAppPrivate::get(noApp)->addBytesRead(bytesRead());
+    NoAppPrivate::get(noApp)->addBytesWritten(bytesWritten());
 }
 
 template <class T>

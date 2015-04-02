@@ -1510,14 +1510,14 @@ void NoApp::broadcast(const NoString& message, bool adminOnly, NoUser* skipUser,
     }
 }
 
-void NoApp::addBytesRead(ulonglong u)
+void NoAppPrivate::addBytesRead(ulonglong bytes)
 {
-    d->bytesRead += u;
+    bytesRead += bytes;
 }
 
-void NoApp::addBytesWritten(ulonglong u)
+void NoAppPrivate::addBytesWritten(ulonglong bytes)
 {
-    d->bytesWritten += u;
+    bytesWritten += bytes;
 }
 
 ulonglong NoApp::bytesRead() const

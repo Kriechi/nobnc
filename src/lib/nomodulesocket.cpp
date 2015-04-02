@@ -20,7 +20,7 @@
 #include "nomodule_p.h"
 #include "nonetwork.h"
 #include "nouser.h"
-#include "noapp.h"
+#include "noapp_p.h"
 #include "nodebug.h"
 
 NoModuleSocket::NoModuleSocket(NoModule* module) : NoSocket(), m_module(module)
@@ -55,8 +55,8 @@ NoModuleSocket::~NoModuleSocket()
         user->addBytesWritten(bytesWritten());
         user->addBytesRead(bytesRead());
     } else {
-        noApp->addBytesWritten(bytesWritten());
-        noApp->addBytesRead(bytesRead());
+        NoAppPrivate::get(noApp)->addBytesWritten(bytesWritten());
+        NoAppPrivate::get(noApp)->addBytesRead(bytesRead());
     }
 }
 

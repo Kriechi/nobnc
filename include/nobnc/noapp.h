@@ -68,8 +68,6 @@ public:
     bool addTrustedProxy(const NoString& host);
     bool removeTrustedProxy(const NoString& host);
     void broadcast(const NoString& message, bool adminOnly = false, NoUser* skipUser = nullptr, NoClient* skipClient = nullptr);
-    void addBytesRead(ulonglong u);
-    void addBytesWritten(ulonglong u);
     ulonglong bytesRead() const;
     ulonglong bytesWritten() const;
 

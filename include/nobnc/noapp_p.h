@@ -46,6 +46,9 @@ public:
     bool addListener(const NoString& line, NoString& error);
     bool addListener(NoSettings* settings, NoString& error);
 
+    void addBytesRead(ulonglong bytes);
+    void addBytesWritten(ulonglong bytes);
+
     time_t startTime;
 
     NoApp::ConfigState configState = NoApp::ConfigNothing;
