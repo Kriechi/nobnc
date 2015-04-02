@@ -350,7 +350,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
                         pNick->removePerm(uPerm);
 
                         if (pNick->equals(d->network->currentNick())) {
-                            remPerm(uPerm);
+                            removePerm(uPerm);
                         }
                     }
 
@@ -408,7 +408,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
             NETWORKMODULECALL(onMode2(opNick, *this, mode, arg, bAdd, noChange), d->network->user(), d->network, nullptr, NOTHING);
 
             if (!bList) {
-                (bAdd) ? addMode(mode, arg) : remMode(mode);
+                (bAdd) ? addMode(mode, arg) : removeMode(mode);
             }
 
             // This is called when we join (ZNC requests the channel modes
@@ -464,7 +464,7 @@ bool NoChannel::addMode(uchar mode, const NoString& arg)
     return true;
 }
 
-bool NoChannel::remMode(uchar mode)
+bool NoChannel::removeMode(uchar mode)
 {
     if (!hasMode(mode)) {
         return false;
@@ -564,7 +564,7 @@ std::map<char, uint> NoChannel::permCounts() const
     return mRet;
 }
 
-bool NoChannel::remNick(const NoString& nick)
+bool NoChannel::removeNick(const NoString& nick)
 {
     std::map<NoString, NoNick>::iterator it;
     std::set<uchar>::iterator it2;
@@ -734,7 +734,7 @@ void NoChannel::addPerm(uchar uPerm)
 {
     d->nick.addPerm(uPerm);
 }
-void NoChannel::remPerm(uchar uPerm)
+void NoChannel::removePerm(uchar uPerm)
 {
     d->nick.removePerm(uPerm);
 }

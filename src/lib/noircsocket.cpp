@@ -580,7 +580,7 @@ void NoIrcSocket::readLine(const NoString& data)
             const std::vector<NoChannel*>& channels = d->network->channels();
 
             for (NoChannel* channel : channels) {
-                if (channel->remNick(nick.nick())) {
+                if (channel->removeNick(nick.nick())) {
                     vFoundChans.push_back(channel);
 
                     if (!channel->isDetached()) {
@@ -625,7 +625,7 @@ void NoIrcSocket::readLine(const NoString& data)
             NoChannel* channel = d->network->findChannel(sChan);
             bool bDetached = false;
             if (channel) {
-                channel->remNick(nick.nick());
+                channel->removeNick(nick.nick());
                 IRCSOCKMODULECALL(onPart(nick.nickMask(), *channel, msg), NOTHING);
 
                 if (channel->isDetached())
@@ -694,7 +694,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 IRCSOCKMODULECALL(onKick(nick, sKickedNick, *channel, msg), NOTHING);
                 // do not remove the nick till after the onKick call, so modules
                 // can do channel.FindNick or something to get more info.
-                channel->remNick(sKickedNick);
+                channel->removeNick(sKickedNick);
             }
 
             if (d->nick.nick().equals(sKickedNick) && channel) {

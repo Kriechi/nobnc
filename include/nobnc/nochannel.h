@@ -65,7 +65,7 @@ public:
     void setModes(const NoString& s);
     void modeChange(const NoString& modes, const NoNick* opNick = nullptr);
     bool addMode(uchar mode, const NoString& arg);
-    bool remMode(uchar mode);
+    bool removeMode(uchar mode);
     NoString modeString() const;
     NoString modeArg(NoString& args) const;
     NoString modeForNames() const;
@@ -75,7 +75,7 @@ public:
     NoNick* findNick(const NoString& nick);
     int addNicks(const NoString& sNicks);
     bool addNick(const NoString& nick);
-    bool remNick(const NoString& nick);
+    bool removeNick(const NoString& nick);
     bool changeNick(const NoString& sOldNick, const NoString& newNick);
 
     const NoBuffer& buffer() const;
@@ -90,7 +90,7 @@ public:
     NoString permStr() const;
     bool hasPerm(uchar uPerm) const;
     void addPerm(uchar uPerm);
-    void remPerm(uchar uPerm);
+    void removePerm(uchar uPerm);
 
     void setModeKnown(bool b);
     void setIsOn(bool b);
