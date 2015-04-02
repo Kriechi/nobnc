@@ -80,6 +80,11 @@ NoNick::~NoNick()
 {
 }
 
+bool NoNick::isValid() const
+{
+    return !d->nick.empty();
+}
+
 bool NoNick::equals(const NoString& nick) const
 {
     // TODO add proper IRC case mapping here

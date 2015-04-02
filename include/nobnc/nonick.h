@@ -33,6 +33,7 @@ public:
     NoNick& operator=(const NoNick& other);
     ~NoNick();
 
+    bool isValid() const;
     bool equals(const NoString& nick) const;
 
     NoString nick() const;
