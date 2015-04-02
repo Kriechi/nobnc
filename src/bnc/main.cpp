@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
+#include "pidfile.h"
 #include <nobnc/noapp.h>
 #include <nobnc/nomodulecall.h>
 #include <nobnc/noexception.h>
 #include <nobnc/nodebug.h>
+#include <nobnc/nodir.h>
 #include <signal.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -352,11 +354,14 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    // TODO: NoDir(pZNC->appPath()).filePath("znc.pid")
+    PidFile pidFile("");
+
     if (bForeground) {
         int pid = getpid();
         No::printMessage("Staying open for debugging [pid: " + NoString(pid) + "]");
 
-        pZNC->writePidFile(pid);
+        pidFile.write(pid);
         No::printMessage(NoApp::tag());
     } else {
         No::printAction("Forking into the background");
@@ -373,9 +378,9 @@ int main(int argc, char** argv)
             // We are the parent. We are done and will go to bed.
             No::printStatus(true, "[pid: " + NoString(pid) + "]");
 
-            pZNC->writePidFile(pid);
+            pidFile.write(pid);
             No::printMessage(NoApp::tag());
-            /* Don't destroy pZNC here or it will delete the pid file. */
+            pidFile.reset();
             return 0;
         }
 

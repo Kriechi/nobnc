@@ -29,9 +29,6 @@ public:
         return app->d.get();
     }
 
-    NoFile* initPidFile();
-    bool deletePidFile();
-
     NoString expandConfigPath(const NoString& configFile, bool allowMkDir = true);
     void backupConfigOnce(const NoString& suffix);
 
@@ -63,7 +60,6 @@ public:
     NoString configFile;
     NoString skinName;
     NoString statusPrefix;
-    NoString pidFile;
     NoString sslCertFile;
     NoString sslCiphers;
     NoString sslProtocols;

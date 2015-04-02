@@ -85,7 +85,6 @@ NoApp::~NoApp()
     delete d->lockFile;
 
     ShutdownCsocket();
-    d->deletePidFile();
 }
 
 NoString NoApp::version()
@@ -218,58 +217,6 @@ void NoApp::loop()
         // 100 msec to 600 sec
         d->manager.dynamicSelectLoop(100 * 1000, 600 * 1000 * 1000);
     }
-}
-
-NoFile* NoAppPrivate::initPidFile()
-{
-    if (!pidFile.empty()) {
-        NoString sFile;
-
-        // absolute path or relative to the data dir?
-        if (pidFile[0] != '/')
-            sFile = noApp->appPath() + "/" + pidFile;
-        else
-            sFile = pidFile;
-
-        return new NoFile(sFile);
-    }
-
-    return nullptr;
-}
-
-bool NoApp::writePidFile(int pid)
-{
-    NoFile* File = d->initPidFile();
-    if (File == nullptr)
-        return false;
-
-    No::printAction("Writing pid file [" + File->GetLongName() + "]");
-
-    bool bRet = false;
-    if (File->Open(O_WRONLY | O_TRUNC | O_CREAT)) {
-        File->Write(NoString(pid) + "\n");
-        File->Close();
-        bRet = true;
-    }
-
-    delete File;
-    No::printStatus(bRet);
-    return bRet;
-}
-
-bool NoAppPrivate::deletePidFile()
-{
-    NoFile* File = initPidFile();
-    if (File == nullptr)
-        return false;
-
-    No::printAction("Deleting pid file [" + File->GetLongName() + "]");
-
-    bool bRet = File->Delete();
-
-    delete File;
-    No::printStatus(bRet);
-    return bRet;
 }
 
 #ifdef HAVE_LIBSSL
@@ -632,10 +579,6 @@ bool NoApp::writeConfig()
 
     config.AddKeyValuePair("ConnectDelay", NoString(d->connectDelay));
     config.AddKeyValuePair("ServerThrottle", NoString(d->connectThrottle.expiration() / 1000));
-
-    if (!d->pidFile.empty()) {
-        config.AddKeyValuePair("PidFile", No::firstLine(d->pidFile));
-    }
 
     if (!d->skinName.empty()) {
         config.AddKeyValuePair("Skin", No::firstLine(d->skinName));
@@ -1260,8 +1203,6 @@ bool NoAppPrivate::doRehash(NoString& error)
     }
 
     NoString sVal;
-    if (config.FindStringEntry("pidfile", sVal))
-        pidFile = sVal;
     if (config.FindStringEntry("statusprefix", sVal))
         statusPrefix = sVal;
     if (config.FindStringEntry("sslcertfile", sVal))
