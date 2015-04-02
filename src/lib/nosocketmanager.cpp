@@ -54,12 +54,12 @@ struct NoDnsTask
 {
     NoDnsTask()
         : hostname(""),
-          iPort(0),
-          sSockName(""),
-          iTimeout(0),
+          port(0),
+          name(""),
+          timeout(0),
           ssl(false),
           sBindhost(""),
-          pcSock(nullptr),
+          socket(nullptr),
           bDoneTarget(false),
           bDoneBind(false),
           aiTarget(nullptr),
@@ -71,12 +71,12 @@ struct NoDnsTask
     NoDnsTask& operator=(const NoDnsTask&) = delete;
 
     NoString hostname;
-    u_short iPort;
-    NoString sSockName;
-    int iTimeout;
+    u_short port;
+    NoString name;
+    int timeout;
     bool ssl;
     NoString sBindhost;
-    NoSocket* pcSock;
+    NoSocket* socket;
 
     bool bDoneTarget;
     bool bDoneBind;
@@ -109,12 +109,12 @@ static void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBin
 static void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind, addrinfo* aiResult);
 static void FinishConnect(NoSocketManager* manager,
                           const NoString& hostname,
-                          u_short iPort,
-                          const NoString& sSockName,
-                          int iTimeout,
+                          u_short port,
+                          const NoString& name,
+                          int timeout,
                           bool ssl,
                           const NoString& bindHost,
-                          NoSocket* pcSock);
+                          NoSocket* socket);
 #endif
 
 NoSocketManager::NoSocketManager() : m_instance(new CSocketManager)
@@ -128,21 +128,21 @@ NoSocketManager::~NoSocketManager()
 {
 }
 
-bool NoSocketManager::listenHost(u_short iPort,
-                                 const NoString& sSockName,
+bool NoSocketManager::listenHost(u_short port,
+                                 const NoString& name,
                                  const NoString& bindHost,
                                  bool ssl,
-                                 int iMaxConns,
-                                 NoSocket* pcSock,
-                                 u_int iTimeout,
+                                 int maxConns,
+                                 NoSocket* socket,
+                                 u_int timeout,
                                  No::AddressType addressType)
 {
-    CSListener L(iPort, bindHost);
+    CSListener L(port, bindHost);
 
-    L.SetSockName(sSockName);
+    L.SetSockName(name);
     L.SetIsSSL(ssl);
-    L.SetTimeout(iTimeout);
-    L.SetMaxConns(iMaxConns);
+    L.SetTimeout(timeout);
+    L.SetMaxConns(maxConns);
 
 #ifdef HAVE_IPV6
     switch (addressType) {
@@ -158,29 +158,29 @@ bool NoSocketManager::listenHost(u_short iPort,
     }
 #endif
 
-    return m_instance->Listen(L, NoSocketPrivate::get(pcSock));
+    return m_instance->Listen(L, NoSocketPrivate::get(socket));
 }
 
-bool NoSocketManager::listenAll(u_short iPort, const NoString& sSockName, bool ssl, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType addressType)
+bool NoSocketManager::listenAll(u_short port, const NoString& name, bool ssl, int maxConns, NoSocket* socket, u_int timeout, No::AddressType addressType)
 {
-    return listenHost(iPort, sSockName, "", ssl, iMaxConns, pcSock, iTimeout, addressType);
+    return listenHost(port, name, "", ssl, maxConns, socket, timeout, addressType);
 }
 
-u_short NoSocketManager::listenRand(const NoString& sSockName,
+u_short NoSocketManager::listenRand(const NoString& name,
                                     const NoString& bindHost,
                                     bool ssl,
-                                    int iMaxConns,
-                                    NoSocket* pcSock,
-                                    u_int iTimeout,
+                                    int maxConns,
+                                    NoSocket* socket,
+                                    u_int timeout,
                                     No::AddressType addressType)
 {
     ushort port = 0;
     CSListener L(0, bindHost);
 
-    L.SetSockName(sSockName);
+    L.SetSockName(name);
     L.SetIsSSL(ssl);
-    L.SetTimeout(iTimeout);
-    L.SetMaxConns(iMaxConns);
+    L.SetTimeout(timeout);
+    L.SetMaxConns(maxConns);
 
 #ifdef HAVE_IPV6
     switch (addressType) {
@@ -196,37 +196,37 @@ u_short NoSocketManager::listenRand(const NoString& sSockName,
     }
 #endif
 
-    m_instance->Listen(L, NoSocketPrivate::get(pcSock), &port);
+    m_instance->Listen(L, NoSocketPrivate::get(socket), &port);
 
     return port;
 }
 
-u_short NoSocketManager::listenAllRand(const NoString& sSockName, bool ssl, int iMaxConns, NoSocket* pcSock, u_int iTimeout, No::AddressType addressType)
+u_short NoSocketManager::listenAllRand(const NoString& name, bool ssl, int maxConns, NoSocket* socket, u_int timeout, No::AddressType addressType)
 {
-    return listenRand(sSockName, "", ssl, iMaxConns, pcSock, iTimeout, addressType);
+    return listenRand(name, "", ssl, maxConns, socket, timeout, addressType);
 }
 
 void NoSocketManager::connect(const NoString& hostname,
-                              u_short iPort,
-                              const NoString& sSockName,
-                              int iTimeout,
+                              u_short port,
+                              const NoString& name,
+                              int timeout,
                               bool ssl,
                               const NoString& bindHost,
-                              NoSocket* pcSock)
+                              NoSocket* socket)
 {
-    if (pcSock) {
-        pcSock->setHostToVerifySsl(hostname);
+    if (socket) {
+        socket->setHostToVerifySsl(hostname);
     }
 #ifdef HAVE_THREADED_DNS
     NO_DEBUG("TDNS: initiating resolving of [" << hostname << "] and bindhost [" << bindHost << "]");
     NoDnsTask* task = new NoDnsTask;
     task->hostname = hostname;
-    task->iPort = iPort;
-    task->sSockName = sSockName;
-    task->iTimeout = iTimeout;
+    task->port = port;
+    task->name = name;
+    task->timeout = timeout;
     task->ssl = ssl;
     task->sBindhost = bindHost;
-    task->pcSock = pcSock;
+    task->socket = socket;
     if (bindHost.empty()) {
         task->bDoneBind = true;
     } else {
@@ -235,7 +235,7 @@ void NoSocketManager::connect(const NoString& hostname,
     StartTDNSThread(this, task, false);
 #else // HAVE_THREADED_DNS
     // Just let Csocket handle DNS itself
-    FinishConnect(this, hostname, iPort, sSockName, iTimeout, ssl, bindHost, pcSock);
+    FinishConnect(this, hostname, port, name, timeout, ssl, bindHost, socket);
 #endif
 }
 
@@ -276,15 +276,15 @@ void NoSocketManager::cleanup()
     m_instance->Cleanup();
 }
 
-void NoSocketManager::dynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution)
+void NoSocketManager::dynamicSelectLoop(uint64_t lowerBounds, uint64_t upperBounds, time_t maxResolution)
 {
-    m_instance->DynamicSelectLoop(iLowerBounds, iUpperBounds, iMaxResolution);
+    m_instance->DynamicSelectLoop(lowerBounds, upperBounds, maxResolution);
 }
 
-void NoSocketManager::addSocket(NoSocket* pcSock, const NoString& sSockName)
+void NoSocketManager::addSocket(NoSocket* socket, const NoString& name)
 {
-    m_sockets.push_back(pcSock);
-    m_instance->AddSock(NoSocketPrivate::get(pcSock), sSockName);
+    m_sockets.push_back(socket);
+    m_instance->AddSock(NoSocketPrivate::get(socket), name);
 }
 
 void NoSocketManager::removeSocket(NoSocket* socket)
@@ -310,9 +310,9 @@ void NoSocketManager::removeCron(CCron* cron)
     m_instance->DelCronByAddr(cron);
 }
 
-void NoSocketManager::doConnect(const CSConnection& cCon, Csock* pcSock)
+void NoSocketManager::doConnect(const CSConnection& connection, Csock* socket)
 {
-    m_instance->Connect(cCon, pcSock);
+    m_instance->Connect(connection, socket);
 }
 
 #ifdef HAVE_THREADED_DNS
@@ -482,13 +482,13 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
             sBindhost = RandomFromSet(ssBinds, gen);
         }
 
-        NO_DEBUG("TDNS: " << task->sSockName << ", connecting to [" << sTargetHost << "] using bindhost [" << sBindhost << "]");
-        FinishConnect(manager, sTargetHost, task->iPort, task->sSockName, task->iTimeout, task->ssl, sBindhost, task->pcSock);
+        NO_DEBUG("TDNS: " << task->name << ", connecting to [" << sTargetHost << "] using bindhost [" << sBindhost << "]");
+        FinishConnect(manager, sTargetHost, task->port, task->name, task->timeout, task->ssl, sBindhost, task->socket);
     } catch (const char* s) {
-        NO_DEBUG(task->sSockName << ", dns resolving error: " << s);
-        task->pcSock->setName(task->sSockName);
-        NoSocketPrivate::get(task->pcSock)->SockError(-1, s);
-        delete task->pcSock;
+        NO_DEBUG(task->name << ", dns resolving error: " << s);
+        task->socket->setName(task->name);
+        NoSocketPrivate::get(task->socket)->SockError(-1, s);
+        delete task->socket;
     }
 
     delete task;
@@ -497,16 +497,16 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
 
 void FinishConnect(NoSocketManager* manager,
                    const NoString& hostname,
-                   u_short iPort,
-                   const NoString& sSockName,
-                   int iTimeout,
+                   u_short port,
+                   const NoString& name,
+                   int timeout,
                    bool ssl,
                    const NoString& bindHost,
-                   NoSocket* pcSock)
+                   NoSocket* socket)
 {
-    CSConnection C(hostname, iPort, iTimeout);
+    CSConnection C(hostname, port, timeout);
 
-    C.SetSockName(sSockName);
+    C.SetSockName(name);
     C.SetIsSSL(ssl);
     C.SetBindHost(bindHost);
 #ifdef HAVE_LIBSSL
@@ -517,5 +517,5 @@ void FinishConnect(NoSocketManager* manager,
     C.SetCipher(sCipher);
 #endif
 
-    manager->doConnect(C, NoSocketPrivate::get(pcSock));
+    manager->doConnect(C, NoSocketPrivate::get(socket));
 }

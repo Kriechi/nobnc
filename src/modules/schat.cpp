@@ -54,16 +54,16 @@ class NoSChatSock : public NoModuleSocket
 {
 public:
     NoSChatSock(NoSChat* mod, const NoString& sChatNick);
-    NoSChatSock(NoSChat* mod, const NoString& sChatNick, const NoString& host, u_short iPort);
+    NoSChatSock(NoSChat* mod, const NoString& sChatNick, const NoString& host, u_short port);
     ~NoSChatSock();
 
-    NoSocket* createSocket(const NoString& hostname, u_short iPort) override
+    NoSocket* createSocket(const NoString& hostname, u_short port) override
     {
-        NoSChatSock* p = new NoSChatSock(m_module, m_sChatNick, hostname, iPort);
+        NoSChatSock* p = new NoSChatSock(m_module, m_sChatNick, hostname, port);
         return (p);
     }
 
-    bool onConnectionFrom(const NoString& host, u_short iPort) override
+    bool onConnectionFrom(const NoString& host, u_short port) override
     {
         close(); // close the listener after the first connection
         return (true);
@@ -175,10 +175,10 @@ public:
             socket->setCipher("HIGH");
             socket->setPemFile(m_sPemFile);
 
-            u_short iPort =
+            u_short port =
             manager()->listenRand(socket->name() + "::LISTENER", user()->localDccIp(), true, SOMAXCONN, socket, 60);
 
-            if (iPort == 0) {
+            if (port == 0) {
                 putModule("Failed to start chat!");
                 return;
             }
@@ -187,7 +187,7 @@ public:
             s << "PRIVMSG " << args << " :\001";
             s << "DCC SCHAT chat ";
             s << No::formatLongIp(user()->localDccIp());
-            s << " " << iPort << "\001";
+            s << " " << port << "\001";
 
             putIrc(s.str());
 
@@ -307,14 +307,14 @@ public:
         if (message.startsWith("DCC SCHAT ")) {
             // chat ip port
             ulong iIP = No::token(message, 3).toULong();
-            ushort iPort = No::token(message, 4).toUShort();
+            ushort port = No::token(message, 4).toUShort();
 
-            if (iIP > 0 && iPort > 0) {
+            if (iIP > 0 && port > 0) {
                 std::pair<u_long, u_short> pTmp;
                 NoString sMask;
 
                 pTmp.first = iIP;
-                pTmp.second = iPort;
+                pTmp.second = port;
                 sMask = "(s)" + nick.nick() + "!" + "(s)" + nick.nick() + "@" + No::formatIp(iIP);
 
                 m_siiWaitingChats["(s)" + nick.nick()] = pTmp;
@@ -329,18 +329,18 @@ public:
         return (CONTINUE);
     }
 
-    void AcceptSDCC(const NoString& nick, u_long iIP, u_short iPort)
+    void AcceptSDCC(const NoString& nick, u_long iIP, u_short port)
     {
-        NoSChatSock* p = new NoSChatSock(this, nick, No::formatIp(iIP), iPort);
-        manager()->connect(No::formatIp(iIP), iPort, p->name(), 60, true, user()->localDccIp(), p);
+        NoSChatSock* p = new NoSChatSock(this, nick, No::formatIp(iIP), port);
+        manager()->connect(No::formatIp(iIP), port, p->name(), 60, true, user()->localDccIp(), p);
         delete findTimer("Remove " + nick); // delete any associated timer to this nick
     }
 
     ModRet onUserMsg(NoString& target, NoString& message) override
     {
         if (target.left(3) == "(s)") {
-            NoString sSockName = moduleName().toUpper() + "::" + target;
-            NoSChatSock* p = (NoSChatSock*)findSocket(sSockName);
+            NoString name = moduleName().toUpper() + "::" + target;
+            NoSChatSock* p = (NoSChatSock*)findSocket(name);
             if (!p) {
                 std::map<NoString, std::pair<u_long, u_short>>::iterator it;
                 it = m_siiWaitingChats.find(target);
@@ -409,8 +409,8 @@ NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick) : NoModuleSock
     mod->AddSocket(this);
 }
 
-NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick, const NoString& host, u_short iPort)
-    : NoModuleSocket(mod, host, iPort)
+NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick, const NoString& host, u_short port)
+    : NoModuleSocket(mod, host, port)
 {
     m_module = mod;
     enableReadLine();

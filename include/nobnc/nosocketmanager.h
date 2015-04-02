@@ -34,58 +34,58 @@ public:
     NoSocketManager();
     ~NoSocketManager();
 
-    bool listenHost(ushort iPort,
-                    const NoString& sSockName,
+    bool listenHost(ushort port,
+                    const NoString& name,
                     const NoString& bindHost,
                     bool ssl = false,
-                    int iMaxConns = SOMAXCONN,
-                    NoSocket* pcSock = nullptr,
-                    u_int iTimeout = 0,
+                    int maxConns = SOMAXCONN,
+                    NoSocket* socket = nullptr,
+                    u_int timeout = 0,
                     No::AddressType addressType = No::Ipv4AndIpv6Address);
 
-    bool listenAll(ushort iPort,
-                   const NoString& sSockName,
+    bool listenAll(ushort port,
+                   const NoString& name,
                    bool ssl = false,
-                   int iMaxConns = SOMAXCONN,
-                   NoSocket* pcSock = nullptr,
-                   u_int iTimeout = 0,
+                   int maxConns = SOMAXCONN,
+                   NoSocket* socket = nullptr,
+                   u_int timeout = 0,
                    No::AddressType addressType = No::Ipv4AndIpv6Address);
 
-    u_short listenRand(const NoString& sSockName,
+    u_short listenRand(const NoString& name,
                        const NoString& bindHost,
                        bool ssl = false,
-                       int iMaxConns = SOMAXCONN,
-                       NoSocket* pcSock = nullptr,
-                       u_int iTimeout = 0,
+                       int maxConns = SOMAXCONN,
+                       NoSocket* socket = nullptr,
+                       u_int timeout = 0,
                        No::AddressType addressType = No::Ipv4AndIpv6Address);
 
-    u_short listenAllRand(const NoString& sSockName,
+    u_short listenAllRand(const NoString& name,
                           bool ssl = false,
-                          int iMaxConns = SOMAXCONN,
-                          NoSocket* pcSock = nullptr,
-                          u_int iTimeout = 0,
+                          int maxConns = SOMAXCONN,
+                          NoSocket* socket = nullptr,
+                          u_int timeout = 0,
                           No::AddressType addressType = No::Ipv4AndIpv6Address);
 
     void connect(const NoString& hostname,
-                 ushort iPort,
-                 const NoString& sSockName,
-                 int iTimeout = 60,
+                 ushort port,
+                 const NoString& name,
+                 int timeout = 60,
                  bool ssl = false,
                  const NoString& bindHost = "",
-                 NoSocket* pcSock = nullptr);
+                 NoSocket* socket = nullptr);
 
     std::vector<NoSocket*> sockets() const;
     std::vector<NoSocket*> findSockets(const NoString& name);
     uint anonConnectionCount(const NoString& address) const;
 
     void cleanup();
-    void dynamicSelectLoop(uint64_t iLowerBounds, uint64_t iUpperBounds, time_t iMaxResolution = 3600);
-    void addSocket(NoSocket* pcSock, const NoString& sSockName);
+    void dynamicSelectLoop(uint64_t lowerBounds, uint64_t upperBounds, time_t maxResolution = 3600);
+    void addSocket(NoSocket* socket, const NoString& name);
     void removeSocket(NoSocket* socket);
     bool swapSocket(Csock* newSocket, Csock* originalSocket);
     void addCron(CCron* cron);
     void removeCron(CCron* cron);
-    void doConnect(const CSConnection& cCon, Csock* pcSock = NULL);
+    void doConnect(const CSConnection& connection, Csock* socket = NULL);
 
 private:
     CSocketManager* m_instance;

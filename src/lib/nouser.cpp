@@ -1014,18 +1014,18 @@ bool NoUser::checkPass(const NoString& pass) const
 /*NoClient* NoUser::client() {
     // Todo: optimize this by saving a pointer to the sock
     NoSocketManager& Manager = noApp->manager();
-    NoString sSockName = "USR::" + d->userName;
+    NoString name = "USR::" + d->userName;
 
     for (uint a = 0; a < Manager.size(); a++) {
         Csock* socket = Manager[a];
-        if (socket->GetSockName().equals(sSockName)) {
+        if (socket->GetSockName().equals(name)) {
             if (!socket->IsClosed()) {
                 return (NoClient*) socket;
             }
         }
     }
 
-    return (NoClient*) noApp->manager()->FindSockByName(sSockName);
+    return (NoClient*) noApp->manager()->FindSockByName(name);
 }*/
 
 NoString NoUser::localDccIp() const

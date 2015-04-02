@@ -90,25 +90,25 @@ bool NoModuleSocket::connect(const NoString& hostname, ushort port, bool ssl, ui
     }
 
     NoUser* user = m_module->user();
-    NoString sSockName = "MOD::C::" + m_module->moduleName();
+    NoString name = "MOD::C::" + m_module->moduleName();
     NoString bindHost;
 
     if (user) {
-        sSockName += "::" + user->userName();
+        name += "::" + user->userName();
         bindHost = user->bindHost();
         NoNetwork* network = m_module->network();
         if (network) {
-            sSockName += "::" + network->name();
+            name += "::" + network->name();
             bindHost = network->bindHost();
         }
     }
 
     // Don't overwrite the socket name if one is already set
-    if (!name().empty()) {
-        sSockName = name();
+    if (!NoSocket::name().empty()) {
+        name = NoSocket::name();
     }
 
-    m_module->manager()->connect(hostname, port, sSockName, uTimeout, ssl, bindHost, this);
+    m_module->manager()->connect(hostname, port, name, uTimeout, ssl, bindHost, this);
     return true;
 }
 
@@ -120,17 +120,17 @@ bool NoModuleSocket::listen(ushort port, bool ssl, uint uTimeout)
     }
 
     NoUser* user = m_module->user();
-    NoString sSockName = "MOD::L::" + m_module->moduleName();
+    NoString name = "MOD::L::" + m_module->moduleName();
 
     if (user) {
-        sSockName += "::" + user->userName();
+        name += "::" + user->userName();
     }
     // Don't overwrite the socket name if one is already set
-    if (!name().empty()) {
-        sSockName = name();
+    if (!NoSocket::name().empty()) {
+        name = NoSocket::name();
     }
 
-    return m_module->manager()->listenAll(port, sSockName, ssl, SOMAXCONN, this);
+    return m_module->manager()->listenAll(port, name, ssl, SOMAXCONN, this);
 }
 
 NoModule* NoModuleSocket::module() const

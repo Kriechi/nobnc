@@ -152,7 +152,7 @@ public:
         Table.addColumn("File");
 
         for (NoDccBounce* socket : m_sockets) {
-            NoString sSockName = socket->name();
+            NoString name = socket->name();
 
             if (!(socket->IsRemote())) {
                 Table.addRow();
