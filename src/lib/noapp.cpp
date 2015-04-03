@@ -23,6 +23,7 @@
 #include "noauthenticator.h"
 #include "noserverinfo.h"
 #include "nouser.h"
+#include "nouser_p.h"
 #include "nonetwork.h"
 #include "nosettings.h"
 #include "noclient.h"
@@ -55,7 +56,7 @@ NoAppPrivate::~NoAppPrivate()
     }
 
     for (const auto& it : users) {
-        it.second->setBeingDeleted(true);
+       NoUserPrivate::get(it.second)->beingDeleted = true;
     }
 
     connectQueueTimer = nullptr;
@@ -63,7 +64,7 @@ NoAppPrivate::~NoAppPrivate()
     manager.cleanup();
 
     for (const auto& it : users) {
-        it.second->setBeingDeleted(true);
+        NoUserPrivate::get(it.second)->beingDeleted = true;
         delete it.second;
     }
 
@@ -176,10 +177,10 @@ bool NoAppPrivate::handleUserDeletion()
 
     for (const auto& it : delUsers) {
         NoUser* user = it.second;
-        user->setBeingDeleted(true);
+        NoUserPrivate::get(user)->beingDeleted = true;
 
         if (noApp->loader()->onDeleteUser(*user)) {
-            user->setBeingDeleted(false);
+            NoUserPrivate::get(user)->beingDeleted = false;
             continue;
         }
         users.erase(user->userName());
@@ -1341,7 +1342,7 @@ bool NoAppPrivate::doRehash(NoString& error)
                 error = "Invalid user [" + user->userName() + "] " + sErr;
                 NO_DEBUG("NoUser::Clone() failed in rehash");
             }
-            user->setBeingDeleted(true);
+            NoUserPrivate::get(user)->beingDeleted = true;
             delete user;
             user = nullptr;
         } else if (!noApp->addUser(user, sErr)) {
@@ -1351,7 +1352,7 @@ bool NoAppPrivate::doRehash(NoString& error)
         if (!error.empty()) {
             No::printError(error);
             if (user) {
-                user->setBeingDeleted(true);
+                NoUserPrivate::get(user)->beingDeleted = true;
                 delete user;
                 user = nullptr;
             }

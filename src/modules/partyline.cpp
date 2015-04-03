@@ -307,7 +307,7 @@ public:
     void onClientDisconnect() override
     {
         NoUser* user = NoModule::user();
-        if (!user->isUserAttached() && !user->isBeingDeleted()) {
+        if (!user->isUserAttached() /*&& !user->isBeingDeleted()*/) {
             for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end(); ++it) {
                 const std::set<NoString>& ssNicks = (*it)->GetNicks();
 
@@ -439,7 +439,7 @@ public:
                     user);
         }
 
-        if (!user->isBeingDeleted() && m_ssDefaultChans.find(pChannel->GetName()) != m_ssDefaultChans.end()) {
+        if (/*!user->isBeingDeleted() &&*/ m_ssDefaultChans.find(pChannel->GetName()) != m_ssDefaultChans.end()) {
             JoinUser(user, pChannel);
         }
 

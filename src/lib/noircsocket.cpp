@@ -1167,7 +1167,7 @@ void NoIrcSocket::onDisconnected()
     IRCSOCKMODULECALL(onIrcDisconnected(), NOTHING);
 
     NO_DEBUG(name() << " == Disconnected()");
-    if (!d->network->user()->isBeingDeleted() && d->network->isEnabled() && d->network->servers().size() != 0) {
+    if (!NoUserPrivate::get(d->network->user())->beingDeleted && d->network->isEnabled() && d->network->servers().size() != 0) {
         d->network->putStatus("Disconnected from IRC. Reconnecting...");
     }
     d->network->clearRawBuffer();
@@ -1195,7 +1195,7 @@ void NoIrcSocket::onSocketError(int iErrno, const NoString& description)
     NoString error = description;
 
     NO_DEBUG(name() << " == SockError(" << iErrno << " " << error << ")");
-    if (!d->network->user()->isBeingDeleted()) {
+    if (!NoUserPrivate::get(d->network->user())->beingDeleted) {
         if (isReady()) {
             d->network->putStatus("Cannot connect to IRC (" + error + "). Retrying...");
         } else {
@@ -1239,7 +1239,7 @@ void NoIrcSocket::onSocketError(int iErrno, const NoString& description)
 void NoIrcSocket::onTimeout()
 {
     NO_DEBUG(name() << " == Timeout()");
-    if (!d->network->user()->isBeingDeleted()) {
+    if (!NoUserPrivate::get(d->network->user())->beingDeleted) {
         d->network->putStatus("IRC connection timed out.  Reconnecting...");
     }
     d->network->clearRawBuffer();
@@ -1252,7 +1252,7 @@ void NoIrcSocket::onTimeout()
 void NoIrcSocket::onConnectionRefused()
 {
     NO_DEBUG(name() << " == ConnectionRefused()");
-    if (!d->network->user()->isBeingDeleted()) {
+    if (!NoUserPrivate::get(d->network->user())->beingDeleted) {
         d->network->putStatus("Connection Refused.  Reconnecting...");
     }
     d->network->clearRawBuffer();

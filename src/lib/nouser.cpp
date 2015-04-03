@@ -1229,11 +1229,6 @@ void NoUser::setAutoclearQueryBuffer(bool b)
     d->autoclearQueryBuffer = b;
 }
 
-void NoUser::setBeingDeleted(bool b)
-{
-    d->beingDeleted = b;
-}
-
 void NoUser::setTimestampFormat(const NoString& s)
 {
     d->timestampFormat = s;
@@ -1441,11 +1436,6 @@ bool NoUser::autoClearChanBuffer() const
 bool NoUser::autoclearQueryBuffer() const
 {
     return d->autoclearQueryBuffer;
-}
-
-bool NoUser::isBeingDeleted() const
-{
-    return d->beingDeleted;
 }
 
 NoString NoUser::timezone() const

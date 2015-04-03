@@ -109,7 +109,6 @@ public:
     void setAutoClearChanBuffer(bool b);
     void setAutoclearQueryBuffer(bool b);
 
-    void setBeingDeleted(bool b);
     void setTimestampFormat(const NoString& s);
     void setTimestampAppend(bool b);
     void setTimestampPrepend(bool b);
@@ -153,7 +152,6 @@ public:
     uint bufferCount() const;
     bool autoClearChanBuffer() const;
     bool autoclearQueryBuffer() const;
-    bool isBeingDeleted() const;
     NoString timezone() const;
     ulonglong bytesRead() const;
     ulonglong bytesWritten() const;
