@@ -47,6 +47,7 @@ list(APPEND NO_HEADERS ${PROJECT_SOURCE_DIR}/include/nobnc/noapp.h
                        ${PROJECT_SOURCE_DIR}/include/nobnc/nothread_p.h
                        ${PROJECT_SOURCE_DIR}/include/nobnc/notimer.h
                        ${PROJECT_SOURCE_DIR}/include/nobnc/nouser.h
+                       ${PROJECT_SOURCE_DIR}/include/nobnc/nouser_p.h
                        ${PROJECT_SOURCE_DIR}/include/nobnc/noutils.h
                        ${PROJECT_SOURCE_DIR}/include/nobnc/nowebpage.h
                        ${PROJECT_SOURCE_DIR}/include/nobnc/nowebsession.h
