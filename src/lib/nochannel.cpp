@@ -75,8 +75,6 @@ NoChannel::NoChannel(const NoString& name, NoNetwork* network, bool bInConfig, N
             setBufferCount(value.toUInt(), true);
         if (settings->FindStringEntry("autoclearchanbuffer", value))
             setAutoClearChanBuffer(value.toBool());
-        if (settings->FindStringEntry("keepbuffer", value))
-            setAutoClearChanBuffer(!value.toBool()); // XXX Compatibility crap, added in 0.207
         if (settings->FindStringEntry("detached", value))
             setDetached(value.toBool());
         if (settings->FindStringEntry("disabled", value))

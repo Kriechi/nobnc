@@ -163,7 +163,6 @@ public:
 
 private:
     void bounceAllClients();
-    void setKeepBuffer(bool b); // XXX compatibility crap, added in 0.207
     bool loadModule(const NoString& name, const NoString& args, const NoString& notice, NoString& error);
 
     NoUser(const NoUser&) = delete;

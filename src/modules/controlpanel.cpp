@@ -229,9 +229,6 @@ class NoAdminMod : public NoModule
             putModule("QuitMsg = " + user->quitMessage());
         else if (sVar == "buffercount")
             putModule("BufferCount = " + NoString(user->bufferCount()));
-        else if (sVar == "keepbuffer")
-            putModule("KeepBuffer = " +
-                      NoString(!user->autoClearChanBuffer())); // XXX compatibility crap, added in 0.207
         else if (sVar == "autoclearchanbuffer")
             putModule("AutoClearChanBuffer = " + NoString(user->autoClearChanBuffer()));
         else if (sVar == "autoclearquerybuffer")
@@ -358,10 +355,6 @@ class NoAdminMod : public NoModule
             } else {
                 putModule("Setting failed, limit is " + NoString(noApp->maxBufferSize()));
             }
-        } else if (sVar == "keepbuffer") { // XXX compatibility crap, added in 0.207
-            bool b = !value.toBool();
-            user->setAutoClearChanBuffer(b);
-            putModule("AutoClearChanBuffer = " + NoString(b));
         } else if (sVar == "autoclearchanbuffer") {
             bool b = value.toBool();
             user->setAutoClearChanBuffer(b);
@@ -699,9 +692,6 @@ class NoAdminMod : public NoModule
                 putModule(channel->name() + ": Buffer = " + value);
             } else if (sVar == "inconfig") {
                 putModule(channel->name() + ": InConfig = " + NoString(channel->inConfig()));
-            } else if (sVar == "keepbuffer") {
-                putModule(channel->name() + ": KeepBuffer = " +
-                          NoString(!channel->autoClearChanBuffer())); // XXX compatibility crap, added in 0.207
             } else if (sVar == "autoclearchanbuffer") {
                 NoString value(channel->autoClearChanBuffer());
                 if (!channel->hasAutoClearChanBufferSet()) {
@@ -764,10 +754,6 @@ class NoAdminMod : public NoModule
                 bool b = value.toBool();
                 channel->setInConfig(b);
                 putModule(channel->name() + ": InConfig = " + NoString(b));
-            } else if (sVar == "keepbuffer") { // XXX compatibility crap, added in 0.207
-                bool b = !value.toBool();
-                channel->setAutoClearChanBuffer(b);
-                putModule(channel->name() + ": AutoClearChanBuffer = " + NoString(b));
             } else if (sVar == "autoclearchanbuffer") {
                 bool b = value.toBool();
                 channel->setAutoClearChanBuffer(b);

@@ -121,7 +121,6 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
         { "maxjoins", &NoUser::setMaxJoins },
     };
     TOption<bool> BoolOptions[] = {
-        { "keepbuffer", &NoUser::setKeepBuffer }, // XXX compatibility crap from pre-0.207
         { "autoclearchanbuffer", &NoUser::setAutoClearChanBuffer },
         { "autoclearquerybuffer", &NoUser::setAutoclearQueryBuffer },
         { "multiclients", &NoUser::setMultiClients },
@@ -586,11 +585,6 @@ void NoUser::bounceAllClients()
     }
 
     d->clients.clear();
-}
-
-void NoUser::setKeepBuffer(bool b)
-{
-    setAutoClearChanBuffer(!b);
 }
 
 void NoUser::userConnected(NoClient* client)
