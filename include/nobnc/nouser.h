@@ -162,9 +162,6 @@ public:
     uint maxQueryBuffers() const;
 
 private:
-    void bounceAllClients();
-    bool loadModule(const NoString& name, const NoString& args, const NoString& notice, NoString& error);
-
     NoUser(const NoUser&) = delete;
     NoUser& operator=(const NoUser&) = delete;
 

@@ -33,6 +33,11 @@ public:
     void addBytesRead(ulonglong bytes);
     void addBytesWritten(ulonglong bytes);
 
+    void bounceAllClients();
+    bool loadModule(const NoString& name, const NoString& args, const NoString& notice, NoString& error);
+
+    NoUser* q;
+
     NoString userName = "";
     NoString cleanUserName = "";
     NoString nickName = "";

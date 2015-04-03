@@ -57,6 +57,7 @@ protected:
 
 NoUser::NoUser(const NoString& userName) : d(new NoUserPrivate)
 {
+    d->q = this;
     d->userName = userName;
     d->cleanUserName = makeCleanUserName(userName);
     d->ident = d->cleanUserName;
@@ -396,7 +397,7 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
         NoString sModRet;
         NoString args = No::tokens(sMod, 1);
 
-        bool bModRet = loadModule(name, args, notice, sModRet);
+        bool bModRet = d->loadModule(name, args, notice, sModRet);
 
         No::printStatus(bModRet, sModRet);
         if (!bModRet) {
@@ -407,7 +408,7 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
                     notice = "Loading [simple_away] module instead";
                     name = "simple_away";
                     // not a fatal error if simple_away is not available
-                    loadModule(name, args, notice, sModRet);
+                    d->loadModule(name, args, notice, sModRet);
                 }
             } else {
                 error = sModRet;
@@ -578,19 +579,19 @@ NoString NoUser::addTimestamp(time_t tm, const NoString& str) const
     return ret;
 }
 
-void NoUser::bounceAllClients()
+void NoUserPrivate::bounceAllClients()
 {
-    for (NoClient* client : d->clients) {
+    for (NoClient* client : clients) {
         client->bouncedOff();
     }
 
-    d->clients.clear();
+    clients.clear();
 }
 
 void NoUser::userConnected(NoClient* client)
 {
     if (!multiClients()) {
-        bounceAllClients();
+        d->bounceAllClients();
     }
 
     client->putClient(":irc.znc.in 001 " + client->nick() + " :- Welcome to ZNC -");
@@ -1105,7 +1106,7 @@ bool NoUser::isUserAttached() const
     return false;
 }
 
-bool NoUser::loadModule(const NoString& name, const NoString& args, const NoString& notice, NoString& error)
+bool NoUserPrivate::loadModule(const NoString& name, const NoString& args, const NoString& notice, NoString& error)
 {
     bool bModRet = true;
     NoString sModRet;
@@ -1123,9 +1124,9 @@ bool NoUser::loadModule(const NoString& name, const NoString& args, const NoStri
                          "] is a network module, loading module for all networks in user.");
 
         // Do they have old NV?
-        NoFile fNVFile = NoFile(userPath() + "/moddata/" + name + "/.registry");
+        NoFile fNVFile = NoFile(userPath + "/moddata/" + name + "/.registry");
 
-        for (NoNetwork* network : d->networks) {
+        for (NoNetwork* network : networks) {
             if (fNVFile.Exists()) {
                 NoString sNetworkModPath = network->networkPath() + "/moddata/" + name;
                 if (!NoFile::Exists(sNetworkModPath)) {
@@ -1135,13 +1136,13 @@ bool NoUser::loadModule(const NoString& name, const NoString& args, const NoStri
                 fNVFile.Copy(sNetworkModPath + "/.registry");
             }
 
-            bModRet = network->loader()->loadModule(name, args, No::NetworkModule, this, network, sModRet);
+            bModRet = network->loader()->loadModule(name, args, No::NetworkModule, q, network, sModRet);
             if (!bModRet) {
                 break;
             }
         }
     } else {
-        bModRet = loader()->loadModule(name, args, No::UserModule, this, nullptr, sModRet);
+        bModRet = modules->loadModule(name, args, No::UserModule, q, nullptr, sModRet);
     }
 
     if (!bModRet) {
