@@ -19,7 +19,7 @@
 #include "nomodule.h"
 #include "nomodule_p.h"
 #include "nonetwork.h"
-#include "nouser.h"
+#include "nouser_p.h"
 #include "noapp_p.h"
 #include "nodebug.h"
 
@@ -52,8 +52,8 @@ NoModuleSocket::~NoModuleSocket()
     }
 
     if (user && m_module && m_module->type() != No::GlobalModule) {
-        user->addBytesWritten(bytesWritten());
-        user->addBytesRead(bytesRead());
+        NoUserPrivate::get(user)->addBytesWritten(bytesWritten());
+        NoUserPrivate::get(user)->addBytesRead(bytesRead());
     } else {
         NoAppPrivate::get(noApp)->addBytesWritten(bytesWritten());
         NoAppPrivate::get(noApp)->addBytesRead(bytesRead());

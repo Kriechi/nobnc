@@ -25,7 +25,7 @@
 #include "nofile.h"
 #include "nodir.h"
 #include "noclient.h"
-#include "nouser.h"
+#include "nouser_p.h"
 #include "nonetwork.h"
 #include "nodebug.h"
 #include "noapp_p.h"
@@ -290,8 +290,8 @@ NoWebSocket::~NoWebSocket()
     // not have a valid NoModule* pointer.
     NoUser* user = session()->user();
     if (user) {
-        user->addBytesWritten(bytesWritten());
-        user->addBytesRead(bytesRead());
+        NoUserPrivate::get(user)->addBytesWritten(bytesWritten());
+        NoUserPrivate::get(user)->addBytesRead(bytesRead());
     } else {
         NoAppPrivate::get(noApp)->addBytesWritten(bytesWritten());
         NoAppPrivate::get(noApp)->addBytesRead(bytesRead());

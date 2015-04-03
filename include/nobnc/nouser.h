@@ -88,9 +88,6 @@ public:
     void cloneNetworks(const NoUser& User);
     bool clone(const NoUser& User, NoString& error, bool cloneNetworks = true);
 
-    void addBytesRead(ulonglong u);
-    void addBytesWritten(ulonglong u);
-
     void setNick(const NoString& s);
     void setAltNick(const NoString& s);
     void setIdent(const NoString& s);
@@ -175,6 +172,7 @@ private:
     NoUser& operator=(const NoUser&) = delete;
 
     std::unique_ptr<NoUserPrivate> d;
+    friend class NoUserPrivate;
 };
 
 #endif // NOUSER_H

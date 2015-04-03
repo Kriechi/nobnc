@@ -23,7 +23,7 @@
 #include "noircsocket.h"
 #include "noauthenticator.h"
 #include "nodebug.h"
-#include "nouser.h"
+#include "nouser_p.h"
 #include "nonetwork.h"
 #include "noquery.h"
 #include "nomodulecall.h"
@@ -171,8 +171,8 @@ NoClient::~NoClient()
         pAuth->invalidate();
     }
     if (d->user != nullptr) {
-        d->user->addBytesRead(d->socket->bytesRead());
-        d->user->addBytesWritten(d->socket->bytesWritten());
+        NoUserPrivate::get(d->user)->addBytesRead(d->socket->bytesRead());
+        NoUserPrivate::get(d->user)->addBytesWritten(d->socket->bytesWritten());
     }
     delete d->socket;
 }

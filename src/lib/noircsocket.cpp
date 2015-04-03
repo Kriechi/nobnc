@@ -18,7 +18,7 @@
 #include "noircsocket.h"
 #include "nosocket_p.h"
 #include "nochannel.h"
-#include "nouser.h"
+#include "nouser_p.h"
 #include "nonetwork.h"
 #include "noserverinfo.h"
 #include "nomodulecall.h"
@@ -149,8 +149,8 @@ NoIrcSocket::~NoIrcSocket()
 
     quit();
     d->chans.clear();
-    d->network->user()->addBytesRead(bytesRead());
-    d->network->user()->addBytesWritten(bytesWritten());
+    NoUserPrivate::get(d->network->user())->addBytesRead(bytesRead());
+    NoUserPrivate::get(d->network->user())->addBytesWritten(bytesWritten());
 }
 
 void NoIrcSocket::quit(const NoString& sQuitMsg)

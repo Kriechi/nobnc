@@ -764,14 +764,14 @@ bool NoUser::clone(const NoUser& User, NoString& error, bool cloneNetworks)
     return true;
 }
 
-void NoUser::addBytesRead(ulonglong u)
+void NoUserPrivate::addBytesRead(ulonglong bytes)
 {
-    d->bytesRead += u;
+    bytesRead += bytes;
 }
 
-void NoUser::addBytesWritten(ulonglong u)
+void NoUserPrivate::addBytesWritten(ulonglong bytes)
 {
-    d->bytesWritten += u;
+    bytesWritten += bytes;
 }
 
 std::set<NoString> NoUser::allowedHosts() const

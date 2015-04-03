@@ -25,6 +25,14 @@ class NoUserTimer;
 class NoUserPrivate
 {
 public:
+    static NoUserPrivate* get(NoUser* user)
+    {
+        return user->d.get();
+    }
+
+    void addBytesRead(ulonglong bytes);
+    void addBytesWritten(ulonglong bytes);
+
     NoString userName = "";
     NoString cleanUserName = "";
     NoString nickName = "";
