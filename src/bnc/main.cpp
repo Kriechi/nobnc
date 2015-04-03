@@ -16,7 +16,7 @@
  */
 
 #include "pidfile.h"
-#include <nobnc/noapp_p.h>
+#include <nobnc/noapp.h>
 #include <nobnc/nomodulecall.h>
 #include <nobnc/noexception.h>
 #include <nobnc/nodebug.h>
@@ -141,13 +141,15 @@ static void GenerateHelp(const char* appname)
     No::printMessage("\t-d, --datadir      Set a different ZNC repository (default is ~/.znc)");
 }
 
+extern void no_cleanup();
+
 static void die(int sig)
 {
     signal(SIGPIPE, SIG_DFL);
 
     No::printMessage("Exiting on SIG [" + NoString(sig) + "]");
 
-    delete NoAppPrivate::get(noApp);
+    no_cleanup();
 
     exit(sig);
 }

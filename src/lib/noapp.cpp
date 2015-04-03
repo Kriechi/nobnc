@@ -38,11 +38,13 @@
 #include <openssl/ssl.h>
 #endif // HAVE_LIBSSL
 
-NoAppPrivate::~NoAppPrivate()
+NO_EXPORT void no_cleanup()
 {
-    modules->unloadAllModules();
+    NoAppPrivate* p = NoAppPrivate::get(noApp);
 
-    for (const auto& it : users) {
+    p->modules->unloadAllModules();
+
+    for (const auto& it : p->users) {
         it.second->loader()->unloadAllModules();
 
         const std::vector<NoNetwork*>& networks = it.second->networks();
@@ -51,28 +53,29 @@ NoAppPrivate::~NoAppPrivate()
         }
     }
 
-    for (NoListener* pListener : listeners) {
+    for (NoListener* pListener : p->listeners)
         delete pListener;
-    }
 
-    for (const auto& it : users) {
+    for (const auto& it : p->users)
        NoUserPrivate::get(it.second)->beingDeleted = true;
-    }
 
-    connectQueueTimer = nullptr;
+    p->connectQueueTimer = nullptr;
     // This deletes d->pConnectQueueTimer
-    manager.cleanup();
+    p->manager.cleanup();
 
-    for (const auto& it : users) {
+    for (const auto& it : p->users) {
         NoUserPrivate::get(it.second)->beingDeleted = true;
         delete it.second;
     }
 
-    users.clear();
-    disableConnectQueue();
+    p->users.clear();
+    p->disableConnectQueue();
 
-    delete modules;
-    delete lockFile;
+    delete p->modules;
+    p->modules = nullptr;
+
+    delete p->lockFile;
+    p->lockFile = nullptr;
 
     ShutdownCsocket();
 }
@@ -101,6 +104,7 @@ NoApp::NoApp() : d(new NoAppPrivate)
 
 NoApp::~NoApp()
 {
+    no_cleanup();
     NoAppPrivate::instance = nullptr;
 }
 

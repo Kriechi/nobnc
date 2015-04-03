@@ -24,8 +24,6 @@
 class NoAppPrivate
 {
 public:
-    NO_EXPORT ~NoAppPrivate(); // ### TODO: cleanup
-
     static NoAppPrivate* get(NoApp* app)
     {
         return app->d.get();
