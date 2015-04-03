@@ -1941,12 +1941,12 @@ NoStringVector NoApp::motd() const
     return d->motd;
 }
 
-void NoApp::addServerThrottle(NoString name)
+void NoApp::addServerThrottle(const NoString& name)
 {
     d->connectThrottle.insert(name, true);
 }
 
-bool NoApp::serverThrottle(NoString name)
+bool NoApp::serverThrottle(const NoString& name)
 {
     return d->connectThrottle.value(name);
 }

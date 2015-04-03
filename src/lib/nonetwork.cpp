@@ -824,15 +824,16 @@ std::vector<NoChannel*> NoNetwork::channels() const
     return d->channels;
 }
 
-NoChannel* NoNetwork::findChannel(NoString name) const
+NoChannel* NoNetwork::findChannel(const NoString& name) const
 {
+    NoString unprefixed = name;
     if (ircSocket()) {
         // See https://tools.ietf.org/html/draft-brocklesby-irc-isupport-03#section-3.16
-        name.trimLeft(ircSocket()->isupport("STATUSMSG", ""));
+        unprefixed.trimLeft(ircSocket()->isupport("STATUSMSG", ""));
     }
 
     for (NoChannel* channel : d->channels) {
-        if (name.equals(channel->name())) {
+        if (unprefixed.equals(channel->name())) {
             return channel;
         }
     }

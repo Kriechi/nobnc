@@ -153,8 +153,8 @@ public:
     void clearMotd();
     NoStringVector motd() const;
 
-    void addServerThrottle(NoString name);
-    bool serverThrottle(NoString name);
+    void addServerThrottle(const NoString& name);
+    bool serverThrottle(const NoString& name);
 
     void addNetworkToQueue(NoNetwork* network);
 

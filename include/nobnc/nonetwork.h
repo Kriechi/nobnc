@@ -84,7 +84,7 @@ public:
     bool putModule(const NoString& module, const NoString& line, NoClient* client = nullptr, NoClient* skipClient = nullptr);
 
     std::vector<NoChannel*> channels() const;
-    NoChannel* findChannel(NoString name) const;
+    NoChannel* findChannel(const NoString& name) const;
     std::vector<NoChannel*> findChannels(const NoString& wild) const;
     bool addChannel(NoChannel* channel);
     bool addChannel(const NoString& name, bool bInConfig);
