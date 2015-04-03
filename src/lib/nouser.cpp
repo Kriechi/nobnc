@@ -101,7 +101,7 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
 {
     TOption<const NoString&> StringOptions[] = {
         { "nick", &NoUser::setNick },
-        { "quitmsg", &NoUser::setQuitMsg },
+        { "quitmsg", &NoUser::setQuitMessage },
         { "altnick", &NoUser::setAltNick },
         { "ident", &NoUser::setIdent },
         { "realname", &NoUser::setRealName },
@@ -677,7 +677,7 @@ bool NoUser::clone(const NoUser& User, NoString& error, bool cloneNetworks)
     setStatusPrefix(User.statusPrefix());
     setBindHost(User.bindHost());
     setDccBindHost(User.dccBindHost());
-    setQuitMsg(User.quitMsg());
+    setQuitMessage(User.quitMessage());
     setSkinName(User.skinName());
     setDefaultChanModes(User.defaultChanModes());
     setBufferCount(User.bufferCount(), true);
@@ -890,7 +890,7 @@ NoSettings NoUser::toConfig() const
     config.AddKeyValuePair("RealName", realName());
     config.AddKeyValuePair("BindHost", bindHost());
     config.AddKeyValuePair("DCCBindHost", dccBindHost());
-    config.AddKeyValuePair("QuitMsg", quitMsg());
+    config.AddKeyValuePair("QuitMsg", quitMessage());
     if (noApp->statusPrefix() != statusPrefix())
         config.AddKeyValuePair("StatusPrefix", statusPrefix());
     config.AddKeyValuePair("Skin", skinName());
@@ -1211,9 +1211,9 @@ void NoUser::setClientEncoding(const NoString& s)
 {
     d->clientEncoding = s;
 }
-void NoUser::setQuitMsg(const NoString& s)
+void NoUser::setQuitMessage(const NoString& s)
 {
-    d->quitMsg = s;
+    d->quitMessage = s;
 }
 void NoUser::setAutoClearChanBuffer(bool b)
 {
@@ -1422,9 +1422,9 @@ bool NoUser::hasSpaceForNewNetwork() const
     return networks().size() < maxNetworks();
 }
 
-NoString NoUser::quitMsg() const
+NoString NoUser::quitMessage() const
 {
-    return (!d->quitMsg.trim_n().empty()) ? d->quitMsg : NoApp::tag(false);
+    return (!d->quitMessage.trim_n().empty()) ? d->quitMessage : NoApp::tag(false);
 }
 NoStringMap NoUser::ctcpReplies() const
 {

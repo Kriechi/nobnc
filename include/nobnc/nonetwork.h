@@ -158,7 +158,7 @@ public:
     NoString realName() const;
     NoString bindHost() const;
     NoString encoding() const;
-    NoString quitMsg() const;
+    NoString quitMessage() const;
 
     void setNick(const NoString& s);
     void setAltNick(const NoString& s);
@@ -166,7 +166,7 @@ public:
     void setRealName(const NoString& s);
     void setBindHost(const NoString& s);
     void setEncoding(const NoString& s);
-    void setQuitMsg(const NoString& s);
+    void setQuitMessage(const NoString& s);
 
     double floodRate() const;
     ushort floodBurst() const;

@@ -234,7 +234,7 @@ public:
         }
         arg = socket.param("quitmsg");
         if (!arg.empty()) {
-            pNewUser->setQuitMsg(arg);
+            pNewUser->setQuitMessage(arg);
         }
         arg = socket.param("chanmodes");
         if (!arg.empty()) {
@@ -877,7 +877,7 @@ public:
                 tmpl["Ident"] = network->ident();
                 tmpl["RealName"] = network->realName();
 
-                tmpl["QuitMsg"] = network->quitMsg();
+                tmpl["QuitMsg"] = network->quitMessage();
 
                 tmpl["FloodProtection"] = NoString(NoIrcSocket::isFloodProtected(network->floodRate()));
                 tmpl["FloodRate"] = NoString(network->floodRate());
@@ -1007,7 +1007,7 @@ public:
         network->setIdent(socket.param("ident"));
         network->setRealName(socket.param("realname"));
 
-        network->setQuitMsg(socket.param("quitmsg"));
+        network->setQuitMessage(socket.param("quitmsg"));
 
         network->setEnabled(socket.param("doconnect").toBool());
 
@@ -1239,7 +1239,7 @@ public:
                 tmpl["StatusPrefix"] = user->statusPrefix();
                 tmpl["Ident"] = user->ident();
                 tmpl["RealName"] = user->realName();
-                tmpl["QuitMsg"] = user->quitMsg();
+                tmpl["QuitMsg"] = user->quitMessage();
                 tmpl["DefaultChanModes"] = user->defaultChanModes();
                 tmpl["BufferCount"] = NoString(user->bufferCount());
                 tmpl["TimestampFormat"] = user->timestampFormat();

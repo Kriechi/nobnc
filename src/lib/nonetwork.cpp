@@ -115,7 +115,7 @@ public:
     NoString realName = "";
     NoString bindHost = "";
     NoString encoding = "";
-    NoString quitMsg = "";
+    NoString quitMessage = "";
     NoStringSet trustedFingerprints;
 
     NoModuleLoader* modules = nullptr;
@@ -212,7 +212,7 @@ void NoNetwork::clone(const NoNetwork& network, bool cloneName)
     setRealName(network.realName());
     setBindHost(network.bindHost());
     setEncoding(network.encoding());
-    setQuitMsg(network.quitMsg());
+    setQuitMessage(network.quitMessage());
     d->trustedFingerprints = network.d->trustedFingerprints;
 
     // Servers
@@ -382,7 +382,7 @@ bool NoNetwork::parseConfig(NoSettings* settings, NoString& error, bool bUpgrade
             { "realname", &NoNetwork::setRealName },
             { "bindhost", &NoNetwork::setBindHost },
             { "encoding", &NoNetwork::setEncoding },
-            { "quitmsg", &NoNetwork::setQuitMsg },
+            { "quitmsg", &NoNetwork::setQuitMessage },
         };
         TOption<bool> BoolOptions[] = {
             { "ircconnectenabled", &NoNetwork::setEnabled },
@@ -542,8 +542,8 @@ NoSettings NoNetwork::toConfig() const
     config.AddKeyValuePair("JoinDelay", NoString(joinDelay()));
     config.AddKeyValuePair("Encoding", d->encoding);
 
-    if (!d->quitMsg.empty()) {
-        config.AddKeyValuePair("QuitMsg", d->quitMsg);
+    if (!d->quitMessage.empty()) {
+        config.AddKeyValuePair("QuitMsg", d->quitMessage);
     }
 
     // Modules
@@ -1531,13 +1531,13 @@ NoString NoNetwork::encoding() const
     return d->encoding;
 }
 
-NoString NoNetwork::quitMsg() const
+NoString NoNetwork::quitMessage() const
 {
-    if (d->quitMsg.empty()) {
-        return d->user->quitMsg();
+    if (d->quitMessage.empty()) {
+        return d->user->quitMessage();
     }
 
-    return d->quitMsg;
+    return d->quitMessage;
 }
 
 void NoNetwork::setNick(const NoString& s)
@@ -1590,12 +1590,12 @@ void NoNetwork::setEncoding(const NoString& s)
     d->encoding = s;
 }
 
-void NoNetwork::setQuitMsg(const NoString& s)
+void NoNetwork::setQuitMessage(const NoString& s)
 {
-    if (d->user->quitMsg().equals(s)) {
-        d->quitMsg = "";
+    if (d->user->quitMessage().equals(s)) {
+        d->quitMessage = "";
     } else {
-        d->quitMsg = s;
+        d->quitMessage = s;
     }
 }
 

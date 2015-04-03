@@ -62,7 +62,7 @@ public:
     void putIrc(const NoString& line);
     void putIrcQuick(const NoString& line); //!< Should be used for PONG only
     void resetChans();
-    void quit(const NoString& sQuitMsg = "");
+    void quit(const NoString& message = "");
 
     /** You can call this from NoModule::onServerCapResult to suspend
      *  sending other CAP requests and CAP END for a while. Each

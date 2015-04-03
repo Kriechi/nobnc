@@ -47,7 +47,7 @@ public:
     NoString defaultChanModes = "";
     NoString clientEncoding = "";
 
-    NoString quitMsg = "";
+    NoString quitMessage = "";
     NoStringMap ctcpReplies;
     NoString timestampFormat = "[%H:%M:%S]";
     NoString timezone = "";

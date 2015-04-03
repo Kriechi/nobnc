@@ -226,7 +226,7 @@ class NoAdminMod : public NoModule
         else if (sVar == "defaultchanmodes")
             putModule("DefaultChanModes = " + user->defaultChanModes());
         else if (sVar == "quitmsg")
-            putModule("QuitMsg = " + user->quitMsg());
+            putModule("QuitMsg = " + user->quitMessage());
         else if (sVar == "buffercount")
             putModule("BufferCount = " + NoString(user->bufferCount()));
         else if (sVar == "keepbuffer")
@@ -348,7 +348,7 @@ class NoAdminMod : public NoModule
             user->setDefaultChanModes(value);
             putModule("DefaultChanModes = " + value);
         } else if (sVar == "quitmsg") {
-            user->setQuitMsg(value);
+            user->setQuitMessage(value);
             putModule("QuitMsg = " + value);
         } else if (sVar == "buffercount") {
             uint i = value.toUInt();
@@ -490,7 +490,7 @@ class NoAdminMod : public NoModule
             putModule("Encoding = " + network->encoding());
 #endif
         } else if (sVar.equals("quitmsg")) {
-            putModule("QuitMsg = " + network->quitMsg());
+            putModule("QuitMsg = " + network->quitMessage());
         } else {
             putModule("Error: Unknown variable");
         }
@@ -584,8 +584,8 @@ class NoAdminMod : public NoModule
             putModule("Encoding = " + network->encoding());
 #endif
         } else if (sVar.equals("quitmsg")) {
-            network->setQuitMsg(value);
-            putModule("QuitMsg = " + network->quitMsg());
+            network->setQuitMessage(value);
+            putModule("QuitMsg = " + network->quitMessage());
         } else {
             putModule("Error: Unknown variable");
         }

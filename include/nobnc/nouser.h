@@ -102,7 +102,7 @@ public:
     bool setStatusPrefix(const NoString& s);
     void setDefaultChanModes(const NoString& s);
     void setClientEncoding(const NoString& s);
-    void setQuitMsg(const NoString& s);
+    void setQuitMessage(const NoString& s);
     bool addCtcpReply(const NoString& ctcp, const NoString& reply);
     bool removeCtcpReply(const NoString& ctcp);
     bool setBufferCount(uint u, bool force = false);
@@ -148,7 +148,7 @@ public:
     NoString statusPrefix() const;
     NoString defaultChanModes() const;
 
-    NoString quitMsg() const;
+    NoString quitMessage() const;
     NoStringMap ctcpReplies() const;
     uint bufferCount() const;
     bool autoClearChanBuffer() const;

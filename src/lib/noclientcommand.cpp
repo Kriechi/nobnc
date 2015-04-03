@@ -360,8 +360,8 @@ void NoClient::userCommand(NoString& line)
         }
 
         if (ircSocket()) {
-            NoString sQuitMsg = No::tokens(line, 1);
-            ircSocket()->quit(sQuitMsg);
+            NoString message = No::tokens(line, 1);
+            ircSocket()->quit(message);
         }
 
         d->network->setEnabled(false);

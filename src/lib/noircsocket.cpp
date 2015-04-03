@@ -153,16 +153,16 @@ NoIrcSocket::~NoIrcSocket()
     NoUserPrivate::get(d->network->user())->addBytesWritten(bytesWritten());
 }
 
-void NoIrcSocket::quit(const NoString& sQuitMsg)
+void NoIrcSocket::quit(const NoString& message)
 {
     if (!d->authed) {
         close(CloseImmediately);
         return;
     }
-    if (!sQuitMsg.empty()) {
-        putIrc("QUIT :" + sQuitMsg);
+    if (!message.empty()) {
+        putIrc("QUIT :" + message);
     } else {
-        putIrc("QUIT :" + d->network->expandString(d->network->quitMsg()));
+        putIrc("QUIT :" + d->network->expandString(d->network->quitMessage()));
     }
     close(CloseAfterWrite);
 }
