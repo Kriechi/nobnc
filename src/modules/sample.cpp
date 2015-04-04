@@ -20,6 +20,7 @@
 #include <nobnc/nochannel.h>
 #include <nobnc/nomodulejob.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 #include <unistd.h>
 
 #ifdef HAVE_PTHREAD
@@ -180,7 +181,7 @@ public:
         putModule("[" + opNick.nick() + "] kicked [" + sKickedNick + "] from [" + channel->name() + "] with the msg [" + message + "]");
     }
 
-    void onQuit(const NoNick& nick, const NoString& message) override
+    void onQuit(const NoHostMask& nick, const NoString& message) override
     {
         putModule("* Quits: " + nick.nick() + " (" + nick.ident() + "!" + nick.host() + ") (" + message + ")");
     }
@@ -201,7 +202,7 @@ public:
         putModule("* Parts: " + nick.nick() + " (" + nick.ident() + "!" + nick.host() + ")");
     }
 
-    ModRet onInvite(const NoNick& nick, const NoString& sChan) override
+    ModRet onInvite(const NoHostMask& nick, const NoString& sChan) override
     {
         if (sChan.equals("#test")) {
             putModule(nick.nick() + " invited us to " + sChan + ", ignoring invites to " + sChan);
@@ -212,7 +213,7 @@ public:
         return CONTINUE;
     }
 
-    void onNick(const NoNick& OldNick, const NoString& newNick) override
+    void onNick(const NoHostMask& OldNick, const NoString& newNick) override
     {
         putModule("* " + OldNick.nick() + " is now known as " + newNick);
     }
@@ -225,7 +226,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onCtcpReply(NoNick& nick, NoString& message) override
+    ModRet onCtcpReply(NoHostMask& nick, NoString& message) override
     {
         putModule("[" + nick.nick() + "] ctcpreply [" + message + "]");
 
@@ -239,7 +240,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
+    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
     {
         putModule("[" + nick.nick() + "] privctcp [" + message + "]");
         message = "\002" + message + "\002";
@@ -263,7 +264,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivNotice(NoNick& nick, NoString& message) override
+    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override
     {
         putModule("[" + nick.nick() + "] privnotice [" + message + "]");
         message = "\002" + message + "\002";
@@ -301,7 +302,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& nick, NoString& message) override
+    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
     {
         putModule("[" + nick.nick() + "] privmsg [" + message + "]");
         message = "\002" + message + "\002";

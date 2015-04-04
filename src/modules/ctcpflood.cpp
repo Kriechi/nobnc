@@ -19,6 +19,7 @@
 #include <nobnc/nochannel.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 class NoCtcpFloodMod : public NoModule
 {
@@ -76,7 +77,7 @@ public:
         return true;
     }
 
-    ModRet Message(const NoNick& nick, const NoString& message)
+    ModRet Message(const NoString& hostMask, const NoString& message)
     {
         // We never block /me, because it doesn't cause a reply
         if (No::token(message, 0).equals("ACTION"))
@@ -92,7 +93,7 @@ public:
         if (m_iNumCTCP < m_iThresholdMsgs)
             return CONTINUE;
         else if (m_iNumCTCP == m_iThresholdMsgs)
-            putModule("Limit reached by [" + nick.hostMask() + "], blocking all CTCP");
+            putModule("Limit reached by [" + hostMask + "], blocking all CTCP");
 
         // Reset the timeout so that we continue blocking messages
         m_tLastCTCP = time(nullptr);
@@ -100,14 +101,14 @@ public:
         return HALT;
     }
 
-    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
+    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
     {
-        return Message(nick, message);
+        return Message(nick.toString(), message);
     }
 
     ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
-        return Message(nick, message);
+        return Message(nick.hostMask(), message);
     }
 
     void OnSecsCommand(const NoString& command)

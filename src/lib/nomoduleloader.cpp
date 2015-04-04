@@ -359,12 +359,12 @@ bool NoModuleLoader::onUserQuit(NoString& message)
     MODHALTCHK(onUserQuit(message));
 }
 
-bool NoModuleLoader::onQuit(const NoNick& nick, const NoString& message)
+bool NoModuleLoader::onQuit(const NoHostMask& nick, const NoString& message)
 {
     MODUNLOADCHK(onQuit(nick, message));
     return false;
 }
-bool NoModuleLoader::onNick(const NoNick& nick, const NoString& newNick)
+bool NoModuleLoader::onNick(const NoHostMask& nick, const NoString& newNick)
 {
     MODUNLOADCHK(onNick(nick, newNick));
     return false;
@@ -388,7 +388,7 @@ bool NoModuleLoader::onPart(const NoNick& nick, NoChannel* channel, const NoStri
     MODUNLOADCHK(onPart(nick, channel, message));
     return false;
 }
-bool NoModuleLoader::onInvite(const NoNick& nick, const NoString& sChan)
+bool NoModuleLoader::onInvite(const NoHostMask& nick, const NoString& sChan)
 {
     MODHALTCHK(onInvite(nick, sChan));
 }
@@ -416,11 +416,11 @@ bool NoModuleLoader::onPrivBufferPlayLine(NoClient* client, NoString& line)
 {
     MODHALTCHK(onPrivBufferPlayLine(client, line));
 }
-bool NoModuleLoader::onCtcpReply(NoNick& nick, NoString& message)
+bool NoModuleLoader::onCtcpReply(NoHostMask& nick, NoString& message)
 {
     MODHALTCHK(onCtcpReply(nick, message));
 }
-bool NoModuleLoader::onPrivCtcp(NoNick& nick, NoString& message)
+bool NoModuleLoader::onPrivCtcp(NoHostMask& nick, NoString& message)
 {
     MODHALTCHK(onPrivCtcp(nick, message));
 }
@@ -428,7 +428,7 @@ bool NoModuleLoader::onChanCtcp(NoNick& nick, NoChannel* channel, NoString& mess
 {
     MODHALTCHK(onChanCtcp(nick, channel, message));
 }
-bool NoModuleLoader::onPrivAction(NoNick& nick, NoString& message)
+bool NoModuleLoader::onPrivAction(NoHostMask& nick, NoString& message)
 {
     MODHALTCHK(onPrivAction(nick, message));
 }
@@ -436,7 +436,7 @@ bool NoModuleLoader::onChanAction(NoNick& nick, NoChannel* channel, NoString& me
 {
     MODHALTCHK(onChanAction(nick, channel, message));
 }
-bool NoModuleLoader::onPrivMsg(NoNick& nick, NoString& message)
+bool NoModuleLoader::onPrivMsg(NoHostMask& nick, NoString& message)
 {
     MODHALTCHK(onPrivMsg(nick, message));
 }
@@ -444,7 +444,7 @@ bool NoModuleLoader::onChanMsg(NoNick& nick, NoChannel* channel, NoString& messa
 {
     MODHALTCHK(onChanMsg(nick, channel, message));
 }
-bool NoModuleLoader::onPrivNotice(NoNick& nick, NoString& message)
+bool NoModuleLoader::onPrivNotice(NoHostMask& nick, NoString& message)
 {
     MODHALTCHK(onPrivNotice(nick, message));
 }

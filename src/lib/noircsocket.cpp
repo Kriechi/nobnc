@@ -27,6 +27,7 @@
 #include "noquery.h"
 #include "noescape.h"
 #include "nonick.h"
+#include "nohostmask.h"
 #include "Csocket/Csocket.h"
 
 #define IRCSOCKMODULECALL(macFUNC, macEXITER) \
@@ -530,6 +531,7 @@ void NoIrcSocket::readLine(const NoString& data)
         }
     } else {
         NoNick nick(No::token(line, 0).trimPrefix_n());
+        NoHostMask mask(No::token(line, 0).trimPrefix_n());
         cmd = No::token(line, 1);
         NoString sRest = No::tokens(line, 2);
 
@@ -551,7 +553,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 d->network->putUser(line);
             }
 
-            IRCSOCKMODULECALL(onNick(nick, newNick), NOTHING);
+            IRCSOCKMODULECALL(onNick(mask, newNick), NOTHING);
 
             if (!bIsVisible) {
                 return;
@@ -577,7 +579,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 }
             }
 
-            IRCSOCKMODULECALL(onQuit(nick, message), NOTHING);
+            IRCSOCKMODULECALL(onQuit(mask, message), NOTHING);
 
             if (!bIsVisible) {
                 return;
@@ -706,7 +708,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 msg.rightChomp(1);
 
                 if (target.equals(d->nick.nick())) {
-                    if (onCtcpReply(nick, msg)) {
+                    if (onCtcpReply(mask, msg)) {
                         return;
                     }
                 }
@@ -715,7 +717,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 return;
             } else {
                 if (target.equals(d->nick.nick())) {
-                    if (onPrivNotice(nick, msg)) {
+                    if (onPrivNotice(mask, msg)) {
                         return;
                     }
                 } else {
@@ -764,7 +766,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 msg.rightChomp(1);
 
                 if (target.equals(d->nick.nick())) {
-                    if (onPrivCtcp(nick, msg)) {
+                    if (onPrivCtcp(mask, msg)) {
                         return;
                     }
                 } else {
@@ -777,7 +779,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 return;
             } else {
                 if (target.equals(d->nick.nick())) {
-                    if (onPrivMsg(nick, msg)) {
+                    if (onPrivMsg(mask, msg)) {
                         return;
                     }
                 } else {
@@ -851,7 +853,7 @@ void NoIrcSocket::readLine(const NoString& data)
             // Don't forward any CAP stuff to the client
             return;
         } else if (cmd.equals("INVITE")) {
-            IRCSOCKMODULECALL(onInvite(nick, No::token(line, 3).trimPrefix_n(":")), &bReturn);
+            IRCSOCKMODULECALL(onInvite(mask, No::token(line, 3).trimPrefix_n(":")), &bReturn);
             if (bReturn)
                 return;
         }
@@ -902,7 +904,7 @@ bool NoIrcSocket::onServerCapAvailable(const NoString& cap)
     return bResult;
 }
 
-bool NoIrcSocket::onCtcpReply(NoNick& nick, NoString& message)
+bool NoIrcSocket::onCtcpReply(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
     IRCSOCKMODULECALL(onCtcpReply(nick, message), &bResult);
@@ -910,7 +912,7 @@ bool NoIrcSocket::onCtcpReply(NoNick& nick, NoString& message)
     return bResult;
 }
 
-bool NoIrcSocket::onPrivCtcp(NoNick& nick, NoString& message)
+bool NoIrcSocket::onPrivCtcp(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
     IRCSOCKMODULECALL(onPrivCtcp(nick, message), &bResult);
@@ -926,7 +928,7 @@ bool NoIrcSocket::onPrivCtcp(NoNick& nick, NoString& message)
         if (!d->network->isUserOnline() || !d->network->user()->autoclearQueryBuffer()) {
             NoQuery* query = d->network->addQuery(nick.nick());
             if (query) {
-                query->addBuffer(":" + _NAMEDFMT(nick.hostMask()) + " PRIVMSG {target} :\001ACTION {text}\001", message);
+                query->addBuffer(":" + _NAMEDFMT(nick.toString()) + " PRIVMSG {target} :\001ACTION {text}\001", message);
             }
         }
 
@@ -937,7 +939,7 @@ bool NoIrcSocket::onPrivCtcp(NoNick& nick, NoString& message)
     return OnGeneralCTCP(nick, message);
 }
 
-bool NoIrcSocket::OnGeneralCTCP(NoNick& nick, NoString& message)
+bool NoIrcSocket::OnGeneralCTCP(NoHostMask& nick, NoString& message)
 {
     const NoStringMap& mssCTCPReplies = d->network->user()->ctcpReplies();
     NoString sQuery = No::token(message, 0).toUpper();
@@ -982,7 +984,7 @@ bool NoIrcSocket::OnGeneralCTCP(NoNick& nick, NoString& message)
     return false;
 }
 
-bool NoIrcSocket::onPrivNotice(NoNick& nick, NoString& message)
+bool NoIrcSocket::onPrivNotice(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
     IRCSOCKMODULECALL(onPrivNotice(nick, message), &bResult);
@@ -991,13 +993,13 @@ bool NoIrcSocket::onPrivNotice(NoNick& nick, NoString& message)
 
     if (!d->network->isUserOnline()) {
         // If the user is detached, add to the buffer
-        d->network->addNoticeBuffer(":" + _NAMEDFMT(nick.hostMask()) + " NOTICE {target} :{text}", message);
+        d->network->addNoticeBuffer(":" + _NAMEDFMT(nick.toString()) + " NOTICE {target} :{text}", message);
     }
 
     return false;
 }
 
-bool NoIrcSocket::onPrivMsg(NoNick& nick, NoString& message)
+bool NoIrcSocket::onPrivMsg(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
     IRCSOCKMODULECALL(onPrivMsg(nick, message), &bResult);
@@ -1007,7 +1009,7 @@ bool NoIrcSocket::onPrivMsg(NoNick& nick, NoString& message)
     if (!d->network->isUserOnline() || !d->network->user()->autoclearQueryBuffer()) {
         NoQuery* query = d->network->addQuery(nick.nick());
         if (query) {
-            query->addBuffer(":" + _NAMEDFMT(nick.hostMask()) + " PRIVMSG {target} :{text}", message);
+            query->addBuffer(":" + _NAMEDFMT(nick.toString()) + " PRIVMSG {target} :{text}", message);
         }
     }
 
@@ -1038,10 +1040,15 @@ bool NoIrcSocket::onChanCtcp(NoNick& nick, const NoString& sChan, NoString& mess
         }
     }
 
-    if (OnGeneralCTCP(nick, message))
-        return true;
+    NoHostMask mask(nick.hostMask());
+    bool res = OnGeneralCTCP(mask, message);
 
-    return (channel && channel->isDetached());
+    // TODO: cleanup
+    nick.setNick(mask.nick());
+    nick.setIdent(mask.ident());
+    nick.setHost(mask.host());
+
+    return res || (channel && channel->isDetached());
 }
 
 bool NoIrcSocket::onChanNotice(NoNick& nick, const NoString& sChan, NoString& message)

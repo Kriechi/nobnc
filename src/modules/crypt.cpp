@@ -39,6 +39,7 @@
 #include <nobnc/noescape.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 #define REQUIRESSL 1
 #define NICK_PREFIX_KEY "[nick-prefix]"
@@ -104,9 +105,11 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& nick, NoString& message) override
+    ModRet onPrivMsg(NoHostMask& mask, NoString& message) override
     {
+        NoNick nick(mask.toString()); // TODO: cleanup
         FilterIncoming(nick.nick(), nick, message);
+        mask.setNick(nick.nick()); // TODO: cleanup
         return CONTINUE;
     }
 

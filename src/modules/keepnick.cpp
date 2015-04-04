@@ -19,6 +19,7 @@
 #include <nobnc/nonetwork.h>
 #include <nobnc/noircsocket.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 class NoKeepNickTimer : public NoTimer
 {
@@ -88,11 +89,11 @@ public:
         return sConfNick;
     }
 
-    void onNick(const NoNick& nick, const NoString& newNick) override
+    void onNick(const NoHostMask& nick, const NoString& newNick) override
     {
         if (newNick == network()->ircSocket()->nick()) {
             // We are changing our own nick
-            if (nick.equals(GetNick())) {
+            if (nick.nick().equals(GetNick())) {
                 // We are changing our nick away from the conf setting.
                 // Let's assume the user wants this and disable
                 // this module (to avoid fighting nickserv).
@@ -106,15 +107,15 @@ public:
         }
 
         // If the nick we want is free now, be fast and get the nick
-        if (nick.equals(GetNick())) {
+        if (nick.nick().equals(GetNick())) {
             KeepNick();
         }
     }
 
-    void onQuit(const NoNick& nick, const NoString& message) override
+    void onQuit(const NoHostMask& nick, const NoString& message) override
     {
         // If someone with the nick we want quits, be fast and get the nick
-        if (nick.equals(GetNick())) {
+        if (nick.nick().equals(GetNick())) {
             KeepNick();
         }
     }

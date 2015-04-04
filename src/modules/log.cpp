@@ -26,6 +26,7 @@
 #include <nobnc/nodebug.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 #include <algorithm>
 
@@ -101,6 +102,7 @@ public:
     void PutLog(const NoString& line, const NoString& sWindow = "status");
     void PutLog(const NoString& line, const NoChannel* channel);
     void PutLog(const NoString& line, const NoNick& nick);
+    void PutLog(const NoString& line, const NoHostMask& nick);
     NoString GetServer();
 
     bool onLoad(const NoString& args, NoString& message) override;
@@ -110,25 +112,25 @@ public:
 
     void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override;
     void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override;
-    void onQuit(const NoNick& nick, const NoString& message) override;
+    void onQuit(const NoHostMask& nick, const NoString& message) override;
     void onJoin(const NoNick& nick, NoChannel* channel) override;
     void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override;
-    void onNick(const NoNick& OldNick, const NoString& newNick) override;
+    void onNick(const NoHostMask& OldNick, const NoString& newNick) override;
     ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override;
 
     /* notices */
     ModRet onUserNotice(NoString& target, NoString& message) override;
-    ModRet onPrivNotice(NoNick& nick, NoString& message) override;
+    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override;
     ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override;
 
     /* actions */
     ModRet onUserAction(NoString& target, NoString& message) override;
-    ModRet onPrivAction(NoNick& nick, NoString& message) override;
+    ModRet onPrivAction(NoHostMask& nick, NoString& message) override;
     ModRet onChanAction(NoNick& nick, NoChannel* channel, NoString& message) override;
 
     /* msgs */
     ModRet onUserMsg(NoString& target, NoString& message) override;
-    ModRet onPrivMsg(NoNick& nick, NoString& message) override;
+    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override;
     ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override;
 
 private:
@@ -280,6 +282,11 @@ void NoLogMod::PutLog(const NoString& line, const NoNick& nick)
     PutLog(line, nick.nick());
 }
 
+void NoLogMod::PutLog(const NoString& line, const NoHostMask& nick)
+{
+    PutLog(line, nick.nick());
+}
+
 NoString NoLogMod::GetServer()
 {
     NoServerInfo* server = network()->currentServer();
@@ -374,7 +381,7 @@ void NoLogMod::onKick(const NoNick& opNick, const NoString& sKickedNick, NoChann
     PutLog("*** " + sKickedNick + " was kicked by " + opNick.nick() + " (" + message + ")", channel);
 }
 
-void NoLogMod::onQuit(const NoNick& nick, const NoString& message)
+void NoLogMod::onQuit(const NoHostMask& nick, const NoString& message)
 {
     std::vector<NoChannel*> channels = network()->findNick(nick.nick());
     for (NoChannel* channel : channels)
@@ -391,7 +398,7 @@ void NoLogMod::onPart(const NoNick& nick, NoChannel* channel, const NoString& me
     PutLog("*** Parts: " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") (" + message + ")", channel);
 }
 
-void NoLogMod::onNick(const NoNick& OldNick, const NoString& newNick)
+void NoLogMod::onNick(const NoHostMask& OldNick, const NoString& newNick)
 {
     std::vector<NoChannel*> channels = network()->findNick(newNick);
     for (NoChannel* channel : channels)
@@ -415,7 +422,7 @@ NoModule::ModRet NoLogMod::onUserNotice(NoString& target, NoString& message)
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::onPrivNotice(NoNick& nick, NoString& message)
+NoModule::ModRet NoLogMod::onPrivNotice(NoHostMask& nick, NoString& message)
 {
     PutLog("-" + nick.nick() + "- " + message, nick);
     return CONTINUE;
@@ -438,7 +445,7 @@ NoModule::ModRet NoLogMod::onUserAction(NoString& target, NoString& message)
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::onPrivAction(NoNick& nick, NoString& message)
+NoModule::ModRet NoLogMod::onPrivAction(NoHostMask& nick, NoString& message)
 {
     PutLog("* " + nick.nick() + " " + message, nick);
     return CONTINUE;
@@ -461,7 +468,7 @@ NoModule::ModRet NoLogMod::onUserMsg(NoString& target, NoString& message)
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::onPrivMsg(NoNick& nick, NoString& message)
+NoModule::ModRet NoLogMod::onPrivMsg(NoHostMask& nick, NoString& message)
 {
     PutLog("<" + nick.nick() + "> " + message, nick);
     return CONTINUE;

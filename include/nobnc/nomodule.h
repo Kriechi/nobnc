@@ -44,6 +44,7 @@ class NoModuleInfo;
 class NoModuleSocket;
 class NoSocket;
 class NoModulePrivate;
+class NoHostMask;
 
 #ifdef REQUIRESSL
 #ifndef HAVE_LIBSSL
@@ -366,13 +367,13 @@ public:
      *  @param nick The nick which quit.
      *  @param message The quit message.
      */
-    virtual void onQuit(const NoNick& nick, const NoString& message);
+    virtual void onQuit(const NoHostMask& nick, const NoString& message);
     /** Called when a nickname change occurs. If we are changing our nick,
      *  newNick will equal m_pIRCSock->GetNick().
      *  @param nick The nick which changed its nickname
      *  @param newNick The new nickname.
      */
-    virtual void onNick(const NoNick& nick, const NoString& newNick);
+    virtual void onNick(const NoHostMask& nick, const NoString& newNick);
     /** Called when a nick is kicked from a channel.
      *  @param opNick The nick which generated the kick.
      *  @param sKickedNick The nick which was kicked.
@@ -401,7 +402,7 @@ public:
      *  @param sChan The channel the user got invited into
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onInvite(const NoNick& nick, const NoString& sChan);
+    virtual ModRet onInvite(const NoHostMask& nick, const NoString& sChan);
 
     /** Called before a channel buffer is played back to a client.
      *  @param channel The channel which will be played back.
@@ -515,13 +516,13 @@ public:
      *  @param message The CTCP reply message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onCtcpReply(NoNick& nick, NoString& message);
+    virtual ModRet onCtcpReply(NoHostMask& nick, NoString& message);
     /** Called when we receive a private CTCP request <em>from IRC</em>.
      *  @param nick The nick the CTCP request is from.
      *  @param message The CTCP request message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivCtcp(NoNick& nick, NoString& message);
+    virtual ModRet onPrivCtcp(NoHostMask& nick, NoString& message);
     /** Called when we receive a channel CTCP request <em>from IRC</em>.
      *  @param nick The nick the CTCP request is from.
      *  @param channel The channel to which the request was sent.
@@ -535,7 +536,7 @@ public:
      *  @param message The action message
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivAction(NoNick& nick, NoString& message);
+    virtual ModRet onPrivAction(NoHostMask& nick, NoString& message);
     /** Called when we receive a channel CTCP ACTION ("/me" in a channel) <em>from IRC</em>.
      *  This is called after NoModule::onChanCtcp().
      *  @param nick The nick the action came from.
@@ -549,7 +550,7 @@ public:
      *  @param message The message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivMsg(NoNick& nick, NoString& message);
+    virtual ModRet onPrivMsg(NoHostMask& nick, NoString& message);
     /** Called when we receive a channel message <em>from IRC</em>.
      *  @param nick The nick which sent the message.
      *  @param channel The channel to which the message was sent.
@@ -562,7 +563,7 @@ public:
      *  @param message The notice message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivNotice(NoNick& nick, NoString& message);
+    virtual ModRet onPrivNotice(NoHostMask& nick, NoString& message);
     /** Called when we receive a channel notice.
      *  @param nick The nick which sent the notice.
      *  @param channel The channel to which the notice was sent.

@@ -25,6 +25,7 @@
 class NoNick;
 class NoClient;
 class NoNetwork;
+class NoHostMask;
 class NoIrcSocketPrivate;
 
 class NO_EXPORT NoIrcSocket : public NoSocket
@@ -41,13 +42,13 @@ public:
         NoArg = 3
     };
 
-    bool onCtcpReply(NoNick& nick, NoString& message);
-    bool onPrivCtcp(NoNick& nick, NoString& message);
+    bool onCtcpReply(NoHostMask& nick, NoString& message);
+    bool onPrivCtcp(NoHostMask& nick, NoString& message);
     bool onChanCtcp(NoNick& nick, const NoString& sChan, NoString& message);
-    bool OnGeneralCTCP(NoNick& nick, NoString& message);
-    bool onPrivMsg(NoNick& nick, NoString& message);
+    bool OnGeneralCTCP(NoHostMask& nick, NoString& message);
+    bool onPrivMsg(NoHostMask& nick, NoString& message);
     bool onChanMsg(NoNick& nick, const NoString& sChan, NoString& message);
-    bool onPrivNotice(NoNick& nick, NoString& message);
+    bool onPrivNotice(NoHostMask& nick, NoString& message);
     bool onChanNotice(NoNick& nick, const NoString& sChan, NoString& message);
     bool onServerCapAvailable(const NoString& cap);
 

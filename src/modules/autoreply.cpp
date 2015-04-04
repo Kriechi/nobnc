@@ -22,6 +22,7 @@
 #include <nobnc/nocachemap.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 class NoAutoReplyMod : public NoModule
 {
@@ -83,7 +84,7 @@ public:
         putIrc("NOTICE " + nick + " :" + GetReply());
     }
 
-    ModRet onPrivMsg(NoNick& nick, NoString& message) override
+    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
     {
         Handle(nick.nick());
         return CONTINUE;

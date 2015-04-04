@@ -22,6 +22,7 @@
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nobuffer.h>
+#include <nobnc/nohostmask.h>
 
 #include <list>
 
@@ -79,7 +80,7 @@ public:
         }
     }
 
-    bool IsMatch(const NoNick& nick, const NoString& text, const NoString& sSource, const NoNetwork* network)
+    bool IsMatch(const NoString& hostMask, const NoString& text, const NoString& sSource, const NoNetwork* network)
     {
         if (IsDisabled()) {
             return false;
@@ -105,7 +106,7 @@ public:
 
         if (!bGoodSource)
             return false;
-        if (!No::wildCmp(nick.hostMask(), m_sHostMask, No::CaseInsensitive))
+        if (!No::wildCmp(hostMask, m_sHostMask, No::CaseInsensitive))
             return false;
         return (No::wildCmp(text, network->expandString(m_sPattern), No::CaseInsensitive));
     }
@@ -230,7 +231,7 @@ public:
 
     void onRawMode(const NoNick& opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
     {
-        Process(opNick, "* " + opNick.nick() + " sets mode: " + modes + " " + args + " on " + channel->name(), channel->name());
+        Process(opNick.hostMask(), "* " + opNick.nick() + " sets mode: " + modes + " " + args + " on " + channel->name(), channel->name());
     }
 
     void onClientLogin() override
@@ -247,14 +248,14 @@ public:
 
     void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override
     {
-        Process(opNick,
+        Process(opNick.hostMask(),
                 "* " + opNick.nick() + " kicked " + sKickedNick + " from " + channel->name() + " because [" + message + "]",
                 channel->name());
     }
 
-    void onQuit(const NoNick& nick, const NoString& message) override
+    void onQuit(const NoHostMask& nick, const NoString& message) override
     {
-        Process(nick,
+        Process(nick.toString(),
                 "* Quits: " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") "
                                                                                       "(" +
                 message + ")",
@@ -263,36 +264,36 @@ public:
 
     void onJoin(const NoNick& nick, NoChannel* channel) override
     {
-        Process(nick, "* " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") joins " + channel->name(), channel->name());
+        Process(nick.hostMask(), "* " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") joins " + channel->name(), channel->name());
     }
 
     void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override
     {
-        Process(nick,
+        Process(nick.hostMask(),
                 "* " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") parts " + channel->name() + "(" + message + ")",
                 channel->name());
     }
 
-    void onNick(const NoNick& OldNick, const NoString& newNick) override
+    void onNick(const NoHostMask& OldNick, const NoString& newNick) override
     {
-        Process(OldNick, "* " + OldNick.nick() + " is now known as " + newNick, "");
+        Process(OldNick.toString(), "* " + OldNick.nick() + " is now known as " + newNick, "");
     }
 
-    ModRet onCtcpReply(NoNick& nick, NoString& message) override
+    ModRet onCtcpReply(NoHostMask& nick, NoString& message) override
     {
-        Process(nick, "* CTCP: " + nick.nick() + " reply [" + message + "]", "priv");
+        Process(nick.toString(), "* CTCP: " + nick.nick() + " reply [" + message + "]", "priv");
         return CONTINUE;
     }
 
-    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
+    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
     {
-        Process(nick, "* CTCP: " + nick.nick() + " [" + message + "]", "priv");
+        Process(nick.toString(), "* CTCP: " + nick.nick() + " [" + message + "]", "priv");
         return CONTINUE;
     }
 
     ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
-        Process(nick,
+        Process(nick.hostMask(),
                 "* CTCP: " + nick.nick() + " [" + message + "] to "
                                                              "[" +
                 channel->name() + "]",
@@ -300,27 +301,27 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivNotice(NoNick& nick, NoString& message) override
+    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override
     {
-        Process(nick, "-" + nick.nick() + "- " + message, "priv");
+        Process(nick.toString(), "-" + nick.nick() + "- " + message, "priv");
         return CONTINUE;
     }
 
     ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
-        Process(nick, "-" + nick.nick() + ":" + channel->name() + "- " + message, channel->name());
+        Process(nick.hostMask(), "-" + nick.nick() + ":" + channel->name() + "- " + message, channel->name());
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& nick, NoString& message) override
+    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
     {
-        Process(nick, "<" + nick.nick() + "> " + message, "priv");
+        Process(nick.toString(), "<" + nick.nick() + "> " + message, "priv");
         return CONTINUE;
     }
 
     ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
     {
-        Process(nick, "<" + nick.nick() + ":" + channel->name() + "> " + message, channel->name());
+        Process(nick.hostMask(), "<" + nick.nick() + ":" + channel->name() + "> " + message, channel->name());
         return CONTINUE;
     }
 
@@ -391,7 +392,7 @@ public:
     }
 
 private:
-    void Process(const NoNick& nick, const NoString& message, const NoString& sSource)
+    void Process(const NoString& hostMask, const NoString& message, const NoString& sSource)
     {
         std::set<NoString> sHandledTargets;
         NoNetwork* network = NoModule::network();
@@ -408,7 +409,7 @@ private:
                 continue;
             }
 
-            if (WatchEntry.IsMatch(nick, message, sSource, network) && sHandledTargets.count(WatchEntry.GetTarget()) < 1) {
+            if (WatchEntry.IsMatch(hostMask, message, sSource, network) && sHandledTargets.count(WatchEntry.GetTarget()) < 1) {
                 if (network->isUserAttached()) {
                     network->putUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " +
                                       network->currentNick() + " :" + message);

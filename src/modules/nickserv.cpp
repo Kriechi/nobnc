@@ -20,6 +20,7 @@
 #include <nobnc/nouser.h>
 #include <nobnc/nonick.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/nohostmask.h>
 
 class NoNickServ : public NoModule
 {
@@ -117,12 +118,12 @@ public:
         return true;
     }
 
-    void HandleMessage(NoNick& nick, const NoString& message)
+    void HandleMessage(NoHostMask& nick, const NoString& message)
     {
         NoRegistry registry(this);
         NoString sNickServName =
         (!registry.value("NickServName").empty()) ? registry.value("NickServName") : "NickServ";
-        if (!registry.value("Password").empty() && nick.equals(sNickServName) &&
+        if (!registry.value("Password").empty() && nick.nick().equals(sNickServName) &&
             (message.contains("msg") || message.contains("authenticate") ||
              message.contains("choose a different nickname") || message.contains("please choose a different nick") ||
              message.contains("If this is your nick, identify yourself with") ||
@@ -137,13 +138,13 @@ public:
         }
     }
 
-    ModRet onPrivMsg(NoNick& nick, NoString& message) override
+    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
     {
         HandleMessage(nick, message);
         return CONTINUE;
     }
 
-    ModRet onPrivNotice(NoNick& nick, NoString& message) override
+    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override
     {
         HandleMessage(nick, message);
         return CONTINUE;

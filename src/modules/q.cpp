@@ -24,6 +24,7 @@
 #include <nobnc/nowebsession.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 #ifndef Q_DEBUG_COMMUNICATION
 #define Q_DEBUG_COMMUNICATION 0
@@ -280,12 +281,12 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& nick, NoString& message) override
+    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
     {
         return HandleMessage(nick, message);
     }
 
-    ModRet onPrivNotice(NoNick& nick, NoString& message) override
+    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override
     {
         return HandleMessage(nick, message);
     }
@@ -318,9 +319,9 @@ public:
             HandleNeed(channel, "v");
     }
 
-    ModRet onInvite(const NoNick& nick, const NoString& sChan) override
+    ModRet onInvite(const NoHostMask& nick, const NoString& sChan) override
     {
-        if (!nick.equals("Q") || !nick.host().equals("CServe.quakenet.org"))
+        if (!nick.nick().equals("Q") || !nick.host().equals("CServe.quakenet.org"))
             return CONTINUE;
         if (m_bJoinonInvite)
             network()->addChannel(sChan, false);
@@ -465,9 +466,9 @@ private:
         PutQ("CHALLENGEAUTH " + m_sUsername + " " + response + " HMAC-SHA-256");
     }
 
-    ModRet HandleMessage(const NoNick& nick, NoString message)
+    ModRet HandleMessage(const NoHostMask& nick, NoString message)
     {
-        if (!nick.equals("Q") || !nick.host().equals("CServe.quakenet.org"))
+        if (!nick.nick().equals("Q") || !nick.host().equals("CServe.quakenet.org"))
             return CONTINUE;
 
         message.trim();

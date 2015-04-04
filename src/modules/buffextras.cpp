@@ -20,6 +20,7 @@
 #include <nobnc/nonetwork.h>
 #include <nobnc/noescape.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 class NoBuffExtras : public NoModule
 {
@@ -50,9 +51,9 @@ public:
         AddBuffer(channel, opNick.hostMask() + " kicked " + sKickedNick + " Reason: [" + message + "]");
     }
 
-    void onQuit(const NoNick& nick, const NoString& message) override
+    void onQuit(const NoHostMask& nick, const NoString& message) override
     {
-        NoString msg = nick.hostMask() + " quit with message: [" + message + "]";
+        NoString msg = nick.toString() + " quit with message: [" + message + "]";
         std::vector<NoChannel*> channels = network()->findNick(nick.nick());
         for (NoChannel* channel : channels)
             AddBuffer(channel, msg);
@@ -68,9 +69,9 @@ public:
         AddBuffer(channel, nick.hostMask() + " parted with message: [" + message + "]");
     }
 
-    void onNick(const NoNick& OldNick, const NoString& newNick) override
+    void onNick(const NoHostMask& OldNick, const NoString& newNick) override
     {
-        NoString msg = OldNick.hostMask() + " is now known as " + newNick;
+        NoString msg = OldNick.toString() + " is now known as " + newNick;
         std::vector<NoChannel*> channels = network()->findNick(newNick);
         for (NoChannel* channel : channels)
             AddBuffer(channel, msg);

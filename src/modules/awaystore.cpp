@@ -37,6 +37,7 @@
 #include <nobnc/noutils.h>
 #include <nobnc/noclient.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 #define CRYPT_VERIFICATION_TOKEN "::__:AWAY:__::"
 
@@ -388,14 +389,14 @@ public:
         m_sReason = "";
     }
 
-    ModRet onPrivMsg(NoNick& nick, NoString& message) override
+    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
     {
         if (m_bIsAway)
             AddMessage(time(nullptr), nick, message);
         return (CONTINUE);
     }
 
-    ModRet onPrivAction(NoNick& nick, NoString& message) override
+    ModRet onPrivAction(NoHostMask& nick, NoString& message) override
     {
         if (m_bIsAway) {
             AddMessage(time(nullptr), nick, "* " + message);
@@ -483,11 +484,11 @@ private:
         return (true);
     }
 
-    void AddMessage(time_t iTime, const NoNick& nick, const NoString& message)
+    void AddMessage(time_t iTime, const NoHostMask& nick, const NoString& message)
     {
         if (nick.nick() == network()->ircNick().nick())
             return; // ignore messages from self
-        AddMessage(NoString(iTime) + " " + nick.hostMask() + " " + message);
+        AddMessage(NoString(iTime) + " " + nick.toString() + " " + message);
     }
 
     void AddMessage(const NoString& text)

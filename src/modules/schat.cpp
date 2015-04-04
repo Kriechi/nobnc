@@ -29,6 +29,7 @@
 #include <nobnc/noapp.h>
 #include <nobnc/nomodulesocket.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>
@@ -302,7 +303,7 @@ public:
             putModule("Unknown command [" + sCom + "] [" + args + "]");
     }
 
-    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
+    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
     {
         if (message.startsWith("DCC SCHAT ")) {
             // chat ip port

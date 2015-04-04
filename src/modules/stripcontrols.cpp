@@ -25,7 +25,7 @@ public:
     {
     }
 
-    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
+    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
     {
         message = No::stripControls(message);
         return CONTINUE;
@@ -37,7 +37,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivNotice(NoNick& nick, NoString& message) override
+    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override
     {
         message = No::stripControls(message);
         return CONTINUE;
@@ -49,7 +49,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoNick& nick, NoString& message) override
+    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
     {
         message = No::stripControls(message);
         return CONTINUE;

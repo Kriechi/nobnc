@@ -563,10 +563,10 @@ void NoModule::onUnknownModCommand(const NoString& line)
         putModule("Unknown command!");
 }
 
-void NoModule::onQuit(const NoNick& nick, const NoString& message)
+void NoModule::onQuit(const NoHostMask& nick, const NoString& message)
 {
 }
-void NoModule::onNick(const NoNick& nick, const NoString& newNick)
+void NoModule::onNick(const NoHostMask& nick, const NoString& newNick)
 {
 }
 void NoModule::onKick(const NoNick& nick, const NoString& sKickedNick, NoChannel* channel, const NoString& message)
@@ -582,7 +582,7 @@ void NoModule::onJoin(const NoNick& nick, NoChannel* channel)
 void NoModule::onPart(const NoNick& nick, NoChannel* channel, const NoString& message)
 {
 }
-NoModule::ModRet NoModule::onInvite(const NoNick& nick, const NoString& sChan)
+NoModule::ModRet NoModule::onInvite(const NoHostMask& nick, const NoString& sChan)
 {
     return CONTINUE;
 }
@@ -664,11 +664,11 @@ NoModule::ModRet NoModule::onUserQuit(NoString& message)
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onCtcpReply(NoNick& nick, NoString& message)
+NoModule::ModRet NoModule::onCtcpReply(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivCtcp(NoNick& nick, NoString& message)
+NoModule::ModRet NoModule::onPrivCtcp(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }
@@ -676,7 +676,7 @@ NoModule::ModRet NoModule::onChanCtcp(NoNick& nick, NoChannel* channel, NoString
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivAction(NoNick& nick, NoString& message)
+NoModule::ModRet NoModule::onPrivAction(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }
@@ -684,7 +684,7 @@ NoModule::ModRet NoModule::onChanAction(NoNick& nick, NoChannel* channel, NoStri
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivMsg(NoNick& nick, NoString& message)
+NoModule::ModRet NoModule::onPrivMsg(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }
@@ -692,7 +692,7 @@ NoModule::ModRet NoModule::onChanMsg(NoNick& nick, NoChannel* channel, NoString&
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivNotice(NoNick& nick, NoString& message)
+NoModule::ModRet NoModule::onPrivNotice(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }

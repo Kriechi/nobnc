@@ -24,6 +24,7 @@
 #include <nobnc/nomodulesocket.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 class NoBounceDccMod;
 
@@ -272,7 +273,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivCtcp(NoNick& nick, NoString& message) override
+    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
     {
         NoNetwork* network = NoModule::network();
         if (message.startsWith("DCC ") && network->isUserAttached()) {
@@ -286,11 +287,11 @@ public:
             ulong uFileSize = tokens.at(5).trim_n("\"").toULong();
 
             if (sType.equals("CHAT")) {
-                NoNick FromNick(nick.hostMask());
+                NoNick FromNick(nick.toString());
                 ushort uBNCPort = NoDccBounce::DCCRequest(FromNick.nick(), uLongIP, port, "", true, this, No::formatIp(uLongIP));
                 if (uBNCPort) {
                     NoString address = GetLocalDCCIP();
-                    putUser(":" + nick.hostMask() + " PRIVMSG " + network->currentNick() + " :\001DCC CHAT chat " +
+                    putUser(":" + nick.toString() + " PRIVMSG " + network->currentNick() + " :\001DCC CHAT chat " +
                             NoString(No::formatLongIp(address)) + " " + NoString(uBNCPort) + "\001");
                 }
             } else if (sType.equals("SEND")) {
@@ -298,7 +299,7 @@ public:
                 ushort uBNCPort = NoDccBounce::DCCRequest(nick.nick(), uLongIP, port, sFile, false, this, No::formatIp(uLongIP));
                 if (uBNCPort) {
                     NoString address = GetLocalDCCIP();
-                    putUser(":" + nick.hostMask() + " PRIVMSG " + network->currentNick() + " :\001DCC SEND " + sFile + " " +
+                    putUser(":" + nick.toString() + " PRIVMSG " + network->currentNick() + " :\001DCC SEND " + sFile + " " +
                             NoString(No::formatLongIp(address)) + " " + NoString(uBNCPort) + " " + NoString(uFileSize) + "\001");
                 }
             } else if (sType.equals("RESUME")) {
@@ -307,7 +308,7 @@ public:
 
                 for (NoDccBounce* socket : m_sockets) {
                     if (socket->localPort() == uResumePort) {
-                        putUser(":" + nick.hostMask() + " PRIVMSG " + network->currentNick() + " :\001DCC " + sType + " " +
+                        putUser(":" + nick.toString() + " PRIVMSG " + network->currentNick() + " :\001DCC " + sType + " " +
                                 sFile + " " + NoString(socket->GetUserPort()) + " " + No::token(message, 4) + "\001");
                     }
                 }
@@ -315,7 +316,7 @@ public:
                 // Need to lookup the connection by port, filter the port, and forward to the user
                 for (NoDccBounce* socket : m_sockets) {
                     if (socket->GetUserPort() == No::token(message, 3).toUShort()) {
-                        putUser(":" + nick.hostMask() + " PRIVMSG " + network->currentNick() + " :\001DCC " + sType + " " +
+                        putUser(":" + nick.toString() + " PRIVMSG " + network->currentNick() + " :\001DCC " + sType + " " +
                                 sFile + " " + NoString(socket->localPort()) + " " + No::token(message, 4) + "\001");
                     }
                 }

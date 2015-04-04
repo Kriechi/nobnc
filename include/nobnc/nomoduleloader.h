@@ -93,13 +93,13 @@ public:
     bool onModNotice(const NoString& message);
     bool onModCTCP(const NoString& message);
 
-    bool onQuit(const NoNick& nick, const NoString& message);
-    bool onNick(const NoNick& nick, const NoString& newNick);
+    bool onQuit(const NoHostMask& nick, const NoString& message);
+    bool onNick(const NoHostMask& nick, const NoString& newNick);
     bool onKick(const NoNick& nick, const NoString& opNick, NoChannel* channel, const NoString& message);
     bool onJoining(NoChannel* channel);
     bool onJoin(const NoNick& nick, NoChannel* channel);
     bool onPart(const NoNick& nick, NoChannel* channel, const NoString& message);
-    bool onInvite(const NoNick& nick, const NoString& sChan);
+    bool onInvite(const NoHostMask& nick, const NoString& sChan);
 
     bool onChanBufferStarting(NoChannel* channel, NoClient* client);
     bool onChanBufferEnding(NoChannel* channel, NoClient* client);
@@ -122,14 +122,14 @@ public:
     bool onUserTopicRequest(NoString& channel);
     bool onUserQuit(NoString& message);
 
-    bool onCtcpReply(NoNick& nick, NoString& message);
-    bool onPrivCtcp(NoNick& nick, NoString& message);
+    bool onCtcpReply(NoHostMask& nick, NoString& message);
+    bool onPrivCtcp(NoHostMask& nick, NoString& message);
     bool onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message);
-    bool onPrivAction(NoNick& nick, NoString& message);
+    bool onPrivAction(NoHostMask& nick, NoString& message);
     bool onChanAction(NoNick& nick, NoChannel* channel, NoString& message);
-    bool onPrivMsg(NoNick& nick, NoString& message);
+    bool onPrivMsg(NoHostMask& nick, NoString& message);
     bool onChanMsg(NoNick& nick, NoChannel* channel, NoString& message);
-    bool onPrivNotice(NoNick& nick, NoString& message);
+    bool onPrivNotice(NoHostMask& nick, NoString& message);
     bool onChanNotice(NoNick& nick, NoChannel* channel, NoString& message);
     bool onTopic(NoNick& nick, NoChannel* channel, NoString& topic);
     bool onTimerAutoJoin(NoChannel* channel);

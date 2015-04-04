@@ -21,6 +21,7 @@
 #include <nobnc/nocachemap.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 class NoAutoCycleMod : public NoModule
 {
@@ -115,7 +116,7 @@ public:
         AutoCycle(channel);
     }
 
-    void onQuit(const NoNick& nick, const NoString& message) override
+    void onQuit(const NoHostMask& nick, const NoString& message) override
     {
         std::vector<NoChannel*> channels = network()->findNick(nick.nick());
         for (NoChannel* channel : channels)

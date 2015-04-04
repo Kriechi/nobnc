@@ -20,6 +20,7 @@
 #include <nobnc/nochannel.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nohostmask.h>
 
 class NoAutoOpMod;
 
@@ -235,7 +236,7 @@ public:
         }
     }
 
-    void onQuit(const NoNick& nick, const NoString& message) override
+    void onQuit(const NoHostMask& nick, const NoString& message) override
     {
         NoStringMap::iterator it = m_msQueue.find(nick.nick().toLower());
 
@@ -244,7 +245,7 @@ public:
         }
     }
 
-    void onNick(const NoNick& OldNick, const NoString& newNick) override
+    void onNick(const NoHostMask& OldNick, const NoString& newNick) override
     {
         // Update the queue with nick changes
         NoStringMap::iterator it = m_msQueue.find(OldNick.nick().toLower());
@@ -255,7 +256,7 @@ public:
         }
     }
 
-    ModRet onPrivNotice(NoNick& nick, NoString& message) override
+    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override
     {
         if (!No::token(message, 0).equals("!ZNCAO")) {
             return CONTINUE;
@@ -531,7 +532,7 @@ public:
         return user;
     }
 
-    bool ChallengeRespond(const NoNick& nick, const NoString& sChallenge)
+    bool ChallengeRespond(const NoHostMask& nick, const NoString& sChallenge)
     {
         // Validate before responding - don't blindly trust everyone
         bool bValid = false;
@@ -542,7 +543,7 @@ public:
             user = it->second;
 
             // First verify that the person who challenged us matches a user's host
-            if (user->HostMatches(nick.hostMask())) {
+            if (user->HostMatches(nick.toString())) {
                 const std::vector<NoChannel*>& Chans = network()->channels();
                 bMatchedHost = true;
 
@@ -568,17 +569,17 @@ public:
 
         if (!bValid) {
             if (bMatchedHost) {
-                putModule("[" + nick.hostMask() +
+                putModule("[" + nick.toString() +
                           "] sent us a challenge but they are not opped in any defined channels.");
             } else {
-                putModule("[" + nick.hostMask() + "] sent us a challenge but they do not match a defined user.");
+                putModule("[" + nick.toString() + "] sent us a challenge but they do not match a defined user.");
             }
 
             return false;
         }
 
         if (sChallenge.length() != AUTOOP_CHALLENGE_LENGTH) {
-            putModule("WARNING! [" + nick.hostMask() + "] sent an invalid challenge.");
+            putModule("WARNING! [" + nick.toString() + "] sent an invalid challenge.");
             return false;
         }
 
@@ -587,12 +588,12 @@ public:
         return false;
     }
 
-    bool VerifyResponse(const NoNick& nick, const NoString& response)
+    bool VerifyResponse(const NoHostMask& nick, const NoString& response)
     {
         NoStringMap::iterator itQueue = m_msQueue.find(nick.nick().toLower());
 
         if (itQueue == m_msQueue.end()) {
-            putModule("[" + nick.hostMask() + "] sent an unchallenged response.  This could be due to lag.");
+            putModule("[" + nick.toString() + "] sent an unchallenged response.  This could be due to lag.");
             return false;
         }
 
@@ -600,19 +601,19 @@ public:
         m_msQueue.erase(itQueue);
 
         for (std::map<NoString, NoAutoOpUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
-            if (it->second->HostMatches(nick.hostMask())) {
+            if (it->second->HostMatches(nick.toString())) {
                 if (response == No::md5(it->second->GetUserKey() + "::" + sChallenge)) {
                     OpUser(nick, *it->second);
                     return true;
                 } else {
-                    putModule("WARNING! [" + nick.hostMask() +
+                    putModule("WARNING! [" + nick.toString() +
                               "] sent a bad response.  Please verify that you have their correct password.");
                     return false;
                 }
             }
         }
 
-        putModule("WARNING! [" + nick.hostMask() + "] sent a response but did not match any defined users.");
+        putModule("WARNING! [" + nick.toString() + "] sent a response but did not match any defined users.");
         return false;
     }
 
@@ -641,7 +642,7 @@ public:
         }
     }
 
-    void OpUser(const NoNick& nick, const NoAutoOpUser& User)
+    void OpUser(const NoHostMask& nick, const NoAutoOpUser& User)
     {
         const std::vector<NoChannel*>& Chans = network()->channels();
 
