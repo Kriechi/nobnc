@@ -19,31 +19,30 @@
 #define NOMODULE_H
 
 #include <nobnc/noglobal.h>
-#include <nobnc/nowebpage.h>
-#include <nobnc/noutils.h>
-#include <nobnc/notable.h>
-#include <nobnc/notimer.h>
+#include <nobnc/nostring.h>
 #include <nobnc/nomoduleinfo.h>
 #include <nobnc/nomodulecommand.h>
-#include <functional>
-#include <set>
-#include <queue>
+
 #include <sys/time.h>
 #include <memory>
 
-class NoAuthenticator;
+class NoUser;
+class NoNick;
+class NoTimer;
+class NoSocket;
+class NoClient;
 class NoChannel;
 class NoNetwork;
-class NoClient;
-class NoWebSocket;
-class NoTemplate;
-class NoIrcSocket;
-class NoModule;
-class NoModuleInfo;
-class NoModuleSocket;
-class NoSocket;
-class NoModulePrivate;
+class NoWebPage;
 class NoHostMask;
+class NoTemplate;
+class NoWebSocket;
+class NoIrcSocket;
+class NoModuleJob;
+class NoModuleSocket;
+class NoAuthenticator;
+class NoSocketManager;
+class NoModulePrivate;
 
 #ifdef REQUIRESSL
 #ifndef HAVE_LIBSSL
@@ -111,14 +110,6 @@ class NoHostMask;
  *  @param DESCRIPTION A short description of your module.
  */
 #define MODULEDEFS(CLASS, DESCRIPTION) NETWORKMODULEDEFS(CLASS, DESCRIPTION)
-
-class NoApp;
-class NoUser;
-class NoNick;
-class NoChannel;
-class NoModule;
-class NoSocketManager;
-class NoModuleJob;
 
 /** The base class for your own ZNC modules.
  *
