@@ -72,19 +72,12 @@ public:
     bool onBroadcast(NoString& message);
 
     bool onChanPermission2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
-    bool onChanPermission(const NoNick& opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
     bool onOp2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
-    bool onOp(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     bool onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
-    bool onDeop(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     bool onVoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
-    bool onVoice(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     bool onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
-    bool onDevoice(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     bool onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args);
-    bool onRawMode(const NoNick& opNick, NoChannel* channel, const NoString& modes, const NoString& args);
     bool onMode2(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange);
-    bool onMode(const NoNick& opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange);
 
     bool onRaw(NoString& line);
 
@@ -104,9 +97,7 @@ public:
     bool onChanBufferStarting(NoChannel* channel, NoClient* client);
     bool onChanBufferEnding(NoChannel* channel, NoClient* client);
     bool onChanBufferPlayLine2(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
-    bool onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line);
     bool onPrivBufferPlayLine2(NoClient* client, NoString& line, const timeval& tv);
-    bool onPrivBufferPlayLine(NoClient* client, NoString& line);
 
     bool onClientLogin();
     bool onClientDisconnect();

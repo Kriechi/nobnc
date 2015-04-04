@@ -476,59 +476,23 @@ NoModule::ModRet NoModule::onBroadcast(NoString& message)
 
 void NoModule::onChanPermission2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
 {
-    if (opNick)
-        onChanPermission(*opNick, nick, channel, mode, added, noChange);
 }
 void NoModule::onOp2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
-    if (opNick)
-        onOp(*opNick, nick, channel, noChange);
 }
 void NoModule::onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
-    if (opNick)
-        onDeop(*opNick, nick, channel, noChange);
 }
 void NoModule::onVoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
-    if (opNick)
-        onVoice(*opNick, nick, channel, noChange);
 }
 void NoModule::onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
-    if (opNick)
-        onDevoice(*opNick, nick, channel, noChange);
 }
 void NoModule::onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args)
 {
-    if (opNick)
-        onRawMode(*opNick, channel, modes, args);
 }
 void NoModule::onMode2(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange)
-{
-    if (opNick)
-        onMode(*opNick, channel, mode, arg, added, noChange);
-}
-
-void NoModule::onChanPermission(const NoNick& opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
-{
-}
-void NoModule::onOp(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange)
-{
-}
-void NoModule::onDeop(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange)
-{
-}
-void NoModule::onVoice(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange)
-{
-}
-void NoModule::onDevoice(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange)
-{
-}
-void NoModule::onRawMode(const NoNick& opNick, NoChannel* channel, const NoString& modes, const NoString& args)
-{
-}
-void NoModule::onMode(const NoNick& opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange)
 {
 }
 
@@ -595,22 +559,14 @@ NoModule::ModRet NoModule::onChanBufferEnding(NoChannel* channel, NoClient* clie
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line)
-{
-    return CONTINUE;
-}
-NoModule::ModRet NoModule::onPrivBufferPlayLine(NoClient* client, NoString& line)
-{
-    return CONTINUE;
-}
 
 NoModule::ModRet NoModule::onChanBufferPlayLine2(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
 {
-    return onChanBufferPlayLine(channel, client, line);
+    return CONTINUE;
 }
 NoModule::ModRet NoModule::onPrivBufferPlayLine2(NoClient* client, NoString& line, const timeval& tv)
 {
-    return onPrivBufferPlayLine(client, line);
+    return CONTINUE;
 }
 
 void NoModule::onClientLogin()

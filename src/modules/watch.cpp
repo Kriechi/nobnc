@@ -229,9 +229,10 @@ public:
         Load();
     }
 
-    void onRawMode(const NoNick& opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
+    void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
     {
-        Process(opNick.hostMask(), "* " + opNick.nick() + " sets mode: " + modes + " " + args + " on " + channel->name(), channel->name());
+        if (opNick)
+            Process(opNick->hostMask(), "* " + opNick->nick() + " sets mode: " + modes + " " + args + " on " + channel->name(), channel->name());
     }
 
     void onClientLogin() override
