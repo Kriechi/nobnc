@@ -234,14 +234,12 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
     subIt = subConf.begin();
     if (subIt != subConf.end()) {
         NoSettings* pSubConf = subIt->second.m_subConfig;
-        NoString sHash;
-        NoString sMethod; // TODO: remove
-        NoString salt;
-        pSubConf->FindStringEntry("hash", sHash);
-        pSubConf->FindStringEntry("method", sMethod); // XXX: remove
-        pSubConf->FindStringEntry("salt", salt);
+        pSubConf->FindStringEntry("hash", d->password);
+        pSubConf->FindStringEntry("salt", d->passwordSalt);
 
-        setPassword(sHash, salt);
+        NoString sMethod; // TODO: remove
+        pSubConf->FindStringEntry("method", sMethod); // XXX: remove
+
         if (!pSubConf->empty()) {
             error = "Unhandled lines in config!";
             No::printError(error);
@@ -615,7 +613,8 @@ bool NoUser::clone(const NoUser& User, NoString& error, bool cloneNetworks)
     }
 
     if (!User.password().empty()) {
-        setPassword(User.password(), User.passwordSalt());
+        setPassword(User.password());
+        d->passwordSalt = NoUserPrivate::get(&const_cast<NoUser&>(User))->passwordSalt;
     }
 
     setNick(User.nick(false));
@@ -1108,10 +1107,10 @@ void NoUser::setDccBindHost(const NoString& s)
 {
     d->dccBindHost = s;
 }
-void NoUser::setPassword(const NoString& s, const NoString& salt)
+void NoUser::setPassword(const NoString& s)
 {
-    d->password = s;
-    d->passwordSalt = salt;
+    d->passwordSalt = No::salt();
+    d->password = No::saltedSha256(s, d->passwordSalt);
 }
 void NoUser::setMultiClients(bool b)
 {
@@ -1301,10 +1300,6 @@ NoString NoUser::dccBindHost() const
 NoString NoUser::password() const
 {
     return d->password;
-}
-NoString NoUser::passwordSalt() const
-{
-    return d->passwordSalt;
 }
 bool NoUser::denyLoadMod() const
 {

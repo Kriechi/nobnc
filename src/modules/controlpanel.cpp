@@ -365,9 +365,7 @@ class NoAdminMod : public NoModule
             user->setAutoclearQueryBuffer(b);
             putModule("autoclearQueryBuffer = " + NoString(b));
         } else if (sVar == "password") {
-            const NoString salt = No::salt();
-            const NoString sHash = No::saltedSha256(value, salt);
-            user->setPassword(sHash, salt);
+            user->setPassword(value);
             putModule("Password has been changed!");
         } else if (sVar == "maxjoins") {
             uint i = value.toUInt();
@@ -829,8 +827,7 @@ class NoAdminMod : public NoModule
         }
 
         NoUser* pNewUser = new NoUser(username);
-        NoString salt = No::salt();
-        pNewUser->setPassword(No::saltedSha256(sPassword, salt), salt);
+        pNewUser->setPassword(sPassword);
 
         NoString sErr;
         if (!noApp->addUser(pNewUser, sErr)) {

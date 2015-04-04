@@ -82,7 +82,7 @@ public:
     void setRealName(const NoString& s);
     void setBindHost(const NoString& s);
     void setDccBindHost(const NoString& s);
-    void setPassword(const NoString& s, const NoString& salt = "");
+    void setPassword(const NoString& s);
     void setMultiClients(bool b);
     void setDenyLoadMod(bool b);
     void setAdmin(bool b);
@@ -118,7 +118,6 @@ public:
     NoString bindHost() const;
     NoString dccBindHost() const;
     NoString password() const;
-    NoString passwordSalt() const;
     std::set<NoString> allowedHosts() const;
     NoString timestampFormat() const;
     NoString clientEncoding() const;

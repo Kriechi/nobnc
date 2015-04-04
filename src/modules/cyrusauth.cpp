@@ -151,7 +151,7 @@ public:
 
                 if (user) {
                     // "::" is an invalid hash, so user won't be able to login by usual method
-                    user->setPassword("::", "::");
+                    user->setPassword("::"); // XXX TODO
                 }
 
                 if (user && !noApp->addUser(user, sErr)) {
