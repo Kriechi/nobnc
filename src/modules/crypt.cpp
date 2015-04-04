@@ -83,7 +83,7 @@ public:
         NoRegistry registry(this);
         if (registry.contains(target.toLower())) {
             NoChannel* channel = network()->findChannel(target);
-            NoString sNickMask = network()->ircNick().nickMask();
+            NoString sNickMask = network()->ircNick().hostMask();
             if (channel) {
                 if (!channel->autoClearChanBuffer())
                     channel->addBuffer(":" + NickPrefix() + _NAMEDFMT(sNickMask) + " PRIVMSG " + _NAMEDFMT(target) +

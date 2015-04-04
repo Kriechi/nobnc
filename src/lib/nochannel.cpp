@@ -167,7 +167,7 @@ void NoChannel::joinUser(const NoString& key)
 
 void NoChannel::attachUser(NoClient* client)
 {
-    d->network->putUser(":" + d->network->ircNick().nickMask() + " JOIN :" + name(), client);
+    d->network->putUser(":" + d->network->ircNick().hostMask() + " JOIN :" + name(), client);
 
     if (!topic().empty()) {
         d->network->putUser(":" + d->network->ircServer() + " 332 " + d->network->ircNick().nick() + " " + name() +
@@ -233,7 +233,7 @@ void NoChannel::attachUser(NoClient* client)
 void NoChannel::detachUser()
 {
     if (!d->detached) {
-        d->network->putUser(":" + d->network->ircNick().nickMask() + " PART " + name());
+        d->network->putUser(":" + d->network->ircNick().hostMask() + " PART " + name());
         d->detached = true;
     }
 }

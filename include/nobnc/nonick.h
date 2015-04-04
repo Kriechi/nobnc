@@ -45,7 +45,6 @@ public:
     NoString host() const;
     void setHost(const NoString& host);
 
-    NoString nickMask() const;
     NoString hostMask() const;
 
     NoNetwork* network() const;

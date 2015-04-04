@@ -41,19 +41,19 @@ public:
 
     void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
     {
-        const NoString sNickMask = opNick ? opNick->nickMask() : "Server";
+        const NoString sNickMask = opNick ? opNick->hostMask() : "Server";
         AddBuffer(channel, sNickMask + " set mode: " + modes + " " + args);
     }
 
     void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override
     {
-        AddBuffer(channel, opNick.nickMask() + " kicked " + sKickedNick + " Reason: [" + message + "]");
+        AddBuffer(channel, opNick.hostMask() + " kicked " + sKickedNick + " Reason: [" + message + "]");
     }
 
     void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
     {
         std::vector<NoChannel*>::const_iterator it;
-        NoString msg = nick.nickMask() + " quit with message: [" + message + "]";
+        NoString msg = nick.hostMask() + " quit with message: [" + message + "]";
         for (it = channels.begin(); it != channels.end(); ++it) {
             AddBuffer(*it, msg);
         }
@@ -61,18 +61,18 @@ public:
 
     void onJoin(const NoNick& nick, NoChannel* channel) override
     {
-        AddBuffer(channel, nick.nickMask() + " joined");
+        AddBuffer(channel, nick.hostMask() + " joined");
     }
 
     void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override
     {
-        AddBuffer(channel, nick.nickMask() + " parted with message: [" + message + "]");
+        AddBuffer(channel, nick.hostMask() + " parted with message: [" + message + "]");
     }
 
     void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
     {
         std::vector<NoChannel*>::const_iterator it;
-        NoString msg = OldNick.nickMask() + " is now known as " + newNick;
+        NoString msg = OldNick.hostMask() + " is now known as " + newNick;
         for (it = channels.begin(); it != channels.end(); ++it) {
             AddBuffer(*it, msg);
         }
@@ -80,7 +80,7 @@ public:
 
     ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override
     {
-        AddBuffer(channel, nick.nickMask() + " changed the topic to: " + topic);
+        AddBuffer(channel, nick.hostMask() + " changed the topic to: " + topic);
 
         return CONTINUE;
     }

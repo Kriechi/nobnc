@@ -1019,7 +1019,7 @@ class NoAdminMod : public NoModule
             if (network->isIrcConnected()) {
                 Table.setValue("OnIRC", "Yes");
                 Table.setValue("IRC Server", network->ircServer());
-                Table.setValue("IRC User", network->ircNick().nickMask());
+                Table.setValue("IRC User", network->ircNick().hostMask());
                 Table.setValue("Channels", NoString(network->channels().size()));
             } else {
                 Table.setValue("OnIRC", "No");

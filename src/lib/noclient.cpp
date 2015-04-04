@@ -674,7 +674,7 @@ void NoClient::setNetwork(NoNetwork* network, bool bDisconnect, bool bReconnect)
             const std::vector<NoChannel*>& channels = d->network->channels();
             for (const NoChannel* channel : channels) {
                 if (!(channel->isDetached())) {
-                    putClient(":" + d->network->ircNick().nickMask() + " PART " + channel->name());
+                    putClient(":" + d->network->ircNick().hostMask() + " PART " + channel->name());
                 }
             }
         } else if (d->user) {

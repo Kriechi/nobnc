@@ -122,7 +122,7 @@ void NoNick::setHost(const NoString& host)
     d->host = host;
 }
 
-NoString NoNick::nickMask() const
+NoString NoNick::hostMask() const
 {
     NoString mask = d->nick;
     if (!d->host.empty()) {
@@ -130,16 +130,6 @@ NoString NoNick::nickMask() const
             mask += "!" + d->ident;
         mask += "@" + d->host;
     }
-    return mask;
-}
-
-NoString NoNick::hostMask() const
-{
-    NoString mask = d->nick;
-    if (!d->ident.empty())
-        mask += "!" + d->ident;
-    if (!d->host.empty())
-        mask += "@" + d->host;
     return mask;
 }
 

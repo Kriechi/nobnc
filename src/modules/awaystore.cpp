@@ -487,7 +487,7 @@ private:
     {
         if (nick.nick() == network()->ircNick().nick())
             return; // ignore messages from self
-        AddMessage(NoString(iTime) + " " + nick.nickMask() + " " + message);
+        AddMessage(NoString(iTime) + " " + nick.hostMask() + " " + message);
     }
 
     void AddMessage(const NoString& text)

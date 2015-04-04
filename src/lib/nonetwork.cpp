@@ -633,7 +633,7 @@ void NoNetwork::clientConnected(NoClient* client)
             sUserMode += cMode;
         }
         if (!sUserMode.empty()) {
-            client->putClient(":" + ircNick().nickMask() + " MODE " + ircNick().nick() + " :+" + sUserMode);
+            client->putClient(":" + ircNick().hostMask() + " MODE " + ircNick().nick() + " :+" + sUserMode);
         }
     }
 
