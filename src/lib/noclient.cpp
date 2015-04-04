@@ -27,6 +27,7 @@
 #include "nonetwork.h"
 #include "noquery.h"
 #include "nomodulecall.h"
+#include "nomodule_p.h"
 #include "noapp.h"
 #include "noescape.h"
 #include "nonick.h"
@@ -36,9 +37,9 @@
         NoModule* module = nullptr;                                        \
         if (NETWORK && (module = (NETWORK)->loader()->findModule(MOD))) {  \
             try {                                                           \
-                module->setClient(CLIENT);                                 \
+                NoModulePrivate::get(module)->client = CLIENT;                                 \
                 module->FUNC;                                              \
-                module->setClient(nullptr);                                \
+                NoModulePrivate::get(module)->client = nullptr;                                \
             } catch (const NoModule::ModException& e) {                     \
                 if (e == NoModule::UNLOAD) {                                \
                     (NETWORK)->loader()->unloadModule(MOD);                 \
@@ -46,11 +47,11 @@
             }                                                               \
         } else if ((module = (USER)->loader()->findModule(MOD))) {         \
             try {                                                           \
-                module->setClient(CLIENT);                                 \
-                module->setNetwork(NETWORK);                               \
+                NoModulePrivate::get(module)->client = CLIENT;                                 \
+                NoModulePrivate::get(module)->network = NETWORK;                               \
                 module->FUNC;                                              \
-                module->setClient(nullptr);                                \
-                module->setNetwork(nullptr);                               \
+                NoModulePrivate::get(module)->client = nullptr;                                \
+                NoModulePrivate::get(module)->network = nullptr;                               \
             } catch (const NoModule::ModException& e) {                     \
                 if (e == NoModule::UNLOAD) {                                \
                     (USER)->loader()->unloadModule(MOD);                    \
@@ -58,13 +59,13 @@
             }                                                               \
         } else if ((module = noApp->loader()->findModule(MOD))) { \
             try {                                                           \
-                module->setClient(CLIENT);                                 \
-                module->setNetwork(NETWORK);                               \
-                module->setUser(USER);                                     \
+                NoModulePrivate::get(module)->client = CLIENT;                                 \
+                NoModulePrivate::get(module)->network = NETWORK;                               \
+                NoModulePrivate::get(module)->user = USER;                                     \
                 module->FUNC;                                              \
-                module->setClient(nullptr);                                \
-                module->setNetwork(nullptr);                               \
-                module->setUser(nullptr);                                  \
+                NoModulePrivate::get(module)->client = nullptr;                                \
+                NoModulePrivate::get(module)->network = nullptr;                               \
+                NoModulePrivate::get(module)->user = nullptr;                                  \
             } catch (const NoModule::ModException& e) {                     \
                 if (e == NoModule::UNLOAD) {                                \
                     noApp->loader()->unloadModule(MOD);            \

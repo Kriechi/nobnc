@@ -108,12 +108,15 @@ public:
         }
     }
 
-    void PutShell(const NoString& msg)
+    void PutShell(const NoString& msg, NoClient* client = nullptr)
     {
+        if (!client)
+            client = NoModule::client();
+
         NoString path = m_sPath.replace_n(" ", "_");
         NoString sSource = ":" + moduleNick() + "!shell@" + path;
-        NoString line = sSource + " PRIVMSG " + client()->nick() + " :" + msg;
-        client()->putClient(line);
+        NoString line = sSource + " PRIVMSG " + client->nick() + " :" + msg;
+        client->putClient(line);
     }
 
     void RunCommand(const NoString& command)
@@ -134,9 +137,7 @@ void NoShellSock::readLine(const NoString& data)
     line.trimRight("\r\n");
     line.replace("\t", "    ");
 
-    m_pParent->setClient(m_pClient);
-    m_pParent->PutShell(line);
-    m_pParent->setClient(nullptr);
+    m_pParent->PutShell(line, m_pClient);
 }
 
 void NoShellSock::onDisconnected()
@@ -147,9 +148,7 @@ void NoShellSock::onDisconnected()
     if (!sBuffer.empty())
         readLine(sBuffer);
 
-    m_pParent->setClient(m_pClient);
-    m_pParent->PutShell("znc$");
-    m_pParent->setClient(nullptr);
+    m_pParent->PutShell("znc$", m_pClient);
 }
 
 template <>

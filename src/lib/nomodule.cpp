@@ -56,19 +56,6 @@ NoModule::~NoModule()
 #endif
 }
 
-void NoModule::setUser(NoUser* user)
-{
-    d->user = user;
-}
-void NoModule::setNetwork(NoNetwork* network)
-{
-    d->network = network;
-}
-void NoModule::setClient(NoClient* client)
-{
-    d->client = client;
-}
-
 void NoModule::unload()
 {
     throw UNLOAD;
@@ -95,26 +82,6 @@ NoString& NoModule::expandString(const NoString& str, NoString& ret) const
     return ret;
 }
 
-void NoModule::setType(No::ModuleType type)
-{
-    d->type = type;
-}
-
-void NoModule::setDescription(const NoString& s)
-{
-    d->description = s;
-}
-
-void NoModule::setModulePath(const NoString& s)
-{
-    d->path = s;
-}
-
-void NoModule::setArgs(const NoString& s)
-{
-    d->args = s;
-}
-
 No::ModuleType NoModule::type() const
 {
     return d->type;
@@ -125,14 +92,19 @@ NoString NoModule::description() const
     return d->description;
 }
 
+NoString NoModule::modulePath() const
+{
+    return d->path;
+}
+
 NoString NoModule::args() const
 {
     return d->args;
 }
 
-NoString NoModule::modulePath() const
+void NoModule::setArgs(const NoString& s)
 {
-    return d->path;
+    d->args = s;
 }
 
 NoUser* NoModule::user() const

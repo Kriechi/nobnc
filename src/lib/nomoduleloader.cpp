@@ -16,6 +16,7 @@
  */
 
 #include "nomoduleloader.h"
+#include "nomodule_p.h"
 #include "nofile.h"
 #include "nodir.h"
 #include "noapp.h"
@@ -32,23 +33,23 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
     for (NoModule * mod : d->modules) {            \
         try {                                       \
             NoClient* oldClient = mod->client();  \
-            mod->setClient(d->client);             \
+            NoModulePrivate::get(mod)->client = d->client;             \
             NoUser* oldUser = nullptr;             \
             if (d->user) {                          \
                 oldUser = mod->user();            \
-                mod->setUser(d->user);             \
+                NoModulePrivate::get(mod)->user = d->user;             \
             }                                       \
             NoNetwork* oldNetwork = nullptr;          \
             if (d->network) {                       \
                 oldNetwork = mod->network();         \
-                mod->setNetwork(d->network);       \
+                NoModulePrivate::get(mod)->network = d->network;       \
             }                                       \
             mod->func;                             \
             if (d->user)                            \
-                mod->setUser(oldUser);            \
+                NoModulePrivate::get(mod)->user = oldUser;            \
             if (d->network)                         \
-                mod->setNetwork(oldNetwork);         \
-            mod->setClient(oldClient);            \
+                NoModulePrivate::get(mod)->network = oldNetwork;         \
+            NoModulePrivate::get(mod)->client = oldClient;            \
         } catch (const NoModule::ModException& e) { \
             if (e == NoModule::UNLOAD) {            \
                 unloadModule(mod->moduleName());   \
@@ -63,23 +64,23 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
         try {                                        \
             NoModule::ModRet e = NoModule::CONTINUE; \
             NoClient* oldClient = mod->client();   \
-            mod->setClient(d->client);              \
+            NoModulePrivate::get(mod)->client = d->client;              \
             NoUser* oldUser = nullptr;              \
             if (d->user) {                           \
                 oldUser = mod->user();             \
-                mod->setUser(d->user);              \
+                NoModulePrivate::get(mod)->user = d->user;              \
             }                                        \
             NoNetwork* oldNetwork = nullptr;           \
             if (d->network) {                        \
                 oldNetwork = mod->network();          \
-                mod->setNetwork(d->network);        \
+                NoModulePrivate::get(mod)->network = d->network;        \
             }                                        \
             e = mod->func;                          \
             if (d->user)                             \
-                mod->setUser(oldUser);             \
+                NoModulePrivate::get(mod)->user = oldUser;             \
             if (d->network)                          \
-                mod->setNetwork(oldNetwork);          \
-            mod->setClient(oldClient);             \
+                NoModulePrivate::get(mod)->network = oldNetwork;          \
+            NoModulePrivate::get(mod)->client = oldClient;             \
             if (e == NoModule::HALTMODS) {           \
                 break;                               \
             } else if (e == NoModule::HALTCORE) {    \
@@ -460,17 +461,17 @@ bool NoModuleLoader::onServerCapAvailable(const NoString& cap)
     for (NoModule* mod : d->modules) {
         try {
             NoClient* oldClient = mod->client();
-            mod->setClient(d->client);
+            NoModulePrivate::get(mod)->client = d->client;
             if (d->user) {
                 NoUser* oldUser = mod->user();
-                mod->setUser(d->user);
+                NoModulePrivate::get(mod)->user = d->user;
                 bResult |= mod->onServerCapAvailable(cap);
-                mod->setUser(oldUser);
+                NoModulePrivate::get(mod)->user = oldUser;
             } else {
                 // WTF? Is that possible?
                 bResult |= mod->onServerCapAvailable(cap);
             }
-            mod->setClient(oldClient);
+            NoModulePrivate::get(mod)->client = oldClient;
         } catch (const NoModule::ModException& e) {
             if (NoModule::UNLOAD == e) {
                 unloadModule(mod->moduleName());
@@ -534,17 +535,17 @@ bool NoModuleLoader::isClientCapSupported(NoClient* client, const NoString& cap,
     for (NoModule* mod : d->modules) {
         try {
             NoClient* oldClient = mod->client();
-            mod->setClient(d->client);
+            NoModulePrivate::get(mod)->client = d->client;
             if (d->user) {
                 NoUser* oldUser = mod->user();
-                mod->setUser(d->user);
+                NoModulePrivate::get(mod)->user = d->user;
                 bResult |= mod->isClientCapSupported(client, cap, state);
-                mod->setUser(oldUser);
+                NoModulePrivate::get(mod)->user = oldUser;
             } else {
                 // WTF? Is that possible?
                 bResult |= mod->isClientCapSupported(client, cap, state);
             }
-            mod->setClient(oldClient);
+            NoModulePrivate::get(mod)->client = oldClient;
         } catch (const NoModule::ModException& e) {
             if (NoModule::UNLOAD == e) {
                 unloadModule(mod->moduleName());
@@ -647,9 +648,9 @@ bool NoModuleLoader::loadModule(const NoString& name, const NoString& args, No::
     }
 
     NoModule* module = info.loader()(p, user, network, name, sDataPath, type);
-    module->setDescription(info.description());
-    module->setArgs(args);
-    module->setModulePath(NoDir::current().filePath(path));
+    NoModulePrivate::get(module)->description = info.description();
+    NoModulePrivate::get(module)->args = args;
+    NoModulePrivate::get(module)->path = NoDir::current().filePath(path);
     d->modules.push_back(module);
 
     bool bLoaded;

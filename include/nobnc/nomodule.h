@@ -179,10 +179,6 @@ public:
         UNLOAD
     };
 
-    void setUser(NoUser* user);
-    void setNetwork(NoNetwork* network);
-    void setClient(NoClient* client);
-
     /** This function throws NoModule::UNLOAD which causes this module to be unloaded.
      */
     void unload();
@@ -719,15 +715,12 @@ public:
     NoString expandString(const NoString& str) const;
     NoString& expandString(const NoString& str, NoString& ret) const;
 
-    void setType(No::ModuleType type);
-    void setDescription(const NoString& s);
-    void setModulePath(const NoString& s);
-    void setArgs(const NoString& s);
-
     No::ModuleType type() const;
     NoString description() const;
-    NoString args() const;
     NoString modulePath() const;
+
+    NoString args() const;
+    void setArgs(const NoString& args);
 
     /** @returns For user modules this returns the user for which this
      *           module was loaded. For global modules this returns nullptr,
