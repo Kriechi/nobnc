@@ -212,40 +212,6 @@ NoModuleSocket* NoModule::findSocket(const NoString& name) const
     return nullptr;
 }
 
-void NoModule::listSockets()
-{
-    if (d->sockets.empty()) {
-        putModule("You have no open sockets.");
-        return;
-    }
-
-    NoTable Table;
-    Table.addColumn("Name");
-    Table.addColumn("State");
-    Table.addColumn("LocalPort");
-    Table.addColumn("SSL");
-    Table.addColumn("RemoteIP");
-    Table.addColumn("RemotePort");
-
-    for (const NoModuleSocket* pSocket : d->sockets) {
-        Table.addRow();
-        Table.setValue("Name", pSocket->name());
-
-        if (pSocket->isListener()) {
-            Table.setValue("State", "Listening");
-        } else {
-            Table.setValue("State", (pSocket->isConnected() ? "Connected" : ""));
-        }
-
-        Table.setValue("LocalPort", NoString(pSocket->localPort()));
-        Table.setValue("SSL", (pSocket->isSsl() ? "yes" : "no"));
-        Table.setValue("RemoteIP", pSocket->remoteAddress());
-        Table.setValue("RemotePort", (pSocket->remotePort()) ? NoString(pSocket->remotePort()) : NoString(""));
-    }
-
-    putModule(Table);
-}
-
 #ifdef HAVE_PTHREAD
 void NoModule::addJob(NoModuleJob* pJob)
 {

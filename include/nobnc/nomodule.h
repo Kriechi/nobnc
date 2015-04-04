@@ -679,7 +679,6 @@ public:
     virtual void listTimers();
 
     NoModuleSocket* findSocket(const NoString& name) const;
-    virtual void listSockets();
 
 #ifdef HAVE_PTHREAD
     void addJob(NoModuleJob* pJob);
