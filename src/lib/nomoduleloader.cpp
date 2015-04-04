@@ -232,9 +232,9 @@ bool NoModuleLoader::onIrcDisconnected()
     return false;
 }
 
-bool NoModuleLoader::onChanPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
+bool NoModuleLoader::onChannelPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
 {
-    MODUNLOADCHK(onChanPermission(opNick, nick, channel, mode, added, noChange));
+    MODUNLOADCHK(onChannelPermission(opNick, nick, channel, mode, added, noChange));
     return false;
 }
 bool NoModuleLoader::onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
@@ -298,9 +298,9 @@ bool NoModuleLoader::onUserAction(NoString& target, NoString& message)
 {
     MODHALTCHK(onUserAction(target, message));
 }
-bool NoModuleLoader::onUserMsg(NoString& target, NoString& message)
+bool NoModuleLoader::onUserMessage(NoString& target, NoString& message)
 {
-    MODHALTCHK(onUserMsg(target, message));
+    MODHALTCHK(onUserMessage(target, message));
 }
 bool NoModuleLoader::onUserNotice(NoString& target, NoString& message)
 {
@@ -360,57 +360,57 @@ bool NoModuleLoader::onInvite(const NoHostMask& nick, const NoString& sChan)
 {
     MODHALTCHK(onInvite(nick, sChan));
 }
-bool NoModuleLoader::onChanBufferStarting(NoChannel* channel, NoClient* client)
+bool NoModuleLoader::onChannelBufferStarting(NoChannel* channel, NoClient* client)
 {
-    MODHALTCHK(onChanBufferStarting(channel, client));
+    MODHALTCHK(onChannelBufferStarting(channel, client));
 }
-bool NoModuleLoader::onChanBufferEnding(NoChannel* channel, NoClient* client)
+bool NoModuleLoader::onChannelBufferEnding(NoChannel* channel, NoClient* client)
 {
-    MODHALTCHK(onChanBufferEnding(channel, client));
+    MODHALTCHK(onChannelBufferEnding(channel, client));
 }
-bool NoModuleLoader::onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
+bool NoModuleLoader::onChannelBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
 {
-    MODHALTCHK(onChanBufferPlayLine(channel, client, line, tv));
+    MODHALTCHK(onChannelBufferPlayLine(channel, client, line, tv));
 }
-bool NoModuleLoader::onPrivBufferPlayLine(NoClient* client, NoString& line, const timeval& tv)
+bool NoModuleLoader::onPrivateBufferPlayLine(NoClient* client, NoString& line, const timeval& tv)
 {
-    MODHALTCHK(onPrivBufferPlayLine(client, line, tv));
+    MODHALTCHK(onPrivateBufferPlayLine(client, line, tv));
 }
 bool NoModuleLoader::onCtcpReply(NoHostMask& nick, NoString& message)
 {
     MODHALTCHK(onCtcpReply(nick, message));
 }
-bool NoModuleLoader::onPrivCtcp(NoHostMask& nick, NoString& message)
+bool NoModuleLoader::onPrivateCtcp(NoHostMask& nick, NoString& message)
 {
-    MODHALTCHK(onPrivCtcp(nick, message));
+    MODHALTCHK(onPrivateCtcp(nick, message));
 }
-bool NoModuleLoader::onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message)
+bool NoModuleLoader::onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message)
 {
-    MODHALTCHK(onChanCtcp(nick, channel, message));
+    MODHALTCHK(onChannelCtcp(nick, channel, message));
 }
-bool NoModuleLoader::onPrivAction(NoHostMask& nick, NoString& message)
+bool NoModuleLoader::onPrivateAction(NoHostMask& nick, NoString& message)
 {
-    MODHALTCHK(onPrivAction(nick, message));
+    MODHALTCHK(onPrivateAction(nick, message));
 }
-bool NoModuleLoader::onChanAction(NoNick& nick, NoChannel* channel, NoString& message)
+bool NoModuleLoader::onChannelAction(NoNick& nick, NoChannel* channel, NoString& message)
 {
-    MODHALTCHK(onChanAction(nick, channel, message));
+    MODHALTCHK(onChannelAction(nick, channel, message));
 }
-bool NoModuleLoader::onPrivMsg(NoHostMask& nick, NoString& message)
+bool NoModuleLoader::onPrivateMessage(NoHostMask& nick, NoString& message)
 {
-    MODHALTCHK(onPrivMsg(nick, message));
+    MODHALTCHK(onPrivateMessage(nick, message));
 }
-bool NoModuleLoader::onChanMsg(NoNick& nick, NoChannel* channel, NoString& message)
+bool NoModuleLoader::onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message)
 {
-    MODHALTCHK(onChanMsg(nick, channel, message));
+    MODHALTCHK(onChannelMessage(nick, channel, message));
 }
-bool NoModuleLoader::onPrivNotice(NoHostMask& nick, NoString& message)
+bool NoModuleLoader::onPrivateNotice(NoHostMask& nick, NoString& message)
 {
-    MODHALTCHK(onPrivNotice(nick, message));
+    MODHALTCHK(onPrivateNotice(nick, message));
 }
-bool NoModuleLoader::onChanNotice(NoNick& nick, NoChannel* channel, NoString& message)
+bool NoModuleLoader::onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message)
 {
-    MODHALTCHK(onChanNotice(nick, channel, message));
+    MODHALTCHK(onChannelNotice(nick, channel, message));
 }
 bool NoModuleLoader::onTopic(NoNick& nick, NoChannel* channel, NoString& topic)
 {

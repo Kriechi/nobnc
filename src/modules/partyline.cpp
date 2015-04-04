@@ -581,7 +581,7 @@ public:
         return HALT;
     }
 
-    ModRet onUserMsg(NoString& target, NoString& message) override
+    ModRet onUserMessage(NoString& target, NoString& message) override
     {
         return HandleMessage("PRIVMSG", target, message);
     }

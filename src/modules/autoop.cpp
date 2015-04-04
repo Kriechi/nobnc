@@ -259,7 +259,7 @@ public:
         }
     }
 
-    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateNotice(NoHostMask& nick, NoString& message) override
     {
         if (!No::token(message, 0).equals("!ZNCAO")) {
             return CONTINUE;

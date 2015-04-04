@@ -390,14 +390,14 @@ public:
         m_sReason = "";
     }
 
-    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override
     {
         if (m_bIsAway)
             AddMessage(time(nullptr), nick, message);
         return (CONTINUE);
     }
 
-    ModRet onPrivAction(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateAction(NoHostMask& nick, NoString& message) override
     {
         if (m_bIsAway) {
             AddMessage(time(nullptr), nick, "* " + message);
@@ -414,7 +414,7 @@ public:
         return (CONTINUE);
     }
 
-    ModRet onUserMsg(NoString& target, NoString& message) override
+    ModRet onUserMessage(NoString& target, NoString& message) override
     {
         Ping();
         if (m_bIsAway)

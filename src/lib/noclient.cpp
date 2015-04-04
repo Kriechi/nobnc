@@ -463,7 +463,7 @@ void NoClient::readLine(const NoString& data)
                 continue;
             }
 
-            NETWORKMODULECALL(onUserMsg(target, msg), d->user, d->network, this, &bContinue);
+            NETWORKMODULECALL(onUserMessage(target, msg), d->user, d->network, this, &bContinue);
             if (bContinue)
                 continue;
 

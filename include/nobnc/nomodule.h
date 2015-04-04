@@ -279,7 +279,7 @@ public:
      *  @see NoIrcSock::GetModeType() for converting mode into a mode (e.g.
      *       'o' for op).
      */
-    virtual void onChanPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
+    virtual void onChannelPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
     /** Called when a nick is opped on a channel */
     virtual void onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     /** Called when a nick is deopped on a channel */
@@ -384,13 +384,13 @@ public:
      *  @param client The client the buffer will be played back to.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferStarting(NoChannel* channel, NoClient* client);
+    virtual ModRet onChannelBufferStarting(NoChannel* channel, NoClient* client);
     /** Called after a channel buffer was played back to a client.
      *  @param channel The channel which was played back.
      *  @param client The client the buffer was played back to.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferEnding(NoChannel* channel, NoClient* client);
+    virtual ModRet onChannelBufferEnding(NoChannel* channel, NoClient* client);
     /** Called when for each line during a channel's buffer play back.
      *  @param channel The channel this playback is from.
      *  @param client The client the buffer is played back to.
@@ -399,14 +399,14 @@ public:
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
+    virtual ModRet onChannelBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
     /** Called when a line from the query buffer is played back.
      *  @param client The client this line will go to.
      *  @param line The raw IRC traffic line from the buffer.
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivBufferPlayLine(NoClient* client, NoString& line, const timeval& tv);
+    virtual ModRet onPrivateBufferPlayLine(NoClient* client, NoString& line, const timeval& tv);
 
     /** Called when a client successfully logged in to ZNC. */
     virtual void onClientLogin();
@@ -447,7 +447,7 @@ public:
      *  @param message The message which was sent.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onUserMsg(NoString& target, NoString& message);
+    virtual ModRet onUserMessage(NoString& target, NoString& message);
     /** This module hook is called when a user sends a notice message.
      *  @param target The target of the message. Could be a channel name or
      *                 a nick name.
@@ -495,55 +495,55 @@ public:
      *  @param message The CTCP request message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivCtcp(NoHostMask& nick, NoString& message);
+    virtual ModRet onPrivateCtcp(NoHostMask& nick, NoString& message);
     /** Called when we receive a channel CTCP request <em>from IRC</em>.
      *  @param nick The nick the CTCP request is from.
      *  @param channel The channel to which the request was sent.
      *  @param message The CTCP request message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message);
+    virtual ModRet onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message);
     /** Called when we receive a private CTCP ACTION ("/me" in query) <em>from IRC</em>.
-     *  This is called after NoModule::onPrivCtcp().
+     *  This is called after NoModule::onPrivateCtcp().
      *  @param nick The nick the action came from.
      *  @param message The action message
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivAction(NoHostMask& nick, NoString& message);
+    virtual ModRet onPrivateAction(NoHostMask& nick, NoString& message);
     /** Called when we receive a channel CTCP ACTION ("/me" in a channel) <em>from IRC</em>.
-     *  This is called after NoModule::onChanCtcp().
+     *  This is called after NoModule::onChannelCtcp().
      *  @param nick The nick the action came from.
      *  @param channel The channel the action was sent to.
      *  @param message The action message
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanAction(NoNick& nick, NoChannel* channel, NoString& message);
+    virtual ModRet onChannelAction(NoNick& nick, NoChannel* channel, NoString& message);
     /** Called when we receive a private message <em>from IRC</em>.
      *  @param nick The nick which sent the message.
      *  @param message The message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivMsg(NoHostMask& nick, NoString& message);
+    virtual ModRet onPrivateMessage(NoHostMask& nick, NoString& message);
     /** Called when we receive a channel message <em>from IRC</em>.
      *  @param nick The nick which sent the message.
      *  @param channel The channel to which the message was sent.
      *  @param message The message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message);
+    virtual ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message);
     /** Called when we receive a private notice.
      *  @param nick The nick which sent the notice.
      *  @param message The notice message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivNotice(NoHostMask& nick, NoString& message);
+    virtual ModRet onPrivateNotice(NoHostMask& nick, NoString& message);
     /** Called when we receive a channel notice.
      *  @param nick The nick which sent the notice.
      *  @param channel The channel to which the notice was sent.
      *  @param message The notice message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message);
+    virtual ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message);
     /** Called when we receive a channel topic change <em>from IRC</em>.
      *  @param nick The nick which changed the topic.
      *  @param channel The channel whose topic was changed.

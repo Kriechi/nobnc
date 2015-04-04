@@ -666,7 +666,7 @@ void NoNetwork::clientConnected(NoClient* client)
         const NoMessage& BufLine = d->noticeBuffer.message(uIdx);
         NoString line = BufLine.formatted(client, msParams);
         bool bContinue = false;
-        NETWORKMODULECALL(onPrivBufferPlayLine(client, line, BufLine.timestamp()), d->user, this, nullptr, &bContinue);
+        NETWORKMODULECALL(onPrivateBufferPlayLine(client, line, BufLine.timestamp()), d->user, this, nullptr, &bContinue);
         if (bContinue)
             continue;
         client->putClient(line);

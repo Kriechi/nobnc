@@ -74,7 +74,7 @@ public:
                    "List all keys");
     }
 
-    ModRet onUserMsg(NoString& target, NoString& message) override
+    ModRet onUserMessage(NoString& target, NoString& message) override
     {
         target.trimLeft(NickPrefix());
 
@@ -107,7 +107,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoHostMask& mask, NoString& message) override
+    ModRet onPrivateMessage(NoHostMask& mask, NoString& message) override
     {
         NoNick nick(mask.toString()); // TODO: cleanup
         FilterIncoming(nick.nick(), nick, message);
@@ -115,7 +115,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
+    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         FilterIncoming(channel->name(), nick, message);
         return CONTINUE;

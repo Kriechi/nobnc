@@ -274,7 +274,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateCtcp(NoHostMask& nick, NoString& message) override
     {
         NoNetwork* network = NoModule::network();
         if (message.startsWith("DCC ") && network->isUserAttached()) {

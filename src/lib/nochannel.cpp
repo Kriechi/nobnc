@@ -353,7 +353,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
                         }
                     }
 
-                    NETWORKMODULECALL(onChanPermission(opNick, *pNick, this, mode, bAdd, noChange),
+                    NETWORKMODULECALL(onChannelPermission(opNick, *pNick, this, mode, bAdd, noChange),
                                       d->network->user(),
                                       d->network,
                                       nullptr,
@@ -651,10 +651,10 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
         // point can't be empty.
         //
         // This loop has to be cycled twice to maintain the existing behavior which is
-        // 1. onChanBufferStarting
-        // 2. onChanBufferPlayLine
+        // 1. onChannelBufferStarting
+        // 2. onChannelBufferPlayLine
         // 3. ClearBuffer() if not keeping the buffer
-        // 4. onChanBufferEnding
+        // 4. onChannelBufferEnding
         //
         // With the exception of ClearBuffer(), this needs to happen per client, and
         // if client is not nullptr, the loops break after the first iteration.
@@ -669,7 +669,7 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                 pUseClient->setPlaybackActive(true);
 
                 bool skipStatusMsg = pUseClient->hasServerTime();
-                NETWORKMODULECALL(onChanBufferStarting(this, pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
+                NETWORKMODULECALL(onChannelBufferStarting(this, pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
 
                 if (!skipStatusMsg) {
                     d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Buffer Playback...", pUseClient);
@@ -692,7 +692,7 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                         No::setMessageTags(line, msBatchTags);
                     }
                     bool bNotShowThisLine = false;
-                    NETWORKMODULECALL(onChanBufferPlayLine(this, pUseClient, line, BufLine.timestamp()),
+                    NETWORKMODULECALL(onChannelBufferPlayLine(this, pUseClient, line, BufLine.timestamp()),
                                       d->network->user(),
                                       d->network,
                                       nullptr,
@@ -703,7 +703,7 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                 }
 
                 skipStatusMsg = pUseClient->hasServerTime();
-                NETWORKMODULECALL(onChanBufferEnding(this, pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
+                NETWORKMODULECALL(onChannelBufferEnding(this, pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
                 if (!skipStatusMsg) {
                     d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Playback Complete.", pUseClient);
                 }

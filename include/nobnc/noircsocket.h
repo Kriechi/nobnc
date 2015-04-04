@@ -43,13 +43,13 @@ public:
     };
 
     bool onCtcpReply(NoHostMask& nick, NoString& message);
-    bool onPrivCtcp(NoHostMask& nick, NoString& message);
-    bool onChanCtcp(NoNick& nick, const NoString& sChan, NoString& message);
+    bool onPrivateCtcp(NoHostMask& nick, NoString& message);
+    bool onChannelCtcp(NoNick& nick, const NoString& sChan, NoString& message);
     bool OnGeneralCTCP(NoHostMask& nick, NoString& message);
-    bool onPrivMsg(NoHostMask& nick, NoString& message);
-    bool onChanMsg(NoNick& nick, const NoString& sChan, NoString& message);
-    bool onPrivNotice(NoHostMask& nick, NoString& message);
-    bool onChanNotice(NoNick& nick, const NoString& sChan, NoString& message);
+    bool onPrivateMessage(NoHostMask& nick, NoString& message);
+    bool onChannelMessage(NoNick& nick, const NoString& sChan, NoString& message);
+    bool onPrivateNotice(NoHostMask& nick, NoString& message);
+    bool onChannelNotice(NoNick& nick, const NoString& sChan, NoString& message);
     bool onServerCapAvailable(const NoString& cap);
 
     void readLine(const NoString& data) override;

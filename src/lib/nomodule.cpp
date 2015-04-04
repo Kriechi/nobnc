@@ -392,7 +392,7 @@ NoModule::ModRet NoModule::onBroadcast(NoString& message)
     return CONTINUE;
 }
 
-void NoModule::onChanPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
+void NoModule::onChannelPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
 {
 }
 void NoModule::onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
@@ -469,20 +469,20 @@ NoModule::ModRet NoModule::onInvite(const NoHostMask& nick, const NoString& sCha
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onChanBufferStarting(NoChannel* channel, NoClient* client)
+NoModule::ModRet NoModule::onChannelBufferStarting(NoChannel* channel, NoClient* client)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onChanBufferEnding(NoChannel* channel, NoClient* client)
+NoModule::ModRet NoModule::onChannelBufferEnding(NoChannel* channel, NoClient* client)
 {
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
+NoModule::ModRet NoModule::onChannelBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivBufferPlayLine(NoClient* client, NoString& line, const timeval& tv)
+NoModule::ModRet NoModule::onPrivateBufferPlayLine(NoClient* client, NoString& line, const timeval& tv)
 {
     return CONTINUE;
 }
@@ -509,7 +509,7 @@ NoModule::ModRet NoModule::onUserAction(NoString& target, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onUserMsg(NoString& target, NoString& message)
+NoModule::ModRet NoModule::onUserMessage(NoString& target, NoString& message)
 {
     return CONTINUE;
 }
@@ -542,35 +542,35 @@ NoModule::ModRet NoModule::onCtcpReply(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivCtcp(NoHostMask& nick, NoString& message)
+NoModule::ModRet NoModule::onPrivateCtcp(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::ModRet NoModule::onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivAction(NoHostMask& nick, NoString& message)
+NoModule::ModRet NoModule::onPrivateAction(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onChanAction(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::ModRet NoModule::onChannelAction(NoNick& nick, NoChannel* channel, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivMsg(NoHostMask& nick, NoString& message)
+NoModule::ModRet NoModule::onPrivateMessage(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onChanMsg(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::ModRet NoModule::onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivNotice(NoHostMask& nick, NoString& message)
+NoModule::ModRet NoModule::onPrivateNotice(NoHostMask& nick, NoString& message)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onChanNotice(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::ModRet NoModule::onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message)
 {
     return CONTINUE;
 }

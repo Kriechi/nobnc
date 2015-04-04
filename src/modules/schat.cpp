@@ -304,7 +304,7 @@ public:
         }
     }
 
-    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateCtcp(NoHostMask& nick, NoString& message) override
     {
         if (message.startsWith("DCC SCHAT ")) {
             // chat ip port
@@ -338,7 +338,7 @@ public:
         delete findTimer("Remove " + nick); // delete any associated timer to this nick
     }
 
-    ModRet onUserMsg(NoString& target, NoString& message) override
+    ModRet onUserMessage(NoString& target, NoString& message) override
     {
         if (target.left(3) == "(s)") {
             NoString name = moduleName().toUpper() + "::" + target;

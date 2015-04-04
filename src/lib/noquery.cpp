@@ -119,7 +119,7 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                         No::setMessageTags(line, tags);
                     }
                     bool skip = false;
-                    NETWORKMODULECALL(onPrivBufferPlayLine(useClient, line, message.timestamp()), d->network->user(), d->network, nullptr, &skip);
+                    NETWORKMODULECALL(onPrivateBufferPlayLine(useClient, line, message.timestamp()), d->network->user(), d->network, nullptr, &skip);
                     if (skip)
                         continue;
                     d->network->putUser(line, useClient);

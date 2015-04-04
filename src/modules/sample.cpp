@@ -135,7 +135,7 @@ public:
         return CONTINUE;
     }
 
-    void onChanPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange) override
+    void onChannelPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange) override
     {
         putModule(((noChange) ? "[0] [" : "[1] [") + (opNick ? opNick->nick() : "server") + "] set mode [" + channel->name() +
                   ((added) ? "] +" : "] -") + NoString(mode) + " " + nick.nick());
@@ -242,7 +242,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateCtcp(NoHostMask& nick, NoString& message) override
     {
         putModule("[" + nick.nick() + "] privctcp [" + message + "]");
         message = "\002" + message + "\002";
@@ -250,7 +250,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
+    ModRet onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         putModule("[" + nick.nick() + "] chanctcp [" + message + "] to [" + channel->name() + "]");
         message = "\00311,5 " + message + " \003";
@@ -266,7 +266,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateNotice(NoHostMask& nick, NoString& message) override
     {
         putModule("[" + nick.nick() + "] privnotice [" + message + "]");
         message = "\002" + message + "\002";
@@ -274,7 +274,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override
+    ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         putModule("[" + nick.nick() + "] channotice [" + message + "] to [" + channel->name() + "]");
         message = "\00311,5 " + message + " \003";
@@ -296,7 +296,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onUserMsg(NoString& target, NoString& message) override
+    ModRet onUserMessage(NoString& target, NoString& message) override
     {
         putModule("[" + target + "] usermsg [" + message + "]");
         message = "Sample: \0034" + message + "\003";
@@ -304,7 +304,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override
     {
         putModule("[" + nick.nick() + "] privmsg [" + message + "]");
         message = "\002" + message + "\002";
@@ -312,7 +312,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
+    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         if (message == "!ping") {
             putIrc("PRIVMSG " + channel->name() + " :PONG?");

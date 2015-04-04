@@ -71,7 +71,7 @@ public:
     bool onIrcRegistration(NoString& pass, NoString& nick, NoString& ident, NoString& realName);
     bool onBroadcast(NoString& message);
 
-    bool onChanPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
+    bool onChannelPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
     bool onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     bool onDeop(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     bool onVoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
@@ -94,10 +94,10 @@ public:
     bool onPart(const NoNick& nick, NoChannel* channel, const NoString& message);
     bool onInvite(const NoHostMask& nick, const NoString& sChan);
 
-    bool onChanBufferStarting(NoChannel* channel, NoClient* client);
-    bool onChanBufferEnding(NoChannel* channel, NoClient* client);
-    bool onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
-    bool onPrivBufferPlayLine(NoClient* client, NoString& line, const timeval& tv);
+    bool onChannelBufferStarting(NoChannel* channel, NoClient* client);
+    bool onChannelBufferEnding(NoChannel* channel, NoClient* client);
+    bool onChannelBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
+    bool onPrivateBufferPlayLine(NoClient* client, NoString& line, const timeval& tv);
 
     bool onClientLogin();
     bool onClientDisconnect();
@@ -105,7 +105,7 @@ public:
     bool onUserCtcpReply(NoString& target, NoString& message);
     bool onUserCtcp(NoString& target, NoString& message);
     bool onUserAction(NoString& target, NoString& message);
-    bool onUserMsg(NoString& target, NoString& message);
+    bool onUserMessage(NoString& target, NoString& message);
     bool onUserNotice(NoString& target, NoString& message);
     bool onUserJoin(NoString& channel, NoString& key);
     bool onUserPart(NoString& channel, NoString& message);
@@ -114,14 +114,14 @@ public:
     bool onUserQuit(NoString& message);
 
     bool onCtcpReply(NoHostMask& nick, NoString& message);
-    bool onPrivCtcp(NoHostMask& nick, NoString& message);
-    bool onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message);
-    bool onPrivAction(NoHostMask& nick, NoString& message);
-    bool onChanAction(NoNick& nick, NoChannel* channel, NoString& message);
-    bool onPrivMsg(NoHostMask& nick, NoString& message);
-    bool onChanMsg(NoNick& nick, NoChannel* channel, NoString& message);
-    bool onPrivNotice(NoHostMask& nick, NoString& message);
-    bool onChanNotice(NoNick& nick, NoChannel* channel, NoString& message);
+    bool onPrivateCtcp(NoHostMask& nick, NoString& message);
+    bool onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message);
+    bool onPrivateAction(NoHostMask& nick, NoString& message);
+    bool onChannelAction(NoNick& nick, NoChannel* channel, NoString& message);
+    bool onPrivateMessage(NoHostMask& nick, NoString& message);
+    bool onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message);
+    bool onPrivateNotice(NoHostMask& nick, NoString& message);
+    bool onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message);
     bool onTopic(NoNick& nick, NoChannel* channel, NoString& topic);
     bool onTimerAutoJoin(NoChannel* channel);
 

@@ -72,7 +72,7 @@ public:
         }
     }
 
-    ModRet onUserMsg(NoString& target, NoString& message) override
+    ModRet onUserMessage(NoString& target, NoString& message) override
     {
         if (m_bRules[RULE_MSG])
             ClearAllBuffers();

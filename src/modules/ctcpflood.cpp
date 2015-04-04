@@ -102,12 +102,12 @@ public:
         return HALT;
     }
 
-    ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateCtcp(NoHostMask& nick, NoString& message) override
     {
         return Message(nick.toString(), message);
     }
 
-    ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
+    ModRet onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         return Message(nick.hostMask(), message);
     }

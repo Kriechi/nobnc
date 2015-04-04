@@ -138,13 +138,13 @@ public:
         }
     }
 
-    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override
     {
         HandleMessage(nick, message);
         return CONTINUE;
     }
 
-    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override
+    ModRet onPrivateNotice(NoHostMask& nick, NoString& message) override
     {
         HandleMessage(nick, message);
         return CONTINUE;

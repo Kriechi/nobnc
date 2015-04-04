@@ -718,11 +718,11 @@ void NoIrcSocket::readLine(const NoString& data)
                 return;
             } else {
                 if (target.equals(d->nick.nick())) {
-                    if (onPrivNotice(mask, msg)) {
+                    if (onPrivateNotice(mask, msg)) {
                         return;
                     }
                 } else {
-                    if (onChanNotice(nick, target, msg)) {
+                    if (onChannelNotice(nick, target, msg)) {
                         return;
                     }
                 }
@@ -767,11 +767,11 @@ void NoIrcSocket::readLine(const NoString& data)
                 msg.rightChomp(1);
 
                 if (target.equals(d->nick.nick())) {
-                    if (onPrivCtcp(mask, msg)) {
+                    if (onPrivateCtcp(mask, msg)) {
                         return;
                     }
                 } else {
-                    if (onChanCtcp(nick, target, msg)) {
+                    if (onChannelCtcp(nick, target, msg)) {
                         return;
                     }
                 }
@@ -780,11 +780,11 @@ void NoIrcSocket::readLine(const NoString& data)
                 return;
             } else {
                 if (target.equals(d->nick.nick())) {
-                    if (onPrivMsg(mask, msg)) {
+                    if (onPrivateMessage(mask, msg)) {
                         return;
                     }
                 } else {
-                    if (onChanMsg(nick, target, msg)) {
+                    if (onChannelMessage(nick, target, msg)) {
                         return;
                     }
                 }
@@ -913,16 +913,16 @@ bool NoIrcSocket::onCtcpReply(NoHostMask& nick, NoString& message)
     return bResult;
 }
 
-bool NoIrcSocket::onPrivCtcp(NoHostMask& nick, NoString& message)
+bool NoIrcSocket::onPrivateCtcp(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(onPrivCtcp(nick, message), &bResult);
+    IRCSOCKMODULECALL(onPrivateCtcp(nick, message), &bResult);
     if (bResult)
         return true;
 
     if (message.trimPrefix("ACTION ")) {
         bResult = false;
-        IRCSOCKMODULECALL(onPrivAction(nick, message), &bResult);
+        IRCSOCKMODULECALL(onPrivateAction(nick, message), &bResult);
         if (bResult)
             return true;
 
@@ -985,10 +985,10 @@ bool NoIrcSocket::OnGeneralCTCP(NoHostMask& nick, NoString& message)
     return false;
 }
 
-bool NoIrcSocket::onPrivNotice(NoHostMask& nick, NoString& message)
+bool NoIrcSocket::onPrivateNotice(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(onPrivNotice(nick, message), &bResult);
+    IRCSOCKMODULECALL(onPrivateNotice(nick, message), &bResult);
     if (bResult)
         return true;
 
@@ -1000,10 +1000,10 @@ bool NoIrcSocket::onPrivNotice(NoHostMask& nick, NoString& message)
     return false;
 }
 
-bool NoIrcSocket::onPrivMsg(NoHostMask& nick, NoString& message)
+bool NoIrcSocket::onPrivateMessage(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(onPrivMsg(nick, message), &bResult);
+    IRCSOCKMODULECALL(onPrivateMessage(nick, message), &bResult);
     if (bResult)
         return true;
 
@@ -1017,19 +1017,19 @@ bool NoIrcSocket::onPrivMsg(NoHostMask& nick, NoString& message)
     return false;
 }
 
-bool NoIrcSocket::onChanCtcp(NoNick& nick, const NoString& sChan, NoString& message)
+bool NoIrcSocket::onChannelCtcp(NoNick& nick, const NoString& sChan, NoString& message)
 {
     NoChannel* channel = d->network->findChannel(sChan);
     if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChanCtcp(nick, channel, message), &bResult);
+        IRCSOCKMODULECALL(onChannelCtcp(nick, channel, message), &bResult);
         if (bResult)
             return true;
 
         // Record a /me
         if (message.trimPrefix("ACTION ")) {
             bResult = false;
-            IRCSOCKMODULECALL(onChanAction(nick, channel, message), &bResult);
+            IRCSOCKMODULECALL(onChannelAction(nick, channel, message), &bResult);
             if (bResult)
                 return true;
             if (!channel->autoClearChanBuffer() || !d->network->isUserOnline() || channel->isDetached()) {
@@ -1052,12 +1052,12 @@ bool NoIrcSocket::onChanCtcp(NoNick& nick, const NoString& sChan, NoString& mess
     return res || (channel && channel->isDetached());
 }
 
-bool NoIrcSocket::onChanNotice(NoNick& nick, const NoString& sChan, NoString& message)
+bool NoIrcSocket::onChannelNotice(NoNick& nick, const NoString& sChan, NoString& message)
 {
     NoChannel* channel = d->network->findChannel(sChan);
     if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChanNotice(nick, channel, message), &bResult);
+        IRCSOCKMODULECALL(onChannelNotice(nick, channel, message), &bResult);
         if (bResult)
             return true;
 
@@ -1069,12 +1069,12 @@ bool NoIrcSocket::onChanNotice(NoNick& nick, const NoString& sChan, NoString& me
     return ((channel) && (channel->isDetached()));
 }
 
-bool NoIrcSocket::onChanMsg(NoNick& nick, const NoString& sChan, NoString& message)
+bool NoIrcSocket::onChannelMessage(NoNick& nick, const NoString& sChan, NoString& message)
 {
     NoChannel* channel = d->network->findChannel(sChan);
     if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChanMsg(nick, channel, message), &bResult);
+        IRCSOCKMODULECALL(onChannelMessage(nick, channel, message), &bResult);
         if (bResult)
             return true;
 

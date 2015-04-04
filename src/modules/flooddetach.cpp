@@ -162,20 +162,20 @@ public:
         }
     }
 
-    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
+    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Message(channel);
         return CONTINUE;
     }
 
-    // This also catches onChanAction()
-    ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
+    // This also catches onChannelAction()
+    ModRet onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Message(channel);
         return CONTINUE;
     }
 
-    ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override
+    ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Message(channel);
         return CONTINUE;

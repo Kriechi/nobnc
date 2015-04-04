@@ -122,18 +122,18 @@ public:
 
     /* notices */
     ModRet onUserNotice(NoString& target, NoString& message) override;
-    ModRet onPrivNotice(NoHostMask& nick, NoString& message) override;
-    ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override;
+    ModRet onPrivateNotice(NoHostMask& nick, NoString& message) override;
+    ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override;
 
     /* actions */
     ModRet onUserAction(NoString& target, NoString& message) override;
-    ModRet onPrivAction(NoHostMask& nick, NoString& message) override;
-    ModRet onChanAction(NoNick& nick, NoChannel* channel, NoString& message) override;
+    ModRet onPrivateAction(NoHostMask& nick, NoString& message) override;
+    ModRet onChannelAction(NoNick& nick, NoChannel* channel, NoString& message) override;
 
     /* msgs */
-    ModRet onUserMsg(NoString& target, NoString& message) override;
-    ModRet onPrivMsg(NoHostMask& nick, NoString& message) override;
-    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override;
+    ModRet onUserMessage(NoString& target, NoString& message) override;
+    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override;
+    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override;
 
 private:
     NoString m_sLogPath;
@@ -424,13 +424,13 @@ NoModule::ModRet NoLogMod::onUserNotice(NoString& target, NoString& message)
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::onPrivNotice(NoHostMask& nick, NoString& message)
+NoModule::ModRet NoLogMod::onPrivateNotice(NoHostMask& nick, NoString& message)
 {
     PutLog("-" + nick.nick() + "- " + message, nick);
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::onChanNotice(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::ModRet NoLogMod::onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message)
 {
     PutLog("-" + nick.nick() + "- " + message, channel);
     return CONTINUE;
@@ -447,20 +447,20 @@ NoModule::ModRet NoLogMod::onUserAction(NoString& target, NoString& message)
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::onPrivAction(NoHostMask& nick, NoString& message)
+NoModule::ModRet NoLogMod::onPrivateAction(NoHostMask& nick, NoString& message)
 {
     PutLog("* " + nick.nick() + " " + message, nick);
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::onChanAction(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::ModRet NoLogMod::onChannelAction(NoNick& nick, NoChannel* channel, NoString& message)
 {
     PutLog("* " + nick.nick() + " " + message, channel);
     return CONTINUE;
 }
 
 /* msgs */
-NoModule::ModRet NoLogMod::onUserMsg(NoString& target, NoString& message)
+NoModule::ModRet NoLogMod::onUserMessage(NoString& target, NoString& message)
 {
     NoNetwork* network = NoModule::network();
     if (network) {
@@ -470,13 +470,13 @@ NoModule::ModRet NoLogMod::onUserMsg(NoString& target, NoString& message)
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::onPrivMsg(NoHostMask& nick, NoString& message)
+NoModule::ModRet NoLogMod::onPrivateMessage(NoHostMask& nick, NoString& message)
 {
     PutLog("<" + nick.nick() + "> " + message, nick);
     return CONTINUE;
 }
 
-NoModule::ModRet NoLogMod::onChanMsg(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::ModRet NoLogMod::onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message)
 {
     PutLog("<" + nick.nick() + "> " + message, channel);
     return CONTINUE;
