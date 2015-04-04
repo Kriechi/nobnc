@@ -392,7 +392,7 @@ NoNetwork* NoUser::addNetwork(const NoString& name, NoString& error)
     NoNetwork* network = new NoNetwork(this, name);
 
     bool bCancel = false;
-    USERMODULECALL(onAddNetwork(*network, error), this, nullptr, &bCancel);
+    USERMODULECALL(onAddNetwork(network, error), this, nullptr, &bCancel);
     if (bCancel) {
         removeNetwork(network);
         delete network;
@@ -427,7 +427,7 @@ bool NoUser::deleteNetwork(const NoString& name)
 
     if (network) {
         bool bCancel = false;
-        USERMODULECALL(onDeleteNetwork(*network), this, nullptr, &bCancel);
+        USERMODULECALL(onDeleteNetwork(network), this, nullptr, &bCancel);
         if (!bCancel) {
             delete network;
             return true;
@@ -564,9 +564,9 @@ void NoUser::cloneNetworks(NoUser* user)
         NoNetwork* network = findNetwork(userNetwork->name());
 
         if (network)
-            network->clone(*userNetwork);
+            network->clone(userNetwork);
         else
-            new NoNetwork(this, *userNetwork); // err what?
+            new NoNetwork(this, userNetwork); // TODO: err what?
     }
 
     std::set<NoString> deleteNetworks;

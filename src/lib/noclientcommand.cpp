@@ -710,7 +710,7 @@ void NoClient::userCommand(NoString& line)
             return;
         }
 
-        pNewNetwork->clone(*pOldNetwork, false);
+        pNewNetwork->clone(pOldNetwork, false);
 
         if (d->network && d->network->name().equals(sOldNetwork) && d->user == oldUser) {
             setNetwork(nullptr);

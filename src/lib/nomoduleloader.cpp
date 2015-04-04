@@ -460,11 +460,11 @@ bool NoModuleLoader::onTimerAutoJoin(NoChannel* channel)
 {
     MODHALTCHK(onTimerAutoJoin(channel));
 }
-bool NoModuleLoader::onAddNetwork(NoNetwork& network, NoString& error)
+bool NoModuleLoader::onAddNetwork(NoNetwork* network, NoString& error)
 {
     MODHALTCHK(onAddNetwork(network, error));
 }
-bool NoModuleLoader::onDeleteNetwork(NoNetwork& network)
+bool NoModuleLoader::onDeleteNetwork(NoNetwork* network)
 {
     MODHALTCHK(onDeleteNetwork(network));
 }

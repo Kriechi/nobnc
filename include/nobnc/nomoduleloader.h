@@ -134,8 +134,8 @@ public:
     bool onTopic(NoNick& nick, NoChannel* channel, NoString& topic);
     bool onTimerAutoJoin(NoChannel* channel);
 
-    bool onAddNetwork(NoNetwork& network, NoString& error);
-    bool onDeleteNetwork(NoNetwork& network);
+    bool onAddNetwork(NoNetwork* network, NoString& error);
+    bool onDeleteNetwork(NoNetwork* network);
 
     bool onSendToClient(NoString& line, NoClient* client);
     bool onSendToIrc(NoString& line);

@@ -39,7 +39,7 @@ public:
     static bool isValidNetwork(const NoString& sNetwork);
 
     NoNetwork(NoUser* user, const NoString& name);
-    NoNetwork(NoUser* user, const NoNetwork& network);
+    NoNetwork(NoUser* user, const NoNetwork* network);
     ~NoNetwork();
 
     enum {
@@ -54,7 +54,7 @@ public:
         NoTrafficTimeout = 540
     };
 
-    void clone(const NoNetwork& network, bool cloneName = true);
+    void clone(const NoNetwork* network, bool cloneName = true);
 
     NoString networkPath() const;
 

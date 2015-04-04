@@ -191,32 +191,32 @@ NoNetwork::NoNetwork(NoUser* user, const NoString& name) : d(new NoNetworkPrivat
     setEnabled(true);
 }
 
-NoNetwork::NoNetwork(NoUser* user, const NoNetwork& network) : NoNetwork(user, "")
+NoNetwork::NoNetwork(NoUser* user, const NoNetwork* network) : NoNetwork(user, "")
 {
     clone(network);
 }
 
-void NoNetwork::clone(const NoNetwork& network, bool cloneName)
+void NoNetwork::clone(const NoNetwork* network, bool cloneName)
 {
     if (cloneName) {
-        d->name = network.name();
+        d->name = network->name();
     }
 
-    d->floodRate = network.floodRate();
-    d->floodBurst = network.floodBurst();
-    d->joinDelay = network.joinDelay();
+    d->floodRate = network->floodRate();
+    d->floodBurst = network->floodBurst();
+    d->joinDelay = network->joinDelay();
 
-    setNick(network.nick());
-    setAltNick(network.altNick());
-    setIdent(network.ident());
-    setRealName(network.realName());
-    setBindHost(network.bindHost());
-    setEncoding(network.encoding());
-    setQuitMessage(network.quitMessage());
-    d->trustedFingerprints = network.d->trustedFingerprints;
+    setNick(network->nick());
+    setAltNick(network->altNick());
+    setIdent(network->ident());
+    setRealName(network->realName());
+    setBindHost(network->bindHost());
+    setEncoding(network->encoding());
+    setQuitMessage(network->quitMessage());
+    d->trustedFingerprints = network->d->trustedFingerprints;
 
     // Servers
-    const std::vector<NoServerInfo*>& vServers = network.servers();
+    const std::vector<NoServerInfo*>& vServers = network->servers();
     NoString sServer;
     NoServerInfo* pCurServ = currentServer();
 
@@ -249,7 +249,7 @@ void NoNetwork::clone(const NoNetwork& network, bool cloneName)
     // !Servers
 
     // Chans
-    const std::vector<NoChannel*>& channels = network.channels();
+    const std::vector<NoChannel*>& channels = network->channels();
     for (NoChannel* pNewChan : channels) {
         NoChannel* channel = findChannel(pNewChan->name());
 
@@ -261,7 +261,7 @@ void NoNetwork::clone(const NoNetwork& network, bool cloneName)
     }
 
     for (NoChannel* channel : d->channels) {
-        NoChannel* pNewChan = network.findChannel(channel->name());
+        NoChannel* pNewChan = network->findChannel(channel->name());
 
         if (!pNewChan) {
             channel->setInConfig(false);
@@ -274,7 +274,7 @@ void NoNetwork::clone(const NoNetwork& network, bool cloneName)
     // Modules
     std::set<NoString> ssUnloadMods;
     NoModuleLoader* vCurMods = loader();
-    const NoModuleLoader* vNewMods = network.loader();
+    const NoModuleLoader* vNewMods = network->loader();
 
     for (NoModule* pNewMod : vNewMods->modules()) {
         NoString sModRet;
@@ -300,7 +300,7 @@ void NoNetwork::clone(const NoNetwork& network, bool cloneName)
     }
     // !Modules
 
-    setEnabled(network.isEnabled());
+    setEnabled(network->isEnabled());
 }
 
 NoNetwork::~NoNetwork()

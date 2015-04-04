@@ -993,7 +993,7 @@ public:
                     NoRegistry registry(module);
                     registry.copy(path);
                 }
-                network->clone(*pOldNetwork, false);
+                network->clone(pOldNetwork, false);
                 user->deleteNetwork(pOldNetwork->name());
             }
         }

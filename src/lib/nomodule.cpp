@@ -708,11 +708,11 @@ NoModule::ModRet NoModule::onTimerAutoJoin(NoChannel* channel)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onAddNetwork(NoNetwork& network, NoString& error)
+NoModule::ModRet NoModule::onAddNetwork(NoNetwork* network, NoString& error)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onDeleteNetwork(NoNetwork& network)
+NoModule::ModRet NoModule::onDeleteNetwork(NoNetwork* network)
 {
     return CONTINUE;
 }

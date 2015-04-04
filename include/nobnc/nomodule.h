@@ -606,12 +606,12 @@ public:
      *                  the module stops adding the network.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onAddNetwork(NoNetwork& network, NoString& error);
+    virtual ModRet onAddNetwork(NoNetwork* network, NoString& error);
     /** This module hook is called when a network is deleted.
      *  @param network The IRC network which is going to be deleted.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onDeleteNetwork(NoNetwork& network);
+    virtual ModRet onDeleteNetwork(NoNetwork* network);
 
     /** Called when ZNC sends a raw traffic line to a client.
      *  @param line The raw traffic line sent.
