@@ -17,7 +17,6 @@
 
 #include "pidfile.h"
 #include <nobnc/noapp.h>
-#include <nobnc/nomodulecall.h>
 #include <nobnc/noexception.h>
 #include <nobnc/nodebug.h>
 #include <nobnc/nodir.h>

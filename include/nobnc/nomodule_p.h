@@ -21,6 +21,110 @@
 #include "nomodule.h"
 #include "noapp.h"
 
+extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
+#define NOTHING &ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER
+
+#define ALLMODULECALL(macFUNC, macEXITER)                                          \
+    do {                                                                           \
+        NoModuleLoader* GMods = noApp->loader();                          \
+        bool bAllExit = false;                                                     \
+        if (GMods->macFUNC) {                                                      \
+            bAllExit = true;                                                       \
+        } else {                                                                   \
+            const std::map<NoString, NoUser*>& mUsers = noApp->userMap(); \
+            std::map<NoString, NoUser*>::const_iterator it;                        \
+            for (it = mUsers.begin(); it != mUsers.end(); ++it) {                  \
+                NoModuleLoader* UMods = it->second->loader();                      \
+                if (UMods->macFUNC) {                                              \
+                    bAllExit = true;                                               \
+                    break;                                                         \
+                }                                                                  \
+                const std::vector<NoNetwork*>& mNets = it->second->networks();     \
+                std::vector<NoNetwork*>::const_iterator it2;                       \
+                for (it2 = mNets.begin(); it2 != mNets.end(); ++it2) {             \
+                    NoModuleLoader* NMods = (*it2)->loader();                      \
+                    if (NMods->macFUNC) {                                          \
+                        bAllExit = true;                                           \
+                        break;                                                     \
+                    }                                                              \
+                }                                                                  \
+                if (bAllExit)                                                      \
+                    break;                                                         \
+            }                                                                      \
+        }                                                                          \
+        if (bAllExit)                                                              \
+            *macEXITER = true;                                                     \
+    } while (false)
+
+#define _GLOBALMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, macEXITER) \
+    do {                                                                      \
+        NoModuleLoader* GMods = noApp->loader();                     \
+        NoUser* pOldGUser = GMods->user();                                    \
+        NoNetwork* pOldGNetwork = GMods->network();                           \
+        NoClient* pOldGClient = GMods->client();                              \
+        GMods->setUser(macUSER);                                              \
+        GMods->setNetwork(macNETWORK);                                        \
+        GMods->setClient(macCLIENT);                                          \
+        if (GMods->macFUNC) {                                                 \
+            GMods->setUser(pOldGUser);                                        \
+            GMods->setNetwork(pOldGNetwork);                                  \
+            GMods->setClient(pOldGClient);                                    \
+            *macEXITER = true;                                                \
+        }                                                                     \
+        GMods->setUser(pOldGUser);                                            \
+        GMods->setNetwork(pOldGNetwork);                                      \
+        GMods->setClient(pOldGClient);                                        \
+    } while (false)
+
+#define _USERMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, macEXITER)         \
+    do {                                                                            \
+        bool bGlobalExited = false;                                                 \
+        _GLOBALMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, &bGlobalExited); \
+        if (bGlobalExited) {                                                        \
+            *macEXITER = true;                                                      \
+            break;                                                                  \
+        }                                                                           \
+        if (macUSER != nullptr) {                                                   \
+            NoModuleLoader* UMods = macUSER->loader();                              \
+            NoNetwork* pOldUNetwork = UMods->network();                             \
+            NoClient* pOldUClient = UMods->client();                                \
+            UMods->setNetwork(macNETWORK);                                          \
+            UMods->setClient(macCLIENT);                                            \
+            if (UMods->macFUNC) {                                                   \
+                UMods->setNetwork(pOldUNetwork);                                    \
+                UMods->setClient(pOldUClient);                                      \
+                *macEXITER = true;                                                  \
+            }                                                                       \
+            UMods->setNetwork(pOldUNetwork);                                        \
+            UMods->setClient(pOldUClient);                                          \
+        }                                                                           \
+    } while (false)
+
+#define NETWORKMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, macEXITER)   \
+    do {                                                                        \
+        bool bUserExited = false;                                               \
+        _USERMODULECALL(macFUNC, macUSER, macNETWORK, macCLIENT, &bUserExited); \
+        if (bUserExited) {                                                      \
+            *macEXITER = true;                                                  \
+            break;                                                              \
+        }                                                                       \
+        if (macNETWORK != nullptr) {                                            \
+            NoModuleLoader* NMods = macNETWORK->loader();                       \
+            NoClient* pOldNClient = NMods->client();                            \
+            NMods->setClient(macCLIENT);                                        \
+            if (NMods->macFUNC) {                                               \
+                NMods->setClient(pOldNClient);                                  \
+                *macEXITER = true;                                              \
+            }                                                                   \
+            NMods->setClient(pOldNClient);                                      \
+        }                                                                       \
+    } while (false)
+
+#define GLOBALMODULECALL(macFUNC, macEXITER) _GLOBALMODULECALL(macFUNC, nullptr, nullptr, nullptr, macEXITER)
+
+#define USERMODULECALL(macFUNC, macUSER, macCLIENT, macEXITER) \
+    _USERMODULECALL(macFUNC, macUSER, nullptr, macCLIENT, macEXITER)
+
 class NoModulePrivate
 {
 public:

@@ -19,7 +19,7 @@
 #include "nouser.h"
 #include "nonetwork.h"
 #include "noclient.h"
-#include "nomodulecall.h"
+#include "nomodule_p.h"
 #include "nomessage.h"
 #include "noapp.h"
 #include "nonick.h"

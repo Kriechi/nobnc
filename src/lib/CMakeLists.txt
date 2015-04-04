@@ -25,7 +25,6 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/nomessage_p.h
                        ${NO_INCDIR}/nomodule.h
                        ${NO_INCDIR}/nomodule_p.h
-                       ${NO_INCDIR}/nomodulecall.h
                        ${NO_INCDIR}/nomodulecommand.h
                        ${NO_INCDIR}/nomoduleinfo.h
                        ${NO_INCDIR}/nomodulejob.h

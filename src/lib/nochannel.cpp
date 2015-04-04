@@ -25,6 +25,7 @@
 #include "nobuffer.h"
 #include "nonick.h"
 #include "noapp.h"
+#include "nomodule_p.h"
 
 class NoChannelPrivate
 {

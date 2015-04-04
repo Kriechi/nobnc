@@ -16,6 +16,7 @@
  */
 
 #include "noauthenticator.h"
+#include "nomodule_p.h"
 #include "nosocket.h"
 #include "nouser.h"
 #include "noapp.h"

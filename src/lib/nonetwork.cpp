@@ -31,6 +31,7 @@
 #include "noapp_p.h"
 #include "nonick.h"
 #include "nobuffer.h"
+#include "nomodule_p.h"
 #include "Csocket/Csocket.h"
 #include <algorithm>
 #include <memory>

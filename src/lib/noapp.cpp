@@ -30,6 +30,7 @@
 #include "nowebsocket.h"
 #include "nolistener.h"
 #include "noregistry.h"
+#include "nomodule_p.h"
 #include <tuple>
 #include <algorithm>
 #include "Csocket/Csocket.h"

@@ -21,7 +21,7 @@
 #include "nouser_p.h"
 #include "nonetwork.h"
 #include "noserverinfo.h"
-#include "nomodulecall.h"
+#include "nomodule_p.h"
 #include "noclient.h"
 #include "noapp.h"
 #include "noquery.h"

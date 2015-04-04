@@ -26,7 +26,7 @@
 #include "nouser.h"
 #include "noquery.h"
 #include "noexception.h"
-#include "nomodulecall.h"
+#include "nomodule_p.h"
 #include "noapp.h"
 #include "nolistener.h"
 #include "noregistry.h"

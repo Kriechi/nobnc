@@ -24,7 +24,7 @@
 #include "noircsocket.h"
 #include "nochannel.h"
 #include "noclient.h"
-#include "nomodulecall.h"
+#include "nomodule_p.h"
 #include "noapp_p.h"
 #include "noregistry.h"
 #include "Csocket/Csocket.h"

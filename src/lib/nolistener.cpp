@@ -21,6 +21,7 @@
 #include "noapp.h"
 #include "nowebsocket.h"
 #include "nosocket_p.h"
+#include "nomodule_p.h"
 
 class NoListenerPrivate
 {

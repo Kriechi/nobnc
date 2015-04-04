@@ -23,7 +23,6 @@
 #include <nobnc/noutils.h>
 #include <nobnc/notable.h>
 #include <nobnc/notimer.h>
-#include <nobnc/nomodulecall.h>
 #include <nobnc/nomoduleinfo.h>
 #include <nobnc/nomodulecommand.h>
 #include <functional>
