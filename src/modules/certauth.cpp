@@ -263,9 +263,9 @@ public:
         return "certauth";
     }
 
-    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
-        NoUser* user = socket.session()->user();
+        NoUser* user = socket->session()->user();
 
         if (page == "index") {
             MNoStringSet::const_iterator it = m_PubKeys.find(user->userName());
@@ -278,13 +278,13 @@ public:
 
             return true;
         } else if (page == "add") {
-            AddKey(user, socket.param("key"));
-            socket.redirect(webPath());
+            AddKey(user, socket->param("key"));
+            socket->redirect(webPath());
             return true;
         } else if (page == "delete") {
             MNoStringSet::iterator it = m_PubKeys.find(user->userName());
             if (it != m_PubKeys.end()) {
-                if (it->second.erase(socket.param("key", false))) {
+                if (it->second.erase(socket->param("key", false))) {
                     if (it->second.size() == 0) {
                         m_PubKeys.erase(it);
                     }
@@ -293,7 +293,7 @@ public:
                 }
             }
 
-            socket.redirect(webPath());
+            socket->redirect(webPath());
             return true;
         }
 

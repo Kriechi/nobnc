@@ -120,7 +120,7 @@ public:
         return "List sockets";
     }
 
-    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
         if (page == "index") {
             if (noApp->manager()->sockets().empty()) {

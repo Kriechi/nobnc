@@ -335,25 +335,25 @@ public:
         return "Q";
     }
 
-    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
         if (page == "index") {
-            bool bSubmitted = (socket.param("submitted").toInt() != 0);
+            bool bSubmitted = (socket->param("submitted").toInt() != 0);
 
             if (bSubmitted) {
-                NoString FormUsername = socket.param("user");
+                NoString FormUsername = socket->param("user");
                 if (!FormUsername.empty())
                     SetUsername(FormUsername);
 
-                NoString FormPassword = socket.param("password");
+                NoString FormPassword = socket->param("password");
                 if (!FormPassword.empty())
                     SetPassword(FormPassword);
 
-                SetUseCloakedHost(socket.param("usecloakedhost").toBool());
-                SetUseChallenge(socket.param("usechallenge").toBool());
-                SetRequestPerms(socket.param("requestperms").toBool());
-                SetJoinonInvite(socket.param("joinoninvite").toBool());
-                SetJoinAfterCloaked(socket.param("joinaftercloaked").toBool());
+                SetUseCloakedHost(socket->param("usecloakedhost").toBool());
+                SetUseChallenge(socket->param("usechallenge").toBool());
+                SetRequestPerms(socket->param("requestperms").toBool());
+                SetJoinonInvite(socket->param("joinoninvite").toBool());
+                SetJoinAfterCloaked(socket->param("joinaftercloaked").toBool());
             }
 
             tmpl["Username"] = m_sUsername;
@@ -389,7 +389,7 @@ public:
             o5["Checked"] = NoString(m_bJoinAfterCloaked);
 
             if (bSubmitted) {
-                socket.session()->addSuccess("Changes have been saved!");
+                socket->session()->addSuccess("Changes have been saved!");
             }
 
             return true;

@@ -112,7 +112,7 @@ public:
         return "Last Seen";
     }
 
-    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
         if (page == "index") {
             NoModuleLoader* GModules = noApp->loader();
@@ -130,7 +130,7 @@ public:
                 NoTemplate& Row = tmpl.addRow("UserLoop");
 
                 Row["Username"] = user->userName();
-                Row["IsSelf"] = NoString(user == socket.session()->user());
+                Row["IsSelf"] = NoString(user == socket->session()->user());
                 Row["LastSeen"] = FormatLastSeen(user, "never");
             }
 
@@ -140,9 +140,9 @@ public:
         return false;
     }
 
-    bool onEmbeddedWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onEmbeddedWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
-        if (page == "webadmin/user" && socket.session()->isAdmin()) {
+        if (page == "webadmin/user" && socket->session()->isAdmin()) {
             NoUser* user = noApp->findUser(tmpl["Username"]);
             if (user) {
                 tmpl["LastSeen"] = FormatLastSeen(user);

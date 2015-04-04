@@ -319,11 +319,11 @@ NoString NoModule::moduleDataDir() const
 }
 
 // Webmods
-bool NoModule::onWebPreRequest(NoWebSocket& socket, const NoString& page)
+bool NoModule::onWebPreRequest(NoWebSocket* socket, const NoString& page)
 {
     return false;
 }
-bool NoModule::onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl)
+bool NoModule::onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl)
 {
     return false;
 }
@@ -333,7 +333,7 @@ void NoModule::addSubPage(std::shared_ptr<NoWebPage> page)
     d->subPages.push_back(page);
 }
 
-bool NoModule::onEmbeddedWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl)
+bool NoModule::onEmbeddedWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl)
 {
     return false;
 }

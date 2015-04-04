@@ -87,24 +87,24 @@ public:
         return true;
     }
 
-    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
         if (page == "index") {
-            if (socket.isPost()) {
-                NoUser* user = noApp->findUser(No::token(socket.param("network"), 0, "/"));
+            if (socket->isPost()) {
+                NoUser* user = noApp->findUser(No::token(socket->param("network"), 0, "/"));
                 if (!user) {
-                    socket.session()->addError("User not found");
+                    socket->session()->addError("User not found");
                     return true;
                 }
 
-                NoNetwork* network = user->findNetwork(No::token(socket.param("network"), 1, "/"));
+                NoNetwork* network = user->findNetwork(No::token(socket->param("network"), 1, "/"));
                 if (!network) {
-                    socket.session()->addError("network not found");
+                    socket->session()->addError("network not found");
                     return true;
                 }
 
-                bool bToServer = socket.param("send_to") == "server";
-                const NoString line = socket.param("line");
+                bool bToServer = socket->param("send_to") == "server";
+                const NoString line = socket->param("line");
 
                 tmpl["user"] = user->userName();
                 tmpl[bToServer ? "to_server" : "to_client"] = "true";
@@ -116,7 +116,7 @@ public:
                     network->putUser(line);
                 }
 
-                socket.session()->addSuccess("Line sent");
+                socket->session()->addSuccess("Line sent");
             }
 
             const std::map<NoString, NoUser*>& msUsers = noApp->userMap();

@@ -844,7 +844,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
                            "Forbidden",
                            "You must login as " + module->user()->userName() + " in order to view this page");
             return Done;
-        } else if (module->onWebPreRequest(*this, m_page)) {
+        } else if (module->onWebPreRequest(this, m_page)) {
             return Deferred;
         }
 
@@ -875,7 +875,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
 
             /* if a module returns false from OnWebRequest, it does not
                want the template to be printed, usually because it did a redirect. */
-            if (module->onWebRequest(*this, m_page, m_template)) {
+            if (module->onWebRequest(this, m_page, m_template)) {
                 // If they already sent a reply, let's assume
                 // they did what they wanted to do.
                 if (sentHeader()) {

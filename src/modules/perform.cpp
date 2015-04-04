@@ -146,15 +146,15 @@ public:
         return "Perform";
     }
 
-    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
         if (page != "index") {
             // only accept requests to index
             return false;
         }
 
-        if (socket.isPost()) {
-            NoStringVector vsPerf = socket.rawParam("perform", true).split("\n", No::SkipEmptyParts);
+        if (socket->isPost()) {
+            NoStringVector vsPerf = socket->rawParam("perform", true).split("\n", No::SkipEmptyParts);
             m_vPerform.clear();
 
             for (NoStringVector::const_iterator it = vsPerf.begin(); it != vsPerf.end(); ++it)

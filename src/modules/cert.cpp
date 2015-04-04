@@ -82,7 +82,7 @@ public:
         return "Certificate";
     }
 
-    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
         if (page == "index") {
             tmpl["Cert"] = NoString(HasPemFile());
@@ -91,15 +91,15 @@ public:
             NoFile fPemFile(PemFile());
 
             if (fPemFile.Open(O_WRONLY | O_TRUNC | O_CREAT)) {
-                fPemFile.Write(socket.param("cert", true, ""));
+                fPemFile.Write(socket->param("cert", true, ""));
                 fPemFile.Close();
             }
 
-            socket.redirect(webPath());
+            socket->redirect(webPath());
             return true;
         } else if (page == "delete") {
             NoFile::Delete(PemFile());
-            socket.redirect(webPath());
+            socket->redirect(webPath());
             return true;
         }
 

@@ -212,7 +212,7 @@ public:
         }
     }
 
-    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
         if (page == "index") {
             NoRegistry registry(this);
@@ -225,12 +225,12 @@ public:
 
             return true;
         } else if (page == "delnote") {
-            DelNote(socket.param("key", false));
-            socket.redirect(webPath());
+            DelNote(socket->param("key", false));
+            socket->redirect(webPath());
             return true;
         } else if (page == "addnote") {
-            AddNote(socket.param("key"), socket.param("note"));
-            socket.redirect(webPath());
+            AddNote(socket->param("key"), socket->param("note"));
+            socket->redirect(webPath());
             return true;
         }
 

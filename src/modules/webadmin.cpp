@@ -162,17 +162,17 @@ public:
         return true;
     }
 
-    NoUser* GetNewUser(NoWebSocket& socket, NoUser* user)
+    NoUser* GetNewUser(NoWebSocket* socket, NoUser* user)
     {
-        std::shared_ptr<NoWebSession> spSession = socket.session();
-        NoString username = socket.param("newuser");
+        std::shared_ptr<NoWebSession> spSession = socket->session();
+        NoString username = socket->param("newuser");
 
         if (username.empty()) {
-            username = socket.param("user");
+            username = socket->param("user");
         }
 
         if (username.empty()) {
-            socket.printErrorPage("Invalid Submission [Username is required]");
+            socket->printErrorPage("Invalid Submission [Username is required]");
             return nullptr;
         }
 
@@ -181,10 +181,10 @@ public:
             username = user->userName();
         }
 
-        NoString arg = socket.param("password");
+        NoString arg = socket->param("password");
 
-        if (arg != socket.param("password2")) {
-            socket.printErrorPage("Invalid Submission [Passwords do not match]");
+        if (arg != socket->param("password2")) {
+            socket->printErrorPage("Invalid Submission [Passwords do not match]");
             return nullptr;
         }
 
@@ -194,7 +194,7 @@ public:
             pNewUser->setPassword(arg);
         }
 
-        NoStringVector vsArgs = socket.rawParam("allowedips").split("\n");
+        NoStringVector vsArgs = socket->rawParam("allowedips").split("\n");
         uint a = 0;
 
         if (vsArgs.size()) {
@@ -205,49 +205,49 @@ public:
             pNewUser->addAllowedHost("*");
         }
 
-        vsArgs = socket.rawParam("ctcpreplies").split("\n");
+        vsArgs = socket->rawParam("ctcpreplies").split("\n");
         for (a = 0; a < vsArgs.size(); a++) {
             NoString reply = vsArgs[a].trimRight_n("\r");
             pNewUser->addCtcpReply(No::token(reply, 0).trim_n(), No::tokens(reply, 1).trim_n());
         }
 
-        arg = socket.param("nick");
+        arg = socket->param("nick");
         if (!arg.empty()) {
             pNewUser->setNick(arg);
         }
-        arg = socket.param("altnick");
+        arg = socket->param("altnick");
         if (!arg.empty()) {
             pNewUser->setAltNick(arg);
         }
-        arg = socket.param("statusprefix");
+        arg = socket->param("statusprefix");
         if (!arg.empty()) {
             pNewUser->setStatusPrefix(arg);
         }
-        arg = socket.param("ident");
+        arg = socket->param("ident");
         if (!arg.empty()) {
             pNewUser->setIdent(arg);
         }
-        arg = socket.param("realname");
+        arg = socket->param("realname");
         if (!arg.empty()) {
             pNewUser->setRealName(arg);
         }
-        arg = socket.param("quitmsg");
+        arg = socket->param("quitmsg");
         if (!arg.empty()) {
             pNewUser->setQuitMessage(arg);
         }
-        arg = socket.param("chanmodes");
+        arg = socket->param("chanmodes");
         if (!arg.empty()) {
             pNewUser->setDefaultChanModes(arg);
         }
-        arg = socket.param("timestampformat");
+        arg = socket->param("timestampformat");
         if (!arg.empty()) {
             pNewUser->setTimestampFormat(arg);
         }
 
-        arg = socket.param("bindhost");
+        arg = socket->param("bindhost");
         // To change BindHosts be admin or don't have DenysetBindHost
         if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
-            NoString arg2 = socket.param("dccbindhost");
+            NoString arg2 = socket->param("dccbindhost");
             if (!arg.empty()) {
                 pNewUser->setBindHost(arg);
             }
@@ -282,7 +282,7 @@ public:
             pNewUser->setDccBindHost(user->dccBindHost());
         }
 
-        arg = socket.param("bufsize");
+        arg = socket->param("bufsize");
         if (!arg.empty())
             pNewUser->setBufferCount(arg.toUInt(), spSession->isAdmin());
         if (!arg.empty()) {
@@ -292,23 +292,23 @@ public:
             pNewUser->setBufferCount(arg.toUInt(), spSession->isAdmin());
         }
 
-        pNewUser->setSkinName(socket.param("skin"));
-        pNewUser->setAutoClearChanBuffer(socket.param("autoclearchanbuffer").toBool());
-        pNewUser->setMultiClients(socket.param("multiclients").toBool());
-        pNewUser->setTimestampAppend(socket.param("appendtimestamp").toBool());
-        pNewUser->setTimestampPrepend(socket.param("prependtimestamp").toBool());
-        pNewUser->setTimezone(socket.param("timezone"));
-        pNewUser->setJoinTries(socket.param("jointries").toUInt());
-        pNewUser->setMaxJoins(socket.param("maxjoins").toUInt());
-        pNewUser->setAutoclearQueryBuffer(socket.param("autoclearquerybuffer").toBool());
-        pNewUser->setMaxQueryBuffers(socket.param("maxquerybuffers").toUInt());
+        pNewUser->setSkinName(socket->param("skin"));
+        pNewUser->setAutoClearChanBuffer(socket->param("autoclearchanbuffer").toBool());
+        pNewUser->setMultiClients(socket->param("multiclients").toBool());
+        pNewUser->setTimestampAppend(socket->param("appendtimestamp").toBool());
+        pNewUser->setTimestampPrepend(socket->param("prependtimestamp").toBool());
+        pNewUser->setTimezone(socket->param("timezone"));
+        pNewUser->setJoinTries(socket->param("jointries").toUInt());
+        pNewUser->setMaxJoins(socket->param("maxjoins").toUInt());
+        pNewUser->setAutoclearQueryBuffer(socket->param("autoclearquerybuffer").toBool());
+        pNewUser->setMaxQueryBuffers(socket->param("maxquerybuffers").toUInt());
 
 #ifdef HAVE_ICU
-        NoString sEncodingUtf = socket.param("encoding_utf");
+        NoString sEncodingUtf = socket->param("encoding_utf");
         if (sEncodingUtf == "legacy") {
             pNewUser->setClientEncoding("");
         }
-        NoString sEncoding = socket.param("encoding");
+        NoString sEncoding = socket->param("encoding");
         if (sEncoding.empty()) {
             sEncoding = "UTF-8";
         }
@@ -322,9 +322,9 @@ public:
 #endif
 
         if (spSession->isAdmin()) {
-            pNewUser->setDenyLoadMod(socket.param("denyloadmod").toBool());
-            pNewUser->setDenysetBindHost(socket.param("denysetbindhost").toBool());
-            arg = socket.param("maxnetworks");
+            pNewUser->setDenyLoadMod(socket->param("denyloadmod").toBool());
+            pNewUser->setDenysetBindHost(socket->param("denysetbindhost").toBool());
+            arg = socket->param("maxnetworks");
             if (!arg.empty())
                 pNewUser->setMaxNetworks(arg.toUInt());
         } else if (user) {
@@ -335,17 +335,17 @@ public:
 
         // If user is not nullptr, we are editing an existing user.
         // Users must not be able to change their own admin flag.
-        if (user != noApp->findUser(socket.username())) {
-            pNewUser->setAdmin(socket.param("isadmin").toBool());
+        if (user != noApp->findUser(socket->username())) {
+            pNewUser->setAdmin(socket->param("isadmin").toBool());
         } else if (user) {
             pNewUser->setAdmin(user->isAdmin());
         }
 
         if (spSession->isAdmin() || (user && !user->denyLoadMod())) {
-            socket.paramValues("loadmod", vsArgs);
+            socket->paramValues("loadmod", vsArgs);
 
             // disallow unload webadmin from itself
-            if (No::UserModule == type() && user == noApp->findUser(socket.username())) {
+            if (No::UserModule == type() && user == noApp->findUser(socket->username())) {
                 bool bLoadedWebadmin = false;
                 for (a = 0; a < vsArgs.size(); ++a) {
                     NoString name = vsArgs[a].trimRight_n("\r");
@@ -365,7 +365,7 @@ public:
                 NoString sModLoadError;
 
                 if (!name.empty()) {
-                    NoString args = socket.param("modargs_" + name);
+                    NoString args = socket->param("modargs_" + name);
 
                     try {
                         if (!pNewUser->loader()->loadModule(name, args, No::UserModule, pNewUser, nullptr, sModRet)) {
@@ -408,34 +408,34 @@ public:
         return pNewUser;
     }
 
-    NoString SafeGetUserNameParam(NoWebSocket& socket)
+    NoString SafeGetUserNameParam(NoWebSocket* socket)
     {
-        NoString userName = socket.param("user"); // check for POST param
-        if (userName.empty() && !socket.isPost()) {
+        NoString userName = socket->param("user"); // check for POST param
+        if (userName.empty() && !socket->isPost()) {
             // if no POST param named user has been given and we are not
             // saving this form, fall back to using the GET parameter.
-            userName = socket.param("user", false);
+            userName = socket->param("user", false);
         }
         return userName;
     }
 
-    NoString SafeGetNetworkParam(NoWebSocket& socket)
+    NoString SafeGetNetworkParam(NoWebSocket* socket)
     {
-        NoString sNetwork = socket.param("network"); // check for POST param
-        if (sNetwork.empty() && !socket.isPost()) {
+        NoString sNetwork = socket->param("network"); // check for POST param
+        if (sNetwork.empty() && !socket->isPost()) {
             // if no POST param named user has been given and we are not
             // saving this form, fall back to using the GET parameter.
-            sNetwork = socket.param("network", false);
+            sNetwork = socket->param("network", false);
         }
         return sNetwork;
     }
 
-    NoUser* SafeGetUserFromParam(NoWebSocket& socket)
+    NoUser* SafeGetUserFromParam(NoWebSocket* socket)
     {
         return noApp->findUser(SafeGetUserNameParam(socket));
     }
 
-    NoNetwork* SafeGetNetworkFromParam(NoWebSocket& socket)
+    NoNetwork* SafeGetNetworkFromParam(NoWebSocket* socket)
     {
         NoUser* user = noApp->findUser(SafeGetUserNameParam(socket));
         NoNetwork* network = nullptr;
@@ -451,9 +451,9 @@ public:
     {
         return "webadmin";
     }
-    bool onWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl) override
+    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
     {
-        std::shared_ptr<NoWebSession> spSession = socket.session();
+        std::shared_ptr<NoWebSession> spSession = socket->session();
 
         if (page == "settings") {
             // Admin Check
@@ -481,7 +481,7 @@ public:
                 return NetworkPage(socket, tmpl, user);
             }
 
-            socket.printErrorPage("No such username");
+            socket->printErrorPage("No such username");
             return true;
         } else if (page == "editnetwork") {
             NoNetwork* network = SafeGetNetworkFromParam(socket);
@@ -492,16 +492,16 @@ public:
             }
 
             if (!network) {
-                socket.printErrorPage("No such username or network");
+                socket->printErrorPage("No such username or network");
                 return true;
             }
 
             return NetworkPage(socket, tmpl, network->user(), network);
 
         } else if (page == "delnetwork") {
-            NoString sUser = socket.param("user");
-            if (sUser.empty() && !socket.isPost()) {
-                sUser = socket.param("user", false);
+            NoString sUser = socket->param("user");
+            if (sUser.empty() && !socket->isPost()) {
+                sUser = socket->param("user", false);
             }
 
             NoUser* user = noApp->findUser(sUser);
@@ -521,17 +521,17 @@ public:
             }
 
             if (!network) {
-                socket.printErrorPage("No such username or network");
+                socket->printErrorPage("No such username or network");
                 return true;
             }
 
-            NoString sChan = socket.param("name");
-            if (sChan.empty() && !socket.isPost()) {
-                sChan = socket.param("name", false);
+            NoString sChan = socket->param("name");
+            if (sChan.empty() && !socket->isPost()) {
+                sChan = socket->param("name", false);
             }
             NoChannel* channel = network->findChannel(sChan);
             if (!channel) {
-                socket.printErrorPage("No such channel");
+                socket->printErrorPage("No such channel");
                 return true;
             }
 
@@ -548,7 +548,7 @@ public:
                 return ChanPage(socket, tmpl, network);
             }
 
-            socket.printErrorPage("No such username or network");
+            socket->printErrorPage("No such username or network");
             return true;
         } else if (page == "delchan") {
             NoNetwork* network = SafeGetNetworkFromParam(socket);
@@ -562,21 +562,21 @@ public:
                 return removeChannel(socket, network);
             }
 
-            socket.printErrorPage("No such username or network");
+            socket->printErrorPage("No such username or network");
             return true;
         } else if (page == "deluser") {
             if (!spSession->isAdmin()) {
                 return false;
             }
 
-            if (!socket.isPost()) {
+            if (!socket->isPost()) {
                 // Show the "Are you sure?" page:
 
-                NoString sUser = socket.param("user", false);
+                NoString sUser = socket->param("user", false);
                 NoUser* user = noApp->findUser(sUser);
 
                 if (!user) {
-                    socket.printErrorPage("No such username");
+                    socket->printErrorPage("No such username");
                     return true;
                 }
 
@@ -588,18 +588,18 @@ public:
             // The "Are you sure?" page has been submitted with "Yes",
             // so we actually delete the user now:
 
-            NoString sUser = socket.param("user");
+            NoString sUser = socket->param("user");
             NoUser* user = noApp->findUser(sUser);
 
             if (user && user == spSession->user()) {
-                socket.printErrorPage("Please don't delete yourself, suicide is not the answer!");
+                socket->printErrorPage("Please don't delete yourself, suicide is not the answer!");
                 return true;
             } else if (noApp->deleteUser(sUser)) {
-                socket.redirect(webPath() + "listusers");
+                socket->redirect(webPath() + "listusers");
                 return true;
             }
 
-            socket.printErrorPage("No such username");
+            socket->printErrorPage("No such username");
             return true;
         } else if (page == "edituser") {
             NoString userName = SafeGetUserNameParam(socket);
@@ -620,7 +620,7 @@ public:
                 return UserPage(socket, tmpl, user);
             }
 
-            socket.printErrorPage("No such username");
+            socket->printErrorPage("No such username");
             return true;
         } else if (page == "listusers" && spSession->isAdmin()) {
             return ListUsersPage(socket, tmpl);
@@ -647,18 +647,18 @@ public:
         return false;
     }
 
-    bool ChanPage(NoWebSocket& socket, NoTemplate& tmpl, NoNetwork* network, NoChannel* channel = nullptr)
+    bool ChanPage(NoWebSocket* socket, NoTemplate& tmpl, NoNetwork* network, NoChannel* channel = nullptr)
     {
-        std::shared_ptr<NoWebSession> spSession = socket.session();
+        std::shared_ptr<NoWebSession> spSession = socket->session();
         tmpl.setFile("add_edit_chan.tmpl");
         NoUser* user = network->user();
 
         if (!user) {
-            socket.printErrorPage("That user doesn't exist");
+            socket->printErrorPage("That user doesn't exist");
             return true;
         }
 
-        if (!socket.param("submitted").toUInt()) {
+        if (!socket->param("submitted").toUInt()) {
             tmpl["User"] = user->userName();
             tmpl["Network"] = network->name();
 
@@ -712,7 +712,7 @@ public:
                 modrow.insert(tmpl.begin(), tmpl.end());
                 modrow["WebadminAction"] = "display";
                 if (mod->onEmbeddedWebRequest(socket, "webadmin/channel", modrow)) {
-                    modrow["Embed"] = socket.findTemplate(mod, "WebadminChan.tmpl");
+                    modrow["Embed"] = socket->findTemplate(mod, "WebadminChan.tmpl");
                     modrow["ModName"] = mod->moduleName();
                 }
             }
@@ -720,11 +720,11 @@ public:
             return true;
         }
 
-        NoString sChanName = socket.param("name").trim_n();
+        NoString sChanName = socket->param("name").trim_n();
 
         if (!channel) {
             if (sChanName.empty()) {
-                socket.printErrorPage("channel name is a required argument");
+                socket->printErrorPage("channel name is a required argument");
                 return true;
             }
 
@@ -732,30 +732,30 @@ public:
             channel = new NoChannel(sChanName, network, true);
 
             if (network->findChannel(channel->name())) {
-                socket.printErrorPage("channel [" + channel->name() + "] already exists");
+                socket->printErrorPage("channel [" + channel->name() + "] already exists");
                 delete channel;
                 return true;
             }
 
             if (!network->addChannel(channel)) {
-                socket.printErrorPage("Could not add channel [" + channel->name() + "]");
+                socket->printErrorPage("Could not add channel [" + channel->name() + "]");
                 return true;
             }
         }
 
-        uint uBufferCount = socket.param("buffercount").toUInt();
+        uint uBufferCount = socket->param("buffercount").toUInt();
         if (channel->bufferCount() != uBufferCount) {
             channel->setBufferCount(uBufferCount, spSession->isAdmin());
         }
-        channel->setDefaultModes(socket.param("defmodes"));
-        channel->setInConfig(socket.param("save").toBool());
-        bool bAutoClearChanBuffer = socket.param("autoclearchanbuffer").toBool();
+        channel->setDefaultModes(socket->param("defmodes"));
+        channel->setInConfig(socket->param("save").toBool());
+        bool bAutoClearChanBuffer = socket->param("autoclearchanbuffer").toBool();
         if (channel->autoClearChanBuffer() != bAutoClearChanBuffer) {
-            channel->setAutoClearChanBuffer(socket.param("autoclearchanbuffer").toBool());
+            channel->setAutoClearChanBuffer(socket->param("autoclearchanbuffer").toBool());
         }
-        channel->setKey(socket.param("key"));
+        channel->setKey(socket->param("key"));
 
-        bool bDetached = socket.param("detached").toBool();
+        bool bDetached = socket->param("detached").toBool();
         if (channel->isDetached() != bDetached) {
             if (bDetached) {
                 channel->detachUser();
@@ -764,7 +764,7 @@ public:
             }
         }
 
-        bool bDisabled = socket.param("disabled").toBool();
+        bool bDisabled = socket->param("disabled").toBool();
         if (bDisabled)
             channel->disable();
         else
@@ -779,26 +779,26 @@ public:
         }
 
         if (!noApp->writeConfig()) {
-            socket.printErrorPage("channel added/modified, but config was not written");
+            socket->printErrorPage("channel added/modified, but config was not written");
             return true;
         }
 
-        if (socket.hasParam("submit_return")) {
-            socket.redirect(webPath() + "editnetwork?user=" + No::escape(user->userName(), No::UrlFormat) +
+        if (socket->hasParam("submit_return")) {
+            socket->redirect(webPath() + "editnetwork?user=" + No::escape(user->userName(), No::UrlFormat) +
                              "&network=" + No::escape(network->name(), No::UrlFormat));
         } else {
-            socket.redirect(webPath() + "editchan?user=" + No::escape(user->userName(), No::UrlFormat) + "&network=" +
+            socket->redirect(webPath() + "editchan?user=" + No::escape(user->userName(), No::UrlFormat) + "&network=" +
                              No::escape(network->name(), No::UrlFormat) + "&name=" + No::escape(channel->name(), No::UrlFormat));
         }
         return true;
     }
 
-    bool NetworkPage(NoWebSocket& socket, NoTemplate& tmpl, NoUser* user, NoNetwork* network = nullptr)
+    bool NetworkPage(NoWebSocket* socket, NoTemplate& tmpl, NoUser* user, NoNetwork* network = nullptr)
     {
-        std::shared_ptr<NoWebSession> spSession = socket.session();
+        std::shared_ptr<NoWebSession> spSession = socket->session();
         tmpl.setFile("add_edit_network.tmpl");
 
-        if (!socket.param("submitted").toUInt()) {
+        if (!socket->param("submitted").toUInt()) {
             tmpl["Username"] = user->userName();
 
             std::set<NoModuleInfo> ssNetworkMods = noApp->loader()->availableModules(No::NetworkModule);
@@ -920,7 +920,7 @@ public:
                 }
             } else {
                 if (!spSession->isAdmin() && !user->hasSpaceForNewNetwork()) {
-                    socket.printErrorPage("Network number limit reached. Ask an admin to increase the limit for you, "
+                    socket->printErrorPage("Network number limit reached. Ask an admin to increase the limit for you, "
                                            "or delete unneeded networks from Your Settings.");
                     return true;
                 }
@@ -939,7 +939,7 @@ public:
                 modrow.insert(tmpl.begin(), tmpl.end());
                 modrow["WebadminAction"] = "display";
                 if (mod->onEmbeddedWebRequest(socket, "webadmin/network", modrow)) {
-                    modrow["Embed"] = socket.findTemplate(mod, "WebadminNetwork.tmpl");
+                    modrow["Embed"] = socket->findTemplate(mod, "WebadminNetwork.tmpl");
                     modrow["ModName"] = mod->moduleName();
                 }
             }
@@ -970,13 +970,13 @@ public:
             return true;
         }
 
-        NoString name = socket.param("name").trim_n();
+        NoString name = socket->param("name").trim_n();
         if (name.empty()) {
-            socket.printErrorPage("Network name is a required argument");
+            socket->printErrorPage("Network name is a required argument");
             return true;
         }
         if (!network && !spSession->isAdmin() && !user->hasSpaceForNewNetwork()) {
-            socket.printErrorPage("Network number limit reached. Ask an admin to increase the limit for you, or "
+            socket->printErrorPage("Network number limit reached. Ask an admin to increase the limit for you, or "
                                    "delete few old ones from Your Settings");
             return true;
         }
@@ -985,7 +985,7 @@ public:
             NoNetwork* pOldNetwork = network;
             network = user->addNetwork(name, sNetworkAddError);
             if (!network) {
-                socket.printErrorPage(sNetworkAddError);
+                socket->printErrorPage(sNetworkAddError);
                 return true;
             }
             if (pOldNetwork) {
@@ -1001,19 +1001,19 @@ public:
 
         NoString arg;
 
-        network->setNick(socket.param("nick"));
-        network->setAltNick(socket.param("altnick"));
-        network->setIdent(socket.param("ident"));
-        network->setRealName(socket.param("realname"));
+        network->setNick(socket->param("nick"));
+        network->setAltNick(socket->param("altnick"));
+        network->setIdent(socket->param("ident"));
+        network->setRealName(socket->param("realname"));
 
-        network->setQuitMessage(socket.param("quitmsg"));
+        network->setQuitMessage(socket->param("quitmsg"));
 
-        network->setEnabled(socket.param("doconnect").toBool());
+        network->setEnabled(socket->param("doconnect").toBool());
 
-        arg = socket.param("bindhost");
+        arg = socket->param("bindhost");
         // To change BindHosts be admin or don't have DenysetBindHost
         if (spSession->isAdmin() || !spSession->user()->denysetBindHost()) {
-            NoString host = socket.param("bindhost");
+            NoString host = socket->param("bindhost");
             const NoStringVector& vsHosts = noApp->bindHosts();
             if (!spSession->isAdmin() && !vsHosts.empty()) {
                 NoStringVector::const_iterator it;
@@ -1033,21 +1033,21 @@ public:
             network->setBindHost(host);
         }
 
-        if (socket.param("floodprotection").toBool()) {
-            network->setFloodRate(socket.param("floodrate").toDouble());
-            network->setFloodBurst(socket.param("floodburst").toUShort());
+        if (socket->param("floodprotection").toBool()) {
+            network->setFloodRate(socket->param("floodrate").toDouble());
+            network->setFloodBurst(socket->param("floodburst").toUShort());
         } else {
             network->setFloodRate(-1);
         }
 
-        network->setJoinDelay(socket.param("joindelay").toUShort());
+        network->setJoinDelay(socket->param("joindelay").toUShort());
 
 #ifdef HAVE_ICU
-        NoString sEncodingUtf = socket.param("encoding_utf");
+        NoString sEncodingUtf = socket->param("encoding_utf");
         if (sEncodingUtf == "legacy") {
             network->setEncoding("");
         }
-        NoString sEncoding = socket.param("encoding");
+        NoString sEncoding = socket->param("encoding");
         if (sEncoding.empty()) {
             sEncoding = "UTF-8";
         }
@@ -1061,12 +1061,12 @@ public:
 #endif
 
         network->delServers();
-        NoStringVector vsArgs = socket.rawParam("servers").split("\n");
+        NoStringVector vsArgs = socket->rawParam("servers").split("\n");
         for (uint a = 0; a < vsArgs.size(); a++) {
             network->addServer(vsArgs[a].trim_n());
         }
 
-        vsArgs = socket.rawParam("fingerprints").split("\n");
+        vsArgs = socket->rawParam("fingerprints").split("\n");
         while (!network->trustedFingerprints().empty()) {
             network->removeTrustedFingerprint(*network->trustedFingerprints().begin());
         }
@@ -1074,17 +1074,17 @@ public:
             network->addTrustedFingerprint(fingerprint);
         }
 
-        socket.paramValues("channel", vsArgs);
+        socket->paramValues("channel", vsArgs);
         for (uint a = 0; a < vsArgs.size(); a++) {
             const NoString& sChan = vsArgs[a];
             NoChannel* channel = network->findChannel(sChan.trimRight_n("\r"));
             if (channel) {
-                channel->setInConfig(socket.param("save_" + sChan).toBool());
+                channel->setInConfig(socket->param("save_" + sChan).toBool());
             }
         }
 
         std::set<NoString> ssArgs;
-        socket.paramValues("loadmod", ssArgs);
+        socket->paramValues("loadmod", ssArgs);
         if (spSession->isAdmin() || !user->denyLoadMod()) {
             for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
                 NoString sModRet;
@@ -1092,7 +1092,7 @@ public:
                 NoString sModLoadError;
 
                 if (!name.empty()) {
-                    NoString args = socket.param("modargs_" + name);
+                    NoString args = socket->param("modargs_" + name);
 
                     NoModule* mod = network->loader()->findModule(name);
 
@@ -1108,7 +1108,7 @@ public:
 
                     if (!sModLoadError.empty()) {
                         NO_DEBUG(sModLoadError);
-                        socket.session()->addError(sModLoadError);
+                        socket->session()->addError(sModLoadError);
                     }
                 }
             }
@@ -1136,37 +1136,37 @@ public:
         }
 
         if (!noApp->writeConfig()) {
-            socket.printErrorPage("Network added/modified, but config was not written");
+            socket->printErrorPage("Network added/modified, but config was not written");
             return true;
         }
 
-        if (socket.hasParam("submit_return")) {
-            socket.redirect(webPath() + "edituser?user=" + No::escape(user->userName(), No::UrlFormat));
+        if (socket->hasParam("submit_return")) {
+            socket->redirect(webPath() + "edituser?user=" + No::escape(user->userName(), No::UrlFormat));
         } else {
-            socket.redirect(webPath() + "editnetwork?user=" + No::escape(user->userName(), No::UrlFormat) +
+            socket->redirect(webPath() + "editnetwork?user=" + No::escape(user->userName(), No::UrlFormat) +
                              "&network=" + No::escape(network->name(), No::UrlFormat));
         }
         return true;
     }
 
-    bool DelNetwork(NoWebSocket& socket, NoUser* user, NoTemplate& tmpl)
+    bool DelNetwork(NoWebSocket* socket, NoUser* user, NoTemplate& tmpl)
     {
-        NoString sNetwork = socket.param("name");
-        if (sNetwork.empty() && !socket.isPost()) {
-            sNetwork = socket.param("name", false);
+        NoString sNetwork = socket->param("name");
+        if (sNetwork.empty() && !socket->isPost()) {
+            sNetwork = socket->param("name", false);
         }
 
         if (!user) {
-            socket.printErrorPage("That user doesn't exist");
+            socket->printErrorPage("That user doesn't exist");
             return true;
         }
 
         if (sNetwork.empty()) {
-            socket.printErrorPage("That network doesn't exist for this user");
+            socket->printErrorPage("That network doesn't exist for this user");
             return true;
         }
 
-        if (!socket.isPost()) {
+        if (!socket->isPost()) {
             // Show the "Are you sure?" page:
 
             tmpl.setFile("del_network.tmpl");
@@ -1178,20 +1178,20 @@ public:
         user->deleteNetwork(sNetwork);
 
         if (!noApp->writeConfig()) {
-            socket.printErrorPage("Network deleted, but config was not written");
+            socket->printErrorPage("Network deleted, but config was not written");
             return true;
         }
 
-        socket.redirect(webPath() + "edituser?user=" + No::escape(user->userName(), No::UrlFormat));
+        socket->redirect(webPath() + "edituser?user=" + No::escape(user->userName(), No::UrlFormat));
         return false;
     }
 
-    bool removeChannel(NoWebSocket& socket, NoNetwork* network)
+    bool removeChannel(NoWebSocket* socket, NoNetwork* network)
     {
-        NoString sChan = socket.param("name", false);
+        NoString sChan = socket->param("name", false);
 
         if (sChan.empty()) {
-            socket.printErrorPage("That channel doesn't exist for this user");
+            socket->printErrorPage("That channel doesn't exist for this user");
             return true;
         }
 
@@ -1199,27 +1199,27 @@ public:
         network->putIrc("PART " + sChan);
 
         if (!noApp->writeConfig()) {
-            socket.printErrorPage("channel deleted, but config was not written");
+            socket->printErrorPage("channel deleted, but config was not written");
             return true;
         }
 
-        socket.redirect(webPath() + "editnetwork?user=" + No::escape(network->user()->userName(), No::UrlFormat) +
+        socket->redirect(webPath() + "editnetwork?user=" + No::escape(network->user()->userName(), No::UrlFormat) +
                          "&network=" + No::escape(network->name(), No::UrlFormat));
         return false;
     }
 
-    bool UserPage(NoWebSocket& socket, NoTemplate& tmpl, NoUser* user = nullptr)
+    bool UserPage(NoWebSocket* socket, NoTemplate& tmpl, NoUser* user = nullptr)
     {
-        std::shared_ptr<NoWebSession> spSession = socket.session();
+        std::shared_ptr<NoWebSession> spSession = socket->session();
         tmpl.setFile("add_edit_user.tmpl");
 
-        if (!socket.param("submitted").toUInt()) {
+        if (!socket->param("submitted").toUInt()) {
             if (user) {
                 tmpl["Action"] = "edituser";
                 tmpl["Title"] = "Edit User [" + user->userName() + "]";
                 tmpl["Edit"] = "true";
             } else {
-                NoString username = socket.param("clone", false);
+                NoString username = socket->param("clone", false);
                 user = noApp->findUser(username);
 
                 if (user) {
@@ -1355,7 +1355,7 @@ public:
             }
 
             std::vector<NoString> vDirs;
-            socket.availableSkins(vDirs);
+            socket->availableSkins(vDirs);
 
             for (uint d = 0; d < vDirs.size(); d++) {
                 const NoString& SubDir = vDirs[d];
@@ -1457,7 +1457,7 @@ public:
                 if (user && user->isAdmin()) {
                     o10["Checked"] = "true";
                 }
-                if (user && user == noApp->findUser(socket.username())) {
+                if (user && user == noApp->findUser(socket->username())) {
                     o10["Disabled"] = "true";
                 }
 
@@ -1482,7 +1482,7 @@ public:
                 modrow.insert(tmpl.begin(), tmpl.end());
                 modrow["WebadminAction"] = "display";
                 if (mod->onEmbeddedWebRequest(socket, "webadmin/user", modrow)) {
-                    modrow["Embed"] = socket.findTemplate(mod, "WebadminUser.tmpl");
+                    modrow["Embed"] = socket->findTemplate(mod, "WebadminUser.tmpl");
                     modrow["ModName"] = mod->moduleName();
                 }
             }
@@ -1492,15 +1492,15 @@ public:
 
         /* If user is nullptr, we are adding a user, else we are editing this one */
 
-        NoString username = socket.param("user");
+        NoString username = socket->param("user");
         if (!user && noApp->findUser(username)) {
-            socket.printErrorPage("Invalid Submission [User " + username + " already exists]");
+            socket->printErrorPage("Invalid Submission [User " + username + " already exists]");
             return true;
         }
 
         NoUser* pNewUser = GetNewUser(socket, user);
         if (!pNewUser) {
-            socket.printErrorPage("Invalid user settings");
+            socket->printErrorPage("Invalid user settings");
             return true;
         }
 
@@ -1508,7 +1508,7 @@ public:
         NoString action;
 
         if (!user) {
-            NoString sClone = socket.param("clone");
+            NoString sClone = socket->param("clone");
             if (NoUser* pCloneUser = noApp->findUser(sClone)) {
                 pNewUser->cloneNetworks(pCloneUser);
             }
@@ -1516,7 +1516,7 @@ public:
             // Add User Submission
             if (!noApp->addUser(pNewUser, sErr)) {
                 delete pNewUser;
-                socket.printErrorPage("Invalid submission [" + sErr + "]");
+                socket->printErrorPage("Invalid submission [" + sErr + "]");
                 return true;
             }
 
@@ -1526,7 +1526,7 @@ public:
             // Edit User Submission
             if (!user->clone(pNewUser, sErr, false)) {
                 delete pNewUser;
-                socket.printErrorPage("Invalid Submission [" + sErr + "]");
+                socket->printErrorPage("Invalid Submission [" + sErr + "]");
                 return true;
             }
 
@@ -1542,23 +1542,23 @@ public:
         }
 
         if (!noApp->writeConfig()) {
-            socket.printErrorPage("User " + action + ", but config was not written");
+            socket->printErrorPage("User " + action + ", but config was not written");
             return true;
         }
 
-        if (spSession->isAdmin() && socket.hasParam("submit_return")) {
-            socket.redirect(webPath() + "listusers");
+        if (spSession->isAdmin() && socket->hasParam("submit_return")) {
+            socket->redirect(webPath() + "listusers");
         } else {
-            socket.redirect(webPath() + "edituser?user=" + user->userName());
+            socket->redirect(webPath() + "edituser?user=" + user->userName());
         }
 
         /* we don't want the template to be printed while we redirect */
         return false;
     }
 
-    bool ListUsersPage(NoWebSocket& socket, NoTemplate& tmpl)
+    bool ListUsersPage(NoWebSocket* socket, NoTemplate& tmpl)
     {
-        std::shared_ptr<NoWebSession> spSession = socket.session();
+        std::shared_ptr<NoWebSession> spSession = socket->session();
         const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
         tmpl["Title"] = "Manage Users";
         tmpl["Action"] = "listusers";
@@ -1581,7 +1581,7 @@ public:
         return true;
     }
 
-    bool TrafficPage(NoWebSocket& socket, NoTemplate& tmpl)
+    bool TrafficPage(NoWebSocket* socket, NoTemplate& tmpl)
     {
         tmpl["Title"] = "Traffic info";
         tmpl["Uptime"] = noApp->uptime();
@@ -1646,18 +1646,18 @@ public:
         return true;
     }
 
-    bool AddListener(NoWebSocket& socket, NoTemplate& tmpl)
+    bool AddListener(NoWebSocket* socket, NoTemplate& tmpl)
     {
-        ushort port = socket.param("port").toUShort();
-        NoString host = socket.param("host");
-        NoString uriPrefix = socket.param("uriprefix");
+        ushort port = socket->param("port").toUShort();
+        NoString host = socket->param("host");
+        NoString uriPrefix = socket->param("uriprefix");
         if (host == "*")
             host = "";
-        bool ssl = socket.param("ssl").toBool();
-        bool bIPv4 = socket.param("ipv4").toBool();
-        bool bIPv6 = socket.param("ipv6").toBool();
-        bool bIRC = socket.param("irc").toBool();
-        bool bWeb = socket.param("web").toBool();
+        bool ssl = socket->param("ssl").toBool();
+        bool bIPv4 = socket->param("ipv4").toBool();
+        bool bIPv6 = socket->param("ipv6").toBool();
+        bool bIRC = socket->param("irc").toBool();
+        bool bWeb = socket->param("web").toBool();
 
         No::AddressType addressType = No::Ipv4AndIpv6Address;
         if (bIPv4) {
@@ -1670,7 +1670,7 @@ public:
             if (bIPv6) {
                 addressType = No::Ipv6Address;
             } else {
-                socket.session()->addError("Choose either IPv4 or IPv6 or both.");
+                socket->session()->addError("Choose either IPv4 or IPv6 or both.");
                 return SettingsPage(socket, tmpl);
             }
         }
@@ -1686,7 +1686,7 @@ public:
             if (bWeb) {
                 acceptType = No::AcceptHttp;
             } else {
-                socket.session()->addError("Choose either IRC or Web or both.");
+                socket->session()->addError("Choose either IRC or Web or both.");
                 return SettingsPage(socket, tmpl);
             }
         }
@@ -1694,24 +1694,24 @@ public:
         NoString message;
         if (noApp->addListener(port, host, uriPrefix, ssl, addressType, acceptType, message)) {
             if (!message.empty()) {
-                socket.session()->addSuccess(message);
+                socket->session()->addSuccess(message);
             }
             if (!noApp->writeConfig()) {
-                socket.session()->addError("Port changed, but config was not written");
+                socket->session()->addError("Port changed, but config was not written");
             }
         } else {
-            socket.session()->addError(message);
+            socket->session()->addError(message);
         }
 
         return SettingsPage(socket, tmpl);
     }
 
-    bool DelListener(NoWebSocket& socket, NoTemplate& tmpl)
+    bool DelListener(NoWebSocket* socket, NoTemplate& tmpl)
     {
-        ushort port = socket.param("port").toUShort();
-        NoString host = socket.param("host");
-        bool bIPv4 = socket.param("ipv4").toBool();
-        bool bIPv6 = socket.param("ipv6").toBool();
+        ushort port = socket->param("port").toUShort();
+        NoString host = socket->param("host");
+        bool bIPv4 = socket->param("ipv4").toBool();
+        bool bIPv6 = socket->param("ipv6").toBool();
 
         No::AddressType addressType = No::Ipv4AndIpv6Address;
         if (bIPv4) {
@@ -1724,7 +1724,7 @@ public:
             if (bIPv6) {
                 addressType = No::Ipv6Address;
             } else {
-                socket.session()->addError("Invalid request.");
+                socket->session()->addError("Invalid request.");
                 return SettingsPage(socket, tmpl);
             }
         }
@@ -1733,19 +1733,19 @@ public:
         if (pListener) {
             noApp->removeListener(pListener);
             if (!noApp->writeConfig()) {
-                socket.session()->addError("Port changed, but config was not written");
+                socket->session()->addError("Port changed, but config was not written");
             }
         } else {
-            socket.session()->addError("The specified listener was not found.");
+            socket->session()->addError("The specified listener was not found.");
         }
 
         return SettingsPage(socket, tmpl);
     }
 
-    bool SettingsPage(NoWebSocket& socket, NoTemplate& tmpl)
+    bool SettingsPage(NoWebSocket* socket, NoTemplate& tmpl)
     {
         tmpl.setFile("settings.tmpl");
-        if (!socket.param("submitted").toUInt()) {
+        if (!socket->param("submitted").toUInt()) {
             tmpl["Action"] = "settings";
             tmpl["Title"] = "Settings";
             tmpl["StatusPrefix"] = noApp->statusPrefix();
@@ -1784,7 +1784,7 @@ public:
                 // simple protection for user from shooting his own foot
                 // TODO check also for hosts/families
                 // such check is only here, user still can forge HTTP request to delete web port
-                l["SuggestDeletion"] = NoString(pListener->port() != socket.localPort());
+                l["SuggestDeletion"] = NoString(pListener->port() != socket->localPort());
 
 #ifdef HAVE_LIBSSL
                 if (pListener->isSsl()) {
@@ -1811,7 +1811,7 @@ public:
             }
 
             std::vector<NoString> vDirs;
-            socket.availableSkins(vDirs);
+            socket->availableSkins(vDirs);
 
             for (uint d = 0; d < vDirs.size(); d++) {
                 const NoString& SubDir = vDirs[d];
@@ -1880,22 +1880,22 @@ public:
         }
 
         NoString arg;
-        arg = socket.param("statusprefix");
+        arg = socket->param("statusprefix");
         noApp->setStatusPrefix(arg);
-        arg = socket.param("maxbufsize");
+        arg = socket->param("maxbufsize");
         noApp->setMaxBufferSize(arg.toUInt());
-        arg = socket.param("connectdelay");
+        arg = socket->param("connectdelay");
         noApp->setConnectDelay(arg.toUInt());
-        arg = socket.param("serverthrottle");
+        arg = socket->param("serverthrottle");
         noApp->setServerThrottle(arg.toUInt());
-        arg = socket.param("anoniplimit");
+        arg = socket->param("anoniplimit");
         noApp->setAnonIpLimit(arg.toUInt());
-        arg = socket.param("protectwebsessions");
+        arg = socket->param("protectwebsessions");
         noApp->setProtectWebSessions(arg.toBool());
-        arg = socket.param("hideversion");
+        arg = socket->param("hideversion");
         noApp->setHideVersion(arg.toBool());
 
-        NoStringVector vsArgs = socket.rawParam("motd").split("\n");
+        NoStringVector vsArgs = socket->rawParam("motd").split("\n");
         noApp->clearMotd();
 
         uint a = 0;
@@ -1903,17 +1903,17 @@ public:
             noApp->addMotd(vsArgs[a].trimRight_n());
         }
 
-        vsArgs = socket.rawParam("bindhosts").split("\n");
+        vsArgs = socket->rawParam("bindhosts").split("\n");
         noApp->clearBindHosts();
 
         for (a = 0; a < vsArgs.size(); a++) {
             noApp->addBindHost(vsArgs[a].trim_n());
         }
 
-        noApp->setSkinName(socket.param("skin"));
+        noApp->setSkinName(socket->param("skin"));
 
         std::set<NoString> ssArgs;
-        socket.paramValues("loadmod", ssArgs);
+        socket->paramValues("loadmod", ssArgs);
 
         for (std::set<NoString>::iterator it = ssArgs.begin(); it != ssArgs.end(); ++it) {
             NoString sModRet;
@@ -1921,7 +1921,7 @@ public:
             NoString sModLoadError;
 
             if (!name.empty()) {
-                NoString args = socket.param("modargs_" + name);
+                NoString args = socket->param("modargs_" + name);
 
                 NoModule* mod = noApp->loader()->findModule(name);
                 if (!mod) {
@@ -1936,7 +1936,7 @@ public:
 
                 if (!sModLoadError.empty()) {
                     NO_DEBUG(sModLoadError);
-                    socket.session()->addError(sModLoadError);
+                    socket->session()->addError(sModLoadError);
                 }
             }
         }
@@ -1956,10 +1956,10 @@ public:
         }
 
         if (!noApp->writeConfig()) {
-            socket.session()->addError("Settings changed, but config was not written");
+            socket->session()->addError("Settings changed, but config was not written");
         }
 
-        socket.redirect(webPath() + "settings");
+        socket->redirect(webPath() + "settings");
         /* we don't want the template to be printed while we redirect */
         return false;
     }
