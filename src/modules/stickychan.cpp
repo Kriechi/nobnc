@@ -21,6 +21,8 @@
 #include <nobnc/nowebsocket.h>
 #include <nobnc/nowebsession.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/noutils.h>
+#include <nobnc/notimer.h>
 
 class NoStickyChan : public NoModule
 {

@@ -20,6 +20,8 @@
 #include <nobnc/noircsocket.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
+#include <nobnc/notimer.h>
+#include <nobnc/noutils.h>
 
 class NoKeepNickTimer : public NoTimer
 {

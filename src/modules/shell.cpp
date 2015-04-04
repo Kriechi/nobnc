@@ -22,6 +22,7 @@
 #include <nobnc/noprocess.h>
 #include <nobnc/noclient.h>
 #include <nobnc/nosocketmanager.h>
+#include <nobnc/noutils.h>
 
 // Forward Declaration
 class NoShellMod;

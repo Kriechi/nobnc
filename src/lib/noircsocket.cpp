@@ -29,6 +29,7 @@
 #include "nonick.h"
 #include "nohostmask.h"
 #include "Csocket/Csocket.h"
+#include <deque>
 
 #define IRCSOCKMODULECALL(macFUNC, macEXITER) \
     NETWORKMODULECALL(macFUNC, d->network->user(), d->network, nullptr, macEXITER)

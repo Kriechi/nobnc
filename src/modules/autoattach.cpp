@@ -19,6 +19,8 @@
 #include <nobnc/nochannel.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/noutils.h>
+#include <nobnc/notable.h>
 
 class NoAttachMatch
 {

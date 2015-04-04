@@ -16,6 +16,7 @@
  */
 
 #include <nobnc/nomodule.h>
+#include <nobnc/noutils.h>
 
 class NoBlockMotd : public NoModule
 {

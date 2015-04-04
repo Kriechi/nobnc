@@ -17,6 +17,7 @@
 
 #include "nowebsession.h"
 #include "nosocket_p.h"
+#include "nowebpage.h"
 #include "nowebsocket.h"
 #include "nomodule_p.h"
 #include "nocachemap.h"

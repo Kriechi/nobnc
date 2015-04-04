@@ -22,6 +22,7 @@
 #include <nobnc/nowebsocket.h>
 #include <nobnc/nowebsession.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/notable.h>
 
 class NoLastSeenMod : public NoModule
 {

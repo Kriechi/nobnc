@@ -26,6 +26,7 @@
 #include <nobnc/noapp.h>
 #include <nobnc/nonick.h>
 #include <nobnc/noutils.h>
+#include <nobnc/notable.h>
 
 template <std::size_t N>
 struct array_size_helper

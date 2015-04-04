@@ -30,6 +30,7 @@
 #include "noapp.h"
 #include "noescape.h"
 #include "nonick.h"
+#include "notable.h"
 
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                           \
     {                                                                       \

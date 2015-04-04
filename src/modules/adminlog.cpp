@@ -24,6 +24,7 @@
 #include <nobnc/noclient.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nosocket.h>
+#include <nobnc/noutils.h>
 
 #include <syslog.h>
 #include <unistd.h>

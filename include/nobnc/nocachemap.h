@@ -19,6 +19,7 @@
 #define NOCACHEMAP_H
 
 #include <nobnc/noglobal.h>
+#include <nobnc/noutils.h>
 #include <map>
 #include <utility>
 

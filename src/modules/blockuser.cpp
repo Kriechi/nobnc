@@ -24,6 +24,7 @@
 #include <nobnc/nowebsocket.h>
 #include <nobnc/nowebsession.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/notable.h>
 
 #define MESSAGE "Your account has been disabled. Contact your administrator."
 

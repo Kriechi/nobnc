@@ -21,6 +21,7 @@
 #include "nodir.h"
 #include "noapp.h"
 #include <dlfcn.h>
+#include <queue>
 
 bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 

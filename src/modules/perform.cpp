@@ -19,6 +19,8 @@
 #include <nobnc/nonetwork.h>
 #include <nobnc/nowebsocket.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/noutils.h>
+#include <nobnc/notable.h>
 
 class NoPerform : public NoModule
 {

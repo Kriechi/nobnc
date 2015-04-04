@@ -22,6 +22,7 @@
 #include <nobnc/noclient.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/notable.h>
 
 // If you change these and it breaks, you get to keep the pieces
 #define CHAN_PREFIX_1 "~"

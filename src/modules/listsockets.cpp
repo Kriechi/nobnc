@@ -20,6 +20,9 @@
 #include <nobnc/noapp.h>
 #include <nobnc/nosocket.h>
 #include <nobnc/notemplate.h>
+#include <nobnc/notable.h>
+
+#include <queue>
 
 class NoSocketSorter
 {

@@ -30,6 +30,8 @@
 #include <nobnc/nomodulesocket.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
+#include <nobnc/notimer.h>
+#include <nobnc/notable.h>
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>

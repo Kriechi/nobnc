@@ -20,6 +20,8 @@
 #include <nobnc/noircsocket.h>
 #include <nobnc/noclient.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/notimer.h>
+#include <nobnc/noutils.h>
 
 struct reply
 {

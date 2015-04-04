@@ -38,6 +38,7 @@
 #include <nobnc/noclient.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
+#include <nobnc/notimer.h>
 
 #define CRYPT_VERIFICATION_TOKEN "::__:AWAY:__::"
 

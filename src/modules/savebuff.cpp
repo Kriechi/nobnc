@@ -36,6 +36,7 @@
 #include <nobnc/noescape.h>
 #include <nobnc/nomessage.h>
 #include <nobnc/nobuffer.h>
+#include <nobnc/notimer.h>
 
 #define LEGACY_VERIFICATION_TOKEN "::__:SAVEBUFF:__::"
 #define CHAN_VERIFICATION_TOKEN "::__:CHANBUFF:__::"

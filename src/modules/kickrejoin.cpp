@@ -27,6 +27,8 @@
 #include <nobnc/nochannel.h>
 #include <nobnc/nonetwork.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/notimer.h>
+#include <nobnc/noutils.h>
 
 class NoRejoinJob : public NoTimer
 {

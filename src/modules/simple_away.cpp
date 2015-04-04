@@ -19,6 +19,8 @@
 #include <nobnc/nouser.h>
 #include <nobnc/nonetwork.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/notimer.h>
+#include <nobnc/noutils.h>
 
 #define SIMPLE_AWAY_DEFAULT_REASON "Auto away at %s"
 #define SIMPLE_AWAY_DEFAULT_TIME 60

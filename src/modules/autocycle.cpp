@@ -22,6 +22,7 @@
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
+#include <nobnc/notable.h>
 
 class NoAutoCycleMod : public NoModule
 {

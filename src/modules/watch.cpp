@@ -23,6 +23,8 @@
 #include <nobnc/nonick.h>
 #include <nobnc/nobuffer.h>
 #include <nobnc/nohostmask.h>
+#include <nobnc/noutils.h>
+#include <nobnc/notable.h>
 
 #include <list>
 

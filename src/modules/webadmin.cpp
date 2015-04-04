@@ -30,6 +30,7 @@
 #include <nobnc/nolistener.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
+#include <nobnc/nowebpage.h>
 
 template <typename T>
 static std::vector<NoModule*> allModules(T* p)

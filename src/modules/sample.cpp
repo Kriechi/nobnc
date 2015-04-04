@@ -21,6 +21,8 @@
 #include <nobnc/nomodulejob.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
+#include <nobnc/notimer.h>
+
 #include <unistd.h>
 
 #ifdef HAVE_PTHREAD

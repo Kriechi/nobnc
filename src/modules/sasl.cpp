@@ -20,6 +20,8 @@
 #include <nobnc/noircsocket.h>
 #include <nobnc/nodebug.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/notable.h>
+#include <nobnc/noutils.h>
 
 static const struct
 {

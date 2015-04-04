@@ -20,6 +20,7 @@
 #include <nobnc/nochannel.h>
 #include <nobnc/nonetwork.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/noutils.h>
 
 #include <sstream>
 #include <stdexcept>

@@ -23,6 +23,7 @@
 #include <nobnc/nodebug.h>
 #include <nobnc/noclient.h>
 #include <nobnc/nomodulesocket.h>
+#include <nobnc/notable.h>
 
 #include <netinet/in.h>
 #include <arpa/inet.h>

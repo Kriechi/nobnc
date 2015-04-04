@@ -20,6 +20,7 @@
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
+#include <nobnc/noutils.h>
 
 class NoCtcpFloodMod : public NoModule
 {

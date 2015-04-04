@@ -27,6 +27,8 @@
 #include "nomodulejob.h"
 #include "nothread.h"
 #include "nomodulesocket.h"
+#include "notimer.h"
+#include "notable.h"
 #include <dlfcn.h>
 
 NoModule::NoModule(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)

@@ -21,6 +21,7 @@
 #include <nobnc/notemplate.h>
 #include <nobnc/nowebsocket.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/notable.h>
 
 class NoNotesMod : public NoModule
 {

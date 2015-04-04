@@ -27,6 +27,7 @@
 #include <nobnc/nowebsession.h>
 #include <nobnc/nolistener.h>
 #include <nobnc/noregistry.h>
+#include <nobnc/notable.h>
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>
