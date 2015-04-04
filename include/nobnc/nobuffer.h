@@ -38,7 +38,7 @@ public:
     uint updateExactMessage(const NoString& format, const NoString& text = "");
 
     const NoMessage& message(uint idx) const;
-    NoString message(uint idx, const NoClient& client, const NoStringMap& params = NoStringMap()) const;
+    NoString message(uint idx, NoClient* client, const NoStringMap& params = NoStringMap()) const;
 
     uint size() const;
     bool isEmpty() const;

@@ -848,7 +848,7 @@ void NoClient::putClient(const NoString& line)
 {
     bool bReturn = false;
     NoString sCopy = line;
-    NETWORKMODULECALL(onSendToClient(sCopy, *this), d->user, d->network, this, &bReturn);
+    NETWORKMODULECALL(onSendToClient(sCopy, this), d->user, d->network, this, &bReturn);
     if (bReturn)
         return;
     NO_DEBUG("(" << fullName() << ") ZNC -> CLI [" << sCopy << "]");

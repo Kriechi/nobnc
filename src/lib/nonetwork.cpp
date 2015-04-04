@@ -624,7 +624,7 @@ void NoNetwork::clientConnected(NoClient* client)
 
         uSize = d->rawBuffer.size();
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            client->putClient(d->rawBuffer.message(uIdx, *client, msParams));
+            client->putClient(d->rawBuffer.message(uIdx, client, msParams));
         }
 
         const NoNick& nick = ircNick();
@@ -641,7 +641,7 @@ void NoNetwork::clientConnected(NoClient* client)
     uSize = d->motdBuffer.size();
     if (uSize > 0) {
         for (uIdx = 0; uIdx < uSize; uIdx++) {
-            client->putClient(d->motdBuffer.message(uIdx, *client, msParams));
+            client->putClient(d->motdBuffer.message(uIdx, client, msParams));
         }
     }
 
@@ -682,9 +682,9 @@ void NoNetwork::clientConnected(NoClient* client)
     uSize = d->noticeBuffer.size();
     for (uIdx = 0; uIdx < uSize; uIdx++) {
         const NoMessage& BufLine = d->noticeBuffer.message(uIdx);
-        NoString line = BufLine.formatted(*client, msParams);
+        NoString line = BufLine.formatted(client, msParams);
         bool bContinue = false;
-        NETWORKMODULECALL(onPrivBufferPlayLine2(*client, line, BufLine.timestamp()), d->user, this, nullptr, &bContinue);
+        NETWORKMODULECALL(onPrivBufferPlayLine2(client, line, BufLine.timestamp()), d->user, this, nullptr, &bContinue);
         if (bContinue)
             continue;
         client->putClient(line);

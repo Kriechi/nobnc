@@ -101,12 +101,12 @@ public:
     bool onPart(const NoNick& nick, NoChannel* channel, const NoString& message);
     bool onInvite(const NoNick& nick, const NoString& sChan);
 
-    bool onChanBufferStarting(NoChannel* channel, NoClient& client);
-    bool onChanBufferEnding(NoChannel* channel, NoClient& client);
-    bool onChanBufferPlayLine2(NoChannel* channel, NoClient& client, NoString& line, const timeval& tv);
-    bool onChanBufferPlayLine(NoChannel* channel, NoClient& client, NoString& line);
-    bool onPrivBufferPlayLine2(NoClient& client, NoString& line, const timeval& tv);
-    bool onPrivBufferPlayLine(NoClient& client, NoString& line);
+    bool onChanBufferStarting(NoChannel* channel, NoClient* client);
+    bool onChanBufferEnding(NoChannel* channel, NoClient* client);
+    bool onChanBufferPlayLine2(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
+    bool onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line);
+    bool onPrivBufferPlayLine2(NoClient* client, NoString& line, const timeval& tv);
+    bool onPrivBufferPlayLine(NoClient* client, NoString& line);
 
     bool onClientLogin();
     bool onClientDisconnect();
@@ -137,7 +137,7 @@ public:
     bool onAddNetwork(NoNetwork& network, NoString& error);
     bool onDeleteNetwork(NoNetwork& network);
 
-    bool onSendToClient(NoString& line, NoClient& client);
+    bool onSendToClient(NoString& line, NoClient* client);
     bool onSendToIrc(NoString& line);
 
     bool onServerCapAvailable(const NoString& cap);

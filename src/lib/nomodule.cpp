@@ -587,28 +587,28 @@ NoModule::ModRet NoModule::onInvite(const NoNick& nick, const NoString& sChan)
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onChanBufferStarting(NoChannel* channel, NoClient& client)
+NoModule::ModRet NoModule::onChanBufferStarting(NoChannel* channel, NoClient* client)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onChanBufferEnding(NoChannel* channel, NoClient& client)
+NoModule::ModRet NoModule::onChanBufferEnding(NoChannel* channel, NoClient* client)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onChanBufferPlayLine(NoChannel* channel, NoClient& client, NoString& line)
+NoModule::ModRet NoModule::onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivBufferPlayLine(NoClient& client, NoString& line)
+NoModule::ModRet NoModule::onPrivBufferPlayLine(NoClient* client, NoString& line)
 {
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onChanBufferPlayLine2(NoChannel* channel, NoClient& client, NoString& line, const timeval& tv)
+NoModule::ModRet NoModule::onChanBufferPlayLine2(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
 {
     return onChanBufferPlayLine(channel, client, line);
 }
-NoModule::ModRet NoModule::onPrivBufferPlayLine2(NoClient& client, NoString& line, const timeval& tv)
+NoModule::ModRet NoModule::onPrivBufferPlayLine2(NoClient* client, NoString& line, const timeval& tv)
 {
     return onPrivBufferPlayLine(client, line);
 }
@@ -717,7 +717,7 @@ NoModule::ModRet NoModule::onDeleteNetwork(NoNetwork& network)
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onSendToClient(NoString& line, NoClient& client)
+NoModule::ModRet NoModule::onSendToClient(NoString& line, NoClient* client)
 {
     return CONTINUE;
 }

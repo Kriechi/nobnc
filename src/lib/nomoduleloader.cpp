@@ -392,27 +392,27 @@ bool NoModuleLoader::onInvite(const NoNick& nick, const NoString& sChan)
 {
     MODHALTCHK(onInvite(nick, sChan));
 }
-bool NoModuleLoader::onChanBufferStarting(NoChannel* channel, NoClient& client)
+bool NoModuleLoader::onChanBufferStarting(NoChannel* channel, NoClient* client)
 {
     MODHALTCHK(onChanBufferStarting(channel, client));
 }
-bool NoModuleLoader::onChanBufferEnding(NoChannel* channel, NoClient& client)
+bool NoModuleLoader::onChanBufferEnding(NoChannel* channel, NoClient* client)
 {
     MODHALTCHK(onChanBufferEnding(channel, client));
 }
-bool NoModuleLoader::onChanBufferPlayLine2(NoChannel* channel, NoClient& client, NoString& line, const timeval& tv)
+bool NoModuleLoader::onChanBufferPlayLine2(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
 {
     MODHALTCHK(onChanBufferPlayLine2(channel, client, line, tv));
 }
-bool NoModuleLoader::onChanBufferPlayLine(NoChannel* channel, NoClient& client, NoString& line)
+bool NoModuleLoader::onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line)
 {
     MODHALTCHK(onChanBufferPlayLine(channel, client, line));
 }
-bool NoModuleLoader::onPrivBufferPlayLine2(NoClient& client, NoString& line, const timeval& tv)
+bool NoModuleLoader::onPrivBufferPlayLine2(NoClient* client, NoString& line, const timeval& tv)
 {
     MODHALTCHK(onPrivBufferPlayLine2(client, line, tv));
 }
-bool NoModuleLoader::onPrivBufferPlayLine(NoClient& client, NoString& line)
+bool NoModuleLoader::onPrivBufferPlayLine(NoClient* client, NoString& line)
 {
     MODHALTCHK(onPrivBufferPlayLine(client, line));
 }
@@ -468,7 +468,7 @@ bool NoModuleLoader::onDeleteNetwork(NoNetwork& network)
 {
     MODHALTCHK(onDeleteNetwork(network));
 }
-bool NoModuleLoader::onSendToClient(NoString& line, NoClient& client)
+bool NoModuleLoader::onSendToClient(NoString& line, NoClient* client)
 {
     MODHALTCHK(onSendToClient(line, client));
 }

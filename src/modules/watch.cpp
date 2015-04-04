@@ -240,7 +240,7 @@ public:
 
         size_t uSize = m_Buffer.size();
         for (uint uIdx = 0; uIdx < uSize; uIdx++) {
-            putUser(m_Buffer.message(uIdx, *client(), msParams));
+            putUser(m_Buffer.message(uIdx, client(), msParams));
         }
         m_Buffer.clear();
     }

@@ -410,13 +410,13 @@ public:
      *  @param client The client the buffer will be played back to.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferStarting(NoChannel* channel, NoClient& client);
+    virtual ModRet onChanBufferStarting(NoChannel* channel, NoClient* client);
     /** Called after a channel buffer was played back to a client.
      *  @param channel The channel which was played back.
      *  @param client The client the buffer was played back to.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferEnding(NoChannel* channel, NoClient& client);
+    virtual ModRet onChanBufferEnding(NoChannel* channel, NoClient* client);
     /** Called when for each line during a channel's buffer play back.
      *  @param channel The channel this playback is from.
      *  @param client The client the buffer is played back to.
@@ -425,16 +425,16 @@ public:
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferPlayLine2(NoChannel* channel, NoClient& client, NoString& line, const timeval& tv);
-    virtual ModRet onChanBufferPlayLine(NoChannel* channel, NoClient& client, NoString& line);
+    virtual ModRet onChanBufferPlayLine2(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
+    virtual ModRet onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line);
     /** Called when a line from the query buffer is played back.
      *  @param client The client this line will go to.
      *  @param line The raw IRC traffic line from the buffer.
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivBufferPlayLine2(NoClient& client, NoString& line, const timeval& tv);
-    virtual ModRet onPrivBufferPlayLine(NoClient& client, NoString& line);
+    virtual ModRet onPrivBufferPlayLine2(NoClient* client, NoString& line, const timeval& tv);
+    virtual ModRet onPrivBufferPlayLine(NoClient* client, NoString& line);
 
     /** Called when a client successfully logged in to ZNC. */
     virtual void onClientLogin();
@@ -619,7 +619,7 @@ public:
      *  @warning Calling putUser() from within this hook leads to infinite recursion.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onSendToClient(NoString& line, NoClient& client);
+    virtual ModRet onSendToClient(NoString& line, NoClient* client);
     /** Called when ZNC sends a raw traffic line to the IRC server.
      *  @param line The raw traffic line sent.
      *  @warning Calling putIrc() from within this hook leads to infinite recursion.

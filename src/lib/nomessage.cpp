@@ -63,16 +63,16 @@ NoMessage::~NoMessage()
 {
 }
 
-NoString NoMessage::formatted(const NoClient& client, const NoStringMap& params) const
+NoString NoMessage::formatted(NoClient* client, const NoStringMap& params) const
 {
     NoStringMap copy = params;
 
-    if (client.hasServerTime()) {
+    if (client->hasServerTime()) {
         copy["text"] = d->text;
         NoString str = No::namedFormat(d->format, copy);
         return "@time=" + No::formatServerTime(d->ts) + " " + str;
     } else {
-        copy["text"] = client.user()->addTimestamp(d->ts.tv_sec, d->text);
+        copy["text"] = client->user()->addTimestamp(d->ts.tv_sec, d->text);
         return No::namedFormat(d->format, copy);
     }
 }

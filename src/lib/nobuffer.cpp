@@ -80,7 +80,7 @@ const NoMessage& NoBuffer::message(uint idx) const
     return d->lines[idx];
 }
 
-NoString NoBuffer::message(uint idx, const NoClient& client, const NoStringMap& params) const
+NoString NoBuffer::message(uint idx, NoClient* client, const NoStringMap& params) const
 {
     return d->lines[idx].formatted(client, params);
 }

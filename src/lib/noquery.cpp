@@ -112,14 +112,14 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                         }
                     }
 
-                    NoString line = message.formatted(*useClient, params);
+                    NoString line = message.formatted(useClient, params);
                     if (batch) {
                         NoStringMap tags = No::messageTags(line);
                         tags["batch"] = batchName;
                         No::setMessageTags(line, tags);
                     }
                     bool skip = false;
-                    NETWORKMODULECALL(onPrivBufferPlayLine2(*useClient, line, message.timestamp()), d->network->user(), d->network, nullptr, &skip);
+                    NETWORKMODULECALL(onPrivBufferPlayLine2(useClient, line, message.timestamp()), d->network->user(), d->network, nullptr, &skip);
                     if (skip)
                         continue;
                     d->network->putUser(line, useClient);

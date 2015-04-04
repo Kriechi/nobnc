@@ -668,7 +668,7 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                 pUseClient->setPlaybackActive(true);
 
                 bool skipStatusMsg = pUseClient->hasServerTime();
-                NETWORKMODULECALL(onChanBufferStarting(this, *pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
+                NETWORKMODULECALL(onChanBufferStarting(this, pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
 
                 if (!skipStatusMsg) {
                     d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Buffer Playback...", pUseClient);
@@ -684,14 +684,14 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                 size_t uSize = Buffer.size();
                 for (size_t uIdx = 0; uIdx < uSize; uIdx++) {
                     const NoMessage& BufLine = Buffer.message(uIdx);
-                    NoString line = BufLine.formatted(*pUseClient, NoStringMap());
+                    NoString line = BufLine.formatted(pUseClient, NoStringMap());
                     if (bBatch) {
                         NoStringMap msBatchTags = No::messageTags(line);
                         msBatchTags["batch"] = sBatchName;
                         No::setMessageTags(line, msBatchTags);
                     }
                     bool bNotShowThisLine = false;
-                    NETWORKMODULECALL(onChanBufferPlayLine2(this, *pUseClient, line, BufLine.timestamp()),
+                    NETWORKMODULECALL(onChanBufferPlayLine2(this, pUseClient, line, BufLine.timestamp()),
                                       d->network->user(),
                                       d->network,
                                       nullptr,
@@ -702,7 +702,7 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                 }
 
                 skipStatusMsg = pUseClient->hasServerTime();
-                NETWORKMODULECALL(onChanBufferEnding(this, *pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
+                NETWORKMODULECALL(onChanBufferEnding(this, pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
                 if (!skipStatusMsg) {
                     d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Playback Complete.", pUseClient);
                 }

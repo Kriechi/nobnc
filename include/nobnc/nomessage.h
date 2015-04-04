@@ -35,7 +35,7 @@ public:
     ~NoMessage();
 
     // TODO: better name
-    NoString formatted(const NoClient& client, const NoStringMap& params) const;
+    NoString formatted(NoClient* client, const NoStringMap& params) const;
 
     NoString format() const;
     void setFormat(const NoString& format);
