@@ -167,13 +167,6 @@ public:
         HALTCORE = 4
     };
 
-    enum ModException {
-        /** Your module can throw this enum at any given time. When this
-         * is thrown, the module will be unloaded.
-         */
-        UNLOAD
-    };
-
     /** This function throws NoModule::UNLOAD which causes this module to be unloaded.
      */
     void unload();

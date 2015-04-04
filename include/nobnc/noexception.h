@@ -23,7 +23,7 @@
 class NO_EXPORT NoException
 {
 public:
-    enum Type { Shutdown, Restart };
+    enum Type { Shutdown, Restart, Unload };
 
     NoException(Type type);
     virtual ~NoException();

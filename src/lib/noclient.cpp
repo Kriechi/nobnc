@@ -31,6 +31,7 @@
 #include "noescape.h"
 #include "nonick.h"
 #include "notable.h"
+#include "noexception.h"
 
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                           \
     {                                                                       \
@@ -40,8 +41,8 @@
                 NoModulePrivate::get(module)->client = CLIENT;                                 \
                 module->FUNC;                                              \
                 NoModulePrivate::get(module)->client = nullptr;                                \
-            } catch (const NoModule::ModException& e) {                     \
-                if (e == NoModule::UNLOAD) {                                \
+            } catch (const NoException& e) {                     \
+                if (e.type() == NoException::Unload) {                                \
                     (NETWORK)->loader()->unloadModule(MOD);                 \
                 }                                                           \
             }                                                               \
@@ -52,8 +53,8 @@
                 module->FUNC;                                              \
                 NoModulePrivate::get(module)->client = nullptr;                                \
                 NoModulePrivate::get(module)->network = nullptr;                               \
-            } catch (const NoModule::ModException& e) {                     \
-                if (e == NoModule::UNLOAD) {                                \
+            } catch (const NoException& e) {                     \
+                if (e.type() == NoException::Unload) {                                \
                     (USER)->loader()->unloadModule(MOD);                    \
                 }                                                           \
             }                                                               \
@@ -66,8 +67,8 @@
                 NoModulePrivate::get(module)->client = nullptr;                                \
                 NoModulePrivate::get(module)->network = nullptr;                               \
                 NoModulePrivate::get(module)->user = nullptr;                                  \
-            } catch (const NoModule::ModException& e) {                     \
-                if (e == NoModule::UNLOAD) {                                \
+            } catch (const NoException& e) {                     \
+                if (e.type() == NoException::Unload) {                                \
                     noApp->loader()->unloadModule(MOD);            \
                 }                                                           \
             }                                                               \

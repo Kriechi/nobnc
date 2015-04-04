@@ -29,6 +29,7 @@
 #include "nomodulesocket.h"
 #include "notimer.h"
 #include "notable.h"
+#include "noexception.h"
 #include <dlfcn.h>
 
 NoModule::NoModule(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
@@ -60,7 +61,7 @@ NoModule::~NoModule()
 
 void NoModule::unload()
 {
-    throw UNLOAD;
+    throw NoException(NoException::Unload);
 }
 
 NoString NoModule::expandString(const NoString& str) const

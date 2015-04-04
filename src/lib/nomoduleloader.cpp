@@ -16,6 +16,7 @@
  */
 
 #include "nomoduleloader.h"
+#include "noexception.h"
 #include "nomodule_p.h"
 #include "nofile.h"
 #include "nodir.h"
@@ -51,8 +52,8 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             if (d->network)                         \
                 NoModulePrivate::get(mod)->network = oldNetwork;         \
             NoModulePrivate::get(mod)->client = oldClient;            \
-        } catch (const NoModule::ModException& e) { \
-            if (e == NoModule::UNLOAD) {            \
+        } catch (const NoException& e) { \
+            if (e.type() == NoException::Unload) {            \
                 unloadModule(mod->moduleName());   \
             }                                       \
         }                                           \
@@ -90,8 +91,8 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
                 bHaltCore = true;                    \
                 break;                               \
             }                                        \
-        } catch (const NoModule::ModException& e) {  \
-            if (e == NoModule::UNLOAD) {             \
+        } catch (const NoException& e) {  \
+            if (e.type() == NoException::Unload) {             \
                 unloadModule(mod->moduleName());    \
             }                                        \
         }                                            \
@@ -183,8 +184,8 @@ bool NoModuleLoader::onBoot()
             if (!mod->onBoot()) {
                 return true;
             }
-        } catch (const NoModule::ModException& e) {
-            if (e == NoModule::UNLOAD) {
+        } catch (const NoException& e) {
+            if (e.type() == NoException::Unload) {
                 unloadModule(mod->moduleName());
             }
         }
@@ -473,8 +474,8 @@ bool NoModuleLoader::onServerCapAvailable(const NoString& cap)
                 bResult |= mod->onServerCapAvailable(cap);
             }
             NoModulePrivate::get(mod)->client = oldClient;
-        } catch (const NoModule::ModException& e) {
-            if (NoModule::UNLOAD == e) {
+        } catch (const NoException& e) {
+            if (e.type() == NoException::Unload) {
                 unloadModule(mod->moduleName());
             }
         }
@@ -547,8 +548,8 @@ bool NoModuleLoader::isClientCapSupported(NoClient* client, const NoString& cap,
                 bResult |= mod->isClientCapSupported(client, cap, state);
             }
             NoModulePrivate::get(mod)->client = oldClient;
-        } catch (const NoModule::ModException& e) {
-            if (NoModule::UNLOAD == e) {
+        } catch (const NoException& e) {
+            if (e.type() == NoException::Unload) {
                 unloadModule(mod->moduleName());
             }
         }
@@ -657,7 +658,7 @@ bool NoModuleLoader::loadModule(const NoString& name, const NoString& args, No::
     bool bLoaded;
     try {
         bLoaded = module->onLoad(args, message);
-    } catch (const NoModule::ModException&) {
+    } catch (const NoException&) {
         bLoaded = false;
         message = "Caught an exception";
     }
