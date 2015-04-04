@@ -36,9 +36,6 @@ public:
 
     bool parseConfig(NoSettings* Config, NoString& error);
 
-    // TODO refactor this
-    enum HashType { HashNone, HashMd5, HashSha256, HashDefault = HashSha256 };
-
     NoSettings toConfig() const;
     bool checkPass(const NoString& pass) const;
     bool addAllowedHost(const NoString& hostMask);
@@ -85,7 +82,7 @@ public:
     void setRealName(const NoString& s);
     void setBindHost(const NoString& s);
     void setDccBindHost(const NoString& s);
-    void setPassword(const NoString& s, HashType hash, const NoString& salt = "");
+    void setPassword(const NoString& s, const NoString& salt = "");
     void setMultiClients(bool b);
     void setDenyLoadMod(bool b);
     void setAdmin(bool b);
@@ -121,7 +118,6 @@ public:
     NoString bindHost() const;
     NoString dccBindHost() const;
     NoString password() const;
-    HashType passwordHashType() const;
     NoString passwordSalt() const;
     std::set<NoString> allowedHosts() const;
     NoString timestampFormat() const;

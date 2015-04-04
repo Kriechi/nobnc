@@ -192,7 +192,7 @@ public:
         if (!arg.empty()) {
             NoString salt = No::salt();
             NoString sHash = No::saltedSha256(arg, salt);
-            pNewUser->setPassword(sHash, NoUser::HashDefault, salt);
+            pNewUser->setPassword(sHash, salt);
         }
 
         NoStringVector vsArgs = socket.rawParam("allowedips").split("\n");

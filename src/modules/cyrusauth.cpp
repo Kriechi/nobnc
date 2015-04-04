@@ -150,8 +150,8 @@ public:
                 }
 
                 if (user) {
-                    // "::" is an invalid MD5 hash, so user won't be able to login by usual method
-                    user->setPassword("::", NoUser::HashMd5, "::");
+                    // "::" is an invalid hash, so user won't be able to login by usual method
+                    user->setPassword("::", "::");
                 }
 
                 if (user && !noApp->addUser(user, sErr)) {

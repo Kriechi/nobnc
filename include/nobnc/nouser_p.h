@@ -56,7 +56,6 @@ public:
     NoStringMap ctcpReplies;
     NoString timestampFormat = "[%H:%M:%S]";
     NoString timezone = "";
-    NoUser::HashType hashType = NoUser::HashNone;
 
     NoString userPath = "";
 

@@ -235,25 +235,13 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
     if (subIt != subConf.end()) {
         NoSettings* pSubConf = subIt->second.m_subConfig;
         NoString sHash;
-        NoString sMethod;
+        NoString sMethod; // TODO: remove
         NoString salt;
-        NoUser::HashType method;
         pSubConf->FindStringEntry("hash", sHash);
-        pSubConf->FindStringEntry("method", sMethod);
+        pSubConf->FindStringEntry("method", sMethod); // XXX: remove
         pSubConf->FindStringEntry("salt", salt);
-        if (sMethod.empty() || sMethod.equals("plain"))
-            method = NoUser::HashNone;
-        else if (sMethod.equals("md5"))
-            method = NoUser::HashMd5;
-        else if (sMethod.equals("sha256"))
-            method = NoUser::HashSha256;
-        else {
-            error = "Invalid hash method";
-            No::printError(error);
-            return false;
-        }
 
-        setPassword(sHash, method, salt);
+        setPassword(sHash, salt);
         if (!pSubConf->empty()) {
             error = "Unhandled lines in config!";
             No::printError(error);
@@ -627,7 +615,7 @@ bool NoUser::clone(const NoUser& User, NoString& error, bool cloneNetworks)
     }
 
     if (!User.password().empty()) {
-        setPassword(User.password(), User.passwordHashType(), User.passwordSalt());
+        setPassword(User.password(), User.passwordSalt());
     }
 
     setNick(User.nick(false));
@@ -827,20 +815,7 @@ NoSettings NoUser::toConfig() const
     NoSettings config;
     NoSettings passConfig;
 
-    NoString sHash;
-    switch (d->hashType) {
-    case HashNone:
-        sHash = "Plain";
-        break;
-    case HashMd5:
-        sHash = "MD5";
-        break;
-    case HashSha256:
-        sHash = "SHA256";
-        break;
-    }
     passConfig.AddKeyValuePair("Salt", d->passwordSalt);
-    passConfig.AddKeyValuePair("Method", sHash);
     passConfig.AddKeyValuePair("Hash", password());
     config.AddSubConfig("Pass", "password", passConfig);
 
@@ -909,15 +884,7 @@ NoSettings NoUser::toConfig() const
 
 bool NoUser::checkPass(const NoString& pass) const
 {
-    switch (d->hashType) {
-    case HashMd5:
-        return d->password.equals(No::saltedMd5(pass, d->passwordSalt));
-    case HashSha256:
-        return d->password.equals(No::saltedSha256(pass, d->passwordSalt));
-    case HashNone:
-    default:
-        return (pass == d->password);
-    }
+    return d->password.equals(No::saltedSha256(pass, d->passwordSalt));
 }
 
 /*NoClient* NoUser::client() {
@@ -1141,10 +1108,9 @@ void NoUser::setDccBindHost(const NoString& s)
 {
     d->dccBindHost = s;
 }
-void NoUser::setPassword(const NoString& s, HashType hash, const NoString& salt)
+void NoUser::setPassword(const NoString& s, const NoString& salt)
 {
     d->password = s;
-    d->hashType = hash;
     d->passwordSalt = salt;
 }
 void NoUser::setMultiClients(bool b)
@@ -1335,10 +1301,6 @@ NoString NoUser::dccBindHost() const
 NoString NoUser::password() const
 {
     return d->password;
-}
-NoUser::HashType NoUser::passwordHashType() const
-{
-    return d->hashType;
 }
 NoString NoUser::passwordSalt() const
 {
