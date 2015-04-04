@@ -297,10 +297,9 @@ public:
             if (user()->isAdmin()) {
                 putModule("    showsocks      - Shows all socket connections.");
             }
-        } else if (sCom.equals("timers"))
-            listTimers();
-        else
+        } else {
             putModule("Unknown command [" + sCom + "] [" + args + "]");
+        }
     }
 
     ModRet onPrivCtcp(NoHostMask& nick, NoString& message) override

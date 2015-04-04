@@ -178,29 +178,6 @@ NoTimer* NoModule::findTimer(const NoString& label) const
     return nullptr;
 }
 
-void NoModule::listTimers()
-{
-    if (d->timers.empty()) {
-        putModule("You have no timers running.");
-        return;
-    }
-
-    NoTable Table;
-    Table.addColumn("Name");
-    Table.addColumn("Secs");
-    Table.addColumn("Cycles");
-    Table.addColumn("Description");
-
-    for (const NoTimer* timer : d->timers) {
-        Table.addRow();
-        Table.setValue("Name", timer->name());
-        Table.setValue("Interval", NoString(timer->interval()) + " seconds");
-        Table.setValue("Description", timer->description());
-    }
-
-    putModule(Table);
-}
-
 NoModuleSocket* NoModule::findSocket(const NoString& name) const
 {
     for (NoModuleSocket* pSocket : d->sockets) {

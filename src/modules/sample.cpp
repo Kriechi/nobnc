@@ -323,13 +323,6 @@ public:
         return CONTINUE;
     }
 
-    void onModCommand(const NoString& command) override
-    {
-        if (command.equals("TIMERS")) {
-            listTimers();
-        }
-    }
-
     ModRet onStatusCommand(NoString& command) override
     {
         if (command.equals("SAMPLE")) {

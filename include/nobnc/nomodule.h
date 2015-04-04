@@ -676,8 +676,6 @@ public:
     NoString moduleDataDir() const;
 
     NoTimer* findTimer(const NoString& label) const;
-    virtual void listTimers();
-
     NoModuleSocket* findSocket(const NoString& name) const;
 
 #ifdef HAVE_PTHREAD

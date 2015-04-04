@@ -286,17 +286,6 @@ public:
         }
     }
 
-    void onModCommand(const NoString& line) override
-    {
-        NoString command = No::token(line, 0).toUpper();
-        if (command.equals("TIMERS")) {
-            // for testing purposes - hidden from help
-            listTimers();
-        } else {
-            handleCommand(line);
-        }
-    }
-
     void onAddUserCommand(const NoString& line)
     {
         NoString sUser = No::token(line, 1);
