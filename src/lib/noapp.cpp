@@ -183,12 +183,12 @@ bool NoAppPrivate::handleUserDeletion()
         NoUser* user = it.second;
         NoUserPrivate::get(user)->beingDeleted = true;
 
-        if (noApp->loader()->onDeleteUser(*user)) {
+        if (noApp->loader()->onDeleteUser(user)) {
             NoUserPrivate::get(user)->beingDeleted = false;
             continue;
         }
         users.erase(user->userName());
-        NoWebSocket::finishUserSessions(*user);
+        NoWebSocket::finishUserSessions(user);
         delete user;
     }
 
@@ -1669,7 +1669,7 @@ bool NoApp::addUser(NoUser* user, NoString& error)
         return false;
     }
     bool bFailed = false;
-    GLOBALMODULECALL(onAddUser(*user, error), &bFailed);
+    GLOBALMODULECALL(onAddUser(user, error), &bFailed);
     if (bFailed) {
         NO_DEBUG("AddUser [" << user->userName() << "] aborted by a module [" << error << "]");
         return false;

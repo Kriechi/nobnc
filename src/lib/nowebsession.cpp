@@ -43,12 +43,12 @@ public:
     NoWebSessionMap(uint uTTL = 5000) : NoCacheMap<NoString, std::shared_ptr<NoWebSession>>(uTTL)
     {
     }
-    void FinishUserSessions(const NoUser& User)
+    void FinishUserSessions(NoUser* user)
     {
         iterator it = begin();
 
         while (it != end()) {
-            if (it->second.second->user() == &User) {
+            if (it->second.second->user() == user) {
                 remove(it++);
             } else {
                 ++it;
@@ -302,9 +302,9 @@ NoWebSocket::~NoWebSocket()
     NoSocketPrivate::get(this)->ResetBytesRead();
 }
 
-void NoWebSocket::finishUserSessions(const NoUser& User)
+void NoWebSocket::finishUserSessions(NoUser* user)
 {
-    Sessions.m_mspSessions.FinishUserSessions(User);
+    Sessions.m_mspSessions.FinishUserSessions(user);
 }
 
 void NoWebSocket::availableSkins(NoStringVector& vRet) const

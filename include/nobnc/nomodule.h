@@ -758,12 +758,12 @@ public:
      *                  the module stops adding the user.
      * @return See NoModule::ModRet.
      */
-    virtual ModRet onAddUser(NoUser& User, NoString& error);
+    virtual ModRet onAddUser(NoUser* user, NoString& error);
     /** This module hook is called when a user is deleted.
      *  @param User The user which will be deleted.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onDeleteUser(NoUser& User);
+    virtual ModRet onDeleteUser(NoUser* user);
     /** This module hook is called when there is an incoming connection on
      *  any of ZNC's listening sockets.
      *  @param socket The incoming client socket.

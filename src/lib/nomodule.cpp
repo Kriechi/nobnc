@@ -804,11 +804,11 @@ NoString NoModule::moduleName() const
 ///////////////////
 // Global Module //
 ///////////////////
-NoModule::ModRet NoModule::onAddUser(NoUser& User, NoString& error)
+NoModule::ModRet NoModule::onAddUser(NoUser* user, NoString& error)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onDeleteUser(NoUser& User)
+NoModule::ModRet NoModule::onDeleteUser(NoUser* user)
 {
     return CONTINUE;
 }

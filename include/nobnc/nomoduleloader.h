@@ -143,8 +143,8 @@ public:
     bool onServerCapAvailable(const NoString& cap);
     bool onServerCapResult(const NoString& cap, bool success);
 
-    bool onAddUser(NoUser& User, NoString& error);
-    bool onDeleteUser(NoUser& User);
+    bool onAddUser(NoUser* user, NoString& error);
+    bool onDeleteUser(NoUser* user);
     bool onClientConnect(NoSocket* socket, const NoString& host, ushort port);
     bool onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth);
     bool onFailedLogin(const NoString& username, const NoString& sRemoteIP);

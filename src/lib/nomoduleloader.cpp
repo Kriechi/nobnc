@@ -532,14 +532,14 @@ bool NoModuleLoader::onServerCapResult(const NoString& cap, bool success)
 ////////////////////
 // Global Modules //
 ////////////////////
-bool NoModuleLoader::onAddUser(NoUser& User, NoString& error)
+bool NoModuleLoader::onAddUser(NoUser* user, NoString& error)
 {
-    MODHALTCHK(onAddUser(User, error));
+    MODHALTCHK(onAddUser(user, error));
 }
 
-bool NoModuleLoader::onDeleteUser(NoUser& User)
+bool NoModuleLoader::onDeleteUser(NoUser* user)
 {
-    MODHALTCHK(onDeleteUser(User));
+    MODHALTCHK(onDeleteUser(user));
 }
 
 bool NoModuleLoader::onClientConnect(NoSocket* client, const NoString& host, ushort port)

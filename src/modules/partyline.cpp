@@ -216,7 +216,7 @@ public:
             registry.remove("topic:" + pChannel->GetName());
     }
 
-    ModRet onDeleteUser(NoUser& User) override
+    ModRet onDeleteUser(NoUser* user) override
     {
         // Loop through each chan
         for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end();) {
@@ -224,7 +224,7 @@ public:
             // RemoveUser() might delete channels, so make sure our
             // iterator doesn't break.
             ++it;
-            RemoveUser(&User, channel, "KICK", "User deleted", true);
+            RemoveUser(user, channel, "KICK", "User deleted", true);
         }
 
         return CONTINUE;

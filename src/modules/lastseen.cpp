@@ -93,10 +93,10 @@ public:
         SetTime(user());
     }
 
-    ModRet onDeleteUser(NoUser& User) override
+    ModRet onDeleteUser(NoUser* user) override
     {
         NoRegistry registry(this);
-        registry.remove(User.userName());
+        registry.remove(user->userName());
         return CONTINUE;
     }
 

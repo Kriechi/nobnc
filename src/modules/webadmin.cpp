@@ -1566,13 +1566,13 @@ public:
 
         for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it, a++) {
             NoTemplate& l = tmpl.addRow("UserLoop");
-            NoUser& User = *it->second;
+            NoUser* user = it->second;
 
-            l["Username"] = User.userName();
-            l["Clients"] = NoString(User.allClients().size());
-            l["Networks"] = NoString(User.networks().size());
+            l["Username"] = user->userName();
+            l["Clients"] = NoString(user->allClients().size());
+            l["Networks"] = NoString(user->networks().size());
 
-            if (&User == spSession->user()) {
+            if (user == spSession->user()) {
                 l["IsSelf"] = "true";
             }
         }

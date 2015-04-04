@@ -146,7 +146,7 @@ public:
     void loginAccepted(NoUser* user) override
     {
         if (m_pClient)
-            m_pClient->acceptLogin(*user);
+            m_pClient->acceptLogin(user);
     }
 
     void loginRefused(NoUser* user, const NoString& reason) override
@@ -758,10 +758,10 @@ void NoClient::refuseLogin(const NoString& reason)
     d->socket->close(NoSocket::CloseAfterWrite);
 }
 
-void NoClient::acceptLogin(NoUser& User)
+void NoClient::acceptLogin(NoUser* user)
 {
     d->password = "";
-    d->user = &User;
+    d->user = user;
 
     // Set our proper timeout and set back our proper timeout mode
     // (constructor set a different timeout and mode)

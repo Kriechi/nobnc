@@ -60,7 +60,7 @@ public:
     NoString requestCookie(const NoString& key);
     bool sendCookie(const NoString& key, const NoString& value);
 
-    static void finishUserSessions(const NoUser& User);
+    static void finishUserSessions(NoUser* user);
 
 protected:
     using NoHttpSocket::printErrorPage;

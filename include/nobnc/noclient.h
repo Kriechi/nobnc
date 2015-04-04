@@ -38,7 +38,7 @@ public:
     NoSocket* socket() const;
 
     void sendRequiredPasswordNotice();
-    void acceptLogin(NoUser& User);
+    void acceptLogin(NoUser* user);
     void refuseLogin(const NoString& reason);
 
     NoString nick(bool allowIRCNick = true) const;
