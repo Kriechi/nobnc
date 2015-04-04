@@ -110,7 +110,7 @@ public:
     void onIrcDisconnected() override;
     ModRet onBroadcast(NoString& message) override;
 
-    void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override;
+    void onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override;
     void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override;
     void onQuit(const NoHostMask& nick, const NoString& message) override;
     void onJoin(const NoNick& nick, NoChannel* channel) override;
@@ -370,7 +370,7 @@ NoModule::ModRet NoLogMod::onBroadcast(NoString& message)
     return CONTINUE;
 }
 
-void NoLogMod::onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args)
+void NoLogMod::onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args)
 {
     const NoString nick = opNick ? opNick->nick() : "Server";
     PutLog("*** " + nick + " sets mode: " + modes + " " + args, channel);

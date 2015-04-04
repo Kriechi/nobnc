@@ -273,7 +273,7 @@ public:
         return HALTCORE;
     }
 
-    void onOp2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
+    void onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         if (nick.nick() == network()->ircNick().nick()) {
             const std::map<NoString, NoNick>& msNicks = channel->nicks();

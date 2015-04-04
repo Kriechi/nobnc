@@ -320,7 +320,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
             opNick = opNick;
     }
 
-    NETWORKMODULECALL(onRawMode2(opNick, this, sModeArg, args), d->network->user(), d->network, nullptr, NOTHING);
+    NETWORKMODULECALL(onRawMode(opNick, this, sModeArg, args), d->network->user(), d->network, nullptr, NOTHING);
 
     for (uint a = 0; a < sModeArg.size(); a++) {
         const uchar& mode = sModeArg[a];
@@ -352,7 +352,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
                         }
                     }
 
-                    NETWORKMODULECALL(onChanPermission2(opNick, *pNick, this, mode, bAdd, noChange),
+                    NETWORKMODULECALL(onChanPermission(opNick, *pNick, this, mode, bAdd, noChange),
                                       d->network->user(),
                                       d->network,
                                       nullptr,
@@ -360,15 +360,15 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
 
                     if (mode == NoChannel::M_Op) {
                         if (bAdd) {
-                            NETWORKMODULECALL(onOp2(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onOp(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
                         } else {
-                            NETWORKMODULECALL(onDeop2(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onDeop(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
                         }
                     } else if (mode == NoChannel::M_Voice) {
                         if (bAdd) {
-                            NETWORKMODULECALL(onVoice2(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onVoice(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
                         } else {
-                            NETWORKMODULECALL(onDevoice2(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onDevoice(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
                         }
                     }
                 }
@@ -403,7 +403,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
             } else {
                 noChange = !hasMode(mode);
             }
-            NETWORKMODULECALL(onMode2(opNick, this, mode, arg, bAdd, noChange), d->network->user(), d->network, nullptr, NOTHING);
+            NETWORKMODULECALL(onMode(opNick, this, mode, arg, bAdd, noChange), d->network->user(), d->network, nullptr, NOTHING);
 
             if (!bList) {
                 (bAdd) ? addMode(mode, arg) : removeMode(mode);
@@ -691,7 +691,7 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                         No::setMessageTags(line, msBatchTags);
                     }
                     bool bNotShowThisLine = false;
-                    NETWORKMODULECALL(onChanBufferPlayLine2(this, pUseClient, line, BufLine.timestamp()),
+                    NETWORKMODULECALL(onChanBufferPlayLine(this, pUseClient, line, BufLine.timestamp()),
                                       d->network->user(),
                                       d->network,
                                       nullptr,

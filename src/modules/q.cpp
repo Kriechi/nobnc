@@ -307,13 +307,13 @@ public:
             HandleNeed(channel, "ov");
     }
 
-    void onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
+    void onDeop(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         if (m_bRequestPerms && IsSelf(nick) && (!opNick || !IsSelf(*opNick)))
             HandleNeed(channel, "o");
     }
 
-    void onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
+    void onDevoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         if (m_bRequestPerms && IsSelf(nick) && (!opNick || !IsSelf(*opNick)))
             HandleNeed(channel, "v");

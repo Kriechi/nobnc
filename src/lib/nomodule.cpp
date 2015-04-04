@@ -474,25 +474,25 @@ NoModule::ModRet NoModule::onBroadcast(NoString& message)
     return CONTINUE;
 }
 
-void NoModule::onChanPermission2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
+void NoModule::onChanPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
 {
 }
-void NoModule::onOp2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
+void NoModule::onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
 }
-void NoModule::onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
+void NoModule::onDeop(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
 }
-void NoModule::onVoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
+void NoModule::onVoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
 }
-void NoModule::onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
+void NoModule::onDevoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
 }
-void NoModule::onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args)
+void NoModule::onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args)
 {
 }
-void NoModule::onMode2(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange)
+void NoModule::onMode(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange)
 {
 }
 
@@ -560,11 +560,11 @@ NoModule::ModRet NoModule::onChanBufferEnding(NoChannel* channel, NoClient* clie
     return CONTINUE;
 }
 
-NoModule::ModRet NoModule::onChanBufferPlayLine2(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
+NoModule::ModRet NoModule::onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
 {
     return CONTINUE;
 }
-NoModule::ModRet NoModule::onPrivBufferPlayLine2(NoClient* client, NoString& line, const timeval& tv)
+NoModule::ModRet NoModule::onPrivBufferPlayLine(NoClient* client, NoString& line, const timeval& tv)
 {
     return CONTINUE;
 }

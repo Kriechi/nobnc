@@ -297,15 +297,15 @@ public:
      *  @see NoIrcSock::GetModeType() for converting mode into a mode (e.g.
      *       'o' for op).
      */
-    virtual void onChanPermission2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
+    virtual void onChanPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
     /** Called when a nick is opped on a channel */
-    virtual void onOp2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
+    virtual void onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     /** Called when a nick is deopped on a channel */
-    virtual void onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
+    virtual void onDeop(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     /** Called when a nick is voiced on a channel */
-    virtual void onVoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
+    virtual void onVoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     /** Called when a nick is devoiced on a channel */
-    virtual void onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
+    virtual void onDevoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     /** Called on an individual channel mode change.
      *  @param opNick The nick who changes the channel mode, or nullptr if set by server.
      *  @param channel The channel whose mode is changed.
@@ -314,7 +314,7 @@ public:
      *  @param added True if this mode is added ("+"), else false.
      *  @param noChange True if this mode was already effective before.
      */
-    virtual void onMode2(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange);
+    virtual void onMode(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange);
     /** Called on any channel mode change. This is called before the more
      *  detailed mode hooks like e.g. onOp() and onMode().
      *  @param opNick The nick who changes the channel mode, or nullptr if set by server.
@@ -322,7 +322,7 @@ public:
      *  @param modes The raw mode change, e.g. "+s-io".
      *  @param args All arguments to the mode change from modes.
      */
-    virtual void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args);
+    virtual void onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args);
 
     /** Called on any raw IRC line received from the <em>IRC server</em>.
      *  @param line The line read from the server.
@@ -417,14 +417,14 @@ public:
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferPlayLine2(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
+    virtual ModRet onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
     /** Called when a line from the query buffer is played back.
      *  @param client The client this line will go to.
      *  @param line The raw IRC traffic line from the buffer.
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onPrivBufferPlayLine2(NoClient* client, NoString& line, const timeval& tv);
+    virtual ModRet onPrivBufferPlayLine(NoClient* client, NoString& line, const timeval& tv);
 
     /** Called when a client successfully logged in to ZNC. */
     virtual void onClientLogin();

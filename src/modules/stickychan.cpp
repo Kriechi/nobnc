@@ -55,7 +55,7 @@ public:
         return CONTINUE;
     }
 
-    virtual void onMode2(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange) override
+    virtual void onMode(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange) override
     {
         if (mode == NoChannel::M_Key) {
             if (added) {

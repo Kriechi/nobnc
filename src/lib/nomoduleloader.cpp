@@ -229,39 +229,39 @@ bool NoModuleLoader::onIrcDisconnected()
     return false;
 }
 
-bool NoModuleLoader::onChanPermission2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
+bool NoModuleLoader::onChanPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange)
 {
-    MODUNLOADCHK(onChanPermission2(opNick, nick, channel, mode, added, noChange));
+    MODUNLOADCHK(onChanPermission(opNick, nick, channel, mode, added, noChange));
     return false;
 }
-bool NoModuleLoader::onOp2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
+bool NoModuleLoader::onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
-    MODUNLOADCHK(onOp2(opNick, nick, channel, noChange));
+    MODUNLOADCHK(onOp(opNick, nick, channel, noChange));
     return false;
 }
-bool NoModuleLoader::onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
+bool NoModuleLoader::onDeop(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
-    MODUNLOADCHK(onDeop2(opNick, nick, channel, noChange));
+    MODUNLOADCHK(onDeop(opNick, nick, channel, noChange));
     return false;
 }
-bool NoModuleLoader::onVoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
+bool NoModuleLoader::onVoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
-    MODUNLOADCHK(onVoice2(opNick, nick, channel, noChange));
+    MODUNLOADCHK(onVoice(opNick, nick, channel, noChange));
     return false;
 }
-bool NoModuleLoader::onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
+bool NoModuleLoader::onDevoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange)
 {
-    MODUNLOADCHK(onDevoice2(opNick, nick, channel, noChange));
+    MODUNLOADCHK(onDevoice(opNick, nick, channel, noChange));
     return false;
 }
-bool NoModuleLoader::onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args)
+bool NoModuleLoader::onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args)
 {
-    MODUNLOADCHK(onRawMode2(opNick, channel, modes, args));
+    MODUNLOADCHK(onRawMode(opNick, channel, modes, args));
     return false;
 }
-bool NoModuleLoader::onMode2(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange)
+bool NoModuleLoader::onMode(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange)
 {
-    MODUNLOADCHK(onMode2(opNick, channel, mode, arg, added, noChange));
+    MODUNLOADCHK(onMode(opNick, channel, mode, arg, added, noChange));
     return false;
 }
 bool NoModuleLoader::onRaw(NoString& line)
@@ -365,13 +365,13 @@ bool NoModuleLoader::onChanBufferEnding(NoChannel* channel, NoClient* client)
 {
     MODHALTCHK(onChanBufferEnding(channel, client));
 }
-bool NoModuleLoader::onChanBufferPlayLine2(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
+bool NoModuleLoader::onChanBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv)
 {
-    MODHALTCHK(onChanBufferPlayLine2(channel, client, line, tv));
+    MODHALTCHK(onChanBufferPlayLine(channel, client, line, tv));
 }
-bool NoModuleLoader::onPrivBufferPlayLine2(NoClient* client, NoString& line, const timeval& tv)
+bool NoModuleLoader::onPrivBufferPlayLine(NoClient* client, NoString& line, const timeval& tv)
 {
-    MODHALTCHK(onPrivBufferPlayLine2(client, line, tv));
+    MODHALTCHK(onPrivBufferPlayLine(client, line, tv));
 }
 bool NoModuleLoader::onCtcpReply(NoHostMask& nick, NoString& message)
 {

@@ -40,7 +40,7 @@ public:
                           message);
     }
 
-    void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
+    void onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
     {
         const NoString sNickMask = opNick ? opNick->hostMask() : "Server";
         AddBuffer(channel, sNickMask + " set mode: " + modes + " " + args);

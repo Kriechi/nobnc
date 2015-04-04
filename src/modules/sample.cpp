@@ -133,33 +133,33 @@ public:
         return CONTINUE;
     }
 
-    void onChanPermission2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange) override
+    void onChanPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange) override
     {
         putModule(((noChange) ? "[0] [" : "[1] [") + (opNick ? opNick->nick() : "server") + "] set mode [" + channel->name() +
                   ((added) ? "] +" : "] -") + NoString(mode) + " " + nick.nick());
     }
 
-    void onOp2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
+    void onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         putModule(((noChange) ? "[0] [" : "[1] [") + (opNick ? opNick->nick() : "server") + "] opped [" + nick.nick() + "] on [" + channel->name() + "]");
     }
 
-    void onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
+    void onDeop(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         putModule(((noChange) ? "[0] [" : "[1] [") + (opNick ? opNick->nick() : "server") + "] deopped [" + nick.nick() + "] on [" + channel->name() + "]");
     }
 
-    void onVoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
+    void onVoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         putModule(((noChange) ? "[0] [" : "[1] [") + (opNick ? opNick->nick() : "server") + "] voiced [" + nick.nick() + "] on [" + channel->name() + "]");
     }
 
-    void onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
+    void onDevoice(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         putModule(((noChange) ? "[0] [" : "[1] [") + (opNick ? opNick->nick() : "server") + "] devoiced [" + nick.nick() + "] on [" + channel->name() + "]");
     }
 
-    void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
+    void onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
     {
         putModule("* " + (opNick ? opNick->nick() : "server") + " sets mode: " + modes + " " + args + " (" + channel->name() + ")");
     }
