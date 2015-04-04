@@ -1096,9 +1096,6 @@ bool NoAppPrivate::doRehash(NoString& error)
     std::make_tuple(No::token(sSavedVersion, 0, ".").toUInt(), No::token(sSavedVersion, 1, ".").toUInt());
     std::tuple<uint, uint> tCurrentVersion = std::make_tuple(NO_VERSION_MAJOR, NO_VERSION_MINOR);
     if (tSavedVersion < tCurrentVersion) {
-        if (sSavedVersion.empty()) {
-            sSavedVersion = "< 0.203";
-        }
         No::printMessage("Found old config from ZNC " + sSavedVersion + ". Saving a backup of it.");
         backupConfigOnce("pre-" + NoString(NO_VERSION_STR));
     } else if (tSavedVersion > tCurrentVersion) {
@@ -1122,12 +1119,6 @@ bool NoAppPrivate::doRehash(NoString& error)
     for (const NoString& sModLine : vsList) {
         NoString name = No::token(sModLine, 0);
         NoString args = No::tokens(sModLine, 1);
-
-        if (name == "saslauth" && tSavedVersion < std::make_tuple(0, 207)) {
-            // XXX compatibility crap, added in 0.207
-            No::printMessage("saslauth module was renamed to cyrusauth. Loading cyrusauth instead.");
-            name = "cyrusauth";
-        }
 
         if (msModules.find(name) != msModules.end()) {
             error = "Module [" + name + "] already loaded";
@@ -1162,32 +1153,6 @@ bool NoAppPrivate::doRehash(NoString& error)
             No::printMessage("Module [" + name + "] already loaded.");
 
         msModules[name] = args;
-    }
-
-    NoString sISpoofFormat, sISpoofFile;
-    config.FindStringEntry("ispoofformat", sISpoofFormat);
-    config.FindStringEntry("ispooffile", sISpoofFile);
-    if (!sISpoofFormat.empty() || !sISpoofFile.empty()) {
-        NoModule* pIdentFileMod = noApp->loader()->findModule("identfile");
-        if (!pIdentFileMod) {
-            No::printAction("Loading global Module [identfile]");
-
-            NoString sModRet;
-            bool bModRet = noApp->loader()->loadModule("identfile", "", No::GlobalModule, nullptr, nullptr, sModRet);
-
-            No::printStatus(bModRet, sModRet);
-            if (!bModRet) {
-                error = sModRet;
-                return false;
-            }
-
-            pIdentFileMod = noApp->loader()->findModule("identfile");
-            msModules["identfile"] = "";
-        }
-
-        NoRegistry registry(pIdentFileMod);
-        registry.setValue("File", sISpoofFile);
-        registry.setValue("Format", sISpoofFormat);
     }
 
     config.FindStringVector("motd", vsList);
@@ -1268,17 +1233,6 @@ bool NoAppPrivate::doRehash(NoString& error)
             } else {
                 disabledSslProtocols = ~uFlag;
             }
-        }
-    }
-
-    // This has to be after SSLCertFile is handled since it uses that value
-    const char* szListenerEntries[] = { "listen", "listen6", "listen4", "listener", "listener6", "listener4" };
-
-    for (const char* szEntry : szListenerEntries) {
-        config.FindStringVector(szEntry, vsList);
-        for (const NoString& sListener : vsList) {
-            if (!addListener(szEntry + NoString(" ") + sListener, error))
-                return false;
         }
     }
 

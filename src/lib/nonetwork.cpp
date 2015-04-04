@@ -423,25 +423,6 @@ bool NoNetwork::parseConfig(NoSettings* settings, NoString& error, bool bUpgrade
             NoString name = No::token(value, 0);
             NoString notice = "Loading network module [" + name + "]";
 
-            // XXX Legacy crap, added in ZNC 0.203, modified in 0.207
-            // Note that 0.203 == 0.207
-            if (name == "away") {
-                notice = "NOTICE: [away] was renamed, loading [awaystore] instead";
-                name = "awaystore";
-            }
-
-            // XXX Legacy crap, added in ZNC 0.207
-            if (name == "autoaway") {
-                notice = "NOTICE: [autoaway] was renamed, loading [awaystore] instead";
-                name = "awaystore";
-            }
-
-            // XXX Legacy crap, added in 1.1; fakeonline module was dropped in 1.0 and returned in 1.1
-            if (name == "fakeonline") {
-                notice = "NOTICE: [fakeonline] was renamed, loading [modules_online] instead";
-                name = "modules_online";
-            }
-
             NoString sModRet;
             NoString args = No::tokens(value, 1);
 

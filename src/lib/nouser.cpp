@@ -294,57 +294,6 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
         NoString name = No::token(sMod, 0);
         NoString notice = "Loading user module [" + name + "]";
 
-        // XXX Legacy crap, added in ZNC 0.089
-        if (name == "discon_kick") {
-            notice = "NOTICE: [discon_kick] was renamed, loading [disconkick] instead";
-            name = "disconkick";
-        }
-
-        // XXX Legacy crap, added in ZNC 0.099
-        if (name == "fixfreenode") {
-            notice = "NOTICE: [fixfreenode] doesn't do anything useful anymore, ignoring it";
-            continue;
-        }
-
-        // XXX Legacy crap, added in ZNC 0.207
-        if (name == "admin") {
-            notice = "NOTICE: [admin] module was renamed, loading [controlpanel] instead";
-            name = "controlpanel";
-        }
-
-        // XXX Legacy crap, should have been added ZNC 0.207, but added only in 1.1 :(
-        if (name == "away") {
-            notice = "NOTICE: [away] was renamed, loading [awaystore] instead";
-            name = "awaystore";
-        }
-
-        // XXX Legacy crap, added in 1.1; fakeonline module was dropped in 1.0 and returned in 1.1
-        if (name == "fakeonline") {
-            notice = "NOTICE: [fakeonline] was renamed, loading [modules_online] instead";
-            name = "modules_online";
-        }
-
-        // XXX Legacy crap, added in 1.3
-        if (name == "charset") {
-            No::printAction("NOTICE: Charset support was moved to core, importing old charset module settings");
-            size_t uIndex = 1;
-            if (No::token(sMod, uIndex).equals("-force")) {
-                uIndex++;
-            }
-            NoStringVector vsClient = No::token(sMod, uIndex).split(",");
-            NoStringVector vsServer = No::token(sMod, uIndex + 1).split(",");
-            if (vsClient.empty() || vsServer.empty()) {
-                No::printStatus(false, "charset module was loaded with wrong parameters.");
-                continue;
-            }
-            setClientEncoding(vsClient[0]);
-            for (NoNetwork* network : d->networks) {
-                network->setEncoding(vsServer[0]);
-            }
-            No::printStatus(true, "Using [" + vsClient[0] + "] for clients, and [" + vsServer[0] + "] for servers");
-            continue;
-        }
-
         NoString sModRet;
         NoString args = No::tokens(sMod, 1);
 
