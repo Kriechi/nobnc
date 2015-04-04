@@ -290,7 +290,7 @@ public:
         return HandleMessage(nick, message);
     }
 
-    ModRet onJoining(NoChannel& channel) override
+    ModRet onJoining(NoChannel* channel) override
     {
         // Halt if are not already cloaked, but the user requres that we delay
         // channel join till after we are cloaked.
@@ -300,19 +300,19 @@ public:
         return CONTINUE;
     }
 
-    void onJoin(const NoNick& nick, NoChannel& channel) override
+    void onJoin(const NoNick& nick, NoChannel* channel) override
     {
         if (m_bRequestPerms && IsSelf(nick))
             HandleNeed(channel, "ov");
     }
 
-    void onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
+    void onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         if (m_bRequestPerms && IsSelf(nick) && (!opNick || !IsSelf(*opNick)))
             HandleNeed(channel, "o");
     }
 
-    void onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
+    void onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         if (m_bRequestPerms && IsSelf(nick) && (!opNick || !IsSelf(*opNick)))
             HandleNeed(channel, "v");
@@ -527,9 +527,9 @@ private:
         return !m_bCatchResponse && user()->isUserAttached() ? CONTINUE : HALT;
     }
 
-    void HandleNeed(const NoChannel& channel, const NoString& sPerms)
+    void HandleNeed(const NoChannel* channel, const NoString& sPerms)
     {
-        NoStringMap::iterator it = m_msChanModes.find(channel.name());
+        NoStringMap::iterator it = m_msChanModes.find(channel->name());
         if (it == m_msChanModes.end())
             return;
         NoString modes = it->second;
@@ -541,8 +541,8 @@ private:
             bool bAutoOp = modes.contains("a");
             if (bMaster || bOp) {
                 if (!bAutoOp) {
-                    putModule("RequestPerms: Requesting op on " + channel.name());
-                    PutQ("OP " + channel.name());
+                    putModule("RequestPerms: Requesting op on " + channel->name());
+                    PutQ("OP " + channel->name());
                 }
                 return;
             }
@@ -553,8 +553,8 @@ private:
             bool bAutoVoice = modes.contains("g");
             if (bMaster || bVoice) {
                 if (!bAutoVoice) {
-                    putModule("RequestPerms: Requesting voice on " + channel.name());
-                    PutQ("VOICE " + channel.name());
+                    putModule("RequestPerms: Requesting voice on " + channel->name());
+                    PutQ("VOICE " + channel->name());
                 }
                 return;
             }

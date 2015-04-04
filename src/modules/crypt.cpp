@@ -110,9 +110,9 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
     {
-        FilterIncoming(channel.name(), nick, message);
+        FilterIncoming(channel->name(), nick, message);
         return CONTINUE;
     }
 

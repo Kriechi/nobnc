@@ -28,24 +28,24 @@ public:
     {
     }
 
-    void AddBuffer(NoChannel& channel, const NoString& message)
+    void AddBuffer(NoChannel* channel, const NoString& message)
     {
         // If they have AutoClearChanBuffer enabled, only add messages if no client is connected
-        if (channel.autoClearChanBuffer() && network()->isUserOnline())
+        if (channel->autoClearChanBuffer() && network()->isUserOnline())
             return;
 
-        channel.addBuffer(":" + moduleNick() + "!" + moduleName() + "@znc.in PRIVMSG " + _NAMEDFMT(channel.name()) +
+        channel->addBuffer(":" + moduleNick() + "!" + moduleName() + "@znc.in PRIVMSG " + _NAMEDFMT(channel->name()) +
                           " :{text}",
                           message);
     }
 
-    void onRawMode2(const NoNick* opNick, NoChannel& channel, const NoString& modes, const NoString& args) override
+    void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
     {
         const NoString sNickMask = opNick ? opNick->nickMask() : "Server";
         AddBuffer(channel, sNickMask + " set mode: " + modes + " " + args);
     }
 
-    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel& channel, const NoString& message) override
+    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override
     {
         AddBuffer(channel, opNick.nickMask() + " kicked " + sKickedNick + " Reason: [" + message + "]");
     }
@@ -55,16 +55,16 @@ public:
         std::vector<NoChannel*>::const_iterator it;
         NoString msg = nick.nickMask() + " quit with message: [" + message + "]";
         for (it = channels.begin(); it != channels.end(); ++it) {
-            AddBuffer(**it, msg);
+            AddBuffer(*it, msg);
         }
     }
 
-    void onJoin(const NoNick& nick, NoChannel& channel) override
+    void onJoin(const NoNick& nick, NoChannel* channel) override
     {
         AddBuffer(channel, nick.nickMask() + " joined");
     }
 
-    void onPart(const NoNick& nick, NoChannel& channel, const NoString& message) override
+    void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override
     {
         AddBuffer(channel, nick.nickMask() + " parted with message: [" + message + "]");
     }
@@ -74,11 +74,11 @@ public:
         std::vector<NoChannel*>::const_iterator it;
         NoString msg = OldNick.nickMask() + " is now known as " + newNick;
         for (it = channels.begin(); it != channels.end(); ++it) {
-            AddBuffer(**it, msg);
+            AddBuffer(*it, msg);
         }
     }
 
-    ModRet onTopic(NoNick& nick, NoChannel& channel, NoString& topic) override
+    ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override
     {
         AddBuffer(channel, nick.nickMask() + " changed the topic to: " + topic);
 

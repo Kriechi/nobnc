@@ -228,9 +228,9 @@ public:
         Load();
     }
 
-    void onRawMode(const NoNick& opNick, NoChannel& channel, const NoString& modes, const NoString& args) override
+    void onRawMode(const NoNick& opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
     {
-        Process(opNick, "* " + opNick.nick() + " sets mode: " + modes + " " + args + " on " + channel.name(), channel.name());
+        Process(opNick, "* " + opNick.nick() + " sets mode: " + modes + " " + args + " on " + channel->name(), channel->name());
     }
 
     void onClientLogin() override
@@ -245,11 +245,11 @@ public:
         m_Buffer.clear();
     }
 
-    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel& channel, const NoString& message) override
+    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override
     {
         Process(opNick,
-                "* " + opNick.nick() + " kicked " + sKickedNick + " from " + channel.name() + " because [" + message + "]",
-                channel.name());
+                "* " + opNick.nick() + " kicked " + sKickedNick + " from " + channel->name() + " because [" + message + "]",
+                channel->name());
     }
 
     void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
@@ -261,16 +261,16 @@ public:
                 "");
     }
 
-    void onJoin(const NoNick& nick, NoChannel& channel) override
+    void onJoin(const NoNick& nick, NoChannel* channel) override
     {
-        Process(nick, "* " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") joins " + channel.name(), channel.name());
+        Process(nick, "* " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") joins " + channel->name(), channel->name());
     }
 
-    void onPart(const NoNick& nick, NoChannel& channel, const NoString& message) override
+    void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override
     {
         Process(nick,
-                "* " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") parts " + channel.name() + "(" + message + ")",
-                channel.name());
+                "* " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") parts " + channel->name() + "(" + message + ")",
+                channel->name());
     }
 
     void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
@@ -290,13 +290,13 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Process(nick,
                 "* CTCP: " + nick.nick() + " [" + message + "] to "
                                                              "[" +
-                channel.name() + "]",
-                channel.name());
+                channel->name() + "]",
+                channel->name());
         return CONTINUE;
     }
 
@@ -306,9 +306,9 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
-        Process(nick, "-" + nick.nick() + ":" + channel.name() + "- " + message, channel.name());
+        Process(nick, "-" + nick.nick() + ":" + channel->name() + "- " + message, channel->name());
         return CONTINUE;
     }
 
@@ -318,9 +318,9 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
     {
-        Process(nick, "<" + nick.nick() + ":" + channel.name() + "> " + message, channel.name());
+        Process(nick, "<" + nick.nick() + ":" + channel->name() + "> " + message, channel->name());
         return CONTINUE;
     }
 

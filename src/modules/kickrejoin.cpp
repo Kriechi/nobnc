@@ -121,15 +121,15 @@ public:
             putModule("Rejoin delay disabled");
     }
 
-    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel& channel, const NoString& message) override
+    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override
     {
         if (network()->currentNick().equals(sKickedNick)) {
             if (!delay) {
-                putIrc("JOIN " + channel.name() + " " + channel.key());
-                channel.enable();
+                putIrc("JOIN " + channel->name() + " " + channel->key());
+                channel->enable();
                 return;
             }
-            NoRejoinJob* timer = new NoRejoinJob(this, channel.name());
+            NoRejoinJob* timer = new NoRejoinJob(this, channel->name());
             timer->setSingleShot(true);
             timer->start(delay);
         }

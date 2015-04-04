@@ -266,7 +266,7 @@ void NoNetwork::clone(const NoNetwork& network, bool cloneName)
         if (!pNewChan) {
             channel->setInConfig(false);
         } else {
-            channel->clone(*pNewChan);
+            channel->clone(pNewChan);
         }
     }
     // !Chans
@@ -965,7 +965,7 @@ void NoNetwork::joinChannels(std::set<NoChannel*>& sChans)
 bool NoNetwork::joinChan(NoChannel* channel)
 {
     bool bReturn = false;
-    NETWORKMODULECALL(onJoining(*channel), d->user, this, nullptr, &bReturn);
+    NETWORKMODULECALL(onJoining(channel), d->user, this, nullptr, &bReturn);
 
     if (bReturn)
         return false;
@@ -976,7 +976,7 @@ bool NoNetwork::joinChan(NoChannel* channel)
     } else {
         channel->incJoinTries();
         bool bFailed = false;
-        NETWORKMODULECALL(onTimerAutoJoin(*channel), d->user, this, nullptr, &bFailed);
+        NETWORKMODULECALL(onTimerAutoJoin(channel), d->user, this, nullptr, &bFailed);
         if (bFailed)
             return false;
         return true;

@@ -105,7 +105,7 @@ public:
         return Message(nick, message);
     }
 
-    ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         return Message(nick, message);
     }

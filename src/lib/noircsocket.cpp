@@ -612,7 +612,7 @@ void NoIrcSocket::readLine(const NoString& data)
 
             if (channel) {
                 channel->addNick(nick.nickMask());
-                IRCSOCKMODULECALL(onJoin(nick.nickMask(), *channel), NOTHING);
+                IRCSOCKMODULECALL(onJoin(nick.nickMask(), channel), NOTHING);
 
                 if (channel->isDetached()) {
                     return;
@@ -626,7 +626,7 @@ void NoIrcSocket::readLine(const NoString& data)
             bool bDetached = false;
             if (channel) {
                 channel->removeNick(nick.nick());
-                IRCSOCKMODULECALL(onPart(nick.nickMask(), *channel, msg), NOTHING);
+                IRCSOCKMODULECALL(onPart(nick.nickMask(), channel, msg), NOTHING);
 
                 if (channel->isDetached())
                     bDetached = true;
@@ -691,7 +691,7 @@ void NoIrcSocket::readLine(const NoString& data)
             NoChannel* channel = d->network->findChannel(sChan);
 
             if (channel) {
-                IRCSOCKMODULECALL(onKick(nick, sKickedNick, *channel, msg), NOTHING);
+                IRCSOCKMODULECALL(onKick(nick, sKickedNick, channel, msg), NOTHING);
                 // do not remove the nick till after the onKick call, so modules
                 // can do channel.FindNick or something to get more info.
                 channel->removeNick(sKickedNick);
@@ -752,7 +752,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 NoString topic = No::tokens(line, 3);
                 topic.leftChomp(1);
 
-                IRCSOCKMODULECALL(onTopic(nick, *channel, topic), &bReturn);
+                IRCSOCKMODULECALL(onTopic(nick, channel, topic), &bReturn);
                 if (bReturn)
                     return;
 
@@ -1031,14 +1031,14 @@ bool NoIrcSocket::onChanCtcp(NoNick& nick, const NoString& sChan, NoString& mess
     NoChannel* channel = d->network->findChannel(sChan);
     if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChanCtcp(nick, *channel, message), &bResult);
+        IRCSOCKMODULECALL(onChanCtcp(nick, channel, message), &bResult);
         if (bResult)
             return true;
 
         // Record a /me
         if (message.trimPrefix("ACTION ")) {
             bResult = false;
-            IRCSOCKMODULECALL(onChanAction(nick, *channel, message), &bResult);
+            IRCSOCKMODULECALL(onChanAction(nick, channel, message), &bResult);
             if (bResult)
                 return true;
             if (!channel->autoClearChanBuffer() || !d->network->isUserOnline() || channel->isDetached()) {
@@ -1061,7 +1061,7 @@ bool NoIrcSocket::onChanNotice(NoNick& nick, const NoString& sChan, NoString& me
     NoChannel* channel = d->network->findChannel(sChan);
     if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChanNotice(nick, *channel, message), &bResult);
+        IRCSOCKMODULECALL(onChanNotice(nick, channel, message), &bResult);
         if (bResult)
             return true;
 
@@ -1078,7 +1078,7 @@ bool NoIrcSocket::onChanMsg(NoNick& nick, const NoString& sChan, NoString& messa
     NoChannel* channel = d->network->findChannel(sChan);
     if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChanMsg(nick, *channel, message), &bResult);
+        IRCSOCKMODULECALL(onChanMsg(nick, channel, message), &bResult);
         if (bResult)
             return true;
 

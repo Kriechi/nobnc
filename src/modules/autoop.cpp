@@ -227,10 +227,10 @@ public:
         m_msUsers.clear();
     }
 
-    void onJoin(const NoNick& nick, NoChannel& channel) override
+    void onJoin(const NoNick& nick, NoChannel* channel) override
     {
         // If we have ops in this chan
-        if (channel.hasPerm(NoChannel::Op)) {
+        if (channel->hasPerm(NoChannel::Op)) {
             CheckAutoOp(nick, channel);
         }
     }
@@ -272,10 +272,10 @@ public:
         return HALTCORE;
     }
 
-    void onOp2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
+    void onOp2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
         if (nick.nick() == network()->ircNick().nick()) {
-            const std::map<NoString, NoNick>& msNicks = channel.nicks();
+            const std::map<NoString, NoNick>& msNicks = channel->nicks();
 
             for (std::map<NoString, NoNick>::const_iterator it = msNicks.begin(); it != msNicks.end(); ++it) {
                 if (!it->second.hasPerm(NoChannel::Op)) {
@@ -483,16 +483,16 @@ public:
         return nullptr;
     }
 
-    bool CheckAutoOp(const NoNick& nick, NoChannel& channel)
+    bool CheckAutoOp(const NoNick& nick, NoChannel* channel)
     {
-        NoAutoOpUser* user = FindUserByHost(nick.hostMask(), channel.name());
+        NoAutoOpUser* user = FindUserByHost(nick.hostMask(), channel->name());
 
         if (!user) {
             return false;
         }
 
         if (user->GetUserKey().equals("__NOKEY__")) {
-            putIrc("MODE " + channel.name() + " +o " + nick.nick());
+            putIrc("MODE " + channel->name() + " +o " + nick.nick());
         } else {
             // then insert this nick into the queue, the timer does the rest
             NoString lower = nick.nick().toLower();
@@ -548,12 +548,12 @@ public:
 
                 // Also verify that they are opped in at least one of the user's chans
                 for (size_t a = 0; a < Chans.size(); a++) {
-                    const NoChannel& channel = *Chans[a];
+                    const NoChannel* channel = Chans[a];
 
-                    const NoNick* pNick = channel.findNick(nick.nick());
+                    const NoNick* pNick = channel->findNick(nick.nick());
 
                     if (pNick) {
-                        if (pNick->hasPerm(NoChannel::Op) && user->ChannelMatches(channel.name())) {
+                        if (pNick->hasPerm(NoChannel::Op) && user->ChannelMatches(channel->name())) {
                             bValid = true;
                             break;
                         }
@@ -646,13 +646,13 @@ public:
         const std::vector<NoChannel*>& Chans = network()->channels();
 
         for (size_t a = 0; a < Chans.size(); a++) {
-            const NoChannel& channel = *Chans[a];
+            const NoChannel* channel = Chans[a];
 
-            if (channel.hasPerm(NoChannel::Op) && User.ChannelMatches(channel.name())) {
-                const NoNick* pNick = channel.findNick(nick.nick());
+            if (channel->hasPerm(NoChannel::Op) && User.ChannelMatches(channel->name())) {
+                const NoNick* pNick = channel->findNick(nick.nick());
 
                 if (pNick && !pNick->hasPerm(NoChannel::Op)) {
-                    putIrc("MODE " + channel.name() + " +o " + nick.nick());
+                    putIrc("MODE " + channel->name() + " +o " + nick.nick());
                 }
             }
         }

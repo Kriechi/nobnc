@@ -110,7 +110,7 @@ public:
         }
     }
 
-    void Message(NoChannel& channel)
+    void Message(NoChannel* channel)
     {
         Limits::iterator it;
         time_t now = time(nullptr);
@@ -118,17 +118,17 @@ public:
         // First: Clean up old entries and reattach where necessary
         Cleanup();
 
-        it = m_chans.find(channel.name());
+        it = m_chans.find(channel->name());
 
         if (it == m_chans.end()) {
             // We don't track detached channels
-            if (channel.isDetached())
+            if (channel->isDetached())
                 return;
 
             // This is the first message for this channel, start a
             // new timeout.
             std::pair<time_t, uint> tmp(now, 1);
-            m_chans[channel.name()] = tmp;
+            m_chans[channel->name()] = tmp;
             return;
         }
 
@@ -152,35 +152,35 @@ public:
         // it detached for longer.
         it->second.first = now;
 
-        channel.detachUser();
+        channel->detachUser();
 
         NoRegistry registry(this);
         if (!registry.value("silent").toBool()) {
-            putModule("channel [" + channel.name() + "] was "
+            putModule("channel [" + channel->name() + "] was "
                                                      "flooded, you've been detached");
         }
     }
 
-    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Message(channel);
         return CONTINUE;
     }
 
     // This also catches onChanAction()
-    ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Message(channel);
         return CONTINUE;
     }
 
-    ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Message(channel);
         return CONTINUE;
     }
 
-    ModRet onTopic(NoNick& nick, NoChannel& channel, NoString& topic) override
+    ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override
     {
         Message(channel);
         return CONTINUE;

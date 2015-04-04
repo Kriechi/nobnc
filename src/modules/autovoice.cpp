@@ -194,14 +194,14 @@ public:
         m_msUsers.clear();
     }
 
-    void onJoin(const NoNick& nick, NoChannel& channel) override
+    void onJoin(const NoNick& nick, NoChannel* channel) override
     {
         // If we have ops in this chan
-        if (channel.hasPerm(NoChannel::Op) || channel.hasPerm(NoChannel::HalfOp)) {
+        if (channel->hasPerm(NoChannel::Op) || channel->hasPerm(NoChannel::HalfOp)) {
             for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
                 // and the nick who joined is a valid user
-                if (it->second->HostMatches(nick.hostMask()) && it->second->ChannelMatches(channel.name())) {
-                    putIrc("MODE " + channel.name() + " +v " + nick.nick());
+                if (it->second->HostMatches(nick.hostMask()) && it->second->ChannelMatches(channel->name())) {
+                    putIrc("MODE " + channel->name() + " +v " + nick.nick());
                     break;
                 }
             }

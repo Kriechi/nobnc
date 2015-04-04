@@ -209,14 +209,14 @@ public:
         return true;
     }
 
-    void TryAttach(const NoNick& nick, NoChannel& channel, NoString& Message)
+    void TryAttach(const NoNick& nick, NoChannel* channel, NoString& Message)
     {
-        const NoString& sChan = channel.name();
+        const NoString& sChan = channel->name();
         const NoString& host = nick.hostMask();
         const NoString& message = Message;
         VAttachIter it;
 
-        if (!channel.isDetached())
+        if (!channel->isDetached())
             return;
 
         // Any negated match?
@@ -228,25 +228,25 @@ public:
         // Now check for a positive match
         for (it = m_vMatches.begin(); it != m_vMatches.end(); ++it) {
             if (!it->IsNegated() && it->IsMatch(sChan, host, message)) {
-                channel.attachUser();
+                channel->attachUser();
                 return;
             }
         }
     }
 
-    ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         TryAttach(nick, channel, message);
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         TryAttach(nick, channel, message);
         return CONTINUE;
     }
 
-    ModRet onChanAction(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanAction(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         TryAttach(nick, channel, message);
         return CONTINUE;

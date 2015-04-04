@@ -296,20 +296,20 @@ public:
      *  @see NoIrcSock::GetModeType() for converting mode into a mode (e.g.
      *       'o' for op).
      */
-    virtual void onChanPermission2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, uchar mode, bool added, bool noChange);
-    virtual void onChanPermission(const NoNick& opNick, const NoNick& nick, NoChannel& channel, uchar mode, bool added, bool noChange);
+    virtual void onChanPermission2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
+    virtual void onChanPermission(const NoNick& opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
     /** Called when a nick is opped on a channel */
-    virtual void onOp2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange);
-    virtual void onOp(const NoNick& opNick, const NoNick& nick, NoChannel& channel, bool noChange);
+    virtual void onOp2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
+    virtual void onOp(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     /** Called when a nick is deopped on a channel */
-    virtual void onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange);
-    virtual void onDeop(const NoNick& opNick, const NoNick& nick, NoChannel& channel, bool noChange);
+    virtual void onDeop2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
+    virtual void onDeop(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     /** Called when a nick is voiced on a channel */
-    virtual void onVoice2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange);
-    virtual void onVoice(const NoNick& opNick, const NoNick& nick, NoChannel& channel, bool noChange);
+    virtual void onVoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
+    virtual void onVoice(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     /** Called when a nick is devoiced on a channel */
-    virtual void onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel& channel, bool noChange);
-    virtual void onDevoice(const NoNick& opNick, const NoNick& nick, NoChannel& channel, bool noChange);
+    virtual void onDevoice2(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
+    virtual void onDevoice(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange);
     /** Called on an individual channel mode change.
      *  @param opNick The nick who changes the channel mode, or nullptr if set by server.
      *  @param channel The channel whose mode is changed.
@@ -318,8 +318,8 @@ public:
      *  @param added True if this mode is added ("+"), else false.
      *  @param noChange True if this mode was already effective before.
      */
-    virtual void onMode2(const NoNick* opNick, NoChannel& channel, char mode, const NoString& arg, bool added, bool noChange);
-    virtual void onMode(const NoNick& opNick, NoChannel& channel, char mode, const NoString& arg, bool added, bool noChange);
+    virtual void onMode2(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange);
+    virtual void onMode(const NoNick& opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange);
     /** Called on any channel mode change. This is called before the more
      *  detailed mode hooks like e.g. onOp() and onMode().
      *  @param opNick The nick who changes the channel mode, or nullptr if set by server.
@@ -327,8 +327,8 @@ public:
      *  @param modes The raw mode change, e.g. "+s-io".
      *  @param args All arguments to the mode change from modes.
      */
-    virtual void onRawMode2(const NoNick* opNick, NoChannel& channel, const NoString& modes, const NoString& args);
-    virtual void onRawMode(const NoNick& opNick, NoChannel& channel, const NoString& modes, const NoString& args);
+    virtual void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args);
+    virtual void onRawMode(const NoNick& opNick, NoChannel* channel, const NoString& modes, const NoString& args);
 
     /** Called on any raw IRC line received from the <em>IRC server</em>.
      *  @param line The line read from the server.
@@ -381,23 +381,23 @@ public:
      *  @param channel The channel on which this kick occurs.
      *  @param message The kick message.
      */
-    virtual void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel& channel, const NoString& message);
+    virtual void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message);
     /** This module hook is called just before ZNC tries to join an IRC channel.
      *  @param channel The channel which is about to get joined.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onJoining(NoChannel& channel);
+    virtual ModRet onJoining(NoChannel* channel);
     /** Called when a nick joins a channel.
      *  @param nick The nick who joined.
      *  @param channel The channel which was joined.
      */
-    virtual void onJoin(const NoNick& nick, NoChannel& channel);
+    virtual void onJoin(const NoNick& nick, NoChannel* channel);
     /** Called when a nick parts a channel.
      *  @param nick The nick who parted.
      *  @param channel The channel which was parted.
      *  @param message The part message.
      */
-    virtual void onPart(const NoNick& nick, NoChannel& channel, const NoString& message);
+    virtual void onPart(const NoNick& nick, NoChannel* channel, const NoString& message);
     /** Called when user is invited into a channel
      *  @param nick The nick who invited you.
      *  @param sChan The channel the user got invited into
@@ -410,13 +410,13 @@ public:
      *  @param client The client the buffer will be played back to.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferStarting(NoChannel& channel, NoClient& client);
+    virtual ModRet onChanBufferStarting(NoChannel* channel, NoClient& client);
     /** Called after a channel buffer was played back to a client.
      *  @param channel The channel which was played back.
      *  @param client The client the buffer was played back to.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferEnding(NoChannel& channel, NoClient& client);
+    virtual ModRet onChanBufferEnding(NoChannel* channel, NoClient& client);
     /** Called when for each line during a channel's buffer play back.
      *  @param channel The channel this playback is from.
      *  @param client The client the buffer is played back to.
@@ -425,8 +425,8 @@ public:
      *  @param tv The timestamp of the message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanBufferPlayLine2(NoChannel& channel, NoClient& client, NoString& line, const timeval& tv);
-    virtual ModRet onChanBufferPlayLine(NoChannel& channel, NoClient& client, NoString& line);
+    virtual ModRet onChanBufferPlayLine2(NoChannel* channel, NoClient& client, NoString& line, const timeval& tv);
+    virtual ModRet onChanBufferPlayLine(NoChannel* channel, NoClient& client, NoString& line);
     /** Called when a line from the query buffer is played back.
      *  @param client The client this line will go to.
      *  @param line The raw IRC traffic line from the buffer.
@@ -530,7 +530,7 @@ public:
      *  @param message The CTCP request message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message);
+    virtual ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message);
     /** Called when we receive a private CTCP ACTION ("/me" in query) <em>from IRC</em>.
      *  This is called after NoModule::onPrivCtcp().
      *  @param nick The nick the action came from.
@@ -545,7 +545,7 @@ public:
      *  @param message The action message
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanAction(NoNick& nick, NoChannel& channel, NoString& message);
+    virtual ModRet onChanAction(NoNick& nick, NoChannel* channel, NoString& message);
     /** Called when we receive a private message <em>from IRC</em>.
      *  @param nick The nick which sent the message.
      *  @param message The message.
@@ -558,7 +558,7 @@ public:
      *  @param message The message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message);
+    virtual ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message);
     /** Called when we receive a private notice.
      *  @param nick The nick which sent the notice.
      *  @param message The notice message.
@@ -571,14 +571,14 @@ public:
      *  @param message The notice message.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message);
+    virtual ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message);
     /** Called when we receive a channel topic change <em>from IRC</em>.
      *  @param nick The nick which changed the topic.
      *  @param channel The channel whose topic was changed.
      *  @param topic The new topic.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onTopic(NoNick& nick, NoChannel& channel, NoString& topic);
+    virtual ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic);
 
     /** Called for every CAP received via CAP LS from server.
      *  @param cap capability supported by server.
@@ -598,7 +598,7 @@ public:
      *  @param channel The channel which will be joined.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet onTimerAutoJoin(NoChannel& channel);
+    virtual ModRet onTimerAutoJoin(NoChannel* channel);
 
     /** This module hook is called when a network is being added.
      *  @param network The new IRC network.

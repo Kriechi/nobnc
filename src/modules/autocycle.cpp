@@ -110,7 +110,7 @@ public:
         }
     }
 
-    void onPart(const NoNick& nick, NoChannel& channel, const NoString& message) override
+    void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override
     {
         AutoCycle(channel);
     }
@@ -118,33 +118,33 @@ public:
     void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
     {
         for (uint i = 0; i < channels.size(); i++)
-            AutoCycle(*channels[i]);
+            AutoCycle(channels[i]);
     }
 
-    void onKick(const NoNick& nick, const NoString& opNick, NoChannel& channel, const NoString& message) override
+    void onKick(const NoNick& nick, const NoString& opNick, NoChannel* channel, const NoString& message) override
     {
         AutoCycle(channel);
     }
 
 protected:
-    void AutoCycle(NoChannel& channel)
+    void AutoCycle(NoChannel* channel)
     {
-        if (!IsAutoCycle(channel.name()))
+        if (!IsAutoCycle(channel->name()))
             return;
 
         // Did we recently annoy opers via cycling of an empty channel?
-        if (m_recentlyCycled.contains(channel.name()))
+        if (m_recentlyCycled.contains(channel->name()))
             return;
 
         // Is there only one person left in the channel?
-        if (channel.nickCount() != 1)
+        if (channel->nickCount() != 1)
             return;
 
         // Is that person us and we don't have op?
-        const NoNick& pNick = channel.nicks().begin()->second;
+        const NoNick& pNick = channel->nicks().begin()->second;
         if (!pNick.hasPerm(NoChannel::Op) && pNick.equals(network()->currentNick())) {
-            channel.cycle();
-            m_recentlyCycled.insert(channel.name());
+            channel->cycle();
+            m_recentlyCycled.insert(channel->name());
         }
     }
 

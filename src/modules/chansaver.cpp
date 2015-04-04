@@ -73,17 +73,17 @@ public:
         }
     }
 
-    void onJoin(const NoNick& nick, NoChannel& channel) override
+    void onJoin(const NoNick& nick, NoChannel* channel) override
     {
-        if (!channel.inConfig() && network()->ircNick().equals(nick.nick())) {
-            channel.setInConfig(true);
+        if (!channel->inConfig() && network()->ircNick().equals(nick.nick())) {
+            channel->setInConfig(true);
         }
     }
 
-    void onPart(const NoNick& nick, NoChannel& channel, const NoString& message) override
+    void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override
     {
-        if (channel.inConfig() && network()->ircNick().equals(nick.nick())) {
-            channel.setInConfig(false);
+        if (channel->inConfig() && network()->ircNick().equals(nick.nick())) {
+            channel->setInConfig(false);
         }
     }
 };

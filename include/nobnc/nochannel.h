@@ -54,7 +54,7 @@ public:
 
     void reset();
     NoSettings toConfig() const;
-    void clone(NoChannel& chan);
+    void clone(NoChannel* channel);
     void cycle() const;
     void joinUser(const NoString& key = "");
     void attachUser(NoClient* client = nullptr);

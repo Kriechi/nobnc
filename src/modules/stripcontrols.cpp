@@ -31,7 +31,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         message = No::stripControls(message);
         return CONTINUE;
@@ -43,7 +43,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         message = No::stripControls(message);
         return CONTINUE;
@@ -55,7 +55,7 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         message = No::stripControls(message);
         return CONTINUE;

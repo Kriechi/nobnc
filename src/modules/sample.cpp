@@ -132,35 +132,35 @@ public:
         return CONTINUE;
     }
 
-    void onChanPermission(const NoNick& opNick, const NoNick& nick, NoChannel& channel, uchar mode, bool added, bool noChange) override
+    void onChanPermission(const NoNick& opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange) override
     {
-        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] set mode [" + channel.name() +
+        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] set mode [" + channel->name() +
                   ((added) ? "] +" : "] -") + NoString(mode) + " " + nick.nick());
     }
 
-    void onOp(const NoNick& opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
+    void onOp(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
-        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] opped [" + nick.nick() + "] on [" + channel.name() + "]");
+        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] opped [" + nick.nick() + "] on [" + channel->name() + "]");
     }
 
-    void onDeop(const NoNick& opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
+    void onDeop(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
-        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] deopped [" + nick.nick() + "] on [" + channel.name() + "]");
+        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] deopped [" + nick.nick() + "] on [" + channel->name() + "]");
     }
 
-    void onVoice(const NoNick& opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
+    void onVoice(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
-        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] voiced [" + nick.nick() + "] on [" + channel.name() + "]");
+        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] voiced [" + nick.nick() + "] on [" + channel->name() + "]");
     }
 
-    void onDevoice(const NoNick& opNick, const NoNick& nick, NoChannel& channel, bool noChange) override
+    void onDevoice(const NoNick& opNick, const NoNick& nick, NoChannel* channel, bool noChange) override
     {
-        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] devoiced [" + nick.nick() + "] on [" + channel.name() + "]");
+        putModule(((noChange) ? "[0] [" : "[1] [") + opNick.nick() + "] devoiced [" + nick.nick() + "] on [" + channel->name() + "]");
     }
 
-    void onRawMode(const NoNick& opNick, NoChannel& channel, const NoString& modes, const NoString& args) override
+    void onRawMode(const NoNick& opNick, NoChannel* channel, const NoString& modes, const NoString& args) override
     {
-        putModule("* " + opNick.nick() + " sets mode: " + modes + " " + args + " (" + channel.name() + ")");
+        putModule("* " + opNick.nick() + " sets mode: " + modes + " " + args + " (" + channel->name() + ")");
     }
 
     ModRet onRaw(NoString& line) override
@@ -175,9 +175,9 @@ public:
         return CONTINUE;
     }
 
-    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel& channel, const NoString& message) override
+    void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override
     {
-        putModule("[" + opNick.nick() + "] kicked [" + sKickedNick + "] from [" + channel.name() + "] with the msg [" + message + "]");
+        putModule("[" + opNick.nick() + "] kicked [" + sKickedNick + "] from [" + channel->name() + "] with the msg [" + message + "]");
     }
 
     void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
@@ -185,18 +185,18 @@ public:
         putModule("* Quits: " + nick.nick() + " (" + nick.ident() + "!" + nick.host() + ") (" + message + ")");
     }
 
-    ModRet onTimerAutoJoin(NoChannel& channel) override
+    ModRet onTimerAutoJoin(NoChannel* channel) override
     {
-        putModule("Attempting to join " + channel.name());
+        putModule("Attempting to join " + channel->name());
         return CONTINUE;
     }
 
-    void onJoin(const NoNick& nick, NoChannel& channel) override
+    void onJoin(const NoNick& nick, NoChannel* channel) override
     {
         putModule("* Joins: " + nick.nick() + " (" + nick.ident() + "!" + nick.host() + ")");
     }
 
-    void onPart(const NoNick& nick, NoChannel& channel, const NoString& message) override
+    void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override
     {
         putModule("* Parts: " + nick.nick() + " (" + nick.ident() + "!" + nick.host() + ")");
     }
@@ -247,9 +247,9 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanCtcp(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
-        putModule("[" + nick.nick() + "] chanctcp [" + message + "] to [" + channel.name() + "]");
+        putModule("[" + nick.nick() + "] chanctcp [" + message + "] to [" + channel->name() + "]");
         message = "\00311,5 " + message + " \003";
 
         return CONTINUE;
@@ -271,17 +271,17 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanNotice(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
-        putModule("[" + nick.nick() + "] channotice [" + message + "] to [" + channel.name() + "]");
+        putModule("[" + nick.nick() + "] channotice [" + message + "] to [" + channel->name() + "]");
         message = "\00311,5 " + message + " \003";
 
         return CONTINUE;
     }
 
-    ModRet onTopic(NoNick& nick, NoChannel& channel, NoString& topic) override
+    ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override
     {
-        putModule("* " + nick.nick() + " changes topic on " + channel.name() + " to '" + topic + "'");
+        putModule("* " + nick.nick() + " changes topic on " + channel->name() + " to '" + topic + "'");
 
         return CONTINUE;
     }
@@ -309,10 +309,10 @@ public:
         return CONTINUE;
     }
 
-    ModRet onChanMsg(NoNick& nick, NoChannel& channel, NoString& message) override
+    ModRet onChanMsg(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         if (message == "!ping") {
-            putIrc("PRIVMSG " + channel.name() + " :PONG?");
+            putIrc("PRIVMSG " + channel->name() + " :PONG?");
         }
 
         message = "x " + message + " x";

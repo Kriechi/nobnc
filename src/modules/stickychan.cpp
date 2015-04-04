@@ -55,18 +55,18 @@ public:
         return CONTINUE;
     }
 
-    virtual void onMode(const NoNick& opNick, NoChannel& channel, char mode, const NoString& arg, bool added, bool noChange) override
+    virtual void onMode(const NoNick& opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange) override
     {
         if (mode == NoChannel::M_Key) {
             if (added) {
                 // We ignore channel key "*" because of some broken nets.
                 if (arg != "*") {
                     NoRegistry registry(this);
-                    registry.setValue(channel.name(), arg);
+                    registry.setValue(channel->name(), arg);
                 }
             } else {
                 NoRegistry registry(this);
-                registry.setValue(channel.name(), "");
+                registry.setValue(channel->name(), "");
             }
         }
     }

@@ -129,15 +129,15 @@ NoSettings NoChannel::toConfig() const
     return config;
 }
 
-void NoChannel::clone(NoChannel& chan)
+void NoChannel::clone(NoChannel* channel)
 {
     // We assume that d->name and d->network are equal
-    setBufferCount(chan.bufferCount(), true);
-    setAutoClearChanBuffer(chan.autoClearChanBuffer());
-    setKey(chan.key());
-    setDefaultModes(chan.defaultModes());
+    setBufferCount(channel->bufferCount(), true);
+    setAutoClearChanBuffer(channel->autoClearChanBuffer());
+    setKey(channel->key());
+    setDefaultModes(channel->defaultModes());
 
-    if (isDetached() != chan.isDetached()) {
+    if (isDetached() != channel->isDetached()) {
         // Only send something if it makes sense
         // (= Only detach if client is on the channel
         //    and only attach if we are on the channel)
@@ -148,7 +148,7 @@ void NoChannel::clone(NoChannel& chan)
                 detachUser();
             }
         }
-        setDetached(chan.isDetached());
+        setDetached(channel->isDetached());
     }
 }
 
@@ -320,7 +320,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
             opNick = opNick;
     }
 
-    NETWORKMODULECALL(onRawMode2(opNick, *this, sModeArg, args), d->network->user(), d->network, nullptr, NOTHING);
+    NETWORKMODULECALL(onRawMode2(opNick, this, sModeArg, args), d->network->user(), d->network, nullptr, NOTHING);
 
     for (uint a = 0; a < sModeArg.size(); a++) {
         const uchar& mode = sModeArg[a];
@@ -352,7 +352,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
                         }
                     }
 
-                    NETWORKMODULECALL(onChanPermission2(opNick, *pNick, *this, mode, bAdd, noChange),
+                    NETWORKMODULECALL(onChanPermission2(opNick, *pNick, this, mode, bAdd, noChange),
                                       d->network->user(),
                                       d->network,
                                       nullptr,
@@ -360,15 +360,15 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
 
                     if (mode == NoChannel::M_Op) {
                         if (bAdd) {
-                            NETWORKMODULECALL(onOp2(opNick, *pNick, *this, noChange), d->network->user(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onOp2(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
                         } else {
-                            NETWORKMODULECALL(onDeop2(opNick, *pNick, *this, noChange), d->network->user(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onDeop2(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
                         }
                     } else if (mode == NoChannel::M_Voice) {
                         if (bAdd) {
-                            NETWORKMODULECALL(onVoice2(opNick, *pNick, *this, noChange), d->network->user(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onVoice2(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
                         } else {
-                            NETWORKMODULECALL(onDevoice2(opNick, *pNick, *this, noChange), d->network->user(), d->network, nullptr, NOTHING);
+                            NETWORKMODULECALL(onDevoice2(opNick, *pNick, this, noChange), d->network->user(), d->network, nullptr, NOTHING);
                         }
                     }
                 }
@@ -403,7 +403,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
             } else {
                 noChange = !hasMode(mode);
             }
-            NETWORKMODULECALL(onMode2(opNick, *this, mode, arg, bAdd, noChange), d->network->user(), d->network, nullptr, NOTHING);
+            NETWORKMODULECALL(onMode2(opNick, this, mode, arg, bAdd, noChange), d->network->user(), d->network, nullptr, NOTHING);
 
             if (!bList) {
                 (bAdd) ? addMode(mode, arg) : removeMode(mode);
@@ -668,7 +668,7 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                 pUseClient->setPlaybackActive(true);
 
                 bool skipStatusMsg = pUseClient->hasServerTime();
-                NETWORKMODULECALL(onChanBufferStarting(*this, *pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
+                NETWORKMODULECALL(onChanBufferStarting(this, *pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
 
                 if (!skipStatusMsg) {
                     d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Buffer Playback...", pUseClient);
@@ -691,7 +691,7 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                         No::setMessageTags(line, msBatchTags);
                     }
                     bool bNotShowThisLine = false;
-                    NETWORKMODULECALL(onChanBufferPlayLine2(*this, *pUseClient, line, BufLine.timestamp()),
+                    NETWORKMODULECALL(onChanBufferPlayLine2(this, *pUseClient, line, BufLine.timestamp()),
                                       d->network->user(),
                                       d->network,
                                       nullptr,
@@ -702,7 +702,7 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                 }
 
                 skipStatusMsg = pUseClient->hasServerTime();
-                NETWORKMODULECALL(onChanBufferEnding(*this, *pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
+                NETWORKMODULECALL(onChanBufferEnding(this, *pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
                 if (!skipStatusMsg) {
                     d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Playback Complete.", pUseClient);
                 }
