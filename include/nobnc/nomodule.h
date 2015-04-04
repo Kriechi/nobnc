@@ -137,16 +137,21 @@ class NoModuleJob;
 class NO_EXPORT NoModule
 {
 public:
-    NoModule(NoModuleHandle pDLL,
-             NoUser* user,
-             NoNetwork* network,
-             const NoString& name,
-             const NoString& dataDir,
-             No::ModuleType type = No::NetworkModule); // TODO: remove default value in ZNC 2.x
+    NoModule(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type);
     virtual ~NoModule();
 
-    NoModule(const NoModule&) = delete;
-    NoModule& operator=(const NoModule&) = delete;
+    No::ModuleType type() const;
+
+    NoUser* user() const;
+    NoNetwork* network() const;
+    NoClient* client() const;
+    NoSocketManager* manager() const;
+
+    NoString description() const;
+    NoString modulePath() const;
+
+    NoString args() const;
+    void setArgs(const NoString& args);
 
     /** This enum is just used for return from module hooks. Based on this
      *  return, ZNC then decides what to do with the event which caused the
@@ -196,7 +201,6 @@ public:
      */
     virtual bool onBoot();
 
-
     /** Modules which can only be used with an active user session have to return true here.
      *  @return false for modules that can do stuff for non-logged in web users as well.
      */
@@ -244,7 +248,6 @@ public:
      *          Exact meaning of return value is up to caller, and depends on context.
      */
     virtual bool onEmbeddedWebRequest(NoWebSocket& socket, const NoString& page, NoTemplate& tmpl);
-
 
     /** Called just before znc.conf is rehashed */
     virtual void onPreRehash();
@@ -715,26 +718,6 @@ public:
     NoString expandString(const NoString& str) const;
     NoString& expandString(const NoString& str, NoString& ret) const;
 
-    No::ModuleType type() const;
-    NoString description() const;
-    NoString modulePath() const;
-
-    NoString args() const;
-    void setArgs(const NoString& args);
-
-    /** @returns For user modules this returns the user for which this
-     *           module was loaded. For global modules this returns nullptr,
-     *           except when we are in a user-specific module hook in which
-     *           case this is the user pointer.
-     */
-    NoUser* user() const;
-    /** @returns nullptr except when we are in a client-specific module hook in
-     *           which case this is the client for which the hook is called.
-     */
-    NoNetwork* network() const;
-    NoClient* client() const;
-    NoSocketManager* manager() const;
-
     /** This module hook is called when a user is being added.
      * @param User The user which will be added.
      * @param error A message that may be displayed to the user if
@@ -803,8 +786,7 @@ public:
      *  @param[out] message text about loading of the module.
      *  @return See NoModule::ModRet.
      */
-    virtual ModRet
-    onModuleLoading(const NoString& name, const NoString& args, No::ModuleType type, bool& success, NoString& message);
+    virtual ModRet onModuleLoading(const NoString& name, const NoString& args, No::ModuleType type, bool& success, NoString& message);
     /** Called when a module is going to be unloaded.
      *  @param module the module.
      *  @param[out] success the module was unloaded successfully
@@ -828,8 +810,10 @@ public:
     virtual void onGetAvailableModules(std::set<NoModuleInfo>& modules, No::ModuleType type);
 
 private:
-    friend class NoModulePrivate;
+    NoModule(const NoModule&) = delete;
+    NoModule& operator=(const NoModule&) = delete;
     std::unique_ptr<NoModulePrivate> d;
+    friend class NoModulePrivate;
 };
 
 #endif // NOMODULE_H
