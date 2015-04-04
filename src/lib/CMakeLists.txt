@@ -15,6 +15,7 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/noescape.h
                        ${NO_INCDIR}/noexception.h
                        ${NO_INCDIR}/nofile.h
+                       ${NO_INCDIR}/nohostmask.h
                        ${NO_INCDIR}/nohttpsocket.h
                        ${NO_INCDIR}/noircsocket.h
                        ${NO_INCDIR}/nojob.h
@@ -72,6 +73,7 @@ list(APPEND NO_SOURCES noapp.cpp
                        noescape.cpp
                        noexception.cpp
                        nofile.cpp
+                       nohostmask.cpp
                        nohttpsocket.cpp
                        noircsocket.cpp
                        nolistener.cpp
