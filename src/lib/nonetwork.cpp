@@ -719,6 +719,16 @@ std::vector<NoClient*> NoNetwork::findClients(const NoString& identifier) const
     return vClients;
 }
 
+std::vector<NoChannel*> NoNetwork::findNick(const NoString& nick) const
+{
+    std::vector<NoChannel*> channels;
+    for (NoChannel* channel : d->channels) {
+        if (channel->findNick(nick))
+            channels.push_back(channel);
+    }
+    return channels;
+}
+
 void NoNetwork::setUser(NoUser* user)
 {
     for (NoClient* client : d->clients) {

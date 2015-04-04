@@ -74,6 +74,8 @@ public:
     std::vector<NoClient*> clients() const;
     std::vector<NoClient*> findClients(const NoString& identifier) const;
 
+    std::vector<NoChannel*> findNick(const NoString& nick) const;
+
     void setUser(NoUser* user);
     bool setName(const NoString& name);
 
