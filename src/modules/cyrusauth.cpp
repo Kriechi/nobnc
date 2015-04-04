@@ -142,7 +142,7 @@ public:
                         user = nullptr;
                     }
 
-                    if (user && !user->clone(*pBaseUser, sErr)) {
+                    if (user && !user->clone(pBaseUser, sErr)) {
                         NO_DEBUG("saslauth: Clone User [" << CloneUser() << "] failed: " << sErr);
                         delete user;
                         user = nullptr;

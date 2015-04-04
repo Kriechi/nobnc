@@ -1509,7 +1509,7 @@ public:
         if (!user) {
             NoString sClone = socket.param("clone");
             if (NoUser* pCloneUser = noApp->findUser(sClone)) {
-                pNewUser->cloneNetworks(*pCloneUser);
+                pNewUser->cloneNetworks(pCloneUser);
             }
 
             // Add User Submission
@@ -1523,7 +1523,7 @@ public:
             action = "added";
         } else {
             // Edit User Submission
-            if (!user->clone(*pNewUser, sErr, false)) {
+            if (!user->clone(pNewUser, sErr, false)) {
                 delete pNewUser;
                 socket.printErrorPage("Invalid Submission [" + sErr + "]");
                 return true;

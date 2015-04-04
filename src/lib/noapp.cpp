@@ -1342,7 +1342,7 @@ bool NoAppPrivate::doRehash(NoString& error)
 
         NoString sErr;
         if (pRealUser) {
-            if (!pRealUser->clone(*user, sErr) || !noApp->addUser(pRealUser, sErr)) {
+            if (!pRealUser->clone(user, sErr) || !noApp->addUser(pRealUser, sErr)) {
                 error = "Invalid user [" + user->userName() + "] " + sErr;
                 NO_DEBUG("NoUser::Clone() failed in rehash");
             }

@@ -558,88 +558,77 @@ void NoUser::userDisconnected(NoClient* client)
     }
 }
 
-void NoUser::cloneNetworks(const NoUser& User)
+void NoUser::cloneNetworks(NoUser* user)
 {
-    const std::vector<NoNetwork*>& vNetworks = User.networks();
-    for (NoNetwork* pUserNetwork : vNetworks) {
-        NoNetwork* network = findNetwork(pUserNetwork->name());
+    for (NoNetwork* userNetwork : user->networks()) {
+        NoNetwork* network = findNetwork(userNetwork->name());
 
-        if (network) {
-            network->clone(*pUserNetwork);
-        } else {
-            new NoNetwork(this, *pUserNetwork);
-        }
+        if (network)
+            network->clone(*userNetwork);
+        else
+            new NoNetwork(this, *userNetwork); // err what?
     }
 
-    std::set<NoString> ssDeleteNetworks;
+    std::set<NoString> deleteNetworks;
     for (NoNetwork* network : d->networks) {
-        if (!(User.findNetwork(network->name()))) {
-            ssDeleteNetworks.insert(network->name());
-        }
+        if (!user->findNetwork(network->name()))
+            deleteNetworks.insert(network->name());
     }
 
-    for (const NoString& sNetwork : ssDeleteNetworks) {
+    for (const NoString& network : deleteNetworks) {
         // The following will move all the clients to the user.
         // So the clients are not disconnected. The client could
         // have requested the rehash. Then when we do
         // client->putStatus("Rehashing succeeded!") we would
         // crash if there was no client anymore.
-        const std::vector<NoClient*>& vClients = findNetwork(sNetwork)->clients();
-
-        while (vClients.begin() != vClients.end()) {
-            NoClient* client = vClients.front();
-            // This line will remove client from vClients,
-            // because it's a reference to the internal network's vector.
+        std::vector<NoClient*> clients = findNetwork(network)->clients();
+        for (NoClient* client : clients)
             client->setNetwork(nullptr);
-        }
 
-        deleteNetwork(sNetwork);
+        deleteNetwork(network);
     }
 }
 
-bool NoUser::clone(const NoUser& User, NoString& error, bool cloneNetworks)
+bool NoUser::clone(NoUser* user, NoString& error, bool cloneNetworks)
 {
     error.clear();
 
-    if (!User.isValid(error, true)) {
+    if (!user || !user->isValid(error, true))
         return false;
-    }
 
     // user names can only specified for the constructor, changing it later
     // on breaks too much stuff (e.g. lots of paths depend on the user name)
-    if (userName() != User.userName()) {
+    if (userName() != user->userName()) {
         NO_DEBUG("Ignoring username in NoUser::Clone(), old username [" << userName() << "]; New username ["
-                                                                        << User.userName() << "]");
+                                                                        << user->userName() << "]");
     }
 
-    if (!User.password().empty()) {
-        setPassword(User.password());
-        d->passwordSalt = NoUserPrivate::get(&const_cast<NoUser&>(User))->passwordSalt;
+    if (!user->password().empty()) {
+        setPassword(user->password());
+        d->passwordSalt = NoUserPrivate::get(user)->passwordSalt;
     }
 
-    setNick(User.nick(false));
-    setAltNick(User.altNick(false));
-    setIdent(User.ident(false));
-    setRealName(User.realName());
-    setStatusPrefix(User.statusPrefix());
-    setBindHost(User.bindHost());
-    setDccBindHost(User.dccBindHost());
-    setQuitMessage(User.quitMessage());
-    setSkinName(User.skinName());
-    setDefaultChanModes(User.defaultChanModes());
-    setBufferCount(User.bufferCount(), true);
-    setJoinTries(User.joinTries());
-    setMaxNetworks(User.maxNetworks());
-    setMaxQueryBuffers(User.maxQueryBuffers());
-    setMaxJoins(User.maxJoins());
-    setClientEncoding(User.clientEncoding());
+    setNick(user->nick(false));
+    setAltNick(user->altNick(false));
+    setIdent(user->ident(false));
+    setRealName(user->realName());
+    setStatusPrefix(user->statusPrefix());
+    setBindHost(user->bindHost());
+    setDccBindHost(user->dccBindHost());
+    setQuitMessage(user->quitMessage());
+    setSkinName(user->skinName());
+    setDefaultChanModes(user->defaultChanModes());
+    setBufferCount(user->bufferCount(), true);
+    setJoinTries(user->joinTries());
+    setMaxNetworks(user->maxNetworks());
+    setMaxQueryBuffers(user->maxQueryBuffers());
+    setMaxJoins(user->maxJoins());
+    setClientEncoding(user->clientEncoding());
 
     // Allowed Hosts
     d->allowedHosts.clear();
-    const std::set<NoString>& ssHosts = User.allowedHosts();
-    for (const NoString& host : ssHosts) {
+    for (const NoString& host : user->allowedHosts())
         addAllowedHost(host);
-    }
 
     for (NoClient* client : d->clients) {
         NoSocket* socket = client->socket();
@@ -653,59 +642,54 @@ bool NoUser::clone(const NoUser& User, NoString& error, bool cloneNetworks)
     // !Allowed Hosts
 
     // Networks
-    if (cloneNetworks) {
-        NoUser::cloneNetworks(User);
-    }
+    if (cloneNetworks)
+        NoUser::cloneNetworks(user);
     // !Networks
 
     // CTCP Replies
     d->ctcpReplies.clear();
-    const NoStringMap& msReplies = User.ctcpReplies();
-    for (const auto& it : msReplies) {
+    const NoStringMap& msReplies = user->ctcpReplies();
+    for (const auto& it : msReplies)
         addCtcpReply(it.first, it.second);
-    }
     // !CTCP Replies
 
     // Flags
-    setAutoClearChanBuffer(User.autoClearChanBuffer());
-    setAutoclearQueryBuffer(User.autoclearQueryBuffer());
-    setMultiClients(User.multiClients());
-    setDenyLoadMod(User.denyLoadMod());
-    setAdmin(User.isAdmin());
-    setDenysetBindHost(User.denysetBindHost());
-    setTimestampAppend(User.timestampAppend());
-    setTimestampPrepend(User.timestampPrepend());
-    setTimestampFormat(User.timestampFormat());
-    setTimezone(User.timezone());
+    setAutoClearChanBuffer(user->autoClearChanBuffer());
+    setAutoclearQueryBuffer(user->autoclearQueryBuffer());
+    setMultiClients(user->multiClients());
+    setDenyLoadMod(user->denyLoadMod());
+    setAdmin(user->isAdmin());
+    setDenysetBindHost(user->denysetBindHost());
+    setTimestampAppend(user->timestampAppend());
+    setTimestampPrepend(user->timestampPrepend());
+    setTimestampFormat(user->timestampFormat());
+    setTimezone(user->timezone());
     // !Flags
 
     // Modules
-    std::set<NoString> ssUnloadMods;
-    NoModuleLoader* vCurMods = loader();
-    const NoModuleLoader* vNewMods = User.loader();
+    std::set<NoString> unloadMods;
+    NoModuleLoader* curMods = loader();
+    const NoModuleLoader* newMods = user->loader();
 
-    for (NoModule* pNewMod : vNewMods->modules()) {
+    for (NoModule* newMod : newMods->modules()) {
         NoString sModRet;
-        NoModule* pCurMod = vCurMods->findModule(pNewMod->moduleName());
+        NoModule* curMod = curMods->findModule(newMod->moduleName());
 
-        if (!pCurMod) {
-            vCurMods->loadModule(pNewMod->moduleName(), pNewMod->args(), No::UserModule, this, nullptr, sModRet);
-        } else if (pNewMod->args() != pCurMod->args()) {
-            vCurMods->reloadModule(pNewMod->moduleName(), pNewMod->args(), this, nullptr, sModRet);
-        }
+        if (!curMod)
+            curMods->loadModule(newMod->moduleName(), newMod->args(), No::UserModule, this, nullptr, sModRet);
+        else if (newMod->args() != curMod->args())
+            curMods->reloadModule(newMod->moduleName(), newMod->args(), this, nullptr, sModRet);
     }
 
-    for (NoModule* pCurMod : vCurMods->modules()) {
-        NoModule* pNewMod = vNewMods->findModule(pCurMod->moduleName());
+    for (NoModule* curMod : curMods->modules()) {
+        NoModule* newMod = newMods->findModule(curMod->moduleName());
 
-        if (!pNewMod) {
-            ssUnloadMods.insert(pCurMod->moduleName());
-        }
+        if (!newMod)
+            unloadMods.insert(curMod->moduleName());
     }
 
-    for (const NoString& sMod : ssUnloadMods) {
-        vCurMods->unloadModule(sMod);
-    }
+    for (const NoString& mod : unloadMods)
+        curMods->unloadModule(mod);
     // !Modules
 
     return true;

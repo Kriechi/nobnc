@@ -73,8 +73,8 @@ public:
     NoString addTimestamp(const NoString& str) const;
     NoString addTimestamp(time_t tm, const NoString& str) const;
 
-    void cloneNetworks(const NoUser& User);
-    bool clone(const NoUser& User, NoString& error, bool cloneNetworks = true);
+    void cloneNetworks(NoUser* user);
+    bool clone(NoUser* user, NoString& error, bool cloneNetworks = true);
 
     void setNick(const NoString& s);
     void setAltNick(const NoString& s);

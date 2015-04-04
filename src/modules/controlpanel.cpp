@@ -898,7 +898,7 @@ class NoAdminMod : public NoModule
 
         NoUser* pNewUser = new NoUser(sNewUsername);
         NoString error;
-        if (!pNewUser->clone(*oldUser, error)) {
+        if (!pNewUser->clone(oldUser, error)) {
             delete pNewUser;
             putModule("Error: Cloning failed! [" + error + "]");
             return;
