@@ -228,44 +228,9 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
             }
         }
     }
-    settings->FindStringEntry("pass", value);
-    // There are different formats for this available:
-    // Pass = <plain text>
-    // Pass = <md5 hash> -
-    // Pass = plain#<plain text>
-    // Pass = <hash name>#<hash>
-    // Pass = <hash name>#<salted hash>#<salt>#
-    // 'Salted hash' means hash of 'password' + 'salt'
-    // Possible hashes are md5 and sha256
-    if (value.right(1) == "-") {
-        value.rightChomp(1);
-        value.trim();
-        setPassword(value, NoUser::HashMd5);
-    } else {
-        NoString sMethod = No::token(value, 0, "#");
-        NoString pass = No::tokens(value, 1, "#");
-        if (sMethod == "md5" || sMethod == "sha256") {
-            NoUser::HashType type = NoUser::HashMd5;
-            if (sMethod == "sha256")
-                type = NoUser::HashSha256;
-
-            NoString salt = No::token(pass, 1, "#");
-            pass = No::token(pass, 0, "#");
-            setPassword(pass, type, salt);
-        } else if (sMethod == "plain") {
-            setPassword(pass, NoUser::HashNone);
-        } else {
-            setPassword(value, NoUser::HashNone);
-        }
-    }
     NoSettings::SubConfig subConf;
     NoSettings::SubConfig::const_iterator subIt;
     settings->FindSubConfig("pass", subConf);
-    if (!value.empty() && !subConf.empty()) {
-        error = "Password defined more than once";
-        No::printError(error);
-        return false;
-    }
     subIt = subConf.begin();
     if (subIt != subConf.end()) {
         NoSettings* pSubConf = subIt->second.m_subConfig;
