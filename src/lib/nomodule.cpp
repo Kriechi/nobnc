@@ -563,10 +563,10 @@ void NoModule::onUnknownModCommand(const NoString& line)
         putModule("Unknown command!");
 }
 
-void NoModule::onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels)
+void NoModule::onQuit(const NoNick& nick, const NoString& message)
 {
 }
-void NoModule::onNick(const NoNick& nick, const NoString& newNick, const std::vector<NoChannel*>& channels)
+void NoModule::onNick(const NoNick& nick, const NoString& newNick)
 {
 }
 void NoModule::onKick(const NoNick& nick, const NoString& sKickedNick, NoChannel* channel, const NoString& message)

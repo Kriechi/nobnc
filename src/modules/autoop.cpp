@@ -235,7 +235,7 @@ public:
         }
     }
 
-    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message) override
     {
         NoStringMap::iterator it = m_msQueue.find(nick.nick().toLower());
 
@@ -244,7 +244,7 @@ public:
         }
     }
 
-    void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& OldNick, const NoString& newNick) override
     {
         // Update the queue with nick changes
         NoStringMap::iterator it = m_msQueue.find(OldNick.nick().toLower());

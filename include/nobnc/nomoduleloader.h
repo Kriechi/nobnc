@@ -93,8 +93,8 @@ public:
     bool onModNotice(const NoString& message);
     bool onModCTCP(const NoString& message);
 
-    bool onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels);
-    bool onNick(const NoNick& nick, const NoString& newNick, const std::vector<NoChannel*>& channels);
+    bool onQuit(const NoNick& nick, const NoString& message);
+    bool onNick(const NoNick& nick, const NoString& newNick);
     bool onKick(const NoNick& nick, const NoString& opNick, NoChannel* channel, const NoString& message);
     bool onJoining(NoChannel* channel);
     bool onJoin(const NoNick& nick, NoChannel* channel);

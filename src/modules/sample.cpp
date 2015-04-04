@@ -180,7 +180,7 @@ public:
         putModule("[" + opNick.nick() + "] kicked [" + sKickedNick + "] from [" + channel->name() + "] with the msg [" + message + "]");
     }
 
-    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message) override
     {
         putModule("* Quits: " + nick.nick() + " (" + nick.ident() + "!" + nick.host() + ") (" + message + ")");
     }
@@ -212,7 +212,7 @@ public:
         return CONTINUE;
     }
 
-    void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& OldNick, const NoString& newNick) override
     {
         putModule("* " + OldNick.nick() + " is now known as " + newNick);
     }

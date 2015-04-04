@@ -365,16 +365,14 @@ public:
     /** Called when a nick quit from IRC.
      *  @param nick The nick which quit.
      *  @param message The quit message.
-     *  @param channels List of channels which you and nick share.
      */
-    virtual void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels);
+    virtual void onQuit(const NoNick& nick, const NoString& message);
     /** Called when a nickname change occurs. If we are changing our nick,
      *  newNick will equal m_pIRCSock->GetNick().
      *  @param nick The nick which changed its nickname
      *  @param newNick The new nickname.
-     *  @param channels Channels which we and nick share.
      */
-    virtual void onNick(const NoNick& nick, const NoString& newNick, const std::vector<NoChannel*>& channels);
+    virtual void onNick(const NoNick& nick, const NoString& newNick);
     /** Called when a nick is kicked from a channel.
      *  @param opNick The nick which generated the kick.
      *  @param sKickedNick The nick which was kicked.

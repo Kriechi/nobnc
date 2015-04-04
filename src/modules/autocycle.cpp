@@ -115,10 +115,11 @@ public:
         AutoCycle(channel);
     }
 
-    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message) override
     {
-        for (uint i = 0; i < channels.size(); i++)
-            AutoCycle(channels[i]);
+        std::vector<NoChannel*> channels = network()->findNick(nick.nick());
+        for (NoChannel* channel : channels)
+            AutoCycle(channel);
     }
 
     void onKick(const NoNick& nick, const NoString& opNick, NoChannel* channel, const NoString& message) override

@@ -537,16 +537,10 @@ void NoIrcSocket::readLine(const NoString& data)
             NoString newNick = sRest.trimPrefix_n();
             bool bIsVisible = false;
 
-            std::vector<NoChannel*> vFoundChans;
-            const std::vector<NoChannel*>& channels = d->network->channels();
-
-            for (NoChannel* channel : channels) {
+            for (NoChannel* channel : d->network->channels()) {
                 if (channel->changeNick(nick.nick(), newNick)) {
-                    vFoundChans.push_back(channel);
-
-                    if (!channel->isDetached()) {
+                    if (!channel->isDetached())
                         bIsVisible = true;
-                    }
                 }
             }
 
@@ -557,7 +551,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 d->network->putUser(line);
             }
 
-            IRCSOCKMODULECALL(onNick(nick, newNick, vFoundChans), NOTHING);
+            IRCSOCKMODULECALL(onNick(nick, newNick), NOTHING);
 
             if (!bIsVisible) {
                 return;
@@ -576,20 +570,14 @@ void NoIrcSocket::readLine(const NoString& data)
                 return;
             }
 
-            std::vector<NoChannel*> vFoundChans;
-            const std::vector<NoChannel*>& channels = d->network->channels();
-
-            for (NoChannel* channel : channels) {
+            for (NoChannel* channel : d->network->channels()) {
                 if (channel->removeNick(nick.nick())) {
-                    vFoundChans.push_back(channel);
-
-                    if (!channel->isDetached()) {
+                    if (!channel->isDetached())
                         bIsVisible = true;
-                    }
                 }
             }
 
-            IRCSOCKMODULECALL(onQuit(nick, message, vFoundChans), NOTHING);
+            IRCSOCKMODULECALL(onQuit(nick, message), NOTHING);
 
             if (!bIsVisible) {
                 return;

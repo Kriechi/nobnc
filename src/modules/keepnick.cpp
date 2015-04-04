@@ -88,7 +88,7 @@ public:
         return sConfNick;
     }
 
-    void onNick(const NoNick& nick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& nick, const NoString& newNick) override
     {
         if (newNick == network()->ircSocket()->nick()) {
             // We are changing our own nick
@@ -111,7 +111,7 @@ public:
         }
     }
 
-    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message) override
     {
         // If someone with the nick we want quits, be fast and get the nick
         if (nick.equals(GetNick())) {

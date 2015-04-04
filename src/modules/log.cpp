@@ -110,10 +110,10 @@ public:
 
     void onRawMode2(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override;
     void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override;
-    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override;
+    void onQuit(const NoNick& nick, const NoString& message) override;
     void onJoin(const NoNick& nick, NoChannel* channel) override;
     void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override;
-    void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override;
+    void onNick(const NoNick& OldNick, const NoString& newNick) override;
     ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override;
 
     /* notices */
@@ -374,10 +374,11 @@ void NoLogMod::onKick(const NoNick& opNick, const NoString& sKickedNick, NoChann
     PutLog("*** " + sKickedNick + " was kicked by " + opNick.nick() + " (" + message + ")", channel);
 }
 
-void NoLogMod::onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels)
+void NoLogMod::onQuit(const NoNick& nick, const NoString& message)
 {
-    for (std::vector<NoChannel*>::const_iterator channel = channels.begin(); channel != channels.end(); ++channel)
-        PutLog("*** Quits: " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") (" + message + ")", *channel);
+    std::vector<NoChannel*> channels = network()->findNick(nick.nick());
+    for (NoChannel* channel : channels)
+        PutLog("*** Quits: " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") (" + message + ")", channel);
 }
 
 void NoLogMod::onJoin(const NoNick& nick, NoChannel* channel)
@@ -390,10 +391,11 @@ void NoLogMod::onPart(const NoNick& nick, NoChannel* channel, const NoString& me
     PutLog("*** Parts: " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") (" + message + ")", channel);
 }
 
-void NoLogMod::onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels)
+void NoLogMod::onNick(const NoNick& OldNick, const NoString& newNick)
 {
-    for (std::vector<NoChannel*>::const_iterator channel = channels.begin(); channel != channels.end(); ++channel)
-        PutLog("*** " + OldNick.nick() + " is now known as " + newNick, *channel);
+    std::vector<NoChannel*> channels = network()->findNick(newNick);
+    for (NoChannel* channel : channels)
+        PutLog("*** " + OldNick.nick() + " is now known as " + newNick, channel);
 }
 
 NoModule::ModRet NoLogMod::onTopic(NoNick& nick, NoChannel* channel, NoString& topic)

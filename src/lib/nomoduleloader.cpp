@@ -359,14 +359,14 @@ bool NoModuleLoader::onUserQuit(NoString& message)
     MODHALTCHK(onUserQuit(message));
 }
 
-bool NoModuleLoader::onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels)
+bool NoModuleLoader::onQuit(const NoNick& nick, const NoString& message)
 {
-    MODUNLOADCHK(onQuit(nick, message, channels));
+    MODUNLOADCHK(onQuit(nick, message));
     return false;
 }
-bool NoModuleLoader::onNick(const NoNick& nick, const NoString& newNick, const std::vector<NoChannel*>& channels)
+bool NoModuleLoader::onNick(const NoNick& nick, const NoString& newNick)
 {
-    MODUNLOADCHK(onNick(nick, newNick, channels));
+    MODUNLOADCHK(onNick(nick, newNick));
     return false;
 }
 bool NoModuleLoader::onKick(const NoNick& nick, const NoString& sKickedNick, NoChannel* channel, const NoString& message)

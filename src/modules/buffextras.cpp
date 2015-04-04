@@ -50,13 +50,12 @@ public:
         AddBuffer(channel, opNick.hostMask() + " kicked " + sKickedNick + " Reason: [" + message + "]");
     }
 
-    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message) override
     {
-        std::vector<NoChannel*>::const_iterator it;
         NoString msg = nick.hostMask() + " quit with message: [" + message + "]";
-        for (it = channels.begin(); it != channels.end(); ++it) {
-            AddBuffer(*it, msg);
-        }
+        std::vector<NoChannel*> channels = network()->findNick(nick.nick());
+        for (NoChannel* channel : channels)
+            AddBuffer(channel, msg);
     }
 
     void onJoin(const NoNick& nick, NoChannel* channel) override
@@ -69,13 +68,12 @@ public:
         AddBuffer(channel, nick.hostMask() + " parted with message: [" + message + "]");
     }
 
-    void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& OldNick, const NoString& newNick) override
     {
-        std::vector<NoChannel*>::const_iterator it;
         NoString msg = OldNick.hostMask() + " is now known as " + newNick;
-        for (it = channels.begin(); it != channels.end(); ++it) {
-            AddBuffer(*it, msg);
-        }
+        std::vector<NoChannel*> channels = network()->findNick(newNick);
+        for (NoChannel* channel : channels)
+            AddBuffer(channel, msg);
     }
 
     ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override

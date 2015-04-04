@@ -252,7 +252,7 @@ public:
                 channel->name());
     }
 
-    void onQuit(const NoNick& nick, const NoString& message, const std::vector<NoChannel*>& channels) override
+    void onQuit(const NoNick& nick, const NoString& message) override
     {
         Process(nick,
                 "* Quits: " + nick.nick() + " (" + nick.ident() + "@" + nick.host() + ") "
@@ -273,7 +273,7 @@ public:
                 channel->name());
     }
 
-    void onNick(const NoNick& OldNick, const NoString& newNick, const std::vector<NoChannel*>& channels) override
+    void onNick(const NoNick& OldNick, const NoString& newNick) override
     {
         Process(OldNick, "* " + OldNick.nick() + " is now known as " + newNick, "");
     }
