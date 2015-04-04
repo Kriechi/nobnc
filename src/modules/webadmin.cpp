@@ -191,7 +191,7 @@ public:
 
         if (!arg.empty()) {
             NoString salt = No::salt();
-            NoString sHash = NoUser::saltedHash(arg, salt);
+            NoString sHash = No::saltedSha256(arg, salt);
             pNewUser->setPassword(sHash, NoUser::HashDefault, salt);
         }
 

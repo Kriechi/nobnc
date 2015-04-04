@@ -20,7 +20,6 @@
 
 #include <nobnc/noglobal.h>
 #include <nobnc/nostring.h>
-#include <nobnc/noutils.h> // TODO: kill NoUser::SaltedHash()
 #include <memory>
 
 class NoClient;
@@ -39,14 +38,6 @@ public:
 
     // TODO refactor this
     enum HashType { HashNone, HashMd5, HashSha256, HashDefault = HashSha256 };
-
-    // If you change the default hash here and in HASH_DEFAULT,
-    // don't forget No::sDefaultHash!
-    // TODO refactor this
-    static NoString saltedHash(const NoString& pass, const NoString& salt)
-    {
-        return No::saltedSha256(pass, salt);
-    }
 
     NoSettings toConfig() const;
     bool checkPass(const NoString& pass) const;

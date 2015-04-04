@@ -25,6 +25,7 @@
 #include <nobnc/noircsocket.h>
 #include <nobnc/noapp.h>
 #include <nobnc/nonick.h>
+#include <nobnc/noutils.h>
 
 template <std::size_t N>
 struct array_size_helper
@@ -365,7 +366,7 @@ class NoAdminMod : public NoModule
             putModule("autoclearQueryBuffer = " + NoString(b));
         } else if (sVar == "password") {
             const NoString salt = No::salt();
-            const NoString sHash = NoUser::saltedHash(value, salt);
+            const NoString sHash = No::saltedSha256(value, salt);
             user->setPassword(sHash, NoUser::HashDefault, salt);
             putModule("Password has been changed!");
         } else if (sVar == "maxjoins") {
@@ -829,7 +830,7 @@ class NoAdminMod : public NoModule
 
         NoUser* pNewUser = new NoUser(username);
         NoString salt = No::salt();
-        pNewUser->setPassword(NoUser::saltedHash(sPassword, salt), NoUser::HashDefault, salt);
+        pNewUser->setPassword(No::saltedSha256(sPassword, salt), NoUser::HashDefault, salt);
 
         NoString sErr;
         if (!noApp->addUser(pNewUser, sErr)) {
