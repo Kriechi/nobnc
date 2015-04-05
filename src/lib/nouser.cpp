@@ -767,7 +767,7 @@ NoSettings NoUser::toConfig() const
 
 bool NoUser::checkPass(const NoString& pass) const
 {
-    return d->password.equals(No::saltedSha256(pass, d->passwordSalt));
+    return d->password.equals(No::sha256(pass + d->passwordSalt));
 }
 
 /*NoClient* NoUser::client() {
@@ -991,10 +991,10 @@ void NoUser::setDccBindHost(const NoString& s)
 {
     d->dccBindHost = s;
 }
-void NoUser::setPassword(const NoString& s)
+void NoUser::setPassword(const NoString& password)
 {
     d->passwordSalt = No::salt();
-    d->password = No::saltedSha256(s, d->passwordSalt);
+    d->password = No::sha256(password + d->passwordSalt);
 }
 void NoUser::setMultiClients(bool b)
 {

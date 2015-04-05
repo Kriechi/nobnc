@@ -127,7 +127,7 @@ NoString No::getSaltedHashPass(NoString& salt)
             No::printError("The supplied passwords did not match");
         } else {
             // Construct the salted pass
-            return saltedSha256(pass1, salt);
+            return sha256(pass1 + salt);
         }
     }
 }
@@ -190,11 +190,6 @@ NoString No::sha256(const NoString& str)
              digest[31]);
 
     return digest_hex;
-}
-
-NoString No::saltedSha256(const NoString& pass, const NoString& salt)
-{
-    return sha256(pass + salt);
 }
 
 NoString No::getPass(const NoString& prompt)
