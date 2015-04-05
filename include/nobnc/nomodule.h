@@ -53,15 +53,9 @@ class NoModulePrivate;
 #endif
 #endif
 
-#if HAVE_VISIBILITY
-#define MODULE_EXPORT __attribute__((__visibility__("default")))
-#else
-#define MODULE_EXPORT
-#endif
-
 #define MODCOMMONDEFS(CLASS, DESCRIPTION, TYPE)                          \
     extern "C" {                                                         \
-    MODULE_EXPORT bool no_moduleInfo(double version, NoModuleInfo& info) \
+    NO_DECL_EXPORT bool no_moduleInfo(double version, NoModuleInfo& info) \
     {                                                                    \
         if (version != NO_VERSION)                                       \
             return false;                                                \
