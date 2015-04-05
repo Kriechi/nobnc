@@ -553,7 +553,7 @@ NoSettings NoNetwork::toConfig() const
     // Chans
     for (NoChannel* channel : d->channels) {
         if (channel->inConfig()) {
-            config.AddSubConfig("Channel", channel->name(), channel->toConfig());
+            config.AddSubConfig("Chan", channel->name(), channel->toConfig());
         }
     }
 
