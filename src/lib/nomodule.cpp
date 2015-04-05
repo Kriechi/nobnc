@@ -186,22 +186,13 @@ NoModuleSocket* NoModule::findSocket(const NoString& name) const
     return nullptr;
 }
 
-bool NoModule::addCommand(const NoModuleCommand& command)
-{
-    if (command.function() == nullptr)
-        return false;
-    if (command.command().contains(" "))
-        return false;
-    if (findCommand(command.command()) != nullptr)
-        return false;
-
-    d->commands[command.command()] = command;
-    return true;
-}
-
 bool NoModule::addCommand(const NoString& cmd, NoModuleCommand::ModCmdFunc func, const NoString& args, const NoString& desc)
 {
-    return addCommand(NoModuleCommand(cmd, this, func, args, desc));
+    if (!func || cmd.contains(" ") || findCommand(cmd))
+        return false;
+
+    d->commands[cmd] = NoModuleCommand(cmd, this, func, args, desc);
+    return true;
 }
 
 void NoModule::addHelpCommand()
