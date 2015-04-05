@@ -44,7 +44,7 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/nostring.h
                        ${NO_INCDIR}/notable.h
                        ${NO_INCDIR}/notemplate.h
-                       ${NO_INCDIR}/nothread_p.h
+                       ${NO_INCDIR}/nothreadpool_p.h
                        ${NO_INCDIR}/notimer.h
                        ${NO_INCDIR}/nouser.h
                        ${NO_INCDIR}/nouser_p.h
@@ -93,7 +93,7 @@ list(APPEND NO_SOURCES noapp.cpp
                        nostring.cpp
                        notable.cpp
                        notemplate.cpp
-                       nothread.cpp
+                       nothreadpool.cpp
                        notimer.cpp
                        nouser.cpp
                        noutils.cpp

@@ -50,7 +50,7 @@ private:
     // Synchronized via the thread pool's mutex! Do not access without that mutex!
     JobState m_state;
     friend class NoThread;
-    friend class NoThreadPrivate;
+    friend class NoThreadPool;
 };
 
 #endif // HAVE_PTHREAD

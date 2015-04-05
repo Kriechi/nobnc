@@ -18,7 +18,7 @@
 #include "nosocketmanager.h"
 #include "nosocket.h"
 #include "nosocket_p.h"
-#include "nothread_p.h"
+#include "nothreadpool_p.h"
 #include "nojob_p.h"
 #include "noapp.h"
 #include "Csocket/Csocket.h"
@@ -35,13 +35,13 @@ class NoDnsMonitorFD : public CSMonitorFD
 public:
     NoDnsMonitorFD()
     {
-        Add(NoThreadPrivate::get()->getReadFD(), CSocketManager::ECT_Read);
+        Add(NoThreadPool::instance()->getReadFD(), CSocketManager::ECT_Read);
     }
 
     bool FDsThatTriggered(const std::map<int, short>& miiReadyFds) override
     {
-        if (miiReadyFds.find(NoThreadPrivate::get()->getReadFD())->second) {
-            NoThreadPrivate::get()->handlePipeReadable();
+        if (miiReadyFds.find(NoThreadPool::instance()->getReadFD())->second) {
+            NoThreadPool::instance()->handlePipeReadable();
         }
         return true;
     }

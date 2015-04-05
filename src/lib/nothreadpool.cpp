@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "nothread_p.h"
+#include "nothreadpool_p.h"
 #include "nomutex.h"
 #include "nomutexlocker.h"
 #include "noconditionvariable.h"
@@ -55,20 +55,20 @@ static void startThread(ThreadFunc* func, void* arg)
 
 static void* threadPoolFunc(void* arg)
 {
-    NoThreadPrivate* thread = reinterpret_cast<NoThreadPrivate*>(arg);
+    NoThreadPool* thread = reinterpret_cast<NoThreadPool*>(arg);
     thread->threadFunc();
     return nullptr;
 }
 
-NoThreadPrivate* NoThreadPrivate::get()
+NoThreadPool* NoThreadPool::instance()
 {
     // Beware! The following is not thread-safe! This function must
     // be called once any thread is started.
-    static NoThreadPrivate thread;
+    static NoThreadPool thread;
     return &thread;
 }
 
-NoThreadPrivate::NoThreadPrivate() : done(false), numThreads(0), numIdle(0), jobPipe{ 0, 0 }
+NoThreadPool::NoThreadPool() : done(false), numThreads(0), numIdle(0), jobPipe{ 0, 0 }
 {
     if (pipe(jobPipe)) {
         NO_DEBUG("Ouch, can't open pipe for thread pool: " << strerror(errno));
@@ -76,7 +76,7 @@ NoThreadPrivate::NoThreadPrivate() : done(false), numThreads(0), numIdle(0), job
     }
 }
 
-void NoThreadPrivate::jobDone(NoJob* job)
+void NoThreadPool::jobDone(NoJob* job)
 {
     // This must be called with the mutex locked!
 
@@ -99,12 +99,12 @@ void NoThreadPrivate::jobDone(NoJob* job)
     }
 }
 
-void NoThreadPrivate::handlePipeReadable() const
+void NoThreadPool::handlePipeReadable() const
 {
     finishJob(getJobFromPipe());
 }
 
-NoJob* NoThreadPrivate::getJobFromPipe() const
+NoJob* NoThreadPool::getJobFromPipe() const
 {
     NoJob* a = nullptr;
     ssize_t need = sizeof(a);
@@ -116,13 +116,13 @@ NoJob* NoThreadPrivate::getJobFromPipe() const
     return a;
 }
 
-void NoThreadPrivate::finishJob(NoJob* job) const
+void NoThreadPool::finishJob(NoJob* job) const
 {
     job->finished();
     delete job;
 }
 
-NoThreadPrivate::~NoThreadPrivate()
+NoThreadPool::~NoThreadPool()
 {
     NoMutexLocker guard(mutex);
     done = true;
@@ -133,14 +133,14 @@ NoThreadPrivate::~NoThreadPrivate()
     }
 }
 
-bool NoThreadPrivate::threadNeeded() const
+bool NoThreadPool::threadNeeded() const
 {
     if (numIdle > MAX_IDLE_THREADS)
         return false;
     return !done;
 }
 
-void NoThreadPrivate::threadFunc()
+void NoThreadPool::threadFunc()
 {
     NoMutexLocker guard(mutex);
     // nuthreads was already increased
@@ -180,7 +180,7 @@ void NoThreadPrivate::threadFunc()
 
 void NoJob::start()
 {
-    NoThreadPrivate* d = NoThreadPrivate::get();
+    NoThreadPool* d = NoThreadPool::instance();
     NoMutexLocker guard(d->mutex);
     d->jobs.push_back(this);
 
@@ -204,10 +204,10 @@ void NoJob::cancel()
 {
     std::set<NoJob*> jobs;
     jobs.insert(this);
-    NoThreadPrivate::get()->cancelJobs(jobs);
+    NoThreadPool::instance()->cancelJobs(jobs);
 }
 
-void NoThreadPrivate::cancelJobs(const std::set<NoJob*>& cancel)
+void NoThreadPool::cancelJobs(const std::set<NoJob*>& cancel)
 {
     // Thanks to the mutex, jobs cannot change state anymore. There are
     // three different states which can occur:
@@ -305,14 +305,14 @@ void NoThreadPrivate::cancelJobs(const std::set<NoJob*>& cancel)
     }
 }
 
-int NoThreadPrivate::getReadFD() const
+int NoThreadPool::getReadFD() const
 {
     return jobPipe[0];
 }
 
 bool NoJob::wasCancelled() const
 {
-    NoMutexLocker guard(NoThreadPrivate::get()->mutex);
+    NoMutexLocker guard(NoThreadPool::instance()->mutex);
     return m_state == Cancelled;
 }
 

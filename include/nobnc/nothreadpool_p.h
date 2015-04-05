@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef NOTHREAD_P_H
-#define NOTHREAD_P_H
+#ifndef NOTHREADPOOL_P_H
+#define NOTHREADPOOL_P_H
 
 #include "nomutex.h"
 #include "noconditionvariable.h"
@@ -26,13 +26,13 @@
 
 class NoJob;
 
-class NO_EXPORT NoThreadPrivate
+class NO_EXPORT NoThreadPool
 {
 public:
-    NoThreadPrivate();
-    ~NoThreadPrivate();
+    NoThreadPool();
+    ~NoThreadPool();
 
-    static NoThreadPrivate* get();
+    static NoThreadPool* instance();
 
     void cancelJobs(const std::set<NoJob*>& jobs);
 
@@ -80,4 +80,4 @@ public:
 
 #endif // HAVE_PTHREAD
 
-#endif // NOTHREAD_P_H
+#endif // NOTHREADPOOL_P_H

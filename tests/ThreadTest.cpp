@@ -16,7 +16,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <nobnc/nothread_p.h>
+#include <nobnc/nothreadpool_p.h>
 #include <nobnc/nomutex.h>
 #include <nobnc/nomutexlocker.h>
 #include <nobnc/noconditionvariable.h>
@@ -82,7 +82,7 @@ TEST(Thread, RunJob)
     pJob->signal();
 
     while (!destroyed)
-        NoThreadPrivate::get()->handlePipeReadable();
+        NoThreadPool::instance()->handlePipeReadable();
 }
 
 class CCancelJob : public NoJob
@@ -200,8 +200,8 @@ TEST(Thread, CancelJobWhenDone)
     // Wait for the job to finish
     fd_set fds;
     FD_ZERO(&fds);
-    FD_SET(NoThreadPrivate::get()->getReadFD(), &fds);
-    EXPECT_EQ(1, select(1 + NoThreadPrivate::get()->getReadFD(), &fds, nullptr, nullptr, nullptr));
+    FD_SET(NoThreadPool::instance()->getReadFD(), &fds);
+    EXPECT_EQ(1, select(1 + NoThreadPool::instance()->getReadFD(), &fds, nullptr, nullptr, nullptr));
 
     // And only cancel it afterwards
     pJob->cancel();
