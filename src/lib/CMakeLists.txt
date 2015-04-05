@@ -9,7 +9,7 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/nocachemap.h
                        ${NO_INCDIR}/nochannel.h
                        ${NO_INCDIR}/noclient.h
-                       ${NO_INCDIR}/noconditionvariable.h
+                       ${NO_INCDIR}/noconditionvariable_p.h
                        ${NO_INCDIR}/nodebug.h
                        ${NO_INCDIR}/nodir.h
                        ${NO_INCDIR}/noescape.h
@@ -29,8 +29,8 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/nomoduleinfo.h
                        ${NO_INCDIR}/nomoduleloader.h
                        ${NO_INCDIR}/nomodulesocket.h
-                       ${NO_INCDIR}/nomutex.h
-                       ${NO_INCDIR}/nomutexlocker.h
+                       ${NO_INCDIR}/nomutex_p.h
+                       ${NO_INCDIR}/nomutexlocker_p.h
                        ${NO_INCDIR}/nonetwork.h
                        ${NO_INCDIR}/nonick.h
                        ${NO_INCDIR}/noprocess.h

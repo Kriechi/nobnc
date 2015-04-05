@@ -18,8 +18,8 @@
 #ifndef NOTHREADPOOL_P_H
 #define NOTHREADPOOL_P_H
 
-#include "nomutex.h"
-#include "noconditionvariable.h"
+#include "nomutex_p.h"
+#include "noconditionvariable_p.h"
 #include <list>
 
 #ifdef HAVE_PTHREAD

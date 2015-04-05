@@ -27,7 +27,7 @@
 #include <iostream>
 
 #if defined(HAVE_LIBSSL) && defined(HAVE_PTHREAD)
-#include <nobnc/nomutex.h>
+#include <nobnc/nomutex_p.h>
 #include <openssl/crypto.h>
 #include <memory>
 

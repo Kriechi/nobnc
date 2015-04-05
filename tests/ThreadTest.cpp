@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 #include <nobnc/nothreadpool_p.h>
-#include <nobnc/nomutex.h>
-#include <nobnc/nomutexlocker.h>
-#include <nobnc/noconditionvariable.h>
+#include <nobnc/nomutex_p.h>
+#include <nobnc/nomutexlocker_p.h>
+#include <nobnc/noconditionvariable_p.h>
 #include <nobnc/nojob_p.h>
 
 class CWaitingJob : public NoJob

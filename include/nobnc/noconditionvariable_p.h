@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef NOCONDITIONVARIABLE_H
-#define NOCONDITIONVARIABLE_H
+#ifndef NOCONDITIONVARIABLE_P_H
+#define NOCONDITIONVARIABLE_P_H
 
 #include <nobnc/noglobal.h>
 
@@ -93,4 +93,4 @@ private:
 
 #endif // HAVE_PTHREAD
 
-#endif // NOCONDITIONVARIABLE_H
+#endif // NOCONDITIONVARIABLE_P_H

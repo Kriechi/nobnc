@@ -16,9 +16,9 @@
  */
 
 #include "nothreadpool_p.h"
-#include "nomutex.h"
-#include "nomutexlocker.h"
-#include "noconditionvariable.h"
+#include "nomutex_p.h"
+#include "nomutexlocker_p.h"
+#include "noconditionvariable_p.h"
 #include "nojob_p.h"
 
 #ifdef HAVE_PTHREAD

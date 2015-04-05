@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef NOMUTEXLOCKER_H
-#define NOMUTEXLOCKER_H
+#ifndef NOMUTEXLOCKER_P_H
+#define NOMUTEXLOCKER_P_H
 
 #include <nobnc/noglobal.h>
 
@@ -76,4 +76,4 @@ private:
 
 #endif // HAVE_PTHREAD
 
-#endif // NOMUTEXLOCKER_H
+#endif // NOMUTEXLOCKER_P_H

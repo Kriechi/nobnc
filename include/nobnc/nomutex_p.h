@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef NOMUTEX_H
-#define NOMUTEX_H
+#ifndef NOMUTEX_P_H
+#define NOMUTEX_P_H
 
 #include <nobnc/noglobal.h>
 
@@ -86,4 +86,4 @@ private:
 
 #endif // HAVE_PTHREAD
 
-#endif // NOMUTEX_H
+#endif // NOMUTEX_P_H
