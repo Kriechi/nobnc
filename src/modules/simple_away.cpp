@@ -214,7 +214,7 @@ private:
             reason = SIMPLE_AWAY_DEFAULT_REASON;
 
         time_t iTime = time(nullptr);
-        NoString sTime = No::cTime(iTime, user()->timezone());
+        NoString sTime = No::ctime(iTime, user()->timezone());
         reason.replace("%s", sTime);
 
         return reason;

@@ -50,7 +50,7 @@ NO_EXPORT bool getNumInput(const NoString& prompt, uint& ret, uint min = 0, uint
 
 NO_EXPORT ulonglong millTime();
 
-NO_EXPORT NoString cTime(time_t t, const NoString& timezone);
+NO_EXPORT NoString ctime(time_t t, const NoString& timezone);
 NO_EXPORT NoString formatTime(time_t t, const NoString& format, const NoString& timezone);
 NO_EXPORT NoString formatServerTime(const timeval& tv);
 NO_EXPORT NoStringSet timezones();

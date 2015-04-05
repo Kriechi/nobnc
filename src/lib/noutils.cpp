@@ -398,7 +398,7 @@ inline NoString FixGMT(NoString timezone)
 }
 }
 
-NoString No::cTime(time_t t, const NoString& sTimezone)
+NoString No::ctime(time_t t, const NoString& sTimezone)
 {
     char s[30] = {}; // should have at least 26 bytes
     if (sTimezone.empty()) {

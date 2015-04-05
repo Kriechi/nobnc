@@ -374,7 +374,7 @@ NoString NoUser::expandString(const NoString& str) const
     ret.replace("%vhost%", bindHost());
     ret.replace("%bindhost%", bindHost());
     ret.replace("%version%", NoApp::version());
-    ret.replace("%time%", No::cTime(time(nullptr), d->timezone));
+    ret.replace("%time%", No::ctime(time(nullptr), d->timezone));
     ret.replace("%uptime%", noApp->uptime());
     // The following lines do not exist. You must be on DrUgS!
     ret.replace("%znc%", "All your IRC are belong to ZNC");
