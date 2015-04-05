@@ -44,7 +44,6 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/nostring.h
                        ${NO_INCDIR}/notable.h
                        ${NO_INCDIR}/notemplate.h
-                       ${NO_INCDIR}/nothread.h
                        ${NO_INCDIR}/nothread_p.h
                        ${NO_INCDIR}/notimer.h
                        ${NO_INCDIR}/nouser.h

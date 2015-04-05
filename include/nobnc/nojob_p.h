@@ -22,20 +22,7 @@
 
 #ifdef HAVE_PTHREAD
 
-/**
- * A job is a task which should run without blocking the main thread. You do
- * this by inheriting from this class and implementing the pure virtual methods
- * runThread(), which gets executed in a separate thread and does not block the
- * main thread, and runMain() which gets automatically called from the main
- * thread after runThread() finishes.
- *
- * After you create a new instance of your class, you can pass it to
- * NoThread()::Get().addJob(job) to start it. The thread pool automatically
- * deletes your class after it finished.
- *
- * For modules you should use NoModuleJob instead.
- */
-class NoJob
+class NO_EXPORT NoJob
 {
 public:
     enum JobState { Ready, Running, Done, Cancelled };
@@ -47,17 +34,14 @@ public:
     {
     } /// Always called from the main thread.
 
-    /// This function is called in a separate thread and can do heavy, blocking work.
-    virtual void run() = 0;
-
-    /// This function is called from the main thread after runThread()
-    /// finishes. It can be used to handle the results from runThread()
-    /// without needing synchronization primitives.
-    virtual void finished() = 0;
-
-    /// This can be used to check if the job was cancelled. For example,
-    /// runThread() can return early if this returns true.
     bool wasCancelled() const;
+
+    void start();
+    void cancel();
+
+protected:
+    virtual void run() = 0;
+    virtual void finished() = 0;
 
 private:
     NoJob(const NoJob&) = delete;

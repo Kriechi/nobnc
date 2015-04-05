@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#include "nothread.h"
 #include "nothread_p.h"
 #include "nomutex.h"
 #include "nomutexlocker.h"
@@ -179,11 +178,11 @@ void NoThreadPrivate::threadFunc()
         exitCond.signal();
 }
 
-void NoThread::run(NoJob* job)
+void NoJob::start()
 {
     NoThreadPrivate* d = NoThreadPrivate::get();
     NoMutexLocker guard(d->mutex);
-    d->jobs.push_back(job);
+    d->jobs.push_back(this);
 
     // Do we already have a thread which can handle this job?
     if (d->numIdle > 0) {
@@ -201,10 +200,10 @@ void NoThread::run(NoJob* job)
     startThread(threadPoolFunc, d);
 }
 
-void NoThread::cancel(NoJob* job)
+void NoJob::cancel()
 {
     std::set<NoJob*> jobs;
-    jobs.insert(job);
+    jobs.insert(this);
     NoThreadPrivate::get()->cancelJobs(jobs);
 }
 

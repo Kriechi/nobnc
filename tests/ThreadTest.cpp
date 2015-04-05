@@ -16,12 +16,11 @@
  */
 
 #include <gtest/gtest.h>
-#include <nobnc/nothread.h>
 #include <nobnc/nothread_p.h>
 #include <nobnc/nomutex.h>
 #include <nobnc/nomutexlocker.h>
 #include <nobnc/noconditionvariable.h>
-#include <nobnc/nojob.h>
+#include <nobnc/nojob_p.h>
 
 class CWaitingJob : public NoJob
 {
@@ -79,7 +78,7 @@ TEST(Thread, RunJob)
     bool destroyed = false;
     CWaitingJob* pJob = new CWaitingJob(destroyed);
 
-    NoThread::run(pJob);
+    pJob->start();
     pJob->signal();
 
     while (!destroyed)
@@ -144,10 +143,10 @@ TEST(Thread, CancelJobEarly)
     bool destroyed = false;
     CCancelJob* pJob = new CCancelJob(destroyed);
 
-    NoThread::run(pJob);
+    pJob->start();
     // Don't wait for the job to run. The idea here is that we are calling
-    // cancelJob() before pJob->runThread() runs, but this is a race.
-    NoThread::cancel(pJob);
+    // cancelJob() before pJob->start() runs, but this is a race.
+    pJob->cancel();
 
     // cancelJob() should only return after successful cancellation
     EXPECT_TRUE(destroyed);
@@ -158,10 +157,10 @@ TEST(Thread, CancelJobWhileRunning)
     bool destroyed = false;
     CCancelJob* pJob = new CCancelJob(destroyed);
 
-    NoThread::run(pJob);
+    pJob->start();
     // Wait for the job to run
     pJob->wait();
-    NoThread::cancel(pJob);
+    pJob->cancel();
 
     // cancelJob() should only return after successful cancellation
     EXPECT_TRUE(destroyed);
@@ -196,7 +195,7 @@ TEST(Thread, CancelJobWhenDone)
     bool destroyed = false;
     CEmptyJob* pJob = new CEmptyJob(destroyed);
 
-    NoThread::run(pJob);
+    pJob->start();
 
     // Wait for the job to finish
     fd_set fds;
@@ -205,7 +204,7 @@ TEST(Thread, CancelJobWhenDone)
     EXPECT_EQ(1, select(1 + NoThreadPrivate::get()->getReadFD(), &fds, nullptr, nullptr, nullptr));
 
     // And only cancel it afterwards
-    NoThread::cancel(pJob);
+    pJob->cancel();
 
     // cancelJob() should only return after successful cancellation
     EXPECT_TRUE(destroyed);

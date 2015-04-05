@@ -18,7 +18,6 @@
 #ifndef NOTHREAD_P_H
 #define NOTHREAD_P_H
 
-#include "nothread.h"
 #include "nomutex.h"
 #include "noconditionvariable.h"
 #include <list>

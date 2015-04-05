@@ -18,7 +18,6 @@
 #include "nosocketmanager.h"
 #include "nosocket.h"
 #include "nosocket_p.h"
-#include "nothread.h"
 #include "nothread_p.h"
 #include "nojob_p.h"
 #include "noapp.h"
@@ -355,13 +354,13 @@ void NoDnsJob::finished()
 void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind)
 {
     NoString hostname = bBind ? task->sBindhost : task->hostname;
-    NoDnsJob* arg = new NoDnsJob;
-    arg->hostname = hostname;
-    arg->task = task;
-    arg->bBind = bBind;
-    arg->pManager = manager;
+    NoDnsJob* job = new NoDnsJob;
+    job->hostname = hostname;
+    job->task = task;
+    job->bBind = bBind;
+    job->pManager = manager;
 
-    NoThread::run(arg);
+    job->start();
 }
 
 static NoString RandomFromSet(const NoStringSet& sSet, std::default_random_engine& gen)

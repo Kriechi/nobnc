@@ -24,7 +24,6 @@
 #include "nonetwork.h"
 #include "noclient.h"
 #include "noapp.h"
-#include "nothread.h"
 #include "nomodulesocket.h"
 #include "notimer.h"
 #include "notable.h"
