@@ -68,7 +68,6 @@ public:
     NoString localDccIp() const;
 
     NoString expandString(const NoString& str) const;
-    NoString& expandString(const NoString& str, NoString& ret) const;
 
     NoString addTimestamp(const NoString& str) const;
     NoString addTimestamp(time_t tm, const NoString& str) const;

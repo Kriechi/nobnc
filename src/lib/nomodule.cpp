@@ -80,23 +80,11 @@ NoModule::~NoModule()
 
 NoString NoModule::expandString(const NoString& str) const
 {
-    NoString ret;
-    return expandString(str, ret);
-}
-
-NoString& NoModule::expandString(const NoString& str, NoString& ret) const
-{
-    ret = str;
-
-    if (d->network) {
-        return d->network->expandString(ret, ret);
-    }
-
-    if (d->user) {
-        return d->user->expandString(ret, ret);
-    }
-
-    return ret;
+    if (d->network)
+        return d->network->expandString(str);
+    if (d->user)
+        return d->user->expandString(str);
+    return str;
 }
 
 No::ModuleType NoModule::type() const

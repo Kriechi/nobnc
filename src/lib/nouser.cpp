@@ -404,15 +404,7 @@ std::vector<NoNetwork*> NoUser::networks() const
 
 NoString NoUser::expandString(const NoString& str) const
 {
-    NoString ret;
-    return expandString(str, ret);
-}
-
-NoString& NoUser::expandString(const NoString& str, NoString& ret) const
-{
-    NoString sTime = No::cTime(time(nullptr), d->timezone);
-
-    ret = str;
+    NoString ret = str;
     ret.replace("%user%", userName());
     ret.replace("%defnick%", nick());
     ret.replace("%nick%", nick());
@@ -422,13 +414,12 @@ NoString& NoUser::expandString(const NoString& str, NoString& ret) const
     ret.replace("%vhost%", bindHost());
     ret.replace("%bindhost%", bindHost());
     ret.replace("%version%", NoApp::version());
-    ret.replace("%time%", sTime);
+    ret.replace("%time%", No::cTime(time(nullptr), d->timezone));
     ret.replace("%uptime%", noApp->uptime());
     // The following lines do not exist. You must be on DrUgS!
     ret.replace("%znc%", "All your IRC are belong to ZNC");
     // Chosen by fair zocchihedron dice roll by SilverLeo
     ret.replace("%rand%", "42");
-
     return ret;
 }
 

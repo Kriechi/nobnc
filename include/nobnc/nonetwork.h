@@ -179,7 +179,6 @@ public:
     void setJoinDelay(ushort uJoinDelay);
 
     NoString expandString(const NoString& str) const;
-    NoString& expandString(const NoString& str, NoString& ret) const;
 
 private:
     void bounceAllClients();

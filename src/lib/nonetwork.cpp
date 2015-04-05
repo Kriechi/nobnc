@@ -1620,21 +1620,14 @@ void NoNetwork::setJoinDelay(ushort uJoinDelay)
 
 NoString NoNetwork::expandString(const NoString& str) const
 {
-    NoString ret;
-    return expandString(str, ret);
-}
-
-NoString& NoNetwork::expandString(const NoString& str, NoString& ret) const
-{
-    ret = str;
+    NoString ret = str;
     ret.replace("%defnick%", nick());
     ret.replace("%nick%", currentNick());
     ret.replace("%altnick%", altNick());
     ret.replace("%ident%", ident());
     ret.replace("%realname%", realName());
     ret.replace("%bindhost%", bindHost());
-
-    return d->user->expandString(ret, ret);
+    return d->user->expandString(ret);
 }
 
 bool NoNetwork::loadModule(const NoString& name, const NoString& args, const NoString& notice, NoString& error)

@@ -115,7 +115,6 @@ public:
     void removeCommand(const NoString& cmd);
 
     NoString expandString(const NoString& str) const;
-    NoString& expandString(const NoString& str, NoString& ret) const;
 
     enum Return {
         Continue = 1,
