@@ -23,12 +23,7 @@ NoModuleCommand::NoModuleCommand() : m_cmd(), m_func(nullptr), m_args(), m_desc(
 }
 
 NoModuleCommand::NoModuleCommand(const NoString& cmd, NoModule* mod, ModCmdFunc func, const NoString& args, const NoString& desc)
-    : m_cmd(cmd), m_func([mod, func](const NoString& line) { (mod->*func)(line); }), m_args(args), m_desc(desc)
-{
-}
-
-NoModuleCommand::NoModuleCommand(const NoString& cmd, CmdFunc func, const NoString& args, const NoString& desc)
-    : m_cmd(cmd), m_func(std::move(func)), m_args(args), m_desc(desc)
+    : m_cmd(cmd), m_func(func), m_args(args), m_desc(desc)
 {
 }
 
@@ -61,9 +56,9 @@ void NoModuleCommand::addHelp(NoTable& Table) const
     Table.setValue("Description", description());
 }
 
-void NoModuleCommand::call(const NoString& line) const
+void NoModuleCommand::call(NoModule* module, const NoString& line) const
 {
-    m_func(line);
+    (module->*m_func)(line);
 }
 
 NoString NoModuleCommand::description() const
@@ -76,7 +71,7 @@ NoString NoModuleCommand::args() const
     return m_args;
 }
 
-NoModuleCommand::CmdFunc NoModuleCommand::function() const
+NoModuleCommand::ModCmdFunc NoModuleCommand::function() const
 {
     return m_func;
 }

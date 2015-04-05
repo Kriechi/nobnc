@@ -21,7 +21,6 @@
 #include <nobnc/noglobal.h>
 #include <nobnc/nostring.h>
 #include <nobnc/nomoduleinfo.h>
-#include <functional>
 
 class NoTable;
 
@@ -31,7 +30,6 @@ class NO_EXPORT NoModuleCommand
 public:
     /// Type for the callback function that handles the actual command.
     typedef void (NoModule::*ModCmdFunc)(const NoString& line);
-    typedef std::function<void(const NoString& line)> CmdFunc;
 
     /// Default constructor, needed so that this can be saved in a std::map.
     NoModuleCommand();
@@ -43,7 +41,6 @@ public:
      * @param desc Help text describing what this command does.
      */
     NoModuleCommand(const NoString& cmd, NoModule* mod, ModCmdFunc func, const NoString& args, const NoString& desc);
-    NoModuleCommand(const NoString& cmd, CmdFunc func, const NoString& args, const NoString& desc);
 
     /** Copy constructor, needed so that this can be saved in a std::map.
      * @param other Object to copy from.
@@ -67,15 +64,15 @@ public:
     void addHelp(NoTable& Table) const;
 
     NoString command() const;
-    CmdFunc function() const;
+    ModCmdFunc function() const;
     NoString args() const;
     NoString description() const;
 
-    void call(const NoString& line) const;
+    void call(NoModule *module, const NoString& line) const;
 
 private:
     NoString m_cmd;
-    CmdFunc m_func;
+    ModCmdFunc m_func;
     NoString m_args;
     NoString m_desc;
 };

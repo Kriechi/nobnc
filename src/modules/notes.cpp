@@ -85,13 +85,12 @@ class NoNotesMod : public NoModule
 public:
     MODCONSTRUCTOR(NoNotesMod)
     {
-        using std::placeholders::_1;
         addHelpCommand();
         addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::ListCommand));
         addCommand("Add", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::AddNoteCommand), "<key> <note>");
         addCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::DelCommand), "<key>", "Delete a note");
-        addCommand("Mod", "<key> <note>", "Modify a note", std::bind(&NoNotesMod::ModCommand, this, _1));
-        addCommand("Get", "<key>", "", [this](const NoString& line) { GetCommand(line); });
+        addCommand("Mod", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::ModCommand), "<key> <note>", "Modify a note");
+        addCommand("Get", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::GetCommand), "<key>", "");
     }
 
     bool onLoad(const NoString& args, NoString& message) override

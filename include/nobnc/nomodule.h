@@ -213,7 +213,6 @@ public:
     void addHelpCommand();
     bool addCommand(const NoModuleCommand& command);
     bool addCommand(const NoString& cmd, NoModuleCommand::ModCmdFunc func, const NoString& args = "", const NoString& desc = "");
-    bool addCommand(const NoString& cmd, const NoString& args, const NoString& desc, std::function<void(const NoString& line)> func);
     bool removeCommand(const NoString& cmd);
     const NoModuleCommand* findCommand(const NoString& cmd) const;
     bool handleCommand(const NoString& line);

@@ -204,11 +204,6 @@ bool NoModule::addCommand(const NoString& cmd, NoModuleCommand::ModCmdFunc func,
     return addCommand(NoModuleCommand(cmd, this, func, args, desc));
 }
 
-bool NoModule::addCommand(const NoString& cmd, const NoString& args, const NoString& desc, std::function<void(const NoString& line)> func)
-{
-    return addCommand(std::move(NoModuleCommand(cmd, std::move(func), args, desc)));
-}
-
 void NoModule::addHelpCommand()
 {
     addCommand("Help", &NoModule::handleHelpCommand, "search", "Generate this output");
@@ -235,7 +230,7 @@ bool NoModule::handleCommand(const NoString& line)
     const NoModuleCommand* pCmd = findCommand(cmd);
 
     if (pCmd) {
-        pCmd->call(line);
+        pCmd->call(this, line);
         return true;
     }
 
