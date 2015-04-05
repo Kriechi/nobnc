@@ -1,9 +1,6 @@
 #ifndef NOCONFIG_H
 #define NOCONFIG_H
 
-// TODO: the other way around
-#include <nobnc/noglobal.h>
-
 /* Use poll() instead of select() */
 #cmakedefine CSOCK_USE_POLL
 
