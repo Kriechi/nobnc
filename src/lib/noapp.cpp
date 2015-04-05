@@ -796,9 +796,8 @@ bool NoApp::writeNewConfig(const NoString& configFile)
     } while (!NoUser::isValidUserName(sUser));
 
     vsLines.push_back("<User " + sUser + ">");
-    NoString salt;
-    sAnswer = No::getSaltedHashPass(salt);
-    vsLines.push_back("\tPass       = " + No::defaultHash() + "#" + sAnswer + "#" + salt + "#");
+    NoString passwordSalt;
+    NoString passwordHash = No::getSaltedHashPass(passwordSalt);
 
     vsLines.push_back("\tAdmin      = true");
 
@@ -830,14 +829,14 @@ bool NoApp::writeNewConfig(const NoString& configFile)
         vsLines.push_back("");
 
         No::printMessage("");
-        No::printMessage("-- network settings --");
+        No::printMessage("-- Network settings --");
         No::printMessage("");
 
         do {
             No::getInput("Name", sNetwork, "freenode");
         } while (!NoNetwork::isValidNetwork(sNetwork));
 
-        vsLines.push_back("\t<network " + sNetwork + ">");
+        vsLines.push_back("\t<Network " + sNetwork + ">");
 
         std::set<NoModuleInfo> ssNetworkMods = loader()->defaultModules(No::NetworkModule);
         std::vector<NoString> vsNetworkModNames;
@@ -877,14 +876,19 @@ bool NoApp::writeNewConfig(const NoString& configFile)
             sChans.replace(";", " ");
             NoStringVector vsChans = sChans.split(" ", No::SkipEmptyParts);
             for (const NoString& sChan : vsChans) {
-                vsLines.push_back("\t\t<channel " + sChan.trim_n() + ">");
-                vsLines.push_back("\t\t</channel>");
+                vsLines.push_back("\t\t<Chan " + sChan.trim_n() + ">");
+                vsLines.push_back("\t\t</Chan>");
             }
         }
+        vsLines.push_back("\t</Network>");
 
         No::printMessage("Enabled network modules [" + NoString(", ").join(vsNetworkModNames.begin(), vsNetworkModNames.end()) + "]");
 
-        vsLines.push_back("\t</network>");
+        vsLines.push_back("");
+        vsLines.push_back("\t<Pass password>");
+        vsLines.push_back("\t\tHash = " + passwordHash);
+        vsLines.push_back("\t\tSalt = " + passwordSalt);
+        vsLines.push_back("\t</Pass>");
     }
 
     vsLines.push_back("</User>");
