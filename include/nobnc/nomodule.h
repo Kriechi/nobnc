@@ -98,6 +98,22 @@ public:
     NoString dataPath() const;
     NoString savePath() const;
 
+    bool putIrc(const NoString& line);
+    bool putUser(const NoString& line);
+    bool putStatus(const NoString& line);
+    bool putModule(const NoString& line);
+    bool putModule(const NoTable& table);
+    bool putModuleNotice(const NoString& line);
+
+    NoTimer* findTimer(const NoString& label) const;
+    NoModuleSocket* findSocket(const NoString& name) const;
+
+    typedef void (NoModule::*CommandFunction)(const NoString& line);
+
+    void addHelpCommand();
+    void addCommand(const NoString& cmd, CommandFunction func, const NoString& args = "", const NoString& desc = "");
+    void removeCommand(const NoString& cmd);
+
     NoString expandString(const NoString& str) const;
     NoString& expandString(const NoString& str, NoString& ret) const;
 
@@ -200,22 +216,6 @@ public:
 
     virtual Return onSendToClient(NoString& line, NoClient* client);
     virtual Return onSendToIrc(NoString& line);
-
-    bool putIrc(const NoString& line);
-    bool putUser(const NoString& line);
-    bool putStatus(const NoString& line);
-    bool putModule(const NoString& line);
-    bool putModule(const NoTable& table);
-    bool putModuleNotice(const NoString& line);
-
-    NoTimer* findTimer(const NoString& label) const;
-    NoModuleSocket* findSocket(const NoString& name) const;
-
-    typedef void (NoModule::*CommandFunction)(const NoString& line);
-
-    void addHelpCommand();
-    void addCommand(const NoString& cmd, CommandFunction func, const NoString& args = "", const NoString& desc = "");
-    void removeCommand(const NoString& cmd);
 
     virtual Return onAddUser(NoUser* user, NoString& error);
     virtual Return onDeleteUser(NoUser* user);
