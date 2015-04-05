@@ -160,43 +160,8 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
     }
 
     NoString value;
-
-    NoString sDCCLookupValue;
-    settings->FindStringEntry("dcclookupmethod", sDCCLookupValue);
-    if (settings->FindStringEntry("bouncedccs", value)) {
-        if (value.toBool()) {
-            No::printAction("Loading Module [bouncedcc]");
-            NoString sModRet;
-            bool bModRet = loader()->loadModule("bouncedcc", "", No::UserModule, this, nullptr, sModRet);
-
-            No::printStatus(bModRet, sModRet);
-            if (!bModRet) {
-                error = sModRet;
-                return false;
-            }
-
-            if (sDCCLookupValue.equals("client")) {
-                NoModule* mod = loader()->findModule("bouncedcc");
-                if (mod) {
-                    NoRegistry registry(mod);
-                    registry.setValue("UseClientIP", "1");
-                }
-            }
-        }
-    }
     if (settings->FindStringEntry("buffer", value))
         setBufferCount(value.toUInt(), true);
-    if (settings->FindStringEntry("awaysuffix", value)) {
-        No::printMessage("WARNING: AwaySuffix has been deprecated, instead try -> LoadModule = awaynick %nick%_" + value);
-    }
-    if (settings->FindStringEntry("autocycle", value)) {
-        if (value.equals("true"))
-            No::printError("WARNING: AutoCycle has been removed, instead try -> LoadModule = autocycle");
-    }
-    if (settings->FindStringEntry("keepnick", value)) {
-        if (value.equals("true"))
-            No::printError("WARNING: KeepNick has been deprecated, instead try -> LoadModule = keepnick");
-    }
     if (settings->FindStringEntry("statusprefix", value)) {
         if (!setStatusPrefix(value)) {
             error = "Invalid StatusPrefix [" + value + "] Must be 1-5 chars, no spaces.";
@@ -206,11 +171,6 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
     }
     if (settings->FindStringEntry("timezone", value)) {
         setTimezone(value);
-    }
-    if (settings->FindStringEntry("timezoneoffset", value)) {
-        if (fabs(value.toDouble()) > 0.1) {
-            No::printError("WARNING: TimezoneOffset has been deprecated, now you can set your timezone by name");
-        }
     }
     if (settings->FindStringEntry("timestamp", value)) {
         if (!value.trim_n().equals("true")) {
