@@ -299,15 +299,15 @@ NoString NoString::fromBase64(const NoString& base64)
     const char* in = sTmp.c_str();
     char c, c1, *p;
     ulong i;
-    ulong uLen = sTmp.size();
-    char* out = new char[uLen + 1];
+    ulong len = sTmp.size();
+    char* out = new char[len + 1];
 
-    for (i = 0, p = out; i < uLen; i++) {
+    for (i = 0, p = out; i < len; i++) {
         c = (char)base64_table[(uchar)in[i++]];
         c1 = (char)base64_table[(uchar)in[i++]];
         *p++ = char((c << 2) | ((c1 >> 4) & 0x3));
 
-        if (i < uLen) {
+        if (i < len) {
             if (in[i] == '=') {
                 break;
             }
@@ -315,7 +315,7 @@ NoString NoString::fromBase64(const NoString& base64)
             *p++ = char(((c1 << 4) & 0xf0) | ((c >> 2) & 0xf));
         }
 
-        if (++i < uLen) {
+        if (++i < len) {
             if (in[i] == '=') {
                 break;
             }
@@ -514,25 +514,25 @@ NoString NoString::trimSuffix_n(const NoString& suffix) const
     return ret;
 }
 
-NoString NoString::leftChomp_n(uint uLen) const
+NoString NoString::leftChomp_n(uint len) const
 {
     NoString ret = *this;
-    ret.leftChomp(uLen);
+    ret.leftChomp(len);
     return ret;
 }
 
-NoString NoString::rightChomp_n(uint uLen) const
+NoString NoString::rightChomp_n(uint len) const
 {
     NoString ret = *this;
-    ret.rightChomp(uLen);
+    ret.rightChomp(len);
     return ret;
 }
 
-bool NoString::leftChomp(uint uLen)
+bool NoString::leftChomp(uint len)
 {
     bool bRet = false;
 
-    while ((uLen--) && (length())) {
+    while ((len--) && (length())) {
         erase(0, 1);
         bRet = true;
     }
@@ -540,11 +540,11 @@ bool NoString::leftChomp(uint uLen)
     return bRet;
 }
 
-bool NoString::rightChomp(uint uLen)
+bool NoString::rightChomp(uint len)
 {
     bool bRet = false;
 
-    while ((uLen--) && (length())) {
+    while ((len--) && (length())) {
         erase(length() - 1);
         bRet = true;
     }

@@ -79,7 +79,7 @@ public:
         EXPECT_EQ(sExpectedOutput, sOutput);
     }
 
-    void ToString(NoString& sRes, NoSettings& conf)
+    void ToString(NoString& res, NoSettings& conf)
     {
         NoSettings::EntryMapIterator it = conf.BeginEntries();
         while (it != conf.EndEntries()) {
@@ -87,10 +87,10 @@ public:
             const NoStringVector& vsEntries = it->second;
             NoStringVector::const_iterator i = vsEntries.begin();
             if (i == vsEntries.end())
-                sRes += key + " <- Error, empty list!\n";
+                res += key + " <- Error, empty list!\n";
             else
                 while (i != vsEntries.end()) {
-                    sRes += key + "=" + *i + "\n";
+                    res += key + "=" + *i + "\n";
                     ++i;
                 }
             ++it;
@@ -101,9 +101,9 @@ public:
             std::map<NoString, NoSettingsEntry>::const_iterator it3 = it2->second.begin();
 
             while (it3 != it2->second.end()) {
-                sRes += "->" + it2->first + "/" + it3->first + "\n";
-                ToString(sRes, *it3->second.m_subConfig);
-                sRes += "<-\n";
+                res += "->" + it2->first + "/" + it3->first + "\n";
+                ToString(res, *it3->second.m_subConfig);
+                res += "<-\n";
                 ++it3;
             }
 

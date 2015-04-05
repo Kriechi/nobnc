@@ -46,7 +46,7 @@ public:
     void SendPacket();
     NoSocket* createSocket(const NoString& host, ushort port) override;
     NoFile* OpenFile(bool bWrite = true);
-    bool Seek(ulong uPos);
+    bool Seek(ulong pos);
 
     // Setters
     void SetRemoteIP(const NoString& s)
@@ -540,11 +540,11 @@ NoFile* NoDccSock::OpenFile(bool bWrite)
     return m_pFile;
 }
 
-bool NoDccSock::Seek(ulong uPos)
+bool NoDccSock::Seek(ulong pos)
 {
     if (m_pFile) {
-        if (m_pFile->Seek(uPos)) {
-            m_uBytesSoFar = uPos;
+        if (m_pFile->Seek(pos)) {
+            m_uBytesSoFar = pos;
             return true;
         }
     }

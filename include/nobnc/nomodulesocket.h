@@ -63,9 +63,9 @@ public:
     bool onConnectionFrom(const NoString& host, ushort port) override;
 
     //! Ease of use Connect, assigns to the manager and is subsequently tracked
-    bool connect(const NoString& hostname, ushort port, bool ssl = false, uint uTimeout = 60);
+    bool connect(const NoString& hostname, ushort port, bool ssl = false, uint timeout = 60);
     //! Ease of use Listen, assigned to the manager and is subsequently tracked
-    bool listen(ushort port, bool ssl, uint uTimeout = 0);
+    bool listen(ushort port, bool ssl, uint timeout = 0);
 
     NoModule* module() const;
 

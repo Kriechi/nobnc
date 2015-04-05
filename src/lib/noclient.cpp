@@ -908,12 +908,12 @@ bool NoClient::isCapEnabled(const NoString& cap) const
     return 1 == d->acceptedCaps.count(cap);
 }
 
-NoString NoClient::nick(bool allowIRCNick) const
+NoString NoClient::nick(bool allowIrcNick) const
 {
     NoString ret;
 
     const NoIrcSocket* socket = ircSocket();
-    if (allowIRCNick && socket && socket->isAuthed()) {
+    if (allowIrcNick && socket && socket->isAuthed()) {
         ret = socket->nick();
     }
 
@@ -1001,8 +1001,8 @@ void NoClient::handleCap(const NoString& line)
         ssOfferCaps.insert("znc.in/server-time-iso");
         ssOfferCaps.insert("znc.in/batch");
         ssOfferCaps.insert("znc.in/self-message");
-        NoString sRes = NoString(" ").join(ssOfferCaps.begin(), ssOfferCaps.end());
-        respondCap("LS :" + sRes);
+        NoString res = NoString(" ").join(ssOfferCaps.begin(), ssOfferCaps.end());
+        respondCap("LS :" + res);
         d->inCapLs = true;
     } else if (sSubCmd.equals("END")) {
         d->inCapLs = false;

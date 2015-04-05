@@ -241,18 +241,18 @@ public:
 
     NoString GetKey(NoSocket* socket)
     {
-        NoString sRes;
-        long int res = socket->peerFingerprint(sRes);
+        NoString res;
+        long int fp = socket->peerFingerprint(res);
 
-        NO_DEBUG("GetKey() returned status " << res << " with key " << sRes);
+        NO_DEBUG("GetKey() returned status " << res << " with key " << res);
 
         // This is 'inspired' by charybdis' libratbox
-        switch (res) {
+        switch (fp) {
         case X509_V_OK:
         case X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
         case X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE:
         case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
-            return sRes.toLower();
+            return res.toLower();
         default:
             return "";
         }

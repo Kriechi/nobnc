@@ -58,9 +58,9 @@ void NoFile::SetFileName(const NoString& filePath)
     m_shortName = filePath;
     m_shortName.trimRight("/");
 
-    NoString::size_type uPos = m_shortName.rfind('/');
-    if (uPos != NoString::npos) {
-        m_shortName = m_shortName.substr(uPos + 1);
+    NoString::size_type pos = m_shortName.rfind('/');
+    if (pos != NoString::npos) {
+        m_shortName = m_shortName.substr(pos + 1);
     }
 }
 
@@ -327,12 +327,12 @@ bool NoFile::Chmod(const NoString& sFile, mode_t mode)
     return (chmod(sFile.c_str(), mode) == 0);
 }
 
-bool NoFile::Seek(off_t uPos)
+bool NoFile::Seek(off_t pos)
 {
     /* This sets errno in case m_iFD == -1 */
     errno = EBADF;
 
-    if (m_fd != -1 && lseek(m_fd, uPos, SEEK_SET) == uPos) {
+    if (m_fd != -1 && lseek(m_fd, pos, SEEK_SET) == pos) {
         ClearBuffer();
         return true;
     }
@@ -367,13 +367,13 @@ bool NoFile::Sync()
     return false;
 }
 
-bool NoFile::Open(const NoString& fileName, int iFlags, mode_t iMode)
+bool NoFile::Open(const NoString& fileName, int iFlags, mode_t mode)
 {
     SetFileName(fileName);
-    return Open(iFlags, iMode);
+    return Open(iFlags, mode);
 }
 
-bool NoFile::Open(int iFlags, mode_t iMode)
+bool NoFile::Open(int iFlags, mode_t mode)
 {
     if (m_fd != -1) {
         errno = EEXIST;
@@ -382,13 +382,13 @@ bool NoFile::Open(int iFlags, mode_t iMode)
     }
 
     // We never want to get a controlling TTY through this -> O_NOCTTY
-    iMode |= O_NOCTTY;
+    mode |= O_NOCTTY;
 
     // Some weird OS from MS needs O_BINARY or else it generates fake EOFs
     // when reading ^Z from a file.
-    iMode |= O_BINARY;
+    mode |= O_BINARY;
 
-    m_fd = open(m_longName.c_str(), iFlags, iMode);
+    m_fd = open(m_longName.c_str(), iFlags, mode);
     if (m_fd < 0) {
         m_hadError = true;
         return false;

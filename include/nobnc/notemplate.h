@@ -91,7 +91,7 @@ public:
     bool hasLoop(const NoString& name);
     NoString value(const NoString& name, bool bFromIf = false);
     NoTemplate& addRow(const NoString& name);
-    NoTemplate* row(const NoString& name, uint uIndex);
+    NoTemplate* row(const NoString& name, uint index);
     std::vector<NoTemplate*>* loop(const NoString& name);
     void deleteCurLoopContext();
     NoTemplateLoopContext* currentLoopContext();

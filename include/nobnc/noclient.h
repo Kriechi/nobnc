@@ -41,7 +41,7 @@ public:
     void acceptLogin(NoUser* user);
     void refuseLogin(const NoString& reason);
 
-    NoString nick(bool allowIRCNick = true) const;
+    NoString nick(bool allowIrcNick = true) const;
     NoString nickMask() const;
     NoString identifier() const;
     bool hasNamesX() const;

@@ -253,17 +253,17 @@ public:
     bool onLoad(const NoString& args, NoString& message) override
     {
         NoString sMyArgs = args;
-        size_t uIndex = 0;
+        size_t index = 0;
         if (No::token(sMyArgs, 0) == "-nostore") {
-            uIndex++;
+            index++;
             m_saveMessages = false;
         }
-        if (No::token(sMyArgs, uIndex) == "-notimer") {
+        if (No::token(sMyArgs, index) == "-notimer") {
             SetAwayTime(0);
-            sMyArgs = No::tokens(sMyArgs, uIndex + 1);
-        } else if (No::token(sMyArgs, uIndex) == "-timer") {
-            SetAwayTime(No::token(sMyArgs, uIndex + 1).toInt());
-            sMyArgs = No::tokens(sMyArgs, uIndex + 2);
+            sMyArgs = No::tokens(sMyArgs, index + 1);
+        } else if (No::token(sMyArgs, index) == "-timer") {
+            SetAwayTime(No::token(sMyArgs, index + 1).toInt());
+            sMyArgs = No::tokens(sMyArgs, index + 2);
         }
         if (m_saveMessages) {
             if (!sMyArgs.empty()) {

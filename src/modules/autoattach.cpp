@@ -74,15 +74,15 @@ public:
 
     NoString ToString()
     {
-        NoString sRes;
+        NoString res;
         if (m_bNegated)
-            sRes += "!";
-        sRes += m_sChannelWildcard;
-        sRes += " ";
-        sRes += m_sSearchWildcard;
-        sRes += " ";
-        sRes += m_sHostmaskWildcard;
-        return sRes;
+            res += "!";
+        res += m_sChannelWildcard;
+        res += " ";
+        res += m_sSearchWildcard;
+        res += " ";
+        res += m_sHostmaskWildcard;
+        return res;
     }
 
 private:

@@ -149,13 +149,13 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
             (this->*Option.pSetter)(value.toBool());
     }
 
-    NoStringVector vsList;
-    settings->FindStringVector("allow", vsList);
-    for (const NoString& host : vsList) {
+    NoStringVector lst;
+    settings->FindStringVector("allow", lst);
+    for (const NoString& host : lst) {
         addAllowedHost(host);
     }
-    settings->FindStringVector("ctcpreply", vsList);
-    for (const NoString& reply : vsList) {
+    settings->FindStringVector("ctcpreply", lst);
+    for (const NoString& reply : lst) {
         addCtcpReply(No::token(reply, 0), No::tokens(reply, 1));
     }
 
@@ -272,7 +272,7 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
         }
     }
 
-    if (settings->FindStringVector("server", vsList, false) || settings->FindStringVector("chan", vsList, false) ||
+    if (settings->FindStringVector("server", lst, false) || settings->FindStringVector("chan", lst, false) ||
         settings->FindSubConfig("chan", subConf, false)) {
         NoNetwork* network = findNetwork("default");
         if (!network) {
@@ -289,8 +289,8 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
         }
     }
 
-    settings->FindStringVector("loadmodule", vsList);
-    for (const NoString& sMod : vsList) {
+    settings->FindStringVector("loadmodule", lst);
+    for (const NoString& sMod : lst) {
         NoString name = No::token(sMod, 0);
         NoString notice = "Loading user module [" + name + "]";
 
@@ -304,7 +304,7 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
             // XXX The awaynick module was retired in 1.6 (still available as external module)
             if (name == "awaynick") {
                 // load simple_away instead, unless it's already on the list
-                if (std::find(vsList.begin(), vsList.end(), "simple_away") == vsList.end()) {
+                if (std::find(lst.begin(), lst.end(), "simple_away") == lst.end()) {
                     notice = "Loading [simple_away] module instead";
                     name = "simple_away";
                     // not a fatal error if simple_away is not available

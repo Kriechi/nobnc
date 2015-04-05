@@ -304,14 +304,14 @@ NoString NoLogMod::GetServer()
 
 bool NoLogMod::onLoad(const NoString& args, NoString& message)
 {
-    size_t uIndex = 0;
+    size_t index = 0;
     if (No::token(args, 0).equals("-sanitize")) {
         m_bSanitize = true;
-        ++uIndex;
+        ++index;
     }
 
     // Use load parameter as save path
-    m_sLogPath = No::token(args, uIndex);
+    m_sLogPath = No::token(args, index);
 
     // Add default filename to path if it's a folder
     if (type() == No::UserModule) {

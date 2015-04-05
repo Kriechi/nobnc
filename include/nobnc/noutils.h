@@ -27,7 +27,7 @@ NO_EXPORT NoString formatIp(ulong addr);
 NO_EXPORT ulong formatLongIp(const NoString& address);
 
 NO_EXPORT void printError(const NoString& message);
-NO_EXPORT void printMessage(const NoString& message, bool bStrong = false);
+NO_EXPORT void printMessage(const NoString& message, bool strong = false);
 NO_EXPORT void printPrompt(const NoString& message);
 NO_EXPORT void printAction(const NoString& message);
 NO_EXPORT void printStatus(bool success, const NoString& message = "");
@@ -44,23 +44,23 @@ NO_EXPORT NoString sha256(const NoString& str);
 NO_EXPORT NoString saltedMd5(const NoString& pass, const NoString& salt);
 NO_EXPORT NoString saltedSha256(const NoString& pass, const NoString& salt);
 
-NO_EXPORT NoString getPass(const NoString& sPrompt);
+NO_EXPORT NoString getPass(const NoString& prompt);
 NO_EXPORT NoString getSaltedHashPass(NoString& salt);
-NO_EXPORT bool getInput(const NoString& sPrompt, NoString& ret, const NoString& sDefault = "", const NoString& sHint = "");
-NO_EXPORT bool getBoolInput(const NoString& sPrompt, bool bDefault);
-NO_EXPORT bool getBoolInput(const NoString& sPrompt, bool* pbDefault = nullptr);
-NO_EXPORT bool getNumInput(const NoString& sPrompt, uint& uRet, uint uMin = 0, uint uMax = ~0, uint uDefault = ~0);
+NO_EXPORT bool getInput(const NoString& prompt, NoString& ret, const NoString& defaultValue = "", const NoString& hint = "");
+NO_EXPORT bool getBoolInput(const NoString& prompt, bool defaultValue);
+NO_EXPORT bool getBoolInput(const NoString& prompt, bool* defaultValue = nullptr);
+NO_EXPORT bool getNumInput(const NoString& prompt, uint& ret, uint min = 0, uint max = ~0, uint defaultValue = ~0);
 
 NO_EXPORT ulonglong millTime();
 
-NO_EXPORT NoString cTime(time_t t, const NoString& sTZ);
-NO_EXPORT NoString formatTime(time_t t, const NoString& format, const NoString& sTZ);
+NO_EXPORT NoString cTime(time_t t, const NoString& timezone);
+NO_EXPORT NoString formatTime(time_t t, const NoString& format, const NoString& timezone);
 NO_EXPORT NoString formatServerTime(const timeval& tv);
 NO_EXPORT NoStringSet timezones();
 NO_EXPORT NoStringSet encodings();
 
 NO_EXPORT NoStringMap messageTags(const NoString& line);
-NO_EXPORT void setMessageTags(NoString& line, const NoStringMap& mssTags);
+NO_EXPORT void setMessageTags(NoString& line, const NoStringMap& tags);
 
 enum status_t {
     MCS_SUCCESS = 0,
@@ -68,7 +68,7 @@ enum status_t {
     MCS_EWRITE = 2,
 };
 
-NO_EXPORT status_t writeToDisk(const NoStringMap& values, const NoString& path, mode_t iMode = 0644);
+NO_EXPORT status_t writeToDisk(const NoStringMap& values, const NoString& path, mode_t mode = 0644);
 NO_EXPORT status_t readFromDisk(NoStringMap& values, const NoString& path);
 
 NO_EXPORT NoString toByteStr(ulonglong d);
@@ -79,17 +79,17 @@ NO_EXPORT NoString stripControls(const NoString& str);
 
 NO_EXPORT NoString randomString(uint uLength);
 
-NO_EXPORT NoString namedFormat(const NoString& format, const NoStringMap& msValues);
+NO_EXPORT NoString namedFormat(const NoString& format, const NoStringMap& values);
 
-NO_EXPORT NoString ellipsize(const NoString& str, uint uLen);
+NO_EXPORT NoString ellipsize(const NoString& str, uint len);
 
 NO_EXPORT NoStringMap optionSplit(const NoString& str);
 NO_EXPORT NoStringVector quoteSplit(const NoString& str);
 
 NO_EXPORT bool wildCmp(const NoString& str, const NoString& wild, No::CaseSensitivity cs = No::CaseSensitive);
 
-NO_EXPORT NoString token(const NoString& str, size_t uPos, const NoString& sSep = " ");
-NO_EXPORT NoString tokens(const NoString& str, size_t uPos, const NoString& sSep = " ");
+NO_EXPORT NoString token(const NoString& str, size_t pos, const NoString& sep = " ");
+NO_EXPORT NoString tokens(const NoString& str, size_t pos, const NoString& sep = " ");
 NO_EXPORT NoString firstLine(const NoString& str);
 }
 

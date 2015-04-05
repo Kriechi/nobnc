@@ -447,11 +447,11 @@ bool NoApp::allowConnectionFrom(const NoString& address) const
 void NoApp::initDirs(const NoString& argvPath, const NoString& dataDir)
 {
     // If the bin was not ran from the current directory, we need to add that dir onto our cwd
-    NoString::size_type uPos = argvPath.rfind('/');
-    if (uPos == NoString::npos)
+    NoString::size_type pos = argvPath.rfind('/');
+    if (pos == NoString::npos)
         d->curPath = "./";
     else
-        d->curPath = NoDir("./").filePath(argvPath.left(uPos));
+        d->curPath = NoDir("./").filePath(argvPath.left(pos));
 
     if (dataDir.empty()) {
         d->appPath = NoDir::home().filePath(".znc");
@@ -846,7 +846,7 @@ bool NoApp::writeNewConfig(const NoString& configFile)
             vsLines.push_back("\t\tLoadModule = " + info.name());
         }
 
-        NoString host, pass, sHint;
+        NoString host, pass, hint;
         bool ssl = false;
         uint uServerPort = 0;
 
@@ -856,10 +856,10 @@ bool NoApp::writeNewConfig(const NoString& configFile)
             ssl = true;
 #endif
         } else {
-            sHint = "host only";
+            hint = "host only";
         }
 
-        while (!No::getInput("Server host", host, host, sHint) || !NoServerInfo(host).isValid())
+        while (!No::getInput("Server host", host, host, hint) || !NoServerInfo(host).isValid())
             ;
 #ifdef HAVE_LIBSSL
         ssl = No::getBoolInput("Server uses SSL?", ssl);
@@ -1115,9 +1115,9 @@ bool NoAppPrivate::doRehash(NoString& error)
 
     NoStringMap msModules; // Modules are queued for later loading
 
-    NoStringVector vsList;
-    config.FindStringVector("loadmodule", vsList);
-    for (const NoString& sModLine : vsList) {
+    NoStringVector lst;
+    config.FindStringVector("loadmodule", lst);
+    for (const NoString& sModLine : lst) {
         NoString name = No::token(sModLine, 0);
         NoString args = No::tokens(sModLine, 1);
 
@@ -1156,23 +1156,23 @@ bool NoAppPrivate::doRehash(NoString& error)
         msModules[name] = args;
     }
 
-    config.FindStringVector("motd", vsList);
-    for (const NoString& sMotd : vsList) {
+    config.FindStringVector("motd", lst);
+    for (const NoString& sMotd : lst) {
         noApp->addMotd(sMotd);
     }
 
-    config.FindStringVector("bindhost", vsList);
-    for (const NoString& host : vsList) {
+    config.FindStringVector("bindhost", lst);
+    for (const NoString& host : lst) {
         noApp->addBindHost(host);
     }
 
-    config.FindStringVector("trustedproxy", vsList);
-    for (const NoString& sProxy : vsList) {
+    config.FindStringVector("trustedproxy", lst);
+    for (const NoString& sProxy : lst) {
         noApp->addTrustedProxy(sProxy);
     }
 
-    config.FindStringVector("vhost", vsList);
-    for (const NoString& host : vsList) {
+    config.FindStringVector("vhost", lst);
+    for (const NoString& host : lst) {
         noApp->addBindHost(host);
     }
 
@@ -1365,9 +1365,9 @@ void NoApp::dumpConfig(const NoSettings* settings)
     NoSettings::EntryMapIterator eit = settings->BeginEntries();
     for (; eit != settings->EndEntries(); ++eit) {
         const NoString& key = eit->first;
-        const NoStringVector& vsList = eit->second;
-        NoStringVector::const_iterator it = vsList.begin();
-        for (; it != vsList.end(); ++it) {
+        const NoStringVector& lst = eit->second;
+        NoStringVector::const_iterator it = lst.begin();
+        for (; it != lst.end(); ++it) {
             No::printError(key + " = " + *it);
         }
     }
@@ -1799,15 +1799,15 @@ bool NoAppPrivate::addListener(NoSettings* settings, NoString& error)
 {
     NoString bindHost;
     NoString uriPrefix;
-    bool ssl;
-    bool b4;
+    bool ssl = false;
+    bool ipv4 = true;
 #ifdef HAVE_IPV6
-    bool b6 = true;
+    bool ipv6 = true;
 #else
-    bool b6 = false;
+    bool ipv6 = false;
 #endif
-    bool bIRC;
-    bool bWeb;
+    bool irc = false;
+    bool web = false;
     ushort port;
     if (!settings->FindUShortEntry("port", port)) {
         error = "No port given";
@@ -1816,18 +1816,18 @@ bool NoAppPrivate::addListener(NoSettings* settings, NoString& error)
     }
     settings->FindStringEntry("host", bindHost);
     settings->FindBoolEntry("ssl", ssl, false);
-    settings->FindBoolEntry("ipv4", b4, true);
-    settings->FindBoolEntry("ipv6", b6, b6);
-    settings->FindBoolEntry("allowirc", bIRC, true);
-    settings->FindBoolEntry("allowweb", bWeb, true);
+    settings->FindBoolEntry("ipv4", ipv4, true);
+    settings->FindBoolEntry("ipv6", ipv6, ipv6);
+    settings->FindBoolEntry("allowirc", irc, true);
+    settings->FindBoolEntry("allowweb", web, true);
     settings->FindStringEntry("uriprefix", uriPrefix);
 
     No::AddressType addressType;
-    if (b4 && b6) {
+    if (ipv4 && ipv6) {
         addressType = No::Ipv4AndIpv6Address;
-    } else if (b4 && !b6) {
+    } else if (ipv4 && !ipv6) {
         addressType = No::Ipv4Address;
-    } else if (!b4 && b6) {
+    } else if (!ipv4 && ipv6) {
         addressType = No::Ipv6Address;
     } else {
         error = "No address family given";
@@ -1836,11 +1836,11 @@ bool NoAppPrivate::addListener(NoSettings* settings, NoString& error)
     }
 
     No::AcceptType acceptType;
-    if (bIRC && bWeb) {
+    if (irc && web) {
         acceptType = No::AcceptAll;
-    } else if (bIRC && !bWeb) {
+    } else if (irc && !web) {
         acceptType = No::AcceptIrc;
-    } else if (!bIRC && bWeb) {
+    } else if (!irc && web) {
         acceptType = No::AcceptHttp;
     } else {
         error = "Either Web or IRC or both should be selected";

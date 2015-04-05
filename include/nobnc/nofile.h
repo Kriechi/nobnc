@@ -73,11 +73,11 @@ public:
     static bool Copy(const NoString& sOldFileName, const NoString& sNewFileName, bool bOverwrite = false);
     bool Chmod(mode_t mode);
     static bool Chmod(const NoString& sFile, mode_t mode);
-    bool Seek(off_t uPos);
+    bool Seek(off_t pos);
     bool Truncate();
     bool Sync();
-    bool Open(const NoString& fileName, int iFlags = O_RDONLY, mode_t iMode = 0644);
-    bool Open(int iFlags = O_RDONLY, mode_t iMode = 0644);
+    bool Open(const NoString& fileName, int iFlags = O_RDONLY, mode_t mode = 0644);
+    bool Open(int iFlags = O_RDONLY, mode_t mode = 0644);
     ssize_t Read(char* pszBuffer, int iBytes);
     bool ReadLine(NoString& data, const NoString& sDelimiter = "\n");
     bool ReadFile(NoString& data, size_t iMaxSize = 512 * 1024);

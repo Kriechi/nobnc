@@ -373,7 +373,7 @@ struct TOption
 
 bool NoNetwork::parseConfig(NoSettings* settings, NoString& error, bool bUpgrade)
 {
-    NoStringVector vsList;
+    NoStringVector lst;
 
     if (!bUpgrade) {
         TOption<const NoString&> StringOptions[] = {
@@ -419,8 +419,8 @@ bool NoNetwork::parseConfig(NoSettings* settings, NoString& error, bool bUpgrade
                 (this->*Option.pSetter)(value);
         }
 
-        settings->FindStringVector("loadmodule", vsList);
-        for (const NoString& value : vsList) {
+        settings->FindStringVector("loadmodule", lst);
+        for (const NoString& value : lst) {
             NoString name = No::token(value, 0);
             NoString notice = "Loading network module [" + name + "]";
 
@@ -433,7 +433,7 @@ bool NoNetwork::parseConfig(NoSettings* settings, NoString& error, bool bUpgrade
                 // XXX The awaynick module was retired in 1.6 (still available as external module)
                 if (name == "awaynick") {
                     // load simple_away instead, unless it's already on the list
-                    if (std::find(vsList.begin(), vsList.end(), "simple_away") == vsList.end()) {
+                    if (std::find(lst.begin(), lst.end(), "simple_away") == lst.end()) {
                         notice = "Loading network module [simple_away] instead";
                         name = "simple_away";
                         // not a fatal error if simple_away is not available
@@ -447,19 +447,19 @@ bool NoNetwork::parseConfig(NoSettings* settings, NoString& error, bool bUpgrade
         }
     }
 
-    settings->FindStringVector("server", vsList);
-    for (const NoString& sServer : vsList) {
+    settings->FindStringVector("server", lst);
+    for (const NoString& sServer : lst) {
         No::printAction("Adding server [" + sServer + "]");
         No::printStatus(addServer(sServer));
     }
 
-    settings->FindStringVector("trustedserverfingerprint", vsList);
-    for (const NoString& fingerprint : vsList) {
+    settings->FindStringVector("trustedserverfingerprint", lst);
+    for (const NoString& fingerprint : lst) {
         addTrustedFingerprint(fingerprint);
     }
 
-    settings->FindStringVector("chan", vsList);
-    for (const NoString& sChan : vsList) {
+    settings->FindStringVector("chan", lst);
+    for (const NoString& sChan : lst) {
         addChannel(sChan, true);
     }
 

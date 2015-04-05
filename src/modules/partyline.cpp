@@ -234,14 +234,14 @@ public:
     Return onRaw(NoString& line) override
     {
         if (No::token(line, 1) == "005") {
-            NoString::size_type uPos = line.toUpper().find("CHANTYPES=");
-            if (uPos != NoString::npos) {
-                uPos = line.find(" ", uPos);
+            NoString::size_type pos = line.toUpper().find("CHANTYPES=");
+            if (pos != NoString::npos) {
+                pos = line.find(" ", pos);
 
-                if (uPos == NoString::npos)
+                if (pos == NoString::npos)
                     line.append(CHAN_PREFIX_1);
                 else
-                    line.insert(uPos, CHAN_PREFIX_1);
+                    line.insert(pos, CHAN_PREFIX_1);
                 m_spInjectedPrefixes.insert(network());
             }
         }

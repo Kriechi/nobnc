@@ -299,11 +299,11 @@ void NoModule::onIrcDisconnected()
 void NoModule::onIrcConnected()
 {
 }
-NoModule::Return NoModule::onIrcConnecting(NoIrcSocket* IRCSock)
+NoModule::Return NoModule::onIrcConnecting(NoIrcSocket* socket)
 {
     return Continue;
 }
-void NoModule::onIrcConnectionError(NoIrcSocket* IRCSock)
+void NoModule::onIrcConnectionError(NoIrcSocket* socket)
 {
 }
 NoModule::Return NoModule::onIrcRegistration(NoString& pass, NoString& nick, NoString& ident, NoString& realName)

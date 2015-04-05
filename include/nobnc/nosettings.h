@@ -55,26 +55,26 @@ public:
 
     void AddKeyValuePair(const NoString& name, const NoString& value);
 
-    bool AddSubConfig(const NoString& sTag, const NoString& name, NoSettings Config);
+    bool AddSubConfig(const NoString& tag, const NoString& name, NoSettings config);
 
-    bool FindStringVector(const NoString& name, NoStringVector& vsList, bool bErase = true);
+    bool FindStringVector(const NoString& name, NoStringVector& lst, bool erase = true);
 
-    bool FindStringEntry(const NoString& name, NoString& sRes, const NoString& sDefault = "");
+    bool FindStringEntry(const NoString& name, NoString& res, const NoString& defaultValue = "");
 
-    bool FindBoolEntry(const NoString& name, bool& bRes, bool bDefault = false);
+    bool FindBoolEntry(const NoString& name, bool& res, bool defaultValue = false);
 
-    bool FindUIntEntry(const NoString& name, uint& uRes, uint uDefault = 0);
+    bool FindUIntEntry(const NoString& name, uint& res, uint defaultValue = 0);
 
-    bool FindUShortEntry(const NoString& name, ushort& uRes, ushort uDefault = 0);
+    bool FindUShortEntry(const NoString& name, ushort& res, ushort defaultValue = 0);
 
-    bool FindDoubleEntry(const NoString& name, double& fRes, double fDefault = 0);
+    bool FindDoubleEntry(const NoString& name, double& res, double defaultValue = 0);
 
-    bool FindSubConfig(const NoString& name, SubConfig& Config, bool bErase = true);
+    bool FindSubConfig(const NoString& name, SubConfig& config, bool erase = true);
 
     bool empty() const;
 
-    bool Parse(NoFile& file, NoString& sErrorMsg);
-    void Write(NoFile& file, uint iIndentation = 0);
+    bool Parse(NoFile& file, NoString& error);
+    void Write(NoFile& file, uint indentation = 0);
 
 private:
     EntryMap m_entries;

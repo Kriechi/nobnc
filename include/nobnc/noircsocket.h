@@ -45,7 +45,7 @@ public:
     bool onCtcpReply(NoHostMask& nick, NoString& message);
     bool onPrivateCtcp(NoHostMask& nick, NoString& message);
     bool onChannelCtcp(NoNick& nick, const NoString& sChan, NoString& message);
-    bool OnGeneralCTCP(NoHostMask& nick, NoString& message);
+    bool onGeneralCtcp(NoHostMask& nick, NoString& message);
     bool onPrivateMessage(NoHostMask& nick, NoString& message);
     bool onChannelMessage(NoNick& nick, const NoString& sChan, NoString& message);
     bool onPrivateNotice(NoHostMask& nick, NoString& message);

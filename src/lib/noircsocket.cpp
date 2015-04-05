@@ -69,7 +69,7 @@ public:
     bool floodProtection = false;
 };
 
-// These are used in OnGeneralCTCP()
+// These are used in onGeneralCtcp()
 const time_t NoIrcSocketPrivate::ctcpFloodTime = 5;
 const uint NoIrcSocketPrivate::ctcpFloodCount = 5;
 
@@ -937,18 +937,18 @@ bool NoIrcSocket::onPrivateCtcp(NoHostMask& nick, NoString& message)
     }
 
     // This handles everything which wasn't handled yet
-    return OnGeneralCTCP(nick, message);
+    return onGeneralCtcp(nick, message);
 }
 
-bool NoIrcSocket::OnGeneralCTCP(NoHostMask& nick, NoString& message)
+bool NoIrcSocket::onGeneralCtcp(NoHostMask& nick, NoString& message)
 {
-    const NoStringMap& mssCTCPReplies = d->network->user()->ctcpReplies();
+    const NoStringMap& ctcpReplies = d->network->user()->ctcpReplies();
     NoString sQuery = No::token(message, 0).toUpper();
-    NoStringMap::const_iterator it = mssCTCPReplies.find(sQuery);
+    NoStringMap::const_iterator it = ctcpReplies.find(sQuery);
     bool bHaveReply = false;
     NoString reply;
 
-    if (it != mssCTCPReplies.end()) {
+    if (it != ctcpReplies.end()) {
         reply = d->network->expandString(it->second);
         bHaveReply = true;
 
@@ -1042,7 +1042,7 @@ bool NoIrcSocket::onChannelCtcp(NoNick& nick, const NoString& sChan, NoString& m
     }
 
     NoHostMask mask(nick.hostMask());
-    bool res = OnGeneralCTCP(mask, message);
+    bool res = onGeneralCtcp(mask, message);
 
     // TODO: cleanup
     nick.setNick(mask.nick());

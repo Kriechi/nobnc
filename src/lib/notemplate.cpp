@@ -127,7 +127,7 @@ public:
         return GetRow(m_uRowIndex);
     }
 
-    NoTemplate* GetRow(uint uIndex);
+    NoTemplate* GetRow(uint index);
     NoString GetValue(const NoString& name, bool bFromIf = false);
 
 private:
@@ -223,15 +223,15 @@ void NoTemplateOptions::Parse(const NoString& line)
     }
 }
 
-NoTemplate* NoTemplateLoopContext::GetRow(uint uIndex)
+NoTemplate* NoTemplateLoopContext::GetRow(uint index)
 {
     size_t uSize = m_pvRows->size();
 
-    if (uIndex < uSize) {
+    if (index < uSize) {
         if (m_bReverse) {
-            return (*m_pvRows)[uSize - uIndex - 1];
+            return (*m_pvRows)[uSize - index - 1];
         } else {
-            return (*m_pvRows)[uIndex];
+            return (*m_pvRows)[index];
         }
     }
 
@@ -461,13 +461,13 @@ NoTemplate& NoTemplate::addRow(const NoString& name)
     return *pTmpl;
 }
 
-NoTemplate* NoTemplate::row(const NoString& name, uint uIndex)
+NoTemplate* NoTemplate::row(const NoString& name, uint index)
 {
     std::vector<NoTemplate*>* pvLoop = loop(name);
 
     if (pvLoop) {
-        if (pvLoop->size() > uIndex) {
-            return (*pvLoop)[uIndex];
+        if (pvLoop->size() > index) {
+            return (*pvLoop)[index];
         }
     }
 
@@ -926,7 +926,7 @@ bool NoTemplate::validIf(const NoString& args)
 
 // TODO: cleanup
 extern NoString
-Token_helper(const NoString& str, size_t uPos, bool bRest, const NoString& sSep, const NoString& sLeft, const NoString& sRight);
+Token_helper(const NoString& str, size_t pos, bool bRest, const NoString& sep, const NoString& sLeft, const NoString& sRight);
 
 bool NoTemplate::validExpr(const NoString& sExpression)
 {

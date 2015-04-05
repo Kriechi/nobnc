@@ -23,11 +23,11 @@
 
 struct ConfigStackEntry
 {
-    NoString sTag;
+    NoString tag;
     NoString name;
-    NoSettings Config;
+    NoSettings config;
 
-    ConfigStackEntry(const NoString& Tag, const NoString Name) : sTag(Tag), name(Name), Config()
+    ConfigStackEntry(const NoString& tag, const NoString& name) : tag(tag), name(name)
     {
     }
 };
@@ -36,7 +36,7 @@ NoSettingsEntry::NoSettingsEntry() : m_subConfig(nullptr)
 {
 }
 
-NoSettingsEntry::NoSettingsEntry(const NoSettings& Config) : m_subConfig(new NoSettings(Config))
+NoSettingsEntry::NoSettingsEntry(const NoSettings& config) : m_subConfig(new NoSettings(config))
 {
 }
 
@@ -94,101 +94,101 @@ void NoSettings::AddKeyValuePair(const NoString& name, const NoString& value)
     m_entries[name].push_back(value);
 }
 
-bool NoSettings::AddSubConfig(const NoString& sTag, const NoString& name, NoSettings Config)
+bool NoSettings::AddSubConfig(const NoString& tag, const NoString& name, NoSettings config)
 {
-    SubConfig& conf = m_subConfigs[sTag];
+    SubConfig& conf = m_subConfigs[tag];
     SubConfig::const_iterator it = conf.find(name);
 
     if (it != conf.end()) {
         return false;
     }
 
-    conf[name] = Config;
+    conf[name] = config;
     return true;
 }
 
-bool NoSettings::FindStringVector(const NoString& name, NoStringVector& vsList, bool bErase)
+bool NoSettings::FindStringVector(const NoString& name, NoStringVector& lst, bool erase)
 {
     EntryMap::iterator it = m_entries.find(name);
-    vsList.clear();
+    lst.clear();
     if (it == m_entries.end())
         return false;
-    vsList = it->second;
+    lst = it->second;
 
-    if (bErase) {
+    if (erase) {
         m_entries.erase(it);
     }
 
     return true;
 }
 
-bool NoSettings::FindStringEntry(const NoString& name, NoString& sRes, const NoString& sDefault)
+bool NoSettings::FindStringEntry(const NoString& name, NoString& res, const NoString& defaultValue)
 {
     EntryMap::iterator it = m_entries.find(name);
-    sRes = sDefault;
+    res = defaultValue;
     if (it == m_entries.end() || it->second.empty())
         return false;
-    sRes = it->second.front();
+    res = it->second.front();
     it->second.erase(it->second.begin());
     if (it->second.empty())
         m_entries.erase(it);
     return true;
 }
 
-bool NoSettings::FindBoolEntry(const NoString& name, bool& bRes, bool bDefault)
+bool NoSettings::FindBoolEntry(const NoString& name, bool& res, bool defaultValue)
 {
     NoString s;
     if (FindStringEntry(name, s)) {
-        bRes = s.toBool();
+        res = s.toBool();
         return true;
     }
-    bRes = bDefault;
+    res = defaultValue;
     return false;
 }
 
-bool NoSettings::FindUIntEntry(const NoString& name, uint& uRes, uint uDefault)
+bool NoSettings::FindUIntEntry(const NoString& name, uint& res, uint defaultValue)
 {
     NoString s;
     if (FindStringEntry(name, s)) {
-        uRes = s.toUInt();
+        res = s.toUInt();
         return true;
     }
-    uRes = uDefault;
+    res = defaultValue;
     return false;
 }
 
-bool NoSettings::FindUShortEntry(const NoString& name, ushort& uRes, ushort uDefault)
+bool NoSettings::FindUShortEntry(const NoString& name, ushort& res, ushort defaultValue)
 {
     NoString s;
     if (FindStringEntry(name, s)) {
-        uRes = s.toUShort();
+        res = s.toUShort();
         return true;
     }
-    uRes = uDefault;
+    res = defaultValue;
     return false;
 }
 
-bool NoSettings::FindDoubleEntry(const NoString& name, double& fRes, double fDefault)
+bool NoSettings::FindDoubleEntry(const NoString& name, double& res, double defaultValue)
 {
     NoString s;
     if (FindStringEntry(name, s)) {
-        fRes = s.toDouble();
+        res = s.toDouble();
         return true;
     }
-    fRes = fDefault;
+    res = defaultValue;
     return false;
 }
 
-bool NoSettings::FindSubConfig(const NoString& name, NoSettings::SubConfig& Config, bool bErase)
+bool NoSettings::FindSubConfig(const NoString& name, NoSettings::SubConfig& config, bool erase)
 {
     SubConfigMap::iterator it = m_subConfigs.find(name);
     if (it == m_subConfigs.end()) {
-        Config.clear();
+        config.clear();
         return false;
     }
-    Config = it->second;
+    config = it->second;
 
-    if (bErase) {
+    if (erase) {
         m_subConfigs.erase(it);
     }
 
@@ -200,27 +200,27 @@ bool NoSettings::empty() const
     return m_entries.empty() && m_subConfigs.empty();
 }
 
-bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
+bool NoSettings::Parse(NoFile& file, NoString& error)
 {
     NoString line;
-    uint uLineNum = 0;
-    NoSettings* pActiveConfig = this;
-    std::stack<ConfigStackEntry> ConfigStack;
-    bool bCommented = false; // support for /**/ style comments
+    uint lineNum = 0;
+    NoSettings* activeConfig = this;
+    std::stack<ConfigStackEntry> configStack;
+    bool commented = false; // support for /**/ style comments
 
     if (!file.Seek(0)) {
-        sErrorMsg = "Could not seek to the beginning of the config.";
+        error = "Could not seek to the beginning of the config.";
         return false;
     }
 
     while (file.ReadLine(line)) {
-        uLineNum++;
+        lineNum++;
 
 #define ERROR(arg)                                             \
     do {                                                       \
         std::stringstream stream;                              \
-        stream << "Error on line " << uLineNum << ": " << arg; \
-        sErrorMsg = stream.str();                              \
+        stream << "Error on line " << lineNum << ": " << arg; \
+        error = stream.str();                              \
         m_subConfigs.clear();                                  \
         m_entries.clear();                                     \
         return false;                                          \
@@ -230,9 +230,9 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
         line.trimLeft();
         line.trimRight("\r\n");
 
-        if (bCommented || line.left(2) == "/*") {
+        if (commented || line.left(2) == "/*") {
             /* Does this comment end on the same line again? */
-            bCommented = (line.right(2) != "*/");
+            commented = (line.right(2) != "*/");
 
             continue;
         }
@@ -246,47 +246,47 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
             line.rightChomp(1);
             line.trim();
 
-            NoString sTag = No::token(line, 0);
+            NoString tag = No::token(line, 0);
             NoString value = No::tokens(line, 1);
 
-            sTag.trim();
+            tag.trim();
             value.trim();
 
-            if (sTag.left(1) == "/") {
-                sTag = sTag.substr(1);
+            if (tag.left(1) == "/") {
+                tag = tag.substr(1);
 
                 if (!value.empty())
-                    ERROR("Malformated closing tag. Expected \"</" << sTag << ">\".");
-                if (ConfigStack.empty())
-                    ERROR("Closing tag \"" << sTag << "\" which is not open.");
+                    ERROR("Malformated closing tag. Expected \"</" << tag << ">\".");
+                if (configStack.empty())
+                    ERROR("Closing tag \"" << tag << "\" which is not open.");
 
-                const struct ConfigStackEntry& entry = ConfigStack.top();
-                NoSettings myConfig(entry.Config);
+                const struct ConfigStackEntry& entry = configStack.top();
+                NoSettings myConfig(entry.config);
                 NoString name(entry.name);
 
-                if (!sTag.equals(entry.sTag))
-                    ERROR("Closing tag \"" << sTag << "\" which is not open.");
+                if (!tag.equals(entry.tag))
+                    ERROR("Closing tag \"" << tag << "\" which is not open.");
 
                 // This breaks entry
-                ConfigStack.pop();
+                configStack.pop();
 
-                if (ConfigStack.empty())
-                    pActiveConfig = this;
+                if (configStack.empty())
+                    activeConfig = this;
                 else
-                    pActiveConfig = &ConfigStack.top().Config;
+                    activeConfig = &configStack.top().config;
 
-                SubConfig& conf = pActiveConfig->m_subConfigs[sTag.toLower()];
+                SubConfig& conf = activeConfig->m_subConfigs[tag.toLower()];
                 SubConfig::const_iterator it = conf.find(name);
 
                 if (it != conf.end())
-                    ERROR("Duplicate entry for tag \"" << sTag << "\" name \"" << name << "\".");
+                    ERROR("Duplicate entry for tag \"" << tag << "\" name \"" << name << "\".");
 
                 conf[name] = NoSettingsEntry(myConfig);
             } else {
                 if (value.empty())
                     ERROR("Empty block name at begin of block.");
-                ConfigStack.push(ConfigStackEntry(sTag.toLower(), value));
-                pActiveConfig = &ConfigStack.top().Config;
+                configStack.push(ConfigStackEntry(tag.toLower(), value));
+                activeConfig = &configStack.top().config;
             }
 
             continue;
@@ -309,37 +309,37 @@ bool NoSettings::Parse(NoFile& file, NoString& sErrorMsg)
             ERROR("Malformed line");
 
         NoString sNameLower = name.toLower();
-        pActiveConfig->m_entries[sNameLower].push_back(value);
+        activeConfig->m_entries[sNameLower].push_back(value);
     }
 
-    if (bCommented)
+    if (commented)
         ERROR("Comment not closed at end of file.");
 
-    if (!ConfigStack.empty()) {
-        const NoString& sTag = ConfigStack.top().sTag;
-        ERROR("Not all tags are closed at the end of the file. Inner-most open tag is \"" << sTag << "\".");
+    if (!configStack.empty()) {
+        const NoString& tag = configStack.top().tag;
+        ERROR("Not all tags are closed at the end of the file. Inner-most open tag is \"" << tag << "\".");
     }
 
     return true;
 }
 
-void NoSettings::Write(NoFile& File, uint iIndentation)
+void NoSettings::Write(NoFile& file, uint indentation)
 {
-    NoString sIndentation = NoString(iIndentation, '\t');
+    NoString sIndentation = NoString(indentation, '\t');
 
     for (const auto& it : m_entries) {
         for (const NoString& value : it.second) {
-            File.Write(sIndentation + it.first + " = " + value + "\n");
+            file.Write(sIndentation + it.first + " = " + value + "\n");
         }
     }
 
     for (const auto& it : m_subConfigs) {
         for (const auto& it2 : it.second) {
-            File.Write("\n");
+            file.Write("\n");
 
-            File.Write(sIndentation + "<" + it.first + " " + it2.first + ">\n");
-            it2.second.m_subConfig->Write(File, iIndentation + 1);
-            File.Write(sIndentation + "</" + it.first + ">\n");
+            file.Write(sIndentation + "<" + it.first + " " + it2.first + ">\n");
+            it2.second.m_subConfig->Write(file, indentation + 1);
+            file.Write(sIndentation + "</" + it.first + ">\n");
         }
     }
 }

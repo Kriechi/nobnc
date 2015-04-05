@@ -26,11 +26,11 @@ class NoNickServ : public NoModule
 {
     void DoNickCommand(const NoString& cmd, const NoString& nick)
     {
-        NoStringMap msValues;
-        msValues["nickname"] = nick;
+        NoStringMap values;
+        values["nickname"] = nick;
         NoRegistry registry(this);
-        msValues["password"] = registry.value("Password");
-        putIrc(No::namedFormat(registry.value(cmd), msValues));
+        values["password"] = registry.value("Password");
+        putIrc(No::namedFormat(registry.value(cmd), values));
     }
 
 public:
@@ -132,9 +132,9 @@ public:
              No::stripControls(message).find("type /NickServ IDENTIFY password") ||
              No::stripControls(message).find("type /msg NickServ IDENTIFY password")) &&
             message.toUpper().contains("IDENTIFY") && message.contains("help")) {
-            NoStringMap msValues;
-            msValues["password"] = registry.value("Password");
-            putIrc(No::namedFormat(registry.value("IdentifyCmd"), msValues));
+            NoStringMap values;
+            values["password"] = registry.value("Password");
+            putIrc(No::namedFormat(registry.value("IdentifyCmd"), values));
         }
     }
 
