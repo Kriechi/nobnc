@@ -34,11 +34,11 @@ public:
     MODCONSTRUCTOR(NoIdentFileModule)
     {
         addHelpCommand();
-        addCommand("GetFile", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::GetFile));
-        addCommand("SetFile", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::SetFile), "<file>");
-        addCommand("GetFormat", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::GetFormat));
-        addCommand("SetFormat", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::SetFormat), "<format>");
-        addCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoIdentFileModule::Show));
+        addCommand("GetFile", static_cast<NoModuleCommand::Function>(&NoIdentFileModule::GetFile));
+        addCommand("SetFile", static_cast<NoModuleCommand::Function>(&NoIdentFileModule::SetFile), "<file>");
+        addCommand("GetFormat", static_cast<NoModuleCommand::Function>(&NoIdentFileModule::GetFormat));
+        addCommand("SetFormat", static_cast<NoModuleCommand::Function>(&NoIdentFileModule::SetFormat), "<format>");
+        addCommand("Show", static_cast<NoModuleCommand::Function>(&NoIdentFileModule::Show));
 
         m_pISpoofLockFile = nullptr;
         m_pIRCSock = nullptr;

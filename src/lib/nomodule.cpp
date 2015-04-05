@@ -186,7 +186,7 @@ NoModuleSocket* NoModule::findSocket(const NoString& name) const
     return nullptr;
 }
 
-bool NoModule::addCommand(const NoString& cmd, NoModuleCommand::ModCmdFunc func, const NoString& args, const NoString& desc)
+bool NoModule::addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args, const NoString& desc)
 {
     if (!func || cmd.contains(" ") || findCommand(cmd))
         return false;

@@ -211,7 +211,7 @@ public:
     NoModuleSocket* findSocket(const NoString& name) const;
 
     void addHelpCommand();
-    bool addCommand(const NoString& cmd, NoModuleCommand::ModCmdFunc func, const NoString& args = "", const NoString& desc = "");
+    bool addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args = "", const NoString& desc = "");
     bool removeCommand(const NoString& cmd);
     const NoModuleCommand* findCommand(const NoString& cmd) const;
     bool handleCommand(const NoString& line);

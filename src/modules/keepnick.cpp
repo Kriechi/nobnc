@@ -38,15 +38,15 @@ public:
     {
         addHelpCommand();
         addCommand("Enable",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoKeepNickMod::OnEnableCommand),
+                   static_cast<NoModuleCommand::Function>(&NoKeepNickMod::OnEnableCommand),
                    "",
                    "Try to get your primary nick");
         addCommand("Disable",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoKeepNickMod::OnDisableCommand),
+                   static_cast<NoModuleCommand::Function>(&NoKeepNickMod::OnDisableCommand),
                    "",
                    "No longer trying to get your primary nick");
         addCommand("State",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoKeepNickMod::OnStateCommand),
+                   static_cast<NoModuleCommand::Function>(&NoKeepNickMod::OnStateCommand),
                    "",
                    "Show the current state");
     }

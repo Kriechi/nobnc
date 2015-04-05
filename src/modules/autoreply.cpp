@@ -31,11 +31,11 @@ public:
     {
         addHelpCommand();
         addCommand("Set",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoReplyMod::OnSetCommand),
+                   static_cast<NoModuleCommand::Function>(&NoAutoReplyMod::OnSetCommand),
                    "<reply>",
                    "Sets a new reply");
         addCommand("Show",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoReplyMod::OnShowCommand),
+                   static_cast<NoModuleCommand::Function>(&NoAutoReplyMod::OnShowCommand),
                    "",
                    "Displays the current query reply");
         m_Messaged.setExpiration(1000 * 120);

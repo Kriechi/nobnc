@@ -167,15 +167,15 @@ public:
     {
         addHelpCommand();
         addCommand("Add",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleAdd),
+                   static_cast<NoModuleCommand::Function>(&NoChannelAttach::HandleAdd),
                    "[!]<#chan> <search> <host>",
                    "Add an entry, use !#chan to negate and * for wildcards");
         addCommand("Del",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleDel),
+                   static_cast<NoModuleCommand::Function>(&NoChannelAttach::HandleDel),
                    "[!]<#chan> <search> <host>",
                    "Remove an entry, needs to be an exact match");
         addCommand("List",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoChannelAttach::HandleList),
+                   static_cast<NoModuleCommand::Function>(&NoChannelAttach::HandleList),
                    "",
                    "List all entries");
     }

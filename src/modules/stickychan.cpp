@@ -30,10 +30,10 @@ public:
     MODCONSTRUCTOR(NoStickyChan)
     {
         addHelpCommand();
-        addCommand("Stick", static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnStickCommand), "<#channel> [key]", "Sticks a channel");
-        addCommand("Unstick", static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnUnstickCommand), "<#channel>", "Unsticks a channel");
+        addCommand("Stick", static_cast<NoModuleCommand::Function>(&NoStickyChan::OnStickCommand), "<#channel> [key]", "Sticks a channel");
+        addCommand("Unstick", static_cast<NoModuleCommand::Function>(&NoStickyChan::OnUnstickCommand), "<#channel>", "Unsticks a channel");
         addCommand("List",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoStickyChan::OnListCommand),
+                   static_cast<NoModuleCommand::Function>(&NoStickyChan::OnListCommand),
                    "",
                    "Lists sticky channels");
     }

@@ -88,19 +88,19 @@ public:
     MODCONSTRUCTOR(NoSaslMod)
     {
         addCommand("Help",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslMod::PrintHelp),
+                   static_cast<NoModuleCommand::Function>(&NoSaslMod::PrintHelp),
                    "search",
                    "Generate this output");
         addCommand("Set",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslMod::Set),
+                   static_cast<NoModuleCommand::Function>(&NoSaslMod::Set),
                    "<username> [<password>]",
                    "Set username and password for the mechanisms that need them. Password is optional");
         addCommand("Mechanism",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslMod::SetMechanismCommand),
+                   static_cast<NoModuleCommand::Function>(&NoSaslMod::SetMechanismCommand),
                    "[mechanism[ ...]]",
                    "Set the mechanisms to be attempted (in order)");
         addCommand("RequireAuth",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSaslMod::RequireAuthCommand),
+                   static_cast<NoModuleCommand::Function>(&NoSaslMod::RequireAuthCommand),
                    "[yes|no]",
                    "Don't connect unless SASL authentication succeeds");
 

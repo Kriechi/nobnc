@@ -86,11 +86,11 @@ public:
     MODCONSTRUCTOR(NoNotesMod)
     {
         addHelpCommand();
-        addCommand("List", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::ListCommand));
-        addCommand("Add", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::AddNoteCommand), "<key> <note>");
-        addCommand("Del", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::DelCommand), "<key>", "Delete a note");
-        addCommand("Mod", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::ModCommand), "<key> <note>", "Modify a note");
-        addCommand("Get", static_cast<NoModuleCommand::ModCmdFunc>(&NoNotesMod::GetCommand), "<key>", "");
+        addCommand("List", static_cast<NoModuleCommand::Function>(&NoNotesMod::ListCommand));
+        addCommand("Add", static_cast<NoModuleCommand::Function>(&NoNotesMod::AddNoteCommand), "<key> <note>");
+        addCommand("Del", static_cast<NoModuleCommand::Function>(&NoNotesMod::DelCommand), "<key>", "Delete a note");
+        addCommand("Mod", static_cast<NoModuleCommand::Function>(&NoNotesMod::ModCommand), "<key> <note>", "Modify a note");
+        addCommand("Get", static_cast<NoModuleCommand::Function>(&NoNotesMod::GetCommand), "<key>", "");
     }
 
     bool onLoad(const NoString& args, NoString& message) override

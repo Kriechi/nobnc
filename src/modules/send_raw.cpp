@@ -142,15 +142,15 @@ public:
     {
         addHelpCommand();
         addCommand("Client",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSendRawMod::SendClient),
+                   static_cast<NoModuleCommand::Function>(&NoSendRawMod::SendClient),
                    "[user] [network] [data to send]",
                    "The data will be sent to the user's IRC client(s)");
         addCommand("Server",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSendRawMod::SendServer),
+                   static_cast<NoModuleCommand::Function>(&NoSendRawMod::SendServer),
                    "[user] [network] [data to send]",
                    "The data will be sent to the IRC server the user is connected to");
         addCommand("Current",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoSendRawMod::CurrentClient),
+                   static_cast<NoModuleCommand::Function>(&NoSendRawMod::CurrentClient),
                    "[data to send]",
                    "The data will be sent to your current client");
     }

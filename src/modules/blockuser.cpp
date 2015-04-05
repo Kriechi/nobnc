@@ -35,15 +35,15 @@ public:
     {
         addHelpCommand();
         addCommand("List",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnListCommand),
+                   static_cast<NoModuleCommand::Function>(&NoBlockUser::OnListCommand),
                    "",
                    "List blocked users");
         addCommand("Block",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnBlockCommand),
+                   static_cast<NoModuleCommand::Function>(&NoBlockUser::OnBlockCommand),
                    "<user>",
                    "Block a user");
         addCommand("Unblock",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoBlockUser::OnUnblockCommand),
+                   static_cast<NoModuleCommand::Function>(&NoBlockUser::OnUnblockCommand),
                    "<user>",
                    "Unblock a user");
     }

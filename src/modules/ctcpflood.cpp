@@ -32,15 +32,15 @@ public:
 
         addHelpCommand();
         addCommand("Secs",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoCtcpFloodMod::OnSecsCommand),
+                   static_cast<NoModuleCommand::Function>(&NoCtcpFloodMod::OnSecsCommand),
                    "<limit>",
                    "Set seconds limit");
         addCommand("Lines",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoCtcpFloodMod::OnLinesCommand),
+                   static_cast<NoModuleCommand::Function>(&NoCtcpFloodMod::OnLinesCommand),
                    "<limit>",
                    "Set lines limit");
         addCommand("Show",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoCtcpFloodMod::OnShowCommand),
+                   static_cast<NoModuleCommand::Function>(&NoCtcpFloodMod::OnShowCommand),
                    "",
                    "Show the current limits");
     }

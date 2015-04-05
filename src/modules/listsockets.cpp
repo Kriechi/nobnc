@@ -83,7 +83,7 @@ public:
     {
         addHelpCommand();
         addCommand("List",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoListSockets::OnListCommand),
+                   static_cast<NoModuleCommand::Function>(&NoListSockets::OnListCommand),
                    "[-n]",
                    "Show the list of active sockets. Pass -n to show IP addresses");
     }

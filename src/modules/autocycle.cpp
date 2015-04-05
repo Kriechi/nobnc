@@ -31,15 +31,15 @@ public:
     {
         addHelpCommand();
         addCommand("Add",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnaddCommand),
+                   static_cast<NoModuleCommand::Function>(&NoAutoCycleMod::OnaddCommand),
                    "[!]<#chan>",
                    "Add an entry, use !#chan to negate and * for wildcards");
         addCommand("Del",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnDelCommand),
+                   static_cast<NoModuleCommand::Function>(&NoAutoCycleMod::OnDelCommand),
                    "[!]<#chan>",
                    "Remove an entry, needs to be an exact match");
         addCommand("List",
-                   static_cast<NoModuleCommand::ModCmdFunc>(&NoAutoCycleMod::OnListCommand),
+                   static_cast<NoModuleCommand::Function>(&NoAutoCycleMod::OnListCommand),
                    "",
                    "List all entries");
         m_recentlyCycled.setExpiration(15 * 1000);

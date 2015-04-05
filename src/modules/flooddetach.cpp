@@ -30,10 +30,10 @@ public:
         m_iThresholdMsgs = 0;
 
         addHelpCommand();
-        addCommand("Show", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::ShowCommand), "");
-        addCommand("Secs", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::SecsCommand), "[<limit>]");
-        addCommand("Lines", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::LinesCommand), "[<limit>]");
-        addCommand("Silent", static_cast<NoModuleCommand::ModCmdFunc>(&NoFloodDetachMod::SilentCommand), "[yes|no]");
+        addCommand("Show", static_cast<NoModuleCommand::Function>(&NoFloodDetachMod::ShowCommand), "");
+        addCommand("Secs", static_cast<NoModuleCommand::Function>(&NoFloodDetachMod::SecsCommand), "[<limit>]");
+        addCommand("Lines", static_cast<NoModuleCommand::Function>(&NoFloodDetachMod::LinesCommand), "[<limit>]");
+        addCommand("Silent", static_cast<NoModuleCommand::Function>(&NoFloodDetachMod::SilentCommand), "[yes|no]");
     }
 
     void Save()

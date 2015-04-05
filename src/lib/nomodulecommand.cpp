@@ -22,7 +22,7 @@ NoModuleCommand::NoModuleCommand() : m_cmd(), m_func(nullptr), m_args(), m_desc(
 {
 }
 
-NoModuleCommand::NoModuleCommand(const NoString& cmd, NoModule* mod, ModCmdFunc func, const NoString& args, const NoString& desc)
+NoModuleCommand::NoModuleCommand(const NoString& cmd, NoModule* mod, Function func, const NoString& args, const NoString& desc)
     : m_cmd(cmd), m_func(func), m_args(args), m_desc(desc)
 {
 }
@@ -71,7 +71,7 @@ NoString NoModuleCommand::args() const
     return m_args;
 }
 
-NoModuleCommand::ModCmdFunc NoModuleCommand::function() const
+NoModuleCommand::Function NoModuleCommand::function() const
 {
     return m_func;
 }
