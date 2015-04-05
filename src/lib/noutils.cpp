@@ -616,36 +616,32 @@ static NoString& Encode(NoString& value)
     return value;
 }
 
-No::status_t No::writeToDisk(const NoStringMap& values, const NoString& path, mode_t mode)
+bool No::writeToDisk(const NoStringMap& values, const NoString& path, mode_t mode)
 {
-    NoFile cFile(path);
+    NoFile file(path);
 
     if (values.empty()) {
-        if (!cFile.Exists())
-            return MCS_SUCCESS;
-        if (cFile.Delete())
-            return MCS_SUCCESS;
+        if (!file.Exists() || file.Delete())
+            return true;
     }
 
-    if (!cFile.Open(O_WRONLY | O_CREAT | O_TRUNC, mode))
-        return MCS_EOPEN;
+    if (!file.Open(O_WRONLY | O_CREAT | O_TRUNC, mode))
+        return false;
 
     for (const auto& it : values) {
         NoString key = it.first;
         NoString value = it.second;
 
-        if (key.empty()) {
+        if (key.empty())
             continue;
-        }
 
-        if (cFile.Write(Encode(key) + " " + Encode(value) + "\n") <= 0) {
-            return MCS_EWRITE;
-        }
+        if (file.Write(Encode(key) + " " + Encode(value) + "\n") <= 0)
+            return false;
     }
 
-    cFile.Close();
+    file.Close();
 
-    return MCS_SUCCESS;
+    return true;
 }
 
 static NoString& Decode(NoString& value)
@@ -672,15 +668,15 @@ static NoString& Decode(NoString& value)
     return value;
 }
 
-No::status_t No::readFromDisk(NoStringMap& values, const NoString& path)
+bool No::readFromDisk(NoStringMap& values, const NoString& path)
 {
-    NoFile cFile(path);
-    if (!cFile.Open(O_RDONLY))
-        return MCS_EOPEN;
+    NoFile file(path);
+    if (!file.Open(O_RDONLY))
+        return false;
 
     NoString sBuffer;
 
-    while (cFile.ReadLine(sBuffer)) {
+    while (file.ReadLine(sBuffer)) {
         sBuffer.trim();
         NoString key = No::token(sBuffer, 0);
         NoString value = No::token(sBuffer, 1);
@@ -689,9 +685,9 @@ No::status_t No::readFromDisk(NoStringMap& values, const NoString& path)
 
         values[key] = value;
     }
-    cFile.Close();
+    file.Close();
 
-    return MCS_SUCCESS;
+    return true;
 }
 
 NoString No::toByteStr(ulonglong d)

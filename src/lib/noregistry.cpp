@@ -56,13 +56,13 @@ const NoModule* NoRegistry::module() const
 
 bool NoRegistry::load()
 {
-    d->dirty = No::readFromDisk(d->registry, filePath()) != No::MCS_SUCCESS;
+    d->dirty = !No::readFromDisk(d->registry, filePath());
     return !d->dirty;
 }
 
 bool NoRegistry::save()
 {
-    d->dirty = No::writeToDisk(d->registry, filePath(), 0600) != No::MCS_SUCCESS;
+    d->dirty = !No::writeToDisk(d->registry, filePath(), 0600);
     return !d->dirty;
 }
 

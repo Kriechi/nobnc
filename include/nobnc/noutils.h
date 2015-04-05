@@ -62,14 +62,8 @@ NO_EXPORT NoStringSet encodings();
 NO_EXPORT NoStringMap messageTags(const NoString& line);
 NO_EXPORT void setMessageTags(NoString& line, const NoStringMap& tags);
 
-enum status_t {
-    MCS_SUCCESS = 0,
-    MCS_EOPEN = 1,
-    MCS_EWRITE = 2,
-};
-
-NO_EXPORT status_t writeToDisk(const NoStringMap& values, const NoString& path, mode_t mode = 0644);
-NO_EXPORT status_t readFromDisk(NoStringMap& values, const NoString& path);
+NO_EXPORT bool writeToDisk(const NoStringMap& values, const NoString& path, mode_t mode = 0644);
+NO_EXPORT bool readFromDisk(NoStringMap& values, const NoString& path);
 
 NO_EXPORT NoString toByteStr(ulonglong d);
 NO_EXPORT NoString toTimeStr(ulong s);
