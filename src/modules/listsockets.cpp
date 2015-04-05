@@ -21,6 +21,7 @@
 #include <nobnc/nosocket.h>
 #include <nobnc/notemplate.h>
 #include <nobnc/notable.h>
+#include <nobnc/nosocketinfo.h>
 
 #include <queue>
 
@@ -140,8 +141,10 @@ public:
                 Row["SSL"] = pSocket->isSsl() ? "Yes" : "No";
                 Row["Local"] = GetLocalHost(pSocket, true);
                 Row["Remote"] = GetRemoteHost(pSocket, true);
-                Row["In"] = No::toByteStr(pSocket->bytesRead());
-                Row["Out"] = No::toByteStr(pSocket->bytesWritten());
+
+                NoSocketInfo info(pSocket);
+                Row["In"] = No::toByteStr(info.bytesRead());
+                Row["Out"] = No::toByteStr(info.bytesWritten());
             }
 
             return true;
@@ -263,8 +266,10 @@ public:
 
             Table.setValue("Local", GetLocalHost(pSocket, bShowHosts));
             Table.setValue("Remote", GetRemoteHost(pSocket, bShowHosts));
-            Table.setValue("In", No::toByteStr(pSocket->bytesRead()));
-            Table.setValue("Out", No::toByteStr(pSocket->bytesWritten()));
+
+            NoSocketInfo info(pSocket);
+            Table.setValue("In", No::toByteStr(info.bytesRead()));
+            Table.setValue("Out", No::toByteStr(info.bytesWritten()));
         }
 
         putModule(Table);

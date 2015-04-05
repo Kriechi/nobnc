@@ -32,6 +32,7 @@
 #include "nonick.h"
 #include "notable.h"
 #include "noexception_p.h"
+#include "nosocketinfo.h"
 
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                           \
     {                                                                       \
@@ -173,8 +174,9 @@ NoClient::~NoClient()
         pAuth->invalidate();
     }
     if (d->user != nullptr) {
-        NoUserPrivate::get(d->user)->addBytesRead(d->socket->bytesRead());
-        NoUserPrivate::get(d->user)->addBytesWritten(d->socket->bytesWritten());
+        NoSocketInfo info(d->socket);
+        NoUserPrivate::get(d->user)->addBytesRead(info.bytesRead());
+        NoUserPrivate::get(d->user)->addBytesWritten(info.bytesWritten());
     }
     delete d->socket;
 }

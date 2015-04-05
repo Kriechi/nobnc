@@ -38,6 +38,7 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/noserverinfo.h
                        ${NO_INCDIR}/nosettings.h
                        ${NO_INCDIR}/nosocket.h
+                       ${NO_INCDIR}/nosocketinfo.h
                        ${NO_INCDIR}/nosocketmanager.h
                        ${NO_INCDIR}/nosslverifyhost.h
                        ${NO_INCDIR}/nostring.h
@@ -86,6 +87,7 @@ list(APPEND NO_SOURCES noapp.cpp
                        noserverinfo.cpp
                        nosettings.cpp
                        nosocket.cpp
+                       nosocketinfo.cpp
                        nosocketmanager.cpp
                        nosslverifyhost.cpp
                        nostring.cpp

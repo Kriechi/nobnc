@@ -337,22 +337,6 @@ SSL_SESSION* NoSocket::sslSession() const
     return d->impl->GetSSLSession();
 }
 #endif
-uint64_t NoSocket::bytesRead() const
-{
-    return d->impl->GetBytesRead();
-}
-uint64_t NoSocket::bytesWritten() const
-{
-    return d->impl->GetBytesWritten();
-}
-double NoSocket::averageReadSpeed() const
-{
-    return d->impl->GetAvgRead();
-}
-double NoSocket::averageWriteSpeed() const
-{
-    return d->impl->GetAvgWrite();
-}
 uint64_t NoSocket::startTime() const
 {
     return d->impl->GetStartTime();

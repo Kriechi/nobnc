@@ -31,6 +31,7 @@
 #include "nodebug.h"
 #include "noapp_p.h"
 #include "noescape.h"
+#include "nosocketinfo.h"
 #include <algorithm>
 
 /// @todo Do we want to make this a configure option?
@@ -290,12 +291,13 @@ NoWebSocket::~NoWebSocket()
     // we have to account for traffic here because NoSocket does
     // not have a valid NoModule* pointer.
     NoUser* user = session()->user();
+    NoSocketInfo info(this);
     if (user) {
-        NoUserPrivate::get(user)->addBytesWritten(bytesWritten());
-        NoUserPrivate::get(user)->addBytesRead(bytesRead());
+        NoUserPrivate::get(user)->addBytesWritten(info.bytesWritten());
+        NoUserPrivate::get(user)->addBytesRead(info.bytesRead());
     } else {
-        NoAppPrivate::get(noApp)->addBytesWritten(bytesWritten());
-        NoAppPrivate::get(noApp)->addBytesRead(bytesRead());
+        NoAppPrivate::get(noApp)->addBytesWritten(info.bytesWritten());
+        NoAppPrivate::get(noApp)->addBytesRead(info.bytesRead());
     }
 
     // bytes have been accounted for, so make sure they don't get again:

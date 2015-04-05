@@ -28,6 +28,7 @@
 #include "noescape.h"
 #include "nonick.h"
 #include "nohostmask.h"
+#include "nosocketinfo.h"
 #include "Csocket/Csocket.h"
 #include <deque>
 
@@ -151,8 +152,9 @@ NoIrcSocket::~NoIrcSocket()
 
     quit();
     d->chans.clear();
-    NoUserPrivate::get(d->network->user())->addBytesRead(bytesRead());
-    NoUserPrivate::get(d->network->user())->addBytesWritten(bytesWritten());
+    NoSocketInfo info(this);
+    NoUserPrivate::get(d->network->user())->addBytesRead(info.bytesRead());
+    NoUserPrivate::get(d->network->user())->addBytesWritten(info.bytesWritten());
 }
 
 void NoIrcSocket::quit(const NoString& message)

@@ -22,6 +22,7 @@
 #include "noircsocket.h"
 #include "noauthenticator.h"
 #include "noserverinfo.h"
+#include "nosocketinfo.h"
 #include "nouser.h"
 #include "nouser_p.h"
 #include "nonetwork.h"
@@ -1944,14 +1945,15 @@ NoApp::TrafficStatsMap NoApp::trafficStats(TrafficStatsPair& Users, TrafficStats
             user = ((NoClient*)socket)->user();
         }
 
+        NoSocketInfo info(socket);
         if (user) {
-            ret[user->userName()].first += socket->bytesRead();
-            ret[user->userName()].second += socket->bytesWritten();
-            uiUsers_in += socket->bytesRead();
-            uiUsers_out += socket->bytesWritten();
+            ret[user->userName()].first += info.bytesRead();
+            ret[user->userName()].second += info.bytesWritten();
+            uiUsers_in += info.bytesRead();
+            uiUsers_out += info.bytesWritten();
         } else {
-            uiZNC_in += socket->bytesRead();
-            uiZNC_out += socket->bytesWritten();
+            uiZNC_in += info.bytesRead();
+            uiZNC_out += info.bytesWritten();
         }
     }
 

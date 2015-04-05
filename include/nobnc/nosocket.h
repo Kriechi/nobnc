@@ -92,12 +92,6 @@ public:
 
     SSL_SESSION* sslSession() const;
 
-    uint64_t bytesRead() const;
-    uint64_t bytesWritten() const;
-
-    double averageReadSpeed() const;
-    double averageWriteSpeed() const;
-
     bool connect();
     bool listen(uint16_t port, int maxConns = SOMAXCONN, const NoString& bindHost = "", uint32_t timeout = 0, bool detach = false);
 

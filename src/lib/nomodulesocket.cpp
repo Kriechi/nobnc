@@ -16,6 +16,7 @@
  */
 
 #include "nomodulesocket.h"
+#include "nosocketinfo.h"
 #include "nomodule.h"
 #include "nomodule_p.h"
 #include "nonetwork.h"
@@ -51,12 +52,13 @@ NoModuleSocket::~NoModuleSocket()
         noApp->manager()->removeSocket(this);
     }
 
+    NoSocketInfo info(this);
     if (user && m_module && m_module->type() != No::GlobalModule) {
-        NoUserPrivate::get(user)->addBytesWritten(bytesWritten());
-        NoUserPrivate::get(user)->addBytesRead(bytesRead());
+        NoUserPrivate::get(user)->addBytesWritten(info.bytesWritten());
+        NoUserPrivate::get(user)->addBytesRead(info.bytesRead());
     } else {
-        NoAppPrivate::get(noApp)->addBytesWritten(bytesWritten());
-        NoAppPrivate::get(noApp)->addBytesRead(bytesRead());
+        NoAppPrivate::get(noApp)->addBytesWritten(info.bytesWritten());
+        NoAppPrivate::get(noApp)->addBytesRead(info.bytesRead());
     }
 }
 

@@ -24,6 +24,7 @@
 #include <nobnc/noclient.h>
 #include <nobnc/nomodulesocket.h>
 #include <nobnc/notable.h>
+#include <nobnc/nosocketinfo.h>
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -245,8 +246,9 @@ public:
             if (socket->isListener()) {
                 Table.setValue("State", "Waiting");
             } else {
+                NoSocketInfo info(socket);
                 Table.setValue("State", No::toPercent(socket->GetProgress()));
-                Table.setValue("Speed", NoString((int)(socket->averageReadSpeed() / 1024.0)) + " KiB/s");
+                Table.setValue("Speed", NoString((int)(info.averageReadSpeed() / 1024.0)) + " KiB/s");
             }
         }
 
@@ -424,12 +426,13 @@ void NoDccSock::onDisconnected()
     if (m_uBytesSoFar > m_uFileSize) {
         m_module->putModule(sStart + "TooMuchData!");
     } else if (m_uBytesSoFar == m_uFileSize) {
+        NoSocketInfo info(this);
         if (m_bSend) {
             m_module->putModule(sStart + "Completed! - Sent [" + m_sLocalFile + "] at [" +
-                                NoString((int)(averageWriteSpeed() / 1024.0)) + " KiB/s ]");
+                                NoString((int)(info.averageWriteSpeed() / 1024.0)) + " KiB/s ]");
         } else {
             m_module->putModule(sStart + "Completed! - Saved to [" + m_sLocalFile + "] at [" +
-                                NoString((int)(averageReadSpeed() / 1024.0)) + " KiB/s ]");
+                                NoString((int)(info.averageReadSpeed() / 1024.0)) + " KiB/s ]");
         }
     } else {
         m_module->putModule(sStart + "Incomplete!");
