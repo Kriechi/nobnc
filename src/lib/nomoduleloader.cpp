@@ -16,7 +16,7 @@
  */
 
 #include "nomoduleloader.h"
-#include "noexception.h"
+#include "noexception_p.h"
 #include "nomodule_p.h"
 #include "nofile.h"
 #include "nodir.h"

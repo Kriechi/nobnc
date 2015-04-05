@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "noexception.h"
+#include "noexception_p.h"
 
 NoException::NoException(Type type) : m_type(type)
 {

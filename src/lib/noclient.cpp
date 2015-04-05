@@ -31,7 +31,7 @@
 #include "noescape.h"
 #include "nonick.h"
 #include "notable.h"
-#include "noexception.h"
+#include "noexception_p.h"
 
 #define CALLMOD(MOD, CLIENT, USER, NETWORK, FUNC)                           \
     {                                                                       \

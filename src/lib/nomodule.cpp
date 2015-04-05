@@ -27,7 +27,7 @@
 #include "nomodulesocket.h"
 #include "notimer.h"
 #include "notable.h"
-#include "noexception.h"
+#include "noexception_p.h"
 #include <dlfcn.h>
 
 double NoModulePrivate::buildVersion()
