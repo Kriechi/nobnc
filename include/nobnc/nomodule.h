@@ -146,6 +146,7 @@ public:
     virtual Return onRaw(NoString& line);
 
     virtual Return onStatusCommand(NoString& command);
+    virtual void onHelpCommand(const NoString& command);
     virtual void onModuleCommand(const NoString& command);
     virtual void onUnknownModuleCommand(const NoString& command);
     virtual void onModuleNotice(const NoString& message);
@@ -215,7 +216,6 @@ public:
     bool addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args = "", const NoString& desc = "");
     bool removeCommand(const NoString& cmd);
     NoModuleCommand* findCommand(const NoString& cmd) const;
-    void handleHelpCommand(const NoString& line = "");
 
     virtual Return onAddUser(NoUser* user, NoString& error);
     virtual Return onDeleteUser(NoUser* user);

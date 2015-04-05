@@ -220,7 +220,7 @@ bool NoModule::addCommand(const NoString& cmd, NoModuleCommand::Function func, c
 
 void NoModule::addHelpCommand()
 {
-    addCommand("Help", &NoModule::handleHelpCommand, "search", "Generate this output");
+    addCommand("Help", &NoModule::onHelpCommand, "search", "Generate this output");
 }
 
 bool NoModule::removeCommand(const NoString& cmd)
@@ -238,7 +238,7 @@ NoModuleCommand* NoModule::findCommand(const NoString& cmd) const
     return nullptr;
 }
 
-void NoModule::handleHelpCommand(const NoString& line)
+void NoModule::onHelpCommand(const NoString& line)
 {
     NoString filter = No::token(line, 1).toLower();
     NoTable Table;

@@ -88,7 +88,7 @@ public:
     MODCONSTRUCTOR(NoSaslMod)
     {
         addCommand("Help",
-                   static_cast<NoModuleCommand::Function>(&NoSaslMod::PrintHelp),
+                   static_cast<NoModuleCommand::Function>(&NoSaslMod::onHelpCommand),
                    "search",
                    "Generate this output");
         addCommand("Set",
@@ -107,9 +107,9 @@ public:
         m_bAuthenticated = false;
     }
 
-    void PrintHelp(const NoString& line)
+    void onHelpCommand(const NoString& line)
     {
-        handleHelpCommand(line);
+        NoModule::onHelpCommand(line);
 
         NoTable Mechanisms;
         Mechanisms.addColumn("Mechanism");

@@ -69,9 +69,9 @@ class NoAdminMod : public NoModule
         }
     }
 
-    void PrintHelp(const NoString& line)
+    void onHelpCommand(const NoString& line)
     {
-        handleHelpCommand(line);
+        NoModule::onHelpCommand(line);
 
         static const char* str = "String";
         static const char* boolean = "Boolean (true/false)";
@@ -1421,7 +1421,7 @@ public:
     MODCONSTRUCTOR(NoAdminMod)
     {
         addCommand("Help",
-                   static_cast<NoModuleCommand::Function>(&NoAdminMod::PrintHelp),
+                   static_cast<NoModuleCommand::Function>(&NoAdminMod::onHelpCommand),
                    "[command] [variable]",
                    "Prints help for matching commands and variables");
         addCommand("Get",
