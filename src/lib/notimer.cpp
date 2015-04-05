@@ -65,18 +65,16 @@ NoTimer::NoTimer(NoModule* module) : d(new NoTimerPrivate(module))
 {
     d->impl = new NoTimerImpl(this);
 
-    if (module) {
+    if (module)
         NoModulePrivate::get(module)->addTimer(this);
-        noApp->manager()->addCron(d->impl);
-    }
+    noApp->manager()->addCron(d->impl);
 }
 
 NoTimer::~NoTimer()
 {
-    if (d->module) {
+    if (d->module)
         NoModulePrivate::get(d->module)->removeTimer(this);
-        noApp->manager()->removeCron(d->impl);
-    }
+    noApp->manager()->removeCron(d->impl);
 }
 
 NoModule* NoTimer::module() const
