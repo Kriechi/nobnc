@@ -20,7 +20,7 @@
 #include "nomutex.h"
 #include "nomutexlocker.h"
 #include "noconditionvariable.h"
-#include "nojob.h"
+#include "nojob_p.h"
 
 #ifdef HAVE_PTHREAD
 

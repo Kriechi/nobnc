@@ -20,7 +20,7 @@
 #include "nosocket_p.h"
 #include "nothread.h"
 #include "nothread_p.h"
-#include "nojob.h"
+#include "nojob_p.h"
 #include "noapp.h"
 #include "Csocket/Csocket.h"
 #include <algorithm>

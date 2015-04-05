@@ -18,7 +18,7 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/nohostmask.h
                        ${NO_INCDIR}/nohttpsocket.h
                        ${NO_INCDIR}/noircsocket.h
-                       ${NO_INCDIR}/nojob.h
+                       ${NO_INCDIR}/nojob_p.h
                        ${NO_INCDIR}/nolistener.h
                        ${NO_INCDIR}/nonamespace.h
                        ${NO_INCDIR}/nomessage.h

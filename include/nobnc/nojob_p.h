@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef NOJOB_H
-#define NOJOB_H
+#ifndef NOJOB_P_H
+#define NOJOB_P_H
 
 #include <nobnc/noglobal.h>
 
@@ -35,7 +35,7 @@
  *
  * For modules you should use NoModuleJob instead.
  */
-class NO_EXPORT NoJob
+class NoJob
 {
 public:
     enum JobState { Ready, Running, Done, Cancelled };
@@ -71,4 +71,4 @@ private:
 
 #endif // HAVE_PTHREAD
 
-#endif // NOJOB_H
+#endif // NOJOB_P_H
