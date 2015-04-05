@@ -208,7 +208,7 @@ NoModuleSocket* NoModule::findSocket(const NoString& name) const
 
 void NoModule::addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args, const NoString& desc)
 {
-    if (!func || cmd.contains(" ") || findCommand(cmd))
+    if (!func || cmd.contains(" ") || d->findCommand(cmd))
         return;
 
     NoModuleCommand command(cmd, func);
@@ -225,16 +225,6 @@ void NoModule::addHelpCommand()
 void NoModule::removeCommand(const NoString& command)
 {
     d->commands.erase(command);
-}
-
-NoModuleCommand* NoModule::findCommand(const NoString& cmd) const
-{
-    for (auto& it : d->commands) {
-        if (!it.first.equals(cmd))
-            continue;
-        return &it.second;
-    }
-    return nullptr;
 }
 
 void NoModule::onHelpCommand(const NoString& line)
@@ -379,7 +369,7 @@ void NoModule::onModuleCtcp(const NoString& message)
 
 void NoModule::onModuleCommand(const NoString& line)
 {
-    NoModuleCommand* cmd = findCommand(No::token(line, 0));
+    NoModuleCommand* cmd = d->findCommand(No::token(line, 0));
     if (cmd)
         moduleCall(cmd, this, line);
     else

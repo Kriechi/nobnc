@@ -162,6 +162,15 @@ public:
     {
         sockets.erase(socket);
     }
+    NoModuleCommand* findCommand(const NoString& cmd)
+    {
+        for (auto& it : commands) {
+            if (!it.first.equals(cmd))
+                continue;
+            return &it.second;
+        }
+        return nullptr;
+    }
 
     No::ModuleType type;
     NoString description;
