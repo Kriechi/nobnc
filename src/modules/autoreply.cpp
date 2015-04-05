@@ -84,10 +84,10 @@ public:
         putIrc("NOTICE " + nick + " :" + GetReply());
     }
 
-    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override
+    Return onPrivateMessage(NoHostMask& nick, NoString& message) override
     {
         Handle(nick.nick());
-        return CONTINUE;
+        return Continue;
     }
 
     void OnShowCommand(const NoString& command)

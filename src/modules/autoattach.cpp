@@ -236,22 +236,22 @@ public:
         }
     }
 
-    ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         TryAttach(nick, channel, message);
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         TryAttach(nick, channel, message);
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelAction(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelAction(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         TryAttach(nick, channel, message);
-        return CONTINUE;
+        return Continue;
     }
 
     VAttachIter FindEntry(const NoString& sChan, const NoString& search, const NoString& host)

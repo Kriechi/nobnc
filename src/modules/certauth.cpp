@@ -117,40 +117,40 @@ public:
         return pair.second;
     }
 
-    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    Return onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         const NoString sUser = Auth->username();
         NoSocket* socket = Auth->socket();
         NoUser* user = noApp->findUser(sUser);
 
         if (socket == nullptr || user == nullptr)
-            return CONTINUE;
+            return Continue;
 
         const NoString sPubKey = GetKey(socket);
         NO_DEBUG("User: " << sUser << " Key: " << sPubKey);
 
         if (sPubKey.empty()) {
             NO_DEBUG("Peer got no public key, ignoring");
-            return CONTINUE;
+            return Continue;
         }
 
         MNoStringSet::const_iterator it = m_PubKeys.find(sUser);
         if (it == m_PubKeys.end()) {
             NO_DEBUG("No saved pubkeys for this client");
-            return CONTINUE;
+            return Continue;
         }
 
         NoStringSet::const_iterator it2 = it->second.find(sPubKey);
         if (it2 == it->second.end()) {
             NO_DEBUG("Invalid pubkey");
-            return CONTINUE;
+            return Continue;
         }
 
         // This client uses a valid pubkey for this user, let them in
         NO_DEBUG("Accepted pubkey auth");
         Auth->acceptLogin(user);
 
-        return HALT;
+        return Halt;
     }
 
     void HandleShowCommand(const NoString& line)

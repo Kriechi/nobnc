@@ -155,15 +155,15 @@ public:
         m_pTimer = nullptr;
     }
 
-    ModRet onUserRaw(NoString& line) override
+    Return onUserRaw(NoString& line) override
     {
         // We dont care if we are not connected to IRC
         if (!network()->isIrcConnected())
-            return CONTINUE;
+            return Continue;
 
         // We are trying to get the config nick and this is a /nick?
         if (!m_pTimer || !No::token(line, 0).equals("NICK"))
-            return CONTINUE;
+            return Continue;
 
         // Is the nick change for the nick we are trying to get?
         NoString nick = No::token(line, 1);
@@ -173,23 +173,23 @@ public:
             nick.leftChomp(1);
 
         if (!nick.equals(GetNick()))
-            return CONTINUE;
+            return Continue;
 
         // Indeed trying to change to this nick, generate a 433 for it.
         // This way we can *always* block incoming 433s from the server.
         putUser(":" + network()->ircServer() + " 433 " + network()->ircNick().nick() + " " + nick +
                 " :ZNC is already trying to get this nickname");
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onRaw(NoString& line) override
+    Return onRaw(NoString& line) override
     {
         // Are we trying to get our primary nick and we caused this error?
         // :irc.server.net 433 mynick badnick :Nickname is already in use.
         if (m_pTimer && No::token(line, 1) == "433" && No::token(line, 3).equals(GetNick()))
-            return HALT;
+            return Halt;
 
-        return CONTINUE;
+        return Continue;
     }
 
     void OnEnableCommand(const NoString& command)

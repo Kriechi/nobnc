@@ -94,25 +94,25 @@ public:
         return true;
     }
 
-    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    Return onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         NoUser* user = noApp->findUser(Auth->username());
 
         if (!user) { // @todo Will want to do some sort of && !m_bAllowCreate in the future
             Auth->refuseLogin("Invalid User - Halting IMAP Lookup");
-            return HALT;
+            return Halt;
         }
 
         if (user && m_Cache.contains(No::md5(Auth->username() + ":" + Auth->password()))) {
             NO_DEBUG("+++ Found in cache");
             Auth->acceptLogin(user);
-            return HALT;
+            return Halt;
         }
 
         NoImapSock* socket = new NoImapSock(this, Auth);
         socket->connect(m_sServer, m_uPort, m_bSSL, 20);
 
-        return HALT;
+        return Halt;
     }
 
     void onModuleCommand(const NoString& line) override

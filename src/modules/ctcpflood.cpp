@@ -78,11 +78,11 @@ public:
         return true;
     }
 
-    ModRet Message(const NoString& hostMask, const NoString& message)
+    Return Message(const NoString& hostMask, const NoString& message)
     {
         // We never block /me, because it doesn't cause a reply
         if (No::token(message, 0).equals("ACTION"))
-            return CONTINUE;
+            return Continue;
 
         if (m_tLastCTCP + m_iThresholdSecs < time(nullptr)) {
             m_tLastCTCP = time(nullptr);
@@ -92,22 +92,22 @@ public:
         m_iNumCTCP++;
 
         if (m_iNumCTCP < m_iThresholdMsgs)
-            return CONTINUE;
+            return Continue;
         else if (m_iNumCTCP == m_iThresholdMsgs)
             putModule("Limit reached by [" + hostMask + "], blocking all CTCP");
 
         // Reset the timeout so that we continue blocking messages
         m_tLastCTCP = time(nullptr);
 
-        return HALT;
+        return Halt;
     }
 
-    ModRet onPrivateCtcp(NoHostMask& nick, NoString& message) override
+    Return onPrivateCtcp(NoHostMask& nick, NoString& message) override
     {
         return Message(nick.toString(), message);
     }
 
-    ModRet onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         return Message(nick.hostMask(), message);
     }

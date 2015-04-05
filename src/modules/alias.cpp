@@ -335,12 +335,12 @@ public:
                    "Reports the actions performed by an alias.");
     }
 
-    ModRet onUserRaw(NoString& line) override
+    Return onUserRaw(NoString& line) override
     {
         NoAlias current_alias;
 
         if (sending_lines)
-            return CONTINUE;
+            return Continue;
 
         try {
             if (line.equals("ZNC-CLEAR-ALL-ALIASES!")) {
@@ -348,7 +348,7 @@ public:
                 putModule("Clearing all of them!");
                 NoRegistry registry(this);
                 registry.clear();
-                return HALT;
+                return Halt;
             } else if (NoAlias::AliasGet(current_alias, this, line)) {
                 NoStringVector rawLines = current_alias.Imprint(line).split("\n", No::SkipEmptyParts);
                 sending_lines = true;
@@ -358,17 +358,17 @@ public:
                 }
 
                 sending_lines = false;
-                return HALT;
+                return Halt;
             }
         } catch (std::exception& e) {
             NoString my_nick = (network() == nullptr ? "" : network()->currentNick());
             if (my_nick.empty())
                 my_nick = "*";
             putUser(NoString(":znc.in 461 " + my_nick + " " + current_alias.GetName() + " :ZNC alias error: ") + e.what());
-            return HALTCORE;
+            return HaltCore;
         }
 
-        return CONTINUE;
+        return Continue;
     }
 };
 

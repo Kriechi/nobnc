@@ -267,7 +267,7 @@ public:
         }
     }
 
-    ModRet onRaw(NoString& line) override
+    Return onRaw(NoString& line) override
     {
         // use onRaw because OnUserMode is not defined (yet?)
         if (No::token(line, 1) == "396" && No::token(line, 3).contains("users.quakenet.org")) {
@@ -280,27 +280,27 @@ public:
                 network()->joinChannels();
             }
         }
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override
+    Return onPrivateMessage(NoHostMask& nick, NoString& message) override
     {
         return HandleMessage(nick, message);
     }
 
-    ModRet onPrivateNotice(NoHostMask& nick, NoString& message) override
+    Return onPrivateNotice(NoHostMask& nick, NoString& message) override
     {
         return HandleMessage(nick, message);
     }
 
-    ModRet onJoining(NoChannel* channel) override
+    Return onJoining(NoChannel* channel) override
     {
         // Halt if are not already cloaked, but the user requres that we delay
         // channel join till after we are cloaked.
         if (!m_bCloaked && m_bUseCloakedHost && m_bJoinAfterCloaked)
-            return HALT;
+            return Halt;
 
-        return CONTINUE;
+        return Continue;
     }
 
     void onJoin(const NoNick& nick, NoChannel* channel) override
@@ -321,13 +321,13 @@ public:
             HandleNeed(channel, "v");
     }
 
-    ModRet onInvite(const NoHostMask& nick, const NoString& sChan) override
+    Return onInvite(const NoHostMask& nick, const NoString& sChan) override
     {
         if (!nick.nick().equals("Q") || !nick.host().equals("CServe.quakenet.org"))
-            return CONTINUE;
+            return Continue;
         if (m_bJoinonInvite)
             network()->addChannel(sChan, false);
-        return CONTINUE;
+        return Continue;
     }
 
     NoString webMenuTitle() override
@@ -468,10 +468,10 @@ private:
         PutQ("CHALLENGEAUTH " + m_sUsername + " " + response + " HMAC-SHA-256");
     }
 
-    ModRet HandleMessage(const NoHostMask& nick, NoString message)
+    Return HandleMessage(const NoHostMask& nick, NoString message)
     {
         if (!nick.nick().equals("Q") || !nick.host().equals("CServe.quakenet.org"))
-            return CONTINUE;
+            return Continue;
 
         message.trim();
 
@@ -496,19 +496,19 @@ private:
         } else if (m_bRequestedWhoami && m_bCatchResponse &&
                    (message.equals("End of list.") || message.equals("account, or HELLO to create an account."))) {
             m_bRequestedWhoami = m_bCatchResponse = false;
-            return HALT;
+            return Halt;
         }
 
         // AUTH
         else if (message.equals("Username or password incorrect.")) {
             m_bAuthed = false;
             putModule("Auth failed: " + message);
-            return HALT;
+            return Halt;
         } else if (No::wildCmp(message, "You are now logged in as *.")) {
             m_bAuthed = true;
             putModule("Auth successful: " + message);
             WhoAmI();
-            return HALT;
+            return Halt;
         } else if (m_bRequestedChallenge && No::token(message, 0).equals("CHALLENGE")) {
             m_bRequestedChallenge = false;
             if (message.contains("not available once you have authed")) {
@@ -523,11 +523,11 @@ private:
                     Auth();
                 }
             }
-            return HALT;
+            return Halt;
         }
 
         // prevent buffering of Q's responses
-        return !m_bCatchResponse && user()->isUserAttached() ? CONTINUE : HALT;
+        return !m_bCatchResponse && user()->isUserAttached() ? Continue : Halt;
     }
 
     void HandleNeed(const NoChannel* channel, const NoString& sPerms)

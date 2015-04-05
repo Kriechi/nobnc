@@ -187,24 +187,24 @@ public:
         return true;
     }
 
-    ModRet onIrcConnecting(NoIrcSocket* socket) override
+    Return onIrcConnecting(NoIrcSocket* socket) override
     {
         if (m_pISpoofLockFile != nullptr) {
             NO_DEBUG("Aborting connection, ident spoof lock file exists");
             putModule(
             "Aborting connection, another user or network is currently connecting and using the ident spoof file");
-            return HALTCORE;
+            return HaltCore;
         }
 
         if (!WriteISpoof()) {
             NoRegistry registry(this);
             NO_DEBUG("identfile [" + registry.value("File") + "] could not be written");
             putModule("[" + registry.value("File") + "] could not be written, retrying...");
-            return HALTCORE;
+            return HaltCore;
         }
 
         SetIRCSock(socket);
-        return CONTINUE;
+        return Continue;
     }
 
     void onIrcConnected() override

@@ -77,11 +77,11 @@ public:
             AddBuffer(channel, msg);
     }
 
-    ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override
+    Return onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override
     {
         AddBuffer(channel, nick.hostMask() + " changed the topic to: " + topic);
 
-        return CONTINUE;
+        return Continue;
     }
 };
 

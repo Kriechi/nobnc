@@ -74,13 +74,13 @@ public:
                    "List all keys");
     }
 
-    ModRet onUserMessage(NoString& target, NoString& message) override
+    Return onUserMessage(NoString& target, NoString& message) override
     {
         target.trimLeft(NickPrefix());
 
         if (message.left(2) == "``") {
             message.leftChomp(2);
-            return CONTINUE;
+            return Continue;
         }
 
         NoRegistry registry(this);
@@ -101,24 +101,24 @@ public:
             msg = "+OK *" + msg;
 
             putIrc("PRIVMSG " + target + " :" + msg);
-            return HALTCORE;
+            return HaltCore;
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onPrivateMessage(NoHostMask& mask, NoString& message) override
+    Return onPrivateMessage(NoHostMask& mask, NoString& message) override
     {
         NoNick nick(mask.toString()); // TODO: cleanup
         FilterIncoming(nick.nick(), nick, message);
         mask.setNick(nick.nick()); // TODO: cleanup
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         FilterIncoming(channel->name(), nick, message);
-        return CONTINUE;
+        return Continue;
     }
 
     void FilterIncoming(const NoString& target, NoNick& nick, NoString& message)

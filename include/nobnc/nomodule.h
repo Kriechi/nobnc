@@ -101,11 +101,11 @@ public:
     NoString expandString(const NoString& str) const;
     NoString& expandString(const NoString& str, NoString& ret) const;
 
-    enum ModRet {
-        CONTINUE = 1,
-        HALT = 2,
-        HALTMODS = 3,
-        HALTCORE = 4
+    enum Return {
+        Continue = 1,
+        Halt = 2,
+        HaltModules = 3,
+        HaltCore = 4
     };
 
     void unload();
@@ -128,11 +128,11 @@ public:
 
     virtual void onIrcDisconnected();
     virtual void onIrcConnected();
-    virtual ModRet onIrcConnecting(NoIrcSocket* socket);
+    virtual Return onIrcConnecting(NoIrcSocket* socket);
     virtual void onIrcConnectionError(NoIrcSocket* socket);
-    virtual ModRet onIrcRegistration(NoString& pass, NoString& nick, NoString& ident, NoString& realName);
+    virtual Return onIrcRegistration(NoString& pass, NoString& nick, NoString& ident, NoString& realName);
 
-    virtual ModRet onBroadcast(NoString& message);
+    virtual Return onBroadcast(NoString& message);
 
     virtual void onChannelPermission(const NoNick* opNick, const NoNick& nick, NoChannel* channel, uchar mode, bool added, bool noChange);
     virtual void onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange);
@@ -142,9 +142,9 @@ public:
     virtual void onMode(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange);
     virtual void onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args);
 
-    virtual ModRet onRaw(NoString& line);
+    virtual Return onRaw(NoString& line);
 
-    virtual ModRet onStatusCommand(NoString& command);
+    virtual Return onStatusCommand(NoString& command);
     virtual void onModuleCommand(const NoString& command);
     virtual void onUnknownModuleCommand(const NoString& command);
     virtual void onModuleNotice(const NoString& message);
@@ -153,52 +153,52 @@ public:
     virtual void onQuit(const NoHostMask& nick, const NoString& message);
     virtual void onNick(const NoHostMask& nick, const NoString& newNick);
     virtual void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message);
-    virtual ModRet onJoining(NoChannel* channel);
+    virtual Return onJoining(NoChannel* channel);
     virtual void onJoin(const NoNick& nick, NoChannel* channel);
     virtual void onPart(const NoNick& nick, NoChannel* channel, const NoString& message);
-    virtual ModRet onInvite(const NoHostMask& nick, const NoString& sChan);
+    virtual Return onInvite(const NoHostMask& nick, const NoString& sChan);
 
-    virtual ModRet onChannelBufferStarting(NoChannel* channel, NoClient* client);
-    virtual ModRet onChannelBufferEnding(NoChannel* channel, NoClient* client);
-    virtual ModRet onChannelBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
-    virtual ModRet onPrivateBufferPlayLine(NoClient* client, NoString& line, const timeval& tv);
+    virtual Return onChannelBufferStarting(NoChannel* channel, NoClient* client);
+    virtual Return onChannelBufferEnding(NoChannel* channel, NoClient* client);
+    virtual Return onChannelBufferPlayLine(NoChannel* channel, NoClient* client, NoString& line, const timeval& tv);
+    virtual Return onPrivateBufferPlayLine(NoClient* client, NoString& line, const timeval& tv);
 
     virtual void onClientLogin();
     virtual void onClientDisconnect();
 
-    virtual ModRet onUserRaw(NoString& line);
-    virtual ModRet onUserCtcpReply(NoString& target, NoString& message);
-    virtual ModRet onUserCtcp(NoString& target, NoString& message);
-    virtual ModRet onUserAction(NoString& target, NoString& message);
-    virtual ModRet onUserMessage(NoString& target, NoString& message);
-    virtual ModRet onUserNotice(NoString& target, NoString& message);
-    virtual ModRet onUserJoin(NoString& channel, NoString& key);
-    virtual ModRet onUserPart(NoString& channel, NoString& message);
-    virtual ModRet onUserTopic(NoString& channel, NoString& topic);
-    virtual ModRet onUserTopicRequest(NoString& channel);
-    virtual ModRet onUserQuit(NoString& message);
+    virtual Return onUserRaw(NoString& line);
+    virtual Return onUserCtcpReply(NoString& target, NoString& message);
+    virtual Return onUserCtcp(NoString& target, NoString& message);
+    virtual Return onUserAction(NoString& target, NoString& message);
+    virtual Return onUserMessage(NoString& target, NoString& message);
+    virtual Return onUserNotice(NoString& target, NoString& message);
+    virtual Return onUserJoin(NoString& channel, NoString& key);
+    virtual Return onUserPart(NoString& channel, NoString& message);
+    virtual Return onUserTopic(NoString& channel, NoString& topic);
+    virtual Return onUserTopicRequest(NoString& channel);
+    virtual Return onUserQuit(NoString& message);
 
-    virtual ModRet onCtcpReply(NoHostMask& nick, NoString& message);
-    virtual ModRet onPrivateCtcp(NoHostMask& nick, NoString& message);
-    virtual ModRet onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message);
-    virtual ModRet onPrivateAction(NoHostMask& nick, NoString& message);
-    virtual ModRet onChannelAction(NoNick& nick, NoChannel* channel, NoString& message);
-    virtual ModRet onPrivateMessage(NoHostMask& nick, NoString& message);
-    virtual ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message);
-    virtual ModRet onPrivateNotice(NoHostMask& nick, NoString& message);
-    virtual ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message);
-    virtual ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic);
+    virtual Return onCtcpReply(NoHostMask& nick, NoString& message);
+    virtual Return onPrivateCtcp(NoHostMask& nick, NoString& message);
+    virtual Return onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message);
+    virtual Return onPrivateAction(NoHostMask& nick, NoString& message);
+    virtual Return onChannelAction(NoNick& nick, NoChannel* channel, NoString& message);
+    virtual Return onPrivateMessage(NoHostMask& nick, NoString& message);
+    virtual Return onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message);
+    virtual Return onPrivateNotice(NoHostMask& nick, NoString& message);
+    virtual Return onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message);
+    virtual Return onTopic(NoNick& nick, NoChannel* channel, NoString& topic);
 
     virtual bool onServerCapAvailable(const NoString& cap);
     virtual void onServerCapResult(const NoString& cap, bool success);
 
-    virtual ModRet onTimerAutoJoin(NoChannel* channel);
+    virtual Return onTimerAutoJoin(NoChannel* channel);
 
-    virtual ModRet onAddNetwork(NoNetwork* network, NoString& error);
-    virtual ModRet onDeleteNetwork(NoNetwork* network);
+    virtual Return onAddNetwork(NoNetwork* network, NoString& error);
+    virtual Return onDeleteNetwork(NoNetwork* network);
 
-    virtual ModRet onSendToClient(NoString& line, NoClient* client);
-    virtual ModRet onSendToIrc(NoString& line);
+    virtual Return onSendToClient(NoString& line, NoClient* client);
+    virtual Return onSendToIrc(NoString& line);
 
     virtual bool putIrc(const NoString& line);
     virtual bool putUser(const NoString& line);
@@ -219,22 +219,22 @@ public:
     bool handleCommand(const NoString& line);
     void handleHelpCommand(const NoString& line = "");
 
-    virtual ModRet onAddUser(NoUser* user, NoString& error);
-    virtual ModRet onDeleteUser(NoUser* user);
+    virtual Return onAddUser(NoUser* user, NoString& error);
+    virtual Return onDeleteUser(NoUser* user);
 
     virtual void onClientConnect(NoSocket* socket, const NoString& host, ushort port);
-    virtual ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth);
+    virtual Return onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth);
     virtual void onFailedLogin(const NoString& username, const NoString& sRemoteIP);
 
-    virtual ModRet onUnknownUserRaw(NoClient* client, NoString& line);
+    virtual Return onUnknownUserRaw(NoClient* client, NoString& line);
 
     virtual void onClientCapLs(NoClient* client, NoStringSet& caps);
     virtual bool isClientCapSupported(NoClient* client, const NoString& cap, bool state);
     virtual void onClientCapRequest(NoClient* client, const NoString& cap, bool state);
 
-    virtual ModRet onModuleLoading(const NoString& name, const NoString& args, No::ModuleType type, bool& success, NoString& message);
-    virtual ModRet onModuleUnloading(NoModule* module, bool& success, NoString& message);
-    virtual ModRet onGetModuleInfo(NoModuleInfo& info, const NoString& name, bool& success, NoString& message);
+    virtual Return onModuleLoading(const NoString& name, const NoString& args, No::ModuleType type, bool& success, NoString& message);
+    virtual Return onModuleUnloading(NoModule* module, bool& success, NoString& message);
+    virtual Return onGetModuleInfo(NoModuleInfo& info, const NoString& name, bool& success, NoString& message);
     virtual void onGetAvailableModules(std::set<NoModuleInfo>& modules, No::ModuleType type);
 
 private:

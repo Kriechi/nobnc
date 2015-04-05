@@ -165,10 +165,10 @@ public:
         putModule("Timer disabled");
     }
 
-    ModRet onUserRaw(NoString& line) override
+    Return onUserRaw(NoString& line) override
     {
         if (!No::token(line, 0).equals("AWAY"))
-            return CONTINUE;
+            return Continue;
 
         // If a client set us away, we don't touch that away message
         const NoString arg = No::tokens(line, 1).trim_n(" ");
@@ -179,7 +179,7 @@ public:
 
         m_bWeSetAway = false;
 
-        return CONTINUE;
+        return Continue;
     }
 
     void SetAway(bool bTimer = true)

@@ -282,50 +282,50 @@ public:
         Process(OldNick.toString(), "* " + OldNick.nick() + " is now known as " + newNick, "");
     }
 
-    ModRet onCtcpReply(NoHostMask& nick, NoString& message) override
+    Return onCtcpReply(NoHostMask& nick, NoString& message) override
     {
         Process(nick.toString(), "* CTCP: " + nick.nick() + " reply [" + message + "]", "priv");
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onPrivateCtcp(NoHostMask& nick, NoString& message) override
+    Return onPrivateCtcp(NoHostMask& nick, NoString& message) override
     {
         Process(nick.toString(), "* CTCP: " + nick.nick() + " [" + message + "]", "priv");
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Process(nick.hostMask(),
                 "* CTCP: " + nick.nick() + " [" + message + "] to "
                                                              "[" +
                 channel->name() + "]",
                 channel->name());
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onPrivateNotice(NoHostMask& nick, NoString& message) override
+    Return onPrivateNotice(NoHostMask& nick, NoString& message) override
     {
         Process(nick.toString(), "-" + nick.nick() + "- " + message, "priv");
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Process(nick.hostMask(), "-" + nick.nick() + ":" + channel->name() + "- " + message, channel->name());
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override
+    Return onPrivateMessage(NoHostMask& nick, NoString& message) override
     {
         Process(nick.toString(), "<" + nick.nick() + "> " + message, "priv");
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Process(nick.hostMask(), "<" + nick.nick() + ":" + channel->name() + "> " + message, channel->name());
-        return CONTINUE;
+        return Continue;
     }
 
     void onModuleCommand(const NoString& command) override

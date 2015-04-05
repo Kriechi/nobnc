@@ -25,18 +25,18 @@ public:
     {
     }
 
-    ModRet onRaw(NoString& line) override
+    Return onRaw(NoString& line) override
     {
         const NoString cmd = No::token(line, 1);
 
         if (cmd == "375" /* begin of MOTD */
             ||
             cmd == "372" /* MOTD */)
-            return HALT;
+            return Halt;
         if (cmd == "376" /* End of MOTD */) {
             line = No::token(line, 0) + " 422 " + No::token(line, 2) + " :MOTD blocked by ZNC";
         }
-        return CONTINUE;
+        return Continue;
     }
 };
 

@@ -24,10 +24,10 @@ public:
     {
     }
 
-    ModRet onRaw(NoString& line) override
+    Return onRaw(NoString& line) override
     {
         putModule("IRC -> [" + line + "]");
-        return CONTINUE;
+        return Continue;
     }
 
     void onModuleCommand(const NoString& command) override
@@ -35,10 +35,10 @@ public:
         putIrc(command);
     }
 
-    ModRet onUserRaw(NoString& line) override
+    Return onUserRaw(NoString& line) override
     {
         putModule("YOU -> [" + line + "]");
-        return CONTINUE;
+        return Continue;
     }
 };
 

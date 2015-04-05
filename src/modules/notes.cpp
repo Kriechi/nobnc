@@ -112,10 +112,10 @@ public:
         }
     }
 
-    ModRet onUserRaw(NoString& line) override
+    Return onUserRaw(NoString& line) override
     {
         if (line.left(1) != "#") {
-            return CONTINUE;
+            return Continue;
         }
 
         NoString key;
@@ -123,7 +123,7 @@ public:
 
         if (line == "#?") {
             ListNotes(true);
-            return HALT;
+            return Halt;
         } else if (line.left(2) == "#-") {
             key = No::token(line, 0).leftChomp_n(2);
             if (DelNote(key)) {
@@ -131,7 +131,7 @@ public:
             } else {
                 putModuleNotice("Unable to delete note [" + key + "]");
             }
-            return HALT;
+            return Halt;
         } else if (line.left(2) == "#+") {
             key = No::token(line, 0).leftChomp_n(2);
             bOverwrite = true;
@@ -155,7 +155,7 @@ public:
             }
         }
 
-        return HALT;
+        return Halt;
     }
 
     bool DelNote(const NoString& key)

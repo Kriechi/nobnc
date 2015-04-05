@@ -217,7 +217,7 @@ public:
             registry.remove("topic:" + pChannel->GetName());
     }
 
-    ModRet onDeleteUser(NoUser* user) override
+    Return onDeleteUser(NoUser* user) override
     {
         // Loop through each chan
         for (std::set<NoPartylineChannel*>::iterator it = m_ssChannels.begin(); it != m_ssChannels.end();) {
@@ -228,10 +228,10 @@ public:
             RemoveUser(user, channel, "KICK", "User deleted", true);
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onRaw(NoString& line) override
+    Return onRaw(NoString& line) override
     {
         if (No::token(line, 1) == "005") {
             NoString::size_type uPos = line.toUpper().find("CHANTYPES=");
@@ -246,7 +246,7 @@ public:
             }
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
     void onIrcDisconnected() override
@@ -322,12 +322,12 @@ public:
         }
     }
 
-    ModRet onUserRaw(NoString& line) override
+    Return onUserRaw(NoString& line) override
     {
         if (line.startsWith("WHO " CHAN_PREFIX_1)) {
-            return HALT;
+            return Halt;
         } else if (line.startsWith("MODE " CHAN_PREFIX_1)) {
-            return HALT;
+            return Halt;
         } else if (line.startsWith("TOPIC " CHAN_PREFIX)) {
             NoString channel = No::token(line, 1);
             NoString topic = No::tokens(line, 2);
@@ -361,29 +361,29 @@ public:
             } else {
                 user->putUser(":irc.znc.in 442 " + client->nick() + " " + channel + " :You're not on that channel");
             }
-            return HALT;
+            return Halt;
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onUserPart(NoString& channel, NoString& message) override
+    Return onUserPart(NoString& channel, NoString& message) override
     {
         if (channel.left(1) != CHAN_PREFIX_1) {
-            return CONTINUE;
+            return Continue;
         }
 
         if (channel.left(2) != CHAN_PREFIX) {
             client()->putClient(":" + ircServer(network()) + " 401 " + client()->nick() + " " + channel +
                                 " :No such channel");
-            return HALT;
+            return Halt;
         }
 
         NoPartylineChannel* pChannel = FindChannel(channel);
 
         PartUser(user(), pChannel);
 
-        return HALT;
+        return Halt;
     }
 
     void PartUser(NoUser* user, NoPartylineChannel* pChannel, const NoString& message = "")
@@ -450,16 +450,16 @@ public:
         }
     }
 
-    ModRet onUserJoin(NoString& channel, NoString& key) override
+    Return onUserJoin(NoString& channel, NoString& key) override
     {
         if (channel.left(1) != CHAN_PREFIX_1) {
-            return CONTINUE;
+            return Continue;
         }
 
         if (channel.left(2) != CHAN_PREFIX) {
             client()->putClient(":" + ircServer(network()) + " 403 " + client()->nick() + " " + channel +
                                 " :Channels look like " CHAN_PREFIX "znc");
-            return HALT;
+            return Halt;
         }
 
         channel = channel.left(32);
@@ -467,7 +467,7 @@ public:
 
         JoinUser(user(), pChannel);
 
-        return HALT;
+        return Halt;
     }
 
     void JoinUser(NoUser* user, NoPartylineChannel* pChannel)
@@ -520,16 +520,16 @@ public:
         }
     }
 
-    ModRet HandleMessage(const NoString& cmd, const NoString& target, const NoString& message)
+    Return HandleMessage(const NoString& cmd, const NoString& target, const NoString& message)
     {
         if (target.empty()) {
-            return CONTINUE;
+            return Continue;
         }
 
         char cPrefix = target[0];
 
         if (cPrefix != CHAN_PREFIX_1C && cPrefix != NICK_PREFIX_C) {
-            return CONTINUE;
+            return Continue;
         }
 
         NoUser* user = NoModule::user();
@@ -545,7 +545,7 @@ public:
             if (FindChannel(target) == nullptr) {
                 client->putClient(":" + ircServer(network) + " 401 " + client->nick() + " " + target +
                                    " :No such channel");
-                return HALT;
+                return Halt;
             }
 
             PutChan(target,
@@ -563,7 +563,7 @@ public:
                 if (vClients.empty()) {
                     client->putClient(":" + ircServer(network) + " 401 " + client->nick() + " " + target +
                                        " :User is not attached: " + nick + "");
-                    return HALT;
+                    return Halt;
                 }
 
                 for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
@@ -578,30 +578,30 @@ public:
             }
         }
 
-        return HALT;
+        return Halt;
     }
 
-    ModRet onUserMessage(NoString& target, NoString& message) override
+    Return onUserMessage(NoString& target, NoString& message) override
     {
         return HandleMessage("PRIVMSG", target, message);
     }
 
-    ModRet onUserNotice(NoString& target, NoString& message) override
+    Return onUserNotice(NoString& target, NoString& message) override
     {
         return HandleMessage("NOTICE", target, message);
     }
 
-    ModRet onUserAction(NoString& target, NoString& message) override
+    Return onUserAction(NoString& target, NoString& message) override
     {
         return HandleMessage("PRIVMSG", target, "\001ACTION " + message + "\001");
     }
 
-    ModRet onUserCtcp(NoString& target, NoString& message) override
+    Return onUserCtcp(NoString& target, NoString& message) override
     {
         return HandleMessage("PRIVMSG", target, "\001" + message + "\001");
     }
 
-    ModRet onUserCtcpReply(NoString& target, NoString& message) override
+    Return onUserCtcpReply(NoString& target, NoString& message) override
     {
         return HandleMessage("NOTICE", target, "\001" + message + "\001");
     }

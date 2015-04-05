@@ -72,14 +72,14 @@ public:
         return true;
     }
 
-    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    Return onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         if (IsBlocked(Auth->username())) {
             Auth->refuseLogin(MESSAGE);
-            return HALT;
+            return Halt;
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
     void onModuleCommand(const NoString& command) override

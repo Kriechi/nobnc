@@ -82,7 +82,7 @@ public:
         Log("[" + user()->userName() + "/" + network()->name() + "] disconnected from IRC");
     }
 
-    ModRet onRaw(NoString& line) override
+    Return onRaw(NoString& line) override
     {
         if (line.startsWith("ERROR ")) {
             // ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
@@ -94,7 +94,7 @@ public:
                 network()->currentServer()->host() + " [" + error + "]",
                 LOG_NOTICE);
         }
-        return CONTINUE;
+        return Continue;
     }
 
     void onClientLogin() override

@@ -25,40 +25,40 @@ public:
     {
     }
 
-    ModRet onPrivateCtcp(NoHostMask& nick, NoString& message) override
+    Return onPrivateCtcp(NoHostMask& nick, NoString& message) override
     {
         message = No::stripControls(message);
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         message = No::stripControls(message);
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onPrivateNotice(NoHostMask& nick, NoString& message) override
+    Return onPrivateNotice(NoHostMask& nick, NoString& message) override
     {
         message = No::stripControls(message);
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         message = No::stripControls(message);
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override
+    Return onPrivateMessage(NoHostMask& nick, NoString& message) override
     {
         message = No::stripControls(message);
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         message = No::stripControls(message);
-        return CONTINUE;
+        return Continue;
     }
 };
 

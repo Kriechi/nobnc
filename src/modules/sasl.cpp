@@ -255,7 +255,7 @@ public:
         }
     }
 
-    ModRet onRaw(NoString& line) override
+    Return onRaw(NoString& line) override
     {
         if (No::token(line, 0).equals("AUTHENTICATE")) {
             Authenticate(No::tokens(line, 1));
@@ -284,10 +284,10 @@ public:
             network()->ircSocket()->resumeCap();
             NO_DEBUG("sasl: Received 907 -- We are already registered");
         } else {
-            return CONTINUE;
+            return Continue;
         }
 
-        return HALT;
+        return Halt;
     }
 
     void onIrcConnected() override

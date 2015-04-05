@@ -110,7 +110,7 @@ public:
     bool onLoad(const NoString& args, NoString& message) override;
     void onIrcConnected() override;
     void onIrcDisconnected() override;
-    ModRet onBroadcast(NoString& message) override;
+    Return onBroadcast(NoString& message) override;
 
     void onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args) override;
     void onKick(const NoNick& opNick, const NoString& sKickedNick, NoChannel* channel, const NoString& message) override;
@@ -118,22 +118,22 @@ public:
     void onJoin(const NoNick& nick, NoChannel* channel) override;
     void onPart(const NoNick& nick, NoChannel* channel, const NoString& message) override;
     void onNick(const NoHostMask& OldNick, const NoString& newNick) override;
-    ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override;
+    Return onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override;
 
     /* notices */
-    ModRet onUserNotice(NoString& target, NoString& message) override;
-    ModRet onPrivateNotice(NoHostMask& nick, NoString& message) override;
-    ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override;
+    Return onUserNotice(NoString& target, NoString& message) override;
+    Return onPrivateNotice(NoHostMask& nick, NoString& message) override;
+    Return onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override;
 
     /* actions */
-    ModRet onUserAction(NoString& target, NoString& message) override;
-    ModRet onPrivateAction(NoHostMask& nick, NoString& message) override;
-    ModRet onChannelAction(NoNick& nick, NoChannel* channel, NoString& message) override;
+    Return onUserAction(NoString& target, NoString& message) override;
+    Return onPrivateAction(NoHostMask& nick, NoString& message) override;
+    Return onChannelAction(NoNick& nick, NoChannel* channel, NoString& message) override;
 
     /* msgs */
-    ModRet onUserMessage(NoString& target, NoString& message) override;
-    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override;
-    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override;
+    Return onUserMessage(NoString& target, NoString& message) override;
+    Return onPrivateMessage(NoHostMask& nick, NoString& message) override;
+    Return onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override;
 
 private:
     NoString m_sLogPath;
@@ -366,10 +366,10 @@ void NoLogMod::onIrcDisconnected()
     PutLog("Disconnected from IRC (" + GetServer() + ")");
 }
 
-NoModule::ModRet NoLogMod::onBroadcast(NoString& message)
+NoModule::Return NoLogMod::onBroadcast(NoString& message)
 {
     PutLog("Broadcast: " + message);
-    return CONTINUE;
+    return Continue;
 }
 
 void NoLogMod::onRawMode(const NoNick* opNick, NoChannel* channel, const NoString& modes, const NoString& args)
@@ -407,79 +407,79 @@ void NoLogMod::onNick(const NoHostMask& OldNick, const NoString& newNick)
         PutLog("*** " + OldNick.nick() + " is now known as " + newNick, channel);
 }
 
-NoModule::ModRet NoLogMod::onTopic(NoNick& nick, NoChannel* channel, NoString& topic)
+NoModule::Return NoLogMod::onTopic(NoNick& nick, NoChannel* channel, NoString& topic)
 {
     PutLog("*** " + nick.nick() + " changes topic to '" + topic + "'", channel);
-    return CONTINUE;
+    return Continue;
 }
 
 /* notices */
-NoModule::ModRet NoLogMod::onUserNotice(NoString& target, NoString& message)
+NoModule::Return NoLogMod::onUserNotice(NoString& target, NoString& message)
 {
     NoNetwork* network = NoModule::network();
     if (network) {
         PutLog("-" + network->currentNick() + "- " + message, target);
     }
 
-    return CONTINUE;
+    return Continue;
 }
 
-NoModule::ModRet NoLogMod::onPrivateNotice(NoHostMask& nick, NoString& message)
+NoModule::Return NoLogMod::onPrivateNotice(NoHostMask& nick, NoString& message)
 {
     PutLog("-" + nick.nick() + "- " + message, nick);
-    return CONTINUE;
+    return Continue;
 }
 
-NoModule::ModRet NoLogMod::onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::Return NoLogMod::onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message)
 {
     PutLog("-" + nick.nick() + "- " + message, channel);
-    return CONTINUE;
+    return Continue;
 }
 
 /* actions */
-NoModule::ModRet NoLogMod::onUserAction(NoString& target, NoString& message)
+NoModule::Return NoLogMod::onUserAction(NoString& target, NoString& message)
 {
     NoNetwork* network = NoModule::network();
     if (network) {
         PutLog("* " + network->currentNick() + " " + message, target);
     }
 
-    return CONTINUE;
+    return Continue;
 }
 
-NoModule::ModRet NoLogMod::onPrivateAction(NoHostMask& nick, NoString& message)
+NoModule::Return NoLogMod::onPrivateAction(NoHostMask& nick, NoString& message)
 {
     PutLog("* " + nick.nick() + " " + message, nick);
-    return CONTINUE;
+    return Continue;
 }
 
-NoModule::ModRet NoLogMod::onChannelAction(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::Return NoLogMod::onChannelAction(NoNick& nick, NoChannel* channel, NoString& message)
 {
     PutLog("* " + nick.nick() + " " + message, channel);
-    return CONTINUE;
+    return Continue;
 }
 
 /* msgs */
-NoModule::ModRet NoLogMod::onUserMessage(NoString& target, NoString& message)
+NoModule::Return NoLogMod::onUserMessage(NoString& target, NoString& message)
 {
     NoNetwork* network = NoModule::network();
     if (network) {
         PutLog("<" + network->currentNick() + "> " + message, target);
     }
 
-    return CONTINUE;
+    return Continue;
 }
 
-NoModule::ModRet NoLogMod::onPrivateMessage(NoHostMask& nick, NoString& message)
+NoModule::Return NoLogMod::onPrivateMessage(NoHostMask& nick, NoString& message)
 {
     PutLog("<" + nick.nick() + "> " + message, nick);
-    return CONTINUE;
+    return Continue;
 }
 
-NoModule::ModRet NoLogMod::onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message)
+NoModule::Return NoLogMod::onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message)
 {
     PutLog("<" + nick.nick() + "> " + message, channel);
-    return CONTINUE;
+    return Continue;
 }
 
 template <>

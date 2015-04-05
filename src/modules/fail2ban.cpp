@@ -95,22 +95,22 @@ public:
             Add(sRemoteIP, 1);
     }
 
-    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    Return onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         // e.g. webadmin ends up here
         const NoString& sRemoteIP = Auth->socket()->remoteAddress();
 
         if (sRemoteIP.empty())
-            return CONTINUE;
+            return Continue;
 
         uint* pCount = m_Cache.value(sRemoteIP);
         if (pCount && *pCount >= m_uiAllowedFailed) {
             // onFailedLogin() will refresh their ban
             Auth->refuseLogin("Please try again later - reconnecting too fast");
-            return HALT;
+            return Halt;
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
 private:

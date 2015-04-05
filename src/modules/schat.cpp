@@ -145,19 +145,19 @@ public:
         }
     }
 
-    ModRet onUserRaw(NoString& line) override
+    Return onUserRaw(NoString& line) override
     {
         if (line.startsWith("schat ")) {
             onModuleCommand("chat " + line.substr(6));
-            return (HALT);
+            return (Halt);
 
         } else if (line.equals("schat")) {
             putModule("SChat User Area ...");
             onModuleCommand("help");
-            return (HALT);
+            return (Halt);
         }
 
-        return (CONTINUE);
+        return (Continue);
     }
 
     void onModuleCommand(const NoString& command) override
@@ -304,7 +304,7 @@ public:
         }
     }
 
-    ModRet onPrivateCtcp(NoHostMask& nick, NoString& message) override
+    Return onPrivateCtcp(NoHostMask& nick, NoString& message) override
     {
         if (message.startsWith("DCC SCHAT ")) {
             // chat ip port
@@ -324,11 +324,11 @@ public:
                 NoRemMarkerJob* p = new NoRemMarkerJob(this, nick.nick());
                 p->setSingleShot(true);
                 p->start(60);
-                return (HALT);
+                return (Halt);
             }
         }
 
-        return (CONTINUE);
+        return (Continue);
     }
 
     void AcceptSDCC(const NoString& nick, u_long iIP, u_short port)
@@ -338,7 +338,7 @@ public:
         delete findTimer("Remove " + nick); // delete any associated timer to this nick
     }
 
-    ModRet onUserMessage(NoString& target, NoString& message) override
+    Return onUserMessage(NoString& target, NoString& message) override
     {
         if (target.left(3) == "(s)") {
             NoString name = NoModule::name().toUpper() + "::" + target;
@@ -355,15 +355,15 @@ public:
                         AcceptSDCC(target, it->second.first, it->second.second);
 
                     m_siiWaitingChats.erase(it);
-                    return (HALT);
+                    return (Halt);
                 }
                 putModule("No such SCHAT to [" + target + "]");
             } else
                 p->write(message + "\n");
 
-            return (HALT);
+            return (Halt);
         }
-        return (CONTINUE);
+        return (Continue);
     }
 
     void RemoveMarker(const NoString& nick)

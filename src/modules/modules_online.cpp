@@ -41,7 +41,7 @@ public:
         return false;
     }
 
-    ModRet onUserRaw(NoString& line) override
+    Return onUserRaw(NoString& line) override
     {
         // Handle ISON
         if (No::token(line, 0).equals("ison")) {
@@ -80,14 +80,14 @@ public:
                 putUser(":znc.in 312 " + network->currentNick() + " " + nick + " *.znc.in :Bouncer");
                 putUser(":znc.in 318 " + network->currentNick() + " " + nick + " :End of /WHOIS list.");
 
-                return HALT;
+                return Halt;
             }
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onRaw(NoString& line) override
+    Return onRaw(NoString& line) override
     {
         // Handle 303 reply if m_Requests is not empty
         if (No::token(line, 1) == "303" && !m_ISONRequests.empty()) {
@@ -105,7 +105,7 @@ public:
             m_ISONRequests.erase(it);
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
 private:

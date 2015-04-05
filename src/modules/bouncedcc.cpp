@@ -218,7 +218,7 @@ public:
         return NoRegistry(this).value("UseClientIP").toBool();
     }
 
-    ModRet onUserCtcp(NoString& target, NoString& message) override
+    Return onUserCtcp(NoString& target, NoString& message) override
     {
         if (message.startsWith("DCC ")) {
             NoStringVector tokens = No::quoteSplit(message);
@@ -268,13 +268,13 @@ public:
                 }
             }
 
-            return HALTCORE;
+            return HaltCore;
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onPrivateCtcp(NoHostMask& nick, NoString& message) override
+    Return onPrivateCtcp(NoHostMask& nick, NoString& message) override
     {
         NoNetwork* network = NoModule::network();
         if (message.startsWith("DCC ") && network->isUserAttached()) {
@@ -323,10 +323,10 @@ public:
                 }
             }
 
-            return HALTCORE;
+            return HaltCore;
         }
 
-        return CONTINUE;
+        return Continue;
     }
     void AddSocket(NoDccBounce* socket)
     {

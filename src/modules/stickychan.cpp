@@ -40,7 +40,7 @@ public:
 
     bool onLoad(const NoString& args, NoString& message) override;
 
-    ModRet onUserPart(NoString& channel, NoString& message) override
+    Return onUserPart(NoString& channel, NoString& message) override
     {
         NoRegistry registry(this);
         for (const NoString& key : registry.keys()) {
@@ -49,12 +49,12 @@ public:
 
                 if (chan) {
                     chan->joinUser();
-                    return HALT;
+                    return Halt;
                 }
             }
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
     virtual void onMode(const NoNick* opNick, NoChannel* channel, char mode, const NoString& arg, bool added, bool noChange) override

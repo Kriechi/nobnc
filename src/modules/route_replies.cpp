@@ -271,13 +271,13 @@ public:
         SendRequest();
     }
 
-    ModRet onRaw(NoString& line) override
+    Return onRaw(NoString& line) override
     {
         NoString cmd = No::token(line, 1).toUpper();
         size_t i = 0;
 
         if (!m_pReplies)
-            return CONTINUE;
+            return Continue;
 
         // Is this a "not enough arguments" error?
         if (cmd == "461") {
@@ -287,32 +287,32 @@ public:
             if (No::token(m_sLastRequest, 0).equals(sOrigCmd)) {
                 // This is the reply to the last request
                 if (RouteReply(line, true))
-                    return HALTCORE;
-                return CONTINUE;
+                    return HaltCore;
+                return Continue;
             }
         }
 
         while (m_pReplies[i].szReply != nullptr) {
             if (m_pReplies[i].szReply == cmd) {
                 if (RouteReply(line, m_pReplies[i].bLastResponse, cmd == "353"))
-                    return HALTCORE;
-                return CONTINUE;
+                    return HaltCore;
+                return Continue;
             }
             i++;
         }
 
-        // TODO HALTCORE is wrong, it should not be passed to
+        // TODO HaltCore is wrong, it should not be passed to
         // the clients, but the core itself should still handle it!
 
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onUserRaw(NoString& line) override
+    Return onUserRaw(NoString& line) override
     {
         NoString cmd = No::token(line, 0).toUpper();
 
         if (!network()->ircSocket())
-            return CONTINUE;
+            return Continue;
 
         if (cmd.equals("MODE")) {
             // Check if this is a mode request that needs to be handled
@@ -320,20 +320,20 @@ public:
             // If there are arguments to a mode change,
             // we must not route it.
             if (!No::tokens(line, 3).empty())
-                return CONTINUE;
+                return Continue;
 
             // Grab the mode change parameter
             NoString sMode = No::token(line, 2);
 
             // If this is a channel mode request, znc core replies to it
             if (sMode.empty())
-                return CONTINUE;
+                return Continue;
 
             // Check if this is a mode change or a specific
             // mode request (the later needs to be routed).
             sMode.trimPrefix("+");
             if (sMode.length() != 1)
-                return CONTINUE;
+                return Continue;
 
             // Now just check if it's one of the supported modes
             switch (sMode[0]) {
@@ -342,7 +342,7 @@ public:
             case 'e':
                 break;
             default:
-                return CONTINUE;
+                return Continue;
             }
 
             // Ok, this looks like we should route it.
@@ -355,11 +355,11 @@ public:
                 m_vsPending[client()].push_back(req);
                 SendRequest();
 
-                return HALTCORE;
+                return HaltCore;
             }
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
     void Timeout()

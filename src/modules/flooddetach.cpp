@@ -162,29 +162,29 @@ public:
         }
     }
 
-    ModRet onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelMessage(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Message(channel);
-        return CONTINUE;
+        return Continue;
     }
 
     // This also catches onChannelAction()
-    ModRet onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelCtcp(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Message(channel);
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
+    Return onChannelNotice(NoNick& nick, NoChannel* channel, NoString& message) override
     {
         Message(channel);
-        return CONTINUE;
+        return Continue;
     }
 
-    ModRet onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override
+    Return onTopic(NoNick& nick, NoChannel* channel, NoString& topic) override
     {
         Message(channel);
-        return CONTINUE;
+        return Continue;
     }
 
     void ShowCommand(const NoString& line)

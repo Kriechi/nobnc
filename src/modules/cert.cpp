@@ -68,13 +68,13 @@ public:
         return (NoFile::Exists(PemFile()));
     }
 
-    ModRet onIrcConnecting(NoIrcSocket* socket) override
+    Return onIrcConnecting(NoIrcSocket* socket) override
     {
         if (HasPemFile()) {
             socket->setPemFile(PemFile());
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
     NoString webMenuTitle() override

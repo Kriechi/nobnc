@@ -390,46 +390,46 @@ public:
         m_sReason = "";
     }
 
-    ModRet onPrivateMessage(NoHostMask& nick, NoString& message) override
+    Return onPrivateMessage(NoHostMask& nick, NoString& message) override
     {
         if (m_bIsAway)
             AddMessage(time(nullptr), nick, message);
-        return (CONTINUE);
+        return (Continue);
     }
 
-    ModRet onPrivateAction(NoHostMask& nick, NoString& message) override
+    Return onPrivateAction(NoHostMask& nick, NoString& message) override
     {
         if (m_bIsAway) {
             AddMessage(time(nullptr), nick, "* " + message);
         }
-        return (CONTINUE);
+        return (Continue);
     }
 
-    ModRet onUserNotice(NoString& target, NoString& message) override
+    Return onUserNotice(NoString& target, NoString& message) override
     {
         Ping();
         if (m_bIsAway)
             Back();
 
-        return (CONTINUE);
+        return (Continue);
     }
 
-    ModRet onUserMessage(NoString& target, NoString& message) override
+    Return onUserMessage(NoString& target, NoString& message) override
     {
         Ping();
         if (m_bIsAway)
             Back();
 
-        return (CONTINUE);
+        return (Continue);
     }
 
-    ModRet onUserAction(NoString& target, NoString& message) override
+    Return onUserAction(NoString& target, NoString& message) override
     {
         Ping();
         if (m_bIsAway)
             Back();
 
-        return (CONTINUE);
+        return (Continue);
     }
 
     time_t GetTimeStamp() const

@@ -64,7 +64,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
     bool bHaltCore = false;                          \
     for (NoModule * mod : d->modules) {             \
         try {                                        \
-            NoModule::ModRet e = NoModule::CONTINUE; \
+            NoModule::Return e = NoModule::Continue; \
             NoClient* oldClient = mod->client();   \
             NoModulePrivate::get(mod)->client = d->client;              \
             NoUser* oldUser = nullptr;              \
@@ -83,11 +83,11 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             if (d->network)                          \
                 NoModulePrivate::get(mod)->network = oldNetwork;          \
             NoModulePrivate::get(mod)->client = oldClient;             \
-            if (e == NoModule::HALTMODS) {           \
+            if (e == NoModule::HaltModules) {           \
                 break;                               \
-            } else if (e == NoModule::HALTCORE) {    \
+            } else if (e == NoModule::HaltCore) {    \
                 bHaltCore = true;                    \
-            } else if (e == NoModule::HALT) {        \
+            } else if (e == NoModule::Halt) {        \
                 bHaltCore = true;                    \
                 break;                               \
             }                                        \
@@ -456,7 +456,7 @@ bool NoModuleLoader::onModuleCtcp(const NoString& message)
     return false;
 }
 
-// Why MODHALTCHK works only with functions returning ModRet ? :(
+// Why MODHALTCHK works only with functions returning Return ? :(
 bool NoModuleLoader::onServerCapAvailable(const NoString& cap)
 {
     bool bResult = false;

@@ -101,7 +101,7 @@ public:
         return true;
     }
 
-    ModRet onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
+    Return onLoginAttempt(std::shared_ptr<NoAuthenticator> Auth) override
     {
         const NoString& username = Auth->username();
         const NoString& sPassword = Auth->password();
@@ -110,7 +110,7 @@ public:
         bool success = false;
 
         if (!user && !CreateUser()) {
-            return CONTINUE;
+            return Continue;
         }
 
         const NoString sCacheKey(No::md5(username + ":" + sPassword));
@@ -163,11 +163,11 @@ public:
 
             if (user) {
                 Auth->acceptLogin(user);
-                return HALT;
+                return Halt;
             }
         }
 
-        return CONTINUE;
+        return Continue;
     }
 
     const NoString& GetMethod() const

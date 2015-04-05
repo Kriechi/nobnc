@@ -259,10 +259,10 @@ public:
         }
     }
 
-    ModRet onPrivateNotice(NoHostMask& nick, NoString& message) override
+    Return onPrivateNotice(NoHostMask& nick, NoString& message) override
     {
         if (!No::token(message, 0).equals("!ZNCAO")) {
-            return CONTINUE;
+            return Continue;
         }
 
         NoString command = No::token(message, 1);
@@ -273,7 +273,7 @@ public:
             VerifyResponse(nick, No::token(message, 2));
         }
 
-        return HALTCORE;
+        return HaltCore;
     }
 
     void onOp(const NoNick* opNick, const NoNick& nick, NoChannel* channel, bool noChange) override

@@ -646,7 +646,7 @@ bool NoTemplate::print(const NoString& fileName, std::ostream& oOut)
                         sOutput += "<?";
                     } else if (action.equals("GT")) {
                         sOutput += "?>";
-                    } else if (action.equals("CONTINUE")) {
+                    } else if (action.equals("Continue")) {
                         NoTemplateLoopContext* pContext = currentLoopContext();
 
                         if (pContext) {
@@ -656,7 +656,7 @@ bool NoTemplate::print(const NoString& fileName, std::ostream& oOut)
                             break;
                         } else {
                             NO_DEBUG("[" + fileName + ":" + NoString(uCurPos - iPos2 - 4) +
-                                     "] <? CONTINUE ?> must be used inside of a loop!");
+                                     "] <? Continue ?> must be used inside of a loop!");
                         }
                     } else if (action.equals("BREAK")) {
                         // break from loop
