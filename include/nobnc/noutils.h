@@ -38,7 +38,6 @@ NO_EXPORT NoString decrypt(const NoString& data, const NoString& password);
 #endif
 
 NO_EXPORT NoString salt();
-NO_EXPORT NoString defaultHash();
 NO_EXPORT NoString md5(const NoString& str);
 NO_EXPORT NoString sha256(const NoString& str);
 NO_EXPORT NoString saltedMd5(const NoString& pass, const NoString& salt);

@@ -137,14 +137,6 @@ NoString No::salt()
     return randomString(20);
 }
 
-// If you change this here and in GetSaltedHashPass(),
-// don't forget NoUser::HASH_DEFAULT!
-// TODO refactor this
-NoString No::defaultHash()
-{
-    return "sha256";
-}
-
 NoString No::md5(const NoString& str)
 {
     return MD5::md5(str);
