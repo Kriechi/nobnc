@@ -32,7 +32,7 @@ public:
     }
     virtual ~NoJob()
     {
-    } /// Always called from the main thread.
+    }
 
     bool wasCancelled() const;
 

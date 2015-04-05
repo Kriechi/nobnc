@@ -133,12 +133,12 @@ public:
     bool enabled = true;
     NoString server = "";
     std::vector<NoServerInfo*> servers;
-    size_t serverIndex = 0; ///< Index in servers of our current server + 1
+    size_t serverIndex = 0;
 
     NoNick ircNick;
     bool away = false;
 
-    double floodRate = 1; ///< Set to -1 to disable protection.
+    double floodRate = 1;
     ushort floodBurst = 4;
 
     NoBuffer rawBuffer;
