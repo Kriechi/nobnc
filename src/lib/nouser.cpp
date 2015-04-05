@@ -759,7 +759,7 @@ NoSettings NoUser::toConfig() const
     config.AddKeyValuePair("MultiClients", NoString(multiClients()));
     config.AddKeyValuePair("DenyLoadMod", NoString(denyLoadMod()));
     config.AddKeyValuePair("Admin", NoString(isAdmin()));
-    config.AddKeyValuePair("DenysetBindHost", NoString(denysetBindHost()));
+    config.AddKeyValuePair("DenySetBindHost", NoString(denysetBindHost()));
     config.AddKeyValuePair("TimestampFormat", timestampFormat());
     config.AddKeyValuePair("AppendTimestamp", NoString(timestampAppend()));
     config.AddKeyValuePair("PrependTimestamp", NoString(timestampPrepend()));

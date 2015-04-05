@@ -90,7 +90,7 @@ class NoAdminMod : public NoModule
                 { "BindHost", str },
                 { "MultiClients", boolean },
                 { "DenyLoadMod", boolean },
-                { "DenysetBindHost", boolean },
+                { "DenySetBindHost", boolean },
                 { "DefaultChanModes", str },
                 { "QuitMsg", str },
                 { "BufferCount", integer },
@@ -224,7 +224,7 @@ class NoAdminMod : public NoModule
         else if (sVar == "denyloadmod")
             putModule("DenyLoadMod = " + NoString(user->denyLoadMod()));
         else if (sVar == "denysetbindhost")
-            putModule("DenysetBindHost = " + NoString(user->denysetBindHost()));
+            putModule("DenySetBindHost = " + NoString(user->denysetBindHost()));
         else if (sVar == "defaultchanmodes")
             putModule("DefaultChanModes = " + user->defaultChanModes());
         else if (sVar == "quitmsg")
@@ -339,7 +339,7 @@ class NoAdminMod : public NoModule
             if (NoModule::user()->isAdmin()) {
                 bool b = value.toBool();
                 user->setDenysetBindHost(b);
-                putModule("DenysetBindHost = " + NoString(b));
+                putModule("DenySetBindHost = " + NoString(b));
             } else {
                 putModule("Access denied!");
             }
