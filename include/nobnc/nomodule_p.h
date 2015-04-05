@@ -145,6 +145,8 @@ public:
         return module->d.get();
     }
 
+    static double buildVersion();
+
     void addTimer(NoTimer* timer)
     {
         timers.insert(timer);

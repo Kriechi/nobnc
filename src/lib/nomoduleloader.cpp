@@ -702,7 +702,7 @@ bool NoModuleLoader::unloadModule(const NoString& name, NoString& message)
     if (bHandled)
         return success;
 
-    NoModuleHandle p = module->GetDLL();
+    NoModuleHandle p = NoModulePrivate::get(module)->handle;
 
     if (p) {
         delete module;
@@ -924,7 +924,7 @@ NoModuleHandle OpenModule(const NoString& name, const NoString& path, bool& bVer
         return nullptr;
     }
 
-    if (no_moduleInfo(NoModule::GetCoreVersion(), info)) {
+    if (no_moduleInfo(NoModulePrivate::buildVersion(), info)) {
         message = "";
         bVersionMismatch = false;
     } else {

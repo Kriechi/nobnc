@@ -599,9 +599,6 @@ public:
      */
     virtual ModRet onSendToIrc(NoString& line);
 
-    NoModuleHandle GetDLL();
-    static double GetCoreVersion();
-
     /** This function sends a given raw IRC line to the IRC server, if we
      *  are connected to one. Else this line is discarded.
      *  @param line The line which should be sent.

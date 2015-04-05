@@ -32,6 +32,11 @@
 #include "noexception.h"
 #include <dlfcn.h>
 
+double NoModulePrivate::buildVersion()
+{
+    return NO_VERSION;
+}
+
 NoModule::NoModule(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
     : d(new NoModulePrivate(pDLL, user, network, name, dataDir, type))
 {
@@ -598,16 +603,6 @@ NoModule::ModRet NoModule::onSendToClient(NoString& line, NoClient* client)
 NoModule::ModRet NoModule::onSendToIrc(NoString& line)
 {
     return CONTINUE;
-}
-
-NoModuleHandle NoModule::GetDLL()
-{
-    return d->handle;
-}
-
-double NoModule::GetCoreVersion()
-{
-    return NO_VERSION;
 }
 
 bool NoModule::onServerCapAvailable(const NoString& cap)
