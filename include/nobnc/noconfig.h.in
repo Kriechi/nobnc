@@ -40,10 +40,6 @@
 /* Define if threaded DNS support is enabled */
 #cmakedefine HAVE_THREADED_DNS
 
-/* Define to 1 or 0, depending whether the compiler supports simple visibility
-   declarations. */
-#cmakedefine HAVE_VISIBILITY @HAVE_VISIBILITY@
-
 /* Define if zlib is available */
 #cmakedefine HAVE_ZLIB
 
