@@ -564,15 +564,17 @@ bool NoModule::putStatus(const NoString& line)
 {
     return (d->network) ? d->network->putStatus(line, d->client) : false;
 }
-uint NoModule::putModule(const NoTable& table)
+bool NoModule::putModule(const NoTable& table)
 {
     if (!d->user)
-        return 0;
+        return false;
 
     NoStringVector lines = table.toString();
-    for (const NoString& line : lines)
-        putModule(line);
-    return lines.size() - 1;
+    for (const NoString& line : lines) {
+        if (!putModule(line))
+            return false;
+    }
+    return true;
 }
 bool NoModule::putModule(const NoString& line)
 {

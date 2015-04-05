@@ -205,7 +205,7 @@ public:
     bool putUser(const NoString& line);
     bool putStatus(const NoString& line);
     bool putModule(const NoString& line);
-    uint putModule(const NoTable& table);
+    bool putModule(const NoTable& table);
     bool putModuleNotice(const NoString& line);
 
     NoTimer* findTimer(const NoString& label) const;
