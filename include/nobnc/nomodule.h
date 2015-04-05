@@ -201,12 +201,12 @@ public:
     virtual Return onSendToClient(NoString& line, NoClient* client);
     virtual Return onSendToIrc(NoString& line);
 
-    virtual bool putIrc(const NoString& line);
-    virtual bool putUser(const NoString& line);
-    virtual bool putStatus(const NoString& line);
-    virtual bool putModule(const NoString& line);
-    virtual uint putModule(const NoTable& table);
-    virtual bool putModuleNotice(const NoString& line);
+    bool putIrc(const NoString& line);
+    bool putUser(const NoString& line);
+    bool putStatus(const NoString& line);
+    bool putModule(const NoString& line);
+    uint putModule(const NoTable& table);
+    bool putModuleNotice(const NoString& line);
 
     NoTimer* findTimer(const NoString& label) const;
     NoModuleSocket* findSocket(const NoString& name) const;
