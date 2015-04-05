@@ -650,7 +650,7 @@ void NoNetwork::clientConnected(NoClient* client)
         }
     }
 
-    bool bClearQuery = d->user->autoclearQueryBuffer();
+    bool bClearQuery = d->user->autoClearQueryBuffer();
     for (NoQuery* query : d->queries) {
         query->sendBuffer(client);
         if (bClearQuery) {

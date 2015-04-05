@@ -66,9 +66,9 @@ public:
                 network->removeQuery(query->name());
             }
 
-            // We deny autoclearQueryBuffer since this module
+            // We deny autoClearQueryBuffer since this module
             // doesn't make any sense with it
-            user()->setAutoclearQueryBuffer(false);
+            user()->setAutoClearQueryBuffer(false);
         }
     }
 

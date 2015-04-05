@@ -300,7 +300,7 @@ public:
         pNewUser->setTimezone(socket->param("timezone"));
         pNewUser->setJoinTries(socket->param("jointries").toUInt());
         pNewUser->setMaxJoins(socket->param("maxjoins").toUInt());
-        pNewUser->setAutoclearQueryBuffer(socket->param("autoclearquerybuffer").toBool());
+        pNewUser->setAutoClearQueryBuffer(socket->param("autoclearquerybuffer").toBool());
         pNewUser->setMaxQueryBuffers(socket->param("maxquerybuffers").toUInt());
 
 #ifdef HAVE_ICU
@@ -1473,7 +1473,7 @@ public:
             o12["Name"] = "autoclearquerybuffer";
             o12["DisplayName"] = "Auto Clear Query Buffer";
             o12["Tooltip"] = "Automatically Clear Query Buffer After Playback";
-            if (!user || user->autoclearQueryBuffer()) {
+            if (!user || user->autoClearQueryBuffer()) {
                 o12["Checked"] = "true";
             }
 

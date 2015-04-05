@@ -425,7 +425,7 @@ void NoClient::readLine(const NoString& data)
                                                  message);
                             }
                         } else {
-                            if (!d->user->autoclearQueryBuffer() || !d->network->isUserOnline()) {
+                            if (!d->user->autoClearQueryBuffer() || !d->network->isUserOnline()) {
                                 NoQuery* query = d->network->addQuery(target);
                                 if (query) {
                                     query->addBuffer(":" + _NAMEDFMT(nickMask()) + " PRIVMSG " + _NAMEDFMT(target) + " :\001ACTION {text}\001",
@@ -483,7 +483,7 @@ void NoClient::readLine(const NoString& data)
                         channel->addBuffer(":" + _NAMEDFMT(nickMask()) + " PRIVMSG " + _NAMEDFMT(target) + " :{text}", msg);
                     }
                 } else {
-                    if (!d->user->autoclearQueryBuffer() || !d->network->isUserOnline()) {
+                    if (!d->user->autoClearQueryBuffer() || !d->network->isUserOnline()) {
                         NoQuery* query = d->network->addQuery(target);
                         if (query) {
                             query->addBuffer(":" + _NAMEDFMT(nickMask()) + " PRIVMSG " + _NAMEDFMT(target) +

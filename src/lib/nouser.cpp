@@ -123,7 +123,7 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
     };
     TOption<bool> BoolOptions[] = {
         { "autoclearchanbuffer", &NoUser::setAutoClearChanBuffer },
-        { "autoclearquerybuffer", &NoUser::setAutoclearQueryBuffer },
+        { "autoclearquerybuffer", &NoUser::setAutoClearQueryBuffer },
         { "multiclients", &NoUser::setMultiClients },
         { "denyloadmod", &NoUser::setDenyLoadMod },
         { "admin", &NoUser::setAdmin },
@@ -595,7 +595,7 @@ bool NoUser::clone(NoUser* user, NoString& error, bool cloneNetworks)
 
     // Flags
     setAutoClearChanBuffer(user->autoClearChanBuffer());
-    setAutoclearQueryBuffer(user->autoclearQueryBuffer());
+    setAutoClearQueryBuffer(user->autoClearQueryBuffer());
     setMultiClients(user->multiClients());
     setDenyLoadMod(user->denyLoadMod());
     setAdmin(user->isAdmin());
@@ -755,7 +755,7 @@ NoSettings NoUser::toConfig() const
     config.AddKeyValuePair("ChanModes", defaultChanModes());
     config.AddKeyValuePair("Buffer", NoString(bufferCount()));
     config.AddKeyValuePair("AutoClearChanBuffer", NoString(autoClearChanBuffer()));
-    config.AddKeyValuePair("autoclearQueryBuffer", NoString(autoclearQueryBuffer()));
+    config.AddKeyValuePair("AutoClearQueryBuffer", NoString(autoClearQueryBuffer()));
     config.AddKeyValuePair("MultiClients", NoString(multiClients()));
     config.AddKeyValuePair("DenyLoadMod", NoString(denyLoadMod()));
     config.AddKeyValuePair("Admin", NoString(isAdmin()));
@@ -1073,9 +1073,9 @@ void NoUser::setAutoClearChanBuffer(bool b)
     }
     d->autoClearChanBuffer = b;
 }
-void NoUser::setAutoclearQueryBuffer(bool b)
+void NoUser::setAutoClearQueryBuffer(bool b)
 {
-    d->autoclearQueryBuffer = b;
+    d->autoClearQueryBuffer = b;
 }
 
 void NoUser::setTimestampFormat(const NoString& s)
@@ -1274,9 +1274,9 @@ bool NoUser::autoClearChanBuffer() const
 {
     return d->autoClearChanBuffer;
 }
-bool NoUser::autoclearQueryBuffer() const
+bool NoUser::autoClearQueryBuffer() const
 {
-    return d->autoclearQueryBuffer;
+    return d->autoClearQueryBuffer;
 }
 
 NoString NoUser::timezone() const

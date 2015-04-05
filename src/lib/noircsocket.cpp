@@ -926,7 +926,7 @@ bool NoIrcSocket::onPrivateCtcp(NoHostMask& nick, NoString& message)
         if (bResult)
             return true;
 
-        if (!d->network->isUserOnline() || !d->network->user()->autoclearQueryBuffer()) {
+        if (!d->network->isUserOnline() || !d->network->user()->autoClearQueryBuffer()) {
             NoQuery* query = d->network->addQuery(nick.nick());
             if (query) {
                 query->addBuffer(":" + _NAMEDFMT(nick.toString()) + " PRIVMSG {target} :\001ACTION {text}\001", message);
@@ -1007,7 +1007,7 @@ bool NoIrcSocket::onPrivateMessage(NoHostMask& nick, NoString& message)
     if (bResult)
         return true;
 
-    if (!d->network->isUserOnline() || !d->network->user()->autoclearQueryBuffer()) {
+    if (!d->network->isUserOnline() || !d->network->user()->autoClearQueryBuffer()) {
         NoQuery* query = d->network->addQuery(nick.nick());
         if (query) {
             query->addBuffer(":" + _NAMEDFMT(nick.toString()) + " PRIVMSG {target} :{text}", message);

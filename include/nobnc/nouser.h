@@ -94,7 +94,7 @@ public:
     bool removeCtcpReply(const NoString& ctcp);
     bool setBufferCount(uint u, bool force = false);
     void setAutoClearChanBuffer(bool b);
-    void setAutoclearQueryBuffer(bool b);
+    void setAutoClearQueryBuffer(bool b);
 
     void setTimestampFormat(const NoString& s);
     void setTimestampAppend(bool b);
@@ -136,7 +136,7 @@ public:
     NoStringMap ctcpReplies() const;
     uint bufferCount() const;
     bool autoClearChanBuffer() const;
-    bool autoclearQueryBuffer() const;
+    bool autoClearQueryBuffer() const;
     NoString timezone() const;
     ulonglong bytesRead() const;
     ulonglong bytesWritten() const;

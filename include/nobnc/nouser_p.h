@@ -64,7 +64,7 @@ public:
     bool admin = false;
     bool denysetBindHost = false;
     bool autoClearChanBuffer = true;
-    bool autoclearQueryBuffer = true;
+    bool autoClearQueryBuffer = true;
     bool beingDeleted = false;
     bool appendTimestamp = false;
     bool prependTimestamp = true;

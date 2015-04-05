@@ -95,7 +95,7 @@ class NoAdminMod : public NoModule
                 { "QuitMsg", str },
                 { "BufferCount", integer },
                 { "AutoClearChanBuffer", boolean },
-                { "autoclearQueryBuffer", boolean },
+                { "AutoClearQueryBuffer", boolean },
                 { "Password", str },
                 { "JoinTries", integer },
                 { "MaxJoins", integer },
@@ -234,7 +234,7 @@ class NoAdminMod : public NoModule
         else if (sVar == "autoclearchanbuffer")
             putModule("AutoClearChanBuffer = " + NoString(user->autoClearChanBuffer()));
         else if (sVar == "autoclearquerybuffer")
-            putModule("autoclearQueryBuffer = " + NoString(user->autoclearQueryBuffer()));
+            putModule("AutoClearQueryBuffer = " + NoString(user->autoClearQueryBuffer()));
         else if (sVar == "maxjoins")
             putModule("MaxJoins = " + NoString(user->maxJoins()));
         else if (sVar == "maxnetworks")
@@ -363,8 +363,8 @@ class NoAdminMod : public NoModule
             putModule("AutoClearChanBuffer = " + NoString(b));
         } else if (sVar == "autoclearquerybuffer") {
             bool b = value.toBool();
-            user->setAutoclearQueryBuffer(b);
-            putModule("autoclearQueryBuffer = " + NoString(b));
+            user->setAutoClearQueryBuffer(b);
+            putModule("AutoClearQueryBuffer = " + NoString(b));
         } else if (sVar == "password") {
             user->setPassword(value);
             putModule("Password has been changed!");
