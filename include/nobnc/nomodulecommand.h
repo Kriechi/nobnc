@@ -21,35 +21,32 @@
 #include <nobnc/noglobal.h>
 #include <nobnc/nostring.h>
 #include <nobnc/nomoduleinfo.h>
+#include <memory>
 
-class NoTable;
+class NoModuleCommandPrivate;
 
 class NO_EXPORT NoModuleCommand
 {
 public:
     typedef void (NoModule::*Function)(const NoString& line);
 
-    NoModuleCommand();
-    NoModuleCommand(const NoString& cmd, NoModule* mod, Function func, const NoString& args, const NoString& desc);
+    NoModuleCommand(const NoString& cmd = "", Function func = nullptr);
     NoModuleCommand(const NoModuleCommand& other);
     NoModuleCommand& operator=(const NoModuleCommand& other);
-
-    static void initHelp(NoTable& Table);
-
-    void addHelp(NoTable& Table) const;
+    ~NoModuleCommand();
 
     NoString command() const;
     Function function() const;
-    NoString args() const;
-    NoString description() const;
 
-    void call(NoModule *module, const NoString& line) const;
+    NoString args() const;
+    void setArgs(const NoString& args);
+
+    NoString description() const;
+    void setDescription(const NoString& description);
 
 private:
-    NoString m_cmd;
-    Function m_func;
-    NoString m_args;
-    NoString m_desc;
+    friend class NoModuleCommandPrivate;
+    std::shared_ptr<NoModuleCommandPrivate> d;
 };
 
 #endif // NOMODULECOMMAND_H

@@ -35,6 +35,26 @@ double NoModulePrivate::buildVersion()
     return NO_VERSION;
 }
 
+static void initCommandHelp(NoTable& table)
+{
+    table.addColumn("Command");
+    table.addColumn("Arguments");
+    table.addColumn("Description");
+}
+
+static void addCommandHelp(NoTable& table, const NoModuleCommand& cmd)
+{
+    table.addRow();
+    table.setValue("Command", cmd.command());
+    table.setValue("Arguments", cmd.args());
+    table.setValue("Description", cmd.description());
+}
+
+static void moduleCall(NoModuleCommand* cmd, NoModule* module, const NoString& line)
+{
+    (module->*(cmd->function()))(line);
+}
+
 NoModule::NoModule(NoModuleHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
     : d(new NoModulePrivate(handle, user, network, name, dataDir, type))
 {
@@ -191,7 +211,10 @@ bool NoModule::addCommand(const NoString& cmd, NoModuleCommand::Function func, c
     if (!func || cmd.contains(" ") || findCommand(cmd))
         return false;
 
-    d->commands[cmd] = NoModuleCommand(cmd, this, func, args, desc);
+    NoModuleCommand command(cmd, func);
+    command.setArgs(args);
+    command.setDescription(desc);
+    d->commands[cmd] = command;
     return true;
 }
 
@@ -205,9 +228,9 @@ bool NoModule::removeCommand(const NoString& cmd)
     return d->commands.erase(cmd) > 0;
 }
 
-const NoModuleCommand* NoModule::findCommand(const NoString& cmd) const
+NoModuleCommand* NoModule::findCommand(const NoString& cmd) const
 {
-    for (const auto& it : d->commands) {
+    for (auto& it : d->commands) {
         if (!it.first.equals(cmd))
             continue;
         return &it.second;
@@ -217,11 +240,9 @@ const NoModuleCommand* NoModule::findCommand(const NoString& cmd) const
 
 bool NoModule::handleCommand(const NoString& line)
 {
-    const NoString& cmd = No::token(line, 0);
-    const NoModuleCommand* pCmd = findCommand(cmd);
-
-    if (pCmd) {
-        pCmd->call(this, line);
+    NoModuleCommand* cmd = findCommand(No::token(line, 0));
+    if (cmd) {
+        moduleCall(cmd, this, line);
         return true;
     }
 
@@ -235,11 +256,11 @@ void NoModule::handleHelpCommand(const NoString& line)
     NoString filter = No::token(line, 1).toLower();
     NoTable Table;
 
-    NoModuleCommand::initHelp(Table);
+    initCommandHelp(Table);
     for (const auto& it : d->commands) {
         NoString cmd = it.second.command().toLower();
         if (filter.empty() || (cmd.startsWith(filter, No::CaseSensitive)) || No::wildCmp(cmd, filter)) {
-            it.second.addHelp(Table);
+            addCommandHelp(Table, it.second);
         }
     }
     if (Table.isEmpty()) {

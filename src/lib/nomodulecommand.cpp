@@ -16,67 +16,71 @@
  */
 
 #include "nomodulecommand.h"
-#include "notable.h"
 
-NoModuleCommand::NoModuleCommand() : m_cmd(), m_func(nullptr), m_args(), m_desc()
+class NoModuleCommandPrivate
 {
+public:
+    NoString command;
+    NoString args;
+    NoString description;
+    NoModuleCommand::Function function;
+};
+
+NoModuleCommand::NoModuleCommand(const NoString& command, Function function) : d(new NoModuleCommandPrivate)
+{
+    d->command = command;
+    d->function = function;
 }
 
-NoModuleCommand::NoModuleCommand(const NoString& cmd, NoModule* mod, Function func, const NoString& args, const NoString& desc)
-    : m_cmd(cmd), m_func(func), m_args(args), m_desc(desc)
+NoModuleCommand::NoModuleCommand(const NoModuleCommand& other) : d(new NoModuleCommandPrivate)
 {
-}
-
-NoModuleCommand::NoModuleCommand(const NoModuleCommand& other)
-    : m_cmd(other.m_cmd), m_func(other.m_func), m_args(other.m_args), m_desc(other.m_desc)
-{
+    d->command = other.command();
+    d->function = other.function();
+    d->args = other.args();
+    d->description = other.description();
 }
 
 NoModuleCommand& NoModuleCommand::operator=(const NoModuleCommand& other)
 {
-    m_cmd = other.m_cmd;
-    m_func = other.m_func;
-    m_args = other.m_args;
-    m_desc = other.m_desc;
+    if (this != &other) {
+        d->command = other.command();
+        d->function = other.function();
+        d->args = other.args();
+        d->description = other.description();
+    }
     return *this;
 }
 
-void NoModuleCommand::initHelp(NoTable& Table)
+NoModuleCommand::~NoModuleCommand()
 {
-    Table.addColumn("Command");
-    Table.addColumn("Arguments");
-    Table.addColumn("Description");
-}
-
-void NoModuleCommand::addHelp(NoTable& Table) const
-{
-    Table.addRow();
-    Table.setValue("Command", command());
-    Table.setValue("Arguments", args());
-    Table.setValue("Description", description());
-}
-
-void NoModuleCommand::call(NoModule* module, const NoString& line) const
-{
-    (module->*m_func)(line);
-}
-
-NoString NoModuleCommand::description() const
-{
-    return m_desc;
-}
-
-NoString NoModuleCommand::args() const
-{
-    return m_args;
-}
-
-NoModuleCommand::Function NoModuleCommand::function() const
-{
-    return m_func;
 }
 
 NoString NoModuleCommand::command() const
 {
-    return m_cmd;
+    return d->command;
+}
+
+NoModuleCommand::Function NoModuleCommand::function() const
+{
+    return d->function;
+}
+
+NoString NoModuleCommand::args() const
+{
+    return d->args;
+}
+
+void NoModuleCommand::setArgs(const NoString& args)
+{
+    d->args = args;
+}
+
+NoString NoModuleCommand::description() const
+{
+    return d->description;
+}
+
+void NoModuleCommand::setDescription(const NoString& description)
+{
+    d->description = description;
 }

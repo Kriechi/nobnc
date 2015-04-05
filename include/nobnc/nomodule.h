@@ -28,6 +28,7 @@
 
 class NoUser;
 class NoNick;
+class NoTable;
 class NoTimer;
 class NoSocket;
 class NoClient;
@@ -213,7 +214,7 @@ public:
     void addHelpCommand();
     bool addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args = "", const NoString& desc = "");
     bool removeCommand(const NoString& cmd);
-    const NoModuleCommand* findCommand(const NoString& cmd) const;
+    NoModuleCommand* findCommand(const NoString& cmd) const;
     bool handleCommand(const NoString& line);
     void handleHelpCommand(const NoString& line = "");
 
