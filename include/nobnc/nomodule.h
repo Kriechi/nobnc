@@ -90,8 +90,8 @@ class NoModulePrivate;
  *  @param CLASS The name of your module's class.
  */
 #define MODCONSTRUCTOR(CLASS)                                                                                                                \
-    CLASS(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& path, No::ModuleType type) \
-        : NoModule(pDLL, user, network, name, path, type)
+    CLASS(NoModuleHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& path, No::ModuleType type) \
+        : NoModule(handle, user, network, name, path, type)
 
 /** This works exactly like MODULEDEFS, but for user modules. */
 #define USERMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, No::UserModule)
@@ -126,7 +126,7 @@ class NoModulePrivate;
 class NO_EXPORT NoModule
 {
 public:
-    NoModule(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type);
+    NoModule(NoModuleHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type);
     virtual ~NoModule();
 
     No::ModuleType type() const;

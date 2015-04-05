@@ -128,9 +128,9 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 class NoModulePrivate
 {
 public:
-    NoModulePrivate(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
+    NoModulePrivate(NoModuleHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
         : type(type),
-          handle(pDLL),
+          handle(handle),
           user(user),
           network(network),
           client(nullptr),

@@ -37,8 +37,8 @@ double NoModulePrivate::buildVersion()
     return NO_VERSION;
 }
 
-NoModule::NoModule(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
-    : d(new NoModulePrivate(pDLL, user, network, name, dataDir, type))
+NoModule::NoModule(NoModuleHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
+    : d(new NoModulePrivate(handle, user, network, name, dataDir, type))
 {
     if (network) {
         d->savePath = network->networkPath() + "/moddata/" + name;
