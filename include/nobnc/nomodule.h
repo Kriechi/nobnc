@@ -213,8 +213,8 @@ public:
     NoModuleSocket* findSocket(const NoString& name) const;
 
     void addHelpCommand();
-    bool addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args = "", const NoString& desc = "");
-    bool removeCommand(const NoString& cmd);
+    void addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args = "", const NoString& desc = "");
+    void removeCommand(const NoString& cmd);
     NoModuleCommand* findCommand(const NoString& cmd) const;
 
     virtual Return onAddUser(NoUser* user, NoString& error);

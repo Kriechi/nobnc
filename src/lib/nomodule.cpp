@@ -206,16 +206,15 @@ NoModuleSocket* NoModule::findSocket(const NoString& name) const
     return nullptr;
 }
 
-bool NoModule::addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args, const NoString& desc)
+void NoModule::addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args, const NoString& desc)
 {
     if (!func || cmd.contains(" ") || findCommand(cmd))
-        return false;
+        return;
 
     NoModuleCommand command(cmd, func);
     command.setArgs(args);
     command.setDescription(desc);
     d->commands[cmd] = command;
-    return true;
 }
 
 void NoModule::addHelpCommand()
@@ -223,9 +222,9 @@ void NoModule::addHelpCommand()
     addCommand("Help", &NoModule::onHelpCommand, "search", "Generate this output");
 }
 
-bool NoModule::removeCommand(const NoString& cmd)
+void NoModule::removeCommand(const NoString& command)
 {
-    return d->commands.erase(cmd) > 0;
+    d->commands.erase(command);
 }
 
 NoModuleCommand* NoModule::findCommand(const NoString& cmd) const
