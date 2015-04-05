@@ -102,14 +102,6 @@ class NoModulePrivate;
 /** This works exactly like MODULEDEFS, but for network modules. */
 #define NETWORKMODULEDEFS(CLASS, DESCRIPTION) MODCOMMONDEFS(CLASS, DESCRIPTION, No::NetworkModule)
 
-/** At the end of your source file, you must call this macro in global context.
- *  It defines some static functions which ZNC needs to load this module.
- *  By default the module will be a network module.
- *  @param CLASS The name of your module's class.
- *  @param DESCRIPTION A short description of your module.
- */
-#define MODULEDEFS(CLASS, DESCRIPTION) NETWORKMODULEDEFS(CLASS, DESCRIPTION)
-
 /** The base class for your own ZNC modules.
  *
  *  If you want to write a module for ZNC, you will have to implement a class

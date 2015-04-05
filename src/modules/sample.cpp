@@ -344,4 +344,4 @@ void no_moduleInfo<NoSampleMod>(NoModuleInfo& info)
     info.setArgsHelpText("Description of module arguments goes here.");
 }
 
-MODULEDEFS(NoSampleMod, "To be used as a sample for writing modules")
+NETWORKMODULEDEFS(NoSampleMod, "To be used as a sample for writing modules")
