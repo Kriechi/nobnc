@@ -622,19 +622,19 @@ bool NoUser::clone(NoUser* user, NoString& error, bool cloneNetworks)
 
     for (NoModule* newMod : newMods->modules()) {
         NoString sModRet;
-        NoModule* curMod = curMods->findModule(newMod->moduleName());
+        NoModule* curMod = curMods->findModule(newMod->name());
 
         if (!curMod)
-            curMods->loadModule(newMod->moduleName(), newMod->args(), No::UserModule, this, nullptr, sModRet);
+            curMods->loadModule(newMod->name(), newMod->args(), No::UserModule, this, nullptr, sModRet);
         else if (newMod->args() != curMod->args())
-            curMods->reloadModule(newMod->moduleName(), newMod->args(), this, nullptr, sModRet);
+            curMods->reloadModule(newMod->name(), newMod->args(), this, nullptr, sModRet);
     }
 
     for (NoModule* curMod : curMods->modules()) {
-        NoModule* newMod = newMods->findModule(curMod->moduleName());
+        NoModule* newMod = newMods->findModule(curMod->name());
 
         if (!newMod)
-            unloadMods.insert(curMod->moduleName());
+            unloadMods.insert(curMod->name());
     }
 
     for (const NoString& mod : unloadMods)
@@ -803,7 +803,7 @@ NoSettings NoUser::toConfig() const
             args = " " + args;
         }
 
-        config.AddKeyValuePair("LoadModule", mod->moduleName() + args);
+        config.AddKeyValuePair("LoadModule", mod->name() + args);
     }
 
     // Networks

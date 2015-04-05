@@ -87,11 +87,19 @@ public:
     NoNetwork* network() const;
     NoClient* client() const;
 
+    NoString name() const;
+    NoString prefix() const;
     NoString description() const;
-    NoString modulePath() const;
 
     NoString args() const;
     void setArgs(const NoString& args);
+
+    NoString path() const;
+    NoString dataPath() const;
+    NoString savePath() const;
+
+    NoString expandString(const NoString& str) const;
+    NoString& expandString(const NoString& str, NoString& ret) const;
 
     enum ModRet {
         CONTINUE = 1,
@@ -199,10 +207,6 @@ public:
     virtual uint putModule(const NoTable& table);
     virtual bool putModuleNotice(const NoString& line);
 
-    NoString moduleName() const;
-    NoString moduleNick() const;
-    NoString moduleDataDir() const;
-
     NoTimer* findTimer(const NoString& label) const;
     NoModuleSocket* findSocket(const NoString& name) const;
 
@@ -214,10 +218,6 @@ public:
     const NoModuleCommand* findCommand(const NoString& cmd) const;
     bool handleCommand(const NoString& line);
     void handleHelpCommand(const NoString& line = "");
-
-    NoString savePath() const;
-    NoString expandString(const NoString& str) const;
-    NoString& expandString(const NoString& str, NoString& ret) const;
 
     virtual ModRet onAddUser(NoUser* user, NoString& error);
     virtual ModRet onDeleteUser(NoUser* user);

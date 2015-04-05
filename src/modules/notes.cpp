@@ -198,9 +198,9 @@ public:
             if (!Table.isEmpty()) {
                 for (const NoString& line : Table.toString()) {
                     if (bNotice)
-                        client->putModuleNotice(moduleName(), line);
+                        client->putModuleNotice(name(), line);
                     else
-                        client->putModule(moduleName(), line);
+                        client->putModule(name(), line);
                 }
             } else {
                 if (bNotice) {

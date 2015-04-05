@@ -307,7 +307,7 @@ public:
             }
         } else {
             m_sPassword = "";
-            No::printError("[" + moduleName() + ".so] Failed to Decrypt Messages");
+            No::printError("[" + name() + ".so] Failed to Decrypt Messages");
             return (false);
         }
 

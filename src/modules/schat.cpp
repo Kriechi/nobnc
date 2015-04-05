@@ -341,7 +341,7 @@ public:
     ModRet onUserMessage(NoString& target, NoString& message) override
     {
         if (target.left(3) == "(s)") {
-            NoString name = moduleName().toUpper() + "::" + target;
+            NoString name = NoModule::name().toUpper() + "::" + target;
             NoSChatSock* p = (NoSChatSock*)findSocket(name);
             if (!p) {
                 std::map<NoString, std::pair<u_long, u_short>>::iterator it;
@@ -407,7 +407,7 @@ NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick) : NoModuleSock
 {
     m_module = mod;
     m_sChatNick = sChatNick;
-    setName(mod->moduleName().toUpper() + "::" + m_sChatNick);
+    setName(mod->name().toUpper() + "::" + m_sChatNick);
     mod->AddSocket(this);
 }
 
@@ -417,7 +417,7 @@ NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick, const NoString
     m_module = mod;
     enableReadLine();
     m_sChatNick = sChatNick;
-    setName(mod->moduleName().toUpper() + "::" + m_sChatNick);
+    setName(mod->name().toUpper() + "::" + m_sChatNick);
     mod->AddSocket(this);
 }
 

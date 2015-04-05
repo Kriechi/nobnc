@@ -349,13 +349,13 @@ public:
                 bool bLoadedWebadmin = false;
                 for (a = 0; a < vsArgs.size(); ++a) {
                     NoString name = vsArgs[a].trimRight_n("\r");
-                    if (name == moduleName()) {
+                    if (name == NoModule::name()) {
                         bLoadedWebadmin = true;
                         break;
                     }
                 }
                 if (!bLoadedWebadmin) {
-                    vsArgs.push_back(moduleName());
+                    vsArgs.push_back(name());
                 }
             }
 
@@ -385,7 +385,7 @@ public:
             NoModuleLoader* Modules = user->loader();
 
             for (NoModule* mod : Modules->modules()) {
-                NoString name = mod->moduleName();
+                NoString name = mod->name();
                 NoString args = mod->args();
                 NoString sModRet;
                 NoString sModLoadError;
@@ -713,7 +713,7 @@ public:
                 modrow["WebadminAction"] = "display";
                 if (mod->onEmbeddedWebRequest(socket, "webadmin/channel", modrow)) {
                     modrow["Embed"] = socket->findTemplate(mod, "WebadminChan.tmpl");
-                    modrow["ModName"] = mod->moduleName();
+                    modrow["ModName"] = mod->name();
                 }
             }
 
@@ -940,7 +940,7 @@ public:
                 modrow["WebadminAction"] = "display";
                 if (mod->onEmbeddedWebRequest(socket, "webadmin/network", modrow)) {
                     modrow["Embed"] = socket->findTemplate(mod, "WebadminNetwork.tmpl");
-                    modrow["ModName"] = mod->moduleName();
+                    modrow["ModName"] = mod->name();
                 }
             }
 
@@ -990,7 +990,7 @@ public:
             }
             if (pOldNetwork) {
                 for (NoModule* module : pOldNetwork->loader()->modules()) {
-                    NoString path = user->userPath() + "/networks/" + name + "/moddata/" + module->moduleName();
+                    NoString path = user->userPath() + "/networks/" + name + "/moddata/" + module->name();
                     NoRegistry registry(module);
                     registry.copy(path);
                 }
@@ -1118,8 +1118,8 @@ public:
         std::set<NoString> ssUnloadMods;
 
         for (NoModule* pCurMod : vCurMods->modules()) {
-            if (ssArgs.find(pCurMod->moduleName()) == ssArgs.end() && pCurMod->moduleName() != moduleName()) {
-                ssUnloadMods.insert(pCurMod->moduleName());
+            if (ssArgs.find(pCurMod->name()) == ssArgs.end() && pCurMod->name() != NoModule::name()) {
+                ssUnloadMods.insert(pCurMod->name());
             }
         }
 
@@ -1399,7 +1399,7 @@ public:
                 if (module) {
                     l["Checked"] = "true";
                     l["Args"] = module->args();
-                    if (No::UserModule == type() && info.name() == moduleName()) {
+                    if (No::UserModule == type() && info.name() == name()) {
                         l["Disabled"] = "true";
                     }
                 }
@@ -1483,7 +1483,7 @@ public:
                 modrow["WebadminAction"] = "display";
                 if (mod->onEmbeddedWebRequest(socket, "webadmin/user", modrow)) {
                     modrow["Embed"] = socket->findTemplate(mod, "WebadminUser.tmpl");
-                    modrow["ModName"] = mod->moduleName();
+                    modrow["ModName"] = mod->name();
                 }
             }
 
@@ -1833,7 +1833,7 @@ public:
                 if (module) {
                     l["Checked"] = "true";
                     l["Args"] = module->args();
-                    if (No::GlobalModule == type() && info.name() == moduleName()) {
+                    if (No::GlobalModule == type() && info.name() == name()) {
                         l["Disabled"] = "true";
                     }
                 }
@@ -1945,9 +1945,9 @@ public:
         std::set<NoString> ssUnloadMods;
 
         for (NoModule* pCurMod : vCurMods->modules()) {
-            if (ssArgs.find(pCurMod->moduleName()) == ssArgs.end() &&
-                (No::GlobalModule != type() || pCurMod->moduleName() != moduleName())) {
-                ssUnloadMods.insert(pCurMod->moduleName());
+            if (ssArgs.find(pCurMod->name()) == ssArgs.end() &&
+                (No::GlobalModule != type() || pCurMod->name() != name())) {
+                ssUnloadMods.insert(pCurMod->name());
             }
         }
 

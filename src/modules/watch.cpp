@@ -551,30 +551,30 @@ private:
         }
 
         putModule("---------------");
-        putModule("/msg " + moduleNick() + " CLEAR");
+        putModule("/msg " + prefix() + " CLEAR");
 
         uint uIdx = 1;
 
         for (std::list<NoWatchEntry>::iterator it = m_lsWatchers.begin(); it != m_lsWatchers.end(); ++it, uIdx++) {
             NoWatchEntry& WatchEntry = *it;
 
-            putModule("/msg " + moduleNick() + " ADD " + WatchEntry.GetHostMask() + " " + WatchEntry.GetTarget() + " " +
+            putModule("/msg " + prefix() + " ADD " + WatchEntry.GetHostMask() + " " + WatchEntry.GetTarget() + " " +
                       WatchEntry.GetPattern());
 
             if (WatchEntry.GetSourcesStr().size()) {
-                putModule("/msg " + moduleNick() + " SETSOURCES " + NoString(uIdx) + " " + WatchEntry.GetSourcesStr());
+                putModule("/msg " + prefix() + " SETSOURCES " + NoString(uIdx) + " " + WatchEntry.GetSourcesStr());
             }
 
             if (WatchEntry.IsDisabled()) {
-                putModule("/msg " + moduleNick() + " DISABLE " + NoString(uIdx));
+                putModule("/msg " + prefix() + " DISABLE " + NoString(uIdx));
             }
 
             if (WatchEntry.IsDetachedClientOnly()) {
-                putModule("/msg " + moduleNick() + " SETDETACHEDCLIENTONLY " + NoString(uIdx) + " TRUE");
+                putModule("/msg " + prefix() + " SETDETACHEDCLIENTONLY " + NoString(uIdx) + " TRUE");
             }
 
             if (WatchEntry.IsDetachedChannelOnly()) {
-                putModule("/msg " + moduleNick() + " SETDETACHEDCHANNELONLY " + NoString(uIdx) + " TRUE");
+                putModule("/msg " + prefix() + " SETDETACHEDCHANNELONLY " + NoString(uIdx) + " TRUE");
             }
         }
 

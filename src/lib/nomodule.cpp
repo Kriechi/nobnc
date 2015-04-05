@@ -94,7 +94,7 @@ NoString NoModule::description() const
     return d->description;
 }
 
-NoString NoModule::modulePath() const
+NoString NoModule::path() const
 {
     return d->path;
 }
@@ -136,11 +136,11 @@ NoString NoModule::webPath()
 {
     switch (d->type) {
     case No::GlobalModule:
-        return "/mods/global/" + moduleName() + "/";
+        return "/mods/global/" + name() + "/";
     case No::UserModule:
-        return "/mods/user/" + moduleName() + "/";
+        return "/mods/user/" + name() + "/";
     case No::NetworkModule:
-        return "/mods/network/" + d->network->name() + "/" + moduleName() + "/";
+        return "/mods/network/" + d->network->name() + "/" + name() + "/";
     default:
         return "/";
     }
@@ -150,11 +150,11 @@ NoString NoModule::webFilesPath()
 {
     switch (d->type) {
     case No::GlobalModule:
-        return "/modfiles/global/" + moduleName() + "/";
+        return "/modfiles/global/" + name() + "/";
     case No::UserModule:
-        return "/modfiles/user/" + moduleName() + "/";
+        return "/modfiles/user/" + name() + "/";
     case No::NetworkModule:
-        return "/modfiles/network/" + d->network->name() + "/" + moduleName() + "/";
+        return "/modfiles/network/" + d->network->name() + "/" + name() + "/";
     default:
         return "/";
     }
@@ -263,12 +263,12 @@ void NoModule::handleHelpCommand(const NoString& line)
     }
 }
 
-NoString NoModule::moduleNick() const
+NoString NoModule::prefix() const
 {
     return (d->user ? d->user->statusPrefix() : "*") + d->name;
 }
 
-NoString NoModule::moduleDataDir() const
+NoString NoModule::dataPath() const
 {
     return d->dataDir;
 }
@@ -587,16 +587,16 @@ uint NoModule::putModule(const NoTable& table)
 bool NoModule::putModule(const NoString& line)
 {
     if (d->client) {
-        d->client->putModule(moduleName(), line);
+        d->client->putModule(name(), line);
         return true;
     }
 
     if (d->network) {
-        return d->network->putModule(moduleName(), line);
+        return d->network->putModule(name(), line);
     }
 
     if (d->user) {
-        return d->user->putModule(moduleName(), line);
+        return d->user->putModule(name(), line);
     }
 
     return false;
@@ -607,14 +607,14 @@ bool NoModule::putModuleNotice(const NoString& line)
         return false;
 
     if (d->client) {
-        d->client->putModuleNotice(moduleName(), line);
+        d->client->putModuleNotice(name(), line);
         return true;
     }
 
-    return d->user->putModuleNotice(moduleName(), line);
+    return d->user->putModuleNotice(name(), line);
 }
 
-NoString NoModule::moduleName() const
+NoString NoModule::name() const
 {
     return d->name;
 }

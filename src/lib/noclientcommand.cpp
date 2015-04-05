@@ -688,8 +688,8 @@ void NoClient::userCommand(NoString& line)
 
         std::vector<NoModule*> vMods = pOldNetwork->loader()->modules();
         for (NoModule* mod : vMods) {
-            NoString sOldModPath = pOldNetwork->networkPath() + "/moddata/" + mod->moduleName();
-            NoString sNewModPath = pNewUser->userPath() + "/networks/" + sNewNetwork + "/moddata/" + mod->moduleName();
+            NoString sOldModPath = pOldNetwork->networkPath() + "/moddata/" + mod->name();
+            NoString sNewModPath = pNewUser->userPath() + "/networks/" + sNewNetwork + "/moddata/" + mod->name();
 
             NoDir oldDir(sOldModPath);
             for (NoFile* pFile : oldDir.files()) {
@@ -885,7 +885,7 @@ void NoClient::userCommand(NoString& line)
 
                 for (const NoModule* mod : GModules->modules()) {
                     GTable.addRow();
-                    GTable.setValue("Name", mod->moduleName());
+                    GTable.setValue("Name", mod->name());
                     GTable.setValue("Arguments", mod->args());
                 }
 
@@ -905,7 +905,7 @@ void NoClient::userCommand(NoString& line)
 
             for (const NoModule* mod : Modules->modules()) {
                 Table.addRow();
-                Table.setValue("Name", mod->moduleName());
+                Table.setValue("Name", mod->name());
                 Table.setValue("Arguments", mod->args());
             }
 
@@ -924,7 +924,7 @@ void NoClient::userCommand(NoString& line)
 
                 for (const NoModule* mod : NetworkModules->modules()) {
                     Table.addRow();
-                    Table.setValue("Name", mod->moduleName());
+                    Table.setValue("Name", mod->name());
                     Table.setValue("Arguments", mod->args());
                 }
 

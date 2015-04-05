@@ -1371,7 +1371,7 @@ class NoAdminMod : public NoModule
 
             for (NoModule* mod : Modules->modules()) {
                 Table.addRow();
-                Table.setValue("Name", mod->moduleName());
+                Table.setValue("Name", mod->name());
                 Table.setValue("Arguments", mod->args());
             }
 

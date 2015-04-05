@@ -623,7 +623,7 @@ bool NoApp::writeConfig()
     NoModuleLoader* Mods = loader();
 
     for (const NoModule* mod : Mods->modules()) {
-        NoString name = mod->moduleName();
+        NoString name = mod->name();
         NoString args = mod->args();
 
         if (!args.empty()) {
@@ -1334,8 +1334,8 @@ bool NoAppPrivate::doRehash(NoString& error)
     // Unload modules which are no longer in the config
     std::set<NoString> ssUnload;
     for (NoModule* pCurMod : noApp->loader()->modules()) {
-        if (msModules.find(pCurMod->moduleName()) == msModules.end())
-            ssUnload.insert(pCurMod->moduleName());
+        if (msModules.find(pCurMod->name()) == msModules.end())
+            ssUnload.insert(pCurMod->name());
     }
 
     for (const NoString& sMod : ssUnload) {

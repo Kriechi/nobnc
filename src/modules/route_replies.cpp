@@ -369,7 +369,7 @@ public:
         NoRegistry registry(this);
         if (!registry.value("silent_timeouts").toBool()) {
             putModule("This module hit a timeout which is possibly a bug.");
-            putModule("To disable this message, do \"/msg " + moduleNick() + " silent yes\"");
+            putModule("To disable this message, do \"/msg " + prefix() + " silent yes\"");
             putModule("Last request: " + m_sLastRequest);
             putModule("Expected replies: ");
 

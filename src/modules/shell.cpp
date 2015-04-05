@@ -116,7 +116,7 @@ public:
             client = NoModule::client();
 
         NoString path = m_sPath.replace_n(" ", "_");
-        NoString sSource = ":" + moduleNick() + "!shell@" + path;
+        NoString sSource = ":" + prefix() + "!shell@" + path;
         NoString line = sSource + " PRIVMSG " + client->nick() + " :" + msg;
         client->putClient(line);
     }

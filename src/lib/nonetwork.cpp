@@ -279,20 +279,20 @@ void NoNetwork::clone(const NoNetwork* network, bool cloneName)
 
     for (NoModule* pNewMod : vNewMods->modules()) {
         NoString sModRet;
-        NoModule* pCurMod = vCurMods->findModule(pNewMod->moduleName());
+        NoModule* pCurMod = vCurMods->findModule(pNewMod->name());
 
         if (!pCurMod) {
-            vCurMods->loadModule(pNewMod->moduleName(), pNewMod->args(), No::NetworkModule, d->user, this, sModRet);
+            vCurMods->loadModule(pNewMod->name(), pNewMod->args(), No::NetworkModule, d->user, this, sModRet);
         } else if (pNewMod->args() != pCurMod->args()) {
-            vCurMods->reloadModule(pNewMod->moduleName(), pNewMod->args(), d->user, this, sModRet);
+            vCurMods->reloadModule(pNewMod->name(), pNewMod->args(), d->user, this, sModRet);
         }
     }
 
     for (NoModule* pCurMod : vCurMods->modules()) {
-        NoModule* pNewMod = vNewMods->findModule(pCurMod->moduleName());
+        NoModule* pNewMod = vNewMods->findModule(pCurMod->name());
 
         if (!pNewMod) {
-            ssUnloadMods.insert(pCurMod->moduleName());
+            ssUnloadMods.insert(pCurMod->name());
         }
     }
 
@@ -538,7 +538,7 @@ NoSettings NoNetwork::toConfig() const
             args = " " + args;
         }
 
-        config.AddKeyValuePair("LoadModule", mod->moduleName() + args);
+        config.AddKeyValuePair("LoadModule", mod->name() + args);
     }
 
     // Servers

@@ -349,7 +349,7 @@ NoStringVector NoWebSocket::directories(NoModule* module, bool bIsTemplate)
     // Module specific paths
 
     if (module) {
-        const NoString& name(module->moduleName());
+        const NoString& name(module->name());
 
         // 1. ~/.znc/webskins/<user_skin_setting>/mods/<mod_name>/
         //
@@ -363,7 +363,7 @@ NoStringVector NoWebSocket::directories(NoModule* module, bool bIsTemplate)
 
         // 3. ./modules/<mod_name>/tmpl/
         //
-        vsResult.push_back(module->moduleDataDir() + "/tmpl/");
+        vsResult.push_back(module->dataPath() + "/tmpl/");
 
         // 4. ~/.znc/webskins/<user_skin_setting>/mods/<mod_name>/
         //
@@ -392,7 +392,7 @@ NoStringVector NoWebSocket::directories(NoModule* module, bool bIsTemplate)
 NoString NoWebSocket::findTemplate(NoModule* module, const NoString& name)
 {
     NoStringVector vsDirs = directories(module, true);
-    NoString sFile = module->moduleName() + "_" + name;
+    NoString sFile = module->name() + "_" + name;
     for (const NoString& sDir : vsDirs) {
         if (NoFile::Exists(NoDir(sDir).filePath(sFile))) {
             m_template.appendPath(sDir);
@@ -476,11 +476,11 @@ bool NoWebSocket::addModuleLoop(const NoString& sLoopName, NoModule& Module, NoT
         NoTemplate& Row = pTemplate->addRow(sLoopName);
         bool bActiveModule = false;
 
-        Row["ModName"] = Module.moduleName();
+        Row["ModName"] = Module.name();
         Row["ModPath"] = Module.webPath();
         Row["Title"] = sTitle;
 
-        if (m_modName == Module.moduleName()) {
+        if (m_modName == Module.name()) {
             NoString sModuleType = No::token(path(), 1, "/");
             if (sModuleType == "global" && Module.type() == No::GlobalModule) {
                 bActiveModule = true;
@@ -509,7 +509,7 @@ bool NoWebSocket::addModuleLoop(const NoString& sLoopName, NoModule& Module, NoT
 
         for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(&Module)->subPages) {
             // active is whether or not the current url matches this subpage (params will be checked below)
-            bool active = (m_modName == Module.moduleName() && m_page == SubPage->name() && bActiveModule);
+            bool active = (m_modName == Module.name() && m_page == SubPage->name() && bActiveModule);
 
             if ((SubPage->flags() & NoWebPage::Admin) && !session()->isAdmin()) {
                 continue; // Don't add admin-only subpages to requests from non-admin users
@@ -517,7 +517,7 @@ bool NoWebSocket::addModuleLoop(const NoString& sLoopName, NoModule& Module, NoT
 
             NoTemplate& SubRow = Row.addRow("SubPageLoop");
 
-            SubRow["ModName"] = Module.moduleName();
+            SubRow["ModName"] = Module.name();
             SubRow["ModPath"] = Module.webPath();
             SubRow["PageName"] = SubPage->name();
             SubRow["Title"] = SubPage->title().empty() ? SubPage->name() : SubPage->title();
@@ -574,7 +574,7 @@ NoWebSocket::PageRequest NoWebSocket::printTemplate(const NoString& page, NoStri
     if (module) {
         NoUser* user = module->user();
         m_template["ModUser"] = user ? user->userName() : "";
-        m_template["ModName"] = module->moduleName();
+        m_template["ModName"] = module->name();
 
         if (m_template.find("Title") == m_template.end()) {
             m_template["Title"] = module->webMenuTitle();
@@ -849,7 +849,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
         }
 
         for (std::shared_ptr<NoWebPage>& SubPage : NoModulePrivate::get(module)->subPages) {
-            bool active = (m_modName == module->moduleName() && m_page == SubPage->name());
+            bool active = (m_modName == module->name() && m_page == SubPage->name());
 
             if (active && (SubPage->flags() & NoWebPage::Admin) && !session()->isAdmin()) {
                 printErrorPage(403, "Forbidden", "You need to be an admin to access this page");
@@ -863,7 +863,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
 
         if (sURI.left(10) == "/modfiles/") {
             m_template.appendPath(skinPath(skinName()) + "/mods/" + m_modName + "/files/");
-            m_template.appendPath(module->moduleDataDir() + "/files/");
+            m_template.appendPath(module->dataPath() + "/files/");
 
             if (printFile(m_template.expandFile(m_page.trimLeft_n("/")))) {
                 return Print;

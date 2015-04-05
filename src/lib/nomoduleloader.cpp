@@ -54,7 +54,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             NoModulePrivate::get(mod)->client = oldClient;            \
         } catch (const NoException& e) { \
             if (e.type() == NoException::Unload) {            \
-                unloadModule(mod->moduleName());   \
+                unloadModule(mod->name());   \
             }                                       \
         }                                           \
     }
@@ -93,7 +93,7 @@ bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
             }                                        \
         } catch (const NoException& e) {  \
             if (e.type() == NoException::Unload) {             \
-                unloadModule(mod->moduleName());    \
+                unloadModule(mod->name());    \
             }                                        \
         }                                            \
     }                                                \
@@ -172,7 +172,7 @@ void NoModuleLoader::unloadAllModules()
 {
     while (!d->modules.empty()) {
         NoString message;
-        NoString name = d->modules.back()->moduleName();
+        NoString name = d->modules.back()->name();
         unloadModule(name, message);
     }
 }
@@ -186,7 +186,7 @@ bool NoModuleLoader::onBoot()
             }
         } catch (const NoException& e) {
             if (e.type() == NoException::Unload) {
-                unloadModule(mod->moduleName());
+                unloadModule(mod->name());
             }
         }
     }
@@ -476,7 +476,7 @@ bool NoModuleLoader::onServerCapAvailable(const NoString& cap)
             NoModulePrivate::get(mod)->client = oldClient;
         } catch (const NoException& e) {
             if (e.type() == NoException::Unload) {
-                unloadModule(mod->moduleName());
+                unloadModule(mod->name());
             }
         }
     }
@@ -550,7 +550,7 @@ bool NoModuleLoader::isClientCapSupported(NoClient* client, const NoString& cap,
             NoModulePrivate::get(mod)->client = oldClient;
         } catch (const NoException& e) {
             if (e.type() == NoException::Unload) {
-                unloadModule(mod->moduleName());
+                unloadModule(mod->name());
             }
         }
     }
@@ -588,7 +588,7 @@ bool NoModuleLoader::onGetAvailableModules(std::set<NoModuleInfo>& modules, No::
 NoModule* NoModuleLoader::findModule(const NoString& name) const
 {
     for (NoModule* mod : d->modules) {
-        if (name.equals(mod->moduleName())) {
+        if (name.equals(mod->name())) {
             return mod;
         }
     }

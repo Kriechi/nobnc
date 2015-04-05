@@ -90,7 +90,7 @@ bool NoModuleSocket::connect(const NoString& hostname, ushort port, bool ssl, ui
     }
 
     NoUser* user = m_module->user();
-    NoString name = "MOD::C::" + m_module->moduleName();
+    NoString name = "MOD::C::" + m_module->name();
     NoString bindHost;
 
     if (user) {
@@ -120,7 +120,7 @@ bool NoModuleSocket::listen(ushort port, bool ssl, uint uTimeout)
     }
 
     NoUser* user = m_module->user();
-    NoString name = "MOD::L::" + m_module->moduleName();
+    NoString name = "MOD::L::" + m_module->name();
 
     if (user) {
         name += "::" + user->userName();

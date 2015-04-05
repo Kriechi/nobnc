@@ -124,8 +124,8 @@ public:
 
                 for (std::vector<NoClient*>::const_iterator it3 = vClients.begin(); it3 != vClients.end(); ++it3) {
                     NoClient* client = *it3;
-                    client->putClient(":*" + moduleName() + "!znc@znc.in KICK " + (*it)->GetName() + " " +
-                                       client->nick() + " :" + moduleName() + " unloaded");
+                    client->putClient(":*" + name() + "!znc@znc.in KICK " + (*it)->GetName() + " " +
+                                       client->nick() + " :" + name() + " unloaded");
                 }
             }
         }
@@ -298,7 +298,7 @@ public:
 
                 SendNickList(user, network, ssNicks, (*it)->GetName());
                 PutChan(ssNicks,
-                        ":*" + moduleName() + "!znc@znc.in MODE " + (*it)->GetName() + " +" +
+                        ":*" + name() + "!znc@znc.in MODE " + (*it)->GetName() + " +" +
                         NoString(user->isAdmin() ? "o" : "v") + " " + NICK_PREFIX + user->userName(),
                         false);
             }
@@ -314,7 +314,7 @@ public:
 
                 if (ssNicks.find(user->userName()) != ssNicks.end()) {
                     PutChan(ssNicks,
-                            ":*" + moduleName() + "!znc@znc.in MODE " + (*it)->GetName() + " -ov " + NICK_PREFIX +
+                            ":*" + name() + "!znc@znc.in MODE " + (*it)->GetName() + " -ov " + NICK_PREFIX +
                             user->userName() + " " + NICK_PREFIX + user->userName(),
                             false);
                 }
@@ -506,14 +506,14 @@ public:
 
             if (user->isAdmin()) {
                 PutChan(ssNicks,
-                        ":*" + moduleName() + "!znc@znc.in MODE " + pChannel->GetName() + " +o " + NICK_PREFIX + user->userName(),
+                        ":*" + name() + "!znc@znc.in MODE " + pChannel->GetName() + " +o " + NICK_PREFIX + user->userName(),
                         false,
                         false,
                         user);
             }
 
             PutChan(ssNicks,
-                    ":*" + moduleName() + "!znc@znc.in MODE " + pChannel->GetName() + " +v " + NICK_PREFIX + user->userName(),
+                    ":*" + name() + "!znc@znc.in MODE " + pChannel->GetName() + " +v " + NICK_PREFIX + user->userName(),
                     false,
                     false,
                     user);

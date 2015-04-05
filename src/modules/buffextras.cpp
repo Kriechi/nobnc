@@ -35,7 +35,7 @@ public:
         if (channel->autoClearChanBuffer() && network()->isUserOnline())
             return;
 
-        channel->addBuffer(":" + moduleNick() + "!" + moduleName() + "@znc.in PRIVMSG " + _NAMEDFMT(channel->name()) +
+        channel->addBuffer(":" + prefix() + "!" + name() + "@znc.in PRIVMSG " + _NAMEDFMT(channel->name()) +
                           " :{text}",
                           message);
     }
