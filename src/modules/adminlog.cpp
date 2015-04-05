@@ -135,7 +135,7 @@ public:
         }
     }
 
-    void onModCommand(const NoString& command) override
+    void onModuleCommand(const NoString& command) override
     {
         if (!user()->isAdmin()) {
             putModule("Access denied");

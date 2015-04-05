@@ -148,19 +148,19 @@ public:
     ModRet onUserRaw(NoString& line) override
     {
         if (line.startsWith("schat ")) {
-            onModCommand("chat " + line.substr(6));
+            onModuleCommand("chat " + line.substr(6));
             return (HALT);
 
         } else if (line.equals("schat")) {
             putModule("SChat User Area ...");
-            onModCommand("help");
+            onModuleCommand("help");
             return (HALT);
         }
 
         return (CONTINUE);
     }
 
-    void onModCommand(const NoString& command) override
+    void onModuleCommand(const NoString& command) override
     {
         NoString sCom = No::token(command, 0);
         NoString args = No::tokens(command, 1);

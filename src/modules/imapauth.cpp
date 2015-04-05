@@ -115,7 +115,7 @@ public:
         return HALT;
     }
 
-    void onModCommand(const NoString& line) override
+    void onModuleCommand(const NoString& line) override
     {
     }
 

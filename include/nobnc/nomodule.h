@@ -137,10 +137,10 @@ public:
     virtual ModRet onRaw(NoString& line);
 
     virtual ModRet onStatusCommand(NoString& command);
-    virtual void onModCommand(const NoString& command);
-    virtual void onUnknownModCommand(const NoString& command);
-    virtual void onModNotice(const NoString& message);
-    virtual void onModCTCP(const NoString& message);
+    virtual void onModuleCommand(const NoString& command);
+    virtual void onUnknownModuleCommand(const NoString& command);
+    virtual void onModuleNotice(const NoString& message);
+    virtual void onModuleCtcp(const NoString& message);
 
     virtual void onQuit(const NoHostMask& nick, const NoString& message);
     virtual void onNick(const NoHostMask& nick, const NoString& newNick);

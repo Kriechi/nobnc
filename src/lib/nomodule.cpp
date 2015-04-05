@@ -239,7 +239,7 @@ bool NoModule::handleCommand(const NoString& line)
         return true;
     }
 
-    onUnknownModCommand(line);
+    onUnknownModuleCommand(line);
 
     return false;
 }
@@ -377,21 +377,21 @@ NoModule::ModRet NoModule::onStatusCommand(NoString& command)
 {
     return CONTINUE;
 }
-void NoModule::onModNotice(const NoString& message)
+void NoModule::onModuleNotice(const NoString& message)
 {
 }
-void NoModule::onModCTCP(const NoString& message)
+void NoModule::onModuleCtcp(const NoString& message)
 {
 }
 
-void NoModule::onModCommand(const NoString& command)
+void NoModule::onModuleCommand(const NoString& command)
 {
     handleCommand(command);
 }
-void NoModule::onUnknownModCommand(const NoString& line)
+void NoModule::onUnknownModuleCommand(const NoString& line)
 {
     if (d->commands.empty())
-        // This function is only called if onModCommand wasn't
+        // This function is only called if onModuleCommand wasn't
         // overriden, so no false warnings for modules which don't use
         // NoModuleCommand for command handling.
         putModule("This module doesn't implement any commands.");

@@ -293,7 +293,7 @@ void NoClient::readLine(const NoString& data)
             if (sModCommand.empty())
                 CALLMOD(target, this, d->user, d->network, putModule("Hello. How may I help you?"))
             else
-                CALLMOD(target, this, d->user, d->network, onModCommand(sModCommand))
+                CALLMOD(target, this, d->user, d->network, onModuleCommand(sModCommand))
         }
         return;
     } else if (command.equals("PING")) {
@@ -332,7 +332,7 @@ void NoClient::readLine(const NoString& data)
         for (NoString& target : vTargets) {
             if (target.trimPrefix(d->user->statusPrefix())) {
                 if (!target.equals("status")) {
-                    CALLMOD(target, this, d->user, d->network, onModNotice(msg));
+                    CALLMOD(target, this, d->user, d->network, onModuleNotice(msg));
                 }
                 continue;
             }
@@ -403,7 +403,7 @@ void NoClient::readLine(const NoString& data)
                     if (target.equals("status")) {
                         statusCtcp(ctcp);
                     } else {
-                        CALLMOD(target, this, d->user, d->network, onModCTCP(ctcp));
+                        CALLMOD(target, this, d->user, d->network, onModuleCtcp(ctcp));
                     }
                     continue;
                 }
@@ -458,7 +458,7 @@ void NoClient::readLine(const NoString& data)
                 if (target.equals("status")) {
                     userCommand(msg);
                 } else {
-                    CALLMOD(target, this, d->user, d->network, onModCommand(msg));
+                    CALLMOD(target, this, d->user, d->network, onModuleCommand(msg));
                 }
                 continue;
             }

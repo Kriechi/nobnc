@@ -30,7 +30,7 @@ public:
         return CONTINUE;
     }
 
-    void onModCommand(const NoString& command) override
+    void onModuleCommand(const NoString& command) override
     {
         putIrc(command);
     }

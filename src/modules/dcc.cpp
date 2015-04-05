@@ -255,7 +255,7 @@ public:
         }
     }
 
-    void onModCTCP(const NoString& message) override
+    void onModuleCtcp(const NoString& message) override
     {
         if (message.startsWith("DCC RESUME ")) {
             NoString sFile = No::token(message, 2);

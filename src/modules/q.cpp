@@ -109,7 +109,7 @@ public:
         WhoAmI();
     }
 
-    void onModCommand(const NoString& line) override
+    void onModuleCommand(const NoString& line) override
     {
         NoString command = No::token(line, 0).toLower();
 

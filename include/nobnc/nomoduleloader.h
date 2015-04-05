@@ -82,9 +82,9 @@ public:
     bool onRaw(NoString& line);
 
     bool onStatusCommand(NoString& command);
-    bool onModCommand(const NoString& command);
-    bool onModNotice(const NoString& message);
-    bool onModCTCP(const NoString& message);
+    bool onModuleCommand(const NoString& command);
+    bool onModuleNotice(const NoString& message);
+    bool onModuleCtcp(const NoString& message);
 
     bool onQuit(const NoHostMask& nick, const NoString& message);
     bool onNick(const NoHostMask& nick, const NoString& newNick);

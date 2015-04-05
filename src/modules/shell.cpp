@@ -88,7 +88,7 @@ public:
         return true;
     }
 
-    void onModCommand(const NoString& line) override
+    void onModuleCommand(const NoString& line) override
     {
         NoString command = No::token(line, 0);
         if (command.equals("cd")) {

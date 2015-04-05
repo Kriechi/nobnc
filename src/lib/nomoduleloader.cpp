@@ -440,19 +440,19 @@ bool NoModuleLoader::onStatusCommand(NoString& command)
 {
     MODHALTCHK(onStatusCommand(command));
 }
-bool NoModuleLoader::onModCommand(const NoString& command)
+bool NoModuleLoader::onModuleCommand(const NoString& command)
 {
-    MODUNLOADCHK(onModCommand(command));
+    MODUNLOADCHK(onModuleCommand(command));
     return false;
 }
-bool NoModuleLoader::onModNotice(const NoString& message)
+bool NoModuleLoader::onModuleNotice(const NoString& message)
 {
-    MODUNLOADCHK(onModNotice(message));
+    MODUNLOADCHK(onModuleNotice(message));
     return false;
 }
-bool NoModuleLoader::onModCTCP(const NoString& message)
+bool NoModuleLoader::onModuleCtcp(const NoString& message)
 {
-    MODUNLOADCHK(onModCTCP(message));
+    MODUNLOADCHK(onModuleCtcp(message));
     return false;
 }
 

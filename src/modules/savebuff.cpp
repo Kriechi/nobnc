@@ -241,7 +241,7 @@ public:
         m_sPassword = No::md5(args);
     }
 
-    void onModCommand(const NoString& sCmdLine) override
+    void onModuleCommand(const NoString& sCmdLine) override
     {
         NoString command = No::token(sCmdLine, 0);
         NoString args = No::tokens(sCmdLine, 1);

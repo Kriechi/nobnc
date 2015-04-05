@@ -56,7 +56,7 @@ public:
         sasl_done();
     }
 
-    void onModCommand(const NoString& command) override
+    void onModuleCommand(const NoString& command) override
     {
         if (user()->isAdmin()) {
             handleCommand(command);

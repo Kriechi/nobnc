@@ -65,7 +65,7 @@ public:
         m_Cache.insert(host, count);
     }
 
-    void onModCommand(const NoString& command) override
+    void onModuleCommand(const NoString& command) override
     {
         putModule("This module can only be configured through its arguments.");
         putModule("The module argument is the number of minutes an IP");

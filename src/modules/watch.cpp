@@ -328,7 +328,7 @@ public:
         return CONTINUE;
     }
 
-    void onModCommand(const NoString& command) override
+    void onModuleCommand(const NoString& command) override
     {
         NoString sCmdName = No::token(command, 0);
         if (sCmdName.equals("ADD") || sCmdName.equals("WATCH")) {
