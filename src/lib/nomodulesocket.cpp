@@ -48,7 +48,7 @@ NoModuleSocket::~NoModuleSocket()
     if (m_module) {
         user = m_module->user();
         NoModulePrivate::get(m_module)->removeSocket(this);
-        m_module->manager()->removeSocket(this);
+        noApp->manager()->removeSocket(this);
     }
 
     if (user && m_module && m_module->type() != No::GlobalModule) {
@@ -108,7 +108,7 @@ bool NoModuleSocket::connect(const NoString& hostname, ushort port, bool ssl, ui
         name = NoSocket::name();
     }
 
-    m_module->manager()->connect(hostname, port, name, uTimeout, ssl, bindHost, this);
+    noApp->manager()->connect(hostname, port, name, uTimeout, ssl, bindHost, this);
     return true;
 }
 
@@ -130,7 +130,7 @@ bool NoModuleSocket::listen(ushort port, bool ssl, uint uTimeout)
         name = NoSocket::name();
     }
 
-    return m_module->manager()->listenAll(port, name, ssl, SOMAXCONN, this);
+    return noApp->manager()->listenAll(port, name, ssl, SOMAXCONN, this);
 }
 
 NoModule* NoModuleSocket::module() const

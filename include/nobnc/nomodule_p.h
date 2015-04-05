@@ -131,7 +131,6 @@ public:
     NoModulePrivate(NoModuleHandle pDLL, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
         : type(type),
           handle(pDLL),
-          manager(noApp->manager()),
           user(user),
           network(network),
           client(nullptr),

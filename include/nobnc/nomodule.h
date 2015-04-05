@@ -41,7 +41,6 @@ class NoIrcSocket;
 class NoModuleJob;
 class NoModuleSocket;
 class NoAuthenticator;
-class NoSocketManager;
 class NoModulePrivate;
 
 #ifdef REQUIRESSL
@@ -135,7 +134,6 @@ public:
     NoUser* user() const;
     NoNetwork* network() const;
     NoClient* client() const;
-    NoSocketManager* manager() const;
 
     NoString description() const;
     NoString modulePath() const;

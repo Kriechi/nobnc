@@ -179,7 +179,7 @@ public:
             socket->setPemFile(m_sPemFile);
 
             u_short port =
-            manager()->listenRand(socket->name() + "::LISTENER", user()->localDccIp(), true, SOMAXCONN, socket, 60);
+            noApp->manager()->listenRand(socket->name() + "::LISTENER", user()->localDccIp(), true, SOMAXCONN, socket, 60);
 
             if (port == 0) {
                 putModule("Failed to start chat!");
@@ -334,7 +334,7 @@ public:
     void AcceptSDCC(const NoString& nick, u_long iIP, u_short port)
     {
         NoSChatSock* p = new NoSChatSock(this, nick, No::formatIp(iIP), port);
-        manager()->connect(No::formatIp(iIP), port, p->name(), 60, true, user()->localDccIp(), p);
+        noApp->manager()->connect(No::formatIp(iIP), port, p->name(), 60, true, user()->localDccIp(), p);
         delete findTimer("Remove " + nick); // delete any associated timer to this nick
     }
 

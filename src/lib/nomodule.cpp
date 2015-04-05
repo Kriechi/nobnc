@@ -130,11 +130,6 @@ NoClient* NoModule::client() const
     return d->client;
 }
 
-NoSocketManager* NoModule::manager() const
-{
-    return d->manager;
-}
-
 NoString NoModule::savePath() const
 {
     if (!NoFile::Exists(d->savePath)) {

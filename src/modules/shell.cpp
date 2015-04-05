@@ -23,6 +23,7 @@
 #include <nobnc/noclient.h>
 #include <nobnc/nosocketmanager.h>
 #include <nobnc/noutils.h>
+#include <nobnc/noapp.h>
 
 // Forward Declaration
 class NoShellMod;
@@ -68,10 +69,10 @@ public:
 
     virtual ~NoShellMod()
     {
-        std::vector<NoSocket*> vSocks = manager()->findSockets("SHELL");
+        std::vector<NoSocket*> vSocks = noApp->manager()->findSockets("SHELL");
 
         for (uint a = 0; a < vSocks.size(); a++) {
-            manager()->removeSocket(vSocks[a]);
+            noApp->manager()->removeSocket(vSocks[a]);
         }
     }
 
@@ -124,7 +125,7 @@ public:
     {
         // TODO: who deletes the instance?
         NoShellSock* sock = new NoShellSock(this, client(), "cd " + m_sPath + " && " + command);
-        manager()->addSocket(sock, "SHELL");
+        noApp->manager()->addSocket(sock, "SHELL");
     }
 
 private:
