@@ -18,50 +18,11 @@
 #include <nobnc/nomodule.h>
 #include <nobnc/noclient.h>
 #include <nobnc/nochannel.h>
-#include <nobnc/nomodulejob.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
 #include <nobnc/notimer.h>
 
 #include <unistd.h>
-
-#ifdef HAVE_PTHREAD
-class NoSampleJob : public NoModuleJob
-{
-public:
-    NoSampleJob(NoModule* module) : NoModuleJob(module, "sample", "Message the user after a delay")
-    {
-    }
-
-    ~NoSampleJob()
-    {
-        if (wasCancelled()) {
-            module()->putModule("Sample job cancelled");
-        } else {
-            module()->putModule("Sample job destroyed");
-        }
-    }
-
-    void run() override
-    {
-        // Cannot safely use GetModule() in here, because this runs in its
-        // own thread and such an access would require synchronisation
-        // between this thread and the main thread!
-
-        for (int i = 0; i < 10; i++) {
-            // Regularly check if we were cancelled
-            if (wasCancelled())
-                return;
-            sleep(1);
-        }
-    }
-
-    void finished() override
-    {
-        module()->putModule("Sample job done");
-    }
-};
-#endif
 
 class NoSampleTimer : public NoTimer
 {
@@ -95,9 +56,6 @@ public:
 // AddTimer(new NoSampleTimer(this, 300, 0, "Sample", "Sample timer for sample things."));
 // AddTimer(new NoSampleTimer(this, 5, 20, "Another", "Another sample timer."));
 // AddTimer(new NoSampleTimer(this, 25000, 5, "Third", "A third sample timer."));
-#ifdef HAVE_PTHREAD
-        addJob(new NoSampleJob(this));
-#endif
         return true;
     }
 
