@@ -238,19 +238,6 @@ NoModuleCommand* NoModule::findCommand(const NoString& cmd) const
     return nullptr;
 }
 
-bool NoModule::handleCommand(const NoString& line)
-{
-    NoModuleCommand* cmd = findCommand(No::token(line, 0));
-    if (cmd) {
-        moduleCall(cmd, this, line);
-        return true;
-    }
-
-    onUnknownModuleCommand(line);
-
-    return false;
-}
-
 void NoModule::handleHelpCommand(const NoString& line)
 {
     NoString filter = No::token(line, 1).toLower();
@@ -391,9 +378,13 @@ void NoModule::onModuleCtcp(const NoString& message)
 {
 }
 
-void NoModule::onModuleCommand(const NoString& command)
+void NoModule::onModuleCommand(const NoString& line)
 {
-    handleCommand(command);
+    NoModuleCommand* cmd = findCommand(No::token(line, 0));
+    if (cmd)
+        moduleCall(cmd, this, line);
+    else
+        onUnknownModuleCommand(line);
 }
 void NoModule::onUnknownModuleCommand(const NoString& line)
 {

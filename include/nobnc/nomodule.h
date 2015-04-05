@@ -215,7 +215,6 @@ public:
     bool addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args = "", const NoString& desc = "");
     bool removeCommand(const NoString& cmd);
     NoModuleCommand* findCommand(const NoString& cmd) const;
-    bool handleCommand(const NoString& line);
     void handleHelpCommand(const NoString& line = "");
 
     virtual Return onAddUser(NoUser* user, NoString& error);

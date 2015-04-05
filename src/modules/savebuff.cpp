@@ -262,7 +262,7 @@ public:
             }
             putModule("//!-- EOF " + args);
         } else {
-            handleCommand(sCmdLine);
+            NoModule::onModuleCommand(sCmdLine);
         }
     }
 

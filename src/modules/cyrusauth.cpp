@@ -59,7 +59,7 @@ public:
     void onModuleCommand(const NoString& command) override
     {
         if (user()->isAdmin()) {
-            handleCommand(command);
+            NoModule::onModuleCommand(command);
         } else {
             putModule("Access denied");
         }

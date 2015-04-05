@@ -140,7 +140,7 @@ public:
         if (!user()->isAdmin()) {
             putModule("Access denied");
         } else {
-            handleCommand(command);
+            NoModule::onModuleCommand(command);
         }
     }
 
