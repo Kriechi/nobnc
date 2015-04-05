@@ -124,8 +124,6 @@ public:
         HaltCore = 4
     };
 
-    void unload();
-
     virtual bool onLoad(const NoString& args, NoString& message);
     virtual bool onBoot();
 

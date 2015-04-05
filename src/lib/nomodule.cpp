@@ -78,11 +78,6 @@ NoModule::~NoModule()
     d->sockets.clear();
 }
 
-void NoModule::unload()
-{
-    throw NoException(NoException::Unload);
-}
-
 NoString NoModule::expandString(const NoString& str) const
 {
     NoString ret;
