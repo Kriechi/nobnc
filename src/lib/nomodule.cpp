@@ -94,9 +94,9 @@ NoString NoModule::description() const
     return d->description;
 }
 
-NoString NoModule::path() const
+NoString NoModule::filePath() const
 {
-    return d->path;
+    return d->filePath;
 }
 
 NoString NoModule::args() const
@@ -270,7 +270,7 @@ NoString NoModule::prefix() const
 
 NoString NoModule::dataPath() const
 {
-    return d->dataDir;
+    return d->dataPath;
 }
 
 // Webmods

@@ -94,7 +94,7 @@ public:
     NoString args() const;
     void setArgs(const NoString& args);
 
-    NoString path() const;
+    NoString filePath() const;
     NoString dataPath() const;
     NoString savePath() const;
 

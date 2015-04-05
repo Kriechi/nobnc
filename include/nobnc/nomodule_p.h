@@ -135,7 +135,7 @@ public:
           network(network),
           client(nullptr),
           name(name),
-          dataDir(dataDir)
+          dataPath(dataDir)
     {
     }
 
@@ -173,10 +173,10 @@ public:
     NoNetwork* network;
     NoClient* client;
     NoString name;
-    NoString dataDir;
+    NoString filePath;
+    NoString dataPath;
     NoString savePath;
     NoString args;
-    NoString path;
 
     std::vector<std::shared_ptr<NoWebPage>> subPages;
     std::map<NoString, NoModuleCommand> commands;

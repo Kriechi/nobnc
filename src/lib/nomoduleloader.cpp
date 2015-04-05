@@ -652,7 +652,7 @@ bool NoModuleLoader::loadModule(const NoString& name, const NoString& args, No::
     NoModule* module = info.loader()(p, user, network, name, sDataPath, type);
     NoModulePrivate::get(module)->description = info.description();
     NoModulePrivate::get(module)->args = args;
-    NoModulePrivate::get(module)->path = NoDir::current().filePath(path);
+    NoModulePrivate::get(module)->filePath = NoDir::current().filePath(path);
     d->modules.push_back(module);
 
     bool bLoaded;
