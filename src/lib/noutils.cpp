@@ -192,11 +192,6 @@ NoString No::sha256(const NoString& str)
     return digest_hex;
 }
 
-NoString No::saltedMd5(const NoString& pass, const NoString& salt)
-{
-    return md5(pass + salt);
-}
-
 NoString No::saltedSha256(const NoString& pass, const NoString& salt)
 {
     return sha256(pass + salt);
