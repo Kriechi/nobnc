@@ -38,7 +38,6 @@ class NoHostMask;
 class NoTemplate;
 class NoWebSocket;
 class NoIrcSocket;
-class NoModuleJob;
 class NoModuleSocket;
 class NoAuthenticator;
 class NoModulePrivate;
@@ -206,14 +205,6 @@ public:
 
     NoTimer* findTimer(const NoString& label) const;
     NoModuleSocket* findSocket(const NoString& name) const;
-
-#ifdef HAVE_PTHREAD
-    void addJob(NoModuleJob* pJob);
-    void cancelJob(NoModuleJob* pJob);
-    bool cancelJob(const NoString& sJobName);
-    void cancelJobs(const std::set<NoModuleJob*>& sJobs);
-    bool unlinkJob(NoModuleJob* pJob);
-#endif
 
     void addHelpCommand();
     bool addCommand(const NoModuleCommand& command);

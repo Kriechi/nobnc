@@ -24,7 +24,6 @@
 #include "nonetwork.h"
 #include "noclient.h"
 #include "noapp.h"
-#include "nomodulejob.h"
 #include "nothread.h"
 #include "nomodulesocket.h"
 #include "notimer.h"
@@ -58,10 +57,6 @@ NoModule::~NoModule()
     for (NoModuleSocket* socket : d->sockets)
         delete socket;
     d->sockets.clear();
-
-#ifdef HAVE_PTHREAD
-    cancelJobs(d->jobs);
-#endif
 }
 
 void NoModule::unload()
@@ -191,46 +186,6 @@ NoModuleSocket* NoModule::findSocket(const NoString& name) const
 
     return nullptr;
 }
-
-#ifdef HAVE_PTHREAD
-void NoModule::addJob(NoModuleJob* pJob)
-{
-    NoThread::run(pJob);
-    d->jobs.insert(pJob);
-}
-
-void NoModule::cancelJob(NoModuleJob* pJob)
-{
-    if (pJob == nullptr)
-        return;
-    // Destructor calls UnlinkJob and removes the job from d->jobs
-    NoThread::cancel(pJob);
-}
-
-bool NoModule::cancelJob(const NoString& sJobName)
-{
-    for (NoModuleJob* pJob : d->jobs) {
-        if (pJob->name().equals(sJobName)) {
-            cancelJob(pJob);
-            return true;
-        }
-    }
-    return false;
-}
-
-void NoModule::cancelJobs(const std::set<NoModuleJob*>& sJobs)
-{
-    for (NoModuleJob* job : sJobs) {
-        // Destructor calls UnlinkJob and removes the jobs from d->jobs
-        NoThread::cancel(job);
-    }
-}
-
-bool NoModule::unlinkJob(NoModuleJob* pJob)
-{
-    return 0 != d->jobs.erase(pJob);
-}
-#endif
 
 bool NoModule::addCommand(const NoModuleCommand& command)
 {

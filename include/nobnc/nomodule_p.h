@@ -167,9 +167,6 @@ public:
     NoString description;
     std::set<NoTimer*> timers;
     std::set<NoModuleSocket*> sockets;
-#ifdef HAVE_PTHREAD
-    std::set<NoModuleJob*> jobs;
-#endif
     NoModuleHandle handle;
     NoSocketManager* manager;
     NoUser* user;
