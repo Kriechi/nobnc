@@ -200,11 +200,11 @@ public:
     {
         addHelpCommand();
         addCommand("ListDCCs",
-                   static_cast<NoModuleCommand::Function>(&NoBounceDccMod::ListDCCsCommand),
+                   static_cast<NoModule::CommandFunction>(&NoBounceDccMod::ListDCCsCommand),
                    "",
                    "List all active DCCs");
         addCommand("UseClientIP",
-                   static_cast<NoModuleCommand::Function>(&NoBounceDccMod::UseClientIPCommand),
+                   static_cast<NoModule::CommandFunction>(&NoBounceDccMod::UseClientIPCommand),
                    "<true|false>");
     }
 

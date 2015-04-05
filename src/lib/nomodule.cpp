@@ -45,14 +45,14 @@ static void initCommandHelp(NoTable& table)
 static void addCommandHelp(NoTable& table, const NoModuleCommand& cmd)
 {
     table.addRow();
-    table.setValue("Command", cmd.command());
-    table.setValue("Arguments", cmd.args());
-    table.setValue("Description", cmd.description());
+    table.setValue("Command", cmd.command);
+    table.setValue("Arguments", cmd.args);
+    table.setValue("Description", cmd.description);
 }
 
 static void moduleCall(NoModuleCommand* cmd, NoModule* module, const NoString& line)
 {
-    (module->*(cmd->function()))(line);
+    (module->*(cmd->function))(line);
 }
 
 NoModule::NoModule(NoModuleHandle handle, NoUser* user, NoNetwork* network, const NoString& name, const NoString& dataDir, No::ModuleType type)
@@ -206,14 +206,17 @@ NoModuleSocket* NoModule::findSocket(const NoString& name) const
     return nullptr;
 }
 
-void NoModule::addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args, const NoString& desc)
+void NoModule::addCommand(const NoString& cmd, CommandFunction func, const NoString& args, const NoString& desc)
 {
     if (!func || cmd.contains(" ") || d->findCommand(cmd))
         return;
 
-    NoModuleCommand command(cmd, func);
-    command.setArgs(args);
-    command.setDescription(desc);
+    NoModuleCommand command;
+    command.command = cmd;
+    command.args = args;
+    command.description = desc;
+    command.function = func;
+
     d->commands[cmd] = command;
 }
 
@@ -234,7 +237,7 @@ void NoModule::onHelpCommand(const NoString& line)
 
     initCommandHelp(Table);
     for (const auto& it : d->commands) {
-        NoString cmd = it.second.command().toLower();
+        NoString cmd = it.second.command.toLower();
         if (filter.empty() || (cmd.startsWith(filter, No::CaseSensitive)) || No::wildCmp(cmd, filter)) {
             addCommandHelp(Table, it.second);
         }

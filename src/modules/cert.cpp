@@ -52,10 +52,10 @@ public:
     {
         addHelpCommand();
         addCommand("delete",
-                   static_cast<NoModuleCommand::Function>(&NoCertMod::Delete),
+                   static_cast<NoModule::CommandFunction>(&NoCertMod::Delete),
                    "",
                    "Delete the current certificate");
-        addCommand("info", static_cast<NoModuleCommand::Function>(&NoCertMod::info));
+        addCommand("info", static_cast<NoModule::CommandFunction>(&NoCertMod::info));
     }
 
     NoString PemFile() const

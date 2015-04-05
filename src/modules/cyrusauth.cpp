@@ -43,12 +43,12 @@ public:
 
         addHelpCommand();
         addCommand("CreateUser",
-                   static_cast<NoModuleCommand::Function>(&NoSaslAuthMod::CreateUserCommand),
+                   static_cast<NoModule::CommandFunction>(&NoSaslAuthMod::CreateUserCommand),
                    "[yes|no]");
         addCommand("CloneUser",
-                   static_cast<NoModuleCommand::Function>(&NoSaslAuthMod::CloneUserCommand),
+                   static_cast<NoModule::CommandFunction>(&NoSaslAuthMod::CloneUserCommand),
                    "[username]");
-        addCommand("DisableCloneUser", static_cast<NoModuleCommand::Function>(&NoSaslAuthMod::DisableCloneUserCommand));
+        addCommand("DisableCloneUser", static_cast<NoModule::CommandFunction>(&NoSaslAuthMod::DisableCloneUserCommand));
     }
 
     virtual ~NoSaslAuthMod()

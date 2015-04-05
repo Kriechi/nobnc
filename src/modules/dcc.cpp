@@ -120,9 +120,9 @@ public:
     MODCONSTRUCTOR(NoDccMod)
     {
         addHelpCommand();
-        addCommand("Send", static_cast<NoModuleCommand::Function>(&NoDccMod::SendCommand), "<nick> <file>");
-        addCommand("Get", static_cast<NoModuleCommand::Function>(&NoDccMod::GetCommand), "<file>");
-        addCommand("ListTransfers", static_cast<NoModuleCommand::Function>(&NoDccMod::ListTransfersCommand));
+        addCommand("Send", static_cast<NoModule::CommandFunction>(&NoDccMod::SendCommand), "<nick> <file>");
+        addCommand("Get", static_cast<NoModule::CommandFunction>(&NoDccMod::GetCommand), "<file>");
+        addCommand("ListTransfers", static_cast<NoModule::CommandFunction>(&NoDccMod::ListTransfersCommand));
     }
 
 #ifndef MOD_DCC_ALLOW_EVERYONE

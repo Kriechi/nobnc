@@ -53,19 +53,19 @@ public:
     {
         addHelpCommand();
         addCommand("Method",
-                   static_cast<NoModuleCommand::Function>(&NoClientNotifyMod::OnMethodCommand),
+                   static_cast<NoModule::CommandFunction>(&NoClientNotifyMod::OnMethodCommand),
                    "<message|notice|off>",
                    "Sets the notify method");
         addCommand("NewOnly",
-                   static_cast<NoModuleCommand::Function>(&NoClientNotifyMod::OnNewOnlyCommand),
+                   static_cast<NoModule::CommandFunction>(&NoClientNotifyMod::OnNewOnlyCommand),
                    "<on|off>",
                    "Turns notifies for unseen IP addresses only on or off");
         addCommand("OnDisconnect",
-                   static_cast<NoModuleCommand::Function>(&NoClientNotifyMod::OnDisconnectCommand),
+                   static_cast<NoModule::CommandFunction>(&NoClientNotifyMod::OnDisconnectCommand),
                    "<on|off>",
                    "Turns notifies on disconnecting clients on or off");
         addCommand("Show",
-                   static_cast<NoModuleCommand::Function>(&NoClientNotifyMod::OnShowCommand),
+                   static_cast<NoModule::CommandFunction>(&NoClientNotifyMod::OnShowCommand),
                    "",
                    "Show the current settings");
     }

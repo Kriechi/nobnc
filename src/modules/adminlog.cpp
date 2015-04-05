@@ -37,11 +37,11 @@ public:
     {
         addHelpCommand();
         addCommand("Show",
-                   static_cast<NoModuleCommand::Function>(&NoAdminLogMod::OnShowCommand),
+                   static_cast<NoModule::CommandFunction>(&NoAdminLogMod::OnShowCommand),
                    "",
                    "Show the logging target");
         addCommand("Target",
-                   static_cast<NoModuleCommand::Function>(&NoAdminLogMod::OnTargetCommand),
+                   static_cast<NoModule::CommandFunction>(&NoAdminLogMod::OnTargetCommand),
                    "<file|syslog|both>",
                    "Set the logging target");
         openlog("znc", LOG_PID, LOG_DAEMON);

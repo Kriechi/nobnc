@@ -70,15 +70,15 @@ public:
 
         addHelpCommand();
         addCommand("SetPass",
-                   static_cast<NoModuleCommand::Function>(&NoSaveBuff::OnSetPassCommand),
+                   static_cast<NoModule::CommandFunction>(&NoSaveBuff::OnSetPassCommand),
                    "<password>",
                    "Sets the password");
         addCommand("Replay",
-                   static_cast<NoModuleCommand::Function>(&NoSaveBuff::OnReplayCommand),
+                   static_cast<NoModule::CommandFunction>(&NoSaveBuff::OnReplayCommand),
                    "<buffer>",
                    "Replays the buffer");
         addCommand("Save",
-                   static_cast<NoModuleCommand::Function>(&NoSaveBuff::OnSaveCommand),
+                   static_cast<NoModule::CommandFunction>(&NoSaveBuff::OnSaveCommand),
                    "",
                    "Saves all buffers");
     }

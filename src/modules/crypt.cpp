@@ -61,15 +61,15 @@ public:
     {
         addHelpCommand();
         addCommand("DelKey",
-                   static_cast<NoModuleCommand::Function>(&NoCryptMod::OnDelKeyCommand),
+                   static_cast<NoModule::CommandFunction>(&NoCryptMod::OnDelKeyCommand),
                    "<#chan|nick>",
                    "Remove a key for nick or channel");
         addCommand("SetKey",
-                   static_cast<NoModuleCommand::Function>(&NoCryptMod::OnSetKeyCommand),
+                   static_cast<NoModule::CommandFunction>(&NoCryptMod::OnSetKeyCommand),
                    "<#chan|nick> <Key>",
                    "Set a key for nick or channel");
         addCommand("ListKeys",
-                   static_cast<NoModuleCommand::Function>(&NoCryptMod::OnListKeysCommand),
+                   static_cast<NoModule::CommandFunction>(&NoCryptMod::OnListKeysCommand),
                    "",
                    "List all keys");
     }

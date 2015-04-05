@@ -79,7 +79,7 @@ public:
     MODCONSTRUCTOR(NoLastSeenMod)
     {
         addHelpCommand();
-        addCommand("Show", static_cast<NoModuleCommand::Function>(&NoLastSeenMod::ShowCommand));
+        addCommand("Show", static_cast<NoModule::CommandFunction>(&NoLastSeenMod::ShowCommand));
     }
 
     // Event stuff:

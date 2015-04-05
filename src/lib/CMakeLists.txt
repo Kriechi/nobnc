@@ -25,7 +25,6 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/nomessage_p.h
                        ${NO_INCDIR}/nomodule.h
                        ${NO_INCDIR}/nomodule_p.h
-                       ${NO_INCDIR}/nomodulecommand.h
                        ${NO_INCDIR}/nomoduleinfo.h
                        ${NO_INCDIR}/nomoduleloader.h
                        ${NO_INCDIR}/nomodulesocket.h
@@ -76,7 +75,6 @@ list(APPEND NO_SOURCES noapp.cpp
                        nolistener.cpp
                        nomessage.cpp
                        nomodule.cpp
-                       nomodulecommand.cpp
                        nomoduleinfo.cpp
                        nomoduleloader.cpp
                        nomodulesocket.cpp

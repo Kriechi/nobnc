@@ -21,7 +21,6 @@
 #include <nobnc/noglobal.h>
 #include <nobnc/nostring.h>
 #include <nobnc/nomoduleinfo.h>
-#include <nobnc/nomodulecommand.h>
 
 #include <sys/time.h>
 #include <memory>
@@ -212,8 +211,10 @@ public:
     NoTimer* findTimer(const NoString& label) const;
     NoModuleSocket* findSocket(const NoString& name) const;
 
+    typedef void (NoModule::*CommandFunction)(const NoString& line);
+
     void addHelpCommand();
-    void addCommand(const NoString& cmd, NoModuleCommand::Function func, const NoString& args = "", const NoString& desc = "");
+    void addCommand(const NoString& cmd, CommandFunction func, const NoString& args = "", const NoString& desc = "");
     void removeCommand(const NoString& cmd);
 
     virtual Return onAddUser(NoUser* user, NoString& error);

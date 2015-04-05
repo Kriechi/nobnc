@@ -138,23 +138,23 @@ public:
     {
         addHelpCommand();
         addCommand("ListUsers",
-                   static_cast<NoModuleCommand::Function>(&NoAutoVoiceMod::OnListUsersCommand),
+                   static_cast<NoModule::CommandFunction>(&NoAutoVoiceMod::OnListUsersCommand),
                    "",
                    "List all users");
         addCommand("addChannels",
-                   static_cast<NoModuleCommand::Function>(&NoAutoVoiceMod::OnaddChannelsCommand),
+                   static_cast<NoModule::CommandFunction>(&NoAutoVoiceMod::OnaddChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Adds channels to a user");
         addCommand("removeChannels",
-                   static_cast<NoModuleCommand::Function>(&NoAutoVoiceMod::OnremoveChannelsCommand),
+                   static_cast<NoModule::CommandFunction>(&NoAutoVoiceMod::OnremoveChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");
         addCommand("AddUser",
-                   static_cast<NoModuleCommand::Function>(&NoAutoVoiceMod::onAddUserCommand),
+                   static_cast<NoModule::CommandFunction>(&NoAutoVoiceMod::onAddUserCommand),
                    "<user> <hostmask> [channels]",
                    "Adds a user");
         addCommand("DelUser",
-                   static_cast<NoModuleCommand::Function>(&NoAutoVoiceMod::OnDelUserCommand),
+                   static_cast<NoModule::CommandFunction>(&NoAutoVoiceMod::OnDelUserCommand),
                    "<user>",
                    "Removes a user");
     }

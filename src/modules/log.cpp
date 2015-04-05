@@ -80,15 +80,15 @@ public:
         m_bSanitize = false;
         addHelpCommand();
         addCommand("SetRules",
-                   static_cast<NoModuleCommand::Function>(&NoLogMod::SetRulesCmd),
+                   static_cast<NoModule::CommandFunction>(&NoLogMod::SetRulesCmd),
                    "<rules>",
                    "Set logging rules, use !#chan or !query to negate and * for wildcards");
         addCommand("ClearRules",
-                   static_cast<NoModuleCommand::Function>(&NoLogMod::ClearRulesCmd),
+                   static_cast<NoModule::CommandFunction>(&NoLogMod::ClearRulesCmd),
                    "",
                    "Clear all logging rules");
         addCommand("ListRules",
-                   static_cast<NoModuleCommand::Function>(&NoLogMod::ListRulesCmd),
+                   static_cast<NoModule::CommandFunction>(&NoLogMod::ListRulesCmd),
                    "",
                    "List all logging rules");
     }

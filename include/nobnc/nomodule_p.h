@@ -125,6 +125,15 @@ extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 #define USERMODULECALL(macFUNC, macUSER, macCLIENT, macEXITER) \
     _USERMODULECALL(macFUNC, macUSER, nullptr, macCLIENT, macEXITER)
 
+class NoModuleCommand
+{
+public:
+    NoString command;
+    NoString args;
+    NoString description;
+    NoModule::CommandFunction function = nullptr;
+};
+
 class NoModulePrivate
 {
 public:
