@@ -151,8 +151,11 @@ public:
         }
 
         NoString sLocalDCCIP = user()->localDccIp();
-        noApp->manager()->listen(0, "DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, socket);
+        socket->setName("DCC::LISTEN::" + sRemoteNick);
+        socket->setBindHost(sLocalDCCIP);
+        socket->setSsl(false);
         socket->setTimeout(120);
+        socket->listen(0);
 
         if (user()->nick().equals(sRemoteNick)) {
             putUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +

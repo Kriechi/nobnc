@@ -567,8 +567,11 @@ ushort NoDccBounce::DCCRequest(const NoString& nick,
                                const NoString& sRemoteIP)
 {
     NoDccBounce* pDCCBounce = new NoDccBounce(mod, uLongIP, port, fileName, nick, sRemoteIP, bIsChat);
-    noApp->manager()->listen(0, "DCC::" + NoString((bIsChat) ? "Chat" : "Xfer") + "::Local::" + nick, mod->GetLocalDCCIP(), false, pDCCBounce);
+    pDCCBounce->setName("DCC::" + NoString((bIsChat) ? "Chat" : "Xfer") + "::Local::" + nick);
     pDCCBounce->setTimeout(120);
+    pDCCBounce->setBindHost(mod->GetLocalDCCIP());
+    pDCCBounce->setSsl(false);
+    pDCCBounce->listen(0);
 
     return pDCCBounce->port();
 }

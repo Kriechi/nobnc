@@ -333,7 +333,7 @@ void NoSocket::connect()
 }
 bool NoSocket::listen(ushort port)
 {
-    return d->impl->Listen(port);
+    return noApp->manager()->listen(port, name(), bindHost(), isSsl(), this);
 }
 void NoSocket::enableReadLine()
 {

@@ -179,11 +179,13 @@ public:
             socket->setCipher("HIGH");
             socket->setPemFile(m_sPemFile);
 
-            u_short port =
-            noApp->manager()->listen(0, socket->name() + "::LISTENER", user()->localDccIp(), true, socket);
+            socket->setName(socket->name() + "::LISTENER");
+            socket->setBindHost(user()->localDccIp());
+            socket->setSsl(true);
             socket->setTimeout(60);
+            socket->listen(0);
 
-            if (port == 0) {
+            if (socket->port() == 0) {
                 putModule("Failed to start chat!");
                 return;
             }
@@ -192,7 +194,7 @@ public:
             s << "PRIVMSG " << args << " :\001";
             s << "DCC SCHAT chat ";
             s << No::formatLongIp(user()->localDccIp());
-            s << " " << port << "\001";
+            s << " " << socket->port() << "\001";
 
             putIrc(s.str());
 
