@@ -208,7 +208,7 @@ void NoIrcSocket::readLine(const NoString& data)
 
     line.trimRight("\n\r");
 
-    NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") IRC -> ZNC [" << line << "]");
+    NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") IRC -> BNC [" << line << "]");
 
     bool bReturn = false;
     IRCSOCKMODULECALL(onRaw(line), &bReturn);
@@ -1123,7 +1123,7 @@ void NoIrcSocket::putIrc(const NoString& line)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (d->floodProtection && d->sendsAllowed <= 0) {
-        NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << line
+        NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") BNC -> IRC [" << line
                      << "] (queued)");
     }
     d->sendQueue.push_back(line);
@@ -1134,7 +1134,7 @@ void NoIrcSocketPrivate::putIrcQuick(const NoString& line)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
     if (floodProtection && sendsAllowed <= 0) {
-        NO_DEBUG("(" << network->user()->userName() << "/" << network->name() << ") ZNC -> IRC [" << line
+        NO_DEBUG("(" << network->user()->userName() << "/" << network->name() << ") BNC -> IRC [" << line
                      << "] (queued to front)");
     }
     sendQueue.push_front(line);
@@ -1151,7 +1151,7 @@ void NoIrcSocketPrivate::trySend()
         IRCSOCKPRIVATECALL(onSendToIrc(line), &skip);
         if (!skip) {
             ;
-            NO_DEBUG("(" << network->user()->userName() << "/" << network->name() << ") ZNC -> IRC [" << line << "]");
+            NO_DEBUG("(" << network->user()->userName() << "/" << network->name() << ") BNC -> IRC [" << line << "]");
             q->write(line + "\r\n");
         }
         sendQueue.pop_front();

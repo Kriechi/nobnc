@@ -203,7 +203,7 @@ void NoClient::readLine(const NoString& data)
 
     line.trimRight("\n\r");
 
-    NO_DEBUG("(" << fullName() << ") CLI -> ZNC [" << line << "]");
+    NO_DEBUG("(" << fullName() << ") CLI -> BNC [" << line << "]");
 
     if (line.startsWith("@")) {
         // TODO support message-tags properly
@@ -855,7 +855,7 @@ void NoClient::putClient(const NoString& line)
     NETWORKMODULECALL(onSendToClient(sCopy, this), d->user, d->network, this, &bReturn);
     if (bReturn)
         return;
-    NO_DEBUG("(" << fullName() << ") ZNC -> CLI [" << sCopy << "]");
+    NO_DEBUG("(" << fullName() << ") BNC -> CLI [" << sCopy << "]");
     d->socket->write(sCopy + "\r\n");
 }
 
@@ -883,7 +883,7 @@ void NoClient::putModuleNotice(const NoString& module, const NoString& line)
         return;
     }
 
-    NO_DEBUG("(" << fullName() << ") ZNC -> CLI [:" + d->user->statusPrefix() + ((module.empty()) ? "status" : module) + "!znc@znc.in NOTICE "
+    NO_DEBUG("(" << fullName() << ") BNC -> CLI [:" + d->user->statusPrefix() + ((module.empty()) ? "status" : module) + "!znc@znc.in NOTICE "
                  << nick() << " :" << line << "]");
     d->socket->write(":" + d->user->statusPrefix() + ((module.empty()) ? "status" : module) + "!znc@znc.in NOTICE " +
                      nick() + " :" + line + "\r\n");
@@ -895,7 +895,7 @@ void NoClient::putModule(const NoString& module, const NoString& line)
         return;
     }
 
-    NO_DEBUG("(" << fullName() << ") ZNC -> CLI [:" + d->user->statusPrefix() + ((module.empty()) ? "status" : module) + "!znc@znc.in PRIVMSG "
+    NO_DEBUG("(" << fullName() << ") BNC -> CLI [:" + d->user->statusPrefix() + ((module.empty()) ? "status" : module) + "!znc@znc.in PRIVMSG "
                  << nick() << " :" << line << "]");
 
     NoStringVector lines = line.split("\n");
