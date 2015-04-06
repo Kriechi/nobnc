@@ -835,20 +835,17 @@ void NoClient::userCommand(NoString& line)
             return;
         }
 
-        const std::vector<NoChannel*>& channels = d->network->channels();
-        NoTable Table;
-        Table.addColumn("Name");
-        Table.addColumn("Set By");
-        Table.addColumn("Topic");
+        NoTable table;
+        table.addColumn("Channel");
+        table.addColumn("Topic");
 
-        for (const NoChannel* channel : channels) {
-            Table.addRow();
-            Table.setValue("Name", channel->name());
-            Table.setValue("Set By", channel->topicOwner());
-            Table.setValue("Topic", channel->topic());
+        for (const NoChannel* channel : d->network->channels()) {
+            table.addRow();
+            table.setValue("Channel", channel->name());
+            table.setValue("Topic", channel->topic());
         }
 
-        putStatus(Table);
+        putStatus(table);
     } else if (command.equals("LISTMODS") || command.equals("LISTMODULES")) {
         if (d->user->isAdmin()) {
             NoModuleLoader* GModules = noApp->loader();
