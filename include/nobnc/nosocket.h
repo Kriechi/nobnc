@@ -20,7 +20,6 @@
 
 #include <nobnc/noglobal.h>
 #include <nobnc/nostring.h>
-#include <sys/socket.h>
 #include <memory>
 
 class NoModule;
@@ -37,7 +36,7 @@ typedef struct ssl_session_st SSL_SESSION;
 class NO_EXPORT NoSocket
 {
 public:
-    NoSocket(const NoString& host = "", u_short port = 0);
+    NoSocket(const NoString& host = "", ushort port = 0);
     virtual ~NoSocket();
 
     bool isSsl() const;
@@ -90,7 +89,7 @@ public:
     SSL_SESSION* sslSession() const;
 
     bool connect();
-    bool listen(ushort port, int maxConns = SOMAXCONN, const NoString& bindHost = "", uint timeout = 0, bool detach = false);
+    bool listen(ushort port);
 
     void enableReadLine();
     void disableReadLine();
@@ -104,9 +103,8 @@ public:
     no_sock_t& writeDescriptor() const;
     void setWriteDescriptor(no_sock_t descriptor);
 
-    enum TimeoutType { ReadTimeout = 1, WriteTimeout = 2, AcceptTimeout = 4, AnyTimeout = ReadTimeout | WriteTimeout | AcceptTimeout };
     int timeout() const;
-    void setTimeout(int timeout, TimeoutType type = AnyTimeout);
+    void setTimeout(int timeout);
 
     enum CloseType { NoClose, CloseImmediately, CloseAfterWrite };
     CloseType closeType() const;

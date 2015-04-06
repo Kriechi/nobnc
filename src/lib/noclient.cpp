@@ -769,7 +769,7 @@ void NoClient::acceptLogin(NoUser* user)
 
     // Set our proper timeout and set back our proper timeout mode
     // (constructor set a different timeout and mode)
-    d->socket->setTimeout(NoNetwork::NoTrafficTimeout, NoSocket::ReadTimeout);
+    d->socket->setTimeout(NoNetwork::NoTrafficTimeout);
 
     d->socket->setName("USR::" + d->user->userName());
     d->socket->setEncoding(d->user->clientEncoding());

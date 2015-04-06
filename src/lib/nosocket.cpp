@@ -337,9 +337,9 @@ bool NoSocket::connect()
 {
     return d->impl->Connect();
 }
-bool NoSocket::listen(ushort port, int maxConns, const NoString& bindHost, uint timeout, bool bDetach)
+bool NoSocket::listen(ushort port)
 {
-    return d->impl->Listen(port, maxConns, bindHost, timeout, bDetach);
+    return d->impl->Listen(port);
 }
 void NoSocket::enableReadLine()
 {
@@ -377,9 +377,9 @@ int NoSocket::timeout() const
 {
     return d->impl->GetTimeout();
 }
-void NoSocket::setTimeout(int timeout, TimeoutType type)
+void NoSocket::setTimeout(int timeout)
 {
-    d->impl->SetTimeout(timeout, type);
+    d->impl->SetTimeout(timeout, Csock::TMO_ALL);
 }
 
 Csock* NoSocketImpl::GetSockObj(const NoString& host, ushort port)

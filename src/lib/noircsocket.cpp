@@ -219,7 +219,7 @@ void NoIrcSocket::readLine(const NoString& data)
             }
 
             d->network->setIrcServer(sServer);
-            setTimeout(NoNetwork::NoTrafficTimeout, ReadTimeout); // Now that we are connected, let nature take its course
+            setTimeout(NoNetwork::NoTrafficTimeout); // Now that we are connected, let nature take its course
             putIrc("WHO " + nick);
 
             d->authed = true;
