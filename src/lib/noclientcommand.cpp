@@ -1645,8 +1645,7 @@ addCommandHelp(NoTable& Table, const NoString& cmd, const NoString& args, const 
 {
     if (filter.empty() || cmd.startsWith(filter) || wildCmp(cmd, filter, No::CaseInsensitive)) {
         Table.addRow();
-        Table.setValue("Command", cmd);
-        Table.setValue("Arguments", args);
+        Table.setValue("Command", cmd + " " + args);
         Table.setValue("Description", desc);
     }
 }
@@ -1655,7 +1654,6 @@ void NoClient::helpUser(const NoString& filter)
 {
     NoTable Table;
     Table.addColumn("Command");
-    Table.addColumn("Arguments");
     Table.addColumn("Description");
 
     if (filter.empty()) {
