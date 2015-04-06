@@ -198,13 +198,13 @@ bool NoUser::parseConfig(NoSettings* settings, NoString& error)
         NoString sMethod; // TODO: remove
         pSubConf->FindStringEntry("method", sMethod); // XXX: remove
 
-        if (!pSubConf->empty()) {
-            error = "Unhandled lines in config!";
-            No::printError(error);
+//        if (!pSubConf->empty()) {
+//            error = "Unhandled lines in config!";
+//            No::printError(error);
 
-            NoApp::dumpConfig(pSubConf);
-            return false;
-        }
+//            NoApp::dumpConfig(pSubConf);
+//            return false;
+//        }
         ++subIt;
     }
     if (subIt != subConf.end()) {

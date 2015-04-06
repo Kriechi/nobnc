@@ -1250,13 +1250,13 @@ bool NoAppPrivate::doRehash(NoString& error)
         NoSettings* pSubConf = subIt->second.m_subConfig;
         if (!addListener(pSubConf, error))
             return false;
-        if (!pSubConf->empty()) {
-            error = "Unhandled lines in Listener config!";
-            No::printError(error);
+//        if (!pSubConf->empty()) {
+//            error = "Unhandled lines in Listener config!";
+//            No::printError(error);
 
-            NoApp::dumpConfig(pSubConf);
-            return false;
-        }
+//            NoApp::dumpConfig(pSubConf);
+//            return false;
+//        }
     }
 
     config.FindSubConfig("user", subConf);
@@ -1292,13 +1292,13 @@ bool NoAppPrivate::doRehash(NoString& error)
             return false;
         }
 
-        if (!pSubConf->empty()) {
-            error = "Unhandled lines in config for User [" + userName + "]!";
-            No::printError(error);
+//        if (!pSubConf->empty()) {
+//            error = "Unhandled lines in config for User [" + userName + "]!";
+//            No::printError(error);
 
-            noApp->dumpConfig(pSubConf);
-            return false;
-        }
+//            noApp->dumpConfig(pSubConf);
+//            return false;
+//        }
 
         NoString sErr;
         if (pRealUser) {
@@ -1327,13 +1327,13 @@ bool NoAppPrivate::doRehash(NoString& error)
         pRealUser = nullptr;
     }
 
-    if (!config.empty()) {
-        error = "Unhandled lines in config!";
-        No::printError(error);
+//    if (!config.empty()) {
+//        error = "Unhandled lines in config!";
+//        No::printError(error);
 
-        noApp->dumpConfig(&config);
-        return false;
-    }
+//        noApp->dumpConfig(&config);
+//        return false;
+//    }
 
 
     // Unload modules which are no longer in the config

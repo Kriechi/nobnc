@@ -473,14 +473,14 @@ bool NoNetwork::parseConfig(NoSettings* settings, NoString& error, bool bUpgrade
         NoSettings* pSubConf = subIt->second.m_subConfig;
         NoChannel* channel = new NoChannel(sChanName, this, true, pSubConf);
 
-        if (!pSubConf->empty()) {
-            error = "Unhandled lines in config for User [" + d->user->userName() + "], network [" + name() +
-                     "], channel [" + sChanName + "]!";
-            No::printError(error);
+//        if (!pSubConf->empty()) {
+//            error = "Unhandled lines in config for User [" + d->user->userName() + "], network [" + name() +
+//                     "], channel [" + sChanName + "]!";
+//            No::printError(error);
 
-            NoApp::dumpConfig(pSubConf);
-            return false;
-        }
+//            NoApp::dumpConfig(pSubConf);
+//            return false;
+//        }
 
         // Save the channel name, because addChannel
         // deletes the NoChannelnel*, if adding fails
