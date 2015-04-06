@@ -42,27 +42,7 @@ public:
         NoArg = 3
     };
 
-    bool onCtcpReply(NoHostMask& nick, NoString& message);
-    bool onPrivateCtcp(NoHostMask& nick, NoString& message);
-    bool onChannelCtcp(NoNick& nick, const NoString& sChan, NoString& message);
-    bool onGeneralCtcp(NoHostMask& nick, NoString& message);
-    bool onPrivateMessage(NoHostMask& nick, NoString& message);
-    bool onChannelMessage(NoNick& nick, const NoString& sChan, NoString& message);
-    bool onPrivateNotice(NoHostMask& nick, NoString& message);
-    bool onChannelNotice(NoNick& nick, const NoString& sChan, NoString& message);
-    bool onServerCapAvailable(const NoString& cap);
-
-    void readLine(const NoString& data) override;
-    void onConnected() override;
-    void onDisconnected() override;
-    void onConnectionRefused() override;
-    void onSocketError(int iErrno, const NoString& description) override;
-    void onTimeout() override;
-    void onReachedMaxBuffer() override;
-
     void putIrc(const NoString& line);
-    void putIrcQuick(const NoString& line); //!< Should be used for PONG only
-    void resetChans();
     void quit(const NoString& message = "");
 
     /** You can call this from NoModule::onServerCapResult to suspend
@@ -105,21 +85,22 @@ public:
     // TODO move this function to NoNetwork and make it non-static?
     static bool isFloodProtected(double fRate);
 
-private:
-    void setNick(const NoString& nick);
-    void parseISupport(const NoString& line);
-    // This is called when we connect and the nick we want is already taken
-    void sendAltNick(const NoString& sBadNick);
-    void sendNextCap();
-    void trySend();
+    void readLine(const NoString& data) override;
 
-    friend class NoIrcFloodTimer;
+protected:
+    void onConnected() override;
+    void onDisconnected() override;
+    void onConnectionRefused() override;
+    void onSocketError(int iErrno, const NoString& description) override;
+    void onTimeout() override;
+    void onReachedMaxBuffer() override;
 
 private:
     NoIrcSocket(const NoIrcSocket&) = delete;
     NoIrcSocket& operator=(const NoIrcSocket&) = delete;
 
     std::unique_ptr<NoIrcSocketPrivate> d;
+    friend class NoIrcSocketPrivate;
 };
 
 #endif // NOIRCSOCKET_H

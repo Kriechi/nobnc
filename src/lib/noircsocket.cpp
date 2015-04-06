@@ -35,6 +35,9 @@
 #define IRCSOCKMODULECALL(macFUNC, macEXITER) \
     NETWORKMODULECALL(macFUNC, d->network->user(), d->network, nullptr, macEXITER)
 
+#define IRCSOCKPRIVATECALL(macFUNC, macEXITER) \
+    NETWORKMODULECALL(macFUNC, network->user(), network, nullptr, macEXITER)
+
 // It will be bad if user sets it to 0.00000000000001
 // If you want no flood protection, set network's flood rate to -1
 // TODO move this constant to NoNetwork?
@@ -43,6 +46,32 @@ static const double FLOOD_MINIMAL_RATE = 0.3;
 class NoIrcSocketPrivate
 {
 public:
+    static NoIrcSocketPrivate* get(NoIrcSocket* socket)
+    {
+        return socket->d.get();
+    }
+
+    void setNick(const NoString& nick);
+    void parseISupport(const NoString& line);
+    // This is called when we connect and the nick we want is already taken
+    void sendAltNick(const NoString& sBadNick);
+    void sendNextCap();
+    void trySend();
+    void resetChans();
+    void putIrcQuick(const NoString& line); //!< Should be used for PONG only
+
+    bool onCtcpReply(NoHostMask& nick, NoString& message);
+    bool onPrivateCtcp(NoHostMask& nick, NoString& message);
+    bool onChannelCtcp(NoNick& nick, const NoString& sChan, NoString& message);
+    bool onGeneralCtcp(NoHostMask& nick, NoString& message);
+    bool onPrivateMessage(NoHostMask& nick, NoString& message);
+    bool onChannelMessage(NoNick& nick, const NoString& sChan, NoString& message);
+    bool onPrivateNotice(NoHostMask& nick, NoString& message);
+    bool onChannelNotice(NoNick& nick, const NoString& sChan, NoString& message);
+    bool onServerCapAvailable(const NoString& cap);
+
+    NoIrcSocket* q = nullptr;
+
     bool authed = false;
     bool hasNamesX = false;
     bool hasUhNames = false;
@@ -81,16 +110,17 @@ class NoIrcFloodTimer : public CCron
 public:
     NoIrcFloodTimer(NoIrcSocket* socket) : m_socket(socket)
     {
-        StartMaxCycles(socket->d->floodRate, 0);
+        StartMaxCycles(NoIrcSocketPrivate::get(socket)->floodRate, 0);
     }
     NoIrcFloodTimer(const NoIrcFloodTimer&) = delete;
     NoIrcFloodTimer& operator=(const NoIrcFloodTimer&) = delete;
     void RunJob() override
     {
-        if (m_socket->d->sendsAllowed < m_socket->d->floodBurst) {
-            m_socket->d->sendsAllowed++;
+        NoIrcSocketPrivate* p = NoIrcSocketPrivate::get(m_socket);
+        if (p->sendsAllowed < p->floodBurst) {
+            p->sendsAllowed++;
         }
-        m_socket->trySend();
+        p->trySend();
     }
 };
 
@@ -101,6 +131,7 @@ bool NoIrcSocket::isFloodProtected(double fRate)
 
 NoIrcSocket::NoIrcSocket(NoNetwork* network) : NoSocket(nullptr), d(new NoIrcSocketPrivate)
 {
+    d->q = this;
     d->network = network;
     d->sendsAllowed = network->floodBurst();
     d->floodBurst = network->floodBurst();
@@ -187,7 +218,7 @@ void NoIrcSocket::readLine(const NoString& data)
     if (line.startsWith("PING ")) {
         // Generate a reply and don't forward this to any user,
         // we don't want any PING forwarded
-        putIrcQuick("PONG " + line.substr(5));
+        d->putIrcQuick("PONG " + line.substr(5));
         return;
     } else if (No::token(line, 1).equals("PONG")) {
         // Block PONGs, we already responded to the pings
@@ -237,7 +268,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 }
             }
 
-            setNick(nick);
+            d->setNick(nick);
 
             IRCSOCKMODULECALL(onIrcConnected(), NOTHING);
 
@@ -249,7 +280,7 @@ void NoIrcSocket::readLine(const NoString& data)
             break;
         }
         case 5:
-            parseISupport(sRest);
+            d->parseISupport(sRest);
             d->network->updateExactRawBuffer(":" + _NAMEDFMT(sServer) + " " + cmd + " {target} " + _NAMEDFMT(sRest));
             break;
         case 10: { // :irc.server.com 010 nick <hostname> <port> :<info>
@@ -493,7 +524,7 @@ void NoIrcSocket::readLine(const NoString& data)
             NoString sBadNick = No::token(sRest, 0);
 
             if (!d->authed) {
-                sendAltNick(sBadNick);
+                d->sendAltNick(sBadNick);
                 return;
             }
             break;
@@ -552,7 +583,7 @@ void NoIrcSocket::readLine(const NoString& data)
             if (nick.equals(d->nick.nick())) {
                 // We are changing our own nick, the clients always must see this!
                 bIsVisible = false;
-                setNick(newNick);
+                d->setNick(newNick);
                 d->network->putUser(line);
             }
 
@@ -711,7 +742,7 @@ void NoIrcSocket::readLine(const NoString& data)
                 msg.rightChomp(1);
 
                 if (target.equals(d->nick.nick())) {
-                    if (onCtcpReply(mask, msg)) {
+                    if (d->onCtcpReply(mask, msg)) {
                         return;
                     }
                 }
@@ -720,11 +751,11 @@ void NoIrcSocket::readLine(const NoString& data)
                 return;
             } else {
                 if (target.equals(d->nick.nick())) {
-                    if (onPrivateNotice(mask, msg)) {
+                    if (d->onPrivateNotice(mask, msg)) {
                         return;
                     }
                 } else {
-                    if (onChannelNotice(nick, target, msg)) {
+                    if (d->onChannelNotice(nick, target, msg)) {
                         return;
                     }
                 }
@@ -769,11 +800,11 @@ void NoIrcSocket::readLine(const NoString& data)
                 msg.rightChomp(1);
 
                 if (target.equals(d->nick.nick())) {
-                    if (onPrivateCtcp(mask, msg)) {
+                    if (d->onPrivateCtcp(mask, msg)) {
                         return;
                     }
                 } else {
-                    if (onChannelCtcp(nick, target, msg)) {
+                    if (d->onChannelCtcp(nick, target, msg)) {
                         return;
                     }
                 }
@@ -782,11 +813,11 @@ void NoIrcSocket::readLine(const NoString& data)
                 return;
             } else {
                 if (target.equals(d->nick.nick())) {
-                    if (onPrivateMessage(mask, msg)) {
+                    if (d->onPrivateMessage(mask, msg)) {
                         return;
                     }
                 } else {
-                    if (onChannelMessage(nick, target, msg)) {
+                    if (d->onChannelMessage(nick, target, msg)) {
                         return;
                     }
                 }
@@ -831,7 +862,7 @@ void NoIrcSocket::readLine(const NoString& data)
                     NoStringVector vsTokens = args.split(" ", No::SkipEmptyParts);
 
                     for (const NoString& cap : vsTokens) {
-                        if (onServerCapAvailable(cap) || cap == "multi-prefix" || cap == "userhost-in-names") {
+                        if (d->onServerCapAvailable(cap) || cap == "multi-prefix" || cap == "userhost-in-names") {
                             d->pendingCaps.insert(cap);
                         }
                     }
@@ -851,7 +882,7 @@ void NoIrcSocket::readLine(const NoString& data)
                     IRCSOCKMODULECALL(onServerCapResult(args, false), NOTHING);
                 }
 
-                sendNextCap();
+                d->sendNextCap();
             }
             // Don't forward any CAP stuff to the client
             return;
@@ -865,16 +896,16 @@ void NoIrcSocket::readLine(const NoString& data)
     d->network->putUser(line);
 }
 
-void NoIrcSocket::sendNextCap()
+void NoIrcSocketPrivate::sendNextCap()
 {
-    if (!d->capPaused) {
-        if (d->pendingCaps.empty()) {
+    if (!capPaused) {
+        if (pendingCaps.empty()) {
             // We already got all needed ACK/NAK replies.
-            putIrc("CAP END");
+            q->putIrc("CAP END");
         } else {
-            NoString cap = *d->pendingCaps.begin();
-            d->pendingCaps.erase(d->pendingCaps.begin());
-            putIrc("CAP REQ :" + cap);
+            NoString cap = *pendingCaps.begin();
+            pendingCaps.erase(pendingCaps.begin());
+            q->putIrc("CAP REQ :" + cap);
         }
     }
 }
@@ -887,7 +918,7 @@ void NoIrcSocket::pauseCap()
 void NoIrcSocket::resumeCap()
 {
     --d->capPaused;
-    sendNextCap();
+    d->sendNextCap();
 }
 
 void NoIrcSocket::setPassword(const NoString& s)
@@ -900,36 +931,36 @@ uint NoIrcSocket::maxNickLen() const
     return d->maxNickLen;
 }
 
-bool NoIrcSocket::onServerCapAvailable(const NoString& cap)
+bool NoIrcSocketPrivate::onServerCapAvailable(const NoString& cap)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(onServerCapAvailable(cap), &bResult);
+    IRCSOCKPRIVATECALL(onServerCapAvailable(cap), &bResult);
     return bResult;
 }
 
-bool NoIrcSocket::onCtcpReply(NoHostMask& nick, NoString& message)
+bool NoIrcSocketPrivate::onCtcpReply(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(onCtcpReply(nick, message), &bResult);
+    IRCSOCKPRIVATECALL(onCtcpReply(nick, message), &bResult);
 
     return bResult;
 }
 
-bool NoIrcSocket::onPrivateCtcp(NoHostMask& nick, NoString& message)
+bool NoIrcSocketPrivate::onPrivateCtcp(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(onPrivateCtcp(nick, message), &bResult);
+    IRCSOCKPRIVATECALL(onPrivateCtcp(nick, message), &bResult);
     if (bResult)
         return true;
 
     if (message.trimPrefix("ACTION ")) {
         bResult = false;
-        IRCSOCKMODULECALL(onPrivateAction(nick, message), &bResult);
+        IRCSOCKPRIVATECALL(onPrivateAction(nick, message), &bResult);
         if (bResult)
             return true;
 
-        if (!d->network->isUserOnline() || !d->network->user()->autoClearQueryBuffer()) {
-            NoQuery* query = d->network->addQuery(nick.nick());
+        if (!network->isUserOnline() || !network->user()->autoClearQueryBuffer()) {
+            NoQuery* query = network->addQuery(nick.nick());
             if (query) {
                 query->addBuffer(":" + _NAMEDFMT(nick.toString()) + " PRIVMSG {target} :\001ACTION {text}\001", message);
             }
@@ -942,16 +973,16 @@ bool NoIrcSocket::onPrivateCtcp(NoHostMask& nick, NoString& message)
     return onGeneralCtcp(nick, message);
 }
 
-bool NoIrcSocket::onGeneralCtcp(NoHostMask& nick, NoString& message)
+bool NoIrcSocketPrivate::onGeneralCtcp(NoHostMask& nick, NoString& message)
 {
-    const NoStringMap& ctcpReplies = d->network->user()->ctcpReplies();
+    const NoStringMap& ctcpReplies = network->user()->ctcpReplies();
     NoString sQuery = No::token(message, 0).toUpper();
     NoStringMap::const_iterator it = ctcpReplies.find(sQuery);
     bool bHaveReply = false;
     NoString reply;
 
     if (it != ctcpReplies.end()) {
-        reply = d->network->expandString(it->second);
+        reply = network->expandString(it->second);
         bHaveReply = true;
 
         if (reply.empty()) {
@@ -959,7 +990,7 @@ bool NoIrcSocket::onGeneralCtcp(NoHostMask& nick, NoString& message)
         }
     }
 
-    if (!bHaveReply && !d->network->isUserAttached()) {
+    if (!bHaveReply && !network->isUserAttached()) {
         if (sQuery == "VERSION") {
             reply = NoApp::tag(false);
         } else if (sQuery == "PING") {
@@ -970,47 +1001,47 @@ bool NoIrcSocket::onGeneralCtcp(NoHostMask& nick, NoString& message)
     if (!reply.empty()) {
         time_t now = time(nullptr);
         // If the last CTCP is older than d->uCTCPFloodTime, reset the counter
-        if (d->lastCtcp + d->ctcpFloodTime < now)
-            d->numCtcp = 0;
-        d->lastCtcp = now;
+        if (lastCtcp + ctcpFloodTime < now)
+            numCtcp = 0;
+        lastCtcp = now;
         // If we are over the limit, don't reply to this CTCP
-        if (d->numCtcp >= d->ctcpFloodCount) {
+        if (numCtcp >= ctcpFloodCount) {
             NO_DEBUG("CTCP flood detected - not replying to query");
             return true;
         }
-        d->numCtcp++;
+        numCtcp++;
 
-        putIrc("NOTICE " + nick.nick() + " :\001" + sQuery + " " + reply + "\001");
+        q->putIrc("NOTICE " + nick.nick() + " :\001" + sQuery + " " + reply + "\001");
         return true;
     }
 
     return false;
 }
 
-bool NoIrcSocket::onPrivateNotice(NoHostMask& nick, NoString& message)
+bool NoIrcSocketPrivate::onPrivateNotice(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(onPrivateNotice(nick, message), &bResult);
+    IRCSOCKPRIVATECALL(onPrivateNotice(nick, message), &bResult);
     if (bResult)
         return true;
 
-    if (!d->network->isUserOnline()) {
+    if (!network->isUserOnline()) {
         // If the user is detached, add to the buffer
-        d->network->addNoticeBuffer(":" + _NAMEDFMT(nick.toString()) + " NOTICE {target} :{text}", message);
+        network->addNoticeBuffer(":" + _NAMEDFMT(nick.toString()) + " NOTICE {target} :{text}", message);
     }
 
     return false;
 }
 
-bool NoIrcSocket::onPrivateMessage(NoHostMask& nick, NoString& message)
+bool NoIrcSocketPrivate::onPrivateMessage(NoHostMask& nick, NoString& message)
 {
     bool bResult = false;
-    IRCSOCKMODULECALL(onPrivateMessage(nick, message), &bResult);
+    IRCSOCKPRIVATECALL(onPrivateMessage(nick, message), &bResult);
     if (bResult)
         return true;
 
-    if (!d->network->isUserOnline() || !d->network->user()->autoClearQueryBuffer()) {
-        NoQuery* query = d->network->addQuery(nick.nick());
+    if (!network->isUserOnline() || !network->user()->autoClearQueryBuffer()) {
+        NoQuery* query = network->addQuery(nick.nick());
         if (query) {
             query->addBuffer(":" + _NAMEDFMT(nick.toString()) + " PRIVMSG {target} :{text}", message);
         }
@@ -1019,22 +1050,22 @@ bool NoIrcSocket::onPrivateMessage(NoHostMask& nick, NoString& message)
     return false;
 }
 
-bool NoIrcSocket::onChannelCtcp(NoNick& nick, const NoString& sChan, NoString& message)
+bool NoIrcSocketPrivate::onChannelCtcp(NoNick& nick, const NoString& sChan, NoString& message)
 {
-    NoChannel* channel = d->network->findChannel(sChan);
+    NoChannel* channel = network->findChannel(sChan);
     if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChannelCtcp(nick, channel, message), &bResult);
+        IRCSOCKPRIVATECALL(onChannelCtcp(nick, channel, message), &bResult);
         if (bResult)
             return true;
 
         // Record a /me
         if (message.trimPrefix("ACTION ")) {
             bResult = false;
-            IRCSOCKMODULECALL(onChannelAction(nick, channel, message), &bResult);
+            IRCSOCKPRIVATECALL(onChannelAction(nick, channel, message), &bResult);
             if (bResult)
                 return true;
-            if (!channel->autoClearChanBuffer() || !d->network->isUserOnline() || channel->isDetached()) {
+            if (!channel->autoClearChanBuffer() || !network->isUserOnline() || channel->isDetached()) {
                 channel->addBuffer(":" + _NAMEDFMT(nick.hostMask()) + " PRIVMSG " + _NAMEDFMT(sChan) +
                                  " :\001ACTION {text}\001",
                                  message);
@@ -1054,16 +1085,16 @@ bool NoIrcSocket::onChannelCtcp(NoNick& nick, const NoString& sChan, NoString& m
     return res || (channel && channel->isDetached());
 }
 
-bool NoIrcSocket::onChannelNotice(NoNick& nick, const NoString& sChan, NoString& message)
+bool NoIrcSocketPrivate::onChannelNotice(NoNick& nick, const NoString& sChan, NoString& message)
 {
-    NoChannel* channel = d->network->findChannel(sChan);
+    NoChannel* channel = network->findChannel(sChan);
     if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChannelNotice(nick, channel, message), &bResult);
+        IRCSOCKPRIVATECALL(onChannelNotice(nick, channel, message), &bResult);
         if (bResult)
             return true;
 
-        if (!channel->autoClearChanBuffer() || !d->network->isUserOnline() || channel->isDetached()) {
+        if (!channel->autoClearChanBuffer() || !network->isUserOnline() || channel->isDetached()) {
             channel->addBuffer(":" + _NAMEDFMT(nick.hostMask()) + " NOTICE " + _NAMEDFMT(sChan) + " :{text}", message);
         }
     }
@@ -1071,16 +1102,16 @@ bool NoIrcSocket::onChannelNotice(NoNick& nick, const NoString& sChan, NoString&
     return ((channel) && (channel->isDetached()));
 }
 
-bool NoIrcSocket::onChannelMessage(NoNick& nick, const NoString& sChan, NoString& message)
+bool NoIrcSocketPrivate::onChannelMessage(NoNick& nick, const NoString& sChan, NoString& message)
 {
-    NoChannel* channel = d->network->findChannel(sChan);
+    NoChannel* channel = network->findChannel(sChan);
     if (channel) {
         bool bResult = false;
-        IRCSOCKMODULECALL(onChannelMessage(nick, channel, message), &bResult);
+        IRCSOCKPRIVATECALL(onChannelMessage(nick, channel, message), &bResult);
         if (bResult)
             return true;
 
-        if (!channel->autoClearChanBuffer() || !d->network->isUserOnline() || channel->isDetached()) {
+        if (!channel->autoClearChanBuffer() || !network->isUserOnline() || channel->isDetached()) {
             channel->addBuffer(":" + _NAMEDFMT(nick.hostMask()) + " PRIVMSG " + _NAMEDFMT(sChan) + " :{text}", message);
         }
     }
@@ -1096,41 +1127,41 @@ void NoIrcSocket::putIrc(const NoString& line)
                      << "] (queued)");
     }
     d->sendQueue.push_back(line);
-    trySend();
+    d->trySend();
 }
 
-void NoIrcSocket::putIrcQuick(const NoString& line)
+void NoIrcSocketPrivate::putIrcQuick(const NoString& line)
 {
     // Only print if the line won't get sent immediately (same condition as in TrySend()!)
-    if (d->floodProtection && d->sendsAllowed <= 0) {
-        NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << line
+    if (floodProtection && sendsAllowed <= 0) {
+        NO_DEBUG("(" << network->user()->userName() << "/" << network->name() << ") ZNC -> IRC [" << line
                      << "] (queued to front)");
     }
-    d->sendQueue.push_front(line);
+    sendQueue.push_front(line);
     trySend();
 }
 
-void NoIrcSocket::trySend()
+void NoIrcSocketPrivate::trySend()
 {
     // This condition must be the same as in putIrc() and putIrcQuick()!
-    while (!d->sendQueue.empty() && (!d->floodProtection || d->sendsAllowed > 0)) {
-        d->sendsAllowed--;
+    while (!sendQueue.empty() && (!floodProtection || sendsAllowed > 0)) {
+        sendsAllowed--;
         bool skip = false;
-        NoString& line = d->sendQueue.front();
-        IRCSOCKMODULECALL(onSendToIrc(line), &skip);
+        NoString& line = sendQueue.front();
+        IRCSOCKPRIVATECALL(onSendToIrc(line), &skip);
         if (!skip) {
             ;
-            NO_DEBUG("(" << d->network->user()->userName() << "/" << d->network->name() << ") ZNC -> IRC [" << line << "]");
-            write(line + "\r\n");
+            NO_DEBUG("(" << network->user()->userName() << "/" << network->name() << ") ZNC -> IRC [" << line << "]");
+            q->write(line + "\r\n");
         }
-        d->sendQueue.pop_front();
+        sendQueue.pop_front();
     }
 }
 
-void NoIrcSocket::setNick(const NoString& nick)
+void NoIrcSocketPrivate::setNick(const NoString& name)
 {
-    d->nick.setNick(nick);
-    d->network->setIrcNick(d->nick);
+    nick.setNick(name);
+    network->setIrcNick(name);
 }
 
 void NoIrcSocket::onConnected()
@@ -1171,7 +1202,7 @@ void NoIrcSocket::onDisconnected()
     d->network->clearRawBuffer();
     d->network->clearMotdBuffer();
 
-    resetChans();
+    d->resetChans();
 
     // send a "reset user modes" cmd to the client.
     // otherwise, on reconnect, it might think it still
@@ -1230,7 +1261,7 @@ void NoIrcSocket::onSocketError(int iErrno, const NoString& description)
     d->network->clearRawBuffer();
     d->network->clearMotdBuffer();
 
-    resetChans();
+    d->resetChans();
     d->userModes.clear();
 }
 
@@ -1243,7 +1274,7 @@ void NoIrcSocket::onTimeout()
     d->network->clearRawBuffer();
     d->network->clearMotdBuffer();
 
-    resetChans();
+    d->resetChans();
     d->userModes.clear();
 }
 
@@ -1264,7 +1295,7 @@ void NoIrcSocket::onReachedMaxBuffer()
     quit();
 }
 
-void NoIrcSocket::parseISupport(const NoString& line)
+void NoIrcSocketPrivate::parseISupport(const NoString& line)
 {
     NoStringVector vsTokens = line.split(" ", No::SkipEmptyParts);
 
@@ -1276,7 +1307,7 @@ void NoIrcSocket::parseISupport(const NoString& line)
             break;
         }
 
-        d->iSupport[name] = value;
+        iSupport[name] = value;
 
         if (name.equals("PREFIX")) {
             NoString sPrefixes = No::token(value, 1, ")");
@@ -1284,39 +1315,39 @@ void NoIrcSocket::parseISupport(const NoString& line)
             sPermModes.trimLeft("(");
 
             if (!sPrefixes.empty() && sPermModes.size() == sPrefixes.size()) {
-                d->perms = sPrefixes;
-                d->permModes = sPermModes;
+                perms = sPrefixes;
+                permModes = sPermModes;
             }
         } else if (name.equals("CHANTYPES")) {
-            d->network->setChannelPrefixes(value);
+            network->setChannelPrefixes(value);
         } else if (name.equals("NICKLEN")) {
             uint uMax = value.toUInt();
 
             if (uMax) {
-                d->maxNickLen = uMax;
+                maxNickLen = uMax;
             }
         } else if (name.equals("CHANMODES")) {
             if (!value.empty()) {
-                d->chanModes.clear();
+                chanModes.clear();
 
                 for (uint a = 0; a < 4; a++) {
                     NoString modes = No::token(value, a, ",");
 
                     for (uint b = 0; b < modes.size(); b++) {
-                        d->chanModes[modes[b]] = (ChanModeArgs)a;
+                        chanModes[modes[b]] = (NoIrcSocket::ChanModeArgs)a;
                     }
                 }
             }
         } else if (name.equals("NAMESX")) {
-            if (d->hasNamesX)
+            if (hasNamesX)
                 continue;
-            d->hasNamesX = true;
-            putIrc("PROTOCTL NAMESX");
+            hasNamesX = true;
+            q->putIrc("PROTOCTL NAMESX");
         } else if (name.equals("UHNAMES")) {
-            if (d->hasUhNames)
+            if (hasUhNames)
                 continue;
-            d->hasUhNames = true;
-            putIrc("PROTOCTL UHNAMES");
+            hasUhNames = true;
+            q->putIrc("PROTOCTL UHNAMES");
         }
     }
 }
@@ -1379,20 +1410,20 @@ void NoIrcSocket::forwardRaw353(const NoString& line, NoClient* client) const
     }
 }
 
-void NoIrcSocket::sendAltNick(const NoString& sBadNick)
+void NoIrcSocketPrivate::sendAltNick(const NoString& sBadNick)
 {
-    const NoString& sLastNick = d->nick.nick();
+    const NoString& sLastNick = nick.nick();
 
     // We don't know the maximum allowed nick length yet, but we know which
     // nick we sent last. If sBadNick is shorter than that, we assume the
     // server truncated our nick.
     if (sBadNick.length() < sLastNick.length())
-        d->maxNickLen = (uint)sBadNick.length();
+        maxNickLen = (uint)sBadNick.length();
 
-    uint uMax = d->maxNickLen;
+    uint uMax = maxNickLen;
 
-    const NoString& sConfNick = d->network->nick();
-    const NoString& sAltNick = d->network->altNick();
+    const NoString& sConfNick = network->nick();
+    const NoString& sAltNick = network->altNick();
     NoString newNick = sConfNick.left(uMax - 1);
 
     if (sLastNick.equals(sConfNick)) {
@@ -1412,16 +1443,16 @@ void NoIrcSocket::sendAltNick(const NoString& sBadNick)
     } else {
         char cLetter = 0;
         if (sBadNick.empty()) {
-            d->network->putUser("No free nick available");
-            quit();
+            network->putUser("No free nick available");
+            q->quit();
             return;
         }
 
         cLetter = sBadNick.right(1)[0];
 
         if (cLetter == 'z') {
-            d->network->putUser("No free nick found");
-            quit();
+            network->putUser("No free nick found");
+            q->quit();
             return;
         }
 
@@ -1429,8 +1460,8 @@ void NoIrcSocket::sendAltNick(const NoString& sBadNick)
         if (newNick.equals(sAltNick))
             newNick = sConfNick.left(uMax - 1) + ++cLetter;
     }
-    putIrc("NICK " + newNick);
-    d->nick.setNick(newNick);
+    q->putIrc("NICK " + newNick);
+    nick.setNick(newNick);
 }
 
 uchar NoIrcSocket::permFromMode(uchar mode) const
@@ -1532,9 +1563,8 @@ NoIrcSocket::ChanModeArgs NoIrcSocket::modeType(uchar mode) const
     return it->second;
 }
 
-void NoIrcSocket::resetChans()
+void NoIrcSocketPrivate::resetChans()
 {
-    for (const auto& it : d->chans) {
+    for (const auto& it : chans)
         it.second->reset();
-    }
 }
