@@ -779,23 +779,15 @@ void NoClient::userCommand(NoString& line)
         }
 
         if (d->network->hasServers()) {
-            const std::vector<NoServerInfo*>& vServers = d->network->servers();
-            NoServerInfo* pCurServ = d->network->currentServer();
-            NoTable Table;
-            Table.addColumn("Host");
-            Table.addColumn("Port");
-            Table.addColumn("SSL");
-            Table.addColumn("Pass");
+            NoTable table;
+            table.addColumn("Server");
 
-            for (const NoServerInfo* server : vServers) {
-                Table.addRow();
-                Table.setValue("Host", server->host() + (server == pCurServ ? "*" : ""));
-                Table.setValue("Port", NoString(server->port()));
-                Table.setValue("SSL", (server->isSsl()) ? "SSL" : "");
-                Table.setValue("Pass", server->password());
+            for (const NoServerInfo* server : d->network->servers()) {
+                table.addRow();
+                table.setValue("Server", server->toString());
             }
 
-            putStatus(Table);
+            putStatus(table);
         } else {
             putStatus("You don't have any servers added.");
         }
