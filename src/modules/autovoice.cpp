@@ -250,14 +250,12 @@ public:
         NoTable Table;
 
         Table.addColumn("User");
-        Table.addColumn("Hostmask");
-        Table.addColumn("Channels");
+        Table.addColumn("Hostmask (Channels)");
 
         for (std::map<NoString, NoAutoVoiceUser*>::iterator it = m_msUsers.begin(); it != m_msUsers.end(); ++it) {
             Table.addRow();
             Table.setValue("User", it->second->GetUsername());
-            Table.setValue("Hostmask", it->second->GetHostmask());
-            Table.setValue("Channels", it->second->GetChannels());
+            Table.setValue("Hostmask (Channels)", it->second->GetHostmask() + " (" + it->second->GetChannels() + ")");
         }
 
         putModule(Table);
