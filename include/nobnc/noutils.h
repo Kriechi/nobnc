@@ -82,6 +82,11 @@ NO_EXPORT bool wildCmp(const NoString& str, const NoString& wild, No::CaseSensit
 NO_EXPORT NoString token(const NoString& str, size_t pos, const NoString& sep = " ");
 NO_EXPORT NoString tokens(const NoString& str, size_t pos, const NoString& sep = " ");
 NO_EXPORT NoString firstLine(const NoString& str);
+
+NO_EXPORT NoString escape(const NoString& str, No::EscapeFormat to);
+NO_EXPORT NoString escape(const NoString& str, No::EscapeFormat from, No::EscapeFormat to);
 }
+
+#define _NAMEDFMT(str) No::escape(str, No::NamedFormat)
 
 #endif // NOUTILS_H

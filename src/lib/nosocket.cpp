@@ -24,7 +24,7 @@
 #include "nouser_p.h"
 #include "noapp.h"
 #include "noapp_p.h"
-#include "noescape.h"
+#include "noutils.h"
 #include <signal.h>
 
 NoSocketImpl::NoSocketImpl(NoSocket* q) : q(q), allowControlCodes(false)

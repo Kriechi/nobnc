@@ -18,7 +18,7 @@
 #include <nobnc/nomodule.h>
 #include <nobnc/nochannel.h>
 #include <nobnc/nonetwork.h>
-#include <nobnc/noescape.h>
+#include <nobnc/noutils.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
 

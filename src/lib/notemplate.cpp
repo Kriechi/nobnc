@@ -20,7 +20,6 @@
 #include "nodir.h"
 #include "nodebug.h"
 #include "noutils.h"
-#include "noescape.h"
 #include <algorithm>
 #include <list>
 

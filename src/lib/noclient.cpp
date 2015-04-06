@@ -28,7 +28,7 @@
 #include "noquery.h"
 #include "nomodule_p.h"
 #include "noapp.h"
-#include "noescape.h"
+#include "noutils.h"
 #include "nonick.h"
 #include "notable.h"
 #include "noexception_p.h"

@@ -30,7 +30,7 @@
 #include "nonetwork.h"
 #include "nodebug.h"
 #include "noapp_p.h"
-#include "noescape.h"
+#include "noutils.h"
 #include "nosocketinfo.h"
 #include <algorithm>
 

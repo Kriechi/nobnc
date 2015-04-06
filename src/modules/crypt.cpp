@@ -36,7 +36,6 @@
 #include <nobnc/nochannel.h>
 #include <nobnc/nouser.h>
 #include <nobnc/nonetwork.h>
-#include <nobnc/noescape.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>

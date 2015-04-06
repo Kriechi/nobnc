@@ -25,7 +25,7 @@
 #include "noserverinfo.h"
 #include "nochannel.h"
 #include "noquery.h"
-#include "noescape.h"
+#include "noutils.h"
 #include "noclient.h"
 #include "noapp.h"
 #include "noapp_p.h"

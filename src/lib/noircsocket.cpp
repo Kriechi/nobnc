@@ -25,7 +25,7 @@
 #include "noclient.h"
 #include "noapp.h"
 #include "noquery.h"
-#include "noescape.h"
+#include "noutils.h"
 #include "nonick.h"
 #include "nohostmask.h"
 #include "nosocketinfo.h"

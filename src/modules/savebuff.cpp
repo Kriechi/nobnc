@@ -33,7 +33,6 @@
 #include <nobnc/nodir.h>
 #include <nobnc/noquery.h>
 #include <nobnc/noutils.h>
-#include <nobnc/noescape.h>
 #include <nobnc/nomessage.h>
 #include <nobnc/nobuffer.h>
 #include <nobnc/notimer.h>

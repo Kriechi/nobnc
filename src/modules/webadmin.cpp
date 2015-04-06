@@ -26,7 +26,7 @@
 #include <nobnc/noapp.h>
 #include <nobnc/nowebsocket.h>
 #include <nobnc/nowebsession.h>
-#include <nobnc/noescape.h>
+#include <nobnc/noutils.h>
 #include <nobnc/nolistener.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>

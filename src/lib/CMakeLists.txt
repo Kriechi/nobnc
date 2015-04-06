@@ -12,7 +12,6 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/noconditionvariable_p.h
                        ${NO_INCDIR}/nodebug.h
                        ${NO_INCDIR}/nodir.h
-                       ${NO_INCDIR}/noescape.h
                        ${NO_INCDIR}/noexception_p.h
                        ${NO_INCDIR}/nofile.h
                        ${NO_INCDIR}/nohostmask.h
@@ -66,7 +65,6 @@ list(APPEND NO_SOURCES noapp.cpp
                        noclientcommand.cpp
                        nodebug.cpp
                        nodir.cpp
-                       noescape.cpp
                        noexception.cpp
                        nofile.cpp
                        nohostmask.cpp
