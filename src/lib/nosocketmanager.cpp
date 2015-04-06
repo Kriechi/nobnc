@@ -55,12 +55,12 @@ struct NoDnsTask
           name(""),
           timeout(0),
           ssl(false),
-          sBindhost(""),
+          bindhost(""),
           socket(nullptr),
-          bDoneTarget(false),
-          bDoneBind(false),
-          aiTarget(nullptr),
-          aiBind(nullptr)
+          doneTarget(false),
+          doneBind(false),
+          target(nullptr),
+          bind(nullptr)
     {
     }
 
@@ -72,18 +72,19 @@ struct NoDnsTask
     NoString name;
     int timeout;
     bool ssl;
-    NoString sBindhost;
+    NoString bindhost;
     NoSocket* socket;
 
-    bool bDoneTarget;
-    bool bDoneBind;
-    addrinfo* aiTarget;
-    addrinfo* aiBind;
+    bool doneTarget;
+    bool doneBind;
+    addrinfo* target;
+    addrinfo* bind;
 };
+
 class NoDnsJob : public NoJob
 {
 public:
-    NoDnsJob() : hostname(""), task(nullptr), pManager(nullptr), bBind(false), iRes(0), aiResult(nullptr)
+    NoDnsJob() : hostname(""), task(nullptr), manager(nullptr), bind(false), res(0), result(nullptr)
     {
     }
 
@@ -92,19 +93,19 @@ public:
 
     NoString hostname;
     NoDnsTask* task;
-    NoSocketManager* pManager;
-    bool bBind;
+    NoSocketManager* manager;
+    bool bind;
 
-    int iRes;
-    addrinfo* aiResult;
+    int res;
+    addrinfo* result;
 
     void run() override;
     void finished() override;
 };
 
-static void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind);
-static void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind, addrinfo* aiResult);
-static void FinishConnect(NoSocketManager* manager,
+static void startDnsThread(NoSocketManager* manager, NoDnsTask* task, bool bind);
+static void finishDnsThread(NoSocketManager* manager, NoDnsTask* task, bool bind, addrinfo* aiResult);
+static void finishConnect(NoSocketManager* manager,
                           const NoString& hostname,
                           u_short port,
                           const NoString& name,
@@ -132,26 +133,26 @@ bool NoSocketManager::listenHost(u_short port,
                                  NoSocket* socket,
                                  No::AddressType addressType)
 {
-    CSListener L(port, bindHost);
+    CSListener listener(port, bindHost);
 
-    L.SetSockName(name);
-    L.SetIsSSL(ssl);
+    listener.SetSockName(name);
+    listener.SetIsSSL(ssl);
 
 #ifdef HAVE_IPV6
     switch (addressType) {
     case No::Ipv4Address:
-        L.SetAFRequire(CSSockAddr::RAF_INET);
+        listener.SetAFRequire(CSSockAddr::RAF_INET);
         break;
     case No::Ipv6Address:
-        L.SetAFRequire(CSSockAddr::RAF_INET6);
+        listener.SetAFRequire(CSSockAddr::RAF_INET6);
         break;
     case No::Ipv4AndIpv6Address:
-        L.SetAFRequire(CSSockAddr::RAF_ANY);
+        listener.SetAFRequire(CSSockAddr::RAF_ANY);
         break;
     }
 #endif
 
-    return m_instance->Listen(L, NoSocketPrivate::get(socket));
+    return m_instance->Listen(listener, NoSocketPrivate::get(socket));
 }
 
 bool NoSocketManager::listenAll(u_short port, const NoString& name, bool ssl, NoSocket* socket, No::AddressType addressType)
@@ -166,26 +167,26 @@ u_short NoSocketManager::listenRand(const NoString& name,
                                     No::AddressType addressType)
 {
     ushort port = 0;
-    CSListener L(0, bindHost);
+    CSListener listener(0, bindHost);
 
-    L.SetSockName(name);
-    L.SetIsSSL(ssl);
+    listener.SetSockName(name);
+    listener.SetIsSSL(ssl);
 
 #ifdef HAVE_IPV6
     switch (addressType) {
     case No::Ipv4Address:
-        L.SetAFRequire(CSSockAddr::RAF_INET);
+        listener.SetAFRequire(CSSockAddr::RAF_INET);
         break;
     case No::Ipv6Address:
-        L.SetAFRequire(CSSockAddr::RAF_INET6);
+        listener.SetAFRequire(CSSockAddr::RAF_INET6);
         break;
     case No::Ipv4AndIpv6Address:
-        L.SetAFRequire(CSSockAddr::RAF_ANY);
+        listener.SetAFRequire(CSSockAddr::RAF_ANY);
         break;
     }
 #endif
 
-    m_instance->Listen(L, NoSocketPrivate::get(socket), &port);
+    m_instance->Listen(listener, NoSocketPrivate::get(socket), &port);
 
     return port;
 }
@@ -213,17 +214,17 @@ void NoSocketManager::connect(const NoString& hostname,
     task->name = name;
     task->timeout = 120;
     task->ssl = ssl;
-    task->sBindhost = bindHost;
+    task->bindhost = bindHost;
     task->socket = socket;
     if (bindHost.empty()) {
-        task->bDoneBind = true;
+        task->doneBind = true;
     } else {
-        StartTDNSThread(this, task, true);
+        startDnsThread(this, task, true);
     }
-    StartTDNSThread(this, task, false);
+    startDnsThread(this, task, false);
 #else // HAVE_THREADED_DNS
     // Just let Csocket handle DNS itself
-    FinishConnect(this, hostname, port, name, timeout, ssl, bindHost, socket);
+    finishConnect(this, hostname, port, name, timeout, ssl, bindHost, socket);
 #endif
 }
 
@@ -314,14 +315,14 @@ void NoDnsJob::run()
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_protocol = IPPROTO_TCP;
         hints.ai_flags = AI_ADDRCONFIG;
-        iRes = getaddrinfo(hostname.c_str(), nullptr, &hints, &aiResult);
-        if (EAGAIN != iRes) {
+        res = getaddrinfo(hostname.c_str(), nullptr, &hints, &result);
+        if (EAGAIN != res) {
             break;
         }
 
         iCount++;
         if (iCount > 5) {
-            iRes = ETIMEDOUT;
+            res = ETIMEDOUT;
             break;
         }
         sleep(5); // wait 5 seconds before next try
@@ -330,32 +331,32 @@ void NoDnsJob::run()
 
 void NoDnsJob::finished()
 {
-    if (0 != this->iRes) {
-        NO_DEBUG("Error in threaded DNS: " << gai_strerror(this->iRes));
-        if (this->aiResult) {
+    if (0 != this->res) {
+        NO_DEBUG("Error in threaded DNS: " << gai_strerror(this->res));
+        if (this->result) {
             NO_DEBUG("And aiResult is not nullptr...");
         }
-        this->aiResult = nullptr; // just for case. Maybe to call freeaddrinfo()?
+        this->result = nullptr; // just for case. Maybe to call freeaddrinfo()?
     }
-    SetTDNSThreadFinished(this->pManager, this->task, this->bBind, this->aiResult);
+    finishDnsThread(this->manager, this->task, this->bind, this->result);
 }
 
-void StartTDNSThread(NoSocketManager* manager, NoDnsTask* task, bool bBind)
+void startDnsThread(NoSocketManager* manager, NoDnsTask* task, bool bind)
 {
-    NoString hostname = bBind ? task->sBindhost : task->hostname;
+    NoString hostname = bind ? task->bindhost : task->hostname;
     NoDnsJob* job = new NoDnsJob;
     job->hostname = hostname;
     job->task = task;
-    job->bBind = bBind;
-    job->pManager = manager;
+    job->bind = bind;
+    job->manager = manager;
 
     job->start();
 }
 
-static NoString RandomFromSet(const NoStringSet& sSet, std::default_random_engine& gen)
+static NoString RandomFromSet(const NoStringSet& set, std::default_random_engine& gen)
 {
-    std::uniform_int_distribution<> distr(0, sSet.size() - 1);
-    auto it = sSet.cbegin();
+    std::uniform_int_distribution<> distr(0, set.size() - 1);
+    auto it = set.cbegin();
     std::advance(it, distr(gen));
     return *it;
 }
@@ -365,113 +366,113 @@ RandomFrom2SetsWithBias(const NoStringSet& ss4, const NoStringSet& ss6, std::def
 {
     // It's not quite what RFC says how to choose between IPv4 and IPv6, but proper way is harder to implement.
     // It would require to maintain some state between Csock objects.
-    bool bUseIPv6;
+    bool ipv6 = false;
     if (ss4.empty()) {
-        bUseIPv6 = true;
+        ipv6 = true;
     } else if (ss6.empty()) {
-        bUseIPv6 = false;
+        ipv6 = false;
     } else {
         // Let's prefer IPv6 :)
         std::discrete_distribution<> d({ 2, 3 });
-        bUseIPv6 = d(gen);
+        ipv6 = d(gen);
     }
-    const NoStringSet& sSet = bUseIPv6 ? ss6 : ss4;
-    return std::make_tuple(RandomFromSet(sSet, gen), bUseIPv6);
+    const NoStringSet& set = ipv6 ? ss6 : ss4;
+    return std::make_tuple(RandomFromSet(set, gen), ipv6);
 }
 
-void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind, addrinfo* aiResult)
+void finishDnsThread(NoSocketManager* manager, NoDnsTask* task, bool bind, addrinfo* result)
 {
-    if (bBind) {
-        task->aiBind = aiResult;
-        task->bDoneBind = true;
+    if (bind) {
+        task->bind = result;
+        task->doneBind = true;
     } else {
-        task->aiTarget = aiResult;
-        task->bDoneTarget = true;
+        task->target = result;
+        task->doneTarget = true;
     }
 
     // Now that something is done, check if everything we needed is done
-    if (!task->bDoneBind || !task->bDoneTarget) {
+    if (!task->doneBind || !task->doneTarget) {
         return;
     }
 
     // All needed DNS is done, now collect the results
-    NoStringSet ssTargets4;
-    NoStringSet ssTargets6;
-    for (addrinfo* ai = task->aiTarget; ai; ai = ai->ai_next) {
+    NoStringSet targets4;
+    NoStringSet targets6;
+    for (addrinfo* ai = task->target; ai; ai = ai->ai_next) {
         char s[INET6_ADDRSTRLEN] = {};
         getnameinfo(ai->ai_addr, ai->ai_addrlen, s, sizeof(s), nullptr, 0, NI_NUMERICHOST);
         switch (ai->ai_family) {
         case AF_INET:
-            ssTargets4.insert(s);
+            targets4.insert(s);
             break;
 #ifdef HAVE_IPV6
         case AF_INET6:
-            ssTargets6.insert(s);
+            targets6.insert(s);
             break;
 #endif
         }
     }
-    NoStringSet ssBinds4;
-    NoStringSet ssBinds6;
-    for (addrinfo* ai = task->aiBind; ai; ai = ai->ai_next) {
+    NoStringSet binds4;
+    NoStringSet binds6;
+    for (addrinfo* ai = task->bind; ai; ai = ai->ai_next) {
         char s[INET6_ADDRSTRLEN] = {};
         getnameinfo(ai->ai_addr, ai->ai_addrlen, s, sizeof(s), nullptr, 0, NI_NUMERICHOST);
         switch (ai->ai_family) {
         case AF_INET:
-            ssBinds4.insert(s);
+            binds4.insert(s);
             break;
 #ifdef HAVE_IPV6
         case AF_INET6:
-            ssBinds6.insert(s);
+            binds6.insert(s);
             break;
 #endif
         }
     }
-    if (task->aiTarget)
-        freeaddrinfo(task->aiTarget);
-    if (task->aiBind)
-        freeaddrinfo(task->aiBind);
+    if (task->target)
+        freeaddrinfo(task->target);
+    if (task->bind)
+        freeaddrinfo(task->bind);
 
-    NoString sBindhost;
-    NoString sTargetHost;
+    NoString bindHost;
+    NoString targetHost;
     std::random_device rd;
     std::default_random_engine gen(rd());
 
     try {
-        if (ssTargets4.empty() && ssTargets6.empty()) {
+        if (targets4.empty() && targets6.empty()) {
             throw "Can't resolve server hostname";
-        } else if (task->sBindhost.empty()) {
+        } else if (task->bindhost.empty()) {
             // Choose random target
-            std::tie(sTargetHost, std::ignore) = RandomFrom2SetsWithBias(ssTargets4, ssTargets6, gen);
-        } else if (ssBinds4.empty() && ssBinds6.empty()) {
+            std::tie(targetHost, std::ignore) = RandomFrom2SetsWithBias(targets4, targets6, gen);
+        } else if (binds4.empty() && binds6.empty()) {
             throw "Can't resolve bind hostname. Try /znc ClearBindHost and /znc ClearUserBindHost";
-        } else if (ssBinds4.empty()) {
-            if (ssTargets6.empty()) {
+        } else if (binds4.empty()) {
+            if (targets6.empty()) {
                 throw "Server address is IPv4-only, but bindhost is IPv6-only";
             } else {
                 // Choose random target and bindhost from IPv6-only sets
-                sTargetHost = RandomFromSet(ssTargets6, gen);
-                sBindhost = RandomFromSet(ssBinds6, gen);
+                targetHost = RandomFromSet(targets6, gen);
+                bindHost = RandomFromSet(binds6, gen);
             }
-        } else if (ssBinds6.empty()) {
-            if (ssTargets4.empty()) {
+        } else if (binds6.empty()) {
+            if (targets4.empty()) {
                 throw "Server address is IPv6-only, but bindhost is IPv4-only";
             } else {
                 // Choose random target and bindhost from IPv4-only sets
-                sTargetHost = RandomFromSet(ssTargets4, gen);
-                sBindhost = RandomFromSet(ssBinds4, gen);
+                targetHost = RandomFromSet(targets4, gen);
+                bindHost = RandomFromSet(binds4, gen);
             }
         } else {
             // Choose random target
             bool bUseIPv6;
-            std::tie(sTargetHost, bUseIPv6) = RandomFrom2SetsWithBias(ssTargets4, ssTargets6, gen);
+            std::tie(targetHost, bUseIPv6) = RandomFrom2SetsWithBias(targets4, targets6, gen);
             // Choose random bindhost matching chosen target
-            const NoStringSet& ssBinds = bUseIPv6 ? ssBinds6 : ssBinds4;
-            sBindhost = RandomFromSet(ssBinds, gen);
+            const NoStringSet& ssBinds = bUseIPv6 ? binds6 : binds4;
+            bindHost = RandomFromSet(ssBinds, gen);
         }
 
-        NO_DEBUG("TDNS: " << task->name << ", connecting to [" << sTargetHost << "] using bindhost [" << sBindhost << "]");
-        FinishConnect(manager, sTargetHost, task->port, task->name, task->timeout, task->ssl, sBindhost, task->socket);
+        NO_DEBUG("TDNS: " << task->name << ", connecting to [" << targetHost << "] using bindhost [" << bindHost << "]");
+        finishConnect(manager, targetHost, task->port, task->name, task->timeout, task->ssl, bindHost, task->socket);
     } catch (const char* s) {
         NO_DEBUG(task->name << ", dns resolving error: " << s);
         task->socket->setName(task->name);
@@ -483,7 +484,7 @@ void SetTDNSThreadFinished(NoSocketManager* manager, NoDnsTask* task, bool bBind
 }
 #endif // HAVE_THREADED_DNS
 
-void FinishConnect(NoSocketManager* manager,
+void finishConnect(NoSocketManager* manager,
                    const NoString& hostname,
                    u_short port,
                    const NoString& name,
@@ -492,14 +493,14 @@ void FinishConnect(NoSocketManager* manager,
                    const NoString& bindHost,
                    NoSocket* socket)
 {
-    CSConnection C(hostname, port, timeout);
+    CSConnection connection(hostname, port, timeout);
 
-    C.SetSockName(name);
-    C.SetIsSSL(ssl);
-    C.SetBindHost(bindHost);
+    connection.SetSockName(name);
+    connection.SetIsSSL(ssl);
+    connection.SetBindHost(bindHost);
 #ifdef HAVE_LIBSSL
-    C.SetCipher(noApp->sslCiphers());
+    connection.SetCipher(noApp->sslCiphers());
 #endif
 
-    manager->doConnect(C, NoSocketPrivate::get(socket));
+    manager->doConnect(connection, NoSocketPrivate::get(socket));
 }
