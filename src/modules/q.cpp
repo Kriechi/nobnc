@@ -20,8 +20,6 @@
 #include <nobnc/nonetwork.h>
 #include <nobnc/noircsocket.h>
 #include <nobnc/nochannel.h>
-#include <nobnc/nowebsocket.h>
-#include <nobnc/nowebsession.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
@@ -328,74 +326,6 @@ public:
         if (m_bJoinonInvite)
             network()->addChannel(sChan, false);
         return Continue;
-    }
-
-    NoString webMenuTitle() override
-    {
-        return "Q";
-    }
-
-    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page == "index") {
-            bool bSubmitted = (socket->param("submitted").toInt() != 0);
-
-            if (bSubmitted) {
-                NoString FormUsername = socket->param("user");
-                if (!FormUsername.empty())
-                    SetUsername(FormUsername);
-
-                NoString FormPassword = socket->param("password");
-                if (!FormPassword.empty())
-                    SetPassword(FormPassword);
-
-                SetUseCloakedHost(socket->param("usecloakedhost").toBool());
-                SetUseChallenge(socket->param("usechallenge").toBool());
-                SetRequestPerms(socket->param("requestperms").toBool());
-                SetJoinonInvite(socket->param("joinoninvite").toBool());
-                SetJoinAfterCloaked(socket->param("joinaftercloaked").toBool());
-            }
-
-            tmpl["Username"] = m_sUsername;
-
-            NoTemplate& o1 = tmpl.addRow("OptionLoop");
-            o1["Name"] = "usecloakedhost";
-            o1["DisplayName"] = "UseCloakedHost";
-            o1["Tooltip"] = "Whether to cloak your hostname (+x) automatically on connect.";
-            o1["Checked"] = NoString(m_bUseCloakedHost);
-
-            NoTemplate& o2 = tmpl.addRow("OptionLoop");
-            o2["Name"] = "usechallenge";
-            o2["DisplayName"] = "UseChallenge";
-            o2["Tooltip"] = "Whether to use the CHALLENGEAUTH mechanism to avoid sending passwords in cleartext.";
-            o2["Checked"] = NoString(m_bUseChallenge);
-
-            NoTemplate& o3 = tmpl.addRow("OptionLoop");
-            o3["Name"] = "requestperms";
-            o3["DisplayName"] = "RequestPerms";
-            o3["Tooltip"] = "Whether to request voice/op from Q on join/devoice/deop.";
-            o3["Checked"] = NoString(m_bRequestPerms);
-
-            NoTemplate& o4 = tmpl.addRow("OptionLoop");
-            o4["Name"] = "joinoninvite";
-            o4["DisplayName"] = "JoinonInvite";
-            o4["Tooltip"] = "Whether to join channels when Q invites you.";
-            o4["Checked"] = NoString(m_bJoinonInvite);
-
-            NoTemplate& o5 = tmpl.addRow("OptionLoop");
-            o5["Name"] = "joinaftercloaked";
-            o5["DisplayName"] = "JoinAfterCloaked";
-            o5["Tooltip"] = "Whether to delay joining channels until after you are cloaked.";
-            o5["Checked"] = NoString(m_bJoinAfterCloaked);
-
-            if (bSubmitted) {
-                socket->session()->addSuccess("Changes have been saved!");
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
 private:

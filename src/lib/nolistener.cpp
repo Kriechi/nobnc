@@ -20,7 +20,6 @@
 #include "nodebug.h"
 #include "noapp.h"
 #include "noapp_p.h"
-#include "nowebsocket.h"
 #include "nosocket_p.h"
 #include "nomodule_p.h"
 
@@ -35,7 +34,6 @@ public:
     ushort port = 0;
     NoString host = "";
     NoString uriPrefix = "";
-    No::AcceptType acceptType = No::AcceptAll;
     No::AddressType addressType = No::Ipv4AndIpv6Address;
     NoSocket* socket = nullptr;
 };
@@ -140,30 +138,16 @@ void NoPeerSocket::readLine(const NoString& line)
     bool isHttp = No::wildCmp(line, "GET * HTTP/1.?\r\n") || No::wildCmp(line, "POST * HTTP/1.?\r\n");
 
     if (!isHttp) {
-        if (!(m_listener->acceptType & No::AcceptIrc)) {
-            write("ERROR :Access Denied. IRC access is not enabled.\r\n");
-            close(CloseAfterWrite);
-            NO_DEBUG("Refused IRC connection to non IRC port");
-        } else {
-            NoClient* client = new NoClient;
-            socket = client->socket();
-            NoAppPrivate::get(noApp)->manager.swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
+        NoClient* client = new NoClient;
+        socket = client->socket();
+        NoAppPrivate::get(noApp)->manager.swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
 
-            // And don't forget to give it some sane name / timeout
-            socket->setName("USR::???");
-        }
+        // And don't forget to give it some sane name / timeout
+        socket->setName("USR::???");
     } else {
-        if (!(m_listener->acceptType & No::AcceptHttp)) {
-            write("HTTP/1.0 403 Access Denied\r\n\r\nWeb access is not enabled.\r\n");
-            close(CloseAfterWrite);
-            NO_DEBUG("Refused HTTP connection to non HTTP port");
-        } else {
-            socket = new NoWebSocket(m_listener->uriPrefix);
-            NoAppPrivate::get(noApp)->manager.swapSocket(NoSocketPrivate::get(socket), NoSocketPrivate::get(this));
-
-            // And don't forget to give it some sane name / timeout
-            socket->setName("WebMod::client");
-        }
+        write("HTTP/1.0 403 Access Denied\r\n\r\nWeb access is not enabled.\r\n");
+        close(CloseAfterWrite);
+        NO_DEBUG("Refused HTTP connection to non HTTP port");
     }
 
     // TODO can we somehow get rid of this?
@@ -234,16 +218,6 @@ void NoListener::setAddressType(No::AddressType type)
 {
     // TODO: warning if (d->socket)
     d->addressType = type;
-}
-
-No::AcceptType NoListener::acceptType() const
-{
-    return d->acceptType;
-}
-
-void NoListener::setAcceptType(No::AcceptType type)
-{
-    d->acceptType = type;
 }
 
 NoSocket* NoListener::socket() const

@@ -1552,7 +1552,6 @@ void NoClient::yserPortCommand(NoString& line)
         Table.addColumn("BindHost");
         Table.addColumn("SSL");
         Table.addColumn("Proto");
-        Table.addColumn("IRC/Web");
         Table.addColumn("URIPrefix");
 
         std::vector<NoListener*>::const_iterator it;
@@ -1567,9 +1566,6 @@ void NoClient::yserPortCommand(NoString& line)
             No::AddressType addressType = listener->addressType();
             Table.setValue("Proto",
                            (addressType == No::Ipv4AndIpv6Address ? "All" : (addressType == No::Ipv4Address ? "IPv4" : "IPv6")));
-
-            No::AcceptType acceptType = listener->acceptType();
-            Table.setValue("IRC/Web", (acceptType == No::AcceptAll ? "All" : (acceptType == No::AcceptIrc ? "IRC" : "Web")));
             Table.setValue("URIPrefix", listener->uriPrefix() + "/");
         }
 
@@ -1595,31 +1591,17 @@ void NoClient::yserPortCommand(NoString& line)
     ushort port = sPort.toUShort();
 
     if (command.equals("ADDPORT")) {
-        No::AcceptType acceptType = No::AcceptAll;
-        NoString sAccept = No::token(line, 3);
-
-        if (sAccept.equals("WEB")) {
-            acceptType = No::AcceptHttp;
-        } else if (sAccept.equals("IRC")) {
-            acceptType = No::AcceptIrc;
-        } else if (sAccept.equals("ALL")) {
-            acceptType = No::AcceptAll;
-        } else {
-            sAccept.clear();
-        }
-
-        if (sPort.empty() || sAddr.empty() || sAccept.empty()) {
-            putStatus("Usage: AddPort <[+]port> <ipv4|ipv6|all> <web|irc|all> [bindhost [uriprefix]]");
+        if (sPort.empty() || sAddr.empty()) {
+            putStatus("Usage: AddPort <[+]port> <ipv4|ipv6|all> [bindhost [uriprefix]]");
         } else {
             bool ssl = sPort.startsWith("+");
-            const NoString host = No::token(line, 4);
-            const NoString uriPrefix = No::token(line, 5);
+            const NoString host = No::token(line, 3);
+            const NoString uriPrefix = No::token(line, 4);
 
             NoListener* listener = new NoListener(host, port);
             listener->setUriPrefix(uriPrefix);
             listener->setSsl(ssl);
             listener->setAddressType(addressType);
-            listener->setAcceptType(acceptType);
 
             if (!listener->listen()) {
                 delete listener;
@@ -1776,7 +1758,7 @@ void NoClient::helpUser(const NoString& filter)
         addCommandHelp(Table, "ListPorts", "", "Show all active listeners", filter);
         addCommandHelp(Table,
                        "AddPort",
-                       "<[+]port> <ipv4|ipv6|all> <web|irc|all> [bindhost [uriprefix]]",
+                       "<[+]port> <ipv4|ipv6|all> [bindhost [uriprefix]]",
                        "Add another port for ZNC to listen on",
                        filter);
         addCommandHelp(Table, "DelPort", "<port> <ipv4|ipv6|all> [bindhost]", "Remove a port from ZNC", filter);

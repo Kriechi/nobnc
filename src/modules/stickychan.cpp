@@ -18,8 +18,6 @@
 #include <nobnc/nomodule.h>
 #include <nobnc/nochannel.h>
 #include <nobnc/nonetwork.h>
-#include <nobnc/nowebsocket.h>
-#include <nobnc/nowebsession.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/noutils.h>
 #include <nobnc/notimer.h>
@@ -109,70 +107,6 @@ public:
                 putModule(NoString(i) + ": " + key + " (" + value + ")");
         }
         putModule(" -- End of List");
-    }
-
-    NoString webMenuTitle() override
-    {
-        return "Sticky Chans";
-    }
-
-    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page == "index") {
-            bool bSubmitted = (socket->param("submitted").toInt() != 0);
-
-            NoRegistry registry(this);
-            const std::vector<NoChannel*>& Channels = network()->channels();
-            for (uint c = 0; c < Channels.size(); c++) {
-                const NoString sChan = Channels[c]->name();
-                bool bStick = registry.contains(sChan);
-
-                if (bSubmitted) {
-                    bool bNewStick = socket->param("stick_" + sChan).toBool();
-                    if (bNewStick && !bStick)
-                        registry.setValue(sChan, ""); // no password support for now unless chansaver is active too
-                    else if (!bNewStick && bStick) {
-                        registry.remove(sChan);
-                    }
-                    bStick = bNewStick;
-                }
-
-                NoTemplate& Row = tmpl.addRow("ChannelLoop");
-                Row["Name"] = sChan;
-                Row["Sticky"] = NoString(bStick);
-            }
-
-            if (bSubmitted) {
-                socket->session()->addSuccess("Changes have been saved!");
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    bool onEmbeddedWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page == "webadmin/channel") {
-            NoString sChan = tmpl["ChanName"];
-            NoRegistry registry(this);
-            bool bStick = registry.contains(sChan);
-            if (tmpl["WebadminAction"].equals("display")) {
-                tmpl["Sticky"] = NoString(bStick);
-            } else if (socket->param("embed_stickychan_presented").toBool()) {
-                bool bNewStick = socket->param("embed_stickychan_sticky").toBool();
-                if (bNewStick && !bStick) {
-                    registry.setValue(sChan, ""); // no password support for now unless chansaver is active too
-                    socket->session()->addSuccess("channel become sticky!");
-                } else if (!bNewStick && bStick) {
-                    registry.remove(sChan);
-                    socket->session()->addSuccess("channel stopped being sticky!");
-                }
-            }
-            return true;
-        }
-        return false;
     }
 };
 

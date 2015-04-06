@@ -825,8 +825,7 @@ std::set<NoModuleInfo> NoModuleLoader::defaultModules(No::ModuleType type)
 
     const std::map<NoString, No::ModuleType> ns = { { "chansaver", No::UserModule },
                                                     { "controlpanel", No::UserModule },
-                                                    { "simple_away", No::NetworkModule },
-                                                    { "webadmin", No::GlobalModule } };
+                                                    { "simple_away", No::NetworkModule } };
 
     auto it = modules.begin();
     while (it != modules.end()) {

@@ -18,9 +18,6 @@
 #include <nobnc/nomodule.h>
 #include <nobnc/nouser.h>
 #include <nobnc/noapp.h>
-#include <nobnc/notemplate.h>
-#include <nobnc/nowebsocket.h>
-#include <nobnc/nowebsession.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/notable.h>
 
@@ -99,58 +96,6 @@ public:
         NoRegistry registry(this);
         registry.remove(user->userName());
         return Continue;
-    }
-
-    // Web stuff:
-
-    bool webRequiresAdmin() override
-    {
-        return true;
-    }
-    NoString webMenuTitle() override
-    {
-        return "Last Seen";
-    }
-
-    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page == "index") {
-            NoModuleLoader* GModules = noApp->loader();
-            tmpl["WebAdminLoaded"] = NoString(GModules->findModule("webadmin") != nullptr);
-
-            MTimeMulti mmSorted;
-            const MUsers& mUsers = noApp->userMap();
-
-            for (MUsers::const_iterator uit = mUsers.begin(); uit != mUsers.end(); ++uit) {
-                mmSorted.insert(std::pair<time_t, NoUser*>(GetTime(uit->second), uit->second));
-            }
-
-            for (MTimeMulti::const_iterator it = mmSorted.begin(); it != mmSorted.end(); ++it) {
-                NoUser* user = it->second;
-                NoTemplate& Row = tmpl.addRow("UserLoop");
-
-                Row["Username"] = user->userName();
-                Row["IsSelf"] = NoString(user == socket->session()->user());
-                Row["LastSeen"] = FormatLastSeen(user, "never");
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    bool onEmbeddedWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page == "webadmin/user" && socket->session()->isAdmin()) {
-            NoUser* user = noApp->findUser(tmpl["Username"]);
-            if (user) {
-                tmpl["LastSeen"] = FormatLastSeen(user);
-            }
-            return true;
-        }
-
-        return false;
     }
 };
 

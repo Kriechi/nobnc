@@ -46,9 +46,6 @@ public:
     No::AddressType addressType() const;
     void setAddressType(No::AddressType type);
 
-    No::AcceptType acceptType() const;
-    void setAcceptType(No::AcceptType type);
-
     bool listen();
     NoSocket* socket() const;
 

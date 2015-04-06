@@ -21,10 +21,9 @@
 #include <nobnc/noclient.h>
 #include <nobnc/noapp.h>
 #include <nobnc/noauthenticator.h>
-#include <nobnc/nowebsocket.h>
-#include <nobnc/nowebsession.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/notable.h>
+#include <nobnc/nosocket.h>
 
 #define MESSAGE "Your account has been disabled. Contact your administrator."
 
@@ -144,42 +143,6 @@ public:
         } else {
             putModule("This user is not blocked");
         }
-    }
-
-    bool onEmbeddedWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page == "webadmin/user" && socket->session()->isAdmin()) {
-            NoString action = tmpl["WebadminAction"];
-            if (action == "display") {
-                tmpl["Blocked"] = NoString(IsBlocked(tmpl["Username"]));
-                tmpl["Self"] = NoString(tmpl["Username"].equals(socket->session()->user()->userName()));
-                return true;
-            }
-            if (action == "change" && socket->param("embed_blockuser_presented").toBool()) {
-                if (tmpl["Username"].equals(socket->session()->user()->userName()) &&
-                    socket->param("embed_blockuser_block").toBool()) {
-                    socket->session()->addError("You can't block yourself");
-                } else if (socket->param("embed_blockuser_block").toBool()) {
-                    if (!socket->param("embed_blockuser_old").toBool()) {
-                        if (Block(tmpl["Username"])) {
-                            socket->session()->addSuccess("Blocked [" + tmpl["Username"] + "]");
-                        } else {
-                            socket->session()->addError("Couldn't block [" + tmpl["Username"] + "]");
-                        }
-                    }
-                } else if (socket->param("embed_blockuser_old").toBool()) {
-                    NoRegistry registry(this);
-                    if (registry.contains(tmpl["Username"])) {
-                        registry.remove(tmpl["Username"]);
-                        socket->session()->addSuccess("Unblocked [" + tmpl["Username"] + "]");
-                    } else {
-                        socket->session()->addError("User [" + tmpl["Username"] + "is not blocked");
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
 private:

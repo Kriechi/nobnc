@@ -21,8 +21,6 @@
 #include <nobnc/nofile.h>
 #include <nobnc/nouser.h>
 #include <nobnc/noircsocket.h>
-#include <nobnc/notemplate.h>
-#include <nobnc/nowebsocket.h>
 
 class NoCertMod : public NoModule
 {
@@ -75,35 +73,6 @@ public:
         }
 
         return Continue;
-    }
-
-    NoString webMenuTitle() override
-    {
-        return "Certificate";
-    }
-
-    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page == "index") {
-            tmpl["Cert"] = NoString(HasPemFile());
-            return true;
-        } else if (page == "update") {
-            NoFile fPemFile(PemFile());
-
-            if (fPemFile.Open(O_WRONLY | O_TRUNC | O_CREAT)) {
-                fPemFile.Write(socket->param("cert", true, ""));
-                fPemFile.Close();
-            }
-
-            socket->redirect(webPath());
-            return true;
-        } else if (page == "delete") {
-            NoFile::Delete(PemFile());
-            socket->redirect(webPath());
-            return true;
-        }
-
-        return false;
     }
 };
 

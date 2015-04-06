@@ -15,7 +15,6 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/noexception_p.h
                        ${NO_INCDIR}/nofile.h
                        ${NO_INCDIR}/nohostmask.h
-                       ${NO_INCDIR}/nohttpsocket.h
                        ${NO_INCDIR}/noircsocket.h
                        ${NO_INCDIR}/nojob_p.h
                        ${NO_INCDIR}/nolistener.h
@@ -41,15 +40,11 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/nosslverifyhost.h
                        ${NO_INCDIR}/nostring.h
                        ${NO_INCDIR}/notable.h
-                       ${NO_INCDIR}/notemplate.h
                        ${NO_INCDIR}/nothreadpool_p.h
                        ${NO_INCDIR}/notimer.h
                        ${NO_INCDIR}/nouser.h
                        ${NO_INCDIR}/nouser_p.h
                        ${NO_INCDIR}/noutils.h
-                       ${NO_INCDIR}/nowebpage.h
-                       ${NO_INCDIR}/nowebsession.h
-                       ${NO_INCDIR}/nowebsocket.h
                        ../3rdparty/defines.h
                        ../3rdparty/md5/md5.h
                        ../3rdparty/sha2/sha2.h
@@ -68,7 +63,6 @@ list(APPEND NO_SOURCES noapp.cpp
                        noexception.cpp
                        nofile.cpp
                        nohostmask.cpp
-                       nohttpsocket.cpp
                        noircsocket.cpp
                        nolistener.cpp
                        nomessage.cpp
@@ -88,13 +82,10 @@ list(APPEND NO_SOURCES noapp.cpp
                        nosslverifyhost.cpp
                        nostring.cpp
                        notable.cpp
-                       notemplate.cpp
                        nothreadpool.cpp
                        notimer.cpp
                        nouser.cpp
                        noutils.cpp
-                       nowebpage.cpp
-                       nowebsession.cpp
                        ../3rdparty/md5/md5.cpp
                        ../3rdparty/sha2/sha2.c
                        ../3rdparty/Csocket/Csocket.cc

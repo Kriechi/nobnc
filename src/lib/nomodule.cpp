@@ -19,7 +19,6 @@
 #include "nomodule_p.h"
 #include "nofile.h"
 #include "nodir.h"
-#include "notemplate.h"
 #include "nouser.h"
 #include "nonetwork.h"
 #include "noclient.h"
@@ -135,34 +134,6 @@ NoString NoModule::savePath() const
     return d->savePath;
 }
 
-NoString NoModule::webPath()
-{
-    switch (d->type) {
-    case No::GlobalModule:
-        return "/mods/global/" + name() + "/";
-    case No::UserModule:
-        return "/mods/user/" + name() + "/";
-    case No::NetworkModule:
-        return "/mods/network/" + d->network->name() + "/" + name() + "/";
-    default:
-        return "/";
-    }
-}
-
-NoString NoModule::webFilesPath()
-{
-    switch (d->type) {
-    case No::GlobalModule:
-        return "/modfiles/global/" + name() + "/";
-    case No::UserModule:
-        return "/modfiles/user/" + name() + "/";
-    case No::NetworkModule:
-        return "/modfiles/network/" + d->network->name() + "/" + name() + "/";
-    default:
-        return "/";
-    }
-}
-
 NoTimer* NoModule::findTimer(const NoString& label) const
 {
     if (label.empty()) {
@@ -242,27 +213,6 @@ NoString NoModule::dataPath() const
     return d->dataPath;
 }
 
-// Webmods
-bool NoModule::onWebPreRequest(NoWebSocket* socket, const NoString& page)
-{
-    return false;
-}
-bool NoModule::onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl)
-{
-    return false;
-}
-
-void NoModule::addSubPage(std::shared_ptr<NoWebPage> page)
-{
-    d->subPages.push_back(page);
-}
-
-bool NoModule::onEmbeddedWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl)
-{
-    return false;
-}
-// !Webmods
-
 bool NoModule::onLoad(const NoString& args, NoString& message)
 {
     message = "";
@@ -273,20 +223,6 @@ bool NoModule::onBoot()
     return true;
 }
 
-bool NoModule::webRequiresLogin()
-{
-    return true;
-}
-
-bool NoModule::webRequiresAdmin()
-{
-    return false;
-}
-
-NoString NoModule::webMenuTitle()
-{
-    return "";
-}
 void NoModule::onPreRehash()
 {
 }

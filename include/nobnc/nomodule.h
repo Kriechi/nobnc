@@ -33,10 +33,7 @@ class NoSocket;
 class NoClient;
 class NoChannel;
 class NoNetwork;
-class NoWebPage;
 class NoHostMask;
-class NoTemplate;
-class NoWebSocket;
 class NoIrcSocket;
 class NoSocket;
 class NoAuthenticator;
@@ -125,16 +122,6 @@ public:
 
     virtual bool onLoad(const NoString& args, NoString& message);
     virtual bool onBoot();
-
-    virtual bool webRequiresLogin();
-    virtual bool webRequiresAdmin();
-    virtual NoString webMenuTitle();
-    virtual NoString webPath();
-    virtual NoString webFilesPath();
-    virtual bool onWebPreRequest(NoWebSocket* socket, const NoString& page);
-    virtual bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl);
-    virtual void addSubPage(std::shared_ptr<NoWebPage> page);
-    virtual bool onEmbeddedWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl);
 
     virtual void onPreRehash();
     virtual void onPostRehash();

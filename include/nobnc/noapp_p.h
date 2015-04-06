@@ -83,7 +83,6 @@ public:
     NoConnectQueueTimer* connectQueueTimer = nullptr;
     uint connectPaused = 0;
     NoCacheMap<NoString> connectThrottle;
-    bool protectWebSessions = true;
     bool hideVersion = false;
 };
 

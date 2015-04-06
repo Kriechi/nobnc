@@ -20,8 +20,6 @@
 #include <nobnc/nonetwork.h>
 #include <nobnc/noapp.h>
 #include <nobnc/noclient.h>
-#include <nobnc/nowebsocket.h>
-#include <nobnc/nowebsession.h>
 
 class NoSendRawMod : public NoModule
 {
@@ -76,66 +74,6 @@ public:
         }
 
         return true;
-    }
-
-    NoString webMenuTitle() override
-    {
-        return "Send Raw";
-    }
-    bool webRequiresAdmin() override
-    {
-        return true;
-    }
-
-    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page == "index") {
-            if (socket->isPost()) {
-                NoUser* user = noApp->findUser(No::token(socket->param("network"), 0, "/"));
-                if (!user) {
-                    socket->session()->addError("User not found");
-                    return true;
-                }
-
-                NoNetwork* network = user->findNetwork(No::token(socket->param("network"), 1, "/"));
-                if (!network) {
-                    socket->session()->addError("network not found");
-                    return true;
-                }
-
-                bool bToServer = socket->param("send_to") == "server";
-                const NoString line = socket->param("line");
-
-                tmpl["user"] = user->userName();
-                tmpl[bToServer ? "to_server" : "to_client"] = "true";
-                tmpl["line"] = line;
-
-                if (bToServer) {
-                    network->putIrc(line);
-                } else {
-                    network->putUser(line);
-                }
-
-                socket->session()->addSuccess("Line sent");
-            }
-
-            const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
-            for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
-                NoTemplate& l = tmpl.addRow("UserLoop");
-                l["Username"] = (*it->second).userName();
-
-                std::vector<NoNetwork*> vNetworks = (*it->second).networks();
-                for (std::vector<NoNetwork*>::const_iterator it2 = vNetworks.begin(); it2 != vNetworks.end(); ++it2) {
-                    NoTemplate& NetworkLoop = l.addRow("NetworkLoop");
-                    NetworkLoop["Username"] = (*it->second).userName();
-                    NetworkLoop["Network"] = (*it2)->name();
-                }
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     MODCONSTRUCTOR(NoSendRawMod)

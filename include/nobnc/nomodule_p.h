@@ -179,7 +179,6 @@ public:
     NoString savePath;
     NoString args;
 
-    std::vector<std::shared_ptr<NoWebPage>> subPages;
     std::map<NoString, NoModuleCommand> commands;
 };
 

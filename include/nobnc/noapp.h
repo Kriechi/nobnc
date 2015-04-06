@@ -89,7 +89,6 @@ public:
     void setMaxBufferSize(uint i);
     void setAnonIpLimit(uint i);
     void setServerThrottle(uint i);
-    void setProtectWebSessions(bool b);
     void setHideVersion(bool b);
     void setConnectDelay(uint i);
 
@@ -113,7 +112,6 @@ public:
     uint anonIpLimit() const;
     uint serverThrottle() const;
     uint connectDelay() const;
-    bool protectWebSessions() const;
     bool hideVersion() const;
     NoString sslCiphers() const;
     uint disabledSslProtocols() const;
@@ -142,7 +140,6 @@ public:
                      const NoString& uriPrefix,
                      bool ssl,
                      No::AddressType addressType,
-                     No::AcceptType acceptType,
                      NoString& error);
     bool removeListener(NoListener*);
 

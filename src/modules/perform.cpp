@@ -17,7 +17,6 @@
 
 #include <nobnc/nomodule.h>
 #include <nobnc/nonetwork.h>
-#include <nobnc/nowebsocket.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/noutils.h>
 #include <nobnc/notable.h>
@@ -139,36 +138,6 @@ public:
         for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
             putIrc(expandString(*it));
         }
-    }
-
-    NoString webMenuTitle() override
-    {
-        return "Perform";
-    }
-
-    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page != "index") {
-            // only accept requests to index
-            return false;
-        }
-
-        if (socket->isPost()) {
-            NoStringVector vsPerf = socket->rawParam("perform", true).split("\n", No::SkipEmptyParts);
-            m_vPerform.clear();
-
-            for (NoStringVector::const_iterator it = vsPerf.begin(); it != vsPerf.end(); ++it)
-                m_vPerform.push_back(ParsePerform(*it));
-
-            Save();
-        }
-
-        for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it) {
-            NoTemplate& Row = tmpl.addRow("PerformLoop");
-            Row["Perform"] = *it;
-        }
-
-        return true;
     }
 
 private:

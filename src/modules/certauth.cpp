@@ -23,11 +23,10 @@
 #include <nobnc/nodebug.h>
 #include <nobnc/noclient.h>
 #include <nobnc/noauthenticator.h>
-#include <nobnc/nowebsocket.h>
-#include <nobnc/nowebsession.h>
 #include <nobnc/nolistener.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/notable.h>
+#include <nobnc/nosocket.h>
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>
@@ -256,48 +255,6 @@ public:
         default:
             return "";
         }
-    }
-
-    NoString webMenuTitle() override
-    {
-        return "certauth";
-    }
-
-    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        NoUser* user = socket->session()->user();
-
-        if (page == "index") {
-            MNoStringSet::const_iterator it = m_PubKeys.find(user->userName());
-            if (it != m_PubKeys.end()) {
-                for (NoStringSet::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-                    NoTemplate& row = tmpl.addRow("KeyLoop");
-                    row["Key"] = *it2;
-                }
-            }
-
-            return true;
-        } else if (page == "add") {
-            AddKey(user, socket->param("key"));
-            socket->redirect(webPath());
-            return true;
-        } else if (page == "delete") {
-            MNoStringSet::iterator it = m_PubKeys.find(user->userName());
-            if (it != m_PubKeys.end()) {
-                if (it->second.erase(socket->param("key", false))) {
-                    if (it->second.size() == 0) {
-                        m_PubKeys.erase(it);
-                    }
-
-                    Save();
-                }
-            }
-
-            socket->redirect(webPath());
-            return true;
-        }
-
-        return false;
     }
 
 private:

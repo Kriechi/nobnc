@@ -18,8 +18,6 @@
 #include <nobnc/nomodule.h>
 #include <nobnc/noapp.h>
 #include <nobnc/noclient.h>
-#include <nobnc/notemplate.h>
-#include <nobnc/nowebsocket.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/notable.h>
 
@@ -97,11 +95,6 @@ public:
     {
         bShowNotesOnLogin = !args.equals("-disableNotesOnLogin");
         return true;
-    }
-
-    NoString webMenuTitle() override
-    {
-        return "Notes";
     }
 
     void onClientLogin() override
@@ -209,31 +202,6 @@ public:
                 }
             }
         }
-    }
-
-    bool onWebRequest(NoWebSocket* socket, const NoString& page, NoTemplate& tmpl) override
-    {
-        if (page == "index") {
-            NoRegistry registry(this);
-            for (const NoString& key : registry.keys()) {
-                NoTemplate& Row = tmpl.addRow("NotesLoop");
-
-                Row["Key"] = key;
-                Row["Note"] = registry.value(key);
-            }
-
-            return true;
-        } else if (page == "delnote") {
-            DelNote(socket->param("key", false));
-            socket->redirect(webPath());
-            return true;
-        } else if (page == "addnote") {
-            AddNote(socket->param("key"), socket->param("note"));
-            socket->redirect(webPath());
-            return true;
-        }
-
-        return false;
     }
 };
 
