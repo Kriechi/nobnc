@@ -18,8 +18,9 @@
 #include "notimer.h"
 #include "nomodule.h"
 #include "nomodule_p.h"
-#include "nosocketmanager.h"
+#include "nosocketmanager_p.h"
 #include "noapp.h"
+#include "noapp_p.h"
 #include "Csocket/Csocket.h"
 
 class NoTimerImpl : public CCron
@@ -67,14 +68,14 @@ NoTimer::NoTimer(NoModule* module) : d(new NoTimerPrivate(module))
 
     if (module)
         NoModulePrivate::get(module)->timers.insert(this);
-    noApp->manager()->addCron(d->impl);
+    NoAppPrivate::get(noApp)->manager.addCron(d->impl);
 }
 
 NoTimer::~NoTimer()
 {
     if (d->module)
         NoModulePrivate::get(d->module)->timers.erase(this);
-    noApp->manager()->removeCron(d->impl);
+    NoAppPrivate::get(noApp)->manager.removeCron(d->impl);
 }
 
 NoModule* NoTimer::module() const

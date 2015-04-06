@@ -19,6 +19,7 @@
 #include "nosocket_p.h"
 #include "nosslverifyhost.h"
 #include "noapp.h"
+#include "noapp_p.h"
 #include "noescape.h"
 #include <signal.h>
 
@@ -329,11 +330,11 @@ SSL_SESSION* NoSocket::sslSession() const
 #endif
 void NoSocket::connect()
 {
-    noApp->manager()->connect(host(), port(), name(), isSsl(), bindHost(), this);
+    NoAppPrivate::get(noApp)->manager.connect(host(), port(), name(), isSsl(), bindHost(), this);
 }
 bool NoSocket::listen(ushort port)
 {
-    return noApp->manager()->listen(port, name(), bindHost(), isSsl(), this);
+    return NoAppPrivate::get(noApp)->manager.listen(port, name(), bindHost(), isSsl(), this);
 }
 void NoSocket::enableReadLine()
 {

@@ -20,7 +20,6 @@
 
 #include <nobnc/noglobal.h>
 #include <nobnc/nostring.h>
-#include <nobnc/nosocketmanager.h>
 #include <nobnc/nomoduleloader.h>
 #include <nobnc/nocachemap.h>
 #include <memory>
@@ -95,7 +94,6 @@ public:
     void setConnectDelay(uint i);
 
     ConfigState configState() const;
-    NoSocketManager* manager() const;
     NoModuleLoader* loader() const;
     NoString skinName() const;
     NoString statusPrefix() const;

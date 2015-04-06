@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef NOSOCKETMANAGER_H
-#define NOSOCKETMANAGER_H
+#ifndef NOSOCKETMANAGER_P_H
+#define NOSOCKETMANAGER_P_H
 
 #include <nobnc/noglobal.h>
 #include <nobnc/nostring.h>
@@ -27,7 +27,7 @@ class CSConnection;
 class CSocketManager;
 class NoSocket;
 
-class NO_EXPORT NoSocketManager
+class NoSocketManager
 {
 public:
     NoSocketManager();
@@ -65,4 +65,4 @@ private:
     std::vector<NoSocket*> m_sockets;
 };
 
-#endif // NOSOCKETMANAGER_H
+#endif // NOSOCKETMANAGER_P_H

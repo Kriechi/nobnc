@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "nosocketmanager.h"
+#include "nosocketmanager_p.h"
 #include "nosocket.h"
 #include "nosocket_p.h"
 #include "nothreadpool_p.h"

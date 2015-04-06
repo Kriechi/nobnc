@@ -185,10 +185,10 @@ NoNetwork::NoNetwork(NoUser* user, const NoString& name) : d(new NoNetworkPrivat
     d->noticeBuffer.setLimit(250, true);
 
     d->pingTimer = new NoNetworkPingTimer(this);
-    noApp->manager()->addCron(d->pingTimer);
+    NoAppPrivate::get(noApp)->manager.addCron(d->pingTimer);
 
     d->joinTimer = new NoNetworkJoinTimer(this);
-    noApp->manager()->addCron(d->joinTimer);
+    NoAppPrivate::get(noApp)->manager.addCron(d->joinTimer);
 
     setEnabled(true);
 }
@@ -308,13 +308,13 @@ void NoNetwork::clone(const NoNetwork* network, bool cloneName)
 NoNetwork::~NoNetwork()
 {
     if (d->socket) {
-        noApp->manager()->removeSocket(d->socket);
+        NoAppPrivate::get(noApp)->manager.removeSocket(d->socket);
         d->socket = nullptr;
     }
 
     // Delete clients
     while (!d->clients.empty()) {
-        noApp->manager()->removeSocket(d->clients[0]->socket());
+        NoAppPrivate::get(noApp)->manager.removeSocket(d->clients[0]->socket());
     }
     d->clients.clear();
 
@@ -340,10 +340,10 @@ NoNetwork::~NoNetwork()
     setUser(nullptr);
 
     // Make sure we are not in the connection queue
-    NoAppPrivate::get(NoApp::instance())->connectQueue.remove(this);
+    NoAppPrivate::get(noApp)->connectQueue.remove(this);
 
-    noApp->manager()->removeCron(d->pingTimer);
-    noApp->manager()->removeCron(d->joinTimer);
+    NoAppPrivate::get(noApp)->manager.removeCron(d->pingTimer);
+    NoAppPrivate::get(noApp)->manager.removeCron(d->joinTimer);
 }
 
 void NoNetwork::delServers()

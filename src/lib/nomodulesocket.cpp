@@ -49,7 +49,7 @@ NoModuleSocket::~NoModuleSocket()
     if (m_module) {
         user = m_module->user();
         NoModulePrivate::get(m_module)->sockets.erase(this);
-        noApp->manager()->removeSocket(this);
+        NoAppPrivate::get(noApp)->manager.removeSocket(this);
     }
 
     NoSocketInfo info(this);
@@ -110,7 +110,7 @@ bool NoModuleSocket::connect(const NoString& hostname, ushort port, bool ssl)
         name = NoSocket::name();
     }
 
-    noApp->manager()->connect(hostname, port, name, ssl, bindHost, this);
+    NoAppPrivate::get(noApp)->manager.connect(hostname, port, name, ssl, bindHost, this);
     return true;
 }
 
@@ -132,7 +132,7 @@ bool NoModuleSocket::listen(ushort port, bool ssl)
         name = NoSocket::name();
     }
 
-    return noApp->manager()->listen(port, name, "", ssl, this);
+    return NoAppPrivate::get(noApp)->manager.listen(port, name, "", ssl, this);
 }
 
 NoModule* NoModuleSocket::module() const

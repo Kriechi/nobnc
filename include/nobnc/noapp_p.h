@@ -19,6 +19,7 @@
 #define NOAPP_P_H
 
 #include "noapp.h"
+#include "nosocketmanager_p.h"
 #include <list>
 
 class NoAppPrivate

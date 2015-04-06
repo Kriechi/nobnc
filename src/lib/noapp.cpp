@@ -457,7 +457,7 @@ bool NoApp::allowConnectionFrom(const NoString& address) const
 {
     if (d->anonIpLimit == 0)
         return true;
-    return (manager()->anonConnectionCount(address) < d->anonIpLimit);
+    return d->manager.anonConnectionCount(address) < d->anonIpLimit;
 }
 
 void NoApp::initDirs(const NoString& argvPath, const NoString& dataDir)
@@ -2120,11 +2120,6 @@ void NoApp::setConnectDelay(uint i)
 NoApp::ConfigState NoApp::configState() const
 {
     return d->configState;
-}
-
-NoSocketManager* NoApp::manager() const
-{
-    return &d->manager;
 }
 
 NoModuleLoader* NoApp::loader() const
