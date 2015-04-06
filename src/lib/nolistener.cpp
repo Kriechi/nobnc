@@ -120,7 +120,7 @@ NoPeerSocket::NoPeerSocket(const NoString& host, ushort port, NoListenerPrivate*
 
 void NoPeerSocket::onReachedMaxBuffer()
 {
-    if (closeType() != NoClose)
+    if (isClosed())
         return; // Already closing
 
     // We don't actually SetMaxBufferThreshold() because that would be

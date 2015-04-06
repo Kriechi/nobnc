@@ -56,6 +56,7 @@ public:
     bool isInbound() const;
     bool isConnected() const;
     bool isReady() const;
+    bool isClosed() const;
 
     ushort localPort() const;
     NoString localAddress() const;
@@ -112,8 +113,7 @@ public:
     int timeout() const;
     void setTimeout(int timeout);
 
-    enum CloseType { NoClose, CloseImmediately, CloseAfterWrite };
-    CloseType closeType() const;
+    enum CloseType { CloseImmediately = 1, CloseAfterWrite = 2 };
     void close(CloseType type = CloseImmediately);
 
     bool startTls();

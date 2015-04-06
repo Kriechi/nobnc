@@ -389,10 +389,6 @@ NoSocket* NoSocket::createSocket(const NoString& host, ushort port)
     return nullptr;
 }
 
-NoSocket::CloseType NoSocket::closeType() const
-{
-    return static_cast<CloseType>(d->impl->GetCloseType());
-}
 void NoSocket::close(CloseType type)
 {
     d->impl->Close(static_cast<Csock::ECloseType>(type));
@@ -440,6 +436,11 @@ bool NoSocket::startTls()
 bool NoSocket::isReady() const
 {
     return d->impl->GetConState() == Csock::CST_OK;
+}
+
+bool NoSocket::isClosed() const
+{
+    return d->impl->GetCloseType() != Csock::CLT_DONT;
 }
 
 void NoSocket::onConnected()
