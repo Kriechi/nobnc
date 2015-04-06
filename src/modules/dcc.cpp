@@ -180,7 +180,12 @@ public:
             return false;
         }
 
-        noApp->manager()->connect(sRemoteIP, uRemotePort, "DCC::GET::" + sRemoteNick, false, user()->localDccIp(), socket);
+        socket->setHost(sRemoteIP);
+        socket->setPort(uRemotePort);
+        socket->setName("DCC::GET::" + sRemoteNick);
+        socket->setSsl(false);
+        socket->setBindHost(user()->localDccIp());
+        socket->connect();
 
         putModule("DCC <- [" + sRemoteNick + "][" + fileName + "] - Attempting to connect to [" + sRemoteIP + "]");
         return true;

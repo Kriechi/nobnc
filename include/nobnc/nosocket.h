@@ -94,7 +94,7 @@ public:
 
     SSL_SESSION* sslSession() const;
 
-    bool connect();
+    void connect();
     bool listen(ushort port);
 
     void enableReadLine();

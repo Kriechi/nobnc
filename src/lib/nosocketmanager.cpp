@@ -159,7 +159,7 @@ bool NoSocketManager::listen(ushort port,
 }
 
 void NoSocketManager::connect(const NoString& hostname,
-                              u_short port,
+                              ushort port,
                               const NoString& name,
                               bool ssl,
                               const NoString& bindHost,

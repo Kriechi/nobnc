@@ -532,12 +532,12 @@ NoSocket* NoDccBounce::createSocket(const NoString& host, ushort port)
     pRemoteSock->SetRemote(true);
     socket->SetRemote(false);
 
-    noApp->manager()->connect(m_sConnectIP,
-                                   m_uRemotePort,
-                                   "DCC::" + NoString((m_bIsChat) ? "Chat" : "XFER") + "::Remote::" + m_sRemoteNick,
-                                   false,
-                                   m_sLocalIP,
-                                   pRemoteSock);
+    pRemoteSock->setHost(m_sConnectIP);
+    pRemoteSock->setPort(m_uRemotePort);
+    pRemoteSock->setName("DCC::" + NoString((m_bIsChat) ? "Chat" : "XFER") + "::Remote::" + m_sRemoteNick);
+    pRemoteSock->setSsl(false);
+    pRemoteSock->setBindHost(m_sLocalIP);
+    pRemoteSock->connect();
 
     socket->setName(name());
     return socket;

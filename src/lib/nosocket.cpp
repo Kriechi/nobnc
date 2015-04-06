@@ -327,9 +327,9 @@ SSL_SESSION* NoSocket::sslSession() const
     return d->impl->GetSSLSession();
 }
 #endif
-bool NoSocket::connect()
+void NoSocket::connect()
 {
-    return d->impl->Connect();
+    noApp->manager()->connect(host(), port(), name(), isSsl(), bindHost(), this);
 }
 bool NoSocket::listen(ushort port)
 {

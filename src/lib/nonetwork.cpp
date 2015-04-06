@@ -1350,9 +1350,13 @@ bool NoNetwork::connect()
         return false;
     }
 
-    NoString name = "IRC::" + d->user->userName() + "::" + d->name;
-    noApp->manager()->connect(server->host(), server->port(), name, ssl, bindHost(), socket);
+    socket->setHost(server->host());
+    socket->setPort(server->port());
+    socket->setSsl(ssl);
     socket->setTimeout(120);
+    socket->setBindHost(bindHost());
+    socket->setName("IRC::" + d->user->userName() + "::" + d->name);
+    socket->connect();
 
     return true;
 }

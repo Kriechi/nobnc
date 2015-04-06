@@ -336,7 +336,11 @@ public:
     void AcceptSDCC(const NoString& nick, u_long iIP, u_short port)
     {
         NoSChatSock* p = new NoSChatSock(this, nick, No::formatIp(iIP), port);
-        noApp->manager()->connect(No::formatIp(iIP), port, p->name(), true, user()->localDccIp(), p);
+        p->setHost(No::formatIp(iIP));
+        p->setPort(port);
+        p->setSsl(true);
+        p->setBindHost(user()->localDccIp());
+        p->connect();
         delete findTimer("Remove " + nick); // delete any associated timer to this nick
     }
 
