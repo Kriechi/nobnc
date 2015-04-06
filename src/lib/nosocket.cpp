@@ -247,10 +247,6 @@ bool NoSocket::write(const NoString& data)
 {
     return d->impl->Write(data);
 }
-time_t NoSocket::timeSinceLastDataTransaction(time_t iNow) const
-{
-    return d->impl->GetTimeSinceLastDataTransaction(iNow);
-}
 NoString NoSocket::name() const
 {
     return d->impl->GetSockName();
@@ -337,10 +333,6 @@ SSL_SESSION* NoSocket::sslSession() const
     return d->impl->GetSSLSession();
 }
 #endif
-ulonglong NoSocket::startTime() const
-{
-    return d->impl->GetStartTime();
-}
 bool NoSocket::connect()
 {
     return d->impl->Connect();

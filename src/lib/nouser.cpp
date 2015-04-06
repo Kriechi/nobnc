@@ -27,6 +27,7 @@
 #include "nomodule_p.h"
 #include "noapp_p.h"
 #include "noregistry.h"
+#include "nosocketinfo.h"
 #include "Csocket/Csocket.h"
 #include <math.h>
 #include <algorithm>
@@ -43,12 +44,9 @@ public:
 protected:
     void RunJob() override
     {
-        const std::vector<NoClient*>& vUserClients = m_pUser->userClients();
-
-        for (NoClient* pUserClient : vUserClients) {
-            if (pUserClient->socket()->timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
-                pUserClient->putClient("PING :ZNC");
-            }
+        for (NoClient* client : m_pUser->userClients()) {
+            if (NoSocketInfo(client->socket()).timeSinceLastDataTransaction() >= NoNetwork::PingFrequency)
+                client->putClient("PING :ZNC");
         }
     }
 

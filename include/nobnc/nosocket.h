@@ -81,9 +81,6 @@ public:
     void pauseRead();
     void resumeRead();
 
-    ulonglong startTime() const;
-    time_t timeSinceLastDataTransaction(time_t now = 0) const;
-
     NoString cipher() const;
     void setCipher(const NoString& cipher);
 

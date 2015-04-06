@@ -32,6 +32,7 @@
 #include "nonick.h"
 #include "nobuffer.h"
 #include "nomodule_p.h"
+#include "nosocketinfo.h"
 #include "Csocket/Csocket.h"
 #include <algorithm>
 #include <memory>
@@ -53,13 +54,13 @@ protected:
     {
         NoIrcSocket* socket = m_pNetwork->ircSocket();
 
-        if (socket && socket->timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
+        if (socket && NoSocketInfo(socket).timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
             socket->putIrc("PING :ZNC");
         }
 
         const std::vector<NoClient*>& vClients = m_pNetwork->clients();
         for (NoClient* client : vClients) {
-            if (client->socket()->timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
+            if (NoSocketInfo(client->socket()).timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
                 client->putClient("PING :ZNC");
             }
         }

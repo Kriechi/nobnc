@@ -20,6 +20,7 @@
 
 #include <nobnc/noglobal.h>
 #include <memory>
+#include <ctime>
 
 class NoSocket;
 class NoSocketInfoPrivate;
@@ -39,6 +40,9 @@ public:
 
     double averageReadSpeed() const;
     double averageWriteSpeed() const;
+
+    ulonglong startTime() const;
+    time_t timeSinceLastDataTransaction() const;
 
 private:
     std::shared_ptr<NoSocketInfoPrivate> d;

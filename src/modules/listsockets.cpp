@@ -182,7 +182,7 @@ public:
 
     NoString GetCreatedTime(NoSocket* pSocket)
     {
-        ulonglong iStartTime = pSocket->startTime();
+        ulonglong iStartTime = NoSocketInfo(pSocket).startTime();
         time_t iTime = iStartTime / 1000;
         return No::formatTime(iTime, "%Y-%m-%d %H:%M:%S", user()->timezone());
     }

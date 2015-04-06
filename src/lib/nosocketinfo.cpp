@@ -77,3 +77,17 @@ double NoSocketInfo::averageWriteSpeed() const
         return 0;
     return NoSocketPrivate::get(d->socket)->GetAvgWrite();
 }
+
+ulonglong NoSocketInfo::startTime() const
+{
+    if (!d->socket)
+        return 0;
+    return NoSocketPrivate::get(d->socket)->GetStartTime();
+}
+
+time_t NoSocketInfo::timeSinceLastDataTransaction() const
+{
+    if (!d->socket)
+        return 0;
+    return NoSocketPrivate::get(d->socket)->GetTimeSinceLastDataTransaction();
+}

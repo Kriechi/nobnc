@@ -32,6 +32,7 @@
 #include <nobnc/nohostmask.h>
 #include <nobnc/notimer.h>
 #include <nobnc/notable.h>
+#include <nobnc/nosocketinfo.h>
 
 #ifdef HAVE_LIBSSL
 #include <openssl/ssl.h>
@@ -206,7 +207,7 @@ public:
             for (NoSChatSock* socket : m_sockets) {
                 Table.addRow();
                 Table.setValue("Nick", socket->GetChatNick());
-                ulonglong iStartTime = socket->startTime();
+                ulonglong iStartTime = NoSocketInfo(socket).startTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
@@ -256,7 +257,7 @@ public:
             for (NoSChatSock* socket : m_sockets) {
                 Table.addRow();
                 Table.setValue("SockName", socket->name());
-                ulonglong iStartTime = socket->startTime();
+                ulonglong iStartTime = NoSocketInfo(socket).startTime();
                 time_t iTime = iStartTime / 1000;
                 char* pTime = ctime(&iTime);
                 if (pTime) {
