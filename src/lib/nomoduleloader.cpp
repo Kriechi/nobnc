@@ -867,11 +867,11 @@ NoModDirList moduleDirs()
     NoModDirList ret;
     NoString sDir;
 
-    // ~/.znc/modules
+    // ~/.nobnc/modules
     sDir = noApp->modulePath() + "/";
     ret.push(std::make_pair(sDir, sDir));
 
-    // <moduledir> and <datadir> (<prefix>/lib/znc)
+    // <moduledir> and <datadir> (<prefix>/lib/nobnc)
     ret.push(std::make_pair(_MODDIR_ + NoString("/"), _DATADIR_ + NoString("/modules/")));
 
     return ret;

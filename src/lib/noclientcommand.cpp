@@ -1762,7 +1762,7 @@ void NoClient::helpUser(const NoString& filter)
                        "Add another port for ZNC to listen on",
                        filter);
         addCommandHelp(Table, "DelPort", "<port> <ipv4|ipv6|all> [bindhost]", "Remove a port from ZNC", filter);
-        addCommandHelp(Table, "Rehash", "", "Reload znc.conf from disk", filter);
+        addCommandHelp(Table, "Rehash", "", "Reload nobnc.conf from disk", filter);
         addCommandHelp(Table, "SaveConfig", "", "Save the current settings to disk", filter);
         addCommandHelp(Table, "ListUsers", "", "List all ZNC users and their connection status", filter);
         addCommandHelp(Table, "ListAllUserNetworks", "", "List all ZNC users and their networks", filter);

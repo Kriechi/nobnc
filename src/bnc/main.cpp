@@ -137,7 +137,7 @@ static void GenerateHelp(const char* appname)
 #ifdef HAVE_LIBSSL
     No::printMessage("\t-p, --makepem      Generates a pemfile for use with SSL");
 #endif // HAVE_LIBSSL
-    No::printMessage("\t-d, --datadir      Set a different ZNC repository (default is ~/.znc)");
+    No::printMessage("\t-d, --datadir      Set a different ZNC repository (default is ~/.nobnc)");
 }
 
 extern void no_cleanup();
@@ -339,7 +339,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    // TODO: NoDir(app.appPath()).filePath("znc.pid")
+    // TODO: NoDir(app.appPath()).filePath("nobnc.pid")
     PidFile pidFile("");
 
     if (bForeground) {

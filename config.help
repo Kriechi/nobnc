@@ -15,11 +15,11 @@ Installation directories:
     --datarootdir <dir> ... The installation root directory for data files
                             [PREFIX/share]
     --datadir <dir> ....... The installation directory for data files
-                            [DATAROOTDIR/znc]
+                            [DATAROOTDIR/nobnc]
     --mandir <dir> ........ The installation directory for manuals
                             [DATAROOTDIR]
     --moddir <dir> ........ The installation directory for modules
-                            [LIBDIR/znc]
+                            [LIBDIR/nobnc]
 
 Build options:
 

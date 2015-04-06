@@ -463,12 +463,12 @@ void NoApp::initDirs(const NoString& argvPath, const NoString& dataDir)
         d->curPath = NoDir("./").filePath(argvPath.left(pos));
 
     if (dataDir.empty()) {
-        d->appPath = NoDir::home().filePath(".znc");
+        d->appPath = NoDir::home().filePath(".nobnc");
     } else {
         d->appPath = dataDir;
     }
 
-    d->sslCertFile = d->appPath + "/znc.pem";
+    d->sslCertFile = d->appPath + "/nobnc.pem";
 }
 
 NoString NoApp::confPath(bool allowMkDir) const
@@ -529,7 +529,7 @@ NoString NoAppPrivate::expandConfigPath(const NoString& configFile, bool allowMk
     NoString sRetPath;
 
     if (configFile.empty()) {
-        sRetPath = noApp->confPath(allowMkDir) + "/znc.conf";
+        sRetPath = noApp->confPath(allowMkDir) + "/nobnc.conf";
     } else {
         if (configFile.startsWith("./") || configFile.startsWith("../")) {
             sRetPath = noApp->currentPath() + "/" + configFile;
@@ -1008,7 +1008,7 @@ void NoAppPrivate::backupConfigOnce(const NoString& suffix)
 
     No::printAction("Creating a config backup");
 
-    NoString sBackup = NoDir(configFile).filePath("../znc.conf." + suffix);
+    NoString sBackup = NoDir(configFile).filePath("../nobnc.conf." + suffix);
     if (NoFile::Copy(configFile, sBackup))
         No::printStatus(true, sBackup);
     else

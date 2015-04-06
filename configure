@@ -245,13 +245,13 @@ fi
 if [ -n "$datadir" ]; then
 	echo "datadir=$datadir" >> ./config.status
 else
-	echo "datadir=\$datarootdir/znc" >> ./config.status
+	echo "datadir=\$datarootdir/nobnc" >> ./config.status
 fi
 
 if [ -n "$moddir" ]; then
 	echo "moddir=$moddir" >> ./config.status
 else
-	echo "moddir=\$libdir/znc" >> ./config.status
+	echo "moddir=\$libdir/nobnc" >> ./config.status
 fi
 
 if [ -n "$mandir" ]; then
