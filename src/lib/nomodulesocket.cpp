@@ -27,7 +27,7 @@
 NoModuleSocket::NoModuleSocket(NoModule* module) : NoSocket(), m_module(module)
 {
     if (module)
-        NoModulePrivate::get(module)->addSocket(this);
+        NoModulePrivate::get(module)->sockets.insert(this);
     enableReadLine();
     setMaxBufferThreshold(10240);
 }
@@ -36,7 +36,7 @@ NoModuleSocket::NoModuleSocket(NoModule* module, const NoString& hostname, ushor
     : NoSocket(hostname, port), m_module(module)
 {
     if (module)
-        NoModulePrivate::get(module)->addSocket(this);
+        NoModulePrivate::get(module)->sockets.insert(this);
     enableReadLine();
     setMaxBufferThreshold(10240);
 }
@@ -48,7 +48,7 @@ NoModuleSocket::~NoModuleSocket()
     // NoWebSocket could cause us to have a nullptr pointer here
     if (m_module) {
         user = m_module->user();
-        NoModulePrivate::get(m_module)->removeSocket(this);
+        NoModulePrivate::get(m_module)->sockets.erase(this);
         noApp->manager()->removeSocket(this);
     }
 

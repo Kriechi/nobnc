@@ -155,22 +155,6 @@ public:
 
     static double buildVersion();
 
-    void addTimer(NoTimer* timer)
-    {
-        timers.insert(timer);
-    }
-    void removeTimer(NoTimer* timer)
-    {
-        timers.erase(timer);
-    }
-    void addSocket(NoModuleSocket* socket)
-    {
-        sockets.insert(socket);
-    }
-    void removeSocket(NoModuleSocket* socket)
-    {
-        sockets.erase(socket);
-    }
     NoModuleCommand* findCommand(const NoString& cmd)
     {
         for (auto& it : commands) {
