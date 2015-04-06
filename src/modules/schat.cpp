@@ -180,7 +180,8 @@ public:
             socket->setPemFile(m_sPemFile);
 
             u_short port =
-            noApp->manager()->listenRand(socket->name() + "::LISTENER", user()->localDccIp(), true, SOMAXCONN, socket, 60);
+            noApp->manager()->listenRand(socket->name() + "::LISTENER", user()->localDccIp(), true, socket);
+            socket->setTimeout(60);
 
             if (port == 0) {
                 putModule("Failed to start chat!");

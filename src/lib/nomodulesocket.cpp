@@ -132,7 +132,7 @@ bool NoModuleSocket::listen(ushort port, bool ssl, uint timeout)
         name = NoSocket::name();
     }
 
-    return noApp->manager()->listenAll(port, name, ssl, SOMAXCONN, this);
+    return noApp->manager()->listenAll(port, name, ssl, this);
 }
 
 NoModule* NoModuleSocket::module() const

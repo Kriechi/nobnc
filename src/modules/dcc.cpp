@@ -152,7 +152,8 @@ public:
 
         NoString sLocalDCCIP = user()->localDccIp();
         ushort port =
-        noApp->manager()->listenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, SOMAXCONN, socket, 120);
+        noApp->manager()->listenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, socket);
+        socket->setTimeout(120);
 
         if (user()->nick().equals(sRemoteNick)) {
             putUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +

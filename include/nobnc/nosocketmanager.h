@@ -20,7 +20,6 @@
 
 #include <nobnc/noglobal.h>
 #include <nobnc/nostring.h>
-#include <sys/socket.h>
 
 class Csock;
 class CCron;
@@ -38,32 +37,24 @@ public:
                     const NoString& name,
                     const NoString& bindHost,
                     bool ssl = false,
-                    int maxConns = SOMAXCONN,
                     NoSocket* socket = nullptr,
-                    u_int timeout = 0,
                     No::AddressType addressType = No::Ipv4AndIpv6Address);
 
     bool listenAll(ushort port,
                    const NoString& name,
                    bool ssl = false,
-                   int maxConns = SOMAXCONN,
                    NoSocket* socket = nullptr,
-                   u_int timeout = 0,
                    No::AddressType addressType = No::Ipv4AndIpv6Address);
 
     u_short listenRand(const NoString& name,
                        const NoString& bindHost,
                        bool ssl = false,
-                       int maxConns = SOMAXCONN,
                        NoSocket* socket = nullptr,
-                       u_int timeout = 0,
                        No::AddressType addressType = No::Ipv4AndIpv6Address);
 
     u_short listenAllRand(const NoString& name,
                           bool ssl = false,
-                          int maxConns = SOMAXCONN,
                           NoSocket* socket = nullptr,
-                          u_int timeout = 0,
                           No::AddressType addressType = No::Ipv4AndIpv6Address);
 
     void connect(const NoString& hostname,

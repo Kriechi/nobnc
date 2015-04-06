@@ -569,7 +569,8 @@ ushort NoDccBounce::DCCRequest(const NoString& nick,
 {
     NoDccBounce* pDCCBounce = new NoDccBounce(mod, uLongIP, port, fileName, nick, sRemoteIP, bIsChat);
     ushort uListenPort = noApp->manager()->listenRand(
-    "DCC::" + NoString((bIsChat) ? "Chat" : "Xfer") + "::Local::" + nick, mod->GetLocalDCCIP(), false, SOMAXCONN, pDCCBounce, 120);
+    "DCC::" + NoString((bIsChat) ? "Chat" : "Xfer") + "::Local::" + nick, mod->GetLocalDCCIP(), false, pDCCBounce);
+    pDCCBounce->setTimeout(120);
 
     return uListenPort;
 }

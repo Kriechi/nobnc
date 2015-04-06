@@ -22,8 +22,10 @@
 #include "nojob_p.h"
 #include "noapp.h"
 #include "Csocket/Csocket.h"
+
 #include <algorithm>
 #include <random>
+#include <sys/socket.h>
 
 #ifdef HAVE_PTHREAD
 class NoDnsMonitorFD : public CSMonitorFD
@@ -127,17 +129,13 @@ bool NoSocketManager::listenHost(u_short port,
                                  const NoString& name,
                                  const NoString& bindHost,
                                  bool ssl,
-                                 int maxConns,
                                  NoSocket* socket,
-                                 u_int timeout,
                                  No::AddressType addressType)
 {
     CSListener L(port, bindHost);
 
     L.SetSockName(name);
     L.SetIsSSL(ssl);
-    L.SetTimeout(timeout);
-    L.SetMaxConns(maxConns);
 
 #ifdef HAVE_IPV6
     switch (addressType) {
@@ -156,17 +154,15 @@ bool NoSocketManager::listenHost(u_short port,
     return m_instance->Listen(L, NoSocketPrivate::get(socket));
 }
 
-bool NoSocketManager::listenAll(u_short port, const NoString& name, bool ssl, int maxConns, NoSocket* socket, u_int timeout, No::AddressType addressType)
+bool NoSocketManager::listenAll(u_short port, const NoString& name, bool ssl, NoSocket* socket, No::AddressType addressType)
 {
-    return listenHost(port, name, "", ssl, maxConns, socket, timeout, addressType);
+    return listenHost(port, name, "", ssl, socket, addressType);
 }
 
 u_short NoSocketManager::listenRand(const NoString& name,
                                     const NoString& bindHost,
                                     bool ssl,
-                                    int maxConns,
                                     NoSocket* socket,
-                                    u_int timeout,
                                     No::AddressType addressType)
 {
     ushort port = 0;
@@ -174,8 +170,6 @@ u_short NoSocketManager::listenRand(const NoString& name,
 
     L.SetSockName(name);
     L.SetIsSSL(ssl);
-    L.SetTimeout(timeout);
-    L.SetMaxConns(maxConns);
 
 #ifdef HAVE_IPV6
     switch (addressType) {
@@ -196,9 +190,9 @@ u_short NoSocketManager::listenRand(const NoString& name,
     return port;
 }
 
-u_short NoSocketManager::listenAllRand(const NoString& name, bool ssl, int maxConns, NoSocket* socket, u_int timeout, No::AddressType addressType)
+u_short NoSocketManager::listenAllRand(const NoString& name, bool ssl, NoSocket* socket, No::AddressType addressType)
 {
-    return listenRand(name, "", ssl, maxConns, socket, timeout, addressType);
+    return listenRand(name, "", ssl, socket, addressType);
 }
 
 void NoSocketManager::connect(const NoString& hostname,
