@@ -40,22 +40,11 @@ public:
                     NoSocket* socket = nullptr,
                     No::AddressType addressType = No::Ipv4AndIpv6Address);
 
-    bool listenAll(ushort port,
-                   const NoString& name,
-                   bool ssl = false,
-                   NoSocket* socket = nullptr,
-                   No::AddressType addressType = No::Ipv4AndIpv6Address);
-
     u_short listenRand(const NoString& name,
                        const NoString& bindHost,
                        bool ssl = false,
                        NoSocket* socket = nullptr,
                        No::AddressType addressType = No::Ipv4AndIpv6Address);
-
-    u_short listenAllRand(const NoString& name,
-                          bool ssl = false,
-                          NoSocket* socket = nullptr,
-                          No::AddressType addressType = No::Ipv4AndIpv6Address);
 
     void connect(const NoString& hostname,
                  ushort port,

@@ -132,7 +132,7 @@ bool NoModuleSocket::listen(ushort port, bool ssl)
         name = NoSocket::name();
     }
 
-    return noApp->manager()->listenAll(port, name, ssl, this);
+    return noApp->manager()->listenHost(port, name, "", ssl, this);
 }
 
 NoModule* NoModuleSocket::module() const

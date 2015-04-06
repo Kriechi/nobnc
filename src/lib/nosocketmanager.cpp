@@ -155,11 +155,6 @@ bool NoSocketManager::listenHost(u_short port,
     return m_instance->Listen(listener, NoSocketPrivate::get(socket));
 }
 
-bool NoSocketManager::listenAll(u_short port, const NoString& name, bool ssl, NoSocket* socket, No::AddressType addressType)
-{
-    return listenHost(port, name, "", ssl, socket, addressType);
-}
-
 u_short NoSocketManager::listenRand(const NoString& name,
                                     const NoString& bindHost,
                                     bool ssl,
@@ -189,11 +184,6 @@ u_short NoSocketManager::listenRand(const NoString& name,
     m_instance->Listen(listener, NoSocketPrivate::get(socket), &port);
 
     return port;
-}
-
-u_short NoSocketManager::listenAllRand(const NoString& name, bool ssl, NoSocket* socket, No::AddressType addressType)
-{
-    return listenRand(name, "", ssl, socket, addressType);
 }
 
 void NoSocketManager::connect(const NoString& hostname,
