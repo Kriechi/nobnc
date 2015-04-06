@@ -1471,42 +1471,43 @@ void NoClient::userCommand(NoString& line)
                       NoString(noApp->maxBufferSize()));
         }
     } else if (d->user->isAdmin() && command.equals("TRAFFIC")) {
+        NoString traffic;
         NoApp::TrafficStatsPair Users, App, Total;
-        NoApp::TrafficStatsMap traffic = noApp->trafficStats(Users, App, Total);
+        NoApp::TrafficStatsMap stats = noApp->trafficStats(Users, App, Total);
 
-        NoTable Table;
-        Table.addColumn("Username");
-        Table.addColumn("In");
-        Table.addColumn("Out");
-        Table.addColumn("Total");
+        NoTable table;
+        table.addColumn("User");
+        table.addColumn("Traffic");
 
-        for (const auto& it : traffic) {
-            Table.addRow();
-            Table.setValue("Username", it.first);
-            Table.setValue("In", No::toByteStr(it.second.first));
-            Table.setValue("Out", No::toByteStr(it.second.second));
-            Table.setValue("Total", No::toByteStr(it.second.first + it.second.second));
+        for (const auto& it : stats) {
+            table.addRow();
+            table.setValue("User", it.first);
+
+            traffic = "in: " + No::toByteStr(it.second.first);
+            traffic += " out: " + No::toByteStr(it.second.second);
+            traffic += " total: " + No::toByteStr(it.second.first + it.second.second);
+            table.setValue("Traffic", traffic);
         }
 
-        Table.addRow();
-        Table.setValue("Username", "<Users>");
-        Table.setValue("In", No::toByteStr(Users.first));
-        Table.setValue("Out", No::toByteStr(Users.second));
-        Table.setValue("Total", No::toByteStr(Users.first + Users.second));
+        table.addRow();
+        table.setValue("Username", "<Users>");
+        traffic = "in: " + No::toByteStr(Users.first);
+        traffic += " out: " + No::toByteStr(Users.second);
+        traffic += " total: " + No::toByteStr(Users.first + Users.second);
 
-        Table.addRow();
-        Table.setValue("Username", "<NoBNC>");
-        Table.setValue("In", No::toByteStr(App.first));
-        Table.setValue("Out", No::toByteStr(App.second));
-        Table.setValue("Total", No::toByteStr(App.first + App.second));
+        table.addRow();
+        table.setValue("Username", "<NoBNC>");
+        traffic = "in: " + No::toByteStr(App.first);
+        traffic += " out: " + No::toByteStr(App.second);
+        traffic += " total: " + No::toByteStr(App.first + App.second);
 
-        Table.addRow();
-        Table.setValue("Username", "<Total>");
-        Table.setValue("In", No::toByteStr(Total.first));
-        Table.setValue("Out", No::toByteStr(Total.second));
-        Table.setValue("Total", No::toByteStr(Total.first + Total.second));
+        table.addRow();
+        table.setValue("Username", "<Total>");
+        traffic = "in: " + No::toByteStr(Total.first);
+        traffic += " out: " + No::toByteStr(Total.second);
+        traffic += " total: " + No::toByteStr(Total.first + Total.second);
 
-        putStatus(Table);
+        putStatus(table);
     } else if (command.equals("UPTIME")) {
         putStatus("Running for " + noApp->uptime());
     } else if (d->user->isAdmin() &&
