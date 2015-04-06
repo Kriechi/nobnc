@@ -78,44 +78,24 @@ void NoClient::userCommand(NoString& line)
             return;
         }
 
-        const std::map<NoString, NoNick>& msNicks = channel->nicks();
-        NoIrcSocket* socket = d->network->ircSocket();
-        const NoString& sPerms = (socket) ? socket->perms() : "";
+        const std::map<NoString, NoNick>& nicks = channel->nicks();
 
-        if (msNicks.empty()) {
+        if (nicks.empty()) {
             putStatus("No nicks on [" + sChan + "]");
             return;
         }
 
-        NoTable Table;
+        NoTable table;
+        table.addColumn("Nick");
+        table.addColumn("Mask");
 
-        for (uint p = 0; p < sPerms.size(); p++) {
-            NoString sPerm;
-            sPerm += sPerms[p];
-            Table.addColumn(sPerm);
+        for (const auto& it : nicks) {
+            table.addRow();
+            table.setValue("Nick", it.second.perms() + it.second.nick());
+            table.setValue("Mask", it.second.hostMask());
         }
 
-        Table.addColumn("Nick");
-        Table.addColumn("Ident");
-        Table.addColumn("Host");
-
-        for (const auto& it : msNicks) {
-            Table.addRow();
-
-            for (uint b = 0; b < sPerms.size(); b++) {
-                if (it.second.hasPerm(sPerms[b])) {
-                    NoString sPerm;
-                    sPerm += sPerms[b];
-                    Table.setValue(sPerm, sPerm);
-                }
-            }
-
-            Table.setValue("Nick", it.second.nick());
-            Table.setValue("Ident", it.second.ident());
-            Table.setValue("Host", it.second.host());
-        }
-
-        putStatus(Table);
+        putStatus(table);
     } else if (command.equals("DETACH")) {
         if (!d->network) {
             putStatus("You must be connected with a network to use this command");
