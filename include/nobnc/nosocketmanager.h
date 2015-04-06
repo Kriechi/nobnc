@@ -60,7 +60,6 @@ public:
     void connect(const NoString& hostname,
                  ushort port,
                  const NoString& name,
-                 int timeout = 60,
                  bool ssl = false,
                  const NoString& bindHost = "",
                  NoSocket* socket = nullptr);

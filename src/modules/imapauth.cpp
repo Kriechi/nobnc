@@ -110,7 +110,8 @@ public:
         }
 
         NoImapSock* socket = new NoImapSock(this, Auth);
-        socket->connect(m_sServer, m_uPort, m_bSSL, 20);
+        socket->connect(m_sServer, m_uPort, m_bSSL);
+        socket->setTimeout(20);
 
         return Halt;
     }

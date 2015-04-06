@@ -84,7 +84,7 @@ bool NoModuleSocket::onConnectionFrom(const NoString& host, ushort port)
     return noApp->allowConnectionFrom(host);
 }
 
-bool NoModuleSocket::connect(const NoString& hostname, ushort port, bool ssl, uint timeout)
+bool NoModuleSocket::connect(const NoString& hostname, ushort port, bool ssl)
 {
     if (!m_module) {
         NO_DEBUG("ERROR: NoSocket::Connect called on instance without m_pModule handle!");
@@ -110,11 +110,11 @@ bool NoModuleSocket::connect(const NoString& hostname, ushort port, bool ssl, ui
         name = NoSocket::name();
     }
 
-    noApp->manager()->connect(hostname, port, name, timeout, ssl, bindHost, this);
+    noApp->manager()->connect(hostname, port, name, ssl, bindHost, this);
     return true;
 }
 
-bool NoModuleSocket::listen(ushort port, bool ssl, uint timeout)
+bool NoModuleSocket::listen(ushort port, bool ssl)
 {
     if (!m_module) {
         NO_DEBUG("ERROR: NoSocket::Listen called on instance without m_pModule handle!");

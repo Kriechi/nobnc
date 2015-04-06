@@ -198,7 +198,6 @@ u_short NoSocketManager::listenAllRand(const NoString& name, bool ssl, NoSocket*
 void NoSocketManager::connect(const NoString& hostname,
                               u_short port,
                               const NoString& name,
-                              int timeout,
                               bool ssl,
                               const NoString& bindHost,
                               NoSocket* socket)
@@ -212,7 +211,7 @@ void NoSocketManager::connect(const NoString& hostname,
     task->hostname = hostname;
     task->port = port;
     task->name = name;
-    task->timeout = timeout;
+    task->timeout = 120;
     task->ssl = ssl;
     task->sBindhost = bindHost;
     task->socket = socket;
