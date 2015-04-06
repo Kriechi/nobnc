@@ -22,24 +22,6 @@
 #include "noescape.h"
 #include <signal.h>
 
-#ifdef HAVE_LIBSSL
-// Copypasted from https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28default.29 at 22 Dec
-// 2014
-const char* ZNC_DefaultCipher =
-"ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-"
-"GCM-SHA384:"
-"DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-"
-"SHA256:"
-"ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-"
-"AES256-SHA:"
-"ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-"
-"SHA256:"
-"DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:"
-"AES128-SHA:"
-"AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-"
-"SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA";
-#endif
-
 NoSocketImpl::NoSocketImpl(NoSocket* q, const NoString& host, u_short port)
     : Csock(host, port), q(q), allowControlCodes(false)
 {
@@ -47,11 +29,7 @@ NoSocketImpl::NoSocketImpl(NoSocket* q, const NoString& host, u_short port)
     DisableSSLCompression();
     FollowSSLCipherServerPreference();
     DisableSSLProtocols(noApp->disabledSslProtocols());
-    NoString sCipher = noApp->sslCiphers();
-    if (sCipher.empty()) {
-        sCipher = ZNC_DefaultCipher;
-    }
-    SetCipher(sCipher);
+    SetCipher(noApp->sslCiphers());
 #endif
 }
 

@@ -25,10 +25,6 @@
 #include <algorithm>
 #include <random>
 
-#ifdef HAVE_LIBSSL
-extern const char* ZNC_DefaultCipher;
-#endif
-
 #ifdef HAVE_PTHREAD
 class NoDnsMonitorFD : public CSMonitorFD
 {
@@ -509,11 +505,7 @@ void FinishConnect(NoSocketManager* manager,
     C.SetIsSSL(ssl);
     C.SetBindHost(bindHost);
 #ifdef HAVE_LIBSSL
-    NoString sCipher = noApp->sslCiphers();
-    if (sCipher.empty()) {
-        sCipher = ZNC_DefaultCipher;
-    }
-    C.SetCipher(sCipher);
+    C.SetCipher(noApp->sslCiphers());
 #endif
 
     manager->doConnect(C, NoSocketPrivate::get(socket));
