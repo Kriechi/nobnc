@@ -329,7 +329,7 @@ public:
                    static_cast<NoModule::CommandFunction>(&NoAliasMod::ListCommand),
                    "",
                    "Lists all aliases by name.");
-        addCommand("info",
+        addCommand("Info",
                    static_cast<NoModule::CommandFunction>(&NoAliasMod::InfoCommand),
                    "<name>",
                    "Reports the actions performed by an alias.");

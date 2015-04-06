@@ -141,11 +141,11 @@ public:
                    static_cast<NoModule::CommandFunction>(&NoAutoVoiceMod::OnListUsersCommand),
                    "",
                    "List all users");
-        addCommand("addChannels",
+        addCommand("AddChannels",
                    static_cast<NoModule::CommandFunction>(&NoAutoVoiceMod::OnaddChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Adds channels to a user");
-        addCommand("removeChannels",
+        addCommand("RemoveChannels",
                    static_cast<NoModule::CommandFunction>(&NoAutoVoiceMod::OnremoveChannelsCommand),
                    "<user> <channel> [channel] ...",
                    "Removes channels from a user");

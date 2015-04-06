@@ -49,11 +49,11 @@ public:
     MODCONSTRUCTOR(NoCertMod)
     {
         addHelpCommand();
-        addCommand("delete",
+        addCommand("Delete",
                    static_cast<NoModule::CommandFunction>(&NoCertMod::Delete),
                    "",
                    "Delete the current certificate");
-        addCommand("info", static_cast<NoModule::CommandFunction>(&NoCertMod::info));
+        addCommand("Info", static_cast<NoModule::CommandFunction>(&NoCertMod::info));
     }
 
     NoString PemFile() const

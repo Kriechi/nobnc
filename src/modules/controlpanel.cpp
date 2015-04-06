@@ -1373,11 +1373,11 @@ public:
                    static_cast<NoModule::CommandFunction>(&NoAdminMod::SetChan),
                    "<variable> <username> <network> <chan> <value>",
                    "Sets the variable's value for the given channel");
-        addCommand("addChannel",
+        addCommand("AddChannel",
                    static_cast<NoModule::CommandFunction>(&NoAdminMod::addChannel),
                    "<username> <network> <chan>",
                    "Adds a new channel");
-        addCommand("removeChannel",
+        addCommand("RemoveChannel",
                    static_cast<NoModule::CommandFunction>(&NoAdminMod::removeChannel),
                    "<username> <network> <chan>",
                    "Deletes a channel");
@@ -1394,7 +1394,7 @@ public:
                    static_cast<NoModule::CommandFunction>(&NoAdminMod::AddServer),
                    "<username> <network> <server>",
                    "Adds a new IRC server for the given or current user");
-        addCommand("removeServer",
+        addCommand("RemoveServer",
                    static_cast<NoModule::CommandFunction>(&NoAdminMod::removeServer),
                    "<username> <network> <server>",
                    "Deletes an IRC server from the given or current user");
