@@ -167,28 +167,24 @@ void NoClient::userCommand(NoString& line)
             }
         }
 
-        std::vector<NoClient*> vClients = user->allClients();
+        std::vector<NoClient*> clients = user->allClients();
 
-        if (vClients.empty()) {
+        if (clients.empty()) {
             putStatus("No clients are connected");
             return;
         }
 
-        NoTable Table;
-        Table.addColumn("Host");
-        Table.addColumn("Network");
-        Table.addColumn("Identifier");
+        NoTable table;
+        table.addColumn("Host");
+        table.addColumn("Name");
 
-        for (const NoClient* client : vClients) {
-            Table.addRow();
-            Table.setValue("Host", client->socket()->remoteAddress());
-            if (client->network()) {
-                Table.setValue("Network", client->network()->name());
-            }
-            Table.setValue("Identifier", client->identifier());
+        for (const NoClient* client : clients) {
+            table.addRow();
+            table.setValue("Host", client->socket()->remoteAddress());
+            table.setValue("Name", client->fullName());
         }
 
-        putStatus(Table);
+        putStatus(table);
     } else if (d->user->isAdmin() && command.equals("LISTUSERS")) {
         const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
         NoTable Table;
