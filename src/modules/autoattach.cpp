@@ -141,18 +141,14 @@ private:
     void HandleList(const NoString& line)
     {
         NoTable Table;
-        Table.addColumn("Neg");
         Table.addColumn("Channel");
-        Table.addColumn("Search");
-        Table.addColumn("Host");
+        Table.addColumn("Match");
 
         VAttachIter it = m_vMatches.begin();
         for (; it != m_vMatches.end(); ++it) {
             Table.addRow();
-            Table.setValue("Neg", it->IsNegated() ? "!" : "");
             Table.setValue("Channel", it->channels());
-            Table.setValue("Search", it->GetSearch());
-            Table.setValue("Host", it->GetHostMask());
+            Table.setValue("Match", (it->IsNegated() ? "!" : "") + it->GetSearch() + " (" + it->GetHostMask() + ")");
         }
 
         if (Table.size()) {
