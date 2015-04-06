@@ -43,7 +43,7 @@ public:
 class NoListenerSocket : public NoSocket
 {
 public:
-    NoListenerSocket(NoListenerPrivate* listener) : m_listener(listener)
+    NoListenerSocket(NoListenerPrivate* listener) : NoSocket(nullptr), m_listener(listener)
     {
     }
     ~NoListenerSocket()
@@ -62,7 +62,7 @@ private:
 class NoPeerSocket : public NoSocket
 {
 public:
-    NoPeerSocket(const NoString& host, ushort port, NoListenerPrivate* listener);
+    NoPeerSocket(NoListenerPrivate* listener);
 
     void readLine(const NoString& data) override;
     void onReachedMaxBuffer() override;
@@ -83,7 +83,9 @@ bool NoListenerSocket::onConnectionFrom(const NoString& host, ushort port)
 
 NoSocket* NoListenerSocket::createSocket(const NoString& host, ushort port)
 {
-    NoPeerSocket* socket = new NoPeerSocket(host, port, m_listener);
+    NoPeerSocket* socket = new NoPeerSocket(m_listener);
+    socket->setHost(host);
+    socket->setPort(port);
     if (noApp->allowConnectionFrom(host)) {
         GLOBALMODULECALL(onClientConnect(socket, host, port), NOTHING);
     } else {
@@ -107,8 +109,8 @@ void NoListenerSocket::onSocketError(int error, const NoString& description)
     }
 }
 
-NoPeerSocket::NoPeerSocket(const NoString& host, ushort port, NoListenerPrivate* listener)
-    : NoSocket(host, port), m_listener(listener)
+NoPeerSocket::NoPeerSocket(NoListenerPrivate* listener)
+    : NoSocket(nullptr), m_listener(listener)
 {
     // The socket will time out in 120 secs, no matter what.
     // This has to be fixed up later, if desired.

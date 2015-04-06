@@ -27,7 +27,7 @@
 #include <nobnc/nouser.h>
 #include <nobnc/nonetwork.h>
 #include <nobnc/noapp.h>
-#include <nobnc/nomodulesocket.h>
+#include <nobnc/nosocket.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
 #include <nobnc/notimer.h>
@@ -54,7 +54,7 @@ protected:
     NoString m_sNick;
 };
 
-class NoSChatSock : public NoModuleSocket
+class NoSChatSock : public NoSocket
 {
 public:
     NoSChatSock(NoSChat* mod, const NoString& sChatNick);
@@ -411,7 +411,7 @@ private:
 
 //////////////////// methods ////////////////
 
-NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick) : NoModuleSocket(mod)
+NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick) : NoSocket(mod)
 {
     m_module = mod;
     m_sChatNick = sChatNick;
@@ -420,8 +420,11 @@ NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick) : NoModuleSock
 }
 
 NoSChatSock::NoSChatSock(NoSChat* mod, const NoString& sChatNick, const NoString& host, u_short port)
-    : NoModuleSocket(mod, host, port)
+    : NoSocket(mod)
 {
+    setHost(host);
+    setPort(port);
+
     m_module = mod;
     enableReadLine();
     m_sChatNick = sChatNick;

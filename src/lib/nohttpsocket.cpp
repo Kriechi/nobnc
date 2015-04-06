@@ -36,7 +36,7 @@ NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& uriPrefix) : NoHttpSoc
 }
 
 NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& uriPrefix, const NoString& hostname, ushort port)
-    : NoModuleSocket(mod, hostname, port),
+    : NoSocket(mod),
       m_sentHeader(false),
       m_gotHeader(false),
       m_loggedIn(false),
@@ -59,6 +59,8 @@ NoHttpSocket::NoHttpSocket(NoModule* mod, const NoString& uriPrefix, const NoStr
       m_responseCookies(),
       m_uriPrefix(uriPrefix)
 {
+    setHost(hostname);
+    setPort(port);
     init();
 }
 
@@ -206,7 +208,7 @@ NoString NoHttpSocket::remoteAddress() const
         return m_forwardedIp;
     }
 
-    return NoModuleSocket::remoteAddress();
+    return NoSocket::remoteAddress();
 }
 
 NoString NoHttpSocket::formatDate(time_t stamp)

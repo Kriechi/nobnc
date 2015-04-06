@@ -99,7 +99,7 @@ bool NoIrcSocket::isFloodProtected(double fRate)
     return fRate > FLOOD_MINIMAL_RATE;
 }
 
-NoIrcSocket::NoIrcSocket(NoNetwork* network) : d(new NoIrcSocketPrivate)
+NoIrcSocket::NoIrcSocket(NoNetwork* network) : NoSocket(nullptr), d(new NoIrcSocketPrivate)
 {
     d->network = network;
     d->sendsAllowed = network->floodBurst();

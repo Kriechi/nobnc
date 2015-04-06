@@ -38,7 +38,7 @@ class NoHostMask;
 class NoTemplate;
 class NoWebSocket;
 class NoIrcSocket;
-class NoModuleSocket;
+class NoSocket;
 class NoAuthenticator;
 class NoModulePrivate;
 
@@ -106,7 +106,7 @@ public:
     bool putModuleNotice(const NoString& line);
 
     NoTimer* findTimer(const NoString& label) const;
-    NoModuleSocket* findSocket(const NoString& name) const;
+    NoSocket* findSocket(const NoString& name) const;
 
     typedef void (NoModule::*CommandFunction)(const NoString& line);
 

@@ -38,7 +38,7 @@ enum {
 class NoSocketImpl : public Csock
 {
 public:
-    NoSocketImpl(NoSocket* q, const NoString& host, u_short port);
+    NoSocketImpl(NoSocket* q);
     ~NoSocketImpl();
 
     int ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& address, u_short* piPort) const override;
@@ -117,6 +117,7 @@ public:
         return socket->d->impl;
     }
 
+    NoModule* module;
     NoSocketImpl* impl;
 };
 

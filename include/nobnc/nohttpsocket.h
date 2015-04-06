@@ -19,12 +19,12 @@
 #define NOHTTPSOCKET_H
 
 #include <nobnc/noglobal.h>
-#include <nobnc/nomodulesocket.h>
+#include <nobnc/nosocket.h>
 
 class NoFile;
 class NoModule;
 
-class NO_EXPORT NoHttpSocket : public NoModuleSocket
+class NO_EXPORT NoHttpSocket : public NoSocket
 {
 public:
     NoHttpSocket(NoModule* mod, const NoString& uriPrefix);

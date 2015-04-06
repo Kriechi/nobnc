@@ -18,13 +18,16 @@
 #include "nosocket.h"
 #include "nosocket_p.h"
 #include "nosslverifyhost.h"
+#include "nosocketinfo.h"
+#include "nomodule_p.h"
+#include "nonetwork.h"
+#include "nouser_p.h"
 #include "noapp.h"
 #include "noapp_p.h"
 #include "noescape.h"
 #include <signal.h>
 
-NoSocketImpl::NoSocketImpl(NoSocket* q, const NoString& host, u_short port)
-    : Csock(host, port), q(q), allowControlCodes(false)
+NoSocketImpl::NoSocketImpl(NoSocket* q) : q(q), allowControlCodes(false)
 {
 #ifdef HAVE_LIBSSL
     DisableSSLCompression();
@@ -42,13 +45,40 @@ NoSocketImpl::~NoSocketImpl()
     delete q;
 }
 
-NoSocket::NoSocket(const NoString& host, u_short port) : d(new NoSocketPrivate)
+NoSocket::NoSocket(NoModule* module) : d(new NoSocketPrivate)
 {
-    d->impl = new NoSocketImpl(this, host, port);
+    d->module = module;
+    d->impl = new NoSocketImpl(this);
+
+    if (module) {
+        NoModulePrivate::get(module)->sockets.insert(this);
+        enableReadLine();
+        setMaxBufferThreshold(10240);
+    }
 }
 
 NoSocket::~NoSocket()
 {
+    if (d->module) {
+        NoModulePrivate::get(d->module)->sockets.erase(this);
+        NoAppPrivate::get(noApp)->manager.removeSocket(this);
+
+        NoSocketInfo info(this);
+        NoUser* user = d->module->user();
+
+        if (user && d->module->type() != No::GlobalModule) {
+            NoUserPrivate::get(user)->addBytesWritten(info.bytesWritten());
+            NoUserPrivate::get(user)->addBytesRead(info.bytesRead());
+        } else {
+            NoAppPrivate::get(noApp)->addBytesWritten(info.bytesWritten());
+            NoAppPrivate::get(noApp)->addBytesRead(info.bytesRead());
+        }
+    }
+}
+
+NoModule* NoSocket::module() const
+{
+    return d->module;
 }
 
 int NoSocketImpl::ConvertAddress(const struct sockaddr_storage* pAddr, socklen_t iAddrLen, CS_STRING& address, u_short* piPort) const
@@ -328,12 +358,42 @@ SSL_SESSION* NoSocket::sslSession() const
     return d->impl->GetSSLSession();
 }
 #endif
+
+static NoString no_socketName(NoModule* module, const NoString& infix)
+{
+    NoString name = "MOD::" + infix + "::" + module->name();
+    NoUser* user = module->user();
+    if (user)
+        name += "::" + user->userName();
+    NoNetwork* network = module->network();
+    if (network)
+        name += "::" + network->name();
+    return name;
+}
+
 void NoSocket::connect()
 {
-    NoAppPrivate::get(noApp)->manager.connect(host(), port(), name(), isSsl(), bindHost(), this);
+    if (d->module && name().empty())
+        setName(no_socketName(d->module, "C"));
+
+    NoString bindHost = NoSocket::bindHost();
+    if (d->module) {
+        NoUser* user = d->module->user();
+        if (user) {
+            bindHost = user->bindHost();
+            NoNetwork* network = d->module->network();
+            if (network)
+                bindHost = network->bindHost();
+        }
+    }
+
+    NoAppPrivate::get(noApp)->manager.connect(host(), port(), name(), isSsl(), bindHost, this);
 }
 bool NoSocket::listen(ushort port)
 {
+    if (d->module && name().empty())
+        setName(no_socketName(d->module, "L"));
+
     return NoAppPrivate::get(noApp)->manager.listen(port, name(), bindHost(), isSsl(), this);
 }
 void NoSocket::enableReadLine()
@@ -465,13 +525,21 @@ void NoSocket::onReadPaused()
 }
 void NoSocket::onReachedMaxBuffer()
 {
-    d->impl->Csock::ReachedMaxBuffer();
+    NO_DEBUG(name() << " == ReachedMaxBuffer()");
+    if (d->module) {
+        d->module->putModule("Socket (" + name() + ") reached its max buffer limit and was closed!");
+        close();
+    }
 }
-void NoSocket::onSocketError(int iErrno, const NoString& description)
+void NoSocket::onSocketError(int error, const NoString& description)
 {
-    d->impl->Csock::SockError(iErrno, description);
+    NO_DEBUG(name() << " == SockError(" << description << ", " << strerror(error) << ")");
+    if (d->module && error == EMFILE) {
+        // We have too many open fds, this can cause a busy loop.
+        close();
+    }
 }
 bool NoSocket::onConnectionFrom(const NoString& host, ushort port)
 {
-    return d->impl->Csock::ConnectionFrom(host, port);
+    return !d->module || noApp->allowConnectionFrom(host);
 }

@@ -81,7 +81,7 @@
 class NoClientSocket : public NoSocket
 {
 public:
-    NoClientSocket(NoClient* client) : m_pClient(client)
+    NoClientSocket(NoClient* client) : NoSocket(nullptr), m_pClient(client)
     {
         NoSocketPrivate::get(this)->allowControlCodes = true;
 

@@ -21,7 +21,7 @@
 #include <nobnc/nodebug.h>
 #include <nobnc/noclient.h>
 #include <nobnc/noapp.h>
-#include <nobnc/nomodulesocket.h>
+#include <nobnc/nosocket.h>
 #include <nobnc/noregistry.h>
 #include <nobnc/nonick.h>
 #include <nobnc/nohostmask.h>
@@ -29,7 +29,7 @@
 
 class NoBounceDccMod;
 
-class NoDccBounce : public NoModuleSocket
+class NoDccBounce : public NoSocket
 {
 public:
     NoDccBounce(NoBounceDccMod* mod,
@@ -348,7 +348,7 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* mod,
                          const NoString& sRemoteNick,
                          const NoString& sRemoteIP,
                          bool bIsChat)
-    : NoModuleSocket(mod)
+    : NoSocket(mod)
 {
     m_uRemotePort = port;
     m_sConnectIP = No::formatIp(uLongIP);
@@ -376,8 +376,11 @@ NoDccBounce::NoDccBounce(NoBounceDccMod* mod,
                          const NoString& sRemoteIP,
                          const NoString& fileName,
                          bool bIsChat)
-    : NoModuleSocket(mod, hostname, port)
+    : NoSocket(mod)
 {
+    setHost(hostname);
+    setPort(port);
+
     m_uRemotePort = 0;
     m_bIsChat = bIsChat;
     m_module = mod;

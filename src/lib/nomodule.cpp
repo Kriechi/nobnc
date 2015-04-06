@@ -24,7 +24,7 @@
 #include "nonetwork.h"
 #include "noclient.h"
 #include "noapp.h"
-#include "nomodulesocket.h"
+#include "nosocket.h"
 #include "notimer.h"
 #include "notable.h"
 #include "noexception_p.h"
@@ -73,7 +73,7 @@ NoModule::~NoModule()
         delete timer;
     d->timers.clear();
 
-    for (NoModuleSocket* socket : d->sockets)
+    for (NoSocket* socket : d->sockets)
         delete socket;
     d->sockets.clear();
 }
@@ -178,9 +178,9 @@ NoTimer* NoModule::findTimer(const NoString& label) const
     return nullptr;
 }
 
-NoModuleSocket* NoModule::findSocket(const NoString& name) const
+NoSocket* NoModule::findSocket(const NoString& name) const
 {
-    for (NoModuleSocket* pSocket : d->sockets) {
+    for (NoSocket* pSocket : d->sockets) {
         if (pSocket->name().equals(name)) {
             return pSocket;
         }

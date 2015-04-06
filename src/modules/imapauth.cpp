@@ -20,15 +20,15 @@
 #include <nobnc/nodebug.h>
 #include <nobnc/noclient.h>
 #include <nobnc/noauthenticator.h>
-#include <nobnc/nomodulesocket.h>
+#include <nobnc/nosocket.h>
 
 class NoImapAuthMod;
 
-class NoImapSock : public NoModuleSocket
+class NoImapSock : public NoSocket
 {
 public:
     NoImapSock(NoImapAuthMod* module, std::shared_ptr<NoAuthenticator> Auth)
-        : NoModuleSocket((NoModule*)module), m_spAuth(Auth)
+        : NoSocket((NoModule*)module), m_spAuth(Auth)
     {
         m_pIMAPMod = module;
         m_bSentReply = false;
@@ -110,8 +110,11 @@ public:
         }
 
         NoImapSock* socket = new NoImapSock(this, Auth);
-        socket->connect(m_sServer, m_uPort, m_bSSL);
+        socket->setSsl(m_bSSL);
+        socket->setHost(m_sServer);
+        socket->setPort(m_uPort);
         socket->setTimeout(20);
+        socket->connect();
 
         return Halt;
     }

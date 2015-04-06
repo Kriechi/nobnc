@@ -168,7 +168,7 @@ public:
     No::ModuleType type;
     NoString description;
     std::set<NoTimer*> timers;
-    std::set<NoModuleSocket*> sockets;
+    std::set<NoSocket*> sockets;
     NoModuleHandle handle;
     NoUser* user;
     NoNetwork* network;

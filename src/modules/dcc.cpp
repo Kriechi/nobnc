@@ -22,7 +22,7 @@
 #include <nobnc/nodir.h>
 #include <nobnc/nodebug.h>
 #include <nobnc/noclient.h>
-#include <nobnc/nomodulesocket.h>
+#include <nobnc/nosocket.h>
 #include <nobnc/notable.h>
 #include <nobnc/nosocketinfo.h>
 
@@ -31,7 +31,7 @@
 
 class NoDccMod;
 
-class NoDccSock : public NoModuleSocket
+class NoDccSock : public NoSocket
 {
 public:
     NoDccSock(NoDccMod* mod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize = 0, NoFile* pFile = nullptr);
@@ -312,7 +312,7 @@ private:
 };
 
 NoDccSock::NoDccSock(NoDccMod* mod, const NoString& sRemoteNick, const NoString& sLocalFile, ulong uFileSize, NoFile* pFile)
-    : NoModuleSocket(mod)
+    : NoSocket(mod)
 {
     m_sRemoteNick = sRemoteNick;
     m_uFileSize = uFileSize;
@@ -328,7 +328,7 @@ NoDccSock::NoDccSock(NoDccMod* mod, const NoString& sRemoteNick, const NoString&
 }
 
 NoDccSock::NoDccSock(NoDccMod* mod, const NoString& sRemoteNick, const NoString& sRemoteIP, ushort uRemotePort, const NoString& sLocalFile, ulong uFileSize)
-    : NoModuleSocket(mod)
+    : NoSocket(mod)
 {
     m_sRemoteNick = sRemoteNick;
     m_sRemoteIP = sRemoteIP;

@@ -36,8 +36,10 @@ typedef struct ssl_session_st SSL_SESSION;
 class NO_EXPORT NoSocket
 {
 public:
-    NoSocket(const NoString& host = "", ushort port = 0);
+    NoSocket(NoModule* module);
     virtual ~NoSocket();
+
+    NoModule* module() const;
 
     ushort port() const;
     void setPort(ushort port);
