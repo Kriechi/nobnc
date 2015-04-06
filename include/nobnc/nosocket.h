@@ -39,9 +39,14 @@ public:
     NoSocket(const NoString& host = "", ushort port = 0);
     virtual ~NoSocket();
 
-    bool isSsl() const;
     ushort port() const;
+    void setPort(ushort port);
+
     NoString host() const;
+    void setHost(const NoString& host);
+
+    bool isSsl() const;
+    void setSsl(bool ssl);
 
     NoString name() const;
     void setName(const NoString& name);
@@ -59,6 +64,7 @@ public:
     virtual NoString remoteAddress() const;
 
     NoString bindHost() const;
+    void setBindHost(const NoString& bindHost);
 
     NoString hostToVerifySsl() const;
     void setHostToVerifySsl(const NoString& host);

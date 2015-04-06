@@ -233,6 +233,10 @@ NoString NoSocket::bindHost() const
 {
     return d->impl->GetBindHost();
 }
+void NoSocket::setBindHost(const NoString& bindHost)
+{
+    return d->impl->SetBindHost(bindHost);
+}
 void NoSocket::setName(const NoString& name)
 {
     d->impl->SetSockName(name);
@@ -257,9 +261,17 @@ ushort NoSocket::port() const
 {
     return d->impl->GetPort();
 }
+void NoSocket::setPort(ushort port)
+{
+    return d->impl->SetPort(port);
+}
 NoString NoSocket::host() const
 {
     return d->impl->GetHostName();
+}
+void NoSocket::setHost(const NoString& host)
+{
+    d->impl->SetHostName(host);
 }
 ushort NoSocket::localPort() const
 {
@@ -272,6 +284,10 @@ ushort NoSocket::remotePort() const
 bool NoSocket::isSsl() const
 {
     return d->impl->GetSSL();
+}
+void NoSocket::setSsl(bool ssl)
+{
+    d->impl->SetSSL(ssl);
 }
 void NoSocket::pauseRead()
 {
