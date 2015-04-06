@@ -21,7 +21,6 @@
 #include <nobnc/nouser.h>
 #include <nobnc/noprocess.h>
 #include <nobnc/noclient.h>
-#include <nobnc/nosocketmanager.h>
 #include <nobnc/noutils.h>
 #include <nobnc/noapp.h>
 
@@ -69,11 +68,12 @@ public:
 
     virtual ~NoShellMod()
     {
-        std::vector<NoSocket*> vSocks = noApp->manager()->findSockets("SHELL");
+        // ### TODO
+//        std::vector<NoSocket*> vSocks = noApp->manager()->findSockets("SHELL");
 
-        for (uint a = 0; a < vSocks.size(); a++) {
-            noApp->manager()->removeSocket(vSocks[a]);
-        }
+//        for (uint a = 0; a < vSocks.size(); a++) {
+//            noApp->manager()->removeSocket(vSocks[a]);
+//        }
     }
 
     bool onLoad(const NoString& args, NoString& message) override
@@ -125,7 +125,8 @@ public:
     {
         // TODO: who deletes the instance?
         NoShellSock* sock = new NoShellSock(this, client(), "cd " + m_sPath + " && " + command);
-        noApp->manager()->addSocket(sock, "SHELL");
+        // ### TODO
+//        noApp->manager()->addSocket(sock, "SHELL");
     }
 
 private:
