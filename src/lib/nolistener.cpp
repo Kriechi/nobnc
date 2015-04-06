@@ -269,5 +269,5 @@ bool NoListener::listen()
     // Make sure there is a consistent error message, not something random
     // which might even be "Error: Success".
     errno = EINVAL;
-    return noApp->manager()->listenHost(d->port, "_LISTENER", d->host, ssl, d->socket, d->addressType);
+    return noApp->manager()->listen(d->port, "_LISTENER", d->host, ssl, d->socket, d->addressType);
 }

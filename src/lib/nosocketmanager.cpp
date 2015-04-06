@@ -126,12 +126,12 @@ NoSocketManager::~NoSocketManager()
 {
 }
 
-bool NoSocketManager::listenHost(u_short port,
-                                 const NoString& name,
-                                 const NoString& bindHost,
-                                 bool ssl,
-                                 NoSocket* socket,
-                                 No::AddressType addressType)
+bool NoSocketManager::listen(ushort port,
+                             const NoString& name,
+                             const NoString& bindHost,
+                             bool ssl,
+                             NoSocket* socket,
+                             No::AddressType addressType)
 {
     CSListener listener(port, bindHost);
 
@@ -152,38 +152,10 @@ bool NoSocketManager::listenHost(u_short port,
     }
 #endif
 
-    return m_instance->Listen(listener, NoSocketPrivate::get(socket));
-}
-
-u_short NoSocketManager::listenRand(const NoString& name,
-                                    const NoString& bindHost,
-                                    bool ssl,
-                                    NoSocket* socket,
-                                    No::AddressType addressType)
-{
-    ushort port = 0;
-    CSListener listener(0, bindHost);
-
-    listener.SetSockName(name);
-    listener.SetIsSSL(ssl);
-
-#ifdef HAVE_IPV6
-    switch (addressType) {
-    case No::Ipv4Address:
-        listener.SetAFRequire(CSSockAddr::RAF_INET);
-        break;
-    case No::Ipv6Address:
-        listener.SetAFRequire(CSSockAddr::RAF_INET6);
-        break;
-    case No::Ipv4AndIpv6Address:
-        listener.SetAFRequire(CSSockAddr::RAF_ANY);
-        break;
-    }
-#endif
-
-    m_instance->Listen(listener, NoSocketPrivate::get(socket), &port);
-
-    return port;
+    if (port != 0)
+        return m_instance->Listen(listener, NoSocketPrivate::get(socket));
+    else
+        return m_instance->Listen(listener, NoSocketPrivate::get(socket), &port);
 }
 
 void NoSocketManager::connect(const NoString& hostname,

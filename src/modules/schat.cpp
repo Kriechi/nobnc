@@ -180,7 +180,7 @@ public:
             socket->setPemFile(m_sPemFile);
 
             u_short port =
-            noApp->manager()->listenRand(socket->name() + "::LISTENER", user()->localDccIp(), true, socket);
+            noApp->manager()->listen(0, socket->name() + "::LISTENER", user()->localDccIp(), true, socket);
             socket->setTimeout(60);
 
             if (port == 0) {

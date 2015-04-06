@@ -151,16 +151,15 @@ public:
         }
 
         NoString sLocalDCCIP = user()->localDccIp();
-        ushort port =
-        noApp->manager()->listenRand("DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, socket);
+        noApp->manager()->listen(0, "DCC::LISTEN::" + sRemoteNick, sLocalDCCIP, false, socket);
         socket->setTimeout(120);
 
         if (user()->nick().equals(sRemoteNick)) {
             putUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
-                    NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(port) + " " + NoString(pFile->GetSize()) + "\001");
+                    NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(socket->port()) + " " + NoString(pFile->GetSize()) + "\001");
         } else {
             putIrc("PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
-                   NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(port) + " " + NoString(pFile->GetSize()) + "\001");
+                   NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(socket->port()) + " " + NoString(pFile->GetSize()) + "\001");
         }
 
         putModule("DCC -> [" + sRemoteNick + "][" + pFile->GetShortName() + "] - Attempting Send.");
