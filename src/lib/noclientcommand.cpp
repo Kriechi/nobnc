@@ -590,29 +590,17 @@ void NoClient::userCommand(NoString& line)
             }
         }
 
-        const std::vector<NoNetwork*>& vNetworks = user->networks();
+        NoTable table;
+        table.addColumn("Network");
+        table.addColumn("Status");
 
-        NoTable Table;
-        Table.addColumn("Network");
-        Table.addColumn("OnIRC");
-        Table.addColumn("IRC Server");
-        Table.addColumn("IRC User");
-        Table.addColumn("Channels");
-
-        for (const NoNetwork* network : vNetworks) {
-            Table.addRow();
-            Table.setValue("Network", network->name());
-            if (network->isIrcConnected()) {
-                Table.setValue("OnIRC", "Yes");
-                Table.setValue("IRC Server", network->ircServer());
-                Table.setValue("IRC User", network->ircNick().hostMask());
-                Table.setValue("Channels", NoString(network->channels().size()));
-            } else {
-                Table.setValue("OnIRC", "No");
-            }
+        for (const NoNetwork* network : user->networks()) {
+            table.addRow();
+            table.setValue("Network", network->name());
+            table.setValue("Status", network->isIrcConnected() ? "Online" : (network->isEnabled() ? "Offline" : "Disabled"));
         }
 
-        if (putStatus(Table) == 0) {
+        if (putStatus(table) == 0) {
             putStatus("No networks");
         }
     } else if (command.equals("SHOWNETWORK")) {
