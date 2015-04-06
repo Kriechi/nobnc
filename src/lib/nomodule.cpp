@@ -37,15 +37,13 @@ double NoModulePrivate::buildVersion()
 static void initCommandHelp(NoTable& table)
 {
     table.addColumn("Command");
-    table.addColumn("Arguments");
     table.addColumn("Description");
 }
 
 static void addCommandHelp(NoTable& table, const NoModuleCommand& cmd)
 {
     table.addRow();
-    table.setValue("Command", cmd.command);
-    table.setValue("Arguments", cmd.args);
+    table.setValue("Command", cmd.command + " " + cmd.args);
     table.setValue("Description", cmd.description);
 }
 
