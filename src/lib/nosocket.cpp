@@ -17,7 +17,7 @@
 
 #include "nosocket.h"
 #include "nosocket_p.h"
-#include "nosslverifyhost.h"
+#include "nosslverifyhost_p.h"
 #include "nosocketinfo.h"
 #include "nomodule_p.h"
 #include "nonetwork.h"
@@ -112,7 +112,7 @@ void NoSocketImpl::SSLHandShakeFinished()
         return;
     }
     NoString sHostVerifyError;
-    if (!ZNC_SSLVerifyHost(q->hostToVerifySsl(), pCert, sHostVerifyError)) {
+    if (!No::sslVerifyHost(q->hostToVerifySsl(), pCert, sHostVerifyError)) {
         certVerificationErrors.insert(sHostVerifyError);
     }
     X509_free(pCert);

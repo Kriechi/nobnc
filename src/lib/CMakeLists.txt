@@ -37,7 +37,7 @@ list(APPEND NO_HEADERS ${NO_INCDIR}/noapp.h
                        ${NO_INCDIR}/nosocket.h
                        ${NO_INCDIR}/nosocketinfo.h
                        ${NO_INCDIR}/nosocketmanager_p.h
-                       ${NO_INCDIR}/nosslverifyhost.h
+                       ${NO_INCDIR}/nosslverifyhost_p.h
                        ${NO_INCDIR}/nostring.h
                        ${NO_INCDIR}/notable.h
                        ${NO_INCDIR}/nothreadpool_p.h

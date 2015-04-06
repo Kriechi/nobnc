@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#include "nosslverifyhost.h"
+#include "nosslverifyhost_p.h"
 #include "Csocket/Csocket.h"
 
 #ifdef HAVE_LIBSSL
 
 #include <openssl/x509v3.h>
 
-namespace ZNC_Curl
+namespace No_Curl
 {
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -259,9 +259,9 @@ static int Curl_cert_hostcheck(const char* match_pattern, const char* hostname)
 // End of https://github.com/bagder/curl/blob/master/lib/
 //
 ///////////////////////////////////////////////////////////////////////////
-} // namespace ZNC_Curl
+} // namespace No_Curl
 
-namespace ZNC_iSECPartners
+namespace No_iSECPartners
 {
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -326,7 +326,7 @@ static HostnameValidationResult matches_common_name(const char* hostname, const 
 
     NO_DEBUG("SSLVerifyHost: Found CN " << common_name_str);
     // Compare expected hostname with the CN
-    if (ZNC_Curl::Curl_cert_hostcheck(common_name_str, hostname)) {
+    if (No_Curl::Curl_cert_hostcheck(common_name_str, hostname)) {
         return MatchFound;
     } else {
         return MatchNotFound;
@@ -371,7 +371,7 @@ static HostnameValidationResult matches_subject_alternative_name(const char* hos
                 break;
             } else { // Compare expected hostname with the DNS name
                 NO_DEBUG("SSLVerifyHost: Found SAN " << dns_name);
-                if (ZNC_Curl::Curl_cert_hostcheck(dns_name, hostname)) {
+                if (No_Curl::Curl_cert_hostcheck(dns_name, hostname)) {
                     result = MatchFound;
                     break;
                 }
@@ -416,21 +416,22 @@ static HostnameValidationResult validate_hostname(const char* hostname, const X5
 // End of https://github.com/iSECPartners/ssl-conservatory/
 //
 ///////////////////////////////////////////////////////////////////////////
-} // namespace ZNC_iSECPartners
+} // namespace No_iSECPartners
 
-bool ZNC_SSLVerifyHost(const NoString& host, const X509* pCert, NoString& error)
+namespace No {
+bool sslVerifyHost(const NoString& host, const X509* pCert, NoString& error)
 {
     NO_DEBUG("SSLVerifyHost: checking " << host);
-    ZNC_iSECPartners::HostnameValidationResult eResult = ZNC_iSECPartners::validate_hostname(host.c_str(), pCert);
+    No_iSECPartners::HostnameValidationResult eResult = No_iSECPartners::validate_hostname(host.c_str(), pCert);
     switch (eResult) {
-    case ZNC_iSECPartners::MatchFound:
+    case No_iSECPartners::MatchFound:
         NO_DEBUG("SSLVerifyHost: verified");
         return true;
-    case ZNC_iSECPartners::MatchNotFound:
+    case No_iSECPartners::MatchNotFound:
         NO_DEBUG("SSLVerifyHost: host doesn't match");
         error = "hostname doesn't match";
         return false;
-    case ZNC_iSECPartners::MalformedCertificate:
+    case No_iSECPartners::MalformedCertificate:
         NO_DEBUG("SSLVerifyHost: malformed cert");
         error = "malformed hostname in certificate";
         return false;
@@ -440,6 +441,6 @@ bool ZNC_SSLVerifyHost(const NoString& host, const X509* pCert, NoString& error)
         return false;
     }
 }
-
+}
 
 #endif // HAVE_LIBSSL

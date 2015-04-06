@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef NOSSLVERIFYHOST_H
-#define NOSSLVERIFYHOST_H
+#ifndef NOSSLVERIFYHOST_P_H
+#define NOSSLVERIFYHOST_P_H
 
 #include <nobnc/noglobal.h>
 #include <nobnc/nostring.h>
@@ -25,8 +25,10 @@
 
 #include <openssl/ssl.h>
 
-bool ZNC_SSLVerifyHost(const NoString& host, const X509* pCert, NoString& error);
+namespace No {
+    bool sslVerifyHost(const NoString& host, const X509* pCert, NoString& error);
+}
 
 #endif // HAVE_LIBSSL
 
-#endif // NOSSLVERIFYHOST_H
+#endif // NOSSLVERIFYHOST_P_H
