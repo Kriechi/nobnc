@@ -189,14 +189,12 @@ void NoClient::userCommand(NoString& line)
         const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
         NoTable Table;
         Table.addColumn("Username");
-        Table.addColumn("Networks");
-        Table.addColumn("Clients");
+        Table.addColumn("Networks/Clients");
 
         for (const auto& it : msUsers) {
             Table.addRow();
             Table.setValue("Username", it.first);
-            Table.setValue("Networks", NoString(it.second->networks().size()));
-            Table.setValue("Clients", NoString(it.second->allClients().size()));
+            Table.setValue("Networks/Clients", NoString(it.second->networks().size()) + "/" + NoString(it.second->allClients().size()));
         }
 
         putStatus(Table);
