@@ -898,8 +898,8 @@ void NoClient::putModule(const NoString& module, const NoString& line)
     NO_DEBUG("(" << fullName() << ") ZNC -> CLI [:" + d->user->statusPrefix() + ((module.empty()) ? "status" : module) + "!znc@znc.in PRIVMSG "
                  << nick() << " :" << line << "]");
 
-    NoStringVector vsLines = line.split("\n");
-    for (const NoString& s : vsLines) {
+    NoStringVector lines = line.split("\n");
+    for (const NoString& s : lines) {
         d->socket->write(":" + d->user->statusPrefix() + ((module.empty()) ? "status" : module) +
                          "!znc@znc.in PRIVMSG " + nick() + " :" + s + "\r\n");
     }

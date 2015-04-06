@@ -152,12 +152,12 @@ public:
 
         NoStringVector::iterator it;
 
-        NoStringVector vsLines = sContent.split("\n");
+        NoStringVector lines = sContent.split("\n");
 
-        for (it = vsLines.begin(); it != vsLines.end(); ++it) {
+        for (it = lines.begin(); it != lines.end(); ++it) {
             NoString line(*it);
             line.trim();
-            if (line[0] == '@' && it + 1 != vsLines.end()) {
+            if (line[0] == '@' && it + 1 != lines.end()) {
                 NoString sTimestamp = No::token(line, 0);
                 sTimestamp.trimLeft("@");
                 timeval ts;
@@ -251,10 +251,10 @@ public:
             NoString sFile;
             NoString name;
             if (DecryptBuffer(GetPath(args), sFile, name)) {
-                NoStringVector vsLines = sFile.split("\n");
+                NoStringVector lines = sFile.split("\n");
                 NoStringVector::iterator it;
 
-                for (it = vsLines.begin(); it != vsLines.end(); ++it) {
+                for (it = lines.begin(); it != lines.end(); ++it) {
                     NoString line(*it);
                     line.trim();
                     putModule("[" + line + "]");
@@ -286,10 +286,10 @@ public:
         NoString name;
         putUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Buffer Playback...");
         if (DecryptBuffer(GetPath(sBuffer), sFile, name)) {
-            NoStringVector vsLines = sFile.split("\n");
+            NoStringVector lines = sFile.split("\n");
             NoStringVector::iterator it;
 
-            for (it = vsLines.begin(); it != vsLines.end(); ++it) {
+            for (it = lines.begin(); it != lines.end(); ++it) {
                 NoString line(*it);
                 line.trim();
                 putUser(line);

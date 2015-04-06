@@ -55,8 +55,8 @@ NO_EXPORT void no_cleanup()
         }
     }
 
-    for (NoListener* pListener : p->listeners)
-        delete pListener;
+    for (NoListener* listener : p->listeners)
+        delete listener;
 
     for (const auto& it : p->users)
        NoUserPrivate::get(it.second)->beingDeleted = true;
@@ -338,18 +338,18 @@ bool NoApp::writePemFile()
     No::PrintError("ZNC was not compiled with ssl support.");
     return false;
 #else
-    NoString sPemFile = pemLocation();
+    NoString pemFile = pemLocation();
 
-    No::printAction("Writing Pem file [" + sPemFile + "]");
+    No::printAction("Writing Pem file [" + pemFile + "]");
 #ifndef _WIN32
-    int fd = creat(sPemFile.c_str(), 0600);
+    int fd = creat(pemFile.c_str(), 0600);
     if (fd == -1) {
         No::printStatus(false, "Unable to open");
         return false;
     }
     FILE* f = fdopen(fd, "w");
 #else
-    FILE* f = fopen(sPemFile.c_str(), "w");
+    FILE* f = fopen(pemFile.c_str(), "w");
 #endif
 
     if (!f) {
@@ -475,12 +475,12 @@ NoString NoApp::confPath(bool allowMkDir) const
 
 NoString NoApp::userPath() const
 {
-    NoString sUserPath = d->appPath + "/users";
-    if (!NoFile::Exists(sUserPath)) {
-        NoDir::mkpath(sUserPath);
+    NoString path = d->appPath + "/users";
+    if (!NoFile::Exists(path)) {
+        NoDir::mkpath(path);
     }
 
-    return sUserPath;
+    return path;
 }
 
 NoString NoApp::modulePath() const
@@ -572,20 +572,20 @@ bool NoApp::writeConfig()
     config.AddKeyValuePair("Version", NoString(NO_VERSION_STR));
 
     uint l = 0;
-    for (NoListener* pListener : d->listeners) {
+    for (NoListener* listener : d->listeners) {
         NoSettings listenerConfig;
 
-        listenerConfig.AddKeyValuePair("Host", pListener->host());
-        listenerConfig.AddKeyValuePair("URIPrefix", pListener->uriPrefix() + "/");
-        listenerConfig.AddKeyValuePair("Port", NoString(pListener->port()));
+        listenerConfig.AddKeyValuePair("Host", listener->host());
+        listenerConfig.AddKeyValuePair("URIPrefix", listener->uriPrefix() + "/");
+        listenerConfig.AddKeyValuePair("Port", NoString(listener->port()));
 
-        listenerConfig.AddKeyValuePair("IPv4", NoString(pListener->addressType() != No::Ipv6Address));
-        listenerConfig.AddKeyValuePair("IPv6", NoString(pListener->addressType() != No::Ipv4Address));
+        listenerConfig.AddKeyValuePair("IPv4", NoString(listener->addressType() != No::Ipv6Address));
+        listenerConfig.AddKeyValuePair("IPv6", NoString(listener->addressType() != No::Ipv4Address));
 
-        listenerConfig.AddKeyValuePair("SSL", NoString(pListener->isSsl()));
+        listenerConfig.AddKeyValuePair("SSL", NoString(listener->isSsl()));
 
-        listenerConfig.AddKeyValuePair("AllowIRC", NoString(pListener->acceptType() != No::AcceptHttp));
-        listenerConfig.AddKeyValuePair("AllowWeb", NoString(pListener->acceptType() != No::AcceptIrc));
+        listenerConfig.AddKeyValuePair("AllowIRC", NoString(listener->acceptType() != No::AcceptHttp));
+        listenerConfig.AddKeyValuePair("AllowWeb", NoString(listener->acceptType() != No::AcceptIrc));
 
         config.AddSubConfig("Listener", "listener" + NoString(l++), listenerConfig);
     }
@@ -690,11 +690,11 @@ NoString NoAppPrivate::makeConfigHeader()
 
 bool NoApp::writeNewConfig(const NoString& configFile)
 {
-    NoString sAnswer, sUser, sNetwork;
-    NoStringVector vsLines;
+    NoString answer, user, network;
+    NoStringVector lines;
 
-    vsLines.push_back(d->makeConfigHeader());
-    vsLines.push_back("Version = " + NoString(NO_VERSION_STR));
+    lines.push_back(d->makeConfigHeader());
+    lines.push_back("Version = " + NoString(NO_VERSION_STR));
 
     d->configFile = d->expandConfigPath(configFile);
 
@@ -708,23 +708,22 @@ bool NoApp::writeNewConfig(const NoString& configFile)
 
 // Listen
 #ifdef HAVE_IPV6
-    bool b6 = true;
+    bool listenIpv6 = true;
 #else
-    bool b6 = false;
+    bool listenIpv6 = false;
 #endif
-    NoString sListenHost;
+    NoString listenHost;
     NoString uriPrefix;
-    bool bListenSSL = false;
-    uint uListenPort = 0;
-    bool success;
+    bool listenSsl = false;
+    uint listenPort = 0;
+    bool success = true;
 
     do {
-        success = true;
         while (true) {
-            if (!No::getNumInput("Listen on port", uListenPort, 1025, 65534)) {
+            if (!No::getNumInput("Listen on port", listenPort, 1025, 65534)) {
                 continue;
             }
-            if (uListenPort == 6667) {
+            if (listenPort == 6667) {
                 No::printStatus(false, "WARNING: Some web browsers reject port 6667. If you intend to");
                 No::printStatus(false, "use ZNC's web interface, you might want to use another port.");
                 if (!No::getBoolInput("Proceed with port 6667 anyway?", true)) {
@@ -734,123 +733,122 @@ bool NoApp::writeNewConfig(const NoString& configFile)
             break;
         }
 
-
 #ifdef HAVE_LIBSSL
-        bListenSSL = No::getBoolInput("Listen using SSL", bListenSSL);
+        listenSsl = No::getBoolInput("Listen using SSL", listenSsl);
 #endif
 
 #ifdef HAVE_IPV6
-        b6 = No::getBoolInput("Listen using both IPv4 and IPv6", b6);
+        listenIpv6 = No::getBoolInput("Listen using both IPv4 and IPv6", listenIpv6);
 #endif
 
         // Don't ask for listen host, it may be configured later if needed.
 
         No::printAction("Verifying the listener");
-        NoListener* pListener = new NoListener(sListenHost, (ushort)uListenPort);
-        pListener->setUriPrefix(uriPrefix);
-        pListener->setSsl(bListenSSL);
-        pListener->setAddressType(b6 ? No::Ipv4AndIpv6Address : No::Ipv4Address);
-        if (!pListener->listen()) {
+        NoListener* listener = new NoListener(listenHost, (ushort)listenPort);
+        listener->setUriPrefix(uriPrefix);
+        listener->setSsl(listenSsl);
+        listener->setAddressType(listenIpv6 ? No::Ipv4AndIpv6Address : No::Ipv4Address);
+        if (!listener->listen()) {
             No::printStatus(false, FormatBindError());
             success = false;
         } else
             No::printStatus(true);
-        delete pListener;
+        delete listener;
     } while (!success);
 
 #ifdef HAVE_LIBSSL
-    NoString sPemFile = pemLocation();
-    if (!NoFile::Exists(sPemFile)) {
-        No::printMessage("Unable to locate pem file: [" + sPemFile + "], creating it");
+    NoString pemFile = pemLocation();
+    if (!NoFile::Exists(pemFile)) {
+        No::printMessage("Unable to locate pem file: [" + pemFile + "], creating it");
         writePemFile();
     }
 #endif
 
-    vsLines.push_back("<Listener l>");
-    vsLines.push_back("\tPort = " + NoString(uListenPort));
-    vsLines.push_back("\tIPv4 = true");
-    vsLines.push_back("\tIPv6 = " + NoString(b6));
-    vsLines.push_back("\tSSL = " + NoString(bListenSSL));
-    if (!sListenHost.empty()) {
-        vsLines.push_back("\tHost = " + sListenHost);
+    lines.push_back("<Listener l>");
+    lines.push_back("\tPort = " + NoString(listenPort));
+    lines.push_back("\tIPv4 = true");
+    lines.push_back("\tIPv6 = " + NoString(listenIpv6));
+    lines.push_back("\tSSL = " + NoString(listenSsl));
+    if (!listenHost.empty()) {
+        lines.push_back("\tHost = " + listenHost);
     }
-    vsLines.push_back("</Listener>");
+    lines.push_back("</Listener>");
     // !Listen
 
-    std::set<NoModuleInfo> ssGlobalMods = loader()->defaultModules(No::GlobalModule);
-    std::vector<NoString> vsGlobalModNames;
-    for (const NoModuleInfo& info : ssGlobalMods) {
-        vsGlobalModNames.push_back(info.name());
-        vsLines.push_back("LoadModule = " + info.name());
+    std::set<NoModuleInfo> globalMods = loader()->defaultModules(No::GlobalModule);
+    std::vector<NoString> globalModNames;
+    for (const NoModuleInfo& info : globalMods) {
+        globalModNames.push_back(info.name());
+        lines.push_back("LoadModule = " + info.name());
     }
-    No::printMessage("Enabled global modules [" + NoString(", ").join(vsGlobalModNames.begin(), vsGlobalModNames.end()) + "]");
+    No::printMessage("Enabled global modules [" + NoString(", ").join(globalModNames.begin(), globalModNames.end()) + "]");
 
     // User
     No::printMessage("");
     No::printMessage("-- Admin user settings --");
     No::printMessage("");
 
-    vsLines.push_back("");
+    lines.push_back("");
     NoString nick;
     do {
-        No::getInput("Username", sUser, "", "alphanumeric");
-    } while (!NoUser::isValidUserName(sUser));
+        No::getInput("Username", user, "", "alphanumeric");
+    } while (!NoUser::isValidUserName(user));
 
-    vsLines.push_back("<User " + sUser + ">");
+    lines.push_back("<User " + user + ">");
     NoString passwordSalt;
     NoString passwordHash = No::getSaltedHashPass(passwordSalt);
 
-    vsLines.push_back("\tAdmin      = true");
+    lines.push_back("\tAdmin      = true");
 
-    No::getInput("Nick", nick, NoUser::makeCleanUserName(sUser));
-    vsLines.push_back("\tNick       = " + nick);
-    No::getInput("Alternate nick", sAnswer, nick + "_");
-    if (!sAnswer.empty()) {
-        vsLines.push_back("\tAltNick    = " + sAnswer);
+    No::getInput("Nick", nick, NoUser::makeCleanUserName(user));
+    lines.push_back("\tNick       = " + nick);
+    No::getInput("Alternate nick", answer, nick + "_");
+    if (!answer.empty()) {
+        lines.push_back("\tAltNick    = " + answer);
     }
-    No::getInput("Ident", sAnswer, sUser);
-    vsLines.push_back("\tIdent      = " + sAnswer);
-    No::getInput("Real name", sAnswer, "Got ZNC?");
-    vsLines.push_back("\tRealName   = " + sAnswer);
-    No::getInput("Bind host", sAnswer, "", "optional");
-    if (!sAnswer.empty()) {
-        vsLines.push_back("\tBindHost   = " + sAnswer);
+    No::getInput("Ident", answer, user);
+    lines.push_back("\tIdent      = " + answer);
+    No::getInput("Real name", answer, "Got ZNC?");
+    lines.push_back("\tRealName   = " + answer);
+    No::getInput("Bind host", answer, "", "optional");
+    if (!answer.empty()) {
+        lines.push_back("\tBindHost   = " + answer);
     }
 
-    std::set<NoModuleInfo> ssUserMods = loader()->defaultModules(No::UserModule);
-    std::vector<NoString> vsUserModNames;
-    for (const NoModuleInfo& info : ssUserMods) {
-        vsUserModNames.push_back(info.name());
-        vsLines.push_back("\tLoadModule = " + info.name());
+    std::set<NoModuleInfo> userMods = loader()->defaultModules(No::UserModule);
+    std::vector<NoString> userModNames;
+    for (const NoModuleInfo& info : userMods) {
+        userModNames.push_back(info.name());
+        lines.push_back("\tLoadModule = " + info.name());
     }
-    No::printMessage("Enabled user modules [" + NoString(", ").join(vsUserModNames.begin(), vsUserModNames.end()) + "]");
+    No::printMessage("Enabled user modules [" + NoString(", ").join(userModNames.begin(), userModNames.end()) + "]");
 
     No::printMessage("");
     if (No::getBoolInput("Set up a network?", true)) {
-        vsLines.push_back("");
+        lines.push_back("");
 
         No::printMessage("");
         No::printMessage("-- Network settings --");
         No::printMessage("");
 
         do {
-            No::getInput("Name", sNetwork, "freenode");
-        } while (!NoNetwork::isValidNetwork(sNetwork));
+            No::getInput("Name", network, "freenode");
+        } while (!NoNetwork::isValidNetwork(network));
 
-        vsLines.push_back("\t<Network " + sNetwork + ">");
+        lines.push_back("\t<Network " + network + ">");
 
-        std::set<NoModuleInfo> ssNetworkMods = loader()->defaultModules(No::NetworkModule);
-        std::vector<NoString> vsNetworkModNames;
-        for (const NoModuleInfo& info : ssNetworkMods) {
-            vsNetworkModNames.push_back(info.name());
-            vsLines.push_back("\t\tLoadModule = " + info.name());
+        std::set<NoModuleInfo> networkMods = loader()->defaultModules(No::NetworkModule);
+        std::vector<NoString> networkModNames;
+        for (const NoModuleInfo& info : networkMods) {
+            networkModNames.push_back(info.name());
+            lines.push_back("\t\tLoadModule = " + info.name());
         }
 
         NoString host, pass, hint;
         bool ssl = false;
-        uint uServerPort = 0;
+        uint serverPort = 0;
 
-        if (sNetwork.equals("freenode")) {
+        if (network.equals("freenode")) {
             host = "chat.freenode.net";
 #ifdef HAVE_LIBSSL
             ssl = true;
@@ -864,69 +862,69 @@ bool NoApp::writeNewConfig(const NoString& configFile)
 #ifdef HAVE_LIBSSL
         ssl = No::getBoolInput("Server uses SSL?", ssl);
 #endif
-        while (!No::getNumInput("Server port", uServerPort, 1, 65535, ssl ? 6697 : 6667))
+        while (!No::getNumInput("Server port", serverPort, 1, 65535, ssl ? 6697 : 6667))
             ;
         No::getInput("Server password (probably empty)", pass);
 
-        vsLines.push_back("\t\tServer     = " + host + ((ssl) ? " +" : " ") + NoString(uServerPort) + " " + pass);
+        lines.push_back("\t\tServer     = " + host + ((ssl) ? " +" : " ") + NoString(serverPort) + " " + pass);
 
-        NoString sChans;
-        if (No::getInput("Initial channels", sChans)) {
-            vsLines.push_back("");
-            sChans.replace(",", " ");
-            sChans.replace(";", " ");
-            NoStringVector vsChans = sChans.split(" ", No::SkipEmptyParts);
+        NoString channels;
+        if (No::getInput("Initial channels", channels)) {
+            lines.push_back("");
+            channels.replace(",", " ");
+            channels.replace(";", " ");
+            NoStringVector vsChans = channels.split(" ", No::SkipEmptyParts);
             for (const NoString& sChan : vsChans) {
-                vsLines.push_back("\t\t<Chan " + sChan.trim_n() + ">");
-                vsLines.push_back("\t\t</Chan>");
+                lines.push_back("\t\t<Chan " + sChan.trim_n() + ">");
+                lines.push_back("\t\t</Chan>");
             }
         }
-        vsLines.push_back("\t</Network>");
+        lines.push_back("\t</Network>");
 
-        No::printMessage("Enabled network modules [" + NoString(", ").join(vsNetworkModNames.begin(), vsNetworkModNames.end()) + "]");
+        No::printMessage("Enabled network modules [" + NoString(", ").join(networkModNames.begin(), networkModNames.end()) + "]");
 
-        vsLines.push_back("");
-        vsLines.push_back("\t<Pass password>");
-        vsLines.push_back("\t\tHash = " + passwordHash);
-        vsLines.push_back("\t\tSalt = " + passwordSalt);
-        vsLines.push_back("\t</Pass>");
+        lines.push_back("");
+        lines.push_back("\t<Pass password>");
+        lines.push_back("\t\tHash = " + passwordHash);
+        lines.push_back("\t\tSalt = " + passwordSalt);
+        lines.push_back("\t</Pass>");
     }
 
-    vsLines.push_back("</User>");
+    lines.push_back("</User>");
 
     No::printMessage("");
     // !User
 
-    NoFile File;
-    bool bFileOK, bFileOpen = false;
+    NoFile file;
+    bool fileOk, fileOpen = false;
     do {
         No::printAction("Writing config [" + d->configFile + "]");
 
-        bFileOK = true;
+        fileOk = true;
         if (NoFile::Exists(d->configFile)) {
-            if (!File.TryExLock(d->configFile)) {
+            if (!file.TryExLock(d->configFile)) {
                 No::printStatus(false, "ZNC is currently running on this config.");
-                bFileOK = false;
+                fileOk = false;
             } else {
-                File.Close();
+                file.Close();
                 No::printStatus(false, "This config already exists.");
                 if (No::getBoolInput("Are you sure you want to overwrite it?", false))
                     No::printAction("Overwriting config [" + d->configFile + "]");
                 else
-                    bFileOK = false;
+                    fileOk = false;
             }
         }
 
-        if (bFileOK) {
-            File.SetFileName(d->configFile);
-            if (File.Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
-                bFileOpen = true;
+        if (fileOk) {
+            file.SetFileName(d->configFile);
+            if (file.Open(O_WRONLY | O_CREAT | O_TRUNC, 0600)) {
+                fileOpen = true;
             } else {
                 No::printStatus(false, "Unable to open file");
-                bFileOK = false;
+                fileOk = false;
             }
         }
-        if (!bFileOK) {
+        if (!fileOk) {
             while (!No::getInput("Please specify an alternate location",
                                  d->configFile,
                                  "",
@@ -934,13 +932,13 @@ bool NoApp::writeNewConfig(const NoString& configFile)
                                  "displaying the config"))
                 ;
             if (d->configFile.equals("stdout"))
-                bFileOK = true;
+                fileOk = true;
             else
                 d->configFile = d->expandConfigPath(d->configFile);
         }
-    } while (!bFileOK);
+    } while (!fileOk);
 
-    if (!bFileOpen) {
+    if (!fileOpen) {
         No::printMessage("");
         No::printMessage("Printing the new config to stdout:");
         No::printMessage("");
@@ -948,17 +946,17 @@ bool NoApp::writeNewConfig(const NoString& configFile)
                   << std::endl << std::endl;
     }
 
-    for (const NoString& line : vsLines) {
-        if (bFileOpen) {
-            File.Write(line + "\n");
+    for (const NoString& line : lines) {
+        if (fileOpen) {
+            file.Write(line + "\n");
         } else {
             std::cout << line << std::endl;
         }
     }
 
-    if (bFileOpen) {
-        File.Close();
-        if (File.HadError())
+    if (fileOpen) {
+        file.Close();
+        if (file.HadError())
             No::printStatus(false, "There was an error while writing the config");
         else
             No::printStatus(true);
@@ -967,34 +965,34 @@ bool NoApp::writeNewConfig(const NoString& configFile)
                   << std::endl << std::endl;
     }
 
-    if (File.HadError()) {
-        bFileOpen = false;
+    if (file.HadError()) {
+        fileOpen = false;
         No::printMessage("Printing the new config to stdout instead:");
         std::cout << std::endl << "----------------------------------------------------------------------------"
                   << std::endl << std::endl;
-        for (const NoString& line : vsLines) {
+        for (const NoString& line : lines) {
             std::cout << line << std::endl;
         }
         std::cout << std::endl << "----------------------------------------------------------------------------"
                   << std::endl << std::endl;
     }
 
-    const NoString sProtocol(bListenSSL ? "https" : "http");
-    const NoString sSSL(bListenSSL ? "+" : "");
+    const NoString protocol(listenSsl ? "https" : "http");
+    const NoString port = (listenSsl ? "+" : "") + NoString(listenPort);
     No::printMessage("");
     No::printMessage("To connect to this ZNC you need to connect to it as your IRC server", true);
     No::printMessage("using the port that you supplied.  You have to supply your login info", true);
     No::printMessage("as the IRC server password like this: user/network:pass.", true);
     No::printMessage("");
     No::printMessage("Try something like this in your IRC client...", true);
-    No::printMessage("/server <znc_server_ip> " + sSSL + NoString(uListenPort) + " " + sUser + ":<pass>", true);
+    No::printMessage("/server <znc_server_ip> " + port + " " + user + ":<pass>", true);
     No::printMessage("");
     No::printMessage("To manage settings, users and networks, point your web browser to", true);
-    No::printMessage(sProtocol + "://<znc_server_ip>:" + NoString(uListenPort) + "/", true);
+    No::printMessage(protocol + "://<znc_server_ip>:" + NoString(listenPort) + "/", true);
     No::printMessage("");
 
-    File.UnLock();
-    return bFileOpen && No::getBoolInput("Launch ZNC now?", true);
+    file.UnLock();
+    return fileOpen && No::getBoolInput("Launch ZNC now?", true);
 }
 
 void NoAppPrivate::backupConfigOnce(const NoString& suffix)
@@ -1206,27 +1204,27 @@ bool NoAppPrivate::doRehash(NoString& error)
     if (config.FindStringEntry("sslprotocols", sslProtocols)) {
         NoStringVector vsProtocols = sslProtocols.split(" ", No::SkipEmptyParts);
 
-        for (NoString& sProtocol : vsProtocols) {
+        for (NoString& protocol : vsProtocols) {
 
             uint uFlag = 0;
-            sProtocol.trim();
-            bool bEnable = sProtocol.trimPrefix("+");
-            bool bDisable = sProtocol.trimPrefix("-");
+            protocol.trim();
+            bool bEnable = protocol.trimPrefix("+");
+            bool bDisable = protocol.trimPrefix("-");
 
-            if (sProtocol.equals("All")) {
+            if (protocol.equals("All")) {
                 uFlag = ~0;
-            } else if (sProtocol.equals("SSLv2")) {
+            } else if (protocol.equals("SSLv2")) {
                 uFlag = Csock::EDP_SSLv2;
-            } else if (sProtocol.equals("SSLv3")) {
+            } else if (protocol.equals("SSLv3")) {
                 uFlag = Csock::EDP_SSLv3;
-            } else if (sProtocol.equals("TLSv1")) {
+            } else if (protocol.equals("TLSv1")) {
                 uFlag = Csock::EDP_TLSv1;
-            } else if (sProtocol.equals("TLSv1.1")) {
+            } else if (protocol.equals("TLSv1.1")) {
                 uFlag = Csock::EDP_TLSv1_1;
-            } else if (sProtocol.equals("TLSv1.2")) {
+            } else if (protocol.equals("TLSv1.2")) {
                 uFlag = Csock::EDP_TLSv1_2;
             } else {
-                No::printError("Invalid SSLProtocols value [" + sProtocol + "]");
+                No::printError("Invalid SSLProtocols value [" + protocol + "]");
                 No::printError("The syntax is [SSLProtocols = [+|-]<protocol> ...]");
                 No::printError("Available protocols are [SSLv2, SSLv3, TLSv1, TLSv1.1, TLSv1.2]");
                 return false;
@@ -1645,14 +1643,14 @@ std::map<NoString, NoUser*> NoApp::userMap() const
 
 NoListener* NoApp::findListener(u_short port, const NoString& host, No::AddressType addressType)
 {
-    for (NoListener* pListener : d->listeners) {
-        if (pListener->port() != port)
+    for (NoListener* listener : d->listeners) {
+        if (listener->port() != port)
             continue;
-        if (pListener->host() != host)
+        if (listener->host() != host)
             continue;
-        if (pListener->addressType() != addressType)
+        if (listener->addressType() != addressType)
             continue;
-        return pListener;
+        return listener;
     }
     return nullptr;
 }
@@ -1746,10 +1744,10 @@ bool NoApp::addListener(ushort port,
         return false;
     }
 #else
-    NoString sPemFile = pemLocation();
+    NoString pemFile = pemLocation();
 
-    if (ssl && !NoFile::Exists(sPemFile)) {
-        error = "Unable to locate pem file: [" + sPemFile + "]";
+    if (ssl && !NoFile::Exists(pemFile)) {
+        error = "Unable to locate pem file: [" + pemFile + "]";
         No::printStatus(false, error);
 
         // If stdin is e.g. /dev/null and we call GetBoolInput(),
@@ -1781,20 +1779,20 @@ bool NoApp::addListener(ushort port,
         }
     }
 
-    NoListener* pListener = new NoListener(bindHost, port);
-    pListener->setUriPrefix(uriPrefix);
-    pListener->setSsl(ssl);
-    pListener->setAddressType(addressType);
-    pListener->setAcceptType(acceptType);
+    NoListener* listener = new NoListener(bindHost, port);
+    listener->setUriPrefix(uriPrefix);
+    listener->setSsl(ssl);
+    listener->setAddressType(addressType);
+    listener->setAcceptType(acceptType);
 
-    if (!pListener->listen()) {
+    if (!listener->listen()) {
         error = FormatBindError();
         No::printStatus(false, error);
-        delete pListener;
+        delete listener;
         return false;
     }
 
-    d->listeners.push_back(pListener);
+    d->listeners.push_back(listener);
     No::printStatus(true);
 
     return true;
@@ -1856,27 +1854,27 @@ bool NoAppPrivate::addListener(NoSettings* settings, NoString& error)
     return noApp->addListener(port, bindHost, uriPrefix, ssl, addressType, acceptType, error);
 }
 
-bool NoApp::addListener(NoListener* pListener)
+bool NoApp::addListener(NoListener* listener)
 {
-    if (!pListener->socket()) {
+    if (!listener->socket()) {
         // Listener doesnt actually listen
-        delete pListener;
+        delete listener;
         return false;
     }
 
     // We don't check if there is an identical listener already listening
     // since one can't listen on e.g. the same port multiple times
 
-    d->listeners.push_back(pListener);
+    d->listeners.push_back(listener);
     return true;
 }
 
-bool NoApp::removeListener(NoListener* pListener)
+bool NoApp::removeListener(NoListener* listener)
 {
-    auto it = std::find(d->listeners.begin(), d->listeners.end(), pListener);
+    auto it = std::find(d->listeners.begin(), d->listeners.end(), listener);
     if (it != d->listeners.end()) {
         d->listeners.erase(it);
-        delete pListener;
+        delete listener;
         return true;
     }
 
@@ -1925,13 +1923,13 @@ NoApp::TrafficStatsMap NoApp::trafficStats(TrafficStatsPair& Users, TrafficStats
 {
     TrafficStatsMap ret;
     ulonglong uiUsers_in, uiUsers_out, uiZNC_in, uiZNC_out;
-    const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
+    const std::map<NoString, NoUser*>& users = noApp->userMap();
 
     uiUsers_in = uiUsers_out = 0;
     uiZNC_in = bytesRead();
     uiZNC_out = bytesWritten();
 
-    for (const auto& it : msUsers) {
+    for (const auto& it : users) {
         ret[it.first] = TrafficStatsPair(it.second->bytesRead(), it.second->bytesWritten());
         uiUsers_in += it.second->bytesRead();
         uiUsers_out += it.second->bytesWritten();

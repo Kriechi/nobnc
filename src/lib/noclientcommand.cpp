@@ -1558,19 +1558,19 @@ void NoClient::yserPortCommand(NoString& line)
         std::vector<NoListener*>::const_iterator it;
         const std::vector<NoListener*>& vpListeners = noApp->listeners();
 
-        for (const NoListener* pListener : vpListeners) {
+        for (const NoListener* listener : vpListeners) {
             Table.addRow();
-            Table.setValue("Port", NoString(pListener->port()));
-            Table.setValue("BindHost", (pListener->host().empty() ? NoString("*") : pListener->host()));
-            Table.setValue("SSL", NoString(pListener->isSsl()));
+            Table.setValue("Port", NoString(listener->port()));
+            Table.setValue("BindHost", (listener->host().empty() ? NoString("*") : listener->host()));
+            Table.setValue("SSL", NoString(listener->isSsl()));
 
-            No::AddressType addressType = pListener->addressType();
+            No::AddressType addressType = listener->addressType();
             Table.setValue("Proto",
                            (addressType == No::Ipv4AndIpv6Address ? "All" : (addressType == No::Ipv4Address ? "IPv4" : "IPv6")));
 
-            No::AcceptType acceptType = pListener->acceptType();
+            No::AcceptType acceptType = listener->acceptType();
             Table.setValue("IRC/Web", (acceptType == No::AcceptAll ? "All" : (acceptType == No::AcceptIrc ? "IRC" : "Web")));
-            Table.setValue("URIPrefix", pListener->uriPrefix() + "/");
+            Table.setValue("URIPrefix", listener->uriPrefix() + "/");
         }
 
         putStatus(Table);
@@ -1615,17 +1615,17 @@ void NoClient::yserPortCommand(NoString& line)
             const NoString host = No::token(line, 4);
             const NoString uriPrefix = No::token(line, 5);
 
-            NoListener* pListener = new NoListener(host, port);
-            pListener->setUriPrefix(uriPrefix);
-            pListener->setSsl(ssl);
-            pListener->setAddressType(addressType);
-            pListener->setAcceptType(acceptType);
+            NoListener* listener = new NoListener(host, port);
+            listener->setUriPrefix(uriPrefix);
+            listener->setSsl(ssl);
+            listener->setAddressType(addressType);
+            listener->setAcceptType(acceptType);
 
-            if (!pListener->listen()) {
-                delete pListener;
+            if (!listener->listen()) {
+                delete listener;
                 putStatus("Unable to bind [" + NoString(strerror(errno)) + "]");
             } else {
-                if (noApp->addListener(pListener))
+                if (noApp->addListener(listener))
                     putStatus("Port Added");
                 else
                     putStatus("Error?!");
@@ -1637,10 +1637,10 @@ void NoClient::yserPortCommand(NoString& line)
         } else {
             const NoString bindHost = No::token(line, 3);
 
-            NoListener* pListener = noApp->findListener(port, bindHost, addressType);
+            NoListener* listener = noApp->findListener(port, bindHost, addressType);
 
-            if (pListener) {
-                noApp->removeListener(pListener);
+            if (listener) {
+                noApp->removeListener(listener);
                 putStatus("Deleted Port");
             } else {
                 putStatus("Unable to find a matching port");

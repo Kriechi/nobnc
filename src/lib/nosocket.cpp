@@ -126,12 +126,12 @@ void NoSocketImpl::SSLHandShakeFinished()
 
 NoString NoSocket::hostToVerifySsl() const
 {
-    return d->impl->hostToVerifySSL;
+    return d->impl->hostToVerifySsl;
 }
 
 void NoSocket::setHostToVerifySsl(const NoString& host)
 {
-    d->impl->hostToVerifySSL = host;
+    d->impl->hostToVerifySsl = host;
 }
 
 NoString NoSocket::fingerprint() const

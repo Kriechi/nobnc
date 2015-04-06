@@ -146,17 +146,17 @@ public:
         }
 
         // Now turn that into a listener instance
-        NoListener* pListener = new NoListener(sListenHost, port);
-        pListener->setUriPrefix(uriPrefix);
-        pListener->setSsl(ssl);
-        pListener->setAddressType(!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address);
-        pListener->setAcceptType(No::AcceptHttp);
+        NoListener* listener = new NoListener(sListenHost, port);
+        listener->setUriPrefix(uriPrefix);
+        listener->setSsl(ssl);
+        listener->setAddressType(!bIPv6 ? No::Ipv4Address : No::Ipv4AndIpv6Address);
+        listener->setAcceptType(No::AcceptHttp);
 
-        if (!pListener->listen()) {
+        if (!listener->listen()) {
             message = "Failed to add backwards-compatible listener";
             return false;
         }
-        noApp->addListener(pListener);
+        noApp->addListener(listener);
 
         setArgs("");
         return true;
@@ -1729,9 +1729,9 @@ public:
             }
         }
 
-        NoListener* pListener = noApp->findListener(port, host, addressType);
-        if (pListener) {
-            noApp->removeListener(pListener);
+        NoListener* listener = noApp->findListener(port, host, addressType);
+        if (listener) {
+            noApp->removeListener(listener);
             if (!noApp->writeConfig()) {
                 socket->session()->addError("Port changed, but config was not written");
             }
@@ -1770,30 +1770,30 @@ public:
 
             const std::vector<NoListener*>& vpListeners = noApp->listeners();
             for (uint c = 0; c < vpListeners.size(); c++) {
-                NoListener* pListener = vpListeners[c];
+                NoListener* listener = vpListeners[c];
                 NoTemplate& l = tmpl.addRow("ListenLoop");
 
-                l["Port"] = NoString(pListener->port());
-                l["BindHost"] = pListener->host();
+                l["Port"] = NoString(listener->port());
+                l["BindHost"] = listener->host();
 
-                l["IsWeb"] = NoString(pListener->acceptType() != No::AcceptIrc);
-                l["IsIRC"] = NoString(pListener->acceptType() != No::AcceptHttp);
+                l["IsWeb"] = NoString(listener->acceptType() != No::AcceptIrc);
+                l["IsIRC"] = NoString(listener->acceptType() != No::AcceptHttp);
 
-                l["URIPrefix"] = pListener->uriPrefix() + "/";
+                l["URIPrefix"] = listener->uriPrefix() + "/";
 
                 // simple protection for user from shooting his own foot
                 // TODO check also for hosts/families
                 // such check is only here, user still can forge HTTP request to delete web port
-                l["SuggestDeletion"] = NoString(pListener->port() != socket->localPort());
+                l["SuggestDeletion"] = NoString(listener->port() != socket->localPort());
 
 #ifdef HAVE_LIBSSL
-                if (pListener->isSsl()) {
+                if (listener->isSsl()) {
                     l["IsSSL"] = "true";
                 }
 #endif
 
 #ifdef HAVE_IPV6
-                switch (pListener->addressType()) {
+                switch (listener->addressType()) {
                 case No::Ipv4Address:
                     l["IsIPV4"] = "true";
                     break;

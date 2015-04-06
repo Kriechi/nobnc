@@ -104,7 +104,7 @@ public:
 
     NoSocket* q;
     bool allowControlCodes;
-    NoString hostToVerifySSL;
+    NoString hostToVerifySsl;
     NoStringSet trustedFingerprints;
     NoStringSet certVerificationErrors;
 };

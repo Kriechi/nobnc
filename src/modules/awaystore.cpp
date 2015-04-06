@@ -298,9 +298,9 @@ public:
         if (DecryptMessages(sFile)) {
             NoStringVector::iterator it;
 
-            NoStringVector vsLines = sFile.split("\n");
+            NoStringVector lines = sFile.split("\n");
 
-            for (it = vsLines.begin(); it != vsLines.end(); ++it) {
+            for (it = lines.begin(); it != lines.end(); ++it) {
                 NoString line(*it);
                 line.trim();
                 AddMessage(line);
