@@ -777,38 +777,6 @@ class NoAdminMod : public NoModule
         }
     }
 
-    void ListUsers(const NoString&)
-    {
-        if (!user()->isAdmin())
-            return;
-
-        const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
-        NoTable Table;
-        Table.addColumn("Username");
-        Table.addColumn("Realname");
-        Table.addColumn("IsAdmin");
-        Table.addColumn("Nick");
-        Table.addColumn("AltNick");
-        Table.addColumn("Ident");
-        Table.addColumn("BindHost");
-
-        for (std::map<NoString, NoUser*>::const_iterator it = msUsers.begin(); it != msUsers.end(); ++it) {
-            Table.addRow();
-            Table.setValue("Username", it->first);
-            Table.setValue("Realname", it->second->realName());
-            if (!it->second->isAdmin())
-                Table.setValue("IsAdmin", "No");
-            else
-                Table.setValue("IsAdmin", "Yes");
-            Table.setValue("Nick", it->second->nick());
-            Table.setValue("AltNick", it->second->altNick());
-            Table.setValue("Ident", it->second->ident());
-            Table.setValue("BindHost", it->second->bindHost());
-        }
-
-        putModule(Table);
-    }
-
     void AddUser(const NoString& line)
     {
         if (!user()->isAdmin()) {
@@ -989,46 +957,6 @@ class NoAdminMod : public NoModule
             putModule("Network [" + sNetwork + "] deleted on user [" + user->userName() + "].");
         } else {
             putModule("Network [" + sNetwork + "] could not be deleted for user [" + user->userName() + "].");
-        }
-    }
-
-    void ListNetworks(const NoString& line)
-    {
-        NoString sUser = No::token(line, 1);
-        NoUser* user = NoModule::user();
-
-        if (!sUser.empty()) {
-            user = FindUser(sUser);
-            if (!user) {
-                return;
-            }
-        }
-
-        const std::vector<NoNetwork*>& vNetworks = user->networks();
-
-        NoTable Table;
-        Table.addColumn("Network");
-        Table.addColumn("OnIRC");
-        Table.addColumn("IRC Server");
-        Table.addColumn("IRC User");
-        Table.addColumn("Channels");
-
-        for (uint a = 0; a < vNetworks.size(); a++) {
-            NoNetwork* network = vNetworks[a];
-            Table.addRow();
-            Table.setValue("Network", network->name());
-            if (network->isIrcConnected()) {
-                Table.setValue("OnIRC", "Yes");
-                Table.setValue("IRC Server", network->ircServer());
-                Table.setValue("IRC User", network->ircNick().hostMask());
-                Table.setValue("Channels", NoString(network->channels().size()));
-            } else {
-                Table.setValue("OnIRC", "No");
-            }
-        }
-
-        if (putModule(Table) == 0) {
-            putModule("No networks");
         }
     }
 
@@ -1453,7 +1381,6 @@ public:
                    static_cast<NoModule::CommandFunction>(&NoAdminMod::removeChannel),
                    "<username> <network> <chan>",
                    "Deletes a channel");
-        addCommand("ListUsers", static_cast<NoModule::CommandFunction>(&NoAdminMod::ListUsers), "", "Lists users");
         addCommand("AddUser", static_cast<NoModule::CommandFunction>(&NoAdminMod::AddUser), "<username> <password>", "Adds a new user");
         addCommand("DelUser",
                    static_cast<NoModule::CommandFunction>(&NoAdminMod::DelUser),
@@ -1522,7 +1449,6 @@ public:
                    static_cast<NoModule::CommandFunction>(&NoAdminMod::DelNetwork),
                    "[username] <network>",
                    "Delete a network for a user");
-        addCommand("ListNetworks", static_cast<NoModule::CommandFunction>(&NoAdminMod::ListNetworks), "[username]", "List all networks for a user");
     }
 };
 
