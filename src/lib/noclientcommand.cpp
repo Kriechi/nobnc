@@ -615,6 +615,51 @@ void NoClient::userCommand(NoString& line)
         if (putStatus(Table) == 0) {
             putStatus("No networks");
         }
+    } else if (command.equals("SHOWNETWORK")) {
+        NoUser *user = NoClient::user();
+        NoString name;
+
+        if (user->isAdmin() && !No::token(line, 2).empty()) {
+            name = No::token(line, 2);
+            user = noApp->findUser(No::token(line, 1));
+
+            if (!user) {
+                putStatus("User not found " + No::token(line, 1));
+                return;
+            }
+        } else {
+            name = No::token(line, 1);
+        }
+
+        NoNetwork *network = user->findNetwork(name);
+        if (!network) {
+            putStatus("Network not found " + name);
+            return;
+        }
+        name = network->name();
+        NoString status = network->isIrcConnected() ? "Online" : (network->isEnabled() ? "Offline" : "Disabled");
+
+        NoTable table;
+        table.addColumn(name);
+        table.addColumn(status);
+
+        table.addRow();
+        table.setValue(name, "IRC Server");
+        table.setValue(status, network->ircServer());
+
+        table.addRow();
+        table.setValue(name, "IRC User");
+        table.setValue(status, network->ircNick().hostMask());
+
+        table.addRow();
+        table.setValue(name, "Clients");
+        table.setValue(status, NoString(network->clients().size()));
+
+        table.addRow();
+        table.setValue(name, "Channels");
+        table.setValue(status, NoString(network->channels().size()));
+
+        putStatus(table);
     } else if (command.equals("MOVENETWORK")) {
         if (!d->user->isAdmin()) {
             putStatus("Access Denied.");
@@ -1647,6 +1692,7 @@ void NoClient::helpUser(const NoString& filter)
     addCommandHelp(Table, "DelNetwork", "<name>", "Delete a network from your user", filter);
     addCommandHelp(Table, "ListNetworks", "", "List all networks", filter);
     if (d->user->isAdmin()) {
+        addCommandHelp(Table, "ShowNetwork", "<name>", "Show network details", filter);
         addCommandHelp(Table,
                        "MoveNetwork",
                        "<old user> <old network> <new user> [new network]",
@@ -1741,6 +1787,7 @@ void NoClient::helpUser(const NoString& filter)
         addCommandHelp(Table, "Rehash", "", "Reload nobnc.conf from disk", filter);
         addCommandHelp(Table, "SaveConfig", "", "Save the current settings to disk", filter);
         addCommandHelp(Table, "ListUsers", "", "List all NoBNC users and their connection status", filter);
+        addCommandHelp(Table, "ShowNetwork", "[user] <name>", "Show network details", filter);
         addCommandHelp(Table, "ListAllUserNetworks", "", "List all NoBNC users and their networks", filter);
         addCommandHelp(Table, "ListChans", "[user <network>]", "List all channels", filter);
         addCommandHelp(Table, "ListClients", "[user]", "List all connected clients", filter);
