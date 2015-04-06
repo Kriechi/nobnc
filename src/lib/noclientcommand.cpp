@@ -1523,29 +1523,20 @@ void NoClient::yserPortCommand(NoString& line)
     const NoString command = No::token(line, 0);
 
     if (command.equals("LISTPORTS")) {
-        NoTable Table;
-        Table.addColumn("Port");
-        Table.addColumn("BindHost");
-        Table.addColumn("SSL");
-        Table.addColumn("Proto");
-        Table.addColumn("URIPrefix");
+        NoTable table;
+        table.addColumn("Port");
+        table.addColumn("Host");
 
         std::vector<NoListener*>::const_iterator it;
         const std::vector<NoListener*>& vpListeners = noApp->listeners();
 
         for (const NoListener* listener : vpListeners) {
-            Table.addRow();
-            Table.setValue("Port", NoString(listener->port()));
-            Table.setValue("BindHost", (listener->host().empty() ? NoString("*") : listener->host()));
-            Table.setValue("SSL", NoString(listener->isSsl()));
-
-            No::AddressType addressType = listener->addressType();
-            Table.setValue("Proto",
-                           (addressType == No::Ipv4AndIpv6Address ? "All" : (addressType == No::Ipv4Address ? "IPv4" : "IPv6")));
-            Table.setValue("URIPrefix", listener->uriPrefix() + "/");
+            table.addRow();
+            table.setValue("Port", (listener->isSsl() ? "+" : "") + NoString(listener->port()));
+            table.setValue("Host", (listener->host().empty() ? NoString("*") : listener->host()) + " " + (listener->addressType() == No::Ipv4AndIpv6Address ? "(all)" : (listener->addressType() == No::Ipv4Address ? "(IPv4)" : "(IPv6)")));
         }
 
-        putStatus(Table);
+        putStatus(table);
 
         return;
     }
