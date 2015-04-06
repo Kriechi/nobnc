@@ -83,7 +83,7 @@ public:
     uint maxJoins = 0;
     NoString skinName = "";
 
-    NoModuleLoader* modules = nullptr;
+    NoModuleLoader* loader = nullptr;
 };
 
 #endif // NOUSER_P_H

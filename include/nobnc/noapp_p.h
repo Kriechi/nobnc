@@ -76,7 +76,7 @@ public:
     uint anonIpLimit = 10;
     uint maxBufferSize = 500;
     uint disabledSslProtocols = 0;
-    NoModuleLoader* modules = nullptr;
+    NoModuleLoader* loader = nullptr;
     ulonglong bytesRead = 0;
     ulonglong bytesWritten = 0;
     std::list<NoNetwork*> connectQueue;

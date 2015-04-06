@@ -120,7 +120,7 @@ public:
     NoString quitMessage = "";
     NoStringSet trustedFingerprints;
 
-    NoModuleLoader* modules = nullptr;
+    NoModuleLoader* loader = nullptr;
 
     std::vector<NoClient*> clients;
 
@@ -175,7 +175,7 @@ bool NoNetwork::isValidNetwork(const NoString& sNetwork)
 NoNetwork::NoNetwork(NoUser* user, const NoString& name) : d(new NoNetworkPrivate)
 {
     d->name = name;
-    d->modules = new NoModuleLoader;
+    d->loader = new NoModuleLoader;
 
     setUser(user);
 
@@ -322,8 +322,8 @@ NoNetwork::~NoNetwork()
     delServers();
 
     // Delete modules (this unloads all modules)
-    delete d->modules;
-    d->modules = nullptr;
+    delete d->loader;
+    d->loader = nullptr;
 
     // Delete Channels
     for (NoChannel* channel : d->channels) {
@@ -762,7 +762,7 @@ bool NoNetwork::setName(const NoString& name)
 
 NoModuleLoader* NoNetwork::loader() const
 {
-    return d->modules;
+    return d->loader;
 }
 
 bool NoNetwork::putUser(const NoString& line, NoClient* client, NoClient* skipClient)

@@ -61,7 +61,7 @@ NoUser::NoUser(const NoString& userName) : d(new NoUserPrivate)
     d->ident = d->cleanUserName;
     d->realName = userName;
     d->userPath = noApp->userPath() + "/" + userName;
-    d->modules = new NoModuleLoader;
+    d->loader = new NoModuleLoader;
     d->userTimer = new NoUserTimer(this);
     NoAppPrivate::get(noApp)->manager.addCron(d->userTimer);
 }
@@ -80,8 +80,8 @@ NoUser::~NoUser()
     d->clients.clear();
 
     // Delete modules (unloads all modules!)
-    delete d->modules;
-    d->modules = nullptr;
+    delete d->loader;
+    d->loader = nullptr;
 
     NoAppPrivate::get(noApp)->manager.removeCron(d->userTimer);
 
@@ -901,7 +901,7 @@ NoString NoUser::makeCleanUserName(const NoString& userName)
 
 NoModuleLoader* NoUser::loader() const
 {
-    return d->modules;
+    return d->loader;
 }
 
 bool NoUser::isUserAttached() const
@@ -955,7 +955,7 @@ bool NoUserPrivate::loadModule(const NoString& name, const NoString& args, const
             }
         }
     } else {
-        bModRet = modules->loadModule(name, args, No::UserModule, q, nullptr, sModRet);
+        bModRet = loader->loadModule(name, args, No::UserModule, q, nullptr, sModRet);
     }
 
     if (!bModRet) {

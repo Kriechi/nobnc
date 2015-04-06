@@ -44,7 +44,7 @@ NO_EXPORT void no_cleanup()
 {
     NoAppPrivate* p = NoAppPrivate::get(noApp);
 
-    p->modules->unloadAllModules();
+    p->loader->unloadAllModules();
 
     for (const auto& it : p->users) {
         it.second->loader()->unloadAllModules();
@@ -73,8 +73,8 @@ NO_EXPORT void no_cleanup()
     p->users.clear();
     p->disableConnectQueue();
 
-    delete p->modules;
-    p->modules = nullptr;
+    delete p->loader;
+    p->loader = nullptr;
 
     delete p->lockFile;
     p->lockFile = nullptr;
@@ -99,7 +99,7 @@ NoApp::NoApp() : d(new NoAppPrivate)
         exit(-1);
     }
     d->startTime = time(nullptr);
-    d->modules = new NoModuleLoader;
+    d->loader = new NoModuleLoader;
     d->disabledSslProtocols = Csock::EDP_SSL;
     d->connectThrottle.setExpiration(30000);
 }
@@ -2124,7 +2124,7 @@ NoApp::ConfigState NoApp::configState() const
 
 NoModuleLoader* NoApp::loader() const
 {
-    return d->modules;
+    return d->loader;
 }
 
 NoString NoApp::skinName() const
