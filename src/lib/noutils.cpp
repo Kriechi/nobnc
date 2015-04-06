@@ -285,7 +285,7 @@ bool No::getInput(const NoString& prompt, NoString& ret, const NoString& default
     }
     sInput = szBuf;
 
-    if (sInput.right(1) == "\n") {
+    if (sInput.endsWith("\n")) {
         sInput.rightChomp(1);
     }
 
@@ -386,7 +386,7 @@ namespace
  */
 inline NoString FixGMT(NoString timezone)
 {
-    if (timezone.length() >= 4 && timezone.left(3) == "GMT") {
+    if (timezone.length() >= 4 && timezone.startsWith("GMT")) {
         if (timezone[3] == '+') {
             timezone[3] = '-';
         } else if (timezone[3] == '-') {
@@ -489,7 +489,7 @@ void FillTimezones(const NoString& path, NoStringSet& result, const NoString& pr
         NoString sFile = pFile->GetLongName();
         if (name == "posix" || name == "right")
             continue; // these 2 dirs contain the same filenames
-        if (name.right(4) == ".tab" || name == "posixrules" || name == "localtime")
+        if (name.endsWith(".tab") || name == "posixrules" || name == "localtime")
             continue;
         if (pFile->IsDir()) {
             if (name == "Etc") {

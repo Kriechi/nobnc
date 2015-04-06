@@ -740,9 +740,9 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
 
         redirect("/"); // the login form is here
         return Done;
-    } else if (sURI.left(5) == "/pub/") {
+    } else if (sURI.startsWith("/pub/")) {
         return printStaticFile(sURI, sPageRet);
-    } else if (sURI.left(11) == "/skinfiles/") {
+    } else if (sURI.startsWith("/skinfiles/")) {
         NoString sSkinName = sURI.substr(11);
         NoString::size_type uPathStart = sSkinName.find("/");
         if (uPathStart != NoString::npos) {
@@ -759,9 +759,9 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
             }
         }
         return NotFound;
-    } else if (sURI.left(6) == "/mods/" || sURI.left(10) == "/modfiles/") {
+    } else if (sURI.startsWith("/mods/") || sURI.startsWith("/modfiles/")) {
         // Make sure modules are treated as directories
-        if (sURI.right(1) != "/" && !sURI.contains(".") && !sURI.trimLeft_n("/mods/").trimLeft_n("/").contains("/")) {
+        if (!sURI.endsWith("/") && !sURI.contains(".") && !sURI.trimLeft_n("/mods/").trimLeft_n("/").contains("/")) {
             redirect(sURI + "/");
             return Done;
         }
@@ -863,7 +863,7 @@ NoWebSocket::PageRequest NoWebSocket::onPageRequestInternal(const NoString& sURI
             addModuleLoop("UserModLoop", *module);
         }
 
-        if (sURI.left(10) == "/modfiles/") {
+        if (sURI.startsWith("/modfiles/")) {
             m_template.appendPath(skinPath(skinName()) + "/mods/" + m_modName + "/files/");
             m_template.appendPath(module->dataPath() + "/files/");
 

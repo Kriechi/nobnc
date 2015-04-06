@@ -96,7 +96,7 @@ public:
             line.trim();
 
             // Only append a space if this isn't an empty reply
-            if (line.right(1) != ":") {
+            if (line.endsWith(":")) {
                 line += " ";
             }
 

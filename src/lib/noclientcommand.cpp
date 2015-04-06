@@ -1611,7 +1611,7 @@ void NoClient::yserPortCommand(NoString& line)
         if (sPort.empty() || sAddr.empty() || sAccept.empty()) {
             putStatus("Usage: AddPort <[+]port> <ipv4|ipv6|all> <web|irc|all> [bindhost [uriprefix]]");
         } else {
-            bool ssl = (sPort.left(1).equals("+"));
+            bool ssl = sPort.startsWith("+");
             const NoString host = No::token(line, 4);
             const NoString uriPrefix = No::token(line, 5);
 

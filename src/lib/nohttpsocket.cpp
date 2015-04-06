@@ -320,21 +320,21 @@ bool NoHttpSocket::printFile(const NoString& fileName, NoString sContentType)
     }
 
     if (sContentType.empty()) {
-        if (fileName.right(5).equals(".html") || fileName.right(4).equals(".htm")) {
+        if (fileName.endsWith(".html") || fileName.endsWith(".htm")) {
             sContentType = "text/html; charset=utf-8";
-        } else if (fileName.right(4).equals(".css")) {
+        } else if (fileName.endsWith(".css")) {
             sContentType = "text/css; charset=utf-8";
-        } else if (fileName.right(3).equals(".js")) {
+        } else if (fileName.endsWith(".js")) {
             sContentType = "application/x-javascript; charset=utf-8";
-        } else if (fileName.right(4).equals(".jpg")) {
+        } else if (fileName.endsWith(".jpg")) {
             sContentType = "image/jpeg";
-        } else if (fileName.right(4).equals(".gif")) {
+        } else if (fileName.endsWith(".gif")) {
             sContentType = "image/gif";
-        } else if (fileName.right(4).equals(".ico")) {
+        } else if (fileName.endsWith(".ico")) {
             sContentType = "image/x-icon";
-        } else if (fileName.right(4).equals(".png")) {
+        } else if (fileName.endsWith(".png")) {
             sContentType = "image/png";
-        } else if (fileName.right(4).equals(".bmp")) {
+        } else if (fileName.endsWith(".bmp")) {
             sContentType = "image/bmp";
         } else {
             sContentType = "text/plain; charset=utf-8";
@@ -372,7 +372,7 @@ bool NoHttpSocket::printFile(const NoString& fileName, NoString sContentType)
         }
 
 #ifdef HAVE_ZLIB
-        bool bGzip = m_acceptGzip && (sContentType.left(5).equals("text/") || fileName.right(3).equals(".js"));
+        bool bGzip = m_acceptGzip && (sContentType.startsWith("text/") || fileName.endsWith(".js"));
 
         if (bGzip) {
             NO_DEBUG("- Sending gzip-compressed.");

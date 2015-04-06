@@ -205,7 +205,7 @@ void NoClient::readLine(const NoString& data)
 
     NO_DEBUG("(" << fullName() << ") CLI -> ZNC [" << line << "]");
 
-    if (line.left(1) == "@") {
+    if (line.startsWith("@")) {
         // TODO support message-tags properly
         line = No::tokens(line, 1);
     }
@@ -220,7 +220,7 @@ void NoClient::readLine(const NoString& data)
         return;
 
     NoString command = No::token(line, 0);
-    if (command.left(1) == ":") {
+    if (command.startsWith(":")) {
         // Evil client! Sending a nickmask prefix on client's command
         // is bad, bad, bad, bad, bad, bad, bad, bad, BAD, B A D!
         line = No::tokens(line, 1);

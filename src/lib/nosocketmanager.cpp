@@ -212,7 +212,7 @@ uint NoSocketManager::anonConnectionCount(const NoString& address) const
     for (Csock* socket : *m_instance) {
         // Logged in NoClients have "USR::<username>" as their sockname
         if (socket->GetType() == Csock::INBOUND && socket->GetRemoteIP() == address &&
-            socket->GetSockName().left(5) != "USR::") {
+            !socket->GetSockName().startsWith("USR::")) {
             ret++;
         }
     }

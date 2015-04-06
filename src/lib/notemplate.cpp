@@ -324,7 +324,7 @@ void NoTemplate::init()
 
 NoString NoTemplate::expandFile(const NoString& sFilename, bool bFromInc)
 {
-    /*if (sFilename.Left(1) == "/" || sFilename.Left(2) == "./") {
+    /*if (sFilename.startsWith("/") || sFilename.startsWith("./")) {
         return sFilename;
     }*/
 
@@ -335,7 +335,7 @@ NoString NoTemplate::expandFile(const NoString& sFilename, bool bFromInc)
         NoString sFilePath = NoDir(sRoot).filePath(sFile);
 
         // Make sure path ends with a slash because "/foo/pub*" matches "/foo/public_keep_out/" but "/foo/pub/*" doesn't
-        if (!sRoot.empty() && sRoot.right(1) != "/") {
+        if (!sRoot.empty() && !sRoot.endsWith("/")) {
             sRoot += "/";
         }
 
@@ -345,7 +345,7 @@ NoString NoTemplate::expandFile(const NoString& sFilename, bool bFromInc)
         }
 
         if (NoFile::Exists(sFilePath)) {
-            if (sRoot.empty() || sFilePath.left(sRoot.length()) == sRoot) {
+            if (sRoot.empty() || sFilePath.startsWith(sRoot)) {
                 NO_DEBUG("    Found  [" + sFilePath + "]");
                 return sFilePath;
             } else {
@@ -381,7 +381,7 @@ NoString NoTemplate::makePath(const NoString& path) const
 {
     NoString ret = NoDir("./").filePath(path + "/");
 
-    if (!ret.empty() && ret.right(1) != "/") {
+    if (!ret.empty() && !ret.endsWith("/")) {
         ret += "/";
     }
 
@@ -682,15 +682,15 @@ bool NoTemplate::print(const NoString& fileName, std::ostream& oOut)
 
                             NoString sLoopName = No::token(args, 0);
                             bool bReverse = (No::token(args, 1).equals("REVERSE"));
-                            bool bSort = (No::token(args, 1).left(4).equals("SORT"));
+                            bool bSort = (No::token(args, 1).startsWith("SORT"));
                             std::vector<NoTemplate*>* pvLoop = loop(sLoopName);
 
                             if (bSort && pvLoop != nullptr && pvLoop->size() > 1) {
                                 NoString key;
 
-                                if (No::token(args, 1).trimPrefix_n("SORT").left(4).equals("ASC=")) {
+                                if (No::token(args, 1).trimPrefix_n("SORT").startsWith("ASC=")) {
                                     key = No::token(args, 1).trimPrefix_n("SORTASC=");
-                                } else if (No::token(args, 1).trimPrefix_n("SORT").left(5).equals("DESC=")) {
+                                } else if (No::token(args, 1).trimPrefix_n("SORT").startsWith("DESC=")) {
                                     key = No::token(args, 1).trimPrefix_n("SORTDESC=");
                                     bReverse = true;
                                 }
@@ -934,7 +934,7 @@ bool NoTemplate::validExpr(const NoString& sExpression)
     NoString name;
     NoString value;
 
-    if (sExpr.left(1) == "!") {
+    if (sExpr.startsWith("!")) {
         bNegate = true;
         sExpr.leftChomp(1);
     }
@@ -1016,10 +1016,10 @@ NoString NoTemplate::fileName() const
 
 NoString NoTemplate::resolveLiteral(const NoString& sString)
 {
-    if (sString.left(2) == "**") {
+    if (sString.startsWith("**")) {
         // Allow string to start with a literal * by using two in a row
         return sString.substr(1);
-    } else if (sString.left(1) == "*") {
+    } else if (sString.startsWith("*")) {
         // If it starts with only one * then treat it as a var and do a lookup
         return value(sString.substr(1));
     }
@@ -1061,7 +1061,7 @@ NoString NoTemplate::value(const NoString& args, bool bFromIf)
             return ret;
         }
     } else {
-        if (name.left(1) == "*") {
+        if (name.startsWith("*")) {
             name.leftChomp(1);
             NoStringMap::iterator it = find(name);
             name = (it != end()) ? it->second : "";

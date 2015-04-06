@@ -230,18 +230,18 @@ bool NoSettings::Parse(NoFile& file, NoString& error)
         line.trimLeft();
         line.trimRight("\r\n");
 
-        if (commented || line.left(2) == "/*") {
+        if (commented || line.startsWith("/*")) {
             /* Does this comment end on the same line again? */
-            commented = (line.right(2) != "*/");
+            commented = !line.endsWith("*/");
 
             continue;
         }
 
-        if ((line.empty()) || (line[0] == '#') || (line.left(2) == "//")) {
+        if (line.empty() || line.startsWith("#") || line.startsWith("//")) {
             continue;
         }
 
-        if ((line.left(1) == "<") && (line.right(1) == ">")) {
+        if (line.startsWith("<") && line.endsWith(">")) {
             line.leftChomp(1);
             line.rightChomp(1);
             line.trim();
@@ -252,7 +252,7 @@ bool NoSettings::Parse(NoFile& file, NoString& error)
             tag.trim();
             value.trim();
 
-            if (tag.left(1) == "/") {
+            if (tag.startsWith("/")) {
                 tag = tag.substr(1);
 
                 if (!value.empty())
@@ -298,7 +298,7 @@ bool NoSettings::Parse(NoFile& file, NoString& error)
 
         // Only remove the first space, people might want
         // leading spaces (e.g. in the MOTD).
-        if (value.left(1) == " ")
+        if (value.startsWith(" "))
             value.leftChomp(1);
 
         // We don't have any names with spaces, trim all

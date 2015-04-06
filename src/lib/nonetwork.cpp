@@ -1151,7 +1151,7 @@ bool NoNetwork::addServer(const NoString& name)
     NoString port = No::token(line, 1);
     NoString pass = No::tokens(line, 2);
 
-    if (port.left(1) == "+") {
+    if (port.startsWith("+")) {
         ssl = true;
         port.leftChomp(1);
     }

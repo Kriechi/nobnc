@@ -641,7 +641,7 @@ void NoIrcSocket::readLine(const NoString& data)
         } else if (cmd.equals("MODE")) {
             NoString target = No::token(sRest, 0);
             NoString modes = No::tokens(sRest, 1);
-            if (modes.left(1) == ":")
+            if (modes.startsWith(":"))
                 modes = modes.substr(1);
 
             NoChannel* channel = d->network->findChannel(target);

@@ -50,7 +50,7 @@ NoFile::~NoFile()
 
 void NoFile::SetFileName(const NoString& filePath)
 {
-    if (filePath.left(2) == "~/") {
+    if (filePath.startsWith("~/")) {
         m_longName = NoDir::home().path() + filePath.substr(1);
     } else
         m_longName = filePath;
@@ -563,7 +563,7 @@ NoString NoFile::GetDir() const
 {
     NoString sDir(m_longName);
 
-    while (!sDir.empty() && sDir.right(1) != "/" && sDir.right(1) != "\\") {
+    while (!sDir.empty() && !sDir.endsWith("/") && !sDir.endsWith("\\")) {
         sDir.rightChomp(1);
     }
 

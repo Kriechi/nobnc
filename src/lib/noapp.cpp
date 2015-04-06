@@ -538,9 +538,9 @@ NoString NoAppPrivate::expandConfigPath(const NoString& configFile, bool allowMk
     if (configFile.empty()) {
         sRetPath = noApp->confPath(allowMkDir) + "/znc.conf";
     } else {
-        if (configFile.left(2) == "./" || configFile.left(3) == "../") {
+        if (configFile.startsWith("./") || configFile.startsWith("../")) {
             sRetPath = noApp->currentPath() + "/" + configFile;
-        } else if (configFile.left(1) != "/") {
+        } else if (!configFile.startsWith("/")) {
             sRetPath = noApp->confPath(allowMkDir) + "/" + configFile;
         } else {
             sRetPath = configFile;
@@ -1704,7 +1704,7 @@ bool NoAppPrivate::addListener(const NoString& line, NoString& error)
         sPort = value;
     }
 
-    if (sPort.left(1) == "+") {
+    if (sPort.startsWith("+")) {
         sPort.leftChomp(1);
         ssl = true;
     }
@@ -1952,9 +1952,9 @@ NoApp::TrafficStatsMap NoApp::trafficStats(TrafficStatsPair& Users, TrafficStats
 
     for (NoSocket* socket : d->manager.sockets()) {
         NoUser* user = nullptr;
-        if (socket->name().left(5) == "IRC::") {
+        if (socket->name().startsWith("IRC::")) {
             user = ((NoIrcSocket*)socket)->network()->user();
-        } else if (socket->name().left(5) == "USR::") {
+        } else if (socket->name().startsWith("USR::")) {
             user = ((NoClient*)socket)->user();
         }
 
