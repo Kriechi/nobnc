@@ -239,7 +239,7 @@ void NoSocket::setPemFile(const NoString& filePath)
     d->impl->SetPemLocation(filePath);
 }
 
-bool NoSocket::write(const char* data, size_t len)
+bool NoSocket::write(const char* data, ulong len)
 {
     return d->impl->Write(data, len);
 }
@@ -279,7 +279,7 @@ bool NoSocket::isConnected() const
 {
     return d->impl->IsConnected();
 }
-uint16_t NoSocket::port() const
+ushort NoSocket::port() const
 {
     return d->impl->GetPort();
 }
@@ -287,11 +287,11 @@ NoString NoSocket::host() const
 {
     return d->impl->GetHostName();
 }
-uint16_t NoSocket::localPort() const
+ushort NoSocket::localPort() const
 {
     return d->impl->GetLocalPort();
 }
-uint16_t NoSocket::remotePort() const
+ushort NoSocket::remotePort() const
 {
     return d->impl->GetRemotePort();
 }
@@ -324,11 +324,11 @@ long NoSocket::peerFingerprint(NoString& fingerprint) const
 {
     return d->impl->GetPeerFingerprint(fingerprint);
 }
-uint32_t NoSocket::requireClientCertFlags() const
+uint NoSocket::requireClientCertFlags() const
 {
     return d->impl->GetRequireClientCertFlags();
 }
-void NoSocket::setRequireClientCertFlags(uint32_t iRequireClientCertFlags)
+void NoSocket::setRequireClientCertFlags(uint iRequireClientCertFlags)
 {
     d->impl->SetRequireClientCertFlags(iRequireClientCertFlags);
 }
@@ -337,7 +337,7 @@ SSL_SESSION* NoSocket::sslSession() const
     return d->impl->GetSSLSession();
 }
 #endif
-uint64_t NoSocket::startTime() const
+ulonglong NoSocket::startTime() const
 {
     return d->impl->GetStartTime();
 }
@@ -345,7 +345,7 @@ bool NoSocket::connect()
 {
     return d->impl->Connect();
 }
-bool NoSocket::listen(uint16_t port, int maxConns, const NoString& bindHost, uint32_t timeout, bool bDetach)
+bool NoSocket::listen(ushort port, int maxConns, const NoString& bindHost, uint timeout, bool bDetach)
 {
     return d->impl->Listen(port, maxConns, bindHost, timeout, bDetach);
 }
@@ -357,11 +357,11 @@ void NoSocket::disableReadLine()
 {
     d->impl->DisableReadLine();
 }
-uint32_t NoSocket::maxBufferThreshold() const
+uint NoSocket::maxBufferThreshold() const
 {
     return d->impl->GetMaxBufferThreshold();
 }
-void NoSocket::setMaxBufferThreshold(uint32_t iThreshold)
+void NoSocket::setMaxBufferThreshold(uint iThreshold)
 {
     d->impl->SetMaxBufferThreshold(iThreshold);
 }
@@ -432,7 +432,7 @@ void NoSocketImpl::ReadData(const char* data, size_t len)
 {
     q->readData(data, len);
 }
-void NoSocket::readData(const char* data, size_t len)
+void NoSocket::readData(const char* data, ulong len)
 {
     return d->impl->Csock::ReadData(data, len);
 }
@@ -441,7 +441,7 @@ void NoSocketImpl::PushBuff(const char* data, size_t len, bool bStartAtZero)
 {
     q->pushBuffer(data, len, bStartAtZero);
 }
-void NoSocket::pushBuffer(const char* data, size_t len, bool bStartAtZero)
+void NoSocket::pushBuffer(const char* data, ulong len, bool bStartAtZero)
 {
     d->impl->Csock::PushBuff(data, len, bStartAtZero);
 }

@@ -41,7 +41,7 @@ public:
     virtual ~NoSocket();
 
     bool isSsl() const;
-    uint16_t port() const;
+    ushort port() const;
     NoString host() const;
 
     NoString name() const;
@@ -53,10 +53,10 @@ public:
     bool isConnected() const;
     bool isReady() const;
 
-    uint16_t localPort() const;
+    ushort localPort() const;
     NoString localAddress() const;
 
-    uint16_t remotePort() const;
+    ushort remotePort() const;
     virtual NoString remoteAddress() const;
 
     NoString bindHost() const;
@@ -75,31 +75,31 @@ public:
     NoString pemFile() const;
     void setPemFile(const NoString& filePath);
 
-    bool write(const char* data, size_t len);
+    bool write(const char* data, ulong len);
     bool write(const NoString& data);
 
     void pauseRead();
     void resumeRead();
 
-    uint64_t startTime() const;
+    ulonglong startTime() const;
     time_t timeSinceLastDataTransaction(time_t now = 0) const;
 
     NoString cipher() const;
     void setCipher(const NoString& cipher);
 
-    uint32_t requireClientCertFlags() const;
-    void setRequireClientCertFlags(uint32_t flags);
+    uint requireClientCertFlags() const;
+    void setRequireClientCertFlags(uint flags);
 
     SSL_SESSION* sslSession() const;
 
     bool connect();
-    bool listen(uint16_t port, int maxConns = SOMAXCONN, const NoString& bindHost = "", uint32_t timeout = 0, bool detach = false);
+    bool listen(ushort port, int maxConns = SOMAXCONN, const NoString& bindHost = "", uint timeout = 0, bool detach = false);
 
     void enableReadLine();
     void disableReadLine();
 
-    uint32_t maxBufferThreshold() const;
-    void setMaxBufferThreshold(uint32_t threshold);
+    uint maxBufferThreshold() const;
+    void setMaxBufferThreshold(uint threshold);
 
     no_sock_t& readDescriptor() const;
     void setReadDescriptor(no_sock_t descriptor);
@@ -118,8 +118,8 @@ public:
     bool startTls();
 
     virtual void readLine(const NoString& line);
-    virtual void readData(const char* data, size_t len);
-    virtual void pushBuffer(const char* data, size_t len, bool startAtZero = false);
+    virtual void readData(const char* data, ulong len);
+    virtual void pushBuffer(const char* data, ulong len, bool startAtZero = false);
 
 protected:
     virtual void onConnected();
