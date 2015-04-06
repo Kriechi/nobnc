@@ -201,45 +201,22 @@ void NoClient::userCommand(NoString& line)
 
         putStatus(Table);
     } else if (d->user->isAdmin() && command.equals("LISTALLUSERNETWORKS")) {
-        const std::map<NoString, NoUser*>& msUsers = noApp->userMap();
-        NoTable Table;
-        Table.addColumn("Username");
-        Table.addColumn("Network");
-        Table.addColumn("Clients");
-        Table.addColumn("OnIRC");
-        Table.addColumn("IRC Server");
-        Table.addColumn("IRC User");
-        Table.addColumn("Channels");
+        const std::map<NoString, NoUser*>& users = noApp->userMap();
+        NoTable table;
+        table.addColumn("Username");
+        table.addColumn("Network");
 
-        for (const auto& it : msUsers) {
-            Table.addRow();
-            Table.setValue("Username", it.first);
-            Table.setValue("Network", "N/A");
-            Table.setValue("Clients", NoString(it.second->userClients().size()));
+        for (const auto& it : users) {
+            const std::vector<NoNetwork*>& networks = it.second->networks();
 
-            const std::vector<NoNetwork*>& vNetworks = it.second->networks();
-
-            for (const NoNetwork* network : vNetworks) {
-                Table.addRow();
-                if (network == vNetworks.back()) {
-                    Table.setValue("Username", "`-");
-                } else {
-                    Table.setValue("Username", "|-");
-                }
-                Table.setValue("Network", network->name());
-                Table.setValue("Clients", NoString(network->clients().size()));
-                if (network->isIrcConnected()) {
-                    Table.setValue("OnIRC", "Yes");
-                    Table.setValue("IRC Server", network->ircServer());
-                    Table.setValue("IRC User", network->ircNick().hostMask());
-                    Table.setValue("Channels", NoString(network->channels().size()));
-                } else {
-                    Table.setValue("OnIRC", "No");
-                }
+            for (const NoNetwork* network : networks) {
+                table.addRow();
+                table.setValue("Username", it.first);
+                table.setValue("Network", network->name() + (network->isIrcConnected() ? " (online)" : (network->isEnabled() ? " (offline)" : " (disabled)")));
             }
         }
 
-        putStatus(Table);
+        putStatus(table);
     } else if (d->user->isAdmin() && command.equals("SetMOTD")) {
         NoString message = No::tokens(line, 1);
 
