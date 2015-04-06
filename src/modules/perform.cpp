@@ -56,13 +56,11 @@ class NoPerform : public NoModule
         NoTable Table;
         uint index = 1;
 
-        Table.addColumn("Id");
         Table.addColumn("Perform");
         Table.addColumn("Expanded");
 
         for (NoStringVector::const_iterator it = m_vPerform.begin(); it != m_vPerform.end(); ++it, index++) {
             Table.addRow();
-            Table.setValue("Id", NoString(index));
             Table.setValue("Perform", *it);
 
             NoString sExpanded = expandString(*it);
