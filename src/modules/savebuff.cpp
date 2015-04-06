@@ -122,7 +122,7 @@ public:
                 m_sPassword = "";
                 No::printError("[" + NoModule::name() + ".so] Failed to Decrypt [" + pFile->GetLongName() + "]");
                 if (!name.empty()) {
-                    putUser(":***!znc@znc.in PRIVMSG " + name +
+                    putUser(":***!no@bnc.no PRIVMSG " + name +
                             " :Failed to decrypt this buffer, did you change the encryption pass?");
                 }
                 break;
@@ -283,7 +283,7 @@ public:
     {
         NoString sFile;
         NoString name;
-        putUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Buffer Playback...");
+        putUser(":***!no@bnc.no PRIVMSG " + sBuffer + " :Buffer Playback...");
         if (DecryptBuffer(GetPath(sBuffer), sFile, name)) {
             NoStringVector lines = sFile.split("\n");
             NoStringVector::iterator it;
@@ -294,7 +294,7 @@ public:
                 putUser(line);
             }
         }
-        putUser(":***!znc@znc.in PRIVMSG " + sBuffer + " :Playback Complete.");
+        putUser(":***!no@bnc.no PRIVMSG " + sBuffer + " :Playback Complete.");
     }
 
     NoString GetPath(const NoString& target) const
@@ -320,7 +320,7 @@ public:
 #ifdef LEGACY_SAVEBUFF /* event logging is deprecated now in savebuf. Use buffextras module along side of this */
     NoString SpoofChanMsg(const NoString& channel, const NoString& sMesg)
     {
-        NoString sReturn = ":*" + moduleName() + "!znc@znc.in PRIVMSG " + channel + " :" + NoString(time(nullptr)) + " " + sMesg;
+        NoString sReturn = ":*" + moduleName() + "!no@bnc.no PRIVMSG " + channel + " :" + NoString(time(nullptr)) + " " + sMesg;
         return (sReturn);
     }
 

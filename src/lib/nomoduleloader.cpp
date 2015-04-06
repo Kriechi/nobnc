@@ -24,7 +24,7 @@
 #include <dlfcn.h>
 #include <queue>
 
-bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
+bool NOBNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
 
 #ifndef RTLD_LOCAL
 #define RTLD_LOCAL 0
@@ -895,7 +895,7 @@ NoModuleHandle OpenModule(const NoString& name, const NoString& path, bool& bVer
     // that (despite what the man page says) we must include either of
     // RTLD_NOW and RTLD_LAZY and either of RTLD_GLOBAL and RTLD_LOCAL.
     //
-    // RTLD_NOW vs. RTLD_LAZY: We use RTLD_NOW to avoid ZNC dying due to
+    // RTLD_NOW vs. RTLD_LAZY: We use RTLD_NOW to avoid NoBNC dying due to
     // failed symbol lookups later on. Doesn't really seem to have much of a
     // performance impact.
     //

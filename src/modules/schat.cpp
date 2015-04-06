@@ -383,7 +383,7 @@ public:
 
     void SendToUser(const NoString& sFrom, const NoString& text)
     {
-        //:*schat!znc@znc.in PRIVMSG Jim :
+        //:*schat!no@bnc.no PRIVMSG Jim :
         NoString sSend = ":" + sFrom + " PRIVMSG " + network()->currentNick() + " :" + text;
         putUser(sSend);
     }

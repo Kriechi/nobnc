@@ -77,8 +77,8 @@ public:
     // Returns a map which maps user names to <traffic in, traffic out>
     // while also providing the traffic of all users together, traffic which
     // couldn't be accounted to any particular user and the total traffic
-    // generated through ZNC.
-    TrafficStatsMap trafficStats(TrafficStatsPair& Users, TrafficStatsPair& ZNC, TrafficStatsPair& Total);
+    // generated through NoBNC.
+    TrafficStatsMap trafficStats(TrafficStatsPair& Users, TrafficStatsPair& App, TrafficStatsPair& Total);
 
     // The result is passed back via callbacks to NoAuthenticator.
     void authUser(std::shared_ptr<NoAuthenticator> AuthClass);

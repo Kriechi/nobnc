@@ -87,7 +87,7 @@ NoSocket* NoListenerSocket::createSocket(const NoString& host, ushort port)
     if (noApp->allowConnectionFrom(host)) {
         GLOBALMODULECALL(onClientConnect(socket, host, port), NOTHING);
     } else {
-        socket->write(":irc.znc.in 464 unknown-nick :Too many anonymous connections from your IP\r\n");
+        socket->write(":irc.bnc.no 464 unknown-nick :Too many anonymous connections from your IP\r\n");
         socket->close(NoSocket::CloseAfterWrite);
         GLOBALMODULECALL(onFailedLogin("", host), NOTHING);
     }

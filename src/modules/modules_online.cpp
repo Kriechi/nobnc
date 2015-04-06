@@ -62,7 +62,7 @@ public:
             if (!network()->ircSocket()) {
                 // if we are not connected to any IRC server, send
                 // an empty or module-nick filled response.
-                putUser(":irc.znc.in 303 " + client()->nick() + " :" + sBNNoNicks);
+                putUser(":irc.bnc.no 303 " + client()->nick() + " :" + sBNNoNicks);
             } else {
                 // We let the server handle this request and then act on
                 // the 303 response from the IRC server.
@@ -76,9 +76,9 @@ public:
 
             if (IsOnlineModNick(nick)) {
                 NoNetwork* network = NoModule::network();
-                putUser(":znc.in 311 " + network->currentNick() + " " + nick + " " + nick + " znc.in * :" + nick);
-                putUser(":znc.in 312 " + network->currentNick() + " " + nick + " *.znc.in :Bouncer");
-                putUser(":znc.in 318 " + network->currentNick() + " " + nick + " :End of /WHOIS list.");
+                putUser(":bnc.no 311 " + network->currentNick() + " " + nick + " " + nick + " bnc.no * :" + nick);
+                putUser(":bnc.no 312 " + network->currentNick() + " " + nick + " *.bnc.no :Bouncer");
+                putUser(":bnc.no 318 " + network->currentNick() + " " + nick + " :End of /WHOIS list.");
 
                 return Halt;
             }

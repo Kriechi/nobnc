@@ -98,7 +98,7 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                 NoString batchName = No::md5(d->name);
 
                 if (batch) {
-                    d->network->putUser(":znc.in BATCH +" + batchName + " znc.in/playback " + d->name, useClient);
+                    d->network->putUser(":bnc.no BATCH +" + batchName + " bnc.no/playback " + d->name, useClient);
                 }
 
                 size_t size = buffer.size();
@@ -126,7 +126,7 @@ void NoQuery::sendBuffer(NoClient* client, const NoBuffer& buffer)
                 }
 
                 if (batch) {
-                    d->network->putUser(":znc.in BATCH -" + batchName, useClient);
+                    d->network->putUser(":bnc.no BATCH -" + batchName, useClient);
                 }
 
                 useClient->setPlaybackActive(wasPlaybackActive);

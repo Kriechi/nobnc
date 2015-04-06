@@ -242,9 +242,9 @@ void NoIrcSocket::readLine(const NoString& data)
 
         switch (uRaw) {
         case 1: { // :irc.server.com 001 nick :Welcome to the Internet Relay network nick
-            if (d->authed && sServer == "irc.znc.in") {
+            if (d->authed && sServer == "irc.bnc.no") {
                 // d->bAuthed == true => we already received another 001 => we might be in a traffic loop
-                d->network->putStatus("ZNC seems to be connected to itself, disconnecting...");
+                d->network->putStatus("NoBNC seems to be connected to itself, disconnecting...");
                 quit();
                 return;
             }
@@ -1253,7 +1253,7 @@ void NoIrcSocket::onSocketError(int iErrno, const NoString& description)
                     d->network->putStatus("SHA1: " + No::escape(sSHA1, No::HexColonFormat, No::HexColonFormat));
                 NoString sSHA256 = fingerprint();
                 d->network->putStatus("SHA-256: " + sSHA256);
-                d->network->putStatus("If you trust this certificate, do /znc AddTrustedServerFingerprint " + sSHA256);
+                d->network->putStatus("If you trust this certificate, do /no AddTrustedServerFingerprint " + sSHA256);
             }
         }
 #endif

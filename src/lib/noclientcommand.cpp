@@ -298,7 +298,7 @@ void NoClient::userCommand(NoString& line)
         }
 
         if (message.empty()) {
-            message = (bRestart ? "ZNC is being restarted NOW!" : "ZNC is being shut down NOW!");
+            message = (bRestart ? "NoBNC is being restarted NOW!" : "NoBNC is being shut down NOW!");
         }
 
         if (!noApp->writeConfig() && !force) {
@@ -561,7 +561,7 @@ void NoClient::userCommand(NoString& line)
     } else if (command.equals("ADDNETWORK")) {
         if (!d->user->isAdmin() && !d->user->hasSpaceForNewNetwork()) {
             putStatus("Network number limit reached. Ask an admin to increase the limit for you, or delete unneeded "
-                      "networks using /znc DelNetwork <name>");
+                      "networks using /no DelNetwork <name>");
             return;
         }
 
@@ -578,7 +578,7 @@ void NoClient::userCommand(NoString& line)
 
         NoString sNetworkAddError;
         if (d->user->addNetwork(sNetwork, sNetworkAddError)) {
-            putStatus("Network added. Use /znc JumpNetwork " + sNetwork + ", or connect to ZNC with username " + d->user->userName() +
+            putStatus("Network added. Use /no JumpNetwork " + sNetwork + ", or connect to NoBNC with username " + d->user->userName() +
                       "/" + sNetwork + " (instead of just " + d->user->userName() + ") to connect to it.");
         } else {
             putStatus("Unable to add that network");
@@ -1496,8 +1496,8 @@ void NoClient::userCommand(NoString& line)
                       NoString(noApp->maxBufferSize()));
         }
     } else if (d->user->isAdmin() && command.equals("TRAFFIC")) {
-        NoApp::TrafficStatsPair Users, ZNC, Total;
-        NoApp::TrafficStatsMap traffic = noApp->trafficStats(Users, ZNC, Total);
+        NoApp::TrafficStatsPair Users, App, Total;
+        NoApp::TrafficStatsMap traffic = noApp->trafficStats(Users, App, Total);
 
         NoTable Table;
         Table.addColumn("Username");
@@ -1520,10 +1520,10 @@ void NoClient::userCommand(NoString& line)
         Table.setValue("Total", No::toByteStr(Users.first + Users.second));
 
         Table.addRow();
-        Table.setValue("Username", "<ZNC>");
-        Table.setValue("In", No::toByteStr(ZNC.first));
-        Table.setValue("Out", No::toByteStr(ZNC.second));
-        Table.setValue("Total", No::toByteStr(ZNC.first + ZNC.second));
+        Table.setValue("Username", "<NoBNC>");
+        Table.setValue("In", No::toByteStr(App.first));
+        Table.setValue("Out", No::toByteStr(App.second));
+        Table.setValue("Total", No::toByteStr(App.first + App.second));
 
         Table.addRow();
         Table.setValue("Username", "<Total>");
@@ -1654,7 +1654,7 @@ void NoClient::helpUser(const NoString& filter)
         putStatus("(Except ListNicks)");
     }
 
-    addCommandHelp(Table, "Version", "", "Print which version of ZNC this is", filter);
+    addCommandHelp(Table, "Version", "", "Print which version of NoBNC this is", filter);
 
     addCommandHelp(Table, "ListMods", "", "List all loaded modules", filter);
     addCommandHelp(Table, "ListAvailMods", "", "List all available modules", filter);
@@ -1663,7 +1663,7 @@ void NoClient::helpUser(const NoString& filter)
     }
     addCommandHelp(Table, "ListNicks", "<#chan>", "List all nicks on a channel", filter);
     if (!d->user->isAdmin()) {
-        addCommandHelp(Table, "ListClients", "", "List all clients connected to your ZNC user", filter);
+        addCommandHelp(Table, "ListClients", "", "List all clients connected to your NoBNC user", filter);
     }
     addCommandHelp(Table, "ListServers", "", "List all servers of current IRC network", filter);
 
@@ -1680,7 +1680,7 @@ void NoClient::helpUser(const NoString& filter)
     addCommandHelp(Table,
                    "JumpNetwork",
                    "<network>",
-                   "Jump to another network (Alternatively, you can connect to ZNC several times, using "
+                   "Jump to another network (Alternatively, you can connect to NoBNC several times, using "
                    "`user/network` as username)",
                    filter);
 
@@ -1738,7 +1738,7 @@ void NoClient::helpUser(const NoString& filter)
     addCommandHelp(Table, "Jump", "[server]", "Jump to the next or the specified server", filter);
     addCommandHelp(Table, "Disconnect", "[message]", "Disconnect from IRC", filter);
     addCommandHelp(Table, "Connect", "", "Reconnect to IRC", filter);
-    addCommandHelp(Table, "Uptime", "", "Show for how long ZNC has been running", filter);
+    addCommandHelp(Table, "Uptime", "", "Show for how long NoBNC has been running", filter);
 
     if (!d->user->denyLoadMod()) {
         addCommandHelp(Table, "LoadMod", "[--type=global|user|network] <module>", "Load a module", filter);
@@ -1749,29 +1749,29 @@ void NoClient::helpUser(const NoString& filter)
         }
     }
 
-    addCommandHelp(Table, "ShowMOTD", "", "Show ZNC's message of the day", filter);
+    addCommandHelp(Table, "ShowMOTD", "", "Show NoBNC's message of the day", filter);
 
     if (d->user->isAdmin()) {
-        addCommandHelp(Table, "SetMOTD", "<message>", "Set ZNC's message of the day", filter);
-        addCommandHelp(Table, "AddMOTD", "<message>", "Append <message> to ZNC's MOTD", filter);
-        addCommandHelp(Table, "ClearMOTD", "", "Clear ZNC's MOTD", filter);
+        addCommandHelp(Table, "SetMOTD", "<message>", "Set NoBNC's message of the day", filter);
+        addCommandHelp(Table, "AddMOTD", "<message>", "Append <message> to NoBNC's MOTD", filter);
+        addCommandHelp(Table, "ClearMOTD", "", "Clear NoBNC's MOTD", filter);
         addCommandHelp(Table, "ListPorts", "", "Show all active listeners", filter);
         addCommandHelp(Table,
                        "AddPort",
                        "<[+]port> <ipv4|ipv6|all> [bindhost [uriprefix]]",
-                       "Add another port for ZNC to listen on",
+                       "Add another port for NoBNC to listen on",
                        filter);
-        addCommandHelp(Table, "DelPort", "<port> <ipv4|ipv6|all> [bindhost]", "Remove a port from ZNC", filter);
+        addCommandHelp(Table, "DelPort", "<port> <ipv4|ipv6|all> [bindhost]", "Remove a port from NoBNC", filter);
         addCommandHelp(Table, "Rehash", "", "Reload nobnc.conf from disk", filter);
         addCommandHelp(Table, "SaveConfig", "", "Save the current settings to disk", filter);
-        addCommandHelp(Table, "ListUsers", "", "List all ZNC users and their connection status", filter);
-        addCommandHelp(Table, "ListAllUserNetworks", "", "List all ZNC users and their networks", filter);
+        addCommandHelp(Table, "ListUsers", "", "List all NoBNC users and their connection status", filter);
+        addCommandHelp(Table, "ListAllUserNetworks", "", "List all NoBNC users and their networks", filter);
         addCommandHelp(Table, "ListChans", "[user <network>]", "List all channels", filter);
         addCommandHelp(Table, "ListClients", "[user]", "List all connected clients", filter);
-        addCommandHelp(Table, "Traffic", "", "Show basic traffic stats for all ZNC users", filter);
-        addCommandHelp(Table, "Broadcast", "[message]", "Broadcast a message to all ZNC users", filter);
-        addCommandHelp(Table, "Shutdown", "[message]", "Shut down ZNC completely", filter);
-        addCommandHelp(Table, "Restart", "[message]", "Restart ZNC", filter);
+        addCommandHelp(Table, "Traffic", "", "Show basic traffic stats for all NoBNC users", filter);
+        addCommandHelp(Table, "Broadcast", "[message]", "Broadcast a message to all NoBNC users", filter);
+        addCommandHelp(Table, "Shutdown", "[message]", "Shut down NoBNC completely", filter);
+        addCommandHelp(Table, "Restart", "[message]", "Restart NoBNC", filter);
     }
 
     if (Table.isEmpty()) {

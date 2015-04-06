@@ -131,13 +131,13 @@ static void GenerateHelp(const char* appname)
     No::printMessage("\t-f, --foreground   Don't fork into the background");
     No::printMessage("\t-D, --debug        Output debugging information (Implies -f)");
     No::printMessage("\t-n, --no-color     Don't use escape sequences in the output");
-    No::printMessage("\t-r, --allow-root   Don't complain if ZNC is run as root");
+    No::printMessage("\t-r, --allow-root   Don't complain if NoBNC is run as root");
     No::printMessage("\t-c, --makeconf     Interactively create a new config");
     No::printMessage("\t-s, --makepass     Generates a password for use in config");
 #ifdef HAVE_LIBSSL
     No::printMessage("\t-p, --makepem      Generates a pemfile for use with SSL");
 #endif // HAVE_LIBSSL
-    No::printMessage("\t-d, --datadir      Set a different ZNC repository (default is ~/.nobnc)");
+    No::printMessage("\t-d, --datadir      Set a different NoBNC repository (default is ~/.nobnc)");
 }
 
 extern void no_cleanup();
@@ -243,7 +243,7 @@ int main(int argc, char** argv)
             bMakePem = true;
             break;
 #else
-            No::PrintError("ZNC is compiled without SSL support.");
+            No::PrintError("NoBNC is compiled without SSL support.");
             return 1;
 #endif // HAVE_LIBSSL
         case 'd':
@@ -282,14 +282,14 @@ int main(int argc, char** argv)
         NoString salt;
         No::printMessage("Type your new password.");
         NoString sHash = No::getSaltedHashPass(salt);
-        No::printMessage("Kill ZNC process, if it's running.");
+        No::printMessage("Kill NoBNC process, if it's running.");
         No::printMessage("Then replace password in the <User> section of your config with this:");
         // Not PrintMessage(), to remove [**] from the beginning, to ease copypasting
         std::cout << "<Pass password>" << std::endl;
         std::cout << "\tHash = " << sHash << std::endl;
         std::cout << "\tSalt = " << salt << std::endl;
         std::cout << "</Pass>" << std::endl;
-        No::printMessage("After that start ZNC again, and you should be able to login with the new password.");
+        No::printMessage("After that start NoBNC again, and you should be able to login with the new password.");
         return 0;
     }
 
@@ -300,9 +300,9 @@ int main(int argc, char** argv)
         std::set<NoModuleInfo> ssNetworkMods = app.loader()->availableModules(No::NetworkModule);
         if (ssGlobalMods.empty() && ssUserMods.empty() && ssNetworkMods.empty()) {
             No::printStatus(false, "");
-            No::printError("No modules found. Perhaps you didn't install ZNC properly?");
+            No::printError("No modules found. Perhaps you didn't install NoBNC properly?");
             No::printError("Read http://wiki.znc.in/Installation for instructions.");
-            if (!No::getBoolInput("Do you really want to run ZNC without any modules?", false)) {
+            if (!No::getBoolInput("Do you really want to run NoBNC without any modules?", false)) {
                 return 1;
             }
         }
@@ -310,14 +310,14 @@ int main(int argc, char** argv)
     }
 
     if (isRoot()) {
-        No::printError("You are running ZNC as root! Don't do that! There are not many valid");
+        No::printError("You are running NoBNC as root! Don't do that! There are not many valid");
         No::printError("reasons for this and it can, in theory, cause great damage!");
         if (!allowRoot) {
             return 1;
         }
         No::printError("You have been warned.");
-        No::printError("Hit CTRL+C now if you don't want to run ZNC as root.");
-        No::printError("ZNC will start in 30 seconds.");
+        No::printError("Hit CTRL+C now if you don't want to run NoBNC as root.");
+        No::printError("NoBNC will start in 30 seconds.");
         sleep(30);
     }
 
@@ -439,7 +439,7 @@ int main(int argc, char** argv)
             // which means the array should be big enough
 
             execvp(args[0], args);
-            No::printError("Unable to restart ZNC [" + NoString(strerror(errno)) + "]");
+            No::printError("Unable to restart NoBNC [" + NoString(strerror(errno)) + "]");
         } /* Fall through */
         default:
             iRet = 1;

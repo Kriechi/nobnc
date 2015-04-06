@@ -410,7 +410,7 @@ void NoChannel::modeChange(const NoString& modes, const NoNick* opNick)
                 (bAdd) ? addMode(mode, arg) : removeMode(mode);
             }
 
-            // This is called when we join (ZNC requests the channel modes
+            // This is called when we join (NoBNC requests the channel modes
             // on join) *and* when someone changes the channel keys.
             // We ignore channel key "*" because of some broken nets.
             if (mode == M_Key && !noChange && bAdd && arg != "*") {
@@ -672,14 +672,14 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                 NETWORKMODULECALL(onChannelBufferStarting(this, pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
 
                 if (!skipStatusMsg) {
-                    d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Buffer Playback...", pUseClient);
+                    d->network->putUser(":***!no@bnc.no PRIVMSG " + name() + " :Buffer Playback...", pUseClient);
                 }
 
                 bool bBatch = pUseClient->hasBatch();
                 NoString sBatchName = No::md5(name());
 
                 if (bBatch) {
-                    d->network->putUser(":znc.in BATCH +" + sBatchName + " znc.in/playback " + name(), pUseClient);
+                    d->network->putUser(":bnc.no BATCH +" + sBatchName + " bnc.no/playback " + name(), pUseClient);
                 }
 
                 size_t uSize = Buffer.size();
@@ -705,11 +705,11 @@ void NoChannel::sendBuffer(NoClient* client, const NoBuffer& Buffer)
                 skipStatusMsg = pUseClient->hasServerTime();
                 NETWORKMODULECALL(onChannelBufferEnding(this, pUseClient), d->network->user(), d->network, nullptr, &skipStatusMsg);
                 if (!skipStatusMsg) {
-                    d->network->putUser(":***!znc@znc.in PRIVMSG " + name() + " :Playback Complete.", pUseClient);
+                    d->network->putUser(":***!no@bnc.no PRIVMSG " + name() + " :Playback Complete.", pUseClient);
                 }
 
                 if (bBatch) {
-                    d->network->putUser(":znc.in BATCH -" + sBatchName, pUseClient);
+                    d->network->putUser(":bnc.no BATCH -" + sBatchName, pUseClient);
                 }
 
                 pUseClient->setPlaybackActive(bWasPlaybackActive);

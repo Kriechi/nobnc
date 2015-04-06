@@ -46,7 +46,7 @@ extern const char* NO_VERSION_EXTRA;
 #endif
 
 /** @mainpage
- *  Welcome to the API documentation for ZNC.
+ *  Welcome to the API documentation for NoBNC.
  *
  *  To write your own module, you should start with writing a new class which
  *  inherits from NoModule. Use #MODCONSTRUCTOR for the module's constructor and

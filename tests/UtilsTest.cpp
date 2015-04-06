@@ -41,8 +41,8 @@ TEST(UtilsTest, GetMessageTags)
     exp.clear();
 
     exp["ab"] = "cdef";
-    exp["znc.in/gh-ij"] = "klmn,op";
-    EXPECT_EQ(exp, No::messageTags("@ab=cdef;znc.in/gh-ij=klmn,op :rest"));
+    exp["bnc.no/gh-ij"] = "klmn,op";
+    EXPECT_EQ(exp, No::messageTags("@ab=cdef;bnc.no/gh-ij=klmn,op :rest"));
     exp.clear();
 
     exp["a"] = "==b==";

@@ -46,7 +46,7 @@ protected:
     {
         for (NoClient* client : m_pUser->userClients()) {
             if (NoSocketInfo(client->socket()).timeSinceLastDataTransaction() >= NoNetwork::PingFrequency)
-                client->putClient("PING :ZNC");
+                client->putClient("PING :NoBNC");
         }
     }
 
@@ -375,7 +375,7 @@ NoString NoUser::expandString(const NoString& str) const
     ret.replace("%time%", No::ctime(time(nullptr), d->timezone));
     ret.replace("%uptime%", noApp->uptime());
     // The following lines do not exist. You must be on DrUgS!
-    ret.replace("%znc%", "All your IRC are belong to ZNC");
+    ret.replace("%nobnc%", "All your IRC are belong to NoBNC");
     // Chosen by fair zocchihedron dice roll by SilverLeo
     ret.replace("%rand%", "42");
     return ret;
@@ -443,7 +443,7 @@ void NoUser::userConnected(NoClient* client)
         d->bounceAllClients();
     }
 
-    client->putClient(":irc.znc.in 001 " + client->nick() + " :- Welcome to ZNC -");
+    client->putClient(":irc.bnc.no 001 " + client->nick() + " :- Welcome to NoBNC -");
 
     d->clients.push_back(client);
 }

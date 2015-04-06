@@ -413,11 +413,11 @@ private:
 
             if (WatchEntry.IsMatch(hostMask, message, sSource, network) && sHandledTargets.count(WatchEntry.GetTarget()) < 1) {
                 if (network->isUserAttached()) {
-                    network->putUser(":" + WatchEntry.GetTarget() + "!watch@znc.in PRIVMSG " +
+                    network->putUser(":" + WatchEntry.GetTarget() + "!watch@bnc.no PRIVMSG " +
                                       network->currentNick() + " :" + message);
                 } else {
                     m_Buffer.addMessage(":" + _NAMEDFMT(WatchEntry.GetTarget()) +
-                                        "!watch@znc.in PRIVMSG {target} :{text}",
+                                        "!watch@bnc.no PRIVMSG {target} :{text}",
                                         message);
                 }
                 sHandledTargets.insert(WatchEntry.GetTarget());

@@ -124,7 +124,7 @@ public:
 
                 for (std::vector<NoClient*>::const_iterator it3 = vClients.begin(); it3 != vClients.end(); ++it3) {
                     NoClient* client = *it3;
-                    client->putClient(":*" + name() + "!znc@znc.in KICK " + (*it)->GetName() + " " +
+                    client->putClient(":*" + name() + "!no@bnc.no KICK " + (*it)->GetName() + " " +
                                        client->nick() + " :" + name() + " unloaded");
                 }
             }
@@ -199,7 +199,7 @@ public:
                 pChannel = FindChannel(arg);
                 NoString value = registry.value(key);
                 if (pChannel && !value.empty()) {
-                    PutChan(pChannel->GetNicks(), ":irc.znc.in TOPIC " + pChannel->GetName() + " :" + value);
+                    PutChan(pChannel->GetNicks(), ":irc.bnc.no TOPIC " + pChannel->GetName() + " :" + value);
                     pChannel->SetTopic(value);
                 }
             }
@@ -276,7 +276,7 @@ public:
             const std::set<NoString>& ssNicks = pChannel->GetNicks();
 
             if (host.empty()) {
-                host = "znc.in";
+                host = "bnc.no";
             }
             PutChan(ssNicks, ":" + NICK_PREFIX + nick + "!" + user->ident() + "@" + host + " JOIN " + *a, false);
             pChannel->AddNick(nick);
@@ -298,7 +298,7 @@ public:
 
                 SendNickList(user, network, ssNicks, (*it)->GetName());
                 PutChan(ssNicks,
-                        ":*" + name() + "!znc@znc.in MODE " + (*it)->GetName() + " +" +
+                        ":*" + name() + "!no@bnc.no MODE " + (*it)->GetName() + " +" +
                         NoString(user->isAdmin() ? "o" : "v") + " " + NICK_PREFIX + user->userName(),
                         false);
             }
@@ -314,7 +314,7 @@ public:
 
                 if (ssNicks.find(user->userName()) != ssNicks.end()) {
                     PutChan(ssNicks,
-                            ":*" + name() + "!znc@znc.in MODE " + (*it)->GetName() + " -ov " + NICK_PREFIX +
+                            ":*" + name() + "!no@bnc.no MODE " + (*it)->GetName() + " -ov " + NICK_PREFIX +
                             user->userName() + " " + NICK_PREFIX + user->userName(),
                             false);
                 }
@@ -346,20 +346,20 @@ public:
                         pChannel->SetTopic(topic);
                         SaveTopic(pChannel);
                     } else {
-                        user->putUser(":irc.znc.in 482 " + client->nick() + " " + channel +
+                        user->putUser(":irc.bnc.no 482 " + client->nick() + " " + channel +
                                        " :You're not channel operator");
                     }
                 } else {
                     topic = pChannel->GetTopic();
 
                     if (topic.empty()) {
-                        user->putUser(":irc.znc.in 331 " + client->nick() + " " + channel + " :No topic is set.");
+                        user->putUser(":irc.bnc.no 331 " + client->nick() + " " + channel + " :No topic is set.");
                     } else {
-                        user->putUser(":irc.znc.in 332 " + client->nick() + " " + channel + " :" + topic);
+                        user->putUser(":irc.bnc.no 332 " + client->nick() + " " + channel + " :" + topic);
                     }
                 }
             } else {
-                user->putUser(":irc.znc.in 442 " + client->nick() + " " + channel + " :You're not on that channel");
+                user->putUser(":irc.bnc.no 442 " + client->nick() + " " + channel + " :You're not on that channel");
             }
             return Halt;
         }
@@ -410,7 +410,7 @@ public:
         NoString host = user->bindHost();
 
         if (host.empty()) {
-            host = "znc.in";
+            host = "bnc.no";
         }
 
         if (bNickAsTarget) {
@@ -482,7 +482,7 @@ public:
             NoString host = user->bindHost();
 
             if (host.empty()) {
-                host = "znc.in";
+                host = "bnc.no";
             }
 
             for (std::vector<NoClient*>::const_iterator it = vClients.begin(); it != vClients.end(); ++it) {
@@ -506,14 +506,14 @@ public:
 
             if (user->isAdmin()) {
                 PutChan(ssNicks,
-                        ":*" + name() + "!znc@znc.in MODE " + pChannel->GetName() + " +o " + NICK_PREFIX + user->userName(),
+                        ":*" + name() + "!no@bnc.no MODE " + pChannel->GetName() + " +o " + NICK_PREFIX + user->userName(),
                         false,
                         false,
                         user);
             }
 
             PutChan(ssNicks,
-                    ":*" + name() + "!znc@znc.in MODE " + pChannel->GetName() + " +v " + NICK_PREFIX + user->userName(),
+                    ":*" + name() + "!no@bnc.no MODE " + pChannel->GetName() + " +v " + NICK_PREFIX + user->userName(),
                     false,
                     false,
                     user);
@@ -538,7 +538,7 @@ public:
         NoString host = user->bindHost();
 
         if (host.empty()) {
-            host = "znc.in";
+            host = "bnc.no";
         }
 
         if (cPrefix == CHAN_PREFIX_1C) {
@@ -609,13 +609,13 @@ public:
     const NoString ircServer(NoNetwork* network)
     {
         if (!network) {
-            return "irc.znc.in";
+            return "irc.bnc.no";
         }
 
         const NoString& sServer = network->ircServer();
         if (!sServer.empty())
             return sServer;
-        return "irc.znc.in";
+        return "irc.bnc.no";
     }
 
     bool PutChan(const NoString& sChan,

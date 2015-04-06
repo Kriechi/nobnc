@@ -21,8 +21,8 @@
 #include "nomodule.h"
 #include "noapp.h"
 
-extern bool ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
-#define NOTHING &ZNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER
+extern bool NOBNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER;
+#define NOTHING &NOBNC_NO_NEED_TO_DO_ANYTHING_ON_MODULE_CALL_EXITER
 
 #define ALLMODULECALL(macFUNC, macEXITER)                                          \
     do {                                                                           \

@@ -364,7 +364,7 @@ public:
             NoString my_nick = (network() == nullptr ? "" : network()->currentNick());
             if (my_nick.empty())
                 my_nick = "*";
-            putUser(NoString(":znc.in 461 " + my_nick + " " + current_alias.GetName() + " :ZNC alias error: ") + e.what());
+            putUser(NoString(":bnc.no 461 " + my_nick + " " + current_alias.GetName() + " :NoBNC alias error: ") + e.what());
             return HaltCore;
         }
 

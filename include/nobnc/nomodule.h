@@ -43,7 +43,7 @@ class NoModulePrivate;
 #ifndef HAVE_LIBSSL
 #error -
 #error -
-#error This module only works when ZNC is compiled with OpenSSL support
+#error This module only works when NoBNC is compiled with OpenSSL support
 #error -
 #error -
 #endif

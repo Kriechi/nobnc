@@ -158,7 +158,7 @@ public:
         socket->listen(0);
 
         if (user()->nick().equals(sRemoteNick)) {
-            putUser(":*dcc!znc@znc.in PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
+            putUser(":*dcc!no@bnc.no PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
                     NoString(No::formatLongIp(sLocalDCCIP)) + " " + NoString(socket->port()) + " " + NoString(pFile->GetSize()) + "\001");
         } else {
             putIrc("PRIVMSG " + sRemoteNick + " :\001DCC SEND " + pFile->GetShortName() + " " +
@@ -277,7 +277,7 @@ public:
                     if (socket->Seek(uResumeSize)) {
                         putModule("DCC -> [" + socket->GetRemoteNick() + "][" + socket->GetFileName() +
                                   "] - Attempting to resume from file position [" + NoString(uResumeSize) + "]");
-                        putUser(":*dcc!znc@znc.in PRIVMSG " + user()->nick() + " :\001DCC ACCEPT " + sFile + " " +
+                        putUser(":*dcc!no@bnc.no PRIVMSG " + user()->nick() + " :\001DCC ACCEPT " + sFile + " " +
                                 NoString(uResumePort) + " " + NoString(uResumeSize) + "\001");
                     } else {
                         putModule("DCC -> [" + user()->nick() + "][" + sFile +

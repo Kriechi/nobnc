@@ -23,7 +23,7 @@
 #include <sstream>
 
 /** Output a debug info if debugging is enabled.
- *  If ZNC was compiled with <code>--enable-debug</code> or was started with
+ *  If NoBNC was compiled with <code>--enable-debug</code> or was started with
  *  <code>--debug</code>, the given argument will be sent to stdout.
  *
  *  You can use all the features of C++ streams:

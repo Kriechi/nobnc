@@ -33,7 +33,7 @@ public:
 
         for (std::vector<NoChannel*>::const_iterator it = channels.begin(); it != channels.end(); ++it) {
             if ((*it)->isOn()) {
-                putUser(":ZNC!znc@znc.in KICK " + (*it)->name() + " " + network()->ircNick().nick() +
+                putUser(":NoBNC!no@bnc.no KICK " + (*it)->name() + " " + network()->ircNick().nick() +
                         " :You have been disconnected from the IRC server");
             }
         }

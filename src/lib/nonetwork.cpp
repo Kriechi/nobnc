@@ -55,13 +55,13 @@ protected:
         NoIrcSocket* socket = m_pNetwork->ircSocket();
 
         if (socket && NoSocketInfo(socket).timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
-            socket->putIrc("PING :ZNC");
+            socket->putIrc("PING :NoBNC");
         }
 
         const std::vector<NoClient*>& vClients = m_pNetwork->clients();
         for (NoClient* client : vClients) {
             if (NoSocketInfo(client->socket()).timeSinceLastDataTransaction() >= NoNetwork::PingFrequency) {
-                client->putClient("PING :ZNC");
+                client->putClient("PING :NoBNC");
             }
         }
     }
@@ -599,7 +599,7 @@ void NoNetwork::clientConnected(NoClient* client)
     client->setPlaybackActive(true);
 
     if (d->rawBuffer.isEmpty()) {
-        client->putClient(":irc.znc.in 001 " + client->nick() + " :- Welcome to ZNC -");
+        client->putClient(":irc.bnc.no 001 " + client->nick() + " :- Welcome to NoBNC -");
     } else {
         const NoString& sClientNick = client->nick(false);
         NoStringMap msParams;
@@ -642,7 +642,7 @@ void NoNetwork::clientConnected(NoClient* client)
     if (d->away) {
         // If they want to know their away reason they'll have to whois
         // themselves. At least we can tell them their away status...
-        client->putClient(":irc.znc.in 306 " + ircNick().nick() + " :You have been marked as being away");
+        client->putClient(":irc.bnc.no 306 " + ircNick().nick() + " :You have been marked as being away");
     }
 
     for (NoChannel* channel : d->channels) {
@@ -893,7 +893,7 @@ void NoNetwork::joinChannels()
         return;
 
     // We start at a random offset into the channel list so that if your
-    // first 3 channels are invite-only and you got MaxJoins == 3, ZNC will
+    // first 3 channels are invite-only and you got MaxJoins == 3, NoBNC will
     // still be able to join the rest of your channels.
     uint start = rand() % d->channels.size();
     uint uJoins = d->user->maxJoins();
@@ -1328,7 +1328,7 @@ bool NoNetwork::connect()
     bool ssl = server->isSsl();
 #ifndef HAVE_LIBSSL
     if (ssl) {
-        putStatus("Cannot connect to [" + server->GetString(false) + "], ZNC is not compiled with SSL.");
+        putStatus("Cannot connect to [" + server->GetString(false) + "], NoBNC is not compiled with SSL.");
         noApp->AddNetworkToQueue(this);
         return false;
     }

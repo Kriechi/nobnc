@@ -58,10 +58,10 @@ TEST_F(ClientTest, Pass)
     testPass("user@identifier:p@ss#w0rd", "user", "identifier", "", "p@ss#w0rd");
     testPass("user@identifier/net-work:p@ss#w0rd", "user", "identifier", "net-work", "p@ss#w0rd");
 
-    testPass("user@znc.in:p@ss#w0rd", "user@znc.in", "", "", "p@ss#w0rd");
-    testPass("user@znc.in/net-work:p@ss#w0rd", "user@znc.in", "", "net-work", "p@ss#w0rd");
-    testPass("user@znc.in@identifier:p@ss#w0rd", "user@znc.in", "identifier", "", "p@ss#w0rd");
-    testPass("user@znc.in@identifier/net-work:p@ss#w0rd", "user@znc.in", "identifier", "net-work", "p@ss#w0rd");
+    testPass("user@bnc.no:p@ss#w0rd", "user@bnc.no", "", "", "p@ss#w0rd");
+    testPass("user@bnc.no/net-work:p@ss#w0rd", "user@bnc.no", "", "net-work", "p@ss#w0rd");
+    testPass("user@bnc.no@identifier:p@ss#w0rd", "user@bnc.no", "identifier", "", "p@ss#w0rd");
+    testPass("user@bnc.no@identifier/net-work:p@ss#w0rd", "user@bnc.no", "identifier", "net-work", "p@ss#w0rd");
 }
 
 TEST_F(ClientTest, User)
@@ -70,7 +70,7 @@ TEST_F(ClientTest, User)
     testUser("user@identifier", "user", "identifier", "");
     testUser("user@identifier/net-work", "user", "identifier", "net-work");
 
-    testUser("user@znc.in/net-work", "user@znc.in", "", "net-work");
-    testUser("user@znc.in@identifier", "user@znc.in", "identifier", "");
-    testUser("user@znc.in@identifier/net-work", "user@znc.in", "identifier", "net-work");
+    testUser("user@bnc.no/net-work", "user@bnc.no", "", "net-work");
+    testUser("user@bnc.no@identifier", "user@bnc.no", "identifier", "");
+    testUser("user@bnc.no@identifier/net-work", "user@bnc.no", "identifier", "net-work");
 }

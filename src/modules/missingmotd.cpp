@@ -26,7 +26,7 @@ public:
 
     void onClientLogin() override
     {
-        putUser(":irc.znc.in 422 :MOTD File is missing");
+        putUser(":irc.bnc.no 422 :MOTD File is missing");
     }
 };
 
