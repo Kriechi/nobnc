@@ -186,7 +186,6 @@ public:
     std::set<NoTimer*> timers;
     std::set<NoModuleSocket*> sockets;
     NoModuleHandle handle;
-    NoSocketManager* manager;
     NoUser* user;
     NoNetwork* network;
     NoClient* client;
